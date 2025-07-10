@@ -57,6 +57,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CNBC_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_HMCTS_SIGNATURE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
@@ -101,7 +102,6 @@ class NotificationClaimantOfHearingHandlerTest {
             when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("welshHmctsSignature"));
             when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("welshPhoneContact"));
             when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
-            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
             when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
         }
@@ -127,6 +127,8 @@ class NotificationClaimantOfHearingHandlerTest {
             // When
             when(notificationsProperties.getHearingListedFeeClaimantLrTemplate())
                 .thenReturn("test-template-fee-claimant-id");
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             handler.handle(params);
             // Then
             verify(notificationService).sendMail(
@@ -158,7 +160,8 @@ class NotificationClaimantOfHearingHandlerTest {
                                     LocalTime.of(15, 30)))
                                 .hearingType("AAA7-TRI")
                                 .build());
-
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             LocalDate now = LocalDate.of(2022, 9, 29);
             try (MockedStatic<LocalDate> mock = mockStatic(LocalDate.class, CALLS_REAL_METHODS)) {
                 mock.when(LocalDate::now).thenReturn(now);
@@ -191,7 +194,8 @@ class NotificationClaimantOfHearingHandlerTest {
                                               .build())
                 .businessProcess(BusinessProcess.builder().processInstanceId("").build())
                 .build();
-
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             when(hearingFeesService.getFeeForHearingFastTrackClaims(any()))
                 .thenReturn(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(0)).build());
             when(hearingNoticeCamundaService.getProcessVariables(any()))
@@ -246,6 +250,8 @@ class NotificationClaimantOfHearingHandlerTest {
             // When
             when(notificationsProperties.getHearingListedNoFeeClaimantLrTemplate())
                 .thenReturn("test-template-no-fee-claimant-id");
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             handler.handle(params);
             // Then
             verify(notificationService).sendMail(
@@ -272,6 +278,8 @@ class NotificationClaimantOfHearingHandlerTest {
 
             when(hearingFeesService.getFeeForHearingFastTrackClaims(any()))
                 .thenReturn(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(0)).build());
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             when(hearingNoticeCamundaService.getProcessVariables(any()))
                 .thenReturn(HearingNoticeVariables.builder()
                                 .hearingId("HER1234")
@@ -313,7 +321,8 @@ class NotificationClaimantOfHearingHandlerTest {
                                               .build())
                 .businessProcess(BusinessProcess.builder().processInstanceId("").build())
                 .build();
-
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             when(hearingFeesService.getFeeForHearingFastTrackClaims(any()))
                 .thenReturn(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(0)).build());
             when(hearingNoticeCamundaService.getProcessVariables(any()))
@@ -366,6 +375,8 @@ class NotificationClaimantOfHearingHandlerTest {
             // When
             when(notificationsProperties.getHearingListedFeeClaimantLrTemplate())
                 .thenReturn("test-template-fee-claimant-id");
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             handler.handle(params);
             // Then
             verify(notificationService).sendMail(
@@ -399,6 +410,8 @@ class NotificationClaimantOfHearingHandlerTest {
             // When
             when(notificationsProperties.getHearingListedFeeClaimantLrTemplate())
                 .thenReturn("test-template-fee-claimant-id");
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             handler.handle(params);
             // Then
             verify(notificationService).sendMail(
@@ -430,6 +443,8 @@ class NotificationClaimantOfHearingHandlerTest {
             // When
             when(notificationsProperties.getHearingListedFeeClaimantLrTemplate())
                 .thenReturn("test-template-fee-claimant-id");
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             handler.handle(params);
             // Then
             verify(notificationService).sendMail(
@@ -462,6 +477,8 @@ class NotificationClaimantOfHearingHandlerTest {
             // When
             when(notificationsProperties.getHearingListedNoFeeClaimantLrTemplate())
                 .thenReturn("test-template-no-fee-claimant-id");
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             handler.handle(params);
             // Then
             verify(notificationService).sendMail(
@@ -491,6 +508,8 @@ class NotificationClaimantOfHearingHandlerTest {
             // When
             when(notificationsProperties.getHearingListedNoFeeClaimantLrTemplate())
                 .thenReturn("test-template-no-fee-claimant-id");
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             handler.handle(params);
             // Then
             verify(notificationService).sendMail(
@@ -521,6 +540,8 @@ class NotificationClaimantOfHearingHandlerTest {
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder().eventId("NOTIFY_CLAIMANT_HEARING").build()).build();
             // When
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             when(notificationsProperties.getHearingListedNoFeeClaimantLrTemplate())
                 .thenReturn("test-template-no-fee-claimant-id");
             handler.handle(params);
@@ -555,6 +576,8 @@ class NotificationClaimantOfHearingHandlerTest {
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder().eventId("NOTIFY_CLAIMANT_HEARING").build()).build();
             // When
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             when(notificationsProperties.getHearingListedNoFeeClaimantLrTemplate())
                 .thenReturn("test-template-no-fee-claimant-id");
             handler.handle(params);
@@ -587,6 +610,8 @@ class NotificationClaimantOfHearingHandlerTest {
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder().eventId("NOTIFY_CLAIMANT_HEARING").build()).build();
             // When
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             when(notificationsProperties.getHearingListedNoFeeClaimantLrTemplate())
                 .thenReturn("test-template-no-fee-claimant-id");
             handler.handle(params);
@@ -614,6 +639,9 @@ class NotificationClaimantOfHearingHandlerTest {
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder().eventId("NOTIFY_CLAIMANT_HEARING").build()).build();
             // When
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             when(notificationsProperties.getHearingNotificationLipDefendantTemplate())
                 .thenReturn("test-template-claimant-lip-id");
             handler.handle(params);
@@ -641,6 +669,9 @@ class NotificationClaimantOfHearingHandlerTest {
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder().eventId("NOTIFY_CLAIMANT_HEARING_HMC").build()).build();
             // When
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             when(hearingNoticeCamundaService.getProcessVariables(any()))
                 .thenReturn(HearingNoticeVariables.builder()
                                 .hearingId("HER1234")
@@ -677,6 +708,9 @@ class NotificationClaimantOfHearingHandlerTest {
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder().eventId("NOTIFY_CLAIMANT_HEARING").build()).build();
             // When
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             when(notificationsProperties.getHearingNotificationLipDefendantTemplateWelsh())
                 .thenReturn("test-template-claimant-lip-welsh-id");
             handler.handle(params);
@@ -691,7 +725,7 @@ class NotificationClaimantOfHearingHandlerTest {
     }
 
     @NotNull
-    public Map<String, String> addCommonProperties() {
+    public Map<String, String> addCommonProperties(boolean isLipCase) {
         Map<String, String> expectedProperties = new HashMap<>();
         expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
         expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
@@ -699,15 +733,21 @@ class NotificationClaimantOfHearingHandlerTest {
         expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
         expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
         expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
-        expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
         expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
         expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+        if (isLipCase) {
+            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+            expectedProperties.put(CNBC_CONTACT, configuration.getCnbcContact());
+        } else {
+            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getRaiseQueryLr());
+            expectedProperties.put(CNBC_CONTACT, configuration.getRaiseQueryLr());
+        }
         return expectedProperties;
     }
 
     @NotNull
     private Map<String, String> getNotificationFeeDataMap(CaseData caseData, boolean is1v2) {
-        Map<String, String> expectedProperties = new HashMap<>(addCommonProperties());
+        Map<String, String> expectedProperties = new HashMap<>(addCommonProperties(false));
         expectedProperties.putAll(Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             "claimantReferenceNumber", "12345",
@@ -726,7 +766,7 @@ class NotificationClaimantOfHearingHandlerTest {
 
     @NotNull
     private Map<String, String> getNotificationFeeDataMapHMC(CaseData caseData) {
-        Map<String, String> expectedProperties = new HashMap<>(addCommonProperties());
+        Map<String, String> expectedProperties = new HashMap<>(addCommonProperties(false));
         expectedProperties.putAll(Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             "hearingFee", "£300.00",
@@ -742,7 +782,7 @@ class NotificationClaimantOfHearingHandlerTest {
 
     @NotNull
     private Map<String, String> getNotificationNoFeeDataMap(CaseData caseData, boolean is1v2) {
-        Map<String, String> expectedProperties = new HashMap<>(addCommonProperties());
+        Map<String, String> expectedProperties = new HashMap<>(addCommonProperties(false));
         expectedProperties.putAll(Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             "claimantReferenceNumber", "12345",
@@ -759,7 +799,7 @@ class NotificationClaimantOfHearingHandlerTest {
 
     @NotNull
     private Map<String, String> getNotificationNoFeeOtherHearingTypeDataMap(CaseData caseData) {
-        Map<String, String> expectedProperties = new HashMap<>(addCommonProperties());
+        Map<String, String> expectedProperties = new HashMap<>(addCommonProperties(false));
         expectedProperties.putAll(Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             "hearingFee", "£0.00",
@@ -776,7 +816,7 @@ class NotificationClaimantOfHearingHandlerTest {
 
     @NotNull
     private Map<String, String> getNotificationNoFeeDataMapHMC(CaseData caseData) {
-        Map<String, String> expectedProperties = new HashMap<>(addCommonProperties());
+        Map<String, String> expectedProperties = new HashMap<>(addCommonProperties(false));
         expectedProperties.putAll(Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             "hearingFee", "£0.00",
@@ -792,7 +832,7 @@ class NotificationClaimantOfHearingHandlerTest {
 
     @NotNull
     private Map<String, String> getNotificationFeeDatePMDataMap(CaseData caseData) {
-        Map<String, String> expectedProperties = new HashMap<>(addCommonProperties());
+        Map<String, String> expectedProperties = new HashMap<>(addCommonProperties(false));
         expectedProperties.putAll(Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             "claimantReferenceNumber", "",
@@ -809,7 +849,7 @@ class NotificationClaimantOfHearingHandlerTest {
 
     @NotNull
     private Map<String, String> getNotificationNoFeeDatePMDataMap(CaseData caseData) {
-        Map<String, String> expectedProperties = new HashMap<>(addCommonProperties());
+        Map<String, String> expectedProperties = new HashMap<>(addCommonProperties(false));
         expectedProperties.putAll(Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             "claimantReferenceNumber", "",
@@ -824,7 +864,7 @@ class NotificationClaimantOfHearingHandlerTest {
 
     @NotNull
     private Map<String, String> getNotificationNoFeeDateHearingOtherDataMap(CaseData caseData) {
-        Map<String, String> expectedProperties = new HashMap<>(addCommonProperties());
+        Map<String, String> expectedProperties = new HashMap<>(addCommonProperties(false));
         expectedProperties.putAll(Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             "claimantReferenceNumber", "",
@@ -839,7 +879,7 @@ class NotificationClaimantOfHearingHandlerTest {
 
     @NotNull
     private Map<String, String> getNotificationLipDataMap(CaseData caseData) {
-        Map<String, String> expectedProperties = new HashMap<>(addCommonProperties());
+        Map<String, String> expectedProperties = new HashMap<>(addCommonProperties(true));
         expectedProperties.putAll(Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             "hearingDate", "17-05-2023",
@@ -853,7 +893,7 @@ class NotificationClaimantOfHearingHandlerTest {
 
     @NotNull
     private Map<String, String> getNotificationNoFeeDatePMDataMapHMC(CaseData caseData) {
-        Map<String, String> expectedProperties = new HashMap<>(addCommonProperties());
+        Map<String, String> expectedProperties = new HashMap<>(addCommonProperties(false));
         expectedProperties.putAll(Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             "hearingFee", "£0.00",
