@@ -49,6 +49,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CNBC_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
@@ -100,7 +101,6 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
         when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("welshHmctsSignature"));
         when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("welshPhoneContact"));
         when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
-        when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
         when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
         when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
     }
@@ -140,6 +140,8 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
             //When
             given(notificationsProperties.getMediationUnsuccessfulClaimantLRTemplate()).willReturn(EMAIL_TEMPLATE);
             given(organisationDetailsService.getApplicantLegalOrganisationName(any())).willReturn(ORGANISATION_NAME);
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             notificationHandler.handle(params);
             //Then
             verify(notificationService, times(1)).sendMail(targetEmail.capture(),
@@ -170,6 +172,9 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
                 .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_CLAIMANT_LR.name()).build()).build();
             //When
             given(notificationsProperties.getMediationUnsuccessfulClaimantLIPTemplate()).willReturn(EMAIL_LIP_TEMPLATE);
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             notificationHandler.handle(params);
             //Then
             verify(notificationService, times(1)).sendMail(targetEmail.capture(),
@@ -201,6 +206,9 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
                 .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_CLAIMANT_LR.name()).build()).build();
             //When
             given(notificationsProperties.getMediationUnsuccessfulClaimantLIPWelshTemplate()).willReturn(EMAIL_LIP_TEMPLATE);
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             notificationHandler.handle(params);
             //Then
             verify(notificationService, times(1)).sendMail(targetEmail.capture(),
@@ -248,6 +256,8 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
                 //When
                 given(notificationsProperties.getMediationUnsuccessfulLRTemplate()).willReturn(CARM_MAIL_TEMPLATE);
                 given(organisationDetailsService.getApplicantLegalOrganisationName(any())).willReturn(ORGANISATION_NAME);
+                Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+                when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
                 notificationHandler.handle(params);
                 //Then
                 verify(notificationService, times(1)).sendMail(targetEmail.capture(),
@@ -284,6 +294,8 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
                 //When
                 given(notificationsProperties.getMediationUnsuccessfulLRTemplate()).willReturn(CARM_MAIL_TEMPLATE);
                 given(organisationDetailsService.getApplicantLegalOrganisationName(any())).willReturn(ORGANISATION_NAME);
+                Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+                when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
                 notificationHandler.handle(params);
                 //Then
                 verify(notificationService, times(1)).sendMail(targetEmail.capture(),
@@ -320,6 +332,8 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
                 //When
                 given(notificationsProperties.getMediationUnsuccessfulLRTemplate()).willReturn(CARM_MAIL_TEMPLATE);
                 given(organisationDetailsService.getApplicantLegalOrganisationName(any())).willReturn(ORGANISATION_NAME);
+                Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+                when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
                 notificationHandler.handle(params);
                 //Then
                 verify(notificationService, times(1)).sendMail(targetEmail.capture(),
@@ -354,6 +368,9 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
 
                 //When
                 given(notificationsProperties.getMediationUnsuccessfulLIPTemplate()).willReturn(CARM_LIP_MAIL_TEMPLATE);
+                Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+                when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+                when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
                 notificationHandler.handle(params);
                 //Then
                 verify(notificationService, times(1)).sendMail(targetEmail.capture(),
@@ -389,6 +406,9 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
 
                 //When
                 given(notificationsProperties.getMediationUnsuccessfulLIPTemplateWelsh()).willReturn(CARM_LIP_MAIL_TEMPLATE);
+                Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+                when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+                when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
                 notificationHandler.handle(params);
                 //Then
                 verify(notificationService, times(1)).sendMail(targetEmail.capture(),
@@ -421,6 +441,8 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
                 //When
                 given(notificationsProperties.getMediationUnsuccessfulNoAttendanceLRTemplate()).willReturn(CARM_NO_ATTENDANCE_MAIL_TEMPLATE);
                 given(organisationDetailsService.getApplicantLegalOrganisationName(any())).willReturn(ORGANISATION_NAME);
+                Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+                when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
                 notificationHandler.handle(params);
                 //Then
                 verify(notificationService, times(1)).sendMail(targetEmail.capture(),
@@ -452,6 +474,8 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
                 //When
                 given(notificationsProperties.getMediationUnsuccessfulNoAttendanceLRTemplate()).willReturn(CARM_NO_ATTENDANCE_MAIL_TEMPLATE);
                 given(organisationDetailsService.getApplicantLegalOrganisationName(any())).willReturn(ORGANISATION_NAME);
+                Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+                when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
                 notificationHandler.handle(params);
                 //Then
                 verify(notificationService, times(1)).sendMail(targetEmail.capture(),
@@ -484,6 +508,8 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
                 //When
                 given(notificationsProperties.getMediationUnsuccessfulNoAttendanceLRTemplate()).willReturn(CARM_NO_ATTENDANCE_MAIL_TEMPLATE);
                 given(organisationDetailsService.getApplicantLegalOrganisationName(any())).willReturn(ORGANISATION_NAME);
+                Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+                when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
                 notificationHandler.handle(params);
                 //Then
                 verify(notificationService, times(1)).sendMail(targetEmail.capture(),
@@ -515,6 +541,8 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
                 //When
                 given(notificationsProperties.getMediationUnsuccessfulNoAttendanceLRTemplate()).willReturn(CARM_NO_ATTENDANCE_MAIL_TEMPLATE);
                 given(organisationDetailsService.getApplicantLegalOrganisationName(any())).willReturn(ORGANISATION_NAME);
+                Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+                when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
                 notificationHandler.handle(params);
                 //Then
                 verify(notificationService, times(1)).sendMail(targetEmail.capture(),
@@ -529,7 +557,7 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
 
         @NotNull
         private Map<String, String> getPropertyMap(CaseData caseData) {
-            Map<String, String> properties = new HashMap<>(addCommonProperties());
+            Map<String, String> properties = new HashMap<>(addCommonProperties(false));
             properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, ORGANISATION_NAME);
             properties.put(DEFENDANT_NAME, DEFENDANT_PARTY_NAME);
             properties.put(CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString());
@@ -540,7 +568,7 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
 
         @NotNull
         private Map<String, String> getCarmPropertyMap(CaseData caseData) {
-            Map<String, String> properties = new HashMap<>(addCommonProperties());
+            Map<String, String> properties = new HashMap<>(addCommonProperties(false));
             properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, ORGANISATION_NAME);
             properties.put(PARTY_NAME, CLAIMANT_TEXT + DEFENDANT_PARTY_NAME);
             properties.put(CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString());
@@ -551,7 +579,7 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
 
         @NotNull
         private Map<String, String> getCarm1v2PropertyMap(CaseData caseData) {
-            Map<String, String> properties = new HashMap<>(addCommonProperties());
+            Map<String, String> properties = new HashMap<>(addCommonProperties(false));
             properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, ORGANISATION_NAME);
             properties.put(PARTY_NAME, CLAIMANT_TEXT + DEFENDANT_PARTY_NAME + " and " + DEFENDANT_2_PARTY_NAME);
             properties.put(CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString());
@@ -562,7 +590,7 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
 
         @NotNull
         private Map<String, String> getCarmNoAttendancePropertyMap(CaseData caseData) {
-            Map<String, String> properties = new HashMap<>(addCommonProperties());
+            Map<String, String> properties = new HashMap<>(addCommonProperties(false));
             properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, ORGANISATION_NAME);
             properties.put(CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString());
             properties.put(PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData));
@@ -572,7 +600,7 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
 
         @NotNull
         private Map<String, String> getPropertyLipMap() {
-            Map<String, String> properties = new HashMap<>(addCommonProperties());
+            Map<String, String> properties = new HashMap<>(addCommonProperties(true));
             properties.put(CLAIMANT_NAME, APPLICANT_PARTY_NAME);
             properties.put(RESPONDENT_NAME, DEFENDANT_PARTY_NAME);
             properties.put(CLAIM_REFERENCE_NUMBER, REFERENCE_NUMBER);
@@ -581,14 +609,14 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
 
         @NotNull
         private Map<String, String> getCarmLipClaimantPropertyMap() {
-            Map<String, String> properties = new HashMap<>(addCommonProperties());
+            Map<String, String> properties = new HashMap<>(addCommonProperties(true));
             properties.put(PARTY_NAME, APPLICANT_PARTY_NAME);
             properties.put(CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString());
             return properties;
         }
 
         @NotNull
-        public Map<String, String> addCommonProperties() {
+        public Map<String, String> addCommonProperties(boolean isLipCase) {
             Map<String, String> expectedProperties = new HashMap<>();
             expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
             expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
@@ -596,9 +624,15 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
             expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
             expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
             expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
-            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
             expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
             expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+            if (isLipCase) {
+                expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+                expectedProperties.put(CNBC_CONTACT, configuration.getCnbcContact());
+            } else {
+                expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getRaiseQueryLr());
+                expectedProperties.put(CNBC_CONTACT, configuration.getRaiseQueryLr());
+            }
             return expectedProperties;
         }
 
