@@ -251,7 +251,7 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
             verify(notificationService).sendMail(
                 APPLICANT_MAIL,
                 TEMPLATE_ID,
-                lrClaimantProperties(caseData),
+                lrClaimantProperties(caseData, false),
                 MEDIATION_SUCCESSFUL_APPLICANT_NOTIFICATION
             );
         }
@@ -330,7 +330,7 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
             verify(notificationService).sendMail(
                 APPLICANT_MAIL,
                 TEMPLATE_ID,
-                lrClaimantProperties(caseData),
+                lrClaimantProperties(caseData, false),
                 MEDIATION_SUCCESSFUL_APPLICANT_NOTIFICATION
             );
         }
@@ -357,7 +357,7 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
             verify(notificationService).sendMail(
                 APPLICANT_MAIL,
                 TEMPLATE_ID,
-                lrClaimantProperties(caseData),
+                lrClaimantProperties(caseData, true),
                 MEDIATION_SUCCESSFUL_APPLICANT_NOTIFICATION
             );
         }
@@ -444,8 +444,8 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
         }
     }
 
-    public Map<String, String> lrClaimantProperties(CaseData caseData) {
-        Map<String, String> expectedProperties = new HashMap<>(addCommonProperties(false));
+    public Map<String, String> lrClaimantProperties(CaseData caseData, boolean isLipCase) {
+        Map<String, String> expectedProperties = new HashMap<>(addCommonProperties(isLipCase));
         expectedProperties.put(CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getApplicantLegalOrganisationName(caseData));
         expectedProperties.put(CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString());
         expectedProperties.put(DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
