@@ -37,7 +37,7 @@ public class StartHearingNoticeBusinessProcessTaskHandler extends BaseExternalTa
     public ExternalTaskData handleTask(ExternalTask externalTask) {
         CaseData caseData = startHearingNoticeBusinessProcess(externalTask);
         variables = Variables.createVariables();
-        var stateFlow = stateFlowEngine.evaluate(caseData);
+        var stateFlow = stateFlowEngine.getStateFlow(caseData);
         variables.putValue(FLOW_STATE, stateFlow.getState().getName());
         variables.putValue(FLOW_FLAGS, stateFlow.getFlags());
         return ExternalTaskData.builder().variables(variables).build();
