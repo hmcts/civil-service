@@ -4,11 +4,12 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.callback.CaseProgressionDashboardCallbackHandler;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import java.util.List;
 
@@ -22,11 +23,14 @@ public class HearingFeeUnpaidDefendantNotificationHandler extends CaseProgressio
 
     private static final List<CaseEvent> EVENTS = List.of(CREATE_DASHBOARD_NOTIFICATION_FOR_HEARING_FEE_UNPAID_FOR_DEFENDANT1);
     public static final String TASK_ID = "CreateHearingFeeUnpaidDashboardNotificationsForDefendant1";
+    private final DashboardNotificationService dashboardNotificationService;
 
-    public HearingFeeUnpaidDefendantNotificationHandler(DashboardApiClient dashboardApiClient,
+    public HearingFeeUnpaidDefendantNotificationHandler(DashboardScenariosService dashboardScenariosService,
                                                         DashboardNotificationsParamsMapper mapper,
-                                                        FeatureToggleService featureToggleService) {
-        super(dashboardApiClient, mapper, featureToggleService);
+                                                        FeatureToggleService featureToggleService,
+                                                        DashboardNotificationService dashboardNotificationService) {
+        super(dashboardScenariosService, mapper, featureToggleService);
+        this.dashboardNotificationService = dashboardNotificationService;
     }
 
     @Override
@@ -53,10 +57,9 @@ public class HearingFeeUnpaidDefendantNotificationHandler extends CaseProgressio
 
     @Override
     protected void beforeRecordScenario(CaseData caseData, String authToken) {
-        dashboardApiClient.deleteNotificationsForCaseIdentifierAndRole(
-            caseData.getCcdCaseReference().toString(),
-            "DEFENDANT",
-            authToken
+        dashboardNotificationService.deleteByReferenceAndCitizenRole(
+            String.valueOf(caseData.getCcdCaseReference()),
+            "DEFENDANT"
         );
     }
 }

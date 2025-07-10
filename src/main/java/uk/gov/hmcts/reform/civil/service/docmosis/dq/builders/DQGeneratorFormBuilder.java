@@ -34,6 +34,7 @@ import java.util.Optional;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.INTERMEDIATE_CLAIM;
@@ -51,6 +52,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITIN
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMISSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 
@@ -114,6 +116,9 @@ public class DQGeneratorFormBuilder {
                                                  ? dq.getDisclosureOfElectronicDocuments() : dq.getSpecDisclosureOfElectronicDocuments())
             .disclosureOfNonElectronicDocuments(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                                                     ? dq.getDisclosureOfNonElectronicDocuments() : dq.getSpecDisclosureOfNonElectronicDocuments())
+            .deterWithoutHearingYesNo(getDeterWithoutHearing(caseData, dq))
+            .deterWithoutHearingWhyNot(getDeterWithoutHearing(caseData, dq) != null && dq.getDeterWithoutHearing().getDeterWithoutHearingYesNo().equals(NO)
+                                           ? dq.getDeterWithoutHearing().getDeterWithoutHearingWhyNot() : null)
             .experts(!specAndSmallClaim ? respondentTemplateForDQGenerator.getExperts(dq) : respondentTemplateForDQGenerator.getSmallClaimExperts(dq, caseData, null))
             .witnesses(witnesses)
             .witnessesIncludingDefendants(witnessesIncludingDefendants)
@@ -193,8 +198,8 @@ public class DQGeneratorFormBuilder {
             ? caseData.getAllocatedTrack().name() : caseData.getResponseClaimTrack();
     }
 
-    private String createStatementOfTruthText(Boolean respondentState) {
-        String role = Boolean.TRUE.equals(respondentState) ? DEFENDANT : "claimant";
+    private String createStatementOfTruthText(boolean respondentState) {
+        String role = respondentState ? DEFENDANT : "claimant";
         String statementOfTruth = role.equals(DEFENDANT)
             ? "The defendant believes that the facts stated in the response are true."
             : "The claimant believes that the facts in this claim are true.";
@@ -207,15 +212,20 @@ public class DQGeneratorFormBuilder {
         return statementOfTruth;
     }
 
-    public Boolean isRespondentState(CaseData caseData) {
+    public boolean isRespondentState(CaseData caseData) {
         if (isClaimantResponse(caseData)) {
             return false;
         }
         String state = stateFlowEngine.evaluate(caseData).getState().getName();
 
+        if (isLipClaimantBilingualRequiresTranslation(caseData)) {
+            return true;
+        }
+
         return SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
             && caseData.getCcdState() == CaseState.AWAITING_APPLICANT_INTENTION
             || state.equals(FULL_DEFENCE.fullName())
+            || state.equals(PART_ADMISSION.fullName())
             || state.equals(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName())
             || state.equals(ALL_RESPONSES_RECEIVED.fullName())
             || state.equals(DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE.fullName())
@@ -347,5 +357,23 @@ public class DQGeneratorFormBuilder {
     private boolean onlyApplicant2IsProceeding(CaseData caseData) {
         return !YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
             && YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1());
+    }
+
+    private static YesOrNo getDeterWithoutHearing(CaseData caseData, DQ dq) {
+        if (isSmallClaim(caseData) && nonNull(dq.getDeterWithoutHearing())) {
+            return dq.getDeterWithoutHearing().getDeterWithoutHearingYesNo();
+        }
+        return null;
+    }
+
+    private static boolean isSmallClaim(CaseData caseData) {
+        return AllocatedTrack.SMALL_CLAIM.equals(caseData.getAllocatedTrack())
+            || SMALL_CLAIM.equals(caseData.getResponseClaimTrack());
+    }
+
+    private boolean isLipClaimantBilingualRequiresTranslation(CaseData caseData) {
+        return featureToggleService.isGaForWelshEnabled()
+            && caseData.getCcdState() == CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT && caseData.isLipvLROneVOne()
+            && caseData.isClaimantBilingual();
     }
 }

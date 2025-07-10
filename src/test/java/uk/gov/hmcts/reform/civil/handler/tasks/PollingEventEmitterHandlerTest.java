@@ -1,13 +1,17 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -26,29 +30,29 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.READY;
 
-@SpringBootTest(classes = {
-    JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class,
-    PollingEventEmitterHandler.class})
+@ExtendWith(MockitoExtension.class)
 class PollingEventEmitterHandlerTest {
 
-    @MockBean
+    @InjectMocks
+    private PollingEventEmitterHandler pollingEventEmitterHandler;
+
+    @Spy
+    private ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+
+    @Spy
+    private CaseDetailsConverter caseDetailsConverter = new CaseDetailsConverter(objectMapper);
+
+    @Mock
     private ExternalTask externalTask;
 
-    @MockBean
+    @Mock
     private ExternalTaskService externalTaskService;
 
-    @MockBean
+    @Mock
     private CaseReadyBusinessProcessSearchService searchService;
 
-    @MockBean
+    @Mock
     private EventEmitterService eventEmitterService;
-
-    @Autowired
-    private CaseDetailsConverter caseDetailsConverter;
-
-    @Autowired
-    private PollingEventEmitterHandler pollingEventEmitterHandler;
 
     private CaseDetails caseDetails1;
     private CaseDetails caseDetails2;
@@ -63,6 +67,7 @@ class PollingEventEmitterHandlerTest {
         caseDetails3 = CaseDetails.builder().id(3L).data(
             Map.of("businessProcess", businessProcessWithCamundaEvent("TEST_EVENT3"))).build();
         when(searchService.getCases()).thenReturn(Set.of(caseDetails1, caseDetails2, caseDetails3));
+        ReflectionTestUtils.setField(pollingEventEmitterHandler, "multiCasesExecutionDelayInSeconds", 1L);
     }
 
     @Test

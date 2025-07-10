@@ -17,6 +17,8 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CertOfSC;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
+import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import static org.mockito.Mockito.times;
@@ -38,6 +40,8 @@ class CheckAndMarkDefendantPaidInFullCallbackHandlerTest extends BaseCallbackHan
     private JudgmentPaidInFullOnlineMapper paidInFullJudgmentOnlineMapper;
     @Mock
     private RuntimeService runtimeService;
+    @Mock
+    private InterestCalculator interestCalculator;
 
     private static final String PROCESS_INSTANCE_ID = "process-instance-id";
     private static final String SEND_DETAILS_CJES = "sendDetailsToCJES";
@@ -51,7 +55,8 @@ class CheckAndMarkDefendantPaidInFullCallbackHandlerTest extends BaseCallbackHan
         handler = new CheckAndMarkDefendantPaidInFullCallbackHandler(
             paidInFullJudgmentOnlineMapper,
             runtimeService,
-            objectMapper
+            objectMapper,
+            interestCalculator
         );
     }
 

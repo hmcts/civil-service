@@ -162,6 +162,9 @@ public class NotificationsProperties {
     private String respondentSolicitorNotifyToProceedSpecWithAction;
 
     @NotEmpty
+    private String respondentSolicitorNotifyToProceedInMediation;
+
+    @NotEmpty
     private String applicantSolicitor1DefaultJudgmentReceived;
 
     @NotEmpty
@@ -381,6 +384,9 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String notifyDefendantLIPClaimantSettleTheClaimTemplate;
+
+    @NotEmpty
+    private String notifyDefendantLRClaimantSettleTheClaimTemplate;
 
     @NotEmpty
     private String  evidenceUploadLipTemplate;
@@ -660,4 +666,38 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String sdoOrderedSpecEa;
+
+    @NotEmpty
+    private String queryRaised;
+
+    @NotEmpty
+    private String queryRaisedLip;
+
+    @NotEmpty
+    private String queryRaisedLipBilingual;
+
+    @NotEmpty
+    private String queryResponseReceived;
+
+    @NotEmpty
+    private String notifyOtherPartyQueryRaised;
+
+    @NotEmpty
+    private String notifyOtherPartyQueryResponseReceived;
+
+    @NotEmpty
+    private String queryLipResponseReceivedEnglish;
+
+    @NotEmpty
+    private String queryLipResponseReceivedWelsh;
+
+    @NotEmpty
+    private String partAdmitPayImmediatelyAgreedClaimant;
+
+    @NotEmpty
+    private String partAdmitPayImmediatelyAgreedDefendant;
+
+    @NotEmpty
+    private String claimantSolicitorImmediatelyDefendantResponseForSpecJBA;
+
 }

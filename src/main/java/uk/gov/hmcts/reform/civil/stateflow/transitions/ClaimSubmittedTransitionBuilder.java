@@ -42,7 +42,7 @@ public class ClaimSubmittedTransitionBuilder extends MidTransitionBuilder {
             .moveTo(TAKEN_OFFLINE_BY_STAFF, transitions).onlyWhen(takenOfflineByStaffBeforeClaimIssued, transitions)
             .moveTo(CLAIM_ISSUED_PAYMENT_FAILED, transitions).onlyWhen(paymentFailed, transitions)
             .moveTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC, transitions).onlyWhen(
-                isLipCase,
+                isLipCase.and(takenOfflineByStaffBeforeClaimIssued.negate()),
                 transitions
             )
             .set(
@@ -89,11 +89,17 @@ public class ClaimSubmittedTransitionBuilder extends MidTransitionBuilder {
                 isDefendantNoCOnlineForCase.and(isLiPvLRCase), transitions
             )
             .set(
-                flags -> flags.putAll(
-                    Map.of(
-                        FlowFlag.LIP_CASE.name(), true,
-                        FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false
-                    )), transitions
+                (c, flags) -> {
+                    flags.putAll(
+                        Map.of(
+                            FlowFlag.LIP_CASE.name(), true,
+                            FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false
+                        )
+                    );
+                    if (claimIssueBilingual.test(c)) {
+                        flags.put(FlowFlag.CLAIM_ISSUE_BILINGUAL.name(), true);
+                    }
+                }, transitions
             )
             .moveTo(SPEC_DEFENDANT_NOC, transitions).onlyWhen(not(isDefendantNoCOnlineForCase).and(
                 nocSubmittedForLiPDefendantBeforeOffline), transitions)

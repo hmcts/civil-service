@@ -55,6 +55,8 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INVALID_HWF_REFERENCE
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NO_REMISSION_HWF;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PARTIAL_REMISSION_HWF_GRANTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DECISION_MADE_ON_APPLICATIONS;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SDO_ORDER;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
 
 @ExtendWith(MockitoExtension.class)
@@ -323,6 +325,24 @@ class CcdClaimStatusDashboardFactoryTest {
     }
 
     @Test
+    void given_hearingNoticeDocumentIssuedAndRelisted_AutoHearingNotice_whenGetStatus_thenReturnHearingFormGeneratedRelisting() {
+        CaseData claim = CaseData.builder()
+            .respondent1ResponseDate(LocalDateTime.now())
+            .hearingDate(LocalDate.now().plusDays(6 * 7 + 1))
+            .ccdState(CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING)
+            .hearingDocuments(List.of(Element.<CaseDocument>builder().value(CaseDocument.builder()
+                                                                                .documentName("testDoc")
+                                                                                .build()).build()))
+            .build();
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
+            claim, featureToggleService, Collections.singletonList(CaseEventDetail.builder()
+                                                                       .id(CaseEvent.GENERATE_HEARING_NOTICE_HMC.name())
+                                                                       .createdDate(LocalDateTime.now())
+                                                                       .build())));
+        assertThat(status).isEqualTo(DashboardClaimStatus.HEARING_FORM_GENERATED_RELISTING);
+    }
+
+    @Test
     void given_mediation_whenGetSatus_mediationSuccessful() {
         CaseData claim = CaseData.builder()
             .respondent1ResponseDate(LocalDateTime.now())
@@ -441,7 +461,7 @@ class CcdClaimStatusDashboardFactoryTest {
             UUID.fromString("5fc03087-d265-11e7-b8c6-83e29cd24f4c"),
             CaseDocument.builder()
                 .createdDatetime(LocalDateTime.now())
-                .documentType(DocumentType.SDO_ORDER)
+                .documentType(SDO_ORDER)
                 .build()
         );
         DynamicListElement selectedCourt = DynamicListElement.builder()
@@ -715,7 +735,7 @@ class CcdClaimStatusDashboardFactoryTest {
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
             caseData, featureToggleService, Collections.emptyList()));
 
-        assertThat(status).isEqualTo(DashboardClaimStatus.WAITING_FOR_CLAIMANT_INTENT_DOC_UPLOAD);
+        assertThat(status).isEqualTo(DashboardClaimStatus.WAITING_FOR_CLAIMANT_INTENT_DOC_UPLOAD_PRE_DEF_NOC_ONLINE);
     }
 
     @Test
@@ -826,5 +846,49 @@ class CcdClaimStatusDashboardFactoryTest {
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
             claim, featureToggleService, Collections.emptyList()));
         assertThat(status).isEqualTo(DashboardClaimStatus.CASE_DISMISSED);
+    }
+
+    @Test
+    void given_sdoIsDrawn_anyPartyBilingual_showStatusDocumentsTranslated() {
+        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+        CaseData claim = CaseData.builder().preTranslationDocuments(List.of(Element.<CaseDocument>builder()
+                                                                                .value(CaseDocument.builder()
+                                                                                           .documentType(SDO_ORDER)
+                                                                                           .build()).build()))
+            .ccdState(CaseState.CASE_PROGRESSION)
+            .build();
+
+        DashboardClaimStatus status =
+            ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
+                claim, featureToggleService, Collections.emptyList()));
+        assertThat(status).isEqualTo(DashboardClaimStatus.SDO_DOCUMENTS_BEING_TRANSLATED);
+    }
+
+    @Test
+    void given_decisionMadeIsDrawn_anyPartyBilingual_showStatusDocumentsTranslated() {
+        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+        CaseData claim = CaseData.builder().preTranslationDocuments(List.of(Element.<CaseDocument>builder()
+                                                                                .value(CaseDocument.builder()
+                                                                                           .documentType(
+                                                                                               DECISION_MADE_ON_APPLICATIONS)
+                                                                                           .build()).build()))
+            .ccdState(CaseState.CASE_PROGRESSION)
+            .build();
+
+        DashboardClaimStatus status =
+            ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
+                claim, featureToggleService, Collections.emptyList()));
+        assertThat(status).isEqualTo(DashboardClaimStatus.DECISION_MADE_DOCUMENTS_BEING_TRANSLATED);
+    }
+  
+    @Test
+    void given_caseDiscontinued_whenGetStatus_thenReturnCaseDiscontinued() {
+        CaseData claim = CaseData.builder()
+            .ccdState(CaseState.CASE_DISCONTINUED)
+            .build();
+
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
+            claim, featureToggleService, Collections.emptyList()));
+        assertThat(status).isEqualTo(DashboardClaimStatus.CASE_DISCONTINUED);
     }
 }

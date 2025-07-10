@@ -26,6 +26,7 @@ public class SealedClaimFormForSpec implements MappableObject {
     @JsonProperty("courtseal")
     private final String courtSeal = "[userImage:courtseal.PNG]"; //NOSONAR
     private final String referenceNumber;
+    private final String ccdCaseReference;
     private final String caseName;
     private final String applicantExternalReference;
     private final String respondentExternalReference;
@@ -65,4 +66,5 @@ public class SealedClaimFormForSpec implements MappableObject {
     private final String defendantResponseDeadlineDate;
     private final YesOrNo claimFixedCosts;
     private final String fixedCostAmount;
+    private final YesOrNo respondentsOrgRegistered;
 }

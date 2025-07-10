@@ -26,6 +26,7 @@ import java.util.List;
 public class SealedClaimResponseFormForSpec implements MappableObject {
 
     private final String referenceNumber;
+    private final String ccdCaseReference;
     private final String caseName;
     private final SolicitorReferences solicitorReferences;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")

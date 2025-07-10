@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.CaseTask;
@@ -16,6 +17,7 @@ import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.dq.Experts;
@@ -30,6 +32,7 @@ import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.utils.DQResponseDocumentUtils;
 import uk.gov.hmcts.reform.civil.utils.FrcDocumentsUtils;
 import uk.gov.hmcts.reform.civil.utils.JudicialReferralUtils;
+import uk.gov.hmcts.reform.civil.utils.RequestedCourtForClaimDetailsTab;
 import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
 
 import java.time.LocalDate;
@@ -70,7 +73,9 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
     private final DQResponseDocumentUtils dqResponseDocumentUtils;
     private final DetermineNextState determineNextState;
     private final Optional<UpdateWaCourtLocationsService> updateWaCourtLocationsService;
+    private final RequestedCourtForClaimDetailsTab requestedCourtForClaimDetailsTab;
     @Value("${court-location.specified-claim.epimms-id}") String cnbcEpimsId;
+    @Value("${court-location.specified-claim.region-id}") String cnbcRegionId;
 
     public CallbackResponse execute(CallbackParams callbackParams) {
 
@@ -113,6 +118,10 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
             ));
         }
 
+        requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabApplicantSpec(callbackParams, builder);
+        builder.nextDeadline(null);
+        builder.previousCCDState(caseData.getCcdState());
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(builder.build().toMap(objectMapper))
             .state(nextState)
@@ -126,8 +135,7 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
             && caseData.hasClaimantAgreedToFreeMediation())
             || (featureToggleService.isCarmEnabledForCase(caseData)
             && SMALL_CLAIM.name().equals(caseData.getResponseClaimTrack())
-            && (YES.equals(caseData.getApplicant1ProceedWithClaim())
-            || YES.equals(caseData.getApplicant1ProceedWithClaimSpec2v1())))) {
+            && caseData.hasApplicantProceededWithClaim())) {
             builder.claimMovedToMediationOn(LocalDate.now());
             log.info("Moved Claim to mediation for Case : {}", caseData.getCcdCaseReference());
         }
@@ -203,7 +211,16 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
     }
 
     private void updateCaselocationDetails(CallbackParams callbackParams, CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder) {
-        if (notTransferredOnline(caseData)) {
+        if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)
+            && isMultiOrIntTrackSpec(caseData)
+            && caseData.isLipCase()) {
+            // If case is Multi or Intermediate, and has a LIP involved, and even if transferred online
+            // CML should be set/maintained at CNBC for transfer offline tasks (takeCaseOfflineMinti)
+            builder.caseManagementLocation(CaseLocationCivil.builder().baseLocation(cnbcEpimsId).region(cnbcRegionId).build());
+            // Otherwise If not Multi or Intermediate, and has a LIP involved,
+            // if case has been transferred online (i.e. current CML is NOT CNBC) we maintain that CML
+        } else if (notTransferredOnline(caseData)) {
+            // If neither, we update CML using logic in location helper (either preferred court, or under 1000 logic)
             updateCaseManagementLocation(callbackParams, builder);
         }
 
@@ -247,7 +264,7 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
     }
 
     private boolean isFlightDelayAndSmallClaim(CaseData caseData) {
-        return (featureToggleService.isSdoR2Enabled() && caseData.getIsFlightDelayClaim() != null
+        return (caseData.getIsFlightDelayClaim() != null
             && caseData.getIsFlightDelayClaim().equals(YES)
             &&  SMALL_CLAIM.name().equals(caseData.getResponseClaimTrack()));
     }
@@ -326,4 +343,10 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
             builder.respondForImmediateOption(YesOrNo.YES);
         }
     }
+
+    private boolean isMultiOrIntTrackSpec(CaseData caseData) {
+        return AllocatedTrack.INTERMEDIATE_CLAIM.name().equals(caseData.getResponseClaimTrack())
+            || AllocatedTrack.MULTI_CLAIM.name().equals(caseData.getResponseClaimTrack());
+    }
+
 }

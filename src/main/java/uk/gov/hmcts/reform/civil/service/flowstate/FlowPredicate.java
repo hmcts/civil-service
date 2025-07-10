@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CaseDataParent;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -480,6 +481,10 @@ public class FlowPredicate {
     public static final Predicate<CaseData> isRespondentResponseLangIsBilingual =
         CaseDataParent::isRespondentResponseBilingual;
 
+    public static final Predicate<CaseData> onlyInitialRespondentResponseLangIsBilingual = caseData ->
+        // dependent lip selected bilingual during response
+        caseData.getChangeLanguagePreference() == null && caseData.isRespondentResponseBilingual();
+
     // This field is used in LR ITP, prevent going another path in preview
     public static final Predicate<CaseData> isOneVOneResponseFlagSpec = caseData ->
         caseData.getShowResponseOneVOneFlag() != null;
@@ -496,4 +501,11 @@ public class FlowPredicate {
         caseData.isRespondent1LiP()
             || caseData.isRespondent2LiP()
             || caseData.isApplicantNotRepresented();
+
+    public static final Predicate<CaseData> isDefendantNoCOnlineForCaseAfterJBA = caseData ->
+        caseData.isLipCase()
+            && caseData.getActiveJudgment() != null
+            && JudgmentType.JUDGMENT_BY_ADMISSION.equals(caseData.getActiveJudgment().getType())
+            && caseData.getTakenOfflineDate() != null
+            && caseData.getChangeOfRepresentation() != null;
 }

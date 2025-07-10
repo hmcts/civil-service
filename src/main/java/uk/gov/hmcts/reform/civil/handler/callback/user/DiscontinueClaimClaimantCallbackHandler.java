@@ -56,8 +56,9 @@ public class DiscontinueClaimClaimantCallbackHandler extends CallbackHandler {
             + "Any listed hearings will still proceed as normal.\n\n"
             + "All other parties will be notified.";
     public static final String NO_COURT_PERMISSION_FULL_DISCONTINUE_ANYONE_BODY = "### Next step \n "
-            + "This will now be reviewed and the claim will proceed offline and your online account will not "
-            + "be updated for this claim.Any updates will be sent by post.";
+        + "This will now be reviewed and the claim will proceed offline and your online account will not "
+        + "be updated for this claim.\n\n"
+        + "Any updates will be sent by post.";
     private final ObjectMapper objectMapper;
     private final CaseDetailsConverter caseDetailsConverter;
 
@@ -206,6 +207,7 @@ public class DiscontinueClaimClaimantCallbackHandler extends CallbackHandler {
             caseDataBuilder.selectedClaimantForDiscontinuance(caseData.getClaimantWhoIsDiscontinuing()
                                                                   .getValue().getLabel());
         }
+        caseDataBuilder.previousCCDState(caseData.getCcdState());
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .state(updateCaseState(caseData))
                 .data(caseDataBuilder.build().toMap(objectMapper))

@@ -11,16 +11,20 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +37,7 @@ public class TranslatedDocumentUploadedClaimantNotificationHandler extends Callb
     public static final String TASK_ID = "NotifyTranslatedDocumentUploadedToClaimant";
     private final FeatureToggleService featureToggleService;
     final  OrganisationService organisationService;
+    private final NotificationsSignatureConfiguration configuration;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -54,16 +59,26 @@ public class TranslatedDocumentUploadedClaimantNotificationHandler extends Callb
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
 
-        if (caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()) {
-            return Map.of(
+        if (caseData.isApplicantNotRepresented() && featureToggleService.isLipVLipEnabled()) {
+            HashMap<String, String> properties = new HashMap<>(Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                 CLAIMANT_NAME, caseData.getApplicant1().getPartyName()
-            );
+            ));
+            addAllFooterItems(caseData, properties, configuration,
+                              featureToggleService.isQueryManagementLRsEnabled(),
+                              featureToggleService.isLipQueryManagementEnabled(caseData));
+            return properties;
         }
-        return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData)
-        );
+        HashMap<String, String> properties = new HashMap<>(Map.of(
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+            CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
+        ));
+        addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isQueryManagementLRsEnabled(),
+                          featureToggleService.isLipQueryManagementEnabled(caseData));
+        return properties;
     }
 
     private CallbackResponse notifyClaimant(CallbackParams callbackParams) {
@@ -81,7 +96,7 @@ public class TranslatedDocumentUploadedClaimantNotificationHandler extends Callb
     }
 
     private String addTemplate(CaseData caseData) {
-        if (caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()) {
+        if (caseData.isApplicantNotRepresented() && featureToggleService.isLipVLipEnabled()) {
             if (caseData.isClaimantBilingual()) {
                 return notificationsProperties.getNotifyClaimantLiPTranslatedDocumentUploadedWhenClaimIssuedInBilingual();
             }
@@ -91,7 +106,7 @@ public class TranslatedDocumentUploadedClaimantNotificationHandler extends Callb
     }
 
     private String getEmail(CaseData caseData) {
-        return (caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled())
+        return (caseData.isApplicantNotRepresented() && featureToggleService.isLipVLipEnabled())
             ? caseData.getApplicant1Email()
             : caseData.getApplicantSolicitor1UserDetails().getEmail();
     }

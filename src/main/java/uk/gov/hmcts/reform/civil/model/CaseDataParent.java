@@ -487,6 +487,8 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     private YesOrNo showOldDJFixedCostsScreen;
     private YesOrNo claimFixedCostsOnEntryDJ;
 
+    private YesOrNo mediationFileSentToMmt;
+
     @JsonIgnore
     public boolean isResponseAcceptedByClaimant() {
         return applicant1AcceptAdmitAmountPaidSpec == YesOrNo.YES
@@ -521,8 +523,17 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
         return Optional.ofNullable(getCaseDataLiP())
             .map(CaseDataLiP::getRespondent1LiPResponse)
             .map(RespondentLiPResponse::getRespondent1ResponseLanguage)
-            .filter(Language.BOTH.toString()::equals)
+            .filter(language -> language.equals(Language.BOTH.toString())
+                || language.equals(Language.WELSH.toString()))
             .isPresent();
+    }
+
+    @JsonIgnore
+    public String getDefendantBilingualLanguagePreference() {
+        return Optional.ofNullable(getCaseDataLiP())
+            .map(CaseDataLiP::getRespondent1LiPResponse)
+            .map(RespondentLiPResponse::getRespondent1ResponseLanguage)
+            .orElse(null);
     }
 
     @JsonIgnore

@@ -35,6 +35,8 @@ import uk.gov.hmcts.reform.civil.enums.finalorders.OrderMadeOnTypes;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.HearingNotes;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -67,6 +69,7 @@ import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.JudgeOrderDown
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -212,6 +215,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldReturnNoError_WhenAboutToStartIsInvoked() {
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateSdoDisposal()
                 .build().toBuilder()
@@ -226,7 +230,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .applicant1Represented(NO).build();
-            when(featureToggleService.isMintiEnabled()).thenReturn(true);
             CallbackParams params = callbackParamsOf(caseData.toMap(mapper), caseData, ABOUT_TO_START, JUDICIAL_REFERRAL);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).hasSize(1);
@@ -238,7 +241,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .applicant1Represented(NO).build();
-            when(featureToggleService.isMintiEnabled()).thenReturn(true);
             CallbackParams params = callbackParamsOf(caseData.toMap(mapper), caseData, ABOUT_TO_START, JUDICIAL_REFERRAL);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).hasSize(1);
@@ -260,7 +262,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                                                        .value(DynamicListElement.builder()
                                                                   .label(BLANK_TEMPLATE_AFTER_HEARING.getLabel())
                                                                   .build()).build()).build();
-            when(featureToggleService.isMintiEnabled()).thenReturn(true);
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).isNull();
@@ -280,8 +282,8 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                                                        .value(DynamicListElement.builder()
                                                                   .label(BLANK_TEMPLATE_AFTER_HEARING.getLabel())
                                                                   .build()).build()).build();
-            when(featureToggleService.isMintiEnabled()).thenReturn(true);
             CallbackParams params = callbackParamsOf(caseData.toMap(mapper), caseData, ABOUT_TO_START, JUDICIAL_REFERRAL);
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).isNull();
             assertThat(response.getData().get("allowOrderTrackAllocation")).isEqualTo("Yes");
@@ -290,7 +292,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldNotReturnError_WhenAboutToStartIsInvokedMintiNotJudicialReferralNotMintiTrack() {
-            when(featureToggleService.isMintiEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .finalOrderTrackAllocation(AllocatedTrack.SMALL_CLAIM)
                 .applicant1Represented(NO)
@@ -303,6 +304,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                                                        .value(DynamicListElement.builder()
                                                                   .label(BLANK_TEMPLATE_AFTER_HEARING.getLabel())
                                                                   .build()).build()).build();
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).isNull();
@@ -311,7 +313,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldNotReturnError_WhenMintiNotEnabledMintiNotJudicialReferralNotMintiTrack() {
-            when(featureToggleService.isMintiEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .finalOrderTrackAllocation(AllocatedTrack.SMALL_CLAIM)
                 .finalOrderAllocateToTrack(YES)
@@ -323,6 +324,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                                                        .value(DynamicListElement.builder()
                                                                   .label(BLANK_TEMPLATE_AFTER_HEARING.getLabel())
                                                                   .build()).build()).build();
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).isNull();
@@ -331,7 +333,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldNotReturnError_WhenMintiEnabledNoJudicialReferralApplicantLip() {
-            when(featureToggleService.isMintiEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .finalOrderTrackAllocation(AllocatedTrack.SMALL_CLAIM)
                 .applicant1Represented(NO)
@@ -344,6 +345,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                                                        .value(DynamicListElement.builder()
                                                                   .label(BLANK_TEMPLATE_AFTER_HEARING.getLabel())
                                                                   .build()).build()).build();
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).isNull();
@@ -363,7 +365,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                                                        .value(DynamicListElement.builder()
                                                                   .label(BLANK_TEMPLATE_AFTER_HEARING.getLabel())
                                                                   .build()).build()).build();
-            when(featureToggleService.isMintiEnabled()).thenReturn(true);
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).isNull();
@@ -383,7 +385,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                                                        .value(DynamicListElement.builder()
                                                                   .label(BLANK_TEMPLATE_AFTER_HEARING.getLabel())
                                                                   .build()).build()).build();
-            when(featureToggleService.isMintiEnabled()).thenReturn(true);
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).isNull();
@@ -404,6 +406,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                                      .value(DynamicListElement.builder()
                                                 .label(BLANK_TEMPLATE_AFTER_HEARING.getLabel())
                                                 .build()).build()).build();
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData().get("finalOrderSelection")).isNull();
@@ -422,6 +425,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .orderOnCourtsList(OrderOnCourtsList.ORDER_ON_COURT_INITIATIVE)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData().get("finalOrderSelection")).isNull();
             assertThat(response.getData().get("freeFormRecordedTextArea")).isNull();
@@ -446,6 +450,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .finalOrderGiveReasonsComplex(AssistedOrderReasons.builder().reasonsText("text").build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData().get("finalOrderSelection")).isNull();
             assertThat(response.getData().get("finalOrderMadeSelection")).isNull();
@@ -466,6 +471,99 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             assertThat(response.getData().get("finalOrderAppealComplex")).isNull();
             assertThat(response.getData().get("orderMadeOnDetailsList")).isNull();
             assertThat(response.getData().get("finalOrderGiveReasonsComplex")).isNull();
+        }
+
+        @Test
+        void shouldNotReturnError_WhenAboutToStartIsInvokedWhenNoLipsAndFlagEnabled() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderTrackAllocation(AllocatedTrack.SMALL_CLAIM)
+                .finalOrderAllocateToTrack(YES)
+                .claimantBilingualLanguagePreference("BOTH")
+                .finalOrderIntermediateTrackComplexityBand(FinalOrdersComplexityBand.builder()
+                                                               .assignComplexityBand(YES)
+                                                               .band(ComplexityBand.BAND_1)
+                                                               .build())
+                .finalOrderDownloadTemplateOptions(DynamicList.builder()
+                                                       .value(DynamicListElement.builder()
+                                                                  .label(BLANK_TEMPLATE_AFTER_HEARING.getLabel())
+                                                                  .build()).build()).build();
+            CallbackParams params = callbackParamsOf(caseData.toMap(mapper), caseData, ABOUT_TO_START, JUDICIAL_REFERRAL);
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData().get("bilingualHint")).isEqualTo("Yes");
+        }
+
+        @Test
+        void shouldNotReturnError_WhenAboutToStartIsInvokedWhenLipsAndFlagEnabledAndRespondentLangExists() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderTrackAllocation(AllocatedTrack.SMALL_CLAIM)
+                .finalOrderAllocateToTrack(YES)
+                .claimantBilingualLanguagePreference("ENGLISH")
+                .caseDataLiP(CaseDataLiP.builder()
+                            .respondent1LiPResponse(RespondentLiPResponse.builder()
+                                                        .respondent1ResponseLanguage("BOTH").build()).build())
+                .finalOrderIntermediateTrackComplexityBand(FinalOrdersComplexityBand.builder()
+                                                               .assignComplexityBand(YES)
+                                                               .band(ComplexityBand.BAND_1)
+                                                               .build())
+                .finalOrderDownloadTemplateOptions(DynamicList.builder()
+                                                       .value(DynamicListElement.builder()
+                                                                  .label(BLANK_TEMPLATE_AFTER_HEARING.getLabel())
+                                                                  .build()).build()).build();
+            CallbackParams params = callbackParamsOf(caseData.toMap(mapper), caseData, ABOUT_TO_START, JUDICIAL_REFERRAL);
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData().get("bilingualHint")).isEqualTo("Yes");
+        }
+
+        @Test
+        void shouldNotReturnError_WhenAboutToStartIsInvokedWhenLipsAndFlagEnabledAndClaimantRespondentLangExists() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderTrackAllocation(AllocatedTrack.SMALL_CLAIM)
+                .finalOrderAllocateToTrack(YES)
+                .claimantBilingualLanguagePreference("BOTH")
+                .caseDataLiP(CaseDataLiP.builder()
+                                 .respondent1LiPResponse(RespondentLiPResponse.builder()
+                                                             .respondent1ResponseLanguage("BOTH").build()).build())
+                .finalOrderIntermediateTrackComplexityBand(FinalOrdersComplexityBand.builder()
+                                                               .assignComplexityBand(YES)
+                                                               .band(ComplexityBand.BAND_1)
+                                                               .build())
+                .finalOrderDownloadTemplateOptions(DynamicList.builder()
+                                                       .value(DynamicListElement.builder()
+                                                                  .label(BLANK_TEMPLATE_AFTER_HEARING.getLabel())
+                                                                  .build()).build()).build();
+            CallbackParams params = callbackParamsOf(caseData.toMap(mapper), caseData, ABOUT_TO_START, JUDICIAL_REFERRAL);
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData().get("bilingualHint")).isEqualTo("Yes");
+        }
+
+        @Test
+        void shouldNotReturnError_WhenAboutToStartIsInvokedWhenLipsAndFlagEnabledAndClaimantRespondentLangNotExists() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderTrackAllocation(AllocatedTrack.SMALL_CLAIM)
+                .finalOrderAllocateToTrack(YES)
+                .claimantBilingualLanguagePreference("ENGLISH")
+                .caseDataLiP(CaseDataLiP.builder()
+                                 .respondent1LiPResponse(RespondentLiPResponse.builder()
+                                                             .respondent1ResponseLanguage("ENGLISH").build()).build())
+                .finalOrderIntermediateTrackComplexityBand(FinalOrdersComplexityBand.builder()
+                                                               .assignComplexityBand(YES)
+                                                               .band(ComplexityBand.BAND_1)
+                                                               .build())
+                .finalOrderDownloadTemplateOptions(DynamicList.builder()
+                                                       .value(DynamicListElement.builder()
+                                                                  .label(BLANK_TEMPLATE_AFTER_HEARING.getLabel())
+                                                                  .build()).build()).build();
+            CallbackParams params = callbackParamsOf(caseData.toMap(mapper), caseData, ABOUT_TO_START, JUDICIAL_REFERRAL);
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData().get("bilingualHint")).isNull();
         }
     }
 
@@ -644,7 +742,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldThrowError_whenFastTrackNotBeingReallocatedToMintiTrack() {
-            when(featureToggleService.isMintiEnabled()).thenReturn(true);
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
                 .build().toBuilder()
@@ -660,7 +757,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldThrowError_whenSmallTrackNotBeingReallocatedToMintiTrack() {
-            when(featureToggleService.isMintiEnabled()).thenReturn(true);
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
                 .build().toBuilder()
@@ -672,20 +768,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).hasSize(1);
             assertThat(response.getErrors()).containsExactlyInAnyOrder(NOT_ALLOWED_FOR_TRACK);
-        }
-
-        @Test
-        void shouldNotThrowError_whenSmallTrackNotBeingReallocatedToMintiTrackMintiNotEnabled() {
-            // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
-                .build().toBuilder()
-                .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
-                .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
-                .finalOrderAllocateToTrack(NO).build();
-            CallbackParams params = callbackParamsOf(caseData.toMap(mapper), caseData, MID, PAGE_ID, JUDICIAL_REFERRAL);
-            // When
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getErrors()).isNull();
         }
 
         @Test
@@ -734,7 +816,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldNotThrowError_whenFastTrackBeingReallocatedToMintiTrackMintiEnabledJudicialReferral() {
-            when(featureToggleService.isMintiEnabled()).thenReturn(true);
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
                 .build().toBuilder()
@@ -765,7 +846,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldNotThrowError_whenFastTrackBeingReallocatedToMintiTrackMintiEnabledNotJudicialReferral() {
-            when(featureToggleService.isMintiEnabled()).thenReturn(true);
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
                 .build().toBuilder()
@@ -795,7 +875,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldNotThrowError_whenMultiTrackInJudicialReferral() {
-            when(featureToggleService.isMintiEnabled()).thenReturn(true);
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
                 .build().toBuilder()
@@ -918,6 +997,22 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                     .isEqualTo(MULTI_OPTIONS.getListItems().get(3).getLabel());
             }
 
+            @Test
+            void shouldDefaultToSmallClaim_whenSpecClaimDJNoClaimTrackMultiClaimAmount() {
+                // Given
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
+                    .build().toBuilder()
+                    .totalClaimAmount(BigDecimal.valueOf(1000000))
+                    .caseAccessCategory(CaseCategory.SPEC_CLAIM).build();
+                CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+                // When
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+                // Then
+                assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems()).hasSize(0);
+                assertThat(updatedData.getFinalOrderTrackToggle())
+                    .isEqualTo(AllocatedTrack.SMALL_CLAIM.name());
+            }
         }
 
         @Nested
@@ -1663,7 +1758,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             finalCaseDocuments.add(element(finalOrder));
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
-                .finalOrderDocumentCollection(finalCaseDocuments)
+                .finalOrderDocumentCollection(new ArrayList<>())
                 .finalOrderDocument(finalOrder)
                 .finalOrderFurtherHearingToggle(List.of(FinalOrderToggle.SHOW))
                 .build();
@@ -1677,6 +1772,100 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             assertThat(updatedData.getFinalOrderDocumentCollection().get(0)
                            .getValue().getDocumentLink().getCategoryID()).isEqualTo("caseManagementOrders");
             assertThat(updatedData.getFinalOrderDocumentCollection().get(0)
+                           .getValue().getDocumentLink().getDocumentFileName()).isEqualTo(fileName);
+        }
+
+        @Test
+        void shouldHideDocumentIfClaimantWelsh_onAboutToSubmit() {
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
+            when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+                                                                            .forename("Judge")
+                                                                            .surname("Judy")
+                                                                            .roles(Collections.emptyList()).build());
+            // Given
+            List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
+            finalCaseDocuments.add(element(finalOrder));
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                .finalOrderDocumentCollection(finalCaseDocuments)
+                .finalOrderDocument(finalOrder)
+                .finalOrderFurtherHearingToggle(List.of(FinalOrderToggle.SHOW))
+                .build();
+            caseData = caseData.toBuilder().claimantBilingualLanguagePreference("BOTH").build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            // Then
+            String fileName = LocalDate.now() + "_Judge Judy" + ".pdf";
+            assertThat(response.getData()).extracting("finalOrderDocumentCollection").isNotNull();
+            assertThat(updatedData.getFinalOrderDocumentCollection()).hasSize(1);
+            assertThat(updatedData.getPreTranslationDocuments().get(0)
+                           .getValue().getDocumentLink().getCategoryID()).isEqualTo("caseManagementOrders");
+            assertThat(updatedData.getPreTranslationDocuments().get(0)
+                           .getValue().getDocumentLink().getDocumentFileName()).isEqualTo(fileName);
+        }
+
+        @Test
+        void shouldNotHideDocumentIfWelshDisabled_onAboutToSubmit() {
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
+            when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+                                                                            .forename("Judge")
+                                                                            .surname("Judy")
+                                                                            .roles(Collections.emptyList()).build());
+            // Given
+            List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
+            finalCaseDocuments.add(element(finalOrder));
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                .finalOrderDocumentCollection(finalCaseDocuments)
+                .finalOrderDocument(finalOrder)
+                .finalOrderFurtherHearingToggle(List.of(FinalOrderToggle.SHOW))
+                .build();
+            caseData = caseData.toBuilder().claimantBilingualLanguagePreference("BOTH").build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            // Then
+            String fileName = LocalDate.now() + "_Judge Judy" + ".pdf";
+            assertThat(response.getData()).extracting("finalOrderDocumentCollection").isNotNull();
+            assertThat(updatedData.getFinalOrderDocumentCollection().get(0)
+                           .getValue().getDocumentLink().getCategoryID()).isEqualTo("caseManagementOrders");
+            assertThat(updatedData.getFinalOrderDocumentCollection().get(0)
+                           .getValue().getDocumentLink().getDocumentFileName()).isEqualTo(fileName);
+        }
+
+        @Test
+        void shouldHideDocumentIfDefendantWelsh_onAboutToSubmit() {
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
+            when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+                                                                            .forename("Judge")
+                                                                            .surname("Judy")
+                                                                            .roles(Collections.emptyList()).build());
+            // Given
+            List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
+            finalCaseDocuments.add(element(finalOrder));
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                .finalOrderDocumentCollection(finalCaseDocuments)
+                .finalOrderDocument(finalOrder)
+                .finalOrderFurtherHearingToggle(List.of(FinalOrderToggle.SHOW))
+                .build();
+            caseData = caseData.toBuilder().caseDataLiP(CaseDataLiP.builder()
+                                            .respondent1LiPResponse(RespondentLiPResponse.builder()
+                                                                        .respondent1ResponseLanguage("WELSH").build()).build()).build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            // Then
+            String fileName = LocalDate.now() + "_Judge Judy" + ".pdf";
+            assertThat(response.getData()).extracting("finalOrderDocumentCollection").isNotNull();
+            assertThat(updatedData.getFinalOrderDocumentCollection()).hasSize(1);
+            assertThat(updatedData.getPreTranslationDocuments().get(0)
+                           .getValue().getDocumentLink().getCategoryID()).isEqualTo("caseManagementOrders");
+            assertThat(updatedData.getPreTranslationDocuments().get(0)
                            .getValue().getDocumentLink().getDocumentFileName()).isEqualTo(fileName);
         }
 
@@ -1758,7 +1947,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             // Then
-            assertThat(response.getState()).isEqualTo("All_FINAL_ORDERS_ISSUED");
+            assertThat(response.getState()).isEqualTo(null);
         }
 
         @Test
@@ -1780,7 +1969,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             // Then
-            assertThat(response.getState()).isEqualTo("All_FINAL_ORDERS_ISSUED");
+            assertThat(response.getState()).isEqualTo(null);
         }
 
         @Test
@@ -1901,7 +2090,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                                                                             .forename("Judge")
                                                                             .surname("Judy")
                                                                             .roles(Collections.emptyList()).build());
-            when(featureToggleService.isMintiEnabled()).thenReturn(true);
             // Given
             List<FinalOrderToggle> toggle = new ArrayList<>();
             toggle.add(FinalOrderToggle.SHOW);
@@ -1929,7 +2117,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                                                                             .forename("Judge")
                                                                             .surname("Judy")
                                                                             .roles(Collections.emptyList()).build());
-            when(featureToggleService.isMintiEnabled()).thenReturn(true);
             // Given
             List<FinalOrderToggle> toggle = new ArrayList<>();
             toggle.add(FinalOrderToggle.SHOW);
@@ -1958,7 +2145,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                                                                             .forename("Judge")
                                                                             .surname("Judy")
                                                                             .roles(Collections.emptyList()).build());
-            when(featureToggleService.isMintiEnabled()).thenReturn(true);
             // Given
             List<FinalOrderToggle> toggle = new ArrayList<>();
             toggle.add(FinalOrderToggle.SHOW);
@@ -1987,7 +2173,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                                                                             .forename("Judge")
                                                                             .surname("Judy")
                                                                             .roles(Collections.emptyList()).build());
-            when(featureToggleService.isMintiEnabled()).thenReturn(true);
             // Given
             List<FinalOrderToggle> toggle = new ArrayList<>();
             toggle.add(FinalOrderToggle.SHOW);
@@ -2082,7 +2267,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                                                                             .forename("Judge")
                                                                             .surname("Judy")
                                                                             .roles(Collections.emptyList()).build());
-            when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
             // Given
             List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
             finalCaseDocuments.add(element(finalOrder));
@@ -2106,7 +2290,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                                                                             .forename("Judge")
                                                                             .surname("Judy")
                                                                             .roles(Collections.emptyList()).build());
-            when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
             // Given
             List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
             finalCaseDocuments.add(element(finalOrder));
@@ -2130,7 +2313,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                                                                             .forename("Judge")
                                                                             .surname("Judy")
                                                                             .roles(Collections.emptyList()).build());
-            when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
             // Given
             List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
             finalCaseDocuments.add(element(finalOrder));

@@ -72,7 +72,7 @@ public class DefendantResponseFullOrPartAdmitInstallmentsScenarioTest extends Da
                         + " mewn rhandaliadau o £"
                         + MonetaryConversions.penniesToPounds(installmentAmount).toPlainString().replace(
                         ".00", "")
-                        + " " + frequency.getDashboardLabelWelsh() + ". Rydych wedi cynnig gwneud hyn o " + DateUtils.formatDateInWelsh(firstPaymentDate)
+                        + " " + frequency.getDashboardLabelWelsh() + ". Rydych wedi cynnig gwneud hyn o " + DateUtils.formatDateInWelsh(firstPaymentDate, false)
                         + " ymlaen. Byddwn yn cysylltu â chi pan fydd yr hawlydd yn ymateb i’ch cynnig.</p><p class=\"govuk-body\"><a "
                         + "href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">Gweld eich ymateb</a></p>"
                 )

@@ -584,6 +584,48 @@ class LocationReferenceDataServiceTest {
             assertEquals(el1.getCourtAddress(), opt.get().getCourtAddress());
             assertEquals(el1.getPostcode(), opt.get().getPostcode());
         }
+
+        @Test
+        void whenDisplayEntry_match_english() {
+            LocationRefData el1 = LocationRefData.builder()
+                .siteName("site name")
+                .welshSiteName("welsh site name")
+                .courtAddress("court address")
+                .postcode("postcode")
+                .build();
+
+            String actualDisplayEntry = LocationReferenceDataService.getDisplayEntry(el1);
+
+            assertEquals(el1.getSiteName() + " - " + el1.getCourtAddress() + " - " + el1.getPostcode(), actualDisplayEntry);
+        }
+
+        @Test
+        void whenDisplayEntry_match_welsh() {
+            LocationRefData el1 = LocationRefData.builder()
+                .siteName("site name")
+                .welshSiteName("welsh site name")
+                .courtAddress("court address")
+                .postcode("postcode")
+                .build();
+
+            String actualDisplayEntry = LocationReferenceDataService.getDisplayEntryWelsh(el1);
+
+            assertEquals(el1.getWelshSiteName() + " - " + el1.getCourtAddress() + " - " + el1.getPostcode(), actualDisplayEntry);
+        }
+
+        @Test
+        void whenDisplayEntry_match_english_ifWelshBlank() {
+            LocationRefData el1 = LocationRefData.builder()
+                .siteName("site name")
+                .welshSiteName("")
+                .courtAddress("court address")
+                .postcode("postcode")
+                .build();
+
+            String actualDisplayEntry = LocationReferenceDataService.getDisplayEntryWelsh(el1);
+
+            assertEquals(el1.getSiteName() + " - " + el1.getCourtAddress() + " - " + el1.getPostcode(), actualDisplayEntry);
+        }
     }
 
     @Nested

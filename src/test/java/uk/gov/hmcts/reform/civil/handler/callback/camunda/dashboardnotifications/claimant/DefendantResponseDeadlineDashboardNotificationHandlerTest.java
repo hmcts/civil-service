@@ -9,7 +9,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -18,6 +17,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import java.util.HashMap;
 
@@ -29,7 +29,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_RESPONSE_DEADLINE_CLAIMANT;
 
 @ExtendWith(MockitoExtension.class)
-public class DefendantResponseDeadlineDashboardNotificationHandlerTest extends BaseCallbackHandlerTest {
+class DefendantResponseDeadlineDashboardNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @InjectMocks
     private DefendantResponseDeadlineDashboardNotificationHandler handler;
@@ -38,7 +38,7 @@ public class DefendantResponseDeadlineDashboardNotificationHandlerTest extends B
     private DashboardNotificationsParamsMapper mapper;
 
     @Mock
-    private DashboardApiClient dashboardApiClient;
+    private DashboardScenariosService dashboardScenariosService;
 
     @Mock
     private DashboardNotificationsParamsMapper dashboardNotificationsParamsMapper;
@@ -82,10 +82,10 @@ public class DefendantResponseDeadlineDashboardNotificationHandlerTest extends B
             HashMap<String, Object> scenarioParams = new HashMap<>();
 
             handler.handle(params);
-            verify(dashboardApiClient).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                "Scenario.AAA6.DefResponse.ResponseTimeElapsed.Claimant",
+            verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
+                "Scenario.AAA6.DefResponse.ResponseTimeElapsed.Claimant",
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }
@@ -98,7 +98,7 @@ public class DefendantResponseDeadlineDashboardNotificationHandlerTest extends B
             ).build();
 
             handler.handle(params);
-            verifyNoInteractions(dashboardApiClient);
+            verifyNoInteractions(dashboardScenariosService);
         }
     }
 }
