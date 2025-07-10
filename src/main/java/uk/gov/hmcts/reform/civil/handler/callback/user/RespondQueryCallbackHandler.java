@@ -23,7 +23,9 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.queryManagementRespondQuery;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.assignCategoryIdToCaseworkerAttachments;
+import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.clearOldQueryCollections;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getLatestQuery;
+import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.migrateAllQueries;
 
 @Service
 @RequiredArgsConstructor
@@ -38,9 +40,9 @@ public class RespondQueryCallbackHandler extends CallbackHandler {
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
+            callbackKey(ABOUT_TO_START), this::aboutToStart,
             callbackKey(ABOUT_TO_SUBMIT), this::setManagementQuery,
-            callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
+            callbackKey(SUBMITTED), this::emptyCallbackResponse
         );
     }
 
@@ -49,23 +51,33 @@ public class RespondQueryCallbackHandler extends CallbackHandler {
         return EVENTS;
     }
 
-    private CallbackResponse setManagementQuery(CallbackParams callbackParams) {
+    private CallbackResponse aboutToStart(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
 
-        CaseMessage latestCaseMessage = getLatestQuery(caseData);
-
-        // ToDo: Remove condition and assign to new caseworker category in CIV-17308 (behind feature toggle)
-        if (!featureToggleService.isPublicQueryManagementEnabled(caseData)) {
-            assignCategoryIdToCaseworkerAttachments(caseData, latestCaseMessage, assignCategoryId);
+        if (featureToggleService.isPublicQueryManagementEnabled(caseData)) {
+            migrateAllQueries(caseDataBuilder);
         }
 
-        caseData = caseData.toBuilder()
-            .businessProcess(BusinessProcess.ready(queryManagementRespondQuery))
-            .build();
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(mapper)).build();
+    }
+
+    private CallbackResponse setManagementQuery(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        CaseMessage latestCaseMessage = getLatestQuery(caseData);
+
+        if (!featureToggleService.isPublicQueryManagementEnabled(caseData)) {
+            assignCategoryIdToCaseworkerAttachments(caseData, latestCaseMessage, assignCategoryId);
+        } else {
+            clearOldQueryCollections(caseDataBuilder);
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseData.toMap(mapper))
+            .data(caseDataBuilder
+                      .businessProcess(BusinessProcess.ready(queryManagementRespondQuery))
+                      .build().toMap(mapper))
             .build();
-
     }
 }

@@ -20,7 +20,7 @@ import java.util.stream.Stream;
 
 import static uk.gov.hmcts.reform.civil.enums.DocCategory.CLAIMANT_QUERY_DOCUMENTS;
 import static java.util.Objects.nonNull;
-import static uk.gov.hmcts.reform.civil.enums.DocCategory.CLAIMANT_QUERY_DOCUMENTS;
+
 import static uk.gov.hmcts.reform.civil.enums.DocCategory.CLAIMANT_QUERY_DOCUMENT_ATTACHMENTS;
 import static uk.gov.hmcts.reform.civil.enums.DocCategory.DEFENDANT_QUERY_DOCUMENTS;
 import static uk.gov.hmcts.reform.civil.enums.DocCategory.DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS;
@@ -241,6 +241,42 @@ public class CaseQueriesUtil {
             return DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS.getValue();
         } else {
             throw new IllegalArgumentException(UNSUPPORTED_ROLE_ERROR);
+        }
+    }
+
+    public static boolean hasOldQueries(CaseData caseData) {
+        return nonNull(caseData.getQmApplicantSolicitorQueries())
+            || nonNull(caseData.getQmRespondentSolicitor1Queries())
+            || nonNull(caseData.getQmRespondentSolicitor2Queries());
+    }
+
+    private static void migrateQueries(CaseQueriesCollection collectionToMigrate, CaseData.CaseDataBuilder builder) {
+        if (nonNull(collectionToMigrate) && nonNull(collectionToMigrate.getCaseMessages())) {
+            CaseData caseData = builder.build();
+            List<Element<CaseMessage>> messages = caseData.getQueries().getCaseMessages();
+            messages.addAll(collectionToMigrate.getCaseMessages());
+            builder.queries(caseData.getQueries().toBuilder().caseMessages(messages).build());
+        }
+    }
+
+    public static void migrateAllQueries(CaseData.CaseDataBuilder builder) {
+        CaseData caseData = builder.build();
+        if (hasOldQueries(caseData)) {
+            builder.queries(CaseQueriesCollection.builder()
+                                .partyName("All queries")
+                                .caseMessages(new ArrayList<>())
+                                .build());
+            migrateQueries(caseData.getQmApplicantSolicitorQueries(), builder);
+            migrateQueries(caseData.getQmRespondentSolicitor1Queries(), builder);
+            migrateQueries(caseData.getQmRespondentSolicitor2Queries(), builder);
+        }
+    }
+
+    public static void clearOldQueryCollections(CaseData.CaseDataBuilder builder) {
+        if (hasOldQueries(builder.build())) {
+            builder.qmApplicantSolicitorQueries(null);
+            builder.qmRespondentSolicitor1Queries(null);
+            builder.qmRespondentSolicitor2Queries(null);
         }
     }
 }
