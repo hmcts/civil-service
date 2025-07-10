@@ -10,6 +10,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -103,6 +104,7 @@ class DefendantLipResponseRespondentNotificationHandlerTest extends BaseCallback
                                 .type(Party.Type.COMPANY)
                                 .companyName("Bad guys ltd")
                                 .build())
+                .respondent1Represented(YesOrNo.NO)
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
@@ -136,6 +138,7 @@ class DefendantLipResponseRespondentNotificationHandlerTest extends BaseCallback
                                 .type(Party.Type.COMPANY)
                                 .companyName("Bad guys ltd")
                                 .build())
+                .respondent1Represented(YesOrNo.NO)
                 .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH").build()).build())
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();

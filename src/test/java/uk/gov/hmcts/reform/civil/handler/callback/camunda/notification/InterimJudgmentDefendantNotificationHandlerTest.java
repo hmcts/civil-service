@@ -125,6 +125,7 @@ public class InterimJudgmentDefendantNotificationHandlerTest extends BaseCallbac
                 .respondent1OrganisationPolicy(null)
                 .legacyCaseReference("12DC910")
                 .respondent2OrganisationPolicy(null).build().toBuilder()
+                .respondent1Represented(YesOrNo.NO)
                 .ccdCaseReference(1594901956117591L).build();
 
             Map<String, String> propertyMap = handler.addProperties(caseData);

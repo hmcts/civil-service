@@ -99,7 +99,8 @@ class HearingFeeDueAfterNocNotificationHandlerTest {
             when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
             when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
             when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
-            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
         }
 
         @Test
@@ -234,8 +235,8 @@ class HearingFeeDueAfterNocNotificationHandlerTest {
         expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
         expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
         expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
-        expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getRaiseQueryLr());
-        expectedProperties.put(CNBC_CONTACT, configuration.getRaiseQueryLr());
+        expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+        expectedProperties.put(CNBC_CONTACT, configuration.getCnbcContact());
         return expectedProperties;
     }
 

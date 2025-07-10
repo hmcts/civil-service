@@ -41,6 +41,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_CLAI
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_16_DIGIT_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CNBC_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LEGAL_REP_NAME;
@@ -48,6 +49,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.OPENING_HOURS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PHONE_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.SPEC_UNSPEC_CONTACT;
 
 @ExtendWith(MockitoExtension.class)
 public class NotifyDefendantsClaimantSettleTheClaimTest extends BaseCallbackHandlerTest {
@@ -93,9 +95,10 @@ public class NotifyDefendantsClaimantSettleTheClaimTest extends BaseCallbackHand
             when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("welshHmctsSignature"));
             when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("welshPhoneContact"));
             when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
-            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
             when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
         }
 
         @Test
@@ -129,6 +132,8 @@ public class NotifyDefendantsClaimantSettleTheClaimTest extends BaseCallbackHand
             assertThat(notificationDataMap.getAllValues().get(0)).containsEntry(OPENING_HOURS, configuration.getOpeningHours());
             assertThat(notificationDataMap.getAllValues().get(0)).containsEntry(LIP_CONTACT, configuration.getLipContactEmail());
             assertThat(notificationDataMap.getAllValues().get(0)).containsEntry(HMCTS_SIGNATURE, configuration.getHmctsSignature());
+            assertThat(notificationDataMap.getAllValues().get(0)).containsEntry(CNBC_CONTACT, configuration.getCnbcContact());
+            assertThat(notificationDataMap.getAllValues().get(0)).containsEntry(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
         }
 
         @ParameterizedTest
@@ -175,6 +180,8 @@ public class NotifyDefendantsClaimantSettleTheClaimTest extends BaseCallbackHand
             assertThat(notificationDataMap.getAllValues().get(0)).containsEntry(OPENING_HOURS, configuration.getOpeningHours());
             assertThat(notificationDataMap.getAllValues().get(0)).containsEntry(LIP_CONTACT, configuration.getLipContactEmail());
             assertThat(notificationDataMap.getAllValues().get(0)).containsEntry(HMCTS_SIGNATURE, configuration.getHmctsSignature());
+            assertThat(notificationDataMap.getAllValues().get(0)).containsEntry(CNBC_CONTACT, configuration.getCnbcContact());
+            assertThat(notificationDataMap.getAllValues().get(0)).containsEntry(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
         }
 
         @Test

@@ -48,6 +48,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME_ONE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME_TWO;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CNBC_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
@@ -102,7 +103,6 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
             when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("welshHmctsSignature"));
             when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("welshPhoneContact"));
             when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
-            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
             when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
         }
@@ -125,13 +125,16 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
                 CallbackRequest.builder().eventId("NOTIFY_RESPONDENT_MEDIATION_SUCCESSFUL")
                     .build()).build();
             //When
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             given(notificationsProperties.getNotifyRespondentLiPMediationSuccessfulTemplate()).willReturn(TEMPLATE_ID);
             handler.handle(params);
             //Then
             verify(notificationService).sendMail(
                 "respondent@example.com",
                 "template-id",
-                getNotificationDataMapSpec(caseData),
+                getNotificationDataMapSpec(caseData, true),
                 "mediation-successful-respondent-notification-000DC001"
             );
         }
@@ -154,13 +157,16 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
                 CallbackRequest.builder().eventId("NOTIFY_RESPONDENT_MEDIATION_SUCCESSFUL")
                     .build()).build();
             //When
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             given(notificationsProperties.getNotifyRespondentLiPMediationSuccessfulTemplateWelsh()).willReturn("template-id-welsh");
             handler.handle(params);
             //Then
             verify(notificationService).sendMail(
                 "respondent@example.com",
                 "template-id-welsh",
-                getNotificationDataMapSpec(caseData),
+                getNotificationDataMapSpec(caseData, true),
                 "mediation-successful-respondent-notification-000DC001"
             );
         }
@@ -186,7 +192,7 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
             //Then
             verify(notificationService, times(0)).sendMail("respondent@example.com",
                                                            "template-id",
-                                                           getNotificationDataMapSpec(caseData),
+                                                           getNotificationDataMapSpec(caseData, true),
                                                            "mediation-successful-respondent-notification-000DC001"
             );
         }
@@ -211,7 +217,7 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
             //Then
             verify(notificationService, times(0)).sendMail("respondent@example.com",
                                                            "template-id",
-                                                           getNotificationDataMapSpec(caseData),
+                                                           getNotificationDataMapSpec(caseData, false),
                                                            "mediation-successful-respondent-notification-000DC001"
             );
         }
@@ -220,7 +226,8 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
         void shouldNotifyDefendantCarmLRvLRNotifyApplicant_whenInvoked() {
             //Given
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
-
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_ONE)
                 .setClaimTypeToSpecClaim()
                 .legacyCaseReference(REFERENCE_NUMBER)
@@ -240,7 +247,7 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
             verify(notificationService).sendMail(
                 RESPONDENT_MAIL,
                 TEMPLATE_ID,
-                lrDefendantProperties(caseData),
+                lrDefendantProperties(caseData, false),
                 MEDIATION_SUCCESSFUL_RESPONDENT_LR_NOTIFICATION
             );
         }
@@ -249,7 +256,8 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
         void shouldNotifyClaimantCarm1V2SameSolicitorNotifyApplicant_whenInvoked() {
             //Given
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
-
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
                 .setClaimTypeToSpecClaim()
                 .legacyCaseReference(REFERENCE_NUMBER)
@@ -265,7 +273,7 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
             verify(notificationService).sendMail(
                 RESPONDENT_MAIL,
                 TEMPLATE_ID,
-                lrDefendantProperties(caseData),
+                lrDefendantProperties(caseData, false),
                 MEDIATION_SUCCESSFUL_RESPONDENT_LR_NOTIFICATION
             );
         }
@@ -274,7 +282,8 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
         void shouldNotifyClaimantCarm1V2DifferentSolicitorNotifyApplicant_whenInvoked() {
             //Given
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
-
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP)
                 .setClaimTypeToSpecClaim()
                 .legacyCaseReference(REFERENCE_NUMBER)
@@ -290,7 +299,7 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
             verify(notificationService).sendMail(
                 RESPONDENT_MAIL,
                 TEMPLATE_ID,
-                lrDefendantProperties(caseData),
+                lrDefendantProperties(caseData, false),
                 MEDIATION_SUCCESSFUL_RESPONDENT_LR_NOTIFICATION
             );
         }
@@ -299,7 +308,8 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
         void shouldNotifyClaimantCarm1V2DifferentSolicitorNotifyApplicantEmailSecondDefendant_whenInvoked() {
             //Given
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
-
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP)
                 .setClaimTypeToSpecClaim()
                 .legacyCaseReference(REFERENCE_NUMBER)
@@ -315,7 +325,7 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
             verify(notificationService).sendMail(
                 "respondentsolicitor2@example.com",
                 TEMPLATE_ID,
-                lrDefendantProperties(caseData),
+                lrDefendantProperties(caseData, false),
                 MEDIATION_SUCCESSFUL_RESPONDENT_LR_NOTIFICATION
             );
         }
@@ -335,6 +345,8 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
             //When
             when(notificationsProperties.getNotifyTwoVOneDefendantSuccessfulMediation()).thenReturn(TEMPLATE_ID);
             when(organisationDetailsService.getRespondent1LegalOrganisationName(any())).thenReturn(ORGANISATION_NAME);
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             handler.handle(params);
             //Then
             verify(notificationService).sendMail(
@@ -357,6 +369,9 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
                 CallbackRequest.builder().eventId(NOTIFY_MEDIATION_SUCCESSFUL_DEFENDANT_2_LR.name())
                     .build()).build();
             //When
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             when(notificationsProperties.getNotifyLipSuccessfulMediation()).thenReturn(TEMPLATE_ID);
             handler.handle(params);
             //Then
@@ -381,6 +396,9 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
                 CallbackRequest.builder().eventId(NOTIFY_MEDIATION_SUCCESSFUL_DEFENDANT_LIP.name())
                     .build()).build();
             //When
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             when(notificationsProperties.getNotifyLipSuccessfulMediation()).thenReturn(TEMPLATE_ID);
             handler.handle(params);
             //Then
@@ -403,6 +421,9 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
                 CallbackRequest.builder().eventId(NOTIFY_MEDIATION_SUCCESSFUL_DEFENDANT_LIP.name())
                     .build()).build();
             //When
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             when(notificationsProperties.getNotifyLipSuccessfulMediationWelsh()).thenReturn(TEMPLATE_ID);
             handler.handle(params);
             //Then
@@ -419,6 +440,9 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
             //Given
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
             when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
 
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_ONE)
                 .setClaimTypeToSpecClaim()
@@ -441,7 +465,7 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
             verify(notificationService).sendMail(
                 RESPONDENT_MAIL,
                 TEMPLATE_ID_LIP_LR,
-                lrDefendantProperties(caseData),
+                lrDefendantProperties(caseData, true),
                 MEDIATION_SUCCESSFUL_RESPONDENT_LR_NOTIFICATION
             );
         }
@@ -451,6 +475,9 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
             //Given
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
             when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
 
             Party respondent1 = PartyBuilder.builder().soleTrader()
                 .partyEmail("respondent@example.com")
@@ -473,7 +500,7 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
             verify(notificationService).sendMail(
                 "respondent@example.com",
                 "template-id",
-                getNotificationDataMapSpec(caseData),
+                getNotificationDataMapSpec(caseData, true),
                 "mediation-successful-respondent-notification-000DC001"
             );
         }
@@ -505,14 +532,14 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
             verify(notificationService).sendMail(
                 "respondent@example.com",
                 "template-id",
-                getNotificationDataMapSpec(caseData),
+                getNotificationDataMapSpec(caseData, true),
                 "mediation-successful-respondent-notification-000DC001"
             );
         }
 
         @NotNull
-        public Map<String, String> getNotificationDataMapSpec(CaseData caseData) {
-            Map<String, String> expectedProperties = new HashMap<>(addCommonProperties());
+        public Map<String, String> getNotificationDataMapSpec(CaseData caseData, boolean isLipCase) {
+            Map<String, String> expectedProperties = new HashMap<>(addCommonProperties(isLipCase));
             expectedProperties.put(CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference());
             expectedProperties.put(CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()));
             expectedProperties.put(DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
@@ -521,8 +548,8 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
 
     }
 
-    public Map<String, String> lrDefendantProperties(CaseData caseData) {
-        Map<String, String> properties = new HashMap<>(addCommonProperties());
+    public Map<String, String> lrDefendantProperties(CaseData caseData, boolean isLipCase) {
+        Map<String, String> properties = new HashMap<>(addCommonProperties(isLipCase));
         properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getRespondent1LegalOrganisationName(caseData));
         properties.put(CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString());
         properties.put(CLAIMANT_NAME, caseData.getApplicant1().getPartyName());
@@ -532,7 +559,7 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
     }
 
     public Map<String, String> twoVOneDefendantProperties(CaseData caseData) {
-        Map<String, String> properties = new HashMap<>(addCommonProperties());
+        Map<String, String> properties = new HashMap<>(addCommonProperties(false));
         properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getRespondent1LegalOrganisationName(caseData));
         properties.put(CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString());
         properties.put(CLAIMANT_NAME_ONE, caseData.getApplicant1().getPartyName());
@@ -543,14 +570,14 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
     }
 
     public Map<String, String> lipDefendantProperties(CaseData caseData) {
-        Map<String, String> properties = new HashMap<>(addCommonProperties());
+        Map<String, String> properties = new HashMap<>(addCommonProperties(true));
         properties.put(PARTY_NAME, caseData.getRespondent1().getPartyName());
         properties.put(CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString());
         return properties;
     }
 
     @NotNull
-    public Map<String, String> addCommonProperties() {
+    public Map<String, String> addCommonProperties(boolean isLipCase) {
         Map<String, String> expectedProperties = new HashMap<>();
         expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
         expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
@@ -561,6 +588,13 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
         expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
         expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
         expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+        if (isLipCase) {
+            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+            expectedProperties.put(CNBC_CONTACT, configuration.getCnbcContact());
+        } else {
+            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getRaiseQueryLr());
+            expectedProperties.put(CNBC_CONTACT, configuration.getRaiseQueryLr());
+        }
         return expectedProperties;
     }
 }
