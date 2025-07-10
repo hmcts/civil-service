@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -81,14 +82,14 @@ public class ApplicationsProceedOfflineNotificationCallbackHandler extends Callb
             return AboutToStartOrSubmitCallbackResponse.builder().build();
         }
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        String notificationType = notificationType(callbackParams);
-        if (notificationType == null) {
+        Optional<String> notificationType = notificationType(callbackParams);
+        if (notificationType.isEmpty()) {
             return AboutToStartOrSubmitCallbackResponse.builder().build();
         }
         ScenarioRequestParams notificationParams = ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build();
         dashboardScenariosService.recordScenarios(
             authToken,
-            notificationType.equals(CLAIMANT)
+            notificationType.get().equals(CLAIMANT)
                 ? SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_CLAIMANT.getScenario()
                 : SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
@@ -96,10 +97,10 @@ public class ApplicationsProceedOfflineNotificationCallbackHandler extends Callb
         if (caseData.getGeneralApplications() == null || caseData.getGeneralApplications().isEmpty()) {
             return AboutToStartOrSubmitCallbackResponse.builder().build();
         }
-        if (isApplicationsExistLive(caseData, notificationType)) {
+        if (isApplicationsExistLive(caseData, notificationType.get())) {
             dashboardScenariosService.recordScenarios(
                 authToken,
-                notificationType.equals(CLAIMANT)
+                notificationType.get().equals(CLAIMANT)
                     ? SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT.getScenario()
                     : SCENARIO_AAA6_UPDATE_CASE_PROCEED_IN_CASE_MAN_DEFENDANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
@@ -108,19 +109,19 @@ public class ApplicationsProceedOfflineNotificationCallbackHandler extends Callb
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
-    private String notificationType(CallbackParams callbackParams) {
+    private Optional<String> notificationType(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String eventId = callbackParams.getRequest().getEventId();
         if (eventId.equals(CREATE_DASHBOARD_NOTIFICATION_APPLICATION_PROCEED_OFFLINE_CLAIMANT.name())
             && caseData.isApplicantLiP()) {
             dashboardNotificationService.deleteByReferenceAndCitizenRole(caseData.getCcdCaseReference().toString(), CLAIMANT);
-            return CLAIMANT;
+            return Optional.of(CLAIMANT);
         } else if (eventId.equals(CREATE_DASHBOARD_NOTIFICATION_APPLICATION_PROCEED_OFFLINE_DEFENDANT.name())
             && caseData.isRespondent1LiP()) {
             dashboardNotificationService.deleteByReferenceAndCitizenRole(caseData.getCcdCaseReference().toString(), DEFENDANT);
-            return DEFENDANT;
+            return Optional.of(DEFENDANT);
         }
-        return null;
+        return Optional.empty();
     }
 
     private boolean isApplicationsExistLive(CaseData caseData, String notificationType) {
