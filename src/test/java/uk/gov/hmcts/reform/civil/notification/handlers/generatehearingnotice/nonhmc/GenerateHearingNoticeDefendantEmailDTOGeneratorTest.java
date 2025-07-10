@@ -9,16 +9,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeCamundaService;
-import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeVariables;
 import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,6 +26,7 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.notification.handlers.DefendantEmailDTOGenerator.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.notification.handlers.DefendantEmailDTOGenerator.HEARING_DATE;
 import static uk.gov.hmcts.reform.civil.notification.handlers.DefendantEmailDTOGenerator.HEARING_TIME;
@@ -41,16 +40,12 @@ class GenerateHearingNoticeDefendantEmailDTOGeneratorTest {
     private static final String PROCESS_ID          = "pid";
     private static final String CASE_REF            = "CASE-123";
     private static final LocalDate HEARING_DATE_VAL = LocalDate.of(2025, 6, 30);
-    private static final LocalDateTime START_DT     = LocalDateTime.of(2025, 6, 30, 14, 45);
     private static final String FORMATTED_DATE      = "30-06-2025";
     private static final String FORMATTED_TIME      = "02:45pm";
     private static final String TIME_ARG            = "14:45";
 
     @Mock
     private NotificationsProperties notificationsProperties;
-
-    @Mock
-    private HearingNoticeCamundaService camundaService;
 
     @InjectMocks
     private GenerateHearingNoticeDefendantEmailDTOGenerator generator;
@@ -97,12 +92,11 @@ class GenerateHearingNoticeDefendantEmailDTOGeneratorTest {
         CaseData caseData = CaseData.builder()
                 .legacyCaseReference(CASE_REF)
                 .hearingDate(HEARING_DATE_VAL)
+                .hearingTimeHourMinute(TIME_ARG)
                 .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_ID).build())
+                .respondent1(Party.builder().individualFirstName("Defendant")
+                            .individualLastName("Org").type(Party.Type.INDIVIDUAL).build())
                 .build();
-        when(camundaService.getProcessVariables(PROCESS_ID))
-                .thenReturn(HearingNoticeVariables.builder()
-                        .hearingStartDateTime(START_DT)
-                        .build());
 
         try (MockedStatic<NotificationUtils> utils = mockStatic(NotificationUtils.class)) {
             utils.when(() -> NotificationUtils.getFormattedHearingDate(HEARING_DATE_VAL))
@@ -118,7 +112,8 @@ class GenerateHearingNoticeDefendantEmailDTOGeneratorTest {
                     () -> assertEquals("value",           result.get("existing")),
                     () -> assertEquals(CASE_REF,          result.get(CLAIM_REFERENCE_NUMBER)),
                     () -> assertEquals(FORMATTED_DATE,    result.get(HEARING_DATE)),
-                    () -> assertEquals(FORMATTED_TIME,    result.get(HEARING_TIME))
+                    () -> assertEquals(FORMATTED_TIME,    result.get(HEARING_TIME)),
+                      () -> assertEquals("Defendant Org", result.get(CLAIM_LEGAL_ORG_NAME_SPEC))
             );
 
             utils.verify(() -> NotificationUtils.getFormattedHearingDate(HEARING_DATE_VAL));

@@ -2,12 +2,16 @@ package uk.gov.hmcts.reform.civil.notification.handlers.generatehearingnotice.no
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.notification.handlers.RespSolOneEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
 
 import java.util.Map;
+import java.util.Optional;
+
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganizationNameForRespondent;
 
 @Component
 public class GenerateHearingNoticeRespSolOneEmailDTOGenerator extends RespSolOneEmailDTOGenerator {
@@ -33,9 +37,14 @@ public class GenerateHearingNoticeRespSolOneEmailDTOGenerator extends RespSolOne
 
     @Override
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
+        boolean isRespondent1 = true;
         properties.put(HEARING_DATE, NotificationUtils.getFormattedHearingDate(caseData.getHearingDate()));
         properties.put(HEARING_TIME, NotificationUtils.getFormattedHearingTime(caseData.getHearingTimeHourMinute()));
-        properties.put(DEFENDANT_REFERENCE_NUMBER, caseData.getSolicitorReferences().getRespondentSolicitor1Reference());
+        properties.put(DEFENDANT_REFERENCE_NUMBER, Optional.ofNullable(caseData.getSolicitorReferences())
+            .map(SolicitorReferences::getRespondentSolicitor1Reference)
+            .orElse(""));
+        properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganizationNameForRespondent(caseData,
+                                                                                        isRespondent1, organisationService));
         return properties;
     }
 }

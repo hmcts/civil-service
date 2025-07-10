@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
 
 @Component
 public class GenerateHearingNoticeAppSolOneEmailDTOGenerator extends AppSolOneEmailDTOGenerator {
@@ -43,6 +44,7 @@ public class GenerateHearingNoticeAppSolOneEmailDTOGenerator extends AppSolOneEm
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
         properties.put(HEARING_DATE, NotificationUtils.getFormattedHearingTime(caseData.getHearingTimeHourMinute()));
         properties.put(HEARING_TIME, NotificationUtils.getFormattedHearingTime(caseData.getHearingTimeHourMinute()));
+        properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData, organisationService));
 
         if (caseData.getHearingFeePaymentDetails() == null
                 || !SUCCESS.equals(caseData.getHearingFeePaymentDetails().getStatus())) {

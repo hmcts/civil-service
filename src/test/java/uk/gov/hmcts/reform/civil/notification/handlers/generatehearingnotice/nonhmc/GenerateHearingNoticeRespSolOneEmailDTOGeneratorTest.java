@@ -9,6 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
 
 import java.time.LocalDate;
@@ -21,6 +22,7 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.notification.handlers.RespSolOneEmailDTOGenerator.DEFENDANT_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.notification.handlers.RespSolOneEmailDTOGenerator.HEARING_DATE;
 import static uk.gov.hmcts.reform.civil.notification.handlers.RespSolOneEmailDTOGenerator.HEARING_TIME;
@@ -35,6 +37,10 @@ class GenerateHearingNoticeRespSolOneEmailDTOGeneratorTest {
     private static final String FORMATTED_DATE = "01-07-2025";
     private static final String FORMATTED_TIME = "08:30am";
     private static final String DEF_REF = "SOLICITOR-REF-1";
+    private static final String RESPONDENT_LEGAL_ORG_NAME = "respondent-legal-org-name";
+
+    @Mock
+    private OrganisationService organisationService;
 
     @Mock
     private NotificationsProperties notificationsProperties;
@@ -76,6 +82,9 @@ class GenerateHearingNoticeRespSolOneEmailDTOGeneratorTest {
             utils.when(() -> NotificationUtils.getFormattedHearingTime(TIME_FIELD))
                     .thenReturn(FORMATTED_TIME);
 
+            utils.when(() -> NotificationUtils.getLegalOrganizationNameForRespondent(caseData, Boolean.TRUE, organisationService))
+                .thenReturn(RESPONDENT_LEGAL_ORG_NAME);
+
             Map<String, String> base = new HashMap<>();
             base.put("foo", "bar");
 
@@ -85,7 +94,8 @@ class GenerateHearingNoticeRespSolOneEmailDTOGeneratorTest {
                     () -> assertEquals("bar", result.get("foo")),
                     () -> assertEquals(FORMATTED_DATE, result.get(HEARING_DATE)),
                     () -> assertEquals(FORMATTED_TIME, result.get(HEARING_TIME)),
-                    () -> assertEquals(DEF_REF, result.get(DEFENDANT_REFERENCE_NUMBER))
+                    () -> assertEquals(DEF_REF, result.get(DEFENDANT_REFERENCE_NUMBER)),
+                      () -> assertEquals(RESPONDENT_LEGAL_ORG_NAME, result.get(CLAIM_LEGAL_ORG_NAME_SPEC))
             );
 
             utils.verify(() -> NotificationUtils.getFormattedHearingDate(HEARING_DATE_VAL));

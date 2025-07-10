@@ -9,6 +9,8 @@ import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
 
 import java.util.Map;
 
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganizationNameForRespondent;
+
 @Component
 public class GenerateHearingNoticeRespSolTwoEmailDTOGenerator extends RespSolOneEmailDTOGenerator {
 
@@ -33,10 +35,13 @@ public class GenerateHearingNoticeRespSolTwoEmailDTOGenerator extends RespSolOne
 
     @Override
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
+        boolean isRespondent1 = false;
         properties.put(HEARING_DATE, NotificationUtils.getFormattedHearingDate(caseData.getHearingDate()));
         properties.put(HEARING_TIME, NotificationUtils.getFormattedHearingTime(caseData.getHearingTimeHourMinute()));
         properties.put(DEFENDANT_REFERENCE_NUMBER, caseData.getRespondentSolicitor2Reference() == null ? "" :
                 caseData.getRespondentSolicitor2Reference());
+        properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganizationNameForRespondent(caseData,
+                                                                                        isRespondent1, organisationService));
         return properties;
     }
 }

@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeVariables;
 import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
 import uk.gov.hmcts.reform.civil.utils.HearingFeeUtils;
 import uk.gov.hmcts.reform.civil.utils.HearingUtils;
+import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -31,6 +32,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.notification.handlers.AppSolOneEmailDTOGenerator.HEARING_DATE;
 import static uk.gov.hmcts.reform.civil.notification.handlers.AppSolOneEmailDTOGenerator.HEARING_DUE_DATE;
 import static uk.gov.hmcts.reform.civil.notification.handlers.AppSolOneEmailDTOGenerator.HEARING_FEE;
@@ -38,6 +40,7 @@ import static uk.gov.hmcts.reform.civil.notification.handlers.AppSolOneEmailDTOG
 import static uk.gov.hmcts.reform.civil.utils.HearingFeeUtils.calculateAndApplyFee;
 import static uk.gov.hmcts.reform.civil.utils.HearingFeeUtils.calculateHearingDueDate;
 import static uk.gov.hmcts.reform.civil.utils.HearingUtils.hearingFeeRequired;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
 
 @ExtendWith(MockitoExtension.class)
 class GenerateHearingNoticeHMCAppSolEmailDTOGeneratorTest {
@@ -146,11 +149,15 @@ class GenerateHearingNoticeHMCAppSolEmailDTOGeneratorTest {
         Fee fakeFee = mock(Fee.class);
         when(fakeFee.formData()).thenReturn("123.45");
 
-        try (MockedStatic<HearingFeeUtils> mocked = mockStatic(HearingFeeUtils.class)) {
+        try (MockedStatic<HearingFeeUtils> mocked = mockStatic(HearingFeeUtils.class);
+             MockedStatic<NotificationUtils> mockedUtils = mockStatic(NotificationUtils.class)) {
             mocked.when(() -> calculateAndApplyFee(hearingFeesService, caseData, caseData.getAssignedTrack()))
                     .thenReturn(fakeFee);
             mocked.when(() -> calculateHearingDueDate(any(LocalDate.class), eq(START_DATE_TIME_1.toLocalDate())))
                     .thenReturn(DUE_DATE_1);
+
+            mockedUtils.when(() -> getApplicantLegalOrganizationName(eq(caseData), any()))
+                .thenReturn("Applicant Org Ltd");
 
             Map<String, String> props = generator.addCustomProperties(new HashMap<>(), caseData);
 
@@ -158,7 +165,8 @@ class GenerateHearingNoticeHMCAppSolEmailDTOGeneratorTest {
                     () -> assertEquals("123.45", props.get(HEARING_FEE)),
                     () -> assertEquals("30-06-2025", props.get(HEARING_DATE)),
                     () -> assertEquals("02:45pm", props.get(HEARING_TIME)),
-                    () -> assertEquals("15-07-2025", props.get(HEARING_DUE_DATE))
+                    () -> assertEquals("15-07-2025", props.get(HEARING_DUE_DATE)),
+                    () -> assertEquals("Applicant Org Ltd", props.get(CLAIM_LEGAL_ORG_NAME_SPEC))
             );
         }
     }
@@ -174,11 +182,15 @@ class GenerateHearingNoticeHMCAppSolEmailDTOGeneratorTest {
                         .hearingStartDateTime(START_DATE_TIME_2)
                         .build());
 
-        try (MockedStatic<HearingFeeUtils> mocked = mockStatic(HearingFeeUtils.class)) {
+        try (MockedStatic<HearingFeeUtils> mocked = mockStatic(HearingFeeUtils.class);
+             MockedStatic<NotificationUtils> mockedUtils = mockStatic(NotificationUtils.class)) {
             mocked.when(() -> calculateAndApplyFee(hearingFeesService, caseData, caseData.getAssignedTrack()))
                     .thenReturn(null);
             mocked.when(() -> calculateHearingDueDate(any(LocalDate.class), eq(START_DATE_TIME_2.toLocalDate())))
                     .thenReturn(DUE_DATE_2);
+
+            mockedUtils.when(() -> getApplicantLegalOrganizationName(eq(caseData), any()))
+                .thenReturn("Applicant Org Ltd");
 
             Map<String, String> props = generator.addCustomProperties(new HashMap<>(), caseData);
 
@@ -186,7 +198,8 @@ class GenerateHearingNoticeHMCAppSolEmailDTOGeneratorTest {
                     () -> assertEquals("£0.00", props.get(HEARING_FEE)),
                     () -> assertEquals("05-01-2025", props.get(HEARING_DATE)),
                     () -> assertEquals("09:00am", props.get(HEARING_TIME)),
-                    () -> assertEquals("20-01-2025", props.get(HEARING_DUE_DATE))
+                    () -> assertEquals("20-01-2025", props.get(HEARING_DUE_DATE)),
+                      () -> assertEquals("Applicant Org Ltd", props.get(CLAIM_LEGAL_ORG_NAME_SPEC))
             );
         }
     }

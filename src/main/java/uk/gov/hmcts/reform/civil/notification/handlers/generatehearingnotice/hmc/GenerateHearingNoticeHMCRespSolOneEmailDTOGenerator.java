@@ -11,6 +11,8 @@ import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
 import java.time.LocalDateTime;
 import java.util.Map;
 
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganizationNameForRespondent;
+
 @Component
 public class GenerateHearingNoticeHMCRespSolOneEmailDTOGenerator extends RespSolOneEmailDTOGenerator {
 
@@ -38,12 +40,15 @@ public class GenerateHearingNoticeHMCRespSolOneEmailDTOGenerator extends RespSol
 
     @Override
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
+        boolean isRespondent1 = true;
         LocalDateTime hearingStartDateTime = camundaService
                 .getProcessVariables(caseData.getBusinessProcess().getProcessInstanceId()).getHearingStartDateTime();
 
         properties.put(HEARING_DATE, NotificationUtils.getFormattedHearingDate(caseData.getHearingDate()));
         properties.put(HEARING_TIME, NotificationUtils.getFormattedHearingTime(hearingStartDateTime.toLocalTime().toString()));
         properties.put(DEFENDANT_REFERENCE_NUMBER, caseData.getSolicitorReferences().getRespondentSolicitor1Reference());
+        properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganizationNameForRespondent(caseData,
+                                                                                        isRespondent1, organisationService));
         return properties;
     }
 }

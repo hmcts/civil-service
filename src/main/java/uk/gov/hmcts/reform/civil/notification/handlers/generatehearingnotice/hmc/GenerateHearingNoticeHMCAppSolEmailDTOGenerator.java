@@ -20,6 +20,7 @@ import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 import static uk.gov.hmcts.reform.civil.utils.HearingFeeUtils.calculateAndApplyFee;
 import static uk.gov.hmcts.reform.civil.utils.HearingFeeUtils.calculateHearingDueDate;
 import static uk.gov.hmcts.reform.civil.utils.HearingUtils.hearingFeeRequired;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
 
 @Component
 public class GenerateHearingNoticeHMCAppSolEmailDTOGenerator extends AppSolOneEmailDTOGenerator {
@@ -74,6 +75,7 @@ public class GenerateHearingNoticeHMCAppSolEmailDTOGenerator extends AppSolOneEm
                 .replace("AM", "am").replace("PM", "pm"));
         properties.put(HEARING_DUE_DATE, calculateHearingDueDate(LocalDate.now(), hearingDate)
                 .format(DateTimeFormatter.ofPattern(DATE_FORMAT)));
+        properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData, organisationService));
         return properties;
     }
 }

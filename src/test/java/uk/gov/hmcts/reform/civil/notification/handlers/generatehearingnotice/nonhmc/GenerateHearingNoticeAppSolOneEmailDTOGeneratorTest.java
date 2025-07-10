@@ -23,14 +23,18 @@ import static java.math.BigDecimal.valueOf;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.FAILED;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.notification.handlers.AppSolOneEmailDTOGenerator.HEARING_DATE;
 import static uk.gov.hmcts.reform.civil.notification.handlers.AppSolOneEmailDTOGenerator.HEARING_DUE_DATE;
 import static uk.gov.hmcts.reform.civil.notification.handlers.AppSolOneEmailDTOGenerator.HEARING_FEE;
 import static uk.gov.hmcts.reform.civil.notification.handlers.AppSolOneEmailDTOGenerator.HEARING_TIME;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
 
 @ExtendWith(MockitoExtension.class)
 class GenerateHearingNoticeAppSolOneEmailDTOGeneratorTest {
@@ -217,13 +221,17 @@ class GenerateHearingNoticeAppSolOneEmailDTOGeneratorTest {
                     .hearingDueDate(DATE_2025_07_01)
                     .build();
 
+            utils.when(() -> getApplicantLegalOrganizationName(eq(caseData), any()))
+                .thenReturn("Applicant Org Ltd");
+
             Map<String, String> result = generator.addCustomProperties(new HashMap<>(), caseData);
 
             assertAll("payment-successful-branch",
                     () -> assertEquals("formattedTime", result.get(HEARING_DATE)),
                     () -> assertEquals("formattedTime", result.get(HEARING_TIME)),
                     () -> assertFalse(result.containsKey(HEARING_FEE)),
-                    () -> assertFalse(result.containsKey(HEARING_DUE_DATE))
+                    () -> assertFalse(result.containsKey(HEARING_DUE_DATE)),
+            () -> assertEquals("Applicant Org Ltd", result.get(CLAIM_LEGAL_ORG_NAME_SPEC))
             );
         }
     }
@@ -243,13 +251,17 @@ class GenerateHearingNoticeAppSolOneEmailDTOGeneratorTest {
                     .hearingDueDate(DATE_2025_08_15)
                     .build();
 
+            utils.when(() -> getApplicantLegalOrganizationName(eq(caseData), any()))
+                .thenReturn("Applicant Org Ltd");
+
             Map<String, String> result = generator.addCustomProperties(new HashMap<>(), caseData);
 
             assertAll("payment-failed-branch",
                     () -> assertEquals("9:00am", result.get(HEARING_DATE)),
                     () -> assertEquals("9:00am", result.get(HEARING_TIME)),
                     () -> assertEquals("£150.00", result.get(HEARING_FEE)),
-                    () -> assertEquals("15-08-2025", result.get(HEARING_DUE_DATE))
+                    () -> assertEquals("15-08-2025", result.get(HEARING_DUE_DATE)),
+                      () -> assertEquals("Applicant Org Ltd", result.get(CLAIM_LEGAL_ORG_NAME_SPEC))
             );
         }
     }

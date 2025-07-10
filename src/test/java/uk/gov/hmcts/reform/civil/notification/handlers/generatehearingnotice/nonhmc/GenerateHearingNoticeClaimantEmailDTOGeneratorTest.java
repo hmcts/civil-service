@@ -8,6 +8,7 @@ import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
@@ -20,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.notification.handlers.ClaimantEmailDTOGenerator.HEARING_DATE;
 import static uk.gov.hmcts.reform.civil.notification.handlers.ClaimantEmailDTOGenerator.HEARING_TIME;
 
@@ -68,6 +70,8 @@ class GenerateHearingNoticeClaimantEmailDTOGeneratorTest {
                 .atStateClaimDetailsNotified()
                 .build().toBuilder()
                 .claimantBilingualLanguagePreference(Language.BOTH.getDisplayedValue())
+                .applicant1(Party.builder().individualFirstName("Claimant")
+                            .individualLastName("Org").type(Party.Type.INDIVIDUAL).build())
                 .build();
 
         when(notificationsProperties.getHearingNotificationLipDefendantTemplateWelsh())
@@ -100,6 +104,8 @@ class GenerateHearingNoticeClaimantEmailDTOGeneratorTest {
                     .build().toBuilder()
                     .hearingTimeHourMinute(TIME_1015)
                     .hearingDate(DATE_2025_07_04)
+                    .applicant1(Party.builder().individualFirstName("Claimant")
+                                    .individualLastName("Org").type(Party.Type.INDIVIDUAL).build())
                     .build();
 
             Map<String, String> result1 = generator.addCustomProperties(props, caseData1);
@@ -124,13 +130,16 @@ class GenerateHearingNoticeClaimantEmailDTOGeneratorTest {
                     .build().toBuilder()
                     .hearingTimeHourMinute(TIME_0800)
                     .hearingDate(DATE_2025_12_01)
+                    .applicant1(Party.builder().individualFirstName("Claimant")
+                                    .individualLastName("Org").type(Party.Type.INDIVIDUAL).build())
                     .build();
 
             Map<String, String> result2 = generator.addCustomProperties(props2, caseData2);
 
             assertAll("override-keys",
                     () -> assertEquals(FORMATTED_TIME_8_00,     result2.get(HEARING_TIME)),
-                    () -> assertEquals(FORMATTED_DATE_01_12_2025, result2.get(HEARING_DATE))
+                    () -> assertEquals(FORMATTED_DATE_01_12_2025, result2.get(HEARING_DATE)),
+                      () -> assertEquals("Claimant Org", result2.get(CLAIM_LEGAL_ORG_NAME_SPEC))
             );
         }
     }

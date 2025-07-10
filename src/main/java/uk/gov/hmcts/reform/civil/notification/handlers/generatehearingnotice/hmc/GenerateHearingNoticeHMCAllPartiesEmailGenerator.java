@@ -11,8 +11,10 @@ public class GenerateHearingNoticeHMCAllPartiesEmailGenerator extends AllParties
     public GenerateHearingNoticeHMCAllPartiesEmailGenerator(
             GenerateHearingNoticeHMCAppSolEmailDTOGenerator appSolGen,
             GenerateHearingNoticeHMCRespSolOneEmailDTOGenerator respSolOneGen,
-            GenerateHearingNoticeHMCRespSolTwoEmailDTOGenerator respSolTwoGen
+            GenerateHearingNoticeHMCRespSolTwoEmailDTOGenerator respSolTwoGen,
+            GenerateHearingNoticeHMCClaimantEmailDTOGenerator claimantEmailDTOGenerator,
+            GenerateHearingNoticeHMCDefendantEmailDTOGenerator defendantEmailDTOGenerator
     ) {
-        super(List.of(appSolGen, respSolOneGen, respSolTwoGen));
+        super(List.of(appSolGen, respSolOneGen, respSolTwoGen, claimantEmailDTOGenerator, defendantEmailDTOGenerator));
     }
 }

@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeCamundaService;
 import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeVariables;
 import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
@@ -25,6 +26,7 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.notification.handlers.RespSolOneEmailDTOGenerator.DEFENDANT_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.notification.handlers.RespSolOneEmailDTOGenerator.HEARING_DATE;
 import static uk.gov.hmcts.reform.civil.notification.handlers.RespSolOneEmailDTOGenerator.HEARING_TIME;
@@ -40,11 +42,16 @@ class GenerateHearingNoticeHMCRespSolOneEmailDTOGeneratorTest {
     private static final LocalDateTime HEARING_START_DATE_TIME = LocalDateTime.of(2025, 7, 1, 8, 30);
     private static final String FORMATTED_DATE = "01-07-2025";
     private static final String FORMATTED_TIME = "08:30am";
+    private static final String RESPONDENT_LEGAL_ORG_NAME = "respondent-legal-org-name";
 
     @Mock
     private NotificationsProperties notificationsProperties;
     @Mock
     private HearingNoticeCamundaService camundaService;
+
+    @Mock
+    private OrganisationService organisationService;
+
     @InjectMocks
     private GenerateHearingNoticeHMCRespSolOneEmailDTOGenerator generator;
 
@@ -87,6 +94,9 @@ class GenerateHearingNoticeHMCRespSolOneEmailDTOGeneratorTest {
             utils.when(() -> NotificationUtils.getFormattedHearingTime("08:30"))
                     .thenReturn(FORMATTED_TIME);
 
+            utils.when(() -> NotificationUtils.getLegalOrganizationNameForRespondent(caseData, Boolean.TRUE, organisationService))
+                .thenReturn(RESPONDENT_LEGAL_ORG_NAME);
+
             Map<String, String> base = new HashMap<>();
             base.put("existing", "value");
 
@@ -96,7 +106,8 @@ class GenerateHearingNoticeHMCRespSolOneEmailDTOGeneratorTest {
                     () -> assertEquals("value", result.get("existing")),
                     () -> assertEquals(FORMATTED_DATE, result.get(HEARING_DATE)),
                     () -> assertEquals(FORMATTED_TIME, result.get(HEARING_TIME)),
-                    () -> assertEquals(DEFENDANT_REFERENCE, result.get(DEFENDANT_REFERENCE_NUMBER))
+                    () -> assertEquals(DEFENDANT_REFERENCE, result.get(DEFENDANT_REFERENCE_NUMBER)),
+                      () -> assertEquals(RESPONDENT_LEGAL_ORG_NAME, result.get(CLAIM_LEGAL_ORG_NAME_SPEC))
             );
 
             verify(camundaService).getProcessVariables(PROCESS_ID);
