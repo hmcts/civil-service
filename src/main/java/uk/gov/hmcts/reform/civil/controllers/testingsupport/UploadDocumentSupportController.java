@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,6 +17,9 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.helpers.ResourceReader;
 
+import java.util.HashMap;
+
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SEALED_CLAIM;
 
 @Tag(name = "Upload Document Support Controller")
@@ -34,9 +38,12 @@ public class UploadDocumentSupportController {
 
     @PostMapping(value = {"/upload/test-document"})
     @Operation(summary = "Upload document")
-    public Document uploadTestDocument(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation) {
-
-        PDF pdf = new PDF("TestFile.pdf", ResourceReader.readBytes("/test_support/TEST_DOCUMENT_1.pdf"), SEALED_CLAIM);
+    public Document uploadTestDocument(
+        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
+        @RequestBody HashMap<String, String> requestPayload
+    ) {
+        String fileName = nonNull(requestPayload) && nonNull(requestPayload.get("filename")) ? requestPayload.get("filename") : "TestFile.pdf";
+        PDF pdf = new PDF(fileName, ResourceReader.readBytes("/test_support/TEST_DOCUMENT_1.pdf"), SEALED_CLAIM);
         return documentManagementService.uploadDocument(authorisation, pdf).getDocumentLink();
     }
 }
