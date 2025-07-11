@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.utils;
 
+import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
@@ -12,8 +13,10 @@ import uk.gov.hmcts.reform.civil.model.querymanagement.LatestQuery;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -34,6 +37,7 @@ import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPDefendant;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorOne;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorTwo;
 
+@Slf4j
 public class CaseQueriesUtil {
 
     private static final String UNSUPPORTED_ROLE_ERROR = "Unsupported case role for query management.";
@@ -250,25 +254,36 @@ public class CaseQueriesUtil {
             || nonNull(caseData.getQmRespondentSolicitor2Queries());
     }
 
-    private static void migrateQueries(CaseQueriesCollection collectionToMigrate, CaseData.CaseDataBuilder builder) {
-        if (nonNull(collectionToMigrate) && nonNull(collectionToMigrate.getCaseMessages())) {
-            CaseData caseData = builder.build();
-            List<Element<CaseMessage>> messages = caseData.getQueries().getCaseMessages();
-            messages.addAll(collectionToMigrate.getCaseMessages());
-            builder.queries(caseData.getQueries().toBuilder().caseMessages(messages).build());
-        }
-    }
-
     public static void migrateAllQueries(CaseData.CaseDataBuilder builder) {
         CaseData caseData = builder.build();
         if (hasOldQueries(caseData)) {
-            builder.queries(CaseQueriesCollection.builder()
-                                .partyName("All queries")
-                                .caseMessages(new ArrayList<>())
-                                .build());
-            migrateQueries(caseData.getQmApplicantSolicitorQueries(), builder);
-            migrateQueries(caseData.getQmRespondentSolicitor1Queries(), builder);
-            migrateQueries(caseData.getQmRespondentSolicitor2Queries(), builder);
+            String collectionOwner = "";
+            try {
+                builder.queries(CaseQueriesCollection.builder()
+                                    .partyName("All queries")
+                                    .caseMessages(new ArrayList<>())
+                                    .build());
+                collectionOwner = "Claimant";
+                migrateQueries(caseData.getQmApplicantSolicitorQueries(), builder);
+                collectionOwner = "Defendant 1";
+                migrateQueries(caseData.getQmRespondentSolicitor1Queries(), builder);
+                collectionOwner = "Defendant 2";
+                migrateQueries(caseData.getQmRespondentSolicitor2Queries(), builder);
+            } catch (Exception e) {
+                log.error("There was a problem migrating the [{}] queries ", collectionOwner, e);
+                // Continue to throw the original error since all queries must be migrated successfully.
+                throw e;
+            }
+        }
+    }
+
+    public static void migrateQueries(CaseQueriesCollection collectionToMigrate, CaseData.CaseDataBuilder builder) {
+        if (nonNull(collectionToMigrate) && nonNull(collectionToMigrate.getCaseMessages())) {
+            CaseData caseData = builder.build();
+            log.info("Started to migrate [{}] queries", collectionToMigrate.getPartyName(), caseData.getCcdCaseReference());
+            List<Element<CaseMessage>> messages = caseData.getQueries().getCaseMessages();
+            messages.addAll(collectionToMigrate.getCaseMessages());
+            builder.queries(caseData.getQueries().toBuilder().caseMessages(messages).build());
         }
     }
 
@@ -277,6 +292,21 @@ public class CaseQueriesUtil {
             builder.qmApplicantSolicitorQueries(null);
             builder.qmRespondentSolicitor1Queries(null);
             builder.qmRespondentSolicitor2Queries(null);
+        }
+    }
+
+    public static void logMigrationSuccess(CaseData caseDataBefore) {
+        if (hasOldQueries(caseDataBefore)) {
+            Arrays.asList(
+                    caseDataBefore.getQmApplicantSolicitorQueries(),
+                    caseDataBefore.getQmRespondentSolicitor1Queries(),
+                    caseDataBefore.getQmRespondentSolicitor2Queries()
+                ).stream().filter(Objects::nonNull)
+                .forEach(collection ->
+                             log.info(
+                                 "Successfully migrated [{}] queries",
+                                 collection.getPartyName(), caseDataBefore.getCcdCaseReference()
+                             ));
         }
     }
 }

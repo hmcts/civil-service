@@ -25,6 +25,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.queryManagementRespon
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.assignCategoryIdToCaseworkerAttachments;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.clearOldQueryCollections;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getLatestQuery;
+import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.logMigrationSuccess;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.migrateAllQueries;
 
 @Service
@@ -42,7 +43,7 @@ public class RespondQueryCallbackHandler extends CallbackHandler {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::aboutToStart,
             callbackKey(ABOUT_TO_SUBMIT), this::setManagementQuery,
-            callbackKey(SUBMITTED), this::emptyCallbackResponse
+            callbackKey(SUBMITTED), this::aboutToSubmit
         );
     }
 
@@ -80,4 +81,13 @@ public class RespondQueryCallbackHandler extends CallbackHandler {
                       .build().toMap(mapper))
             .build();
     }
+
+    private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
+        CaseData caseDataBefore = callbackParams.getCaseDataBefore();
+        if (featureToggleService.isPublicQueryManagementEnabled(caseDataBefore)) {
+            logMigrationSuccess(callbackParams.getCaseDataBefore());
+        }
+        return emptySubmittedCallbackResponse(callbackParams);
+    }
+
 }
