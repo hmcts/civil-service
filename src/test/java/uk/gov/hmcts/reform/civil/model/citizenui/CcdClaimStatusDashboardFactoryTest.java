@@ -850,7 +850,7 @@ class CcdClaimStatusDashboardFactoryTest {
 
     @Test
     void given_sdoIsDrawn_anyPartyBilingual_showStatusDocumentsTranslated() {
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         CaseData claim = CaseData.builder().preTranslationDocuments(List.of(Element.<CaseDocument>builder()
                                                                                 .value(CaseDocument.builder()
                                                                                            .documentType(SDO_ORDER)
@@ -866,7 +866,7 @@ class CcdClaimStatusDashboardFactoryTest {
 
     @Test
     void given_decisionMadeIsDrawn_anyPartyBilingual_showStatusDocumentsTranslated() {
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         CaseData claim = CaseData.builder().preTranslationDocuments(List.of(Element.<CaseDocument>builder()
                                                                                 .value(CaseDocument.builder()
                                                                                            .documentType(
@@ -880,7 +880,7 @@ class CcdClaimStatusDashboardFactoryTest {
                 claim, featureToggleService, Collections.emptyList()));
         assertThat(status).isEqualTo(DashboardClaimStatus.DECISION_MADE_DOCUMENTS_BEING_TRANSLATED);
     }
-  
+
     @Test
     void given_caseDiscontinued_whenGetStatus_thenReturnCaseDiscontinued() {
         CaseData claim = CaseData.builder()
