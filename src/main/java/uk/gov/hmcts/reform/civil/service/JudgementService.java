@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -73,9 +74,7 @@ public class JudgementService {
         if (caseData.getOutstandingFeeInPounds() != null) {
             return caseData.getOutstandingFeeInPounds();
         }
-        return caseData.isLipvLipOneVOne()
-            ? caseData.getCcjPaymentDetails().getCcjJudgmentAmountClaimFee()
-            : MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence());
+        return MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence());
     }
 
     public BigDecimal ccjJudgmentPaidAmount(CaseData caseData) {
@@ -101,15 +100,15 @@ public class JudgementService {
     }
 
     public BigDecimal ccjJudgementSubTotal(CaseData caseData) {
-        if (isLrFullAdmitRepaymentPlan(caseData) || isLRPartAdmitRepaymentPlan(caseData) || isLrPayImmediatelyPlan(caseData)) {
+        if (isLrFullAdmitRepaymentPlan(caseData) || isLRPartAdmitRepaymentPlan(caseData) || isLipvLipPartAdmit(caseData) || isLrPayImmediatelyPlan(caseData)) {
             return ccjJudgmentClaimAmount(caseData)
                 .add(ccjJudgmentClaimFee(caseData))
-                .add(ccjJudgmentFixedCost(caseData));
+                .add(ccjJudgmentFixedCost(caseData)).setScale(2, RoundingMode.UNNECESSARY);
         } else {
             return ccjJudgmentClaimAmount(caseData)
                 .add(ccjJudgmentClaimFee(caseData))
                 .add(ccjJudgmentInterest(caseData))
-                .add(ccjJudgmentFixedCost(caseData));
+                .add(ccjJudgmentFixedCost(caseData)).setScale(2, RoundingMode.UNNECESSARY);
         }
     }
 
@@ -158,6 +157,16 @@ public class JudgementService {
         return featureToggleService.isLrAdmissionBulkEnabled()
             && !caseData.isApplicantLiP()
             && isOneVOne(caseData);
+    }
+
+    private boolean isLipvLip(CaseData caseData) {
+        return caseData.isApplicantLiP() && caseData.isRespondent1LiP();
+    }
+
+    private boolean isLipvLipPartAdmit(CaseData caseData) {
+        return isLipvLip(caseData)
+            && caseData.isPartAdmitClaimSpec()
+            && (caseData.isPayImmediately() || caseData.isPayByInstallment() || caseData.isPayBySetDate());
     }
 
     public boolean isLrPayImmediatelyPlan(CaseData caseData) {
