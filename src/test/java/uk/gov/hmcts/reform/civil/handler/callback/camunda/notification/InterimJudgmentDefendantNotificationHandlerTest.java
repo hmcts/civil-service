@@ -40,6 +40,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CNBC_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LEGAL_ORG_DEF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
@@ -87,7 +88,6 @@ public class InterimJudgmentDefendantNotificationHandlerTest extends BaseCallbac
             when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("welshHmctsSignature"));
             when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("welshPhoneContact"));
             when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
-            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
             when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
         }
@@ -97,7 +97,8 @@ public class InterimJudgmentDefendantNotificationHandlerTest extends BaseCallbac
             when(notificationsProperties.getInterimJudgmentApprovalDefendant()).thenReturn("template-id-app");
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
-
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
             handler.handle(params);
@@ -112,7 +113,9 @@ public class InterimJudgmentDefendantNotificationHandlerTest extends BaseCallbac
 
         @Test
         void shouldReturnPartyNameIfRespondentIsLip() {
-
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             CaseData caseData = CaseDataBuilder.builder()
                 .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("hmcts")
                                  .individualTitle("Mr.")
@@ -122,6 +125,7 @@ public class InterimJudgmentDefendantNotificationHandlerTest extends BaseCallbac
                 .respondent1OrganisationPolicy(null)
                 .legacyCaseReference("12DC910")
                 .respondent2OrganisationPolicy(null).build().toBuilder()
+                .respondent1Represented(YesOrNo.NO)
                 .ccdCaseReference(1594901956117591L).build();
 
             Map<String, String> propertyMap = handler.addProperties(caseData);
@@ -130,7 +134,8 @@ public class InterimJudgmentDefendantNotificationHandlerTest extends BaseCallbac
 
         @Test
         void shouldReturnPartyNameIfOrgnisationPolicyIsSetButOrgIdMissing() {
-
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             CaseData caseData = CaseDataBuilder.builder()
                 .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("hmcts")
                                  .individualTitle("Mr.")
@@ -154,7 +159,8 @@ public class InterimJudgmentDefendantNotificationHandlerTest extends BaseCallbac
             when(notificationsProperties.getInterimJudgmentApprovalDefendant()).thenReturn("template-id-app");
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
-
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued1v2AndBothDefendantsDefaultJudgment()
                 .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
@@ -173,7 +179,9 @@ public class InterimJudgmentDefendantNotificationHandlerTest extends BaseCallbac
             when(notificationsProperties.getInterimJudgmentApprovalDefendant()).thenReturn("template-id-app");
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
-
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued1v2AndBothDefendantsDefaultJudgment()
                 .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
@@ -189,7 +197,7 @@ public class InterimJudgmentDefendantNotificationHandlerTest extends BaseCallbac
         }
 
         private Map<String, String> getNotificationDataMap() {
-            Map<String, String> properties = new HashMap<>(addCommonProperties());
+            Map<String, String> properties = new HashMap<>(addCommonProperties(false));
             properties.put("Defendant LegalOrg Name", "Test Org Name");
             properties.put("Claim number", "1594901956117591");
             properties.put("Defendant Name", "Mr. Sole Trader");
@@ -199,7 +207,7 @@ public class InterimJudgmentDefendantNotificationHandlerTest extends BaseCallbac
         }
 
         @NotNull
-        public Map<String, String> addCommonProperties() {
+        public Map<String, String> addCommonProperties(boolean isLipCase) {
             Map<String, String> expectedProperties = new HashMap<>();
             expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
             expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
@@ -207,9 +215,15 @@ public class InterimJudgmentDefendantNotificationHandlerTest extends BaseCallbac
             expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
             expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
             expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
-            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
             expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
             expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+            if (isLipCase) {
+                expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+                expectedProperties.put(CNBC_CONTACT, configuration.getCnbcContact());
+            } else {
+                expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getRaiseQueryLr());
+                expectedProperties.put(CNBC_CONTACT, configuration.getRaiseQueryLr());
+            }
             return expectedProperties;
         }
     }

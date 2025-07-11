@@ -166,8 +166,7 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
             map.put(CLAIMANT_REFERENCE_NUMBER, reference);
         }
         addAllFooterItems(caseData, map, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
         return map;
     }
 
@@ -238,8 +237,7 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
             CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
         addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
 
         return properties;
     }

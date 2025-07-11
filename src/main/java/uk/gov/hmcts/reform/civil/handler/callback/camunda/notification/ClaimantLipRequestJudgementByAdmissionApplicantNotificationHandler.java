@@ -82,8 +82,7 @@ public class ClaimantLipRequestJudgementByAdmissionApplicantNotificationHandler 
             FRONTEND_URL, pipInPostConfiguration.getCuiFrontEndUrl()
         ));
         addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
         return properties;
     }
 

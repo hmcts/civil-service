@@ -155,8 +155,7 @@ public class MediationSuccessfulRespondentNotificationHandler extends CallbackHa
             DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
         ));
         addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
 
         return properties;
     }
@@ -176,8 +175,7 @@ public class MediationSuccessfulRespondentNotificationHandler extends CallbackHa
             CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
         addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
 
         return properties;
     }
@@ -192,8 +190,7 @@ public class MediationSuccessfulRespondentNotificationHandler extends CallbackHa
             CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
         addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
 
         return properties;
     }
@@ -204,8 +201,7 @@ public class MediationSuccessfulRespondentNotificationHandler extends CallbackHa
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString()
         ));
         addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
         return properties;
     }
 

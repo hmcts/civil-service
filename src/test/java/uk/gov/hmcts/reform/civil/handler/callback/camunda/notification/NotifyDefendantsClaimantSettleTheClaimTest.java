@@ -41,6 +41,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_CLAI
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_16_DIGIT_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CNBC_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LEGAL_REP_NAME;
@@ -48,6 +49,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.OPENING_HOURS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PHONE_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.SPEC_UNSPEC_CONTACT;
 
 @ExtendWith(MockitoExtension.class)
 public class NotifyDefendantsClaimantSettleTheClaimTest extends BaseCallbackHandlerTest {
@@ -93,13 +95,17 @@ public class NotifyDefendantsClaimantSettleTheClaimTest extends BaseCallbackHand
             when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("welshHmctsSignature"));
             when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("welshPhoneContact"));
             when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
-            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
             when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
         }
 
         @Test
         void shouldSendNotificationToDefendantLip_whenLiPvLiPandDefendantHasEmail() {
+            //When
+            given(notificationsProperties.getNotifyDefendantLIPClaimantSettleTheClaimTemplate()).willReturn(EMAIL_TEMPLATE);
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             //Given
             CaseData caseData = CaseData.builder()
                 .respondent1(Party.builder().type(Party.Type.COMPANY).companyName(DEFENDANT_PARTY_NAME).partyEmail(
@@ -108,11 +114,10 @@ public class NotifyDefendantsClaimantSettleTheClaimTest extends BaseCallbackHand
                 .legacyCaseReference(REFERENCE_NUMBER)
                 .addApplicant2(YesOrNo.NO)
                 .addRespondent2(YesOrNo.NO)
+                .respondent1Represented(YesOrNo.NO)
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder().eventId(NOTIFY_DEFENDANT_CLAIMANT_SETTLE_THE_CLAIM.name()).build()).build();
-            //When
-            given(notificationsProperties.getNotifyDefendantLIPClaimantSettleTheClaimTemplate()).willReturn(EMAIL_TEMPLATE);
             notificationHandler.handle(params);
             //Then
             verify(notificationService, times(1)).sendMail(targetEmail.capture(),
@@ -129,11 +134,21 @@ public class NotifyDefendantsClaimantSettleTheClaimTest extends BaseCallbackHand
             assertThat(notificationDataMap.getAllValues().get(0)).containsEntry(OPENING_HOURS, configuration.getOpeningHours());
             assertThat(notificationDataMap.getAllValues().get(0)).containsEntry(LIP_CONTACT, configuration.getLipContactEmail());
             assertThat(notificationDataMap.getAllValues().get(0)).containsEntry(HMCTS_SIGNATURE, configuration.getHmctsSignature());
+            assertThat(notificationDataMap.getAllValues().get(0)).containsEntry(CNBC_CONTACT, configuration.getCnbcContact());
+            assertThat(notificationDataMap.getAllValues().get(0)).containsEntry(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
         }
 
         @ParameterizedTest
         @ValueSource(booleans = {true, false})
         void shouldSendNotificationToDefendantLR_whenLiPvLRandDefendantHasEmail(boolean referenceWasProvided) {
+            //When
+            when(organisationService.findOrganisationById(anyString()))
+                .thenReturn(Optional.of(uk.gov.hmcts.reform.civil.prd.model.Organisation.builder().name("Legal Rep Name").build()));
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
+            given(notificationsProperties.getNotifyDefendantLRClaimantSettleTheClaimTemplate()).willReturn(EMAIL_TEMPLATE_LR);
+
             //Given
             CaseData caseData = CaseData.builder()
                 .respondent1(Party.builder().type(Party.Type.COMPANY).build())
@@ -149,13 +164,10 @@ public class NotifyDefendantsClaimantSettleTheClaimTest extends BaseCallbackHand
                 .ccdCaseReference(1234567891234567L)
                 .addApplicant2(YesOrNo.NO)
                 .addRespondent2(YesOrNo.NO)
+                .applicant1Represented(YesOrNo.NO)
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder().eventId(NOTIFY_DEFENDANT_CLAIMANT_SETTLE_THE_CLAIM.name()).build()).build();
-            //When
-            when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(uk.gov.hmcts.reform.civil.prd.model.Organisation.builder().name("Legal Rep Name").build()));
-            given(notificationsProperties.getNotifyDefendantLRClaimantSettleTheClaimTemplate()).willReturn(EMAIL_TEMPLATE_LR);
             notificationHandler.handle(params);
             //Then
             verify(notificationService, times(1)).sendMail(targetEmail.capture(),
@@ -175,6 +187,8 @@ public class NotifyDefendantsClaimantSettleTheClaimTest extends BaseCallbackHand
             assertThat(notificationDataMap.getAllValues().get(0)).containsEntry(OPENING_HOURS, configuration.getOpeningHours());
             assertThat(notificationDataMap.getAllValues().get(0)).containsEntry(LIP_CONTACT, configuration.getLipContactEmail());
             assertThat(notificationDataMap.getAllValues().get(0)).containsEntry(HMCTS_SIGNATURE, configuration.getHmctsSignature());
+            assertThat(notificationDataMap.getAllValues().get(0)).containsEntry(CNBC_CONTACT, configuration.getCnbcContact());
+            assertThat(notificationDataMap.getAllValues().get(0)).containsEntry(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
         }
 
         @Test

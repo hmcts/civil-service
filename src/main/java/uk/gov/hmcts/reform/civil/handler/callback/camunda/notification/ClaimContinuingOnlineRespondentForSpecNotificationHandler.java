@@ -139,8 +139,7 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandler extends C
         map.put(CLAIM_DETAILS_NOTIFICATION_DEADLINE, formatLocalDate(caseData.getRespondent1ResponseDeadline()
                                                                          .toLocalDate(), DATE));
         addAllFooterItems(caseData, map, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
         return map;
     }
 

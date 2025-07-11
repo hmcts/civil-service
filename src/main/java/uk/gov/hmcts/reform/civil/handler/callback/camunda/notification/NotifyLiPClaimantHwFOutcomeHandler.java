@@ -206,8 +206,7 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
             HWF_REFERENCE_NUMBER, caseData.getHwFReferenceNumber()
         ));
         addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
         return properties;
     }
 

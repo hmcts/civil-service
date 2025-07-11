@@ -103,8 +103,7 @@ public class ClaimantResponseAgreedRepaymentRespondentNotificationHandler extend
                 CASEMAN_REF, caseData.getLegacyCaseReference()
             ));
             addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
             return properties;
         }
         if (caseData.isRespondent1NotRepresented()) {
@@ -113,8 +112,7 @@ public class ClaimantResponseAgreedRepaymentRespondentNotificationHandler extend
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
             ));
             addAllFooterItems(caseData, properties, configuration,
-                              featureToggleService.isQueryManagementLRsEnabled(),
-                              featureToggleService.isLipQueryManagementEnabled(caseData));
+                              featureToggleService.isPublicQueryManagementEnabled(caseData));
             return properties;
         }
         return null;

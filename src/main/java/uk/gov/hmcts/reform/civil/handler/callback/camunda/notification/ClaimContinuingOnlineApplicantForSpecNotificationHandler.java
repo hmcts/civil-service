@@ -107,8 +107,7 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandler extends Ca
                 caseData.getRespondent1ResponseDeadline(), DATE_TIME_AT));
         }
         addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
 
         return properties;
     }

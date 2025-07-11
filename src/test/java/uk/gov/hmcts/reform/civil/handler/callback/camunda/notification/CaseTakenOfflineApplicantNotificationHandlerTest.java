@@ -80,7 +80,6 @@ class CaseTakenOfflineApplicantNotificationHandlerTest extends BaseCallbackHandl
             when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("welshHmctsSignature"));
             when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("welshPhoneContact"));
             when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
-            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
             when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
@@ -89,6 +88,9 @@ class CaseTakenOfflineApplicantNotificationHandlerTest extends BaseCallbackHandl
         @Test
         void shouldNotifyApplicantSolicitor_whenInvoked() {
             when(notificationsProperties.getSolicitorCaseTakenOffline()).thenReturn("template-id");
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
@@ -97,7 +99,7 @@ class CaseTakenOfflineApplicantNotificationHandlerTest extends BaseCallbackHandl
             verify(notificationService).sendMail(
                 "applicantsolicitor@example.com",
                 "template-id",
-                getNotificationDataMap(caseData),
+                getNotificationDataMap(caseData, false),
                 "case-taken-offline-applicant-notification-000DC001"
             );
         }
@@ -105,6 +107,9 @@ class CaseTakenOfflineApplicantNotificationHandlerTest extends BaseCallbackHandl
         @Test
         void shouldUseApplicantNotRespondedTemplate_when1v1SpecBothPartiesRepresented() {
             when(notificationsProperties.getSolicitorCaseTakenOfflineNoApplicantResponse()).thenReturn("template-id2");
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified().build().toBuilder()
                 .applicant1ResponseDeadline(LocalDateTime.now())
@@ -117,7 +122,7 @@ class CaseTakenOfflineApplicantNotificationHandlerTest extends BaseCallbackHandl
             verify(notificationService).sendMail(
                 "applicantsolicitor@example.com",
                 "template-id2",
-                getNotificationDataMap(caseData),
+                getNotificationDataMap(caseData, false),
                 "case-taken-offline-applicant-notification-000DC001"
             );
         }
@@ -125,6 +130,9 @@ class CaseTakenOfflineApplicantNotificationHandlerTest extends BaseCallbackHandl
         @Test
         void shouldUseApplicantNotRespondedTemplate_when1v1SpecRespondentUnrepresented() {
             when(notificationsProperties.getSolicitorCaseTakenOffline()).thenReturn("template-id");
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified().build().toBuilder()
                 .applicant1ResponseDeadline(LocalDateTime.now())
@@ -138,7 +146,7 @@ class CaseTakenOfflineApplicantNotificationHandlerTest extends BaseCallbackHandl
             verify(notificationService).sendMail(
                 "applicantsolicitor@example.com",
                 "template-id",
-                getNotificationDataMap(caseData),
+                getNotificationDataMap(caseData, true),
                 "case-taken-offline-applicant-notification-000DC001"
             );
         }
@@ -146,6 +154,9 @@ class CaseTakenOfflineApplicantNotificationHandlerTest extends BaseCallbackHandl
         @Test
         void shouldNotUseApplicantNotRespondedTemplate_when1v2SpecBothPartiesRepresented() {
             when(notificationsProperties.getSolicitorCaseTakenOffline()).thenReturn("template-id");
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .multiPartyClaimTwoDefendantSolicitors()
@@ -160,14 +171,14 @@ class CaseTakenOfflineApplicantNotificationHandlerTest extends BaseCallbackHandl
             verify(notificationService).sendMail(
                 "applicantsolicitor@example.com",
                 "template-id",
-                getNotificationDataMap(caseData),
+                getNotificationDataMap(caseData, false),
                 "case-taken-offline-applicant-notification-000DC001"
             );
         }
 
         @NotNull
-        private Map<String, String> getNotificationDataMap(CaseData caseData) {
-            Map<String, String> map = new HashMap<>(addCommonProperties());
+        private Map<String, String> getNotificationDataMap(CaseData caseData, boolean isLipCase) {
+            Map<String, String> map = new HashMap<>(addCommonProperties(isLipCase));
             map.put(CLAIM_REFERENCE_NUMBER, CASE_ID.toString());
             map.put(PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData));
             map.put(CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name");
@@ -176,7 +187,7 @@ class CaseTakenOfflineApplicantNotificationHandlerTest extends BaseCallbackHandl
         }
 
         @NotNull
-        public Map<String, String> addCommonProperties() {
+        public Map<String, String> addCommonProperties(boolean isLipCase) {
             Map<String, String> expectedProperties = new HashMap<>();
             expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
             expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
@@ -188,6 +199,13 @@ class CaseTakenOfflineApplicantNotificationHandlerTest extends BaseCallbackHandl
             expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
             expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
             expectedProperties.put(CNBC_CONTACT, configuration.getCnbcContact());
+            if (isLipCase) {
+                expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+                expectedProperties.put(CNBC_CONTACT, configuration.getCnbcContact());
+            } else {
+                expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getRaiseQueryLr());
+                expectedProperties.put(CNBC_CONTACT, configuration.getRaiseQueryLr());
+            }
             return expectedProperties;
         }
 

@@ -38,7 +38,6 @@ import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCnbcContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
@@ -220,10 +219,7 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
             CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
         addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
-        addCnbcContact(caseData, properties, configuration,
-                       featureToggleService.isQueryManagementLRsEnabled());
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
         return properties;
     }
 
@@ -238,11 +234,7 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
             CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
         addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
-        addCnbcContact(caseData, properties, configuration,
-                       featureToggleService.isQueryManagementLRsEnabled());
-
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
         return properties;
     }
 
@@ -254,10 +246,7 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
             CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
         addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
-        addCnbcContact(caseData, properties, configuration,
-                       featureToggleService.isQueryManagementLRsEnabled());
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
         return properties;
     }
 

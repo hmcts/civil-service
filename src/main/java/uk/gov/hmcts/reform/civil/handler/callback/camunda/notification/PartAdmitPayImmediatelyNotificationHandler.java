@@ -46,7 +46,7 @@ public class PartAdmitPayImmediatelyNotificationHandler extends CallbackHandler 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
     private final OrganisationService organisationService;
-    
+
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
@@ -107,8 +107,7 @@ public class PartAdmitPayImmediatelyNotificationHandler extends CallbackHandler 
             CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
         addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
         return properties;
     }
 }

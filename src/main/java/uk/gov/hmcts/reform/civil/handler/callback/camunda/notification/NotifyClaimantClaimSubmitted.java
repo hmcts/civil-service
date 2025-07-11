@@ -74,8 +74,7 @@ public class NotifyClaimantClaimSubmitted extends CallbackHandler implements Not
             FRONTEND_URL, pipInPostConfiguration.getCuiFrontEndUrl()
         ));
         addAllFooterItems(caseData, properties, configuration,
-                          toggleService.isQueryManagementLRsEnabled(),
-                          toggleService.isLipQueryManagementEnabled(caseData));
+                          toggleService.isPublicQueryManagementEnabled(caseData));
         return properties;
     }
 

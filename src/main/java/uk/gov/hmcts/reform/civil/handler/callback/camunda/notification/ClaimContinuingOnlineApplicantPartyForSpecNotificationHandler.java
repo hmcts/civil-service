@@ -74,8 +74,7 @@ public class ClaimContinuingOnlineApplicantPartyForSpecNotificationHandler exten
                                                    .toLocalDate(), DATE)
         ));
         addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
         return properties;
     }
 

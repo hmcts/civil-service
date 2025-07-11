@@ -98,14 +98,13 @@ public class TemplateCommonPropertiesHelper {
     }
 
     public boolean isQueryManagementAllowedForLRCase(CaseData caseData) {
-        return featureToggleService.isQueryManagementLRsEnabled()
-            && !queryNotAllowedCaseStates(caseData)
-            && !caseData.isLipCase();
+        return !queryNotAllowedCaseStates(caseData)
+            && (!caseData.isLipCase()
+            || (featureToggleService.isPublicQueryManagementEnabled(caseData) && caseData.isLipCase()));
     }
 
     public boolean isQueryManagementAllowedForLipCase(CaseData caseData) {
-        return featureToggleService.isLipQueryManagementEnabled(caseData)
-            && featureToggleService.isQueryManagementLRsEnabled()
+        return featureToggleService.isPublicQueryManagementEnabled(caseData)
             && !queryNotAllowedCaseStates(caseData)
             && caseData.isLipCase();
     }

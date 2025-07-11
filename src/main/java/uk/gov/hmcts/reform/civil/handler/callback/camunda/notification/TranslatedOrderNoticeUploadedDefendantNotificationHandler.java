@@ -58,8 +58,7 @@ public class TranslatedOrderNoticeUploadedDefendantNotificationHandler extends C
             PARTY_NAME, caseData.getRespondent1().getPartyName()
         ));
         addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
 
         return properties;
     }

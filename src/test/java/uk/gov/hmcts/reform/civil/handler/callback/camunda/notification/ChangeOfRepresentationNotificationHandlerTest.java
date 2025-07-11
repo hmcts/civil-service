@@ -44,6 +44,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.Ch
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASE_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CCD_REF;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CNBC_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.FORMER_SOL;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.ISSUE_DATE;
@@ -117,7 +118,6 @@ class ChangeOfRepresentationNotificationHandlerTest extends BaseCallbackHandlerT
             when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("welshHmctsSignature"));
             when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("welshPhoneContact"));
             when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
-            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
             when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
         }
@@ -132,6 +132,8 @@ class ChangeOfRepresentationNotificationHandlerTest extends BaseCallbackHandlerT
                 when(organisationService.findOrganisationById("Previous-sol-id"))
                     .thenReturn(Optional.of(Organisation.builder().name(PREVIOUS_SOL).build()));
                 when(notificationsProperties.getNoticeOfChangeFormerSolicitor()).thenReturn(PREVIOUS_SOL_TEMPLATE);
+                Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+                when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
 
                 CaseData caseData =
                     CaseDataBuilder.builder().atStateClaimDetailsNotifiedWithNoticeOfChangeRespondent1().build();
@@ -152,13 +154,13 @@ class ChangeOfRepresentationNotificationHandlerTest extends BaseCallbackHandlerT
                 expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
                 expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
                 expectedProperties.put(HMCTS_SIGNATURE, configuration.getHmctsSignature());
-                expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+                expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getRaiseQueryLr());
                 expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
                 expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
                 expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
-                expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
                 expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
                 expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+                expectedProperties.put(CNBC_CONTACT, configuration.getRaiseQueryLr());
                 CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                     .request(CallbackRequest.builder()
                                  .eventId(NOTIFY_FORMER_SOLICITOR.name()).build()).build();
@@ -224,13 +226,13 @@ class ChangeOfRepresentationNotificationHandlerTest extends BaseCallbackHandlerT
                 expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
                 expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
                 expectedProperties.put(HMCTS_SIGNATURE, configuration.getHmctsSignature());
-                expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+                expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getRaiseQueryLr());
                 expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
                 expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
                 expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
-                expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
                 expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
                 expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+                expectedProperties.put(CNBC_CONTACT, configuration.getRaiseQueryLr());
 
                 CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                     .request(CallbackRequest.builder()
@@ -276,9 +278,9 @@ class ChangeOfRepresentationNotificationHandlerTest extends BaseCallbackHandlerT
                 expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
                 expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
                 expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
-                expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
                 expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
                 expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+                expectedProperties.put(CNBC_CONTACT, configuration.getCnbcContact());
                 CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                     .request(CallbackRequest.builder()
                                  .eventId(NOTIFY_NEW_DEFENDANT_SOLICITOR.name()).build()).build();
@@ -320,13 +322,13 @@ class ChangeOfRepresentationNotificationHandlerTest extends BaseCallbackHandlerT
                 expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
                 expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
                 expectedProperties.put(HMCTS_SIGNATURE, configuration.getHmctsSignature());
-                expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+                expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getRaiseQueryLr());
                 expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
                 expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
                 expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
-                expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
                 expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
                 expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+                expectedProperties.put(CNBC_CONTACT, configuration.getRaiseQueryLr());
 
                 CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                     .request(CallbackRequest.builder()
@@ -360,6 +362,7 @@ class ChangeOfRepresentationNotificationHandlerTest extends BaseCallbackHandlerT
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
             when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
         }
 
         @Test
@@ -392,8 +395,8 @@ class ChangeOfRepresentationNotificationHandlerTest extends BaseCallbackHandlerT
             expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
             expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
             expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
-            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
             expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
+            expectedProperties.put(CNBC_CONTACT, configuration.getCnbcContact());
             expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
 
             verify(notificationService).sendMail(
@@ -433,9 +436,9 @@ class ChangeOfRepresentationNotificationHandlerTest extends BaseCallbackHandlerT
             expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
             expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
             expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
-            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
             expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
             expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+            expectedProperties.put(CNBC_CONTACT, configuration.getCnbcContact());
 
             verify(notificationService).sendMail(
                 "rambo@email.com",

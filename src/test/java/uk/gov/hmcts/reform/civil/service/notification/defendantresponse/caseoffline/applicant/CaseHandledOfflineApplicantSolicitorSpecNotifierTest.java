@@ -35,6 +35,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CNBC_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.OPENING_HOURS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
@@ -79,13 +80,19 @@ class CaseHandledOfflineApplicantSolicitorSpecNotifierTest {
         when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("welshHmctsSignature"));
         when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("welshPhoneContact"));
         when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
-        when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
         when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
         when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
     }
 
     @Nested
     class NotifyLip {
+
+        @BeforeEach
+        void setup() {
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
+        }
 
         @Test
         void shouldNotifyApplicantLiP() {
@@ -128,6 +135,8 @@ class CaseHandledOfflineApplicantSolicitorSpecNotifierTest {
 
     @Test
     void shouldNotifyDefendantSolicitor1_when1v1CounterClaimCase() {
+        Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+        when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
         when(notificationsProperties.getClaimantSolicitorCounterClaimForSpec())
             .thenReturn(TEMPLATE);
 
@@ -152,6 +161,12 @@ class CaseHandledOfflineApplicantSolicitorSpecNotifierTest {
 
     @Nested
     class NotifySolicitor {
+
+        @BeforeEach
+        void setUp() {
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
+        }
 
         @Test
         void shouldNotifyApplicantSolicitor_when1v1Case() {
@@ -245,7 +260,6 @@ class CaseHandledOfflineApplicantSolicitorSpecNotifierTest {
                     CLAIMANT_NAME, caseData.getApplicant1().getPartyName(),
                     PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050",
                     OPENING_HOURS, "Monday to Friday, 8.30am to 5pm",
-                    SPEC_UNSPEC_CONTACT, "Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk",
                     HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service"
                 ));
                 expectedProperties.put("welshOpeningHours", "Dydd Llun i ddydd Iau, 9am – 5pm, dydd Gwener, 9am – 4.30pm");
@@ -253,6 +267,8 @@ class CaseHandledOfflineApplicantSolicitorSpecNotifierTest {
                 expectedProperties.put("welshHmctsSignature", "Hawliadau am Arian yn y Llys Sifil Ar-lein \n Gwasanaeth Llysoedd a Thribiwnlysoedd EF");
                 expectedProperties.put("welshContact", "E-bost: ymholiadaucymraeg@justice.gov.uk");
                 expectedProperties.put("specContact", "Email: contactocmc@justice.gov.uk");
+                expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+                expectedProperties.put(CNBC_CONTACT, configuration.getCnbcContact());
                 return expectedProperties;
             } else {
                 Map<String, String> expectedProperties = new HashMap<>(Map.of(
@@ -263,7 +279,6 @@ class CaseHandledOfflineApplicantSolicitorSpecNotifierTest {
                     CASEMAN_REF, "000DC001",
                     PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050",
                     OPENING_HOURS, "Monday to Friday, 8.30am to 5pm",
-                    SPEC_UNSPEC_CONTACT, "Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk",
                     HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service"
 
                 ));
@@ -272,6 +287,8 @@ class CaseHandledOfflineApplicantSolicitorSpecNotifierTest {
                 expectedProperties.put("welshHmctsSignature", "Hawliadau am Arian yn y Llys Sifil Ar-lein \n Gwasanaeth Llysoedd a Thribiwnlysoedd EF");
                 expectedProperties.put("welshContact", "E-bost: ymholiadaucymraeg@justice.gov.uk");
                 expectedProperties.put("specContact", "Email: contactocmc@justice.gov.uk");
+                expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getRaiseQueryLr());
+                expectedProperties.put(CNBC_CONTACT, configuration.getRaiseQueryLr());
                 return expectedProperties;
             }
         } else if (getMultiPartyScenario(caseData).equals(TWO_V_ONE)) {
@@ -287,13 +304,14 @@ class CaseHandledOfflineApplicantSolicitorSpecNotifierTest {
                 PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050",
                 OPENING_HOURS, "Monday to Friday, 8.30am to 5pm"));
 
-            expectedProperties.put(SPEC_UNSPEC_CONTACT, "Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk");
             expectedProperties.put(HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service");
             expectedProperties.put("welshOpeningHours", "Dydd Llun i ddydd Iau, 9am – 5pm, dydd Gwener, 9am – 4.30pm");
             expectedProperties.put("welshPhoneContact", "Ffôn: 0300 303 5174");
             expectedProperties.put("welshHmctsSignature", "Hawliadau am Arian yn y Llys Sifil Ar-lein \n Gwasanaeth Llysoedd a Thribiwnlysoedd EF");
             expectedProperties.put("welshContact", "E-bost: ymholiadaucymraeg@justice.gov.uk");
             expectedProperties.put("specContact", "Email: contactocmc@justice.gov.uk");
+            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getRaiseQueryLr());
+            expectedProperties.put(CNBC_CONTACT, configuration.getRaiseQueryLr());
             return expectedProperties;
         } else {
             //1v2 template is used and expects different data
@@ -309,13 +327,14 @@ class CaseHandledOfflineApplicantSolicitorSpecNotifierTest {
             ));
             expectedProperties.put(PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050");
             expectedProperties.put(OPENING_HOURS, "Monday to Friday, 8.30am to 5pm");
-            expectedProperties.put(SPEC_UNSPEC_CONTACT, "Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk");
             expectedProperties.put(HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service");
             expectedProperties.put("welshOpeningHours", "Dydd Llun i ddydd Iau, 9am – 5pm, dydd Gwener, 9am – 4.30pm");
             expectedProperties.put("welshPhoneContact", "Ffôn: 0300 303 5174");
             expectedProperties.put("welshHmctsSignature", "Hawliadau am Arian yn y Llys Sifil Ar-lein \n Gwasanaeth Llysoedd a Thribiwnlysoedd EF");
             expectedProperties.put("welshContact", "E-bost: ymholiadaucymraeg@justice.gov.uk");
             expectedProperties.put("specContact", "Email: contactocmc@justice.gov.uk");
+            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getRaiseQueryLr());
+            expectedProperties.put(CNBC_CONTACT, configuration.getRaiseQueryLr());
             return expectedProperties;
         }
 
@@ -329,7 +348,6 @@ class CaseHandledOfflineApplicantSolicitorSpecNotifierTest {
             CASEMAN_REF, "000DC001",
             PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050",
             OPENING_HOURS, "Monday to Friday, 8.30am to 5pm",
-            SPEC_UNSPEC_CONTACT, "Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk",
             HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service"
         ));
         expectedProperties.put("welshOpeningHours", "Dydd Llun i ddydd Iau, 9am – 5pm, dydd Gwener, 9am – 4.30pm");
@@ -337,6 +355,8 @@ class CaseHandledOfflineApplicantSolicitorSpecNotifierTest {
         expectedProperties.put("welshHmctsSignature", "Hawliadau am Arian yn y Llys Sifil Ar-lein \n Gwasanaeth Llysoedd a Thribiwnlysoedd EF");
         expectedProperties.put("welshContact", "E-bost: ymholiadaucymraeg@justice.gov.uk");
         expectedProperties.put("specContact", "Email: contactocmc@justice.gov.uk");
+        expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getRaiseQueryLr());
+        expectedProperties.put(CNBC_CONTACT, configuration.getRaiseQueryLr());
         return expectedProperties;
     }
 
