@@ -109,8 +109,7 @@ class RecordJudgmentDeterminationMeansApplicantNotificationHandlerTest extends B
                 .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
                                                                                             .organisationID(ORG_NAME).build()).build()).build();
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
-            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
-            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             when(notificationsProperties.getNotifyLrRecordJudgmentDeterminationMeansTemplate()).thenReturn("template-id");
             when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(Organisation.builder().name(ORG_NAME).build()));
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
@@ -127,7 +126,8 @@ class RecordJudgmentDeterminationMeansApplicantNotificationHandlerTest extends B
         @Test
         void shouldNotifyApplicantLip_whenInvoked() {
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
-            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithDeterminationMeans();
             caseData = caseData.toBuilder()
                 .applicant1(Party.builder()
