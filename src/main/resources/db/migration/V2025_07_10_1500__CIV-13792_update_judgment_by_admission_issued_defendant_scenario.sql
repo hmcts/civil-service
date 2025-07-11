@@ -10,5 +10,7 @@ SET notifications_to_delete = '{"Notice.AAA6.ClaimantIntent.CCJ.Requested.Defend
           "Notice.AAA6.DefResponse.FullOrPartAdmit.PayByInstallments.Defendant",
           "Notice.AAA6.DefResponse.FullOrPartAdmit.PayImmediately.Defendant",
           "Notice.AAA6.ClaimantIntent.PartAdmit.Defendant",
-          "Notice.AAA6.DefResponse.FullOrPartAdmit.PayBySetDate.Claimant"}'
+          "Notice.AAA6.DefResponse.FullOrPartAdmit.PayBySetDate.Claimant",
+          "Notice.AAA6.DefResponse.FullOrPartAdmit.PayByInstalments.Claimant",
+          "Notice.AAA6.DefResponse.FullAdmit.PayImmediately.Claimant"}'
 WHERE name = 'Scenario.AAA6.JudgmentsOnline.IssuedCCJ.Defendant';
