@@ -165,12 +165,7 @@ class EventHistoryMapperTest {
         @Test
         void shouldPrepareMiscellaneousEvent_whenClaimWith1v1UnregisteredDefendant() {
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOffline1v1UnregisteredDefendant().build();
-            if (caseData.getRespondent2OrgRegistered() != null
-                && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
-            }
+
             Event expectedEvent = Event.builder()
                 .eventSequence(1)
                 .eventCode("999")
