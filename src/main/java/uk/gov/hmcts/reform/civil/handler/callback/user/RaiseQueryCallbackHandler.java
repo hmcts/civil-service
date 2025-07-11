@@ -38,6 +38,7 @@ import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.buildLatestQuery;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.clearOldQueryCollections;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getLatestQuery;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getUserQueriesByRole;
+import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.logMigrationSuccess;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.migrateAllQueries;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.updateQueryCollectionPartyName;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPClaimant;
@@ -63,7 +64,7 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::aboutToStart,
             callbackKey(ABOUT_TO_SUBMIT), this::setManagementQuery,
-            callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
+            callbackKey(SUBMITTED), this::aboutToSubmit
         );
     }
 
@@ -120,6 +121,14 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
                       .businessProcess(BusinessProcess.ready(queryManagementRaiseQuery))
                       .build().toMap(objectMapper))
             .build();
+    }
+
+    private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
+        CaseData caseDataBefore = callbackParams.getCaseDataBefore();
+        if (featureToggleService.isPublicQueryManagementEnabled(caseDataBefore)) {
+            logMigrationSuccess(callbackParams.getCaseDataBefore());
+        }
+        return emptySubmittedCallbackResponse(callbackParams);
     }
 
     private List<String> retrieveUserCaseRoles(String caseReference, String userToken) {
