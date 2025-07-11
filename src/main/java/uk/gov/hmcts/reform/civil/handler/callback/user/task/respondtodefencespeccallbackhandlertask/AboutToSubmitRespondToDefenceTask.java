@@ -53,7 +53,6 @@ import static uk.gov.hmcts.reform.civil.model.dq.Expert.fromSmallClaimExpertDeta
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ExpertUtils.addEventAndDateAddedToApplicantExperts;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateDQPartyIds;
-import static uk.gov.hmcts.reform.civil.utils.PersistDataUtils.persistFlagsForParties;
 import static uk.gov.hmcts.reform.civil.utils.PersistDataUtils.persistPartyAddress;
 import static uk.gov.hmcts.reform.civil.utils.WitnessUtils.addEventAndDateAddedToApplicantWitnesses;
 
@@ -84,7 +83,6 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
         CaseData caseData = persistPartyAddress(oldCaseData, callbackParams.getCaseData());
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder().applicant1ResponseDate(time.now());
 
-        persistFlagsForParties(oldCaseData, caseData, builder);
         setResponseDocumentNull(builder);
         updateCaselocationDetails(callbackParams, caseData, builder);
         updateApplicant1DQ(callbackParams, caseData, builder);
