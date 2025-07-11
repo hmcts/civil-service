@@ -389,14 +389,6 @@ class NotificationUtilsTest {
         @Nested
         class CnbcContact {
 
-            @Test
-            void shouldAddCnbcContactWhenLRQmNotEnabled() {
-                CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
-                when(configuration.getCnbcContact()).thenReturn("cnbcEmail");
-                Map<String, String> actual = addCnbcContact(caseData, new HashMap<>(), configuration, false);
-                assertThat(actual.get(CNBC_CONTACT)).isEqualTo("cnbcEmail");
-            }
-
             @ParameterizedTest()
             @ValueSource(strings = {"PENDING_CASE_ISSUED", "CLOSED", "PROCEEDS_IN_HERITAGE_SYSTEM", "CASE_DISMISSED"})
             void shouldAddCnbcContactWhenCaseInQueryNotAllowedState(String caseState) {
@@ -411,18 +403,18 @@ class NotificationUtilsTest {
             void shouldAddCnbcContactWhenApplicantLip() {
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
                     .toBuilder().applicant1Represented(NO).build();
-                when(configuration.getCnbcContact()).thenReturn("cnbcEmail");
+                when(configuration.getRaiseQueryLr()).thenReturn("raiseQueryLr");
                 Map<String, String> actual = addCnbcContact(caseData, new HashMap<>(), configuration, true);
-                assertThat(actual.get(CNBC_CONTACT)).isEqualTo("cnbcEmail");
+                assertThat(actual.get(CNBC_CONTACT)).isEqualTo("raiseQueryLr");
             }
 
             @Test
             void shouldAddCnbcContactWhenRespondentLip() {
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
                     .toBuilder().respondent1Represented(NO).build();
-                when(configuration.getCnbcContact()).thenReturn("cnbcEmail");
+                when(configuration.getRaiseQueryLr()).thenReturn("raiseQueryLr");
                 Map<String, String> actual = addCnbcContact(caseData, new HashMap<>(), configuration, true);
-                assertThat(actual.get(CNBC_CONTACT)).isEqualTo("cnbcEmail");
+                assertThat(actual.get(CNBC_CONTACT)).isEqualTo("raiseQueryLr");
             }
 
             @Test
@@ -440,9 +432,9 @@ class NotificationUtilsTest {
             @Test
             void shouldAddSpecAndUnspecContactWhenLRQmNotEnabled() {
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
-                when(configuration.getSpecUnspecContact()).thenReturn("specUnspecEmail");
+                when(configuration.getRaiseQueryLr()).thenReturn("raiseQueryLr");
                 Map<String, String> actual = addSpecAndUnspecContact(caseData, new HashMap<>(), configuration, false);
-                assertThat(actual.get(SPEC_UNSPEC_CONTACT)).isEqualTo("specUnspecEmail");
+                assertThat(actual.get(SPEC_UNSPEC_CONTACT)).isEqualTo("raiseQueryLr");
             }
 
             @ParameterizedTest()
@@ -459,18 +451,18 @@ class NotificationUtilsTest {
             void shouldAddSpecAndUnspecContactWhenApplicantLip() {
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
                     .toBuilder().applicant1Represented(NO).build();
-                when(configuration.getSpecUnspecContact()).thenReturn("specUnspecEmail");
+                when(configuration.getRaiseQueryLr()).thenReturn("raiseQueryLr");
                 Map<String, String> actual = addSpecAndUnspecContact(caseData, new HashMap<>(), configuration, true);
-                assertThat(actual.get(SPEC_UNSPEC_CONTACT)).isEqualTo("specUnspecEmail");
+                assertThat(actual.get(SPEC_UNSPEC_CONTACT)).isEqualTo("raiseQueryLr");
             }
 
             @Test
             void shouldAddCnbcContactWhenRespondentLip() {
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
                     .toBuilder().respondent1Represented(NO).build();
-                when(configuration.getSpecUnspecContact()).thenReturn("specUnspecEmail");
+                when(configuration.getRaiseQueryLr()).thenReturn("raiseQueryLr");
                 Map<String, String> actual = addSpecAndUnspecContact(caseData, new HashMap<>(), configuration, true);
-                assertThat(actual.get(SPEC_UNSPEC_CONTACT)).isEqualTo("specUnspecEmail");
+                assertThat(actual.get(SPEC_UNSPEC_CONTACT)).isEqualTo("raiseQueryLr");
             }
 
             @Test
