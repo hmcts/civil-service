@@ -13,8 +13,7 @@ public class GenerateHearingNoticeAllPartiesEmailGenerator extends AllPartiesEma
             GenerateHearingNoticeAppSolOneEmailDTOGenerator appSolGen,
             GenerateHearingNoticeDefendantEmailDTOGenerator defendantGen,
             GenerateHearingNoticeRespSolOneEmailDTOGenerator respSolOneGen,
-            GenerateHearingNoticeRespSolOneEmailDTOGenerator respSolTwoGen
-
+            GenerateHearingNoticeRespSolTwoEmailDTOGenerator respSolTwoGen
     ) {
         super(List.of(lipGen, appSolGen, defendantGen, respSolOneGen, respSolTwoGen));
     }

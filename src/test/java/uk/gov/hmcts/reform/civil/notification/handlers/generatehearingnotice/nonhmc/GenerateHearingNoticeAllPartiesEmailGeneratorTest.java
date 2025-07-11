@@ -28,7 +28,7 @@ class GenerateHearingNoticeAllPartiesEmailGeneratorTest {
     private GenerateHearingNoticeRespSolOneEmailDTOGenerator respSolOneGen;
 
     @Mock
-    private GenerateHearingNoticeRespSolOneEmailDTOGenerator respSolTwoGen;
+    private GenerateHearingNoticeRespSolTwoEmailDTOGenerator respSolTwoGen;
 
     @Test
     void shouldExtendAllPartiesEmailGeneratorWithCorrectDependencies() {
