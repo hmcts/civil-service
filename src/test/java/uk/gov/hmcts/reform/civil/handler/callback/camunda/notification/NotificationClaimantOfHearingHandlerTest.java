@@ -626,6 +626,13 @@ class NotificationClaimantOfHearingHandlerTest {
 
         @Test
         void shouldNotifyApplicantLip_whenInvokedAnd1v1() {
+            // When
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
+            when(notificationsProperties.getHearingNotificationLipDefendantTemplate())
+                .thenReturn("test-template-claimant-lip-id");
+
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
                 .hearingDate(LocalDate.of(2023, 05, 17))
@@ -638,12 +645,6 @@ class NotificationClaimantOfHearingHandlerTest {
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder().eventId("NOTIFY_CLAIMANT_HEARING").build()).build();
-            // When
-            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
-            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
-            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
-            when(notificationsProperties.getHearingNotificationLipDefendantTemplate())
-                .thenReturn("test-template-claimant-lip-id");
             handler.handle(params);
             // Then
             verify(notificationService).sendMail(
@@ -656,18 +657,6 @@ class NotificationClaimantOfHearingHandlerTest {
 
         @Test
         void shouldNotifyApplicantLip_whenInvokedAnd1v1HMC() {
-            // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-                .hearingDate(LocalDate.of(2023, 05, 17))
-                .applicant1Represented(YesOrNo.NO)
-                .claimantUserDetails(IdamUserDetails.builder().email("applicant1@example.com").build())
-                .hearingReferenceNumber("000HN001")
-                .addApplicant2(YesOrNo.NO)
-                .addRespondent2(YesOrNo.NO)
-                .businessProcess(BusinessProcess.builder().processInstanceId("").build())
-                .build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
-                .request(CallbackRequest.builder().eventId("NOTIFY_CLAIMANT_HEARING_HMC").build()).build();
             // When
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
@@ -682,6 +671,19 @@ class NotificationClaimantOfHearingHandlerTest {
                                 .build());
             when(notificationsProperties.getHearingNotificationLipDefendantTemplate())
                 .thenReturn("test-template-claimant-lip-id");
+
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .hearingDate(LocalDate.of(2023, 05, 17))
+                .applicant1Represented(YesOrNo.NO)
+                .claimantUserDetails(IdamUserDetails.builder().email("applicant1@example.com").build())
+                .hearingReferenceNumber("000HN001")
+                .addApplicant2(YesOrNo.NO)
+                .addRespondent2(YesOrNo.NO)
+                .businessProcess(BusinessProcess.builder().processInstanceId("").build())
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder().eventId("NOTIFY_CLAIMANT_HEARING_HMC").build()).build();
             handler.handle(params);
             // Then
             verify(notificationService).sendMail(
@@ -694,6 +696,13 @@ class NotificationClaimantOfHearingHandlerTest {
 
         @Test
         void shouldNotifyApplicantLipinWelsh_whenInvokedAnd1v1() {
+            // When
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
+            when(notificationsProperties.getHearingNotificationLipDefendantTemplateWelsh())
+                .thenReturn("test-template-claimant-lip-welsh-id");
+
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
                 .hearingDate(LocalDate.of(2023, 05, 17))
@@ -707,12 +716,6 @@ class NotificationClaimantOfHearingHandlerTest {
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder().eventId("NOTIFY_CLAIMANT_HEARING").build()).build();
-            // When
-            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
-            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
-            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
-            when(notificationsProperties.getHearingNotificationLipDefendantTemplateWelsh())
-                .thenReturn("test-template-claimant-lip-welsh-id");
             handler.handle(params);
             // Then
             verify(notificationService).sendMail(

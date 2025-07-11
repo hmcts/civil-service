@@ -125,6 +125,11 @@ class NotifyClaimantJudgmentVariedDeterminationOfMeansNotificationHandlerTest ex
 
         @Test
         void shouldNotifyApplicantLip_whenInvoked() {
+            when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn(TEMPLATE_ID);
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
+
             CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithDeterminationMeans();
             caseData = caseData.toBuilder()
                 .applicant1(Party.builder()
@@ -139,10 +144,6 @@ class NotifyClaimantJudgmentVariedDeterminationOfMeansNotificationHandlerTest ex
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
-            when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn(TEMPLATE_ID);
-            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
-            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
-            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             handler.handle(params);
 
             verify(notificationService).sendMail(

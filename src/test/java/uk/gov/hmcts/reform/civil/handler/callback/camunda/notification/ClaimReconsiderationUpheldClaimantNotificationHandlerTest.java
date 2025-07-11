@@ -115,7 +115,6 @@ class ClaimReconsiderationUpheldClaimantNotificationHandlerTest extends BaseCall
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
 
-
             CallbackParams params = CallbackParams.builder()
                 .caseData(caseData)
                 .type(ABOUT_TO_SUBMIT)

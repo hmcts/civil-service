@@ -170,6 +170,11 @@ class RecordJudgmentDeterminationMeansRespondentNotificationHandlerTest extends 
 
         @Test
         void shouldNotifyRespondentLip_whenInvoked() {
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
+            when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn("template-id");
+
             CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithDeterminationMeans();
             caseData = caseData.toBuilder()
                 .applicant1(Party.builder()
@@ -185,10 +190,6 @@ class RecordJudgmentDeterminationMeansRespondentNotificationHandlerTest extends 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(NOTIFY_RESPONDENT1_FOR_RECORD_JUDGMENT.name()).build()
             ).build();
-            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
-            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
-            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
-            when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn("template-id");
             handler.handle(params);
 
             verify(notificationService).sendMail(

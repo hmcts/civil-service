@@ -101,6 +101,11 @@ public class NotifyDefendantsClaimantSettleTheClaimTest extends BaseCallbackHand
 
         @Test
         void shouldSendNotificationToDefendantLip_whenLiPvLiPandDefendantHasEmail() {
+            //When
+            given(notificationsProperties.getNotifyDefendantLIPClaimantSettleTheClaimTemplate()).willReturn(EMAIL_TEMPLATE);
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             //Given
             CaseData caseData = CaseData.builder()
                 .respondent1(Party.builder().type(Party.Type.COMPANY).companyName(DEFENDANT_PARTY_NAME).partyEmail(
@@ -113,11 +118,6 @@ public class NotifyDefendantsClaimantSettleTheClaimTest extends BaseCallbackHand
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder().eventId(NOTIFY_DEFENDANT_CLAIMANT_SETTLE_THE_CLAIM.name()).build()).build();
-            //When
-            given(notificationsProperties.getNotifyDefendantLIPClaimantSettleTheClaimTemplate()).willReturn(EMAIL_TEMPLATE);
-            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
-            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
-            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             notificationHandler.handle(params);
             //Then
             verify(notificationService, times(1)).sendMail(targetEmail.capture(),
@@ -141,6 +141,14 @@ public class NotifyDefendantsClaimantSettleTheClaimTest extends BaseCallbackHand
         @ParameterizedTest
         @ValueSource(booleans = {true, false})
         void shouldSendNotificationToDefendantLR_whenLiPvLRandDefendantHasEmail(boolean referenceWasProvided) {
+            //When
+            when(organisationService.findOrganisationById(anyString()))
+                .thenReturn(Optional.of(uk.gov.hmcts.reform.civil.prd.model.Organisation.builder().name("Legal Rep Name").build()));
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
+            given(notificationsProperties.getNotifyDefendantLRClaimantSettleTheClaimTemplate()).willReturn(EMAIL_TEMPLATE_LR);
+
             //Given
             CaseData caseData = CaseData.builder()
                 .respondent1(Party.builder().type(Party.Type.COMPANY).build())
@@ -160,13 +168,6 @@ public class NotifyDefendantsClaimantSettleTheClaimTest extends BaseCallbackHand
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder().eventId(NOTIFY_DEFENDANT_CLAIMANT_SETTLE_THE_CLAIM.name()).build()).build();
-            //When
-            when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(uk.gov.hmcts.reform.civil.prd.model.Organisation.builder().name("Legal Rep Name").build()));
-            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
-            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
-            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
-            given(notificationsProperties.getNotifyDefendantLRClaimantSettleTheClaimTemplate()).willReturn(EMAIL_TEMPLATE_LR);
             notificationHandler.handle(params);
             //Then
             verify(notificationService, times(1)).sendMail(targetEmail.capture(),

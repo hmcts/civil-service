@@ -143,6 +143,13 @@ class ClaimContinuingOnlineApplicantPartyForSpecNotificationHandlerTest extends 
 
         @Test
         void shouldNotifyApplicant1WithBilingualEmailTemplateWhenClaimantIsBilingual() {
+            when(notificationsProperties.getBilingualClaimantClaimContinuingOnlineForSpec())
+                .thenReturn(BILINGUAL_TEMPLATE_ID);
+            when(toggleService.isLipVLipEnabled()).thenReturn(true);
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
+
             // Given
             CaseData caseData = getCaseData(CLAIMANT_EMAIL_ADDRESS, null);
             caseData = caseData.toBuilder()
@@ -151,14 +158,7 @@ class ClaimContinuingOnlineApplicantPartyForSpecNotificationHandlerTest extends 
                 .claimantBilingualLanguagePreference(Language.BOTH.toString())
                 .build();
             CallbackParams params = getCallbackParams(caseData);
-            when(notificationsProperties.getBilingualClaimantClaimContinuingOnlineForSpec())
-                .thenReturn(BILINGUAL_TEMPLATE_ID);
-            when(toggleService.isLipVLipEnabled()).thenReturn(true);
-            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
-            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
-            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
 
-            // When
             handler.handle(params);
 
             // Then

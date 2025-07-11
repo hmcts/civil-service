@@ -138,14 +138,6 @@ class NotifyClaimantStayUpdateRequestedHandlerTest {
     @ParameterizedTest
     @MethodSource("provideCaseDataLip")
     void sendNotificationShouldSendEmailToLip(String language, String template) {
-
-        caseData = caseData.toBuilder()
-            .applicant1Represented(YesOrNo.NO)
-            .claimantBilingualLanguagePreference(language)
-            .build();
-        CallbackParams params = CallbackParams.builder().caseData(caseData)
-            .request(CallbackRequest.builder().eventId(NOTIFY_CLAIMANT_STAY_UPDATE_REQUESTED.toString()).build()).build();
-
         if (ENGLISH.equals(language)) {
             when(notificationsProperties.getNotifyLipStayUpdateRequested()).thenReturn("default-template");
         } else {
@@ -154,6 +146,13 @@ class NotifyClaimantStayUpdateRequestedHandlerTest {
         Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
         when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
         when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
+
+        caseData = caseData.toBuilder()
+            .applicant1Represented(YesOrNo.NO)
+            .claimantBilingualLanguagePreference(language)
+            .build();
+        CallbackParams params = CallbackParams.builder().caseData(caseData)
+            .request(CallbackRequest.builder().eventId(NOTIFY_CLAIMANT_STAY_UPDATE_REQUESTED.toString()).build()).build();
 
         CallbackResponse response = handler.sendNotification(params);
 

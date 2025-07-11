@@ -139,14 +139,14 @@ class NotifyClaimantStayLiftedHandlerTest {
 
     @Test
     void sendNotificationShouldSendEmail() {
+        when(notificationsProperties.getNotifyLRStayLifted()).thenReturn("solicitor-template");
+        Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+        when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
+
         caseData = caseData.toBuilder()
             .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("respondentSolicitor@hmcts.net").build())
             .build();
         CallbackParams params = CallbackParams.builder().caseData(caseData).build();
-
-        when(notificationsProperties.getNotifyLRStayLifted()).thenReturn("solicitor-template");
-        Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
-        when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
         CallbackResponse response = handler.sendNotification(params);
         assertNotNull(response);
 
@@ -170,17 +170,6 @@ class NotifyClaimantStayLiftedHandlerTest {
     @ParameterizedTest
     @MethodSource("provideCaseDataLip")
     void sendNotificationShouldSendEmail(boolean isRespondentLiP, boolean isRespondentBilingual, String template) {
-        CaseData caseData = getCaseData(isRespondentLiP, isRespondentBilingual);
-
-        CallbackRequest callbackRequest = CallbackRequest
-            .builder()
-            .eventId(CaseEvent.NOTIFY_CLAIMANT_DISMISS_CASE.name())
-            .build();
-        CallbackParams params = CallbackParams.builder()
-            .request(callbackRequest)
-            .caseData(caseData)
-            .type(ABOUT_TO_SUBMIT)
-            .build();
         Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
         when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
         when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
@@ -191,7 +180,16 @@ class NotifyClaimantStayLiftedHandlerTest {
         } else {
             when(notificationsProperties.getNotifyLRStayLifted()).thenReturn("solicitor-template");
         }
-
+        CaseData caseData = getCaseData(isRespondentLiP, isRespondentBilingual);
+        CallbackRequest callbackRequest = CallbackRequest
+            .builder()
+            .eventId(CaseEvent.NOTIFY_CLAIMANT_DISMISS_CASE.name())
+            .build();
+        CallbackParams params = CallbackParams.builder()
+            .request(callbackRequest)
+            .caseData(caseData)
+            .type(ABOUT_TO_SUBMIT)
+            .build();
         final CallbackResponse response = handler.sendNotification(params);
 
         Map<String, String> commonProps = addCommonProperties(true);
