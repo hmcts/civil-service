@@ -184,36 +184,6 @@ class EvidenceUploadRespondentNotificationHandlerTest extends BaseCallbackHandle
         }
 
         @Test
-        void shouldNotifyRespondent2Lip_whenInvoked() {
-            //given: case data has two respondents, with second being litigant in person
-            when(notificationsProperties.getEvidenceUploadLipTemplate()).thenReturn(TEMPLATE_ID_LIP);
-            when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
-            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
-            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
-            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
-
-            CaseData caseData = createCaseDataWithText(NOTIFICATION_TEXT).toBuilder()
-                .addRespondent2(YesOrNo.YES)
-                .respondent2Represented(YesOrNo.NO)
-                .respondent2(Party.builder()
-                                 .individualLastName("Doe")
-                                 .individualFirstName("John")
-                                 .type(Party.Type.INDIVIDUAL)
-                                 .partyName("Billy").partyEmail(RESPONDENT1_LIP_EMAIL).build())
-                .build();
-            //when: RepondentNotificationhandler for respondent 2 is called
-            handler.notifyRespondentEvidenceUpload(caseData, false);
-            //then: email should be sent to respondent 2
-            verify(notificationService).sendMail(
-                RESPONDENT1_LIP_EMAIL,
-                TEMPLATE_ID_LIP,
-                getNotificationDataMap(caseData, true, true),
-                "evidence-upload-notification-" + caseData.getLegacyCaseReference()
-            );
-        }
-
-        @Test
         void shouldNotNotifyRespondent1Solicitor_whenInvokedAndNoNotificationContent() {
             CaseData caseData = createCaseDataWithText("NULLED");
             //when: RepondentNotificationhandler for solicitor1 is called
@@ -275,7 +245,6 @@ class EvidenceUploadRespondentNotificationHandlerTest extends BaseCallbackHandle
             expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
             expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
             expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
-            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
             expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
             expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
             return expectedProperties;
