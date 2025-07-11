@@ -621,19 +621,20 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
         finalCaseDocuments.add(element(finalDocument));
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        if (featureToggleService.isGaForWelshEnabled()
+        if (featureToggleService.isWelshEnabledForMainCase()
                 && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
             List<Element<CaseDocument>> preTranslationDocuments = caseData.getPreTranslationDocuments();
             preTranslationDocuments.addAll(finalCaseDocuments);
             caseDataBuilder.preTranslationDocuments(preTranslationDocuments);
+            caseDataBuilder.bilingualHint(YesOrNo.YES);
             // Do not trigger business process when document is hidden
         } else {
             if (!isEmpty(caseData.getFinalOrderDocumentCollection())) {
                 finalCaseDocuments.addAll(caseData.getFinalOrderDocumentCollection());
             }
             caseDataBuilder.finalOrderDocumentCollection(finalCaseDocuments);
-            caseDataBuilder.businessProcess(BusinessProcess.ready(GENERATE_ORDER_NOTIFICATION));
         }
+        caseDataBuilder.businessProcess(BusinessProcess.ready(GENERATE_ORDER_NOTIFICATION));
 
         // Casefileview will show any document uploaded even without an categoryID under uncategorized section,
         // we only use freeFormOrderDocument as a preview and do not want it shown on case file view, so to prevent it

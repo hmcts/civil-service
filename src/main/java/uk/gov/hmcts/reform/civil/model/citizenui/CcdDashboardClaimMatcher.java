@@ -2,10 +2,12 @@ package uk.gov.hmcts.reform.civil.model.citizenui;
 
 import uk.gov.hmcts.reform.ccd.client.model.CaseEventDetail;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.math.BigDecimal;
@@ -142,6 +144,25 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
 
         return isCaseProgression && isBaseLocationValid && (!isFeatureToggleEnabled
             || (isSDOTimeBeforeCPRelease && isSDOTimeAfterLastNonSdoOrder));
+    }
+
+    @Override
+    public boolean decisionMadeDocumentsAreInTranslation() {
+        return (featureToggleService.isGaForWelshEnabled() && caseData.getPreTranslationDocuments() != null
+            && caseData.getPreTranslationDocuments().stream().map(
+                    Element::getValue)
+                .map(CaseDocument::getDocumentType)
+            .anyMatch(type -> DocumentType.DECISION_MADE_ON_APPLICATIONS.equals(type))) && !isSettled()
+            && !CaseState.CASE_DISCONTINUED.equals(caseData.getCcdState());
+    }
+
+    @Override
+    public boolean sdoDocumentsAreInTranslation() {
+        return (featureToggleService.isGaForWelshEnabled() && caseData.getPreTranslationDocuments() != null
+            && caseData.getPreTranslationDocuments().stream().map(
+                    Element::getValue)
+            .map(CaseDocument::getDocumentType).anyMatch(type -> DocumentType.SDO_ORDER.equals(type))
+            && !isSettled() && !CaseState.CASE_DISCONTINUED.equals(caseData.getCcdState()));
     }
 
     @Override
@@ -284,5 +305,17 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
     private boolean isWaitingForClaimantIntentDocUpload() {
         return caseData.isRespondentResponseFullDefence() && caseData.getApplicant1ResponseDate() != null
             && caseData.getCcdState() == CaseState.AWAITING_APPLICANT_INTENTION && caseData.isClaimantBilingual();
+    }
+
+    @Override
+    public boolean awaitingHearingNoticeTranslationNotSettledOrDiscontinued() {
+        return awaitingHearingNoticeTranslation() && !isSettled() && !isCasedDiscontinued();
+    }
+
+    private boolean awaitingHearingNoticeTranslation() {
+        return caseData.getPreTranslationDocuments() != null
+            && caseData.getPreTranslationDocuments().stream().anyMatch(
+                element -> element.getValue().getDocumentType() == DocumentType.HEARING_FORM
+        );
     }
 }

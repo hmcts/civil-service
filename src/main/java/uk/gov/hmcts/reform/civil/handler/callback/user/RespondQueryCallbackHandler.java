@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.util.List;
@@ -32,6 +33,7 @@ public class RespondQueryCallbackHandler extends CallbackHandler {
 
     private final ObjectMapper mapper;
     private final AssignCategoryId assignCategoryId;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -51,7 +53,9 @@ public class RespondQueryCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
 
         CaseMessage latestCaseMessage = getLatestQuery(caseData);
-        assignCategoryIdToCaseworkerAttachments(caseData, latestCaseMessage, assignCategoryId);
+
+        boolean isPublicQmEnabled = featureToggleService.isPublicQueryManagementEnabled(caseData);
+        assignCategoryIdToCaseworkerAttachments(caseData, latestCaseMessage, assignCategoryId, isPublicQmEnabled);
 
         caseData = caseData.toBuilder()
             .businessProcess(BusinessProcess.ready(queryManagementRespondQuery))

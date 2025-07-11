@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -17,6 +18,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseQueriesCollection;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.time.LocalDateTime;
@@ -26,6 +28,8 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.queryManagementRespondQuery;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -49,6 +53,9 @@ class RespondQueryCallbackHandlerTest extends BaseCallbackHandlerTest {
     @InjectMocks
     private ObjectMapper objectMapper;
 
+    @Mock
+    private FeatureToggleService featuretoggleService;
+
     @Test
     public void handleEventsReturnsTheExpectedCallbackEvents() {
         assertThat(handler.handledEvents()).containsOnly(queryManagementRespondQuery);
@@ -61,8 +68,31 @@ class RespondQueryCallbackHandlerTest extends BaseCallbackHandlerTest {
         void setupTest() {
             objectMapper.registerModule(new JavaTimeModule());
             handler = new RespondQueryCallbackHandler(
-                objectMapper, assignCategoryId
+                objectMapper, assignCategoryId, featuretoggleService
             );
+        }
+
+        @Test
+        public void shouldAssignClaimantQueryCategoryId_forCaseWorker() {
+            CaseData caseData = CaseData.builder()
+                .ccdCaseReference(CASE_ID)
+                .queries(mockQueriesCollection(QUERY_ID, NOW))
+                .build();
+            when(featuretoggleService.isPublicQueryManagementEnabled(any(CaseData.class))).thenReturn(true);
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
+            List<Document> documents = unwrapElements(updatedData.getQueries()
+                                                          .getCaseMessages().get(0).getValue()
+                                                          .getAttachments());
+
+            assertThat(response.getErrors()).isNull();
+            for (Document document : documents) {
+                assertThat(document.getCategoryID()).isEqualTo(DocCategory.CASEWORKER_QUERY_DOCUMENT_ATTACHMENTS.getValue());
+            }
         }
 
         @Test

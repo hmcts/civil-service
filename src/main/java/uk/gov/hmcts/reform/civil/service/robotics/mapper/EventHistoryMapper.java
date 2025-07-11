@@ -260,7 +260,7 @@ public class EventHistoryMapper {
                     case IN_MEDIATION:
                         buildClaimInMediation(builder, caseData);
                         break;
-                    case TAKEN_OFFLINE_SPEC_DEFENDANT_NOC:
+                    case TAKEN_OFFLINE_SPEC_DEFENDANT_NOC, TAKEN_OFFLINE_SPEC_DEFENDANT_NOC_AFTER_JBA:
                         buildTakenOfflineDueToDefendantNoc(builder, caseData);
                         break;
                     default:
@@ -656,7 +656,7 @@ public class EventHistoryMapper {
             .amountOfJudgment(caseData.getCcjPaymentDetails().getCcjJudgmentAmountClaimAmount()
                                   .add(caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()
                                            ? caseData.getCcjPaymentDetails().getCcjJudgmentLipInterest() :
-                                           Optional.ofNullable(caseData.getTotalInterest()).orElse(ZERO))
+                                           totalInterestForLrClaim(caseData))
                                   .setScale(2))
             .amountOfCosts(caseData.getCcjPaymentDetails().getCcjJudgmentFixedCostAmount()
                                .add(caseData.getCcjPaymentDetails().getCcjJudgmentAmountClaimFee()).setScale(2))
@@ -684,6 +684,11 @@ public class EventHistoryMapper {
             .eventDetails(judgmentByAdmissionEvent)
             .eventDetailsText("")
             .build()));
+    }
+
+    private BigDecimal totalInterestForLrClaim(CaseData caseData) {
+        return featureToggleService.isLrAdmissionBulkEnabled() ? ZERO : Optional.ofNullable(caseData.getTotalInterest()).orElse(
+            ZERO);
     }
 
     private void buildRespondentDivergentResponse(EventHistory.EventHistoryBuilder builder, CaseData caseData,
@@ -1147,9 +1152,7 @@ public class EventHistoryMapper {
     private boolean hasActiveQueries(CaseData caseData) {
         return caseData.getQmApplicantSolicitorQueries() != null
             || caseData.getQmRespondentSolicitor1Queries() != null
-            || caseData.getQmRespondentSolicitor2Queries() != null
-            || caseData.getQmApplicantCitizenQueries() != null
-            || caseData.getQmRespondentCitizenQueries() != null;
+            || caseData.getQmRespondentSolicitor2Queries() != null;
     }
 
     private boolean isCaseOffline(CaseData caseData) {

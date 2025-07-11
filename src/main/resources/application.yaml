@@ -276,6 +276,7 @@ notifications:
   claimantSolicitorDefendantResponse1v2DSForSpec: "684d7f7d-7520-4161-8e0a-32afda832125"
   claimantSolicitorDefendantResponseForSpec: "2df7c3e2-de71-437e-9787-538922ebc293"
   claimantSolicitorImmediatelyDefendantResponseForSpec: "0935f427-063f-4c06-8a1c-da2e05a6871f"
+  claimantSolicitorImmediatelyDefendantResponseForSpecJBA: "f05e1e4d-726e-49cf-8a31-bce9fc36fb4b"
   respondentSolicitorDefendantResponseForSpec: "99ffd73f-dbb0-47bb-86c8-28298cf564db"
   respondentSolicitorDefResponseSpecWithClaimantAction: "0daaf9e7-fa2c-4662-9391-9d64b535e233"
   respondentDefendantResponseForSpec: "2c4435ae-af57-4988-9e79-cb28db4bba49"
@@ -496,6 +497,8 @@ notifications:
   notifyOtherPartyQueryResponseReceived: "bbb1c567-b5a1-4910-bf00-871163e7f318"
   queryLipResponseReceivedEnglish: "29d4ca19-460c-4133-a9ae-6e470e6cc443"
   queryLipResponseReceivedWelsh: "1464b8a5-3ec6-484d-9e61-527326045633"
+  partAdmitPayImmediatelyAgreedClaimant: "c8f80d91-5f4f-4396-9955-6c5da13a818b"
+  partAdmitPayImmediatelyAgreedDefendant: "d653484b-2e1d-4e65-bea5-b58f23a3f242"
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}

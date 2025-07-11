@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
+import uk.gov.hmcts.reform.civil.config.ClaimUrlsConfiguration;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -35,6 +36,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.PayImmediatelyConfText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtodefencespeccallbackhandlertask.AboutToSubmitRespondToDefenceTask;
@@ -81,6 +83,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.DocumentBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
+import uk.gov.hmcts.reform.civil.service.DirectionsQuestionnairePreparer;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
@@ -91,6 +94,7 @@ import uk.gov.hmcts.reform.civil.service.citizenui.RespondentMediationService;
 import uk.gov.hmcts.reform.civil.service.citizenui.ResponseOneVOneShowTagService;
 import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
+import uk.gov.hmcts.reform.civil.service.flowstate.FlowStateAllowedEventService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
@@ -244,6 +248,10 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     private WorkingDayIndicator workingDayIndicator;
     @MockBean
     private DeadlineExtensionCalculatorService deadlineCalculatorService;
+    @MockBean
+    private  FlowStateAllowedEventService flowStateAllowedEventService;
+    @MockBean
+    private  DirectionsQuestionnairePreparer directionsQuestionnairePreparer;
     @Autowired
     private RoboticsAddressMapper addressMapper;
     @Autowired
@@ -2194,6 +2202,67 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getConfirmationHeader())
                 .contains(
                     "Judgment Submitted");
+        }
+
+        @Nested
+        class ConfTextLRBulkAdmission {
+
+            @MockBean
+            private ClaimUrlsConfiguration claimUrlsConfiguration;
+            @MockBean
+            private AboutToSubmitRespondToDefenceTask aboutToSubmitRespondToDefenceTask;
+            @MockBean
+            private PopulateCaseDataTask populateCaseDataTask;
+
+            private BuildConfirmationTask buildConfirmationTask;
+            private RespondToDefenceSpecCallbackHandler respondToDefenceSpecCallbackHandler;
+
+            @BeforeEach
+            void setUp() {
+                PayImmediatelyConfText textGen = new PayImmediatelyConfText(paymentDateService, claimUrlsConfiguration);
+
+                buildConfirmationTask = new BuildConfirmationTask(
+                    List.of(),
+                    List.of(textGen)
+                );
+
+                respondToDefenceSpecCallbackHandler = new RespondToDefenceSpecCallbackHandler(
+                    objectMapper,
+                    unavailableDateValidator,
+                    judgementService,
+                    respondentMediationService,
+                    aboutToSubmitRespondToDefenceTask,
+                    populateCaseDataTask,
+                    buildConfirmationTask,
+                    featureToggleService
+                );
+            }
+
+            @Test
+            void summary_when_all_finals_order_issued_on_LR_bulk_admission() {
+                given(featureToggleService.isPinInPostEnabled()).willReturn(true);
+                given(featureToggleService.isJudgmentOnlineLive()).willReturn(true);
+                CaseData caseData = CaseData.builder()
+                    .respondent1Represented(YesOrNo.YES)
+                    .applicant1Represented(YesOrNo.YES)
+                    .applicant1AcceptFullAdmitPaymentPlanSpec(YES)
+                    .applicant1(Party.builder().type(COMPANY).companyName("Applicant1").build())
+                    .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                    .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
+                    .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder().whenWillThisAmountBePaid(LocalDate.now().plusDays(1)).build())
+                    .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
+                    .respondent1(Party.builder()
+                                     .primaryAddress(Address.builder().build())
+                                     .type(Party.Type.INDIVIDUAL).build()).build();
+
+                CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
+
+                SubmittedCallbackResponse response = (SubmittedCallbackResponse) respondToDefenceSpecCallbackHandler
+                    .handle(params);
+
+                assertThat(response.getConfirmationBody())
+                    .contains("by selecting 'Request Judgment by Admission'");
+            }
         }
     }
 

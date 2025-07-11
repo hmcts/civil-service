@@ -57,7 +57,8 @@ public class JudgementService {
 
     public BigDecimal ccjJudgmentClaimAmount(CaseData caseData) {
         BigDecimal claimAmount = caseData.getTotalClaimAmount();
-        if (isLrFullAdmitRepaymentPlan(caseData)) {
+        if (isLrFullAdmitRepaymentPlan(caseData)
+            || isLrFullAdmitPayImmediately(caseData)) {
             BigDecimal interest = interestCalculator.calculateInterestForJO(caseData);
             claimAmount = claimAmount.add(interest);
         } else {
@@ -83,7 +84,7 @@ public class JudgementService {
     }
 
     public BigDecimal ccjJudgmentFixedCost(CaseData caseData) {
-        if ((isLrFullAdmitRepaymentPlan(caseData) || isLRPartAdmitRepaymentPlan(caseData))
+        if ((isLrFullAdmitRepaymentPlan(caseData) || isLRPartAdmitRepaymentPlan(caseData) || isLrPayImmediatelyPlan(caseData))
             && nonNull(caseData.getFixedCosts())
             && YesOrNo.YES.equals(caseData.getFixedCosts().getClaimFixedCosts())) {
             BigDecimal claimIssueFixedCost = MonetaryConversions.penniesToPounds(BigDecimal.valueOf(
@@ -100,7 +101,7 @@ public class JudgementService {
     }
 
     public BigDecimal ccjJudgementSubTotal(CaseData caseData) {
-        if (isLrFullAdmitRepaymentPlan(caseData) || isLRPartAdmitRepaymentPlan(caseData)) {
+        if (isLrFullAdmitRepaymentPlan(caseData) || isLRPartAdmitRepaymentPlan(caseData) || isLrPayImmediatelyPlan(caseData)) {
             return ccjJudgmentClaimAmount(caseData)
                 .add(ccjJudgmentClaimFee(caseData))
                 .add(ccjJudgmentFixedCost(caseData));
@@ -120,8 +121,13 @@ public class JudgementService {
     private String ccjJudgmentStatement(CaseData caseData) {
         if (caseData.isLRvLipOneVOne()
             && featureToggleService.isPinInPostEnabled()) {
+            boolean hasPaymentOption = caseData.isPayImmediately() || caseData.isPayByInstallment() || caseData.isPayBySetDate();
+            if (featureToggleService.isLrAdmissionBulkEnabled()
+                && hasPaymentOption) {
+                return String.format(JUDGEMENT_ORDER_V2, ccjJudgementSubTotal(caseData));
+            }
             if (featureToggleService.isJudgmentOnlineLive()
-                && (caseData.isPayImmediately() || caseData.isPayByInstallment() || caseData.isPayBySetDate())) {
+                && hasPaymentOption) {
                 return JUDGEMENT_BY_COURT_NOT_OFFLINE;
             }
             return JUDGEMENT_BY_COURT;
@@ -134,7 +140,7 @@ public class JudgementService {
 
     public boolean isLRAdmissionRepaymentPlan(CaseData caseData) {
         return featureToggleService.isLrAdmissionBulkEnabled()
-            && isLRvLR(caseData)
+            && !caseData.isApplicantLiP()
             && (caseData.isPayBySetDate() || caseData.isPayByInstallment());
     }
 
@@ -148,23 +154,23 @@ public class JudgementService {
             && caseData.isPartAdmitClaimSpec();
     }
 
-    private boolean isLRvLR(CaseData caseData) {
-        return !caseData.isApplicantLiP() && !caseData.isRespondent1LiP() && !caseData.isRespondent2LiP();
+    public boolean isLrvLrOneVOneBulkAdmissionsEnabled(CaseData caseData) {
+        return featureToggleService.isLrAdmissionBulkEnabled()
+            && !caseData.isApplicantLiP()
+            && isOneVOne(caseData);
     }
 
     public boolean isLrPayImmediatelyPlan(CaseData caseData) {
-        return caseData.isPayImmediately()
-            && isOneVOne(caseData)
-            && isLRvLR(caseData)
-            && featureToggleService.isLrAdmissionBulkEnabled();
+        return isLrvLrOneVOneBulkAdmissionsEnabled(caseData)
+            && caseData.isPayImmediately();
+    }
+
+    public boolean isLrFullAdmitPayImmediately(CaseData caseData) {
+        return isLrPayImmediatelyPlan(caseData)
+            && caseData.isFullAdmitClaimSpec();
     }
 
     private YesOrNo checkFixedCostOption(CaseData caseData) {
-        if (isLrFullAdmitRepaymentPlan(caseData)
-            && (nonNull(caseData.getFixedCosts()) && YesOrNo.YES.equals(caseData.getFixedCosts().getClaimFixedCosts()))
-            || YesOrNo.YES.equals(caseData.getCcjPaymentDetails().getCcjJudgmentFixedCostOption())) {
-            return YesOrNo.YES;
-        }
         return caseData.getCcjPaymentDetails().getCcjJudgmentFixedCostOption();
     }
 }

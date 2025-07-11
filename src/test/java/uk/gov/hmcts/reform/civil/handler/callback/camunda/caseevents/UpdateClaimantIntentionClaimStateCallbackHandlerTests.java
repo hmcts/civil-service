@@ -43,7 +43,11 @@ class UpdateClaimantIntentionClaimStateCallbackHandlerTests extends BaseCallback
     @BeforeEach
     void setup() {
         objectMapper = new ObjectMapper();
-        handler = new UpdateClaimantIntentionClaimStateCallbackHandler(objectMapper, updateClaimStateService, toggleConfiguration);
+        handler = new UpdateClaimantIntentionClaimStateCallbackHandler(
+            objectMapper,
+            updateClaimStateService,
+            toggleConfiguration
+        );
         objectMapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
     }
 
@@ -64,6 +68,22 @@ class UpdateClaimantIntentionClaimStateCallbackHandlerTests extends BaseCallback
 
         // when
         var response = (AboutToStartOrSubmitCallbackResponse)handler.handle(params);
+
+        // then
+        assertThat(response.getErrors()).isNull();
+        verify(updateClaimStateService, times(1)).setUpCaseState(caseData);
+    }
+
+    @Test
+    void shouldUpdateCaseStateForFullDefenceNotProcessIfClaimantBilingual() {
+        // given
+        CaseData caseData = CaseDataBuilder.builder().build().toBuilder().claimantBilingualLanguagePreference("BOTH")
+            .applicant1ProceedWithClaim(YesOrNo.NO).build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        // when
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         // then
         assertThat(response.getErrors()).isNull();
