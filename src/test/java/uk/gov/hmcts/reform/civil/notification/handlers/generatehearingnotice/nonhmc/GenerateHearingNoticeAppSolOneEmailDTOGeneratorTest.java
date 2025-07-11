@@ -231,7 +231,7 @@ class GenerateHearingNoticeAppSolOneEmailDTOGeneratorTest {
                     () -> assertEquals("formattedTime", result.get(HEARING_TIME)),
                     () -> assertFalse(result.containsKey(HEARING_FEE)),
                     () -> assertFalse(result.containsKey(HEARING_DUE_DATE)),
-            () -> assertEquals("Applicant Org Ltd", result.get(CLAIM_LEGAL_ORG_NAME_SPEC))
+                    () -> assertEquals("Applicant Org Ltd", result.get(CLAIM_LEGAL_ORG_NAME_SPEC))
             );
         }
     }
