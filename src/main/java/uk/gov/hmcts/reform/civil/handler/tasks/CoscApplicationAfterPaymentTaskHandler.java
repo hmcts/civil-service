@@ -61,7 +61,7 @@ public class CoscApplicationAfterPaymentTaskHandler extends BaseExternalTaskHand
     public VariableMap getVariableMap(ExternalTaskData externalTaskData) {
         var data = externalTaskData.caseData().orElseThrow();
         VariableMap variables = Variables.createVariables();
-        var stateFlow = stateFlowEngine.evaluate(data);
+        var stateFlow = stateFlowEngine.getStateFlow(data);
         variables.putValue(FLOW_STATE, stateFlow.getState().getName());
         variables.putValue(FLOW_FLAGS, stateFlow.getFlags());
         variables.putValue("isJudgmentMarkedPaidInFull", checkMarkPaidInFull(data));

@@ -25,6 +25,7 @@ java:
     HMC_HEARINGS_SUBSCRIPTION_ENABLED: false
     HMC_API_URL: http://${SERVICE_NAME}-wiremock
     RD_PROFESSIONAL_API_URL: http://${SERVICE_NAME}-wiremock
+    DOCMOSIS_TORNADO_URL: http://${SERVICE_NAME}-wiremock
     ROLE_ASSIGNMENT_URL: http://am-role-assignment-service-aat.service.core-compute-aat.internal
     ROLE_INITIALISATION_ENABLED: true
     CASE_FLAGS_LOGGING_ENABLED: true
