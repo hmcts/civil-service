@@ -342,6 +342,7 @@ notifications:
 
   notifyClaimantLrTemplate: "cee63486-8f75-42ea-baca-5e602e248ab6"
   notifyClaimantLipTemplateManualDetermination: "16046f1d-2443-47b2-980b-ecc1d6842fb7"
+  notifyClaimantLipTemplateManualDeterminationForWelsh: "1b8175df-05c4-4a8b-8f37-a0c489835d2e"
   notifyClaimantAfterClaimIssue: "04bc79ee-2f8f-44d8-8bb6-a7fd5ad93e4f"
   notifyDefendantLrTemplate: "651ac972-fb4b-49cb-aace-9317ccd069f1"
   notifyDefendantLipTemplate: "f2521805-bfec-42b9-99f5-9fda3dfb6a99"
