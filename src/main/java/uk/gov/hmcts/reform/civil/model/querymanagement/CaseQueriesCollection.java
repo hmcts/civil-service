@@ -52,6 +52,11 @@ public class CaseQueriesCollection {
     }
 
     @JsonIgnore
+    public List<Element<CaseMessage>> messageThread(CaseMessage message) {
+        return messageThread(nonNull(message.getParentId()) ? message.getParentId() : message.getId());
+    }
+
+    @JsonIgnore
     public boolean hasAQueryAwaitingResponse() {
         return caseMessages.stream()
             .filter(message -> nonNull(message.getValue()) && message.getValue().getParentId() == null)
