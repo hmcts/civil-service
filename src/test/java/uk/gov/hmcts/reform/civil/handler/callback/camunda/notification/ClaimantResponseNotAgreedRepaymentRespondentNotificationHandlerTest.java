@@ -129,6 +129,31 @@ class ClaimantResponseNotAgreedRepaymentRespondentNotificationHandlerTest extend
             );
         }
 
+        @Test
+        void shouldNotifyClaimantLipWelsh_whenInvoked() {
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+            given(featureToggleService.isLipVLipEnabled()).willReturn(true);
+            when(notificationsProperties.getNotifyClaimantLipTemplateManualDeterminationForWelsh()).thenReturn(
+                "template-id-manual-determination");
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .applicant1Represented(YesOrNo.NO)
+                .claimantBilingualLanguagePreference("BOTH")
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId("NOTIFY_CLAIMANT_FOR_RESPONDENT1_REJECT_REPAYMENT")
+                    .build()).build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "rambo@email.com",
+                "template-id-manual-determination",
+                getNotificationDataMapLip(caseData),
+                "claimant-reject-repayment-respondent-notification-000DC001"
+            );
+        }
+
         @NotNull
         public Map<String, String> getNotificationDataMapSolicitorSpec(CaseData caseData) {
             Map<String, String> properties = new HashMap<>(addCommonProperties());
