@@ -68,7 +68,7 @@ class FeesPaymentServiceTest {
     private static final CardPaymentServiceRequestDTO CARD_PAYMENT_SERVICE_REQUEST
         = CardPaymentServiceRequestDTO.builder()
         .returnUrl("http://localhost:3001/hearing-payment-confirmation/1701090368574910")
-        .language("En")
+        .language("en")
         .amount(new BigDecimal("232.12")).currency("GBP").build();
 
     @Autowired
