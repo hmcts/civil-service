@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
+import uk.gov.hmcts.reform.civil.model.welshenhancements.PreferredLanguage;
 import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 import uk.gov.hmcts.reform.payments.request.CardPaymentServiceRequestDTO;
 import uk.gov.hmcts.reform.payments.response.CardPaymentServiceRequestResponse;
@@ -52,7 +53,7 @@ public class FeesPaymentService {
             .amount(feePaymentDetails.getFee().getCalculatedAmountInPence()
                 .divide(BigDecimal.valueOf(100), 2, RoundingMode.UNNECESSARY))
             .currency("GBP")
-            .language(caseData.isClaimantBilingual() ? "cy" : "En")
+            .language(getClaimantSelectedLanguage(caseData))
             .returnUrl(pinInPostConfiguration.getCuiFrontEndUrl() + returnUrlSubPath + caseReference)
             .build();
 
@@ -63,6 +64,13 @@ public class FeesPaymentService {
                 requestDto
             );
         return CardPaymentStatusResponse.from(govPayCardPaymentRequest);
+    }
+
+    private String getClaimantSelectedLanguage(CaseData caseData) {
+        if (requireNonNull(caseData.getClaimantLanguagePreferenceDisplay()) == PreferredLanguage.WELSH) {
+            return "cy";
+        }
+        return "en";
     }
 
     public CardPaymentStatusResponse getGovPaymentRequestStatus(
