@@ -109,6 +109,7 @@ allprojects {
       //Solves CVE-2023-34034
       dependency group: 'org.springframework.security', name: 'spring-security-crypto', version: '6.5.1'
 
+
       dependency group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: versions.jackson
       dependency group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: versions.jackson
       dependency group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: versions.jackson
@@ -420,6 +421,7 @@ dependencies {
 
   implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: versions.jackson
   implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: versions.jackson
+  implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-csv', version: versions.jacksonDatabind
 
   implementation group: 'org.camunda.bpm', name: 'camunda-external-task-client', version: versions.camunda
   implementation group: 'org.camunda.community.rest', name: 'camunda-platform-7-rest-client-spring-boot-starter', version: versions.camunda
