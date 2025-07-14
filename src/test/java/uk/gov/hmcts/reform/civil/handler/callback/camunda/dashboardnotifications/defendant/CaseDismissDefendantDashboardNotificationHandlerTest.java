@@ -59,7 +59,7 @@ class CaseDismissDefendantDashboardNotificationHandlerTest extends BaseCallbackH
         HashMap<String, Object> scenarioParams = new HashMap<>();
         when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        when(featureToggleService.isLipQueryManagementEnabled(any())).thenReturn(false);
+        when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
             .respondent1Represented(YesOrNo.NO)
@@ -97,7 +97,7 @@ class CaseDismissDefendantDashboardNotificationHandlerTest extends BaseCallbackH
         HashMap<String, Object> scenarioParams = new HashMap<>();
         when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        when(featureToggleService.isLipQueryManagementEnabled(any())).thenReturn(true);
+        when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec()
             .includesRespondentCitizenQueryFollowUp(OffsetDateTime.now())
