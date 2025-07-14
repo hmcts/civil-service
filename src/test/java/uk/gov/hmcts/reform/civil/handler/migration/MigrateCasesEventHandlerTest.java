@@ -64,7 +64,7 @@ class MigrateCasesEventHandlerTest {
             migrationTaskFactory,
             objectMapper,
             500, // migrationBatchSize
-            10,// migrationWaitTime
+            10, // migrationWaitTime
             "DUMMY_KEY"
         );
     }
