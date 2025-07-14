@@ -719,4 +719,7 @@ public class NotificationsProperties {
     private String queryLipWelshPublicResponseReceived;
 
 
+    @NotEmpty
+    private String notifyClaimantLipTemplateManualDeterminationForWelsh;
+
 }

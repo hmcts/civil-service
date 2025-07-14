@@ -139,21 +139,24 @@ class GenerateHearingNoticeAppSolOneEmailDTOGeneratorTest {
                     .thenReturn("10:15am");
             utils.when(() -> NotificationUtils.getFormattedHearingDate(DATE_2025_07_04))
                     .thenReturn("04-07-2025");
+            utils.when(() -> NotificationUtils.getFormattedHearingDate(DATE_2025_07_01))
+                .thenReturn("01-07-2025");
 
             CaseData caseData = baseBuilder()
                     .hearingTimeHourMinute(TIME_1015)
                     .hearingFeePaymentDetails(null)
                     .hearingFee(null)
                     .hearingDueDate(DATE_2025_07_04)
+                    .hearingDate(DATE_2025_07_01)
                     .build();
 
             Map<String, String> result = generator.addCustomProperties(new HashMap<>(), caseData);
 
             assertAll("zero-fee-branch",
-                    () -> assertEquals("10:15am", result.get(HEARING_DATE)),
                     () -> assertEquals("10:15am", result.get(HEARING_TIME)),
                     () -> assertEquals("£0.00", result.get(HEARING_FEE)),
-                    () -> assertEquals("04-07-2025", result.get(HEARING_DUE_DATE))
+                    () -> assertEquals("04-07-2025", result.get(HEARING_DUE_DATE)),
+                    () -> assertEquals("01-07-2025", result.get(HEARING_DATE))
             );
         }
     }
@@ -164,20 +167,27 @@ class GenerateHearingNoticeAppSolOneEmailDTOGeneratorTest {
             utils.when(() -> NotificationUtils.getFormattedHearingTime(TIME_1115))
                     .thenReturn("11:15am");
 
+            utils.when(() -> NotificationUtils.getFormattedHearingDate(DATE_2025_07_04))
+                .thenReturn("04-07-2025");
+
+            utils.when(() -> NotificationUtils.getFormattedHearingDate(DATE_2025_07_01))
+                .thenReturn("01-07-2025");
+
             CaseData caseData = baseBuilder()
                     .hearingTimeHourMinute(TIME_1115)
                     .hearingFeePaymentDetails(null)
                     .hearingFee(Fee.builder().calculatedAmountInPence(valueOf(25000)).build())
                     .hearingDueDate(null)
+                    .hearingDate(DATE_2025_07_01)
                     .build();
 
             Map<String, String> result = generator.addCustomProperties(new HashMap<>(), caseData);
 
             assertAll("empty-due-date-branch",
-                    () -> assertEquals("11:15am", result.get(HEARING_DATE)),
                     () -> assertEquals("11:15am", result.get(HEARING_TIME)),
                     () -> assertEquals("£250.00", result.get(HEARING_FEE)),
-                    () -> assertEquals("", result.get(HEARING_DUE_DATE))
+                    () -> assertEquals("", result.get(HEARING_DUE_DATE)),
+                    () -> assertEquals("01-07-2025", result.get(HEARING_DATE))
             );
         }
     }
@@ -190,20 +200,24 @@ class GenerateHearingNoticeAppSolOneEmailDTOGeneratorTest {
             utils.when(() -> NotificationUtils.getFormattedHearingDate(DATE_2025_06_30))
                     .thenReturn("30-06-2025");
 
+            utils.when(() -> NotificationUtils.getFormattedHearingDate(DATE_2025_07_01))
+                .thenReturn("01-07-2025");
+
             CaseData caseData = baseBuilder()
                     .hearingTimeHourMinute(TIME_1500)
                     .hearingFeePaymentDetails(null)
                     .hearingFee(Fee.builder().calculatedAmountInPence(valueOf(20000)).build())
                     .hearingDueDate(DATE_2025_06_30)
+                    .hearingDate(DATE_2025_07_01)
                     .build();
 
             Map<String, String> result = generator.addCustomProperties(new HashMap<>(), caseData);
 
             assertAll("no-successful-payment-branch",
-                    () -> assertEquals("3:00pm", result.get(HEARING_DATE)),
                     () -> assertEquals("3:00pm", result.get(HEARING_TIME)),
                     () -> assertEquals("£200.00", result.get(HEARING_FEE)),
-                    () -> assertEquals("30-06-2025", result.get(HEARING_DUE_DATE))
+                    () -> assertEquals("30-06-2025", result.get(HEARING_DUE_DATE)),
+                      () -> assertEquals("01-07-2025", result.get(HEARING_DATE))
             );
         }
     }
@@ -214,11 +228,15 @@ class GenerateHearingNoticeAppSolOneEmailDTOGeneratorTest {
             utils.when(() -> NotificationUtils.getFormattedHearingTime(TIME_0800))
                     .thenReturn("formattedTime");
 
+            utils.when(() -> NotificationUtils.getFormattedHearingDate(DATE_2025_07_01))
+                .thenReturn("01-07-2025");
+
             CaseData caseData = baseBuilder()
                     .hearingTimeHourMinute(TIME_0800)
                     .hearingFeePaymentDetails(PaymentDetails.builder().status(SUCCESS).build())
                     .hearingFee(Fee.builder().calculatedAmountInPence(valueOf(10000)).build())
                     .hearingDueDate(DATE_2025_07_01)
+                    .hearingDate(DATE_2025_07_01)
                     .build();
 
             utils.when(() -> getApplicantLegalOrganizationName(eq(caseData), any()))
@@ -227,7 +245,7 @@ class GenerateHearingNoticeAppSolOneEmailDTOGeneratorTest {
             Map<String, String> result = generator.addCustomProperties(new HashMap<>(), caseData);
 
             assertAll("payment-successful-branch",
-                    () -> assertEquals("formattedTime", result.get(HEARING_DATE)),
+                    () -> assertEquals("01-07-2025", result.get(HEARING_DATE)),
                     () -> assertEquals("formattedTime", result.get(HEARING_TIME)),
                     () -> assertFalse(result.containsKey(HEARING_FEE)),
                     () -> assertFalse(result.containsKey(HEARING_DUE_DATE)),
@@ -244,11 +262,15 @@ class GenerateHearingNoticeAppSolOneEmailDTOGeneratorTest {
             utils.when(() -> NotificationUtils.getFormattedHearingDate(DATE_2025_08_15))
                     .thenReturn("15-08-2025");
 
+            utils.when(() -> NotificationUtils.getFormattedHearingDate(DATE_2025_07_01))
+                .thenReturn("01-07-2025");
+
             CaseData caseData = baseBuilder()
                     .hearingTimeHourMinute(TIME_0900)
                     .hearingFeePaymentDetails(PaymentDetails.builder().status(FAILED).build())
                     .hearingFee(Fee.builder().calculatedAmountInPence(valueOf(15000)).build())
                     .hearingDueDate(DATE_2025_08_15)
+                    .hearingDate(DATE_2025_07_01)
                     .build();
 
             utils.when(() -> getApplicantLegalOrganizationName(eq(caseData), any()))
@@ -257,7 +279,7 @@ class GenerateHearingNoticeAppSolOneEmailDTOGeneratorTest {
             Map<String, String> result = generator.addCustomProperties(new HashMap<>(), caseData);
 
             assertAll("payment-failed-branch",
-                    () -> assertEquals("9:00am", result.get(HEARING_DATE)),
+                    () -> assertEquals("01-07-2025", result.get(HEARING_DATE)),
                     () -> assertEquals("9:00am", result.get(HEARING_TIME)),
                     () -> assertEquals("£150.00", result.get(HEARING_FEE)),
                     () -> assertEquals("15-08-2025", result.get(HEARING_DUE_DATE)),
