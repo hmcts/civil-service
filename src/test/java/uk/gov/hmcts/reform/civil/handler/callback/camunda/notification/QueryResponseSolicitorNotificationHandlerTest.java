@@ -331,7 +331,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
     }
 
     @NotNull
-    private Map<String, String> getNotificationDataForLip(LocalDateTime now) {
+    private Map<String, String> getNotificationDataForLip(LocalDateTime now, boolean publicQmEnabled) {
         Map<String, String> expectedProperties = new HashMap<>(Map.of(
             "partyReferences",
             "Claimant reference: 12345 - Defendant reference: 6789",
@@ -350,10 +350,17 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
         expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
         expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
         expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
-        expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
-        expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
-        expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
-        expectedProperties.put(CNBC_CONTACT, configuration.getCnbcContact());
+        if (publicQmEnabled) {
+            expectedProperties.put(LIP_CONTACT, configuration.getRaiseQueryLip());
+            expectedProperties.put(LIP_CONTACT_WELSH, configuration.getRaiseQueryLipWelsh());
+            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getRaiseQueryLr());
+            expectedProperties.put(CNBC_CONTACT, configuration.getRaiseQueryLr());
+        } else {
+            expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
+            expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+            expectedProperties.put(CNBC_CONTACT, configuration.getCnbcContact());
+        }
         return expectedProperties;
     }
 
@@ -578,10 +585,13 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
             when(notificationsProperties.getQueryLipResponseReceivedWelsh()).thenReturn(TEMPLATE_ID_LIP_WELSH);
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
+            when(configuration.getRaiseQueryLip()).thenReturn((String) configMap.get("raiseQueryLip"));
+            when(configuration.getRaiseQueryLipWelsh()).thenReturn((String) configMap.get("raiseQueryLipWelsh"));
         }
 
         @NotNull
-        private Map<String, String> getNotificationDataMapLipRes(LocalDateTime now) {
+        private Map<String, String> getNotificationDataMapLipRes(LocalDateTime now, boolean publicQmEnabled) {
             Map<String, String> expectedProperties = new HashMap<>(Map.of(
                 "partyReferences",
                 "Claimant reference: 12345 - Defendant reference: 6789",
@@ -600,10 +610,17 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
             expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
             expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
             expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
-            expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
-            expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
-            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
-            expectedProperties.put(CNBC_CONTACT, configuration.getCnbcContact());
+            if (publicQmEnabled) {
+                expectedProperties.put(LIP_CONTACT, configuration.getRaiseQueryLip());
+                expectedProperties.put(LIP_CONTACT_WELSH, configuration.getRaiseQueryLipWelsh());
+                expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getRaiseQueryLr());
+                expectedProperties.put(CNBC_CONTACT, configuration.getRaiseQueryLr());
+            } else {
+                expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
+                expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+                expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+                expectedProperties.put(CNBC_CONTACT, configuration.getCnbcContact());
+            }
             return expectedProperties;
         }
 
@@ -630,7 +647,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
             verify(notificationService).sendMail(
                 "rambo@email.com",
                 publicQuery ? TEMPLATE_PUBLIC_LIP_ID : TEMPLATE_ID_LIP,
-                getNotificationDataForLip(now.toLocalDateTime()),
+                getNotificationDataForLip(now.toLocalDateTime(), publicQuery),
                 "response-to-query-notification-000DC001"
             );
         }
@@ -659,7 +676,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
             verify(notificationService).sendMail(
                 "rambo@email.com",
                 publicQuery ? TEMPLATE_PUBLIC_WELSH_LIP_ID : TEMPLATE_ID_LIP_WELSH,
-                getNotificationDataForLip(now.toLocalDateTime()),
+                getNotificationDataForLip(now.toLocalDateTime(), publicQuery),
                 "response-to-query-notification-000DC001"
             );
         }
@@ -690,7 +707,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
             verify(notificationService).sendMail(
                 "sole.trader@email.com",
                 publicQuery ? TEMPLATE_PUBLIC_LIP_ID : TEMPLATE_ID_LIP,
-                getNotificationDataMapLipRes(now.toLocalDateTime()),
+                getNotificationDataMapLipRes(now.toLocalDateTime(), publicQuery),
                 "response-to-query-notification-000DC001"
             );
         }
@@ -722,7 +739,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
             verify(notificationService).sendMail(
                 "sole.trader@email.com",
                 publicQuery ? TEMPLATE_PUBLIC_WELSH_LIP_ID : TEMPLATE_ID_LIP_WELSH,
-                getNotificationDataMapLipRes(now.toLocalDateTime()),
+                getNotificationDataMapLipRes(now.toLocalDateTime(), publicQuery),
                 "response-to-query-notification-000DC001"
             );
         }
