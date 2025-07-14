@@ -564,6 +564,11 @@ public class CmcClaim implements Claim {
     }
 
     @Override
+    public boolean decisionMadeDocumentsAreInTranslation() {
+        return false;
+    }
+
+    @Override
     public boolean isCaseStayed() {
         return false;
     }
@@ -629,12 +634,22 @@ public class CmcClaim implements Claim {
     }
 
     @Override
+    public boolean sdoDocumentsAreInTranslation() {
+        return false;
+    }
+
+    @Override
     public boolean isBundleCreatedStatusActive() {
         return false;
     }
 
     @Override
     public boolean isCasedDiscontinued() {
+        return false;
+    }
+
+    @Override
+    public boolean awaitingHearingNoticeTranslationNotSettledOrDiscontinued() {
         return false;
     }
 }

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.handler.callback.user;
+package uk.gov.hmcts.reform.civil.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterAll;
@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.handler.callback.user.ManageContactInformationCallbackHandler;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.managecontactinformation.PrepareEventTask;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.managecontactinformation.ShowWarningTask;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.managecontactinformation.SubmitChangesTask;
