@@ -318,8 +318,8 @@ public class JudgmentByAdmissionOrDeterminationMapper {
     }
 
     private String getClaimCosts(CaseData caseData) {
-        return (judgementService.isLrFullAdmitRepaymentPlan(caseData)
-            || judgementService.isLRPartAdmitRepaymentPlan(caseData))
+        return (judgementService.isLRAdmissionRepaymentPlan(caseData)
+               || judgementService.isLrPayImmediatelyPlan(caseData))
             ? (getClaimFee(caseData).add(judgementService.ccjJudgmentFixedCost(caseData))).toString()
             : getClaimFee(caseData).toString();
     }
