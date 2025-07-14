@@ -39,7 +39,7 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
     @Value("${migration.wait-time-mins:10}")
     private final int migrationWaitTime;
 
-    @Value("${migration.csvFile.decrypt.key:DUMMY_SECRET}")
+    @Value("${migration.csvFile.decrypt.key:DUMMY_KEY}")
     private final String encryptionSecret;
 
     @Override

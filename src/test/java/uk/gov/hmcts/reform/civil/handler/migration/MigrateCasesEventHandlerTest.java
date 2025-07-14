@@ -64,8 +64,8 @@ class MigrateCasesEventHandlerTest {
             migrationTaskFactory,
             objectMapper,
             500, // migrationBatchSize
-            10,
-            "DUMMY_SECRET"// migrationWaitTime
+            10,// migrationWaitTime
+            "DUMMY_KEY"
         );
     }
 
@@ -144,7 +144,7 @@ class MigrateCasesEventHandlerTest {
         MockedStatic<CaseMigrationEncryptionUtil> caseMigrationEncryptionUtilMockedStatic = Mockito.mockStatic(CaseMigrationEncryptionUtil.class);
         caseMigrationEncryptionUtilMockedStatic.when(() -> CaseMigrationEncryptionUtil.isFileEncrypted(csvFileName)).thenReturn(true);
 
-        when(caseReferenceCsvLoader.loadCaseReferenceList(csvFileName, "DUMMY_SECRET")).thenReturn(mockReferences);
+        when(caseReferenceCsvLoader.loadCaseReferenceList(csvFileName, "DUMMY_KEY")).thenReturn(mockReferences);
 
         // Act
         List<CaseReference> result = handler.getCaseReferenceList(caseIds, csvFileName);
