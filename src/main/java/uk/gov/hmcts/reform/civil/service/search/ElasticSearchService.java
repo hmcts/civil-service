@@ -41,6 +41,7 @@ public abstract class ElasticSearchService {
     abstract Query query(int startIndex);
 
     protected int calculatePages(SearchResult searchResult) {
+        log.info("Initially search service found {} case(s) ", searchResult.getTotal());
         return new BigDecimal(searchResult.getTotal()).divide(new BigDecimal(ES_DEFAULT_SEARCH_LIMIT), UP).intValue();
     }
 }

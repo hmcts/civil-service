@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CaseDataParent;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
@@ -66,12 +67,13 @@ public class GenerateInterlocutoryJudgementHandler extends CallbackHandler {
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
         CaseData updatedCaseData;
-        if (featureToggleService.isGaForWelshEnabled()
+        if (featureToggleService.isWelshEnabledForMainCase()
             && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
             List<Element<CaseDocument>> preTranslationDocuments = caseData.getPreTranslationDocuments();
             preTranslationDocuments.add(element(interlocutoryJudgementDoc));
             updatedCaseData = caseData.toBuilder()
                 .preTranslationDocuments(preTranslationDocuments)
+                .bilingualHint(YesOrNo.YES)
                 .preTranslationDocumentType(PreTranslationDocumentType.INTERLOCUTORY_JUDGMENT)
                 .build();
         } else {

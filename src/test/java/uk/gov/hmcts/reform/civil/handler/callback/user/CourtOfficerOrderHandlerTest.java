@@ -1,15 +1,16 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
@@ -25,6 +26,7 @@ import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderFurtherHearing;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.CourtOfficerOrderGenerator;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
@@ -50,28 +52,27 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.COURT_OFFICER_ORDER;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CourtOfficerOrderHandler.HEADER;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    CourtOfficerOrderHandler.class,
-    JacksonAutoConfiguration.class,
-    AssignCategoryId.class,
-})
+@ExtendWith(MockitoExtension.class)
 public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
 
-    @Autowired
+    @InjectMocks
     private CourtOfficerOrderHandler handler;
-    @MockBean
+    @Mock
     private DocumentHearingLocationHelper locationHelper;
-    @MockBean
+    @Mock
     private WorkingDayIndicator workingDayIndicator;
-    @MockBean
+    @Mock
     private LocationReferenceDataService locationRefDataService;
-    @Autowired
+    @Spy
     private AssignCategoryId assignCategoryId;
-    @MockBean
+    @Spy
+    private ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+    @Mock
     private CourtOfficerOrderGenerator courtOfficerOrderGenerator;
-    @MockBean
+    @Mock
     private FeatureToggleService featureToggleService;
+    @Mock
+    private UserService userService;
 
     private static LocationRefData locationRefData =   LocationRefData.builder().siteName("A nice Site Name")
         .courtAddress("1").postcode("1")
@@ -93,14 +94,19 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
 
     @BeforeEach
     void setup() {
-        when(locationHelper.getHearingLocation(any(), any(), any())).thenReturn(locationRefData);
-        List<LocationRefData> locationRefDataList = new ArrayList<>();
-        locationRefDataList.add(locationRefData);
-        when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(locationRefDataList);
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     }
 
     @Nested
     class AboutToStartCallback {
+
+        @BeforeEach
+        void setup() {
+            when(locationHelper.getHearingLocation(any(), any(), any())).thenReturn(locationRefData);
+            List<LocationRefData> locationRefDataList = new ArrayList<>();
+            locationRefDataList.add(locationRefData);
+            when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(locationRefDataList);
+        }
 
         @Test
         void shouldPopulateValues_whenInvoked() {
@@ -144,18 +150,24 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
                                                        .listFromDate(null).build())
                 .build();
 
+            when(courtOfficerOrderGenerator.generate(any(), any())).thenReturn(CaseDocument.builder().documentLink(
+                Document.builder()
+                    .documentFileName(fileName)
+                    .categoryID("caseManagementOrders")
+                    .build()).createdDatetime(LocalDateTime.now()).build());
+
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData())
                 .extracting("previewCourtOfficerOrder")
                 .extracting("documentLink")
-                .extracting("document_filename")
+                .extracting("documentFileName")
                 .isEqualTo(fileName);
             assertThat(response.getData())
                 .extracting("previewCourtOfficerOrder")
                 .extracting("documentLink")
-                .extracting("category_id")
+                .extracting("categoryID")
                 .isEqualTo("caseManagementOrders");
         }
 
@@ -244,7 +256,7 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldHideDocumentIfClaimantWelsh_onAboutToSubmit() {
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
             // Given
             caseData = caseData.toBuilder()
                 .previewCourtOfficerOrder(courtOfficerOrder)
@@ -263,7 +275,7 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotHideDocumentIfWelshDisabled_onAboutToSubmit() {
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
             // Given
             caseData = caseData.toBuilder()
                 .previewCourtOfficerOrder(courtOfficerOrder)
@@ -282,7 +294,7 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldHideDocumentIfDefendantWelsh_onAboutToSubmit() {
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
             // Given
             caseData = caseData.toBuilder()
                 .previewCourtOfficerOrder(courtOfficerOrder)

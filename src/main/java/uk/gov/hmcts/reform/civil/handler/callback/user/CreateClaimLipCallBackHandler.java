@@ -131,7 +131,7 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
                                                        .build());
             caseDataBuilder.locationName(locationRefData.getSiteName());
         }
-        if (featureToggleService.isGaForWelshEnabled()) {
+        if (featureToggleService.isWelshEnabledForMainCase()) {
             caseDataBuilder.claimantLanguagePreferenceDisplay(PreferredLanguage.fromString(caseData.getClaimantBilingualLanguagePreference()));
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
