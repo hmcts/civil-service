@@ -35,12 +35,12 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
     private final ObjectMapper objectMapper;
 
     @Value("${migration.batchsize:500}")
-    private int migrationBatchSize;
+    private final int migrationBatchSize;
     @Value("${migration.wait-time-mins:10}")
-    private int migrationWaitTime;
+    private final int migrationWaitTime;
 
     @Value("${migration.csvFile.decrypt.key:DUMMY_SECRET}")
-    protected String secret;
+    private final String encryptionSecret;
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
@@ -69,9 +69,7 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
                 StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseReference.getCaseReference(), CaseEvent.UPDATE_CASE_DATA);
                 CaseData caseData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
                 caseData = task.migrateCaseData(caseData);
-                CaseDataContent caseDataContent = buildCaseDataContent(startEventResponse, caseData);
-                caseDataContent.getEvent().setSummary(task.getEventSummary());
-                caseDataContent.getEvent().setDescription(task.getEventDescription());
+                CaseDataContent caseDataContent = buildCaseDataContent(startEventResponse, caseData, task);
                 coreCaseDataService.submitUpdate(
                     caseReference.getCaseReference(),
                     caseDataContent
@@ -84,12 +82,12 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
         return ExternalTaskData.builder().build();
     }
 
-    private List<CaseReference> getCaseReferenceList(String caseIds, String csvFileName) {
+    protected List<CaseReference> getCaseReferenceList(String caseIds, String csvFileName) {
         List<CaseReference> caseReferences;
         if (caseIds == null || caseIds.isEmpty()) {
             log.info("Loading case references from CSV file: {}", csvFileName);
             if (CaseMigrationEncryptionUtil.isFileEncrypted(csvFileName)) {
-                caseReferences = caseReferenceCsvLoader.loadCaseReferenceList(csvFileName, secret);
+                caseReferences = caseReferenceCsvLoader.loadCaseReferenceList(csvFileName, encryptionSecret);
             } else {
                 caseReferences = caseReferenceCsvLoader.loadCaseReferenceList(csvFileName);
             }
@@ -105,14 +103,14 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
         return caseReferences;
     }
 
-    private CaseDataContent buildCaseDataContent(StartEventResponse startEventResponse, CaseData caseData) {
+    protected CaseDataContent buildCaseDataContent(StartEventResponse startEventResponse, CaseData caseData, MigrationTask task) {
 
         Map<String, Object> updatedData = caseData.toMap(objectMapper);
         return CaseDataContent.builder()
             .eventToken(startEventResponse.getToken())
             .event(Event.builder().id(startEventResponse.getEventId())
-                .summary(null)
-                .description(null)
+                .summary(task.getEventSummary())
+                .description(task.getEventDescription())
                 .build())
             .data(updatedData)
             .build();
