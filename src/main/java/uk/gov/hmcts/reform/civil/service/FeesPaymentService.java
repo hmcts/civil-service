@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.payments.response.CardPaymentServiceRequestResponse;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Arrays;
+import java.util.Objects;
 
 import static java.util.Objects.requireNonNull;
 
@@ -52,7 +53,7 @@ public class FeesPaymentService {
             .amount(feePaymentDetails.getFee().getCalculatedAmountInPence()
                 .divide(BigDecimal.valueOf(100), 2, RoundingMode.UNNECESSARY))
             .currency("GBP")
-            .language(getClaimantLanguagePreference(caseData))
+            .language(Objects.equals(caseData.getClaimantBilingualLanguagePreference(), "WELSH") ? "cy" : "en")
             .returnUrl(pinInPostConfiguration.getCuiFrontEndUrl() + returnUrlSubPath + caseReference)
             .build();
 
@@ -63,11 +64,6 @@ public class FeesPaymentService {
                 requestDto
             );
         return CardPaymentStatusResponse.from(govPayCardPaymentRequest);
-    }
-
-    private String getClaimantLanguagePreference(CaseData caseData) {
-        return (caseData.getClaimantBilingualLanguagePreference() != null 
-            && caseData.getClaimantBilingualLanguagePreference().equals("WELSH")) ? "cy" : "en";
     }
 
     public CardPaymentStatusResponse getGovPaymentRequestStatus(
