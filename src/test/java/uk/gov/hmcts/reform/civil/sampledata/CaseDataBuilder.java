@@ -703,8 +703,7 @@ public class CaseDataBuilder {
     private String partialPaymentAmount;
     private LocalDate nextDeadline;
 
-    private CaseQueriesCollection qmApplicantCitizenQueries;
-    private CaseQueriesCollection qmRespondentCitizenQueries;
+    private CaseQueriesCollection queries;
 
     public CaseDataBuilder claimantBilingualLanguagePreference(String claimantBilingualLanguagePreference) {
         this.claimantBilingualLanguagePreference = claimantBilingualLanguagePreference;
@@ -4271,7 +4270,7 @@ public class CaseDataBuilder {
                                         .createdOn(queryCreationDatetime)
                                         .build())
                                 .build());
-        this.qmApplicantCitizenQueries = CaseQueriesCollection.builder()
+        this.queries = CaseQueriesCollection.builder()
             .partyName("Claimant")
             .roleOnCase("applicant-citizen")
             .caseMessages(caseMessages).build();
@@ -4280,9 +4279,9 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder includesApplicantCitizenQueryResponse(OffsetDateTime queryCreationDatetime) {
         includesApplicantCitizenQuery(queryCreationDatetime);
-        this.qmApplicantCitizenQueries = this.qmApplicantCitizenQueries.toBuilder().caseMessages(
+        this.queries = this.queries.toBuilder().caseMessages(
             Stream.concat(
-                this.qmApplicantCitizenQueries.getCaseMessages().stream(),
+                this.queries.getCaseMessages().stream(),
                 List.of(Element.<CaseMessage>builder()
                             .id(UUID.randomUUID())
                             .value(
@@ -4298,9 +4297,9 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder includesApplicantCitizenQueryFollowUp(OffsetDateTime queryCreationDatetime) {
         includesApplicantCitizenQueryResponse(queryCreationDatetime);
-        this.qmApplicantCitizenQueries = this.qmApplicantCitizenQueries.toBuilder().caseMessages(
+        this.queries = this.queries.toBuilder().caseMessages(
                 Stream.concat(
-                    this.qmApplicantCitizenQueries.getCaseMessages().stream(),
+                    this.queries.getCaseMessages().stream(),
                     List.of(Element.<CaseMessage>builder()
                                 .id(UUID.randomUUID())
                                 .value(
@@ -4326,7 +4325,7 @@ public class CaseDataBuilder {
                                      .createdOn(queryCreationDatetime)
                                      .build())
                              .build());
-        this.qmRespondentCitizenQueries = CaseQueriesCollection.builder()
+        this.queries = CaseQueriesCollection.builder()
             .partyName("Defendant")
             .roleOnCase("respondent-citizen")
             .caseMessages(caseMessages).build();
@@ -4335,9 +4334,9 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder includesRespondentCitizenQueryResponse(OffsetDateTime queryCreationDatetime) {
         includesRespondentCitizenQuery(queryCreationDatetime);
-        this.qmRespondentCitizenQueries = this.qmRespondentCitizenQueries.toBuilder().caseMessages(
+        this.queries = this.queries.toBuilder().caseMessages(
             Stream.concat(
-                this.qmRespondentCitizenQueries.getCaseMessages().stream(),
+                this.queries.getCaseMessages().stream(),
                 List.of(Element.<CaseMessage>builder()
                             .id(UUID.randomUUID())
                             .value(
@@ -4353,9 +4352,9 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder includesRespondentCitizenQueryFollowUp(OffsetDateTime queryCreationDatetime) {
         includesRespondentCitizenQueryResponse(queryCreationDatetime);
-        this.qmRespondentCitizenQueries = this.qmRespondentCitizenQueries.toBuilder().caseMessages(
+        this.queries = this.queries.toBuilder().caseMessages(
                 Stream.concat(
-                    this.qmRespondentCitizenQueries.getCaseMessages().stream(),
+                    this.queries.getCaseMessages().stream(),
                     List.of(Element.<CaseMessage>builder()
                                 .id(UUID.randomUUID())
                                 .value(
@@ -8153,6 +8152,7 @@ public class CaseDataBuilder {
             .partialPaymentAmount(partialPaymentAmount)
             .nextDeadline(nextDeadline)
             .fixedCosts(fixedCosts)
+            .queries(queries)
             .build();
     }
 
