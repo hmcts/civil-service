@@ -53,7 +53,7 @@ public class FeesPaymentService {
             .amount(feePaymentDetails.getFee().getCalculatedAmountInPence()
                 .divide(BigDecimal.valueOf(100), 2, RoundingMode.UNNECESSARY))
             .currency("GBP")
-            .language(getClaimantSelectedLanguage(caseData))
+            .language(getClaimantLanguagePreference(caseData))
             .returnUrl(pinInPostConfiguration.getCuiFrontEndUrl() + returnUrlSubPath + caseReference)
             .build();
 
@@ -66,7 +66,7 @@ public class FeesPaymentService {
         return CardPaymentStatusResponse.from(govPayCardPaymentRequest);
     }
 
-    private String getClaimantSelectedLanguage(CaseData caseData) {
+    private String getClaimantLanguagePreference(CaseData caseData) {
         if (requireNonNull(caseData.getClaimantLanguagePreferenceDisplay()) == PreferredLanguage.WELSH) {
             return "cy";
         }
