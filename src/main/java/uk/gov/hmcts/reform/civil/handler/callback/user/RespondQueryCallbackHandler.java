@@ -69,9 +69,10 @@ public class RespondQueryCallbackHandler extends CallbackHandler {
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         CaseMessage latestCaseMessage = getLatestQuery(caseData);
 
-        if (!featureToggleService.isPublicQueryManagementEnabled(caseData)) {
-            assignCategoryIdToCaseworkerAttachments(caseData, latestCaseMessage, assignCategoryId);
-        } else {
+        boolean isPublicQmEnabled = featureToggleService.isPublicQueryManagementEnabled(caseData);
+        assignCategoryIdToCaseworkerAttachments(caseData, latestCaseMessage, assignCategoryId, isPublicQmEnabled);
+
+        if (isPublicQmEnabled) {
             clearOldQueryCollections(caseDataBuilder);
         }
 

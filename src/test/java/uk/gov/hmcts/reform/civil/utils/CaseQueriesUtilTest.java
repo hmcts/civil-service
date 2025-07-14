@@ -252,7 +252,7 @@ class CaseQueriesUtilTest {
                                                .build())
             .build();
 
-        CaseQueriesUtil.assignCategoryIdToCaseworkerAttachments(caseData, queries.get(1).getValue(), assignCategoryId);
+        CaseQueriesUtil.assignCategoryIdToCaseworkerAttachments(caseData, queries.get(1).getValue(), assignCategoryId, false);
 
         List<Document> documents = unwrapElements(queries.get(1).getValue().getAttachments());
 
@@ -270,7 +270,7 @@ class CaseQueriesUtilTest {
                                                .build())
             .build();
 
-        CaseQueriesUtil.assignCategoryIdToCaseworkerAttachments(caseData, queries.get(1).getValue(), assignCategoryId);
+        CaseQueriesUtil.assignCategoryIdToCaseworkerAttachments(caseData, queries.get(1).getValue(), assignCategoryId, false);
 
         List<Document> documents = unwrapElements(queries.get(1).getValue().getAttachments());
 
@@ -288,12 +288,30 @@ class CaseQueriesUtilTest {
                                                .build())
             .build();
 
-        CaseQueriesUtil.assignCategoryIdToCaseworkerAttachments(caseData, queries.get(1).getValue(), assignCategoryId);
+        CaseQueriesUtil.assignCategoryIdToCaseworkerAttachments(caseData, queries.get(1).getValue(), assignCategoryId, false);
 
         List<Document> documents = unwrapElements(queries.get(1).getValue().getAttachments());
 
         assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(0).getCategoryID());
         assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(1).getCategoryID());
+    }
+
+    @Test
+    void shouldAssignCategoryIDToAttachments_whenCaseworker_QmLip_isOn() {
+        List<Element<CaseMessage>> queries = buildCaseMessageWithFollowUpQuery();
+        CaseData caseData = CaseData.builder()
+            .ccdCaseReference(1L)
+            .qmRespondentSolicitor2Queries(CaseQueriesCollection.builder()
+                                               .caseMessages(queries)
+                                               .build())
+            .build();
+
+        CaseQueriesUtil.assignCategoryIdToCaseworkerAttachments(caseData, queries.get(1).getValue(), assignCategoryId, true);
+
+        List<Document> documents = unwrapElements(queries.get(1).getValue().getAttachments());
+
+        assertEquals(DocCategory.CASEWORKER_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(0).getCategoryID());
+        assertEquals(DocCategory.CASEWORKER_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(1).getCategoryID());
     }
 
     @Test
