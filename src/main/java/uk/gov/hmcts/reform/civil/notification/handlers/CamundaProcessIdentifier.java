@@ -12,6 +12,8 @@ public enum CamundaProcessIdentifier {
     AcknowledgeClaimUnspecNotifyParties,
     GenerateOrderNotifyPartiesCourtOfficerOrder,
     GenerateOrderNotifyParties,
+    MediationSuccessfulNotifyParties,
+    MediationUnsuccessfulNotifyParties,
     DismissCaseNotifier,
     HwFOutcomeNotifyParties,
     DefendantResponseUnspecFullDefenceNotifyParties,
@@ -25,6 +27,7 @@ public enum CamundaProcessIdentifier {
     JudgmentVariedDeterminationOfMeansNotifyParties,
     ClaimSubmittedApplicantNotifier,
     ClaimantLipHelpWithFeesNotifier,
+    DiscontinuanceClaimNotifyParties,
     ExtendResponseDeadlineNotifier,
     DefendantResponseCUINotify,
     TakeCaseOfflineNotifier,
@@ -44,5 +47,5 @@ public enum CamundaProcessIdentifier {
     Respondent1NotifyOthersTrialReady,
     Respondent2NotifyOthersTrialReady,
     AmendRestitchBundleNotify,
-    CreateSDONotify,
+    CreateSDONotify
 }
