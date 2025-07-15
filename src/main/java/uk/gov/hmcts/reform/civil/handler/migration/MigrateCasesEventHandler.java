@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.utils.CaseMigrationEncryptionUtil;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 @Component
 @Slf4j
@@ -71,13 +72,22 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
         String csvFileName = externalTask.getVariable("csvFileName");
         List<CaseReference> caseReferences = getCaseReferenceList(caseIds, csvFileName);
 
+        int count = 0;
+        int batchCount = 1;
         log.info("Found {} case references to process", caseReferences.size());
         if (caseReferences.isEmpty()) {
             log.warn("No case references found to process");
             return ExternalTaskData.builder().build();
         }
         for (CaseReference caseReference : caseReferences) {
+            count++;
             try {
+                if (count == migrationBatchSize) {
+                    log.info("Batch {} limit reached {}, pausing for {} minutes", batchCount, migrationBatchSize, migrationWaitTime);
+                    TimeUnit.MINUTES.sleep(migrationWaitTime);
+                    count = 0;
+                    batchCount++;
+                }
                 log.info("Migrating case with ID: {}", caseReference);
                 StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseReference.getCaseReference(), CaseEvent.UPDATE_CASE_DATA);
                 CaseData caseData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
