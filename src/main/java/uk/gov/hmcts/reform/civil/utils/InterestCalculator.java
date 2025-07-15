@@ -72,16 +72,6 @@ public class InterestCalculator {
         return ZERO;
     }
 
-    private LocalDate getToDateForJO(CaseData caseData) {
-        if (Objects.isNull(caseData.getInterestClaimUntil())) {
-            return LocalDate.now();
-        } else if (InterestClaimUntilType.UNTIL_CLAIM_SUBMIT_DATE.equals(caseData.getInterestClaimUntil())) {
-            return getSubmittedDate(caseData);
-        } else {
-            return LocalDate.now().minusDays(1);
-        }
-    }
-
     private LocalDate getToDate(CaseData caseData) {
         if (Objects.nonNull(caseData.getInterestClaimUntil())
             && InterestClaimUntilType.UNTIL_CLAIM_SUBMIT_DATE.equals(caseData.getInterestClaimUntil())) {

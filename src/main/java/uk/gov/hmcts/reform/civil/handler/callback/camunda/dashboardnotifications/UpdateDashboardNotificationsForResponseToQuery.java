@@ -9,13 +9,9 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
-import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
+
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.service.querymanagement.QueryManagementCamundaService;
-import uk.gov.hmcts.reform.civil.service.querymanagement.QueryManagementVariables;
-import uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
@@ -30,11 +26,6 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_QUERY_RESPONDED_CLAIMANT_DELETE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_QUERY_RESPONDED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_QUERY_RESPONDED_DEFENDANT_DELETE;
-import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getQueryById;
-import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getUserQueriesCreatedByUser;
-import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getUserRoleForQuery;
-import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPClaimant;
-import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPDefendant;
 
 @Service
 @RequiredArgsConstructor
@@ -46,8 +37,6 @@ public class UpdateDashboardNotificationsForResponseToQuery extends CallbackHand
     public static final String TASK_ID = "UpdateDashboardNotificationsResponseToQuery";
     private final DashboardScenariosService dashboardScenariosService;
     private final DashboardNotificationsParamsMapper mapper;
-    private final CoreCaseUserService coreCaseUserService;
-    private final QueryManagementCamundaService runtimeService;
     private final FeatureToggleService featureToggleService;
 
     @Override
@@ -72,18 +61,10 @@ public class UpdateDashboardNotificationsForResponseToQuery extends CallbackHand
         if (!featureToggleService.isPublicQueryManagementEnabled(caseData)) {
             return AboutToStartOrSubmitCallbackResponse.builder().build();
         }
-        String processInstanceId = caseData.getBusinessProcess().getProcessInstanceId();
-        QueryManagementVariables processVariables = runtimeService.getProcessVariables(processInstanceId);
-        String queryId = processVariables.getQueryId();
-
-        CaseMessage responseQuery = getQueryById(caseData, queryId);
-        String parentQueryId = responseQuery.getParentId();
-        List<String> roles = getUserRoleForQuery(caseData, coreCaseUserService, parentQueryId);
         ScenarioRequestParams
             notificationParams = ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        if (isLIPClaimant(roles) && caseData.getQueries() != null
-            && hasQueryRaisedByLipUser(caseData, queryId)) {
+        if (caseData.isApplicantLiP()) {
             dashboardScenariosService.recordScenarios(
                 authToken,
                 SCENARIO_AAA6_QUERY_RESPONDED_CLAIMANT_DELETE.getScenario(),
@@ -97,8 +78,7 @@ public class UpdateDashboardNotificationsForResponseToQuery extends CallbackHand
                 notificationParams
             );
         }
-        if (isLIPDefendant(roles) && caseData.getQueries() != null
-            && hasQueryRaisedByLipUser(caseData, queryId)) {
+        if (caseData.isRespondent1LiP()) {
             dashboardScenariosService.recordScenarios(
                 authToken,
                 SCENARIO_AAA6_QUERY_RESPONDED_DEFENDANT_DELETE.getScenario(),
@@ -113,12 +93,5 @@ public class UpdateDashboardNotificationsForResponseToQuery extends CallbackHand
             );
         }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
-    }
-
-    private boolean hasQueryRaisedByLipUser(CaseData caseData, String queryId) {
-        CaseMessage query = CaseQueriesUtil.getQueryById(caseData, queryId);
-        String createdBy = query.getCreatedBy();
-        List<CaseMessage> queriesCreatedByUser = getUserQueriesCreatedByUser(caseData, createdBy);
-        return queriesCreatedByUser.size() > 0;
     }
 }

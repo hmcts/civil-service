@@ -60,7 +60,7 @@ public class JudgementService {
         BigDecimal claimAmount = caseData.getTotalClaimAmount();
         if (isLrFullAdmitRepaymentPlan(caseData)
             || isLrFullAdmitPayImmediately(caseData)) {
-            BigDecimal interest = interestCalculator.calculateInterestForJO(caseData);
+            BigDecimal interest = interestCalculator.calculateInterest(caseData);
             claimAmount = claimAmount.add(interest);
         } else {
             if (caseData.isPartAdmitClaimSpec()) {
