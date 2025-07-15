@@ -204,7 +204,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
             populateTrackToggle(caseData, caseDataBuilder);
         }
 
-        if (featureToggleService.isGaForWelshEnabled()
+        if (featureToggleService.isWelshEnabledForMainCase()
             && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
             caseDataBuilder.bilingualHint(YesOrNo.YES);
         }
