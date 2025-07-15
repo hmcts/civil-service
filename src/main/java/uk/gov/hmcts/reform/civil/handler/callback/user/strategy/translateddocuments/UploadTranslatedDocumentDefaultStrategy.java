@@ -366,7 +366,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
             }
         }
 
-        if (caseData.isLRvLipOneVOne() && featureToggleService.isGaForWelshEnabled()) {
+        if (caseData.isLRvLipOneVOne() && featureToggleService.isWelshEnabledForMainCase()) {
             if (caseData.getCcdState() == CaseState.AWAITING_APPLICANT_INTENTION) {
                 return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_CLAIMANT_LR_INTENTION;
             }
