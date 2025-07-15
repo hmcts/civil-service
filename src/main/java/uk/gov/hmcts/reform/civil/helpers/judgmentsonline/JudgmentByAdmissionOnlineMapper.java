@@ -85,10 +85,19 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
         JudgmentDetails activeJudgmentDetails = addUpdateActiveJudgment(caseData);
         builder.activeJudgment(activeJudgmentDetails);
         CaseData data = builder.build();
-        BigDecimal interest = (!judgementService.isLrFullAdmitRepaymentPlan(data)
-            && !judgementService.isLRPartAdmitRepaymentPlan(data))
+        boolean isLrAdmissionFA = judgementService.isLrFullAdmitRepaymentPlan(data);
+        boolean isLrAdmissionPA = judgementService.isLRPartAdmitRepaymentPlan(data);
+        BigDecimal interest = (!isLrAdmissionFA
+            && !isLrAdmissionPA)
             ? interestCalculator.calculateInterest(data) : null;
         super.updateJudgmentTabDataWithActiveJudgment(activeJudgmentDetails, builder, interest);
+
+        if (isLrAdmissionFA || isLrAdmissionPA) {
+            builder.joRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummaryForLRAdmission(
+                activeJudgmentDetails,
+                interest
+            ));
+        }
         return builder;
     }
 

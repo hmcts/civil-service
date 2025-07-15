@@ -186,16 +186,31 @@ public class JudgmentsOnlineHelper {
     }
 
     @NotNull
+    public static String calculateRepaymentBreakdownSummaryForLRAdmission(JudgmentDetails activeJudgment, BigDecimal interest) {
+        BigDecimal totalAmount = MonetaryConversions.penniesToPounds(new BigDecimal(activeJudgment.getTotalAmount()));
+        StringBuilder repaymentBreakdown = new StringBuilder();
+        
+        getJudgmentSummaryText(totalAmount, repaymentBreakdown);
+        getClaimAmountBreakdownSummary(activeJudgment, totalAmount, repaymentBreakdown);
+        getClaimInterestBreakdownSummary(interest, repaymentBreakdown);
+        repaymentJoBreakdownSummary(activeJudgment, totalAmount, repaymentBreakdown);
+        return repaymentBreakdown.toString();
+    }
+
+    @NotNull
     public static String calculateRepaymentBreakdownSummaryForLRImmediatePlan(JudgmentDetails activeJudgment) {
         BigDecimal totalAmount = MonetaryConversions.penniesToPounds(new BigDecimal(activeJudgment.getTotalAmount()));
         StringBuilder repaymentBreakdown = new StringBuilder();
-        //creates  the text on the page
-        repaymentBreakdown.append("The judgment will order the defendant to pay £").append(totalAmount);
-        repaymentBreakdown.append(", including the claim fee, any fixed costs if claimed and interest if applicable, as shown:");
 
+        getJudgmentSummaryText(totalAmount, repaymentBreakdown);
         getClaimAmountBreakdownSummary(activeJudgment, totalAmount, repaymentBreakdown);
         repaymentJoBreakdownSummary(activeJudgment, totalAmount, repaymentBreakdown);
         return repaymentBreakdown.toString();
+    }
+
+    private static void getJudgmentSummaryText(BigDecimal totalAmount, StringBuilder repaymentBreakdown) {
+        repaymentBreakdown.append("The judgment will order the defendant to pay £").append(totalAmount);
+        repaymentBreakdown.append(", including the claim fee, any fixed costs if claimed and interest if applicable, as shown:");
     }
 
     private static void getClaimAmountBreakdownSummary(JudgmentDetails activeJudgment, BigDecimal totalAmount, StringBuilder repaymentBreakdown) {
