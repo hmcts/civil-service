@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.migration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,7 +23,6 @@ import java.util.Map;
 import java.util.Optional;
 
 @Component
-@RequiredArgsConstructor
 @Slf4j
 public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
 
@@ -33,14 +31,29 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
     private final CaseDetailsConverter caseDetailsConverter;
     private final MigrationTaskFactory migrationTaskFactory;
     private final ObjectMapper objectMapper;
-
-    @Value("${migration.batchsize:500}")
     private final int migrationBatchSize;
-    @Value("${migration.wait-time-mins:10}")
     private final int migrationWaitTime;
-
-    @Value("${migration.csvFile.decrypt.key:DUMMY_KEY}")
     private final String encryptionSecret;
+
+    public MigrateCasesEventHandler(
+        CaseReferenceCsvLoader caseReferenceCsvLoader,
+        CoreCaseDataService coreCaseDataService,
+        CaseDetailsConverter caseDetailsConverter,
+        MigrationTaskFactory migrationTaskFactory,
+        ObjectMapper objectMapper,
+        @Value("${migration.batchsize:500}") int migrationBatchSize,
+        @Value("${migration.wait-time-mins:10}") int migrationWaitTime,
+        @Value("${migration.csvFile.decrypt.key:DUMMY_KEY}") String encryptionSecret
+    ) {
+        this.caseReferenceCsvLoader = caseReferenceCsvLoader;
+        this.coreCaseDataService = coreCaseDataService;
+        this.caseDetailsConverter = caseDetailsConverter;
+        this.migrationTaskFactory = migrationTaskFactory;
+        this.objectMapper = objectMapper;
+        this.migrationBatchSize = migrationBatchSize;
+        this.migrationWaitTime = migrationWaitTime;
+        this.encryptionSecret = encryptionSecret;
+    }
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
