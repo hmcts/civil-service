@@ -66,7 +66,7 @@ public class JudgementService {
                 claimAmount = caseData.getRespondToAdmittedClaimOwingAmountPounds();
             }
         }
-        return claimAmount;
+        return claimAmount.setScale(2);
     }
 
     public BigDecimal ccjJudgmentClaimFee(CaseData caseData) {
@@ -102,14 +102,14 @@ public class JudgementService {
 
     public BigDecimal ccjJudgementSubTotal(CaseData caseData) {
         if (isLrFullAdmitRepaymentPlan(caseData) || isLRPartAdmitRepaymentPlan(caseData) || isLrPayImmediatelyPlan(caseData)) {
-            return ccjJudgmentClaimAmount(caseData)
+            return (ccjJudgmentClaimAmount(caseData)
                 .add(ccjJudgmentClaimFee(caseData))
-                .add(ccjJudgmentFixedCost(caseData));
+                .add(ccjJudgmentFixedCost(caseData))).setScale(2);
         } else {
-            return ccjJudgmentClaimAmount(caseData)
+            return (ccjJudgmentClaimAmount(caseData)
                 .add(ccjJudgmentClaimFee(caseData))
                 .add(ccjJudgmentInterest(caseData))
-                .add(ccjJudgmentFixedCost(caseData));
+                .add(ccjJudgmentFixedCost(caseData))).setScale(2);
         }
     }
 
@@ -124,7 +124,7 @@ public class JudgementService {
             boolean hasPaymentOption = caseData.isPayImmediately() || caseData.isPayByInstallment() || caseData.isPayBySetDate();
             if (featureToggleService.isLrAdmissionBulkEnabled()
                 && hasPaymentOption) {
-                return String.format(JUDGEMENT_ORDER_V2, ccjJudgementSubTotal(caseData));
+                return String.format(JUDGEMENT_ORDER_V2, ccjJudgementSubTotal(caseData).toString());
             }
             if (featureToggleService.isJudgmentOnlineLive()
                 && hasPaymentOption) {
@@ -134,7 +134,7 @@ public class JudgementService {
         } else {
             return String.format(
                 isLrFullAdmitRepaymentPlan(caseData) || isLrPayImmediatelyPlan(caseData)
-                    ? JUDGEMENT_ORDER_V2 : JUDGEMENT_ORDER, ccjJudgementSubTotal(caseData));
+                    ? JUDGEMENT_ORDER_V2 : JUDGEMENT_ORDER, ccjJudgementSubTotal(caseData).toString());
         }
     }
 
