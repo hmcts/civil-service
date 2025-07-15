@@ -9,7 +9,6 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.Map;
 
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoTwoLegalRep;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganizationNameForRespondent;
@@ -27,22 +26,6 @@ public class ClaimContinuingOnlineSpecRespSolTwoEmailDTOGenerator extends RespSo
     ) {
         super(organisationService);
         this.notificationsProperties = notificationsProperties;
-    }
-
-    @Override
-    public Boolean getShouldNotify(CaseData caseData) {
-        if (caseData.getRespondent2SameLegalRepresentative() == YesOrNo.YES) {
-            return true;
-        }
-        return isOneVTwoTwoLegalRep(caseData) && !caseData.isRespondent2LiP();
-    }
-
-    @Override
-    protected String getEmailAddress(CaseData caseData) {
-        if (caseData.getRespondent2SameLegalRepresentative() == YesOrNo.YES) {
-            return caseData.getRespondentSolicitor1EmailAddress();
-        }
-        return caseData.getRespondentSolicitor2EmailAddress();
     }
 
     @Override
