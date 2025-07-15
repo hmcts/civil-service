@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
@@ -82,6 +83,7 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
         for (CaseReference caseReference : caseReferences) {
             count++;
             try {
+                RequestContextHolder.setRequestAttributes(new CustomRequestScopeAttr());
                 if (count == migrationBatchSize) {
                     log.info("Batch {} limit reached {}, pausing for {} minutes", batchCount, migrationBatchSize, migrationWaitTime);
                     TimeUnit.MINUTES.sleep(migrationWaitTime);
@@ -98,10 +100,14 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
                     caseDataContent
                 );
                 log.info("Migration completed for case ID: {}", caseReference.getCaseReference());
-            } catch (Exception e) {
+            } catch (InterruptedException | RuntimeException e) {
                 log.error("Error migrating case with ID: {}. Error: {}", caseReference.getCaseReference(), e.getMessage(), e);
             }
-        }
+            finally {
+                RequestContextHolder.resetRequestAttributes();
+            }
+
+    }
         return ExternalTaskData.builder().build();
     }
 
