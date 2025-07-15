@@ -75,7 +75,7 @@ class DirectionsQuestionnairePreparerTest {
     @Test
     void shouldPrepareDirectionsQuestionnaire_singleResponse_ClaimantDqPreTranslation() {
         // Given
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         CaseData caseData = CaseData.builder()
             .ccdState(CaseState.AWAITING_APPLICANT_INTENTION)
             .caseAccessCategory(CaseCategory.SPEC_CLAIM)
@@ -116,7 +116,7 @@ class DirectionsQuestionnairePreparerTest {
         CaseDocument caseDocument = CaseDocument.builder().documentName("directionsQuestionnaire").build();
         when(directionsQuestionnaireGenerator.generate(any(CaseData.class), eq(userToken)))
             .thenReturn(caseDocument);
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         // When
         CaseData result = preparer.prepareDirectionsQuestionnaire(caseData, userToken);
 
