@@ -100,8 +100,11 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
                     caseDataContent
                 );
                 log.info("Migration completed for case ID: {}", caseReference.getCaseReference());
-            } catch (InterruptedException | RuntimeException e) {
+            } catch (RuntimeException e) {
                 log.error("Error migrating case with ID: {}. Error: {}", caseReference.getCaseReference(), e.getMessage(), e);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new RuntimeException(e);
             } finally {
                 RequestContextHolder.resetRequestAttributes();
             }
