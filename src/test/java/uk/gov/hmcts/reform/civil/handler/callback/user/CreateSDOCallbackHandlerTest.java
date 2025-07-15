@@ -260,7 +260,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .thenReturn(LocalDate.now().plusDays(5));
             when(deadlinesCalculator.getOrderSetAsideOrVariedApplicationDeadline(ArgumentMatchers.any(LocalDateTime.class)))
                 .thenReturn(LocalDate.now().plusDays(7));
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
         }
 
         @Test
@@ -327,7 +327,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
                 categorySearchResult));
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .atStateClaimIssuedDisposalHearingSDOInPersonHearing()
                 .claimantBilingualLanguagePreference("BOTH")
@@ -376,7 +376,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
                 categorySearchResult));
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                 .caseDataLip(CaseDataLiP.builder()
                                  .respondent1LiPResponse(RespondentLiPResponse.builder()
@@ -429,7 +429,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
                 categorySearchResult));
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                 .caseDataLip(CaseDataLiP.builder()
                                  .respondent1LiPResponse(RespondentLiPResponse.builder()
@@ -482,7 +482,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
                 categorySearchResult));
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                 .caseDataLip(CaseDataLiP.builder()
                                  .respondent1LiPResponse(RespondentLiPResponse.builder()
