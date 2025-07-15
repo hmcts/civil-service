@@ -258,7 +258,7 @@ class UploadTranslatedDocumentDefaultStrategyTest {
     @Test
     void shouldUpdateBusinessProcess_WhenLrVsLipAndCcdState_InAwaitingClaimantResponse() {
         //Given
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         TranslatedDocument translatedDocument1 = TranslatedDocument
             .builder()
