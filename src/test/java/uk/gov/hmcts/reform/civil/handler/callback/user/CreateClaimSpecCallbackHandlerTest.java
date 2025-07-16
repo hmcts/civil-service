@@ -1245,9 +1245,9 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Then
             assertThat(response.getData()).containsEntry("calculatedInterest", " | Description | Amount | \n" +
                 " |---|---| \n" +
-                " | Claim amount | £ 1000 | \n" +
-                " | Interest amount | £ 0 | \n" +
-                " | Total amount | £ 1000 |");
+                " | Claim amount | £ 1000.00 | \n" +
+                " | Interest amount | £ 0.00 | \n" +
+                " | Total amount | £ 1000.00 |");
         }
 
         @Test
@@ -1270,9 +1270,9 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Then
             assertThat(response.getData()).containsEntry("calculatedInterest", " | Description | Amount | \n" +
                 " |---|---| \n" +
-                " | Claim amount | £ 1000 | \n" +
-                " | Interest amount | £ 0 | \n" +
-                " | Total amount | £ 1000 |");
+                " | Claim amount | £ 1000.00 | \n" +
+                " | Interest amount | £ 0.00 | \n" +
+                " | Total amount | £ 1000.00 |");
         }
     }
 
