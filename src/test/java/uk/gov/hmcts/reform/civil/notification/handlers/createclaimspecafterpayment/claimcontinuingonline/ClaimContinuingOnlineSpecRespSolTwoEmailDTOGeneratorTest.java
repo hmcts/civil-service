@@ -65,6 +65,7 @@ public class ClaimContinuingOnlineSpecRespSolTwoEmailDTOGeneratorTest {
                 .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .respondent1ResponseDeadline(LocalDateTime.now())
                 .respondent2ResponseDeadline(LocalDateTime.now())
                 .respondent2SameLegalRepresentative(YesOrNo.NO)
                 .respondent2OrganisationPolicy(OrganisationPolicy.builder()
