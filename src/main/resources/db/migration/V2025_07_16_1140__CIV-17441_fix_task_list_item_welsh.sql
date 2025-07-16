@@ -1,5 +1,5 @@
 UPDATE dbs.task_item_template SET
-  task_name_cy = '<a href={VIEW_RESPONSE_TO_CLAIM} class="govuk-link"><a>Gweld yr ymateb i''r hawliad</a>',
+  task_name_cy = '<a href={VIEW_RESPONSE_TO_CLAIM} class="govuk-link">Gweld yr ymateb i''r hawliad</a>',
   category_cy = 'Yr ymateb'
 WHERE scenario_name = 'Scenario.AAA6.DefResponse.BilingualFlagSet.Claimant';
 
