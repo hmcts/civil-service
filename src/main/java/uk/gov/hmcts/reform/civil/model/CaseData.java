@@ -638,7 +638,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final YesOrNo bilingualHint;
     private final CaseDocument respondent1OriginalDqDoc;
 
-    private final YesOrNo isLipOnCase = isLipCaseYesNo();
+    private final YesOrNo isMintiLipCase;
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending
@@ -1587,11 +1587,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public boolean isLipCase() {
         return this.isApplicant1NotRepresented() || this.isRespondent1LiP();
-    }
-
-    @JsonIgnore
-    public YesOrNo isLipCaseYesNo() {
-        return (this.isApplicant1NotRepresented() || this.isRespondent1LiP()) ? YesOrNo.YES : YesOrNo.NO;
     }
 
     @JsonIgnore
