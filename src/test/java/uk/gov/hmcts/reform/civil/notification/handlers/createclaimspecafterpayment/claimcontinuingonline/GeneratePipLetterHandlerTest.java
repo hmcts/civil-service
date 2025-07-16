@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -18,6 +19,7 @@ import uk.gov.hmcts.reform.civil.service.docmosis.pip.PiPLetterGenerator;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -27,7 +29,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 @ExtendWith(MockitoExtension.class)
-public class GeneratePipLetterHandlerTest {
+class GeneratePipLetterHandlerTest {
 
     @Mock
     private ObjectMapper objectMapper;
@@ -43,6 +45,19 @@ public class GeneratePipLetterHandlerTest {
 
     @InjectMocks
     private GeneratePipLetterHandler generatePipLetter;
+
+    @Test
+    void shouldReturnCorrectCamundaActivityId() {
+        CallbackParams params = CallbackParamsBuilder.builder().build();
+        String activityId = generatePipLetter.camundaActivityId(params);
+        assertThat(activityId).isEqualTo(GeneratePipLetterHandler.TASK_ID);
+    }
+
+    @Test
+    void shouldReturnHandledEvents() {
+        List<CaseEvent> events = generatePipLetter.handledEvents();
+        assertThat(events).containsExactlyInAnyOrder(CaseEvent.GENERATE_PIP_LETTER);
+    }
 
     @Test
     void shouldGenerateAndPrintLetterSuccessfully() {

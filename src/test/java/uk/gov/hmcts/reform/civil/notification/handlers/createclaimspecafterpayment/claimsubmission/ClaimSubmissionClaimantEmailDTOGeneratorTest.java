@@ -58,7 +58,8 @@ class ClaimSubmissionClaimantEmailDTOGeneratorTest {
 
         Map<String, String> result = generator.addCustomProperties(properties, caseData);
 
-        assertThat(result).containsEntry(RESPONDENT_NAME, "Respondent");
-        assertThat(result).containsEntry(CLAIMANT_NAME, "Claimant");
+        assertThat(result)
+                .containsEntry(RESPONDENT_NAME, "Respondent")
+                .containsEntry(CLAIMANT_NAME, "Claimant");
     }
 }

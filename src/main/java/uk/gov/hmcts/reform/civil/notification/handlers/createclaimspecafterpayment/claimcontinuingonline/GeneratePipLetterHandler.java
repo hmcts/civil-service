@@ -17,7 +17,7 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.docmosis.pip.PiPLetterGenerator;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -58,11 +58,11 @@ public class GeneratePipLetterHandler extends CallbackHandler {
     private CallbackResponse generatePipLetter(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime claimNotificationDate = time.now();
-        final CaseData.CaseDataBuilder caseDataBuilder
-                = caseData.toBuilder().claimNotificationDate(claimNotificationDate);
+        final CaseData.CaseDataBuilder<?, ?> caseDataBuilder =
+                caseData.toBuilder().claimNotificationDate(claimNotificationDate);
 
         if (caseData.isRespondent1LiP()) {
-            generatePIPLetter(callbackParams);
+            generateAndPrintPipLetter(callbackParams);
         }
 
         String updateCaseState = setClaimState(caseData);
@@ -72,11 +72,11 @@ public class GeneratePipLetterHandler extends CallbackHandler {
                 .build();
     }
 
-    private void generatePIPLetter(CallbackParams callbackParams) {
+    private void generateAndPrintPipLetter(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         byte[] letterContent = pipLetterGenerator.downloadLetter(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
 
-        List<String> recipients = Arrays.asList(caseData.getRespondent1().getPartyName());
+        List<String> recipients = Collections.singletonList(caseData.getRespondent1().getPartyName());
         bulkPrintService.printLetter(letterContent, caseData.getLegacyCaseReference(),
                 caseData.getLegacyCaseReference(), FIRST_CONTACT_PACK_LETTER_TYPE, recipients);
     }
