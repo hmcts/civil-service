@@ -11,7 +11,7 @@ import uk.gov.hmcts.contino.GithubAPI
 def type = "java"
 def product = "civil"
 def component = "service"
-def ccdBranch = "CIV-17325-Update-offline-scheduler-for-MINTI-LiP"
+def ccdBranch = "master"
 def camundaBranch = "master"
 def dmnBranch = "master"
 def yarnBuilder = new uk.gov.hmcts.contino.YarnBuilder(this)
@@ -103,7 +103,7 @@ def getCivilCcdDefinitionBranch() {
   for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "civilDefinitionBranch:")) {
     return label.minus("civilDefinitionBranch:").trim()
   }
-  return "master"
+  return "CIV-17325-Update-offline-scheduler-for-MINTI-LiP"
 }
 
 withPipeline(type, product, component) {
