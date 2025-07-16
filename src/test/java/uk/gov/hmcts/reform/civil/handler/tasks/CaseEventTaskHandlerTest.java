@@ -58,7 +58,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_EVENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PROCEEDS_IN_HERITAGE_SYSTEM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -111,7 +111,7 @@ class CaseEventTaskHandlerTest {
         void init() {
             Map<String, Object> variables = Map.of(
                 "caseId", CASE_ID,
-                "caseEvent", NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE.name()
+                "caseEvent", NOTIFY_EVENT.name()
             );
 
             when(mockTask.getAllVariables()).thenReturn(variables);
@@ -135,7 +135,7 @@ class CaseEventTaskHandlerTest {
 
             CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
 
-            when(coreCaseDataService.startUpdate(CASE_ID, NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE))
+            when(coreCaseDataService.startUpdate(CASE_ID, NOTIFY_EVENT))
                 .thenReturn(StartEventResponse.builder().caseDetails(caseDetails).build());
 
             when(coreCaseDataService.submitUpdate(eq(CASE_ID), any(CaseDataContent.class))).thenReturn(caseData);
@@ -145,7 +145,7 @@ class CaseEventTaskHandlerTest {
 
             caseEventTaskHandler.execute(mockTask, externalTaskService);
 
-            verify(coreCaseDataService).startUpdate(CASE_ID, NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE);
+            verify(coreCaseDataService).startUpdate(CASE_ID, NOTIFY_EVENT);
             verify(coreCaseDataService).submitUpdate(eq(CASE_ID), any(CaseDataContent.class));
             verify(externalTaskService).complete(mockTask, variables);
         }
@@ -158,7 +158,7 @@ class CaseEventTaskHandlerTest {
         void init() {
             Map<String, Object> variables = Map.of(
                 "caseId", CASE_ID,
-                "caseEvent", NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE.name()
+                "caseEvent", NOTIFY_EVENT.name()
             );
 
             when(mockTask.getAllVariables()).thenReturn(variables);
@@ -169,7 +169,7 @@ class CaseEventTaskHandlerTest {
             String errorMessage = "there was an error";
 
             when(mockTask.getRetries()).thenReturn(null);
-            when(coreCaseDataService.startUpdate(CASE_ID, NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE))
+            when(coreCaseDataService.startUpdate(CASE_ID, NOTIFY_EVENT))
                 .thenAnswer(invocation -> {
                     throw new Exception(errorMessage);
                 });
@@ -194,7 +194,7 @@ class CaseEventTaskHandlerTest {
             String exampleUrl = "example url";
 
             when(mockTask.getRetries()).thenReturn(null);
-            when(coreCaseDataService.startUpdate(CASE_ID, NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE))
+            when(coreCaseDataService.startUpdate(CASE_ID, NOTIFY_EVENT))
                 .thenAnswer(invocation -> {
                     throw FeignException.errorStatus(errorMessage, Response.builder()
                         .request(
@@ -945,7 +945,7 @@ class CaseEventTaskHandlerTest {
         @Test
         void shouldNotCallHandleFailureMethod_whenCaseIdNotFound() {
             //given: ExternalTask variables without caseId
-            Map<String, Object> allVariables = Map.of("caseEvent", NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE);
+            Map<String, Object> allVariables = Map.of("caseEvent", NOTIFY_EVENT);
             when(mockTask.getAllVariables())
                 .thenReturn(allVariables);
 
