@@ -26,7 +26,8 @@ public class JudgementService {
     private static final String JUDGEMENT_BY_COURT_NOT_OFFLINE = "The judgment request will be processed and a County"
         + " Court Judgment (CCJ) will be issued, you will receive any further updates by email.";
     private static final String JUDGEMENT_ORDER = "The judgment will order the defendant to pay £%s , including the claim fee and interest, if applicable, as shown:";
-    private static final String JUDGEMENT_ORDER_V2 = "The judgment will order the defendant to pay £%s which include the amounts shown:";
+    private static final String JUDGEMENT_ORDER_V2 = "The judgment will order the defendant to pay £%s"
+        + ", including the claim fee, any fixed costs if claimed and interest if applicable, as shown:";
     private final FeatureToggleService featureToggleService;
     private final InterestCalculator interestCalculator;
 
