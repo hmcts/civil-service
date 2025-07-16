@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
@@ -26,7 +27,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 @ExtendWith(MockitoExtension.class)
-public class GeneratePipLetterTest {
+public class GeneratePipLetterHandlerTest {
 
     @Mock
     private ObjectMapper objectMapper;
@@ -41,7 +42,7 @@ public class GeneratePipLetterTest {
     private Time time;
 
     @InjectMocks
-    private GeneratePipLetter generatePipLetter;
+    private GeneratePipLetterHandler generatePipLetter;
 
     @Test
     void shouldGenerateAndPrintLetterSuccessfully() {
@@ -52,6 +53,7 @@ public class GeneratePipLetterTest {
         CaseData caseData = CaseData.builder()
                 .legacyCaseReference("12345")
                 .respondent1(Party.builder().partyName("Test Respondent").type(Party.Type.COMPANY).build())
+                .respondent1Represented(YesOrNo.NO)
                 .build();
         CallbackParams params = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, caseData)

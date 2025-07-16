@@ -27,7 +27,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_PIP_LETTER;
 
 @Service
 @RequiredArgsConstructor
-public class GeneratePipLetter extends CallbackHandler {
+public class GeneratePipLetterHandler extends CallbackHandler {
 
     public static final String TASK_ID = "GeneratePipLetter";
     private static final String FIRST_CONTACT_PACK_LETTER_TYPE = "first-contact-pack";
@@ -61,7 +61,9 @@ public class GeneratePipLetter extends CallbackHandler {
         final CaseData.CaseDataBuilder caseDataBuilder
                 = caseData.toBuilder().claimNotificationDate(claimNotificationDate);
 
-        generatePIPLetter(callbackParams);
+        if (caseData.isRespondent1LiP()) {
+            generatePIPLetter(callbackParams);
+        }
 
         String updateCaseState = setClaimState(caseData);
         return AboutToStartOrSubmitCallbackResponse.builder()
