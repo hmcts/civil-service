@@ -8,6 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,6 +33,9 @@ class ClaimContinuingOnlineSpecAppSolOneEmailDTOGeneratorTest {
     private static final String TEMPLATE_SINGLE = "template-single";
     private static final String TEMPLATE_MULTI = "template-multi";
     private static final String REFERENCE_TEMPLATE = "claim-continuing-online-notification-%s";
+
+    @Mock
+    private OrganisationService organisationService;
 
     @Mock
     private NotificationsProperties notificationsProperties;

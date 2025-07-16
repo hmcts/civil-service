@@ -12,6 +12,7 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Component
@@ -46,7 +47,7 @@ public class ClaimContinuingOnlineSpecAppSolOneEmailDTOGenerator extends AppSolO
             Map<String, String> properties,
             CaseData caseData
     ) {
-
+        properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData, organisationService));
         properties.put(ISSUED_ON, formatLocalDate(caseData.getIssueDate(), DATE));
         properties.put(CLAIM_DETAILS_NOTIFICATION_DEADLINE,
                 formatLocalDate(caseData.getRespondent1ResponseDeadline().toLocalDate(), DATE)
