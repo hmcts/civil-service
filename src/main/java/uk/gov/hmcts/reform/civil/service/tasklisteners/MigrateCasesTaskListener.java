@@ -4,7 +4,7 @@ import org.camunda.bpm.client.ExternalTaskClient;
 import org.camunda.bpm.client.topic.TopicSubscriptionBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.handler.RetriggerCasesEventHandler;
+import uk.gov.hmcts.reform.civil.handler.migration.MigrateCasesEventHandler;
 
 @Component
 public class MigrateCasesTaskListener {
@@ -12,8 +12,8 @@ public class MigrateCasesTaskListener {
     private static final String TOPIC = "MIGRATE_CASES_EVENTS";
 
     @Autowired
-    private MigrateCasesTaskListener(RetriggerCasesEventHandler retriggerCasesEventHandler, ExternalTaskClient client) {
+    private MigrateCasesTaskListener(MigrateCasesEventHandler migrateCasesEventHandler, ExternalTaskClient client) {
         TopicSubscriptionBuilder subscriptionBuilder = client.subscribe(TOPIC);
-        subscriptionBuilder.handler(retriggerCasesEventHandler).open();
+        subscriptionBuilder.handler(migrateCasesEventHandler).open();
     }
 }
