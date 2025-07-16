@@ -47,5 +47,6 @@ public enum CamundaProcessIdentifier {
     Respondent1NotifyOthersTrialReady,
     Respondent2NotifyOthersTrialReady,
     AmendRestitchBundleNotify,
+    BundleCreationNotify,
     CreateSDONotify
 }
