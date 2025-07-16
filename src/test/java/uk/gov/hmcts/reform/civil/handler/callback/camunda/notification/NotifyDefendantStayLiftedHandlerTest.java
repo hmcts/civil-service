@@ -187,7 +187,7 @@ class NotifyDefendantStayLiftedHandlerTest {
 
             CallbackRequest callbackRequest = CallbackRequest
                 .builder()
-                .eventId(CaseEvent.NOTIFY_DEFENDANT_DISMISS_CASE.name())
+                .eventId(CaseEvent.NOTIFY_EVENT.name())
                 .build();
             final CallbackParams params = CallbackParams.builder()
                 .request(callbackRequest)
