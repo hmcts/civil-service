@@ -41,7 +41,6 @@ public class ClaimContinuingOnlineSpecRespSolTwoEmailDTOGenerator extends RespSo
         return YesOrNo.YES.equals(caseData.getAddRespondent2());
     }
 
-
     @Override
     protected String getEmailTemplateId(CaseData caseData) {
         return notificationsProperties.getRespondentSolicitorClaimContinuingOnlineForSpec();
