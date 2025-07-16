@@ -148,7 +148,7 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
 
     @Override
     public boolean decisionMadeDocumentsAreInTranslation() {
-        return (featureToggleService.isGaForWelshEnabled() && caseData.getPreTranslationDocuments() != null
+        return (featureToggleService.isWelshEnabledForMainCase() && caseData.getPreTranslationDocuments() != null
             && caseData.getPreTranslationDocuments().stream().map(
                     Element::getValue)
                 .map(CaseDocument::getDocumentType)
@@ -158,7 +158,7 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
 
     @Override
     public boolean sdoDocumentsAreInTranslation() {
-        return (featureToggleService.isGaForWelshEnabled() && caseData.getPreTranslationDocuments() != null
+        return (featureToggleService.isWelshEnabledForMainCase() && caseData.getPreTranslationDocuments() != null
             && caseData.getPreTranslationDocuments().stream().map(
                     Element::getValue)
             .map(CaseDocument::getDocumentType).anyMatch(type -> DocumentType.SDO_ORDER.equals(type))

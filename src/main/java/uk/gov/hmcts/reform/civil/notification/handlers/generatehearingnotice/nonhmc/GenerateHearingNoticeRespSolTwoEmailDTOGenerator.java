@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.civil.notification.handlers.generatehearingnotice.no
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.notification.handlers.RespSolOneEmailDTOGenerator;
+import uk.gov.hmcts.reform.civil.notification.handlers.RespSolTwoEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
@@ -12,7 +12,7 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganizationNameForRespondent;
 
 @Component
-public class GenerateHearingNoticeRespSolTwoEmailDTOGenerator extends RespSolOneEmailDTOGenerator {
+public class GenerateHearingNoticeRespSolTwoEmailDTOGenerator extends RespSolTwoEmailDTOGenerator {
 
     private static final String REFERENCE_TEMPLATE_HEARING_RESP_SOL_TWO = "notification-of-hearing-%s";
     private final NotificationsProperties notificationsProperties;

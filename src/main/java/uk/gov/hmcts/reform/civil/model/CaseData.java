@@ -301,6 +301,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private BigDecimal totalInterest;
     private BigDecimal totalClaimAmountPlusInterestAdmitPart;
     private BigDecimal totalClaimAmountPlusInterest;
+    private String totalClaimAmountPlusInterestAdmitPartString;
+    private String totalClaimAmountPlusInterestString;
     private final YesOrNo claimInterest;
     private final InterestClaimOptions interestClaimOptions;
     private final SameRateInterestSelection sameRateInterestSelection;

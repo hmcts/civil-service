@@ -37,11 +37,13 @@ public class CalculateTotalClaimAmountTask {
             totalClaimAmount =
                 totalClaimAmount.add(claimAmountBreakup.getValue().getClaimAmount());
 
+            BigDecimal claimAmountBreakupValue = MonetaryConversions.penniesToPounds(claimAmountBreakup.getValue().getClaimAmount());
+
             stringBuilder.append(" | ")
                 .append(claimAmountBreakup.getValue().getClaimReason())
                 .append(" | ")
                 .append("£ ")
-                .append(MonetaryConversions.penniesToPounds(claimAmountBreakup.getValue().getClaimAmount()))
+                .append(claimAmountBreakupValue.setScale(2))
                 .append(" |\n");
         }
         totalAmount = totalAmount.concat(stringBuilder.toString());
@@ -58,10 +60,10 @@ public class CalculateTotalClaimAmountTask {
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
 
         caseDataBuilder.totalClaimAmount(
-            MonetaryConversions.penniesToPounds(totalClaimAmount));
+            MonetaryConversions.penniesToPounds(totalClaimAmount).setScale(2));
 
         totalAmount = totalAmount.concat(" | **Total** | £ " + MonetaryConversions
-            .penniesToPounds(totalClaimAmount) + " | ");
+            .penniesToPounds(totalClaimAmount).setScale(2) + " | ");
 
         caseDataBuilder.claimAmountBreakupSummaryObject(totalAmount);
 
