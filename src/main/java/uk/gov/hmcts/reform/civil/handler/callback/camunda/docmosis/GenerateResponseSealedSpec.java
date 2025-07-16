@@ -117,7 +117,7 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
     private void isLipWelshApplicant(CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder,
                                      CaseDocument sealedForm,
                                      CaseDocument copy) {
-        if (featureToggleService.isGaForWelshEnabled() && caseData.isLipvLROneVOne()
+        if (featureToggleService.isWelshEnabledForMainCase() && caseData.isLipvLROneVOne()
             && caseData.isClaimantBilingual()
             && CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT.equals(caseData.getCcdState())) {
             List<Element<CaseDocument>> preTranslationDocs =
@@ -164,7 +164,7 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
                 LocalDate.now().toString()
             ));
         }
-        if (featureToggleService.isGaForWelshEnabled() && caseData.isLipvLROneVOne()
+        if (featureToggleService.isWelshEnabledForMainCase() && caseData.isLipvLROneVOne()
             && caseData.isClaimantBilingual() && caseData.getRespondent1OriginalDqDoc() != null
             && CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT.equals(caseData.getCcdState())) {
             documents.add(

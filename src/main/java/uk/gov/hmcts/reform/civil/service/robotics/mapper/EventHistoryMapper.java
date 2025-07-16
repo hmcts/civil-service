@@ -1127,7 +1127,7 @@ public class EventHistoryMapper {
     }
 
     private void buildQueriesEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        if (!isCaseOffline(caseData) || !featureToggleService.isQueryManagementLRsEnabled()) {
+        if (!isCaseOffline(caseData)) {
             return;
         }
         if (!hasActiveQueries(caseData)) {
@@ -1150,9 +1150,13 @@ public class EventHistoryMapper {
     }
 
     private boolean hasActiveQueries(CaseData caseData) {
-        return caseData.getQmApplicantSolicitorQueries() != null
-            || caseData.getQmRespondentSolicitor1Queries() != null
-            || caseData.getQmRespondentSolicitor2Queries() != null;
+        if (featureToggleService.isPublicQueryManagementEnabled(caseData)) {
+            return caseData.getQueries() != null;
+        } else {
+            return caseData.getQmApplicantSolicitorQueries() != null
+                || caseData.getQmRespondentSolicitor1Queries() != null
+                || caseData.getQmRespondentSolicitor2Queries() != null;
+        }
     }
 
     private boolean isCaseOffline(CaseData caseData) {
