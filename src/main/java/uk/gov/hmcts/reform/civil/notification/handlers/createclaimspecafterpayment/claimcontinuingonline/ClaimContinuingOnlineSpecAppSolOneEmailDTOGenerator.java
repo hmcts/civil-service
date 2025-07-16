@@ -57,8 +57,7 @@ public class ClaimContinuingOnlineSpecAppSolOneEmailDTOGenerator extends AppSolO
             properties.put(RESPONDENT_TWO_NAME, getPartyNameBasedOnType(caseData.getRespondent2()));
         } else {
             properties.put(RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
-            properties.put(
-                    RESPONSE_DEADLINE,
+            properties.put(RESPONSE_DEADLINE,
                     formatLocalDateTime(caseData.getRespondent1ResponseDeadline(), DATE_TIME_AT)
             );
         }
