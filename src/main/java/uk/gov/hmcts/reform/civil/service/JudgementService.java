@@ -116,7 +116,7 @@ public class JudgementService {
         } else {
             return ccjJudgmentClaimAmount(caseData)
                 .add(ccjJudgmentClaimFee(caseData))
-                .add(ccjJudgmentInterest(caseData))
+                .add(!isLipVLipFullAdmitSetDate(caseData) ? ccjJudgmentInterest(caseData) : ZERO)
                 .add(ccjJudgmentFixedCost(caseData));
         }
     }
