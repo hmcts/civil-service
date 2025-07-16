@@ -1,13 +1,18 @@
 package uk.gov.hmcts.reform.civil.utils;
 
+import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.LitigationFriend;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PartyFlagStructure;
 import uk.gov.hmcts.reform.civil.model.caseflags.FlagDetail;
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -48,11 +53,7 @@ import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFE
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_TWO_WITNESSES_ID;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.appendWithNewPartyId;
 
-import uk.gov.hmcts.reform.civil.model.LitigationFriend;
-import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.prd.model.Organisation;
-import uk.gov.hmcts.reform.civil.service.OrganisationService;
-
+@Slf4j
 public class CaseFlagUtils {
 
     public static final String RESPONDENT_SOLICITOR_ONE_WITNESS = "Defendant solicitor 1 witness";
@@ -301,16 +302,16 @@ public class CaseFlagUtils {
     }
 
     private static void updatePartyFlags(CaseData.CaseDataBuilder<?, ?> builder, CaseData caseData, String partyChosen) {
-        if ((CLAIMANT_ONE_ID).equals(partyChosen)) {
+        if (CLAIMANT_ONE_ID.equals(partyChosen) && caseData.getApplicant1().getFlags() != null) {
             builder.applicant1(updatePartyNameForFlags(caseData.getApplicant1()));
         }
-        if ((CLAIMANT_TWO_ID).equals(partyChosen)) {
+        if (CLAIMANT_TWO_ID.equals(partyChosen) && caseData.getApplicant2().getFlags() != null) {
             builder.applicant2(updatePartyNameForFlags(caseData.getApplicant2()));
         }
-        if ((DEFENDANT_ONE_ID).equals(partyChosen)) {
+        if (DEFENDANT_ONE_ID.equals(partyChosen) && caseData.getRespondent1().getFlags() != null) {
             builder.respondent1(updatePartyNameForFlags(caseData.getRespondent1()));
         }
-        if ((DEFENDANT_TWO_ID).equals(partyChosen)) {
+        if (DEFENDANT_TWO_ID.equals(partyChosen) && caseData.getRespondent2().getFlags() != null) {
             builder.respondent2(updatePartyNameForFlags(caseData.getRespondent2()));
         }
     }
