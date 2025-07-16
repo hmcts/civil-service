@@ -65,10 +65,10 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
         DocmosisTemplates templateId;
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             if (isClaimantResponse(caseData)) {
-                templateId = isFastTrackOrMinti
-                    ? DocmosisTemplates.CLAIMANT_RESPONSE_SPEC_FAST_TRACK_INT : DocmosisTemplates.CLAIMANT_RESPONSE_SPEC;
+                log.info("For testing CLAIMANT_RESPONSE_SPEC");
+                templateId = DocmosisTemplates.CLAIMANT_RESPONSE_SPEC;
             } else {
-                log.info("For testing");
+                log.info("For testing DEFENDANT_RESPONSE_SPEC");
                 templateId = DocmosisTemplates.DEFENDANT_RESPONSE_SPEC;
             }
         } else {
