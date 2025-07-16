@@ -33,10 +33,6 @@ public class InterestCalculator {
         return this.calculateInterest(caseData, getToDate(caseData));
     }
 
-    public BigDecimal claimAmountPlusInterestToDate(CaseData caseData) {
-        return caseData.getTotalClaimAmount().add(calculateInterest(caseData));
-    }
-
     private BigDecimal calculateInterest(CaseData caseData, LocalDate interestToDate) {
         BigDecimal interestAmount = ZERO;
         if (caseData.getClaimInterest() == YesOrNo.YES) {
@@ -55,6 +51,10 @@ public class InterestCalculator {
             }
         }
         return interestAmount;
+    }
+
+    public BigDecimal claimAmountPlusInterestToDate(CaseData caseData) {
+        return caseData.getTotalClaimAmount().add(calculateInterest(caseData));
     }
 
     private BigDecimal calculateInterestAmount(CaseData caseData, BigDecimal interestRate, LocalDate interestToDate) {
