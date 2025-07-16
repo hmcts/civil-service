@@ -29,19 +29,6 @@ public class ClaimContinuingOnlineSpecRespSolTwoEmailDTOGenerator extends RespSo
     }
 
     @Override
-    protected String getEmailAddress(CaseData caseData) {
-        if (caseData.getRespondent2SameLegalRepresentative() == YesOrNo.YES) {
-            return caseData.getRespondentSolicitor1EmailAddress();
-        }
-        return caseData.getRespondentSolicitor2EmailAddress();
-    }
-
-    @Override
-    public Boolean getShouldNotify(CaseData caseData) {
-        return YesOrNo.YES.equals(caseData.getAddRespondent2());
-    }
-
-    @Override
     protected String getEmailTemplateId(CaseData caseData) {
         return notificationsProperties.getRespondentSolicitorClaimContinuingOnlineForSpec();
     }
@@ -61,7 +48,7 @@ public class ClaimContinuingOnlineSpecRespSolTwoEmailDTOGenerator extends RespSo
                     false, organisationService));
         }
         properties.put(CLAIM_DETAILS_NOTIFICATION_DEADLINE,
-                formatLocalDate(caseData.getRespondent2ResponseDeadline().toLocalDate(), DATE)
+                formatLocalDate(caseData.getRespondent1ResponseDeadline().toLocalDate(), DATE)
         );
         return properties;
     }
