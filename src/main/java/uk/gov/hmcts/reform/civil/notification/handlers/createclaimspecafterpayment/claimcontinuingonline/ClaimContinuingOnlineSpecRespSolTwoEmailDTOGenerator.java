@@ -30,10 +30,7 @@ public class ClaimContinuingOnlineSpecRespSolTwoEmailDTOGenerator extends RespSo
 
     @Override
     protected String getEmailAddress(CaseData caseData) {
-        if (caseData.getRespondent2SameLegalRepresentative() == YesOrNo.YES) {
-            return caseData.getRespondentSolicitor1EmailAddress();
-        }
-        return caseData.getRespondentSolicitor2EmailAddress();
+        return caseData.getRespondentSolicitor1EmailAddress();
     }
 
     @Override
