@@ -11,10 +11,11 @@ public class ClaimContinuingOnlineSpecAllPartiesEmailGenerator extends AllPartie
     public ClaimContinuingOnlineSpecAllPartiesEmailGenerator(
             ClaimContinuingOnlineSpecAppSolOneEmailDTOGenerator appGen,
             ClaimContinuingOnlineSpecRespSolOneEmailDTOGenerator respOneGen,
+            ClaimContinuingOnlineSpecRespSolTwoEmailDTOGenerator respTwoGen,
             ClaimContinuingOnlineSpecClaimantEmailDTOGenerator claimantGen,
             ClaimContinuingOnlineSpecDefendantEmailDTOGenerator defendantGen
     ) {
-        super(List.of(appGen, respOneGen, claimantGen, defendantGen
+        super(List.of(appGen, respOneGen, respTwoGen, claimantGen, defendantGen
         ));
     }
 }
