@@ -349,6 +349,7 @@ notifications:
 
   notifyClaimantLrTemplate: "cee63486-8f75-42ea-baca-5e602e248ab6"
   notifyClaimantLipTemplateManualDetermination: "16046f1d-2443-47b2-980b-ecc1d6842fb7"
+  notifyClaimantLipTemplateManualDeterminationForWelsh: "1b8175df-05c4-4a8b-8f37-a0c489835d2e"
   notifyClaimantAfterClaimIssue: "04bc79ee-2f8f-44d8-8bb6-a7fd5ad93e4f"
   notifyDefendantLrTemplate: "651ac972-fb4b-49cb-aace-9317ccd069f1"
   notifyDefendantLipTemplate: "f2521805-bfec-42b9-99f5-9fda3dfb6a99"
@@ -504,6 +505,12 @@ notifications:
   notifyOtherPartyQueryResponseReceived: "bbb1c567-b5a1-4910-bf00-871163e7f318"
   queryLipResponseReceivedEnglish: "29d4ca19-460c-4133-a9ae-6e470e6cc443"
   queryLipResponseReceivedWelsh: "1464b8a5-3ec6-484d-9e61-527326045633"
+  notifyOtherPartyPublicQueryRaised: "0d2c9b47-a84f-4ea2-a4b6-52c1db909076"
+  notifyOtherLipPartyPublicQueryRaised: "5bced03b-b3ce-49bc-8efb-b5ab35ef21eb"
+  notifyOtherLipPartyWelshPublicQueryRaised: "0b9b41cc-d30f-44c2-8901-f34e1e19e623"
+  queryLrPublicResponseReceived: "cd51bd5e-f4e7-47d3-9f8f-7a59d8612526"
+  queryLipPublicResponseReceived: "b097eb54-3e00-4272-9b77-426b23a71ce1"
+  queryLipWelshPublicResponseReceived: "d1ff72f3-db0e-44c9-83e9-5c6a43681d69"
   partAdmitPayImmediatelyAgreedClaimant: "c8f80d91-5f4f-4396-9955-6c5da13a818b"
   partAdmitPayImmediatelyAgreedDefendant: "d653484b-2e1d-4e65-bea5-b58f23a3f242"
 
