@@ -144,9 +144,9 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
                 errors.add(NOT_IN_EA_REGION);
             } else {
                 /*
-                 * General Application can only be initiated if Defendant is assigned to the case
+                 * General Application can only be initiated if Defendant is assigned to the case and QM LR is off
                  * */
-                if (Objects.isNull(caseData.getDefendantUserDetails()) && !caseData.isLipvLROneVOne()) {
+                if (!featureToggleService.isQueryManagementLRsEnabled() && Objects.isNull(caseData.getDefendantUserDetails()) && !caseData.isLipvLROneVOne()) {
                     errors.add(RESP_NOT_ASSIGNED_ERROR_LIP);
                 }
             }

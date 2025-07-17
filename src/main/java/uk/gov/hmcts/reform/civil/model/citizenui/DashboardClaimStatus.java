@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.civil.model.citizenui;
 
 import lombok.Getter;
 
+import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
 
 /**
@@ -19,11 +21,20 @@ public enum DashboardClaimStatus {
     HEARING_FEE_UNPAID(
         Claim::isCaseStruckOut
     ),
+    DECISION_MADE_DOCUMENTS_BEING_TRANSLATED(
+        Claim::decisionMadeDocumentsAreInTranslation
+    ),
+    SDO_DOCUMENTS_BEING_TRANSLATED(
+        Claim::sdoDocumentsAreInTranslation
+    ),
     MEDIATION_UNSUCCESSFUL(
         Claim::isMediationUnsuccessful
     ),
     MEDIATION_SUCCESSFUL(
         Claim::isMediationSuccessful
+    ),
+    AWAITING_HEARING_NOTICE_TRANSLATION(
+        Claim::awaitingHearingNoticeTranslationNotSettledOrDiscontinued
     ),
     CLAIMANT_REJECT_PARTIAL_ADMISSION(
         Claim::isPartialAdmissionRejected
@@ -136,11 +147,11 @@ public enum DashboardClaimStatus {
     SETTLED(
         Claim::isSettled
     ),
+    CLAIMANT_DOCUMENTS_BEING_TRANSLATED(
+        Claim::pausedForTranslationAfterResponse
+    ),
     REQUESTED_COUNTRY_COURT_JUDGEMENT(
         Claim::claimantRequestedCountyCourtJudgement
-    ),
-    CLAIMANT_DOCUMENTS_BEING_TRANSLATED(
-        Claim::defendantRespondedWithPreferredLanguageWelsh
     ),
     DEFENDANT_PART_ADMIT_PAID(
         Claim::hasDefendantStatedTheyPaid
@@ -224,6 +235,9 @@ public enum DashboardClaimStatus {
     NO_STATUS(c -> false),
     ORDER_MADE(
         Claim::isOrderMade
+    ),
+    CASE_DISCONTINUED(
+        Claim::isCasedDiscontinued
     );
 
     @Getter
@@ -232,4 +246,10 @@ public enum DashboardClaimStatus {
     DashboardClaimStatus(Predicate<Claim> claimMatcher) {
         this.claimMatcher = claimMatcher;
     }
+
+    // Can be used to ensure that a status lower down the list takes precedence over a previous one
+    public static final Map<DashboardClaimStatus, List<DashboardClaimStatus>> STATUS_OVERRIDES =
+        Map.of(
+            AWAITING_HEARING_NOTICE_TRANSLATION, List.of(ORDER_MADE)
+        );
 }

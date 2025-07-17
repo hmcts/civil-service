@@ -137,6 +137,10 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
             }
         }
 
+        if (featureToggleService.isLrAdmissionBulkEnabled() && featureToggleService.isJudgmentOnlineLive()) {
+            caseDataBuilder.previousCCDState(callbackParams.getCaseData().getCcdState());
+        }
+
         updateDefendantQueryCollectionPartyName(caseDataBuilder);
         resetLanguagePreference(caseDataBuilder, caseData, replacedSolicitorCaseRole);
         clearLRIndividuals(replacedSolicitorCaseRole, caseDataBuilder.build(), caseDataBuilder, caseData);
@@ -159,7 +163,7 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
     }
 
     private void resetLanguagePreference(CaseData.CaseDataBuilder<?, ?> updatedCaseDataBuilder, CaseData caseData, String caseRole) {
-        if (featureToggleService.isGaForWelshEnabled()) {
+        if (featureToggleService.isWelshEnabledForMainCase()) {
             if (CaseRole.APPLICANTSOLICITORONE.getFormattedName().equals(caseRole) && caseData.isClaimantBilingual()) {
                 updatedCaseDataBuilder
                         .claimantBilingualLanguagePreference(null)

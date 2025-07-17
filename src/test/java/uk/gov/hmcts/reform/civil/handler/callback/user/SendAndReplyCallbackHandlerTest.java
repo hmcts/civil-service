@@ -13,9 +13,12 @@ import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sendandreply.RolePool;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimValue;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -76,6 +79,7 @@ class SendAndReplyCallbackHandlerTest {
             CaseData caseData = CaseData.builder()
                 .sendAndReplyOption(SEND)
                 .build();
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
 
@@ -88,13 +92,52 @@ class SendAndReplyCallbackHandlerTest {
         }
 
         @Test
+        void shouldSetTheNotificationSendAndReplyOption_WhenAboutToStartIsInvokedFlagEnabled() {
+            CaseData caseData = CaseData.builder()
+                .sendAndReplyOption(SEND)
+                .claimantBilingualLanguagePreference("BOTH")
+                .build();
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            CaseData responseCaseData = new ObjectMapper().convertValue(response.getData(), CaseData.class);
+
+            assertThat(responseCaseData.getBilingualHint()).isEqualTo(YesOrNo.YES);
+        }
+
+        @Test
+        void shouldSetTheNotificationSendAndReplyOptionRespondentBiligual_WhenAboutToStartIsInvokedFlagEnabled() {
+            CaseData caseData = CaseData.builder()
+                .sendAndReplyOption(SEND)
+                .claimantBilingualLanguagePreference("ENGLISH")
+                .caseDataLiP(CaseDataLiP.builder()
+                                 .respondent1LiPResponse(RespondentLiPResponse.builder()
+                                                             .respondent1ResponseLanguage("BOTH").build()).build())
+                .build();
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            CaseData responseCaseData = new ObjectMapper().convertValue(response.getData(), CaseData.class);
+
+            assertThat(responseCaseData.getBilingualHint()).isEqualTo(YesOrNo.YES);
+        }
+
+        @Test
         void shouldPopulateMessagesToReplyTo_whenMessagesExist() {
             List<Element<Message>> messages = List.of(element(Message.builder().build()));
             CaseData caseData = CaseData.builder()
                 .messages(messages)
                 .build();
             DynamicList expectedMessages = DynamicList.fromList(List.of("mock"));
-
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
             when(messageService.createMessageSelectionList(messages)).thenReturn(expectedMessages);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
@@ -112,7 +155,7 @@ class SendAndReplyCallbackHandlerTest {
         void shouldNotInteractWithMessagesService_whenNoMessagesExist() {
             CaseData caseData = CaseData.builder().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
-
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
             handler.handle(params);
 
             verifyNoInteractions(messageService);
@@ -197,7 +240,7 @@ class SendAndReplyCallbackHandlerTest {
                 .sendMessageContent(messageContent)
                 .build();
 
-            when(messageService.addMessage(null, messageMetaData, messageContent, AUTH_TOKEN))
+            when(messageService.addMessage(null, messageMetaData, messageContent, AUTH_TOKEN, caseData))
                 .thenReturn(wrapElements(expectedMessages));
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
@@ -216,7 +259,7 @@ class SendAndReplyCallbackHandlerTest {
             assertThat(responseCaseData.getLastMessageJudgeLabel()).isNull();
 
             verify(messageService, times(1))
-                .addMessage(null, messageMetaData, messageContent, AUTH_TOKEN);
+                .addMessage(null, messageMetaData, messageContent, AUTH_TOKEN, caseData);
         }
 
         @Test
@@ -237,7 +280,7 @@ class SendAndReplyCallbackHandlerTest {
                 .sendMessageContent(messageContent)
                 .build();
 
-            when(messageService.addMessage(null, messageMetaData, messageContent, AUTH_TOKEN))
+            when(messageService.addMessage(null, messageMetaData, messageContent, AUTH_TOKEN, caseData))
                 .thenReturn(wrapElements(expectedMessages));
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
@@ -256,7 +299,7 @@ class SendAndReplyCallbackHandlerTest {
             assertThat(responseCaseData.getLastMessageJudgeLabel()).isEqualTo("Judge");
 
             verify(messageService, times(1))
-                .addMessage(null, messageMetaData, messageContent, AUTH_TOKEN);
+                .addMessage(null, messageMetaData, messageContent, AUTH_TOKEN, caseData);
         }
 
         @Test
@@ -277,7 +320,7 @@ class SendAndReplyCallbackHandlerTest {
                 .sendMessageContent(messageContent)
                 .build();
 
-            when(messageService.addMessage(null, messageMetaData, messageContent, AUTH_TOKEN))
+            when(messageService.addMessage(null, messageMetaData, messageContent, AUTH_TOKEN, caseData))
                 .thenReturn(wrapElements(expectedMessages));
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
@@ -296,7 +339,7 @@ class SendAndReplyCallbackHandlerTest {
             assertThat(responseCaseData.getLastMessageJudgeLabel()).isEqualTo("CJ");
 
             verify(messageService, times(1))
-                .addMessage(null, messageMetaData, messageContent, AUTH_TOKEN);
+                .addMessage(null, messageMetaData, messageContent, AUTH_TOKEN, caseData);
         }
 
         @Test
@@ -317,7 +360,7 @@ class SendAndReplyCallbackHandlerTest {
                 .sendMessageContent(messageContent)
                 .build();
 
-            when(messageService.addMessage(null, messageMetaData, messageContent, AUTH_TOKEN))
+            when(messageService.addMessage(null, messageMetaData, messageContent, AUTH_TOKEN, caseData))
                 .thenReturn(wrapElements(expectedMessages));
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
@@ -336,7 +379,7 @@ class SendAndReplyCallbackHandlerTest {
             assertThat(responseCaseData.getLastMessageJudgeLabel()).isEqualTo("DJ");
 
             verify(messageService, times(1))
-                .addMessage(null, messageMetaData, messageContent, AUTH_TOKEN);
+                .addMessage(null, messageMetaData, messageContent, AUTH_TOKEN, caseData);
         }
 
         @Test
@@ -357,7 +400,7 @@ class SendAndReplyCallbackHandlerTest {
                 .sendMessageContent(messageContent)
                 .build();
 
-            when(messageService.addMessage(null, messageMetaData, messageContent, AUTH_TOKEN))
+            when(messageService.addMessage(null, messageMetaData, messageContent, AUTH_TOKEN, caseData))
                 .thenReturn(wrapElements(expectedMessages));
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
@@ -376,7 +419,7 @@ class SendAndReplyCallbackHandlerTest {
             assertThat(responseCaseData.getLastMessageJudgeLabel()).isEqualTo("Judge");
 
             verify(messageService, times(1))
-                .addMessage(null, messageMetaData, messageContent, AUTH_TOKEN);
+                .addMessage(null, messageMetaData, messageContent, AUTH_TOKEN, caseData);
         }
 
         @Test
@@ -397,7 +440,7 @@ class SendAndReplyCallbackHandlerTest {
                 .sendMessageContent(messageContent)
                 .build();
 
-            when(messageService.addMessage(null, messageMetaData, messageContent, AUTH_TOKEN))
+            when(messageService.addMessage(null, messageMetaData, messageContent, AUTH_TOKEN, caseData))
                 .thenReturn(wrapElements(expectedMessages));
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
@@ -416,7 +459,7 @@ class SendAndReplyCallbackHandlerTest {
             assertThat(responseCaseData.getLastMessageJudgeLabel()).isEqualTo("Judge");
 
             verify(messageService, times(1))
-                .addMessage(null, messageMetaData, messageContent, AUTH_TOKEN);
+                .addMessage(null, messageMetaData, messageContent, AUTH_TOKEN, caseData);
         }
 
         @Test
@@ -438,7 +481,7 @@ class SendAndReplyCallbackHandlerTest {
                 .sendMessageContent(messageContent)
                 .build();
 
-            when(messageService.addMessage(null, messageMetaData, messageContent, AUTH_TOKEN))
+            when(messageService.addMessage(null, messageMetaData, messageContent, AUTH_TOKEN, caseData))
                 .thenReturn(wrapElements(expectedMessages));
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
@@ -457,7 +500,7 @@ class SendAndReplyCallbackHandlerTest {
             assertThat(responseCaseData.getLastMessageJudgeLabel()).isEqualTo("DJ");
 
             verify(messageService, times(1))
-                .addMessage(null, messageMetaData, messageContent, AUTH_TOKEN);
+                .addMessage(null, messageMetaData, messageContent, AUTH_TOKEN, caseData);
         }
 
         @Test
@@ -479,7 +522,7 @@ class SendAndReplyCallbackHandlerTest {
                 .sendMessageContent(messageContent)
                 .build();
 
-            when(messageService.addMessage(null, messageMetaData, messageContent, AUTH_TOKEN))
+            when(messageService.addMessage(null, messageMetaData, messageContent, AUTH_TOKEN, caseData))
                 .thenReturn(wrapElements(expectedMessages));
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
@@ -498,9 +541,9 @@ class SendAndReplyCallbackHandlerTest {
             assertThat(responseCaseData.getLastMessageJudgeLabel()).isEqualTo("DJ");
 
             verify(messageService, times(1))
-                .addMessage(null, messageMetaData, messageContent, AUTH_TOKEN);
+                .addMessage(null, messageMetaData, messageContent, AUTH_TOKEN, caseData);
         }
-        
+
         @Test
         void shouldReturnExpectedResponse_WhenAboutToSubmitIsInvoked_andSendAndReplyOptionIsReply() {
             Element<Message> message = element(Message.builder().messageContent("Original Message").build());
@@ -527,7 +570,7 @@ class SendAndReplyCallbackHandlerTest {
                 .messageHistory("message history markup")
                 .build();
 
-            when(messageService.addReplyToMessage(messages, replyList.getCode(), messageReply, AUTH_TOKEN)).thenReturn(
+            when(messageService.addReplyToMessage(messages, replyList.getCode(), messageReply, AUTH_TOKEN, caseData)).thenReturn(
                 updatedMessages);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
@@ -544,7 +587,7 @@ class SendAndReplyCallbackHandlerTest {
             assertThat(responseCaseData.getMessages()).isEqualTo(updatedMessages);
 
             verify(messageService, times(1))
-                .addReplyToMessage(messages, replyList.getCode(), messageReply, AUTH_TOKEN);
+                .addReplyToMessage(messages, replyList.getCode(), messageReply, AUTH_TOKEN, caseData);
         }
     }
 

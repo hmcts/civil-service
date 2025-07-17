@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.docmosis.sdo.SdoCoverLetterAppendService;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
+import uk.gov.hmcts.reform.civil.utils.LanguageUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +30,10 @@ public class SendSDOBulkPrintService {
 
     public void sendSDOOrderToLIP(String authorisation, CaseData caseData, String taskId) {
         if (caseData.getSystemGeneratedCaseDocuments() != null && !caseData.getSystemGeneratedCaseDocuments().isEmpty()) {
-            Language language = determineLanguageForBulkPrint(caseData, taskId);
+            Language language = LanguageUtils.determineLanguageForBulkPrint(
+                caseData,
+                TASK_ID_CLAIMANT.equals(taskId),
+                featureToggleService.isWelshEnabledForMainCase());
             List<CaseDocument> caseDocuments = new ArrayList<>();
             switch (language) {
                 case ENGLISH -> caseData.getSDODocument().map(Element::getValue).ifPresent(caseDocuments::add);
@@ -51,37 +55,6 @@ public class SendSDOBulkPrintService {
                 List<String> recipients = getRecipientsList(caseData, taskId);
                 bulkPrintService.printLetter(letterContent, caseData.getLegacyCaseReference(),
                                              caseData.getLegacyCaseReference(), SDO_ORDER_PACK_LETTER_TYPE, recipients);
-            }
-        }
-    }
-
-    private Language determineLanguageForBulkPrint(CaseData caseData, String taskId) {
-        if (!featureToggleService.isGaForWelshEnabled()) {
-            return Language.ENGLISH;
-        }
-        if (TASK_ID_CLAIMANT.equals(taskId)) {
-            if (caseData.getApplicant1DQ() != null
-                && caseData.getApplicant1DQ().getApplicant1DQLanguage() != null
-                && (caseData.getApplicant1DQ().getApplicant1DQLanguage().getDocuments() != null)) {
-                return caseData.getApplicant1DQ().getApplicant1DQLanguage().getDocuments();
-            } else {
-                return switch (caseData.getClaimantBilingualLanguagePreference()) {
-                    case "WELSH" -> Language.WELSH;
-                    case "BOTH" -> Language.BOTH;
-                    default -> Language.ENGLISH;
-                };
-            }
-        } else {
-            if (caseData.getRespondent1DQ() != null
-                && caseData.getRespondent1DQ().getRespondent1DQLanguage() != null
-                && (caseData.getRespondent1DQ().getRespondent1DQLanguage().getDocuments() != null)) {
-                return caseData.getRespondent1DQ().getRespondent1DQLanguage().getDocuments();
-            } else {
-                return switch (caseData.getDefendantBilingualLanguagePreference()) {
-                    case "WELSH" -> Language.WELSH;
-                    case "BOTH" -> Language.BOTH;
-                    default -> Language.ENGLISH;
-                };
             }
         }
     }

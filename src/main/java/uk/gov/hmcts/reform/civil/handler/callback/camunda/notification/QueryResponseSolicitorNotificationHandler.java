@@ -96,7 +96,8 @@ public class QueryResponseSolicitorNotificationHandler extends CallbackHandler i
         if (queryDate != null) {
             properties.put(QUERY_DATE, formatLocalDate(queryDate, DATE));
         }
-        String template = getTemplates(caseData, roles);
+        boolean publicQueryEnabled = featureToggleService.isPublicQueryManagementEnabled(caseData);
+        String template = publicQueryEnabled ? getPublicQueryTemplates(caseData, roles) : getTemplates(caseData, roles);
         notificationService.sendMail(
             email,
             template,
@@ -109,6 +110,11 @@ public class QueryResponseSolicitorNotificationHandler extends CallbackHandler i
 
     private LocalDate getOriginalQueryCreatedDate(CaseData caseData, CaseMessage responseQuery, List<String> roles,
                                                   CaseMessage parentQuery) {
+        if (caseData.getQueries() != null) {
+            return getLastRelatedQueryRaisedBySolicitorDate(caseData.getQueries(),
+                                                            parentQuery, responseQuery
+            );
+        }
         if (isApplicantSolicitor(roles)) {
             return getLastRelatedQueryRaisedBySolicitorDate(caseData.getQmApplicantSolicitorQueries(),
                                                             parentQuery, responseQuery
@@ -174,5 +180,17 @@ public class QueryResponseSolicitorNotificationHandler extends CallbackHandler i
         }
 
         return notificationsProperties.getQueryResponseReceived();
+    }
+
+    private String getPublicQueryTemplates(CaseData caseData, List<String> roles) {
+        if ((isLIPClaimant(roles) && caseData.isClaimantBilingual())
+            || (isLIPDefendant(roles) && caseData.isRespondentResponseBilingual())) {
+            return notificationsProperties.getQueryLipWelshPublicResponseReceived();
+        }
+        if (isLIPClaimant(roles) || isLIPDefendant(roles)) {
+            return notificationsProperties.getQueryLipPublicResponseReceived();
+        }
+
+        return notificationsProperties.getQueryLrPublicResponseReceived();
     }
 }
