@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
 import org.camunda.bpm.engine.variable.VariableMap;
@@ -9,12 +11,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
@@ -23,13 +23,13 @@ import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.StateFlowDTO;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
-import uk.gov.hmcts.reform.civil.service.flowstate.TransitionsTestConfiguration;
-import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
+import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
+import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
 import java.util.Map;
 
@@ -48,15 +48,7 @@ import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.FL
 import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.FLOW_STATE;
 import static uk.gov.hmcts.reform.civil.handler.tasks.StartBusinessProcessTaskHandler.BUSINESS_PROCESS;
 
-@SpringBootTest(classes = {
-    StartBusinessProcessTaskHandler.class,
-    JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class,
-    SimpleStateFlowEngine.class,
-    SimpleStateFlowBuilder.class,
-    TransitionsTestConfiguration.class
-})
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
 class StartBusinessProcessTaskHandlerTest {
 
     private static final String CASE_ID = "1";
@@ -66,12 +58,18 @@ class StartBusinessProcessTaskHandlerTest {
     @Mock
     private ExternalTask mockTask;
     @Mock
+    private IStateFlowEngine stateFlowEngine;
+    @Mock
     private ExternalTaskService externalTaskService;
-    @MockBean
+    @Mock
     private CoreCaseDataService coreCaseDataService;
-    @MockBean
+    @Mock
     private FeatureToggleService featureToggleService;
-    @Autowired
+    @Spy
+    private ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+    @Spy
+    private CaseDetailsConverter caseDetailsConverter = new CaseDetailsConverter(objectMapper);
+    @InjectMocks
     private StartBusinessProcessTaskHandler handler;
 
     private final VariableMap variables = Variables.createVariables();
@@ -80,9 +78,7 @@ class StartBusinessProcessTaskHandlerTest {
     void init() {
         variables.putValue(FLOW_STATE, "MAIN.DRAFT");
         variables.putValue(FLOW_FLAGS, Map.of());
-        when(mockTask.getTopicName()).thenReturn("test");
-        when(mockTask.getWorkerId()).thenReturn("worker");
-        when(mockTask.getActivityId()).thenReturn("activityId");
+
         when(mockTask.getProcessInstanceId()).thenReturn(PROCESS_INSTANCE_ID);
 
         when(mockTask.getAllVariables()).thenReturn(Map.of(
@@ -101,6 +97,11 @@ class StartBusinessProcessTaskHandlerTest {
 
         when(coreCaseDataService.startUpdate(CASE_ID, START_BUSINESS_PROCESS)).thenReturn(startEventResponse);
         when(coreCaseDataService.submitUpdate(eq(CASE_ID), any(CaseDataContent.class))).thenReturn(caseData);
+        when(mockTask.getTopicName()).thenReturn("test");
+        when(stateFlowEngine.getStateFlow(any(CaseData.class))).thenReturn(StateFlowDTO.builder()
+                                                                               .state(State.from("MAIN.DRAFT"))
+                                                                               .flags(Map.of())
+                                                                               .build());
 
         handler.execute(mockTask, externalTaskService);
 
@@ -117,7 +118,13 @@ class StartBusinessProcessTaskHandlerTest {
         StartEventResponse startEventResponse = StartEventResponse.builder().caseDetails(caseDetails).build();
 
         when(coreCaseDataService.startUpdate(CASE_ID, START_BUSINESS_PROCESS)).thenReturn(startEventResponse);
-        when(coreCaseDataService.submitUpdate(eq(CASE_ID), any(CaseDataContent.class))).thenReturn(caseData);
+        //when(coreCaseDataService.submitUpdate(eq(CASE_ID), any(CaseDataContent.class))).thenReturn(caseData);
+        when(mockTask.getTopicName()).thenReturn("test");
+        //when(mockTask.getActivityId()).thenReturn("activityId");
+        when(stateFlowEngine.getStateFlow(any(CaseData.class))).thenReturn(StateFlowDTO.builder()
+                                                                               .state(State.from("MAIN.DRAFT"))
+                                                                               .flags(Map.of())
+                                                                               .build());
 
         handler.execute(mockTask, externalTaskService);
 
