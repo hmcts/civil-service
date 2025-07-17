@@ -204,7 +204,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
             populateTrackToggle(caseData, caseDataBuilder);
         }
 
-        if (featureToggleService.isGaForWelshEnabled()
+        if (featureToggleService.isWelshEnabledForMainCase()
             && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
             caseDataBuilder.bilingualHint(YesOrNo.YES);
         }
@@ -626,6 +626,8 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
             List<Element<CaseDocument>> preTranslationDocuments = caseData.getPreTranslationDocuments();
             preTranslationDocuments.addAll(finalCaseDocuments);
             caseDataBuilder.preTranslationDocuments(preTranslationDocuments);
+            caseDataBuilder.bilingualHint(YesOrNo.YES);
+            // Do not trigger business process when document is hidden
         } else {
             if (!isEmpty(caseData.getFinalOrderDocumentCollection())) {
                 finalCaseDocuments.addAll(caseData.getFinalOrderDocumentCollection());

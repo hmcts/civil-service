@@ -148,7 +148,7 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
 
     @Override
     public boolean decisionMadeDocumentsAreInTranslation() {
-        return (featureToggleService.isGaForWelshEnabled() && caseData.getPreTranslationDocuments() != null
+        return (featureToggleService.isWelshEnabledForMainCase() && caseData.getPreTranslationDocuments() != null
             && caseData.getPreTranslationDocuments().stream().map(
                     Element::getValue)
                 .map(CaseDocument::getDocumentType)
@@ -158,7 +158,7 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
 
     @Override
     public boolean sdoDocumentsAreInTranslation() {
-        return (featureToggleService.isGaForWelshEnabled() && caseData.getPreTranslationDocuments() != null
+        return (featureToggleService.isWelshEnabledForMainCase() && caseData.getPreTranslationDocuments() != null
             && caseData.getPreTranslationDocuments().stream().map(
                     Element::getValue)
             .map(CaseDocument::getDocumentType).anyMatch(type -> DocumentType.SDO_ORDER.equals(type))
@@ -305,5 +305,17 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
     private boolean isWaitingForClaimantIntentDocUpload() {
         return caseData.isRespondentResponseFullDefence() && caseData.getApplicant1ResponseDate() != null
             && caseData.getCcdState() == CaseState.AWAITING_APPLICANT_INTENTION && caseData.isClaimantBilingual();
+    }
+
+    @Override
+    public boolean awaitingHearingNoticeTranslationNotSettledOrDiscontinued() {
+        return awaitingHearingNoticeTranslation() && !isSettled() && !isCasedDiscontinued();
+    }
+
+    private boolean awaitingHearingNoticeTranslation() {
+        return caseData.getPreTranslationDocuments() != null
+            && caseData.getPreTranslationDocuments().stream().anyMatch(
+                element -> element.getValue().getDocumentType() == DocumentType.HEARING_FORM
+        );
     }
 }

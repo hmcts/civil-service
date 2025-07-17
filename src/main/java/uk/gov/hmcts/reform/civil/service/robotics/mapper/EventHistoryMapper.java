@@ -656,7 +656,7 @@ public class EventHistoryMapper {
             .amountOfJudgment(caseData.getCcjPaymentDetails().getCcjJudgmentAmountClaimAmount()
                                   .add(caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()
                                            ? caseData.getCcjPaymentDetails().getCcjJudgmentLipInterest() :
-                                           Optional.ofNullable(caseData.getTotalInterest()).orElse(ZERO))
+                                           totalInterestForLrClaim(caseData))
                                   .setScale(2))
             .amountOfCosts(caseData.getCcjPaymentDetails().getCcjJudgmentFixedCostAmount()
                                .add(caseData.getCcjPaymentDetails().getCcjJudgmentAmountClaimFee()).setScale(2))
@@ -684,6 +684,11 @@ public class EventHistoryMapper {
             .eventDetails(judgmentByAdmissionEvent)
             .eventDetailsText("")
             .build()));
+    }
+
+    private BigDecimal totalInterestForLrClaim(CaseData caseData) {
+        return featureToggleService.isLrAdmissionBulkEnabled() ? ZERO : Optional.ofNullable(caseData.getTotalInterest()).orElse(
+            ZERO);
     }
 
     private void buildRespondentDivergentResponse(EventHistory.EventHistoryBuilder builder, CaseData caseData,
@@ -1122,7 +1127,7 @@ public class EventHistoryMapper {
     }
 
     private void buildQueriesEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        if (!isCaseOffline(caseData) || !featureToggleService.isQueryManagementLRsEnabled()) {
+        if (!isCaseOffline(caseData)) {
             return;
         }
         if (!hasActiveQueries(caseData)) {
@@ -1145,9 +1150,13 @@ public class EventHistoryMapper {
     }
 
     private boolean hasActiveQueries(CaseData caseData) {
-        return caseData.getQmApplicantSolicitorQueries() != null
-            || caseData.getQmRespondentSolicitor1Queries() != null
-            || caseData.getQmRespondentSolicitor2Queries() != null;
+        if (featureToggleService.isPublicQueryManagementEnabled(caseData)) {
+            return caseData.getQueries() != null;
+        } else {
+            return caseData.getQmApplicantSolicitorQueries() != null
+                || caseData.getQmRespondentSolicitor1Queries() != null
+                || caseData.getQmRespondentSolicitor2Queries() != null;
+        }
     }
 
     private boolean isCaseOffline(CaseData caseData) {

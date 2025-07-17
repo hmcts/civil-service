@@ -454,8 +454,8 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         BigDecimal totalAmountWithInterest = caseData.getTotalClaimAmount().add(interest);
 
         String calculatedInterest = " | Description | Amount | \n |---|---| \n | Claim amount | £ "
-            + caseData.getTotalClaimAmount()
-            + " | \n | Interest amount | £ " + interest + " | \n | Total amount | £ " + totalAmountWithInterest + " |";
+            + caseData.getTotalClaimAmount().setScale(2)
+            + " | \n | Interest amount | £ " + interest.setScale(2) + " | \n | Total amount | £ " + totalAmountWithInterest.setScale(2) + " |";
         caseDataBuilder.calculatedInterest(calculatedInterest);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -468,8 +468,8 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         BigDecimal totalAmountWithInterest = caseData.getTotalClaimAmount();
 
         String calculateInterest = " | Description | Amount | \n |---|---| \n | Claim amount | £ "
-            + caseData.getTotalClaimAmount()
-            + " | \n | Interest amount | £ " + "0" + " | \n | Total amount | £ " + totalAmountWithInterest + " |";
+            + caseData.getTotalClaimAmount().setScale(2)
+            + " | \n | Interest amount | £ " + "0" + " | \n | Total amount | £ " + totalAmountWithInterest.setScale(2) + " |";
         caseDataBuilder.calculatedInterest(calculateInterest);
 
         return AboutToStartOrSubmitCallbackResponse.builder()

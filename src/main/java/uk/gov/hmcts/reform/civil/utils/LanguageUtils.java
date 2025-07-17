@@ -13,7 +13,13 @@ public class LanguageUtils {
         if (!welshEnabled) {
             return Language.ENGLISH;
         }
+
         String languageString = isClaimant ? caseData.getClaimantBilingualLanguagePreference() : caseData.getDefendantBilingualLanguagePreference();
+
+        if (languageString == null) {
+            return Language.ENGLISH;
+        }
+
         return switch (languageString) {
             case "WELSH" -> Language.WELSH;
             case "BOTH" -> Language.BOTH;
