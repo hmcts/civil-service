@@ -10,5 +10,11 @@
     <cve>CVE-2025-49125</cve>
     <cve>CVE-2025-48976</cve>
     <cve>CVE-2024-47554</cve>
+    <notes>
+      CVE-2025-46392 is present due to a transitive dependency on commons-configuration:1.8 via Archaius (from spring-cloud-starter-netflix-hystrix:2.2.10.RELEASE).
+      We do not use Archaius configuration loading in our application.
+      This is safe in our usage context.
+    </notes>
+    <cve>CVE-2025-46392</cve>
   </suppress>
 </suppressions>
