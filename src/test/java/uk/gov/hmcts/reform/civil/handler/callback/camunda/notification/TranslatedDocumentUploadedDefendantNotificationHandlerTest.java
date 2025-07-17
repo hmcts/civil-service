@@ -11,8 +11,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
@@ -66,13 +69,10 @@ public class TranslatedDocumentUploadedDefendantNotificationHandlerTest {
     @Nested
     class AboutToSubmitCallback {
 
-        @BeforeEach
-        void setup() {
-            when(notificationsProperties.getNotifyDefendantTranslatedDocumentUploaded()).thenReturn(emailTemplate);
-        }
-
         @Test
-        void shouldNotifyApplicantParty_whenInvoked() {
+        void shouldNotifyApplicantPartyIsBilingual_whenInvoked() {
+            when(notificationsProperties.getNotifyDefendantTranslatedDocumentUploaded()).thenReturn(emailTemplate);
+
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getHmctsSignature()).thenReturn((String) configMap.get("hmctsSignature"));
             when(configuration.getPhoneContact()).thenReturn((String) configMap.get("phoneContact"));
@@ -90,9 +90,57 @@ public class TranslatedDocumentUploadedDefendantNotificationHandlerTest {
                 .build();
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .caseDataLip(CaseDataLiP.builder()
+                                 .respondent1LiPResponse(RespondentLiPResponse.builder()
+                                                             .respondent1ResponseLanguage(Language.BOTH.toString()).build())
+                                 .build())
                 .setClaimTypeToSpecClaim()
                 .respondent1(party)
                 .build();
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CaseEvent.NOTIFY_DEFENDANT_TRANSLATED_DOCUMENT_UPLOADED.name())
+                    .build()).build();
+            //When
+            handler.handle(params);
+            //Then
+            verify(notificationService).sendMail(
+                defendantEmail,
+                emailTemplate,
+                getNotificationDataMapSpec(caseData),
+                legacyCaseReference
+            );
+        }
+
+        @Test
+        void shouldNotifyApplicantPartyIsEnglish_whenInvoked() {
+            when(notificationsProperties.getRespondent1LipClaimUpdatedTemplate()).thenReturn(emailTemplate);
+
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getHmctsSignature()).thenReturn((String) configMap.get("hmctsSignature"));
+            when(configuration.getPhoneContact()).thenReturn((String) configMap.get("phoneContact"));
+            when(configuration.getOpeningHours()).thenReturn((String) configMap.get("openingHours"));
+            when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("hmctsSignature"));
+            when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("phoneContact"));
+            when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("openingHours"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
+            when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
+            when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmail"));
+            //Given
+            Party party = PartyBuilder.builder()
+                .individual(defendantName)
+                .partyEmail(defendantEmail)
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .caseDataLip(CaseDataLiP.builder()
+                                 .respondent1LiPResponse(RespondentLiPResponse.builder()
+                                                             .respondent1ResponseLanguage(Language.ENGLISH.toString()).build())
+                                 .build())
+                .setClaimTypeToSpecClaim()
+                .respondent1(party)
+                .build();
+
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CaseEvent.NOTIFY_DEFENDANT_TRANSLATED_DOCUMENT_UPLOADED.name())
                     .build()).build();
