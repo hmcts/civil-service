@@ -1205,10 +1205,12 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             updatedCaseData.showCarmFields(NO);
         }
         if (toggleService.isLrAdmissionBulkEnabled()) {
-            updatedCaseData.totalClaimAmountPlusInterest(caseData.getClaimAmountInPounds());
-            BigDecimal interest = interestCalculator.calculateInterest(caseData);
-            BigDecimal totalAmountWithInterest = caseData.getTotalClaimAmount().add(interest);
+            updatedCaseData.totalClaimAmountPlusInterest(caseData.getClaimAmountInPounds().setScale(2));
+            updatedCaseData.totalClaimAmountPlusInterestString(caseData.getClaimAmountInPounds().setScale(2).toString());
+            BigDecimal interest = interestCalculator.calculateInterest(caseData).setScale(2);
+            BigDecimal totalAmountWithInterest = caseData.getTotalClaimAmount().add(interest).setScale(2);
             updatedCaseData.totalClaimAmountPlusInterestAdmitPart(totalAmountWithInterest);
+            updatedCaseData.totalClaimAmountPlusInterestAdmitPartString(totalAmountWithInterest.toString());
         }
 
         updatedCaseData.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1().toBuilder().flags(null).build());
