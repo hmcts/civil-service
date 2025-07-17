@@ -15,6 +15,8 @@ import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Objects.nonNull;
+
 @Service
 public class CaseDismissClaimantDashboardNotificationHandler extends DashboardCallbackHandler {
 
@@ -69,7 +71,7 @@ public class CaseDismissClaimantDashboardNotificationHandler extends DashboardCa
     }
 
     private boolean claimantQueryAwaitingAResponse(CaseData caseData) {
-        // todo CIV-17287
-        return featureToggleService.isLipQueryManagementEnabled(caseData);
+        return featureToggleService.isPublicQueryManagementEnabled(caseData)
+            && nonNull(caseData.getQueries()) && caseData.getQueries().hasAQueryAwaitingResponse();
     }
 }

@@ -42,7 +42,7 @@ public class GenerateHearingNoticeAppSolOneEmailDTOGenerator extends AppSolOneEm
 
     @Override
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
-        properties.put(HEARING_DATE, NotificationUtils.getFormattedHearingTime(caseData.getHearingTimeHourMinute()));
+        properties.put(HEARING_DATE, NotificationUtils.getFormattedHearingDate(caseData.getHearingDate()));
         properties.put(HEARING_TIME, NotificationUtils.getFormattedHearingTime(caseData.getHearingTimeHourMinute()));
         properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData, organisationService));
 
