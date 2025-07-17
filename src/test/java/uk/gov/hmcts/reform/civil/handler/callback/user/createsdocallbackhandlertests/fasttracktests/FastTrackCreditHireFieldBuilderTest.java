@@ -39,7 +39,6 @@ class FastTrackCreditHireFieldBuilderTest {
         when(workingDayIndicator.getNextWorkingDay(date2)).thenReturn(date2);
         when(workingDayIndicator.getNextWorkingDay(date3)).thenReturn(date3);
         when(workingDayIndicator.getNextWorkingDay(date4)).thenReturn(date4);
-        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
 
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = CaseData.builder();
 

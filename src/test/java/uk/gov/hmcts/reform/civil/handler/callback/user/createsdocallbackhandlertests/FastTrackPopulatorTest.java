@@ -12,8 +12,8 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.util.List;
 
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class FastTrackPopulatorTest {

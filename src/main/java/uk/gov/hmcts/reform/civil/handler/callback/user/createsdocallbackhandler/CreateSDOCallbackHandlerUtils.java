@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
-import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.HEARING_CHANNEL_SDO;
+import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.HEARING_CHANNEL;
 import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.SPEC_SERVICE_ID;
 import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.UNSPEC_SERVICE_ID;
 
@@ -47,7 +47,7 @@ public class CreateSDOCallbackHandlerUtils {
     }
 
     private Optional<LocationRefData> getMatchingLocation(RequestedCourt preferredCourt, boolean getAllCourts, List<LocationRefData> locations) {
-        if (featureToggleService.isSdoR2Enabled() && getAllCourts) {
+        if (getAllCourts) {
             logger.debug("SDO R2 is enabled and getAllCourts is true, returning empty matching location");
             return Optional.empty();
         }
@@ -73,7 +73,7 @@ public class CreateSDOCallbackHandlerUtils {
         String serviceId = caseData.getCaseAccessCategory().equals(CaseCategory.SPEC_CLAIM)
                 ? SPEC_SERVICE_ID : UNSPEC_SERVICE_ID;
         Optional<CategorySearchResult> categorySearchResult = categoryService.findCategoryByCategoryIdAndServiceId(
-                authToken, HEARING_CHANNEL_SDO, serviceId
+                authToken, HEARING_CHANNEL, serviceId
         );
         DynamicList hearingMethodList = HearingMethodUtils.getHearingMethodList(categorySearchResult.orElse(null));
         List<DynamicListElement> hearingMethodListWithoutNotInAttendance = hearingMethodList
@@ -99,6 +99,7 @@ public class CreateSDOCallbackHandlerUtils {
         updatedData.fastTrackSchedulesOfLossToggle(checkList);
         updatedData.fastTrackCostsToggle(checkList);
         updatedData.fastTrackTrialToggle(checkList);
+        updatedData.fastTrackTrialBundleToggle(checkList);
         updatedData.fastTrackMethodToggle(checkList);
         updatedData.disposalHearingDisclosureOfDocumentsToggle(checkList);
         updatedData.disposalHearingWitnessOfFactToggle(checkList);
@@ -114,9 +115,8 @@ public class CreateSDOCallbackHandlerUtils {
         updatedData.smallClaimsMethodToggle(checkList);
         updatedData.smallClaimsDocumentsToggle(checkList);
         updatedData.smallClaimsWitnessStatementToggle(checkList);
-        if (featureToggleService.isSdoR2Enabled()) {
-            updatedData.smallClaimsFlightDelayToggle(checkList);
-        }
+        updatedData.smallClaimsFlightDelayToggle(checkList);
+
         if (featureToggleService.isCarmEnabledForCase(updatedData.build())) {
             updatedData.smallClaimsMediationSectionToggle(checkList);
         }

@@ -58,32 +58,24 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
     properties = {"reference.database.enabled=false"})
 class CreateSDOAboutToSubmitCallbackTest extends BaseCallbackHandlerTest {
 
-    @MockBean
-    private Time time;
-
-    @MockBean
-    private FeatureToggleService featureToggleService;
-
-    @MockBean
-    private SdoGeneratorService sdoGeneratorService;
-
-    @MockBean
-    private PublicHolidaysCollection publicHolidaysCollection;
-
-    @MockBean
-    private NonWorkingDaysCollection nonWorkingDaysCollection;
-
-    @MockBean
-    private CategoryService categoryService;
-
+    private final LocalDateTime submittedDate = LocalDateTime.now();
     @MockBean
     protected LocationReferenceDataService locationRefDataService;
-
+    @MockBean
+    private Time time;
+    @MockBean
+    private FeatureToggleService featureToggleService;
+    @MockBean
+    private SdoGeneratorService sdoGeneratorService;
+    @MockBean
+    private PublicHolidaysCollection publicHolidaysCollection;
+    @MockBean
+    private NonWorkingDaysCollection nonWorkingDaysCollection;
+    @MockBean
+    private CategoryService categoryService;
     @Autowired
     private CreateSDOCallbackHandler handler;
-
     private CallbackParams params;
-    private final LocalDateTime submittedDate = LocalDateTime.now();
 
     @BeforeEach
     void setup() {

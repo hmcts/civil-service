@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
@@ -25,9 +24,7 @@ class CourtLocationFieldUpdaterTest {
     private CourtLocationFieldUpdater courtLocationFieldUpdater;
 
     @Test
-    void shouldUpdateEaCourtLocationToYesWhenCaseIsWhitelisted() {
-        when(featureToggleService.isLocationWhiteListedForCaseProgression("1010101")).thenReturn(true);
-
+    void shouldUpdateEaCourtLocationToYes() {
         CaseData caseData = CaseData.builder()
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation("1010101").region("orange").build())
                 .ccdCaseReference(1234L)

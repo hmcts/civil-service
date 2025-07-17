@@ -7,6 +7,9 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.CaseTask;
 import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -16,8 +19,10 @@ import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsJudgementDeductionValue;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
+import java.util.List;
 import java.util.Optional;
 
+import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.ERROR_MINTI_DISPOSAL_NOT_ALLOWED;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
@@ -34,16 +39,22 @@ public class SetOrderDetailsFlags implements CaseTask {
         log.info("Executing SetOrderDetailsFlags");
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
 
+        if (isMultiOrIntermediateTrackClaim(caseData)
+                && OrderType.DISPOSAL.equals(caseData.getOrderType())
+                && CaseState.JUDICIAL_REFERRAL.equals(caseData.getCcdState())) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                    .errors(List.of(ERROR_MINTI_DISPOSAL_NOT_ALLOWED))
+                    .build();
+        }
+
         log.debug("Updating deduction values");
         updateDeductionValue(caseData, updatedData);
 
         log.debug("Resetting flags");
         resetFlags(updatedData);
 
-        if (featureToggleService.isSdoR2Enabled()) {
-            log.debug("Setting isSdoR2NewScreen to NO");
-            updatedData.isSdoR2NewScreen(NO).build();
-        }
+        log.debug("Setting isSdoR2NewScreen to NO");
+        updatedData.isSdoR2NewScreen(NO).build();
 
         log.debug("Updating flags based on track");
         updateFlagsBasedOnTrack(caseData, updatedData);
@@ -63,14 +74,14 @@ public class SetOrderDetailsFlags implements CaseTask {
         if (SdoHelper.isSmallClaimsTrack(caseData)) {
             log.debug("Case is on Small Claims track");
             updatedData.setSmallClaimsFlag(YES).build();
-            if (featureToggleService.isSdoR2Enabled() && SdoHelper.isSDOR2ScreenForDRHSmallClaim(caseData)) {
+            if (SdoHelper.isSDOR2ScreenForDRHSmallClaim(caseData)) {
                 log.debug("Enabling SdoR2 new screen for DRH Small Claim");
                 updatedData.isSdoR2NewScreen(YES).build();
             }
         } else if (SdoHelper.isFastTrack(caseData)) {
             log.debug("Case is on Fast Track");
             updatedData.setFastTrackFlag(YES).build();
-            if (featureToggleService.isSdoR2Enabled() && SdoHelper.isNihlFastTrack(caseData)) {
+            if (SdoHelper.isNihlFastTrack(caseData)) {
                 log.debug("Enabling SdoR2 new screen for NIHL Fast Track");
                 updatedData.isSdoR2NewScreen(YES).build();
             }
@@ -103,5 +114,13 @@ public class SetOrderDetailsFlags implements CaseTask {
                                     .build();
                     updatedData.smallClaimsJudgementDeductionValue(tempSmallClaimsJudgementDeductionValue).build();
                 });
+    }
+
+    private boolean isMultiOrIntermediateTrackClaim(CaseData caseData) {
+        return featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)
+                && (AllocatedTrack.INTERMEDIATE_CLAIM.equals(caseData.getAllocatedTrack())
+                || AllocatedTrack.INTERMEDIATE_CLAIM.name().equals(caseData.getResponseClaimTrack())
+                || AllocatedTrack.MULTI_CLAIM.equals(caseData.getAllocatedTrack())
+                || AllocatedTrack.MULTI_CLAIM.name().equals(caseData.getResponseClaimTrack()));
     }
 }

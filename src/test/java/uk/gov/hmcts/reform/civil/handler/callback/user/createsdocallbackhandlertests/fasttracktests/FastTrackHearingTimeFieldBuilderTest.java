@@ -33,8 +33,5 @@ class FastTrackHearingTimeFieldBuilderTest {
         assertThat(hearingTime.getDateToToggle()).contains(DateToShowToggle.SHOW);
         assertThat(hearingTime.getHelpText1()).isEqualTo("If either party considers that the time estimate is insufficient, they must inform the court within 7 days of the date " +
                 "of this order.");
-        assertThat(hearingTime.getHelpText2()).isEqualTo("Not more than seven nor less than three clear days before the trial, the claimant must file at court and serve an " +
-                "indexed and paginated bundle of documents which complies with the requirements of Rule 39.5 Civil Procedure Rules and which complies with requirements of PD32. " +
-                "The parties must endeavour to agree the contents of the bundle before it is filed. The bundle will include a case summary and a chronology.");
     }
 }

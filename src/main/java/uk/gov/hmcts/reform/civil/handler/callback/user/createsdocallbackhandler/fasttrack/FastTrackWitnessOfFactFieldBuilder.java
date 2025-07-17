@@ -4,20 +4,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
-import uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantFastTrack;
 import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.SdoCaseFieldBuilder;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackWitnessOfFact;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictNoOfPagesDetails;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictNoOfWitnessDetails;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictPages;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictWitness;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WitnessOfFact;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.time.LocalDate;
-
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 
 @Slf4j
 @Component
@@ -25,15 +16,10 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 public class FastTrackWitnessOfFactFieldBuilder implements SdoCaseFieldBuilder {
 
     private final WorkingDayIndicator workingDayIndicator;
-    private final FeatureToggleService featureToggleService;
 
     @Override
     public void build(CaseData.CaseDataBuilder<?, ?> updatedData) {
-        if (featureToggleService.isSdoR2Enabled()) {
-            updatedData.sdoR2FastTrackWitnessOfFact(getSdoR2WitnessOfFact());
-        } else {
-            updatedData.fastTrackWitnessOfFact(getFastTrackWitnessOfFact());
-        }
+        updatedData.fastTrackWitnessOfFact(getFastTrackWitnessOfFact());
     }
 
     private FastTrackWitnessOfFact getFastTrackWitnessOfFact() {
@@ -52,33 +38,6 @@ public class FastTrackWitnessOfFactFieldBuilder implements SdoCaseFieldBuilder {
                 .input9("Evidence will not be permitted at trial from a witness whose statement has not been uploaded "
                         + "in accordance with this Order. Evidence not uploaded, or uploaded late, will not be "
                         + "permitted except with permission from the Court.")
-                .build();
-    }
-
-    private static SdoR2WitnessOfFact getSdoR2WitnessOfFact() {
-        return SdoR2WitnessOfFact.builder()
-                .sdoStatementOfWitness(SdoR2UiConstantFastTrack.STATEMENT_WITNESS)
-                .sdoR2RestrictWitness(SdoR2RestrictWitness.builder()
-                        .isRestrictWitness(NO)
-                        .restrictNoOfWitnessDetails(
-                                SdoR2RestrictNoOfWitnessDetails.builder()
-                                        .noOfWitnessClaimant(3)
-                                        .noOfWitnessDefendant(3)
-                                        .partyIsCountedAsWitnessTxt(SdoR2UiConstantFastTrack.RESTRICT_WITNESS_TEXT)
-                                        .build())
-                        .build())
-                .sdoRestrictPages(SdoR2RestrictPages.builder()
-                        .isRestrictPages(NO)
-                        .restrictNoOfPagesDetails(
-                                SdoR2RestrictNoOfPagesDetails.builder()
-                                        .witnessShouldNotMoreThanTxt(SdoR2UiConstantFastTrack.RESTRICT_NUMBER_PAGES_TEXT1)
-                                        .noOfPages(12)
-                                        .fontDetails(SdoR2UiConstantFastTrack.RESTRICT_NUMBER_PAGES_TEXT2)
-                                        .build())
-                        .build())
-                .sdoWitnessDeadline(SdoR2UiConstantFastTrack.DEADLINE)
-                .sdoWitnessDeadlineDate(LocalDate.now().plusDays(70))
-                .sdoWitnessDeadlineText(SdoR2UiConstantFastTrack.DEADLINE_EVIDENCE)
                 .build();
     }
 }

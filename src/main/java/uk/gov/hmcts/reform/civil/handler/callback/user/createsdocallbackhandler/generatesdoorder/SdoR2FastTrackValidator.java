@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.fieldsnihl.ValidateFieldsNihl;
 import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.List;
 
@@ -16,7 +15,6 @@ import java.util.List;
 public class SdoR2FastTrackValidator implements GenerateSdoOrderValidator {
 
     private final ValidateFieldsNihl validateFieldsNihl;
-    private final FeatureToggleService featureToggleService;
 
     @Override
     public void validate(CaseData caseData, List<String> errors) {
@@ -31,7 +29,7 @@ public class SdoR2FastTrackValidator implements GenerateSdoOrderValidator {
     }
 
     private boolean isSdoR2EnabledForNihlFastTrack(CaseData caseData) {
-        boolean enabled = featureToggleService.isSdoR2Enabled() && SdoHelper.isNihlFastTrack(caseData);
+        boolean enabled = SdoHelper.isNihlFastTrack(caseData);
         log.debug("SdoR2 enabled for Nihl Fast Track: {}", enabled);
         return enabled;
     }

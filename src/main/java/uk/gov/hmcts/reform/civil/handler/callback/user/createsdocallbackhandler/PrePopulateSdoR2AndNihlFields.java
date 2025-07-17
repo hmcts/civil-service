@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantFastTrack;
 import uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantSmallClaim;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.HearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.HearingOnRadioOptions;
@@ -89,6 +90,11 @@ public class PrePopulateSdoR2AndNihlFields {
         CaseData caseData = callbackParams.getCaseData();
         if (featureToggleService.isCarmEnabledForCase(caseData)) {
             setCarmFields(updatedData);
+        }
+
+        if (featureToggleService.isWelshEnabledForMainCase()
+                && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
+            updatedData.bilingualHint(YesOrNo.YES);
         }
     }
 

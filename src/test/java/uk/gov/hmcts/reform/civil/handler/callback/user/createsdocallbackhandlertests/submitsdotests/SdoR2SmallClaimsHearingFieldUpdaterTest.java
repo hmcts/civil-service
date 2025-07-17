@@ -66,7 +66,6 @@ class SdoR2SmallClaimsHearingFieldUpdaterTest {
                 ))
                 .build();
 
-        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
         when(submitSdoUtils.deleteLocationList(any(DynamicList.class))).thenReturn(updatedOptions);
 
         try (MockedStatic<SdoHelper> mockedSdoHelper = mockStatic(SdoHelper.class)) {
@@ -90,8 +89,6 @@ class SdoR2SmallClaimsHearingFieldUpdaterTest {
                 .build();
 
         CaseDataBuilder<?, ?> dataBuilder = CaseData.builder();
-
-        when(featureToggleService.isSdoR2Enabled()).thenReturn(false);
 
         sdoR2SmallClaimsHearingFieldUpdater.update(caseData, dataBuilder);
 

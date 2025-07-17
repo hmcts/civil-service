@@ -6,19 +6,17 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearing;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class SdoR2SmallClaimsHearingFieldUpdater implements SdoCaseDataFieldUpdater {
 
-    private final FeatureToggleService featureToggleService;
     private final SubmitSdoUtils submitSdoUtils;
 
     @Override
     public void update(CaseData caseData, CaseData.CaseDataBuilder<?, ?> dataBuilder) {
-        if (featureToggleService.isSdoR2Enabled() && SdoHelper.isSDOR2ScreenForDRHSmallClaim(caseData)
+        if (SdoHelper.isSDOR2ScreenForDRHSmallClaim(caseData)
                 && caseData.getSdoR2SmallClaimsHearing() != null) {
             log.debug("Handling SDO R2 Small Claims Hearing for case {}", caseData.getCcdCaseReference());
             dataBuilder.sdoR2SmallClaimsHearing(updateHearingAfterDeletingLocationList(caseData.getSdoR2SmallClaimsHearing()));

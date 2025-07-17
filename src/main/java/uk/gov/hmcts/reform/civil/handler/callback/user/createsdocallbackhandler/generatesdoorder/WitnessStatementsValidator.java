@@ -57,7 +57,7 @@ public class WitnessStatementsValidator implements GenerateSdoOrderValidator {
     }
 
     private boolean isSdoR2EnabledForDRHSmallClaim(CaseData caseData) {
-        boolean enabled = featureToggleService.isSdoR2Enabled() && SdoHelper.isSDOR2ScreenForDRHSmallClaim(caseData);
+        boolean enabled = SdoHelper.isSDOR2ScreenForDRHSmallClaim(caseData);
         log.debug("SdoR2 enabled for DRH Small Claim: {}", enabled);
         return enabled;
     }

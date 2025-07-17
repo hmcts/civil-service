@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.ERROR_MESSAGE_NUMBER_CANNOT_BE_LESS_THAN_ZERO;
 
 @ExtendWith(MockitoExtension.class)
@@ -60,7 +59,6 @@ class WitnessStatementsValidatorTest {
 
     @Test
     void shouldValidateDRHFields() {
-        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
         CaseData caseData = CaseData.builder()
                 .sdoR2SmallClaimsImpNotes(SdoR2SmallClaimsImpNotes.builder()
                         .date(LocalDate.now().plusDays(1))

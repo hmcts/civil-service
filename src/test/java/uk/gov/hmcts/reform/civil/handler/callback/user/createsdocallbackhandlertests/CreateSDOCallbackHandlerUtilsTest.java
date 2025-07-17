@@ -60,7 +60,6 @@ class CreateSDOCallbackHandlerUtilsTest {
         List<LocationRefData> locations = List.of(locationRefData);
 
         when(locationHelper.getMatching(anyList(), any(RequestedCourt.class))).thenReturn(Optional.of(locationRefData));
-        when(featureToggleService.isSdoR2Enabled()).thenReturn(false);
 
         DynamicList result = createSDOCallbackHandlerUtils.getLocationList(requestedCourt, false, locations);
 
@@ -73,7 +72,6 @@ class CreateSDOCallbackHandlerUtilsTest {
         LocationRefData locationRefData = LocationRefData.builder().build();
         List<LocationRefData> locations = List.of(locationRefData);
 
-        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
         lenient().when(locationHelper.getMatching(anyList(), any(RequestedCourt.class))).thenReturn(Optional.empty());
 
         DynamicList result = createSDOCallbackHandlerUtils.getLocationList(requestedCourt, true, locations);
@@ -86,7 +84,6 @@ class CreateSDOCallbackHandlerUtilsTest {
         RequestedCourt requestedCourt = new RequestedCourt();
         List<LocationRefData> locations = Collections.emptyList();
 
-        when(featureToggleService.isSdoR2Enabled()).thenReturn(false);
         when(locationHelper.getMatching(anyList(), any(RequestedCourt.class))).thenReturn(Optional.empty());
 
         DynamicList result = createSDOCallbackHandlerUtils.getLocationList(requestedCourt, false, locations);
@@ -101,12 +98,10 @@ class CreateSDOCallbackHandlerUtilsTest {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = CaseData.builder();
         List<OrderDetailsPagesSectionsToggle> checkList = List.of(OrderDetailsPagesSectionsToggle.SHOW);
 
-        when(featureToggleService.isSdoR2Enabled()).thenReturn(isSdoR2Enabled);
         lenient().when(featureToggleService.isCarmEnabledForCase(caseDataBuilder.build())).thenReturn(isCarmEnabledForCase);
 
         createSDOCallbackHandlerUtils.setCheckList(caseDataBuilder, checkList);
 
-        verify(featureToggleService).isSdoR2Enabled();
         verify(featureToggleService).isCarmEnabledForCase(caseDataBuilder.build());
     }
 

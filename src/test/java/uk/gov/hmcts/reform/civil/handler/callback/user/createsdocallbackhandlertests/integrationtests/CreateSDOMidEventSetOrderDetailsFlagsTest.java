@@ -36,7 +36,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 
 @SpringBootTest(classes = {
@@ -54,28 +53,21 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
     properties = {"reference.database.enabled=false"})
 class CreateSDOMidEventSetOrderDetailsFlagsTest extends BaseCallbackHandlerTest {
 
-    @MockBean
-    private FeatureToggleService featureToggleService;
-
-    @MockBean
-    private SdoGeneratorService sdoGeneratorService;
-
-    @MockBean
-    private PublicHolidaysCollection publicHolidaysCollection;
-
-    @MockBean
-    private NonWorkingDaysCollection nonWorkingDaysCollection;
-
-    @MockBean
-    private CategoryService categoryService;
-
+    private static final String PAGE_ID = "order-details-navigation";
     @MockBean
     protected LocationReferenceDataService locationRefDataService;
-
+    @MockBean
+    private FeatureToggleService featureToggleService;
+    @MockBean
+    private SdoGeneratorService sdoGeneratorService;
+    @MockBean
+    private PublicHolidaysCollection publicHolidaysCollection;
+    @MockBean
+    private NonWorkingDaysCollection nonWorkingDaysCollection;
+    @MockBean
+    private CategoryService categoryService;
     @Autowired
     private CreateSDOCallbackHandler handler;
-
-    private static final String PAGE_ID = "order-details-navigation";
 
     private AboutToStartOrSubmitCallbackResponse executeHandler(CaseData caseData) {
         CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -140,7 +132,6 @@ class CreateSDOMidEventSetOrderDetailsFlagsTest extends BaseCallbackHandlerTest 
 
     @Test
     void fastTRackSdoR2NihlPathTwo() {
-        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
         List<FastTrack> fastTrackList = new ArrayList<>();
         fastTrackList.add(FastTrack.fastClaimBuildingDispute);
         fastTrackList.add(FastTrack.fastClaimNoiseInducedHearingLoss);
@@ -159,7 +150,6 @@ class CreateSDOMidEventSetOrderDetailsFlagsTest extends BaseCallbackHandlerTest 
 
     @Test
     void fastTrackFlagSetToYesNihlPathOne() {
-        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
         List<FastTrack> fastTrackList = new ArrayList<>();
         fastTrackList.add(FastTrack.fastClaimBuildingDispute);
         fastTrackList.add(FastTrack.fastClaimNoiseInducedHearingLoss);
@@ -176,7 +166,6 @@ class CreateSDOMidEventSetOrderDetailsFlagsTest extends BaseCallbackHandlerTest 
 
     @Test
     void smallClaimsSdoR2FlagSetToYesPathOne() {
-        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
                 .drawDirectionsOrderRequired(YesOrNo.NO)
                 .claimsTrack(ClaimsTrack.smallClaimsTrack)
@@ -190,7 +179,6 @@ class CreateSDOMidEventSetOrderDetailsFlagsTest extends BaseCallbackHandlerTest 
 
     @Test
     void smallClaimsSdoR2FlagSetToYesPathTwo() {
-        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
                 .drawDirectionsOrderRequired(YesOrNo.YES)
                 .drawDirectionsOrderSmallClaims(YesOrNo.YES)

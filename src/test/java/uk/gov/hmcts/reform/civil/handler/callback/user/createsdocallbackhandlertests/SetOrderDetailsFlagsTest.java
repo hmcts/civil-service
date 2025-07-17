@@ -22,7 +22,6 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 
 @ExtendWith(MockitoExtension.class)
@@ -65,8 +64,6 @@ class SetOrderDetailsFlagsTest {
                 .caseData(caseData)
                 .build();
 
-        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
-
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) setOrderDetailsFlags.execute(callbackParams);
 
         assertEquals("No", response.getData().get("isSdoR2NewScreen"));
@@ -82,8 +79,6 @@ class SetOrderDetailsFlagsTest {
         CallbackParams params = CallbackParams.builder()
                 .caseData(caseData)
                 .build();
-
-        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) setOrderDetailsFlags.execute(params);
 
@@ -103,8 +98,6 @@ class SetOrderDetailsFlagsTest {
                 .caseData(caseData)
                 .build();
 
-        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
-
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) setOrderDetailsFlags.execute(params);
 
         assertEquals("Yes", response.getData().get("setFastTrackFlag"));
@@ -118,8 +111,6 @@ class SetOrderDetailsFlagsTest {
         CallbackParams params = CallbackParams.builder()
                 .caseData(caseData)
                 .build();
-
-        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) setOrderDetailsFlags.execute(params);
 

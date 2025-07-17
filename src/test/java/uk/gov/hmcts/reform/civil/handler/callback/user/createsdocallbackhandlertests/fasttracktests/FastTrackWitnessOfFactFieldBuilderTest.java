@@ -33,7 +33,6 @@ class FastTrackWitnessOfFactFieldBuilderTest {
         LocalDate now = LocalDate.now();
         LocalDate expectedDate = now.plusWeeks(8);
         when(workingDayIndicator.getNextWorkingDay(expectedDate)).thenReturn(expectedDate);
-        when(featureToggleService.isSdoR2Enabled()).thenReturn(false);
 
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = CaseData.builder();
 

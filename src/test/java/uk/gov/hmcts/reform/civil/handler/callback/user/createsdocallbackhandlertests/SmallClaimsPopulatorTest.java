@@ -50,8 +50,7 @@ class SmallClaimsPopulatorTest {
     }
 
     @Test
-    void shouldSetSmallClaimsFields_whenSdoR2Enabled() {
-        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
+    void shouldSetSmallClaimsFields() {
         when(workingDayIndicator.getNextWorkingDay(any(LocalDate.class))).thenReturn(LocalDate.now().plusDays(1));
         when(deadlinesCalculator.plusWorkingDays(any(LocalDate.class), any(Integer.class))).thenReturn(LocalDate.now().plusDays(5));
 
@@ -62,25 +61,6 @@ class SmallClaimsPopulatorTest {
         assertThat(result.getSmallClaimsJudgesRecital()).isNotNull();
         assertThat(result.getSmallClaimsDocuments()).isNotNull();
         assertThat(result.getSdoR2SmallClaimsWitnessStatementOther()).isNotNull();
-        assertThat(result.getSmallClaimsHearing()).isNotNull();
-        assertThat(result.getSmallClaimsNotes()).isNotNull();
-        assertThat(result.getSmallClaimsCreditHire()).isNotNull();
-        assertThat(result.getSmallClaimsRoadTrafficAccident()).isNotNull();
-    }
-
-    @Test
-    void shouldSetSmallClaimsFields_whenSdoR2Disabled() {
-        when(featureToggleService.isSdoR2Enabled()).thenReturn(false);
-        when(workingDayIndicator.getNextWorkingDay(any(LocalDate.class))).thenReturn(LocalDate.now().plusDays(1));
-        when(deadlinesCalculator.plusWorkingDays(any(LocalDate.class), any(Integer.class))).thenReturn(LocalDate.now().plusDays(5));
-
-        CaseData.CaseDataBuilder<?, ?> updatedData = CaseData.builder();
-        smallClaimsPopulator.setSmallClaimsFields(updatedData, caseData);
-
-        CaseData result = updatedData.build();
-        assertThat(result.getSmallClaimsJudgesRecital()).isNotNull();
-        assertThat(result.getSmallClaimsDocuments()).isNotNull();
-        assertThat(result.getSmallClaimsWitnessStatement()).isNotNull();
         assertThat(result.getSmallClaimsHearing()).isNotNull();
         assertThat(result.getSmallClaimsNotes()).isNotNull();
         assertThat(result.getSmallClaimsCreditHire()).isNotNull();

@@ -45,7 +45,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -66,25 +65,18 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 class CreateSDOMidEventNegativeNumberOfWitnessTest extends BaseCallbackHandlerTest {
 
     private static final String PAGE_ID = "generate-sdo-order";
-
-    @MockBean
-    private FeatureToggleService featureToggleService;
-
-    @MockBean
-    private SdoGeneratorService sdoGeneratorService;
-
-    @MockBean
-    private PublicHolidaysCollection publicHolidaysCollection;
-
-    @MockBean
-    private NonWorkingDaysCollection nonWorkingDaysCollection;
-
-    @MockBean
-    private CategoryService categoryService;
-
     @MockBean
     protected LocationReferenceDataService locationRefDataService;
-
+    @MockBean
+    private FeatureToggleService featureToggleService;
+    @MockBean
+    private SdoGeneratorService sdoGeneratorService;
+    @MockBean
+    private PublicHolidaysCollection publicHolidaysCollection;
+    @MockBean
+    private NonWorkingDaysCollection nonWorkingDaysCollection;
+    @MockBean
+    private CategoryService categoryService;
     @Autowired
     private CreateSDOCallbackHandler handler;
 
@@ -175,7 +167,6 @@ class CreateSDOMidEventNegativeNumberOfWitnessTest extends BaseCallbackHandlerTe
                                 .build())
                         .build())
                 .build();
-        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
         AboutToStartOrSubmitCallbackResponse response = invokeHandler(caseData);
         if (valid) {
             assertThat(response.getErrors()).isEmpty();
@@ -197,7 +188,6 @@ class CreateSDOMidEventNegativeNumberOfWitnessTest extends BaseCallbackHandlerTe
                         .date(LocalDate.now().plusDays(2))
                         .build())
                 .build();
-        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
         AboutToStartOrSubmitCallbackResponse response = invokeHandler(caseData);
         assertThat(response.getErrors()).isEmpty();
     }
@@ -221,7 +211,6 @@ class CreateSDOMidEventNegativeNumberOfWitnessTest extends BaseCallbackHandlerTe
                                 .build())
                         .build())
                 .build();
-        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
         AboutToStartOrSubmitCallbackResponse response = invokeHandler(caseData);
         if (valid) {
             assertThat(response.getErrors()).isEmpty();

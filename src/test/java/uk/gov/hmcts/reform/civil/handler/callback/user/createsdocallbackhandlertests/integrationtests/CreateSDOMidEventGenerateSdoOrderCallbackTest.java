@@ -81,43 +81,23 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
     properties = {"reference.database.enabled=false"})
 class CreateSDOMidEventGenerateSdoOrderCallbackTest extends BaseCallbackHandlerTest {
 
-    @MockBean
-    private SdoGeneratorService sdoGeneratorService;
-
-    @MockBean
-    private PublicHolidaysCollection publicHolidaysCollection;
-
-    @MockBean
-    private NonWorkingDaysCollection nonWorkingDaysCollection;
-
-    @MockBean
-    private CategoryService categoryService;
-
-    @MockBean
-    private FeatureToggleService featureToggleService;
-
+    private static final String PAGE_ID = "generate-sdo-order";
     @MockBean
     protected LocationReferenceDataService locationRefDataService;
-
+    @MockBean
+    private SdoGeneratorService sdoGeneratorService;
+    @MockBean
+    private PublicHolidaysCollection publicHolidaysCollection;
+    @MockBean
+    private NonWorkingDaysCollection nonWorkingDaysCollection;
+    @MockBean
+    private CategoryService categoryService;
+    @MockBean
+    private FeatureToggleService featureToggleService;
     @Autowired
     private ObjectMapper objectMapper;
-
     @Autowired
     private CreateSDOCallbackHandler handler;
-
-    private static final String PAGE_ID = "generate-sdo-order";
-
-    @ParameterizedTest
-    @MethodSource("provideCaseDataForSdoOrderGeneration")
-    void shouldGenerateAndSaveSdoOrder_forVariousStates(CaseData caseData) {
-        CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
-        CaseDocument order = CaseDocument.builder()
-                .documentLink(Document.builder().documentUrl("url").build())
-                .build();
-        when(sdoGeneratorService.generate(any(), any())).thenReturn(order);
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        assertThat(response.getData()).extracting("sdoOrderDocument").isNotNull();
-    }
 
     private static Stream<CaseData> provideCaseDataForSdoOrderGeneration() {
         return Stream.of(
@@ -142,6 +122,22 @@ class CreateSDOMidEventGenerateSdoOrderCallbackTest extends BaseCallbackHandlerT
         );
     }
 
+    private static Stream<Boolean> provideCaseDataForNihlValidation() {
+        return Stream.of(true, false);
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideCaseDataForSdoOrderGeneration")
+    void shouldGenerateAndSaveSdoOrder_forVariousStates(CaseData caseData) {
+        CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
+        CaseDocument order = CaseDocument.builder()
+                .documentLink(Document.builder().documentUrl("url").build())
+                .build();
+        when(sdoGeneratorService.generate(any(), any())).thenReturn(order);
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        assertThat(response.getData()).extracting("sdoOrderDocument").isNotNull();
+    }
+
     @Test
     void shouldAssignCategoryId_whenInvoked() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
@@ -158,7 +154,6 @@ class CreateSDOMidEventGenerateSdoOrderCallbackTest extends BaseCallbackHandlerT
 
     @Test
     void shouldGenerateAndSaveSdoOrder_whenNihl() {
-        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
         List<FastTrack> fastTrackList = new ArrayList<>();
         fastTrackList.add(FastTrack.fastClaimNoiseInducedHearingLoss);
         CaseData caseData = CaseDataBuilder.builder()
@@ -183,8 +178,6 @@ class CreateSDOMidEventGenerateSdoOrderCallbackTest extends BaseCallbackHandlerT
     @ParameterizedTest
     @MethodSource("provideCaseDataForNihlValidation")
     void shouldValidateFieldsForNihl(boolean valid) {
-        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
-
         List<FastTrack> fastTrackList = new ArrayList<>();
         fastTrackList.add(FastTrack.fastClaimNoiseInducedHearingLoss);
 
@@ -269,13 +262,8 @@ class CreateSDOMidEventGenerateSdoOrderCallbackTest extends BaseCallbackHandlerT
         }
     }
 
-    private static Stream<Boolean> provideCaseDataForNihlValidation() {
-        return Stream.of(true, false);
-    }
-
     @Test
     void shouldGenerateAndSaveSdoOrder_whenDrhIsSelected() {
-        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .atStateClaimIssued()
                 .build()

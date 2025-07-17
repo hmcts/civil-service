@@ -41,6 +41,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 @ExtendWith(MockitoExtension.class)
 class PrePopulateOrderDetailsPagesTest {
 
+    private static final BigDecimal TEST_CCMCC_AMOUNT = new BigDecimal("1000");
+    private static final String TEST_CCMCC_EPIMMS_ID = "some-epimms-id";
     @Mock
     private LocationReferenceDataService locationRefDataService;
     @Mock
@@ -59,11 +61,7 @@ class PrePopulateOrderDetailsPagesTest {
     private PrePopulateSdoR2AndNihlFields prePopulateSdoR2AndNihlFields;
     @Mock
     private List<OrderDetailsPagesCaseFieldBuilder> orderDetailsPagesCaseFieldBuilders;
-
     private PrePopulateOrderDetailsPages prePopulateOrderDetailsPages;
-
-    private static final BigDecimal TEST_CCMCC_AMOUNT = new BigDecimal("1000");
-    private static final String TEST_CCMCC_EPIMMS_ID = "some-epimms-id";
 
     @BeforeEach
     void setUp() {
@@ -126,7 +124,6 @@ class PrePopulateOrderDetailsPagesTest {
                 .params(Map.of(BEARER_TOKEN, "test-token"))
                 .build();
 
-        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
         when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(List.of(LocationRefData.builder().build()));
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) prePopulateOrderDetailsPages.execute(callbackParams);
@@ -150,7 +147,6 @@ class PrePopulateOrderDetailsPagesTest {
                 .params(Map.of(BEARER_TOKEN, "test-token"))
                 .build();
 
-        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
         when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(List.of(LocationRefData.builder().build()));
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) prePopulateOrderDetailsPages.execute(callbackParams);
@@ -163,8 +159,6 @@ class PrePopulateOrderDetailsPagesTest {
 
     @Test
     void shouldNotPrePopulateOrderDetailsPages_whenSdoR2Disabled() {
-        when(featureToggleService.isSdoR2Enabled()).thenReturn(false);
-
         CaseData caseData = CaseData.builder()
                 .ccdState(CaseState.CASE_PROGRESSION)
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
@@ -196,7 +190,6 @@ class PrePopulateOrderDetailsPagesTest {
                 .params(Map.of(BEARER_TOKEN, "test-token"))
                 .build();
 
-        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
         when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(List.of(LocationRefData.builder().build()));
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
 
@@ -220,7 +213,6 @@ class PrePopulateOrderDetailsPagesTest {
                 .params(Map.of(BEARER_TOKEN, "test-token"))
                 .build();
 
-        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
         when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(List.of(LocationRefData.builder().build()));
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) prePopulateOrderDetailsPages.execute(callbackParams);

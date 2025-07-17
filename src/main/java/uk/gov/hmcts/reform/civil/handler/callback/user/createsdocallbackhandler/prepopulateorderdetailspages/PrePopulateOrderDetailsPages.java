@@ -146,27 +146,24 @@ public class PrePopulateOrderDetailsPages implements CaseTask {
 
     private void handleSdoR2FeaturesIfNeeded(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData, CallbackParams callbackParams,
                                              Optional<RequestedCourt> preferredCourt, DynamicList hearingMethodList, List<LocationRefData> locationRefDataList) {
-        if (featureToggleService.isSdoR2Enabled()
-                && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
+        if (CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
                 && DecisionOnRequestReconsiderationOptions.CREATE_SDO.equals(
                 caseData.getDecisionOnRequestReconsiderationOptions())) {
             log.debug("Resetting fields for reconsideration");
             orderDetailsPagesCaseFieldBuilders.forEach(builder -> builder.build(updatedData));
         }
 
-        if (featureToggleService.isSdoR2Enabled()) {
+        orderDetailsPagesCaseFieldBuilders.forEach(builder -> builder.build(updatedData));
 
-            orderDetailsPagesCaseFieldBuilders.forEach(builder -> builder.build(updatedData));
+        log.debug("Populating DRH fields");
+        prePopulateSdoR2AndNihlFields.populateDRHFields(callbackParams, updatedData, preferredCourt, hearingMethodList, locationRefDataList);
 
-            log.debug("Populating DRH fields");
-            prePopulateSdoR2AndNihlFields.populateDRHFields(callbackParams, updatedData, preferredCourt, hearingMethodList, locationRefDataList);
+        log.debug("Populating NIHL fields");
+        prePopulateSdoR2AndNihlFields.prePopulateNihlFields(updatedData, hearingMethodList, preferredCourt, locationRefDataList);
 
-            log.debug("Populating NIHL fields");
-            prePopulateSdoR2AndNihlFields.prePopulateNihlFields(updatedData, hearingMethodList, preferredCourt, locationRefDataList);
+        log.debug("Setting checklist for NIHL inclusion");
+        setCheckListNihl(updatedData, List.of(IncludeInOrderToggle.INCLUDE));
 
-            log.debug("Setting checklist for NIHL inclusion");
-            setCheckListNihl(updatedData, List.of(IncludeInOrderToggle.INCLUDE));
-        }
     }
 
     private void setHearingMethodValues(CaseData.CaseDataBuilder<?, ?> updatedData,

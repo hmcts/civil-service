@@ -6,18 +6,15 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2Trial;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class SdoR2TrialFieldUpdater implements SdoCaseDataFieldUpdater {
 
-    private final FeatureToggleService featureToggleService;
-
     @Override
     public void update(CaseData caseData, CaseData.CaseDataBuilder<?, ?> dataBuilder) {
-        if (featureToggleService.isSdoR2Enabled() && caseData.getSdoR2Trial() != null) {
+        if (caseData.getSdoR2Trial() != null) {
             log.debug("Handling SDO R2 Trial for case {}", caseData.getCcdCaseReference());
             SdoR2Trial sdoR2Trial = caseData.getSdoR2Trial();
             if (caseData.getSdoR2Trial().getHearingCourtLocationList() != null) {

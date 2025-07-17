@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
@@ -248,7 +246,6 @@ class CreateSDOAboutToStartCallbackTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldClearDataIfStateIsCaseProgression() {
-            when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                     .drawDirectionsOrderRequired(YES)
                     .drawDirectionsOrderSmallClaims(YES)
@@ -298,7 +295,6 @@ class CreateSDOAboutToStartCallbackTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPopulateHearingCourtLocationForNihl() {
-            when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
             mockLocationRefDataService();
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
                     .drawDirectionsOrderRequired(NO)
@@ -316,7 +312,6 @@ class CreateSDOAboutToStartCallbackTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPopulateDefaultFieldsForNihl() {
-            when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
             List<FastTrack> fastTrackList = List.of(FastTrack.fastClaimNoiseInducedHearingLoss);
             mockLocationRefDataService();
             mockCategoryService();
@@ -388,10 +383,9 @@ class CreateSDOAboutToStartCallbackTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldPrePopulateUpdatedWitnessSectionsForSDOR2() {
+        void shouldPrePopulateUpdatedWitnessSections() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                     .atStateClaimIssuedDisposalHearingSDOInPersonHearing().build();
-            when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
             AboutToStartOrSubmitCallbackResponse response = handleCallback(caseData);
             CaseData data = objectMapper.convertValue(response.getData(), CaseData.class);
 
@@ -425,30 +419,20 @@ class CreateSDOAboutToStartCallbackTest extends BaseCallbackHandlerTest {
             assertThat(data.getSdoR2FastTrackWitnessOfFact().getSdoWitnessDeadlineText()).isEqualTo(SdoR2UiConstantFastTrack.DEADLINE_EVIDENCE);
         }
 
-        @ParameterizedTest
-        @ValueSource(booleans = {true, false})
-        void shouldPopulateWelshSectionForSDOR2(boolean valid) {
+        @Test
+        void shouldPopulateWelshSection() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build().toBuilder()
                     .claimsTrack(ClaimsTrack.smallClaimsTrack)
                     .drawDirectionsOrderRequired(NO)
                     .build();
-            when(featureToggleService.isSdoR2Enabled()).thenReturn(valid);
             AboutToStartOrSubmitCallbackResponse response = handleCallback(caseData);
             CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
 
-            if (valid) {
-                assertThat(responseCaseData.getSdoR2FastTrackUseOfWelshLanguage().getDescription()).isEqualTo(WELSH_LANG_DESCRIPTION);
-                assertThat(responseCaseData.getSdoR2SmallClaimsUseOfWelshLanguage().getDescription()).isEqualTo(WELSH_LANG_DESCRIPTION);
-                assertThat(responseCaseData.getSdoR2DisposalHearingUseOfWelshLanguage().getDescription()).isEqualTo(WELSH_LANG_DESCRIPTION);
-                assertThat(responseCaseData.getSdoR2DrhUseOfWelshLanguage().getDescription()).isEqualTo(WELSH_LANG_DESCRIPTION);
-                assertThat(responseCaseData.getSdoR2NihlUseOfWelshLanguage().getDescription()).isEqualTo(WELSH_LANG_DESCRIPTION);
-            } else {
-                assertThat(responseCaseData.getSdoR2FastTrackUseOfWelshLanguage()).isNull();
-                assertThat(responseCaseData.getSdoR2SmallClaimsUseOfWelshLanguage()).isNull();
-                assertThat(responseCaseData.getSdoR2DisposalHearingUseOfWelshLanguage()).isNull();
-                assertThat(responseCaseData.getSdoR2DrhUseOfWelshLanguage()).isNull();
-                assertThat(responseCaseData.getSdoR2NihlUseOfWelshLanguage()).isNull();
-            }
+            assertThat(responseCaseData.getSdoR2FastTrackUseOfWelshLanguage().getDescription()).isEqualTo(WELSH_LANG_DESCRIPTION);
+            assertThat(responseCaseData.getSdoR2SmallClaimsUseOfWelshLanguage().getDescription()).isEqualTo(WELSH_LANG_DESCRIPTION);
+            assertThat(responseCaseData.getSdoR2DisposalHearingUseOfWelshLanguage().getDescription()).isEqualTo(WELSH_LANG_DESCRIPTION);
+            assertThat(responseCaseData.getSdoR2DrhUseOfWelshLanguage().getDescription()).isEqualTo(WELSH_LANG_DESCRIPTION);
+            assertThat(responseCaseData.getSdoR2NihlUseOfWelshLanguage().getDescription()).isEqualTo(WELSH_LANG_DESCRIPTION);
         }
 
         @Test

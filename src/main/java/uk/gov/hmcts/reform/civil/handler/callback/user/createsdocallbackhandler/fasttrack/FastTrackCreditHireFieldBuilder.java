@@ -20,17 +20,15 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FastTrackCreditHireFieldBuilder implements SdoCaseFieldBuilder {
 
-    private final FeatureToggleService featureToggleService;
-    private final WorkingDayIndicator workingDayIndicator;
     static final String WITNESS_STATEMENT_STRING = "This witness statement is limited to 10 pages per party, including any appendices.";
     static final String LATER_THAN_FOUR_PM_STRING = "later than 4pm on";
     static final String CLAIMANT_EVIDENCE_STRING = "and the claimant's evidence in reply if so advised to be uploaded by 4pm on";
+    private final FeatureToggleService featureToggleService;
+    private final WorkingDayIndicator workingDayIndicator;
 
     @Override
     public void build(CaseData.CaseDataBuilder<?, ?> updatedData) {
-        if (featureToggleService.isSdoR2Enabled()) {
-            updatedData.sdoR2FastTrackCreditHire(getSdoR2FastTrackCreditHire());
-        }
+        updatedData.sdoR2FastTrackCreditHire(getSdoR2FastTrackCreditHire());
         updatedData.fastTrackCreditHire(getFastTrackCreditHire());
     }
 
@@ -78,9 +76,8 @@ public class FastTrackCreditHireFieldBuilder implements SdoCaseFieldBuilder {
                         If impecuniosity is alleged by the claimant and not admitted by the defendant, the claimant's \
                         disclosure as ordered earlier in this Order must include:
                         a) Evidence of all income from all sources for a period of 3 months prior to the \
-                        commencement of hire until the earlier of:
-                        
-                             i) 3 months after cessation of hire
+                        commencement of hire until the earlier of:                   
+                              i) 3 months after cessation of hire
                              ii) the repair or replacement of the claimant's vehicle
                         b) Copies of all bank, credit card, and saving account statements for a period of 3 months \
                         prior to the commencement of hire until the earlier of:

@@ -77,32 +77,23 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 class CreateSDOMidEventPrePopulateOrderDetailsPagesCallbackTest extends BaseCallbackHandlerTest {
 
     @MockBean
+    protected LocationReferenceDataService locationRefDataService;
+    @MockBean
     private Time time;
-
     @MockBean
     private FeatureToggleService featureToggleService;
-
     @MockBean
     private SdoGeneratorService sdoGeneratorService;
-
     @MockBean
     private PublicHolidaysCollection publicHolidaysCollection;
-
     @MockBean
     private NonWorkingDaysCollection nonWorkingDaysCollection;
-
     @MockBean
     private CategoryService categoryService;
-
     @MockBean
     private WorkingDayIndicator workingDayIndicator;
-
     @MockBean
     private DeadlinesCalculator deadlinesCalculator;
-
-    @MockBean
-    protected LocationReferenceDataService locationRefDataService;
-
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -234,7 +225,6 @@ class CreateSDOMidEventPrePopulateOrderDetailsPagesCallbackTest extends BaseCall
         @Test
         void shouldPrePopulateOrderDetailsPagesWithSmallClaimFlightDelay() {
             setupCategoryMocks();
-            when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                     .setClaimTypeToSpecClaim()
                     .atStateClaimDraft()
@@ -266,7 +256,6 @@ class CreateSDOMidEventPrePopulateOrderDetailsPagesCallbackTest extends BaseCall
         @Test
         void shouldPrePopulateOrderDetailsPagesWithUpdatedExpertEvidenceDataForR2() {
             setupCategoryMocks();
-            when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                     .setClaimTypeToSpecClaim()
                     .atStateClaimDraft()
@@ -306,7 +295,6 @@ class CreateSDOMidEventPrePopulateOrderDetailsPagesCallbackTest extends BaseCall
 
             when(locationRefDataService.getHearingCourtLocations(any(String.class))).thenReturn(locations);
             setupCategoryMocks();
-            when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
             given(featureToggleService.isCarmEnabledForCase(any())).willReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder()
@@ -368,7 +356,6 @@ class CreateSDOMidEventPrePopulateOrderDetailsPagesCallbackTest extends BaseCall
         @Test
         void shouldPrePopulateDRHFields_CarmNotEnabled() {
             setupCategoryMocks();
-            when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
             given(featureToggleService.isCarmEnabledForCase(any())).willReturn(false);
             CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimDraft()
@@ -383,7 +370,6 @@ class CreateSDOMidEventPrePopulateOrderDetailsPagesCallbackTest extends BaseCall
         @Test
         void shouldPrePopulateOrderDetailsPagesWithUpdatedDisclosureOfDocumentDataForR2() {
             setupCategoryMocks();
-            when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                     .setClaimTypeToSpecClaim()
                     .atStateClaimDraft()
@@ -410,7 +396,6 @@ class CreateSDOMidEventPrePopulateOrderDetailsPagesCallbackTest extends BaseCall
         @Test
         void shouldPrePopulateToggleDRHFields_CarmEnabled() {
             setupCategoryMocks();
-            when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
             given(featureToggleService.isCarmEnabledForCase(any())).willReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimDraft()

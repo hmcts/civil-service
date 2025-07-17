@@ -17,7 +17,6 @@ import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsNotes;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsRoadTrafficAccident;
-import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsWitnessStatement;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
@@ -38,12 +37,12 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 @Slf4j
 public class SmallClaimsPopulator {
 
-    private final WorkingDayIndicator workingDayIndicator;
-    private final DeadlinesCalculator deadlinesCalculator;
-    private final FeatureToggleService featureToggleService;
     static final String WITNESS_STATEMENT_STRING = "This witness statement is limited to 10 pages per party, including any appendices.";
     static final String LATER_THAN_FOUR_PM_STRING = "later than 4pm on";
     static final String CLAIMANT_EVIDENCE_STRING = "and the claimant's evidence in reply if so advised to be uploaded by 4pm on";
+    private final WorkingDayIndicator workingDayIndicator;
+    private final DeadlinesCalculator deadlinesCalculator;
+    private final FeatureToggleService featureToggleService;
 
     public void setSmallClaimsFields(CaseData.CaseDataBuilder<?, ?> updatedData, CaseData caseData) {
         log.info("Setting small claims fields for case {}", caseData.getCcdCaseReference());
@@ -60,13 +59,7 @@ public class SmallClaimsPopulator {
                         "The court may refuse to consider any document which has not been uploaded to the Digital Portal by the above date.")
                 .build());
 
-        if (featureToggleService.isSdoR2Enabled()) {
-            log.debug("SDO R2 is enabled, setting SDO R2 small claims witness statements.");
-            updatedData.sdoR2SmallClaimsWitnessStatementOther(getSdoR2SmallClaimsWitnessStatements());
-        } else {
-            log.debug("SDO R2 is not enabled, setting small claims witness statements.");
-            updatedData.smallClaimsWitnessStatement(getSmallClaimsWitnessStatement());
-        }
+        updatedData.sdoR2SmallClaimsWitnessStatementOther(getSdoR2SmallClaimsWitnessStatements());
 
         if (featureToggleService.isCarmEnabledForCase(caseData)) {
             log.debug(
@@ -85,25 +78,23 @@ public class SmallClaimsPopulator {
                     .build());
         }
 
-        if (featureToggleService.isSdoR2Enabled()) {
-            log.debug("SDO R2 is enabled, setting small claims flight delay.");
-            updatedData.smallClaimsFlightDelay(SmallClaimsFlightDelay.builder()
-                    .smallClaimsFlightDelayToggle(List.of(SHOW))
-                    .relatedClaimsInput("""
-                            In the event that the Claimant(s) or Defendant(s) are aware if other\s
-                            claims relating to the same flight they must notify the court\s
-                            where the claim is being managed within 14 days of receipt of\s
-                            this Order providing all relevant details of those claims including\s
-                            case number(s), hearing date(s) and copy final substantive order(s)\s
-                            if any, to assist the Court with ongoing case management which may\s
-                            include the cases being heard together.""")
-                    .legalDocumentsInput("""
-                            Any arguments as to the law to be applied to this claim, together with\s
-                            copies of legal authorities or precedents relied on, shall be uploaded\s
-                            to the Digital Portal not later than 3 full working days before the\s
-                            final hearing date.""")
-                    .build());
-        }
+        log.debug("SDO R2 is enabled, setting small claims flight delay.");
+        updatedData.smallClaimsFlightDelay(SmallClaimsFlightDelay.builder()
+                .smallClaimsFlightDelayToggle(List.of(SHOW))
+                .relatedClaimsInput("""
+                        In the event that the Claimant(s) or Defendant(s) are aware if other\s
+                        claims relating to the same flight they must notify the court\s
+                        where the claim is being managed within 14 days of receipt of\s
+                        this Order providing all relevant details of those claims including\s
+                        case number(s), hearing date(s) and copy final substantive order(s)\s
+                        if any, to assist the Court with ongoing case management which may\s
+                        include the cases being heard together.""")
+                .legalDocumentsInput("""
+                        Any arguments as to the law to be applied to this claim, together with\s
+                        copies of legal authorities or precedents relied on, shall be uploaded\s
+                        to the Digital Portal not later than 3 full working days before the\s
+                        final hearing date.""")
+                .build());
 
         updatedData.smallClaimsHearing(SmallClaimsHearing.builder()
                 .input1(
@@ -128,46 +119,6 @@ public class SmallClaimsPopulator {
                                 " agreed by the parties and uploaded to the Digital Portal no later than 21 days before the hearing.")
                 .build());
         log.info("Finished setting small claims fields for case {}", caseData.getCcdCaseReference());
-    }
-
-    private SmallClaimsWitnessStatement getSmallClaimsWitnessStatement() {
-        log.debug("Creating small claims witness statement.");
-        return SmallClaimsWitnessStatement.builder()
-                .smallClaimsNumberOfWitnessesToggle(List.of(SHOW))
-                .input1(
-                        "Each party must upload to the Digital Portal copies of all witness statements of the witnesses upon whose" +
-                                " evidence they intend to rely at the hearing not less than 21 days before the hearing.")
-                .input2("2")
-                .input3("2")
-                .input4("For this limitation, a party is counted as a witness.")
-                .text("""
-                        A witness statement must:\s
-                        a) Start with the name of the case and the claim number;\
-                        \s
-                        b) State the full name and address of the witness; \
-                        \s
-                        c) Set out the witness's evidence clearly in numbered paragraphs on numbered pages;\
-                        \s
-                        d) End with this paragraph: 'I believe that the facts stated in this witness \
-                        statement are true. I understand that proceedings for contempt of court may be \
-                        brought against anyone who makes, or causes to be made, a false statement in a \
-                        document verified by a statement of truth without an honest belief in its truth'.\
-                        \s
-                        e) be signed by the witness and dated.\
-                        \s
-                        f) If a witness is unable to read the statement there must be a certificate that \
-                        it has been read or interpreted to the witness by a suitably qualified person and \
-                        at the final hearing there must be an independent interpreter who will not be \
-                        provided by the Court.\
-                        \s
-                        The judge may refuse to allow a witness to give evidence or consider any \
-                        statement of any witness whose statement has not been uploaded to the Digital Portal in \
-                        accordance with the paragraphs above.\
-                        \s
-                        A witness whose statement has been uploaded in accordance with the above must attend \
-                        the hearing. If they do not attend, it will be for the court to decide how much \
-                        reliance, if any, to place on their evidence.""")
-                .build();
     }
 
     private SmallClaimsCreditHire getSmallClaimsCreditHire() {
