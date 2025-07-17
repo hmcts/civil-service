@@ -84,6 +84,8 @@ class FeesPaymentServiceTest {
     private PinInPostConfiguration pinInPostConfiguration;
     @MockBean
     private UpdatePaymentStatusService updatePaymentStatusService;
+    @MockBean
+    private FeatureToggleService featureToggleService;
 
     @BeforeEach
     void before() {

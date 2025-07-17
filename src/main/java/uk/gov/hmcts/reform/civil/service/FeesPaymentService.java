@@ -31,6 +31,7 @@ public class FeesPaymentService {
     private final PinInPostConfiguration pinInPostConfiguration;
     private final PaymentStatusService paymentStatusService;
     private final UpdatePaymentStatusService updatePaymentStatusService;
+    private final FeatureToggleService featureToggleService;
 
     public CardPaymentStatusResponse createGovPaymentRequest(
         FeeType feeType, String caseReference, String authorization) {
@@ -53,7 +54,7 @@ public class FeesPaymentService {
             .amount(feePaymentDetails.getFee().getCalculatedAmountInPence()
                 .divide(BigDecimal.valueOf(100), 2, RoundingMode.UNNECESSARY))
             .currency("GBP")
-            .language(Objects.equals(caseData.getClaimantBilingualLanguagePreference(), "WELSH") ? "cy" : "en")
+            .language(getClaimantSelectedLanguage(caseData))
             .returnUrl(pinInPostConfiguration.getCuiFrontEndUrl() + returnUrlSubPath + caseReference)
             .build();
 
@@ -64,6 +65,11 @@ public class FeesPaymentService {
                 requestDto
             );
         return CardPaymentStatusResponse.from(govPayCardPaymentRequest);
+    }
+
+    private String getClaimantSelectedLanguage(CaseData caseData) {
+        return Objects.equals(caseData.getClaimantBilingualLanguagePreference(), "WELSH" )
+            || (!featureToggleService.isWelshEnabledForMainCase() &&  Objects.equals(caseData.getClaimantBilingualLanguagePreference(), "BOTH")) ? "cy" : "en";
     }
 
     public CardPaymentStatusResponse getGovPaymentRequestStatus(
