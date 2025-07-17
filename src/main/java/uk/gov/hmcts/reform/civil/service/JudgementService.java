@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
@@ -20,7 +19,6 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class JudgementService {
 
     private static final String JUDGEMENT_BY_COURT = "The Judgement request will be reviewed by the court,"
@@ -59,7 +57,6 @@ public class JudgementService {
     }
 
     public BigDecimal ccjJudgmentClaimAmount(CaseData caseData) {
-        log.info("AT ccjJudgmentClaimAmount");
         BigDecimal claimAmount = caseData.getTotalClaimAmount();
         if (isLrFullAdmitRepaymentPlan(caseData)
             || isLrFullAdmitPayImmediately(caseData)) {
@@ -68,7 +65,6 @@ public class JudgementService {
         }
         if (isLipVLipFullAdmitSetDate(caseData)) {
             BigDecimal interest = interestCalculator.calculateInterest(caseData);
-            log.info("add interest lip v lip, full admit and set date, {}", interest);
             claimAmount = claimAmount.add(interest);
         } else {
             if (caseData.isPartAdmitClaimSpec()) {
