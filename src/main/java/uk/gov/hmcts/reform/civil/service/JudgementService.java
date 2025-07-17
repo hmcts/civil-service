@@ -101,8 +101,10 @@ public class JudgementService {
     }
 
     public BigDecimal ccjJudgementSubTotal(CaseData caseData) {
-        if (isLrFullAdmitRepaymentPlan(caseData) || isLRPartAdmitRepaymentPlan(caseData) || isLipvLipPartAdmit(caseData) ||
-            isLrPayImmediatelyPlan(caseData)) {
+        if (isLrFullAdmitRepaymentPlan(caseData)
+            || isLRPartAdmitRepaymentPlan(caseData)
+            || isLipvLipPartAdmit(caseData)
+            || isLrPayImmediatelyPlan(caseData)) {
             return (ccjJudgmentClaimAmount(caseData)
                 .add(ccjJudgmentClaimFee(caseData))
                 .add(ccjJudgmentFixedCost(caseData))).setScale(2);
