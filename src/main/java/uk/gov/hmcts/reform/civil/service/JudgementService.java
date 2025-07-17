@@ -9,7 +9,6 @@ import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -26,7 +25,8 @@ public class JudgementService {
         + " this case will proceed offline, you will receive any further updates by post.";
     private static final String JUDGEMENT_BY_COURT_NOT_OFFLINE = "The judgment request will be processed and a County"
         + " Court Judgment (CCJ) will be issued, you will receive any further updates by email.";
-    private static final String JUDGEMENT_ORDER = "The judgment will order the defendant to pay £%s , including the claim fee and interest, if applicable, as shown:";
+    private static final String JUDGEMENT_ORDER =
+        "The judgment will order the defendant to pay £%s , including the claim fee and interest, if applicable, as shown:";
     private static final String JUDGEMENT_ORDER_V2 = "The judgment will order the defendant to pay £%s"
         + ", including the claim fee, any fixed costs if claimed and interest if applicable, as shown:";
     private final FeatureToggleService featureToggleService;
@@ -101,7 +101,8 @@ public class JudgementService {
     }
 
     public BigDecimal ccjJudgementSubTotal(CaseData caseData) {
-        if (isLrFullAdmitRepaymentPlan(caseData) || isLRPartAdmitRepaymentPlan(caseData) || isLipvLipPartAdmit(caseData) || isLrPayImmediatelyPlan(caseData)) {
+        if (isLrFullAdmitRepaymentPlan(caseData) || isLRPartAdmitRepaymentPlan(caseData) || isLipvLipPartAdmit(caseData) ||
+            isLrPayImmediatelyPlan(caseData)) {
             return (ccjJudgmentClaimAmount(caseData)
                 .add(ccjJudgmentClaimFee(caseData))
                 .add(ccjJudgmentFixedCost(caseData))).setScale(2);
