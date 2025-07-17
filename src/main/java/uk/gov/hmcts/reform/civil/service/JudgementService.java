@@ -63,7 +63,7 @@ public class JudgementService {
             BigDecimal interest = interestCalculator.calculateInterest(caseData);
             claimAmount = claimAmount.add(interest);
         }
-        if (isLipVLipFullAdmitSetDate(caseData)) {
+        if (isLipVLipFullAdmitSetDate(caseData) && featureToggleService.isLrAdmissionBulkEnabled()) {
             BigDecimal interest = interestCalculator.calculateInterest(caseData);
             claimAmount = claimAmount.add(interest);
         } else {
@@ -113,7 +113,7 @@ public class JudgementService {
         } else {
             return (ccjJudgmentClaimAmount(caseData)
                 .add(ccjJudgmentClaimFee(caseData))
-                .add(!isLipVLipFullAdmitSetDate(caseData) ? ccjJudgmentInterest(caseData) : ZERO)
+                .add((!isLipVLipFullAdmitSetDate(caseData) && !featureToggleService.isLrAdmissionBulkEnabled()) ? ccjJudgmentInterest(caseData) : ZERO)
                 .add(ccjJudgmentFixedCost(caseData))).setScale(2);
         }
     }
