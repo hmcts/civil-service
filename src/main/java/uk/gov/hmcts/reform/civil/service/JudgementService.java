@@ -160,11 +160,11 @@ public class JudgementService {
             && isOneVOne(caseData);
     }
 
-    private boolean isLipvLip(CaseData caseData) {
+    public boolean isLipvLip(CaseData caseData) {
         return caseData.isApplicantLiP() && caseData.isRespondent1LiP();
     }
 
-    private boolean isLipvLipPartAdmit(CaseData caseData) {
+    public boolean isLipvLipPartAdmit(CaseData caseData) {
         return isLipvLip(caseData)
             && caseData.isPartAdmitClaimSpec()
             && (caseData.isPayImmediately() || caseData.isPayByInstallment() || caseData.isPayBySetDate());
