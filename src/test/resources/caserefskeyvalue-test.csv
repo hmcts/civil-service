@@ -1,5 +1,5 @@
-case_reference,previousFRCKey,previousFRCValue,previousCourtListKey,previousCourtListValue
-1537718844104601,walesFRCList,"northwales",northWalesCourtList,"FR_northwalesList_3"
-1600206369014522,walesFRCList,"northwales",northWalesCourtList,"FR_northwalesList_3"
-1600433785706016,walesFRCList,"northwales",northWalesCourtList,"FR_northwalesList_3"
-1601560955449453,walesFRCList,"northwales",northWalesCourtList,"FR_northwalesList_3"
+case_reference,previousHRKey,previousHCValue,previousCourtListKey,previousCourtListValue
+1537718844104601,walesHRList,"northwales",northWalesCourtList,"FR_northwalesList_3"
+1600206369014522,walesHRList,"northwales",northWalesCourtList,"FR_northwalesList_3"
+1600433785706016,walesHRList,"northwales",northWalesCourtList,"FR_northwalesList_3"
+1601560955449453,walesHRList,"northwales",northWalesCourtList,"FR_northwalesList_3"
