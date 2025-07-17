@@ -198,7 +198,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             .put(callbackKey(MID, "experts"), this::validateRespondentExperts)
             .put(callbackKey(MID, "witnesses"), this::validateRespondentWitnesses)
             .put(callbackKey(MID, "upload"), this::emptyCallbackResponse)
-            .put(callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth)
+            .put(callbackKey(MID, "statement-of-truth"), this::emptyCallbackResponse)
             .put(callbackKey(MID, "validate-payment-date"), this::validateRespondentPaymentDate)
             .put(callbackKey(MID, "specCorrespondenceAddress"), this::validateCorrespondenceApplicantAddress)
             .put(callbackKey(MID, "determineLoggedInSolicitor"), this::determineLoggedInSolicitor)
@@ -1407,21 +1407,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             );
         }
         return Collections.emptyList();
-    }
-
-    private CallbackResponse resetStatementOfTruth(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-
-        // resetting statement of truth field, this resets in the page, but the data is still sent to the db.
-        // setting null here does not clear, need to overwrite with value.
-        // must be to do with the way XUI cache data entered through the lifecycle of an event.
-        CaseData updatedCaseData = caseData.toBuilder()
-            .uiStatementOfTruth(StatementOfTruth.builder().role("").build())
-            .build();
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseData.toMap(objectMapper))
-            .build();
     }
 
     private CallbackResponse setApplicantResponseDeadline(CallbackParams callbackParams) {
