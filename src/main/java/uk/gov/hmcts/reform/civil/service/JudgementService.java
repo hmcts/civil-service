@@ -28,7 +28,8 @@ public class JudgementService {
     private static final String JUDGEMENT_BY_COURT_NOT_OFFLINE = "The judgment request will be processed and a County"
         + " Court Judgment (CCJ) will be issued, you will receive any further updates by email.";
     private static final String JUDGEMENT_ORDER = "The judgment will order the defendant to pay £%s , including the claim fee and interest, if applicable, as shown:";
-    private static final String JUDGEMENT_ORDER_V2 = "The judgment will order the defendant to pay £%s which include the amounts shown:";
+    private static final String JUDGEMENT_ORDER_V2 = "The judgment will order the defendant to pay £%s"
+        + ", including the claim fee, any fixed costs if claimed and interest if applicable, as shown:";
     private final FeatureToggleService featureToggleService;
     private final InterestCalculator interestCalculator;
 
@@ -74,7 +75,7 @@ public class JudgementService {
                 claimAmount = caseData.getRespondToAdmittedClaimOwingAmountPounds();
             }
         }
-        return claimAmount;
+        return claimAmount.setScale(2);
     }
 
     public BigDecimal ccjJudgmentClaimFee(CaseData caseData) {
@@ -110,14 +111,14 @@ public class JudgementService {
 
     public BigDecimal ccjJudgementSubTotal(CaseData caseData) {
         if (isLrFullAdmitRepaymentPlan(caseData) || isLRPartAdmitRepaymentPlan(caseData) || isLrPayImmediatelyPlan(caseData)) {
-            return ccjJudgmentClaimAmount(caseData)
+            return (ccjJudgmentClaimAmount(caseData)
                 .add(ccjJudgmentClaimFee(caseData))
-                .add(ccjJudgmentFixedCost(caseData));
+                .add(ccjJudgmentFixedCost(caseData))).setScale(2);
         } else {
-            return ccjJudgmentClaimAmount(caseData)
+            return (ccjJudgmentClaimAmount(caseData)
                 .add(ccjJudgmentClaimFee(caseData))
                 .add(!isLipVLipFullAdmitSetDate(caseData) ? ccjJudgmentInterest(caseData) : ZERO)
-                .add(ccjJudgmentFixedCost(caseData));
+                .add(ccjJudgmentFixedCost(caseData))).setScale(2);
         }
     }
 
@@ -132,7 +133,7 @@ public class JudgementService {
             boolean hasPaymentOption = caseData.isPayImmediately() || caseData.isPayByInstallment() || caseData.isPayBySetDate();
             if (featureToggleService.isLrAdmissionBulkEnabled()
                 && hasPaymentOption) {
-                return String.format(JUDGEMENT_ORDER_V2, ccjJudgementSubTotal(caseData));
+                return String.format(JUDGEMENT_ORDER_V2, ccjJudgementSubTotal(caseData).toString());
             }
             if (featureToggleService.isJudgmentOnlineLive()
                 && hasPaymentOption) {
@@ -142,7 +143,7 @@ public class JudgementService {
         } else {
             return String.format(
                 isLrFullAdmitRepaymentPlan(caseData) || isLrPayImmediatelyPlan(caseData)
-                    ? JUDGEMENT_ORDER_V2 : JUDGEMENT_ORDER, ccjJudgementSubTotal(caseData));
+                    ? JUDGEMENT_ORDER_V2 : JUDGEMENT_ORDER, ccjJudgementSubTotal(caseData).toString());
         }
     }
 
