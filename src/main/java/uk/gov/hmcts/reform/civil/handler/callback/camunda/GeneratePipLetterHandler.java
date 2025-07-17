@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.notification.handlers.createclaimspecafterpayment.claimcontinuingonline;
+package uk.gov.hmcts.reform.civil.handler.callback.camunda;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
