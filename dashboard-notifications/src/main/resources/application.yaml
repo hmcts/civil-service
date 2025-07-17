@@ -20,10 +20,10 @@ logging:
       dao: debug
       transaction: debug
       jdbc.core.JdbcTemplate: info
-    #    org.hibernate:
-    #      SQL: debug
-    #      type.descriptor.sql.BasicBinder: debug
-    #      engine: debug
+      org.hibernate:
+          SQL: debug
+          type.descriptor.sql.BasicBinder: debug
+          engine: debug
     uk.gov.hmcts.reform: debug
 config:
   allowedJurisdictions: ${ALLOWED_JURISDICTIONS:wa,ia,sscs,civil,PUBLICLAW,PRIVATELAW,EMPLOYMENT}
