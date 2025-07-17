@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
+  <!--
+   CVE-2025-46392 is present due to a transitive dependency on commons-configuration:1.8
+   via Archaius (from spring-cloud-starter-netflix-hystrix:2.2.10.RELEASE).
+   Archaius config loading is not used in this project, so the CVE does not apply in our context.
+ -->
   <suppress until="2025-09-04">
     <cve>CVE-2024-38820</cve>
     <cve>CVE-2024-22259</cve>
@@ -10,11 +15,6 @@
     <cve>CVE-2025-49125</cve>
     <cve>CVE-2025-48976</cve>
     <cve>CVE-2024-47554</cve>
-    <notes>
-      CVE-2025-46392 is present due to a transitive dependency on commons-configuration:1.8 via Archaius (from spring-cloud-starter-netflix-hystrix:2.2.10.RELEASE).
-      We do not use Archaius configuration loading in our application.
-      This is safe in our usage context.
-    </notes>
-    <cve>CVE-2025-46392</cve>
+    <cve >CVE-2025-46392</cve>
   </suppress>
 </suppressions>
