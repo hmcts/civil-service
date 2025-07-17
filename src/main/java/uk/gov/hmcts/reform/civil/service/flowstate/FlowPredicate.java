@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CaseDataParent;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -19,6 +20,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_L
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.COUNTER_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -177,19 +179,40 @@ public class FlowPredicate {
         return false;
     }
 
-    public static final Predicate<CaseData> awaitingResponsesNonFullDefenceReceived = FlowPredicate::getPredicateForAwaitingResponsesNonFullDefenceReceived;
+    public static final Predicate<CaseData> awaitingResponsesFullAdmitReceived = FlowPredicate::getPredicateForAwaitingResponsesFullAdmitReceived;
 
-    private static boolean getPredicateForAwaitingResponsesNonFullDefenceReceived(CaseData caseData) {
+    private static boolean getPredicateForAwaitingResponsesFullAdmitReceived(CaseData caseData) {
         MultiPartyScenario scenario = Objects.requireNonNull(getMultiPartyScenario(caseData));
 
         if (scenario == MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP) {
-            boolean respondent1NonFullDefence = caseData.getRespondent1ClaimResponseType() != null
+            boolean respondent1FullDefence = caseData.getRespondent1ClaimResponseType() != null
                 && caseData.getRespondent2ClaimResponseType() == null
-                && !FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseType());
-            boolean respondent2NonFullDefence = caseData.getRespondent1ClaimResponseType() == null
+                && FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseType());
+            boolean respondent2FullDefence = caseData.getRespondent1ClaimResponseType() == null
                 && caseData.getRespondent2ClaimResponseType() != null
-                && !FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseType());
-            return respondent1NonFullDefence || respondent2NonFullDefence;
+                && FULL_ADMISSION.equals(caseData.getRespondent2ClaimResponseType());
+            return respondent1FullDefence || respondent2FullDefence;
+        }
+
+        return false;
+    }
+
+    public static final Predicate<CaseData> awaitingResponsesNonFullDefenceOrFullAdmitReceived
+        = FlowPredicate::getPredicateForAwaitingResponsesNonFullDefenceOrFullAdmitReceived;
+
+    private static boolean getPredicateForAwaitingResponsesNonFullDefenceOrFullAdmitReceived(CaseData caseData) {
+        MultiPartyScenario scenario = Objects.requireNonNull(getMultiPartyScenario(caseData));
+
+        if (scenario == MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP) {
+            boolean respondent1NonFullDefenceOrFullAdmit = caseData.getRespondent1ClaimResponseType() != null
+                && caseData.getRespondent2ClaimResponseType() == null
+                && !FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseType())
+                && !FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseType());
+            boolean respondent2NonFullDefenceOrFullAdmit = caseData.getRespondent1ClaimResponseType() == null
+                && caseData.getRespondent2ClaimResponseType() != null
+                && !FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseType())
+                && !FULL_ADMISSION.equals(caseData.getRespondent2ClaimResponseType());
+            return respondent1NonFullDefenceOrFullAdmit || respondent2NonFullDefenceOrFullAdmit;
         }
 
         return false;
@@ -458,6 +481,10 @@ public class FlowPredicate {
     public static final Predicate<CaseData> isRespondentResponseLangIsBilingual =
         CaseDataParent::isRespondentResponseBilingual;
 
+    public static final Predicate<CaseData> onlyInitialRespondentResponseLangIsBilingual = caseData ->
+        // dependent lip selected bilingual during response
+        caseData.getChangeLanguagePreference() == null && caseData.isRespondentResponseBilingual();
+
     // This field is used in LR ITP, prevent going another path in preview
     public static final Predicate<CaseData> isOneVOneResponseFlagSpec = caseData ->
         caseData.getShowResponseOneVOneFlag() != null;
@@ -474,4 +501,11 @@ public class FlowPredicate {
         caseData.isRespondent1LiP()
             || caseData.isRespondent2LiP()
             || caseData.isApplicantNotRepresented();
+
+    public static final Predicate<CaseData> isDefendantNoCOnlineForCaseAfterJBA = caseData ->
+        caseData.isLipCase()
+            && caseData.getActiveJudgment() != null
+            && JudgmentType.JUDGMENT_BY_ADMISSION.equals(caseData.getActiveJudgment().getType())
+            && caseData.getTakenOfflineDate() != null
+            && caseData.getChangeOfRepresentation() != null;
 }

@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sendandreply.RolePool;
 import uk.gov.hmcts.reform.civil.enums.sendandreply.SendAndReplyOption;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -91,6 +92,11 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
             builder.messagesToReplyTo(messageService.createMessageSelectionList(caseData.getMessages()));
         }
 
+        if (featureToggleService.isWelshEnabledForMainCase()
+            && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
+            builder.bilingualHint(YesOrNo.YES);
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(builder.sendAndReplyOption(null).build().toMap(objectMapper)).build();
     }
@@ -112,7 +118,7 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
                 caseData.getMessages(),
                 caseData.getSendMessageMetadata(),
                 caseData.getSendMessageContent(),
-                userAuth
+                userAuth, caseData
             );
 
             builder.messages(messagesNew)
@@ -123,7 +129,7 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
                 caseData.getMessages(),
                 caseData.getMessagesToReplyTo().getValue().getCode(),
                 caseData.getMessageReplyMetadata(),
-                userAuth
+                userAuth, caseData
             );
             builder.messages(messagesNew)
                 .messagesToReplyTo(null)

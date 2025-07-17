@@ -56,7 +56,7 @@ public class HearingDetailsMapper {
         return isHearingInWales(caseData) && isWelshHearingSelected(caseData);
     }
 
-    private static boolean isHearingInWales(CaseData caseData) {
+    public static boolean isHearingInWales(CaseData caseData) {
         if (Objects.nonNull(caseData.getCaseManagementLocation()) && Objects.nonNull(caseData.getCaseManagementLocation()
                                                                                          .getRegion())) {
             return caseData.getCaseManagementLocation().getRegion().equals(WELSH_REGION_ID);

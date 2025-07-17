@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseAssignmentUserRolesResource;
 import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
-import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.DebtPaymentOptions;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
@@ -34,6 +33,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -54,15 +54,18 @@ import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServic
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceConstants.INTERMEDIATE_CLAIM_TRACK;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceConstants.MULTI_CLAIM_TRACK;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceConstants.SMALL_CLAIM_TRACK;
+import static uk.gov.hmcts.reform.civil.service.LocationService.settleDiscontinueStates;
 import static uk.gov.hmcts.reform.civil.service.LocationService.statesBeforeSDO;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class InitiateGeneralApplicationService {
 
+    public static final int GA_CLAIM_DEADLINE_EXTENSION_MONTHS = 24;
     private final InitiateGeneralApplicationServiceHelper helper;
     private final GeneralAppsDeadlinesCalculator deadlinesCalculator;
     private final FeatureToggleService featureToggleService;
@@ -84,6 +87,10 @@ public class InitiateGeneralApplicationService {
 
     private CaseData populateGeneralApplicationData(CaseData.CaseDataBuilder<?, ?> dataBuilder, List<Element<GeneralApplication>> applications) {
         return dataBuilder
+            .claimDismissedDeadline(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(
+                GA_CLAIM_DEADLINE_EXTENSION_MONTHS,
+                LocalDate.now()
+            ))
             .generalApplications(applications)
             .generalAppType(GAApplicationType.builder().build())
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().build())
@@ -117,6 +124,7 @@ public class InitiateGeneralApplicationService {
         setBusinessProcess(caseData, userDetails, applicationBuilder);
         setCaseNameGaInternal(caseData, applicationBuilder);
         setFeatureToggles(caseData, applicationBuilder);
+        setDates(caseData, applicationBuilder);
         return finalizeApplication(applicationBuilder.build(), caseData, userDetails);
     }
 
@@ -225,8 +233,15 @@ public class InitiateGeneralApplicationService {
         );
     }
 
-    private boolean hasSDOBeenMade(CaseState state) {
-        return !statesBeforeSDO.contains(state);
+    private boolean hasSDOBeenMade(CaseData caseData) {
+        if (featureToggleService.isQueryManagementLRsEnabled()) {
+            return (!statesBeforeSDO.contains(caseData.getCcdState())
+                && !settleDiscontinueStates.contains(caseData.getCcdState()))
+                || (!statesBeforeSDO.contains(caseData.getPreviousCCDState())
+                && settleDiscontinueStates.contains(caseData.getCcdState()));
+        } else {
+            return !statesBeforeSDO.contains(caseData.getCcdState());
+        }
     }
 
     private void setGeneralAppEvidenceDocument(CaseData caseData, GeneralApplication.GeneralApplicationBuilder applicationBuilder) {
@@ -240,6 +255,7 @@ public class InitiateGeneralApplicationService {
     }
 
     private void setPartyNames(CaseData caseData, GeneralApplication.GeneralApplicationBuilder applicationBuilder) {
+        applicationBuilder.emailPartyReference(buildPartiesReferencesEmailSubject(caseData));
         applicationBuilder.claimant1PartyName(getPartyNameBasedOnType(caseData.getApplicant1()));
         applicationBuilder.defendant1PartyName(getPartyNameBasedOnType(caseData.getRespondent1()));
         if (YES.equals(caseData.getAddApplicant2())) {
@@ -253,6 +269,10 @@ public class InitiateGeneralApplicationService {
     private void setCaseType(CaseData caseData, GeneralApplication.GeneralApplicationBuilder applicationBuilder) {
         final var caseType = SPEC_CLAIM.equals(caseData.getCaseAccessCategory()) ? CaseCategory.SPEC_CLAIM : CaseCategory.UNSPEC_CLAIM;
         applicationBuilder.generalAppSuperClaimType(caseType.name()).caseAccessCategory(caseType);
+    }
+
+    private void setDates(CaseData caseData, GeneralApplication.GeneralApplicationBuilder applicationBuilder) {
+        applicationBuilder.mainCaseSubmittedDate(caseData.getSubmittedDate());
     }
 
     private void setRespondentAgreement(CaseData caseData, GeneralApplication.GeneralApplicationBuilder applicationBuilder) {
@@ -287,7 +307,7 @@ public class InitiateGeneralApplicationService {
     }
 
     private void setCaseManagementLocation(CaseData caseData, String authToken, GeneralApplication.GeneralApplicationBuilder applicationBuilder) {
-        if (featureToggleService.isGaForLipsEnabled() && caseContainsLiP(caseData) && hasSDOBeenMade(caseData.getCcdState())) {
+        if (featureToggleService.isGaForLipsEnabled() && caseContainsLiP(caseData) && hasSDOBeenMade(caseData)) {
             setLocationDetails(caseData, authToken, applicationBuilder);
         } else {
             setDefaultLocation(caseData, authToken, applicationBuilder);
@@ -320,7 +340,7 @@ public class InitiateGeneralApplicationService {
             caseLocation.getLeft().setPostcode(locationDetails.getPostcode());
         }
         applicationBuilder.caseManagementLocation(caseLocation.getLeft());
-        applicationBuilder.locationName(hasSDOBeenMade(caseData.getCcdState()) ? caseData.getLocationName() : caseLocation.getLeft().getSiteName());
+        applicationBuilder.locationName(hasSDOBeenMade(caseData) ? caseData.getLocationName() : caseLocation.getLeft().getSiteName());
         applicationBuilder.isCcmccLocation(caseLocation.getRight() ? YES : NO);
     }
 
@@ -377,9 +397,7 @@ public class InitiateGeneralApplicationService {
             }
             applicationBuilder.certOfSC(caseData.getCertOfSC());
         }
-        if (featureToggleService.isMintiEnabled()) {
-            applicationBuilder.gaWaTrackLabel(getClaimTrackForTaskName(caseData));
-        }
+        applicationBuilder.gaWaTrackLabel(getClaimTrackForTaskName(caseData));
     }
 
 }

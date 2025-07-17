@@ -1,9 +1,11 @@
 package uk.gov.hmcts.reform.civil.helpers.judgmentsonline;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
@@ -29,21 +31,42 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.JudgementService;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
+import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_ADMISSION;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @ExtendWith(MockitoExtension.class)
 class JudgmentByAdmissionMapperTest {
 
-    private RoboticsAddressMapper addressMapper = new RoboticsAddressMapper(new AddressLinesMapper());
-    private JudgmentByAdmissionOnlineMapper judgmentByAdmissionOnlineMapper = new JudgmentByAdmissionOnlineMapper(addressMapper);
+    private RoboticsAddressMapper addressMapper;
+    @Mock
+    private FeatureToggleService featureToggleService;
+    private InterestCalculator interestCalculator;
+    private JudgementService judgementService;
+    private JudgmentByAdmissionOnlineMapper judgmentByAdmissionOnlineMapper;
+
+    @BeforeEach
+    void setUp() {
+        when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(false);
+
+        addressMapper = new RoboticsAddressMapper(new AddressLinesMapper());
+        interestCalculator = new InterestCalculator();
+        judgementService = new JudgementService(featureToggleService, interestCalculator);
+        judgmentByAdmissionOnlineMapper =
+            new JudgmentByAdmissionOnlineMapper(addressMapper, judgementService, interestCalculator);
+    }
 
     @Test
     void testIfJudgmentByAdmission() {
@@ -59,15 +82,16 @@ class JudgmentByAdmissionMapperTest {
                                       .build())
             .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
             .ccjPaymentDetails(buildCCJPaymentDetails())
+            .totalInterest(BigDecimal.valueOf(10))
             .respondent1(PartyBuilder.builder().individual().build())
             .build();
         JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData);
 
         assertNotNull(activeJudgment);
         assertEquals(JudgmentState.ISSUED, activeJudgment.getState());
-        assertEquals("14000", activeJudgment.getOrderedAmount());
+        assertEquals("15000", activeJudgment.getOrderedAmount());
         assertEquals("1000", activeJudgment.getCosts());
-        assertEquals("15000", activeJudgment.getTotalAmount());
+        assertEquals("16000", activeJudgment.getTotalAmount());
         assertEquals(YesOrNo.YES, activeJudgment.getIsRegisterWithRTL());
         assertEquals(JudgmentRTLStatus.ISSUED.getRtlState(), activeJudgment.getRtlState());
         assertEquals(LocalDate.now(), activeJudgment.getIssueDate());
@@ -81,6 +105,87 @@ class JudgmentByAdmissionMapperTest {
 
         assertEquals("Mr. John Rambo", caseData.getJoDefendantName1());
         assertEquals(PaymentPlanSelection.PAY_IMMEDIATELY, caseData.getJoPaymentPlanSelected());
+
+    }
+
+    @Test
+    void testIfJudgmentByAdmissionLrBulkAdmission() {
+        when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
+        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+            .respondent1Represented(YES)
+            .specRespondent1Represented(YES)
+            .applicant1Represented(YES)
+            .respondent1ClaimResponseTypeForSpec(FULL_ADMISSION)
+            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
+            .defendantDetailsSpec(DynamicList.builder()
+                                      .value(DynamicListElement.builder()
+                                                 .label("John Doe")
+                                                 .build())
+                                      .build())
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
+            .ccjPaymentDetails(buildCCJPaymentDetails())
+            .totalInterest(BigDecimal.valueOf(10))
+            .respondent1(PartyBuilder.builder().individual().build())
+            .build();
+        JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData);
+
+        assertNotNull(activeJudgment);
+        assertEquals(JudgmentState.ISSUED, activeJudgment.getState());
+        assertEquals("14000", activeJudgment.getOrderedAmount());
+
+    }
+
+    @Test
+    void testIfJudgmentByPartAdmissionLrPayImmediatelyNotAddInterest() {
+        when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
+        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+            .respondent1Represented(YES)
+            .specRespondent1Represented(YES)
+            .applicant1Represented(YES)
+            .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
+            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+            .defendantDetailsSpec(DynamicList.builder()
+                                      .value(DynamicListElement.builder()
+                                                 .label("John Doe")
+                                                 .build())
+                                      .build())
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
+            .ccjPaymentDetails(buildCCJPaymentDetails())
+            .totalInterest(BigDecimal.valueOf(10))
+            .respondent1(PartyBuilder.builder().individual().build())
+            .build();
+        JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData);
+
+        assertNotNull(activeJudgment);
+        assertEquals(JudgmentState.ISSUED, activeJudgment.getState());
+        assertEquals("14000", activeJudgment.getOrderedAmount());
+
+    }
+
+    @Test
+    void testIfJudgmentByFullAdmissionLrPayImmeidatelyNotAddInterest() {
+        when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
+        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+            .respondent1Represented(YES)
+            .specRespondent1Represented(YES)
+            .applicant1Represented(YES)
+            .respondent1ClaimResponseTypeForSpec(FULL_ADMISSION)
+            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+            .defendantDetailsSpec(DynamicList.builder()
+                                      .value(DynamicListElement.builder()
+                                                 .label("John Doe")
+                                                 .build())
+                                      .build())
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
+            .ccjPaymentDetails(buildCCJPaymentDetails())
+            .totalInterest(BigDecimal.valueOf(10))
+            .respondent1(PartyBuilder.builder().individual().build())
+            .build();
+        JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData);
+
+        assertNotNull(activeJudgment);
+        assertEquals(JudgmentState.ISSUED, activeJudgment.getState());
+        assertEquals("14000", activeJudgment.getOrderedAmount());
 
     }
 

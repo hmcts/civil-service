@@ -8,7 +8,6 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -22,6 +21,7 @@ import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.HearingFeeUtils;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import java.util.List;
 import java.util.Map;
@@ -51,7 +51,7 @@ public class HearingScheduledClaimantNotificationHandler extends CallbackHandler
         List.of(CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT,
                 CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT_HMC);
     public static final String TASK_ID = "GenerateDashboardNotificationHearingScheduledClaimant";
-    private final DashboardApiClient dashboardApiClient;
+    private final DashboardScenariosService dashboardScenariosService;
     private final DashboardNotificationsParamsMapper mapper;
     private final FeatureToggleService toggleService;
     private final LocationReferenceDataService locationRefDataService;
@@ -81,6 +81,7 @@ public class HearingScheduledClaimantNotificationHandler extends CallbackHandler
 
     private CallbackResponse configureScenarioForHearingScheduled(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        final String caseId = String.valueOf(caseData.getCcdCaseReference());
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         List<LocationRefData> locations = (locationRefDataService
                 .getHearingCourtLocations(authToken));
@@ -90,8 +91,9 @@ public class HearingScheduledClaimantNotificationHandler extends CallbackHandler
         }
 
         if (caseData.isApplicant1NotRepresented()) {
-            dashboardApiClient.recordScenario(caseData.getCcdCaseReference().toString(),
-                    SCENARIO_AAA6_CP_HEARING_SCHEDULED_CLAIMANT.getScenario(), authToken,
+            dashboardScenariosService.recordScenarios(
+                    authToken,
+                    SCENARIO_AAA6_CP_HEARING_SCHEDULED_CLAIMANT.getScenario(), caseId,
                     ScenarioRequestParams.builder().params(
                             mapper.mapCaseDataToParams(caseData)).build()
             );
@@ -114,8 +116,8 @@ public class HearingScheduledClaimantNotificationHandler extends CallbackHandler
                 || (isAutoHearingNotice && hearingFeeRequired(camundaVars.getHearingType())));
 
         if (shouldRecordFeeScenario) {
-            dashboardApiClient.recordScenario(caseData.getCcdCaseReference().toString(),
-                                              SCENARIO_AAA6_CP_HEARING_FEE_REQUIRED_CLAIMANT.getScenario(), authToken,
+            dashboardScenariosService.recordScenarios(authToken,
+                                              SCENARIO_AAA6_CP_HEARING_FEE_REQUIRED_CLAIMANT.getScenario(), caseId,
                                               ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build()
             );
         }
@@ -123,14 +125,14 @@ public class HearingScheduledClaimantNotificationHandler extends CallbackHandler
         if (caseData.isApplicant1NotRepresented()) {
             if (AllocatedTrack.FAST_CLAIM.name().equals(caseData.getAssignedTrack())
                 && isNull(caseData.getTrialReadyApplicant())) {
-                dashboardApiClient.recordScenario(caseData.getCcdCaseReference().toString(),
-                                                  SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_RELIST_HEARING_CLAIMANT.getScenario(), authToken,
+                dashboardScenariosService.recordScenarios(authToken,
+                                                  SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_RELIST_HEARING_CLAIMANT.getScenario(), caseId,
                                                   ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build()
                 );
             }
 
-            dashboardApiClient.recordScenario(caseData.getCcdCaseReference().toString(),
-                                              SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOAD_CLAIMANT.getScenario(), authToken,
+            dashboardScenariosService.recordScenarios(authToken,
+                                              SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOAD_CLAIMANT.getScenario(), caseId,
                                               ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build()
             );
         }

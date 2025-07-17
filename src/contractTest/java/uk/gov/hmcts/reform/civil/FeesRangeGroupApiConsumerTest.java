@@ -69,8 +69,8 @@ public class FeesRangeGroupApiConsumerTest extends BaseContractTest {
         assertThat(fee[0].getFeeVersions().get(0).getApprovedBy(), is(equalTo("39907")));
         assertThat(fee[0].getFeeVersions().get(0).getDescription(), is(equalTo("Counter Claim - 5000.01 up to 10000 GBP")));
         assertThat(fee[0].getFeeVersions().get(0).getStatus(), is(equalTo("approved")));
-        assertThat(fee[0].getFeeVersions().get(0).getValidFrom().toString(), is(equalTo("2015-03-09T00:00Z")));
-        assertThat(fee[0].getFeeVersions().get(0).getValidTo().toString(), is(equalTo("2022-03-09T00:00Z")));
+        assertThat(fee[0].getFeeVersions().get(0).getValidFrom().toString(), is(equalTo("2015-03-09")));
+        assertThat(fee[0].getFeeVersions().get(0).getValidTo().toString(), is(equalTo("2022-03-09")));
         assertThat(fee[0].getFeeVersions().get(0).getFlatAmount().getAmount(), is(equalTo(BigDecimal.valueOf(455))));
         assertThat(fee[0].getFeeVersions().get(0).getMemoLine(), is(equalTo("RECEIPT OF FEES - Civil issue money")));
         assertThat(fee[0].getFeeVersions().get(0).getStatutoryInstrument(), is(equalTo("2014 No 874")));
@@ -152,12 +152,8 @@ public class FeesRangeGroupApiConsumerTest extends BaseContractTest {
             .stringType("si_ref_id", "1.1h")
             .stringType("status", "approved")
             .stringType("statutory_instrument", "2014 No 874")
-            .stringMatcher("valid_from",
-                "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{1,6}\\+\\d{2}:\\d{2})$",
-                "2015-03-09T00:00:00.000+00:00")
-            .stringMatcher("valid_to",
-                "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{1,6}\\+\\d{2}:\\d{2})$",
-                "2022-03-09T00:00:00.000+00:00")
+                .date("valid_from", "2015-03-09")
+                .date("valid_to", "2022-03-09")
             .numberType("version", 2);
     }
 }

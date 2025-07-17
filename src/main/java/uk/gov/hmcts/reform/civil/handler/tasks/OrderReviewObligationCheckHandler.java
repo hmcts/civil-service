@@ -17,7 +17,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.OrderReviewObligationSearchService;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -32,26 +32,24 @@ public class OrderReviewObligationCheckHandler extends BaseExternalTaskHandler {
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
-        if (featureToggleService.isCaseEventsEnabled()) {
-            List<CaseDetails> cases = caseSearchService.getCases();
-            log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
+        Set<CaseDetails> cases = caseSearchService.getCases();
+        log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
 
-            cases.forEach(caseDetails -> {
-                try {
-                    CaseData caseData = caseDetailsConverter.toCaseData(coreCaseDataService.getCase(caseDetails.getId()));
-                    LocalDate currentDate = LocalDate.now();
+        cases.forEach(caseDetails -> {
+            try {
+                CaseData caseData = caseDetailsConverter.toCaseData(coreCaseDataService.getCase(caseDetails.getId()));
+                LocalDate currentDate = LocalDate.now();
 
-                    caseData.getStoredObligationData().stream()
-                        .map(Element::getValue)
-                        .filter(data -> !data.getObligationDate().isAfter(currentDate) && YesOrNo.NO.equals(data.getObligationWATaskRaised()))
-                        .forEach(data -> applicationEventPublisher.publishEvent(new OrderReviewObligationCheckEvent(
-                            caseDetails.getId())));
+                caseData.getStoredObligationData().stream()
+                    .map(Element::getValue)
+                    .filter(data -> !data.getObligationDate().isAfter(currentDate) && YesOrNo.NO.equals(data.getObligationWATaskRaised()))
+                    .forEach(data -> applicationEventPublisher.publishEvent(new OrderReviewObligationCheckEvent(
+                        caseDetails.getId())));
 
-                } catch (Exception e) {
-                    log.error("Updating case with id: '{}' failed", caseDetails.getId(), e);
-                }
-            });
-        }
+            } catch (Exception e) {
+                log.error("Updating case with id: '{}' failed", caseDetails.getId(), e);
+            }
+        });
         return ExternalTaskData.builder().build();
     }
 }

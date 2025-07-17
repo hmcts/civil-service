@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -73,11 +74,7 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
 
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
-        log.info("stitchEnabled {}, isLipvLipOneVOne {} isLipVLipEnabled {} for case {}", stitchEnabled,
-                 caseData.isLipvLipOneVOne(), featureToggleService.isLipVLipEnabled(), caseId);
-
         if (stitchEnabled && caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()) {
-            log.info("if condition for case {}", caseId);
             List<DocumentMetaData> documentMetaDataList = fetchDocumentsToStitch(caseData, sealedForm);
             log.info("no of document sending for stitch {} for caseId {}", documentMetaDataList.size(), caseId);
             if (documentMetaDataList.size() > 1) {
@@ -89,31 +86,29 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
                                                                     DocumentType.DEFENDANT_DEFENCE,
                                                                     authToken);
                 log.info("Civil stitch service for response cui sealed form {} for caseId {}", stitchedDocument, caseId);
-
-                caseDataBuilder.respondent1ClaimResponseDocumentSpec(stitchedDocument)
-                    .systemGeneratedCaseDocuments(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
-                        stitchedDocument,  caseData));
-                assignCategoryId.assignCategoryIdToCaseDocument(stitchedDocument, DocCategory.DEF1_DEFENSE_DQ.getValue());
-            } else {
-                log.info("Inner else condition for case {}", caseData.getCcdCaseReference());
-                addToSystemGeneratedDocuments(caseDataBuilder, sealedForm, caseData);
+                addToSystemGeneratedDocuments(caseDataBuilder, stitchedDocument, caseData);
             }
-        } else {
-            log.info("Outer else condition for case {}", caseData.getCcdCaseReference());
-            addToSystemGeneratedDocuments(caseDataBuilder, sealedForm, caseData);
         }
+        addToSystemGeneratedDocuments(caseDataBuilder, sealedForm, caseData);
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
 
-    private void addToSystemGeneratedDocuments(CaseData.CaseDataBuilder<?, ?> caseDataBuilder, CaseDocument sealedForm, CaseData caseData) {
-        caseDataBuilder.respondent1ClaimResponseDocumentSpec(sealedForm)
-            .systemGeneratedCaseDocuments(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
-                sealedForm,
-                caseData
-            ));
-        assignCategoryId.assignCategoryIdToCaseDocument(sealedForm, DocCategory.DEF1_DEFENSE_DQ.getValue());
+    private void addToSystemGeneratedDocuments(CaseData.CaseDataBuilder<?, ?> caseDataBuilder, CaseDocument document, CaseData caseData) {
+        if (featureToggleService.isWelshEnabledForMainCase() && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
+            caseDataBuilder.respondent1ClaimResponseDocumentSpec(document)
+                .bilingualHint(YesOrNo.YES)
+                .preTranslationDocuments(List.of(ElementUtils.element(document)));
+        } else {
+            caseDataBuilder.respondent1ClaimResponseDocumentSpec(document)
+                .systemGeneratedCaseDocuments(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
+                    document,
+                    caseData
+                ));
+            assignCategoryId.assignCategoryIdToCaseDocument(document, DocCategory.DEF1_DEFENSE_DQ.getValue());
+        }
     }
 
     private List<DocumentMetaData> fetchDocumentsToStitch(CaseData caseData, CaseDocument sealedForm) {
@@ -124,16 +119,25 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
                 "Sealed Claim form",
                 LocalDate.now().toString()
         ));
-        ElementUtils.unwrapElements(caseData.getSystemGeneratedCaseDocuments()).stream()
+        if (featureToggleService.isWelshEnabledForMainCase() && caseData.getRespondent1OriginalDqDoc() != null) {
+            documents.add(
+                new DocumentMetaData(
+                    caseData.getRespondent1OriginalDqDoc().getDocumentLink(),
+                    "Directions Questionnaire",
+                    LocalDate.now().toString()
+                )
+            );
+        } else {
+            ElementUtils.unwrapElements(caseData.getSystemGeneratedCaseDocuments()).stream()
                 .filter(cd -> DIRECTIONS_QUESTIONNAIRE.equals(cd.getDocumentType()))
                 .map(cd ->
-                        new DocumentMetaData(
-                                cd.getDocumentLink(),
-                                "Directions Questionnaire",
-                                LocalDate.now().toString()
-                        )
+                         new DocumentMetaData(
+                             cd.getDocumentLink(),
+                             "Directions Questionnaire",
+                             LocalDate.now().toString()
+                         )
                 ).forEach(documents::add);
-
+        }
         return documents;
     }
 }

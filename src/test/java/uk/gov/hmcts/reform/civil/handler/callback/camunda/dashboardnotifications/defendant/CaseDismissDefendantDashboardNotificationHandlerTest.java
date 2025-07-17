@@ -9,18 +9,20 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios;
-import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant.CaseDismissDefendantDashboardNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
+import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
+import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
+import java.time.OffsetDateTime;
 import java.util.HashMap;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -42,7 +44,11 @@ class CaseDismissDefendantDashboardNotificationHandlerTest extends BaseCallbackH
     private ObjectMapper objectMapper;
 
     @Mock
-    private DashboardApiClient dashboardApiClient;
+    private DashboardScenariosService dashboardScenariosService;
+    @Mock
+    private DashboardNotificationService dashboardNotificationService;
+    @Mock
+    private TaskListService taskListService;
 
     @Mock
     private DashboardNotificationsParamsMapper mapper;
@@ -50,6 +56,11 @@ class CaseDismissDefendantDashboardNotificationHandlerTest extends BaseCallbackH
     @Test
     void shouldRecordScenario_whenInvoked() {
         // Given
+        HashMap<String, Object> scenarioParams = new HashMap<>();
+        when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+        when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
+
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
             .respondent1Represented(YesOrNo.NO)
             .applicant1Represented(YesOrNo.NO)
@@ -59,28 +70,69 @@ class CaseDismissDefendantDashboardNotificationHandlerTest extends BaseCallbackH
         CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
             CallbackRequest.builder().eventId(CaseEvent.CREATE_DASHBOARD_NOTIFICATION_DISMISS_CASE_DEFENDANT.name()).build()
         ).build();
-        when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
-        HashMap<String, Object> scenarioParams = new HashMap<>();
-        when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
         // When
         handler.handle(params);
-
+        final String caseId = caseData.getCcdCaseReference().toString();
         // Then
-        verify(dashboardApiClient).deleteNotificationsForCaseIdentifierAndRole(
-            caseData.getCcdCaseReference().toString(),
-            "DEFENDANT",
-            "BEARER_TOKEN"
+        verify(dashboardNotificationService).deleteByReferenceAndCitizenRole(
+            caseId,
+            "DEFENDANT"
         );
-        verify(dashboardApiClient).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
-            caseData.getCcdCaseReference().toString(),
-            "DEFENDANT",
-            "BEARER_TOKEN"
+        verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+            caseId,
+            "DEFENDANT"
         );
-        verify(dashboardApiClient).recordScenario(
-            caseData.getCcdCaseReference().toString(),
-            DashboardScenarios.SCENARIO_AAA6_DISMISS_CASE_DEFENDANT.getScenario(),
+        verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
+            DashboardScenarios.SCENARIO_AAA6_DISMISS_CASE_DEFENDANT.getScenario(),
+            caseId,
+            ScenarioRequestParams.builder().params(scenarioParams).build()
+        );
+    }
+
+    @Test
+    void shouldRecordQMNotificationScenario_whenInvokedWhileDefendantCitizenHasAnOpenQuery() {
+        // Given
+        HashMap<String, Object> scenarioParams = new HashMap<>();
+        when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+        when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
+
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec()
+            .includesRespondentCitizenQueryFollowUp(OffsetDateTime.now())
+            .build().toBuilder()
+            .respondent1Represented(YesOrNo.NO)
+            .applicant1Represented(YesOrNo.NO)
+            .ccdCaseReference(1234L)
+            .previousCCDState(AWAITING_APPLICANT_INTENTION).build();
+
+        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+            CallbackRequest.builder().eventId(CaseEvent.CREATE_DASHBOARD_NOTIFICATION_DISMISS_CASE_DEFENDANT.name()).build()
+        ).build();
+
+        // When
+        handler.handle(params);
+        final String caseId = caseData.getCcdCaseReference().toString();
+        // Then
+        verify(dashboardNotificationService).deleteByReferenceAndCitizenRole(
+            caseId,
+            "DEFENDANT"
+        );
+        verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+            caseId,
+            "DEFENDANT"
+        );
+        verify(dashboardScenariosService).recordScenarios(
+            "BEARER_TOKEN",
+            DashboardScenarios.SCENARIO_AAA6_DISMISS_CASE_DEFENDANT.getScenario(),
+            caseId,
+            ScenarioRequestParams.builder().params(scenarioParams).build()
+        );
+        verify(dashboardScenariosService).recordScenarios(
+            "BEARER_TOKEN",
+            DashboardScenarios.SCENARIO_AAA6_LIP_QM_CASE_OFFLINE_OPEN_QUERIES_DEFENDANT.getScenario(),
+            caseId,
             ScenarioRequestParams.builder().params(scenarioParams).build()
         );
     }

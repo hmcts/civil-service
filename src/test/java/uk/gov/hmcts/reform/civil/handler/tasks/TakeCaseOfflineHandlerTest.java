@@ -16,8 +16,8 @@ import uk.gov.hmcts.reform.civil.event.TakeCaseOfflineEvent;
 import uk.gov.hmcts.reform.civil.exceptions.CompleteTaskException;
 import uk.gov.hmcts.reform.civil.service.search.TakeCaseOfflineSearchService;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -60,7 +60,7 @@ class TakeCaseOfflineHandlerTest {
     void shouldEmitTakeCaseOfflineEvent_whenCasesFound() {
         long caseId = 1L;
         Map<String, Object> data = Map.of("data", "some data");
-        List<CaseDetails> caseDetails = List.of(CaseDetails.builder().id(caseId).data(data).build());
+        Set<CaseDetails> caseDetails = Set.of(CaseDetails.builder().id(caseId).data(data).build());
 
         when(searchService.getCases()).thenReturn(caseDetails);
 
@@ -72,7 +72,7 @@ class TakeCaseOfflineHandlerTest {
 
     @Test
     void shouldNotEmitTakeCaseOfflineEvent_WhenNoCasesFound() {
-        when(searchService.getCases()).thenReturn(List.of());
+        when(searchService.getCases()).thenReturn(Set.of());
 
         handler.execute(mockTask, externalTaskService);
 
@@ -125,7 +125,7 @@ class TakeCaseOfflineHandlerTest {
         long caseId = 1L;
         long otherId = 2L;
         Map<String, Object> data = Map.of("data", "some data");
-        List<CaseDetails> caseDetails = List.of(
+        Set<CaseDetails> caseDetails = Set.of(
             CaseDetails.builder().id(caseId).data(data).build(),
             CaseDetails.builder().id(otherId).data(data).build());
 

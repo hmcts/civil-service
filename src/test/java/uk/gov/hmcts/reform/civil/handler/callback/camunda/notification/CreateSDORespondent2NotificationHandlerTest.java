@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -23,6 +24,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -31,11 +33,21 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT_WELSH;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.OPENING_HOURS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PHONE_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.SPEC_UNSPEC_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_HMCTS_SIGNATURE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_OPENING_HOURS;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_PHONE_CONTACT;
 
 @ExtendWith(MockitoExtension.class)
 class CreateSDORespondent2NotificationHandlerTest extends BaseCallbackHandlerTest {
@@ -52,16 +64,20 @@ class CreateSDORespondent2NotificationHandlerTest extends BaseCallbackHandlerTes
     @Mock
     private FeatureToggleService featureToggleService;
 
+    @Mock
+    private NotificationsSignatureConfiguration configuration;
+
     private CreateSDORespondent2NotificationHandler handler;
 
     @BeforeEach
     void setup() {
         CreateSDORespondent2LRNotificationSender lrNotificationSender =
             new CreateSDORespondent2LRNotificationSender(notificationService, notificationsProperties,
-                                                         organisationService, featureToggleService
+                                                         organisationService, featureToggleService, configuration
             );
         CreateSDORespondent2LiPNotificationSender lipNotificationSender =
             new CreateSDORespondent2LiPNotificationSender(notificationService, notificationsProperties,
+                                                          configuration,
                                                           featureToggleService
             );
         handler = new CreateSDORespondent2NotificationHandler(lipNotificationSender, lrNotificationSender);
@@ -69,6 +85,20 @@ class CreateSDORespondent2NotificationHandlerTest extends BaseCallbackHandlerTes
 
     @Nested
     class AboutToSubmitCallback {
+
+        @BeforeEach
+        void setUp() {
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getHmctsSignature()).thenReturn((String) configMap.get("hmctsSignature"));
+            when(configuration.getPhoneContact()).thenReturn((String) configMap.get("phoneContact"));
+            when(configuration.getOpeningHours()).thenReturn((String) configMap.get("openingHours"));
+            when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("welshHmctsSignature"));
+            when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("welshPhoneContact"));
+            when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
+            when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
+            when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
+        }
 
         @Test
         void shouldNotifyRespondentSolicitor_whenInvoked() {
@@ -129,22 +159,43 @@ class CreateSDORespondent2NotificationHandlerTest extends BaseCallbackHandlerTes
             verify(notificationService).sendMail(
                 "company@email.com",
                 "template-id",
-                Map.of(
-                    CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
-                    PARTY_NAME, "Mr. Sole Trader",
-                    CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData)
-                ),
+                getNotificationDataMapLip(caseData),
                 "create-sdo-respondent-2-notification-000DC001"
             );
         }
 
         @NotNull
+        private Map<String, String> getNotificationDataMapLip(CaseData caseData) {
+            Map<String, String> expectedProperties = new HashMap<>(addCommonProperties());
+            expectedProperties.put(CLAIM_REFERENCE_NUMBER, CASE_ID.toString());
+            expectedProperties.put(PARTY_NAME, "Mr. Sole Trader");
+            expectedProperties.put(CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData));
+            return expectedProperties;
+        }
+
+        @NotNull
         private Map<String, String> getNotificationDataMap() {
-            return Map.of(
-                CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
-                CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
-                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant 1 reference: 6789 - Defendant 2 reference: Not provided"
-            );
+            Map<String, String> expectedProperties = new HashMap<>(addCommonProperties());
+            expectedProperties.put(CLAIM_REFERENCE_NUMBER, CASE_ID.toString());
+            expectedProperties.put(CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name");
+            expectedProperties.put(PARTY_REFERENCES, "Claimant reference: 12345 - Defendant 1 reference: 6789 - Defendant 2 reference: Not provided");
+            expectedProperties.put(CASEMAN_REF, "000DC001");
+            return expectedProperties;
+        }
+
+        @NotNull
+        public Map<String, String> addCommonProperties() {
+            Map<String, String> expectedProperties = new HashMap<>();
+            expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
+            expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
+            expectedProperties.put(HMCTS_SIGNATURE, configuration.getHmctsSignature());
+            expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
+            expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
+            expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
+            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+            expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
+            expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+            return expectedProperties;
         }
     }
 
@@ -157,6 +208,4 @@ class CreateSDORespondent2NotificationHandlerTest extends BaseCallbackHandlerTes
             .isEqualTo("CreateSDONotifyRespondentSolicitor2");
     }
 }
-
-
 

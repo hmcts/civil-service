@@ -41,6 +41,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -144,17 +145,17 @@ public class DocumentControllerTest extends BaseIntegrationTest {
         UUID documentId = getDocumentIdFromSelfHref(documentPath);
 
         when(caseDocumentClientApi.getMetadataForDocument(
-                 anyString(),
-                 anyString(),
-                 eq(documentId)
-             )
+                anyString(),
+                anyString(),
+                eq(documentId)
+            )
         ).thenReturn(document);
 
         when(caseDocumentClientApi.getDocumentBinary(
-                 anyString(),
-                 anyString(),
-                 eq(documentId)
-             )
+                anyString(),
+                anyString(),
+                eq(documentId)
+            )
         ).thenReturn(responseEntity);
 
         when(responseEntity.getBody()).thenReturn(new ByteArrayResource(file));
@@ -171,6 +172,7 @@ public class DocumentControllerTest extends BaseIntegrationTest {
             .legacyCaseReference(REFERENCE_NUMBER)
             .totalClaimAmount(BigDecimal.ONE)
             .issueDate(DATE)
+            .respondent1ResponseDeadline(LocalDateTime.now())
             .build();
         when(docmosisApiClient.createDocument(any(DocmosisRequest.class)))
             .thenReturn(bytes);
@@ -182,7 +184,7 @@ public class DocumentControllerTest extends BaseIntegrationTest {
 
         JSONObject jsonReturnedCaseDocument = new JSONObject(result.getResponse().getContentAsString());
         assertEquals(FILE_NAME, jsonReturnedCaseDocument.get("documentName"),
-                     "Document file names should match"
+            "Document file names should match"
         );
     }
 
@@ -194,6 +196,7 @@ public class DocumentControllerTest extends BaseIntegrationTest {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted()
             .legacyCaseReference(REFERENCE_NUMBER)
             .totalClaimAmount(BigDecimal.ONE)
+            .respondent1ResponseDeadline(LocalDateTime.now())
             .issueDate(DATE)
             .build();
 
@@ -237,7 +240,7 @@ public class DocumentControllerTest extends BaseIntegrationTest {
 
         JSONObject jsonReturnedCaseDocument = new JSONObject(result.getResponse().getContentAsString());
         assertEquals("TestFile.png", jsonReturnedCaseDocument.get("documentName"),
-                     "Document file names should match"
+            "Document file names should match"
         );
     }
 
@@ -258,6 +261,7 @@ public class DocumentControllerTest extends BaseIntegrationTest {
             .thenReturn(bytes);
         when(caseDocumentClientApi.uploadDocuments(anyString(), anyString(), any()))
             .thenReturn(new UploadResponse(List.of(document)));
+        when(userRequestAuthorizerMock.authorise(any())).thenReturn(null);
 
         //then
         doFilePost(BEARER_TOKEN, file, GENERATE_ANY_DOC_URL)

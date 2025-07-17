@@ -1,15 +1,16 @@
 package uk.gov.hmcts.reform.civil.service.mediation;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.util.List;
@@ -24,12 +25,13 @@ import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPClaimant;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPDefendant;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorOne;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class UploadMediationService {
 
     private final DashboardNotificationsParamsMapper mapper;
-    private final DashboardApiClient dashboardApiClient;
+    private final DashboardScenariosService dashboardScenariosService;
     private final CoreCaseUserService coreCaseUserService;
     private final UserService userService;
     private final FeatureToggleService featureToggleService;
@@ -63,13 +65,11 @@ public class UploadMediationService {
         return new String[]{};
     }
 
-    private void recordScenarios(String[] scenarios, CaseData caseData, String authToken) {
+    private void recordScenarios(String[] scenarios, CaseData caseData, String authorisation) {
         for (String scenario : scenarios) {
-            dashboardApiClient.recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                scenario,
-                authToken,
-                ScenarioRequestParams.builder()
+            dashboardScenariosService.recordScenarios(
+                authorisation, scenario,
+                caseData.getCcdCaseReference().toString(), ScenarioRequestParams.builder()
                     .params(mapper.mapCaseDataToParams(caseData)).build()
             );
         }

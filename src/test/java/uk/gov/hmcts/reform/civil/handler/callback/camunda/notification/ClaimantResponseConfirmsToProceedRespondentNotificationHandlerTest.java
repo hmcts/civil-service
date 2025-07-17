@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,12 +22,15 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -45,10 +49,21 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.Cl
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ClaimantResponseConfirmsToProceedRespondentNotificationHandler.TASK_ID_RESPONDENT_SOL2_MULTITRACK;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ClaimantResponseConfirmsToProceedRespondentNotificationHandler.Task_ID_RESPONDENT_SOL2;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.APPLICANT_ONE_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CNBC_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT_WELSH;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.OPENING_HOURS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PHONE_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.SPEC_UNSPEC_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_HMCTS_SIGNATURE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_OPENING_HOURS;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_PHONE_CONTACT;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @ExtendWith(MockitoExtension.class)
@@ -63,11 +78,32 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
     @Mock
     private NotificationsProperties notificationsProperties;
 
+    @Mock
+    private FeatureToggleService featureToggleService;
+
+    @Mock
+    private NotificationsSignatureConfiguration configuration;
+
     @InjectMocks
     private ClaimantResponseConfirmsToProceedRespondentNotificationHandler handler;
 
     @Nested
     class AboutToSubmitCallback {
+
+        @BeforeEach
+        void setUp() {
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getHmctsSignature()).thenReturn((String) configMap.get("hmctsSignature"));
+            when(configuration.getPhoneContact()).thenReturn((String) configMap.get("phoneContact"));
+            when(configuration.getOpeningHours()).thenReturn((String) configMap.get("openingHours"));
+            when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("welshHmctsSignature"));
+            when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("welshPhoneContact"));
+            when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
+            when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
+            when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+        }
 
         @Test
         void shouldNotifyRespondentSolicitor_whenInvoked() {
@@ -105,15 +141,18 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
             verify(notificationService).sendMail(
                 "respondentsolicitor@example.com",
                 "spec-template-id",
-                getNotificationDataMapSpec(caseData,
-                                           CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED),
+                getNotificationDataMapSpec(
+                    caseData,
+                    CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED
+                ),
                 "claimant-confirms-to-proceed-respondent-notification-000DC001"
             );
         }
 
         @Test
         void shouldNotifyRespondentSolicitor_whenSpecRejectAllNoMediation() {
-            when(notificationsProperties.getRespondentSolicitorNotifyToProceedSpecWithAction()).thenReturn("spec-template-no-mediation");
+            when(notificationsProperties.getRespondentSolicitorNotifyToProceedSpecWithAction()).thenReturn(
+                "spec-template-no-mediation");
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
@@ -131,8 +170,10 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
             verify(notificationService).sendMail(
                 "respondentsolicitor@example.com",
                 "spec-template-no-mediation",
-                getNotificationDataMapSpec(caseData,
-                                           CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED),
+                getNotificationDataMapSpec(
+                    caseData,
+                    CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED
+                ),
                 "claimant-confirms-to-proceed-respondent-notification-000DC001"
             );
         }
@@ -140,7 +181,6 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
         @Test
         void shouldNotifyRespondentSolicitor2_whenInvoked_spec() {
             when(notificationsProperties.getRespondentSolicitorNotifyToProceedSpec()).thenReturn("spec-template-id");
-
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .setClaimTypeToSpecClaim()
@@ -154,8 +194,10 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
             verify(notificationService).sendMail(
                 "respondentsolicitor2@example.com",
                 "spec-template-id",
-                getNotificationDataMapSpec(caseData,
-                                           CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIMANT_CONFIRMS_TO_PROCEED),
+                getNotificationDataMapSpec(
+                    caseData,
+                    CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIMANT_CONFIRMS_TO_PROCEED
+                ),
                 "claimant-confirms-to-proceed-respondent-notification-000DC001"
             );
         }
@@ -177,15 +219,18 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
             verify(notificationService).sendMail(
                 "applicantsolicitor@example.com",
                 "spec-template-id",
-                getNotificationDataMapSpec(caseData,
-                                           CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC),
+                getNotificationDataMapSpec(
+                    caseData,
+                    CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC
+                ),
                 "claimant-confirms-to-proceed-respondent-notification-000DC001"
             );
         }
 
         @Test
         void shouldNotifyApplicantSolicitor_whenSpecRejectAllNoMediation() {
-            when(notificationsProperties.getClaimantSolicitorConfirmsToProceedSpecWithAction()).thenReturn("spec-template-no-mediation");
+            when(notificationsProperties.getClaimantSolicitorConfirmsToProceedSpecWithAction()).thenReturn(
+                "spec-template-no-mediation");
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
@@ -203,8 +248,10 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
             verify(notificationService).sendMail(
                 "applicantsolicitor@example.com",
                 "spec-template-no-mediation",
-                getNotificationDataMapSpec(caseData,
-                                           CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC),
+                getNotificationDataMapSpec(
+                    caseData,
+                    CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC
+                ),
                 "claimant-confirms-to-proceed-respondent-notification-000DC001"
             );
         }
@@ -298,23 +345,6 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
         }
 
         @Test
-        void shouldNotNotifyRespondent_whenInvokedWithNoSolicitorRepresentedAndNoEmail() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .respondent1(PartyBuilder.builder().company().partyEmail(null).build())
-                .respondent1Represented(null)
-                .specRespondent1Represented(YesOrNo.NO)
-                .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-                .build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId("NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED")
-                    .build()).build();
-
-            handler.handle(params);
-
-            verify(notificationService, never()).sendMail(any(), any(), any(), any());
-        }
-
-        @Test
         void shouldNotNotifyRespondent_whenInvokedWithNoSolicitorRepresentedWithEmail() {
             when(notificationsProperties.getRespondent1LipClaimUpdatedTemplate()).thenReturn("spec-template-id");
 
@@ -361,6 +391,30 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
         }
 
         @Test
+        void shouldNotifyRespondent_whenMultiTrack_mintiEligibleClaim() {
+            when(notificationsProperties.getClaimantSolicitorConfirmsToProceed()).thenReturn("template-id");
+            when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
+                .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+                .setMultiTrackClaim()
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId("NOTIFY_RES_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_MULTITRACK")
+                    .build()).build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                caseData.getRespondentSolicitor1EmailAddress(),
+                "template-id",
+                getNotificationDataMap(caseData),
+                "claimant-confirms-to-proceed-respondent-notification-000DC001"
+            );
+        }
+
+        @Test
         void shouldNotifyRespondent2_whenMultiTrack() {
             when(notificationsProperties.getSolicitorCaseTakenOffline()).thenReturn("offline-template-id");
 
@@ -396,7 +450,6 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
             "NOTIFY_RES_SOLICITOR2_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_MULTITRACK",
             "NOTIFY_APP_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC_MULTITRACK"})
         void shouldNotNotify_whenLip(CaseEvent notificationEvent) {
-
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
@@ -421,42 +474,63 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
 
         @NotNull
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
-            return Map.of(
-                CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
-                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
-                CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name"
-            );
+            Map<String, String> properties = addCommonProperties();
+            properties.put(CLAIM_REFERENCE_NUMBER, CASE_ID.toString());
+            properties.put(PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789");
+            properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name");
+            properties.put(CASEMAN_REF, "000DC001");
+            return properties;
         }
 
         @NotNull
         private Map<String, String> getNotificationDataMapLRvLiP(CaseData caseData) {
-            return Map.of(
-                CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
-                RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
-                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789"
-            );
+            Map<String, String> properties = addCommonProperties();
+            properties.put(CLAIM_REFERENCE_NUMBER, CASE_ID.toString());
+            properties.put(RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
+            properties.put(PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789");
+            properties.put(CASEMAN_REF, "000DC001");
+            properties.put(LIP_CONTACT, configuration.getLipContactEmail());
+            return properties;
         }
 
         @NotNull
         public Map<String, String> getNotificationDataMapSpec(CaseData caseData, CaseEvent caseEvent) {
-            return Map.of(
-                CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganisationName(caseData, caseEvent),
-                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
-                RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
-                APPLICANT_ONE_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
-                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789"
-            );
+            Map<String, String> properties = addCommonProperties();
+            properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganisationName(caseData, caseEvent));
+            properties.put(CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString());
+            properties.put(RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
+            properties.put(APPLICANT_ONE_NAME, getPartyNameBasedOnType(caseData.getApplicant1()));
+            properties.put(PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789");
+            properties.put(CASEMAN_REF, "000DC001");
+            return properties;
         }
-    }
 
-    private String getLegalOrganisationName(CaseData caseData,  CaseEvent caseEvent) {
-        String organisationID;
-        organisationID = caseEvent.equals(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC)
-            ? caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID()
-            : caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID();
-        Optional<Organisation> organisation = organisationService.findOrganisationById(organisationID);
-        return organisation.isPresent() ? organisation.get().getName() :
-            caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
+        @NotNull
+        public Map<String, String> addCommonProperties() {
+            Map<String, String> expectedProperties = new HashMap<>();
+            expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
+            expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
+            expectedProperties.put(HMCTS_SIGNATURE, configuration.getHmctsSignature());
+            expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
+            expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
+            expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
+            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+            expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
+            expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+            expectedProperties.put(CNBC_CONTACT, configuration.getCnbcContact());
+            return expectedProperties;
+        }
+
+        private String getLegalOrganisationName(CaseData caseData, CaseEvent caseEvent) {
+            String organisationID;
+            organisationID = caseEvent.equals(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC)
+                ? caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID()
+                : caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID();
+            Optional<Organisation> organisation = organisationService.findOrganisationById(organisationID);
+            return organisation.isPresent() ? organisation.get().getName() :
+                caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
+        }
+
     }
 
     @Test
@@ -464,7 +538,8 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
         CaseData caseData = CaseDataBuilder.builder().build();
         assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                                                  .request(CallbackRequest.builder().eventId(
-                                                     "NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED").build()).build())).isEqualTo(TASK_ID);
+                                                     "NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED").build()).build())).isEqualTo(
+            TASK_ID);
 
         assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                                                  .request(CallbackRequest.builder().eventId(
@@ -493,4 +568,22 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
                                                      "NOTIFY_APP_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC_MULTITRACK").build()).build()))
             .isEqualTo(TASK_ID_CC_MULTITRACK);
     }
+
+    @Test
+    void shouldNotNotifyRespondent_whenInvokedWithNoSolicitorRepresentedAndNoEmail() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+            .respondent1(PartyBuilder.builder().company().partyEmail(null).build())
+            .respondent1Represented(null)
+            .specRespondent1Represented(YesOrNo.NO)
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+            .build();
+        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+            CallbackRequest.builder().eventId("NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED")
+                .build()).build();
+
+        handler.handle(params);
+
+        verify(notificationService, never()).sendMail(any(), any(), any(), any());
+    }
+
 }

@@ -74,7 +74,7 @@ public class DefendantResponseAdmitPayInstalmentCompanyDefendantScenarioTest ext
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Rydych wedi cynnig talu £1000 mewn rhandaliadau o £10 i Claimant John " +
                         frequency.getDashboardLabelWelsh() + "." +
-                        " Rydych wedi cynnig gwneud hyn o " + DateUtils.formatDateInWelsh(firstRepaymentDate) + " ymlaen." +
+                        " Rydych wedi cynnig gwneud hyn o " + DateUtils.formatDateInWelsh(firstRepaymentDate, false) + " ymlaen." +
                         " Mae angen i chi anfon eich manylion ariannol at yr hawlydd. Bydd y llys yn cysylltu â chi pan fyddant yn ymateb.</p>" +
                         "<p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">Gweld eich ymateb</a></p>"
                 )
@@ -135,7 +135,7 @@ public class DefendantResponseAdmitPayInstalmentCompanyDefendantScenarioTest ext
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Rydych wedi cynnig talu £1001 mewn rhandaliadau o £10 i Claimant John " +
                         frequency.getDashboardLabelWelsh() + "." +
-                        " Rydych wedi cynnig gwneud hyn o " + DateUtils.formatDateInWelsh(firstRepaymentDate) + " ymlaen." +
+                        " Rydych wedi cynnig gwneud hyn o " + DateUtils.formatDateInWelsh(firstRepaymentDate, false) + " ymlaen." +
                         " Mae angen i chi anfon eich manylion ariannol at yr hawlydd. Bydd y llys yn cysylltu â chi pan fyddant yn ymateb.</p>" +
                         "<p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">Gweld eich ymateb</a></p>"
                 )

@@ -1,19 +1,21 @@
 package uk.gov.hmcts.reform.dashboard.entities;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.hibernate.annotations.Immutable;
 
+import java.io.Serializable;
+import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import java.io.Serializable;
-import java.util.Date;
 
 @lombok.Data
 @lombok.Builder(toBuilder = true)
 @lombok.NoArgsConstructor
 @lombok.AllArgsConstructor
 @Entity
+@Immutable
 @Table(name = "dashboard_notifications_templates", schema = "dbs")
 public class NotificationTemplateEntity implements Serializable {
 

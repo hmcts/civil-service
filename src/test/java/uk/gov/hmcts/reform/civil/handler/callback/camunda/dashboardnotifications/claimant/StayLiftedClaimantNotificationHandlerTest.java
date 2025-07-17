@@ -9,7 +9,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -19,10 +18,12 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
@@ -46,13 +47,13 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_STAY_LIFTED_VIEW_DOCUMENTS_TASK_NOT_AVAILABLE_CLAIMANT;
 
 @ExtendWith(MockitoExtension.class)
-public class StayLiftedClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
+class StayLiftedClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @InjectMocks
     private StayLiftedClaimantNotificationHandler handler;
 
     @Mock
-    private DashboardApiClient dashboardApiClient;
+    private DashboardScenariosService dashboardScenariosService;
 
     @Mock
     private DashboardNotificationsParamsMapper dashboardNotificationsParamsMapper;
@@ -93,7 +94,6 @@ public class StayLiftedClaimantNotificationHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldNotRecordAnyScenarios_ifClaimantIsNotLip() {
-            when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
                 .toBuilder()
@@ -107,13 +107,13 @@ public class StayLiftedClaimantNotificationHandlerTest extends BaseCallbackHandl
 
             handler.handle(callbackParams);
 
-            verifyNoInteractions(dashboardApiClient);
+            verifyNoInteractions(dashboardScenariosService);
         }
 
         @Test
         void shouldRecordExpectedScenarios_whenPreStateInMediation() {
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-            when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
                 .toBuilder()
@@ -135,7 +135,7 @@ public class StayLiftedClaimantNotificationHandlerTest extends BaseCallbackHandl
         @Test
         void shouldRecordExpectedScenarios_whenPreStateJudicialReferral() {
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-            when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
                 .toBuilder()
@@ -157,7 +157,7 @@ public class StayLiftedClaimantNotificationHandlerTest extends BaseCallbackHandl
         @Test
         void shouldRecordExpectedScenarios_whenPreStateCaseProgression() {
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-            when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
                 .toBuilder()
@@ -180,7 +180,7 @@ public class StayLiftedClaimantNotificationHandlerTest extends BaseCallbackHandl
         @Test
         void shouldRecordExpectedScenarios_whenPreStateHearingReadiness() {
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-            when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
                 .toBuilder()
@@ -205,7 +205,7 @@ public class StayLiftedClaimantNotificationHandlerTest extends BaseCallbackHandl
         @Test
         void shouldRecordExpectedScenarios_whenPreStatePfHcH_withFeePaid() {
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-            when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
                 .toBuilder()
@@ -230,7 +230,7 @@ public class StayLiftedClaimantNotificationHandlerTest extends BaseCallbackHandl
         @Test
         void shouldRecordExpectedScenarios_whenPreStatePfHcH_withFeeNotRequired() {
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-            when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
                 .toBuilder()
@@ -255,7 +255,7 @@ public class StayLiftedClaimantNotificationHandlerTest extends BaseCallbackHandl
         @Test
         void shouldRecordExpectedScenarios_whenEvidenceUploadedByClaimant() {
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-            when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
                 .toBuilder()
@@ -282,7 +282,7 @@ public class StayLiftedClaimantNotificationHandlerTest extends BaseCallbackHandl
         @Test
         void shouldRecordExpectedScenarios_whenEvidenceUploadedByDefendant() {
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-            when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
                 .toBuilder()
@@ -307,21 +307,22 @@ public class StayLiftedClaimantNotificationHandlerTest extends BaseCallbackHandl
         }
 
         void verifyRecordedScenario(String scenario) {
-            verify(dashboardApiClient, times(1)).recordScenario(
-                CCD_REFERENCE,
-                scenario,
+            verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
+                scenario,
+                CCD_REFERENCE,
                 ScenarioRequestParams.builder().params(params).build()
             );
         }
 
         void verifyRecordedScenarios(List<String> expectedScenarios) {
-            if (expectedScenarios == null || expectedScenarios.size() < 1) {
+            if (expectedScenarios == null || expectedScenarios.isEmpty()) {
                 fail("Expected scenarios should be provided.");
             }
 
             // Ensure total numbers of scenarios recorded match expected
-            verify(dashboardApiClient, times(expectedScenarios.size())).recordScenario(any(), any(), any(), any());
+            verify(dashboardScenariosService,
+                   times(Objects.requireNonNull(expectedScenarios).size())).recordScenarios(any(), any(), any(), any());
 
             // Ensure each scenario is only recorded once
             expectedScenarios.forEach(this::verifyRecordedScenario);

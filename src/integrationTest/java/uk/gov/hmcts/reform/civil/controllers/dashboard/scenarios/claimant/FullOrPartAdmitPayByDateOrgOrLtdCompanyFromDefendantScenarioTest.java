@@ -65,7 +65,7 @@ public class FullOrPartAdmitPayByDateOrgOrLtdCompanyFromDefendantScenarioTest ex
                 jsonPath("$[0].titleCy").value("Ymateb i’r hawliad"),
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Mae Company one wedi cynnig talu £1000 i chi erbyn "
-                     +   DateUtils.formatDateInWelsh(responseDeadline)
+                     +   DateUtils.formatDateInWelsh(responseDeadline, false)
                      +   ". Mae angen i’r diffynnydd anfon eu manylion ariannol atoch.</p>"
                      +   "<p class=\"govuk-body\"><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">Gweld ac ymateb</a></p>")
             );
@@ -121,7 +121,7 @@ public class FullOrPartAdmitPayByDateOrgOrLtdCompanyFromDefendantScenarioTest ex
                 jsonPath("$[0].titleCy").value("Ymateb i’r hawliad"),
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Mae Org one wedi cynnig talu £1001 i chi erbyn "
-                        +   DateUtils.formatDateInWelsh(admitPaymentDeadline)
+                        +   DateUtils.formatDateInWelsh(admitPaymentDeadline, false)
                         +   ". Mae angen i’r diffynnydd anfon eu manylion ariannol atoch.</p>"
                         +   "<p class=\"govuk-body\"><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">Gweld ac ymateb</a></p>")
             );

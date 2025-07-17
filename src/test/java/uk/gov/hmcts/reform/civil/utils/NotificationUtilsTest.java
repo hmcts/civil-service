@@ -1,17 +1,22 @@
 package uk.gov.hmcts.reform.civil.utils;
 
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -20,11 +25,28 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CNBC_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT_WELSH;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.OPENING_HOURS;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PHONE_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.SPEC_UNSPEC_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_HMCTS_SIGNATURE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_OPENING_HOURS;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_PHONE_CONTACT;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCnbcContact;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCommonFooterSignature;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCommonFooterSignatureWelsh;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addLipContact;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addLipContactWelsh;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addSpecAndUnspecContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantEmail;
 
 class NotificationUtilsTest {
 
     private OrganisationService organisationService = mock(OrganisationService.class);
+    private NotificationsSignatureConfiguration configuration = mock(NotificationsSignatureConfiguration.class);
 
     @Test
     void shouldReturnReferences_when1v1NoReferencesProvided() {
@@ -360,4 +382,213 @@ class NotificationUtilsTest {
             assertThat(getApplicantEmail(caseData, isApplicantLip)).isEqualTo("lipapplicant@example.com");
         }
     }
+
+    @Nested
+    class EmailSignatures {
+
+        @Nested
+        class CnbcContact {
+
+            @Test
+            void shouldAddCnbcContactWhenLRQmNotEnabled() {
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+                when(configuration.getCnbcContact()).thenReturn("cnbcEmail");
+                Map<String, String> actual = addCnbcContact(caseData, new HashMap<>(), configuration, false);
+                assertThat(actual.get(CNBC_CONTACT)).isEqualTo("cnbcEmail");
+            }
+
+            @ParameterizedTest()
+            @ValueSource(strings = {"PENDING_CASE_ISSUED", "CLOSED", "PROCEEDS_IN_HERITAGE_SYSTEM", "CASE_DISMISSED"})
+            void shouldAddCnbcContactWhenCaseInQueryNotAllowedState(String caseState) {
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
+                    .toBuilder().ccdState(Enum.valueOf(CaseState.class, caseState)).build();
+                when(configuration.getCnbcContact()).thenReturn("cnbcEmail");
+                Map<String, String> actual = addCnbcContact(caseData, new HashMap<>(), configuration, true);
+                assertThat(actual.get(CNBC_CONTACT)).isEqualTo("cnbcEmail");
+            }
+
+            @Test
+            void shouldAddCnbcContactWhenApplicantLip() {
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
+                    .toBuilder().applicant1Represented(NO).build();
+                when(configuration.getCnbcContact()).thenReturn("cnbcEmail");
+                Map<String, String> actual = addCnbcContact(caseData, new HashMap<>(), configuration, true);
+                assertThat(actual.get(CNBC_CONTACT)).isEqualTo("cnbcEmail");
+            }
+
+            @Test
+            void shouldAddCnbcContactWhenRespondentLip() {
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
+                    .toBuilder().respondent1Represented(NO).build();
+                when(configuration.getCnbcContact()).thenReturn("cnbcEmail");
+                Map<String, String> actual = addCnbcContact(caseData, new HashMap<>(), configuration, true);
+                assertThat(actual.get(CNBC_CONTACT)).isEqualTo("cnbcEmail");
+            }
+
+            @Test
+            void shouldAddQueryStringWhenAllConditionsTrue() {
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+                when(configuration.getRaiseQueryLr()).thenReturn("raise query");
+                Map<String, String> actual = addCnbcContact(caseData, new HashMap<>(), configuration, true);
+                assertThat(actual.get(CNBC_CONTACT)).isEqualTo("raise query");
+            }
+        }
+
+        @Nested
+        class SpecAndUnspecContact {
+
+            @Test
+            void shouldAddSpecAndUnspecContactWhenLRQmNotEnabled() {
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+                when(configuration.getSpecUnspecContact()).thenReturn("specUnspecEmail");
+                Map<String, String> actual = addSpecAndUnspecContact(caseData, new HashMap<>(), configuration, false);
+                assertThat(actual.get(SPEC_UNSPEC_CONTACT)).isEqualTo("specUnspecEmail");
+            }
+
+            @ParameterizedTest()
+            @ValueSource(strings = {"PENDING_CASE_ISSUED", "CLOSED", "PROCEEDS_IN_HERITAGE_SYSTEM", "CASE_DISMISSED"})
+            void shouldAddSpecAndUnspecContactWhenCaseInQueryNotAllowedState(String caseState) {
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
+                    .toBuilder().ccdState(Enum.valueOf(CaseState.class, caseState)).build();
+                when(configuration.getSpecUnspecContact()).thenReturn("specUnspecEmail");
+                Map<String, String> actual = addSpecAndUnspecContact(caseData, new HashMap<>(), configuration, true);
+                assertThat(actual.get(SPEC_UNSPEC_CONTACT)).isEqualTo("specUnspecEmail");
+            }
+
+            @Test
+            void shouldAddSpecAndUnspecContactWhenApplicantLip() {
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
+                    .toBuilder().applicant1Represented(NO).build();
+                when(configuration.getSpecUnspecContact()).thenReturn("specUnspecEmail");
+                Map<String, String> actual = addSpecAndUnspecContact(caseData, new HashMap<>(), configuration, true);
+                assertThat(actual.get(SPEC_UNSPEC_CONTACT)).isEqualTo("specUnspecEmail");
+            }
+
+            @Test
+            void shouldAddCnbcContactWhenRespondentLip() {
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
+                    .toBuilder().respondent1Represented(NO).build();
+                when(configuration.getSpecUnspecContact()).thenReturn("specUnspecEmail");
+                Map<String, String> actual = addSpecAndUnspecContact(caseData, new HashMap<>(), configuration, true);
+                assertThat(actual.get(SPEC_UNSPEC_CONTACT)).isEqualTo("specUnspecEmail");
+            }
+
+            @Test
+            void shouldAddQueryStringWhenAllConditionsTrue() {
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+                when(configuration.getRaiseQueryLr()).thenReturn("raise query");
+                Map<String, String> actual = addSpecAndUnspecContact(caseData, new HashMap<>(), configuration, true);
+                assertThat(actual.get(SPEC_UNSPEC_CONTACT)).isEqualTo("raise query");
+            }
+        }
+
+        @Nested
+        class AddLipContactDetails {
+
+            @Test
+            void shouldAddLipEmailWhenQmNotEnabled() {
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
+                    .toBuilder().respondent1Represented(NO).build();
+                when(configuration.getLipContactEmail()).thenReturn("contactocmc@justice.gov.uk");
+                Map<String, String> actual = addLipContact(caseData, new HashMap<>(), configuration, false, false);
+                assertThat(actual.get(LIP_CONTACT)).isEqualTo("contactocmc@justice.gov.uk");
+            }
+
+            @Test
+            void shouldAddLipEmailWhenLrQmNotEnabled() {
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
+                    .toBuilder().respondent1Represented(NO).build();
+                when(configuration.getLipContactEmail()).thenReturn("contactocmc@justice.gov.uk");
+                Map<String, String> actual = addLipContact(caseData, new HashMap<>(), configuration, false, true);
+                assertThat(actual.get(LIP_CONTACT)).isEqualTo("contactocmc@justice.gov.uk");
+            }
+
+            @ParameterizedTest()
+            @ValueSource(strings = {"PENDING_CASE_ISSUED", "CLOSED", "PROCEEDS_IN_HERITAGE_SYSTEM", "CASE_DISMISSED"})
+            void shouldAddLipEmailWhenCaseInQueryNotAllowedState(String caseState) {
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build().toBuilder()
+                    .respondent1Represented(NO)
+                    .ccdState(Enum.valueOf(CaseState.class, caseState)).build();
+                when(configuration.getLipContactEmail()).thenReturn("contactocmc@justice.gov.uk");
+                Map<String, String> actual = addLipContact(caseData, new HashMap<>(), configuration, true, true);
+                assertThat(actual.get(LIP_CONTACT)).isEqualTo("contactocmc@justice.gov.uk");
+            }
+
+            @Test
+            void shouldAddLipQueryTextWhenQmEnabledAndValidState() {
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
+                    .toBuilder().respondent1Represented(NO).build();
+                when(configuration.getRaiseQueryLip()).thenReturn("To contact the court, select contact or apply to the court on your dashboard.");
+                Map<String, String> actual = addLipContact(caseData, new HashMap<>(), configuration, true, true);
+                assertThat(actual.get(LIP_CONTACT)).isEqualTo("To contact the court, select contact or apply to the court on your dashboard.");
+            }
+
+        }
+
+        @Nested
+        class AddWelshLipContactDetails {
+
+            @Test
+            void shouldAddWelshLipEmailWhenQmNotEnabled() {
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
+                    .toBuilder().respondent1Represented(NO).build();
+                when(configuration.getLipContactEmailWelsh()).thenReturn("E-bost: ymholiadaucymraeg@justice.gov.uk");
+                Map<String, String> actual = addLipContactWelsh(caseData, new HashMap<>(), configuration, false, false);
+                assertThat(actual.get(LIP_CONTACT_WELSH)).isEqualTo("E-bost: ymholiadaucymraeg@justice.gov.uk");
+            }
+
+            @Test
+            void shouldAddWelshLipEmailWhenLrQmNotEnabled() {
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
+                    .toBuilder().respondent1Represented(NO).build();
+                when(configuration.getLipContactEmailWelsh()).thenReturn("E-bost: ymholiadaucymraeg@justice.gov.uk");
+                Map<String, String> actual = addLipContactWelsh(caseData, new HashMap<>(), configuration, false, true);
+                assertThat(actual.get(LIP_CONTACT_WELSH)).isEqualTo("E-bost: ymholiadaucymraeg@justice.gov.uk");
+            }
+
+            @ParameterizedTest()
+            @ValueSource(strings = {"PENDING_CASE_ISSUED", "CLOSED", "PROCEEDS_IN_HERITAGE_SYSTEM", "CASE_DISMISSED"})
+            void shouldAddWelshLipEmailWhenCaseInQueryNotAllowedState(String caseState) {
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build().toBuilder()
+                    .respondent1Represented(NO)
+                    .ccdState(Enum.valueOf(CaseState.class, caseState)).build();
+                when(configuration.getLipContactEmailWelsh()).thenReturn("E-bost: ymholiadaucymraeg@justice.gov.uk");
+                Map<String, String> actual = addLipContactWelsh(caseData, new HashMap<>(), configuration, true, true);
+                assertThat(actual.get(LIP_CONTACT_WELSH)).isEqualTo("E-bost: ymholiadaucymraeg@justice.gov.uk");
+            }
+
+            @Test
+            void shouldAddWelshLipQueryTextWhenQmEnabledAndValidState() {
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
+                    .toBuilder().respondent1Represented(NO).build();
+                when(configuration.getRaiseQueryLipWelsh()).thenReturn("I gysylltu â’r llys, dewiswch ‘contact or apply to the court’ ar eich dangosfwrdd.");
+                Map<String, String> actual = addLipContactWelsh(caseData, new HashMap<>(), configuration, true, true);
+                assertThat(actual.get(LIP_CONTACT_WELSH)).isEqualTo("I gysylltu â’r llys, dewiswch ‘contact or apply to the court’ ar eich dangosfwrdd.");
+            }
+
+        }
+
+        @Test
+        void shouldAddCommonFooterSignatureWhenInvoked() {
+            when(configuration.getHmctsSignature()).thenReturn("hmctsSignature");
+            when(configuration.getPhoneContact()).thenReturn("phoneContact");
+            when(configuration.getOpeningHours()).thenReturn("openingHours");
+            Map<String, String> actual = addCommonFooterSignature(new HashMap<>(), configuration);
+            assertThat(actual.get(HMCTS_SIGNATURE)).isEqualTo("hmctsSignature");
+            assertThat(actual.get(PHONE_CONTACT)).isEqualTo("phoneContact");
+            assertThat(actual.get(OPENING_HOURS)).isEqualTo("openingHours");
+        }
+
+        @Test
+        void shouldAddCommonWelshFooterSignatureWhenInvoked() {
+            when(configuration.getWelshHmctsSignature()).thenReturn("hmctsSignature welsh");
+            when(configuration.getWelshPhoneContact()).thenReturn("phoneContact welsh");
+            when(configuration.getWelshOpeningHours()).thenReturn("openingHours welsh");
+            Map<String, String> actual = addCommonFooterSignatureWelsh(new HashMap<>(), configuration);
+            assertThat(actual.get(WELSH_HMCTS_SIGNATURE)).isEqualTo("hmctsSignature welsh");
+            assertThat(actual.get(WELSH_PHONE_CONTACT)).isEqualTo("phoneContact welsh");
+            assertThat(actual.get(WELSH_OPENING_HOURS)).isEqualTo("openingHours welsh");
+        }
+    }
+
 }

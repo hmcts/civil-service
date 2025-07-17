@@ -38,14 +38,29 @@ public class UpdatePaymentStatusService {
     public void updatePaymentStatus(FeeType feeType, String caseReference, CardPaymentStatusResponse cardPaymentStatusResponse) {
 
         try {
+            log.info("Fetching case details for case reference [{}]", caseReference);
             CaseDetails caseDetails = coreCaseDataService.getCase(Long.valueOf(caseReference));
+
+            log.info("Converting case details to CaseData for case reference [{}]", caseReference);
             CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
+
+            log.info("Updating CaseData with state and payment details for case reference [{}], fee type [{}]", caseReference, feeType.name());
             caseData = updateCaseDataWithStateAndPaymentDetails(cardPaymentStatusResponse, caseData, feeType.name());
 
+            log.info("Creating event for case reference [{}] with fee type [{}]", caseReference, feeType.name());
             createEvent(caseData, caseReference, feeType.name());
+
         } catch (Exception ex) {
+            log.error(
+                "Error occurred while processing case reference [{}] with fee type [{}]: {}",
+                caseReference,
+                feeType.name(),
+                ex.getMessage(),
+                ex
+            );
             throw new CaseDataUpdateException();
         }
+
     }
 
     private void createEvent(CaseData caseData, String caseReference, String feeType) {

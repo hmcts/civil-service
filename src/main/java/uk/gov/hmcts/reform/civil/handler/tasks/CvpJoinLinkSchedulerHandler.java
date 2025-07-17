@@ -10,7 +10,7 @@ import uk.gov.hmcts.reform.civil.event.CvpJoinLinkEvent;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.service.search.CaseHearingDateSearchService;
 
-import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -22,9 +22,8 @@ public class CvpJoinLinkSchedulerHandler extends BaseExternalTaskHandler {
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
-        List<CaseDetails> cases = searchService.getCases();
-        List<Long> ids = cases.stream().map(CaseDetails::getId).sorted().toList();
-        log.info("CVP Join Link Scheduler job '{}' found {} case(s) with ids {}", externalTask.getTopicName(), cases.size(), ids);
+        Set<CaseDetails> cases = searchService.getCases();
+        log.info("CVP Join Link Scheduler job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
 
         cases.forEach(caseDetails -> {
             try {
