@@ -73,7 +73,6 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
 
     private <T extends CaseReference> ExternalTaskData handleTypedTask(ExternalTask externalTask, MigrationTask<T> task) {
         String csvFileName = externalTask.getVariable(CSV_FILE_NAME);
-
         List<T> caseReferences = getCaseReferenceList(task.getType(), csvFileName);
 
         int count = 0;
