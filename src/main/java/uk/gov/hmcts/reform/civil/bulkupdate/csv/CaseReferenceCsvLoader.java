@@ -32,14 +32,14 @@ public class CaseReferenceCsvLoader {
     private static final int TAG_LENGTH_BIT = 128;
 
     @SuppressWarnings({"java:S3740", "java:S1488"})
-    public List<CaseReference> loadCaseReferenceList(String fileName) {
+    public <T extends CaseReference> List<T> loadCaseReferenceList(Class<T> type, String fileName) {
         try {
             CsvMapper csvMapper = new CsvMapper();
-            CsvSchema csvSchema = csvMapper.typedSchemaFor(CaseReference.class).withHeader();
-            MappingIterator<CaseReference> it = new CsvMapper().readerFor(CaseReference.class)
+            CsvSchema csvSchema = csvMapper.typedSchemaFor(type).withHeader();
+            MappingIterator<T> it = new CsvMapper().readerFor(type)
                 .with(csvSchema)
                 .readValues(getClass().getClassLoader().getResource(fileName));
-            List<CaseReference> list = it.readAll();
+            List<T> list = it.readAll();
 
             return list;
         } catch (Exception e) {
@@ -48,19 +48,22 @@ public class CaseReferenceCsvLoader {
         }
     }
 
-    public List<CaseReference> loadCaseReferenceList(String fileName, String secret) {
+    public <T extends CaseReference> List<T> loadCaseReferenceList(Class<T> type, String fileName, String secret) {
         try {
-            String encryptedContent = new String(Files.readAllBytes(Paths.get(getClass().getClassLoader().getResource(fileName).toURI())));
+            String encryptedContent = new String(
+                Files.readAllBytes(Paths.get(getClass().getClassLoader().getResource(fileName).toURI()))
+            );
             SecretKey key = getKeyFromString(secret);
             String decryptedContent = decrypt(encryptedContent, key);
 
             CsvMapper csvMapper = new CsvMapper();
-            CsvSchema csvSchema = csvMapper.typedSchemaFor(CaseReference.class).withHeader();
-            MappingIterator<CaseReference> it = new CsvMapper().readerFor(CaseReference.class)
+            CsvSchema csvSchema = csvMapper.typedSchemaFor(type).withHeader();
+
+            MappingIterator<T> it = csvMapper.readerFor(type)
                 .with(csvSchema)
                 .readValues(decryptedContent);
-            List<CaseReference> list = it.readAll();
-            return list;
+
+            return it.readAll();
         } catch (Exception e) {
             log.error("Error occurred while loading object list from file " + fileName, e);
             return Collections.emptyList();

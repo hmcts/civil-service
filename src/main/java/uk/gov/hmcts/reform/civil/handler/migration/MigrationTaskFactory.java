@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.migration;
 
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseReference;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -17,10 +18,15 @@ public class MigrationTaskFactory {
             .collect(Collectors.toMap(MigrationTask::getTaskName, migrationTask -> migrationTask));
     }
 
-    public Optional<MigrationTask> getMigrationTask(String taskName) {
+    @SuppressWarnings("unchecked")
+    public <T extends CaseReference> Optional<MigrationTask<T>> getMigrationTask(String taskName) {
         if (taskName == null || taskName.isEmpty()) {
             return Optional.empty();
         }
-        return Optional.ofNullable(taskNameToMigrationTaskMapping.get(taskName));
+        MigrationTask<?> task = taskNameToMigrationTaskMapping.get(taskName);
+        if (task == null) {
+            return Optional.empty();
+        }
+        return Optional.of((MigrationTask<T>) task); // unsafe cast, but controlled
     }
 }

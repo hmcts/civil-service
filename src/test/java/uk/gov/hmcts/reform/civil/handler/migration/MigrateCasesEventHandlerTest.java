@@ -74,10 +74,12 @@ class MigrateCasesEventHandlerTest {
         // Arrange
         ExternalTask externalTask = mock(ExternalTask.class);
         when(externalTask.getVariable("taskName")).thenReturn("testTask");
-        when(externalTask.getVariable("caseIds")).thenReturn("12345,67890");
-        when(externalTask.getVariable("csvFileName")).thenReturn(null);
+        String csvFileName = "test.csv";
+        when(externalTask.getVariable("csvFileName")).thenReturn(csvFileName);
 
-        MigrationTask migrationTask = mock(MigrationTask.class);
+        @SuppressWarnings("unchecked")
+        MigrationTask<CaseReference> migrationTask = mock(MigrationTask.class);
+        when(migrationTask.getType()).thenReturn(CaseReference.class);
         when(migrationTask.getEventDescription()).thenReturn("Test Migration Task");
         when(migrationTask.getEventSummary()).thenReturn("Migrating cases for test task");
 
@@ -91,8 +93,11 @@ class MigrateCasesEventHandlerTest {
 
         CaseData caseData = mock(CaseData.class);
 
+        List<CaseReference> mockReferences = List.of(new CaseReference("12345"), new CaseReference("67890"));
+        when(caseReferenceCsvLoader.loadCaseReferenceList(CaseReference.class, csvFileName)).thenReturn(mockReferences);
+
         when(caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails())).thenReturn(caseData);
-        when(migrationTask.migrateCaseData(caseData)).thenReturn(caseData);
+        when(migrationTask.migrateCaseData(any(CaseData.class), any(CaseReference.class))).thenReturn(caseData);
 
         ExternalTaskData result = handler.handleTask(externalTask);
 
@@ -103,30 +108,15 @@ class MigrateCasesEventHandlerTest {
     }
 
     @Test
-    void shouldReturnCaseReferencesFromCaseIds() {
-        // Arrange
-        String caseIds = "12345,67890";
-        String csvFileName = null;
-
-        // Act
-        List<CaseReference> result = handler.getCaseReferenceList(caseIds, csvFileName);
-
-        // Assert
-        assertEquals(2, result.size());
-        assertEquals("12345", result.get(0).getCaseReference());
-        assertEquals("67890", result.get(1).getCaseReference());
-    }
-
-    @Test
     void shouldReturnCaseReferencesFromCsvFile() {
         // Arrange
         String caseIds = null;
         String csvFileName = "test.csv";
         List<CaseReference> mockReferences = List.of(new CaseReference("12345"), new CaseReference("67890"));
-        when(caseReferenceCsvLoader.loadCaseReferenceList(csvFileName)).thenReturn(mockReferences);
+        when(caseReferenceCsvLoader.loadCaseReferenceList(CaseReference.class, csvFileName)).thenReturn(mockReferences);
 
         // Act
-        List<CaseReference> result = handler.getCaseReferenceList(caseIds, csvFileName);
+        List<CaseReference> result = handler.getCaseReferenceList(CaseReference.class, csvFileName);
 
         // Assert
         assertEquals(2, result.size());
@@ -144,10 +134,10 @@ class MigrateCasesEventHandlerTest {
         MockedStatic<CaseMigrationEncryptionUtil> caseMigrationEncryptionUtilMockedStatic = Mockito.mockStatic(CaseMigrationEncryptionUtil.class);
         caseMigrationEncryptionUtilMockedStatic.when(() -> CaseMigrationEncryptionUtil.isFileEncrypted(csvFileName)).thenReturn(true);
 
-        when(caseReferenceCsvLoader.loadCaseReferenceList(csvFileName, "DUMMY_KEY")).thenReturn(mockReferences);
+        when(caseReferenceCsvLoader.loadCaseReferenceList(CaseReference.class, csvFileName, "DUMMY_KEY")).thenReturn(mockReferences);
 
         // Act
-        List<CaseReference> result = handler.getCaseReferenceList(caseIds, csvFileName);
+        List<CaseReference> result = handler.getCaseReferenceList(CaseReference.class, csvFileName);
 
         // Assert
         assertEquals(2, result.size());
@@ -164,7 +154,7 @@ class MigrateCasesEventHandlerTest {
         String csvFileName = null;
 
         // Act
-        List<CaseReference> result = handler.getCaseReferenceList(caseIds, csvFileName);
+        List<CaseReference> result = handler.getCaseReferenceList(CaseReference.class, csvFileName);
 
         // Assert
         assertEquals(0, result.size());

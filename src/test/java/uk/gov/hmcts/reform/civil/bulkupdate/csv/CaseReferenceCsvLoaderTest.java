@@ -18,7 +18,7 @@ class CaseReferenceCsvLoaderTest {
 
     @Test
     void shouldLoadCaseRefsCsvFile() {
-        List<CaseReference> caseReferences = caseReferenceCsvLoader.loadCaseReferenceList("caserefs-test.csv");
+        List<CaseReference> caseReferences = caseReferenceCsvLoader.loadCaseReferenceList(CaseReference.class, "caserefs-test.csv");
 
         assertThat(caseReferences.isEmpty(), equalTo(Boolean.FALSE));
         assertThat(caseReferences.size(), equalTo(4));
@@ -26,7 +26,7 @@ class CaseReferenceCsvLoaderTest {
 
     @Test
     void shouldReturnEmptyCollectionWhenFileNotFound() {
-        List<CaseReference> caseReferences = caseReferenceCsvLoader.loadCaseReferenceList("caserefs-test-file-does-not-exist.csv");
+        List<CaseReference> caseReferences = caseReferenceCsvLoader.loadCaseReferenceList(CaseReference.class, "caserefs-test-file-does-not-exist.csv");
 
         assertThat(caseReferences.isEmpty(), equalTo(Boolean.TRUE));
     }
@@ -48,7 +48,7 @@ class CaseReferenceCsvLoaderTest {
         String secret = "DUMMY_SECRET";
         String fileName = "caserefs-test-encrypted.csv";
 
-        List<CaseReference> caseReferences = caseReferenceCsvLoader.loadCaseReferenceList(fileName, secret);
+        List<CaseReference> caseReferences = caseReferenceCsvLoader.loadCaseReferenceList(CaseReference.class, fileName, secret);
 
         assertThat(caseReferences.isEmpty(), equalTo(Boolean.FALSE));
         assertEquals(3, caseReferences.size());
@@ -68,7 +68,7 @@ class CaseReferenceCsvLoaderTest {
         String secret = "incorrect-secret";
         String fileName = "caserefs-test-encrypted.csv";
 
-        List<CaseReference> caseReferences = caseReferenceCsvLoader.loadCaseReferenceList(fileName, secret);
+        List<CaseReference> caseReferences = caseReferenceCsvLoader.loadCaseReferenceList(CaseReference.class, fileName, secret);
 
         Assertions.assertThat(caseReferences).isEmpty();
     }
@@ -78,7 +78,7 @@ class CaseReferenceCsvLoaderTest {
         String secret = "invalid-secret";
         String fileName = "invalid-csv-file.csv";
 
-        List<CaseReference> caseReferences = caseReferenceCsvLoader.loadCaseReferenceList(fileName, secret);
+        List<CaseReference> caseReferences = caseReferenceCsvLoader.loadCaseReferenceList(CaseReference.class, fileName, secret);
 
         Assertions.assertThat(caseReferences).isEmpty();
     }

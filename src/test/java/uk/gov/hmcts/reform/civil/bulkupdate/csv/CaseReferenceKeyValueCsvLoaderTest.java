@@ -9,11 +9,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 public class CaseReferenceKeyValueCsvLoaderTest {
 
-    CaseReferenceKeyValueCsvLoader caseReferenceCsvLoader = new CaseReferenceKeyValueCsvLoader();
+    CaseReferenceCsvLoader caseReferenceCsvLoader = new CaseReferenceCsvLoader();
 
     @Test
     public void shouldLoadCaseRefsCsvFile() {
-        List<CaseReferenceKeyValue> caseReferences = caseReferenceCsvLoader.loadCaseReferenceList("caserefskeyvalue-test.csv");
+        List<CaseReferenceKeyValue> caseReferences = caseReferenceCsvLoader.loadCaseReferenceList(CaseReferenceKeyValue.class, "caserefskeyvalue-test.csv");
 
         assertThat(caseReferences.isEmpty(), equalTo(Boolean.FALSE));
         assertThat(caseReferences.size(), equalTo(4));
@@ -21,7 +21,7 @@ public class CaseReferenceKeyValueCsvLoaderTest {
 
     @Test
     public void shouldReturnEmptyCollectionWhenFileNotFound() {
-        List<CaseReferenceKeyValue> caseReferences = caseReferenceCsvLoader.loadCaseReferenceList("caserefs-test-file-does-not-exist.csv");
+        List<CaseReferenceKeyValue> caseReferences = caseReferenceCsvLoader.loadCaseReferenceList(CaseReferenceKeyValue.class, "caserefs-test-file-does-not-exist.csv");
 
         assertThat(caseReferences.isEmpty(), equalTo(Boolean.TRUE));
     }
