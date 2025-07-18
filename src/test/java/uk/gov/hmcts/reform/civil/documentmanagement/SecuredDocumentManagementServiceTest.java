@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.documentmanagement;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.tika.Tika;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -64,6 +65,8 @@ class SecuredDocumentManagementServiceTest {
     private AuthTokenGenerator authTokenGenerator;
     @MockBean
     private UserService userService;
+    @MockBean
+    private Tika tika;
 
     @Autowired
     private ObjectMapper mapper;
@@ -73,6 +76,10 @@ class SecuredDocumentManagementServiceTest {
 
     @Mock
     private ResponseEntity<Resource> responseEntity;
+
+
+    private static final String PNG_MIME_TYPE = "application/png";
+
     private final UserInfo userInfo = UserInfo.builder()
         .roles(List.of("role"))
         .uid("id")
@@ -149,6 +156,7 @@ class SecuredDocumentManagementServiceTest {
             );
 
             //when
+            when(tika.detect(anyString())).thenReturn(PNG_MIME_TYPE);
             when(caseDocumentClientApi.uploadDocuments(anyString(), anyString(), any(DocumentUploadRequest.class)))
                 .thenReturn(uploadResponse);
 
@@ -454,6 +462,7 @@ class SecuredDocumentManagementServiceTest {
 
         @Test
         void shouldDeleteDocument() {
+
             String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8ae1b5";
 
             documentManagementService.deleteDocument(BEARER_TOKEN, documentPath);
