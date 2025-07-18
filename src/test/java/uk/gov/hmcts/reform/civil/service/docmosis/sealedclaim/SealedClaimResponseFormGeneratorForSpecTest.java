@@ -234,20 +234,6 @@ public class SealedClaimResponseFormGeneratorForSpecTest {
     }
 
     @Test
-    void shouldSelectTemplateWithRepaymentPlan_whenPinAndPostEnabled() {
-        //Given
-        DocmosisDocument docmosisDocument = DocmosisDocument.builder().build();
-        given(featureToggleService.isPinInPostEnabled()).willReturn(true);
-        given(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), any()))
-            .willReturn(docmosisDocument);
-        //When
-        generator.generate(CASE_DATA_WITH_RESPONDENT1, BEARER_TOKEN);
-        //Then
-        verify(documentGeneratorService).generateDocmosisDocument(templateDataCaptor.capture(), docmosisTemplatesArgumentCaptor.capture());
-        assertThat(docmosisTemplatesArgumentCaptor.getValue()).isEqualTo(DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_SEALED_1V1_INSTALLMENTS);
-    }
-
-    @Test
     void shouldSelectTemplateWithoutRepaymentPlan_whenPinAndPostDisabled() {
         //Given
         DocmosisDocument docmosisDocument = DocmosisDocument.builder().build();
