@@ -427,6 +427,7 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
     }
 
     private DocmosisTemplates getTemplate(CaseData caseData) {
+        log.info("Testing DTSCCI-2300");
         if (caseData.getRespondent2() != null && YesOrNo.YES.equals(caseData.getRespondentResponseIsSame())) {
             return featureToggleService.isLrAdmissionBulkEnabled()
                     ? DEFENDANT_RESPONSE_SPEC_SEALED_1V2_LR_ADMISSION_BULK
