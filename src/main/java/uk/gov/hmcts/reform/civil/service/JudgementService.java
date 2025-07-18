@@ -113,7 +113,7 @@ public class JudgementService {
         } else {
             return (ccjJudgmentClaimAmount(caseData)
                 .add(ccjJudgmentClaimFee(caseData))
-                .add((!isLipVLipFullAdmitSetDate(caseData) && !featureToggleService.isLrAdmissionBulkEnabled()) ? ccjJudgmentInterest(caseData) : ZERO)
+                .add((!isLipVLipFullAdmitSetDate(caseData) || !featureToggleService.isLrAdmissionBulkEnabled()) ? ccjJudgmentInterest(caseData) : ZERO)
                 .add(ccjJudgmentFixedCost(caseData))).setScale(2);
         }
     }
