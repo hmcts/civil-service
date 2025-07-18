@@ -6,6 +6,8 @@ public enum CamundaProcessIdentifier {
     RejectRepaymentPlanNotifyParties,
     LitigationFriendAddedNotifier,
     ChangeOfRepresentationNotifyParties,
+    //NoC - Lip v Lip to LR v Lip
+    ClaimantLipRepresentedWithNoCNotifier,
     GenerateDJFormNotifyParties,
     ClaimProceedsOfflineUnspecNotifyApplicantSolicitor,
     UnspecNotifyClaimNotifier,
