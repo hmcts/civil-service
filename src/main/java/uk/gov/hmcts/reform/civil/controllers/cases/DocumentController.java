@@ -67,6 +67,10 @@ public class DocumentController {
         @NotNull @PathVariable String documentId) {
         DownloadedDocumentResponse documentResponse = claimFormService.downloadDocumentById(authorisation, documentId);
         HttpHeaders headers = new HttpHeaders();
+        log.info(
+            "document response : {}",
+            documentResponse.toString()
+        );
         headers.setContentType(MediaType.valueOf(documentResponse.mimeType()));
         headers.set("original-file-name", documentResponse.fileName());
 
