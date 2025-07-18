@@ -27,7 +27,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_2;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_EVENT;
 
 @SpringBootTest(classes = {
     CallbackHandlerFactory.class,
@@ -44,7 +44,7 @@ class CallbackHandlerFactoryTest {
         .build();
 
     public static final CallbackResponse ALREADY_HANDLED_EVENT_RESPONSE = AboutToStartOrSubmitCallbackResponse.builder()
-        .errors(List.of(format("Event %s is already processed", NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE.name())))
+        .errors(List.of(format("Event %s is already processed", NOTIFY_EVENT.name())))
         .build();
 
     @TestConfiguration
@@ -96,7 +96,7 @@ class CallbackHandlerFactoryTest {
 
                 @Override
                 public List<CaseEvent> handledEvents() {
-                    return Collections.singletonList(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE);
+                    return Collections.singletonList(NOTIFY_EVENT);
                 }
             };
         }
@@ -188,7 +188,7 @@ class CallbackHandlerFactoryTest {
     void shouldNotProcessEventAgain_whenEventIsAlreadyProcessed() {
         CallbackRequest callbackRequest = CallbackRequest
             .builder()
-            .eventId(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE.name())
+            .eventId(NOTIFY_EVENT.name())
             .caseDetailsBefore(CaseDetails.builder().data(Map.of(
                 "businessProcess",
                 BusinessProcess.builder().activityId("CreateClaimPaymentSuccessfulNotifyRespondentSolicitor1").build()
@@ -211,7 +211,7 @@ class CallbackHandlerFactoryTest {
     void shouldProcessEvent_whenEventIsNotAlreadyProcessed() {
         CallbackRequest callbackRequest = CallbackRequest
             .builder()
-            .eventId(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE.name())
+            .eventId(NOTIFY_EVENT.name())
             .caseDetailsBefore(CaseDetails.builder().data(Map.of(
                 "businessProcess",
                 BusinessProcess.builder().activityId("unProcessedTask").build()
