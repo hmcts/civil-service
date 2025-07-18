@@ -65,6 +65,8 @@ class SecuredDocumentManagementServiceTest {
     private AuthTokenGenerator authTokenGenerator;
     @MockBean
     private UserService userService;
+    @MockBean
+    private Tika tika;
 
     @Autowired
     private ObjectMapper mapper;
@@ -75,8 +77,6 @@ class SecuredDocumentManagementServiceTest {
     @Mock
     private ResponseEntity<Resource> responseEntity;
 
-    @Mock
-    private Tika tika;
 
     private static final String PNG_MIME_TYPE = "application/png";
 
@@ -462,6 +462,7 @@ class SecuredDocumentManagementServiceTest {
 
         @Test
         void shouldDeleteDocument() {
+
             String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8ae1b5";
 
             documentManagementService.deleteDocument(BEARER_TOKEN, documentPath);
