@@ -900,7 +900,7 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         //Given
         TranslatedDocument translatedDocument1 = TranslatedDocument
             .builder()
-            .documentType(DEFENDANT_DEFENCE)
+            .documentType(DEFENDANT_RESPONSE)
             .file(Document.builder().documentFileName(FILE_NAME_1).build())
             .build();
 
