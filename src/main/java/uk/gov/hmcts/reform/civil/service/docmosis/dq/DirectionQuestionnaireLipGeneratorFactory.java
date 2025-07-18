@@ -1,21 +1,18 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.dq;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class DirectionQuestionnaireLipGeneratorFactory {
 
-    private final FeatureToggleService featureToggleService;
     private final DirectionsQuestionnaireLipGenerator directionsQuestionnaireLipGenerator;
-    private final DirectionQuestionnaireLipResponseGenerator directionQuestionnaireLipResponseGenerator;
 
     public DirectionsQuestionnaireGenerator getDirectionQuestionnaire() {
-        if (featureToggleService.isLipVLipEnabled()) {
-            return directionQuestionnaireLipResponseGenerator;
-        }
+        log.info("Testing DTSCCI-2300");
         return directionsQuestionnaireLipGenerator;
     }
 }

@@ -8,7 +8,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
 class DirectionQuestionnaireLipGeneratorFactoryTest {
@@ -30,15 +29,4 @@ class DirectionQuestionnaireLipGeneratorFactoryTest {
         //Then
         assertThat(directionsQuestionnaireGenerator).isInstanceOf(DirectionsQuestionnaireLipGenerator.class);
     }
-
-    @Test
-    void shouldReturnDirectionQuestionnaireLipResposeGenerator_whenLipVLipIsEnabled() {
-        //Given
-        given(featureToggleService.isLipVLipEnabled()).willReturn(true);
-        //When
-        DirectionsQuestionnaireGenerator directionsQuestionnaireGenerator = factory.getDirectionQuestionnaire();
-        //Then
-        assertThat(directionsQuestionnaireGenerator).isInstanceOf(DirectionQuestionnaireLipResponseGenerator.class);
-    }
-
 }
