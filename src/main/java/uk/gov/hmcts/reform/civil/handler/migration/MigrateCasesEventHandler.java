@@ -21,13 +21,14 @@ import uk.gov.hmcts.reform.civil.utils.CaseMigrationEncryptionUtil;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @Component
 @Slf4j
 public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
 
+    protected static final String TASK_NAME = "taskName";
+    protected static final String CSV_FILE_NAME = "csvFileName";
     private final CaseReferenceCsvLoader caseReferenceCsvLoader;
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
@@ -59,22 +60,20 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
-        assert externalTask.getVariable("taskName") != null;
-        if (externalTask.getVariable("csvFileName") == null) {
+        assert externalTask.getVariable(TASK_NAME) != null;
+        if (externalTask.getVariable(CSV_FILE_NAME) == null) {
             throw new AssertionError("csvFileName is null");
         }
-
-        String taskName = externalTask.getVariable("taskName");
-        Optional<? extends MigrationTask<? extends CaseReference>> optionalTask =
-             migrationTaskFactory.getMigrationTask(taskName);
-        optionalTask.orElseThrow(() -> new IllegalArgumentException("No migration task found for: " + taskName));
-
-        MigrationTask<? extends CaseReference> task = optionalTask.get();
+        String taskName = externalTask.getVariable(TASK_NAME);
+        MigrationTask<? extends CaseReference> task = migrationTaskFactory
+            .getMigrationTask(taskName)
+            .orElseThrow(() -> new IllegalArgumentException("No migration task found for: " + taskName));
         return handleTypedTask(externalTask, task);
     }
 
+
     private <T extends CaseReference> ExternalTaskData handleTypedTask(ExternalTask externalTask, MigrationTask<T> task) {
-        String csvFileName = externalTask.getVariable("csvFileName");
+        String csvFileName = externalTask.getVariable(CSV_FILE_NAME);
 
         List<T> caseReferences = getCaseReferenceList(task.getType(), csvFileName);
 
