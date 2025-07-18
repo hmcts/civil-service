@@ -37,7 +37,6 @@ public class StatementOfTruthPopulatorTest {
     void shouldPopulateDetailsForRespondent1() {
         StatementOfTruth respondent1StatementOfTruth = StatementOfTruth.builder().name("Respondent 1").build();
         Respondent1DQ respondent1DQ = Respondent1DQ.builder()
-            .respondent1DQRequestedCourt(RequestedCourt.builder().build())
             .respondent1DQStatementOfTruth(respondent1StatementOfTruth)
             .build();
 
