@@ -23,7 +23,10 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.queryManagementRespondQuery;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.assignCategoryIdToCaseworkerAttachments;
+import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.clearOldQueryCollections;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getLatestQuery;
+import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.logMigrationSuccess;
+import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.migrateAllQueries;
 
 @Service
 @RequiredArgsConstructor
@@ -38,9 +41,9 @@ public class RespondQueryCallbackHandler extends CallbackHandler {
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
+            callbackKey(ABOUT_TO_START), this::aboutToStart,
             callbackKey(ABOUT_TO_SUBMIT), this::setManagementQuery,
-            callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
+            callbackKey(SUBMITTED), this::aboutToSubmit
         );
     }
 
@@ -49,21 +52,43 @@ public class RespondQueryCallbackHandler extends CallbackHandler {
         return EVENTS;
     }
 
+    private CallbackResponse aboutToStart(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+
+        if (featureToggleService.isPublicQueryManagementEnabled(caseData)) {
+            migrateAllQueries(caseDataBuilder);
+        }
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(mapper)).build();
+    }
+
     private CallbackResponse setManagementQuery(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         CaseMessage latestCaseMessage = getLatestQuery(caseData);
 
         boolean isPublicQmEnabled = featureToggleService.isPublicQueryManagementEnabled(caseData);
         assignCategoryIdToCaseworkerAttachments(caseData, latestCaseMessage, assignCategoryId, isPublicQmEnabled);
 
-        caseData = caseData.toBuilder()
-            .businessProcess(BusinessProcess.ready(queryManagementRespondQuery))
-            .build();
+        if (isPublicQmEnabled) {
+            clearOldQueryCollections(caseDataBuilder);
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseData.toMap(mapper))
+            .data(caseDataBuilder
+                      .businessProcess(BusinessProcess.ready(queryManagementRespondQuery))
+                      .build().toMap(mapper))
             .build();
-
     }
+
+    private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
+        CaseData caseDataBefore = callbackParams.getCaseDataBefore();
+        if (featureToggleService.isPublicQueryManagementEnabled(caseDataBefore)) {
+            logMigrationSuccess(callbackParams.getCaseDataBefore());
+        }
+        return emptySubmittedCallbackResponse(callbackParams);
+    }
+
 }
