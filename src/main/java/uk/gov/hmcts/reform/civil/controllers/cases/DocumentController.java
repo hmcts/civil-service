@@ -67,7 +67,7 @@ public class DocumentController {
         @NotNull @PathVariable String documentId) {
         DownloadedDocumentResponse documentResponse = claimFormService.downloadDocumentById(authorisation, documentId);
         HttpHeaders headers = new HttpHeaders();
-        log.info(
+        log.debug(
             "document response : {}",
             documentResponse.toString()
         );
