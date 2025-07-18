@@ -49,7 +49,7 @@ public class ValidateDiscontinueClaimClaimantCallbackHandler extends CallbackHan
 
     private final ObjectMapper objectMapper;
     private static final String BOTH = "Both";
-    private FeatureToggleService featureToggleService;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
