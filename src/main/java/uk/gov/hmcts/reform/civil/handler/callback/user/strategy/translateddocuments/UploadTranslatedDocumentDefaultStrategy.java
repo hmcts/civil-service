@@ -151,12 +151,10 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                             == DocumentType.NOTICE_OF_DISCONTINUANCE_DEFENDANT).findFirst();
                     noticeOfDiscontinuanceOpt.ifPresent(noticeOfDiscontinuance -> {
                         preTranslationDocuments.remove(noticeOfDiscontinuance);
-                        if (!caseData.isJudgeOrderVerificationRequired()) {
-                            caseDataBuilder.applicant1NoticeOfDiscontinueAllPartyViewDoc(caseData.getApplicant1NoticeOfDiscontinueCWViewDoc());
-                            caseDataBuilder.applicant1NoticeOfDiscontinueCWViewDoc(null);
-                            caseDataBuilder.respondent1NoticeOfDiscontinueCWViewDoc(null);
-                            caseDataBuilder.respondent1NoticeOfDiscontinueAllPartyViewDoc(noticeOfDiscontinuance.getValue());
-                        }
+                        caseDataBuilder.applicant1NoticeOfDiscontinueAllPartyViewDoc(caseData.getApplicant1NoticeOfDiscontinueCWViewDoc());
+                        caseDataBuilder.applicant1NoticeOfDiscontinueCWViewDoc(null);
+                        caseDataBuilder.respondent1NoticeOfDiscontinueCWViewDoc(null);
+                        caseDataBuilder.respondent1NoticeOfDiscontinueAllPartyViewDoc(noticeOfDiscontinuance.getValue());
                     });
                 } else if (document.getValue().getDocumentType().equals(SETTLEMENT_AGREEMENT)) {
                     Optional<Element<CaseDocument>> preTranslationSettlementAgreement =

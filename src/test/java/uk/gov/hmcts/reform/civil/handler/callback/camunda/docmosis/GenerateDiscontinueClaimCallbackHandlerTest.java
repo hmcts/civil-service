@@ -407,6 +407,7 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
             .applicant1(getApplicant1PartyDetails())
             .respondent1Represented(YesOrNo.NO)
             .typeOfDiscontinuance(DiscontinuanceTypeList.PART_DISCONTINUANCE)
+            .courtPermissionNeeded(SettleDiscontinueYesOrNoList.NO)
             .caseDataLiP(CaseDataLiP.builder()
                              .respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH")
                                                          .build()).build())
