@@ -60,7 +60,7 @@ public class DefendantResponseDeadlineCheckSearchService extends ElasticSearchSe
             boolQuery()
                 .minimumShouldMatch(1)
                 .should(boolQuery()
-                            .must(rangeQuery("data.respondent1ResponseDeadline").lt("now"))
+                            .must(rangeQuery("data.respondent1ResponseDeadline").lt(timeNow))
                             .mustNot(matchQuery("data.respondent1ResponseDeadlineChecked", "Yes"))
                             .must(beState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT))
                             .must(haveNoOngoingBusinessProcess())
