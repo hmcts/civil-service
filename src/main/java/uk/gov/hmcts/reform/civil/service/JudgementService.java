@@ -62,6 +62,10 @@ public class JudgementService {
             || isLrFullAdmitPayImmediately(caseData)) {
             BigDecimal interest = interestCalculator.calculateInterest(caseData);
             claimAmount = claimAmount.add(interest);
+        }
+        if (isLipVLipFullAdmitSetDate(caseData) && featureToggleService.isLrAdmissionBulkEnabled()) {
+            BigDecimal interest = interestCalculator.calculateInterest(caseData);
+            claimAmount = claimAmount.add(interest);
         } else {
             if (caseData.isPartAdmitClaimSpec()) {
                 claimAmount = caseData.getRespondToAdmittedClaimOwingAmountPounds();
@@ -109,7 +113,7 @@ public class JudgementService {
         } else {
             return (ccjJudgmentClaimAmount(caseData)
                 .add(ccjJudgmentClaimFee(caseData))
-                .add(ccjJudgmentInterest(caseData))
+                .add((!isLipVLipFullAdmitSetDate(caseData) || !featureToggleService.isLrAdmissionBulkEnabled()) ? ccjJudgmentInterest(caseData) : ZERO)
                 .add(ccjJudgmentFixedCost(caseData))).setScale(2);
         }
     }
@@ -173,5 +177,9 @@ public class JudgementService {
 
     private YesOrNo checkFixedCostOption(CaseData caseData) {
         return caseData.getCcjPaymentDetails().getCcjJudgmentFixedCostOption();
+    }
+
+    public boolean isLipVLipFullAdmitSetDate(CaseData caseData) {
+        return caseData.isLipvLipOneVOne() && caseData.isPayBySetDate() && caseData.isFullAdmitClaimSpec();
     }
 }
