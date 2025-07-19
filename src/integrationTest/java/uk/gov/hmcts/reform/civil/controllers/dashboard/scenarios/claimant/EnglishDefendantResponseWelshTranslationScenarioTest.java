@@ -8,7 +8,6 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.DefendantResponseWelshClaimantDashboardNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.dashboard.data.TaskStatus;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -45,13 +44,10 @@ public class EnglishDefendantResponseWelshTranslationScenarioTest extends Dashbo
         doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "CLAIMANT")
             .andExpectAll(
                 status().is(HttpStatus.OK.value()),
-                jsonPath("$[0].reference").value(caseId),
-                jsonPath("$[0].taskNameEn").value(
-                    "<a href={VIEW_RESPONSE_TO_CLAIM} class=\"govuk-link\">View the response to the claim</a>"),
-                jsonPath("$[0].currentStatusEn").value(TaskStatus.AVAILABLE.getName()),
-                jsonPath("$[0].taskNameCy").value(
-                    "<a href={VIEW_RESPONSE_TO_CLAIM} class=\"govuk-link\">View the response to the claim</a>"),
-                jsonPath("$[0].currentStatusCy").value(TaskStatus.AVAILABLE.getWelshName())
+                jsonPath("$[0].reference").doesNotExist(),
+                jsonPath("$[0].taskNameEn").doesNotExist(),
+                jsonPath("$[0].taskNameCy").doesNotExist(),
+                jsonPath("$[0].currentStatusCy").doesNotExist()
             );
     }
 
