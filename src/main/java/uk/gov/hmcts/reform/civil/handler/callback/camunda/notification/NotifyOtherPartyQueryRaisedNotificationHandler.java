@@ -134,8 +134,7 @@ public class NotifyOtherPartyQueryRaisedNotificationHandler extends CallbackHand
             properties.put(CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString());
         }
         addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
 
         return properties;
     }

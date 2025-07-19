@@ -39,6 +39,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_DETAILS_NOTIFICATION_DEADLINE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CNBC_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.ISSUED_ON;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
@@ -100,7 +101,6 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
             when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("welshHmctsSignature"));
             when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("welshPhoneContact"));
             when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
-            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
             when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
         }
@@ -110,6 +110,8 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
             when(notificationsProperties.getClaimantSolicitorClaimContinuingOnlineForSpec()).thenReturn(TEMPLATE);
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name(ORG_NAME).build()));
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             CallbackParams params = CallbackParamsBuilder.builder()
@@ -138,6 +140,8 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
             when(notificationsProperties.getClaimantSolicitorClaimContinuingOnline1v2ForSpec()).thenReturn(TEMPLATE_1v2);
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name(ORG_NAME).build()));
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
@@ -166,6 +170,8 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
             when(notificationsProperties.getClaimantSolicitorClaimContinuingOnline1v2ForSpec()).thenReturn(TEMPLATE_1v2);
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name(ORG_NAME).build()));
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
@@ -194,6 +200,8 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
             when(notificationsProperties.getClaimantSolicitorClaimContinuingOnlineForSpec()).thenReturn(TEMPLATE);
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name(ORG_NAME).build()));
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
@@ -225,6 +233,8 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
             when(notificationsProperties.getClaimantSolicitorClaimContinuingOnlineForSpec()).thenReturn(TEMPLATE);
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.empty());
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             CallbackParams params = CallbackParamsBuilder.builder()
@@ -253,6 +263,9 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
             when(notificationsProperties.getClaimantSolicitorClaimContinuingOnlineForSpec()).thenReturn(TEMPLATE);
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name(ORG_NAME).build()));
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
 
             CaseData caseData =
                 CaseDataBuilder.builder()
@@ -282,6 +295,8 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
             when(notificationsProperties.getClaimantSolicitorClaimContinuingOnlineForSpec()).thenReturn(TEMPLATE);
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name(ORG_NAME).build()));
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
 
             CaseData caseData =
                 CaseDataBuilder.builder()
@@ -309,7 +324,7 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
     }
 
     private Map<String, String> getNotificationDataMap(CaseData caseData, boolean is1v2DS) {
-        Map<String, String> properties = new HashMap<>(addCommonProperties());
+        Map<String, String> properties = new HashMap<>(addCommonProperties(caseData.isLipCase()));
 
         properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, ORG_NAME);
         properties.put(CLAIM_REFERENCE_NUMBER, CASE_ID.toString());
@@ -336,7 +351,7 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
     }
 
     @NotNull
-    public Map<String, String> addCommonProperties() {
+    public Map<String, String> addCommonProperties(boolean isLipCase) {
         Map<String, String> expectedProperties = new HashMap<>();
         expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
         expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
@@ -344,9 +359,15 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
         expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
         expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
         expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
-        expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
         expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
         expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+        if (isLipCase) {
+            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+            expectedProperties.put(CNBC_CONTACT, configuration.getCnbcContact());
+        } else {
+            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getRaiseQueryLr());
+            expectedProperties.put(CNBC_CONTACT, configuration.getRaiseQueryLr());
+        }
         return expectedProperties;
     }
 

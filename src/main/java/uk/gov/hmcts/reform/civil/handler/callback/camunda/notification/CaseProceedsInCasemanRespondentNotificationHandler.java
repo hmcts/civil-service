@@ -128,8 +128,7 @@ public class CaseProceedsInCasemanRespondentNotificationHandler extends Callback
             CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
         addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
 
         return properties;
     }

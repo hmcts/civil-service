@@ -48,6 +48,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.Ac
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CNBC_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT_WELSH;
@@ -94,9 +95,9 @@ class AcknowledgeClaimApplicantNotificationHandlerTest extends BaseCallbackHandl
             when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("welshHmctsSignature"));
             when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("welshPhoneContact"));
             when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
-            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
             when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
         }
 
         @Test
@@ -398,9 +399,10 @@ class AcknowledgeClaimApplicantNotificationHandlerTest extends BaseCallbackHandl
             properties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
             properties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
             properties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
-            properties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
             properties.put(LIP_CONTACT, configuration.getLipContactEmail());
             properties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+            properties.put(SPEC_UNSPEC_CONTACT, configuration.getRaiseQueryLr());
+            properties.put(CNBC_CONTACT, configuration.getRaiseQueryLr());
             return properties;
         }
     }

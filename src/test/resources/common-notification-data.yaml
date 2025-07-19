@@ -7,7 +7,7 @@ notifications:
   welshOpeningHours: "Dydd Llun i ddydd Iau, 9am – 5pm, dydd Gwener, 9am – 4.30pm"
   specUnspecContact: "Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk"
   cnbcContact: "Email: OCMCNton@justice.gov.uk"
-  raiseQueryLr: "Contact us about your claim by selecting Raise a query from the next steps menu in case file view."
+  raiseQueryLr: "Contact us about your claim by selecting Raise a query from the next steps menu."
   raiseQueryLip: "To contact the court, select contact or apply to the court on your dashboard."
   lipContactEmail: "Email: contactocmc@justice.gov.uk"
   raiseQueryLipWelsh: "I gysylltu â’r llys, dewiswch ‘contact or apply to the court’ ar eich dangosfwrdd."

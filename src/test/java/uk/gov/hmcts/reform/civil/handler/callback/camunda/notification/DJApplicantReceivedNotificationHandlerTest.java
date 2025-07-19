@@ -106,7 +106,8 @@ class DJApplicantReceivedNotificationHandlerTest {
                 .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
             when(notificationsProperties.getApplicantSolicitor1DefaultJudgmentReceived())
                 .thenReturn("test-template-received-id");
-
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             //send Received email
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
                 .addRespondent2(YesOrNo.NO)
@@ -129,7 +130,8 @@ class DJApplicantReceivedNotificationHandlerTest {
                 .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
             when(notificationsProperties.getApplicantSolicitor1DefaultJudgmentReceived())
                 .thenReturn("test-template-received-id");
-
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
                 .respondent2(PartyBuilder.builder().individual().build())
                 .addRespondent2(YesOrNo.YES)
@@ -158,7 +160,8 @@ class DJApplicantReceivedNotificationHandlerTest {
                 .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
             when(notificationsProperties.getApplicantSolicitor1DefaultJudgmentRequested())
                 .thenReturn("test-template-requested-id");
-
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             //send Requested email
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
                 .respondent2(PartyBuilder.builder().individual().build())
@@ -188,6 +191,9 @@ class DJApplicantReceivedNotificationHandlerTest {
                 .thenReturn("test-template-requested-lip-id");
             when(featureToggleService.isLipVLipEnabled())
                 .thenReturn(true);
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             //send Received email
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
                 .respondent1Represented(YesOrNo.NO)
@@ -216,7 +222,9 @@ class DJApplicantReceivedNotificationHandlerTest {
                 .thenReturn("test-template-requested-lip-id-bilingual");
             when(featureToggleService.isLipVLipEnabled())
                     .thenReturn(true);
-
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
                     .applicant1(PartyBuilder.builder().individual().build().toBuilder()
                             .build())
@@ -242,31 +250,29 @@ class DJApplicantReceivedNotificationHandlerTest {
 
         @NotNull
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
-            Map<String, String> properties = new HashMap<>(addCommonProperties());
+            Map<String, String> properties = new HashMap<>(addCommonProperties(false));
             properties.put(LEGAL_ORG_SPECIFIED, "Test Org Name");
             properties.put(CLAIM_NUMBER, CASE_ID.toString());
             properties.put(DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
             properties.put(PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789");
             properties.put(CASEMAN_REF, "000DC001");
-            properties.put(CNBC_CONTACT, configuration.getCnbcContact());
             return properties;
         }
 
         @NotNull
         private Map<String, String> getNotificationDataMapForRequested() {
-            Map<String, String> properties = new HashMap<>(addCommonProperties());
+            Map<String, String> properties = new HashMap<>(addCommonProperties(false));
             properties.put(LEGAL_ORG_APPLICANT1, "Test Org Name");
             properties.put(CLAIM_NUMBER, CASE_ID.toString());
             properties.put(DEFENDANT_NAME, "David");
             properties.put(PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789");
             properties.put(CASEMAN_REF, "000DC001");
-            properties.put(CNBC_CONTACT, configuration.getCnbcContact());
             return properties;
         }
 
         @NotNull
         public Map<String, String> getLipvLiPData(CaseData caseData) {
-            Map<String, String> properties = new HashMap<>(addCommonProperties());
+            Map<String, String> properties = new HashMap<>(addCommonProperties(true));
             properties.put(APPLICANT_ONE_NAME, getPartyNameBasedOnType(caseData.getApplicant1()));
             properties.put(CLAIM_NUMBER, LEGACY_CASE_REFERENCE);
             properties.put(DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
@@ -274,7 +280,7 @@ class DJApplicantReceivedNotificationHandlerTest {
         }
 
         @NotNull
-        public Map<String, String> addCommonProperties() {
+        public Map<String, String> addCommonProperties(boolean isLipCase) {
             Map<String, String> expectedProperties = new HashMap<>();
             expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
             expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
@@ -282,9 +288,15 @@ class DJApplicantReceivedNotificationHandlerTest {
             expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
             expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
             expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
-            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
             expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
             expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+            if (isLipCase) {
+                expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+                expectedProperties.put(CNBC_CONTACT, configuration.getCnbcContact());
+            } else {
+                expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getRaiseQueryLr());
+                expectedProperties.put(CNBC_CONTACT, configuration.getRaiseQueryLr());
+            }
             return expectedProperties;
         }
 

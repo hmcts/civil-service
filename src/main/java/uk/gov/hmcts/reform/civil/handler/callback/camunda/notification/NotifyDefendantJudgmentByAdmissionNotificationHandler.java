@@ -87,8 +87,7 @@ public class NotifyDefendantJudgmentByAdmissionNotificationHandler extends Callb
             PARTY_NAME, caseData.getRespondent1().getPartyName()
         ));
         addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
         return properties;
     }
 }

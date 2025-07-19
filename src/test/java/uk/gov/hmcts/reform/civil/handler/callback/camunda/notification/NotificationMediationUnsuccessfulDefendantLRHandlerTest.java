@@ -51,6 +51,7 @@ import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulRea
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CNBC_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT_WELSH;
@@ -117,7 +118,6 @@ class NotificationMediationUnsuccessfulDefendantLRHandlerTest extends BaseCallba
             when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("welshHmctsSignature"));
             when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("welshPhoneContact"));
             when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
-            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
             when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
         }
@@ -141,7 +141,8 @@ class NotificationMediationUnsuccessfulDefendantLRHandlerTest extends BaseCallba
             //When
             given(notificationsProperties.getMediationUnsuccessfulLRTemplate()).willReturn(EMAIL_TEMPLATE);
             given(organisationDetailsService.getRespondent1LegalOrganisationName(any())).willReturn(ORGANISATION_NAME_1);
-
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
@@ -177,7 +178,8 @@ class NotificationMediationUnsuccessfulDefendantLRHandlerTest extends BaseCallba
                 .build();
             given(notificationsProperties.getMediationUnsuccessfulLRTemplate()).willReturn(EMAIL_TEMPLATE);
             given(organisationDetailsService.getRespondent2LegalOrganisationName(any())).willReturn(ORGANISATION_NAME_2);
-
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_2_LR.name()).build()).build();
@@ -213,7 +215,8 @@ class NotificationMediationUnsuccessfulDefendantLRHandlerTest extends BaseCallba
                 .build();
             given(notificationsProperties.getMediationUnsuccessfulLRTemplate()).willReturn(EMAIL_TEMPLATE);
             given(organisationDetailsService.getRespondent1LegalOrganisationName(any())).willReturn(ORGANISATION_NAME_1);
-
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_1_LR.name()).build()).build();
@@ -252,7 +255,8 @@ class NotificationMediationUnsuccessfulDefendantLRHandlerTest extends BaseCallba
             given(notificationsProperties.getMediationUnsuccessfulNoAttendanceLRTemplate()).willReturn(
                 EMAIL_NO_ATTENDANCE_TEMPLATE);
             given(organisationDetailsService.getRespondent1LegalOrganisationName(any())).willReturn(ORGANISATION_NAME_1);
-
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_1_LR.name()).build()).build();
@@ -290,7 +294,8 @@ class NotificationMediationUnsuccessfulDefendantLRHandlerTest extends BaseCallba
             given(notificationsProperties.getMediationUnsuccessfulNoAttendanceLRTemplate()).willReturn(
                 EMAIL_NO_ATTENDANCE_TEMPLATE);
             given(organisationDetailsService.getRespondent2LegalOrganisationName(any())).willReturn(ORGANISATION_NAME_2);
-
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_2_LR.name()).build()).build();
@@ -328,7 +333,8 @@ class NotificationMediationUnsuccessfulDefendantLRHandlerTest extends BaseCallba
             given(notificationsProperties.getMediationUnsuccessfulNoAttendanceLRTemplate()).willReturn(
                 EMAIL_NO_ATTENDANCE_TEMPLATE);
             given(organisationDetailsService.getRespondent1LegalOrganisationName(any())).willReturn(ORGANISATION_NAME_1);
-
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
@@ -370,7 +376,8 @@ class NotificationMediationUnsuccessfulDefendantLRHandlerTest extends BaseCallba
             given(notificationsProperties.getMediationUnsuccessfulNoAttendanceLRTemplate()).willReturn(
                 EMAIL_NO_ATTENDANCE_TEMPLATE);
             given(organisationDetailsService.getRespondent2LegalOrganisationName(any())).willReturn(ORGANISATION_NAME_2);
-
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
@@ -407,7 +414,9 @@ class NotificationMediationUnsuccessfulDefendantLRHandlerTest extends BaseCallba
             given(organisationDetailsService.getRespondent1LegalOrganisationName(any())).willReturn(ORGANISATION_NAME_1);
             given(notificationsProperties.getMediationUnsuccessfulLRTemplateForLipVLr()).willReturn(
                 EMAIL_TEMPLATE_LIP_V_LR);
-
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_1_LR.name()).build()).build();
 
@@ -424,7 +433,7 @@ class NotificationMediationUnsuccessfulDefendantLRHandlerTest extends BaseCallba
 
         @NotNull
         private Map<String, String> getCarmD1PropertyMap(CaseData caseData) {
-            Map<String, String> properties = new HashMap<>(addCommonProperties());
+            Map<String, String> properties = new HashMap<>(addCommonProperties(false));
             properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, ORGANISATION_NAME_1);
             properties.put(PARTY_NAME, APPLICANT_PARTY_NAME + DEFENDANTS_TEXT);
             properties.put(CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString());
@@ -435,7 +444,7 @@ class NotificationMediationUnsuccessfulDefendantLRHandlerTest extends BaseCallba
 
         @NotNull
         private Map<String, String> getCarmD2PropertyMap(CaseData caseData) {
-            Map<String, String> properties = new HashMap<>(addCommonProperties());
+            Map<String, String> properties = new HashMap<>(addCommonProperties(false));
             properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, ORGANISATION_NAME_2);
             properties.put(PARTY_NAME, APPLICANT_PARTY_NAME + DEFENDANTS_TEXT);
             properties.put(CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString());
@@ -446,7 +455,7 @@ class NotificationMediationUnsuccessfulDefendantLRHandlerTest extends BaseCallba
 
         @NotNull
         private Map<String, String> getCarm2v1PropertyMap(CaseData caseData) {
-            Map<String, String> properties = new HashMap<>(addCommonProperties());
+            Map<String, String> properties = new HashMap<>(addCommonProperties(false));
             properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, ORGANISATION_NAME_1);
             properties.put(PARTY_NAME, APPLICANT_PARTY_NAME + " and " + APPLICANT_2_PARTY_NAME + DEFENDANTS_TEXT);
             properties.put(CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString());
@@ -457,7 +466,7 @@ class NotificationMediationUnsuccessfulDefendantLRHandlerTest extends BaseCallba
 
         @NotNull
         private Map<String, String> getCarmD1NoAttendancePropertyMap(CaseData caseData) {
-            Map<String, String> properties = new HashMap<>(addCommonProperties());
+            Map<String, String> properties = new HashMap<>(addCommonProperties(false));
             properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, ORGANISATION_NAME_1);
             properties.put(CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString());
             properties.put(PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData));
@@ -467,7 +476,7 @@ class NotificationMediationUnsuccessfulDefendantLRHandlerTest extends BaseCallba
 
         @NotNull
         private Map<String, String> getCarmD2NoAttendancePropertyMap(CaseData caseData) {
-            Map<String, String> properties = new HashMap<>(addCommonProperties());
+            Map<String, String> properties = new HashMap<>(addCommonProperties(false));
             properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, ORGANISATION_NAME_2);
             properties.put(CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString());
             properties.put(PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData));
@@ -476,7 +485,7 @@ class NotificationMediationUnsuccessfulDefendantLRHandlerTest extends BaseCallba
         }
 
         @NotNull
-        public Map<String, String> addCommonProperties() {
+        public Map<String, String> addCommonProperties(boolean isLipCase) {
             Map<String, String> expectedProperties = new HashMap<>();
             expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
             expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
@@ -484,9 +493,15 @@ class NotificationMediationUnsuccessfulDefendantLRHandlerTest extends BaseCallba
             expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
             expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
             expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
-            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
             expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
             expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+            if (isLipCase) {
+                expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+                expectedProperties.put(CNBC_CONTACT, configuration.getCnbcContact());
+            } else {
+                expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getRaiseQueryLr());
+                expectedProperties.put(CNBC_CONTACT, configuration.getRaiseQueryLr());
+            }
             return expectedProperties;
         }
     }
@@ -544,7 +559,6 @@ class NotificationMediationUnsuccessfulDefendantLRHandlerTest extends BaseCallba
     void shouldNotSendNotificationToDefendant1LRforLiPvLrCase_RespondentSolicitorNotSet() {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-
         CaseData caseData = CaseData.builder()
             .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(APPLICANT_PARTY_NAME).build())
             .applicant1Represented(NO)

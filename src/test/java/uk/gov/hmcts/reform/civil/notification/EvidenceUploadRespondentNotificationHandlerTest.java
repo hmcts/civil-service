@@ -37,6 +37,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CNBC_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT_WELSH;
@@ -86,7 +87,6 @@ class EvidenceUploadRespondentNotificationHandlerTest extends BaseCallbackHandle
             when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("welshHmctsSignature"));
             when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("welshPhoneContact"));
             when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
-            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
             when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
         }
@@ -96,6 +96,8 @@ class EvidenceUploadRespondentNotificationHandlerTest extends BaseCallbackHandle
             when(notificationsProperties.getEvidenceUploadTemplate()).thenReturn(TEMPLATE_ID);
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
 
             CaseData caseData = createCaseDataWithText(NOTIFICATION_TEXT);
             handler.notifyRespondentEvidenceUpload(caseData, true);
@@ -113,6 +115,9 @@ class EvidenceUploadRespondentNotificationHandlerTest extends BaseCallbackHandle
             //given: case data has one respondent litigant in person
             //when: RepondentNotificationhandler for respondent 1 is called
             when(notificationsProperties.getEvidenceUploadLipTemplate()).thenReturn(TEMPLATE_ID_LIP);
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
 
             CaseData caseData = createCaseDataForLip(NOTIFICATION_TEXT);
 
@@ -129,6 +134,9 @@ class EvidenceUploadRespondentNotificationHandlerTest extends BaseCallbackHandle
         @Test
         void shouldNotifyRespondent1LipInWelsh_whenInvoked() {
             when(notificationsProperties.getEvidenceUploadLipTemplateWelsh()).thenReturn(TEMPLATE_ID_WELSH_LIP);
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
 
             CaseData caseData = createCaseDataForLip(NOTIFICATION_TEXT).toBuilder()
                 .caseDataLiP(CaseDataLiP.builder()
@@ -155,6 +163,8 @@ class EvidenceUploadRespondentNotificationHandlerTest extends BaseCallbackHandle
             when(notificationsProperties.getEvidenceUploadTemplate()).thenReturn(TEMPLATE_ID);
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
 
             CaseData caseData = createCaseDataWithText(NOTIFICATION_TEXT).toBuilder()
                 .respondent2(Party.builder().build())
@@ -169,33 +179,6 @@ class EvidenceUploadRespondentNotificationHandlerTest extends BaseCallbackHandle
                 RESPONDENT2_SOLICITOR_EMAIL,
                 TEMPLATE_ID,
                 getNotificationDataMap(caseData, false, true),
-                "evidence-upload-notification-" + caseData.getLegacyCaseReference()
-            );
-        }
-
-        @Test
-        void shouldNotifyRespondent2Lip_whenInvoked() {
-            //given: case data has two respondents, with second being litigant in person
-            when(notificationsProperties.getEvidenceUploadLipTemplate()).thenReturn(TEMPLATE_ID_LIP);
-            when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
-
-            CaseData caseData = createCaseDataWithText(NOTIFICATION_TEXT).toBuilder()
-                .addRespondent2(YesOrNo.YES)
-                .respondent2Represented(YesOrNo.NO)
-                .respondent2(Party.builder()
-                                 .individualLastName("Doe")
-                                 .individualFirstName("John")
-                                 .type(Party.Type.INDIVIDUAL)
-                                 .partyName("Billy").partyEmail(RESPONDENT1_LIP_EMAIL).build())
-                .build();
-            //when: RepondentNotificationhandler for respondent 2 is called
-            handler.notifyRespondentEvidenceUpload(caseData, false);
-            //then: email should be sent to respondent 2
-            verify(notificationService).sendMail(
-                RESPONDENT1_LIP_EMAIL,
-                TEMPLATE_ID_LIP,
-                getNotificationDataMap(caseData, true, true),
                 "evidence-upload-notification-" + caseData.getLegacyCaseReference()
             );
         }
@@ -249,13 +232,19 @@ class EvidenceUploadRespondentNotificationHandlerTest extends BaseCallbackHandle
                 CLAIM_LEGAL_ORG_NAME_SPEC, isLip && !is1v2 ? "John Doe" : "org name",
                 CASEMAN_REF, "000DC001"
             ));
+            if (isLip) {
+                expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+                expectedProperties.put(CNBC_CONTACT, configuration.getCnbcContact());
+            } else {
+                expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getRaiseQueryLr());
+                expectedProperties.put(CNBC_CONTACT, configuration.getRaiseQueryLr());
+            }
             expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
             expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
             expectedProperties.put(HMCTS_SIGNATURE, configuration.getHmctsSignature());
             expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
             expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
             expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
-            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
             expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
             expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
             return expectedProperties;

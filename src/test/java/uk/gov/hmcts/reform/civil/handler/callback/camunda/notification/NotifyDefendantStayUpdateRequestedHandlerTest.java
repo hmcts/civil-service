@@ -39,6 +39,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT2_STAY_UPDATE_REQUESTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_STAY_UPDATE_REQUESTED;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CNBC_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT_WELSH;
@@ -87,7 +88,6 @@ class NotifyDefendantStayUpdateRequestedHandlerTest {
         when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("welshHmctsSignature"));
         when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("welshPhoneContact"));
         when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
-        when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
         when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
         when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
     }
@@ -139,7 +139,8 @@ class NotifyDefendantStayUpdateRequestedHandlerTest {
             .build();
         CallbackParams params = CallbackParams.builder().caseData(caseData)
             .request(CallbackRequest.builder().eventId(caseEvent.toString()).build()).build();
-
+        Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+        when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
         when(notificationsProperties.getNotifyLRStayUpdateRequested()).thenReturn("solicitor-template");
 
         CallbackResponse response = handler.sendNotification(params);
@@ -172,7 +173,9 @@ class NotifyDefendantStayUpdateRequestedHandlerTest {
     @ParameterizedTest
     @MethodSource("provideCaseDataLip")
     void sendNotificationShouldSendEmailToLip(String language, String template) {
-
+        Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+        when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+        when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
         RespondentLiPResponse respondentLip = RespondentLiPResponse.builder()
             .respondent1ResponseLanguage(language).build();
         caseData = caseData.toBuilder()
@@ -202,7 +205,7 @@ class NotifyDefendantStayUpdateRequestedHandlerTest {
 
     @NotNull
     private Map<String, String> propertiesLip() {
-        Map<String, String> expectedProperties = new HashMap<>(addCommonProperties());
+        Map<String, String> expectedProperties = new HashMap<>(addCommonProperties(true));
         expectedProperties.putAll(Map.of(
             "claimantvdefendant", "Mr. John Rambo V Jack Jackson",
             "claimReferenceNumber", "1594901956117591",
@@ -213,7 +216,7 @@ class NotifyDefendantStayUpdateRequestedHandlerTest {
 
     @NotNull
     private Map<String, String> propertiesDef1(CaseData caseData) {
-        Map<String, String> expectedProperties = new HashMap<>(addCommonProperties());
+        Map<String, String> expectedProperties = new HashMap<>(addCommonProperties(false));
         expectedProperties.putAll(Map.of(
             "claimantvdefendant", "Mr. John Rambo V Jack Jackson",
             "claimReferenceNumber", "1594901956117591",
@@ -226,7 +229,7 @@ class NotifyDefendantStayUpdateRequestedHandlerTest {
 
     @NotNull
     private Map<String, String> propertiesDef2(CaseData caseData) {
-        Map<String, String> expectedProperties = new HashMap<>(addCommonProperties());
+        Map<String, String> expectedProperties = new HashMap<>(addCommonProperties(false));
 
         expectedProperties.putAll(Map.of(
             "claimantvdefendant", "Mr. John Rambo V Jack Jackson",
@@ -240,7 +243,7 @@ class NotifyDefendantStayUpdateRequestedHandlerTest {
     }
 
     @NotNull
-    public Map<String, String> addCommonProperties() {
+    public Map<String, String> addCommonProperties(boolean isLipCase) {
         Map<String, String> expectedProperties = new HashMap<>();
         expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
         expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
@@ -248,9 +251,15 @@ class NotifyDefendantStayUpdateRequestedHandlerTest {
         expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
         expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
         expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
-        expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
         expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
         expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+        if (isLipCase) {
+            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+            expectedProperties.put(CNBC_CONTACT, configuration.getCnbcContact());
+        } else {
+            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getRaiseQueryLr());
+            expectedProperties.put(CNBC_CONTACT, configuration.getRaiseQueryLr());
+        }
         return expectedProperties;
     }
 }

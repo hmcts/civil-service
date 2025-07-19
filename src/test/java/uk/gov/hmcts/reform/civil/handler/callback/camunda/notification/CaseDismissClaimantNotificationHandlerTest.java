@@ -34,6 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CNBC_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT_WELSH;
@@ -125,12 +126,16 @@ class CaseDismissClaimantNotificationHandlerTest {
             .type(ABOUT_TO_SUBMIT)
             .build();
 
+        Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
         if (isRespondentLiP && isRespondentBilingual) {
             when(notificationsProperties.getNotifyLipUpdateTemplateBilingual()).thenReturn("bilingual-template");
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
         } else if (isRespondentLiP) {
             when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn("default-template");
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
         } else {
             when(notificationsProperties.getNotifyLRCaseDismissed()).thenReturn("solicitor-template");
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
         }
 
         CallbackResponse response = handler.sendNotification(params);
@@ -138,14 +143,14 @@ class CaseDismissClaimantNotificationHandlerTest {
         verify(notificationService).sendMail(
             isRespondentLiP ? "claimant@hmcts.net" : "solicitor@example.com",
             template,
-            getProperties(caseData),
+            getProperties(caseData, isRespondentLiP),
             "dismiss-case-claimant-notification-1594901956117591"
         );
         assertNotNull(response);
     }
 
     @NotNull
-    public Map<String, String> getProperties(CaseData caseData) {
+    public Map<String, String> getProperties(CaseData caseData, boolean isRespondentLiP) {
         Map<String, String> expectedProperties = new HashMap<>();
         expectedProperties.put("claimReferenceNumber", "1594901956117591");
         expectedProperties.put("name", "John Doe");
@@ -161,6 +166,13 @@ class CaseDismissClaimantNotificationHandlerTest {
         expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
         expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
         expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+        if (isRespondentLiP) {
+            expectedProperties.put(CNBC_CONTACT, configuration.getCnbcContact());
+            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+        } else {
+            expectedProperties.put(CNBC_CONTACT, configuration.getRaiseQueryLr());
+            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getRaiseQueryLr());
+        }
         return expectedProperties;
     }
 }

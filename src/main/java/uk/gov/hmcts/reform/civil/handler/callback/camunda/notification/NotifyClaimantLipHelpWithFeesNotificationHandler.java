@@ -74,8 +74,7 @@ public class NotifyClaimantLipHelpWithFeesNotificationHandler extends CallbackHa
             CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData)
         ));
         addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
         return properties;
     }
 

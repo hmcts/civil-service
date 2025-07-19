@@ -55,6 +55,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_OTHER_PARTY_QU
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CNBC_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT_WELSH;
@@ -114,28 +115,26 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
     private static final String TEMPLATE_ID_LIP = "template-public-query-id-lip";
     private static final String TEMPLATE_ID_LIP_WELSH = "template-public-query-id-welsh";
 
-    @BeforeEach
-    void setUp() {
-        when(organisationService.findOrganisationById(any()))
-            .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
-        when(notificationsProperties.getNotifyOtherPartyQueryResponseReceived()).thenReturn(TEMPLATE_ID);
-        when(notificationsProperties.getQueryLrPublicResponseReceived()).thenReturn(TEMPLATE_PUBLIC_QUERY_ID);
-        when(notificationsProperties.getQueryLipPublicResponseReceived()).thenReturn(TEMPLATE_ID_LIP);
-        when(notificationsProperties.getQueryLipWelshPublicResponseReceived()).thenReturn(TEMPLATE_ID_LIP_WELSH);
-        Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
-        when(configuration.getHmctsSignature()).thenReturn((String) configMap.get("hmctsSignature"));
-        when(configuration.getPhoneContact()).thenReturn((String) configMap.get("phoneContact"));
-        when(configuration.getOpeningHours()).thenReturn((String) configMap.get("openingHours"));
-        when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("welshHmctsSignature"));
-        when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("welshPhoneContact"));
-        when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
-        when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
-        when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
-        when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
-    }
-
     @Nested
     class LrNotifications {
+
+        @BeforeEach
+        void setUp() {
+            when(organisationService.findOrganisationById(any()))
+                .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
+            when(notificationsProperties.getNotifyOtherPartyQueryResponseReceived()).thenReturn(TEMPLATE_ID);
+            when(notificationsProperties.getQueryLrPublicResponseReceived()).thenReturn(TEMPLATE_PUBLIC_QUERY_ID);
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getHmctsSignature()).thenReturn((String) configMap.get("hmctsSignature"));
+            when(configuration.getPhoneContact()).thenReturn((String) configMap.get("phoneContact"));
+            when(configuration.getOpeningHours()).thenReturn((String) configMap.get("openingHours"));
+            when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("welshHmctsSignature"));
+            when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("welshPhoneContact"));
+            when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
+            when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
+            when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
+        }
 
         @ParameterizedTest
         @CsvSource({
@@ -159,7 +158,7 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
             verify(notificationService).sendMail(
                 email,
                 Boolean.parseBoolean(toggle) ? TEMPLATE_PUBLIC_QUERY_ID : TEMPLATE_ID,
-                getNotificationDataMap(caseData),
+                getNotificationDataMap(caseData, false),
                 "other-party-response-to-query-notification-000DC001"
             );
         }
@@ -186,7 +185,7 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
             verify(notificationService).sendMail(
                 email,
                 Boolean.parseBoolean(toggle) ? TEMPLATE_PUBLIC_QUERY_ID : TEMPLATE_ID,
-                getNotificationDataMap(caseData),
+                getNotificationDataMap(caseData, false),
                 "other-party-response-to-query-notification-000DC001"
             );
         }
@@ -215,7 +214,7 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
                 verify(notificationService).sendMail(
                     email,
                     Boolean.parseBoolean(toggle) ? TEMPLATE_PUBLIC_QUERY_ID : TEMPLATE_ID,
-                    getNotificationDataMap(caseData),
+                    getNotificationDataMap(caseData, false),
                     "other-party-response-to-query-notification-000DC001"
                 );
             }
@@ -230,13 +229,13 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
 
                 assertThat(targetEmail.getAllValues().get(0)).isEqualTo(email);
                 assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(Boolean.parseBoolean(toggle) ? TEMPLATE_PUBLIC_QUERY_ID : TEMPLATE_ID);
-                assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(getNotificationDataMap(caseData));
+                assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(getNotificationDataMap(caseData, false));
                 assertThat(reference.getAllValues().get(0)).isEqualTo(
                     "other-party-response-to-query-notification-000DC001");
 
                 assertThat(targetEmail.getAllValues().get(1)).isEqualTo(emailDef2);
                 assertThat(emailTemplate.getAllValues().get(1)).isEqualTo(Boolean.parseBoolean(toggle) ? TEMPLATE_PUBLIC_QUERY_ID : TEMPLATE_ID);
-                assertThat(notificationDataMap.getAllValues().get(1)).isEqualTo(getNotificationDataMap(caseData));
+                assertThat(notificationDataMap.getAllValues().get(1)).isEqualTo(getNotificationDataMap(caseData, false));
                 assertThat(reference.getAllValues().get(1)).isEqualTo(
                     "other-party-response-to-query-notification-000DC001");
             }
@@ -592,6 +591,28 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
     @Nested
     class LipOnCaseNotifications {
 
+        @BeforeEach
+        void setUp() {
+            when(organisationService.findOrganisationById(any()))
+                .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
+            when(notificationsProperties.getNotifyOtherPartyQueryResponseReceived()).thenReturn(TEMPLATE_ID);
+            when(notificationsProperties.getQueryLrPublicResponseReceived()).thenReturn(TEMPLATE_PUBLIC_QUERY_ID);
+            when(notificationsProperties.getQueryLipPublicResponseReceived()).thenReturn(TEMPLATE_ID_LIP);
+            when(notificationsProperties.getQueryLipWelshPublicResponseReceived()).thenReturn(TEMPLATE_ID_LIP_WELSH);
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getHmctsSignature()).thenReturn((String) configMap.get("hmctsSignature"));
+            when(configuration.getPhoneContact()).thenReturn((String) configMap.get("phoneContact"));
+            when(configuration.getOpeningHours()).thenReturn((String) configMap.get("openingHours"));
+            when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("welshHmctsSignature"));
+            when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("welshPhoneContact"));
+            when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
+            when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
+            when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
+            when(configuration.getRaiseQueryLip()).thenReturn((String) configMap.get("raiseQueryLip"));
+            when(configuration.getRaiseQueryLipWelsh()).thenReturn((String) configMap.get("raiseQueryLipWelsh"));
+        }
+
         @ParameterizedTest
         @ValueSource(booleans = {true, false})
         void shouldNotifyOtherParty_whenQueryResponseOnLipCase_OtherPartyLipApplicant(boolean isWelsh) {
@@ -719,7 +740,7 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
             verify(notificationService).sendMail(
                 "applicantsolicitor@example.com",
                 TEMPLATE_PUBLIC_QUERY_ID,
-                getNotificationDataMap(caseData),
+                getNotificationDataMap(caseData, true),
                 "other-party-response-to-query-notification-000DC001"
             );
         }
@@ -751,7 +772,7 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
             verify(notificationService).sendMail(
                 "respondentsolicitor@example.com",
                 TEMPLATE_PUBLIC_QUERY_ID,
-                getNotificationDataMap(caseData),
+                getNotificationDataMap(caseData, true),
                 "other-party-response-to-query-notification-000DC001"
             );
         }
@@ -791,20 +812,20 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
 
             assertThat(targetEmail.getAllValues().get(0)).isEqualTo("respondentsolicitor@example.com");
             assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(TEMPLATE_PUBLIC_QUERY_ID);
-            assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(getNotificationDataMap(caseData));
+            assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(getNotificationDataMap(caseData, true));
             assertThat(reference.getAllValues().get(0)).isEqualTo("other-party-response-to-query-notification-000DC001");
 
             assertThat(targetEmail.getAllValues().get(1)).isEqualTo("respondentsolicitor2@example.com");
             assertThat(emailTemplate.getAllValues().get(1)).isEqualTo(TEMPLATE_PUBLIC_QUERY_ID);
-            assertThat(notificationDataMap.getAllValues().get(1)).isEqualTo(getNotificationDataMap(caseData));
+            assertThat(notificationDataMap.getAllValues().get(1)).isEqualTo(getNotificationDataMap(caseData, true));
             assertThat(reference.getAllValues().get(1)).isEqualTo("other-party-response-to-query-notification-000DC001");
         }
 
     }
 
     @NotNull
-    private Map<String, String> getNotificationDataMap(CaseData caseData) {
-        Map<String, String> properties = new HashMap<>(addCommonProperties());
+    private Map<String, String> getNotificationDataMap(CaseData caseData, boolean isLipCase) {
+        Map<String, String> properties = new HashMap<>(addCommonProperties(isLipCase));
         properties.put(CLAIM_REFERENCE_NUMBER, "1594901956117591");
         properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name");
         properties.put(CASEMAN_REF, "000DC001");
@@ -814,7 +835,7 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
 
     @NotNull
     private Map<String, String> getNotificationDataMapLip(boolean applicant) {
-        Map<String, String> properties = new HashMap<>(addCommonProperties());
+        Map<String, String> properties = new HashMap<>(addCommonProperties(true));
         properties.putAll(Map.of(
             CLAIM_REFERENCE_NUMBER, "1594901956117591",
             PARTY_NAME, applicant ? "Mr. John Rambo" : "Mr. Sole Trader"
@@ -823,7 +844,7 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
     }
 
     @NotNull
-    public Map<String, String> addCommonProperties() {
+    public Map<String, String> addCommonProperties(boolean isLipCase) {
         Map<String, String> expectedProperties = new HashMap<>();
         expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
         expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
@@ -831,9 +852,15 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
         expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
         expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
         expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
-        expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
-        expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
-        expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+        if (isLipCase) {
+            expectedProperties.put(LIP_CONTACT, configuration.getRaiseQueryLip());
+            expectedProperties.put(LIP_CONTACT_WELSH, configuration.getRaiseQueryLipWelsh());
+        } else {
+            expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
+            expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+        }
+        expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getRaiseQueryLr());
+        expectedProperties.put(CNBC_CONTACT, configuration.getRaiseQueryLr());
         return expectedProperties;
     }
 

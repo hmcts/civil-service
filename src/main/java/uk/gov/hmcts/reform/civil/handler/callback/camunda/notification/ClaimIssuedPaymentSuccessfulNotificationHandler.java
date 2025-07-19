@@ -86,8 +86,7 @@ public class ClaimIssuedPaymentSuccessfulNotificationHandler extends CallbackHan
         ));
 
         addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
         return properties;
     }
 

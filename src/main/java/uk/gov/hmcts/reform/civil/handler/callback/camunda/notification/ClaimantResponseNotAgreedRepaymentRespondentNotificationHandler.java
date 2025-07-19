@@ -88,8 +88,7 @@ public class ClaimantResponseNotAgreedRepaymentRespondentNotificationHandler ext
                 CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1())
             ));
             addAllFooterItems(caseData, lipProperties, configuration,
-                              featureToggleService.isQueryManagementLRsEnabled(),
-                              featureToggleService.isLipQueryManagementEnabled(caseData));
+                              featureToggleService.isPublicQueryManagementEnabled(caseData));
             return lipProperties;
         } else {
             HashMap<String, String> properties = new HashMap<>(Map.of(
@@ -99,8 +98,7 @@ public class ClaimantResponseNotAgreedRepaymentRespondentNotificationHandler ext
                 CASEMAN_REF, caseData.getLegacyCaseReference()
             ));
             addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
             return properties;
         }
     }

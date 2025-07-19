@@ -42,6 +42,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CNBC_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.FRONTEND_URL;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
@@ -97,23 +98,24 @@ class ResponseDeadlineExtensionClaimantNotificationHandlerTest extends BaseCallb
             when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("welshHmctsSignature"));
             when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("welshPhoneContact"));
             when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
-            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
             when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
         }
 
         @Test
         void shouldSendEmailToClaimantLR() {
+            when(organisationService.findOrganisationById(anyString()))
+                .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
+            given(notificationsProperties.getClaimantDeadlineExtension()).willReturn(emailTemplate);
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .build().toBuilder()
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
                 .respondentSolicitor1AgreedDeadlineExtension(LocalDate.now())
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
-
-            when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
-            given(notificationsProperties.getClaimantDeadlineExtension()).willReturn(emailTemplate);
             handler.handle(params);
 
             verify(notificationService).sendMail(
@@ -129,6 +131,9 @@ class ResponseDeadlineExtensionClaimantNotificationHandlerTest extends BaseCallb
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
             given(notificationsProperties.getClaimantLipDeadlineExtension()).willReturn(emailLipTemplate);
             when(pipInPostConfiguration.getCuiFrontEndUrl()).thenReturn("url");
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .build().toBuilder()
@@ -155,6 +160,9 @@ class ResponseDeadlineExtensionClaimantNotificationHandlerTest extends BaseCallb
             given(notificationsProperties.getClaimantLipDeadlineExtensionWelsh()).willReturn(emailLipWelshTemplate);
             when(toggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
             when(pipInPostConfiguration.getCuiFrontEndUrl()).thenReturn("url");
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .build().toBuilder()
@@ -182,6 +190,9 @@ class ResponseDeadlineExtensionClaimantNotificationHandlerTest extends BaseCallb
             given(notificationsProperties.getClaimantLipDeadlineExtension()).willReturn(emailLipTemplate);
             when(toggleService.isDefendantNoCOnlineForCase(any())).thenReturn(false);
             when(pipInPostConfiguration.getCuiFrontEndUrl()).thenReturn("url");
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .build().toBuilder()
@@ -213,6 +224,8 @@ class ResponseDeadlineExtensionClaimantNotificationHandlerTest extends BaseCallb
                 PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
                 CASEMAN_REF, "000DC001"
             ));
+            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getRaiseQueryLr());
+            expectedProperties.put(CNBC_CONTACT, configuration.getRaiseQueryLr());
             return expectedProperties;
         }
 
@@ -227,6 +240,8 @@ class ResponseDeadlineExtensionClaimantNotificationHandlerTest extends BaseCallb
                 RESPONSE_DEADLINE, formatLocalDate(
                     caseData.getRespondent1ResponseDeadline().toLocalDate(), DATE)
             ));
+            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+            expectedProperties.put(CNBC_CONTACT, configuration.getCnbcContact());
             return expectedProperties;
         }
 
@@ -239,7 +254,6 @@ class ResponseDeadlineExtensionClaimantNotificationHandlerTest extends BaseCallb
             expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
             expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
             expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
-            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
             expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
             expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
             return expectedProperties;

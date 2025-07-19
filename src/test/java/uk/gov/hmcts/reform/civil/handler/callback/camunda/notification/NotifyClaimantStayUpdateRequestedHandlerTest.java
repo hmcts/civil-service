@@ -35,6 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIMANT_STAY_UPDATE_REQUESTED;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CNBC_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT_WELSH;
@@ -88,6 +89,7 @@ class NotifyClaimantStayUpdateRequestedHandlerTest {
         when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
         when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
         when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
+
     }
 
     @Test
@@ -112,6 +114,8 @@ class NotifyClaimantStayUpdateRequestedHandlerTest {
         CallbackParams params = CallbackParams.builder().caseData(caseData).build();
 
         when(notificationsProperties.getNotifyLRStayUpdateRequested()).thenReturn("solicitor-template");
+        Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+        when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
 
         CallbackResponse response = handler.sendNotification(params);
 
@@ -134,6 +138,14 @@ class NotifyClaimantStayUpdateRequestedHandlerTest {
     @ParameterizedTest
     @MethodSource("provideCaseDataLip")
     void sendNotificationShouldSendEmailToLip(String language, String template) {
+        if (ENGLISH.equals(language)) {
+            when(notificationsProperties.getNotifyLipStayUpdateRequested()).thenReturn("default-template");
+        } else {
+            when(notificationsProperties.getNotifyLipBilingualStayUpdateRequested()).thenReturn("bilingual-template");
+        }
+        Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+        when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+        when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
 
         caseData = caseData.toBuilder()
             .applicant1Represented(YesOrNo.NO)
@@ -141,12 +153,6 @@ class NotifyClaimantStayUpdateRequestedHandlerTest {
             .build();
         CallbackParams params = CallbackParams.builder().caseData(caseData)
             .request(CallbackRequest.builder().eventId(NOTIFY_CLAIMANT_STAY_UPDATE_REQUESTED.toString()).build()).build();
-
-        if (ENGLISH.equals(language)) {
-            when(notificationsProperties.getNotifyLipStayUpdateRequested()).thenReturn("default-template");
-        } else {
-            when(notificationsProperties.getNotifyLipBilingualStayUpdateRequested()).thenReturn("bilingual-template");
-        }
 
         CallbackResponse response = handler.sendNotification(params);
 
@@ -160,7 +166,7 @@ class NotifyClaimantStayUpdateRequestedHandlerTest {
     }
 
     public Map<String, String> getProperties(CaseData caseData) {
-        Map<String, String> properties = new HashMap<>(addCommonProperties());
+        Map<String, String> properties = new HashMap<>(addCommonProperties(false));
         properties.put("claimantvdefendant", "John Doe V Jack Jackson");
         properties.put("name", "John Doe");
         properties.put("claimReferenceNumber", "1594901956117591");
@@ -170,7 +176,7 @@ class NotifyClaimantStayUpdateRequestedHandlerTest {
     }
 
     public Map<String, String> getLipProperties() {
-        Map<String, String> properties = new HashMap<>(addCommonProperties());
+        Map<String, String> properties = new HashMap<>(addCommonProperties(true));
         properties.put("claimantvdefendant", "John Doe V Jack Jackson");
         properties.put("claimReferenceNumber", "1594901956117591");
         properties.put("name", "John Doe");
@@ -178,7 +184,7 @@ class NotifyClaimantStayUpdateRequestedHandlerTest {
     }
 
     @NotNull
-    public Map<String, String> addCommonProperties() {
+    public Map<String, String> addCommonProperties(boolean isLipCase) {
         Map<String, String> expectedProperties = new HashMap<>();
         expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
         expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
@@ -189,6 +195,13 @@ class NotifyClaimantStayUpdateRequestedHandlerTest {
         expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
         expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
         expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+        if (isLipCase) {
+            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+            expectedProperties.put(CNBC_CONTACT, configuration.getCnbcContact());
+        } else {
+            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getRaiseQueryLr());
+            expectedProperties.put(CNBC_CONTACT, configuration.getRaiseQueryLr());
+        }
         return expectedProperties;
     }
 }

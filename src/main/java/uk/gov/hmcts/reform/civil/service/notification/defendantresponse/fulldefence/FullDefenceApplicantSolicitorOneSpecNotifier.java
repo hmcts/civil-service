@@ -97,8 +97,7 @@ public class FullDefenceApplicantSolicitorOneSpecNotifier extends FullDefenceSol
                 CASEMAN_REF, caseData.getLegacyCaseReference()
             ));
             addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
             return properties;
         } else {
             HashMap<String, String> properties = new HashMap<>(Map.of(
@@ -110,8 +109,7 @@ public class FullDefenceApplicantSolicitorOneSpecNotifier extends FullDefenceSol
                 CASEMAN_REF, caseData.getLegacyCaseReference()
             ));
             addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
             return properties;
         }
     }

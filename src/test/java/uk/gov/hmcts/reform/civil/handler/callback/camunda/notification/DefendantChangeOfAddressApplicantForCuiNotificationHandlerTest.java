@@ -34,6 +34,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CNBC_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.EXTERNAL_ID;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.FRONTEND_URL;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
@@ -94,7 +95,6 @@ class DefendantChangeOfAddressApplicantForCuiNotificationHandlerTest extends Bas
             when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("welshHmctsSignature"));
             when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("welshPhoneContact"));
             when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
-            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
             when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
         }
@@ -104,7 +104,8 @@ class DefendantChangeOfAddressApplicantForCuiNotificationHandlerTest extends Bas
             when(notificationsProperties.getRespondentChangeOfAddressNotificationTemplate()).thenReturn(TEMPLATE_ID);
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
-
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
@@ -122,7 +123,9 @@ class DefendantChangeOfAddressApplicantForCuiNotificationHandlerTest extends Bas
         void shouldNotifyLiPClaimant_whenInvoked() {
             when(notificationsProperties.getNotifyLiPClaimantDefendantChangedContactDetails()).thenReturn(TEMPLATE_ID);
             when(pinInPostConfiguration.getCuiFrontEndUrl()).thenReturn(FRONTEND_CUI_URL);
-
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .applicant1Represented(YesOrNo.NO)
                 .build();
@@ -140,7 +143,7 @@ class DefendantChangeOfAddressApplicantForCuiNotificationHandlerTest extends Bas
 
         @NotNull
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
-            Map<String, String> expectedProperties = new HashMap<>(addCommonProperties());
+            Map<String, String> expectedProperties = new HashMap<>(addCommonProperties(false));
             expectedProperties.put(CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString());
             expectedProperties.put(RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
             expectedProperties.put(CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name");
@@ -151,7 +154,7 @@ class DefendantChangeOfAddressApplicantForCuiNotificationHandlerTest extends Bas
 
         @NotNull
         private Map<String, String> getNotificationDataMapForLiPClaimant() {
-            Map<String, String> expectedProperties = new HashMap<>(addCommonProperties());
+            Map<String, String> expectedProperties = new HashMap<>(addCommonProperties(true));
             expectedProperties.put(CLAIMANT_NAME, APPLICANT_NAME);
             expectedProperties.put(CLAIM_REFERENCE_NUMBER, REFERENCE_NUMBER);
             expectedProperties.put(RESPONDENT_NAME, DEFENDANT_NAME);
@@ -161,7 +164,7 @@ class DefendantChangeOfAddressApplicantForCuiNotificationHandlerTest extends Bas
         }
 
         @NotNull
-        public Map<String, String> addCommonProperties() {
+        public Map<String, String> addCommonProperties(boolean isLipCase) {
             Map<String, String> expectedProperties = new HashMap<>();
             expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
             expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
@@ -169,9 +172,15 @@ class DefendantChangeOfAddressApplicantForCuiNotificationHandlerTest extends Bas
             expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
             expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
             expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
-            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
             expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
             expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+            if (isLipCase) {
+                expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+                expectedProperties.put(CNBC_CONTACT, configuration.getCnbcContact());
+            } else {
+                expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getRaiseQueryLr());
+                expectedProperties.put(CNBC_CONTACT, configuration.getRaiseQueryLr());
+            }
             return expectedProperties;
         }
     }

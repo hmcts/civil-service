@@ -73,8 +73,7 @@ public class NotifyApplicant1GenericTemplateHandler extends CallbackHandler impl
             CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData)
         ));
         addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
         return properties;
     }
 

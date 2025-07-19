@@ -40,6 +40,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT2_FO
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CNBC_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LEGAL_ORG_NAME;
@@ -88,7 +89,6 @@ class RecordJudgmentDeterminationMeansRespondentNotificationHandlerTest extends 
             when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("welshHmctsSignature"));
             when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("welshPhoneContact"));
             when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
-            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
             when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
         }
@@ -118,7 +118,8 @@ class RecordJudgmentDeterminationMeansRespondentNotificationHandlerTest extends 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(NOTIFY_RESPONDENT1_FOR_RECORD_JUDGMENT.name()).build()
             ).build();
-
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             when(notificationsProperties.getNotifyLrRecordJudgmentDeterminationMeansTemplate()).thenReturn("template-id");
             handler.handle(params);
 
@@ -150,7 +151,8 @@ class RecordJudgmentDeterminationMeansRespondentNotificationHandlerTest extends 
                 .respondent2OrganisationPolicy(OrganisationPolicy.builder().organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
                                                                                              .organisationID(ORG_NAME_RESPONDENT2).build()).build()).build();
             when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(Organisation.builder().name(ORG_NAME_RESPONDENT2).build()));
-
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(NOTIFY_RESPONDENT2_FOR_RECORD_JUDGMENT.name()).build()
             ).build();
@@ -168,6 +170,11 @@ class RecordJudgmentDeterminationMeansRespondentNotificationHandlerTest extends 
 
         @Test
         void shouldNotifyRespondentLip_whenInvoked() {
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
+            when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn("template-id");
+
             CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithDeterminationMeans();
             caseData = caseData.toBuilder()
                 .applicant1(Party.builder()
@@ -183,8 +190,6 @@ class RecordJudgmentDeterminationMeansRespondentNotificationHandlerTest extends 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(NOTIFY_RESPONDENT1_FOR_RECORD_JUDGMENT.name()).build()
             ).build();
-
-            when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn("template-id");
             handler.handle(params);
 
             verify(notificationService).sendMail(
@@ -203,6 +208,8 @@ class RecordJudgmentDeterminationMeansRespondentNotificationHandlerTest extends 
             properties.put(DEFENDANT_NAME, NotificationUtils.getDefendantNameBasedOnCaseType(caseData));
             properties.put(PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData));
             properties.put(CASEMAN_REF, caseData.getLegacyCaseReference());
+            properties.put(SPEC_UNSPEC_CONTACT, configuration.getRaiseQueryLr());
+            properties.put(CNBC_CONTACT, configuration.getRaiseQueryLr());
             return properties;
         }
 
@@ -214,6 +221,8 @@ class RecordJudgmentDeterminationMeansRespondentNotificationHandlerTest extends 
             properties.put(DEFENDANT_NAME, NotificationUtils.getDefendantNameBasedOnCaseType(caseData));
             properties.put(PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData));
             properties.put(CASEMAN_REF, caseData.getLegacyCaseReference());
+            properties.put(SPEC_UNSPEC_CONTACT, configuration.getRaiseQueryLr());
+            properties.put(CNBC_CONTACT, configuration.getRaiseQueryLr());
             return properties;
         }
 
@@ -222,6 +231,8 @@ class RecordJudgmentDeterminationMeansRespondentNotificationHandlerTest extends 
             properties.put(CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference());
             properties.put(PARTY_NAME, caseData.getRespondent1().getPartyName());
             properties.put(CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData));
+            properties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+            properties.put(CNBC_CONTACT, configuration.getCnbcContact());
             return properties;
         }
 
