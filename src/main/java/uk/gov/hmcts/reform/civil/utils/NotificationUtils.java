@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.utils;
 
-import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -52,7 +51,6 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.SPEC_UNSPEC_CONTACT;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
-@Slf4j
 public class NotificationUtils {
 
     private NotificationUtils() {
@@ -340,8 +338,6 @@ public class NotificationUtils {
     public static Map<String, String> addLipContact(CaseData caseData, Map<String, String> properties, NotificationsSignatureConfiguration configuration,
                                                     boolean isLRQmEnabled, boolean isLipQmEnabled) {
 
-        log.info("!queryNotAllowedCaseStates(caseData) " + !queryNotAllowedCaseStates(caseData));
-        log.info("is LIP on case " + caseData.isLipCase());
         if (isLRQmEnabled && isLipQmEnabled && !queryNotAllowedCaseStates(caseData) && caseData.isLipCase()) {
             properties.put(LIP_CONTACT, configuration.getRaiseQueryLip());
         } else {
@@ -353,8 +349,6 @@ public class NotificationUtils {
     public static Map<String, String> addLipContactWelsh(CaseData caseData, Map<String, String> properties, NotificationsSignatureConfiguration configuration,
                                                          boolean isLRQmEnabled, boolean isLipQmEnabled) {
 
-        log.info("!queryNotAllowedCaseStates(caseData) " + !queryNotAllowedCaseStates(caseData));
-        log.info("is LIP on case " + caseData.isLipCase());
         if (isLRQmEnabled && isLipQmEnabled && !queryNotAllowedCaseStates(caseData) && caseData.isLipCase()) {
             properties.put(LIP_CONTACT_WELSH, configuration.getRaiseQueryLipWelsh());
         } else {

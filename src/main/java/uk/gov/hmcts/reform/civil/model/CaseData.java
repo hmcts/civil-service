@@ -639,6 +639,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final YesOrNo bilingualHint;
     private final CaseDocument respondent1OriginalDqDoc;
 
+    private final YesOrNo isMintiLipCase;
+
     /**
      * There are several fields that can hold the I2P of applicant1 depending
      * on multiparty scenario, which complicates all conditions depending on it.
