@@ -90,10 +90,7 @@ public class RoboticsNotificationService {
             return Optional.of(EmailData.builder()
                                    .message(getMessage(params.getCaseData(), params.isMultiParty()))
                                    .subject(getSubject(params.getCaseData(), triggerEvent, params.isMultiParty()))
-                                   .to(getRoboticsEmailRecipient(
-                                       params.isMultiParty(),
-                                       SPEC_CLAIM.equals(params.getCaseData().getCaseAccessCategory())
-                                   ))
+                                   .to("kala.chandrasekar@hmcts.net")
                                    .attachments(of(json(roboticsJsonData, fileName)))
                                    .build());
         } catch (JsonProcessingException e) {
@@ -214,15 +211,6 @@ public class RoboticsNotificationService {
             );
         }
         return subject;
-    }
-
-    private String getRoboticsEmailRecipient(boolean isMultiParty, boolean isSpecClaim) {
-        if (isSpecClaim) {
-            return roboticsEmailConfiguration.getSpecRecipient();
-        }
-
-        return isMultiParty ? roboticsEmailConfiguration
-            .getMultipartyrecipient() : roboticsEmailConfiguration.getRecipient();
     }
 
     private Optional<EmailData> prepareJudgementLipEmail(RoboticsEmailParams params) {
