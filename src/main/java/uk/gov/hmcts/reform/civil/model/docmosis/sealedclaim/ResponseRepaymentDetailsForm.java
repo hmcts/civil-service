@@ -7,7 +7,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
@@ -54,12 +53,48 @@ public class ResponseRepaymentDetailsForm {
     private final String evidenceComments;
     private final boolean mediation;
     private final RespondentResponsePartAdmissionPaymentTimeLRspec howToPay;
+    private final BigDecimal admittedAmount;
 
     public String getResponseTypeDisplay() {
         return Optional.ofNullable(responseType).map(RespondentResponseTypeSpec::getDisplayedValue).orElse("");
     }
 
-    public static ResponseRepaymentDetailsForm toSealedClaimResponseCommonContent(CaseData caseData, boolean isLRAdmissionBulkToggleEnabled) {
+    public static ResponseRepaymentDetailsForm toSealedClaimResponseCommonContent(CaseData caseData,
+                                                                                  BigDecimal admittedAmount,
+                                                                                  boolean isLRAdmissionBulkToggleEnabled) {
+        ResponseRepaymentDetailsForm.ResponseRepaymentDetailsFormBuilder builder = ResponseRepaymentDetailsForm.builder();
+
+        if (caseData.getRespondent1ClaimResponseTypeForSpec() != null && !useRespondent2(caseData)) {
+            builder.howToPay(caseData.getDefenceAdmitPartPaymentTimeRouteRequired());
+            builder.responseType(caseData.getRespondent1ClaimResponseTypeForSpec());
+            switch (caseData.getRespondent1ClaimResponseTypeForSpec()) {
+                case FULL_ADMISSION -> addRepaymentMethodLip(caseData, builder, getTotalClaimAmountWithInterest(caseData, isLRAdmissionBulkToggleEnabled), admittedAmount);
+                case PART_ADMISSION -> partAdmissionData(caseData, builder);
+                case FULL_DEFENCE -> fullDefenceData(caseData, builder);
+                case COUNTER_CLAIM -> builder.whyReject(COUNTER_CLAIM.name());
+                default -> builder.whyReject(null);
+            }
+        } else if (caseData.getRespondent2ClaimResponseTypeForSpec() != null && useRespondent2(caseData)) {
+            builder.howToPay(caseData.getDefenceAdmitPartPaymentTimeRouteRequired());
+            builder.responseType(caseData.getRespondent2ClaimResponseTypeForSpec());
+            switch (caseData.getRespondent2ClaimResponseTypeForSpec()) {
+                case FULL_ADMISSION -> addRepaymentMethodLip(caseData, builder, getTotalClaimAmountWithInterest(caseData, isLRAdmissionBulkToggleEnabled), admittedAmount);
+                case PART_ADMISSION -> partAdmissionData(caseData, builder);
+                case FULL_DEFENCE -> fullDefenceData(caseData, builder);
+                case COUNTER_CLAIM -> builder.whyReject(COUNTER_CLAIM.name());
+                default -> builder.whyReject(null);
+            }
+        }
+
+        return builder
+            .whyNotPayImmediately(caseData.getResponseToClaimAdmitPartWhyNotPayLRspec())
+            .responseType(caseData.getRespondent1ClaimResponseTypeForSpec())
+            .mediation(caseData.getResponseClaimMediationSpecRequired() == YesOrNo.YES)
+            .build();
+    }
+
+    public static ResponseRepaymentDetailsForm toSealedClaimResponseCommonContent(CaseData caseData,
+                                                                                  boolean isLRAdmissionBulkToggleEnabled) {
         ResponseRepaymentDetailsForm.ResponseRepaymentDetailsFormBuilder builder = ResponseRepaymentDetailsForm.builder();
 
         if (caseData.getRespondent1ClaimResponseTypeForSpec() != null && !useRespondent2(caseData)) {
@@ -96,6 +131,19 @@ public class ResponseRepaymentDetailsForm {
             return caseData.getTotalClaimAmountPlusInterest();
         }
         return caseData.getTotalClaimAmount();
+    }
+
+    private static void addRepaymentMethodLip(CaseData caseData, ResponseRepaymentDetailsFormBuilder builder,
+                                              BigDecimal totalAmount,
+                                              BigDecimal admittedAmount) {
+        if (caseData.isPayImmediately()) {
+            addPayByDatePayImmediately(builder, admittedAmount, caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid());
+        } else if (caseData.isPayByInstallment()) {
+            addRepaymentPlan(caseData, builder, totalAmount);
+            builder.admittedAmount(admittedAmount);
+        } else if (caseData.isPayBySetDate()) {
+            addPayBySetDate(caseData, builder, admittedAmount);
+        }
     }
 
     private static void addRepaymentMethod(CaseData caseData, ResponseRepaymentDetailsFormBuilder builder, BigDecimal totalAmount) {

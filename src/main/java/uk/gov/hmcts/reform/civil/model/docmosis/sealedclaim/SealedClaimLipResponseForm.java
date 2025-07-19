@@ -8,17 +8,15 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.ChildrenByAgeGroupLRspec;
 import uk.gov.hmcts.reform.civil.model.EmployerDetailsLRspec;
 import uk.gov.hmcts.reform.civil.model.PartnerAndDependentsLRspec;
 import uk.gov.hmcts.reform.civil.model.Respondent1CourtOrderDetails;
 import uk.gov.hmcts.reform.civil.model.Respondent1DebtLRspec;
 import uk.gov.hmcts.reform.civil.model.Respondent1EmployerDetailsLRspec;
 import uk.gov.hmcts.reform.civil.model.Respondent1SelfEmploymentLRspec;
-import uk.gov.hmcts.reform.civil.model.UnavailableDate;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
+import uk.gov.hmcts.reform.civil.model.UnavailableDate;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.AccommodationTemplate;
@@ -26,10 +24,10 @@ import uk.gov.hmcts.reform.civil.model.docmosis.common.AccountSimpleTemplateData
 import uk.gov.hmcts.reform.civil.model.docmosis.common.DebtTemplateData;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.ReasonMoneyTemplateData;
 import uk.gov.hmcts.reform.civil.model.docmosis.lip.LipFormPartyDefence;
-
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
+import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -41,6 +39,8 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_ADMISSION;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils.formatCcdCaseReference;
 
 @Getter
@@ -79,19 +79,10 @@ public class SealedClaimLipResponseForm implements MappableObject {
     private final List<Element<UnavailableDate>> defendant1UnavailableDatesList;
     private final boolean checkCarmToggle;
     private final StatementOfTruth uiStatementOfTruth;
-
-    public boolean isCurrentlyWorking() {
-        return (employerDetails != null && !employerDetails.isEmpty())
-            || selfEmployment != null && selfEmployment.getAnnualTurnover() != null;
-    }
-
-    public int getNumberOfChildren() {
-        return Optional.ofNullable(partnerAndDependent).map(PartnerAndDependentsLRspec::getHowManyChildrenByAgeGroup)
-            .map(ChildrenByAgeGroupLRspec::getTotalChildren).orElse(0);
-    }
+    private final String faContent;
 
     @JsonIgnore
-    public static SealedClaimLipResponseForm toTemplate(final CaseData caseData) {
+    public static SealedClaimLipResponseForm toTemplate(final CaseData caseData, BigDecimal admittedAmount) {
         SealedClaimLipResponseForm.SealedClaimLipResponseFormBuilder builder = SealedClaimLipResponseForm.builder()
             .generationDate(LocalDate.now())
             .ccdCaseReference(formatCcdCaseReference(caseData))
@@ -104,7 +95,8 @@ public class SealedClaimLipResponseForm implements MappableObject {
             .defendant2(LipFormPartyDefence.toLipDefenceParty(caseData.getRespondent2()))
             .partnerAndDependent(caseData.getRespondent1PartnerAndDependent())
             .debtList(mapToDebtList(caseData.getSpecDefendant1Debts()))
-            .commonDetails(ResponseRepaymentDetailsForm.toSealedClaimResponseCommonContent(caseData, false))
+            .commonDetails(ResponseRepaymentDetailsForm.toSealedClaimResponseCommonContent(caseData, admittedAmount, false))
+            .faContent(getAdditionContent(caseData))
             .uiStatementOfTruth(caseData.getRespondent1LiPStatementOfTruth());
         addSolicitorDetails(caseData, builder);
         addEmployeeDetails(caseData, builder);
@@ -113,6 +105,28 @@ public class SealedClaimLipResponseForm implements MappableObject {
         addCourtOrderDetails(caseData, builder);
         return builder.build();
 
+    }
+
+    private static String getAdditionContent(CaseData caseData) {
+        if (caseData.getRespondent1ClaimResponseTypeForSpec() != null) {
+            if (FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
+                if (caseData.isPayImmediately() || caseData.isPayBySetDate()) {
+                    return "This amount includes interest if it has been claimed which may continue to accrue on the" +
+                        " amount outstanding up to the date of Judgment, settlement agreement or earlier payment." +
+                        "\n" +
+                        "The amount does not include the claim fee and any fixed costs which are payable in addition.";
+
+                } else if (caseData.isPayByInstallment()) {
+                    return "The final payment date may be later to reflect any additional interest, " +
+                        "any fixed costs and claim fee added to the judgment, settlement agreement or earlier payment amount";
+                }
+            } else if (PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+                && caseData.isPayImmediately() || caseData.isPayBySetDate()) {
+                return "The claim fee and any fixed costs claimed are not included in this figure but are payable in addition and if judgment," +
+                    " settlement agreement or earlier payment is entered on an admission will be included in the total amount.";
+            }
+        }
+        return "";
     }
 
     private static void addSolicitorDetails(final CaseData caseData, SealedClaimLipResponseFormBuilder builder) {

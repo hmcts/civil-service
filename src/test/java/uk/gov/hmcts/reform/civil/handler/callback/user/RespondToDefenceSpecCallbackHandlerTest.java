@@ -2493,7 +2493,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             given(workingDayIndicator.isWorkingDay(any())).willReturn(true);
             LocalDate whenWillPay = LocalDate.now();
-            given(deadlineCalculatorService.calculateExtendedDeadline(any(), anyInt())).willReturn(whenWillPay);
+            given(deadlineCalculatorService.calculateExtendedDeadline(any(LocalDateTime.class), anyInt())).willReturn(whenWillPay);
 
             RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec =
                 RespondToClaimAdmitPartLRspec.builder()
@@ -2521,7 +2521,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
 
             LocalDate whenWillPay = LocalDate.now().plusDays(5);
-            given(deadlineCalculatorService.calculateExtendedDeadline(any(), anyInt())).willReturn(whenWillPay);
+            given(deadlineCalculatorService.calculateExtendedDeadline(any(LocalDateTime.class), anyInt())).willReturn(whenWillPay);
 
             RespondToClaim respondToAdmittedClaim =
                 RespondToClaim.builder()
@@ -2551,7 +2551,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             given(workingDayIndicator.isWorkingDay(any())).willReturn(true);
             LocalDate whenWillPay = LocalDate.now();
-            given(deadlineCalculatorService.calculateExtendedDeadline(any(), anyInt())).willReturn(whenWillPay);
+            given(deadlineCalculatorService.calculateExtendedDeadline(any(LocalDate.class), anyInt())).willReturn(whenWillPay);
 
             CaseData caseData = CaseData.builder()
                 .respondent1ResponseDate(LocalDateTime.now())

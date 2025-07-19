@@ -86,6 +86,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_ONE;
@@ -9181,5 +9182,58 @@ class EventHistoryMapperTest {
                     .asList().containsExactly(expectedEvent);
             }
         }
+    }
+
+    @Test
+    void shouldCalculateAmountOfJudgmentForAdmission_WithInterest() {
+        // Arrange
+        CaseData caseData = mock(CaseData.class);
+        CCJPaymentDetails ccjPaymentDetails = mock(CCJPaymentDetails.class);
+        when(caseData.getCcjPaymentDetails()).thenReturn(ccjPaymentDetails);
+        when(ccjPaymentDetails.getCcjJudgmentAmountClaimAmount()).thenReturn(BigDecimal.valueOf(1000));
+        when(caseData.getTotalInterest()).thenReturn(BigDecimal.valueOf(200));
+        when(caseData.isLipvLipOneVOne()).thenReturn(false);
+
+        // Act
+        BigDecimal result = mapper.getAmountOfJudgmentForAdmission(caseData);
+
+        // Assert
+        assertEquals(BigDecimal.valueOf(1200).setScale(2), result);
+    }
+
+    @Test
+    void shouldCalculateAmountOfJudgmentForAdmission_LipVLipScenario() {
+        // Arrange
+        CaseData caseData = mock(CaseData.class);
+        CCJPaymentDetails ccjPaymentDetails = mock(CCJPaymentDetails.class);
+        when(caseData.getCcjPaymentDetails()).thenReturn(ccjPaymentDetails);
+        when(ccjPaymentDetails.getCcjJudgmentAmountClaimAmount()).thenReturn(BigDecimal.valueOf(1000));
+        when(ccjPaymentDetails.getCcjJudgmentLipInterest()).thenReturn(BigDecimal.valueOf(150));
+        when(caseData.isLipvLipOneVOne()).thenReturn(true);
+        when(caseData.isPartAdmitClaimSpec()).thenReturn(false);
+
+        // Act
+        BigDecimal result = mapper.getAmountOfJudgmentForAdmission(caseData);
+
+        // Assert
+        assertEquals(BigDecimal.valueOf(1150).setScale(2), result);
+    }
+
+    @Test
+    void shouldCalculateAmountOfJudgmentWithoutInterestForPartAdmission_LipVLipScenario() {
+        // Arrange
+        CaseData caseData = mock(CaseData.class);
+        CCJPaymentDetails ccjPaymentDetails = mock(CCJPaymentDetails.class);
+        when(caseData.getCcjPaymentDetails()).thenReturn(ccjPaymentDetails);
+        when(ccjPaymentDetails.getCcjJudgmentAmountClaimAmount()).thenReturn(BigDecimal.valueOf(1000));
+        when(ccjPaymentDetails.getCcjJudgmentLipInterest()).thenReturn(BigDecimal.valueOf(150));
+        when(caseData.isLipvLipOneVOne()).thenReturn(true);
+        when(caseData.isPartAdmitClaimSpec()).thenReturn(true);
+
+        // Act
+        BigDecimal result = mapper.getAmountOfJudgmentForAdmission(caseData);
+
+        // Assert
+        assertEquals(BigDecimal.valueOf(1000).setScale(2), result);
     }
 }
