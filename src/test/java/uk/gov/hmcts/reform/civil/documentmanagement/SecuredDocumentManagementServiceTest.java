@@ -2,9 +2,7 @@ package uk.gov.hmcts.reform.civil.documentmanagement;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.http.entity.mime.MIME;
 import org.apache.tika.Tika;
-import org.apache.xmpbox.type.MIMEType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
