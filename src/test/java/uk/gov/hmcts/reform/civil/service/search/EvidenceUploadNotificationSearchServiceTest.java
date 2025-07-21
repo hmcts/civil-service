@@ -31,9 +31,9 @@ class EvidenceUploadNotificationSearchServiceTest extends ElasticSearchServiceTe
             .must(boolQuery()
                       .minimumShouldMatch(1)
                       .should(rangeQuery("data.caseDocumentUploadDate").lt("now").gt(
-                          "now-8d"))
+                          "now-7"))
                       .should(rangeQuery("data.caseDocumentUploadDateRes").lt("now").gt(
-                          "now-8d"))
+                          "now-7"))
                       );
         return new Query(query, List.of("reference"), fromValue);
     }
