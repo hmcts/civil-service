@@ -16,7 +16,7 @@ import static uk.gov.hmcts.reform.civil.utils.ContentCachingRequestWrapperUtil.g
 @Slf4j
 @ControllerAdvice
 @RequiredArgsConstructor
-@Order(2)
+@Order(3)
 public class UncaughtExceptionHandler {
 
     @ExceptionHandler(value = RuntimeException.class)
