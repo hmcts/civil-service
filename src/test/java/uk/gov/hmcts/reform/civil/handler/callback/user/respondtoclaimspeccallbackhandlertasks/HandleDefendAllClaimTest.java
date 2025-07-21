@@ -53,10 +53,10 @@ class HandleDefendAllClaimTest {
     void setUp() {
         ObjectMapper objectMapper = new ObjectMapper();
         handleDefendAllClaim = new HandleDefendAllClaim(
-            objectMapper,
-            toggleService,
-            paymentDateValidator,
-            respondToClaimSpecUtils
+                objectMapper,
+                toggleService,
+                paymentDateValidator,
+                respondToClaimSpecUtils
         );
     }
 
@@ -75,8 +75,8 @@ class HandleDefendAllClaimTest {
     @Test
     void shouldReturnSuccessResponseWhenPaymentsAreValid() {
         CaseData caseData = CaseData.builder()
-            .totalClaimAmount(BigDecimal.valueOf(1000))
-            .build();
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .build();
         CallbackRequest callbackRequest = CallbackRequest.builder().eventId(DEFENDANT_RESPONSE_SPEC).build();
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
         when(paymentDateValidator.validate(any())).thenReturn(Collections.emptyList());
@@ -90,9 +90,9 @@ class HandleDefendAllClaimTest {
     @Test
     void shouldUpdateSpecPaidOrDisputeStatusCorrectly() {
         CaseData caseData = CaseData.builder()
-            .respondent1ClaimResponsePaymentAdmissionForSpec(RespondentResponseTypeSpecPaidStatus.PAID_LESS_THAN_CLAIMED_AMOUNT)
-            .totalClaimAmount(BigDecimal.valueOf(1000))
-            .build();
+                .respondent1ClaimResponsePaymentAdmissionForSpec(RespondentResponseTypeSpecPaidStatus.PAID_LESS_THAN_CLAIMED_AMOUNT)
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .build();
         CallbackRequest callbackRequest = CallbackRequest.builder().eventId(DEFENDANT_RESPONSE_SPEC).build();
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
         when(paymentDateValidator.validate(any())).thenReturn(Collections.emptyList());
@@ -102,19 +102,19 @@ class HandleDefendAllClaimTest {
         AboutToStartOrSubmitCallbackResponse callbackResponse = (AboutToStartOrSubmitCallbackResponse) response;
         assertTrue(callbackResponse.getData().containsKey("specPaidLessAmountOrDisputesOrPartAdmission"));
         assertEquals(
-            YesOrNo.YES.name(),
-            callbackResponse.getData().get("specPaidLessAmountOrDisputesOrPartAdmission").toString().toUpperCase()
+                YesOrNo.YES.name(),
+                callbackResponse.getData().get("specPaidLessAmountOrDisputesOrPartAdmission").toString().toUpperCase()
         );
     }
 
     @Test
     void shouldSetSpecDisputesOrPartAdmissionWhenConditionMet() {
         CaseData caseData = CaseData.builder()
-            .isRespondent1(YesOrNo.YES)
-            .defenceRouteRequired("DISPUTES_THE_CLAIM")
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-            .totalClaimAmount(BigDecimal.valueOf(1000))
-            .build();
+                .isRespondent1(YesOrNo.YES)
+                .defenceRouteRequired("DISPUTES_THE_CLAIM")
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .build();
 
         CallbackRequest callbackRequest = CallbackRequest.builder().eventId(DEFENDANT_RESPONSE_SPEC).build();
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
@@ -126,17 +126,17 @@ class HandleDefendAllClaimTest {
         AboutToStartOrSubmitCallbackResponse callbackResponse = (AboutToStartOrSubmitCallbackResponse) response;
         assertTrue(callbackResponse.getData().containsKey("specDisputesOrPartAdmission"));
         assertEquals(
-            YesOrNo.YES.name(),
-            callbackResponse.getData().get("specDisputesOrPartAdmission").toString().toUpperCase()
+                YesOrNo.YES.name(),
+                callbackResponse.getData().get("specDisputesOrPartAdmission").toString().toUpperCase()
         );
     }
 
     @Test
     void shouldReturnTrueWhenResponseTypeIsPartAdmission() {
         CaseData caseData = CaseData.builder()
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-            .totalClaimAmount(BigDecimal.valueOf(1000))
-            .build();
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .build();
 
         CallbackRequest callbackRequest = CallbackRequest.builder().eventId(DEFENDANT_RESPONSE_SPEC).build();
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
@@ -147,18 +147,18 @@ class HandleDefendAllClaimTest {
         AboutToStartOrSubmitCallbackResponse callbackResponse = (AboutToStartOrSubmitCallbackResponse) response;
         assertTrue(callbackResponse.getData().containsKey("specDisputesOrPartAdmission"));
         assertEquals(
-            YesOrNo.YES.name(),
-            callbackResponse.getData().get("specDisputesOrPartAdmission").toString().toUpperCase()
+                YesOrNo.YES.name(),
+                callbackResponse.getData().get("specDisputesOrPartAdmission").toString().toUpperCase()
         );
     }
 
     @Test
     void shouldReturnTrueWhenRespondent2ResponseTypeIsPartAdmission() {
         CaseData caseData = CaseData.builder()
-            .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-            .totalClaimAmount(BigDecimal.valueOf(1000))
-            .isRespondent2(YesOrNo.YES)
-            .build();
+                .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .isRespondent2(YesOrNo.YES)
+                .build();
 
         CallbackRequest callbackRequest = CallbackRequest.builder().eventId(DEFENDANT_RESPONSE_SPEC).build();
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
@@ -169,19 +169,19 @@ class HandleDefendAllClaimTest {
         AboutToStartOrSubmitCallbackResponse callbackResponse = (AboutToStartOrSubmitCallbackResponse) response;
         assertTrue(callbackResponse.getData().containsKey("specDisputesOrPartAdmission"));
         assertEquals(
-            YesOrNo.YES.name(),
-            callbackResponse.getData().get("specDisputesOrPartAdmission").toString().toUpperCase()
+                YesOrNo.YES.name(),
+                callbackResponse.getData().get("specDisputesOrPartAdmission").toString().toUpperCase()
         );
     }
 
     @Test
     void shouldSetSpecDisputesOrPartAdmissionWhenDefenceRouteRequired2IsDispute() {
         CaseData caseData = CaseData.builder()
-            .isRespondent2(YesOrNo.YES)
-            .defenceRouteRequired2("DISPUTES_THE_CLAIM")
-            .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-            .totalClaimAmount(BigDecimal.valueOf(1000))
-            .build();
+                .isRespondent2(YesOrNo.YES)
+                .defenceRouteRequired2("DISPUTES_THE_CLAIM")
+                .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .build();
 
         CallbackRequest callbackRequest = CallbackRequest.builder().eventId(DEFENDANT_RESPONSE_SPEC).build();
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
@@ -192,21 +192,21 @@ class HandleDefendAllClaimTest {
         AboutToStartOrSubmitCallbackResponse callbackResponse = (AboutToStartOrSubmitCallbackResponse) response;
         assertTrue(callbackResponse.getData().containsKey("specDisputesOrPartAdmission"));
         assertEquals(
-            YesOrNo.YES.name(),
-            callbackResponse.getData().get("specDisputesOrPartAdmission").toString().toUpperCase()
+                YesOrNo.YES.name(),
+                callbackResponse.getData().get("specDisputesOrPartAdmission").toString().toUpperCase()
         );
     }
 
     @Test
     void shouldSetSpecDisputesOrPartAdmissionWhenDefenceRouteRequired2IsDispute1() {
         CaseData caseData = CaseData.builder()
-            .defendantSingleResponseToBothClaimants(YesOrNo.NO)
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-            .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-            .defenceRouteRequired("DISPUTES_THE_CLAIM")
-            .defenceRouteRequired2("DISPUTES_THE_CLAIM")
-            .totalClaimAmount(BigDecimal.valueOf(1000))
-            .build();
+                .defendantSingleResponseToBothClaimants(YesOrNo.NO)
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                .defenceRouteRequired("DISPUTES_THE_CLAIM")
+                .defenceRouteRequired2("DISPUTES_THE_CLAIM")
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .build();
 
         CallbackRequest callbackRequest = CallbackRequest.builder().eventId(DEFENDANT_RESPONSE_SPEC).build();
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
@@ -217,21 +217,21 @@ class HandleDefendAllClaimTest {
         AboutToStartOrSubmitCallbackResponse callbackResponse = (AboutToStartOrSubmitCallbackResponse) response;
         assertTrue(callbackResponse.getData().containsKey("specDisputesOrPartAdmission"));
         assertEquals(
-            YesOrNo.YES.name(),
-            callbackResponse.getData().get("specDisputesOrPartAdmission").toString().toUpperCase()
+                YesOrNo.YES.name(),
+                callbackResponse.getData().get("specDisputesOrPartAdmission").toString().toUpperCase()
         );
     }
 
     @Test
     void shouldHandleTwoVOneWithSeparateResponses() {
         CaseData caseData = CaseData.builder()
-            .totalClaimAmount(BigDecimal.valueOf(1000))
-            .defendantSingleResponseToBothClaimants(YesOrNo.NO)
-            .claimant1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-            .defenceRouteRequired("DISPUTES_THE_CLAIM")
-            .claimant2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-            .defenceRouteRequired2("DISPUTES_THE_CLAIM")
-            .build();
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .defendantSingleResponseToBothClaimants(YesOrNo.NO)
+                .claimant1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                .defenceRouteRequired("DISPUTES_THE_CLAIM")
+                .claimant2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                .defenceRouteRequired2("DISPUTES_THE_CLAIM")
+                .build();
 
         CallbackRequest callbackRequest = CallbackRequest.builder().eventId(DEFENDANT_RESPONSE_SPEC).build();
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
@@ -243,19 +243,19 @@ class HandleDefendAllClaimTest {
         AboutToStartOrSubmitCallbackResponse callbackResponse = (AboutToStartOrSubmitCallbackResponse) response;
         assertTrue(callbackResponse.getData().containsKey("specDisputesOrPartAdmission"));
         assertEquals(
-            YesOrNo.YES.name(),
-            callbackResponse.getData().get("specDisputesOrPartAdmission").toString().toUpperCase()
+                YesOrNo.YES.name(),
+                callbackResponse.getData().get("specDisputesOrPartAdmission").toString().toUpperCase()
         );
     }
 
     @Test
     void shouldHandleTwoVOneWithSingleResponse() {
         CaseData caseData = CaseData.builder()
-            .totalClaimAmount(BigDecimal.valueOf(1000))
-            .defendantSingleResponseToBothClaimants(YesOrNo.YES)
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-            .defenceRouteRequired("DISPUTES_THE_CLAIM")
-            .build();
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .defendantSingleResponseToBothClaimants(YesOrNo.YES)
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                .defenceRouteRequired("DISPUTES_THE_CLAIM")
+                .build();
 
         CallbackRequest callbackRequest = CallbackRequest.builder().eventId(DEFENDANT_RESPONSE_SPEC).build();
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
@@ -267,19 +267,19 @@ class HandleDefendAllClaimTest {
         AboutToStartOrSubmitCallbackResponse callbackResponse = (AboutToStartOrSubmitCallbackResponse) response;
         assertTrue(callbackResponse.getData().containsKey("specDisputesOrPartAdmission"));
         assertEquals(
-            YesOrNo.YES.name(),
-            callbackResponse.getData().get("specDisputesOrPartAdmission").toString().toUpperCase()
+                YesOrNo.YES.name(),
+                callbackResponse.getData().get("specDisputesOrPartAdmission").toString().toUpperCase()
         );
     }
 
     @Test
     void shouldAddTagWhenFullDefenceAndPaidLess() {
         CaseData caseData = CaseData.builder()
-            .claimant1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-            .defenceRouteRequired("DISPUTES_THE_CLAIM")
-            .respondToClaim(RespondToClaim.builder().howMuchWasPaid(BigDecimal.valueOf(500)).build())
-            .totalClaimAmount(BigDecimal.valueOf(1000))
-            .build();
+                .claimant1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                .defenceRouteRequired("DISPUTES_THE_CLAIM")
+                .respondToClaim(RespondToClaim.builder().howMuchWasPaid(BigDecimal.valueOf(500)).build())
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .build();
         CallbackRequest callbackRequest = CallbackRequest.builder().eventId(DEFENDANT_RESPONSE_SPEC).build();
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
 
@@ -290,21 +290,21 @@ class HandleDefendAllClaimTest {
         AboutToStartOrSubmitCallbackResponse callbackResponse = (AboutToStartOrSubmitCallbackResponse) response;
         assertTrue(callbackResponse.getData().containsKey("specDisputesOrPartAdmission"));
         assertEquals(
-            YesOrNo.YES.name(),
-            callbackResponse.getData().get("specDisputesOrPartAdmission").toString().toUpperCase()
+                YesOrNo.YES.name(),
+                callbackResponse.getData().get("specDisputesOrPartAdmission").toString().toUpperCase()
         );
     }
 
     @Test
     void shouldHandleTwoVOneScenarioCorrectly() {
         CaseData caseData = CaseData.builder()
-            .totalClaimAmount(BigDecimal.valueOf(1000))
-            .defendantSingleResponseToBothClaimants(YesOrNo.NO)
-            .claimant1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-            .defenceRouteRequired("DISPUTES_THE_CLAIM")
-            .claimant2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-            .defenceRouteRequired2("DISPUTES_THE_CLAIM")
-            .build();
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .defendantSingleResponseToBothClaimants(YesOrNo.NO)
+                .claimant1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                .defenceRouteRequired("DISPUTES_THE_CLAIM")
+                .claimant2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                .defenceRouteRequired2("DISPUTES_THE_CLAIM")
+                .build();
 
         CallbackRequest callbackRequest = CallbackRequest.builder().eventId(DEFENDANT_RESPONSE_SPEC).build();
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
@@ -319,8 +319,8 @@ class HandleDefendAllClaimTest {
             AboutToStartOrSubmitCallbackResponse callbackResponse = (AboutToStartOrSubmitCallbackResponse) response;
             assertTrue(callbackResponse.getData().containsKey("specDisputesOrPartAdmission"));
             assertEquals(
-                YesOrNo.YES.name(),
-                callbackResponse.getData().get("specDisputesOrPartAdmission").toString().toUpperCase()
+                    YesOrNo.YES.name(),
+                    callbackResponse.getData().get("specDisputesOrPartAdmission").toString().toUpperCase()
             );
         }
     }
@@ -328,11 +328,11 @@ class HandleDefendAllClaimTest {
     @Test
     void shouldHandleOneVOneScenarioWhenDefendantSingleResponseToBothClaimantsIsYes() {
         CaseData caseData = CaseData.builder()
-            .totalClaimAmount(BigDecimal.valueOf(1000))
-            .defendantSingleResponseToBothClaimants(YesOrNo.YES)
-            .claimant1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-            .defenceRouteRequired("DISPUTES_THE_CLAIM")
-            .build();
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .defendantSingleResponseToBothClaimants(YesOrNo.YES)
+                .claimant1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                .defenceRouteRequired("DISPUTES_THE_CLAIM")
+                .build();
 
         CallbackRequest callbackRequest = CallbackRequest.builder().eventId(DEFENDANT_RESPONSE_SPEC).build();
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
@@ -347,8 +347,8 @@ class HandleDefendAllClaimTest {
             AboutToStartOrSubmitCallbackResponse callbackResponse = (AboutToStartOrSubmitCallbackResponse) response;
             assertTrue(callbackResponse.getData().containsKey("specDisputesOrPartAdmission"));
             assertEquals(
-                YesOrNo.YES.name(),
-                callbackResponse.getData().get("specDisputesOrPartAdmission").toString().toUpperCase()
+                    YesOrNo.YES.name(),
+                    callbackResponse.getData().get("specDisputesOrPartAdmission").toString().toUpperCase()
             );
         }
     }
@@ -356,14 +356,14 @@ class HandleDefendAllClaimTest {
     @Test
     void shouldHandleOneVTwoOneLegalRepScenarioCorrectly() {
         CaseData caseData = CaseData.builder()
-            .respondentResponseIsSame(YesOrNo.YES)
-            .totalClaimAmount(BigDecimal.valueOf(1000))
-            .defendantSingleResponseToBothClaimants(YesOrNo.NO)
-            .claimant1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-            .defenceRouteRequired("DISPUTES_THE_CLAIM")
-            .claimant2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-            .defenceRouteRequired2("DISPUTES_THE_CLAIM")
-            .build();
+                .respondentResponseIsSame(YesOrNo.YES)
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .defendantSingleResponseToBothClaimants(YesOrNo.NO)
+                .claimant1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                .defenceRouteRequired("DISPUTES_THE_CLAIM")
+                .claimant2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .defenceRouteRequired2("DISPUTES_THE_CLAIM")
+                .build();
 
         CallbackRequest callbackRequest = CallbackRequest.builder().eventId(DEFENDANT_RESPONSE_SPEC).build();
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
@@ -378,8 +378,8 @@ class HandleDefendAllClaimTest {
             AboutToStartOrSubmitCallbackResponse callbackResponse = (AboutToStartOrSubmitCallbackResponse) response;
             assertTrue(callbackResponse.getData().containsKey("specDisputesOrPartAdmission"));
             assertEquals(
-                YesOrNo.YES.name(),
-                callbackResponse.getData().get("specDisputesOrPartAdmission").toString().toUpperCase()
+                    YesOrNo.YES.name(),
+                    callbackResponse.getData().get("specDisputesOrPartAdmission").toString().toUpperCase()
             );
         }
     }
@@ -387,14 +387,14 @@ class HandleDefendAllClaimTest {
     @Test
     void shouldHandleOneVTwoTwoLegalRepScenarioCorrectly() {
         CaseData caseData = CaseData.builder()
-            .totalClaimAmount(BigDecimal.valueOf(1000))
-            .defendantSingleResponseToBothClaimants(YesOrNo.NO)
-            .claimant1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-            .defenceRouteRequired("DISPUTES_THE_CLAIM")
-            .claimant2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-            .defenceRouteRequired2("DISPUTES_THE_CLAIM")
-            .showConditionFlags(Collections.singleton(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1))
-            .build();
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .defendantSingleResponseToBothClaimants(YesOrNo.NO)
+                .claimant1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                .defenceRouteRequired("DISPUTES_THE_CLAIM")
+                .claimant2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .defenceRouteRequired2("DISPUTES_THE_CLAIM")
+                .showConditionFlags(Collections.singleton(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1))
+                .build();
 
         CallbackRequest callbackRequest = CallbackRequest.builder().eventId(DEFENDANT_RESPONSE_SPEC).build();
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
@@ -409,8 +409,8 @@ class HandleDefendAllClaimTest {
             AboutToStartOrSubmitCallbackResponse callbackResponse = (AboutToStartOrSubmitCallbackResponse) response;
             assertTrue(callbackResponse.getData().containsKey("specDisputesOrPartAdmission"));
             assertEquals(
-                YesOrNo.YES.name(),
-                callbackResponse.getData().get("specDisputesOrPartAdmission").toString().toUpperCase()
+                    YesOrNo.YES.name(),
+                    callbackResponse.getData().get("specDisputesOrPartAdmission").toString().toUpperCase()
             );
         }
     }
@@ -418,14 +418,14 @@ class HandleDefendAllClaimTest {
     @Test
     void shouldHandleOneVTwoOneLegalRepScenarioWithSingleResponseToBothClaimantsSetToNo() {
         CaseData caseData = CaseData.builder()
-            .respondentResponseIsSame(YesOrNo.NO)
-            .totalClaimAmount(BigDecimal.valueOf(1000))
-            .defendantSingleResponseToBothClaimants(YesOrNo.NO)
-            .claimant1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-            .defenceRouteRequired("DISPUTES_THE_CLAIM")
-            .claimant2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-            .defenceRouteRequired2("DISPUTES_THE_CLAIM")
-            .build();
+                .respondentResponseIsSame(YesOrNo.NO)
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .defendantSingleResponseToBothClaimants(YesOrNo.NO)
+                .claimant1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                .defenceRouteRequired("DISPUTES_THE_CLAIM")
+                .claimant2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .defenceRouteRequired2("DISPUTES_THE_CLAIM")
+                .build();
 
         CallbackRequest callbackRequest = CallbackRequest.builder().eventId(DEFENDANT_RESPONSE_SPEC).build();
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
@@ -440,8 +440,8 @@ class HandleDefendAllClaimTest {
             AboutToStartOrSubmitCallbackResponse callbackResponse = (AboutToStartOrSubmitCallbackResponse) response;
             assertTrue(callbackResponse.getData().containsKey("specDisputesOrPartAdmission"));
             assertEquals(
-                YesOrNo.YES.name(),
-                callbackResponse.getData().get("specDisputesOrPartAdmission").toString().toUpperCase()
+                    YesOrNo.YES.name(),
+                    callbackResponse.getData().get("specDisputesOrPartAdmission").toString().toUpperCase()
             );
         }
     }
@@ -449,14 +449,14 @@ class HandleDefendAllClaimTest {
     @Test
     void shouldHandleOneVTwoTwoLegalRepScenarioWithCanAnswerRespondent2() {
         CaseData caseData = CaseData.builder()
-            .totalClaimAmount(BigDecimal.valueOf(1000))
-            .defendantSingleResponseToBothClaimants(YesOrNo.NO)
-            .claimant1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-            .defenceRouteRequired("DISPUTES_THE_CLAIM")
-            .claimant2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-            .defenceRouteRequired2("DISPUTES_THE_CLAIM")
-            .showConditionFlags(Collections.singleton(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_2))
-            .build();
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .defendantSingleResponseToBothClaimants(YesOrNo.NO)
+                .claimant1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                .defenceRouteRequired("DISPUTES_THE_CLAIM")
+                .claimant2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .defenceRouteRequired2("DISPUTES_THE_CLAIM")
+                .showConditionFlags(Collections.singleton(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_2))
+                .build();
 
         CallbackRequest callbackRequest = CallbackRequest.builder().eventId(DEFENDANT_RESPONSE_SPEC).build();
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
@@ -471,8 +471,8 @@ class HandleDefendAllClaimTest {
             AboutToStartOrSubmitCallbackResponse callbackResponse = (AboutToStartOrSubmitCallbackResponse) response;
             assertTrue(callbackResponse.getData().containsKey("specDisputesOrPartAdmission"));
             assertEquals(
-                YesOrNo.YES.name(),
-                callbackResponse.getData().get("specDisputesOrPartAdmission").toString().toUpperCase()
+                    YesOrNo.YES.name(),
+                    callbackResponse.getData().get("specDisputesOrPartAdmission").toString().toUpperCase()
             );
         }
     }
@@ -480,9 +480,9 @@ class HandleDefendAllClaimTest {
     @Test
     void shouldAddSomeoneDisputesWhenOnlyRespondent1Disputes() {
         CaseData caseData = CaseData.builder()
-            .showConditionFlags(Collections.singleton(DefendantResponseShowTag.ONLY_RESPONDENT_1_DISPUTES))
-            .totalClaimAmount(BigDecimal.valueOf(1000))
-            .build();
+                .showConditionFlags(Collections.singleton(DefendantResponseShowTag.ONLY_RESPONDENT_1_DISPUTES))
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .build();
 
         CallbackRequest callbackRequest = CallbackRequest.builder().eventId(DEFENDANT_RESPONSE_SPEC).build();
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
@@ -498,9 +498,9 @@ class HandleDefendAllClaimTest {
     @Test
     void shouldAddSomeoneDisputesWhenOnlyRespondent2Disputes() {
         CaseData caseData = CaseData.builder()
-            .showConditionFlags(Collections.singleton(DefendantResponseShowTag.ONLY_RESPONDENT_2_DISPUTES))
-            .totalClaimAmount(BigDecimal.valueOf(1000))
-            .build();
+                .showConditionFlags(Collections.singleton(DefendantResponseShowTag.ONLY_RESPONDENT_2_DISPUTES))
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .build();
 
         CallbackRequest callbackRequest = CallbackRequest.builder().eventId(DEFENDANT_RESPONSE_SPEC).build();
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
@@ -516,9 +516,9 @@ class HandleDefendAllClaimTest {
     @Test
     void shouldAddSomeoneDisputesWhenBothRespondentsDispute() {
         CaseData caseData = CaseData.builder()
-            .showConditionFlags(Collections.singleton(DefendantResponseShowTag.BOTH_RESPONDENTS_DISPUTE))
-            .totalClaimAmount(BigDecimal.valueOf(1000))
-            .build();
+                .showConditionFlags(Collections.singleton(DefendantResponseShowTag.BOTH_RESPONDENTS_DISPUTE))
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .build();
 
         CallbackRequest callbackRequest = CallbackRequest.builder().eventId(DEFENDANT_RESPONSE_SPEC).build();
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
@@ -534,20 +534,20 @@ class HandleDefendAllClaimTest {
     @Test
     void shouldSetPaidStatusToPaidLessThanClaimedAmountWhenPaidLess() {
         CaseData caseData = CaseData.builder()
-            .defenceRouteRequired(SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED)
-            .totalClaimAmount(BigDecimal.valueOf(1000))
-            .respondToClaim(RespondToClaim.builder()
-                                .howMuchWasPaid(BigDecimal.valueOf(50_000))
-                                .build())
-            .build();
+                .defenceRouteRequired(SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED)
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .respondToClaim(RespondToClaim.builder()
+                        .howMuchWasPaid(BigDecimal.valueOf(50_000))
+                        .build())
+                .build();
 
         CallbackRequest callbackRequest = CallbackRequest.builder()
-            .eventId(DEFENDANT_RESPONSE_SPEC)
-            .build();
+                .eventId(DEFENDANT_RESPONSE_SPEC)
+                .build();
         CallbackParams callbackParams = CallbackParams.builder()
-            .caseData(caseData)
-            .request(callbackRequest)
-            .build();
+                .caseData(caseData)
+                .request(callbackRequest)
+                .build();
 
         when(paymentDateValidator.validate(any())).thenReturn(Collections.emptyList());
 
@@ -560,9 +560,9 @@ class HandleDefendAllClaimTest {
     @Test
     void shouldAddSpecDisputesOrPartAdmissionWhenBothRespondentsDispute() {
         CaseData caseData = CaseData.builder()
-            .showConditionFlags(Collections.singleton(DefendantResponseShowTag.BOTH_RESPONDENTS_DISPUTE))
-            .totalClaimAmount(BigDecimal.valueOf(1000))
-            .build();
+                .showConditionFlags(Collections.singleton(DefendantResponseShowTag.BOTH_RESPONDENTS_DISPUTE))
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .build();
 
         CallbackRequest callbackRequest = CallbackRequest.builder().eventId("HAS_PAID_THE_AMOUNT_CLAIMED").build();
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
@@ -578,13 +578,13 @@ class HandleDefendAllClaimTest {
     @Test
     void shouldSetSpecDisputesOrPartAdmissionForOneVTwoTwoLegalRepScenario() {
         CaseData caseData = CaseData.builder()
-            .totalClaimAmount(BigDecimal.valueOf(1000))
-            .defendantSingleResponseToBothClaimants(YesOrNo.NO)
-            .claimant1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-            .defenceRouteRequired("DISPUTES_THE_CLAIM")
-            .claimant2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-            .defenceRouteRequired2("DISPUTES_THE_CLAIM")
-            .build();
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .defendantSingleResponseToBothClaimants(YesOrNo.NO)
+                .claimant1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                .defenceRouteRequired("DISPUTES_THE_CLAIM")
+                .claimant2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .defenceRouteRequired2("DISPUTES_THE_CLAIM")
+                .build();
 
         CallbackRequest callbackRequest = CallbackRequest.builder().eventId(DEFENDANT_RESPONSE_SPEC).build();
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
@@ -599,8 +599,8 @@ class HandleDefendAllClaimTest {
             AboutToStartOrSubmitCallbackResponse callbackResponse = (AboutToStartOrSubmitCallbackResponse) response;
             assertTrue(callbackResponse.getData().containsKey("specDisputesOrPartAdmission"));
             assertEquals(
-                YesOrNo.YES.name(),
-                callbackResponse.getData().get("specDisputesOrPartAdmission").toString().toUpperCase()
+                    YesOrNo.YES.name(),
+                    callbackResponse.getData().get("specDisputesOrPartAdmission").toString().toUpperCase()
             );
         }
     }
@@ -608,11 +608,11 @@ class HandleDefendAllClaimTest {
     @Test
     void shouldReturnPaidLessTagWhenPaidLessThanClaimedAmount() {
         CaseData caseData = CaseData.builder()
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-            .defenceRouteRequired("HAS_PAID_THE_AMOUNT_CLAIMED")
-            .totalClaimAmount(BigDecimal.valueOf(1000))
-            .respondToClaim(RespondToClaim.builder().howMuchWasPaid(BigDecimal.valueOf(500)).build())
-            .build();
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                .defenceRouteRequired("HAS_PAID_THE_AMOUNT_CLAIMED")
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .respondToClaim(RespondToClaim.builder().howMuchWasPaid(BigDecimal.valueOf(500)).build())
+                .build();
 
         CallbackRequest callbackRequest = CallbackRequest.builder().eventId(DEFENDANT_RESPONSE_SPEC).build();
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
@@ -628,11 +628,11 @@ class HandleDefendAllClaimTest {
     @Test
     void shouldNotReturnPaidLessTagWhenPaidEqualOrMoreThanClaimedAmount() {
         CaseData caseData = CaseData.builder()
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-            .defenceRouteRequired("HAS_PAID_THE_AMOUNT_CLAIMED")
-            .respondToClaim(RespondToClaim.builder().howMuchWasPaid(BigDecimal.valueOf(1000)).build())
-            .totalClaimAmount(BigDecimal.valueOf(1000))
-            .build();
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                .defenceRouteRequired("HAS_PAID_THE_AMOUNT_CLAIMED")
+                .respondToClaim(RespondToClaim.builder().howMuchWasPaid(BigDecimal.valueOf(1000)).build())
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .build();
 
         CallbackRequest callbackRequest = CallbackRequest.builder().eventId(DEFENDANT_RESPONSE_SPEC).build();
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
@@ -644,8 +644,8 @@ class HandleDefendAllClaimTest {
         AboutToStartOrSubmitCallbackResponse callbackResponse = (AboutToStartOrSubmitCallbackResponse) response;
         assertTrue(callbackResponse.getData().containsKey("specPaidLessAmountOrDisputesOrPartAdmission"));
         assertEquals(
-            YesOrNo.NO.name(),
-            callbackResponse.getData().get("specPaidLessAmountOrDisputesOrPartAdmission").toString().toUpperCase()
+                YesOrNo.NO.name(),
+                callbackResponse.getData().get("specPaidLessAmountOrDisputesOrPartAdmission").toString().toUpperCase()
         );
     }
 }

@@ -46,9 +46,9 @@ class HandleRespondentResponseTypeForSpecTest {
     @Test
     void shouldSetSpecDefenceFullAdmittedRequiredToNoWhenNotFullAdmission() {
         CaseData caseData = CaseData.builder()
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-            .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-            .build();
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .build();
 
         assertSpecDefenceFullAdmittedRequired(caseData, NO);
     }
@@ -56,10 +56,10 @@ class HandleRespondentResponseTypeForSpecTest {
     @Test
     void shouldNotChangeSpecDefenceFullAdmittedRequiredWhenFullAdmission() {
         CaseData caseData = CaseData.builder()
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-            .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-            .specDefenceFullAdmittedRequired(YES)
-            .build();
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .specDefenceFullAdmittedRequired(YES)
+                .build();
 
         assertSpecDefenceFullAdmittedRequired(caseData, YES);
     }
@@ -67,9 +67,9 @@ class HandleRespondentResponseTypeForSpecTest {
     @Test
     void shouldSetSpecDefenceFullAdmittedRequiredToNoWhenRespondent2ResponseTypeIsNull() {
         CaseData caseData = CaseData.builder()
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-            .respondent2ClaimResponseTypeForSpec(null)
-            .build();
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .respondent2ClaimResponseTypeForSpec(null)
+                .build();
 
         assertSpecDefenceFullAdmittedRequired(caseData, NO);
     }
@@ -77,9 +77,9 @@ class HandleRespondentResponseTypeForSpecTest {
     @Test
     void shouldSetSpecDefenceFullAdmittedRequiredToNoWhenRespondent2ResponseTypeIsNotFullAdmission() {
         CaseData caseData = CaseData.builder()
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-            .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-            .build();
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .build();
 
         assertSpecDefenceFullAdmittedRequired(caseData, NO);
     }

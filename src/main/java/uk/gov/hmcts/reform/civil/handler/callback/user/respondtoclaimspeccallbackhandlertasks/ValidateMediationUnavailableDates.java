@@ -29,8 +29,8 @@ public class ValidateMediationUnavailableDates implements CaseTask {
         validateMediationAvailability(caseData.getResp2MediationAvailability(), errors);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(errors)
-            .build();
+                .errors(errors)
+                .build();
     }
 
     private void validateMediationAvailability(MediationAvailability mediationAvailability, List<String> errors) {

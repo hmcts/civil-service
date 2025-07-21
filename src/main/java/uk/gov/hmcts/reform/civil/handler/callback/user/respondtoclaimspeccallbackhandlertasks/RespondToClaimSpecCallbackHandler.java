@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.handler.callback.user;
+package uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
@@ -12,27 +12,16 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.DetermineLoggedInSolicitor;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.handleadmitpartofclaim.HandleAdmitPartOfClaim;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.HandleDefendAllClaim;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.HandleRespondentResponseTypeForSpec;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.PopulateRespondent1Copy;
 import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.setapplicantresponsedeadlinespec.SetApplicantResponseDeadlineSpec;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.SetGenericResponseTypeFlag;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.SetUploadTimelineTypeFlag;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.ValidateDateOfBirth;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.ValidateLengthOfUnemployment;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.ValidateMediationUnavailableDates;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.ValidateRespondentExpertsSpec;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.ValidateRespondentPaymentDate;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.ValidateRespondentWitnessesSpec;
-import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.ValidateUnavailableDatesSpec;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.CaseDataToTextGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationHeaderSpecGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationTextSpecGenerator;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.DefendantAddressValidator;
@@ -57,7 +46,7 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 @Service
 @RequiredArgsConstructor
 public class RespondToClaimSpecCallbackHandler extends CallbackHandler
-    implements ExpertsValidator, WitnessesValidator, DefendantAddressValidator {
+        implements ExpertsValidator, WitnessesValidator, DefendantAddressValidator {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(DEFENDANT_RESPONSE_SPEC);
 
@@ -81,6 +70,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     private final ValidateRespondentPaymentDate validateRespondentPaymentDate;
     private final ValidateLengthOfUnemployment validateLengthOfUnemployment;
     private final SetApplicantResponseDeadlineSpec setApplicantResponseDeadline;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -90,28 +80,28 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     @Override
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
-            .put(callbackKey(ABOUT_TO_START), this::populateRespondent1Copy)
-            .put(callbackKey(MID, "validate-mediation-unavailable-dates"), this::validateMediationUnavailableDates)
-            .put(callbackKey(MID, "confirm-details"), this::validateDateOfBirth)
-            .put(callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates)
-            .put(callbackKey(MID, "experts"), this::validateRespondentExperts)
-            .put(callbackKey(MID, "witnesses"), this::validateRespondentWitnesses)
-            .put(callbackKey(MID, "upload"), this::emptyCallbackResponse)
-            .put(callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth)
-            .put(callbackKey(MID, "validate-payment-date"), this::validateRespondentPaymentDate)
-            .put(callbackKey(MID, "specCorrespondenceAddress"), this::validateCorrespondenceApplicantAddress)
-            .put(callbackKey(MID, "determineLoggedInSolicitor"), this::determineLoggedInSolicitor)
-            .put(callbackKey(MID, "track"), this::handleDefendAllClaim)
-            .put(callbackKey(MID, "specHandleResponseType"), this::handleRespondentResponseTypeForSpec)
-            .put(callbackKey(MID, "specHandleAdmitPartClaim"), this::handleAdmitPartOfClaim)
-            .put(callbackKey(MID, "validate-length-of-unemployment"), this::validateLengthOfUnemployment)
-            .put(callbackKey(MID, "validate-repayment-plan"), this::validateDefendant1RepaymentPlan)
-            .put(callbackKey(MID, "validate-repayment-plan-2"), this::validateDefendant2RepaymentPlan)
-            .put(callbackKey(MID, "set-generic-response-type-flag"), this::setGenericResponseTypeFlag)
-            .put(callbackKey(MID, "set-upload-timeline-type-flag"), this::setUploadTimelineTypeFlag)
-            .put(callbackKey(ABOUT_TO_SUBMIT), this::setApplicantResponseDeadline)
-            .put(callbackKey(SUBMITTED), this::buildConfirmation)
-            .build();
+                .put(callbackKey(ABOUT_TO_START), this::populateRespondent1Copy)
+                .put(callbackKey(MID, "validate-mediation-unavailable-dates"), this::validateMediationUnavailableDates)
+                .put(callbackKey(MID, "confirm-details"), this::validateDateOfBirth)
+                .put(callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates)
+                .put(callbackKey(MID, "experts"), this::validateRespondentExperts)
+                .put(callbackKey(MID, "witnesses"), this::validateRespondentWitnesses)
+                .put(callbackKey(MID, "upload"), this::emptyCallbackResponse)
+                .put(callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth)
+                .put(callbackKey(MID, "validate-payment-date"), this::validateRespondentPaymentDate)
+                .put(callbackKey(MID, "specCorrespondenceAddress"), this::validateCorrespondenceApplicantAddress)
+                .put(callbackKey(MID, "determineLoggedInSolicitor"), this::determineLoggedInSolicitor)
+                .put(callbackKey(MID, "track"), this::handleDefendAllClaim)
+                .put(callbackKey(MID, "specHandleResponseType"), this::handleRespondentResponseTypeForSpec)
+                .put(callbackKey(MID, "specHandleAdmitPartClaim"), this::handleAdmitPartOfClaim)
+                .put(callbackKey(MID, "validate-length-of-unemployment"), this::validateLengthOfUnemployment)
+                .put(callbackKey(MID, "validate-repayment-plan"), this::validateDefendant1RepaymentPlan)
+                .put(callbackKey(MID, "validate-repayment-plan-2"), this::validateDefendant2RepaymentPlan)
+                .put(callbackKey(MID, "set-generic-response-type-flag"), this::setGenericResponseTypeFlag)
+                .put(callbackKey(MID, "set-upload-timeline-type-flag"), this::setUploadTimelineTypeFlag)
+                .put(callbackKey(ABOUT_TO_SUBMIT), this::setApplicantResponseDeadline)
+                .put(callbackKey(SUBMITTED), this::buildConfirmation)
+                .build();
     }
 
     private CallbackResponse validateMediationUnavailableDates(CallbackParams callbackParams) {
@@ -143,7 +133,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             return validateCorrespondenceApplicantAddress(callbackParams, postcodeValidator);
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .build();
+                .build();
     }
 
     private CallbackResponse determineLoggedInSolicitor(CallbackParams callbackParams) {
@@ -177,12 +167,12 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         // setting null here does not clear, need to overwrite with value.
         // must be to do with the way XUI cache data entered through the lifecycle of an event.
         CaseData updatedCaseData = caseData.toBuilder()
-            .uiStatementOfTruth(StatementOfTruth.builder().role("").build())
-            .build();
+                .uiStatementOfTruth(StatementOfTruth.builder().role("").build())
+                .build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseData.toMap(objectMapper))
-            .build();
+                .data(updatedCaseData.toMap(objectMapper))
+                .build();
     }
 
     private CallbackResponse setApplicantResponseDeadline(CallbackParams callbackParams) {
@@ -194,41 +184,51 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         String claimNumber = caseData.getLegacyCaseReference();
 
         String body = CaseDataToTextGenerator.getTextFor(
-            confirmationTextSpecGenerators.stream(),
-            () -> getDefaultConfirmationBody(caseData),
-            caseData
+                confirmationTextSpecGenerators.stream(),
+                () -> getDefaultConfirmationBody(caseData),
+                caseData,
+                featureToggleService
         );
 
         String header = CaseDataToTextGenerator.getTextFor(
-            confirmationHeaderGenerators.stream(),
-            () -> format("# You have submitted your response%n## Claim number: %s", claimNumber),
-            caseData
+                confirmationHeaderGenerators.stream(),
+                () -> format("# You have submitted your response%n## Claim number: %s", claimNumber),
+                caseData,
+                featureToggleService
         );
 
         return SubmittedCallbackResponse.builder()
-            .confirmationHeader(header)
-            .confirmationBody(body)
-            .build();
+                .confirmationHeader(header)
+                .confirmationBody(body)
+                .build();
     }
 
     private String getDefaultConfirmationBody(CaseData caseData) {
         LocalDateTime responseDeadline = caseData.getApplicant1ResponseDeadline();
         if (responseDeadline == null) {
             return format(
-                "<h2 class=\"govuk-heading-m\">What happens next</h2>"
-                    + "After the other solicitor has responded and/or the time"
-                    + " for responding has passed the claimant will be notified."
-                    + "%n%n<a href=\"%s\" target=\"_blank\">Download questionnaire (opens in a new tab)</a>",
-                format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference())
+                    "<h2 class=\"govuk-heading-m\">What happens next</h2>"
+                            + "After the other solicitor has responded and/or the time"
+                            + " for responding has passed the claimant will be notified."
+                            + "%n%n<a href=\"%s\" target=\"_blank\">Download questionnaire (opens in a new tab)</a>",
+                    format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference())
+            );
+        } else if (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+                && (caseData.isPayBySetDate())) {
+            return format(
+                    "<h2 class=\"govuk-heading-m\">What happens next</h2>"
+                            + "%n%nThe claimant has until 4pm on %s to respond to your claim. "
+                            + "We will let you know when they respond.%n%n",
+                    formatLocalDateTime(responseDeadline, DATE)
             );
         } else {
             return format(
-                "<h2 class=\"govuk-heading-m\">What happens next</h2>"
-                    + "%n%nThe claimant has until 4pm on %s to respond to your claim. "
-                    + "We will let you know when they respond."
-                    + "%n%n<a href=\"%s\" target=\"_blank\">Download questionnaire (opens in a new tab)</a>",
-                formatLocalDateTime(responseDeadline, DATE),
-                format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference())
+                    "<h2 class=\"govuk-heading-m\">What happens next</h2>"
+                            + "%n%nThe claimant has until 4pm on %s to respond to your claim. "
+                            + "We will let you know when they respond."
+                            + "%n%n<a href=\"%s\" target=\"_blank\">Download questionnaire (opens in a new tab)</a>",
+                    formatLocalDateTime(responseDeadline, DATE),
+                    format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference())
             );
         }
     }
@@ -253,15 +253,15 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         List<String> errors;
 
         if (repaymentPlan != null
-            && repaymentPlan.getFirstRepaymentDate() != null) {
+                && repaymentPlan.getFirstRepaymentDate() != null) {
             errors = unavailableDateValidator.validateFuturePaymentDate(repaymentPlan
-                                                                            .getFirstRepaymentDate());
+                    .getFirstRepaymentDate());
         } else {
             errors = new ArrayList<>();
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(errors)
-            .build();
+                .errors(errors)
+                .build();
     }
 }

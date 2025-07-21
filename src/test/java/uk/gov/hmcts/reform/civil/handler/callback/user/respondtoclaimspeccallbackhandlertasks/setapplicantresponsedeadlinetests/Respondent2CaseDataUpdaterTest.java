@@ -12,11 +12,15 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbac
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.service.Time;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 class Respondent2CaseDataUpdaterTest {
+
+    @Mock
+    private Time time;
 
     @InjectMocks
     private Respondent2CaseDataUpdater updater;

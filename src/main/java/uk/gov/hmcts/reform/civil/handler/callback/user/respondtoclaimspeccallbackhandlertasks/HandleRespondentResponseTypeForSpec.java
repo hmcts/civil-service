@@ -23,11 +23,11 @@ public class HandleRespondentResponseTypeForSpec implements CaseTask {
     public CallbackResponse execute(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         if (caseData.getRespondent1ClaimResponseTypeForSpec() != RespondentResponseTypeSpec.FULL_ADMISSION
-            || caseData.getRespondent2ClaimResponseTypeForSpec() != RespondentResponseTypeSpec.FULL_ADMISSION) {
+                || caseData.getRespondent2ClaimResponseTypeForSpec() != RespondentResponseTypeSpec.FULL_ADMISSION) {
             caseData = caseData.toBuilder().specDefenceFullAdmittedRequired(NO).build();
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseData.toMap(objectMapper))
-            .build();
+                .data(caseData.toMap(objectMapper))
+                .build();
     }
 }

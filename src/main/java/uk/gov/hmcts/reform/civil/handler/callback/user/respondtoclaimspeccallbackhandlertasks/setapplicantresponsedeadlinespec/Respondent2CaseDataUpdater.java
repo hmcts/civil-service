@@ -7,8 +7,11 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.service.Time;
 
+import java.time.LocalDateTime;
+
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllDefendantSolicitorReferencesSpec;
 
 @Component
 @RequiredArgsConstructor
@@ -19,10 +22,12 @@ public class Respondent2CaseDataUpdater implements SetApplicantResponseDeadlineC
 
     @Override
     public void update(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
+        LocalDateTime responseDate = time.now();
         if (respondToClaimSpecUtils.isRespondent2HasSameLegalRep(caseData)
-                && YES.equals(caseData.getRespondentResponseIsSame())) {
+                && caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == YES) {
             updatedData.respondent2ClaimResponseTypeForSpec(caseData.getRespondent1ClaimResponseTypeForSpec());
-            updatedData.respondent2ResponseDate(time.now());
+            updatedData
+                    .respondent2ResponseDate(responseDate);
         }
 
         if (ofNullable(caseData.getRespondent2()).isPresent()
@@ -35,5 +40,8 @@ public class Respondent2CaseDataUpdater implements SetApplicantResponseDeadlineC
                     .respondent2Copy(null);
             updatedData.respondent2DetailsForClaimDetailsTab(updatedRespondent2.toBuilder().flags(null).build());
         }
+
+        updatedData.caseListDisplayDefendantSolicitorReferences(getAllDefendantSolicitorReferencesSpec(caseData));
+
     }
 }

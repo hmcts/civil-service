@@ -44,12 +44,11 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.Defendan
 @Slf4j
 public class HandleDefendAllClaim implements CaseTask {
 
+    static final String UNKNOWN_MP_SCENARIO = "Unknown mp scenario";
     private final ObjectMapper objectMapper;
     private final FeatureToggleService toggleService;
     private final PaymentDateValidator paymentDateValidator;
     private final RespondToClaimSpecUtils respondToClaimSpecUtils;
-
-    static final String UNKNOWN_MP_SCENARIO = "Unknown mp scenario";
 
     public CallbackResponse execute(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
@@ -70,13 +69,13 @@ public class HandleDefendAllClaim implements CaseTask {
 
     private List<String> validatePaymentDate(CaseData caseData) {
         return paymentDateValidator.validate(Optional.ofNullable(caseData.getRespondToClaim())
-                                                 .orElseGet(() -> RespondToClaim.builder().build()));
+                .orElseGet(() -> RespondToClaim.builder().build()));
     }
 
     private CallbackResponse buildErrorResponse(List<String> errors) {
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(errors)
-            .build();
+                .errors(errors)
+                .build();
     }
 
     private boolean isDefendantResponseSpec(CallbackParams callbackParams) {
@@ -100,10 +99,10 @@ public class HandleDefendAllClaim implements CaseTask {
 
     private boolean isPaidLessOrDisputesOrPartAdmission(CaseData caseData) {
         return caseData.getRespondent1ClaimResponsePaymentAdmissionForSpec() == RespondentResponseTypeSpecPaidStatus.PAID_LESS_THAN_CLAIMED_AMOUNT
-            || DISPUTES_THE_CLAIM.equals(caseData.getDefenceRouteRequired())
-            || DISPUTES_THE_CLAIM.equals(caseData.getDefenceRouteRequired2())
-            || caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION
-            || caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION;
+                || DISPUTES_THE_CLAIM.equals(caseData.getDefenceRouteRequired())
+                || DISPUTES_THE_CLAIM.equals(caseData.getDefenceRouteRequired2())
+                || caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION
+                || caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION;
     }
 
     private void updateSpecDisputesOrPartAdmission(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCase) {
@@ -124,20 +123,20 @@ public class HandleDefendAllClaim implements CaseTask {
 
     private boolean isRespondent2DisputesOrPartAdmission(CaseData caseData) {
         return RespondentResponseTypeSpecPaidStatus.PAID_LESS_THAN_CLAIMED_AMOUNT != caseData.getRespondent1ClaimResponsePaymentAdmissionForSpec()
-            && (DISPUTES_THE_CLAIM.equals(caseData.getDefenceRouteRequired2())
-            || caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION);
+                && (DISPUTES_THE_CLAIM.equals(caseData.getDefenceRouteRequired2())
+                || caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION);
     }
 
     private boolean isRespondent1DisputesOrPartAdmission(CaseData caseData) {
         return RespondentResponseTypeSpecPaidStatus.PAID_LESS_THAN_CLAIMED_AMOUNT != caseData.getRespondent1ClaimResponsePaymentAdmissionForSpec()
-            && (DISPUTES_THE_CLAIM.equals(caseData.getDefenceRouteRequired())
-            || caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION);
+                && (DISPUTES_THE_CLAIM.equals(caseData.getDefenceRouteRequired())
+                || caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION);
     }
 
     private CallbackResponse buildSuccessResponse(CaseData caseData) {
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseData.toMap(objectMapper))
-            .build();
+                .data(caseData.toMap(objectMapper))
+                .build();
     }
 
     private Set<DefendantResponseShowTag> whoDisputesFullDefence(CaseData caseData) {
@@ -170,12 +169,12 @@ public class HandleDefendAllClaim implements CaseTask {
 
     private void handleOneVOne(CaseData caseData, Set<DefendantResponseShowTag> bcoPartAdmission) {
         fullDefenceAndPaidLess(
-            caseData.getRespondent1ClaimResponseTypeForSpec(),
-            caseData.getDefenceRouteRequired(),
-            caseData.getRespondToClaim(),
-            caseData.getTotalClaimAmount(),
-            ONLY_RESPONDENT_1_DISPUTES,
-            DefendantResponseShowTag.RESPONDENT_1_PAID_LESS
+                caseData.getRespondent1ClaimResponseTypeForSpec(),
+                caseData.getDefenceRouteRequired(),
+                caseData.getRespondToClaim(),
+                caseData.getTotalClaimAmount(),
+                ONLY_RESPONDENT_1_DISPUTES,
+                DefendantResponseShowTag.RESPONDENT_1_PAID_LESS
         ).ifPresent(bcoPartAdmission::add);
     }
 
@@ -191,32 +190,32 @@ public class HandleDefendAllClaim implements CaseTask {
 
     private void handleSingleResponseToBothClaimants(CaseData caseData, Set<DefendantResponseShowTag> bcoPartAdmission) {
         fullDefenceAndPaidLess(
-            caseData.getRespondent1ClaimResponseTypeForSpec(),
-            caseData.getDefenceRouteRequired(),
-            caseData.getRespondToClaim(),
-            caseData.getTotalClaimAmount(),
-            ONLY_RESPONDENT_1_DISPUTES,
-            DefendantResponseShowTag.RESPONDENT_1_PAID_LESS
+                caseData.getRespondent1ClaimResponseTypeForSpec(),
+                caseData.getDefenceRouteRequired(),
+                caseData.getRespondToClaim(),
+                caseData.getTotalClaimAmount(),
+                ONLY_RESPONDENT_1_DISPUTES,
+                DefendantResponseShowTag.RESPONDENT_1_PAID_LESS
         ).ifPresent(bcoPartAdmission::add);
     }
 
     private void handleSeparateResponses(CaseData caseData, Set<DefendantResponseShowTag> bcoPartAdmission) {
         fullDefenceAndPaidLess(
-            caseData.getClaimant1ClaimResponseTypeForSpec(),
-            caseData.getDefenceRouteRequired(),
-            caseData.getRespondToClaim(),
-            caseData.getTotalClaimAmount(),
-            ONLY_RESPONDENT_1_DISPUTES,
-            DefendantResponseShowTag.RESPONDENT_1_PAID_LESS
+                caseData.getClaimant1ClaimResponseTypeForSpec(),
+                caseData.getDefenceRouteRequired(),
+                caseData.getRespondToClaim(),
+                caseData.getTotalClaimAmount(),
+                ONLY_RESPONDENT_1_DISPUTES,
+                DefendantResponseShowTag.RESPONDENT_1_PAID_LESS
         ).ifPresent(bcoPartAdmission::add);
 
         fullDefenceAndPaidLess(
-            caseData.getClaimant2ClaimResponseTypeForSpec(),
-            caseData.getDefenceRouteRequired(),
-            caseData.getRespondToClaim(),
-            caseData.getTotalClaimAmount(),
-            ONLY_RESPONDENT_1_DISPUTES,
-            DefendantResponseShowTag.RESPONDENT_1_PAID_LESS
+                caseData.getClaimant2ClaimResponseTypeForSpec(),
+                caseData.getDefenceRouteRequired(),
+                caseData.getRespondToClaim(),
+                caseData.getTotalClaimAmount(),
+                ONLY_RESPONDENT_1_DISPUTES,
+                DefendantResponseShowTag.RESPONDENT_1_PAID_LESS
         ).ifPresent(bcoPartAdmission::add);
     }
 
@@ -230,12 +229,12 @@ public class HandleDefendAllClaim implements CaseTask {
 
     private void handleSameResponse(CaseData caseData, Set<DefendantResponseShowTag> bcoPartAdmission) {
         fullDefenceAndPaidLess(
-            caseData.getRespondent1ClaimResponseTypeForSpec(),
-            caseData.getDefenceRouteRequired(),
-            caseData.getRespondToClaim(),
-            caseData.getTotalClaimAmount(),
-            BOTH_RESPONDENTS_DISPUTE,
-            DefendantResponseShowTag.RESPONDENT_1_PAID_LESS
+                caseData.getRespondent1ClaimResponseTypeForSpec(),
+                caseData.getDefenceRouteRequired(),
+                caseData.getRespondToClaim(),
+                caseData.getTotalClaimAmount(),
+                BOTH_RESPONDENTS_DISPUTE,
+                DefendantResponseShowTag.RESPONDENT_1_PAID_LESS
         ).ifPresent(tag -> {
             bcoPartAdmission.add(tag);
             if (tag == DefendantResponseShowTag.RESPONDENT_1_PAID_LESS) {
@@ -246,12 +245,12 @@ public class HandleDefendAllClaim implements CaseTask {
 
     private void handleDifferentResponses(CaseData caseData, Set<DefendantResponseShowTag> bcoPartAdmission) {
         fullDefenceAndPaidLess(
-            caseData.getRespondent1ClaimResponseTypeForSpec(),
-            caseData.getDefenceRouteRequired(),
-            caseData.getRespondToClaim(),
-            caseData.getTotalClaimAmount(),
-            ONLY_RESPONDENT_1_DISPUTES,
-            DefendantResponseShowTag.RESPONDENT_1_PAID_LESS
+                caseData.getRespondent1ClaimResponseTypeForSpec(),
+                caseData.getDefenceRouteRequired(),
+                caseData.getRespondToClaim(),
+                caseData.getTotalClaimAmount(),
+                ONLY_RESPONDENT_1_DISPUTES,
+                DefendantResponseShowTag.RESPONDENT_1_PAID_LESS
         ).ifPresent(bcoPartAdmission::add);
 
         if (caseData.getRespondentResponseIsSame() == YES) {
@@ -260,18 +259,18 @@ public class HandleDefendAllClaim implements CaseTask {
             }
         } else {
             fullDefenceAndPaidLess(
-                caseData.getRespondent2ClaimResponseTypeForSpec(),
-                caseData.getDefenceRouteRequired(),
-                caseData.getRespondToClaim(),
-                caseData.getTotalClaimAmount(),
-                DefendantResponseShowTag.ONLY_RESPONDENT_2_DISPUTES,
-                DefendantResponseShowTag.RESPONDENT_2_PAID_LESS
+                    caseData.getRespondent2ClaimResponseTypeForSpec(),
+                    caseData.getDefenceRouteRequired(),
+                    caseData.getRespondToClaim(),
+                    caseData.getTotalClaimAmount(),
+                    DefendantResponseShowTag.ONLY_RESPONDENT_2_DISPUTES,
+                    DefendantResponseShowTag.RESPONDENT_2_PAID_LESS
             ).ifPresent(bcoPartAdmission::add);
         }
 
         EnumSet<DefendantResponseShowTag> bothOnlyDisputes = EnumSet.of(
-            DefendantResponseShowTag.ONLY_RESPONDENT_1_DISPUTES,
-            DefendantResponseShowTag.ONLY_RESPONDENT_2_DISPUTES
+                DefendantResponseShowTag.ONLY_RESPONDENT_1_DISPUTES,
+                DefendantResponseShowTag.ONLY_RESPONDENT_2_DISPUTES
         );
         if (bcoPartAdmission.containsAll(bothOnlyDisputes)) {
             bcoPartAdmission.removeAll(bothOnlyDisputes);
@@ -282,29 +281,29 @@ public class HandleDefendAllClaim implements CaseTask {
     private void handleOneVTwoTwoLegalRep(CaseData caseData, Set<DefendantResponseShowTag> tags, Set<DefendantResponseShowTag> bcoPartAdmission) {
         if (tags.contains(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1)) {
             fullDefenceAndPaidLess(
-                caseData.getRespondent1ClaimResponseTypeForSpec(),
-                caseData.getDefenceRouteRequired(),
-                caseData.getRespondToClaim(),
-                caseData.getTotalClaimAmount(),
-                ONLY_RESPONDENT_1_DISPUTES,
-                DefendantResponseShowTag.RESPONDENT_1_PAID_LESS
+                    caseData.getRespondent1ClaimResponseTypeForSpec(),
+                    caseData.getDefenceRouteRequired(),
+                    caseData.getRespondToClaim(),
+                    caseData.getTotalClaimAmount(),
+                    ONLY_RESPONDENT_1_DISPUTES,
+                    DefendantResponseShowTag.RESPONDENT_1_PAID_LESS
             ).ifPresent(bcoPartAdmission::add);
         } else if (tags.contains(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_2)) {
             fullDefenceAndPaidLess(
-                caseData.getRespondent2ClaimResponseTypeForSpec(),
-                caseData.getDefenceRouteRequired2(),
-                caseData.getRespondToClaim2(),
-                caseData.getTotalClaimAmount(),
-                DefendantResponseShowTag.ONLY_RESPONDENT_2_DISPUTES,
-                DefendantResponseShowTag.RESPONDENT_2_PAID_LESS
+                    caseData.getRespondent2ClaimResponseTypeForSpec(),
+                    caseData.getDefenceRouteRequired2(),
+                    caseData.getRespondToClaim2(),
+                    caseData.getTotalClaimAmount(),
+                    DefendantResponseShowTag.ONLY_RESPONDENT_2_DISPUTES,
+                    DefendantResponseShowTag.RESPONDENT_2_PAID_LESS
             ).ifPresent(bcoPartAdmission::add);
         }
     }
 
     private void addSomeoneDisputesTag(Set<DefendantResponseShowTag> tags) {
         if (tags.contains(ONLY_RESPONDENT_1_DISPUTES)
-            || tags.contains(ONLY_RESPONDENT_2_DISPUTES)
-            || tags.contains(BOTH_RESPONDENTS_DISPUTE)) {
+                || tags.contains(ONLY_RESPONDENT_2_DISPUTES)
+                || tags.contains(BOTH_RESPONDENTS_DISPUTE)) {
             tags.add(SOMEONE_DISPUTES);
         }
     }
@@ -318,15 +317,15 @@ public class HandleDefendAllClaim implements CaseTask {
 
     private void updateRespondent1PaymentStatus(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updated) {
         if (SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED.equals(caseData.getDefenceRouteRequired())
-            && caseData.getRespondToClaim().getHowMuchWasPaid() != null) {
+                && caseData.getRespondToClaim().getHowMuchWasPaid() != null) {
             int comparison = caseData.getRespondToClaim().getHowMuchWasPaid()
-                .compareTo(new BigDecimal(MonetaryConversions.poundsToPennies(caseData.getTotalClaimAmount())));
+                    .compareTo(new BigDecimal(MonetaryConversions.poundsToPennies(caseData.getTotalClaimAmount())));
             if (comparison < 0) {
                 updated.respondent1ClaimResponsePaymentAdmissionForSpec(
-                    RespondentResponseTypeSpecPaidStatus.PAID_LESS_THAN_CLAIMED_AMOUNT).build();
+                        RespondentResponseTypeSpecPaidStatus.PAID_LESS_THAN_CLAIMED_AMOUNT).build();
             } else {
                 updated.respondent1ClaimResponsePaymentAdmissionForSpec(
-                    RespondentResponseTypeSpecPaidStatus.PAID_FULL_OR_MORE_THAN_CLAIMED_AMOUNT).build();
+                        RespondentResponseTypeSpecPaidStatus.PAID_FULL_OR_MORE_THAN_CLAIMED_AMOUNT).build();
             }
         } else {
             updated.respondent1ClaimResponsePaymentAdmissionForSpec(RespondentResponseTypeSpecPaidStatus.DID_NOT_PAY).build();
@@ -335,15 +334,15 @@ public class HandleDefendAllClaim implements CaseTask {
 
     private void updateRespondent2PaymentStatus(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updated) {
         if (SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED.equals(caseData.getDefenceRouteRequired2())
-            && caseData.getRespondToClaim2().getHowMuchWasPaid() != null) {
+                && caseData.getRespondToClaim2().getHowMuchWasPaid() != null) {
             int comparison = caseData.getRespondToClaim2().getHowMuchWasPaid()
-                .compareTo(new BigDecimal(MonetaryConversions.poundsToPennies(caseData.getTotalClaimAmount())));
+                    .compareTo(new BigDecimal(MonetaryConversions.poundsToPennies(caseData.getTotalClaimAmount())));
             if (comparison < 0) {
                 updated.respondent1ClaimResponsePaymentAdmissionForSpec(
-                    RespondentResponseTypeSpecPaidStatus.PAID_LESS_THAN_CLAIMED_AMOUNT).build();
+                        RespondentResponseTypeSpecPaidStatus.PAID_LESS_THAN_CLAIMED_AMOUNT).build();
             } else {
                 updated.respondent1ClaimResponsePaymentAdmissionForSpec(
-                    RespondentResponseTypeSpecPaidStatus.PAID_FULL_OR_MORE_THAN_CLAIMED_AMOUNT).build();
+                        RespondentResponseTypeSpecPaidStatus.PAID_FULL_OR_MORE_THAN_CLAIMED_AMOUNT).build();
             }
         } else {
             updated.respondent1ClaimResponsePaymentAdmissionForSpec(null).build();
@@ -352,16 +351,16 @@ public class HandleDefendAllClaim implements CaseTask {
 
     private AllocatedTrack getAllocatedTrack(CaseData caseData) {
         return AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(), null, null,
-                                                toggleService, caseData);
+                toggleService, caseData);
     }
 
     private Optional<DefendantResponseShowTag> fullDefenceAndPaidLess(
-        RespondentResponseTypeSpec responseType,
-        String fullDefenceRoute,
-        RespondToClaim responseDetails,
-        BigDecimal claimedAmount,
-        DefendantResponseShowTag ifDisputing,
-        DefendantResponseShowTag ifPaidLess) {
+            RespondentResponseTypeSpec responseType,
+            String fullDefenceRoute,
+            RespondToClaim responseDetails,
+            BigDecimal claimedAmount,
+            DefendantResponseShowTag ifDisputing,
+            DefendantResponseShowTag ifPaidLess) {
 
         if (isFullDefence(responseType)) {
             if (isDisputingClaim(fullDefenceRoute)) {
@@ -383,9 +382,9 @@ public class HandleDefendAllClaim implements CaseTask {
 
     private boolean isPaidLessThanClaimed(RespondToClaim responseDetails, BigDecimal claimedAmount) {
         return Optional.ofNullable(responseDetails)
-            .map(RespondToClaim::getHowMuchWasPaid)
-            .map(MonetaryConversions::penniesToPounds)
-            .map(wasPaid -> wasPaid.compareTo(claimedAmount) < 0)
-            .orElse(false);
+                .map(RespondToClaim::getHowMuchWasPaid)
+                .map(MonetaryConversions::penniesToPounds)
+                .map(wasPaid -> wasPaid.compareTo(claimedAmount) < 0)
+                .orElse(false);
     }
 }

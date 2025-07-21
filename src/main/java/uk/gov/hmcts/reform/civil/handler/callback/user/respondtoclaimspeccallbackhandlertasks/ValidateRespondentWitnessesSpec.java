@@ -55,23 +55,23 @@ public class ValidateRespondentWitnessesSpec implements CaseTask, WitnessesValid
 
     private boolean isRespondent2HasDifferentResponse(CaseData caseData) {
         return respondent2HasSameLegalRep(caseData)
-            && caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO
-            && caseData.getRespondent2DQ() != null && caseData.getRespondent2DQ().getRespondent2DQWitnesses() != null;
+                && caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO
+                && caseData.getRespondent2DQ() != null && caseData.getRespondent2DQ().getRespondent2DQWitnesses() != null;
     }
 
     private CallbackResponse validateR1Witnesses(CaseData caseData) {
         List<String> errors = new ArrayList<>();
         if (caseData.getRespondent1DQWitnessesRequiredSpec() == YES
-            && caseData.getRespondent1DQWitnessesDetailsSpec() == null) {
+                && caseData.getRespondent1DQWitnessesDetailsSpec() == null) {
             errors.add("Witness details required");
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(errors)
-            .build();
+                .errors(errors)
+                .build();
     }
 
     private boolean respondent2HasSameLegalRep(CaseData caseData) {
         return caseData.getRespondent2SameLegalRepresentative() != null
-            && caseData.getRespondent2SameLegalRepresentative() == YES;
+                && caseData.getRespondent2SameLegalRepresentative() == YES;
     }
 }

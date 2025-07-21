@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.handleadmitpartofclaim;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyResponseTypeFlags;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
@@ -8,6 +9,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -31,7 +33,10 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.Defendan
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.WHY_2_DOES_NOT_PAY_IMMEDIATELY;
 
 @Component
+@RequiredArgsConstructor
 public class ShowConditionFlagsCaseUpdater implements HandleAdmitPartOfClaimCaseUpdater {
+
+    private final FeatureToggleService featureToggleService;
 
     @Override
     public void update(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
@@ -48,6 +53,8 @@ public class ShowConditionFlagsCaseUpdater implements HandleAdmitPartOfClaimCase
             currentShowFlags.add(WHEN_WILL_CLAIM_BE_PAID);
         }
         updatedCaseData.showConditionFlags(currentShowFlags);
+        check1v1PartAdmitLRBulkAdmission(updatedCaseData);
+
     }
 
     private Set<DefendantResponseShowTag> checkNecessaryFinancialDetails(CaseData caseData) {
@@ -235,5 +242,13 @@ public class ShowConditionFlagsCaseUpdater implements HandleAdmitPartOfClaimCase
     private boolean isRespondent2EligibleForNonImmediatePayment(CaseData caseData) {
         return caseData.getRespondentClaimResponseTypeForSpecGeneric() != COUNTER_CLAIM
                 && caseData.getRespondentClaimResponseTypeForSpecGeneric() != FULL_DEFENCE;
+    }
+
+    private void check1v1PartAdmitLRBulkAdmission(CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
+        CaseData caseData = updatedCaseData.build();
+        if (featureToggleService.isLrAdmissionBulkEnabled()) {
+            updatedCaseData.partAdmit1v1Defendant(MultiPartyScenario.isOneVOne(caseData)
+                    && caseData.isPartAdmitClaimSpec() ? YES : NO);
+        }
     }
 }

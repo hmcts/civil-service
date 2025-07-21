@@ -32,13 +32,17 @@ import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
+import uk.gov.hmcts.reform.civil.utils.RequestedCourtForClaimDetailsTab;
 import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_SPEC;
@@ -64,7 +68,6 @@ public class SetApplicantResponseDeadlineSpec implements CaseTask {
 
     private final UserService userService;
     private final CoreCaseUserService coreCaseUserService;
-    private final FeatureToggleService toggleService;
     private final ObjectMapper objectMapper;
     private final CaseFlagsInitialiser caseFlagsInitialiser;
     private final Time time;
@@ -74,10 +77,28 @@ public class SetApplicantResponseDeadlineSpec implements CaseTask {
     private final RespondToClaimSpecUtils respondToClaimSpecUtils;
     private final List<SetApplicantResponseDeadlineCaseDataUpdater> setApplicantResponseDeadlineCaseDataUpdaters;
     private final List<ExpertsAndWitnessesCaseDataUpdater> expertsAndWitnessesCaseDataUpdaters;
+    private final RequestedCourtForClaimDetailsTab requestedCourtForClaimDetailsTab;
+    private final FeatureToggleService featureToggleService;
+
+    public static void getUserInfo(CallbackParams callbackParams, CaseData.CaseDataBuilder<?, ?> updatedData,
+                                   CaseData caseData, UserService userService, CoreCaseUserService coreCaseUserService) {
+        UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
+        updatedData.respondent2DocumentGeneration(null);
+        if (!coreCaseUserService.userHasCaseRole(
+                caseData.getCcdCaseReference().toString(),
+                userInfo.getUid(),
+                RESPONDENTSOLICITORONE)
+                && coreCaseUserService.userHasCaseRole(
+                caseData.getCcdCaseReference().toString(),
+                userInfo.getUid(),
+                RESPONDENTSOLICITORTWO)) {
+            updatedData.respondent2DocumentGeneration("userRespondent2");
+        }
+    }
 
     public CallbackResponse execute(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        final LocalDateTime responseDate = time.now();
+        LocalDateTime responseDate = time.now();
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
 
         setApplicantResponseDeadlineCaseDataUpdaters.forEach(updater -> updater.update(caseData, updatedData));
@@ -122,27 +143,60 @@ public class SetApplicantResponseDeadlineSpec implements CaseTask {
         updatedData.respondent2ResponseDate(responseDate)
                 .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE_SPEC));
         if (caseData.getRespondent1ResponseDate() != null) {
-            updatedData.applicant1ResponseDeadline(getApplicant1ResponseDeadline(responseDate));
+            LocalDateTime applicant1ResponseDeadline = getApplicant1ResponseDeadline(responseDate);
+            updatedData
+                    .applicant1ResponseDeadline(applicant1ResponseDeadline)
+                    .nextDeadline(applicant1ResponseDeadline.toLocalDate());
         }
         StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
         Respondent2DQ.Respondent2DQBuilder dq = caseData.getRespondent2DQ().toBuilder()
                 .respondent2DQStatementOfTruth(statementOfTruth);
         handleCourtLocationForRespondent2DQ(caseData, updatedData, dq, callbackParams);
         updatedData.respondent2DQ(dq.build());
+        requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabRespondent2Spec(callbackParams, updatedData);
         updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
     }
 
     private void handleBothRespondentsRepresentation(CallbackParams callbackParams, CaseData caseData,
                                                      CaseData.CaseDataBuilder<?, ?> updatedData,
                                                      LocalDateTime responseDate) {
-        updatedData.respondent1ResponseDate(responseDate)
+        boolean nextDeadlineRespondent2 = NO.equals(caseData.getRespondent2SameLegalRepresentative())
+                && isNull(caseData.getRespondent2ResponseDate());
+        LocalDateTime applicant1ResponseDeadline = getApplicant1ResponseDeadline(responseDate);
+        LocalDate respondent2Deadline = nonNull(caseData.getRespondent2ResponseDeadline())
+                ? caseData.getRespondent2ResponseDeadline().toLocalDate()
+                : caseData.getRespondent1ResponseDeadline().toLocalDate();
+
+        LocalDate nextDeadline = nextDeadlineRespondent2
+                ? respondent2Deadline
+                : applicant1ResponseDeadline.toLocalDate();
+
+        updatedData
+                .respondent1ResponseDate(responseDate)
                 .applicant1ResponseDeadline(getApplicant1ResponseDeadline(responseDate))
+                .applicant1ResponseDeadline(applicant1ResponseDeadline)
+                .nextDeadline(nextDeadline)
                 .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE_SPEC));
 
         if (caseData.getRespondent2() != null && caseData.getRespondent2Copy() != null) {
-            updateRespondent2Details(caseData, updatedData);
+            Party updatedRespondent2;
+
+            if (NO.equals(caseData.getSpecAoSRespondent2HomeAddressRequired())) {
+                updatedRespondent2 = caseData.getRespondent2().toBuilder()
+                        .primaryAddress(caseData.getSpecAoSRespondent2HomeAddressDetails()).build();
+            } else {
+                updatedRespondent2 = caseData.getRespondent2().toBuilder()
+                        .primaryAddress(caseData.getRespondent2Copy().getPrimaryAddress()).build();
+            }
+
+            updatedData
+                    .respondent2(updatedRespondent2.toBuilder()
+                            .flags(caseData.getRespondent2Copy().getFlags()).build())
+                    .respondent2Copy(null);
+            updatedData.respondent2DetailsForClaimDetailsTab(updatedRespondent2.toBuilder().flags(null).build());
         }
 
+        // moving statement of truth value to correct field, this was not possible in mid event.
         StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
         Respondent1DQ.Respondent1DQBuilder dq = caseData.getRespondent1DQ().toBuilder()
                 .respondent1DQStatementOfTruth(statementOfTruth)
@@ -152,60 +206,18 @@ public class SetApplicantResponseDeadlineSpec implements CaseTask {
                         .build());
         handleCourtLocationForRespondent1DQ(caseData, dq, callbackParams);
         updatedData.respondent1DQ(dq.build());
+        requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabRespondent1Spec(callbackParams, updatedData);
+        // resetting statement of truth to make sure it's empty the next time it appears in the UI.
         updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
-    }
-
-    private void updateRespondent2Details(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
-        Party updatedRespondent2;
-        if (NO.equals(caseData.getSpecAoSRespondent2HomeAddressRequired())) {
-            updatedRespondent2 = caseData.getRespondent2().toBuilder()
-                    .primaryAddress(caseData.getSpecAoSRespondent2HomeAddressDetails())
-                    .build();
-        } else {
-            updatedRespondent2 = caseData.getRespondent2().toBuilder()
-                    .primaryAddress(caseData.getRespondent2Copy().getPrimaryAddress())
-                    .flags(caseData.getRespondent2Copy().getFlags())
-                    .build();
-        }
-        updatedData.respondent2(updatedRespondent2)
-                .respondent2Copy(null);
-        updatedData.respondent2DetailsForClaimDetailsTab(updatedRespondent2.toBuilder().flags(null).build());
     }
 
     private void handleExpertsAndWitnesses(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
         expertsAndWitnessesCaseDataUpdaters.forEach(updater -> updater.update(caseData, updatedData));
     }
 
-    private void clearFlagsInDetails(CaseData.CaseDataBuilder<?, ?> updatedData, CaseData caseData) {
-        updatedData.respondent1DetailsForClaimDetailsTab(
-                updatedData.build().getRespondent1().toBuilder().flags(null).build()
-        );
-        if (ofNullable(caseData.getRespondent2()).isPresent()) {
-            updatedData.respondent2DetailsForClaimDetailsTab(
-                    updatedData.build().getRespondent2().toBuilder().flags(null).build()
-            );
-        }
-    }
-
     private void handleDocumentGeneration(CallbackParams callbackParams, CaseData.CaseDataBuilder<?, ?> updatedData,
                                           CaseData caseData) {
         getUserInfo(callbackParams, updatedData, caseData, userService, coreCaseUserService);
-    }
-
-    public static void getUserInfo(CallbackParams callbackParams, CaseData.CaseDataBuilder<?, ?> updatedData,
-                                   CaseData caseData, UserService userService, CoreCaseUserService coreCaseUserService) {
-        UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
-        updatedData.respondent2DocumentGeneration(null);
-        if (!coreCaseUserService.userHasCaseRole(
-                caseData.getCcdCaseReference().toString(),
-                userInfo.getUid(),
-                RESPONDENTSOLICITORONE)
-                && coreCaseUserService.userHasCaseRole(
-                caseData.getCcdCaseReference().toString(),
-                userInfo.getUid(),
-                RESPONDENTSOLICITORTWO)) {
-            updatedData.respondent2DocumentGeneration("userRespondent2");
-        }
     }
 
     private void updateCorrespondenceAddresses(CallbackParams callbackParams, CaseData.CaseDataBuilder<?, ?> updatedData,
@@ -256,6 +268,14 @@ public class SetApplicantResponseDeadlineSpec implements CaseTask {
                     .build();
         }
         respondToClaimSpecUtils.assembleResponseDocumentsSpec(caseData, updatedData);
+
+        if (featureToggleService.isWelshEnabledForMainCase() && caseData.isLipvLROneVOne()
+                && caseData.isClaimantBilingual()) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                    .data(updatedData.build().toMap(objectMapper))
+                    .build();
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(updatedData.build().toMap(objectMapper))
                 .state(CaseState.AWAITING_APPLICANT_INTENTION.name())

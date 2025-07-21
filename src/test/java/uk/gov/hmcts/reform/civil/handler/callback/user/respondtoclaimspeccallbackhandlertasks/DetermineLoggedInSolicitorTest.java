@@ -45,9 +45,9 @@ class DetermineLoggedInSolicitorTest {
         CaseData caseData = CaseData.builder().ccdCaseReference(1234L).build();
         UserInfo userInfo = UserInfo.builder().uid("userId").build();
         callbackParams = CallbackParams.builder()
-            .caseData(caseData)
-            .params(Map.of(BEARER_TOKEN, "token"))
-            .build();
+                .caseData(caseData)
+                .params(Map.of(BEARER_TOKEN, "token"))
+                .build();
         when(userService.getUserInfo(any())).thenReturn(userInfo);
     }
 
@@ -137,16 +137,16 @@ class DetermineLoggedInSolicitorTest {
 
     private CaseData buildCaseData(Party.Type partyType) {
         return CaseData.builder()
-            .isRespondent2(YesOrNo.YES)
-            .respondent2DetailsForClaimDetailsTab(Party.builder().type(partyType).build())
-            .ccdCaseReference(1234L)
-            .build();
+                .isRespondent2(YesOrNo.YES)
+                .respondent2DetailsForClaimDetailsTab(Party.builder().type(partyType).build())
+                .ccdCaseReference(1234L)
+                .build();
     }
 
     private CallbackParams buildCallbackParams(CaseData caseData) {
         return CallbackParams.builder()
-            .caseData(caseData)
-            .params(Map.of(BEARER_TOKEN, "token"))
-            .build();
+                .caseData(caseData)
+                .params(Map.of(BEARER_TOKEN, "token"))
+                .build();
     }
 }

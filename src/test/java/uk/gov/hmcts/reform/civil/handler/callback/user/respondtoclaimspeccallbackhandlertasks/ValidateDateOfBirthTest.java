@@ -85,9 +85,9 @@ class ValidateDateOfBirthTest {
     void shouldReturnErrorsWhenCorrespondenceAddressIsInvalid() {
         when(postcodeValidator.validate(null)).thenReturn(Collections.singletonList("Invalid postcode"));
         caseData = caseData.toBuilder()
-            .isRespondent1(YES)
-            .specAoSRespondentCorrespondenceAddressRequired(NO)
-            .build();
+                .isRespondent1(YES)
+                .specAoSRespondentCorrespondenceAddressRequired(NO)
+                .build();
         when(callbackParams.getCaseData()).thenReturn(caseData);
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) validateDateOfBirth.execute(callbackParams);
@@ -139,9 +139,9 @@ class ValidateDateOfBirthTest {
     void shouldReturnErrorsWhenSpecAoSRespondent2CorrespondenceAddressRequiredIsNO() {
         when(postcodeValidator.validate(null)).thenReturn(Collections.singletonList("Invalid postcode"));
         caseData = caseData.toBuilder()
-            .isRespondent2(YES)
-            .specAoSRespondent2CorrespondenceAddressRequired(NO)
-            .build();
+                .isRespondent2(YES)
+                .specAoSRespondent2CorrespondenceAddressRequired(NO)
+                .build();
         when(callbackParams.getCaseData()).thenReturn(caseData);
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) validateDateOfBirth.execute(callbackParams);
@@ -152,9 +152,9 @@ class ValidateDateOfBirthTest {
     @Test
     void shouldReturnNoErrorsWhenSpecAoSRespondentCorrespondenceAddressRequiredIsYES() {
         caseData = caseData.toBuilder()
-            .isRespondent1(YES)
-            .specAoSRespondentCorrespondenceAddressRequired(YES)
-            .build();
+                .isRespondent1(YES)
+                .specAoSRespondentCorrespondenceAddressRequired(YES)
+                .build();
         when(callbackParams.getCaseData()).thenReturn(caseData);
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) validateDateOfBirth.execute(callbackParams);
@@ -165,9 +165,9 @@ class ValidateDateOfBirthTest {
     @Test
     void shouldReturnNoErrorsWhenSpecAoSRespondent2CorrespondenceAddressRequiredIsYES() {
         caseData = caseData.toBuilder()
-            .isRespondent2(YES)
-            .specAoSRespondent2CorrespondenceAddressRequired(YES)
-            .build();
+                .isRespondent2(YES)
+                .specAoSRespondent2CorrespondenceAddressRequired(YES)
+                .build();
         when(callbackParams.getCaseData()).thenReturn(caseData);
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) validateDateOfBirth.execute(callbackParams);
@@ -178,8 +178,8 @@ class ValidateDateOfBirthTest {
     @Test
     void shouldSetSameSolicitorSameResponseToYesWhenBothSolicitorsRepresentOnlyOneRespondent() {
         caseData = CaseData.builder()
-            .addRespondent2(YES)
-            .build();
+                .addRespondent2(YES)
+                .build();
         when(callbackParams.getCaseData()).thenReturn(caseData);
 
         try (MockedStatic<MultiPartyScenario> mockedScenario = mockStatic(MultiPartyScenario.class)) {
@@ -196,8 +196,8 @@ class ValidateDateOfBirthTest {
     @Test
     void shouldSetSameSolicitorSameResponseToYesWhenOnlySecondSolicitorRepresentsOneRespondent() {
         caseData = CaseData.builder()
-            .addRespondent2(YES)
-            .build();
+                .addRespondent2(YES)
+                .build();
         when(callbackParams.getCaseData()).thenReturn(caseData);
 
         try (MockedStatic<MultiPartyScenario> mockedScenario = mockStatic(MultiPartyScenario.class)) {
@@ -213,8 +213,8 @@ class ValidateDateOfBirthTest {
     @Test
     void shouldSetSameSolicitorSameResponseToYesWhenNoSolicitorRepresentsOneRespondent() {
         caseData = CaseData.builder()
-            .addRespondent2(YES)
-            .build();
+                .addRespondent2(YES)
+                .build();
         when(callbackParams.getCaseData()).thenReturn(caseData);
 
         try (MockedStatic<MultiPartyScenario> mockedScenario = mockStatic(MultiPartyScenario.class)) {
@@ -230,9 +230,9 @@ class ValidateDateOfBirthTest {
     @Test
     void shouldSetSameSolicitorSameResponseToNoWhenOneVTwoOneLegalRepAndRespondentResponseIsNotSame() {
         caseData = CaseData.builder()
-            .addRespondent2(YES)
-            .respondentResponseIsSame(NO)
-            .build();
+                .addRespondent2(YES)
+                .respondentResponseIsSame(NO)
+                .build();
         when(callbackParams.getCaseData()).thenReturn(caseData);
 
         try (MockedStatic<MultiPartyScenario> mockedScenario = mockStatic(MultiPartyScenario.class)) {
@@ -247,9 +247,9 @@ class ValidateDateOfBirthTest {
     @Test
     void shouldNotSetSameSolicitorSameResponseWhenAddRespondent2IsNoAndRespondentResponseIsNotSame() {
         caseData = CaseData.builder()
-            .addRespondent2(NO)
-            .respondentResponseIsSame(NO)
-            .build();
+                .addRespondent2(NO)
+                .respondentResponseIsSame(NO)
+                .build();
         when(callbackParams.getCaseData()).thenReturn(caseData);
 
         try (MockedStatic<MultiPartyScenario> mockedScenario = mockStatic(MultiPartyScenario.class)) {
@@ -264,9 +264,9 @@ class ValidateDateOfBirthTest {
     @Test
     void shouldSetSameSolicitorSameResponseToYesWhenOneVTwoOneLegalRepAndRespondentResponseIsSame() {
         caseData = CaseData.builder()
-            .addRespondent2(YES)
-            .respondentResponseIsSame(YES)
-            .build();
+                .addRespondent2(YES)
+                .respondentResponseIsSame(YES)
+                .build();
         when(callbackParams.getCaseData()).thenReturn(caseData);
 
         try (MockedStatic<MultiPartyScenario> mockedScenario = mockStatic(MultiPartyScenario.class)) {

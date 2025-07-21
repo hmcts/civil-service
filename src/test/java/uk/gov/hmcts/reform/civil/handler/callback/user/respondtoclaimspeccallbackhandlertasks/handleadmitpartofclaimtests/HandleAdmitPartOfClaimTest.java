@@ -32,7 +32,7 @@ import static uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec.DEFE
 class HandleAdmitPartOfClaimTest {
 
     @Mock
-    private FeatureToggleService toggleService;
+    private FeatureToggleService featureToggleService;
 
     @Mock
     private PaymentDateValidator paymentDateValidator;
@@ -47,8 +47,8 @@ class HandleAdmitPartOfClaimTest {
         ObjectMapper objectMapper = new ObjectMapper();
         handleAdmitPartOfClaim = new HandleAdmitPartOfClaim(
                 objectMapper,
-                toggleService,
                 paymentDateValidator,
+                featureToggleService,
                 handleAdmitPartOfClaimCaseUpdaters
         );
     }

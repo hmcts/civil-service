@@ -48,9 +48,9 @@ public class ValidateDateOfBirth implements CaseTask {
         updateSolicitorResponse(callbackParams, caseData, updatedData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedData.build().toMap(objectMapper))
-            .errors(errors)
-            .build();
+                .data(updatedData.build().toMap(objectMapper))
+                .errors(errors)
+                .build();
     }
 
     private Party getRespondent(CallbackParams callbackParams) {
@@ -64,12 +64,12 @@ public class ValidateDateOfBirth implements CaseTask {
     private void updateSolicitorResponse(CallbackParams callbackParams, CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
         if (isTwoLegalRepsScenario(caseData) && YES.equals(caseData.getAddRespondent2())) {
             updatedData.sameSolicitorSameResponse(
-                respondToClaimSpecUtils.isSolicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)
-                    && respondToClaimSpecUtils.isSolicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONE) ? YES : NO
+                    respondToClaimSpecUtils.isSolicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)
+                            && respondToClaimSpecUtils.isSolicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONE) ? YES : NO
             ).build();
         } else if (isOneLegalRepScenario(caseData) && YES.equals(caseData.getAddRespondent2())) {
             updatedData.sameSolicitorSameResponse(
-                NO.equals(caseData.getRespondentResponseIsSame()) ? NO : YES
+                    NO.equals(caseData.getRespondentResponseIsSame()) ? NO : YES
             ).build();
         }
     }

@@ -25,11 +25,11 @@ public class ValidateRespondentPaymentDate implements CaseTask {
         CaseData caseData = callbackParams.getCaseData();
 
         List<String> errors = paymentDateValidator
-            .validate(Optional.ofNullable(caseData.getRespondToClaimAdmitPartLRspec())
-                          .orElseGet(() -> RespondToClaimAdmitPartLRspec.builder().build()));
+                .validate(Optional.ofNullable(caseData.getRespondToClaimAdmitPartLRspec())
+                        .orElseGet(() -> RespondToClaimAdmitPartLRspec.builder().build()));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(errors)
-            .build();
+                .errors(errors)
+                .build();
     }
 }

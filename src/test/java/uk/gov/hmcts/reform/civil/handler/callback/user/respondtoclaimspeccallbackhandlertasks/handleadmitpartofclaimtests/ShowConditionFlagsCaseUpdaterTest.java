@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
@@ -12,6 +13,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbac
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.EnumSet;
 
@@ -28,6 +30,9 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.Defendan
 
 @ExtendWith(MockitoExtension.class)
 public class ShowConditionFlagsCaseUpdaterTest {
+
+    @Mock
+    private FeatureToggleService featureToggleService;
 
     @InjectMocks
     private ShowConditionFlagsCaseUpdater updater;

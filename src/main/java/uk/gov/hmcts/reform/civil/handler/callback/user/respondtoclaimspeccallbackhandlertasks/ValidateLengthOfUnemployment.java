@@ -22,8 +22,8 @@ public class ValidateLengthOfUnemployment implements CaseTask {
         List<String> errors = validateLengthOfUnemployment(caseData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(errors)
-            .build();
+                .errors(errors)
+                .build();
     }
 
     private List<String> validateLengthOfUnemployment(CaseData caseData) {
@@ -32,7 +32,7 @@ public class ValidateLengthOfUnemployment implements CaseTask {
         if (caseData.getRespondToClaimAdmitPartUnemployedLRspec() != null) {
             var lengthOfUnemployment = caseData.getRespondToClaimAdmitPartUnemployedLRspec().getLengthOfUnemployment();
             if (lengthOfUnemployment != null
-                && (lengthOfUnemployment.getNumberOfYearsInUnemployment().contains(".")
+                    && (lengthOfUnemployment.getNumberOfYearsInUnemployment().contains(".")
                     || lengthOfUnemployment.getNumberOfMonthsInUnemployment().contains("."))) {
                 errors.add("Length of time unemployed must be a whole number, for example, 10.");
             }

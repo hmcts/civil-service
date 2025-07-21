@@ -37,8 +37,8 @@ public class ValidateUnavailableDatesSpec implements CaseTask {
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(errors)
-            .build();
+                .errors(errors)
+                .build();
     }
 
     private boolean isSmallClaim(CaseData caseData) {

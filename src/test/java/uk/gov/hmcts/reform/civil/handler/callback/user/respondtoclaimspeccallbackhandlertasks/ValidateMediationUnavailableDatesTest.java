@@ -31,6 +31,18 @@ class ValidateMediationUnavailableDatesTest {
     @Mock
     private CallbackParams callbackParams;
 
+    private static MediationAvailability buildMediationAvailability(YesOrNo isUnavailable, LocalDate date) {
+        return MediationAvailability.builder()
+                .isMediationUnavailablityExists(isUnavailable)
+                .unavailableDatesForMediation(wrapElements(
+                        UnavailableDate.builder()
+                                .unavailableDateType(UnavailableDateType.SINGLE_DATE)
+                                .date(date)
+                                .build()
+                ))
+                .build();
+    }
+
     @BeforeEach
     void setUp() {
         when(callbackParams.getCaseData()).thenReturn(CaseData.builder().build());
@@ -40,8 +52,8 @@ class ValidateMediationUnavailableDatesTest {
     void shouldReturnErrorsWhenResp1MediationAvailabilityExists() {
         MediationAvailability mediationAvailability = buildMediationAvailability(YES, LocalDate.now().minusYears(5));
         CaseData caseData = CaseData.builder()
-            .resp1MediationAvailability(mediationAvailability)
-            .build();
+                .resp1MediationAvailability(mediationAvailability)
+                .build();
         when(callbackParams.getCaseData()).thenReturn(caseData);
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) validateMediationUnavailableDates.execute(callbackParams);
@@ -53,8 +65,8 @@ class ValidateMediationUnavailableDatesTest {
     void shouldReturnNoErrorsWhenResp1MediationAvailabilityDoesNotExist() {
         MediationAvailability mediationAvailability = buildMediationAvailability(NO, LocalDate.now().minusYears(5));
         CaseData caseData = CaseData.builder()
-            .resp1MediationAvailability(mediationAvailability)
-            .build();
+                .resp1MediationAvailability(mediationAvailability)
+                .build();
         when(callbackParams.getCaseData()).thenReturn(caseData);
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) validateMediationUnavailableDates.execute(callbackParams);
@@ -66,8 +78,8 @@ class ValidateMediationUnavailableDatesTest {
     void shouldReturnErrorsWhenResp2MediationAvailabilityExists() {
         MediationAvailability mediationAvailability = buildMediationAvailability(YES, LocalDate.now().minusYears(5));
         CaseData caseData = CaseData.builder()
-            .resp2MediationAvailability(mediationAvailability)
-            .build();
+                .resp2MediationAvailability(mediationAvailability)
+                .build();
         when(callbackParams.getCaseData()).thenReturn(caseData);
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) validateMediationUnavailableDates.execute(callbackParams);
@@ -79,8 +91,8 @@ class ValidateMediationUnavailableDatesTest {
     void shouldReturnNoErrorsWhenResp2MediationAvailabilityDoesNotExist() {
         MediationAvailability mediationAvailability = buildMediationAvailability(NO, LocalDate.now().minusYears(5));
         CaseData caseData = CaseData.builder()
-            .resp2MediationAvailability(mediationAvailability)
-            .build();
+                .resp2MediationAvailability(mediationAvailability)
+                .build();
         when(callbackParams.getCaseData()).thenReturn(caseData);
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) validateMediationUnavailableDates.execute(callbackParams);
@@ -96,17 +108,5 @@ class ValidateMediationUnavailableDatesTest {
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) validateMediationUnavailableDates.execute(callbackParams);
 
         assertThat(response.getErrors()).isEmpty();
-    }
-
-    private static MediationAvailability buildMediationAvailability(YesOrNo isUnavailable, LocalDate date) {
-        return MediationAvailability.builder()
-            .isMediationUnavailablityExists(isUnavailable)
-            .unavailableDatesForMediation(wrapElements(
-                UnavailableDate.builder()
-                    .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                    .date(date)
-                    .build()
-            ))
-            .build();
     }
 }

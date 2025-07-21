@@ -54,8 +54,8 @@ class ValidateRespondentWitnessesTest {
     @Test
     void shouldReturnErrorsWhenWitnessDetailsAreMissing() {
         caseData = CaseData.builder()
-            .respondent1DQWitnessesRequiredSpec(YES)
-            .build();
+                .respondent1DQWitnessesRequiredSpec(YES)
+                .build();
 
         when(callbackParams.getCaseData()).thenReturn(caseData);
 
@@ -68,9 +68,9 @@ class ValidateRespondentWitnessesTest {
     void shouldReturnNoErrorsWhenWitnessDetailsArePresent() {
         List<Element<Witness>> witnessDetails = List.of(element(Witness.builder().firstName("First").build()));
         caseData = CaseData.builder()
-            .respondent1DQWitnessesRequiredSpec(YES)
-            .respondent1DQWitnessesDetailsSpec(witnessDetails)
-            .build();
+                .respondent1DQWitnessesRequiredSpec(YES)
+                .respondent1DQWitnessesDetailsSpec(witnessDetails)
+                .build();
 
         when(callbackParams.getCaseData()).thenReturn(caseData);
 
@@ -108,9 +108,9 @@ class ValidateRespondentWitnessesTest {
         Respondent1DQ respondent1DQ = Respondent1DQ.builder().build();
         Respondent2DQ respondent2DQ = Respondent2DQ.builder().build();
         caseData = CaseData.builder()
-            .respondent1DQ(respondent1DQ)
-            .respondent2DQ(respondent2DQ)
-            .build();
+                .respondent1DQ(respondent1DQ)
+                .respondent2DQ(respondent2DQ)
+                .build();
 
         when(callbackParams.getCaseData()).thenReturn(caseData);
 
@@ -129,9 +129,9 @@ class ValidateRespondentWitnessesTest {
         Respondent1DQ respondent1DQ = Respondent1DQ.builder().build();
         Respondent2DQ respondent2DQ = Respondent2DQ.builder().build();
         caseData = CaseData.builder()
-            .respondent1DQ(respondent1DQ)
-            .respondent2DQ(respondent2DQ)
-            .build();
+                .respondent1DQ(respondent1DQ)
+                .respondent2DQ(respondent2DQ)
+                .build();
 
         when(callbackParams.getCaseData()).thenReturn(caseData);
 
@@ -149,16 +149,16 @@ class ValidateRespondentWitnessesTest {
     void shouldHandleRespondent2HasDifferentLegalRepScenario() {
         Respondent1DQ respondent1DQ = Respondent1DQ.builder().build();
         Witnesses respondent2DQWitnesses = Witnesses.builder()
-            .witnessesToAppear(YES)
-            .build();
+                .witnessesToAppear(YES)
+                .build();
         Respondent2DQ respondent2DQ = Respondent2DQ.builder()
-            .respondent2DQWitnesses(respondent2DQWitnesses)
-            .build();
+                .respondent2DQWitnesses(respondent2DQWitnesses)
+                .build();
         caseData = CaseData.builder()
-            .respondent1DQ(respondent1DQ)
-            .respondent2DQ(respondent2DQ)
-            .respondentResponseIsSame(NO)
-            .build();
+                .respondent1DQ(respondent1DQ)
+                .respondent2DQ(respondent2DQ)
+                .respondentResponseIsSame(NO)
+                .build();
 
         when(callbackParams.getCaseData()).thenReturn(caseData);
 
@@ -179,10 +179,10 @@ class ValidateRespondentWitnessesTest {
         Respondent1DQ respondent1DQ = Respondent1DQ.builder().build();
         Respondent2DQ respondent2DQ = Respondent2DQ.builder().build();
         caseData = CaseData.builder()
-            .respondent1DQ(respondent1DQ)
-            .respondent2DQ(respondent2DQ)
-            .respondentResponseIsSame(null)
-            .build();
+                .respondent1DQ(respondent1DQ)
+                .respondent2DQ(respondent2DQ)
+                .respondentResponseIsSame(null)
+                .build();
 
         when(callbackParams.getCaseData()).thenReturn(caseData);
 
@@ -204,9 +204,9 @@ class ValidateRespondentWitnessesTest {
         Witnesses respondent2DQWitnesses = Witnesses.builder().witnessesToAppear(YES).build();
         Respondent2DQ respondent2DQ = Respondent2DQ.builder().respondent2DQWitnesses(respondent2DQWitnesses).build();
         caseData = CaseData.builder()
-            .respondent1DQ(respondent1DQ)
-            .respondent2DQ(respondent2DQ)
-            .build();
+                .respondent1DQ(respondent1DQ)
+                .respondent2DQ(respondent2DQ)
+                .build();
 
         when(callbackParams.getCaseData()).thenReturn(caseData);
 
@@ -227,10 +227,10 @@ class ValidateRespondentWitnessesTest {
         Respondent1DQ respondent1DQ = Respondent1DQ.builder().build();
         Respondent2DQ respondent2DQ = Respondent2DQ.builder().build();
         caseData = CaseData.builder()
-            .respondent1DQ(respondent1DQ)
-            .respondent2DQ(respondent2DQ)
-            .respondentResponseIsSame(NO)
-            .build();
+                .respondent1DQ(respondent1DQ)
+                .respondent2DQ(respondent2DQ)
+                .respondentResponseIsSame(NO)
+                .build();
 
         when(callbackParams.getCaseData()).thenReturn(caseData);
 
@@ -250,16 +250,16 @@ class ValidateRespondentWitnessesTest {
     void shouldHandleRespondent2HasDifferentLegalRepScenarioWhenResponseIsSame() {
         Respondent1DQ respondent1DQ = Respondent1DQ.builder().build();
         Witnesses respondent2DQWitnesses = Witnesses.builder()
-            .witnessesToAppear(YES)
-            .build();
+                .witnessesToAppear(YES)
+                .build();
         Respondent2DQ respondent2DQ = Respondent2DQ.builder()
-            .respondent2DQWitnesses(respondent2DQWitnesses)
-            .build();
+                .respondent2DQWitnesses(respondent2DQWitnesses)
+                .build();
         caseData = CaseData.builder()
-            .respondent1DQ(respondent1DQ)
-            .respondent2DQ(respondent2DQ)
-            .respondentResponseIsSame(YES)
-            .build();
+                .respondent1DQ(respondent1DQ)
+                .respondent2DQ(respondent2DQ)
+                .respondentResponseIsSame(YES)
+                .build();
 
         when(callbackParams.getCaseData()).thenReturn(caseData);
 
@@ -279,9 +279,9 @@ class ValidateRespondentWitnessesTest {
     void shouldHandleRespondent2DQIsNull() {
         Respondent1DQ respondent1DQ = Respondent1DQ.builder().build();
         caseData = CaseData.builder()
-            .respondent1DQ(respondent1DQ)
-            .respondent2DQ(null)
-            .build();
+                .respondent1DQ(respondent1DQ)
+                .respondent2DQ(null)
+                .build();
 
         when(callbackParams.getCaseData()).thenReturn(caseData);
 
@@ -301,14 +301,14 @@ class ValidateRespondentWitnessesTest {
     void shouldHandleRespondent2DQIsNotNullButWitnessesAreNull() {
         Respondent1DQ respondent1DQ = Respondent1DQ.builder().build();
         Witnesses respondent2DQWitnesses = Witnesses.builder()
-            .witnessesToAppear(YES)
-            .build();
+                .witnessesToAppear(YES)
+                .build();
 
         caseData = CaseData.builder()
-            .respondent1DQ(respondent1DQ)
-            .respondentResponseIsSame(NO)
-            .respondent2DQWitnessesSmallClaim(respondent2DQWitnesses)
-            .build();
+                .respondent1DQ(respondent1DQ)
+                .respondentResponseIsSame(NO)
+                .respondent2DQWitnessesSmallClaim(respondent2DQWitnesses)
+                .build();
 
         when(callbackParams.getCaseData()).thenReturn(caseData);
 

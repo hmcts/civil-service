@@ -38,8 +38,8 @@ public class DetermineLoggedInSolicitor implements CaseTask {
         updateCompanyOrOrganisationStatus(caseData, updatedCaseData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseData.build().toMap(objectMapper))
-            .build();
+                .data(updatedCaseData.build().toMap(objectMapper))
+                .build();
     }
 
     private void updateSolicitorRoles(CallbackParams callbackParams, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
@@ -68,8 +68,8 @@ public class DetermineLoggedInSolicitor implements CaseTask {
 
     private void updateCompanyOrOrganisationStatusForRespondent2(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
         if (caseData.getRespondent2DetailsForClaimDetailsTab() != null
-            && ("Company".equals(caseData.getRespondent2DetailsForClaimDetailsTab().getPartyTypeDisplayValue())
-            || "Organisation".equals(caseData.getRespondent2DetailsForClaimDetailsTab().getPartyTypeDisplayValue()))) {
+                && ("Company".equals(caseData.getRespondent2DetailsForClaimDetailsTab().getPartyTypeDisplayValue())
+                || "Organisation".equals(caseData.getRespondent2DetailsForClaimDetailsTab().getPartyTypeDisplayValue()))) {
             updatedCaseData.neitherCompanyNorOrganisation(NO);
         } else {
             updatedCaseData.neitherCompanyNorOrganisation(YES);
@@ -78,8 +78,8 @@ public class DetermineLoggedInSolicitor implements CaseTask {
 
     private void updateCompanyOrOrganisationStatusForRespondent1(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
         if (caseData.getRespondent1DetailsForClaimDetailsTab() != null
-            && ("Company".equals(caseData.getRespondent1DetailsForClaimDetailsTab().getPartyTypeDisplayValue())
-            || "Organisation".equals(caseData.getRespondent1DetailsForClaimDetailsTab().getPartyTypeDisplayValue()))) {
+                && ("Company".equals(caseData.getRespondent1DetailsForClaimDetailsTab().getPartyTypeDisplayValue())
+                || "Organisation".equals(caseData.getRespondent1DetailsForClaimDetailsTab().getPartyTypeDisplayValue()))) {
             updatedCaseData.neitherCompanyNorOrganisation(NO);
         } else {
             updatedCaseData.neitherCompanyNorOrganisation(YES);
@@ -91,9 +91,9 @@ public class DetermineLoggedInSolicitor implements CaseTask {
         UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
 
         return coreCaseUserService.userHasCaseRole(
-            caseData.getCcdCaseReference().toString(),
-            userInfo.getUid(),
-            caseRole
+                caseData.getCcdCaseReference().toString(),
+                userInfo.getUid(),
+                caseRole
         );
     }
 }

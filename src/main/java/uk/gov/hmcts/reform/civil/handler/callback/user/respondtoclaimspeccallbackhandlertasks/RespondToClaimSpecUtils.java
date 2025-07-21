@@ -53,7 +53,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.buildElemCaseDocument
 public class RespondToClaimSpecUtils {
 
     static final String UNKNOWN_MP_SCENARIO = "Unknown mp scenario";
-
+    private static final String DEF2 = "Defendant 2";
     private final LocationReferenceDataService locationRefDataService;
     private final UserService userService;
     private final IStateFlowEngine stateFlowEngine;
@@ -62,11 +62,28 @@ public class RespondToClaimSpecUtils {
     private final AssignCategoryId assignCategoryId;
     private final DQResponseDocumentUtils dqResponseDocumentUtils;
 
-    private static final String DEF2 = "Defendant 2";
+    public static void addRespondentDocuments(CaseData.CaseDataBuilder<?, ?> updatedCaseData, List<Element<CaseDocument>> defendantUploads,
+                                              ResponseDocument respondent1SpecDefenceResponseDocument, AssignCategoryId assignCategoryId) {
+        if (respondent1SpecDefenceResponseDocument != null) {
+            uk.gov.hmcts.reform.civil.documentmanagement.model.Document respondent1ClaimDocument = respondent1SpecDefenceResponseDocument.getFile();
+            if (respondent1ClaimDocument != null) {
+                Element<CaseDocument> documentElement = buildElemCaseDocument(
+                        respondent1ClaimDocument, "Defendant",
+                        updatedCaseData.build().getRespondent1ResponseDate(),
+                        DocumentType.DEFENDANT_DEFENCE
+                );
+                assignCategoryId.assignCategoryIdToDocument(
+                        respondent1ClaimDocument,
+                        DocCategory.DEF1_DEFENSE_DQ.getValue()
+                );
+                defendantUploads.add(documentElement);
+            }
+        }
+    }
 
     public boolean isRespondent2HasSameLegalRep(CaseData caseData) {
         return caseData.getRespondent2SameLegalRepresentative() != null
-            && caseData.getRespondent2SameLegalRepresentative() == YES;
+                && caseData.getRespondent2SameLegalRepresentative() == YES;
     }
 
     public List<LocationRefData> getLocationData(CallbackParams callbackParams) {
@@ -79,10 +96,10 @@ public class RespondToClaimSpecUtils {
         UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
 
         return stateFlowEngine.evaluate(caseData).isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)
-            && coreCaseUserService.userHasCaseRole(
-            caseData.getCcdCaseReference().toString(),
-            userInfo.getUid(),
-            caseRole
+                && coreCaseUserService.userHasCaseRole(
+                caseData.getCcdCaseReference().toString(),
+                userInfo.getUid(),
+                caseRole
         );
     }
 
@@ -117,9 +134,9 @@ public class RespondToClaimSpecUtils {
 
     private void handleTwoVOneScenario(CaseData caseData, Set<DefendantResponseShowTag> tags) {
         if ((caseData.getDefendantSingleResponseToBothClaimants() == YES
-            && caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION)
-            || caseData.getClaimant1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION
-            || caseData.getClaimant2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
+                && caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION)
+                || caseData.getClaimant1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION
+                || caseData.getClaimant2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
             tags.add(ONLY_RESPONDENT_1_DISPUTES);
         }
     }
@@ -127,7 +144,7 @@ public class RespondToClaimSpecUtils {
     private void handleOneVTwoOneLegalRepScenario(CaseData caseData, Set<DefendantResponseShowTag> tags) {
         if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
             if (caseData.getRespondentResponseIsSame() == YES
-                || caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
+                    || caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
                 tags.add(DefendantResponseShowTag.BOTH_RESPONDENTS_DISPUTE);
             } else {
                 tags.add(ONLY_RESPONDENT_1_DISPUTES);
@@ -139,32 +156,32 @@ public class RespondToClaimSpecUtils {
 
     private void handleOneVTwoTwoLegalRepScenario(CaseData caseData, Set<DefendantResponseShowTag> tags) {
         if (caseData.getShowConditionFlags().contains(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1)
-            && caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
+                && caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
             tags.add(ONLY_RESPONDENT_1_DISPUTES);
         } else if (caseData.getShowConditionFlags().contains(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_2)
-            && caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
+                && caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
             tags.add(DefendantResponseShowTag.ONLY_RESPONDENT_2_DISPUTES);
         }
     }
 
     public void removeWhoDisputesAndWhoPaidLess(Set<DefendantResponseShowTag> tags) {
         tags.removeIf(EnumSet.of(
-            ONLY_RESPONDENT_1_DISPUTES,
-            DefendantResponseShowTag.ONLY_RESPONDENT_2_DISPUTES,
-            DefendantResponseShowTag.BOTH_RESPONDENTS_DISPUTE,
-            SOMEONE_DISPUTES,
-            DefendantResponseShowTag.CURRENT_ADMITS_PART_OR_FULL,
-            DefendantResponseShowTag.RESPONDENT_1_PAID_LESS,
-            DefendantResponseShowTag.RESPONDENT_2_PAID_LESS,
-            WHEN_WILL_CLAIM_BE_PAID,
-            RESPONDENT_1_ADMITS_PART_OR_FULL,
-            RESPONDENT_2_ADMITS_PART_OR_FULL,
-            NEED_FINANCIAL_DETAILS_1,
-            NEED_FINANCIAL_DETAILS_2,
-            DefendantResponseShowTag.WHY_1_DOES_NOT_PAY_IMMEDIATELY,
-            WHY_2_DOES_NOT_PAY_IMMEDIATELY,
-            REPAYMENT_PLAN_2,
-            DefendantResponseShowTag.MEDIATION
+                ONLY_RESPONDENT_1_DISPUTES,
+                DefendantResponseShowTag.ONLY_RESPONDENT_2_DISPUTES,
+                DefendantResponseShowTag.BOTH_RESPONDENTS_DISPUTE,
+                SOMEONE_DISPUTES,
+                DefendantResponseShowTag.CURRENT_ADMITS_PART_OR_FULL,
+                DefendantResponseShowTag.RESPONDENT_1_PAID_LESS,
+                DefendantResponseShowTag.RESPONDENT_2_PAID_LESS,
+                WHEN_WILL_CLAIM_BE_PAID,
+                RESPONDENT_1_ADMITS_PART_OR_FULL,
+                RESPONDENT_2_ADMITS_PART_OR_FULL,
+                NEED_FINANCIAL_DETAILS_1,
+                NEED_FINANCIAL_DETAILS_2,
+                DefendantResponseShowTag.WHY_1_DOES_NOT_PAY_IMMEDIATELY,
+                WHY_2_DOES_NOT_PAY_IMMEDIATELY,
+                REPAYMENT_PLAN_2,
+                DefendantResponseShowTag.MEDIATION
         )::contains);
     }
 
@@ -183,7 +200,7 @@ public class RespondToClaimSpecUtils {
 
     private List<Element<CaseDocument>> getDefendantUploads(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
         List<Element<CaseDocument>> defendantUploads = nonNull(caseData.getDefendantResponseDocuments())
-            ? caseData.getDefendantResponseDocuments() : new ArrayList<>();
+                ? caseData.getDefendantResponseDocuments() : new ArrayList<>();
 
         addRespondent1Documents(caseData, updatedCaseData, defendantUploads);
         addRespondent2Documents(caseData, updatedCaseData, defendantUploads);
@@ -194,30 +211,11 @@ public class RespondToClaimSpecUtils {
     private void addRespondent1Documents(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData, List<Element<CaseDocument>> defendantUploads) {
         ResponseDocument respondent1SpecDefenceResponseDocument = caseData.getRespondent1SpecDefenceResponseDocument();
         addRespondentDocuments(
-            updatedCaseData,
-            defendantUploads,
-            respondent1SpecDefenceResponseDocument,
-            assignCategoryId
+                updatedCaseData,
+                defendantUploads,
+                respondent1SpecDefenceResponseDocument,
+                assignCategoryId
         );
-    }
-
-    public static void addRespondentDocuments(CaseData.CaseDataBuilder<?, ?> updatedCaseData, List<Element<CaseDocument>> defendantUploads,
-                                              ResponseDocument respondent1SpecDefenceResponseDocument, AssignCategoryId assignCategoryId) {
-        if (respondent1SpecDefenceResponseDocument != null) {
-            uk.gov.hmcts.reform.civil.documentmanagement.model.Document respondent1ClaimDocument = respondent1SpecDefenceResponseDocument.getFile();
-            if (respondent1ClaimDocument != null) {
-                Element<CaseDocument> documentElement = buildElemCaseDocument(
-                    respondent1ClaimDocument, "Defendant",
-                    updatedCaseData.build().getRespondent1ResponseDate(),
-                    DocumentType.DEFENDANT_DEFENCE
-                );
-                assignCategoryId.assignCategoryIdToDocument(
-                    respondent1ClaimDocument,
-                    DocCategory.DEF1_DEFENSE_DQ.getValue()
-                );
-                defendantUploads.add(documentElement);
-            }
-        }
     }
 
     private void addRespondent2Documents(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData, List<Element<CaseDocument>> defendantUploads) {
@@ -226,13 +224,13 @@ public class RespondToClaimSpecUtils {
             uk.gov.hmcts.reform.civil.documentmanagement.model.Document respondent2ClaimDocument = respondent2SpecDefenceResponseDocument.getFile();
             if (respondent2ClaimDocument != null) {
                 Element<CaseDocument> documentElement = buildElemCaseDocument(
-                    respondent2ClaimDocument, DEF2,
-                    updatedCaseData.build().getRespondent2ResponseDate(),
-                    DocumentType.DEFENDANT_DEFENCE
+                        respondent2ClaimDocument, DEF2,
+                        updatedCaseData.build().getRespondent2ResponseDate(),
+                        DocumentType.DEFENDANT_DEFENCE
                 );
                 assignCategoryId.assignCategoryIdToDocument(
-                    respondent2ClaimDocument,
-                    DocCategory.DEF2_DEFENSE_DQ.getValue()
+                        respondent2ClaimDocument,
+                        DocCategory.DEF2_DEFENSE_DQ.getValue()
                 );
                 defendantUploads.add(documentElement);
                 addCopyIfNonNull(defendantUploads, documentElement);

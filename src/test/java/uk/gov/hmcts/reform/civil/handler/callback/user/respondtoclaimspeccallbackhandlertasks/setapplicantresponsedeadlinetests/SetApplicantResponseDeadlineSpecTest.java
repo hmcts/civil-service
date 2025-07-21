@@ -38,8 +38,10 @@ import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
+import uk.gov.hmcts.reform.civil.utils.RequestedCourtForClaimDetailsTab;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +51,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
@@ -60,7 +63,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @ExtendWith(MockitoExtension.class)
-class SetApplicantResponseDeadlineTest {
+class SetApplicantResponseDeadlineSpecTest {
 
     private SetApplicantResponseDeadlineSpec setApplicantResponseDeadline;
 
@@ -83,7 +86,7 @@ class SetApplicantResponseDeadlineTest {
     private DeadlinesCalculator deadlinesCalculator;
 
     @Mock
-    private FeatureToggleService toggleService;
+    private FeatureToggleService featureToggleService;
 
     @Mock
     private CaseFlagsInitialiser caseFlagsInitialiser;
@@ -98,6 +101,9 @@ class SetApplicantResponseDeadlineTest {
     private List<ExpertsAndWitnessesCaseDataUpdater> expertsAndWitnessesCaseDataUpdaters;
 
     @Mock
+    private RequestedCourtForClaimDetailsTab requestedCourtForClaimDetailsTab;
+
+    @Mock
     private RespondToClaimSpecUtils respondToClaimSpecUtils;
 
     private ObjectMapper objectMapper;
@@ -109,7 +115,6 @@ class SetApplicantResponseDeadlineTest {
         setApplicantResponseDeadline = new SetApplicantResponseDeadlineSpec(
                 userService,
                 coreCaseUserService,
-                toggleService,
                 objectMapper,
                 caseFlagsInitialiser,
                 time,
@@ -118,7 +123,9 @@ class SetApplicantResponseDeadlineTest {
                 courtLocationUtils,
                 respondToClaimSpecUtils,
                 setApplicantResponseDeadlineCaseDataUpdaters,
-                expertsAndWitnessesCaseDataUpdaters
+                expertsAndWitnessesCaseDataUpdaters,
+                requestedCourtForClaimDetailsTab,
+                featureToggleService
         );
         when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
         when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
@@ -131,6 +138,13 @@ class SetApplicantResponseDeadlineTest {
 
     @Test
     void shouldUpdateRespondent2WhenBothRespondent2AndRespondent2CopyArePresent() {
+        LocalDateTime fixedNow = LocalDateTime.of(2025, 7, 21, 10, 0);
+        when(time.now()).thenReturn(fixedNow);
+
+        doReturn(fixedNow.plusMonths(1))
+                .when(deadlinesCalculator)
+                .calculateApplicantResponseDeadlineSpec(any(LocalDateTime.class));
+
         Address address = buildAddress("123 Test Street", "AB12 3CD");
 
         Party respondent1 = Party.builder()
@@ -172,6 +186,13 @@ class SetApplicantResponseDeadlineTest {
 
     @Test
     void shouldNotUpdateRespondent2WhenRespondent2CopyIsNotPresent() {
+        LocalDateTime fixedNow = LocalDateTime.of(2025, 7, 21, 10, 0);
+        when(time.now()).thenReturn(fixedNow);
+
+        doReturn(fixedNow.plusMonths(1))
+                .when(deadlinesCalculator)
+                .calculateApplicantResponseDeadlineSpec(any(LocalDateTime.class));
+
         Address address = buildAddress("123 Test Street", "AB12 3CD");
 
         Party respondent1 = Party.builder()
@@ -208,6 +229,13 @@ class SetApplicantResponseDeadlineTest {
 
     @Test
     void shouldUpdateRespondent2PrimaryAddressWhenSpecAoSRespondent2HomeAddressRequiredIsNo() {
+        LocalDateTime fixedNow = LocalDateTime.of(2025, 7, 21, 10, 0);
+        when(time.now()).thenReturn(fixedNow);
+
+        doReturn(fixedNow.plusMonths(1))
+                .when(deadlinesCalculator)
+                .calculateApplicantResponseDeadlineSpec(any(LocalDateTime.class));
+
         Address expectedAddress = buildAddress("123 Test Street", "AB1 2CD");
 
         Party respondent1 = Party.builder()
@@ -227,6 +255,7 @@ class SetApplicantResponseDeadlineTest {
                 .respondent1(respondent1)
                 .respondent1Copy(respondent1)
                 .respondent1DQ(new Respondent1DQ())
+                .respondent1ResponseDeadline(LocalDateTime.now())
                 .respondent2(respondent2)
                 .respondent2Copy(respondent2)
                 .ccdCaseReference(1234L)
@@ -276,6 +305,13 @@ class SetApplicantResponseDeadlineTest {
 
     @Test
     void shouldUpdateRespondent1ExpertsWhenExpertRequiredIsYesAndDetailsPresent() {
+        LocalDateTime fixedNow = LocalDateTime.of(2025, 7, 21, 10, 0);
+        when(time.now()).thenReturn(fixedNow);
+
+        doReturn(fixedNow.plusMonths(1))
+                .when(deadlinesCalculator)
+                .calculateApplicantResponseDeadlineSpec(any(LocalDateTime.class));
+
         Witnesses respondent1Witnesses = Witnesses.builder().build();
 
         Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondToClaimExperts(ExpertDetails.builder().build()).build();
@@ -287,10 +323,12 @@ class SetApplicantResponseDeadlineTest {
 
         CaseData caseData = CaseData.builder()
                 .responseClaimExpertSpecRequired(YES)
+                .applicant1ResponseDeadline(LocalDateTime.now())
                 .respondent1DQ(respondent1DQ)
                 .respondent1(respondent1)
                 .respondent1Copy(respondent1)
                 .respondent1DQWitnessesSmallClaim(respondent1Witnesses)
+                .respondent1ResponseDeadline(LocalDateTime.now())
                 .ccdCaseReference(1234L)
                 .build();
 
@@ -317,6 +355,13 @@ class SetApplicantResponseDeadlineTest {
                 eq(RESPONDENTSOLICITORTWO)
         )).thenReturn(false);
 
+        LocalDateTime fixedNow = LocalDateTime.of(2025, 7, 21, 10, 0);
+        when(time.now()).thenReturn(fixedNow);
+
+        doReturn(fixedNow.plusMonths(1))
+                .when(deadlinesCalculator)
+                .calculateApplicantResponseDeadlineSpec(any(LocalDateTime.class));
+
         Party respondent1 = Party.builder()
                 .primaryAddress(buildAddress("Old Address", ""))
                 .type(Party.Type.INDIVIDUAL)
@@ -327,6 +372,7 @@ class SetApplicantResponseDeadlineTest {
                 .respondent1(respondent1)
                 .respondent1Copy(respondent1)
                 .respondent1DQ(new Respondent1DQ())
+                .respondent1ResponseDeadline(LocalDateTime.now())
                 .ccdCaseReference(1234L)
                 .build();
 
@@ -375,6 +421,13 @@ class SetApplicantResponseDeadlineTest {
 
     @Test
     void shouldUpdateRespondent1WitnessesWhenExpertRequiredIsYesAndDetailsPresent() {
+        LocalDateTime fixedNow = LocalDateTime.of(2025, 7, 21, 10, 0);
+        when(time.now()).thenReturn(fixedNow);
+
+        doReturn(fixedNow.plusMonths(1))
+                .when(deadlinesCalculator)
+                .calculateApplicantResponseDeadlineSpec(any(LocalDateTime.class));
+
         Witnesses respondent1Witnesses = Witnesses.builder().build();
 
         Respondent1DQ respondent1DQ = Respondent1DQ.builder().build();
@@ -390,6 +443,7 @@ class SetApplicantResponseDeadlineTest {
                 .respondent1(respondent1)
                 .respondent1Copy(respondent1)
                 .respondent1DQWitnessesSmallClaim(respondent1Witnesses)
+                .respondent1ResponseDeadline(LocalDateTime.now())
                 .ccdCaseReference(1234L)
                 .build();
 
@@ -416,6 +470,13 @@ class SetApplicantResponseDeadlineTest {
                 eq(RESPONDENTSOLICITORTWO)
         )).thenReturn(false);
 
+        LocalDateTime fixedNow = LocalDateTime.of(2025, 7, 21, 10, 0);
+        when(time.now()).thenReturn(fixedNow);
+
+        doReturn(fixedNow.plusMonths(1))
+                .when(deadlinesCalculator)
+                .calculateApplicantResponseDeadlineSpec(any(LocalDateTime.class));
+
         Party respondent1 = Party.builder()
                 .primaryAddress(buildAddress("Old Address", ""))
                 .type(Party.Type.INDIVIDUAL)
@@ -438,6 +499,7 @@ class SetApplicantResponseDeadlineTest {
                 .respondent1DQ(Respondent1DQ.builder()
                         .respondToCourtLocation(RequestedCourt.builder().build())
                         .build())
+                .respondent1ResponseDeadline(LocalDateTime.now())
                 .ccdCaseReference(1234L)
                 .defendantResponseDocuments(defendantUploads)
                 .courtLocation(CourtLocation.builder().build())

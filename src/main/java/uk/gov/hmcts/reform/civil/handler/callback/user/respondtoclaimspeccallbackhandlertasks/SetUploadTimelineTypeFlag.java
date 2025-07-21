@@ -43,28 +43,28 @@ public class SetUploadTimelineTypeFlag implements CaseTask {
         updatedData.showConditionFlags(updatedShowConditions);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedData.build().toMap(objectMapper))
-            .build();
+                .data(updatedData.build().toMap(objectMapper))
+                .build();
     }
 
     private void removeExistingTimelineFlags(Set<DefendantResponseShowTag> updatedShowConditions) {
         updatedShowConditions.removeIf(EnumSet.of(
-            TIMELINE_UPLOAD,
-            TIMELINE_MANUALLY
+                TIMELINE_UPLOAD,
+                TIMELINE_MANUALLY
         )::contains);
     }
 
     private boolean shouldAddTimelineUploadFlag(CaseData caseData) {
         return (YES.equals(caseData.getIsRespondent1())
-            && caseData.getSpecClaimResponseTimelineList() == TimelineUploadTypeSpec.UPLOAD)
-            || (YES.equals(caseData.getIsRespondent2())
-            && caseData.getSpecClaimResponseTimelineList2() == TimelineUploadTypeSpec.UPLOAD);
+                && caseData.getSpecClaimResponseTimelineList() == TimelineUploadTypeSpec.UPLOAD)
+                || (YES.equals(caseData.getIsRespondent2())
+                && caseData.getSpecClaimResponseTimelineList2() == TimelineUploadTypeSpec.UPLOAD);
     }
 
     private boolean shouldAddTimelineManualFlag(CaseData caseData) {
         return (YES.equals(caseData.getIsRespondent1())
-            && caseData.getSpecClaimResponseTimelineList() == TimelineUploadTypeSpec.MANUAL)
-            || (YES.equals(caseData.getIsRespondent2())
-            && caseData.getSpecClaimResponseTimelineList2() == TimelineUploadTypeSpec.MANUAL);
+                && caseData.getSpecClaimResponseTimelineList() == TimelineUploadTypeSpec.MANUAL)
+                || (YES.equals(caseData.getIsRespondent2())
+                && caseData.getSpecClaimResponseTimelineList2() == TimelineUploadTypeSpec.MANUAL);
     }
 }

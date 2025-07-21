@@ -15,7 +15,10 @@ import uk.gov.hmcts.reform.civil.model.Party.Type;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
+import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
+import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.util.HashMap;
@@ -27,6 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -52,6 +56,12 @@ class PopulateRespondent1CopyTest {
     @Mock
     private RespondToClaimSpecUtils respondToClaimSpecUtils;
 
+    @Mock
+    private IStateFlowEngine stateFlowEngine;
+
+    @Mock
+    private InterestCalculator interestCalculator;
+
     private ObjectMapper objectMapper;
 
     private CaseData caseData;
@@ -61,22 +71,26 @@ class PopulateRespondent1CopyTest {
     void setUp() {
         objectMapper = new ObjectMapper();
         populateRespondent1Copy = new PopulateRespondent1Copy(
-            userService,
-            coreCaseUserService,
-            toggleService,
-            courtLocationUtils,
-            objectMapper,
-            respondToClaimSpecUtils
-            );
+                userService,
+                coreCaseUserService,
+                toggleService,
+                courtLocationUtils,
+                objectMapper,
+                stateFlowEngine,
+                respondToClaimSpecUtils,
+                interestCalculator
+        );
         caseData = CaseData.builder()
-            .respondent1(Party.builder().type(Type.INDIVIDUAL).build())
-            .respondent2(Party.builder().type(Type.INDIVIDUAL).build())
-            .ccdCaseReference(1234L)
-            .build();
+                .respondent1(Party.builder().type(Type.INDIVIDUAL).build())
+                .respondent2(Party.builder().type(Type.INDIVIDUAL).build())
+                .ccdCaseReference(1234L)
+                .build();
 
         userInfo = UserInfo.builder()
-            .uid("testUserId")
-            .build();
+                .uid("testUserId")
+                .build();
+
+        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mock(StateFlow.class));
     }
 
     @Test
@@ -90,12 +104,12 @@ class PopulateRespondent1CopyTest {
         params.put(BEARER_TOKEN, "testBearerToken");
 
         CallbackParams callbackParams = CallbackParams.builder()
-            .caseData(caseData)
-            .params(params)
-            .build();
+                .caseData(caseData)
+                .params(params)
+                .build();
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) populateRespondent1Copy.execute(
-            callbackParams);
+                callbackParams);
 
         Map<String, Object> responseData = response.getData();
         CaseData updatedCaseData = objectMapper.convertValue(responseData, CaseData.class);
@@ -114,12 +128,12 @@ class PopulateRespondent1CopyTest {
         params.put(BEARER_TOKEN, "testBearerToken");
 
         CallbackParams callbackParams = CallbackParams.builder()
-            .caseData(caseData)
-            .params(params)
-            .build();
+                .caseData(caseData)
+                .params(params)
+                .build();
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) populateRespondent1Copy.execute(
-            callbackParams);
+                callbackParams);
 
         Map<String, Object> responseData = response.getData();
         CaseData updatedCaseData = objectMapper.convertValue(responseData, CaseData.class);
@@ -132,20 +146,20 @@ class PopulateRespondent1CopyTest {
         when(courtLocationUtils.getLocationsFromList(any())).thenReturn(null);
         when(userService.getUserInfo(any())).thenReturn(userInfo);
         when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(
-            "RESPONDENTSOLICITORONE",
-            "RESPONDENTSOLICITORTWO"
+                "RESPONDENTSOLICITORONE",
+                "RESPONDENTSOLICITORTWO"
         ));
 
         Map<CallbackParams.Params, Object> params = new HashMap<>();
         params.put(BEARER_TOKEN, "testBearerToken");
 
         CallbackParams callbackParams = CallbackParams.builder()
-            .caseData(caseData)
-            .params(params)
-            .build();
+                .caseData(caseData)
+                .params(params)
+                .build();
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) populateRespondent1Copy.execute(
-            callbackParams);
+                callbackParams);
 
         Map<String, Object> responseData = response.getData();
         CaseData updatedCaseData = objectMapper.convertValue(responseData, CaseData.class);
@@ -160,17 +174,17 @@ class PopulateRespondent1CopyTest {
         when(courtLocationUtils.getLocationsFromList(any())).thenReturn(null);
 
         caseData = CaseData.builder()
-            .respondent1(Party.builder().type(Type.INDIVIDUAL).build())
-            .respondent2(null)
-            .build();
+                .respondent1(Party.builder().type(Type.INDIVIDUAL).build())
+                .respondent2(null)
+                .build();
 
         Map<CallbackParams.Params, Object> params = new HashMap<>();
         params.put(BEARER_TOKEN, "testBearerToken");
 
         CallbackParams callbackParams = CallbackParams.builder()
-            .caseData(caseData)
-            .params(params)
-            .build();
+                .caseData(caseData)
+                .params(params)
+                .build();
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) populateRespondent1Copy.execute(callbackParams);
 
@@ -187,19 +201,19 @@ class PopulateRespondent1CopyTest {
         when(courtLocationUtils.getLocationsFromList(any())).thenReturn(null);
 
         caseData = CaseData.builder()
-            .respondent1(Party.builder().type(Type.INDIVIDUAL).build())
-            .respondent2(Party.builder().type(Type.INDIVIDUAL).build())
-            .respondent2SameLegalRepresentative(YES)
-            .ccdCaseReference(1234L)
-            .build();
+                .respondent1(Party.builder().type(Type.INDIVIDUAL).build())
+                .respondent2(Party.builder().type(Type.INDIVIDUAL).build())
+                .respondent2SameLegalRepresentative(YES)
+                .ccdCaseReference(1234L)
+                .build();
 
         Map<CallbackParams.Params, Object> params = new HashMap<>();
         params.put(BEARER_TOKEN, "testBearerToken");
 
         CallbackParams callbackParams = CallbackParams.builder()
-            .caseData(caseData)
-            .params(params)
-            .build();
+                .caseData(caseData)
+                .params(params)
+                .build();
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) populateRespondent1Copy.execute(callbackParams);
 
@@ -218,18 +232,18 @@ class PopulateRespondent1CopyTest {
         when(courtLocationUtils.getLocationsFromList(any())).thenReturn(null);
 
         caseData = CaseData.builder()
-            .respondent1(Party.builder().type(Type.INDIVIDUAL).build())
-            .respondent2(null)
-            .ccdCaseReference(1234L)
-            .build();
+                .respondent1(Party.builder().type(Type.INDIVIDUAL).build())
+                .respondent2(null)
+                .ccdCaseReference(1234L)
+                .build();
 
         Map<CallbackParams.Params, Object> params = new HashMap<>();
         params.put(BEARER_TOKEN, "testBearerToken");
 
         CallbackParams callbackParams = CallbackParams.builder()
-            .caseData(caseData)
-            .params(params)
-            .build();
+                .caseData(caseData)
+                .params(params)
+                .build();
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) populateRespondent1Copy.execute(callbackParams);
 

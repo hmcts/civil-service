@@ -48,9 +48,9 @@ class ValidateRespondentExpertsTest {
         Respondent1DQ respondent1DQ = Respondent1DQ.builder().build();
         Respondent2DQ respondent2DQ = Respondent2DQ.builder().build();
         caseData = CaseData.builder()
-            .respondent1DQ(respondent1DQ)
-            .respondent2DQ(respondent2DQ)
-            .build();
+                .respondent1DQ(respondent1DQ)
+                .respondent2DQ(respondent2DQ)
+                .build();
     }
 
     @Test
@@ -120,10 +120,10 @@ class ValidateRespondentExpertsTest {
         Respondent1DQ respondent1DQ = Respondent1DQ.builder().build();
         Respondent2DQ respondent2DQ = Respondent2DQ.builder().build();
         caseData = CaseData.builder()
-            .respondentResponseIsSame(NO)
-            .respondent1DQ(respondent1DQ)
-            .respondent2DQ(respondent2DQ)
-            .build();
+                .respondentResponseIsSame(NO)
+                .respondent1DQ(respondent1DQ)
+                .respondent2DQ(respondent2DQ)
+                .build();
         when(callbackParams.getCaseData()).thenReturn(caseData);
         try (MockedStatic<MultiPartyScenario> mockedScenario = mockStatic(MultiPartyScenario.class)) {
             mockedScenario.when(() -> MultiPartyScenario.getMultiPartyScenario(caseData)).thenReturn(ONE_V_TWO_TWO_LEGAL_REP);
@@ -139,10 +139,10 @@ class ValidateRespondentExpertsTest {
         Respondent1DQ respondent1DQ = Respondent1DQ.builder().build();
         Respondent2DQ respondent2DQ = Respondent2DQ.builder().build();
         caseData = CaseData.builder()
-            .respondentResponseIsSame(YES)
-            .respondent1DQ(respondent1DQ)
-            .respondent2DQ(respondent2DQ)
-            .build();
+                .respondentResponseIsSame(YES)
+                .respondent1DQ(respondent1DQ)
+                .respondent2DQ(respondent2DQ)
+                .build();
         when(callbackParams.getCaseData()).thenReturn(caseData);
         try (MockedStatic<MultiPartyScenario> mockedScenario = mockStatic(MultiPartyScenario.class)) {
             mockedScenario.when(() -> MultiPartyScenario.getMultiPartyScenario(caseData)).thenReturn(ONE_V_TWO_TWO_LEGAL_REP);
@@ -158,10 +158,10 @@ class ValidateRespondentExpertsTest {
         Respondent1DQ respondent1DQ = Respondent1DQ.builder().build();
         Respondent2DQ respondent2DQ = Respondent2DQ.builder().build();
         caseData = CaseData.builder()
-            .respondentResponseIsSame(null)
-            .respondent1DQ(respondent1DQ)
-            .respondent2DQ(respondent2DQ)
-            .build();
+                .respondentResponseIsSame(null)
+                .respondent1DQ(respondent1DQ)
+                .respondent2DQ(respondent2DQ)
+                .build();
         when(callbackParams.getCaseData()).thenReturn(caseData);
         try (MockedStatic<MultiPartyScenario> mockedScenario = mockStatic(MultiPartyScenario.class)) {
             mockedScenario.when(() -> MultiPartyScenario.getMultiPartyScenario(caseData)).thenReturn(ONE_V_TWO_TWO_LEGAL_REP);
@@ -176,16 +176,16 @@ class ValidateRespondentExpertsTest {
     void shouldHandleRespondent2HasDifferentLegalRepScenario() {
         Respondent1DQ respondent1DQ = Respondent1DQ.builder().build();
         Witnesses respondent2DQWitnesses = Witnesses.builder()
-            .witnessesToAppear(YES)
-            .build();
+                .witnessesToAppear(YES)
+                .build();
         Respondent2DQ respondent2DQ = Respondent2DQ.builder()
-            .respondent2DQWitnesses(respondent2DQWitnesses)
-            .build();
+                .respondent2DQWitnesses(respondent2DQWitnesses)
+                .build();
         caseData = CaseData.builder()
-            .respondent1DQ(respondent1DQ)
-            .respondent2DQ(respondent2DQ)
-            .respondentResponseIsSame(NO)
-            .build();
+                .respondent1DQ(respondent1DQ)
+                .respondent2DQ(respondent2DQ)
+                .respondentResponseIsSame(NO)
+                .build();
         when(callbackParams.getCaseData()).thenReturn(caseData);
         try (MockedStatic<MultiPartyScenario> mockedScenario = mockStatic(MultiPartyScenario.class)) {
             mockedScenario.when(() -> MultiPartyScenario.getMultiPartyScenario(caseData)).thenReturn(ONE_V_TWO_ONE_LEGAL_REP);
@@ -204,10 +204,10 @@ class ValidateRespondentExpertsTest {
         Respondent1DQ respondent1DQ = Respondent1DQ.builder().build();
         Respondent2DQ respondent2DQ = Respondent2DQ.builder().respondent2DQExperts(null).build();
         caseData = CaseData.builder()
-            .respondent1DQ(respondent1DQ)
-            .respondent2DQ(respondent2DQ)
-            .respondentResponseIsSame(YES)
-            .build();
+                .respondent1DQ(respondent1DQ)
+                .respondent2DQ(respondent2DQ)
+                .respondentResponseIsSame(YES)
+                .build();
         when(callbackParams.getCaseData()).thenReturn(caseData);
         try (MockedStatic<MultiPartyScenario> mockedScenario = mockStatic(MultiPartyScenario.class)) {
             mockedScenario.when(() -> MultiPartyScenario.getMultiPartyScenario(caseData)).thenReturn(ONE_V_TWO_ONE_LEGAL_REP);
@@ -226,9 +226,9 @@ class ValidateRespondentExpertsTest {
         Respondent1DQ respondent1DQ = Respondent1DQ.builder().build();
         Respondent2DQ respondent2DQ = Respondent2DQ.builder().respondent2DQExperts(null).build();
         caseData = CaseData.builder()
-            .respondent1DQ(respondent1DQ)
-            .respondent2DQ(respondent2DQ)
-            .build();
+                .respondent1DQ(respondent1DQ)
+                .respondent2DQ(respondent2DQ)
+                .build();
         when(callbackParams.getCaseData()).thenReturn(caseData);
         try (MockedStatic<MultiPartyScenario> mockedScenario = mockStatic(MultiPartyScenario.class)) {
             mockedScenario.when(() -> MultiPartyScenario.getMultiPartyScenario(caseData)).thenReturn(ONE_V_TWO_ONE_LEGAL_REP);
@@ -247,10 +247,10 @@ class ValidateRespondentExpertsTest {
         Respondent1DQ respondent1DQ = Respondent1DQ.builder().build();
         Respondent2DQ respondent2DQ = Respondent2DQ.builder().respondent2DQExperts(new Experts()).build();
         caseData = CaseData.builder()
-            .respondentResponseIsSame(NO)
-            .respondent1DQ(respondent1DQ)
-            .respondent2DQ(respondent2DQ)
-            .build();
+                .respondentResponseIsSame(NO)
+                .respondent1DQ(respondent1DQ)
+                .respondent2DQ(respondent2DQ)
+                .build();
         when(callbackParams.getCaseData()).thenReturn(caseData);
         try (MockedStatic<MultiPartyScenario> mockedScenario = mockStatic(MultiPartyScenario.class)) {
             mockedScenario.when(() -> MultiPartyScenario.getMultiPartyScenario(caseData)).thenReturn(ONE_V_TWO_ONE_LEGAL_REP);
@@ -268,13 +268,13 @@ class ValidateRespondentExpertsTest {
     void shouldHandleWhenRespondent2DQIsNull() {
         Respondent1DQ respondent1DQ = Respondent1DQ.builder().build();
         Witnesses respondent2DQWitnesses = Witnesses.builder()
-            .witnessesToAppear(YES)
-            .build();
+                .witnessesToAppear(YES)
+                .build();
         caseData = CaseData.builder()
-            .respondent1DQ(respondent1DQ)
-            .respondent2DQWitnessesSmallClaim(respondent2DQWitnesses)
-            .respondentResponseIsSame(NO)
-            .build();
+                .respondent1DQ(respondent1DQ)
+                .respondent2DQWitnessesSmallClaim(respondent2DQWitnesses)
+                .respondentResponseIsSame(NO)
+                .build();
         when(callbackParams.getCaseData()).thenReturn(caseData);
         try (MockedStatic<MultiPartyScenario> mockedScenario = mockStatic(MultiPartyScenario.class)) {
             mockedScenario.when(() -> MultiPartyScenario.getMultiPartyScenario(caseData)).thenReturn(ONE_V_TWO_ONE_LEGAL_REP);
