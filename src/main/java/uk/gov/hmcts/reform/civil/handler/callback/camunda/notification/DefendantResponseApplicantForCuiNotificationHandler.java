@@ -84,8 +84,7 @@ public class DefendantResponseApplicantForCuiNotificationHandler
         properties.put(CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()));
         properties.put(RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
         addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
         return properties;
     }
 
@@ -98,8 +97,7 @@ public class DefendantResponseApplicantForCuiNotificationHandler
         properties.put(CASEMAN_REF, caseData.getLegacyCaseReference());
         properties.put(RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
         addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
         return properties;
     }
 

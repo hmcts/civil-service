@@ -70,8 +70,7 @@ public abstract class AbstractNotifyManageStayHandler extends CallbackHandler im
                 CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData)
             ));
             addAllFooterItems(caseData, properties, configuration,
-                              featureToggleService.isQueryManagementLRsEnabled(),
-                              featureToggleService.isLipQueryManagementEnabled(caseData));
+                              featureToggleService.isPublicQueryManagementEnabled(caseData));
             return properties;
         } else {
             HashMap<String, String> properties = new HashMap<>(Map.of(
@@ -82,8 +81,7 @@ public abstract class AbstractNotifyManageStayHandler extends CallbackHandler im
                 CASEMAN_REF, caseData.getLegacyCaseReference()
             ));
             addAllFooterItems(caseData, properties, configuration,
-                              featureToggleService.isQueryManagementLRsEnabled(),
-                              featureToggleService.isLipQueryManagementEnabled(caseData));
+                              featureToggleService.isPublicQueryManagementEnabled(caseData));
             return properties;
         }
     }

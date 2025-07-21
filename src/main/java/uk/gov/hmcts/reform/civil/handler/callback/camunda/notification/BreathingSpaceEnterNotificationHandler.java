@@ -129,8 +129,7 @@ public class BreathingSpaceEnterNotificationHandler extends CallbackHandler impl
         properties.put(PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData));
         properties.put(CASEMAN_REF, caseData.getLegacyCaseReference());
         addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
         return properties;
     }
 }
