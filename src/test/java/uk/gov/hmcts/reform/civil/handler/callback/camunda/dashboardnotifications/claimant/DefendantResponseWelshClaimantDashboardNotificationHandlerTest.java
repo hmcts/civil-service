@@ -104,7 +104,6 @@ class DefendantResponseWelshClaimantDashboardNotificationHandlerTest extends Bas
             );
         }
 
-
         @Test
         void shouldRecordScenarioWhenDefendantHasWelshLanguagePreference_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
