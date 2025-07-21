@@ -95,10 +95,8 @@ class DJRespondentReceivedNotificationHandlerTest {
             when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("welshHmctsSignature"));
             when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("welshPhoneContact"));
             when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
-            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
             when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
-            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
         }
 
         @Test
@@ -107,7 +105,8 @@ class DJRespondentReceivedNotificationHandlerTest {
                 .thenReturn("test-template-received-id");
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
-
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             //send Received email
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
                 .addRespondent2(YesOrNo.NO)
@@ -127,6 +126,9 @@ class DJRespondentReceivedNotificationHandlerTest {
         @Test
         void shouldSendNotificationToRespondentSolicitorForLipVSLrNotification() {
             //send Received email
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             when(notificationsProperties.getRespondentSolicitor1DefaultJudgmentReceivedForLipVSLR())
                 .thenReturn("test-template-received-id");
 
@@ -182,7 +184,8 @@ class DJRespondentReceivedNotificationHandlerTest {
                 .thenReturn("test-template-received-id");
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
-
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             //send Received email
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
                 .respondent2(PartyBuilder.builder().individual().build())
@@ -212,7 +215,8 @@ class DJRespondentReceivedNotificationHandlerTest {
                 .thenReturn("test-template-requested-id");
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
-
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             //send Requested email
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
                 .respondent2(PartyBuilder.builder().individual().build())
@@ -240,7 +244,9 @@ class DJRespondentReceivedNotificationHandlerTest {
         void shouldGenerateEmail_whenInvokedAnd1v1AndLRvLiP() {
             when(notificationsProperties.getRespondent1DefaultJudgmentRequestedTemplate())
                 .thenReturn("test-template-requested-id");
-
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             //send Received email
             when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
@@ -263,7 +269,7 @@ class DJRespondentReceivedNotificationHandlerTest {
 
         @NotNull
         private Map<String, String> getNotificationDataMapLRvLip() {
-            Map<String, String> properties = new HashMap<>(addCommonProperties());
+            Map<String, String> properties = new HashMap<>(addCommonProperties(true));
             properties.put(CLAIM_NUMBER_INTERIM, CASE_ID.toString());
             properties.put(DEFENDANT_NAME_INTERIM, "Company ltd");
             properties.put(APPLICANT_ONE_NAME, "Mr. John Rambo");
@@ -274,7 +280,7 @@ class DJRespondentReceivedNotificationHandlerTest {
 
         @NotNull
         private Map<String, String> getNotificationDataMap1v1(CaseData caseData) {
-            Map<String, String> properties = new HashMap<>(addCommonProperties());
+            Map<String, String> properties = new HashMap<>(addCommonProperties(false));
             properties.put(DEFENDANT_EMAIL, "Test Org Name");
             properties.put(CLAIM_NUMBER, CASE_ID.toString());
             properties.put(DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
@@ -285,7 +291,7 @@ class DJRespondentReceivedNotificationHandlerTest {
         }
 
         private Map<String, String> getNotificationDataMap1v2(CaseData caseData) {
-            Map<String, String> properties = new HashMap<>(addCommonProperties());
+            Map<String, String> properties = new HashMap<>(addCommonProperties(false));
             properties.put(DEFENDANT_EMAIL, "Test Org Name");
             properties.put(CLAIM_NUMBER, CASE_ID.toString());
             properties.put(DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
@@ -296,7 +302,7 @@ class DJRespondentReceivedNotificationHandlerTest {
         }
 
         private Map<String, String> getNotificationDataMap1v2fail() {
-            Map<String, String> properties = new HashMap<>(addCommonProperties());
+            Map<String, String> properties = new HashMap<>(addCommonProperties(false));
             properties.put(DEFENDANT_EMAIL, "Test Org Name");
             properties.put(CLAIM_NUMBER, CASE_ID.toString());
             properties.put(DEFENDANT_NAME, "steve");
@@ -307,7 +313,7 @@ class DJRespondentReceivedNotificationHandlerTest {
         }
 
         @NotNull
-        public Map<String, String> addCommonProperties() {
+        public Map<String, String> addCommonProperties(boolean isLipCase) {
             Map<String, String> expectedProperties = new HashMap<>();
             expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
             expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
@@ -315,10 +321,15 @@ class DJRespondentReceivedNotificationHandlerTest {
             expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
             expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
             expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
-            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
             expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
             expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
-            expectedProperties.put(CNBC_CONTACT, configuration.getCnbcContact());
+            if (isLipCase) {
+                expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+                expectedProperties.put(CNBC_CONTACT, configuration.getCnbcContact());
+            } else {
+                expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getRaiseQueryLr());
+                expectedProperties.put(CNBC_CONTACT, configuration.getRaiseQueryLr());
+            }
             return expectedProperties;
         }
 
