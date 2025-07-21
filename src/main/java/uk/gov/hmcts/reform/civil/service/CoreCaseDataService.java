@@ -152,7 +152,6 @@ public class CoreCaseDataService {
         caseDataContent.setData(payload);
         caseDataContent.getEvent().setSummary(eventSummary);
         caseDataContent.getEvent().setDescription(eventDescription);
-
         submitUpdate(caseId.toString(), caseDataContent);
     }
 
@@ -183,11 +182,6 @@ public class CoreCaseDataService {
             caseDataContent
         );
         return caseDetailsConverter.toCaseData(caseDetails);
-    }
-
-    private CaseLocationCivil getCaseManagementLocationObj(Object object) {
-        return mapper.convertValue(object, new TypeReference<>() {
-        });
     }
 
     private CourtLocation getCourtLocationObj(Object object) {
