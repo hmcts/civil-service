@@ -207,15 +207,11 @@ public class CaseQueriesUtil {
 
     private static boolean isWelshQuery(CaseData caseData, List<String> roles) {
         String languagePreference = null;
-
         if (isLIPClaimant(roles)) {
             languagePreference = caseData.getClaimantBilingualLanguagePreference();
-        }
-
-        if (isLIPDefendant(roles)) {
+        } else if (isLIPDefendant(roles)) {
             languagePreference = caseData.getDefendantBilingualLanguagePreference();
         }
-
         return nonNull(languagePreference) && (languagePreference.equals("WELSH") || languagePreference.equals("BOTH"));
     }
 
