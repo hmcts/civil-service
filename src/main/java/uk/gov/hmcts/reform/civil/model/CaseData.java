@@ -301,6 +301,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private BigDecimal totalInterest;
     private BigDecimal totalClaimAmountPlusInterestAdmitPart;
     private BigDecimal totalClaimAmountPlusInterest;
+    private String totalClaimAmountPlusInterestAdmitPartString;
+    private String totalClaimAmountPlusInterestString;
     private final YesOrNo claimInterest;
     private final InterestClaimOptions interestClaimOptions;
     private final SameRateInterestSelection sameRateInterestSelection;
@@ -537,6 +539,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String caseNamePublic;
     private final YesOrNo ccjJudgmentAmountShowInterest;
     private final YesOrNo claimFixedCostsExist;
+    private final YesOrNo partAdmit1v1Defendant;
 
     @Builder.Default
     private final List<Element<CaseDocument>> defaultJudgmentDocuments = new ArrayList<>();

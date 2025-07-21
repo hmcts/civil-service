@@ -39,6 +39,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartySc
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CNBC_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LEGAL_ORG_NAME;
@@ -101,7 +102,8 @@ class NotifyClaimantJudgmentVariedDeterminationOfMeansNotificationHandlerTest ex
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateNotificationAcknowledged_1v2_BothDefendants()
                 .multiPartyClaimTwoDefendantSolicitorsSpec().build();
-
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             CallbackParams params = CallbackParams.builder()
                 .caseData(caseData)
                 .type(ABOUT_TO_SUBMIT)
@@ -123,6 +125,11 @@ class NotifyClaimantJudgmentVariedDeterminationOfMeansNotificationHandlerTest ex
 
         @Test
         void shouldNotifyApplicantLip_whenInvoked() {
+            when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn(TEMPLATE_ID);
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
+
             CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithDeterminationMeans();
             caseData = caseData.toBuilder()
                 .applicant1(Party.builder()
@@ -137,7 +144,6 @@ class NotifyClaimantJudgmentVariedDeterminationOfMeansNotificationHandlerTest ex
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
-            when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn(TEMPLATE_ID);
             handler.handle(params);
 
             verify(notificationService).sendMail(
@@ -159,7 +165,7 @@ class NotifyClaimantJudgmentVariedDeterminationOfMeansNotificationHandlerTest ex
                 .concat(" and ")
                 .concat(getPartyNameBasedOnType(caseData.getRespondent2()));
         }
-        Map<String, String> properties = new HashMap<>(addCommonProperties());
+        Map<String, String> properties = new HashMap<>(addCommonProperties(false));
         properties.put(CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString());
         properties.put(LEGAL_ORG_NAME, getApplicantLegalOrganizationName(caseData));
         properties.put(DEFENDANT_NAME, defendantName);
@@ -169,7 +175,7 @@ class NotifyClaimantJudgmentVariedDeterminationOfMeansNotificationHandlerTest ex
     }
 
     public Map<String, String> getLipNotificationDataMap(CaseData caseData) {
-        Map<String, String> properties = new HashMap<>(addCommonProperties());
+        Map<String, String> properties = new HashMap<>(addCommonProperties(true));
         properties.put(CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData));
         properties.put(CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference());
         properties.put(PARTY_NAME, caseData.getApplicant1().getPartyName());
@@ -177,7 +183,7 @@ class NotifyClaimantJudgmentVariedDeterminationOfMeansNotificationHandlerTest ex
     }
 
     @NotNull
-    public Map<String, String> addCommonProperties() {
+    public Map<String, String> addCommonProperties(boolean isLipCase) {
         Map<String, String> expectedProperties = new HashMap<>();
         expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
         expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
@@ -188,6 +194,13 @@ class NotifyClaimantJudgmentVariedDeterminationOfMeansNotificationHandlerTest ex
         expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
         expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
         expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+        if (isLipCase) {
+            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+            expectedProperties.put(CNBC_CONTACT, configuration.getCnbcContact());
+        } else {
+            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getRaiseQueryLr());
+            expectedProperties.put(CNBC_CONTACT, configuration.getRaiseQueryLr());
+        }
         return expectedProperties;
     }
 
