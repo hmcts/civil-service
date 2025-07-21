@@ -79,8 +79,7 @@ public class ClaimSubmissionLipClaimantNotificationHandler extends CallbackHandl
             CLAIMANT_NAME, caseData.getApplicant1().getPartyName()
         ));
         addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
 
         return properties;
     }
