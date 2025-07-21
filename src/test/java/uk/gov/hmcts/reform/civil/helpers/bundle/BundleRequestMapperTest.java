@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.TypeOfDocDocumentaryEvidenceOfTrial;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.DocumentWithRegex;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
 import uk.gov.hmcts.reform.civil.model.bundle.BundleCreateRequest;
@@ -112,18 +113,26 @@ class BundleRequestMapperTest {
                      bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments().get(0).getValue().getDocumentFileName());
         assertEquals("Particulars Of Claim 10/02/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments().get(1).getValue().getDocumentFileName());
-        assertEquals("DF 1 Defence 10/02/2023",
+        assertEquals("Medical Report 10/02/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments().get(2).getValue().getDocumentFileName());
-        assertEquals("CL's reply 10/02/2023",
+        assertEquals("Schedule Of Loss 10/02/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments().get(3).getValue().getDocumentFileName());
-        assertEquals("CL 1 reply to part 18 request 12/01/2023",
+        assertEquals("Certificate Of Suitability 10/02/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments().get(4).getValue().getDocumentFileName());
-        assertEquals("CL 2 reply to part 18 request 12/01/2023",
+        assertEquals("Other 10/02/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments().get(5).getValue().getDocumentFileName());
-        assertEquals("DF 1 reply to part 18 request 12/01/2023",
+        assertEquals("DF 1 Defence 10/02/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments().get(6).getValue().getDocumentFileName());
-        assertEquals("DF 2 reply to part 18 request 12/01/2023",
+        assertEquals("CL's reply 10/02/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments().get(7).getValue().getDocumentFileName());
+        assertEquals("CL 1 reply to part 18 request 12/01/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments().get(8).getValue().getDocumentFileName());
+        assertEquals("CL 2 reply to part 18 request 12/01/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments().get(9).getValue().getDocumentFileName());
+        assertEquals("DF 1 reply to part 18 request 12/01/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments().get(10).getValue().getDocumentFileName());
+        assertEquals("DF 2 reply to part 18 request 12/01/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments().get(11).getValue().getDocumentFileName());
         assertEquals("CL 1 Directions Questionnaire 10/02/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(0).getValue().getDocumentFileName());
         assertEquals("DF 1 Directions Questionnaire 10/02/2023",
@@ -246,18 +255,26 @@ class BundleRequestMapperTest {
                      bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments().get(0).getValue().getDocumentFileName());
         assertEquals("Particulars Of Claim 10/02/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments().get(1).getValue().getDocumentFileName());
-        assertEquals("DF 1 Defence 10/02/2023",
+        assertEquals("Medical Report 10/02/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments().get(2).getValue().getDocumentFileName());
-        assertEquals("CL's reply 10/02/2023",
+        assertEquals("Schedule Of Loss 10/02/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments().get(3).getValue().getDocumentFileName());
-        assertEquals("CL 1 reply to part 18 request 12/01/2023",
+        assertEquals("Certificate Of Suitability 10/02/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments().get(4).getValue().getDocumentFileName());
-        assertEquals("CL 2 reply to part 18 request 12/01/2023",
+        assertEquals("Other 10/02/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments().get(5).getValue().getDocumentFileName());
-        assertEquals("DF 1 reply to part 18 request 12/01/2023",
+        assertEquals("DF 1 Defence 10/02/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments().get(6).getValue().getDocumentFileName());
-        assertEquals("DF 2 reply to part 18 request 12/01/2023",
+        assertEquals("CL's reply 10/02/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments().get(7).getValue().getDocumentFileName());
+        assertEquals("CL 1 reply to part 18 request 12/01/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments().get(8).getValue().getDocumentFileName());
+        assertEquals("CL 2 reply to part 18 request 12/01/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments().get(9).getValue().getDocumentFileName());
+        assertEquals("DF 1 reply to part 18 request 12/01/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments().get(10).getValue().getDocumentFileName());
+        assertEquals("DF 2 reply to part 18 request 12/01/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments().get(11).getValue().getDocumentFileName());
         assertEquals("CL 1 Directions Questionnaire 10/02/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(0).getValue().getDocumentFileName());
         assertEquals("DF 1 Directions Questionnaire 10/02/2023",
@@ -376,25 +393,6 @@ class BundleRequestMapperTest {
     private CaseData getCaseDataWithNoId() {
         return CaseData.builder().ccdCaseReference(1L)
             .systemGeneratedCaseDocuments(setupSystemGeneratedCaseDocsNoId())
-            .applicant1(Party.builder().individualLastName("lastname").individualFirstName("cl1Fname").partyName(
-                "applicant1").type(Party.Type.INDIVIDUAL).build())
-            .respondent1(Party.builder().individualLastName("lastname").individualFirstName("df1Fname").partyName(
-                "respondent1").type(Party.Type.INDIVIDUAL).build())
-            .addApplicant2(YesOrNo.YES)
-            .addRespondent2(YesOrNo.YES)
-            .applicant2(Party.builder().individualLastName("lastname").individualFirstName("cl2Fname").partyName(
-                "applicant2").type(Party.Type.INDIVIDUAL).build())
-            .respondent2(Party.builder().individualLastName("lastname").individualFirstName("df2Fname").partyName(
-                "respondent2").type(Party.Type.INDIVIDUAL).build())
-            .hearingDate(LocalDate.now())
-            .submittedDate(LocalDateTime.of(2023, 2, 10, 2,
-                                            2, 2))
-            .build();
-    }
-
-    private CaseData getCaseDataWithUnbundledFolderId() {
-        return CaseData.builder().ccdCaseReference(1L)
-            .systemGeneratedCaseDocuments(setupSystemGeneratedCaseDocsUnbundledFolderId())
             .applicant1(Party.builder().individualLastName("lastname").individualFirstName("cl1Fname").partyName(
                 "applicant1").type(Party.Type.INDIVIDUAL).build())
             .respondent1(Party.builder().individualLastName("lastname").individualFirstName("df1Fname").partyName(
@@ -553,7 +551,18 @@ class BundleRequestMapperTest {
         List<Element<Document>> particularsOfClaim = new ArrayList<>();
         Document document = Document.builder().documentFileName(TEST_FILE_NAME).documentUrl(TEST_URL).build();
         particularsOfClaim.add(ElementUtils.element(document));
-        return ServedDocumentFiles.builder().particularsOfClaimDocument(particularsOfClaim).build();
+        List<Element<DocumentWithRegex>> docs = new ArrayList<>();
+        DocumentWithRegex doc = DocumentWithRegex.builder().document(Document.builder()
+                                                                                .documentFileName(TEST_FILE_NAME)
+                                                                                .documentUrl(TEST_URL).build()).build();
+        docs.add(ElementUtils.element(doc));
+        return ServedDocumentFiles.builder()
+            .particularsOfClaimDocument(particularsOfClaim)
+            .medicalReport(docs)
+            .certificateOfSuitability(docs)
+            .scheduleOfLoss(docs)
+            .other(docs)
+            .build();
     }
 
     private List<Element<UploadEvidenceExpert>> getExpertOtherPartyQuestionDocs(String partyName) {

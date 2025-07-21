@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.civil.service.robotics.mapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -48,6 +50,7 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideOrderType;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideReason;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
+import uk.gov.hmcts.reform.civil.model.querymanagement.CaseQueriesCollection;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
@@ -105,6 +108,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFIC
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_SDO;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_SDO_NOT_DRAWN;
 import static uk.gov.hmcts.reform.civil.service.robotics.RoboticsNotificationService.findLatestEventTriggerReason;
+import static uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper.QUERIES_ON_CASE;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper.RPA_IN_MEDIATION;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper.RPA_REASON_JUDGMENT_BY_ADMISSION;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper.RECORD_JUDGMENT;
@@ -160,12 +164,7 @@ class EventHistoryMapperTest {
         @Test
         void shouldPrepareMiscellaneousEvent_whenClaimWith1v1UnregisteredDefendant() {
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOffline1v1UnregisteredDefendant().build();
-            if (caseData.getRespondent2OrgRegistered() != null
-                && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
-            }
+
             Event expectedEvent = Event.builder()
                 .eventSequence(1)
                 .eventCode("999")
@@ -3898,7 +3897,7 @@ class EventHistoryMapperTest {
             void shouldPrepareExpectedEvents_whenDefendantResponseFullAdmits() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .multiPartyClaimTwoDefendantSolicitors()
-                    .atState(FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED)
+                    .atState(FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED)
                     .build();
                 if (caseData.getRespondent2OrgRegistered() != null
                     && caseData.getRespondent2Represented() == null) {
@@ -5709,6 +5708,229 @@ class EventHistoryMapperTest {
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .containsExactly(expectedMiscellaneousEvents.get(0), expectedMiscellaneousEvents.get(1));
+
+            assertEmptyEvents(
+                eventHistory,
+                "defenceFiled",
+                "defenceAndCounterClaim",
+                "receiptOfPartAdmission",
+                "replyToDefence",
+                "directionsQuestionnaireFiled",
+                "receiptOfAdmission",
+                "acknowledgementOfServiceReceived",
+                "consentExtensionFilingDefence"
+            );
+        }
+
+        @ParameterizedTest
+        @CsvSource({
+            "PROD_LR_QUERY",
+            "PUBLIC_QUERY"
+        })
+        void shouldPrepareExpectedEvents_whenClaimTakenOfflineAfterClaimIssuedQueryExists(String queryType) {
+            CaseData caseData;
+            if (queryType.equals("PROD_LR_QUERY")) {
+                when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
+                caseData = CaseDataBuilder.builder()
+                    .atStateTakenOfflineByStaff()
+                    .takenOfflineDate(time.now())
+                    .build().toBuilder()
+                    .qmApplicantSolicitorQueries(CaseQueriesCollection.builder()
+                                                     .roleOnCase("APPLICANT")
+                                                     .build())
+                    .build();
+            } else {
+                when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
+                caseData = CaseDataBuilder.builder()
+                    .atStateTakenOfflineByStaff()
+                    .takenOfflineDate(time.now())
+                    .build().toBuilder()
+                    .queries(CaseQueriesCollection.builder()
+                                                   .roleOnCase("APPLICANT")
+                                                   .build())
+                    .build();
+            }
+
+            List<Event> expectedMiscellaneousEvents = List.of(
+                Event.builder()
+                    .eventSequence(1)
+                    .eventCode("999")
+                    .dateReceived(time.now())
+                    .eventDetailsText(QUERIES_ON_CASE)
+                    .eventDetails(EventDetails.builder()
+                                      .miscText(QUERIES_ON_CASE)
+                                      .build())
+                    .build(),
+                Event.builder()
+                    .eventSequence(2)
+                    .eventCode("999")
+                    .dateReceived(caseData.getIssueDate().atStartOfDay())
+                    .eventDetailsText("Claim issued in CCD.")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("Claim issued in CCD.")
+                                      .build())
+                    .build(),
+                Event.builder()
+                    .eventSequence(3)
+                    .eventCode("999")
+                    .dateReceived(caseData.getTakenOfflineByStaffDate())
+                    .eventDetailsText(mapper.prepareTakenOfflineEventDetails(caseData))
+                    .eventDetails(EventDetails.builder()
+                                      .miscText(mapper.prepareTakenOfflineEventDetails(caseData))
+                                      .build())
+                    .build()
+            );
+
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .containsExactly(expectedMiscellaneousEvents.get(0), expectedMiscellaneousEvents.get(1),
+                                 expectedMiscellaneousEvents.get(2));
+
+            assertEmptyEvents(
+                eventHistory,
+                "defenceFiled",
+                "defenceAndCounterClaim",
+                "receiptOfPartAdmission",
+                "replyToDefence",
+                "directionsQuestionnaireFiled",
+                "receiptOfAdmission",
+                "acknowledgementOfServiceReceived",
+                "consentExtensionFilingDefence"
+            );
+        }
+
+        @Test
+        void shouldPrepareExpectedEvents_whenClaimTakenOfflineAfterNocDeadlinePassedRes1QueryEnabled() {
+            when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineDefendant1NocDeadlinePassed()
+                .build().toBuilder()
+                .queries(CaseQueriesCollection.builder()
+                                                 .roleOnCase("APPLICANT")
+                                                 .build())
+                .build();
+
+            List<Event> expectedMiscellaneousEvents = List.of(
+                Event.builder()
+                    .eventSequence(1)
+                    .eventCode("999")
+                    .dateReceived(caseData.getTakenOfflineDate())
+                    .eventDetailsText("RPA Reason: Claim moved offline after defendant NoC deadline has passed")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("RPA Reason: Claim moved offline after defendant NoC deadline has passed")
+                                      .build())
+                    .build(),
+                Event.builder()
+                    .eventSequence(2)
+                    .eventCode("999")
+                    .dateReceived(caseData.getTakenOfflineDate())
+                    .eventDetailsText(QUERIES_ON_CASE)
+                    .eventDetails(EventDetails.builder()
+                                      .miscText(QUERIES_ON_CASE)
+                                      .build())
+                    .build()
+            );
+
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .containsExactlyInAnyOrder(expectedMiscellaneousEvents.get(0), expectedMiscellaneousEvents.get(1));
+
+            assertEmptyEvents(
+                eventHistory,
+                "defenceFiled",
+                "defenceAndCounterClaim",
+                "receiptOfPartAdmission",
+                "replyToDefence",
+                "directionsQuestionnaireFiled",
+                "receiptOfAdmission",
+                "acknowledgementOfServiceReceived",
+                "consentExtensionFilingDefence"
+            );
+        }
+
+        @Test
+        void shouldPrepareExpectedEvents_whenClaimTakenOfflineAfterNocDeadlinePassedRes2QueryEnabled() {
+            when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineDefendant2NocDeadlinePassed()
+                .build().toBuilder()
+                .queries(CaseQueriesCollection.builder()
+                                                 .roleOnCase("APPLICANT")
+                                                 .build())
+                .build();
+
+            List<Event> expectedMiscellaneousEvents = List.of(
+                Event.builder()
+                    .eventSequence(1)
+                    .eventCode("999")
+                    .dateReceived(caseData.getTakenOfflineDate())
+                    .eventDetailsText("RPA Reason: Claim moved offline after defendant NoC deadline has passed")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("RPA Reason: Claim moved offline after defendant NoC deadline has passed")
+                                      .build())
+                    .build(),
+                Event.builder()
+                    .eventSequence(2)
+                    .eventCode("999")
+                    .dateReceived(caseData.getTakenOfflineDate())
+                    .eventDetailsText(QUERIES_ON_CASE)
+                    .eventDetails(EventDetails.builder()
+                                      .miscText(QUERIES_ON_CASE)
+                                      .build())
+                    .build()
+            );
+
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .containsExactly(expectedMiscellaneousEvents.get(0), expectedMiscellaneousEvents.get(1));
+
+            assertEmptyEvents(
+                eventHistory,
+                "defenceFiled",
+                "defenceAndCounterClaim",
+                "receiptOfPartAdmission",
+                "replyToDefence",
+                "directionsQuestionnaireFiled",
+                "receiptOfAdmission",
+                "acknowledgementOfServiceReceived",
+                "consentExtensionFilingDefence"
+            );
+        }
+
+        @Test
+        void shouldPrepareExpectedEvents_whenClaimTakenOfflineAfterNocDeadlinePassedRes2QueryDisabled() {
+            when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineDefendant2NocDeadlinePassed()
+                .build().toBuilder()
+                .queries(CaseQueriesCollection.builder()
+                                                 .roleOnCase("APPLICANT")
+                                                 .build())
+                .build();
+
+            List<Event> expectedMiscellaneousEvents = List.of(
+                Event.builder()
+                    .eventSequence(1)
+                    .eventCode("999")
+                    .dateReceived(caseData.getTakenOfflineDate())
+                    .eventDetailsText("RPA Reason: Claim moved offline after defendant NoC deadline has passed")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("RPA Reason: Claim moved offline after defendant NoC deadline has passed")
+                                      .build())
+                    .build()
+            );
+
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .containsExactly(expectedMiscellaneousEvents.get(0));
 
             assertEmptyEvents(
                 eventHistory,
@@ -7844,6 +8066,7 @@ class EventHistoryMapperTest {
                         + "Subtotal \n £1172.00\n\n ### Amount"
                         + " already paid \n£100.00\n ## Total still owed \n £1072.00")
                 .respondent2SameLegalRepresentative(YES)
+                .joDJCreatedDate(LocalDateTime.now())
                 .hearingSupportRequirementsDJ(HearingSupportRequirementsDJ.builder().build())
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                 .defendantDetailsSpec(DynamicList.builder()
@@ -7875,6 +8098,7 @@ class EventHistoryMapperTest {
                 .respondent2(PartyBuilder.builder().individual().build())
                 .addRespondent2(YES)
                 .paymentTypeSelection(DJPaymentTypeSelection.REPAYMENT_PLAN)
+                .joDJCreatedDate(LocalDateTime.now())
                 .repaymentSummaryObject(
                     "The judgment will order dsfsdf ffdg to pay £1072.00, "
                         + "including the claim fee and interest,"
@@ -7902,6 +8126,50 @@ class EventHistoryMapperTest {
                 .extracting("eventDetailsText").asString().isNotEmpty();
         }
 
+        @Test
+        public void shouldgenerateRPAfeedfor_DJ_event_update_sequenceno() {
+
+            given(featureToggleService.isJOLiveFeedActive()).willReturn(true);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateNotificationAcknowledged().build().toBuilder()
+                .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
+                .totalClaimAmount(new BigDecimal(1000))
+                .repaymentSuggestion("100")
+                .repaymentFrequency(RepaymentFrequencyDJ.ONCE_ONE_MONTH)
+                .respondent2(PartyBuilder.builder().individual().build())
+                .addRespondent2(YES)
+                .paymentTypeSelection(DJPaymentTypeSelection.REPAYMENT_PLAN)
+                .joDJCreatedDate(LocalDateTime.now())
+                .repaymentSummaryObject(
+                    "The judgment will order dsfsdf ffdg to pay £1072.00, "
+                        + "including the claim fee and interest,"
+                        + " if applicable, as shown:\n### Claim amount \n"
+                        + " £1000.00\n ### Fixed cost amount"
+                        + " \n£102.00\n### Claim fee amount \n £70.00\n ## "
+                        + "Subtotal \n £1172.00\n\n ### Amount"
+                        + " already paid \n£100.00\n ## Total still owed \n £1072.00")
+                .respondent2SameLegalRepresentative(YES)
+                .hearingSupportRequirementsDJ(HearingSupportRequirementsDJ.builder().build())
+                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                .defendantDetailsSpec(DynamicList.builder()
+                                          .value(DynamicListElement.builder()
+                                                     .label("Both")
+                                                     .build())
+                                          .build())
+                .build();
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
+            assertThat(eventHistory).extracting("defaultJudgment").asList()
+                .extracting("eventCode").asString().contains("[230, 230]");
+            assertThat(eventHistory).extracting("defaultJudgment").asList()
+                .extracting("eventSequence").asString().contains("1");
+
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .extracting("eventCode").asString().contains("999");
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .extracting("eventSequence").asString().contains("3");
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .extracting("eventDetailsText").asString().isNotEmpty();
+        }
     }
 
     @Nested
@@ -8330,6 +8598,8 @@ class EventHistoryMapperTest {
 
     @Nested
     class RequestJudgmentByAdmission {
+        LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
+
         @Test
         public void shouldGenerateRPA_ForFullAdmit_WhenClaimAgreedRepaymentPlan_BySetDate() {
             LocalDate whenWillPay = LocalDate.now().plusDays(5);
@@ -8353,8 +8623,9 @@ class EventHistoryMapperTest {
                 .ccjPaymentDetails(ccjPaymentDetails)
                 .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
                 .respondToClaimAdmitPartLRspec(paymentDetails)
-                .applicant1ResponseDate(LocalDateTime.now())
+                .applicant1ResponseDate(now)
                 .totalInterest(BigDecimal.ZERO)
+                .joJudgementByAdmissionIssueDate(now)
                 .build();
 
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
@@ -8403,6 +8674,7 @@ class EventHistoryMapperTest {
                 .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
                 .respondent1RepaymentPlan(respondent1RepaymentPlan)
                 .totalInterest(BigDecimal.ZERO)
+                .joJudgementByAdmissionIssueDate(now)
                 .build();
 
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
@@ -8453,6 +8725,7 @@ class EventHistoryMapperTest {
                 .respondToClaimAdmitPartLRspec(paymentDetails)
                 .totalInterest(BigDecimal.ZERO)
                 .applicant1ResponseDate(LocalDateTime.now())
+                .joJudgementByAdmissionIssueDate(now)
                 .build();
 
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
@@ -8498,6 +8771,7 @@ class EventHistoryMapperTest {
                 .respondent1Represented(YesOrNo.NO)
                 .specRespondent1Represented(YesOrNo.NO)
                 .applicant1Represented(YesOrNo.NO)
+                .joJudgementByAdmissionIssueDate(now)
                 .build();
 
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
@@ -8512,6 +8786,8 @@ class EventHistoryMapperTest {
                 .extracting("eventCode").asString().contains("999");
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .extracting("eventDetailsText").asString().contains(RPA_REASON_JUDGMENT_BY_ADMISSION);
+            assertThat(eventHistory).extracting("judgmentByAdmission").asList()
+                .extracting("litigiousPartyID").asString().contains("001");
         }
 
         @Test
@@ -8532,6 +8808,7 @@ class EventHistoryMapperTest {
                 .ccjPaymentDetails(ccjPaymentDetails)
                 .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
                 .totalInterest(BigDecimal.ZERO)
+                .joJudgementByAdmissionIssueDate(now)
                 .build();
             //When
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
@@ -8545,6 +8822,8 @@ class EventHistoryMapperTest {
             assertThat(eventHistory).extracting("judgmentByAdmission").asList()
                 .extracting("eventDetails").asList()
                 .extracting("installmentAmount").isNotNull();
+            assertThat(eventHistory).extracting("judgmentByAdmission").asList()
+                .extracting("litigiousPartyID").asString().contains("001");
 
         }
 
@@ -8589,6 +8868,7 @@ class EventHistoryMapperTest {
                 .totalInterest(BigDecimal.ZERO)
                 .applicant1ResponseDate(LocalDateTime.now())
                 .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+                .joJudgementByAdmissionIssueDate(now)
                 .build();
             when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
@@ -8601,6 +8881,11 @@ class EventHistoryMapperTest {
                 .extracting("isJudgmentForthwith").contains(true);
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .extracting("eventCode").asString().contains("999");
+            assertThat(eventHistory).extracting("judgmentByAdmission").asList()
+                .extracting("litigiousPartyID").asString().contains("002");
+            assertThat(eventHistory).extracting("judgmentByAdmission").asList()
+                .extracting("eventDetails").asList()
+                .extracting("installmentPeriod").contains("FW");
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .extracting("eventDetailsText").asString().contains(RPA_RECORD_JUDGMENT_REASON);
         }
@@ -8625,6 +8910,7 @@ class EventHistoryMapperTest {
                 .specRespondent1Represented(YesOrNo.YES)
                 .applicant1Represented(YesOrNo.YES)
                 .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
+                .joJudgementByAdmissionIssueDate(now)
                 .build();
             when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
@@ -8632,6 +8918,11 @@ class EventHistoryMapperTest {
             assertThat(eventHistory).extracting("judgmentByAdmission").isNotNull();
             assertThat(eventHistory).extracting("judgmentByAdmission").asList()
                 .extracting("eventCode").asString().contains("240");
+            assertThat(eventHistory).extracting("judgmentByAdmission").asList()
+                .extracting("litigiousPartyID").asString().contains("002");
+            assertThat(eventHistory).extracting("judgmentByAdmission").asList()
+                .extracting("eventDetails").asList()
+                .extracting("installmentPeriod").contains("FW");
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .extracting("eventCode").asString().contains("999");
             assertThat(eventHistory).extracting("miscellaneous").asList()
@@ -8656,6 +8947,7 @@ class EventHistoryMapperTest {
                 .respondToClaimAdmitPartLRspec(paymentDetails)
                 .applicant1ResponseDate(LocalDateTime.now())
                 .totalInterest(BigDecimal.ZERO)
+                .joJudgementByAdmissionIssueDate(now)
                 .build();
             given(featureToggleService.isJOLiveFeedActive()).willReturn(true);
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
@@ -8663,6 +8955,11 @@ class EventHistoryMapperTest {
             assertThat(eventHistory).extracting("judgmentByAdmission").isNotNull();
             assertThat(eventHistory).extracting("judgmentByAdmission").asList()
                 .extracting("eventCode").asString().contains("240");
+            assertThat(eventHistory).extracting("judgmentByAdmission").asList()
+                .extracting("litigiousPartyID").asString().contains("002");
+            assertThat(eventHistory).extracting("judgmentByAdmission").asList()
+                .extracting("eventDetails").asList()
+                .extracting("installmentPeriod").contains("FUL");
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .extracting("eventCode").asString().contains("999");
             assertThat(eventHistory).extracting("miscellaneous").asList()
@@ -8688,6 +8985,7 @@ class EventHistoryMapperTest {
                 .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
                 .respondent1RepaymentPlan(respondent1RepaymentPlan)
                 .totalInterest(BigDecimal.ZERO)
+                .joJudgementByAdmissionIssueDate(now)
                 .build();
             given(featureToggleService.isJOLiveFeedActive()).willReturn(true);
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
@@ -8695,6 +8993,11 @@ class EventHistoryMapperTest {
             assertThat(eventHistory).extracting("judgmentByAdmission").isNotNull();
             assertThat(eventHistory).extracting("judgmentByAdmission").asList()
                 .extracting("eventCode").asString().contains("240");
+            assertThat(eventHistory).extracting("judgmentByAdmission").asList()
+                .extracting("litigiousPartyID").asString().contains("002");
+            assertThat(eventHistory).extracting("judgmentByAdmission").asList()
+                .extracting("eventDetails").asList()
+                .extracting("installmentPeriod").contains("MTH");
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .extracting("eventCode").asString().contains("999");
             assertThat(eventHistory).extracting("miscellaneous").asList()

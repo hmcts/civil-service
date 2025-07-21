@@ -37,7 +37,6 @@ public class StayLiftedDefendantScenarioTest extends DashboardBaseIntegrationTes
             .build();
 
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
         handler.handle(callbackParams(caseData));
 
         //Verify Notification is created

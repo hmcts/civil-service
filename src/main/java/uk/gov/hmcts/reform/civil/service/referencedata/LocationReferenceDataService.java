@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.apache.logging.log4j.util.Strings.concat;
+import static org.apache.logging.log4j.util.Strings.isNotBlank;
 
 @Slf4j
 @Service
@@ -177,6 +178,21 @@ public class LocationReferenceDataService {
     public static String getDisplayEntry(LocationRefData location) {
         return concat(
             concat(concat(location.getSiteName(), " - "), concat(location.getCourtAddress(), " - ")),
+            location.getPostcode()
+        );
+    }
+
+    /**
+     * Label is siteName - courtAddress - postCode.
+     *
+     * @param location a location
+     * @return string to serve as label
+     */
+    public static String getDisplayEntryWelsh(LocationRefData location) {
+        return concat(
+            concat(concat(
+                isNotBlank(location.getWelshSiteName()) ? location.getWelshSiteName() : location.getSiteName(),
+                          " - "), concat(location.getCourtAddress(), " - ")),
             location.getPostcode()
         );
     }

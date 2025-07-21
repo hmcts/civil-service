@@ -66,9 +66,9 @@ public class PartAdmitFullDefenceFullPaidClaimantScenarioTest extends DashboardB
                 jsonPath("$[0].titleCy").value("Ymateb i’r hawliad"),
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Mae’r diffynnydd wedi dweud eu bod wedi talu £1000 yn barod ar " +
-                         DateUtils.formatDateInWelsh(paymentDate) +
+                         DateUtils.formatDateInWelsh(paymentDate, false) +
                         ". Gallwch gadarnhau bod y taliad wedi’i wneud a setlo, neu barhau â’r hawliad." +
-                        " Mae angen i chi ymateb erbyn 4pm ar " + DateUtils.formatDateInWelsh(deadline) + " neu ni fydd yr hawliad yn parhau.</p>" +
+                        " Mae angen i chi ymateb erbyn 4pm ar " + DateUtils.formatDateInWelsh(deadline, false) + " neu ni fydd yr hawliad yn parhau.</p>" +
                         "<p class=\"govuk-body\"><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">Gweld ac ymateb</a></p>"
                 )
             );
@@ -124,9 +124,9 @@ public class PartAdmitFullDefenceFullPaidClaimantScenarioTest extends DashboardB
                 jsonPath("$[0].titleCy").value("Ymateb i’r hawliad"),
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Mae’r diffynnydd wedi dweud eu bod wedi talu £1000 yn barod ar " +
-                        DateUtils.formatDateInWelsh(paymentDate) +
+                        DateUtils.formatDateInWelsh(paymentDate, false) +
                         ". Gallwch gadarnhau bod y taliad wedi’i wneud a setlo, neu barhau â’r hawliad." +
-                        " Mae angen i chi ymateb erbyn 4pm ar " + DateUtils.formatDateInWelsh(deadline) + " neu ni fydd yr hawliad yn parhau.</p>" +
+                        " Mae angen i chi ymateb erbyn 4pm ar " + DateUtils.formatDateInWelsh(deadline, false) + " neu ni fydd yr hawliad yn parhau.</p>" +
                         "<p class=\"govuk-body\"><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">Gweld ac ymateb</a></p>"
                 )
             );

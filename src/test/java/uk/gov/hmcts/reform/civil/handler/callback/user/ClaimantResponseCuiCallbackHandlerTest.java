@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.MediationDecision;
 import uk.gov.hmcts.reform.civil.enums.PaymentType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
@@ -37,6 +38,7 @@ import uk.gov.hmcts.reform.civil.model.dq.Experts;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.WelshLanguageRequirements;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
@@ -53,6 +55,8 @@ import uk.gov.hmcts.reform.civil.service.citizenui.ResponseOneVOneShowTagService
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
+import uk.gov.hmcts.reform.civil.utils.RequestedCourtForClaimDetailsTab;
+import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -105,6 +109,10 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
     private OrganisationService organisationService;
     @Mock
     private JudgmentByAdmissionOnlineMapper judgmentByAdmissionOnlineMapper;
+    @Mock
+    private RequestedCourtForClaimDetailsTab requestedCourtForClaimDetailsTab;
+    @Mock
+    private InterestCalculator interestCalculator;
 
     @Mock
     private Time time;
@@ -117,7 +125,7 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
         mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
         CaseFlagsInitialiser caseFlagsInitialiser = new CaseFlagsInitialiser(organisationService);
-        JudgementService judgementService = new JudgementService(featureToggleService);
+        JudgementService judgementService = new JudgementService(featureToggleService, interestCalculator);
         CourtLocationUtils courtLocationUtils = new CourtLocationUtils();
         UpdateCaseManagementDetailsService updateCaseManagementLocationDetailsService = new UpdateCaseManagementDetailsService(locationHelper,
                                                                                                                                locationRefDataService,
@@ -128,7 +136,7 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                          judgementService, mapper,
                                                          time,
                                                          updateCaseManagementLocationDetailsService, deadlinesCalculator,
-                                                         caseFlagsInitialiser, judgmentByAdmissionOnlineMapper
+                                                         caseFlagsInitialiser, judgmentByAdmissionOnlineMapper, requestedCourtForClaimDetailsTab
         );
     }
 
@@ -410,7 +418,7 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("status")
                 .isEqualTo("READY");
             assertThat(ccjPaymentDetails.getCcjPaymentPaidSomeOption()).isEqualTo(ccjResponseForJudgement.getCcjPaymentPaidSomeOption());
-            assertThat(caseData.getTotalClaimAmount()).isEqualTo(ccjResponseForJudgement.getCcjJudgmentAmountClaimAmount());
+            assertThat(caseData.getTotalClaimAmount().setScale(2)).isEqualTo(ccjResponseForJudgement.getCcjJudgmentAmountClaimAmount());
         }
 
         private CaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {
@@ -564,11 +572,13 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                             .type(Party.Type.INDIVIDUAL)
                             .partyName("CLAIMANT_NAME")
                             .build())
+                    .nextDeadline(LocalDate.now())
                     .build();
             given(deadlinesCalculator.getRespondentToImmediateSettlementAgreement(any())).willReturn(LocalDateTime.MAX);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedCaseData = getCaseData(response);
+            assertThat(updatedCaseData.getRespondent1RespondToSettlementAgreementDeadline()).isNotNull();
             assertThat(updatedCaseData.getRespondent1RespondToSettlementAgreementDeadline()).isNotNull();
         }
 
@@ -621,10 +631,36 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
+            AboutToStartOrSubmitCallbackResponse response;
+            try (MockedStatic<LocalDateTime> mock = mockStatic(LocalDateTime.class, CALLS_REAL_METHODS)) {
+                mock.when(LocalDateTime::now).thenReturn(now);
+                response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            }
             CaseData updatedCaseData = getCaseData(response);
             assertThat(updatedCaseData.getActiveJudgment()).isNotNull();
             assertThat(updatedCaseData.getJoIsLiveJudgmentExists()).isEqualTo(YES);
+            assertThat(updatedCaseData.getJoJudgementByAdmissionIssueDate()).isEqualTo(now);
+        }
+
+        @Test
+        void shouldUpdateLanguagePreferenceWhenWelshDocsSelected() {
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder()
+                .applicant1ResponseDate(LocalDateTime.now())
+                .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
+                .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("DEFENDANT_NAME").build())
+                .respondent1Represented(NO)
+                .specRespondent1Represented(NO)
+                .applicant1Represented(NO)
+                .applicant1DQ(Applicant1DQ.builder().applicant1DQLanguage(WelshLanguageRequirements.builder().documents(
+                    Language.WELSH).build()).build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedCaseData = getCaseData(response);
+            assertThat(updatedCaseData.getClaimantBilingualLanguagePreference()).isEqualTo("WELSH");
         }
     }
 

@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.dashboard.entities.TaskListEntity;
 import uk.gov.hmcts.reform.dashboard.repositories.TaskItemTemplateRepository;
 import uk.gov.hmcts.reform.dashboard.repositories.TaskListRepository;
 
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -170,12 +171,86 @@ class TaskListServiceTest {
             .thenReturn(tasks);
 
         //when
-        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole("123", "Claimant", null);
+        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole("123", "Claimant");
 
         //then
         verify(taskListRepository).findByReferenceAndTaskItemTemplateRoleAndCurrentStatusNotIn(
             "123", "Claimant",
             List.of(TaskStatus.AVAILABLE.getPlaceValue(), TaskStatus.DONE.getPlaceValue(), TaskStatus.NOT_AVAILABLE_YET.getPlaceValue())
+        );
+
+        verify(taskListRepository, atLeast(4)).save(ArgumentMatchers.argThat(
+            a -> {
+                Assertions.assertEquals(
+                    a.getCurrentStatus(),
+                    TaskStatus.INACTIVE.getPlaceValue()
+                );
+                Assertions.assertEquals(
+                    a.getNextStatus(),
+                    TaskStatus.INACTIVE.getPlaceValue()
+                );
+                Assertions.assertTrue(StringUtils.isBlank(a.getHintTextCy()));
+                Assertions.assertTrue(StringUtils.isBlank(a.getHintTextEn()));
+                Assertions.assertEquals("Link name", a.getTaskNameEn());
+                Assertions.assertEquals("Link name Welsh", a.getTaskNameCy());
+                return true;
+            }
+        ));
+    }
+
+    @Test
+    void shouldMakeProgressAbleTaskListInactiveExcludingTemplate_whenTaskListIsPresent() {
+
+        //given
+        List<TaskListEntity> tasks = new ArrayList<>();
+        tasks.add(getTaskListEntity(UUID.randomUUID()).toBuilder()
+                      .taskNameEn("<a href=\"somewhere\">Link name</A >")
+                      .taskNameCy("<A  href=\"somewhere\">Link name Welsh</A>")
+                      .currentStatus(TaskStatus.NOT_AVAILABLE_YET.getPlaceValue())
+                      .build());
+        tasks.add(getTaskListEntity(UUID.randomUUID()).toBuilder()
+                      .currentStatus(TaskStatus.INACTIVE.getPlaceValue())
+                      .taskNameEn("<a href=\"somewhere\">Link name</A >")
+                      .taskNameCy("<A  href=\"somewhere\">Link name Welsh</A>").build());
+        tasks.add(getTaskListEntity(UUID.randomUUID()).toBuilder()
+                      .currentStatus(TaskStatus.AVAILABLE.getPlaceValue())
+                      .taskNameEn("<a href=\"somewhere\">Link name</A >")
+                      .taskNameCy("<A  href=\"somewhere\">Link name Welsh</A>").build());
+        tasks.add(getTaskListEntity(UUID.randomUUID()).toBuilder()
+                      .currentStatus(TaskStatus.OPTIONAL.getPlaceValue())
+                      .taskNameEn("<a href=\"somewhere\">Link name</A >")
+                      .taskNameCy("<A  href=\"somewhere\">Link name Welsh</A>").build());
+        tasks.add(getTaskListEntity(UUID.randomUUID()).toBuilder()
+                      .currentStatus(TaskStatus.ACTION_NEEDED.getPlaceValue())
+                      .taskNameEn("<a href=\"somewhere\">Link name</A >")
+                      .taskNameCy("<A  href=\"somewhere\">Link name Welsh</A>")
+                      .build());
+        tasks.add(getTaskListEntity(UUID.randomUUID()).toBuilder()
+                      .currentStatus(TaskStatus.IN_PROGRESS.getPlaceValue())
+                      .taskNameEn("<a href=\"somewhere\">Link name</A >")
+                      .taskNameCy("<A  href=\"somewhere\">Link name Welsh</A>")
+                      .build());
+        tasks.add(getTaskListEntity(UUID.randomUUID()).toBuilder()
+                      .currentStatus(TaskStatus.DONE.getPlaceValue())
+                      .taskNameEn("<a href=\"somewhere\">Link name</A >")
+                      .taskNameCy("<A  href=\"somewhere\">Link name Welsh</A>")
+                      .build());
+
+        when(taskListRepository.findByReferenceAndTaskItemTemplateRoleAndCurrentStatusNotInAndTaskItemTemplateTemplateNameNot(
+            "123", "Claimant",
+            List.of(TaskStatus.AVAILABLE.getPlaceValue(), TaskStatus.DONE.getPlaceValue(), TaskStatus.NOT_AVAILABLE_YET.getPlaceValue()),
+            "Template"
+        ))
+            .thenReturn(tasks);
+
+        //when
+        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate("123", "Claimant", "Template");
+
+        //then
+        verify(taskListRepository).findByReferenceAndTaskItemTemplateRoleAndCurrentStatusNotInAndTaskItemTemplateTemplateNameNot(
+            "123", "Claimant",
+            List.of(TaskStatus.AVAILABLE.getPlaceValue(), TaskStatus.DONE.getPlaceValue(), TaskStatus.NOT_AVAILABLE_YET.getPlaceValue()),
+            "Template"
         );
 
         verify(taskListRepository, atLeast(4)).save(ArgumentMatchers.argThat(
@@ -259,7 +334,7 @@ class TaskListServiceTest {
             .thenReturn(categories);
 
         //when
-        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole("123", "Claimant", "CategoryEn");
+        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory("123", "Claimant", "CategoryEn");
 
         //then
         verify(taskItemTemplateRepository).findByCategoryEnAndRole(
@@ -288,6 +363,48 @@ class TaskListServiceTest {
                 return true;
             }
         ));
+    }
+
+    @Test
+    public void shouldDeleteWhenThereWereDuplicateEntriesInTheRepository() {
+        TaskListEntity task = getTaskListEntity(UUID.randomUUID()).toBuilder()
+            .currentStatus(TaskStatus.AVAILABLE.getPlaceValue())
+            .taskNameEn("<a href=\"somewhere\">Link name</A >")
+            .taskNameCy("<A  href=\"somewhere\">Link name Welsh</A>")
+            .createdAt(OffsetDateTime.MAX)
+            .build();
+
+        TaskListEntity task2 = getTaskListEntity(UUID.randomUUID()).toBuilder()
+            .taskNameEn("<a href=\"somewhere\">Link name</A >")
+            .taskNameCy("<A  href=\"somewhere\">Link name Welsh</A>")
+            .currentStatus(TaskStatus.NOT_AVAILABLE_YET.getPlaceValue())
+            .createdAt(OffsetDateTime.MIN.plusDays(99L))
+            .build();
+
+        TaskListEntity task3 = getTaskListEntity(UUID.randomUUID()).toBuilder()
+            .currentStatus(TaskStatus.INACTIVE.getPlaceValue())
+            .taskNameEn("<a href=\"somewhere\">Link name</A >")
+            .taskNameCy("<A  href=\"somewhere\">Link name Welsh</A>")
+            .createdAt(OffsetDateTime.MIN.plusDays(20L))
+            .build();
+
+        List<TaskListEntity> tasks = new ArrayList<>();
+        tasks.add(task);
+        tasks.add(task2);
+        tasks.add(task3);
+
+        when(taskListRepository
+            .findByReferenceAndTaskItemTemplateRoleAndTaskItemTemplateTemplateName(
+                any(),
+                any(),
+                any()
+            )).thenReturn(tasks);
+
+        taskListService.saveOrUpdate(task);
+
+        verify(taskListRepository).deleteById(task2.getId());
+        verify(taskListRepository).deleteById(task3.getId());
+        verify(taskListRepository).save(task);
     }
 
 }

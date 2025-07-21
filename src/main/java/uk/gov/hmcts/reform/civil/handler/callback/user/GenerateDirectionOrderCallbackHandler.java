@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums;
 import uk.gov.hmcts.reform.civil.enums.finalorders.HearingLengthFinalOrderList;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -33,6 +34,8 @@ import uk.gov.hmcts.reform.civil.model.finalorders.DatesFinalOrders;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderAppeal;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderFurtherHearing;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderRepresentation;
+import uk.gov.hmcts.reform.civil.model.finalorders.OrderAfterHearingDate;
+import uk.gov.hmcts.reform.civil.model.finalorders.OrderAfterHearingDateType;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMade;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMadeOnDetails;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMadeOnDetailsOrderWithoutNotice;
@@ -90,6 +93,9 @@ import static uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums.SUBJECT_DETA
 import static uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderRepresentationList.CLAIMANT_AND_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderToggle.SHOW;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
+import static uk.gov.hmcts.reform.civil.model.finalorders.OrderAfterHearingDateType.DATE_RANGE;
+import static uk.gov.hmcts.reform.civil.model.finalorders.OrderAfterHearingDateType.SINGLE_DATE;
+import static uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.JudgeOrderDownloadGenerator.BLANK_TEMPLATE_TO_BE_USED_AFTER_A_HEARING;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
@@ -141,6 +147,10 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         + " Standard Direction Order (SDO) otherwise use Not suitable for SDO.";
     public static final String NOT_ALLOWED_FOR_TRACK = "The Make an order event is not available for Small Claims and Fast Track cases until the track has"
         + " been allocated. You must use the Standard Direction Order (SDO) to proceed.";
+    public static final String FUTURE_SINGLE_DATE_ERROR = "The date in Order made may not be later than the established date";
+    public static final String FUTURE_DATE_FROM_ERROR = "The date in Order made 'Date from' may not be later than the established date";
+    public static final String FUTURE_DATE_TO_ERROR = "The date in Order made 'Date to' may not be later than the established date";
+    public static final String DATE_FROM_AFTER_DATE_TO_ERROR = "The date in Order made 'Date from' may not be later than the 'Date to'";
     private String defendantTwoPartyName;
     private String claimantTwoPartyName;
     public static final String APPEAL_NOTICE_DATE = "Appeal notice date";
@@ -163,6 +173,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
             callbackKey(MID, "populate-form-values"), this::populateFormValues,
             callbackKey(MID, "create-download-template-document"), this::generateTemplate,
             callbackKey(MID, "validate-and-generate-document"), this::validateFormAndGeneratePreviewDocument,
+            callbackKey(MID, "hearing-date-order"), this::addingHearingDateToTemplate,
             callbackKey(ABOUT_TO_SUBMIT), this::addGeneratedDocumentToCollection,
             callbackKey(SUBMITTED), this::buildConfirmation
         );
@@ -179,22 +190,25 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     private CallbackResponse nullPreviousSelections(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        if (featureToggleService.isMintiEnabled()
-            && isJudicialReferral(callbackParams)
+        if (isJudicialReferral(callbackParams)
             && caseData.isLipCase()) {
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(List.of(NOT_ALLOWED_FOR_CITIZEN))
                 .build();
         }
 
-        if (featureToggleService.isMintiEnabled()) {
-            if (isJudicialReferral(callbackParams) || isMultiOrIntTrack(caseData)) {
-                caseDataBuilder.allowOrderTrackAllocation(YES).finalOrderTrackToggle(null);
-            } else {
-                caseDataBuilder.allowOrderTrackAllocation(NO);
-                populateTrackToggle(caseData, caseDataBuilder);
-            }
+        if (isJudicialReferral(callbackParams) || isMultiOrIntTrack(caseData)) {
+            caseDataBuilder.allowOrderTrackAllocation(YES).finalOrderTrackToggle(null);
+        } else {
+            caseDataBuilder.allowOrderTrackAllocation(NO);
+            populateTrackToggle(caseData, caseDataBuilder);
         }
+
+        if (featureToggleService.isWelshEnabledForMainCase()
+            && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
+            caseDataBuilder.bilingualHint(YesOrNo.YES);
+        }
+
         caseDataBuilder.finalOrderFurtherHearingToggle(null);
         return nullPreviousSelections(caseDataBuilder);
     }
@@ -224,7 +238,9 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         caseDataBuilder.finalOrderTrackAllocation(null)
             .finalOrderAllocateToTrack(null)
             .finalOrderIntermediateTrackComplexityBand(null)
-            .finalOrderDownloadTemplateOptions(null);
+            .finalOrderDownloadTemplateOptions(null)
+            .orderAfterHearingDate(null)
+            .showOrderAfterHearingDatePage(null);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -234,6 +250,30 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     private CallbackResponse generateTemplate(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        if (!BLANK_TEMPLATE_TO_BE_USED_AFTER_A_HEARING.equals(caseData.getFinalOrderDownloadTemplateOptions().getValue().getLabel())) {
+            CaseDocument documentDownload = judgeOrderDownloadGenerator.generate(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
+            caseDataBuilder.finalOrderDownloadTemplateDocument(documentDownload);
+            caseDataBuilder.showOrderAfterHearingDatePage(NO);
+        } else {
+            caseDataBuilder.showOrderAfterHearingDatePage(YES);
+        }
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse addingHearingDateToTemplate(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        List<String> errors = validateOrderAfterHearingDates(caseData);
+
+        if (!errors.isEmpty()) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(errors)
+                .build();
+        }
 
         CaseDocument documentDownload = judgeOrderDownloadGenerator.generate(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
         caseDataBuilder.finalOrderDownloadTemplateDocument(documentDownload);
@@ -246,9 +286,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     private CallbackResponse assignTrackToggle(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-
-        if (featureToggleService.isMintiEnabled()
-            && caseData.getFinalOrderAllocateToTrack().equals(NO)
+        if (NO.equals(caseData.getFinalOrderAllocateToTrack())
             && isJudicialReferral(callbackParams)
             && isSmallOrFastTrack(caseData)) {
             return AboutToStartOrSubmitCallbackResponse.builder()
@@ -258,7 +296,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
 
         caseDataBuilder = populateDownloadTemplateOptions(caseDataBuilder);
 
-        if (caseData.getFinalOrderAllocateToTrack().equals(YES)) {
+        if (YES.equals(caseData.getFinalOrderAllocateToTrack())) {
             caseDataBuilder.finalOrderTrackToggle(caseData.getFinalOrderTrackAllocation().name());
         } else {
             populateTrackToggle(caseData, caseDataBuilder);
@@ -582,13 +620,22 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
 
         List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
         finalCaseDocuments.add(element(finalDocument));
-
-        if (!isEmpty(caseData.getFinalOrderDocumentCollection())) {
-            finalCaseDocuments.addAll(caseData.getFinalOrderDocumentCollection());
-        }
-
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        caseDataBuilder.finalOrderDocumentCollection(finalCaseDocuments);
+        if (featureToggleService.isWelshEnabledForMainCase()
+                && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
+            List<Element<CaseDocument>> preTranslationDocuments = caseData.getPreTranslationDocuments();
+            preTranslationDocuments.addAll(finalCaseDocuments);
+            caseDataBuilder.preTranslationDocuments(preTranslationDocuments);
+            caseDataBuilder.bilingualHint(YesOrNo.YES);
+            // Do not trigger business process when document is hidden
+        } else {
+            if (!isEmpty(caseData.getFinalOrderDocumentCollection())) {
+                finalCaseDocuments.addAll(caseData.getFinalOrderDocumentCollection());
+            }
+            caseDataBuilder.finalOrderDocumentCollection(finalCaseDocuments);
+        }
+        caseDataBuilder.businessProcess(BusinessProcess.ready(GENERATE_ORDER_NOTIFICATION));
+
         // Casefileview will show any document uploaded even without an categoryID under uncategorized section,
         // we only use freeFormOrderDocument as a preview and do not want it shown on case file view, so to prevent it
         // showing, we remove.
@@ -597,17 +644,13 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         caseDataBuilder.finalOrderDownloadTemplateDocument(null);
         caseDataBuilder.allowOrderTrackAllocation(null);
 
-        if (featureToggleService.isMintiEnabled()) {
-            if (YES.equals(caseData.getFinalOrderAllocateToTrack())) {
-                if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-                    caseDataBuilder.responseClaimTrack(caseData.getFinalOrderTrackAllocation().name());
-                } else {
-                    caseDataBuilder.allocatedTrack(caseData.getFinalOrderTrackAllocation());
-                }
+        if (YES.equals(caseData.getFinalOrderAllocateToTrack())) {
+            if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+                caseDataBuilder.responseClaimTrack(caseData.getFinalOrderTrackAllocation().name());
+            } else {
+                caseDataBuilder.allocatedTrack(caseData.getFinalOrderTrackAllocation());
             }
         }
-
-        caseDataBuilder.businessProcess(BusinessProcess.ready(GENERATE_ORDER_NOTIFICATION));
 
         if (nonNull(caseData.getFinalOrderSelection())) {
             // populate hearing notes in listing tab with hearing notes from either assisted or freeform order, if either exist.
@@ -635,8 +678,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         }
         nullPreviousSelections(caseDataBuilder);
 
-        if (featureToggleService.isCaseEventsEnabled()
-            && !JUDICIAL_REFERRAL.toString().equals(callbackParams.getRequest().getCaseDetails().getState())
+        if (!JUDICIAL_REFERRAL.toString().equals(callbackParams.getRequest().getCaseDetails().getState())
             && ((ASSISTED_ORDER.equals(caseData.getFinalOrderSelection())
             && isNull(caseData.getFinalOrderFurtherHearingToggle()))
             || FREE_FORM_ORDER.equals(caseData.getFinalOrderSelection())
@@ -690,13 +732,18 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     }
 
     private boolean isJudicialReferral(CallbackParams callbackParams) {
-        return JUDICIAL_REFERRAL.toString().equals(callbackParams.getRequest().getCaseDetails().getState())
-            && featureToggleService.isMintiEnabled();
+        return JUDICIAL_REFERRAL.toString().equals(callbackParams.getRequest().getCaseDetails().getState());
     }
 
     private void populateTrackToggle(CaseData caseData, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
         if (caseData.getCaseAccessCategory().equals(SPEC_CLAIM)) {
-            caseDataBuilder.finalOrderTrackToggle(caseData.getResponseClaimTrack());
+            if (caseData.getResponseClaimTrack() != null) {
+                caseDataBuilder.finalOrderTrackToggle(caseData.getResponseClaimTrack());
+            } else {
+                // track is null when DJ is completed, default to small/fast track journey
+                // in this scenario
+                caseDataBuilder.finalOrderTrackToggle(AllocatedTrack.SMALL_CLAIM.name());
+            }
 
         }
         if (caseData.getCaseAccessCategory().equals(UNSPEC_CLAIM)) {
@@ -751,5 +798,28 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
                 .append("_").append(judgeName);
         }
         return updatedFileName.append(".").append(ext).toString();
+    }
+
+    private List<String> validateOrderAfterHearingDates(CaseData caseData) {
+        List<String> errors = new ArrayList<>();
+        LocalDate now = LocalDate.now();
+        OrderAfterHearingDate orderAfterHearingDate = caseData.getOrderAfterHearingDate();
+        OrderAfterHearingDateType dateType = orderAfterHearingDate.getDateType();
+
+        if (dateType.equals(SINGLE_DATE) && orderAfterHearingDate.getDate().isAfter(now)) {
+            errors.add(FUTURE_SINGLE_DATE_ERROR);
+        }
+        if (dateType.equals(DATE_RANGE)) {
+            if (orderAfterHearingDate.getFromDate().isAfter(now)) {
+                errors.add(FUTURE_DATE_FROM_ERROR);
+            }
+            if (orderAfterHearingDate.getToDate().isAfter(now)) {
+                errors.add(FUTURE_DATE_TO_ERROR);
+            }
+            if (orderAfterHearingDate.getFromDate().isAfter(orderAfterHearingDate.getToDate())) {
+                errors.add(DATE_FROM_AFTER_DATE_TO_ERROR);
+            }
+        }
+        return errors;
     }
 }

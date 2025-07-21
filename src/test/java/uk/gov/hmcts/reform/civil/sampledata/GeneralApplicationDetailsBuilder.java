@@ -341,7 +341,7 @@ public class GeneralApplicationDetailsBuilder {
         return caseDataBuilder.build();
     }
 
-    public CaseData getTestCaseDataWithLocationDetails(CaseData caseData,
+    public CaseData getTestCaseDataWithLocationDetailsLip(CaseData caseData,
                                                boolean withGADetails,
                                                boolean withGADetailsResp,
                                                boolean withGADetailsResp2, boolean withGADetailsMaster,
@@ -350,6 +350,7 @@ public class GeneralApplicationDetailsBuilder {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.caseManagementLocation(CaseLocationCivil.builder().baseLocation("000000")
                                                    .region("2").build());
+        caseDataBuilder.respondent1Represented(NO);
         caseDataBuilder.ccdCaseReference(1L);
         if (!Collections.isEmpty(applicationIdStatus)) {
             List<GeneralApplication> genApps = new ArrayList<>();
@@ -486,6 +487,7 @@ public class GeneralApplicationDetailsBuilder {
         return caseData.toBuilder()
             .ccdCaseReference(1234L)
             .caseAccessCategory(SPEC_CLAIM)
+            .claimDismissedDeadline(LocalDateTime.now().plusMonths(6))
             .solicitorReferences(SolicitorReferences.builder().applicantSolicitor1Reference("AppSol1Ref").respondentSolicitor1Reference("RespSol1ref").build())
             .responseClaimTrack("MULTI_CLAIM")
             .respondent2OrganisationPolicy(OrganisationPolicy.builder()
@@ -909,6 +911,7 @@ public class GeneralApplicationDetailsBuilder {
         return CaseData.builder()
             .ccdCaseReference(1234L)
             .caseAccessCategory(claimType)
+            .submittedDate(LocalDateTime.of(2025, 5, 5, 0, 0, 0))
             .courtLocation(CourtLocation.builder()
                                .caseLocation(CaseLocationCivil.builder()
                                                  .region("2")

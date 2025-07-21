@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.model.docmosis.lip.LipFormParty;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
+import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -28,6 +29,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
+import static uk.gov.hmcts.reform.civil.utils.DateUtils.formatDateInWelsh;
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getApplicant;
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getApplicantSolicitorRef;
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getOrgDetails;
@@ -43,6 +45,7 @@ public class JudgmentByAdmissionOrDeterminationMapper {
     private final JudgementService judgementService;
     private final OrganisationService organisationService;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMMM yyyy 'at' h:mma");
+    private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy");
 
     public JudgmentByAdmissionOrDetermination toClaimantResponseForm(CaseData caseData, CaseEvent caseEvent) {
         Optional<CaseDataLiP> caseDataLip = Optional.ofNullable(caseData.getCaseDataLiP());
@@ -87,7 +90,7 @@ public class JudgmentByAdmissionOrDeterminationMapper {
             .repaymentPlan(addRepaymentPlan(caseData))
             .ccjJudgmentAmount(judgementService.ccjJudgmentClaimAmount(caseData).setScale(2).toString())
             .ccjInterestToDate(totalInterest)
-            .claimFee(getClaimFee(caseData))
+            .claimFee(getClaimFee(caseData).toString())
             .ccjSubtotal(judgementService.ccjJudgementSubTotal(caseData).setScale(2).toString())
             .ccjAlreadyPaidAmount(getAlreadyPaidAmount(caseData))
             .ccjFinalTotal(judgementService.ccjJudgmentFinalTotal(caseData).setScale(2).toString())
@@ -97,12 +100,12 @@ public class JudgmentByAdmissionOrDeterminationMapper {
             .build();
     }
 
-    private String getClaimFee(CaseData caseData) {
+    private BigDecimal getClaimFee(CaseData caseData) {
         BigDecimal claimFee = judgementService.ccjJudgmentClaimFee(caseData);
         if (BigDecimal.ZERO.compareTo(claimFee) == 0) {
-            return BigDecimal.ZERO.toString();
+            return BigDecimal.ZERO;
         }
-        return claimFee.setScale(2).toString();
+        return claimFee.setScale(2);
     }
 
     private String getAlreadyPaidAmount(CaseData caseData) {
@@ -227,13 +230,43 @@ public class JudgmentByAdmissionOrDeterminationMapper {
                                     ? getRepaymentFrequency(caseData.getRespondent1RepaymentPlan().getRepaymentFrequency()) : null)
             .repaymentDate(caseData.isPayByInstallment()
                                ? DateFormatHelper.formatLocalDate(caseData.getRespondent1RepaymentPlan().getFirstRepaymentDate(), DateFormatHelper.DATE) : null)
-            .installmentAmount(caseData.isPayByInstallment() ? String.valueOf(caseData.getRespondent1RepaymentPlan().getPaymentAmount().setScale(2)) : null)
+            .installmentAmount(caseData.isPayByInstallment()
+                                   ? String.valueOf(MonetaryConversions.penniesToPounds(caseData.getRespondent1RepaymentPlan().getPaymentAmount()))
+                                   : null)
             .ccjJudgmentAmount(judgementService.ccjJudgmentClaimAmount(caseData).setScale(2).toString())
             .ccjInterestToDate(totalInterest)
-            .claimFee(getClaimFee(caseData))
+            .claimFee(getClaimCosts(caseData))
             .ccjSubtotal(judgementService.ccjJudgementSubTotal(caseData).setScale(2).toString())
             .ccjFinalTotal(judgementService.ccjJudgmentFinalTotal(caseData).setScale(2).toString())
             .build();
+    }
+
+    public JudgmentByAdmissionOrDetermination toNonDivergentWelshDocs(CaseData caseData, JudgmentByAdmissionOrDetermination builder) {
+        return builder.toBuilder()
+            .welshDate(formatDateInWelsh(LocalDate.now(), false))
+            .welshPayByDate(getWelshPayByDate(caseData))
+            .welshRepaymentDate(getWelshRepaymentDate(caseData))
+            .welshRepaymentFrequency(caseData.isPayByInstallment()
+                                         ? getRepaymentFrequencyInWelsh(caseData.getRespondent1RepaymentPlan().getRepaymentFrequency()) : null)
+            .welshPaymentStr(caseData.isPayByInstallment() ? getRepaymentWelshString(caseData.getRespondent1RepaymentPlan().getRepaymentFrequency()) : null)
+            .build();
+    }
+
+    private String getWelshPayByDate(CaseData caseData) {
+        return caseData.getRespondToClaimAdmitPartLRspec() != null
+            ? formatDateInWelsh(LocalDate.parse(
+            DateFormatHelper.formatLocalDate(
+                caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid(),
+                DateFormatHelper.DATE
+            ), dateTimeFormatter), false) : null;
+    }
+
+    private String getWelshRepaymentDate(CaseData caseData) {
+        return caseData.isPayByInstallment()
+            ? formatDateInWelsh(LocalDate.parse(DateFormatHelper.formatLocalDate(
+            caseData.getRespondent1RepaymentPlan().getFirstRepaymentDate(),
+            DateFormatHelper.DATE
+        ), dateTimeFormatter), false) : null;
     }
 
     private String getRepaymentString(PaymentFrequencyLRspec repaymentFrequency) {
@@ -245,11 +278,29 @@ public class JudgmentByAdmissionOrDeterminationMapper {
         }
     }
 
+    private String getRepaymentWelshString(PaymentFrequencyLRspec repaymentFrequency) {
+        switch (repaymentFrequency) {
+            case ONCE_ONE_WEEK : return "pob mis";
+            case ONCE_ONE_MONTH: return "pob mis";
+            case ONCE_TWO_WEEKS: return "pob 2 wythnos";
+            default: return null;
+        }
+    }
+
     private String getRepaymentFrequency(PaymentFrequencyLRspec repaymentFrequency) {
         switch (repaymentFrequency) {
             case ONCE_ONE_WEEK : return "per week";
             case ONCE_ONE_MONTH: return "per month";
             case ONCE_TWO_WEEKS: return "every 2 weeks";
+            default: return null;
+        }
+    }
+
+    private String getRepaymentFrequencyInWelsh(PaymentFrequencyLRspec repaymentFrequency) {
+        switch (repaymentFrequency) {
+            case ONCE_ONE_WEEK : return "yr wythnos";
+            case ONCE_ONE_MONTH: return "y mis";
+            case ONCE_TWO_WEEKS: return "bob pythefnos";
             default: return null;
         }
     }
@@ -264,5 +315,12 @@ public class JudgmentByAdmissionOrDeterminationMapper {
             return "SET_DATE";
         }
         return null;
+    }
+
+    private String getClaimCosts(CaseData caseData) {
+        return (judgementService.isLRAdmissionRepaymentPlan(caseData)
+               || judgementService.isLrPayImmediatelyPlan(caseData))
+            ? (getClaimFee(caseData).add(judgementService.ccjJudgmentFixedCost(caseData))).toString()
+            : getClaimFee(caseData).toString();
     }
 }

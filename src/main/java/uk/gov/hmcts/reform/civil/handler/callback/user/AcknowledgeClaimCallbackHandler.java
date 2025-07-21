@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.setapplicantresponsedeadlinespec.SetApplicantResponseDeadlineSpec;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
@@ -27,6 +26,7 @@ import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -158,8 +158,9 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse validateDateOfBirth(CallbackParams callbackParams) {
-        Party respondent = callbackParams.getCaseData().getRespondent1();
-        List<String> errors = dateOfBirthValidator.validate(respondent);
+        List<String> errors = new ArrayList<>();
+        ofNullable(callbackParams.getCaseData().getRespondent1())
+            .ifPresent(party -> errors.addAll(dateOfBirthValidator.validate(party)));
         ofNullable(callbackParams.getCaseData().getRespondent2())
             .ifPresent(party -> errors.addAll(dateOfBirthValidator.validate(party)));
         return AboutToStartOrSubmitCallbackResponse.builder()

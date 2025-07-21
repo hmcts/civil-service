@@ -8,8 +8,11 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.service.docmosis.dq.DirectionsQuestionnaireGenerator;
@@ -18,6 +21,7 @@ import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import java.util.ArrayList;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -35,6 +39,9 @@ class DirectionsQuestionnairePreparerTest {
 
     @Mock
     private AssignCategoryId assignCategoryId;
+
+    @Mock
+    private FeatureToggleService featureToggleService;
 
     @InjectMocks
     private DirectionsQuestionnairePreparer preparer;
@@ -63,6 +70,60 @@ class DirectionsQuestionnairePreparerTest {
         verify(directionsQuestionnaireGenerator).generate(any(CaseData.class), eq(userToken));
         verify(assignCategoryId).copyCaseDocumentWithCategoryId(any(CaseDocument.class), eq(""));
         assertEquals(1, result.getSystemGeneratedCaseDocuments().size());
+    }
+
+    @Test
+    void shouldPrepareDirectionsQuestionnaire_singleResponse_ClaimantDqPreTranslation() {
+        // Given
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
+        CaseData caseData = CaseData.builder()
+            .ccdState(CaseState.AWAITING_APPLICANT_INTENTION)
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+            .applicant1Represented(YES)
+            .respondent1Represented(NO)
+            .caseDataLiP(CaseDataLiP.builder()
+                             .respondent1LiPResponse(RespondentLiPResponse.builder()
+                                                         .respondent1ResponseLanguage("WELSH")
+                                                         .build())
+                             .build())
+            .build();
+        String userToken = "userToken";
+
+        CaseDocument caseDocument = CaseDocument.builder().documentName("directionsQuestionnaire").build();
+        when(directionsQuestionnaireGenerator.generate(any(CaseData.class), eq(userToken)))
+            .thenReturn(caseDocument);
+
+        // When
+        CaseData result = preparer.prepareDirectionsQuestionnaire(caseData, userToken);
+
+        // Then
+        verify(directionsQuestionnaireGenerator).generate(any(CaseData.class), eq(userToken));
+        assertEquals(1, result.getPreTranslationDocuments().size());
+    }
+
+    @Test
+    void shouldPrepareDirectionsQuestionnaire_singleResponseForWelshLip() {
+        // Given
+        CaseData caseData = CaseData.builder()
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+            .ccdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT)
+            .claimantBilingualLanguagePreference("BOTH")
+            .specRespondent1Represented(YES)
+            .applicant1Represented(NO)
+            .build();
+        String userToken = "userToken";
+
+        CaseDocument caseDocument = CaseDocument.builder().documentName("directionsQuestionnaire").build();
+        when(directionsQuestionnaireGenerator.generate(any(CaseData.class), eq(userToken)))
+            .thenReturn(caseDocument);
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
+        // When
+        CaseData result = preparer.prepareDirectionsQuestionnaire(caseData, userToken);
+
+        // Then
+        verify(directionsQuestionnaireGenerator).generate(any(CaseData.class), eq(userToken));
+        verify(assignCategoryId).copyCaseDocumentWithCategoryId(any(CaseDocument.class), eq(""));
+        assertThat(result.getRespondent1OriginalDqDoc()).isNotNull();
     }
 
     @Test

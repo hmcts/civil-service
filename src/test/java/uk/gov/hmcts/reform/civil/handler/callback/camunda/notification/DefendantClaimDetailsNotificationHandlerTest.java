@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -16,13 +17,16 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -39,11 +43,22 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOL
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIM_DETAILS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.DefendantClaimDetailsNotificationHandler.TASK_ID_EMAIL_APP_SOL_CC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.DefendantClaimDetailsNotificationHandler.TASK_ID_EMAIL_FIRST_SOL;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CNBC_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT_WELSH;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.OPENING_HOURS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PHONE_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONSE_DEADLINE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONSE_DEADLINE_PLUS_28;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.SPEC_UNSPEC_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_HMCTS_SIGNATURE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_OPENING_HOURS;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_PHONE_CONTACT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
@@ -62,6 +77,12 @@ class DefendantClaimDetailsNotificationHandlerTest extends BaseCallbackHandlerTe
 
     @InjectMocks
     private DefendantClaimDetailsNotificationHandler handler;
+
+    @Mock
+    private FeatureToggleService featureToggleService;
+
+    @Mock
+    private NotificationsSignatureConfiguration configuration;
 
     @Mock
     private DeadlinesCalculator deadlinesCalculator;
@@ -87,6 +108,16 @@ class DefendantClaimDetailsNotificationHandlerTest extends BaseCallbackHandlerTe
             given(toggleConfiguration.getFeatureToggle()).willReturn("WA 4");
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getHmctsSignature()).thenReturn((String) configMap.get("hmctsSignature"));
+            when(configuration.getPhoneContact()).thenReturn((String) configMap.get("phoneContact"));
+            when(configuration.getOpeningHours()).thenReturn((String) configMap.get("openingHours"));
+            when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("welshHmctsSignature"));
+            when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("welshPhoneContact"));
+            when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
+            when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
+            when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
         }
 
         @Test
@@ -124,18 +155,6 @@ class DefendantClaimDetailsNotificationHandlerTest extends BaseCallbackHandlerTe
                 templateId,
                 getNotificationDataMap(caseData),
                 REFERENCE
-            );
-        }
-
-        private Map<String, String> getNotificationDataMap(CaseData caseData) {
-            return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
-                RESPONSE_DEADLINE, formatLocalDate(caseData.getClaimDetailsNotificationDeadline().toLocalDate(), DATE),
-                RESPONSE_DEADLINE_PLUS_28, formatLocalDate(
-                    deadlinesCalculator.plus14DaysDeadline(caseData.getRespondent1ResponseDeadline())
-                         .toLocalDate(), DATE),
-                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
-                CLAIM_LEGAL_ORG_NAME_SPEC, "org name"
             );
         }
 
@@ -214,6 +233,7 @@ class DefendantClaimDetailsNotificationHandlerTest extends BaseCallbackHandlerTe
         @Test
         void shouldNotNotifyRespondentSolicitor_when1v2SSRecipient1IsNull() {
             when(deadlinesCalculator.plus14DaysDeadline(any())).thenReturn(responseDeadline);
+
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
                 .respondentSolicitor1EmailAddress(null)
@@ -232,6 +252,7 @@ class DefendantClaimDetailsNotificationHandlerTest extends BaseCallbackHandlerTe
         @Test
         void shouldNotNotifyApplicantSolicitor_ApplicantRecipient1IsNull() {
             when(deadlinesCalculator.plus14DaysDeadline(any())).thenReturn(responseDeadline);
+
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
                 .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(null).build())
@@ -249,6 +270,7 @@ class DefendantClaimDetailsNotificationHandlerTest extends BaseCallbackHandlerTe
 
         @Test
         void shouldNotNotifyRespondentSolicitor_1v2DSRecipient1IsNull() {
+
             when(deadlinesCalculator.plus14DaysDeadline(any())).thenReturn(responseDeadline);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
@@ -263,6 +285,37 @@ class DefendantClaimDetailsNotificationHandlerTest extends BaseCallbackHandlerTe
 
             handler.handle(params);
             assertThatNoException();
+        }
+
+        @NotNull
+        private Map<String, String> getNotificationDataMap(CaseData caseData) {
+            Map<String, String> properties = new HashMap<>(addCommonProperties());
+
+            properties.put(CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString());
+            properties.put(RESPONSE_DEADLINE, formatLocalDate(caseData.getClaimDetailsNotificationDeadline().toLocalDate(), DATE));
+            properties.put(RESPONSE_DEADLINE_PLUS_28, formatLocalDate(
+                deadlinesCalculator.plus14DaysDeadline(caseData.getRespondent1ResponseDeadline()).toLocalDate(), DATE));
+            properties.put(PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData));
+            properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, "org name");
+            properties.put(CASEMAN_REF, "000DC001");
+
+            return properties;
+        }
+
+        @NotNull
+        public Map<String, String> addCommonProperties() {
+            Map<String, String> expectedProperties = new HashMap<>();
+            expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
+            expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
+            expectedProperties.put(HMCTS_SIGNATURE, configuration.getHmctsSignature());
+            expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
+            expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
+            expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
+            expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
+            expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getRaiseQueryLr());
+            expectedProperties.put(CNBC_CONTACT, configuration.getRaiseQueryLr());
+            return expectedProperties;
         }
 
     }

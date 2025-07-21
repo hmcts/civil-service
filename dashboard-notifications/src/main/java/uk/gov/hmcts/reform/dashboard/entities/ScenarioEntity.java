@@ -1,23 +1,25 @@
 package uk.gov.hmcts.reform.dashboard.entities;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.Type;
 
+import java.io.Serializable;
+import java.time.OffsetDateTime;
+import java.util.Map;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
-import java.io.Serializable;
-import java.time.OffsetDateTime;
-import java.util.Map;
 
 @lombok.Data
 @lombok.Builder(toBuilder = true)
 @lombok.NoArgsConstructor
 @lombok.AllArgsConstructor
 @Entity
+@Immutable
 @Table(name = "scenario", schema = "dbs")
 public class ScenarioEntity implements Serializable {
 

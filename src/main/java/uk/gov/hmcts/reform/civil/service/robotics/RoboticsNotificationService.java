@@ -86,7 +86,6 @@ public class RoboticsNotificationService {
                 triggerEvent = findLatestEventTriggerReasonSpec(roboticsCaseDataDTO.getEvents());
             } else {
                 triggerEvent = findLatestEventTriggerReason(roboticsCaseDataDTO.getEvents());
-                log.info(String.format("triggerEvent %s", triggerEvent));
             }
             return Optional.of(EmailData.builder()
                                    .message(getMessage(params.getCaseData(), params.isMultiParty()))
@@ -197,6 +196,11 @@ public class RoboticsNotificationService {
             subject = String.format("Multiparty LR v LR Case Data for %s - %s - %s",
                                     caseData.getLegacyCaseReference(),
                                     caseData.getCcdState(), triggerEvent
+            );
+        } else if (nonNull(caseData.getPaymentTypeSelection()) && caseData.isLipvLROneVOne()) {
+            subject = String.format(
+                "LIP v LR Default Judgment Case Data for %s",
+                caseData.getLegacyCaseReference()
             );
         } else if (caseData.isLipvLROneVOne()) {
             subject = String.format(

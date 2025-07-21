@@ -21,7 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.RequestAHearingCallbackHandler.LISTING_REQUESTED;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.RequestAHearingCallbackHandler.LISTING_REQUESTED_TASKS;
 
@@ -44,7 +43,6 @@ class RequestAHearingCallbackHandlerTest extends BaseCallbackHandlerTest {
     void shouldPopulateIntermediateList_whenInvoked() {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .allocatedTrack(AllocatedTrack.INTERMEDIATE_CLAIM)
-            .requestAnotherHearing(YES)
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -58,7 +56,6 @@ class RequestAHearingCallbackHandlerTest extends BaseCallbackHandlerTest {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .caseAccessCategory(CaseCategory.SPEC_CLAIM)
             .responseClaimTrack("MULTI_CLAIM")
-            .requestAnotherHearing(YES)
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -70,7 +67,6 @@ class RequestAHearingCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void shouldClearData_whenInvoked() {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .requestAnotherHearing(YES)
             .allocatedTrack(AllocatedTrack.MULTI_CLAIM)
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);

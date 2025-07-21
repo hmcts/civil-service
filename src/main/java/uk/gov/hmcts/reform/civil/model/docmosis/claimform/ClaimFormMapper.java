@@ -28,6 +28,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE;
+import static uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils.formatCcdCaseReference;
 
 @Component
 @RequiredArgsConstructor
@@ -84,6 +85,7 @@ public class ClaimFormMapper {
             ))
             .generationDate(LocalDateTime.now())
             .claimIssuedDate(caseData.getIssueDate())
+            .ccdCaseReference(formatCcdCaseReference(caseData))
             .claimNumber(caseData.getLegacyCaseReference())
             .flightDelayDetails(getFlightDelayDetails(caseData))
             .evidenceList(Optional.ofNullable(caseData.getSpeclistYourEvidenceList())
@@ -92,6 +94,7 @@ public class ClaimFormMapper {
                                   .map(EvidenceTemplateData::toEvidenceTemplateData)
                                   .toList())
                               .orElse(Collections.emptyList()))
+            .uiStatementOfTruth(caseData.getUiStatementOfTruth())
             .build();
     }
 
@@ -105,8 +108,8 @@ public class ClaimFormMapper {
     @Nullable
     private static LocalDate getInterestFromDate(CaseData caseData) {
         return Optional.ofNullable(caseData.getInterestFromSpecificDate())
-            .orElse(Optional.ofNullable(caseData.getIssueDate())
-                .orElse(null));
+            .orElse(Optional.ofNullable(caseData.getSubmittedDate())
+                        .map(LocalDateTime::toLocalDate).orElse(null));
     }
 
     @Nullable

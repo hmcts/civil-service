@@ -7,10 +7,12 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.enums.sendandreply.RolePool;
+import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -19,6 +21,7 @@ import uk.gov.hmcts.reform.civil.model.sendandreply.MessageReply;
 import uk.gov.hmcts.reform.civil.model.sendandreply.SendMessageMetadata;
 import uk.gov.hmcts.reform.civil.ras.model.RoleAssignmentResponse;
 import uk.gov.hmcts.reform.civil.ras.model.RoleAssignmentServiceResponse;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDateTime;
@@ -28,6 +31,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -66,6 +70,35 @@ class SendAndReplyMessageServiceTest {
 
     private Message message;
 
+    private static final List<String> SUPPORTED_ROLES = List.of(
+        "ctsc-team-leader",
+        "ctsc",
+        "hearing-centre-team-leader",
+        "hearing-centre-admin",
+        "senior-tribunal-caseworker",
+        "tribunal-caseworker",
+        "nbc-team-leader",
+        "national-business-centre",
+        "circuit-judge",
+        "district-judge",
+        "judge"
+    );
+
+    private static final List<String> SUPPORTED_ROLES_WITH_TOGGLE_ON = List.of(
+        "wlu-admin",
+        "ctsc-team-leader",
+        "ctsc",
+        "hearing-centre-team-leader",
+        "hearing-centre-admin",
+        "senior-tribunal-caseworker",
+        "tribunal-caseworker",
+        "nbc-team-leader",
+        "national-business-centre",
+        "circuit-judge",
+        "district-judge",
+        "judge"
+    );
+
     @Mock
     private UserService userService;
 
@@ -78,15 +111,21 @@ class SendAndReplyMessageServiceTest {
     @Mock
     private Time time;
 
+    @Mock
+    private FeatureToggleService featureToggleService;
+
     private LocalDateTime updatedDateTime = LocalDateTime.of(2024, 1, 1, 0, 0, 0);
 
     @InjectMocks
     private SendAndReplyMessageService messageService;
 
+    private CaseData caseData;
+
     @BeforeEach
     void setupTest() {
         when(time.now()).thenReturn(NOW);
         when(tableMarkupService.buildTableMarkUp(any())).thenReturn("<div>Some markup</div>");
+        caseData = CaseDataBuilder.builder().build();
 
         message = Message.builder()
             .updatedTime(updatedDateTime)
@@ -99,13 +138,40 @@ class SendAndReplyMessageServiceTest {
 
     @Nested
     class AddMessage {
+
+        @ParameterizedTest
+        @ValueSource(booleans = {true, false})
+        void shouldAddOrNotAddWlu_SupportedRoleMap_toggleCondition(boolean toggle) {
+            when(featureToggleService.isPublicQueryManagementEnabled(caseData)).thenReturn(toggle);
+            Map<String, RolePool> supportedRolesMap = messageService.buildSupportedRolesMap(caseData);
+
+            if (toggle) {
+                assertThat(supportedRolesMap).containsEntry("wlu-admin", RolePool.WLU_ADMIN);
+            } else {
+                assertThat(supportedRolesMap).doesNotContainKey("wlu-admin");
+            }
+        }
+
+        @ParameterizedTest
+        @ValueSource(booleans = {true, false})
+        void shouldAddOrNotAddWlu_SupportedRoleList_toggleCondition(boolean toggle) {
+            when(featureToggleService.isPublicQueryManagementEnabled(caseData)).thenReturn(toggle);
+            List<String> supportedRoleList = messageService.buildSupportedRolesList(caseData);
+
+            if (toggle) {
+                assertThat(supportedRoleList).contains("wlu-admin");
+            } else {
+                assertThat(supportedRoleList).doesNotContain("wlu-admin");
+            }
+        }
+
         @Test
         void should_returnExpectedMessage_whenExistingMessagesAreNull() {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
 
             RolePool expectedSenderRoleCategory = RolePool.ADMIN;
             String expectedUserRoleLabel = "Hearing Centre Administrator";
-            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH)).thenReturn(
+            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH, SUPPORTED_ROLES)).thenReturn(
                 buildRoleAssignmentsResponse(List.of(
                     RoleAssignmentResponse.builder().roleName("hearing-centre-admin").roleLabel(
                         "Hearing Centre Administrator").roleCategory("ADMIN").build())
@@ -116,7 +182,8 @@ class SendAndReplyMessageServiceTest {
                 null,
                 MESSAGE_METADATA,
                 MESSAGE_CONTENT,
-                USER_AUTH
+                USER_AUTH,
+                caseData
             );
 
             assertEquals(
@@ -131,7 +198,7 @@ class SendAndReplyMessageServiceTest {
 
             RolePool expectedSenderRoleCategory = RolePool.ADMIN;
             String expectedUserRoleLabel = "Hearing Centre Team Leader";
-            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH)).thenReturn(
+            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH, SUPPORTED_ROLES)).thenReturn(
                 buildRoleAssignmentsResponse(List.of(
                                                  RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
                                                  RoleAssignmentResponse.builder().roleName("hearing-centre-admin").roleLabel(
@@ -149,7 +216,8 @@ class SendAndReplyMessageServiceTest {
                 messages,
                 MESSAGE_METADATA,
                 MESSAGE_CONTENT,
-                USER_AUTH
+                USER_AUTH,
+                caseData
             );
 
             assertEquals(List.of(
@@ -164,7 +232,7 @@ class SendAndReplyMessageServiceTest {
 
             String expectedUserRoleLabel = "CTSC";
             RolePool expectedSenderRoleCategory = RolePool.ADMIN;
-            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH)).thenReturn(
+            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH, SUPPORTED_ROLES)).thenReturn(
                 buildRoleAssignmentsResponse(List.of(
                                                  RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
                                                  RoleAssignmentResponse.builder().roleName("ctsc").roleLabel("CTSC").roleCategory("ADMIN").build()
@@ -178,7 +246,8 @@ class SendAndReplyMessageServiceTest {
                 messages,
                 MESSAGE_METADATA,
                 MESSAGE_CONTENT,
-                USER_AUTH
+                USER_AUTH,
+                caseData
             );
 
             assertEquals(List.of(
@@ -193,7 +262,7 @@ class SendAndReplyMessageServiceTest {
 
             RolePool expectedSenderRoleCategory = RolePool.ADMIN;
             String expectedUserRoleLabel = "CTSC Team Leader";
-            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH)).thenReturn(
+            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH, SUPPORTED_ROLES)).thenReturn(
                 buildRoleAssignmentsResponse(List.of(
                                                  RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
                                                  RoleAssignmentResponse.builder().roleName("ctsc").roleLabel("CTSC").roleCategory("ADMIN").build(),
@@ -210,7 +279,8 @@ class SendAndReplyMessageServiceTest {
                 messages,
                 MESSAGE_METADATA,
                 MESSAGE_CONTENT,
-                USER_AUTH
+                USER_AUTH,
+                caseData
             );
 
             assertEquals(List.of(
@@ -225,7 +295,7 @@ class SendAndReplyMessageServiceTest {
 
             RolePool expectedSenderRoleCategory = RolePool.LEGAL_OPERATIONS;
             String expectedUserRoleLabel = "Tribunal Caseworker";
-            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH)).thenReturn(
+            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH, SUPPORTED_ROLES)).thenReturn(
                 buildRoleAssignmentsResponse(List.of(
                                                  RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
                                                  RoleAssignmentResponse.builder().roleName("tribunal-caseworker").roleLabel("Tribunal Caseworker").roleCategory(
@@ -241,7 +311,8 @@ class SendAndReplyMessageServiceTest {
                 messages,
                 MESSAGE_METADATA,
                 MESSAGE_CONTENT,
-                USER_AUTH
+                USER_AUTH,
+                caseData
             );
 
             assertEquals(List.of(
@@ -256,7 +327,7 @@ class SendAndReplyMessageServiceTest {
 
             RolePool expectedSenderRoleCategory = RolePool.LEGAL_OPERATIONS;
             String expectedUserRoleLabel = "Senior Tribunal Caseworker";
-            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH)).thenReturn(
+            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH, SUPPORTED_ROLES)).thenReturn(
                 buildRoleAssignmentsResponse(List.of(
                                                  RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
                                                  RoleAssignmentResponse.builder().roleName("tribunal-caseworker").roleLabel("Tribunal Caseworker").roleCategory(
@@ -274,7 +345,8 @@ class SendAndReplyMessageServiceTest {
                 messages,
                 MESSAGE_METADATA,
                 MESSAGE_CONTENT,
-                USER_AUTH
+                USER_AUTH,
+                caseData
             );
 
             assertEquals(List.of(
@@ -289,7 +361,7 @@ class SendAndReplyMessageServiceTest {
 
             RolePool expectedSenderRoleCategory = RolePool.ADMIN;
             String expectedUserRoleLabel = "National Business Centre";
-            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH)).thenReturn(
+            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH, SUPPORTED_ROLES)).thenReturn(
                 buildRoleAssignmentsResponse(List.of(
                                                  RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
                                                  RoleAssignmentResponse.builder().roleName("national-business-centre").roleLabel(
@@ -305,7 +377,8 @@ class SendAndReplyMessageServiceTest {
                 messages,
                 MESSAGE_METADATA,
                 MESSAGE_CONTENT,
-                USER_AUTH
+                USER_AUTH,
+                caseData
             );
 
             assertEquals(List.of(
@@ -320,7 +393,7 @@ class SendAndReplyMessageServiceTest {
 
             RolePool expectedSenderRoleCategory = RolePool.ADMIN;
             String expectedUserRoleLabel = "NBC Team Leader";
-            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH)).thenReturn(
+            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH, SUPPORTED_ROLES)).thenReturn(
                 buildRoleAssignmentsResponse(List.of(
                                                  RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
                                                  RoleAssignmentResponse.builder().roleName("national-business-centre").roleLabel(
@@ -338,7 +411,8 @@ class SendAndReplyMessageServiceTest {
                 messages,
                 MESSAGE_METADATA,
                 MESSAGE_CONTENT,
-                USER_AUTH
+                USER_AUTH,
+                caseData
             );
 
             assertEquals(List.of(
@@ -353,7 +427,7 @@ class SendAndReplyMessageServiceTest {
 
             RolePool expectedSenderRoleCategory = RolePool.JUDICIAL_DISTRICT;
             String expectedUserRoleLabel = "District Judge";
-            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH)).thenReturn(
+            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH, SUPPORTED_ROLES)).thenReturn(
                 buildRoleAssignmentsResponse(List.of(
                                                  RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
                                                  RoleAssignmentResponse.builder().roleName("judge").roleLabel("Judge").roleCategory("JUDICIAL").build(),
@@ -370,7 +444,8 @@ class SendAndReplyMessageServiceTest {
                 messages,
                 MESSAGE_METADATA,
                 MESSAGE_CONTENT,
-                USER_AUTH
+                USER_AUTH,
+                caseData
             );
 
             assertEquals(List.of(
@@ -385,7 +460,7 @@ class SendAndReplyMessageServiceTest {
 
             RolePool expectedSenderRoleCategory = RolePool.JUDICIAL_CIRCUIT;
             String expectedUserRoleLabel = "Circuit Judge";
-            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH)).thenReturn(
+            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH, SUPPORTED_ROLES)).thenReturn(
                 buildRoleAssignmentsResponse(List.of(
                                                  RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
                                                  RoleAssignmentResponse.builder().roleName("judge").roleLabel("Judge").roleCategory("JUDICIAL").build(),
@@ -402,7 +477,8 @@ class SendAndReplyMessageServiceTest {
                 messages,
                 MESSAGE_METADATA,
                 MESSAGE_CONTENT,
-                USER_AUTH
+                USER_AUTH,
+                caseData
             );
 
             assertEquals(List.of(
@@ -417,7 +493,7 @@ class SendAndReplyMessageServiceTest {
 
             RolePool expectedSenderRoleCategory = RolePool.JUDICIAL;
             String expectedUserRoleLabel = "Judge";
-            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH)).thenReturn(
+            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH, SUPPORTED_ROLES)).thenReturn(
                 buildRoleAssignmentsResponse(List.of(
                                                  RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
                                                  RoleAssignmentResponse.builder().roleName("judge").roleLabel("Judge").roleCategory("JUDICIAL").build()
@@ -432,7 +508,41 @@ class SendAndReplyMessageServiceTest {
                 messages,
                 MESSAGE_METADATA,
                 MESSAGE_CONTENT,
-                USER_AUTH
+                USER_AUTH,
+                caseData
+            );
+
+            assertEquals(List.of(
+                message,
+                buildExpectedMessage(expectedSenderRoleCategory, expectedUserRoleLabel)
+            ), unwrapElements(actual));
+        }
+
+        @Test
+        void should_returnExpectedMessage_forWluAdmin() {
+            when(featureToggleService.isPublicQueryManagementEnabled(caseData)).thenReturn(true);
+            when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
+
+            RolePool expectedSenderRoleCategory = RolePool.WLU_ADMIN;
+            String expectedUserRoleLabel = "Welsh language unit";
+            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH, SUPPORTED_ROLES_WITH_TOGGLE_ON)).thenReturn(
+                buildRoleAssignmentsResponse(List.of(
+                                                 RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
+                                                 RoleAssignmentResponse.builder().roleName("wlu-admin").roleLabel(
+                                                     "Welsh language unit").roleCategory("ADMIN").build()
+                                             )
+                )
+            );
+
+            List<Element<Message>> messages = new ArrayList<>();
+            messages.add(element(message));
+
+            List<Element<Message>> actual = messageService.addMessage(
+                messages,
+                MESSAGE_METADATA,
+                MESSAGE_CONTENT,
+                USER_AUTH,
+                caseData
             );
 
             assertEquals(List.of(
@@ -567,7 +677,7 @@ class SendAndReplyMessageServiceTest {
 
             String originalUserRoleLabel = oldRoleLabel;
             String newUserRoleLabel = newRoleLabel;
-            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH)).thenReturn(
+            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH, SUPPORTED_ROLES)).thenReturn(
                 buildRoleAssignmentsResponse(roleAssignmentResponses)
             );
 
@@ -602,7 +712,8 @@ class SendAndReplyMessageServiceTest {
                 messages,
                 existingMessageToBeChanged.getId().toString(),
                 messageReply,
-                USER_AUTH
+                USER_AUTH,
+                caseData
             ));
 
             List<MessageReply> actualMessageHistory = unwrapElements(actualMessages.get(0).getHistory());
@@ -622,7 +733,7 @@ class SendAndReplyMessageServiceTest {
         @Test
         void shouldAddMessageReplyToExistingHistory_withTwoExistingReplies() {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
-            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH)).thenReturn(
+            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH, SUPPORTED_ROLES)).thenReturn(
                 buildRoleAssignmentsResponse(List.of(
                     RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
                     RoleAssignmentResponse.builder().roleName("hearing-centre-admin").roleLabel(
@@ -666,7 +777,8 @@ class SendAndReplyMessageServiceTest {
                 messages,
                 existingMessageElement.getId().toString(),
                 newReply,
-                USER_AUTH
+                USER_AUTH,
+                caseData
             ));
 
             List<MessageReply> actualMessageHistory = unwrapElements(actualMessages.get(0).getHistory());

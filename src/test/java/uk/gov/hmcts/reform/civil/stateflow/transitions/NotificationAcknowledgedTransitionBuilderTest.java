@@ -45,15 +45,16 @@ public class NotificationAcknowledgedTransitionBuilderTest {
 
     @Test
     void shouldSetUpTransitions() {
-        assertThat(result).hasSize(7); // Adjusted for the correct number of transitions
+        assertThat(result).hasSize(8); // Adjusted for the correct number of transitions
 
         assertTransition(result.get(0), "MAIN.NOTIFICATION_ACKNOWLEDGED", "MAIN.NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION");
         assertTransition(result.get(1), "MAIN.NOTIFICATION_ACKNOWLEDGED", "MAIN.ALL_RESPONSES_RECEIVED");
         assertTransition(result.get(2), "MAIN.NOTIFICATION_ACKNOWLEDGED", "MAIN.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED");
-        assertTransition(result.get(3), "MAIN.NOTIFICATION_ACKNOWLEDGED", "MAIN.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED");
-        assertTransition(result.get(4), "MAIN.NOTIFICATION_ACKNOWLEDGED", "MAIN.TAKEN_OFFLINE_BY_STAFF");
-        assertTransition(result.get(5), "MAIN.NOTIFICATION_ACKNOWLEDGED", "MAIN.PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA");
-        assertTransition(result.get(6), "MAIN.NOTIFICATION_ACKNOWLEDGED", "MAIN.TAKEN_OFFLINE_SDO_NOT_DRAWN");
+        assertTransition(result.get(3), "MAIN.NOTIFICATION_ACKNOWLEDGED", "MAIN.AWAITING_RESPONSES_FULL_ADMIT_RECEIVED");
+        assertTransition(result.get(4), "MAIN.NOTIFICATION_ACKNOWLEDGED", "MAIN.AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED");
+        assertTransition(result.get(5), "MAIN.NOTIFICATION_ACKNOWLEDGED", "MAIN.TAKEN_OFFLINE_BY_STAFF");
+        assertTransition(result.get(6), "MAIN.NOTIFICATION_ACKNOWLEDGED", "MAIN.PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA");
+        assertTransition(result.get(7), "MAIN.NOTIFICATION_ACKNOWLEDGED", "MAIN.TAKEN_OFFLINE_SDO_NOT_DRAWN");
     }
 
     @Test

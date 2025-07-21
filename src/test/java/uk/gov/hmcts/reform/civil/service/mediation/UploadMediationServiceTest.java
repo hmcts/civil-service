@@ -6,7 +6,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
@@ -14,6 +13,7 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.util.HashMap;
@@ -23,6 +23,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 
@@ -37,7 +38,8 @@ public class UploadMediationServiceTest {
     private DashboardNotificationsParamsMapper mapper;
 
     @Mock
-    private DashboardApiClient dashboardApiClient;
+    private DashboardScenariosService dashboardScenariosService;
+
     @Mock
     private CoreCaseUserService coreCaseUserService;
     @Mock
@@ -67,7 +69,7 @@ public class UploadMediationServiceTest {
         //When
         uploadMediationService.uploadMediationDocumentsTaskList(callBack);
         //Then
-        verify(dashboardApiClient, times(2)).recordScenario(any(), any(), any(), any());
+        verify(dashboardScenariosService, times(2)).recordScenarios(any(), any(), any(), any());
 
     }
 
@@ -83,24 +85,7 @@ public class UploadMediationServiceTest {
         //When
         uploadMediationService.uploadMediationDocumentsTaskList(callBack);
         //Then
-        verify(dashboardApiClient, times(2)).recordScenario(any(), any(), any(), any());
-
-    }
-
-    @Test
-    void shouldReturnRecordScenarioWhenCarmIsEnabledAndRespondentSolicitorOne() {
-        //Given
-        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-
-        when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
-            .thenReturn(List.of(CaseRole.RESPONDENTSOLICITORONE.getFormattedName()));
-
-        var callBack = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, CASE_DATA).build();
-        //When
-        uploadMediationService.uploadMediationDocumentsTaskList(callBack);
-        //Then
-        verify(dashboardApiClient, times(2)).recordScenario(any(), any(), any(), any());
-
+        verify(dashboardScenariosService, times(2)).recordScenarios(any(), any(), any(), any());
     }
 
     @Test
@@ -115,8 +100,7 @@ public class UploadMediationServiceTest {
         //When
         uploadMediationService.uploadMediationDocumentsTaskList(callBack);
         //Then
-        verify(dashboardApiClient, times(2)).recordScenario(any(), any(), any(), any());
-
+        verify(dashboardScenariosService, times(2)).recordScenarios(any(), any(), any(), any());
     }
 
     @Test
@@ -131,8 +115,7 @@ public class UploadMediationServiceTest {
         //When
         uploadMediationService.uploadMediationDocumentsTaskList(callBack);
         //Then
-        verify(dashboardApiClient, times(0)).recordScenario(any(), any(), any(), any());
-
+        verifyNoInteractions(dashboardScenariosService);
     }
 
     @Test
@@ -143,9 +126,7 @@ public class UploadMediationServiceTest {
         //When
         uploadMediationService.uploadMediationDocumentsTaskList(callBack);
         //Then
-        verify(dashboardApiClient, times(0)).recordScenario(any(), any(), any(), any());
-
+        verifyNoInteractions(dashboardScenariosService);
     }
-
 }
 

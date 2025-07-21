@@ -1,22 +1,30 @@
 package uk.gov.hmcts.reform.civil.utils;
 
+import lombok.extern.slf4j.Slf4j;
+import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
-import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
+import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISMISSED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CLOSED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
@@ -26,17 +34,25 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CNBC_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_HMCTS_SIGNATURE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT_WELSH;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.OPENING_HOURS;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_OPENING_HOURS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PHONE_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_PHONE_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.REASON;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_ONE_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_ONE_RESPONSE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_TWO_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_TWO_RESPONSE;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.SPEC_UNSPEC_CONTACT;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
+@Slf4j
 public class NotificationUtils {
 
     private NotificationUtils() {
@@ -62,20 +78,24 @@ public class NotificationUtils {
     }
 
     public static Map<String, String> caseOfflineNotificationAddProperties(
-        CaseData caseData, OrganisationPolicy organisationPolicy, OrganisationService organisationService) {
+        CaseData caseData, OrganisationPolicy organisationPolicy, OrganisationService organisationService,
+        boolean isPublicQMEnabled, NotificationsSignatureConfiguration configuration) {
         if (getMultiPartyScenario(caseData).equals(ONE_V_ONE)) {
-            return Map.of(
+            HashMap<String, String> properties = new HashMap<>(Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 REASON, caseData.getRespondent1ClaimResponseType().getDisplayedValue(),
                 PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
                 CLAIM_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(organisationPolicy, organisationService),
                 CASEMAN_REF, caseData.getLegacyCaseReference()
-            );
+            ));
+            addAllFooterItems(caseData, properties, configuration,
+                              isPublicQMEnabled);
+            return properties;
         } else if (getMultiPartyScenario(caseData).equals(TWO_V_ONE)) {
             String responseTypeToApplicant2 = SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                 ? caseData.getClaimant1ClaimResponseTypeForSpec().getDisplayedValue()
                 : caseData.getRespondent1ClaimResponseTypeToApplicant2().toString();
-            return Map.of(
+            HashMap<String, String> properties = new HashMap<>(Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 REASON, SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                     ? caseData.getClaimant1ClaimResponseTypeForSpec().getDisplayedValue()
@@ -86,10 +106,13 @@ public class NotificationUtils {
                 PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
                 CLAIM_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(organisationPolicy, organisationService),
                 CASEMAN_REF, caseData.getLegacyCaseReference()
-            );
+            ));
+            addAllFooterItems(caseData, properties, configuration,
+                              isPublicQMEnabled);
+            return properties;
         } else {
             //1v2 template is used and expects different data
-            return Map.of(
+            HashMap<String, String> properties = new HashMap<>(Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 RESPONDENT_ONE_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
                 RESPONDENT_TWO_NAME, getPartyNameBasedOnType(caseData.getRespondent2()),
@@ -102,23 +125,10 @@ public class NotificationUtils {
                 PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
                 CLAIM_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(organisationPolicy, organisationService),
                 CASEMAN_REF, caseData.getLegacyCaseReference()
-            );
-        }
-    }
-
-    public static String getSolicitorClaimDismissedProperty(List<String> stateHistoryNameList,
-                                                            NotificationsProperties notificationsProperties) {
-        //scenerio 1: Claim notification does not happen within 4 months of issue
-        if (stateHistoryNameList.contains(CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE.fullName())) {
-            return notificationsProperties.getSolicitorClaimDismissedWithin4Months();
-        } else if (stateHistoryNameList.contains(CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE.fullName())) {
-            //scenerio 2: Claims details notification is not completed within 14 days of the claim notification step
-            return notificationsProperties.getSolicitorClaimDismissedWithin14Days();
-        } else if (stateHistoryNameList.contains(CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE.fullName())) {
-            //scenerio 3 Claimant does not give their intention by the given deadline
-            return notificationsProperties.getSolicitorClaimDismissedWithinDeadline();
-        } else {
-            return notificationsProperties.getSolicitorClaimDismissedWithinDeadline();
+            ));
+            addAllFooterItems(caseData, properties, configuration,
+                              isPublicQMEnabled);
+            return properties;
         }
     }
 
@@ -200,11 +210,15 @@ public class NotificationUtils {
             if (caseData.getRespondent1OrganisationPolicy().getOrganisation() != null
                 && caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID() != null) {
                 id = caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID();
+            } else if (caseData.getRespondent1OrganisationIDCopy() != null) {
+                id = caseData.getRespondent1OrganisationIDCopy();
             }
         } else {
             if (caseData.getRespondent2OrganisationPolicy().getOrganisation() != null
                 && caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID() != null) {
                 id = caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID();
+            } else if (caseData.getRespondent2OrganisationIDCopy() != null) {
+                id = caseData.getRespondent2OrganisationIDCopy();
             }
         }
         if (id != null) {
@@ -248,11 +262,14 @@ public class NotificationUtils {
                 stringBuilder.append(" - ");
             }
             stringBuilder.append("Defendant 2 reference: ");
-            if (caseData.getRespondentSolicitor2Reference() != null) {
-                stringBuilder.append(caseData.getRespondentSolicitor2Reference());
-            } else {
-                stringBuilder.append(REFERENCE_NOT_PROVIDED);
-            }
+            String respondent2Reference = caseData.getSolicitorReferences() != null
+                && caseData.getSolicitorReferences().getRespondentSolicitor2Reference() != null
+                ? caseData.getSolicitorReferences().getRespondentSolicitor2Reference()
+                : caseData.getRespondentSolicitor2Reference() != null
+                ? caseData.getRespondentSolicitor2Reference()
+                : REFERENCE_NOT_PROVIDED;
+            stringBuilder.append(respondent2Reference);
+
         }
         return stringBuilder.toString();
     }
@@ -267,5 +284,93 @@ public class NotificationUtils {
             }, () -> stringBuilder.append(REFERENCE_NOT_PROVIDED));
 
         return stringBuilder.toString();
+    }
+
+    public static final Set<CaseState> qmNotAllowedStates = EnumSet.of(PENDING_CASE_ISSUED, CLOSED,
+                                                                       PROCEEDS_IN_HERITAGE_SYSTEM, CASE_DISMISSED);
+
+    private static boolean queryNotAllowedCaseStates(CaseData caseData) {
+        return qmNotAllowedStates.contains(caseData.getCcdState());
+    }
+
+    public static Map<String, String> addAllFooterItems(CaseData caseData, Map<String, String> properties,
+                                                        NotificationsSignatureConfiguration configuration,
+                                                        boolean isPublicQMEnabled) {
+
+        addCommonFooterSignature(properties, configuration);
+        addSpecAndUnspecContact(caseData, properties, configuration, isPublicQMEnabled);
+        addCnbcContact(caseData, properties, configuration, isPublicQMEnabled);
+
+        addCommonFooterSignatureWelsh(properties, configuration);
+        addLipContactWelsh(caseData, properties, configuration, isPublicQMEnabled);
+        addLipContact(caseData, properties, configuration, isPublicQMEnabled);
+
+        return properties;
+    }
+
+    public static Map<String, String> addCommonFooterSignature(Map<String, String> properties,
+                                                               NotificationsSignatureConfiguration configuration) {
+        properties.putAll(Map.of(HMCTS_SIGNATURE, configuration.getHmctsSignature(),
+                                 PHONE_CONTACT, configuration.getPhoneContact(),
+                                 OPENING_HOURS, configuration.getOpeningHours()));
+        return properties;
+    }
+
+    public static Map<String, String> addCommonFooterSignatureWelsh(Map<String, String> properties,
+                                                               NotificationsSignatureConfiguration configuration) {
+        properties.putAll(Map.of(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature(),
+                                 WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact(),
+                                 WELSH_OPENING_HOURS, configuration.getWelshOpeningHours()));
+        return properties;
+    }
+
+    public static Map<String, String> addSpecAndUnspecContact(CaseData caseData, Map<String, String> properties,
+                                                              NotificationsSignatureConfiguration configuration,
+                                                              boolean isPublicQMEnabled) {
+        if (!queryNotAllowedCaseStates(caseData)
+            && (!caseData.isLipCase() || (caseData.isLipCase() && isPublicQMEnabled))) {
+            properties.put(SPEC_UNSPEC_CONTACT, configuration.getRaiseQueryLr());
+        } else {
+            properties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+        }
+        return properties;
+    }
+
+    public static Map<String, String> addLipContact(CaseData caseData, Map<String, String> properties, NotificationsSignatureConfiguration configuration,
+                                                    boolean isPublicQMEnabled) {
+
+        log.info("!queryNotAllowedCaseStates(caseData) " + !queryNotAllowedCaseStates(caseData));
+        log.info("is LIP on case " + caseData.isLipCase());
+        if (isPublicQMEnabled && !queryNotAllowedCaseStates(caseData) && caseData.isLipCase()) {
+            properties.put(LIP_CONTACT, configuration.getRaiseQueryLip());
+        } else {
+            properties.put(LIP_CONTACT, configuration.getLipContactEmail());
+        }
+        return properties;
+    }
+
+    public static Map<String, String> addLipContactWelsh(CaseData caseData, Map<String, String> properties, NotificationsSignatureConfiguration configuration,
+                                                         boolean isPublicQMEnabled) {
+
+        log.info("!queryNotAllowedCaseStates(caseData) " + !queryNotAllowedCaseStates(caseData));
+        log.info("is LIP on case " + caseData.isLipCase());
+        if (isPublicQMEnabled && !queryNotAllowedCaseStates(caseData) && caseData.isLipCase()) {
+            properties.put(LIP_CONTACT_WELSH, configuration.getRaiseQueryLipWelsh());
+        } else {
+            properties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+        }
+        return properties;
+    }
+
+    public static Map<String, String> addCnbcContact(CaseData caseData, Map<String, String> properties,
+                                                              NotificationsSignatureConfiguration configuration,
+                                                              boolean isPublicQMEnabled) {
+        if (!queryNotAllowedCaseStates(caseData)
+            && (!caseData.isLipCase() || (caseData.isLipCase() && isPublicQMEnabled))) {
+            properties.put(CNBC_CONTACT, configuration.getRaiseQueryLr());
+        } else {
+            properties.put(CNBC_CONTACT, configuration.getCnbcContact());
+        }
+        return properties;
     }
 }

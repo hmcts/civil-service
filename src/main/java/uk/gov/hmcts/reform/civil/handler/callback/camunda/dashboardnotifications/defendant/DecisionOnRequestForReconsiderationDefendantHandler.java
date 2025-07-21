@@ -4,10 +4,10 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.callback.CaseProgressionDashboardCallbackHandler;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import java.util.List;
 
@@ -20,10 +20,10 @@ public class DecisionOnRequestForReconsiderationDefendantHandler extends CasePro
     private static final List<CaseEvent> EVENTS = List.of(CREATE_DASHBOARD_NOTIFICATION_DECISION_RECONSIDERATION_DEFENDANT1);
     public static final String TASK_ID = "GenerateDashboardNotificationDecisionReconsiderationDefendant";
 
-    public DecisionOnRequestForReconsiderationDefendantHandler(DashboardApiClient dashboardApiClient,
-                                                              DashboardNotificationsParamsMapper mapper,
-                                                              FeatureToggleService featureToggleService) {
-        super(dashboardApiClient, mapper, featureToggleService);
+    public DecisionOnRequestForReconsiderationDefendantHandler(DashboardScenariosService dashboardScenariosService,
+                                                               DashboardNotificationsParamsMapper mapper,
+                                                               FeatureToggleService featureToggleService) {
+        super(dashboardScenariosService, mapper, featureToggleService);
     }
 
     @Override

@@ -11,13 +11,16 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_LIP_APPLICANT_CLAIMANT_CONFIRM_TO_PROCEED;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
@@ -33,6 +36,7 @@ public class ClaimantResponseConfirmsToProceedApplicantNotificationHandler exten
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
     private final FeatureToggleService featureToggleService;
+    private final NotificationsSignatureConfiguration configuration;
 
     private final Map<String, Callback> callbackMap = Map.of(
         callbackKey(ABOUT_TO_SUBMIT),
@@ -70,22 +74,25 @@ public class ClaimantResponseConfirmsToProceedApplicantNotificationHandler exten
     }
 
     private String getEmailTemplate(CaseData caseData) {
-        if (isBilingualForLipvsLip(caseData)) {
+        if (isBilingualForLipApplicant(caseData)) {
             return notificationsProperties.getClaimantLipClaimUpdatedBilingualTemplate();
         }
         return notificationsProperties.getClaimantLipClaimUpdatedTemplate();
     }
 
-    private boolean isBilingualForLipvsLip(CaseData caseData) {
-        return caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()
+    private boolean isBilingualForLipApplicant(CaseData caseData) {
+        return caseData.isApplicantNotRepresented() && featureToggleService.isLipVLipEnabled()
             && caseData.isClaimantBilingual();
     }
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-        return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+        HashMap<String, String> properties = new HashMap<>(Map.of(
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             APPLICANT_ONE_NAME, getPartyNameBasedOnType(caseData.getApplicant1())
-        );
+        ));
+        addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
+        return properties;
     }
 }

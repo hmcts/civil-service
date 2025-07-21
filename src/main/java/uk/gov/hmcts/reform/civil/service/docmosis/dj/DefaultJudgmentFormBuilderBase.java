@@ -13,7 +13,10 @@ import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Optional;
+
+import static uk.gov.hmcts.reform.civil.utils.DateUtils.formatDateInWelsh;
 
 @RequiredArgsConstructor
 public abstract class DefaultJudgmentFormBuilderBase {
@@ -51,30 +54,28 @@ public abstract class DefaultJudgmentFormBuilderBase {
         return debtAmount;
     }
 
-    protected String getRepaymentString(RepaymentFrequencyDJ repaymentFrequency) {
+    protected String getRepaymentString(RepaymentFrequencyDJ repaymentFrequency, boolean isWelsh) {
         switch (repaymentFrequency) {
-            case ONCE_ONE_WEEK:
-                return "each week";
-            case ONCE_ONE_MONTH:
-                return "each month";
-            case ONCE_TWO_WEEKS:
-                return "every 2 weeks";
+            case ONCE_ONE_WEEK : return isWelsh ? "pob wythnos" : "each week";
+            case ONCE_ONE_MONTH: return isWelsh ? "pob mis" : "each month";
+            case ONCE_TWO_WEEKS: return isWelsh  ? "pob 2 wythnos" : "every 2 weeks";
             default:
                 return null;
         }
     }
 
-    protected String getRepaymentFrequency(RepaymentFrequencyDJ repaymentFrequencyDJ) {
+    protected String getRepaymentFrequency(RepaymentFrequencyDJ repaymentFrequencyDJ, boolean isWelsh) {
         switch (repaymentFrequencyDJ) {
-            case ONCE_ONE_WEEK:
-                return "per week";
-            case ONCE_ONE_MONTH:
-                return "per month";
-            case ONCE_TWO_WEEKS:
-                return "every 2 weeks";
+            case ONCE_ONE_WEEK : return isWelsh ?  "yr wythnos" : "per week";
+            case ONCE_ONE_MONTH: return isWelsh ?  "y mis" : "per month";
+            case ONCE_TWO_WEEKS: return isWelsh ?  "pob 2 wythnos" : "every 2 weeks";
             default:
                 return null;
         }
+    }
+
+    protected String getDateInWelsh(LocalDate dateToConvert) {
+        return formatDateInWelsh(dateToConvert, false);
     }
 
     protected String getInstallmentAmount(String amount) {

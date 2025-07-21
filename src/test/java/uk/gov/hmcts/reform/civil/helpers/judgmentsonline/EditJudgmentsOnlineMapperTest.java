@@ -2,9 +2,9 @@ package uk.gov.hmcts.reform.civil.helpers.judgmentsonline;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
@@ -21,6 +21,8 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.JudgementService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
@@ -34,22 +36,31 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class EditJudgmentsOnlineMapperTest {
 
-    private InterestCalculator interestCalculator;
-    private RoboticsAddressMapper addressMapper = new RoboticsAddressMapper(new AddressLinesMapper());
-    private EditJudgmentOnlineMapper editJudgmentOnlineMapper = new EditJudgmentOnlineMapper();
-    private RecordJudgmentOnlineMapper recordJudgmentMapper = new RecordJudgmentOnlineMapper(addressMapper);
-    private JudgmentByAdmissionOnlineMapper judgmentByAdmissionMapper = new JudgmentByAdmissionOnlineMapper(addressMapper);
-    private DefaultJudgmentOnlineMapper defaultJudgmentMapper = new DefaultJudgmentOnlineMapper(interestCalculator, addressMapper);
+    @Mock
+    private FeatureToggleService featureToggleService;
 
+    private InterestCalculator interestCalculator;
+    private JudgementService judgementService;
+    private RoboticsAddressMapper addressMapper;
+    private EditJudgmentOnlineMapper editJudgmentOnlineMapper;
+    private RecordJudgmentOnlineMapper recordJudgmentMapper;
+    private JudgmentByAdmissionOnlineMapper judgmentByAdmissionMapper;
+    private DefaultJudgmentOnlineMapper defaultJudgmentMapper;
+
+    @Mock
     private Time time;
 
     @BeforeEach
-    public void setUpTest() {
-        time = Mockito.mock(Time.class);
+    public void setUp() {
         interestCalculator = new InterestCalculator();
+        judgementService = new JudgementService(featureToggleService, interestCalculator);
+        addressMapper = new RoboticsAddressMapper(new AddressLinesMapper());
+        editJudgmentOnlineMapper = new EditJudgmentOnlineMapper();
+        recordJudgmentMapper = new RecordJudgmentOnlineMapper(addressMapper);
+        judgmentByAdmissionMapper = new JudgmentByAdmissionOnlineMapper(addressMapper, judgementService, interestCalculator);
         defaultJudgmentMapper = new DefaultJudgmentOnlineMapper(interestCalculator, addressMapper);
     }
 

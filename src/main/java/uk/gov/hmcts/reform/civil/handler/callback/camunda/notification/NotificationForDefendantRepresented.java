@@ -13,6 +13,8 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.utils.NocNotificationUtils;
 
@@ -22,11 +24,12 @@ import java.util.Map;
 
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIMANT_DEFENDANT_REPRESENTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_AFTER_NOC_APPROVAL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_SOLICITOR_AFTER_NOC_APPROVAL;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIMANT_DEFENDANT_REPRESENTED;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @Service
@@ -36,6 +39,8 @@ public class NotificationForDefendantRepresented extends CallbackHandler impleme
     private final OrganisationService organisationService;
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
+    private final NotificationsSignatureConfiguration configuration;
+    private final FeatureToggleService featureToggleService;
     private static final String REFERENCE_TEMPLATE_LIP =
         "notify-lip-after-defendant-noc-approval-%s";
     private static final String REFERENCE_TEMPLATE_LR =
@@ -95,34 +100,44 @@ public class NotificationForDefendantRepresented extends CallbackHandler impleme
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-        return Map.of(
+        HashMap<String, String> properties = new HashMap<>(Map.of(
             RESPONDENT_NAME, caseData.getRespondent1().getPartyName(),
             CLAIM_16_DIGIT_NUMBER, caseData.getCcdCaseReference().toString(),
             CLAIM_NUMBER, caseData.getLegacyCaseReference()
-        );
+        ));
+        addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
+        return properties;
     }
 
     public Map<String, String> addPropertiesDefendantLr(CaseData caseData) {
-        return Map.of(
+        HashMap<String, String> properties = new HashMap<>(Map.of(
             DEFENDANT_NAME, caseData.getRespondent1().getPartyName(),
             CLAIM_16_DIGIT_NUMBER, caseData.getCcdCaseReference().toString(),
             LEGAL_REP_NAME, getOrganisationName(caseData.getChangeOfRepresentation().getOrganisationToAddID()),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             CASEMAN_REF, caseData.getLegacyCaseReference()
-            );
+        ));
+        addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
+
+        return properties;
     }
 
     public Map<String, String> addPropertiesClaimant(CaseData caseData) {
-        return Map.of(
+        HashMap<String, String> properties = new HashMap<>(Map.of(
             CLAIMANT_NAME, caseData.getApplicant1().getPartyName(),
             CLAIM_16_DIGIT_NUMBER, caseData.getCcdCaseReference().toString(),
             DEFENDANT_NAME_INTERIM, caseData.getRespondent1().getPartyName(),
             CLAIM_NUMBER, caseData.getLegacyCaseReference()
-        );
+        ));
+        addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
+        return properties;
     }
 
     public Map<String, String> addPropertiesClaimantLr(CaseData caseData) {
-        return Map.of(
+        HashMap<String, String> properties = new HashMap<>(Map.of(
             CASE_NAME, NocNotificationUtils.getCaseName(caseData),
             ISSUE_DATE, formatLocalDate(caseData.getIssueDate(), DATE),
             CCD_REF, caseData.getCcdCaseReference().toString(),
@@ -130,7 +145,11 @@ public class NotificationForDefendantRepresented extends CallbackHandler impleme
             OTHER_SOL_NAME, getOrganisationName(NocNotificationUtils.getOtherSolicitor1Name(caseData)),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             CASEMAN_REF, caseData.getLegacyCaseReference()
-        );
+        ));
+        addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
+
+        return properties;
     }
 
     private String getOrganisationName(String orgToName) {

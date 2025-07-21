@@ -9,17 +9,24 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @RequiredArgsConstructor
 public abstract class AbstractCaseDismissNotificationHandler extends CallbackHandler implements NotificationData {
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
+    private final NotificationsSignatureConfiguration configuration;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -28,11 +35,16 @@ public abstract class AbstractCaseDismissNotificationHandler extends CallbackHan
 
     public Map<String, String> addProperties(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        return Map.of(
+        HashMap<String, String> properties = new HashMap<>(Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             PARTY_NAME, getPartyName(caseData, callbackParams),
-            CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData)
-        );
+            CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
+        ));
+        addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
+        return properties;
     }
 
     @Override

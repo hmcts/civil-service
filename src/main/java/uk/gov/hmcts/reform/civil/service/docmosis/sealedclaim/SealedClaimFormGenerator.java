@@ -30,6 +30,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1_MULTIPARTY_SAME_SOL;
+import static uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils.formatCcdCaseReference;
 
 @Service
 @RequiredArgsConstructor
@@ -76,6 +77,7 @@ public class SealedClaimFormGenerator implements TemplateDataGeneratorWithAuth<S
             .claimDetails(caseData.getDetailsOfClaim())
             .hearingCourtLocation(hearingCourtLocation)
             .referenceNumber(caseData.getLegacyCaseReference())
+            .ccdCaseReference(formatCcdCaseReference(caseData))
             .issueDate(caseData.getIssueDate())
             .submittedOn(caseData.getSubmittedDate().toLocalDate())
             .applicantExternalReference(solicitorReferences

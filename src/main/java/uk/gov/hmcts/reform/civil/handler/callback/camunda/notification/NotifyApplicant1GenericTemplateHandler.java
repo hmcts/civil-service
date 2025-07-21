@@ -11,13 +11,17 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT1_GENERIC_TEMPLATE;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +35,8 @@ public class NotifyApplicant1GenericTemplateHandler extends CallbackHandler impl
     private static final List<CaseEvent> EVENTS = List.of(
         NOTIFY_APPLICANT1_GENERIC_TEMPLATE
     );
+    private final NotificationsSignatureConfiguration configuration;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -61,11 +67,14 @@ public class NotifyApplicant1GenericTemplateHandler extends CallbackHandler impl
     }
 
     public Map<String, String> addProperties(CaseData caseData) {
-        return Map.of(
+        HashMap<String, String> properties = new HashMap<>(Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             PARTY_NAME, caseData.getApplicant1().getPartyName(),
             CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData)
-        );
+        ));
+        addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
+        return properties;
     }
 
     private String getNotificationTemplate(CaseData caseData) {
@@ -75,7 +84,9 @@ public class NotifyApplicant1GenericTemplateHandler extends CallbackHandler impl
     }
 
     private String getRecipientEmail(CaseData caseData) {
-        return caseData.getClaimantUserDetails().getEmail();
+        return  caseData.isApplicantNotRepresented()
+            ? caseData.getClaimantUserDetails().getEmail()
+            : caseData.getApplicantSolicitor1UserDetails().getEmail();
     }
 
 }

@@ -3,11 +3,10 @@ package uk.gov.hmcts.reform.civil.utils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.PartyFlagStructure;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.PartyFlagStructure;
 import uk.gov.hmcts.reform.civil.model.UpdateDetailsForm;
 import uk.gov.hmcts.reform.civil.model.caseflags.FlagDetail;
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
@@ -156,15 +155,14 @@ class CaseFlagUtilsTest {
 
         @Test
         void shouldReturnNullWhenLitigationFriendIsNull() {
-            LitigationFriend actual = CaseFlagUtils.updateLitFriend("applicant", null);
-            assertNull(actual);
+            assertNull(CaseFlagUtils.updateLitFriend("applicant", null));
         }
     }
 
     @Nested
     class UpdateDQParties {
         @Test
-        public void shouldCreateFlagsStructureForRespondentExperts() {
+        void shouldCreateFlagsStructureForRespondentExperts() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
                 .multiPartyClaimTwoDefendantSolicitors()
@@ -234,7 +232,7 @@ class CaseFlagUtilsTest {
         }
 
         @Test
-        public void shouldCreateFlagsStructureForRespondentWitness() {
+        void shouldCreateFlagsStructureForRespondentWitness() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
                 .multiPartyClaimTwoDefendantSolicitors()
@@ -305,7 +303,7 @@ class CaseFlagUtilsTest {
         }
 
         @Test
-        public void shouldCreateFlagsStructureForApplicantWitness() {
+        void shouldCreateFlagsStructureForApplicantWitness() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateBothApplicantsRespondToDefenceAndProceed_2v1()
                 .multiPartyClaimTwoApplicants()
@@ -372,7 +370,7 @@ class CaseFlagUtilsTest {
         }
 
         @Test
-        public void shouldCreateFlagsStructureForApplicantExperts() {
+        void shouldCreateFlagsStructureForApplicantExperts() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateBothApplicantsRespondToDefenceAndProceed_2v1()
                 .multiPartyClaimTwoApplicants()
@@ -438,7 +436,7 @@ class CaseFlagUtilsTest {
         }
 
         @Test
-        public void getAllCaseFlagsThatAreNotEmpty_1v1() {
+        void getAllCaseFlagsThatAreNotEmpty_1v1() {
             List<FlagDetail> expectedApplicant1Flags = flagDetails();
             List<FlagDetail> expectedApplicant1WitnessFlags = flagDetails();
             List<FlagDetail> expectedApplicant1ExpertFlags = flagDetails();
@@ -478,7 +476,7 @@ class CaseFlagUtilsTest {
         }
 
         @Test
-        public void getAllCaseFlagsThatAreNotEmpty_2v1_App2Proceeds() {
+        void getAllCaseFlagsThatAreNotEmpty_2v1_App2Proceeds() {
             List<FlagDetail> expectedApplicant2Flags = flagDetails();
             List<FlagDetail> expectedApplicant2WitnessFlags = flagDetails();
             List<FlagDetail> expectedApplicant2ExpertFlags = flagDetails();
@@ -519,7 +517,7 @@ class CaseFlagUtilsTest {
         }
 
         @Test
-        public void getAllCaseFlagsThatAreNotEmpty_1v2DS() {
+        void getAllCaseFlagsThatAreNotEmpty_1v2DS() {
             List<FlagDetail> expectedRespondent1Flags = flagDetails();
             List<FlagDetail> expectedRespondent1WitnessFlags = flagDetails();
             List<FlagDetail> expectedRespondent1ExpertFlags = flagDetails();
@@ -561,7 +559,7 @@ class CaseFlagUtilsTest {
         }
 
         @Test
-        public void filterCaseFlagsByActive() {
+        void filterCaseFlagsByActive() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .withApplicant1Flags()
@@ -579,7 +577,7 @@ class CaseFlagUtilsTest {
         }
 
         @Test
-        public void filterCaseFlagsByHearingRelevant() {
+        void filterCaseFlagsByHearingRelevant() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .withApplicant1Flags()
@@ -745,6 +743,26 @@ class CaseFlagUtilsTest {
             }
 
             @Test
+            void shouldNotUpdateClaimant1FlagName_whenFlagIsMissing() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateApplicantRespondToDefenceAndProceed()
+                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(CLAIMANT_ONE_ID).build())
+                    .build();
+
+                CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
+                    .applicant1(caseData.getApplicant1().toBuilder()
+                                    .individualFirstName("Johnny")
+                                    .individualLastName("Rambo new").build());
+
+                CaseFlagUtils.createOrUpdateFlags(builder, builder.build(), organisationService);
+
+                Flags actual = builder.build().getApplicant1().getFlags();
+                Flags expected = builder.build().getApplicant1().getFlags();
+
+                assertThat(actual).isEqualTo(expected);
+            }
+
+            @Test
             void shouldUpdateFlagName_whenClaimant2NameUpdated() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .multiPartyClaimTwoApplicants()
@@ -769,6 +787,27 @@ class CaseFlagUtilsTest {
                     .details(wrapElements(List.of(
                         FlagDetail.builder().name("flag name").build())))
                     .roleOnCase("applicant").build();
+
+                assertThat(actual).isEqualTo(expected);
+            }
+
+            @Test
+            void shouldNotUpdateClaimant2FlagName_whenFlagIsMissing() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .multiPartyClaimTwoApplicants()
+                    .atStateClaimIssued()
+                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(CLAIMANT_TWO_ID).build())
+                    .build();
+
+                CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
+                    .applicant2(caseData.getApplicant2().toBuilder()
+                                    .individualFirstName("JJ")
+                                    .individualLastName("Rambo edited").build());
+
+                CaseFlagUtils.createOrUpdateFlags(builder, builder.build(), organisationService);
+
+                Flags actual = builder.build().getApplicant2().getFlags();
+                Flags expected = builder.build().getApplicant2().getFlags();
 
                 assertThat(actual).isEqualTo(expected);
             }
@@ -802,6 +841,26 @@ class CaseFlagUtilsTest {
             }
 
             @Test
+            void shouldNotUpdateDefendant1FlagName_whenFlagIsMissing() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimIssued()
+                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_ONE_ID).build())
+                    .build();
+
+                CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
+                    .respondent1(caseData.getRespondent1().toBuilder()
+                                     .soleTraderFirstName("Solo")
+                                     .soleTraderLastName("New trader").build());
+
+                CaseFlagUtils.createOrUpdateFlags(builder, builder.build(), organisationService);
+
+                Flags actual = builder.build().getRespondent1().getFlags();
+                Flags expected = builder.build().getRespondent1().getFlags();
+
+                assertThat(actual).isEqualTo(expected);
+            }
+
+            @Test
             void shouldUpdateFlagName_whenRespondent2NameUpdated() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssued()
@@ -827,6 +886,28 @@ class CaseFlagUtilsTest {
                     .details(wrapElements(List.of(
                         FlagDetail.builder().name("flag name").build())))
                     .roleOnCase("respondent").build();
+
+                assertThat(actual).isEqualTo(expected);
+            }
+
+            @Test
+            void shouldNotUpdateDefendant2FlagName_whenFlagIsMissing() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimIssued()
+                    .multiPartyClaimTwoDefendantSolicitors()
+                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_TWO_ID).build())
+                    .build();
+
+                CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
+                    .respondent2(caseData.getRespondent2().toBuilder()
+                                     .individualTitle("Miss")
+                                     .individualFirstName("Jenny")
+                                     .individualLastName("Rombo").build());
+
+                CaseFlagUtils.createOrUpdateFlags(builder, builder.build(), organisationService);
+
+                Flags actual = builder.build().getRespondent2().getFlags();
+                Flags expected = builder.build().getRespondent2().getFlags();
 
                 assertThat(actual).isEqualTo(expected);
             }

@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.ManageStayUpdateRequestedSearchService;
 
-import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -24,23 +24,21 @@ public class ManageStayWATaskSchedulerHandler extends BaseExternalTaskHandler {
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
-        if (featureToggleService.isCaseEventsEnabled()) {
 
-            List<CaseDetails> cases = caseSearchService.getCases();
-            log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
+        Set<CaseDetails> cases = caseSearchService.getCases();
+        log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
 
-            cases.forEach(caseDetails -> {
-                try {
-                    applicationEventPublisher.publishEvent(new ManageStayWATaskEvent(caseDetails.getId()));
-                } catch (Exception e) {
-                    log.error(
-                        "Manage Stay WA Task scheduler failed to process case with id: '{}",
-                        caseDetails.getId(),
-                        e
-                    );
-                }
-            });
-        }
+        cases.forEach(caseDetails -> {
+            try {
+                applicationEventPublisher.publishEvent(new ManageStayWATaskEvent(caseDetails.getId()));
+            } catch (Exception e) {
+                log.error(
+                    "Manage Stay WA Task scheduler failed to process case with id: '{}",
+                    caseDetails.getId(),
+                    e
+                );
+            }
+        });
         return ExternalTaskData.builder().build();
     }
 }
