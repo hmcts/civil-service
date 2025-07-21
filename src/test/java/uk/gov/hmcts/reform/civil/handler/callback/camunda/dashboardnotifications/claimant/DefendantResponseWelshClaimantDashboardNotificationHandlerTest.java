@@ -18,8 +18,10 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
+import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -38,6 +40,8 @@ class DefendantResponseWelshClaimantDashboardNotificationHandlerTest extends Bas
     @Mock
     private DashboardScenariosService dashboardScenariosService;
     @Mock
+    private DashboardNotificationService dashboardNotificationService;
+    @Mock
     private DashboardNotificationsParamsMapper mapper;
     @Mock
     private FeatureToggleService toggleService;
@@ -51,6 +55,7 @@ class DefendantResponseWelshClaimantDashboardNotificationHandlerTest extends Bas
 
         @Test
         void shouldRecordScenarioWhenDefendantHasEnglishLanguagePreference_whenInvoked() {
+            when(toggleService.isWelshEnabledForMainCase()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
             caseData = caseData.toBuilder().applicant1Represented(NO).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -70,6 +75,35 @@ class DefendantResponseWelshClaimantDashboardNotificationHandlerTest extends Bas
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }
+
+        @Test
+        void shouldDeleteClaimantDJNotification_whenInvoked() {
+            when(toggleService.isWelshEnabledForMainCase()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
+            caseData = caseData.toBuilder().applicant1Represented(NO).respondent1ResponseDeadline(LocalDateTime.MIN).build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_RESPONSE_WELSH.name()).build()
+            ).build();
+
+            HashMap<String, Object> scenarioParams = new HashMap<>();
+
+            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
+
+            handler.handle(params);
+
+            verify(dashboardNotificationService).deleteByNameAndReferenceAndCitizenRole(
+                "Notice.AAA6.DefResponse.ResponseTimeElapsed.Claimant",
+                caseData.getCcdCaseReference().toString(),
+                "CLAIMANT");
+
+            verify(dashboardScenariosService).recordScenarios(
+                "BEARER_TOKEN",
+                "Scenario.AAA6.EnglishDefResponse.BilingualFlagSet.Claimant",
+                caseData.getCcdCaseReference().toString(),
+                ScenarioRequestParams.builder().params(scenarioParams).build()
+            );
+        }
+
 
         @Test
         void shouldRecordScenarioWhenDefendantHasWelshLanguagePreference_whenInvoked() {
