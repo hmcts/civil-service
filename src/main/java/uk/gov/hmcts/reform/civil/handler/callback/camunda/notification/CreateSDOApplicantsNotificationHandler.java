@@ -82,8 +82,7 @@ public class CreateSDOApplicantsNotificationHandler extends CallbackHandler impl
                  .getOrganisation().getOrganisationID(), caseData)
         ));
         addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
 
         return properties;
     }
@@ -95,8 +94,7 @@ public class CreateSDOApplicantsNotificationHandler extends CallbackHandler impl
             CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData)
         ));
         addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
         return properties;
     }
 

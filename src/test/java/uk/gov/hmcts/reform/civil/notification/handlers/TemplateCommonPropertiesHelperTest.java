@@ -32,6 +32,9 @@ class TemplateCommonPropertiesHelperTest {
     private static final String TEST_OPENING_HOURS_WELSH = "Dydd Llun i ddydd Iau, 9am – 5pm, dydd Gwener, 9am – 4.30pm";
     private static final String TEST_LIP_CONTACT = "Email: contactocmc@justice.gov.uk";
     private static final String TEST_LIP_CONTACT_WELSH = "E-bost: ymholiadaucymraeg@justice.gov.uk";
+    private static final String TEST_RAISE_QUERY_LR = "Raise query LR";
+    private static final String TEST_RAISE_QUERY_LIP = "Raise query LIP";
+    private static final String TEST_RAISE_QUERY_LIP_WELSH = "Raise query LIP welsh";
 
     @Mock
     private NotificationsSignatureConfiguration configuration;
@@ -59,11 +62,13 @@ class TemplateCommonPropertiesHelperTest {
         when(configuration.getWelshOpeningHours()).thenReturn(TEST_OPENING_HOURS_WELSH);
         when(configuration.getLipContactEmail()).thenReturn(TEST_LIP_CONTACT);
         when(configuration.getLipContactEmailWelsh()).thenReturn(TEST_LIP_CONTACT_WELSH);
+        when(configuration.getRaiseQueryLr()).thenReturn(TEST_RAISE_QUERY_LR);
+        when(configuration.getRaiseQueryLip()).thenReturn(TEST_RAISE_QUERY_LIP);
+        when(configuration.getRaiseQueryLipWelsh()).thenReturn(TEST_RAISE_QUERY_LIP_WELSH);
     }
 
     @Test
-    void shouldAddSpecAndUnspecContactForLRCase() {
-        when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
+    void shouldAddSpecAndUnspecContactForLRCase_offline() {
         when(caseData.isLipCase()).thenReturn(false);
         when(caseData.getCcdState()).thenReturn(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM);
 
@@ -76,8 +81,7 @@ class TemplateCommonPropertiesHelperTest {
 
     @Test
     void shouldAddContactForLipCase() {
-        when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
-        when(featureToggleService.isLipQueryManagementEnabled(any())).thenReturn(true);
+        when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
         when(caseData.isLipCase()).thenReturn(true);
         when(caseData.getCcdState()).thenReturn(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM);
 
@@ -90,8 +94,7 @@ class TemplateCommonPropertiesHelperTest {
 
     @Test
     void shouldAddContactForWelshLipCase() {
-        when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
-        when(featureToggleService.isLipQueryManagementEnabled(any())).thenReturn(true);
+        when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
         when(caseData.isLipCase()).thenReturn(true);
         when(caseData.getCcdState()).thenReturn(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM);
 
@@ -104,7 +107,6 @@ class TemplateCommonPropertiesHelperTest {
 
     @Test
     void shouldAddCnbcContactForLRCase() {
-        when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
         when(caseData.isLipCase()).thenReturn(false);
         when(caseData.getCcdState()).thenReturn(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM);
 
@@ -116,30 +118,7 @@ class TemplateCommonPropertiesHelperTest {
     }
 
     @Test
-    void shouldAddSpecAndUnspecContactForNonLRCase() {
-        when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(false);
-
-        Map<String, String> properties = new java.util.HashMap<>();
-        helper.addSpecAndUnspecContact(caseData, properties);
-
-        assertThat(properties)
-            .containsEntry(SPEC_UNSPEC_CONTACT, TEST_SPEC_UNSPEC_CONTACT);
-    }
-
-    @Test
-    void shouldAddCnbcContactForNonLRCase() {
-        Map<String, String> properties = new java.util.HashMap<>();
-        when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(false);
-
-        helper.addCnbcContact(caseData, properties);
-
-        assertThat(properties)
-            .containsEntry(CNBC_CONTACT, TEST_CNBC_CONTACT);
-    }
-
-    @Test
     void shouldCheckIfQueryManagementAllowedForLRCase() {
-        when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
         when(caseData.isLipCase()).thenReturn(false);
         when(caseData.getCcdState()).thenReturn(CaseState.AWAITING_APPLICANT_INTENTION);
 
@@ -150,23 +129,13 @@ class TemplateCommonPropertiesHelperTest {
 
     @Test
     void shouldCheckIfQueryManagementAllowedForLipCase() {
-        when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
-        when(featureToggleService.isLipQueryManagementEnabled(any())).thenReturn(true);
+        when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
         when(caseData.isLipCase()).thenReturn(true);
         when(caseData.getCcdState()).thenReturn(CaseState.AWAITING_APPLICANT_INTENTION);
 
         boolean result = helper.isQueryManagementAllowedForLipCase(caseData);
 
         assertThat(result).isTrue();
-    }
-
-    @Test
-    void shouldCheckIfQueryManagementNotAllowedForNonLRCase() {
-        when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(false);
-
-        boolean result = helper.isQueryManagementAllowedForLRCase(caseData);
-
-        assertThat(result).isFalse();
     }
 
     @Test
