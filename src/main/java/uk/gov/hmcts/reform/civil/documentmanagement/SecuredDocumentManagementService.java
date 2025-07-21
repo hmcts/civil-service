@@ -212,7 +212,7 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
             }
 
             return new DownloadedDocumentResponse(responseEntity.getBody(), documentMetadata.originalDocumentName,
-                                                  documentMetadata.mimeType);
+                                                  tika.detect(documentMetadata.originalDocumentName));
         } catch (Exception ex) {
             log.error("Failed downloading document {}", documentPath, ex);
             throw new DocumentDownloadException(documentPath, ex);

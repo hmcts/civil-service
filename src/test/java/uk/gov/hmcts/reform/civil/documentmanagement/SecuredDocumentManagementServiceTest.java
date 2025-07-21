@@ -2,7 +2,9 @@ package uk.gov.hmcts.reform.civil.documentmanagement;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.http.entity.mime.MIME;
 import org.apache.tika.Tika;
+import org.apache.xmpbox.type.MIMEType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -14,6 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
@@ -51,7 +54,7 @@ import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SE
 @SpringBootTest(classes = {
     SecuredDocumentManagementService.class,
     JacksonAutoConfiguration.class,
-    DocumentManagementConfiguration.class})
+    DocumentManagementConfiguration.class, Tika.class})
 class SecuredDocumentManagementServiceTest {
 
     private static final String USER_ROLES_JOINED = "caseworker-civil,caseworker-civil-solicitor";
@@ -65,18 +68,12 @@ class SecuredDocumentManagementServiceTest {
     private AuthTokenGenerator authTokenGenerator;
     @MockBean
     private UserService userService;
-    @MockBean
-    private Tika tika;
-
     @Autowired
     private ObjectMapper mapper;
-
     @Autowired
     private SecuredDocumentManagementService documentManagementService;
-
     @Mock
     private ResponseEntity<Resource> responseEntity;
-
 
     private static final String PNG_MIME_TYPE = "application/png";
 
@@ -156,7 +153,6 @@ class SecuredDocumentManagementServiceTest {
             );
 
             //when
-            when(tika.detect(anyString())).thenReturn(PNG_MIME_TYPE);
             when(caseDocumentClientApi.uploadDocuments(anyString(), anyString(), any(DocumentUploadRequest.class)))
                 .thenReturn(uploadResponse);
 
@@ -310,6 +306,42 @@ class SecuredDocumentManagementServiceTest {
                 ResourceReader.readString("document-management/download.success.json"),
                 Document.class
             );
+            String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8ae1b7";
+            UUID documentId = getDocumentIdFromSelfHref(documentPath);
+
+            when(caseDocumentClientApi.getMetadataForDocument(
+                     anyString(),
+                     anyString(),
+                     eq(documentId)
+                 )
+            ).thenReturn(document);
+
+            when(caseDocumentClientApi.getDocumentBinary(
+                     anyString(),
+                     anyString(),
+                     eq(documentId)
+                 )
+            ).thenReturn(responseEntity);
+
+            when(responseEntity.getBody()).thenReturn(new ByteArrayResource("test".getBytes()));
+
+            //When
+            DownloadedDocumentResponse expectedResult =
+                new DownloadedDocumentResponse(new ByteArrayResource("test".getBytes()), "TEST_DOCUMENT_1.pdf",
+                                               "application/pdf");
+
+            //Then
+            assertEquals(expectedResult, documentManagementService.downloadDocumentWithMetaData(BEARER_TOKEN, documentPath));
+        }
+
+        @Test
+        void shouldDownloadDocumentByDocumentPathMetaDataWithInvalidMimeType() throws JsonProcessingException {
+            //Given
+            Document document = mapper.readValue(
+                ResourceReader.readString("document-management/download.success.json"),
+                Document.class
+            );
+            document.mimeType = MediaType.ALL_VALUE;
             String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8ae1b7";
             UUID documentId = getDocumentIdFromSelfHref(documentPath);
 
