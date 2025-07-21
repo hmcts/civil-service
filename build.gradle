@@ -97,7 +97,6 @@ allprojects {
         entry 'guava'
       }
 
-
       dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-common', version: '1.9.25'
       dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk7', version: '1.9.25'
       dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8', version: '1.9.25'
@@ -108,7 +107,6 @@ allprojects {
 
       //Solves CVE-2023-34034
       dependency group: 'org.springframework.security', name: 'spring-security-crypto', version: '6.5.1'
-
 
       dependency group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: versions.jackson
       dependency group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: versions.jackson
