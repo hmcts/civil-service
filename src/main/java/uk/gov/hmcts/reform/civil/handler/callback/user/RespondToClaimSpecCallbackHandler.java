@@ -401,10 +401,19 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             currentShowFlags.add(WHEN_WILL_CLAIM_BE_PAID);
         }
         updatedCaseData.showConditionFlags(currentShowFlags);
+        check1v1PartAdmitLRBulkAdmission(updatedCaseData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.build().toMap(objectMapper))
             .build();
+    }
+
+    private void check1v1PartAdmitLRBulkAdmission(CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
+        CaseData caseData = updatedCaseData.build();
+        if (featureToggleService.isLrAdmissionBulkEnabled()) {
+            updatedCaseData.partAdmit1v1Defendant(MultiPartyScenario.isOneVOne(caseData)
+                                                      && caseData.isPartAdmitClaimSpec() ? YES : NO);
+        }
     }
 
     private Set<DefendantResponseShowTag> checkNecessaryFinancialDetails(CaseData caseData) {
