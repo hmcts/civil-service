@@ -92,8 +92,7 @@ public class ClaimantResponseConfirmsToProceedApplicantNotificationHandler exten
             APPLICANT_ONE_NAME, getPartyNameBasedOnType(caseData.getApplicant1())
         ));
         addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
         return properties;
     }
 }
