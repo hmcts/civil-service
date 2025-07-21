@@ -38,9 +38,9 @@ public class EvidenceUploadNotificationSearchService extends ElasticSearchServic
                 .mustNot(matchQuery("data.evidenceUploadNotificationSent", "Yes"))
                 .must(boolQuery()
                           .minimumShouldMatch(1)
-                          .should(rangeQuery("data.caseDocumentUploadDate").lt("now/d").gt(
+                          .should(rangeQuery("data.caseDocumentUploadDate").lt("now").gt(
                               "now-7d"))
-                          .should(rangeQuery("data.caseDocumentUploadDateRes").lt("now/d").gt(
+                          .should(rangeQuery("data.caseDocumentUploadDateRes").lt("now").gt(
                               "now-7d"))
                           ),
             List.of("reference"),
