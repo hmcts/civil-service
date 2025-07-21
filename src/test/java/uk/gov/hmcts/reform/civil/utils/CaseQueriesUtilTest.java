@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
@@ -27,11 +28,13 @@ import java.time.OffsetDateTime;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.QueryCollectionType.APPLICANT_SOLICITOR_QUERIES;
 import static uk.gov.hmcts.reform.civil.enums.QueryCollectionType.RESPONDENT_SOLICITOR_ONE_QUERIES;
 import static uk.gov.hmcts.reform.civil.enums.QueryCollectionType.RESPONDENT_SOLICITOR_TWO_QUERIES;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
@@ -931,4 +934,101 @@ class CaseQueriesUtilTest {
         assertNull(result);
     }
 
+    @Test
+    void shouldMigrateAllQueries_whenOldQueriesExist() {
+        List<Element<CaseMessage>> applicantMessages = wrapElements(CaseMessage.builder().id("app1").createdOn(OffsetDateTime.now()).build());
+        List<Element<CaseMessage>> respondent1Messages = wrapElements(CaseMessage.builder().id("res1").createdOn(OffsetDateTime.now().plusHours(1)).build());
+        List<Element<CaseMessage>> respondent2Messages = wrapElements(CaseMessage.builder().id("res2").createdOn(OffsetDateTime.now().plusHours(2)).build());
+
+        CaseData.CaseDataBuilder builder = CaseData.builder()
+            .qmApplicantSolicitorQueries(CaseQueriesCollection.builder().caseMessages(applicantMessages).build())
+            .qmRespondentSolicitor1Queries(CaseQueriesCollection.builder().caseMessages(respondent1Messages).build())
+            .qmRespondentSolicitor2Queries(CaseQueriesCollection.builder().caseMessages(respondent2Messages).build());
+
+        CaseQueriesUtil.migrateAllQueries(builder);
+
+        CaseData updatedCaseData = builder.build();
+        assertThat(updatedCaseData.getQueries()).isNotNull();
+        assertThat(updatedCaseData.getQueries().getPartyName()).isEqualTo("All queries");
+        assertThat(updatedCaseData.getQueries().getCaseMessages()).hasSize(3);
+        assertThat(unwrapElements(updatedCaseData.getQueries().getCaseMessages()).stream().map(CaseMessage::getId))
+            .containsExactlyInAnyOrder("app1", "res1", "res2");
+    }
+
+    @Test
+    void shouldNotMigrateQueries_whenNoOldQueriesExist() {
+        CaseData.CaseDataBuilder builder = CaseData.builder();
+
+        CaseQueriesUtil.migrateAllQueries(builder);
+
+        CaseData updatedCaseData = builder.build();
+        assertThat(updatedCaseData.getQueries()).isNull();
+    }
+
+    @Test
+    void shouldNotConsumeOriginalException() {
+        CaseData.CaseDataBuilder builder = CaseData.builder()
+            .qmApplicantSolicitorQueries(CaseQueriesCollection.builder().caseMessages(List.of(element(CaseMessage.builder().build()))).build());
+
+        try (MockedStatic<CaseQueriesUtil> mockedStatic = mockStatic(CaseQueriesUtil.class)) {
+            NullPointerException expectedException = new NullPointerException("Simulated migration failure");
+            mockedStatic.when(() -> CaseQueriesUtil.migrateAllQueries(any(CaseData.CaseDataBuilder.class)))
+                .thenCallRealMethod();
+            mockedStatic.when(() -> CaseQueriesUtil.hasOldQueries(any(CaseData.class)))
+                .thenCallRealMethod();
+            mockedStatic.when(() -> CaseQueriesUtil.migrateQueries(any(CaseQueriesCollection.class), any(CaseData.CaseDataBuilder.class)))
+                .thenThrow(expectedException);
+
+            NullPointerException thrownException = assertThrows(NullPointerException.class, () ->
+                CaseQueriesUtil.migrateAllQueries(builder));
+
+            assertThat(thrownException).isEqualTo(expectedException);
+        }
+    }
+
+    @Test
+    void shouldClearOldQueryCollections_whenOldQueriesExist() {
+        CaseData.CaseDataBuilder builder = CaseData.builder()
+            .qmApplicantSolicitorQueries(CaseQueriesCollection.builder().build())
+            .qmRespondentSolicitor1Queries(CaseQueriesCollection.builder().build())
+            .qmRespondentSolicitor2Queries(CaseQueriesCollection.builder().build());
+
+        CaseQueriesUtil.clearOldQueryCollections(builder);
+
+        CaseData updatedCaseData = builder.build();
+        assertThat(updatedCaseData.getQmApplicantSolicitorQueries()).isNull();
+        assertThat(updatedCaseData.getQmRespondentSolicitor1Queries()).isNull();
+        assertThat(updatedCaseData.getQmRespondentSolicitor2Queries()).isNull();
+    }
+
+    @Test
+    void shouldNotClearOldQueryCollections_whenNoOldQueriesExist() {
+        CaseData.CaseDataBuilder builder = CaseData.builder();
+
+        CaseQueriesUtil.clearOldQueryCollections(builder);
+
+        CaseData updatedCaseData = builder.build();
+        assertThat(updatedCaseData.getQmApplicantSolicitorQueries()).isNull();
+        assertThat(updatedCaseData.getQmRespondentSolicitor1Queries()).isNull();
+        assertThat(updatedCaseData.getQmRespondentSolicitor2Queries()).isNull();
+    }
+
+    @Test
+    void shouldNotError_whenOldQueriesExistWhileLoggingMigrationSuccess() {
+        List<Element<CaseMessage>> applicantMessages = wrapElements(CaseMessage.builder().id("app1").createdOn(OffsetDateTime.now()).build());
+        List<Element<CaseMessage>> respondent1Messages = wrapElements(CaseMessage.builder().id("res1").createdOn(OffsetDateTime.now().plusHours(1)).build());
+        List<Element<CaseMessage>> respondent2Messages = wrapElements(CaseMessage.builder().id("res2").createdOn(OffsetDateTime.now().plusHours(2)).build());
+
+        CaseData.CaseDataBuilder builder = CaseData.builder()
+            .qmApplicantSolicitorQueries(CaseQueriesCollection.builder().caseMessages(applicantMessages).build())
+            .qmRespondentSolicitor1Queries(CaseQueriesCollection.builder().caseMessages(respondent1Messages).build())
+            .qmRespondentSolicitor2Queries(CaseQueriesCollection.builder().caseMessages(respondent2Messages).build());
+
+        CaseQueriesUtil.logMigrationSuccess(builder.build());
+    }
+
+    @Test
+    void shouldNotError_whenNoOldQueriesExistWhileLoggingMigrationSuccess() {
+        CaseQueriesUtil.logMigrationSuccess(CaseData.builder().build());
+    }
 }
