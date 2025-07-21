@@ -141,7 +141,7 @@ public class QueryNotificationUtils {
                 emailDetailsList.add(createLipOnCaseEmailDetails(email, lipName, lipOtherPartyWelsh));
                 break;
             case "lipRespondent":
-                email = caseData.getDefendantUserDetails().getEmail();
+                email = caseData.getRespondent1().getPartyEmail();
                 lipName = caseData.getRespondent1().getPartyName();
                 lipOtherPartyWelsh = caseData.isRespondentResponseBilingual() ? "WELSH" : "NON_WELSH";
                 emailDetailsList.add(createLipOnCaseEmailDetails(email, lipName, lipOtherPartyWelsh));
