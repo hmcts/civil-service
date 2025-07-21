@@ -1676,12 +1676,15 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT, caseDataBefore.toMap(mapper));
 
             when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+            when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getData()).extracting("respondent1").extracting("flags").isNotNull();
-            assertThat(response.getData()).extracting("businessProcess").isNotNull();
-            assertThat(response.getData().get("businessProcess")).extracting("camundaEvent").isEqualTo(DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC.name());
+            CaseData responseData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(responseData.getRespondent1().getFlags()).isNotNull();
+            assertThat(responseData.getBusinessProcess()).isNotNull();
+            assertThat(responseData.getBusinessProcess().getCamundaEvent()).isEqualTo(DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC.name());
             assertThat(response.getState()).isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
+            assertThat(responseData.getJoRepaymentSummaryObject()).doesNotContain("Claim interest amount");
             assertInterestIsPopulated(response, 0);
         }
     }

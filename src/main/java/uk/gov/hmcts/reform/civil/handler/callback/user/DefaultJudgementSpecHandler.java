@@ -397,7 +397,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
 
         repaymentBreakdown.append("\n").append("### Claim amount \n £").append(caseData.getTotalClaimAmount().setScale(2));
 
-        if (interest.compareTo(BigDecimal.ZERO) != 0) {
+        if (!toggleService.isLrAdmissionBulkEnabled() && interest.compareTo(BigDecimal.ZERO) != 0) {
             repaymentBreakdown.append("\n ### Claim interest amount \n").append("£").append(interest.setScale(2));
         }
 
@@ -507,10 +507,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             JudgmentDetails activeJudgment = djOnlineMapper.addUpdateActiveJudgment(caseData);
             caseData.setActiveJudgment(activeJudgment);
             BigDecimal interest = interestCalculator.calculateInterest(caseData);
-            caseData.setJoRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(
-                activeJudgment,
-                interest
-            ));
+            caseData.setJoRepaymentSummaryObject(getDJJudgmentTabSummaryObject(activeJudgment, interest));
             caseData.setJoIsLiveJudgmentExists(YesOrNo.YES);
             caseData.setJoDJCreatedDate(LocalDateTime.now());
         }
@@ -540,6 +537,12 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             .data(caseDataBuilder.build().toMap(objectMapper))
             .state(nextState)
             .build();
+    }
+
+    private String getDJJudgmentTabSummaryObject(JudgmentDetails activeJudgment, BigDecimal interest) {
+        return featureToggleService.isLrAdmissionBulkEnabled()
+            ? JudgmentsOnlineHelper.calculateRepaymentBreakdownSummaryForLRImmediatePlan(activeJudgment)
+            : JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(activeJudgment, interest);
     }
 
     private BigDecimal calculateOverallTotal(BigDecimal partialPaymentPounds, BigDecimal subTotal) {
