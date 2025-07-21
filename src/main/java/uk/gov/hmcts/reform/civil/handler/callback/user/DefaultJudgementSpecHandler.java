@@ -541,7 +541,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
 
     private String getDJJudgmentTabSummaryObject(JudgmentDetails activeJudgment, BigDecimal interest) {
         return featureToggleService.isLrAdmissionBulkEnabled()
-            ? JudgmentsOnlineHelper.calculateRepaymentBreakdownSummaryForLRImmediatePlan(activeJudgment)
+            ? JudgmentsOnlineHelper.calculateRepaymentBreakdownSummaryWithoutClaimInterest(activeJudgment, true)
             : JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(activeJudgment, interest);
     }
 
