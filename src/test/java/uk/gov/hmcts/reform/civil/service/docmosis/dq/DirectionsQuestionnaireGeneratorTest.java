@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.ComplexityBand;
 import uk.gov.hmcts.reform.civil.enums.ExpertReportsSent;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -1523,39 +1522,6 @@ class DirectionsQuestionnaireGeneratorTest {
                 .uploadDocument(BEARER_TOKEN, new PDF(HNL_FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE));
             verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class),
                 eq(DQ_RESPONSE_1V1));
-        }
-
-        @Test
-        void shouldGenerateClaimantDQ_for1v2_DS() {
-            when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DQ_RESPONSE_1V2_DS)))
-                .thenReturn(new DocmosisDocument(DQ_RESPONSE_1V2_DS.getDocumentTitle(), bytes));
-            when(documentManagementService.uploadDocument(
-                BEARER_TOKEN, new PDF(HNL_FILE_NAME_CLAIMANT_1v2, bytes, DIRECTIONS_QUESTIONNAIRE))
-            ).thenReturn(HNL_CASE_DOCUMENT_DEFENDANT);
-
-            CaseData caseData = CaseDataBuilder.builder()
-                .multiPartyClaimTwoDefendantSolicitors()
-                .atStateApplicantRespondToDefenceAndProceedVsBothDefendants_1v2()
-                .respondent2SameLegalRepresentative(NO)
-                .respondent2AcknowledgeNotificationDate(LocalDateTime.now())
-                .respondent2ClaimResponseType(RespondentResponseType.FULL_DEFENCE)
-                .businessProcess(BusinessProcess.builder().camundaEvent("CLAIMANT_RESPONSE").build())
-                .build();
-            if (caseData.getRespondent2OrgRegistered() != null
-                && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
-            }
-            CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
-
-            assertThat(caseDocument).isNotNull().isEqualTo(HNL_CASE_DOCUMENT_DEFENDANT);
-
-            verify(representativeService).getRespondent2Representative(caseData);
-            verify(documentManagementService)
-                .uploadDocument(BEARER_TOKEN, new PDF(HNL_FILE_NAME_CLAIMANT_1v2, bytes, DIRECTIONS_QUESTIONNAIRE));
-            verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class),
-                eq(DQ_RESPONSE_1V2_DS));
         }
 
         @Test

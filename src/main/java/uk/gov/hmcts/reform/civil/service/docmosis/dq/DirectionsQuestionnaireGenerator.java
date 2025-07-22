@@ -28,7 +28,6 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartySc
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_RESPONSE_1V1;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_RESPONSE_1V1_FAST_TRACK_INT;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_RESPONSE_1V2_DS;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_RESPONSE_1V2_DS_FAST_TRACK_INT;
 
 @Service
@@ -81,8 +80,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
         switch (getMultiPartyScenario(caseData)) {
             case ONE_V_TWO_TWO_LEGAL_REP:
                 if (isClaimantResponse(caseData) && isClaimantMultipartyProceed(caseData)) {
-                    templateId = isFastTrackOrMinti
-                        ? DQ_RESPONSE_1V2_DS_FAST_TRACK_INT : DQ_RESPONSE_1V2_DS;
+                    templateId = DQ_RESPONSE_1V2_DS_FAST_TRACK_INT;
                 }
                 break;
             case ONE_V_TWO_ONE_LEGAL_REP:
