@@ -2,3 +2,19 @@
 launchdarkly:
   # The last file in the list of files must be one with the latest status from launchdarkly; the ones before are to override those values
   file: bin/utils/launchdarkly-flag-GAspec.json, bin/utils/launchdarkly-flags.json
+
+
+logging:
+  level:
+    org.springframework:
+      dao: DEBUG
+      transaction: DEBUG
+        interceptor = trace
+      jdbc.core.JdbcTemplate: info
+      orm.jpa: DEBUG
+      org.hibernate:
+        SQL: DEBUG
+        type.descriptor.sql.BasicBinder: DEBUG
+        engine: DEBUG
+        transaction: DEBUG
+    uk.gov.hmcts.reform: DEBUG
