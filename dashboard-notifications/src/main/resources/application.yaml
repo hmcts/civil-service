@@ -19,14 +19,14 @@ logging:
     org.springframework:
       dao: DEBUG
       transaction: DEBUG
-        interceptor = trace
+#        interceptor = trace
       jdbc.core.JdbcTemplate: info
-      orm.jpa: DEBUG
-      org.hibernate:
-          SQL: DEBUG
-          type.descriptor.sql.BasicBinder: DEBUG
-          engine: DEBUG
-          transaction: DEBUG
+#      orm.jpa: DEBUG
+#      org.hibernate:
+#          SQL: DEBUG
+#          type.descriptor.sql.BasicBinder: DEBUG
+#          engine: DEBUG
+#          transaction: DEBUG
     uk.gov.hmcts.reform: DEBUG
 config:
   allowedJurisdictions: ${ALLOWED_JURISDICTIONS:wa,ia,sscs,civil,PUBLICLAW,PRIVATELAW,EMPLOYMENT}
