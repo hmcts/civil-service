@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimAmountBreakup;
@@ -42,6 +43,8 @@ import java.util.function.Function;
 
 import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
@@ -121,7 +124,10 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
     public SealedClaimFormForSpec getTemplateData(CaseData caseData) {
         Optional<SolicitorReferences> solicitorReferences = ofNullable(caseData.getSolicitorReferences());
         BigDecimal interest = interestCalculator.calculateInterest(caseData);
-        return SealedClaimFormForSpec.builder()
+        List<SpecifiedParty> respondents = getRespondents(caseData);
+        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
+
+        SealedClaimFormForSpec.SealedClaimFormForSpecBuilder sealedClaimFormBuilder =  SealedClaimFormForSpec.builder()
             .ccdCaseReference(formatCcdCaseReference(caseData))
             .referenceNumber(caseData.getLegacyCaseReference())
             .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
@@ -134,7 +140,7 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
             .issueDate(caseData.getIssueDate())
             .submittedOn(caseData.getSubmittedDate().toLocalDate())
             .applicants(getApplicants(caseData))
-            .respondents(getRespondents(caseData))
+            .respondents(respondents)
             .timeline(getTimeLine(caseData))
             .sameInterestRate(caseData.getInterestClaimOptions() != null
                 ? caseData.getInterestClaimOptions().equals(SAME_RATE_INTEREST) + "" : null)
@@ -179,8 +185,16 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
                                  ? MonetaryConversions.penniesToPounds(BigDecimal.valueOf(
                                      Integer.parseInt(caseData.getFixedCosts().getFixedCostAmount()))).toString()
                                  : (BigDecimal.valueOf(0)).toString())
-            .respondentsOrgRegistered(getRespondentsOrgRegistered(caseData))
-            .build();
+            .respondentsOrgRegistered(getRespondentsOrgRegistered(caseData));
+
+        if (caseData.isRespondentSolicitorRegistered()) {
+            sealedClaimFormBuilder.respondent1RepresentativeOrganisationName(respondents.get(0).getRepresentative().getOrganisationName());
+        }
+        if (multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP && caseData.isRespondentTwoSolicitorRegistered()) {
+            sealedClaimFormBuilder.respondent2RepresentativeOrganisationName(respondents.get(1).getRepresentative().getOrganisationName());
+        }
+
+        return sealedClaimFormBuilder.build();
     }
 
     private LocalDate getInterestFromDate(CaseData caseData) {
