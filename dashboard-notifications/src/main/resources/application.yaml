@@ -17,14 +17,17 @@ ccd_gateway:
 logging:
   level:
     org.springframework:
-      dao: debug
-      transaction: debug
+      dao: DEBUG
+      transaction: DEBUG
+        interceptor = trace
       jdbc.core.JdbcTemplate: info
+      orm.jpa: DEBUG
       org.hibernate:
-          SQL: debug
-          type.descriptor.sql.BasicBinder: debug
-          engine: debug
-    uk.gov.hmcts.reform: debug
+          SQL: DEBUG
+          type.descriptor.sql.BasicBinder: DEBUG
+          engine: DEBUG
+          transaction: DEBUG
+    uk.gov.hmcts.reform: DEBUG
 config:
   allowedJurisdictions: ${ALLOWED_JURISDICTIONS:wa,ia,sscs,civil,PUBLICLAW,PRIVATELAW,EMPLOYMENT}
   allowedCaseTypes: ${ALLOWED_CASE_TYPES:asylum,wacasetype,sscs,civil,generalapplication,CARE_SUPERVISION_EPO,PRLAPPS,ET_EnglandWales,ET_EnglandWales_Listings,ET_EnglandWales_Multiple,ET_Scotland,ET_Scotland_Listings,ET_Scotland_Multiple,ET_Admin}
