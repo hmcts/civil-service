@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notification.handlers.resetpin.ResetPinDefendantLipNotifier;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
@@ -24,6 +25,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 @ExtendWith(MockitoExtension.class)
@@ -102,4 +104,38 @@ public class ResetPinCUICallbackHandlerTest extends BaseCallbackHandlerTest {
         }
     }
 
+    @Nested
+    class AboutToStartCallback {
+
+        @Test
+        void shouldReturnErrorWhenDefendantEmailIsMissing() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued()
+                .respondent1(null)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).containsExactly(
+                "Defendant email is missing. Please update defendant details with Manage contact information event and then perform RESET PIN"
+            );
+        }
+
+        @Test
+        void shouldNotReturnErrorWhenDefendantEmailIsPresent() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued()
+                .respondent1(Party.builder()
+                                 .partyEmail("test@gmail.com").build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNullOrEmpty();
+        }
+    }
 }
