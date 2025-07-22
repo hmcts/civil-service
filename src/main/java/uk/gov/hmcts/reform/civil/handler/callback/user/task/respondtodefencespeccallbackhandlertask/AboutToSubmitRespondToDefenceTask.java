@@ -114,6 +114,12 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
         clearTempDocuments(builder);
 
         if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
+            if ((AllocatedTrack.MULTI_CLAIM.name().equals(caseData.getResponseClaimTrack())
+                || AllocatedTrack.INTERMEDIATE_CLAIM.name().equals(caseData.getResponseClaimTrack())
+                && caseData.isLipCase())) {
+                builder.isMintiLipCase(YES);
+            }
+
             updateWaCourtLocationsService.ifPresent(service -> service.updateCourtListingWALocations(
                 callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
                 builder
