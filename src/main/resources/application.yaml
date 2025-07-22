@@ -838,18 +838,3 @@ court_location_dmn:
 
 stitch-bundle:
   wait-time-in-milliseconds: ${WAIT_TIME_IN_MILLISECONDS:3000}
-
-logging:
-  level:
-    org.springframework:
-      dao: DEBUG
-      transaction: DEBUG
-#        interceptor = trace
-      jdbc.core.JdbcTemplate: info
-#      orm.jpa: DEBUG
-#      org.hibernate:
-#        SQL: DEBUG
-#        type.descriptor.sql.BasicBinder: DEBUG
-#        engine: DEBUG
-#        transaction: DEBUG
-    uk.gov.hmcts.reform: DEBUG
