@@ -206,13 +206,13 @@ public class CaseQueriesUtil {
     }
 
     private static boolean isWelshQuery(CaseData caseData, List<String> roles) {
-        String languagePreference = null;
         if (isLIPClaimant(roles)) {
-            languagePreference = caseData.getClaimantBilingualLanguagePreference();
-        } else if (isLIPDefendant(roles)) {
-            languagePreference = caseData.getDefendantBilingualLanguagePreference();
+            return caseData.isClaimantBilingual();
         }
-        return nonNull(languagePreference) && (languagePreference.equals("WELSH") || languagePreference.equals("BOTH"));
+        if (isLIPDefendant(roles)) {
+            return caseData.isRespondentResponseBilingual();
+        }
+        return false;
     }
 
     public static LatestQuery buildLatestQuery(CaseMessage latestCaseMessage) {
