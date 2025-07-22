@@ -94,8 +94,7 @@ public class HearingFeeUnpaidApplicantNotificationHandler extends CallbackHandle
             CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
         addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
 
         return properties;
     }
@@ -107,8 +106,7 @@ public class HearingFeeUnpaidApplicantNotificationHandler extends CallbackHandle
             PARTY_NAME, caseData.getApplicant1().getPartyName()
         ));
         addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
         return properties;
 
     }
