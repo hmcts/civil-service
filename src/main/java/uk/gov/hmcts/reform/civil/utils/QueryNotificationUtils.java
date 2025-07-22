@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
@@ -141,6 +142,9 @@ public class QueryNotificationUtils {
                 emailDetailsList.add(createLipOnCaseEmailDetails(email, lipName, lipOtherPartyWelsh));
                 break;
             case "lipRespondent":
+                if (ofNullable(caseData.getRespondent1().getPartyEmail()).isEmpty()) {
+                    break;
+                }
                 email = caseData.getRespondent1().getPartyEmail();
                 lipName = caseData.getRespondent1().getPartyName();
                 lipOtherPartyWelsh = caseData.isRespondentResponseBilingual() ? "WELSH" : "NON_WELSH";
@@ -153,15 +157,24 @@ public class QueryNotificationUtils {
                 break;
             case "lrDefendant":
                 if (getMultiPartyScenario(caseData).equals(ONE_V_TWO_TWO_LEGAL_REP)) {
+                    if (ofNullable(caseData.getRespondentSolicitor1EmailAddress()).isEmpty()) {
+                        break;
+                    }
                     emailDetailsList.add(createEmailDetails(
                         caseData.getRespondentSolicitor1EmailAddress(),
                         getLegalOrganizationNameForRespondent(caseData, true, organisationService)
                     ));
+                    if (ofNullable(caseData.getRespondentSolicitor2EmailAddress()).isEmpty()) {
+                        break;
+                    }
                     emailDetailsList.add(createEmailDetails(
                         caseData.getRespondentSolicitor2EmailAddress(),
                         getLegalOrganizationNameForRespondent(caseData, false, organisationService)
                     ));
                 } else {
+                    if (ofNullable(caseData.getRespondentSolicitor1EmailAddress()).isEmpty()) {
+                        break;
+                    }
                     email = caseData.getRespondentSolicitor1EmailAddress();
                     legalOrgName = getLegalOrganizationNameForRespondent(caseData, true, organisationService);
                     emailDetailsList.add(createEmailDetails(email, legalOrgName));
