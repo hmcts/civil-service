@@ -22,11 +22,14 @@ import uk.gov.hmcts.reform.civil.model.CourtLocation;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.search.Query;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.data.UserAuthContent;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.CASE_TYPE;
@@ -48,6 +51,7 @@ public class CoreCaseDataService {
     private final CaseDetailsConverter caseDetailsConverter;
     private final UserService userService;
     private final FeatureToggleService featureToggleService;
+    private final LocationReferenceDataService referenceDataService;
 
     public void triggerEvent(Long caseId, CaseEvent eventName) {
         triggerEvent(caseId, eventName, Map.of());
@@ -74,10 +78,16 @@ public class CoreCaseDataService {
                                                    String caseManagementLocationObj,
                                                    String courtLocationObj,
                                                    String applicant1DQRequestedCourtObj,
+                                                   String respondent1DQRequestedCourtObj,
                                                    String eventSummary,
                                                    String eventDescription) {
         StartEventResponse startEventResponse = startUpdate(caseId.toString(), eventName);
         HashMap<String, Object> payload = new HashMap<>(startEventResponse.getCaseDetails().getData());
+        List<LocationRefData> locationRefDataList = referenceDataService.getCourtLocationsByEpimmsId(
+            getSystemUpdateUser().getUserToken(),
+            epimdsId
+        );
+        LocationRefData locationRefData = locationRefDataList.get(0);
         //set case management location epimsId
         if ("Yes".equalsIgnoreCase(caseManagementLocationObj)) {
             Object caseManagementLocation = payload.get("caseManagementLocation");
@@ -111,12 +121,30 @@ public class CoreCaseDataService {
                     .caseLocation(CaseLocationCivil.builder()
                                       .region(region)
                                       .baseLocation(epimdsId).build())
-                    .responseCourtCode(existingRequestedCourt.getResponseCourtCode())
-                    .responseCourtName(existingRequestedCourt.getResponseCourtName())
+                    .responseCourtCode(locationRefData.getCourtLocationCode())
+                    .responseCourtName(locationRefData.getCourtName())
                     .reasonForHearingAtSpecificCourt(existingRequestedCourt.getReasonForHearingAtSpecificCourt())
                     .otherPartyPreferredSite(existingRequestedCourt.getOtherPartyPreferredSite())
                     .build();
                 payload.put("applicant1DQRequestedCourt", newRequestedCourt);
+            }
+        }
+
+        //set respondent1 DQ RequestedCourt epimsId
+        if ("Yes".equalsIgnoreCase(respondent1DQRequestedCourtObj)) {
+            Object respondent1DQRequestedCourt = payload.get("respondent1DQRequestedCourt");
+            if (respondent1DQRequestedCourt != null) {
+                RequestedCourt existingRequestedCourt = getRequestedCourtObj(respondent1DQRequestedCourt);
+                RequestedCourt newRequestedCourt = RequestedCourt.builder()
+                    .caseLocation(CaseLocationCivil.builder()
+                                      .region(region)
+                                      .baseLocation(epimdsId).build())
+                    .responseCourtCode(locationRefData.getCourtLocationCode())
+                    .responseCourtName(locationRefData.getCourtName())
+                    .reasonForHearingAtSpecificCourt(existingRequestedCourt.getReasonForHearingAtSpecificCourt())
+                    .otherPartyPreferredSite(existingRequestedCourt.getOtherPartyPreferredSite())
+                    .build();
+                payload.put("respondent1DQRequestedCourt", newRequestedCourt);
             }
         }
         //set payload
@@ -124,7 +152,6 @@ public class CoreCaseDataService {
         caseDataContent.setData(payload);
         caseDataContent.getEvent().setSummary(eventSummary);
         caseDataContent.getEvent().setDescription(eventDescription);
-
         submitUpdate(caseId.toString(), caseDataContent);
     }
 
@@ -155,11 +182,6 @@ public class CoreCaseDataService {
             caseDataContent
         );
         return caseDetailsConverter.toCaseData(caseDetails);
-    }
-
-    private CaseLocationCivil getCaseManagementLocationObj(Object object) {
-        return mapper.convertValue(object, new TypeReference<>() {
-        });
     }
 
     private CourtLocation getCourtLocationObj(Object object) {

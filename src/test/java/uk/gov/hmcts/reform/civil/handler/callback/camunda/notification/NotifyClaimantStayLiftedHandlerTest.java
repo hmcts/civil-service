@@ -40,6 +40,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIMANT_STAY_LIFTED;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CNBC_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT_WELSH;
@@ -118,7 +119,6 @@ class NotifyClaimantStayLiftedHandlerTest {
         when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("welshHmctsSignature"));
         when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("welshPhoneContact"));
         when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
-        when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
         when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
         when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
     }
@@ -139,17 +139,18 @@ class NotifyClaimantStayLiftedHandlerTest {
 
     @Test
     void sendNotificationShouldSendEmail() {
+        when(notificationsProperties.getNotifyLRStayLifted()).thenReturn("solicitor-template");
+        Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+        when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
+
         caseData = caseData.toBuilder()
             .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("respondentSolicitor@hmcts.net").build())
             .build();
         CallbackParams params = CallbackParams.builder().caseData(caseData).build();
-
-        when(notificationsProperties.getNotifyLRStayLifted()).thenReturn("solicitor-template");
-
         CallbackResponse response = handler.sendNotification(params);
         assertNotNull(response);
 
-        Map<String, String> commonProps = addCommonProperties();
+        Map<String, String> commonProps = addCommonProperties(false);
 
         Map<String, String> notificationData = new HashMap<>(commonProps);
         notificationData.put("claimReferenceNumber", "1594901956117591");
@@ -169,8 +170,17 @@ class NotifyClaimantStayLiftedHandlerTest {
     @ParameterizedTest
     @MethodSource("provideCaseDataLip")
     void sendNotificationShouldSendEmail(boolean isRespondentLiP, boolean isRespondentBilingual, String template) {
+        Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+        when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+        when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
+        if (isRespondentLiP && isRespondentBilingual) {
+            when(notificationsProperties.getNotifyLipUpdateTemplateBilingual()).thenReturn("bilingual-template");
+        } else if (isRespondentLiP) {
+            when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn("default-template");
+        } else {
+            when(notificationsProperties.getNotifyLRStayLifted()).thenReturn("solicitor-template");
+        }
         CaseData caseData = getCaseData(isRespondentLiP, isRespondentBilingual);
-
         CallbackRequest callbackRequest = CallbackRequest
             .builder()
             .eventId(CaseEvent.NOTIFY_CLAIMANT_DISMISS_CASE.name())
@@ -180,18 +190,9 @@ class NotifyClaimantStayLiftedHandlerTest {
             .caseData(caseData)
             .type(ABOUT_TO_SUBMIT)
             .build();
-
-        if (isRespondentLiP && isRespondentBilingual) {
-            when(notificationsProperties.getNotifyLipUpdateTemplateBilingual()).thenReturn("bilingual-template");
-        } else if (isRespondentLiP) {
-            when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn("default-template");
-        } else {
-            when(notificationsProperties.getNotifyLRStayLifted()).thenReturn("solicitor-template");
-        }
-
         final CallbackResponse response = handler.sendNotification(params);
 
-        Map<String, String> commonProps = addCommonProperties();
+        Map<String, String> commonProps = addCommonProperties(true);
         Map<String, String> notificationData = new HashMap<>(commonProps);
         notificationData.put("claimReferenceNumber", "1594901956117591");
         notificationData.put("name", "John Doe");
@@ -207,7 +208,7 @@ class NotifyClaimantStayLiftedHandlerTest {
     }
 
     @NotNull
-    public Map<String, String> addCommonProperties() {
+    public Map<String, String> addCommonProperties(boolean isLipCase) {
         Map<String, String> expectedProperties = new HashMap<>();
         expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
         expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
@@ -215,9 +216,15 @@ class NotifyClaimantStayLiftedHandlerTest {
         expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
         expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
         expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
-        expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
         expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
         expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+        if (isLipCase) {
+            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+            expectedProperties.put(CNBC_CONTACT, configuration.getCnbcContact());
+        } else {
+            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getRaiseQueryLr());
+            expectedProperties.put(CNBC_CONTACT, configuration.getRaiseQueryLr());
+        }
         return expectedProperties;
     }
 }
