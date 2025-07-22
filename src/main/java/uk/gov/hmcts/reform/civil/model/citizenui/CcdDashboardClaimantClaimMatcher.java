@@ -415,9 +415,11 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
     }
 
     @Override
-    public boolean defendantRespondedWithPreferredLanguageWelsh() {
-        return caseData.isRespondentResponseBilingual()
-            && caseData.getCcdState() == CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
+    public boolean pausedForTranslationAfterResponse() {
+        return (caseData.getRespondent1ClaimResponseTypeForSpec() != null
+            && caseData.getCcdState() == CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT)
+            || (caseData.getApplicant1ResponseDate() != null
+            && caseData.getCcdState() == CaseState.AWAITING_APPLICANT_INTENTION);
     }
 
     public boolean isNocForDefendant() {
@@ -499,5 +501,10 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
         } else {
             return false;
         }
+    }
+
+    @Override
+    public boolean isCasedDiscontinued() {
+        return false;
     }
 }

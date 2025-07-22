@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
@@ -21,7 +22,6 @@ import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.Representative;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.SealedClaimFormForSpec;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.TimelineEventDetailsDocmosis;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
-import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
@@ -54,11 +54,11 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_1V
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_1V2_SAME_SOL;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_2V1;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_2V1_LIP;
-import static uk.gov.hmcts.reform.civil.utils.DateUtils.isAfterFourPM;
 import static uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils.formatCcdCaseReference;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<SealedClaimFormForSpec> {
 
     private final DocumentManagementService documentManagementService;
@@ -67,7 +67,6 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
     private final InterestCalculator interestCalculator;
     public LocalDateTime localDateTime = LocalDateTime.now();
     private static final String END_OF_BUSINESS_DAY = "4pm, ";
-    private final DeadlinesCalculator deadlinesCalculator;
     private final FeatureToggleService featureToggleService;
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
@@ -254,14 +253,10 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
     }
 
     private String getResponseDeadline(CaseData caseData) {
-        LocalDate date = caseData.getIssueDate();
-        deadlinesCalculator.calculateFirstWorkingDay(date.plusDays(29));
-        var notificationDeadline = formatLocalDate(
-            deadlinesCalculator
-                .calculateFirstWorkingDay(isAfterFourPM(localDateTime) ? date.plusDays(29) : date.plusDays(28)),
-            DATE
-        );
-        return END_OF_BUSINESS_DAY + notificationDeadline;
+        String notificationDeadline = formatLocalDate(caseData.getRespondent1ResponseDeadline().toLocalDate(), DATE);
+        String responseDeadline = END_OF_BUSINESS_DAY + notificationDeadline;
+        log.info("Response deadline: {} for caseID {} for claim form generation", responseDeadline, caseData.getCcdCaseReference());
+        return responseDeadline;
     }
 
     private List<SpecifiedParty> getRespondents(CaseData caseData) {

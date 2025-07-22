@@ -11,12 +11,16 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +31,8 @@ public class TranslatedOrderNoticeUploadedDefendantNotificationHandler extends C
     private static final List<CaseEvent> EVENTS = List.of(CaseEvent.NOTIFY_DEFENDANT_UPLOADED_DOCUMENT_ORDER_NOTICE);
     private static final String REFERENCE_TEMPLATE = "translated-order-notice-uploaded-defendant-notification-%s";
     public static final String TASK_ID = "NotifyDefendantOfUploadedOrderNotice";
+    private final NotificationsSignatureConfiguration configuration;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
@@ -47,11 +53,14 @@ public class TranslatedOrderNoticeUploadedDefendantNotificationHandler extends C
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-
-        return Map.of(
+        HashMap<String, String> properties = new HashMap<>(Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             PARTY_NAME, caseData.getRespondent1().getPartyName()
-        );
+        ));
+        addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
+
+        return properties;
     }
 
     private CallbackResponse notifyDefendantOfTranslation(CallbackParams callbackParams) {

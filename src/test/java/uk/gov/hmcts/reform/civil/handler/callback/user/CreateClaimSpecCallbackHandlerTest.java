@@ -164,7 +164,7 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         + " Court Claims Centre.";
 
     public static final String SPEC_LIP_CONFIRMATION_SCREEN = "<br />When the payment is confirmed your claim will be issued "
-        + "and you'll be notified by email. The claim will then progress offline."
+        + "and youll be notified by email. The claim will then progress offline."
         + "%n%nOnce the claim has been issued, you will need to serve the claim upon the "
         + "defendant which must include a response pack"
         + "%n%nYou will need to send the following:<ul style=\"margin-bottom : 0px;\"> <li> <a href=\"%s\" target=\"_blank\">sealed claim form</a> "
@@ -1245,9 +1245,9 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Then
             assertThat(response.getData()).containsEntry("calculatedInterest", " | Description | Amount | \n" +
                 " |---|---| \n" +
-                " | Claim amount | £ 1000 | \n" +
-                " | Interest amount | £ 0 | \n" +
-                " | Total amount | £ 1000 |");
+                " | Claim amount | £ 1000.00 | \n" +
+                " | Interest amount | £ 0.00 | \n" +
+                " | Total amount | £ 1000.00 |");
         }
 
         @Test
@@ -1270,9 +1270,9 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Then
             assertThat(response.getData()).containsEntry("calculatedInterest", " | Description | Amount | \n" +
                 " |---|---| \n" +
-                " | Claim amount | £ 1000 | \n" +
-                " | Interest amount | £ 0 | \n" +
-                " | Total amount | £ 1000 |");
+                " | Claim amount | £ 1000.00 | \n" +
+                " | Interest amount | £ 0.00 | \n" +
+                " | Total amount | £ 1000.00 |");
         }
     }
 
@@ -1369,9 +1369,9 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Then
             assertThat(response.getData()).containsEntry("calculatedInterest", " | Description | Amount | \n" +
                 " |---|---| \n" +
-                " | Claim amount | £ 1000 | \n" +
+                " | Claim amount | £ 1000.00 | \n" +
                 " | Interest amount | £ 0 | \n" +
-                " | Total amount | £ 1000 |");
+                " | Total amount | £ 1000.00 |");
         }
     }
 
@@ -2200,7 +2200,7 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPopulateCasenamePublic_whenInvoked() {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getData()).extracting("caseNamePublic").isEqualTo("'John Rambo' v 'Sole Trader'");
+            assertThat(response.getData()).extracting("caseNamePublic").isEqualTo("John Rambo v Sole Trader");
         }
 
         @Test
@@ -2249,7 +2249,7 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             // Then
             assertThat(response.getData())
-                .containsEntry("caseNameHmctsInternal", "'John Rambo' v 'Sole Trader', 'John Rambo'");
+                .containsEntry("caseNameHmctsInternal", "John Rambo v Sole Trader, John Rambo");
             assertThat(response.getData().get("caseManagementCategory")).extracting("value")
                 .extracting("code").isEqualTo("Civil");
         }
@@ -2265,7 +2265,7 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             // Then
             assertThat(response.getData())
-                .containsEntry("caseNameHmctsInternal", "'John Rambo', 'Jason Rambo' v 'Sole Trader'");
+                .containsEntry("caseNameHmctsInternal", "John Rambo, Jason Rambo v Sole Trader");
             assertThat(response.getData().get("caseManagementCategory")).extracting("value")
                 .extracting("code").isEqualTo("Civil");
         }
@@ -2281,7 +2281,7 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             // Then
             assertThat(response.getData().get("caseNameHmctsInternal"))
-                .isEqualTo("'John Rambo' v 'Sole Trader'");
+                .isEqualTo("John Rambo v Sole Trader");
             assertThat(response.getData().get("caseManagementCategory")).extracting("value")
                 .extracting("code").isEqualTo("Civil");
         }

@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
@@ -34,7 +35,11 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.assignCategoryIdToAttachments;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.buildLatestQuery;
+import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.clearOldQueryCollections;
+import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getLatestQuery;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getUserQueriesByRole;
+import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.logMigrationSuccess;
+import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.migrateAllQueries;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.updateQueryCollectionPartyName;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPClaimant;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPDefendant;
@@ -49,15 +54,17 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
     protected final UserService userService;
     protected final CoreCaseUserService coreCaseUserService;
     private final AssignCategoryId assignCategoryId;
+    private final FeatureToggleService featureToggleService;
 
     public static final String INVALID_CASE_STATE_ERROR = "If your case is offline, you cannot raise a query.";
+    public static final String PUBLIC_QUERIES_PARTY_NAME = "All queries";
 
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_START), this::checkCaseState,
+            callbackKey(ABOUT_TO_START), this::aboutToStart,
             callbackKey(ABOUT_TO_SUBMIT), this::setManagementQuery,
-            callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
+            callbackKey(SUBMITTED), this::aboutToSubmit
         );
     }
 
@@ -66,16 +73,25 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
         return EVENTS;
     }
 
-    private CallbackResponse checkCaseState(CallbackParams callbackParams) {
+    private CallbackResponse aboutToStart(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+
         List<CaseState> invalidStates = Arrays.asList(PENDING_CASE_ISSUED, CASE_DISMISSED,
                                                       PROCEEDS_IN_HERITAGE_SYSTEM, CLOSED);
-        if (invalidStates.contains(callbackParams.getCaseData().getCcdState())) {
+        if (invalidStates.contains(caseData.getCcdState())) {
             List<String> errors = List.of(INVALID_CASE_STATE_ERROR);
 
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(errors).build();
         }
-        return emptyCallbackResponse(callbackParams);
+
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        if (featureToggleService.isPublicQueryManagementEnabled(caseData)) {
+            migrateAllQueries(caseDataBuilder);
+        }
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper)).build();
     }
 
     private CallbackResponse setManagementQuery(CallbackParams callbackParams) {
@@ -86,13 +102,17 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
 
-        CaseMessage latestCaseMessage = getUserQueriesByRole(caseData, roles).latest();
+        CaseMessage latestCaseMessage = featureToggleService.isPublicQueryManagementEnabled(caseData)
+            ? getLatestQuery(caseData) : getUserQueriesByRole(caseData, roles).latest();
 
         assignCategoryIdToAttachments(latestCaseMessage, assignCategoryId, roles);
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder().qmLatestQuery(
             buildLatestQuery(latestCaseMessage));
 
-        if (!isLIPClaimant(roles) && !isLIPDefendant(roles)) {
+        if (featureToggleService.isPublicQueryManagementEnabled(caseData)) {
+            caseDataBuilder.queries(caseData.getQueries().toBuilder().partyName(PUBLIC_QUERIES_PARTY_NAME).build());
+            clearOldQueryCollections(caseDataBuilder);
+        } else if (!isLIPClaimant(roles) && !isLIPDefendant(roles)) {
             updateQueryCollectionPartyName(roles, MultiPartyScenario.getMultiPartyScenario(caseData), caseDataBuilder);
         }
 
@@ -101,6 +121,14 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
                       .businessProcess(BusinessProcess.ready(queryManagementRaiseQuery))
                       .build().toMap(objectMapper))
             .build();
+    }
+
+    private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
+        CaseData caseDataBefore = callbackParams.getCaseDataBefore();
+        if (featureToggleService.isPublicQueryManagementEnabled(caseDataBefore)) {
+            logMigrationSuccess(callbackParams.getCaseDataBefore());
+        }
+        return emptySubmittedCallbackResponse(callbackParams);
     }
 
     private List<String> retrieveUserCaseRoles(String caseReference, String userToken) {

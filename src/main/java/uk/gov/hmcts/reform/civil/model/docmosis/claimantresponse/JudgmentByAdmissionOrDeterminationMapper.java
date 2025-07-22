@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.model.docmosis.lip.LipFormParty;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
+import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -89,7 +90,7 @@ public class JudgmentByAdmissionOrDeterminationMapper {
             .repaymentPlan(addRepaymentPlan(caseData))
             .ccjJudgmentAmount(judgementService.ccjJudgmentClaimAmount(caseData).setScale(2).toString())
             .ccjInterestToDate(totalInterest)
-            .claimFee(getClaimFee(caseData))
+            .claimFee(getClaimFee(caseData).toString())
             .ccjSubtotal(judgementService.ccjJudgementSubTotal(caseData).setScale(2).toString())
             .ccjAlreadyPaidAmount(getAlreadyPaidAmount(caseData))
             .ccjFinalTotal(judgementService.ccjJudgmentFinalTotal(caseData).setScale(2).toString())
@@ -99,12 +100,12 @@ public class JudgmentByAdmissionOrDeterminationMapper {
             .build();
     }
 
-    private String getClaimFee(CaseData caseData) {
+    private BigDecimal getClaimFee(CaseData caseData) {
         BigDecimal claimFee = judgementService.ccjJudgmentClaimFee(caseData);
         if (BigDecimal.ZERO.compareTo(claimFee) == 0) {
-            return BigDecimal.ZERO.toString();
+            return BigDecimal.ZERO;
         }
-        return claimFee.setScale(2).toString();
+        return claimFee.setScale(2);
     }
 
     private String getAlreadyPaidAmount(CaseData caseData) {
@@ -229,10 +230,12 @@ public class JudgmentByAdmissionOrDeterminationMapper {
                                     ? getRepaymentFrequency(caseData.getRespondent1RepaymentPlan().getRepaymentFrequency()) : null)
             .repaymentDate(caseData.isPayByInstallment()
                                ? DateFormatHelper.formatLocalDate(caseData.getRespondent1RepaymentPlan().getFirstRepaymentDate(), DateFormatHelper.DATE) : null)
-            .installmentAmount(caseData.isPayByInstallment() ? String.valueOf(caseData.getRespondent1RepaymentPlan().getPaymentAmount().setScale(2)) : null)
+            .installmentAmount(caseData.isPayByInstallment()
+                                   ? String.valueOf(MonetaryConversions.penniesToPounds(caseData.getRespondent1RepaymentPlan().getPaymentAmount()))
+                                   : null)
             .ccjJudgmentAmount(judgementService.ccjJudgmentClaimAmount(caseData).setScale(2).toString())
             .ccjInterestToDate(totalInterest)
-            .claimFee(getClaimFee(caseData))
+            .claimFee(getClaimCosts(caseData))
             .ccjSubtotal(judgementService.ccjJudgementSubTotal(caseData).setScale(2).toString())
             .ccjFinalTotal(judgementService.ccjJudgmentFinalTotal(caseData).setScale(2).toString())
             .build();
@@ -312,5 +315,12 @@ public class JudgmentByAdmissionOrDeterminationMapper {
             return "SET_DATE";
         }
         return null;
+    }
+
+    private String getClaimCosts(CaseData caseData) {
+        return (judgementService.isLRAdmissionRepaymentPlan(caseData)
+               || judgementService.isLrPayImmediatelyPlan(caseData))
+            ? (getClaimFee(caseData).add(judgementService.ccjJudgmentFixedCost(caseData))).toString()
+            : getClaimFee(caseData).toString();
     }
 }

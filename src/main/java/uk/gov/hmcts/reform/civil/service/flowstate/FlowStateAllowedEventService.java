@@ -489,7 +489,8 @@ public class FlowStateAllowedEventService {
                 DISMISS_CASE,
                 MANAGE_STAY,
                 CONFIRM_ORDER_REVIEW,
-                ORDER_REVIEW_OBLIGATION_CHECK
+                ORDER_REVIEW_OBLIGATION_CHECK,
+                EVIDENCE_UPLOAD_APPLICANT
             )
         ),
 
@@ -1337,7 +1338,8 @@ public class FlowStateAllowedEventService {
                 CONFIRM_ORDER_REVIEW,
                 ORDER_REVIEW_OBLIGATION_CHECK,
                 INITIATE_GENERAL_APPLICATION_COSC,
-                CHANGE_LANGUAGE_PREFERENCE
+                CHANGE_LANGUAGE_PREFERENCE,
+                EVIDENCE_UPLOAD_APPLICANT
             )
         ),
 

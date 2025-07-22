@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.civil.service.robotics.mapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -162,12 +164,7 @@ class EventHistoryMapperTest {
         @Test
         void shouldPrepareMiscellaneousEvent_whenClaimWith1v1UnregisteredDefendant() {
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOffline1v1UnregisteredDefendant().build();
-            if (caseData.getRespondent2OrgRegistered() != null
-                && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
-            }
+
             Event expectedEvent = Event.builder()
                 .eventSequence(1)
                 .eventCode("999")
@@ -5725,34 +5722,52 @@ class EventHistoryMapperTest {
             );
         }
 
-        @Test
-        void shouldPrepareExpectedEvents_whenClaimTakenOfflineAfterClaimIssuedQueryExists() {
-            when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateTakenOfflineByStaff()
-                .build().toBuilder()
-                .qmApplicantSolicitorQueries(CaseQueriesCollection.builder()
-                                                 .roleOnCase("APPLICANT")
-                                                 .build())
-                .build();
+        @ParameterizedTest
+        @CsvSource({
+            "PROD_LR_QUERY",
+            "PUBLIC_QUERY"
+        })
+        void shouldPrepareExpectedEvents_whenClaimTakenOfflineAfterClaimIssuedQueryExists(String queryType) {
+            CaseData caseData;
+            if (queryType.equals("PROD_LR_QUERY")) {
+                when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
+                caseData = CaseDataBuilder.builder()
+                    .atStateTakenOfflineByStaff()
+                    .takenOfflineDate(time.now())
+                    .build().toBuilder()
+                    .qmApplicantSolicitorQueries(CaseQueriesCollection.builder()
+                                                     .roleOnCase("APPLICANT")
+                                                     .build())
+                    .build();
+            } else {
+                when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
+                caseData = CaseDataBuilder.builder()
+                    .atStateTakenOfflineByStaff()
+                    .takenOfflineDate(time.now())
+                    .build().toBuilder()
+                    .queries(CaseQueriesCollection.builder()
+                                                   .roleOnCase("APPLICANT")
+                                                   .build())
+                    .build();
+            }
 
             List<Event> expectedMiscellaneousEvents = List.of(
                 Event.builder()
                     .eventSequence(1)
                     .eventCode("999")
-                    .dateReceived(caseData.getIssueDate().atStartOfDay())
-                    .eventDetailsText("Claim issued in CCD.")
+                    .dateReceived(time.now())
+                    .eventDetailsText(QUERIES_ON_CASE)
                     .eventDetails(EventDetails.builder()
-                                      .miscText("Claim issued in CCD.")
+                                      .miscText(QUERIES_ON_CASE)
                                       .build())
                     .build(),
                 Event.builder()
                     .eventSequence(2)
                     .eventCode("999")
-                    .dateReceived(caseData.getTakenOfflineByStaffDate())
-                    .eventDetailsText(QUERIES_ON_CASE)
+                    .dateReceived(caseData.getIssueDate().atStartOfDay())
+                    .eventDetailsText("Claim issued in CCD.")
                     .eventDetails(EventDetails.builder()
-                                      .miscText(QUERIES_ON_CASE)
+                                      .miscText("Claim issued in CCD.")
                                       .build())
                     .build(),
                 Event.builder()
@@ -5788,11 +5803,11 @@ class EventHistoryMapperTest {
 
         @Test
         void shouldPrepareExpectedEvents_whenClaimTakenOfflineAfterNocDeadlinePassedRes1QueryEnabled() {
-            when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
+            when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateTakenOfflineDefendant1NocDeadlinePassed()
                 .build().toBuilder()
-                .qmApplicantSolicitorQueries(CaseQueriesCollection.builder()
+                .queries(CaseQueriesCollection.builder()
                                                  .roleOnCase("APPLICANT")
                                                  .build())
                 .build();
@@ -5802,18 +5817,18 @@ class EventHistoryMapperTest {
                     .eventSequence(1)
                     .eventCode("999")
                     .dateReceived(caseData.getTakenOfflineDate())
-                    .eventDetailsText(QUERIES_ON_CASE)
+                    .eventDetailsText("RPA Reason: Claim moved offline after defendant NoC deadline has passed")
                     .eventDetails(EventDetails.builder()
-                                      .miscText(QUERIES_ON_CASE)
+                                      .miscText("RPA Reason: Claim moved offline after defendant NoC deadline has passed")
                                       .build())
                     .build(),
                 Event.builder()
                     .eventSequence(2)
                     .eventCode("999")
                     .dateReceived(caseData.getTakenOfflineDate())
-                    .eventDetailsText("RPA Reason: Claim moved offline after defendant NoC deadline has passed")
+                    .eventDetailsText(QUERIES_ON_CASE)
                     .eventDetails(EventDetails.builder()
-                                      .miscText("RPA Reason: Claim moved offline after defendant NoC deadline has passed")
+                                      .miscText(QUERIES_ON_CASE)
                                       .build())
                     .build()
             );
@@ -5822,7 +5837,7 @@ class EventHistoryMapperTest {
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("miscellaneous").asList()
-                .containsExactly(expectedMiscellaneousEvents.get(0), expectedMiscellaneousEvents.get(1));
+                .containsExactlyInAnyOrder(expectedMiscellaneousEvents.get(0), expectedMiscellaneousEvents.get(1));
 
             assertEmptyEvents(
                 eventHistory,
@@ -5839,11 +5854,11 @@ class EventHistoryMapperTest {
 
         @Test
         void shouldPrepareExpectedEvents_whenClaimTakenOfflineAfterNocDeadlinePassedRes2QueryEnabled() {
-            when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
+            when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateTakenOfflineDefendant2NocDeadlinePassed()
                 .build().toBuilder()
-                .qmApplicantSolicitorQueries(CaseQueriesCollection.builder()
+                .queries(CaseQueriesCollection.builder()
                                                  .roleOnCase("APPLICANT")
                                                  .build())
                 .build();
@@ -5853,18 +5868,18 @@ class EventHistoryMapperTest {
                     .eventSequence(1)
                     .eventCode("999")
                     .dateReceived(caseData.getTakenOfflineDate())
-                    .eventDetailsText(QUERIES_ON_CASE)
+                    .eventDetailsText("RPA Reason: Claim moved offline after defendant NoC deadline has passed")
                     .eventDetails(EventDetails.builder()
-                                      .miscText(QUERIES_ON_CASE)
+                                      .miscText("RPA Reason: Claim moved offline after defendant NoC deadline has passed")
                                       .build())
                     .build(),
                 Event.builder()
                     .eventSequence(2)
                     .eventCode("999")
                     .dateReceived(caseData.getTakenOfflineDate())
-                    .eventDetailsText("RPA Reason: Claim moved offline after defendant NoC deadline has passed")
+                    .eventDetailsText(QUERIES_ON_CASE)
                     .eventDetails(EventDetails.builder()
-                                      .miscText("RPA Reason: Claim moved offline after defendant NoC deadline has passed")
+                                      .miscText(QUERIES_ON_CASE)
                                       .build())
                     .build()
             );
@@ -5890,11 +5905,11 @@ class EventHistoryMapperTest {
 
         @Test
         void shouldPrepareExpectedEvents_whenClaimTakenOfflineAfterNocDeadlinePassedRes2QueryDisabled() {
-            when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(false);
+            when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateTakenOfflineDefendant2NocDeadlinePassed()
                 .build().toBuilder()
-                .qmApplicantSolicitorQueries(CaseQueriesCollection.builder()
+                .queries(CaseQueriesCollection.builder()
                                                  .roleOnCase("APPLICANT")
                                                  .build())
                 .build();
