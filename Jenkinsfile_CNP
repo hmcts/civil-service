@@ -103,7 +103,7 @@ def getCivilCcdDefinitionBranch() {
   for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "civilDefinitionBranch:")) {
     return label.minus("civilDefinitionBranch:").trim()
   }
-  return "master"
+  return "CIV-17325-Update-offline-scheduler-for-MINTI-LiP-v2"
 }
 
 withPipeline(type, product, component) {
