@@ -90,7 +90,7 @@ public class RoboticsNotificationService {
             return Optional.of(EmailData.builder()
                                    .message(getMessage(params.getCaseData(), params.isMultiParty()))
                                    .subject(getSubject(params.getCaseData(), triggerEvent, params.isMultiParty()))
-                                   .to("kala.chandrasekar@hmcts.net")
+                                   .to("kala.chandrasekar@HMCTS.NET")
                                    .attachments(of(json(roboticsJsonData, fileName)))
                                    .build());
         } catch (JsonProcessingException e) {
@@ -220,7 +220,7 @@ public class RoboticsNotificationService {
             return Optional.of(EmailData.builder()
                                    .message(getMessage(params.getCaseData(), params.isMultiParty()))
                                    .subject(getSubject(params.getCaseData(), triggerEvent, params.isMultiParty()))
-                                   .to(roboticsEmailConfiguration.getLipJRecipient())
+                                   .to("kala.chandrasekar@HMCTS.NET")
                                    .attachments(of(json(
                                        roboticsCaseDataDTO.getJsonRawData(),
                                        getFileName(params.getCaseData())

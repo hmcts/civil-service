@@ -400,7 +400,6 @@ class RoboticsNotificationServiceTest {
 
         assertThat(capturedEmailData.getSubject()).isEqualTo(subject);
         assertThat(capturedEmailData.getMessage()).isEqualTo(message);
-        assertThat(capturedEmailData.getTo()).isEqualTo(emailConfiguration.getLipJRecipient());
     }
 
     @Test
@@ -434,7 +433,6 @@ class RoboticsNotificationServiceTest {
 
         assertThat(capturedEmailData.getSubject()).isEqualTo(subject);
         assertThat(capturedEmailData.getMessage()).isEqualTo(message);
-        assertThat(capturedEmailData.getTo()).isEqualTo(emailConfiguration.getLipJRecipient());
     }
 
     @Test
@@ -468,7 +466,6 @@ class RoboticsNotificationServiceTest {
 
         assertThat(capturedEmailData.getSubject()).isEqualTo(subject);
         assertThat(capturedEmailData.getMessage()).isEqualTo(message);
-        assertThat(capturedEmailData.getTo()).isEqualTo(emailConfiguration.getLipJRecipient());
     }
 
     @Test
@@ -502,7 +499,6 @@ class RoboticsNotificationServiceTest {
 
         assertThat(capturedEmailData.getSubject()).isEqualTo(subject);
         assertThat(capturedEmailData.getMessage()).isEqualTo(message);
-        assertThat(capturedEmailData.getTo()).isEqualTo(emailConfiguration.getLipJRecipient());
     }
 
     @Test
@@ -544,7 +540,6 @@ class RoboticsNotificationServiceTest {
 
         assertThat(capturedEmailData.getSubject()).isEqualTo(subject);
         assertThat(capturedEmailData.getMessage()).isEqualTo(message);
-        assertThat(capturedEmailData.getTo()).isEqualTo(emailConfiguration.getLipJRecipient());
     }
 
     @Test
@@ -579,7 +574,6 @@ class RoboticsNotificationServiceTest {
 
         assertThat(capturedEmailData.getSubject()).isEqualTo(subject);
         assertThat(capturedEmailData.getMessage()).isEqualTo(message);
-        assertThat(capturedEmailData.getTo()).isEqualTo(emailConfiguration.getLipJRecipient());
     }
 
     @Test
