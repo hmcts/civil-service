@@ -32,9 +32,9 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_RE
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_RESPONSE_1V2_DS;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_RESPONSE_1V2_DS_FAST_TRACK_INT;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWithAuth<DirectionsQuestionnaireForm> {
 
     private final DocumentManagementService documentManagementService;
@@ -44,24 +44,24 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
     private final RespondentTemplateForDQGenerator respondentTemplateForDQGenerator;
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
-        log.info("Starting DQ generation for case ID: {}", caseData.getCcdCaseReference());
-        DocmosisTemplates templateId = getTemplateId(caseData);
-        log.info("Template ID selected: {}", templateId);
+        log.info("Starting generation of directions questionnaire for caseId {}", caseData.getCcdCaseReference());
 
-        DirectionsQuestionnaireForm templateData = getTemplateData(caseData, authorisation);
-        log.info("Template data populated for case ID: {}", caseData.getCcdCaseReference());
+        DocmosisTemplates templateId;
+        DocmosisDocument docmosisDocument;
+        DirectionsQuestionnaireForm templateData;
+        templateId = getTemplateId(caseData);
 
-        DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(templateData, templateId);
-        log.info("Docmosis document generated for case ID: {}", caseData.getCcdCaseReference());
+        templateData = getTemplateData(caseData, authorisation);
+        docmosisDocument = documentGeneratorService.generateDocmosisDocument(templateData, templateId);
 
-        CaseDocument caseDocument = documentManagementService.uploadDocument(
+        CaseDocument uploadedDocument = documentManagementService.uploadDocument(
                 authorisation,
                 new PDF(getFileName(caseData, templateId), docmosisDocument.getBytes(),
                         DocumentType.DIRECTIONS_QUESTIONNAIRE
-                )
-        );
-        log.info("DQ document uploaded for case ID: {}", caseData.getCcdCaseReference());
-        return caseDocument;
+                ));
+
+        log.info("Completed upload of directions questionnaire for caseId {}", caseData.getCcdCaseReference());
+        return uploadedDocument;
     }
 
     protected DocmosisTemplates getTemplateId(CaseData caseData) {
@@ -110,51 +110,67 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
         return templateId;
     }
 
-    public CaseDocument generateDQFor1v2SingleSolDiffResponse(CaseData caseData, String authorisation, String respondent) {
-        log.info("Starting DQ generation for 1v2 single solicitor different response for case ID: {}", caseData.getCcdCaseReference());
-        DocmosisTemplates templateId = getTemplateId(caseData);
-        log.info("Template ID selected: {}", templateId);
+    public CaseDocument generateDQFor1v2SingleSolDiffResponse(CaseData caseData,
+                                                              String authorisation,
+                                                              String respondent) {
+        log.info("Starting 1v2 single-solicitor different-response DQ for caseId {} respondent {}", caseData.getCcdCaseReference(), respondent);
 
-        DirectionsQuestionnaireForm templateData = getDirectionsQuestionnaireForm(caseData, authorisation, respondent);
-        log.info("Template data populated for respondent: {}", respondent);
+        boolean isFastTrackOrMinti = featureToggleService.isFastTrackUpliftsEnabled() || featureToggleService.isMultiOrIntermediateTrackEnabled(caseData);
+        DocmosisTemplates templateId = isFastTrackOrMinti ? DQ_RESPONSE_1V1_FAST_TRACK_INT : DQ_RESPONSE_1V1;
+        DirectionsQuestionnaireForm templateData;
 
-        DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(templateData, templateId);
-        log.info("Docmosis document generated for respondent: {}", respondent);
+        if (respondent.equals("ONE")) {
+            templateData = respondentTemplateForDQGenerator.getRespondent1TemplateData(caseData, "ONE", authorisation);
+        } else if (respondent.equals("TWO")) {
+            templateData = respondentTemplateForDQGenerator.getRespondent2TemplateData(caseData, "TWO", authorisation);
+        } else {
+            throw new IllegalArgumentException("Respondent argument is expected to be one of ONE or TWO");
+        }
 
-        CaseDocument caseDocument = documentManagementService.uploadDocument(
-                authorisation,
-                new PDF(getFileName(caseData, templateId), docmosisDocument.getBytes(),
-                        DocumentType.DIRECTIONS_QUESTIONNAIRE
-                )
+        DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
+            templateData, templateId);
+
+        log.info("Completed upload of 1v2 single-solicitor DQ for caseId {} respondent {}", caseData.getCcdCaseReference(), respondent);
+
+        return documentManagementService.uploadDocument(
+            authorisation,
+            new PDF(getFileName(caseData, templateId), docmosisDocument.getBytes(),
+                    DocumentType.DIRECTIONS_QUESTIONNAIRE
+            )
         );
-        log.info("DQ document uploaded for respondent: {}", respondent);
-        return caseDocument;
     }
 
-    public Optional<CaseDocument> generateDQFor1v2DiffSol(CaseData caseData, String authorisation, String respondent) {
-        log.info("Starting DQ generation for 1v2 different solicitors for case ID: {}", caseData.getCcdCaseReference());
-        DocmosisTemplates templateId = getTemplateId(caseData);
-        log.info("Template ID selected: {}", templateId);
+    // return optional, if you get an empty optional, you didn't need to generate the doc
+    public Optional<CaseDocument> generateDQFor1v2DiffSol(CaseData caseData,
+                                                          String authorisation,
+                                                          String respondent) {
+        boolean isFastTrackOrMinti = featureToggleService.isFastTrackUpliftsEnabled() || featureToggleService.isMultiOrIntermediateTrackEnabled(caseData);
+        DocmosisTemplates templateId = isFastTrackOrMinti ? DQ_RESPONSE_1V1_FAST_TRACK_INT : DQ_RESPONSE_1V1;
 
+        log.info("Starting 1v2 different-solicitor DQ check for caseId {} respondent {}", caseData.getCcdCaseReference(), respondent);
         String fileName = getFileName(caseData, templateId);
         LocalDateTime responseDate = getResponseDate(caseData, respondent);
 
+        // Check if the DQ is already generated for this response date and file name
         if (isDQAlreadyGenerated(caseData, responseDate, fileName)) {
-            log.info("DQ already generated for response date: {} and file name: {}", responseDate, fileName);
+            log.info("DQ already exists for caseId {} respondent {} responseDate {}", caseData.getCcdCaseReference(), respondent, responseDate);
             return Optional.empty();
         }
 
-        DirectionsQuestionnaireForm templateData = getDirectionsQuestionnaireForm(caseData, authorisation, respondent);
-        log.info("Template data populated for respondent: {}", respondent);
+        DirectionsQuestionnaireForm templateData =
+            getDirectionsQuestionnaireForm(caseData, authorisation, respondent);
 
-        DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(templateData, templateId);
-        log.info("Docmosis document generated for respondent: {}", respondent);
-
+        // Generate docmosis document and upload it
+        DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
+            templateData, templateId);
         CaseDocument document = documentManagementService.uploadDocument(
-                authorisation,
-                new PDF(fileName, docmosisDocument.getBytes(), DocumentType.DIRECTIONS_QUESTIONNAIRE)
+            authorisation,
+            new PDF(getFileName(caseData, templateId), docmosisDocument.getBytes(),
+                    DocumentType.DIRECTIONS_QUESTIONNAIRE
+            )
         );
-        log.info("DQ document uploaded for respondent: {}", respondent);
+
+        log.info("Uploaded new 1v2 different-solicitor DQ for caseId {} respondent {} responseDate {}", caseData.getCcdCaseReference(), respondent, responseDate);
         return Optional.of(document.toBuilder().createdDatetime(responseDate).build());
     }
 
