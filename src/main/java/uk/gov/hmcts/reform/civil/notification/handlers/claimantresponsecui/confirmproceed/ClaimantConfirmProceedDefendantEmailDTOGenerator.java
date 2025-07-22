@@ -9,7 +9,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.Map;
 
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Component
@@ -25,12 +25,10 @@ public class ClaimantConfirmProceedDefendantEmailDTOGenerator extends DefendantE
     @Override
     protected String getEmailTemplateId(CaseData caseData) {
         if (caseData.isClaimantBilingual()
-            && (!featureToggleService.isDefendantNoCOnlineForCase(caseData)
-            || NO.equals(caseData.getApplicant1ProceedWithClaim())
-            || caseData.isClaimantIntentionSettlePartAdmit())) {
+                && (!featureToggleService.isDefendantNoCOnlineForCase(caseData)
+                || (YES.equals(caseData.getApplicant1ProceedWithClaim()) && !caseData.isClaimantIntentionSettlePartAdmit()))) {
             return NO_EMAIL_OPERATION;
         }
-
 
         return caseData.isRespondentResponseBilingual() ? notificationsProperties.getNotifyDefendantTranslatedDocumentUploaded()
             : notificationsProperties.getRespondent1LipClaimUpdatedTemplate();
