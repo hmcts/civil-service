@@ -295,7 +295,8 @@ ext.libraries = [
     "org.junit.jupiter:junit-jupiter-engine:${versions.junit}",
     "org.junit.jupiter:junit-jupiter-params:${versions.junit}",
     "org.junit.platform:junit-platform-commons:${versions.junitPlatform}",
-    "org.junit.platform:junit-platform-engine:${versions.junitPlatform}"
+    "org.junit.platform:junit-platform-engine:${versions.junitPlatform}",
+    "org.junit.platform:junit-platform-launcher:${versions.junitPlatform}"
   ]
 ]
 
@@ -449,14 +450,14 @@ dependencies {
   //pact contract testing
   contractTestImplementation 'au.com.dius.pact.consumer:junit5:4.6.5'
   contractTestImplementation group: 'org.hamcrest', name: 'java-hamcrest', version: '2.0.0.0'
-  contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.13.4')
-  contractTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.13.4')
+  contractTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit
+  contractTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: versions.junit
 
   contractTestImplementation sourceSets.main.runtimeClasspath
   contractTestImplementation sourceSets.test.runtimeClasspath
 
-  integrationTestImplementation('org.junit.jupiter:junit-jupiter-api:5.13.4')
-  integrationTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.13.4')
+  integrationTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit
+  integrationTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: versions.junit
 
   testImplementation group: 'org.testcontainers', name: 'postgresql', version: versions.testcontainers
   testImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: versions.testcontainers
