@@ -98,7 +98,6 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_RE
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_RESPONSE_1V2_SS;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_RESPONSE_1V2_SS_FAST_TRACK_INT;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_RESPONSE_2V1;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_RESPONSE_2V1_FAST_TRACK_INT;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 
@@ -426,124 +425,6 @@ class DirectionsQuestionnaireGeneratorTest {
                 any(DirectionsQuestionnaireForm.class),
                 eq(DocmosisTemplates.CLAIMANT_RESPONSE_SPEC)
             );
-        }
-
-        @Nested
-        class MintiToggleIsOn {
-            @BeforeEach
-            void setup() {
-                when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
-            }
-
-            @Test
-            void shouldGenerateDefendantDQWhen1v1() {
-                when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DQ_RESPONSE_1V1_FAST_TRACK_INT)))
-                    .thenReturn(new DocmosisDocument(DQ_RESPONSE_1V1_FAST_TRACK_INT.getDocumentTitle(), bytes));
-                when(documentManagementService.uploadDocument(
-                    BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE))
-                ).thenReturn(CASE_DOCUMENT_DEFENDANT);
-
-                CaseData caseData = CaseDataBuilder.builder()
-                    .atStateRespondentFullDefence()
-                    .setMultiTrackClaim()
-                    .build();
-
-                CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
-
-                assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT_DEFENDANT);
-
-                verify(documentManagementService)
-                    .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE));
-                verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class),
-                    eq(DQ_RESPONSE_1V1_FAST_TRACK_INT)
-                );
-            }
-
-            @Test
-            void shouldGenerateDefendantDQWhen1v2SS() {
-                when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DQ_RESPONSE_1V2_SS_FAST_TRACK_INT)))
-                    .thenReturn(new DocmosisDocument(DQ_RESPONSE_1V2_SS_FAST_TRACK_INT.getDocumentTitle(), bytes));
-                when(documentManagementService.uploadDocument(
-                    BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT_1v2SS, bytes, DIRECTIONS_QUESTIONNAIRE))
-                ).thenReturn(CASE_DOCUMENT_CLAIMANT);
-
-                CaseData caseData = CaseDataBuilder.builder()
-                    .atStateApplicantRespondToDefenceAndProceed()
-                    .multiPartyClaimOneDefendantSolicitor()
-                    .businessProcess(BusinessProcess.builder()
-                        .camundaEvent("CLAIMANT_RESPONSE").build())
-                    .applicantsProceedIntention(YesOrNo.YES)
-                    .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(YesOrNo.YES)
-                    .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(YesOrNo.YES)
-                    .build();
-                CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
-
-                assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT_CLAIMANT);
-
-                verify(documentManagementService)
-                    .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT_1v2SS, bytes, DIRECTIONS_QUESTIONNAIRE));
-                verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class),
-                    eq(DQ_RESPONSE_1V2_SS_FAST_TRACK_INT)
-                );
-            }
-
-            @Test
-            void shouldGenerateClaimantDQWhen1v2DS() {
-                when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DQ_RESPONSE_1V2_DS_FAST_TRACK_INT)))
-                    .thenReturn(new DocmosisDocument(DQ_RESPONSE_1V2_DS_FAST_TRACK_INT.getDocumentTitle(), bytes));
-                when(documentManagementService.uploadDocument(
-                    BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT_1v2, bytes, DIRECTIONS_QUESTIONNAIRE))
-                ).thenReturn(CASE_DOCUMENT_CLAIMANT);
-
-                CaseData caseData = CaseDataBuilder.builder()
-                    .multiPartyClaimTwoDefendantSolicitors()
-                    .atStateApplicantRespondToDefenceAndProceedVsBothDefendants_1v2()
-                    .respondent2SameLegalRepresentative(NO)
-                    .respondent2AcknowledgeNotificationDate(LocalDateTime.now())
-                    .respondent2ClaimResponseType(RespondentResponseType.FULL_DEFENCE)
-                    .businessProcess(BusinessProcess.builder().camundaEvent("CLAIMANT_RESPONSE").build())
-                    .build();
-                if (caseData.getRespondent2OrgRegistered() != null
-                    && caseData.getRespondent2Represented() == null) {
-                    caseData = caseData.toBuilder()
-                        .respondent2Represented(YES)
-                        .build();
-                }
-
-                CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
-
-                assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT_CLAIMANT);
-
-                verify(documentManagementService)
-                    .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT_1v2, bytes, DIRECTIONS_QUESTIONNAIRE));
-                verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class),
-                    eq(DQ_RESPONSE_1V2_DS_FAST_TRACK_INT)
-                );
-            }
-
-            @Test
-            void shouldGenerateDQWhen2v1() {
-                when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DQ_RESPONSE_2V1_FAST_TRACK_INT)))
-                    .thenReturn(new DocmosisDocument(DQ_RESPONSE_2V1_FAST_TRACK_INT.getDocumentTitle(), bytes));
-                when(documentManagementService.uploadDocument(
-                    BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE))
-                ).thenReturn(CASE_DOCUMENT_DEFENDANT);
-
-                CaseData caseData = CaseDataBuilder.builder()
-                    .atStateApplicantRespondToDefenceAndProceed()
-                    .multiPartyClaimTwoApplicants()
-                    .build();
-
-                CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
-
-                assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT_DEFENDANT);
-
-                verify(documentManagementService)
-                    .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE));
-                verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class),
-                    eq(DQ_RESPONSE_2V1_FAST_TRACK_INT)
-                );
-            }
         }
 
         @Nested
