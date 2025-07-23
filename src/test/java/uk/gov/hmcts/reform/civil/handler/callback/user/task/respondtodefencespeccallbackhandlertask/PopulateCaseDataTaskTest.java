@@ -35,6 +35,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @ExtendWith(MockitoExtension.class)
@@ -87,6 +88,7 @@ class PopulateCaseDataTaskTest {
             .totalClaimAmount(BigDecimal.valueOf(1000))
             .build();
 
+        when(featureToggleService.isCarmEnabledForCase(any(CaseData.class))).thenReturn(true);
         when(paymentDateService.getPaymentDateAdmittedClaim(any())).thenReturn(LocalDate.EPOCH);
         when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
 
@@ -101,6 +103,8 @@ class PopulateCaseDataTaskTest {
         assertEquals(YES, getCaseData(response).getShowCarmFields());
         assertEquals(CaseCategory.SPEC_CLAIM, getCaseData(response).getCaseAccessCategory());
         verify(featureToggleService, times(2)).isPinInPostEnabled();
+        verify(featureToggleService, times(1)).isCarmEnabledForCase(any(CaseData.class));
+
     }
 
     @Test
@@ -115,6 +119,7 @@ class PopulateCaseDataTaskTest {
             .respondent2DocumentURL("test-respondent2Doc-url")
             .build();
 
+        when(featureToggleService.isCarmEnabledForCase(any(CaseData.class))).thenReturn(false);
         when(featureToggleService.isPinInPostEnabled()).thenReturn(false);
 
         CallbackParams params = callbackParams(caseData).toBuilder()
@@ -125,6 +130,7 @@ class PopulateCaseDataTaskTest {
             (AboutToStartOrSubmitCallbackResponse) task.execute(params);
 
         assertNotNull(response);
+        assertEquals(NO, getCaseData(response).getShowCarmFields());
         assertEquals(CaseCategory.SPEC_CLAIM, getCaseData(response).getCaseAccessCategory());
         verify(featureToggleService, times(1)).isPinInPostEnabled();
 

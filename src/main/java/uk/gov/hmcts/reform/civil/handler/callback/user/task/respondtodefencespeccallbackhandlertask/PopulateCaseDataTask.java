@@ -36,6 +36,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_2;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_ADMISSION;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
@@ -71,7 +72,11 @@ public class PopulateCaseDataTask implements CaseTask {
             .claimantResponseScenarioFlag(getMultiPartyScenario(caseData))
             .caseAccessCategory(CaseCategory.SPEC_CLAIM);
 
-        updatedCaseData.showCarmFields(YES);
+        if (featureToggleService.isCarmEnabledForCase(caseData)) {
+            updatedCaseData.showCarmFields(YES);
+        } else {
+            updatedCaseData.showCarmFields(NO);
+        }
 
         List<LocationRefData> locations = fetchLocationData(callbackParams);
         updatedCaseData.applicant1DQ(
