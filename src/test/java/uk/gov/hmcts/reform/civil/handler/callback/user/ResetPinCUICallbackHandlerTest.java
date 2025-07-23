@@ -129,6 +129,9 @@ public class ResetPinCUICallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateClaimIssued()
                 .respondent1(Party.builder()
                                  .partyEmail("test@gmail.com").build())
+                .addRespondent1PinToPostLRspec(DefendantPinToPostLRspec.builder()
+                                                   .accessCode("000MC08")
+                                                   .build())
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
@@ -136,6 +139,25 @@ public class ResetPinCUICallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getErrors()).isNullOrEmpty();
+        }
+
+        @Test
+        void shouldReturnErrorWhenAccessCodeIsMissing() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued()
+                .respondent1(Party.builder().partyEmail("test@gmail.com").build())
+                .addRespondent1PinToPostLRspec(DefendantPinToPostLRspec.builder()
+                                                   .accessCode(null)
+                                                   .build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).containsExactly(
+                "Access code is unavailable, the defendant user already linked to the claim"
+            );
         }
     }
 }

@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -11,12 +12,14 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.notification.handlers.resetpin.ResetPinDefendantLipNotifier;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -34,10 +37,12 @@ public class ResetPinCUICallbackHandler extends CallbackHandler {
     private static final String ERROR_MESSAGE_DEFENDANT_LIP_EMAIL_MISSING = "Defendant email is missing. Please update defendant details" +
         " with Manage contact information event and then perform RESET PIN";
 
+    private static final String ERROR_MESSAGE_ACCESS_CODE = "Access code is unavailable, the defendant user already linked to the claim";
+
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_START), this::validateDefendantLipEmail,
+            callbackKey(ABOUT_TO_START), this::validateDefendantInfo,
             callbackKey(ABOUT_TO_SUBMIT), this::resetPinExpiryDate,
             callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
         );
@@ -48,11 +53,20 @@ public class ResetPinCUICallbackHandler extends CallbackHandler {
         return List.of(RESET_PIN);
     }
 
-    private CallbackResponse validateDefendantLipEmail(CallbackParams callbackParams) {
+    private CallbackResponse validateDefendantInfo(CallbackParams callbackParams) {
         List<String> errors = new ArrayList<>();
         var caseData = callbackParams.getCaseData();
+
+        String lipAccessCode = Optional.ofNullable(caseData.getRespondent1PinToPostLRspec())
+            .map(DefendantPinToPostLRspec::getAccessCode)
+            .orElse(null);
+
         if (caseData.getRespondent1PartyEmail() == null) {
             errors.add(ERROR_MESSAGE_DEFENDANT_LIP_EMAIL_MISSING);
+        }
+
+        if (StringUtils.isEmpty(lipAccessCode)) {
+            errors.add(ERROR_MESSAGE_ACCESS_CODE);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
