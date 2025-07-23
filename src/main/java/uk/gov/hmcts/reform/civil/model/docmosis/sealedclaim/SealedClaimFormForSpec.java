@@ -67,6 +67,5 @@ public class SealedClaimFormForSpec implements MappableObject {
     private final YesOrNo claimFixedCosts;
     private final String fixedCostAmount;
     private final YesOrNo respondentsOrgRegistered;
-    private final String respondent1RepresentativeOrganisationName;
-    private final String respondent2RepresentativeOrganisationName;
+    private final String respondentRepresentativeOrganisationName;
 }

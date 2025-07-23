@@ -91,15 +91,8 @@ public class SealedClaimFormGenerator implements TemplateDataGeneratorWithAuth<S
             .applicantRepresentativeOrganisationName(applicants.get(0).getRepresentative().getOrganisationName())
             .courtFee(caseData.getClaimFee().formData());
 
-        if (caseData.isRespondentSolicitorRegistered()) {
-            sealedClaimFormBuilder.respondent1RepresentativeOrganisationName(respondents.get(0).getRepresentative().getOrganisationName());
-        }
-
         if (multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP) {
             sealedClaimFormBuilder.respondent2ExternalReference(caseData.getRespondentSolicitor2Reference());
-            if (caseData.isRespondentTwoSolicitorRegistered()) {
-                sealedClaimFormBuilder.respondent2RepresentativeOrganisationName(respondents.get(1).getRepresentative().getOrganisationName());
-            }
         }
 
         return sealedClaimFormBuilder.build();

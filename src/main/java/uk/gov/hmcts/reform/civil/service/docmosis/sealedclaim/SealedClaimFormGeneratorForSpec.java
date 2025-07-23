@@ -188,13 +188,22 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
             .respondentsOrgRegistered(getRespondentsOrgRegistered(caseData));
 
         if (caseData.isRespondentSolicitorRegistered()) {
-            sealedClaimFormBuilder.respondent1RepresentativeOrganisationName(respondents.get(0).getRepresentative().getOrganisationName());
+            sealedClaimFormBuilder.respondentRepresentativeOrganisationName(respondents.get(0).getRepresentative().getOrganisationName());
         }
-        if (multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP && caseData.isRespondentTwoSolicitorRegistered()) {
-            sealedClaimFormBuilder.respondent2RepresentativeOrganisationName(respondents.get(1).getRepresentative().getOrganisationName());
+        if (multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP && caseData.isRespondentTwoSolicitorRegistered() && isRespondent2(caseData)) {
+            sealedClaimFormBuilder.respondentRepresentativeOrganisationName(respondents.get(1).getRepresentative().getOrganisationName());
         }
 
         return sealedClaimFormBuilder.build();
+    }
+
+    private boolean isRespondent2(CaseData caseData) {
+        if (caseData.getRespondent2ResponseDate() != null) {
+            return caseData.getRespondent1ResponseDate() == null
+                || caseData.getRespondent2ResponseDate().isAfter(caseData.getRespondent1ResponseDate());
+        }
+
+        return false;
     }
 
     private LocalDate getInterestFromDate(CaseData caseData) {
