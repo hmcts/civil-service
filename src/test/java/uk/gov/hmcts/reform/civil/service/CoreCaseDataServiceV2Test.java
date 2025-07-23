@@ -18,12 +18,18 @@ import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.verify;
@@ -44,6 +50,8 @@ class CoreCaseDataServiceV2Test {
     private AuthTokenGenerator authTokenGenerator;
     @Mock
     private FeatureToggleService featureToggleService;
+    @Mock
+    private LocationReferenceDataService locationReferenceDataService;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Mock
@@ -61,7 +69,8 @@ class CoreCaseDataServiceV2Test {
                                           authTokenGenerator,
                                           caseDetailsConverter,
                                           userService,
-                                          featureToggleService);
+                                          featureToggleService,
+                                          locationReferenceDataService);
         clearInvocations(authTokenGenerator, userService);
         when(authTokenGenerator.generate()).thenReturn(SERVICE_AUTH_TOKEN);
     }
@@ -83,6 +92,16 @@ class CoreCaseDataServiceV2Test {
 
         @BeforeEach
         void setUp() {
+            List<LocationRefData> mockLocation = new ArrayList<>();
+            LocationRefData locationRefData = LocationRefData.builder()
+                .region("1")
+                .epimmsId("12345")
+                .courtAddress("Central London")
+                .postcode("LJ09 EMM")
+                .siteName("London SX12 2345")
+                .build();
+            mockLocation.add(locationRefData);
+            when(locationReferenceDataService.getCourtLocationsByEpimmsId(anyString(), anyString())).thenReturn(mockLocation);
             when(userService.getUserInfo(USER_AUTH_TOKEN)).thenReturn(UserInfo.builder().uid(USER_ID).build());
             when(authTokenGenerator.generate()).thenReturn(SERVICE_AUTH_TOKEN);
             when(userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword())).thenReturn(USER_AUTH_TOKEN);
@@ -111,6 +130,7 @@ class CoreCaseDataServiceV2Test {
                                                        "12345",
                                                        "2",
                                                         "yes",
+                                                       "yes",
                                                        "yes",
                                                        "yes",
                                                        "Summary",

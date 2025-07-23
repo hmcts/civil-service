@@ -38,6 +38,7 @@ class RetriggerUpdateLocationDataHandlerTest {
         when(externalTask.getVariable("caseManagementLocation")).thenReturn(YES);
         when(externalTask.getVariable("courtLocation")).thenReturn(YES);
         when(externalTask.getVariable("applicant1DQRequestedCourt")).thenReturn(YES);
+        when(externalTask.getVariable("respondent1DQRequestedCourt")).thenReturn(YES);
         when(externalTask.getProcessInstanceId()).thenReturn("1");
 
         handler.handleTask(externalTask);
@@ -50,6 +51,7 @@ class RetriggerUpdateLocationDataHandlerTest {
             YES,
             YES,
             YES,
+            YES,
             "Update locations epimId by 123456",
             EVENT_DESCRIPTION
         );
@@ -58,6 +60,7 @@ class RetriggerUpdateLocationDataHandlerTest {
             CaseEvent.UPDATE_CASE_DATA,
             "123456",
             "2",
+            YES,
             YES,
             YES,
             YES,

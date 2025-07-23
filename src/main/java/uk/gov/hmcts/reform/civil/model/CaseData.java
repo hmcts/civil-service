@@ -539,6 +539,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String caseNamePublic;
     private final YesOrNo ccjJudgmentAmountShowInterest;
     private final YesOrNo claimFixedCostsExist;
+    private final YesOrNo partAdmit1v1Defendant;
 
     @Builder.Default
     private final List<Element<CaseDocument>> defaultJudgmentDocuments = new ArrayList<>();
@@ -637,6 +638,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final PreTranslationDocumentType preTranslationDocumentType;
     private final YesOrNo bilingualHint;
     private final CaseDocument respondent1OriginalDqDoc;
+
+    private final YesOrNo isMintiLipCase;
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending
@@ -1124,6 +1127,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
+    public Optional<Element<CaseDocument>> getHiddenSDODocument() {
+        return getLatestHiddenDocumentOfType(DocumentType.SDO_ORDER);
+    }
+
+    @JsonIgnore
     public Optional<Element<CaseDocument>> getTranslatedSDODocument() {
         return getLatestDocumentOfType(DocumentType.SDO_TRANSLATED_DOCUMENT);
     }
@@ -1141,6 +1149,14 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public Optional<Element<CaseDocument>> getLatestDocumentOfType(DocumentType documentType) {
         return ofNullable(systemGeneratedCaseDocuments)
+            .flatMap(docs -> docs.stream()
+                .filter(doc -> doc.getValue().getDocumentType().equals(documentType))
+                .max(Comparator.comparing(doc -> doc.getValue().getCreatedDatetime())));
+    }
+
+    @JsonIgnore
+    public Optional<Element<CaseDocument>> getLatestHiddenDocumentOfType(DocumentType documentType) {
+        return ofNullable(preTranslationDocuments)
             .flatMap(docs -> docs.stream()
                 .filter(doc -> doc.getValue().getDocumentType().equals(documentType))
                 .max(Comparator.comparing(doc -> doc.getValue().getCreatedDatetime())));
