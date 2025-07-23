@@ -753,7 +753,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     class MidStatementOfTruth {
 
         @Test
-        void shouldSetStatementOfTruthFieldsToNull_whenPopulated() {
+        void shouldSetEmptyCallbackResponse_whenStatementOfTruthMidEventIsCalled() {
             String name = "John Smith";
             String role = "Solicitor";
 
@@ -764,10 +764,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, MID, "statement-of-truth");
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertThat(response.getData())
-                .extracting("uiStatementOfTruth")
-                .doesNotHaveToString("name")
-                .doesNotHaveToString("role");
+            assertThat(response.getData()).isNull();
         }
     }
 
@@ -776,7 +773,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         private static final String PAGE_ID = "get-payment-date";
 
         @Test
-        void shouldSetStatementOfTruthFieldsToNull_whenPopulated() {
+        void shouldSetEmptyCallbackResponse_whenStatementOfTruthMidEventIsCalled() {
             String name = "John Smith";
             String role = "Solicitor";
 
@@ -787,9 +784,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertThat(response.getData())
-                .extracting("currentDateboxDefendantSpec")
-                .isNotNull();
+            assertThat(response.getData()).isNull();
         }
 
     }
