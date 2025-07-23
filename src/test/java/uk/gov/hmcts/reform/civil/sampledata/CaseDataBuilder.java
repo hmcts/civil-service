@@ -2527,16 +2527,30 @@ public class CaseDataBuilder {
         CaseDataBuilder caseDataBuilder = atStateClaimDraft();
         caseDataBuilder.caseManagementLocation(CaseLocationCivil.builder().region("2").baseLocation("41112").build());
         caseDataBuilder.applicant1DQ(Applicant1DQ.builder()
-            .applicant1DQRequestedCourt(RequestedCourt.builder().responseCourtCode("court4")
-                                            .caseLocation(CaseLocationCivil.builder()
-                                                              .baseLocation("dummy base").region("dummy region")
-                                                              .build())
-                                            .responseCourtName("testCourt")
-                                            .responseCourtCode("0000")
-                                            .reasonForHearingAtSpecificCourt("reason")
-                                            .otherPartyPreferredSite("site")
-                                            .build())
-                .build());
+                                         .applicant1DQRequestedCourt(RequestedCourt.builder().responseCourtCode("court4")
+                                                                         .caseLocation(CaseLocationCivil.builder()
+                                                                                           .baseLocation("dummy base").region(
+                                                                                 "dummy region")
+                                                                                           .build())
+                                                                         .responseCourtName("testCourt")
+                                                                         .responseCourtCode("0000")
+                                                                         .reasonForHearingAtSpecificCourt("reason")
+                                                                         .otherPartyPreferredSite("site")
+                                                                         .build())
+                                         .build());
+        caseDataBuilder.respondent1DQ(Respondent1DQ.builder()
+                                          .respondent1DQRequestedCourt(RequestedCourt.builder().responseCourtCode(
+                                                  "court4")
+                                                                           .caseLocation(CaseLocationCivil.builder()
+                                                                                             .baseLocation("dummy base").region(
+                                                                                   "dummy region")
+                                                                                             .build())
+                                                                           .responseCourtName("testCourt")
+                                                                           .responseCourtCode("0000")
+                                                                           .reasonForHearingAtSpecificCourt("reason")
+                                                                           .otherPartyPreferredSite("site")
+                                                                           .build())
+                                          .build());
         return caseDataBuilder;
     }
 
