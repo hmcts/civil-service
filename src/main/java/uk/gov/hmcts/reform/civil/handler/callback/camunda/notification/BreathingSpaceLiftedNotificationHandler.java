@@ -99,8 +99,7 @@ public class BreathingSpaceLiftedNotificationHandler extends CallbackHandler imp
             CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
         addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
         return properties;
     }
 
@@ -125,8 +124,7 @@ public class BreathingSpaceLiftedNotificationHandler extends CallbackHandler imp
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
         ));
         addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
         return properties;
     }
 
