@@ -583,7 +583,11 @@ public class DashboardNotificationsParamsMapperTest {
     void shouldMapOrderParameters_whenEventIsSdo() {
         List<Element<CaseDocument>> systemGeneratedDocuments = new ArrayList<>();
         systemGeneratedDocuments.add(element(generateOrder(SDO_ORDER)));
-        caseData = caseData.toBuilder().systemGeneratedCaseDocuments(systemGeneratedDocuments).build();
+        List<Element<CaseDocument>> preTranslationDocuments = new ArrayList<>();
+        preTranslationDocuments.add(element(generateOrder(SDO_ORDER)));
+        caseData = caseData.toBuilder()
+            .systemGeneratedCaseDocuments(systemGeneratedDocuments)
+            .preTranslationDocuments(preTranslationDocuments).build();
 
         Map<String, Object> resultClaimant =
             mapper.mapCaseDataToParams(caseData, CaseEvent.CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT);
@@ -592,6 +596,8 @@ public class DashboardNotificationsParamsMapperTest {
 
         assertThat(resultClaimant).extracting("orderDocument").isEqualTo("binary-url");
         assertThat(resultDefendant).extracting("orderDocument").isEqualTo("binary-url");
+        assertThat(resultClaimant).extracting("hiddenOrderDocument").isEqualTo("binary-url");
+        assertThat(resultDefendant).extracting("hiddenOrderDocument").isEqualTo("binary-url");
     }
 
     @Test
