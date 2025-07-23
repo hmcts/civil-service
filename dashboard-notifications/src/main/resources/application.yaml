@@ -16,11 +16,18 @@ ccd_gateway:
 
 logging:
   level:
-    org.springframework:
-      dao: debug
-      transaction: debug
-      jdbc.core.JdbcTemplate: info
-    #    org.hibernate:
+    root: DEBUG                                # General logging level for the application
+    org.springframework.data.jpa.repository: DEBUG  # Log JPA repository method calls
+    org.hibernate.SQL: DEBUG                   # Log SQL statements executed by Hibernate
+    org.hibernate.type.descriptor.sql: TRACE
+    #
+#logging:
+#  level:
+#    org.springframework:
+#      dao: debug
+#      transaction: debug
+#      jdbc.core.JdbcTemplate: info
+#    #    org.hibernate:
     #      SQL: debug
     #      type.descriptor.sql.BasicBinder: debug
     #      engine: debug
