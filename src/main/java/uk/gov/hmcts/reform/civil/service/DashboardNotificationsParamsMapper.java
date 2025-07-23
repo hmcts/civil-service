@@ -50,6 +50,7 @@ public class DashboardNotificationsParamsMapper {
     public static final String CLAIMANT1_ACCEPTED_REPAYMENT_PLAN_WELSH = "derbyn";
     public static final String CLAIMANT1_REJECTED_REPAYMENT_PLAN_WELSH = "gwrthod";
     public static final String ORDER_DOCUMENT = "orderDocument";
+    public static final String HIDDEN_ORDER_DOCUMENT = "hiddenOrderDocument";
     public static final int CLAIM_SETTLED_OBJECTION_DEADLINE_DAYS = 19;
     private final FeatureToggleService featureToggleService;
     private final ClaimantResponseUtils claimantResponseUtils;
@@ -290,6 +291,10 @@ public class DashboardNotificationsParamsMapper {
         if (nonNull(orderDocumentUrl)) {
             params.put(ORDER_DOCUMENT, orderDocumentUrl);
         }
+        String hiddenOrderDocumentUrl = addToHiddenDocumentInfo(caseData, caseEvent);
+        if (nonNull(hiddenOrderDocumentUrl)) {
+            params.put(HIDDEN_ORDER_DOCUMENT, hiddenOrderDocumentUrl);
+        }
         return params;
     }
 
@@ -458,7 +463,8 @@ public class DashboardNotificationsParamsMapper {
         if (nonNull(caseEvent)) {
             switch (caseEvent) {
                 case CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT, CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT -> {
-                    if (featureToggleService.isGaForWelshEnabled() && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
+                    if (featureToggleService.isWelshEnabledForMainCase()
+                        && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
                         return null;
                     } else {
                         return caseData.getFinalOrderDocumentCollection()
@@ -475,6 +481,23 @@ public class DashboardNotificationsParamsMapper {
                 }
                 case CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT, CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT -> {
                     Optional<Element<CaseDocument>> sdoDocument = caseData.getSDODocument();
+                    if (sdoDocument.isPresent()) {
+                        return sdoDocument.get().getValue().getDocumentLink().getDocumentBinaryUrl();
+                    }
+                }
+                default -> {
+                    return null;
+                }
+            }
+        }
+        return null;
+    }
+
+    private String addToHiddenDocumentInfo(CaseData caseData, CaseEvent caseEvent) {
+        if (nonNull(caseEvent)) {
+            switch (caseEvent) {
+                case CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT, CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT -> {
+                    Optional<Element<CaseDocument>> sdoDocument = caseData.getHiddenSDODocument();
                     if (sdoDocument.isPresent()) {
                         return sdoDocument.get().getValue().getDocumentLink().getDocumentBinaryUrl();
                     }
