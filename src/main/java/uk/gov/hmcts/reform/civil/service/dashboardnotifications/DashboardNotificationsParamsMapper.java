@@ -20,6 +20,7 @@ import static java.util.Objects.nonNull;
 public class DashboardNotificationsParamsMapper {
 
     public static final String ORDER_DOCUMENT = "orderDocument";
+    public static final String HIDDEN_ORDER_DOCUMENT = "hiddenOrderDocument";
 
     private final List<DashboardNotificationsParamsBuilder> dashboardNotificationsParamsBuilders;
     private final FeatureToggleService featureToggleService;
@@ -37,6 +38,10 @@ public class DashboardNotificationsParamsMapper {
         String orderDocumentUrl = addToMapDocumentInfo(caseData, caseEvent);
         if (nonNull(orderDocumentUrl)) {
             params.put(ORDER_DOCUMENT, orderDocumentUrl);
+        }
+        String hiddenOrderDocumentUrl = addToHiddenDocumentInfo(caseData, caseEvent);
+        if (nonNull(hiddenOrderDocumentUrl)) {
+            params.put(HIDDEN_ORDER_DOCUMENT, hiddenOrderDocumentUrl);
         }
         return params;
     }
@@ -64,6 +69,23 @@ public class DashboardNotificationsParamsMapper {
                 }
                 case CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT, CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT -> {
                     Optional<Element<CaseDocument>> sdoDocument = caseData.getSDODocument();
+                    if (sdoDocument.isPresent()) {
+                        return sdoDocument.get().getValue().getDocumentLink().getDocumentBinaryUrl();
+                    }
+                }
+                default -> {
+                    return null;
+                }
+            }
+        }
+        return null;
+    }
+
+    private String addToHiddenDocumentInfo(CaseData caseData, CaseEvent caseEvent) {
+        if (nonNull(caseEvent)) {
+            switch (caseEvent) {
+                case CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT, CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT -> {
+                    Optional<Element<CaseDocument>> sdoDocument = caseData.getHiddenSDODocument();
                     if (sdoDocument.isPresent()) {
                         return sdoDocument.get().getValue().getDocumentLink().getDocumentBinaryUrl();
                     }
