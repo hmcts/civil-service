@@ -112,6 +112,9 @@ public class ResetPinCUICallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .respondent1(null)
+                .addRespondent1PinToPostLRspec(DefendantPinToPostLRspec.builder()
+                                                   .accessCode("000MC08")
+                                                   .build())
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
