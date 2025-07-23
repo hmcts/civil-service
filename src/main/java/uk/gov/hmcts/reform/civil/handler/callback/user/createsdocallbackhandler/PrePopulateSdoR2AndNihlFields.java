@@ -81,6 +81,7 @@ public class PrePopulateSdoR2AndNihlFields {
                                   Optional<RequestedCourt> preferredCourt,
                                   DynamicList hearingMethodList,
                                   List<LocationRefData> locationRefDataList) {
+        log.info("Populating DRH fields for caseId: {}", callbackParams.getCaseData().getCcdCaseReference());
         DynamicList courtList = getCourtLocationForSdoR2(preferredCourt.orElse(null), locationRefDataList);
         courtList.setValue(courtList.getListItems().get(0));
 
@@ -89,8 +90,9 @@ public class PrePopulateSdoR2AndNihlFields {
 
         CaseData caseData = callbackParams.getCaseData();
 
-        setCarmFields(updatedData);
-
+        if (featureToggleService.isCarmEnabledForCase(caseData)) {
+            setCarmFields(updatedData);
+        }
         if (featureToggleService.isWelshEnabledForMainCase()
                 && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
             updatedData.bilingualHint(YesOrNo.YES);
@@ -110,6 +112,7 @@ public class PrePopulateSdoR2AndNihlFields {
                                       DynamicList hearingMethodList,
                                       Optional<RequestedCourt> preferredCourt,
                                       List<LocationRefData> locationRefDataList) {
+        log.info("Setting Small Claims fields for caseId: {}", updatedData.build().getCcdCaseReference());
         updatedData.sdoR2SmallClaimsJudgesRecital(SdoR2SmallClaimsJudgesRecital.builder().input(
                 SdoR2UiConstantSmallClaim.JUDGE_RECITAL).build());
         updatedData.sdoR2SmallClaimsPPI(SdoR2SmallClaimsPPI.builder().ppiDate(LocalDate.now().plusDays(21)).text(
@@ -157,6 +160,7 @@ public class PrePopulateSdoR2AndNihlFields {
     }
 
     private void setCarmFields(CaseData.CaseDataBuilder<?, ?> updatedData) {
+        log.info("Setting CARM fields for caseId: {}", updatedData.build().getCcdCaseReference());
         updatedData.sdoR2SmallClaimsMediationSectionToggle(includeInOrderToggle);
         updatedData.sdoR2SmallClaimsMediationSectionStatement(SdoR2SmallClaimsMediation.builder()
                 .input(SdoR2UiConstantSmallClaim.CARM_MEDIATION_TEXT)
@@ -165,6 +169,7 @@ public class PrePopulateSdoR2AndNihlFields {
 
     public void prePopulateNihlFields(CaseData.CaseDataBuilder<?, ?> updatedData, DynamicList hearingMethodList,
                                       Optional<RequestedCourt> preferredCourt, List<LocationRefData> locationRefDataList) {
+        log.info("Pre-populating NIHL fields for caseId: {}", updatedData.build().getCcdCaseReference());
         setHearingMethodInPerson(hearingMethodList);
         setFastTrackJudgesRecital(updatedData);
         setDisclosureOfDocuments(updatedData);
@@ -192,11 +197,13 @@ public class PrePopulateSdoR2AndNihlFields {
     }
 
     private void setFastTrackJudgesRecital(CaseData.CaseDataBuilder<?, ?> updatedData) {
+        log.info("Setting Fast Track Judges Recital for caseId: {}", updatedData.build().getCcdCaseReference());
         updatedData.sdoFastTrackJudgesRecital(FastTrackJudgesRecital.builder()
                 .input(SdoR2UiConstantFastTrack.JUDGE_RECITAL).build());
     }
 
     private void setDisclosureOfDocuments(CaseData.CaseDataBuilder<?, ?> updatedData) {
+        log.info("Setting Disclosure of Documents for caseId: {}", updatedData.build().getCcdCaseReference());
         updatedData.sdoR2DisclosureOfDocuments(SdoR2DisclosureOfDocuments.builder()
                 .standardDisclosureTxt(SdoR2UiConstantFastTrack.STANDARD_DISCLOSURE)
                 .standardDisclosureDate(LocalDate.now().plusDays(28))
@@ -207,6 +214,7 @@ public class PrePopulateSdoR2AndNihlFields {
     }
 
     private void setWitnessesOfFact(CaseData.CaseDataBuilder<?, ?> updatedData) {
+        log.info("Setting Witnesses of Fact for caseId: {}", updatedData.build().getCcdCaseReference());
         updatedData.sdoR2WitnessesOfFact(SdoR2WitnessOfFact.builder()
                 .sdoStatementOfWitness(SdoR2UiConstantFastTrack.STATEMENT_WITNESS)
                 .sdoR2RestrictWitness(SdoR2RestrictWitness.builder()
@@ -232,6 +240,7 @@ public class PrePopulateSdoR2AndNihlFields {
     }
 
     private void setScheduleOfLoss(CaseData.CaseDataBuilder<?, ?> updatedData) {
+        log.info("Setting Schedule of Loss for caseId: {}", updatedData.build().getCcdCaseReference());
         updatedData.sdoR2ScheduleOfLoss(SdoR2ScheduleOfLoss.builder()
                 .sdoR2ScheduleOfLossClaimantText(SdoR2UiConstantFastTrack.SCHEDULE_OF_LOSS_CLAIMANT)
                 .isClaimForPecuniaryLoss(NO)
@@ -244,6 +253,7 @@ public class PrePopulateSdoR2AndNihlFields {
 
     private void setTrialDetails(CaseData.CaseDataBuilder<?, ?> updatedData, DynamicList hearingMethodList,
                                  Optional<RequestedCourt> preferredCourt, List<LocationRefData> locationRefDataList) {
+        log.info("Setting Trial Details for caseId: {}", updatedData.build().getCcdCaseReference());
         updatedData.sdoR2Trial(SdoR2Trial.builder()
                 .trialOnOptions(TrialOnRadioOptions.OPEN_DATE)
                 .lengthList(FastTrackHearingTimeEstimate.FIVE_HOURS)
@@ -265,17 +275,20 @@ public class PrePopulateSdoR2AndNihlFields {
     }
 
     private void setImportantNotes(CaseData.CaseDataBuilder<?, ?> updatedData) {
+        log.info("Setting Important Notes for caseId: {}", updatedData.build().getCcdCaseReference());
         updatedData.sdoR2ImportantNotesTxt(SdoR2UiConstantFastTrack.IMPORTANT_NOTES);
         updatedData.sdoR2ImportantNotesDate(LocalDate.now().plusDays(7));
     }
 
     private void setExpertEvidence(CaseData.CaseDataBuilder<?, ?> updatedData) {
+        log.info("Setting Expert Evidence for caseId: {}", updatedData.build().getCcdCaseReference());
         updatedData.sdoR2ExpertEvidence(SdoR2ExpertEvidence.builder()
                 .sdoClaimantPermissionToRelyTxt(SdoR2UiConstantFastTrack.CLAIMANT_PERMISSION_TO_RELY)
                 .build());
     }
 
     private void setAddendumReport(CaseData.CaseDataBuilder<?, ?> updatedData) {
+        log.info("Setting Addendum Report for caseId: {}", updatedData.build().getCcdCaseReference());
         updatedData.sdoR2AddendumReport(SdoR2AddendumReport.builder()
                 .sdoAddendumReportTxt(SdoR2UiConstantFastTrack.ADDENDUM_REPORT)
                 .sdoAddendumReportDate(LocalDate.now().plusDays(56))
@@ -283,6 +296,7 @@ public class PrePopulateSdoR2AndNihlFields {
     }
 
     private void setFurtherAudiogram(CaseData.CaseDataBuilder<?, ?> updatedData) {
+        log.info("Setting Further Audiogram for caseId: {}", updatedData.build().getCcdCaseReference());
         updatedData.sdoR2FurtherAudiogram(SdoR2FurtherAudiogram.builder()
                 .sdoClaimantShallUndergoTxt(SdoR2UiConstantFastTrack.CLAIMANT_SHALL_UNDERGO)
                 .sdoServiceReportTxt(SdoR2UiConstantFastTrack.SERVICE_REPORT)
@@ -292,6 +306,7 @@ public class PrePopulateSdoR2AndNihlFields {
     }
 
     private void setQuestionsClaimantExpert(CaseData.CaseDataBuilder<?, ?> updatedData) {
+        log.info("Setting Questions for Claimant Expert for caseId: {}", updatedData.build().getCcdCaseReference());
         updatedData.sdoR2QuestionsClaimantExpert(SdoR2QuestionsClaimantExpert.builder()
                 .sdoDefendantMayAskTxt(SdoR2UiConstantFastTrack.DEFENDANT_MAY_ASK)
                 .sdoDefendantMayAskDate(LocalDate.now().plusDays(126))
@@ -309,6 +324,7 @@ public class PrePopulateSdoR2AndNihlFields {
     }
 
     private void setPermissionToRelyOnExpert(CaseData.CaseDataBuilder<?, ?> updatedData) {
+        log.info("Setting Permission to Rely on Expert for caseId: {}", updatedData.build().getCcdCaseReference());
         updatedData.sdoR2PermissionToRelyOnExpert(SdoR2PermissionToRelyOnExpert.builder()
                 .sdoPermissionToRelyOnExpertTxt(SdoR2UiConstantFastTrack.PERMISSION_TO_RELY_ON_EXPERT)
                 .sdoPermissionToRelyOnExpertDate(LocalDate.now().plusDays(119))
@@ -319,6 +335,7 @@ public class PrePopulateSdoR2AndNihlFields {
     }
 
     private void setEvidenceAcousticEngineer(CaseData.CaseDataBuilder<?, ?> updatedData) {
+        log.info("Setting Evidence Acoustic Engineer for caseId: {}", updatedData.build().getCcdCaseReference());
         updatedData.sdoR2EvidenceAcousticEngineer(SdoR2EvidenceAcousticEngineer.builder()
                 .sdoEvidenceAcousticEngineerTxt(SdoR2UiConstantFastTrack.EVIDENCE_ACOUSTIC_ENGINEER)
                 .sdoInstructionOfTheExpertTxt(SdoR2UiConstantFastTrack.INSTRUCTION_OF_EXPERT)
@@ -338,6 +355,7 @@ public class PrePopulateSdoR2AndNihlFields {
     }
 
     private void setQuestionsToEntExpert(CaseData.CaseDataBuilder<?, ?> updatedData) {
+        log.info("Setting Questions to Ent Expert for caseId: {}", updatedData.build().getCcdCaseReference());
         updatedData.sdoR2QuestionsToEntExpert(SdoR2QuestionsToEntExpert.builder()
                 .sdoWrittenQuestionsTxt(SdoR2UiConstantFastTrack.ENT_WRITTEN_QUESTIONS)
                 .sdoWrittenQuestionsDate(LocalDate.now().plusDays(336))
@@ -349,12 +367,14 @@ public class PrePopulateSdoR2AndNihlFields {
     }
 
     private void setUploadOfDocuments(CaseData.CaseDataBuilder<?, ?> updatedData) {
+        log.info("Setting Upload of Documents for caseId: {}", updatedData.build().getCcdCaseReference());
         updatedData.sdoR2UploadOfDocuments(SdoR2UploadOfDocuments.builder()
                 .sdoUploadOfDocumentsTxt(SdoR2UiConstantFastTrack.UPLOAD_OF_DOCUMENTS)
                 .build());
     }
 
     private void setWelshLanguageUsage(CaseData.CaseDataBuilder<?, ?> updatedData) {
+        log.info("Setting Welsh Language Usage for caseId: {}", updatedData.build().getCcdCaseReference());
         updatedData.sdoR2NihlUseOfWelshLanguage(SdoR2WelshLanguageUsage.builder()
                 .description(SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION)
                 .build());
@@ -362,6 +382,7 @@ public class PrePopulateSdoR2AndNihlFields {
 
     private DynamicList getCourtLocationForSdoR2(RequestedCourt preferredCourt,
                                                  List<LocationRefData> locations) {
+        log.info("Getting court location for SDO R2 with preferredCourt: {}", preferredCourt);
         Optional<LocationRefData> matchingLocation = Optional.ofNullable(preferredCourt)
                 .flatMap(requestedCourt -> locationHelper.getMatching(locations, preferredCourt));
 
@@ -375,7 +396,6 @@ public class PrePopulateSdoR2AndNihlFields {
     }
 
     private DynamicList getAlternativeCourtLocationsForNihl(List<LocationRefData> locations) {
-
         List<DynamicListElement> dynamicListOptions = new ArrayList<>();
 
         locations.forEach(loc -> dynamicListOptions.add(
