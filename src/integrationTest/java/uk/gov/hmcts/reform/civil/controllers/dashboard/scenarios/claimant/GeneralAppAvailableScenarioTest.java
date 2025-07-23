@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.claimant;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.http.HttpStatus;
@@ -31,9 +30,9 @@ public class GeneralAppAvailableScenarioTest extends BaseIntegrationTest {
 
         UUID caseId = UUID.randomUUID();
         doPost(BEARER_TOKEN,
-               ScenarioRequestParams.builder()
-                   .params(new HashMap<>()).build(),
-               DASHBOARD_CREATE_SCENARIO_URL, SCENARIO_GA_AVAILABLE, caseId
+            ScenarioRequestParams.builder()
+                .params(new HashMap<>()).build(),
+            DASHBOARD_CREATE_SCENARIO_URL, SCENARIO_GA_AVAILABLE, caseId
         )
             .andExpect(status().isOk());
 
