@@ -5,11 +5,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,6 +22,7 @@ import static uk.gov.hmcts.reform.civil.enums.dq.Language.ENGLISH;
 import static uk.gov.hmcts.reform.civil.enums.dq.Language.WELSH;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
+import static uk.gov.hmcts.reform.civil.notification.handlers.claimantresponsecui.confirmproceed.ClaimantConfirmProceedDefendantEmailDTOGenerator.NO_EMAIL_OPERATION;
 
 @ExtendWith(MockitoExtension.class)
 class ClaimantConfirmProceedDefendantEmailDTOGeneratorTest {
@@ -29,6 +32,9 @@ class ClaimantConfirmProceedDefendantEmailDTOGeneratorTest {
     @Mock
     private NotificationsProperties notificationsProperties;
 
+    @Mock
+    private FeatureToggleService featureToggleService;
+
     @InjectMocks
     private ClaimantConfirmProceedDefendantEmailDTOGenerator emailDTOGenerator;
 
@@ -37,6 +43,7 @@ class ClaimantConfirmProceedDefendantEmailDTOGeneratorTest {
         CaseData caseData = CaseData.builder().caseDataLiP(CaseDataLiP.builder().respondent1LiPResponse(
             RespondentLiPResponse.builder().respondent1ResponseLanguage(WELSH.toString()).build()).build()).build();
         String expectedTemplateId = "template-id";
+
         when(notificationsProperties.getNotifyDefendantTranslatedDocumentUploaded()).thenReturn(expectedTemplateId);
 
         String actualTemplateId = emailDTOGenerator.getEmailTemplateId(caseData);
@@ -49,11 +56,39 @@ class ClaimantConfirmProceedDefendantEmailDTOGeneratorTest {
         CaseData caseData = CaseData.builder().caseDataLiP(CaseDataLiP.builder().respondent1LiPResponse(
             RespondentLiPResponse.builder().respondent1ResponseLanguage(ENGLISH.toString()).build()).build()).build();
         String expectedTemplateId = "template-id";
+
         when(notificationsProperties.getRespondent1LipClaimUpdatedTemplate()).thenReturn(expectedTemplateId);
 
         String actualTemplateId = emailDTOGenerator.getEmailTemplateId(caseData);
 
         assertThat(actualTemplateId).isEqualTo(expectedTemplateId);
+    }
+
+    @Test
+    void shouldReturnNoEmailOperation_whenDefendantGetTemplateNocDisabledClaimantBilingual() {
+        CaseData caseData = CaseData.builder().caseDataLiP(CaseDataLiP.builder().respondent1LiPResponse(
+            RespondentLiPResponse.builder().respondent1ResponseLanguage(ENGLISH.toString()).build()).build())
+            .claimantBilingualLanguagePreference(WELSH.toString()).build();
+        when(featureToggleService.isDefendantNoCOnlineForCase(caseData)).thenReturn(false);
+
+        String actualTemplateId = emailDTOGenerator.getEmailTemplateId(caseData);
+
+        assertThat(actualTemplateId).isEqualTo(NO_EMAIL_OPERATION);
+    }
+
+    @Test
+    void shouldReturnNoEmailOperation_whenDefendantGetTemplateIsInvokedAndClaimantBilingualAndProceedNoPartAdmit() {
+        CaseData caseData = CaseData.builder().caseDataLiP(CaseDataLiP.builder().respondent1LiPResponse(
+                RespondentLiPResponse.builder().respondent1ResponseLanguage(ENGLISH.toString()).build()).build())
+            .claimantBilingualLanguagePreference(WELSH.toString())
+            .applicant1ProceedWithClaim(YesOrNo.YES)
+            .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.NO)
+            .build();
+        when(featureToggleService.isDefendantNoCOnlineForCase(caseData)).thenReturn(true);
+
+        String actualTemplateId = emailDTOGenerator.getEmailTemplateId(caseData);
+
+        assertThat(actualTemplateId).isEqualTo(NO_EMAIL_OPERATION);
     }
 
     @Test
