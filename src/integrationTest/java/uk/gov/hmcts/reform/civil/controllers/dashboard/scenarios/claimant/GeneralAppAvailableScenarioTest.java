@@ -24,7 +24,6 @@ public class GeneralAppAvailableScenarioTest extends BaseIntegrationTest {
         = "/dashboard/scenarios/{scenario_ref}/{unique_case_identifier}";
     private static final String GET_TASKS_ITEMS_URL = "/dashboard/taskList/{ccd-case-identifier}/role/{role-type}";
 
-
     @Test
     void should_create_scenario_for_general_application_action_needed() throws Exception {
 
