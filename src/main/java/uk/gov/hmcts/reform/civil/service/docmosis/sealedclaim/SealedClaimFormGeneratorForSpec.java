@@ -121,7 +121,6 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
     public SealedClaimFormForSpec getTemplateData(CaseData caseData) {
         Optional<SolicitorReferences> solicitorReferences = ofNullable(caseData.getSolicitorReferences());
         BigDecimal interest = interestCalculator.calculateInterest(caseData);
-        List<SpecifiedParty> respondents = getRespondents(caseData);
 
         return SealedClaimFormForSpec.builder()
             .ccdCaseReference(formatCcdCaseReference(caseData))
@@ -136,7 +135,7 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
             .issueDate(caseData.getIssueDate())
             .submittedOn(caseData.getSubmittedDate().toLocalDate())
             .applicants(getApplicants(caseData))
-            .respondents(respondents)
+            .respondents(getRespondents(caseData))
             .timeline(getTimeLine(caseData))
             .sameInterestRate(caseData.getInterestClaimOptions() != null
                 ? caseData.getInterestClaimOptions().equals(SAME_RATE_INTEREST) + "" : null)
