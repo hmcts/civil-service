@@ -20,6 +20,17 @@ logging:
     org.springframework.data.jpa.repository: DEBUG  # Log JPA repository method calls
     org.hibernate.SQL: DEBUG                   # Log SQL statements executed by Hibernate
     org.hibernate.type.descriptor.sql: TRACE
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    org.hibernate.type.descriptor.sql.BasicExtractor: DEBUG
+    org.hibernate.orm.jdbc.bind: TRACE
+    org.hibernate.stat: DEBUG
+    org.hibernate: INFO
+
+spring:
+  jpa:
+    properties:
+      hibernate:
+        format_sql: true
     #
 #logging:
 #  level:
