@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
@@ -20,6 +21,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CNBC_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.OPENING_HOURS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
@@ -46,6 +48,7 @@ class RaisingClaimAgainstLitigantInPersonForSpecNotificationHandlerTest {
     void addProperties() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimDetailsNotified()
+            .respondent1Represented(YesOrNo.NO)
             .legacyCaseReference("reference")
             .build();
 
@@ -58,10 +61,10 @@ class RaisingClaimAgainstLitigantInPersonForSpecNotificationHandlerTest {
         when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("welshHmctsSignature"));
         when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("welshPhoneContact"));
         when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
-        when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
         when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
         when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
-
+        when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+        when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
         Map<String, String> parameters = handler.addProperties(caseData);
         Assertions.assertTrue(parameters.containsKey(CLAIM_REFERENCE_NUMBER));
         Assertions.assertTrue(parameters.containsKey(PARTY_REFERENCES));
@@ -69,6 +72,7 @@ class RaisingClaimAgainstLitigantInPersonForSpecNotificationHandlerTest {
         Assertions.assertTrue(parameters.containsKey(PHONE_CONTACT));
         Assertions.assertTrue(parameters.containsKey(OPENING_HOURS));
         Assertions.assertTrue(parameters.containsKey(SPEC_UNSPEC_CONTACT));
+        Assertions.assertTrue(parameters.containsKey(CNBC_CONTACT));
         Assertions.assertTrue(parameters.containsKey(HMCTS_SIGNATURE));
         Assertions.assertTrue(parameters.containsKey(WELSH_HMCTS_SIGNATURE));
     }

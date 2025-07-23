@@ -27,6 +27,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CNBC_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT_WELSH;
@@ -64,7 +65,6 @@ class NotifyApplicant1GenericTemplateHandlerTest {
         when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("welshHmctsSignature"));
         when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("welshPhoneContact"));
         when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
-        when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
         when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
         when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
     }
@@ -82,7 +82,9 @@ class NotifyApplicant1GenericTemplateHandlerTest {
 
         when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn(
             TEMPLATE_ID);
-
+        Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+        when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+        when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
         CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
         handler.handle(params);
@@ -90,7 +92,7 @@ class NotifyApplicant1GenericTemplateHandlerTest {
         verify(notificationService).sendMail(
             "claimant@hmcts.net",
             TEMPLATE_ID,
-            getNotificationDataMap(caseData),
+            getNotificationDataMap(caseData, true),
             "generic-notification-lip-000DC001"
         );
 
@@ -118,7 +120,7 @@ class NotifyApplicant1GenericTemplateHandlerTest {
         verify(notificationService).sendMail(
             "solicitor@claimant.net",
             TEMPLATE_ID,
-            getNotificationDataMap(caseData),
+            getNotificationDataMap(caseData, false),
             "generic-notification-lip-000DC001"
         );
 
@@ -138,6 +140,9 @@ class NotifyApplicant1GenericTemplateHandlerTest {
 
         when(notificationsProperties.getNotifyLipUpdateTemplateBilingual()).thenReturn(
             BILINGUAL_TEMPLATE_ID);
+        Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+        when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+        when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
 
         CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
@@ -146,14 +151,14 @@ class NotifyApplicant1GenericTemplateHandlerTest {
         verify(notificationService).sendMail(
             "claimant@hmcts.net",
             BILINGUAL_TEMPLATE_ID,
-            getNotificationDataMap(caseData),
+            getNotificationDataMap(caseData, true),
             "generic-notification-lip-000DC001"
         );
 
     }
 
     @NotNull
-    public Map<String, String> getNotificationDataMap(CaseData caseData) {
+    public Map<String, String> getNotificationDataMap(CaseData caseData, boolean isLipCase) {
         Map<String, String> expectedProperties = new HashMap<>();
         expectedProperties.put(CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString());
         expectedProperties.put(PARTY_NAME, "John Doe");
@@ -164,9 +169,15 @@ class NotifyApplicant1GenericTemplateHandlerTest {
         expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
         expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
         expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
-        expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
         expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
         expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+        if (isLipCase) {
+            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+            expectedProperties.put(CNBC_CONTACT, configuration.getCnbcContact());
+        } else {
+            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getRaiseQueryLr());
+            expectedProperties.put(CNBC_CONTACT, configuration.getRaiseQueryLr());
+        }
         return expectedProperties;
     }
 

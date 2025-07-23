@@ -38,7 +38,11 @@ public class PayImmediatelyConfText implements RespondToResponseConfirmationText
 
         String formattedWhenBePaid = formatLocalDate(whenBePaid, DATE);
 
-        String genericText = "They must make sure you have the money by %s. "
+        String admitImmediatePayText = caseData.isPartAdmitClaimSpec() && isLrPayImmediatelyPlan(caseData, featureToggleService)
+            ? "They must make sure you have the money within 5 days of the claimant response."
+            : "They must make sure you have the money by %s. ";
+
+        String genericText = admitImmediatePayText
             + "Any cheques or transfers should be clear in your account"
             + "<p>You need to tell us if you’ve settled the claim, for example because the defendant has paid you.</p>"
             + "<p>You can settle for less than the full claim amount.</p>"
@@ -77,6 +81,6 @@ public class PayImmediatelyConfText implements RespondToResponseConfirmationText
     public boolean isLrPayImmediatelyPlan(CaseData caseData, FeatureToggleService featureToggleService) {
         return caseData.isPayImmediately()
             && isOneVOne(caseData)
-            && featureToggleService.isJudgmentOnlineLive();
+            && featureToggleService.isLrAdmissionBulkEnabled();
     }
 }

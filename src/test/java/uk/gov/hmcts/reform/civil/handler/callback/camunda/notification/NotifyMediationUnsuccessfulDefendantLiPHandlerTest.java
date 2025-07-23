@@ -44,6 +44,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_LIP;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CNBC_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
@@ -89,9 +90,10 @@ class NotifyMediationUnsuccessfulDefendantLiPHandlerTest extends BaseCallbackHan
         when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("welshHmctsSignature"));
         when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("welshPhoneContact"));
         when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
-        when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
         when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
         when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
+        when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+        when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
     }
 
     @Nested
@@ -123,6 +125,7 @@ class NotifyMediationUnsuccessfulDefendantLiPHandlerTest extends BaseCallbackHan
                 .ccdCaseReference(CCD_REFERENCE_NUMBER)
                 .addApplicant2(YesOrNo.NO)
                 .addRespondent2(YesOrNo.NO)
+                .respondent1Represented(YesOrNo.NO)
                 .mediation(Mediation.builder().mediationUnsuccessfulReasonsMultiSelect(List.of(reason)).build())
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
@@ -155,6 +158,7 @@ class NotifyMediationUnsuccessfulDefendantLiPHandlerTest extends BaseCallbackHan
                 .ccdCaseReference(CCD_REFERENCE_NUMBER)
                 .addApplicant2(YesOrNo.NO)
                 .addRespondent2(YesOrNo.NO)
+                .respondent1Represented(YesOrNo.NO)
                 .mediation(Mediation.builder().mediationUnsuccessfulReasonsMultiSelect(List.of(reason)).build())
                 .caseDataLiP(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH").build()).build())
                 .build();
@@ -183,6 +187,7 @@ class NotifyMediationUnsuccessfulDefendantLiPHandlerTest extends BaseCallbackHan
                 .legacyCaseReference(REFERENCE_NUMBER)
                 .addApplicant2(YesOrNo.NO)
                 .addRespondent2(YesOrNo.NO)
+                .respondent1Represented(YesOrNo.NO)
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_LIP.name()).build()).build();
@@ -208,6 +213,7 @@ class NotifyMediationUnsuccessfulDefendantLiPHandlerTest extends BaseCallbackHan
                 .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(CLAIMANT_ORG_NAME).build())
                 .legacyCaseReference(REFERENCE_NUMBER)
                 .addApplicant2(YesOrNo.NO)
+                .respondent1Represented(YesOrNo.NO)
                 .addRespondent2(YesOrNo.NO)
                 .caseDataLiP(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage(BILINGUAL_SELECTION).build()).build())
                 .build();
@@ -236,6 +242,7 @@ class NotifyMediationUnsuccessfulDefendantLiPHandlerTest extends BaseCallbackHan
                 .legacyCaseReference(REFERENCE_NUMBER)
                 .addApplicant2(YesOrNo.NO)
                 .addRespondent2(YesOrNo.NO)
+                .respondent1Represented(YesOrNo.NO)
                 .caseDataLiP(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage(ENGLISH_SELECTION).build()).build())
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
@@ -300,9 +307,10 @@ class NotifyMediationUnsuccessfulDefendantLiPHandlerTest extends BaseCallbackHan
             expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
             expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
             expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
-            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
             expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
             expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+            expectedProperties.put(CNBC_CONTACT, configuration.getCnbcContact());
             return expectedProperties;
         }
     }
