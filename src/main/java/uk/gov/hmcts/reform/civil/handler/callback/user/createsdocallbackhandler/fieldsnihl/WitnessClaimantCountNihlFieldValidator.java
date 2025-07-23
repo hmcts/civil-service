@@ -20,13 +20,13 @@ public class WitnessClaimantCountNihlFieldValidator implements NihlFieldValidato
                 && caseData.getSdoR2WitnessesOfFact().getSdoR2RestrictWitness() != null
                 && caseData.getSdoR2WitnessesOfFact().getSdoR2RestrictWitness().getRestrictNoOfWitnessDetails() != null
                 && caseData.getSdoR2WitnessesOfFact().getSdoR2RestrictWitness().getRestrictNoOfWitnessDetails().getNoOfWitnessClaimant() != null) {
-            log.debug("Validating Witness Claimant Count");
+            log.debug("Validating Witness Claimant Count for caseId: {}", caseData.getCcdCaseReference());
             fieldsNihlUtils.validateGreaterOrEqualZero(caseData.getSdoR2WitnessesOfFact()
                             .getSdoR2RestrictWitness()
                             .getRestrictNoOfWitnessDetails()
                             .getNoOfWitnessClaimant())
                     .ifPresent(error -> {
-                        log.warn("Witness Claimant Count validation failed: {}", error);
+                        log.warn("Witness Claimant Count validation failed: {} for caseId: {}", error, caseData.getCcdCaseReference());
                         errors.add(error);
                     });
         }

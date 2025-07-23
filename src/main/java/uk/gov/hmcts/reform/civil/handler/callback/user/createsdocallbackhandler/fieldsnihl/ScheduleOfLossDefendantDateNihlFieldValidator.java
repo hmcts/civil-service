@@ -18,9 +18,9 @@ public class ScheduleOfLossDefendantDateNihlFieldValidator implements NihlFieldV
     public void validate(CaseData caseData, List<String> errors) {
         if (caseData.getSdoR2ScheduleOfLoss() != null
                 && caseData.getSdoR2ScheduleOfLoss().getSdoR2ScheduleOfLossDefendantDate() != null) {
-            log.debug("Validating Schedule Of Loss Defendant Date");
+            log.debug("Validating Schedule Of Loss Defendant Date for caseId: {}", caseData.getCcdCaseReference());
             fieldsNihlUtils.validateFutureDate(caseData.getSdoR2ScheduleOfLoss().getSdoR2ScheduleOfLossDefendantDate()).ifPresent(error -> {
-                log.warn("Schedule Of Loss Defendant Date validation failed: {}", error);
+                log.warn("Schedule Of Loss Defendant Date validation failed: {} for caseId: {}", error, caseData.getCcdCaseReference());
                 errors.add(error);
             });
         }

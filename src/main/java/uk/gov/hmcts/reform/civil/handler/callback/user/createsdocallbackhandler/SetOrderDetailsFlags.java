@@ -36,7 +36,7 @@ public class SetOrderDetailsFlags implements CaseTask {
 
     public CallbackResponse execute(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        log.info("Executing SetOrderDetailsFlags");
+        log.info("Executing SetOrderDetailsFlags for caseId: {}", caseData.getCcdCaseReference());
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
 
         if (isMultiOrIntermediateTrackClaim(caseData)
@@ -47,16 +47,16 @@ public class SetOrderDetailsFlags implements CaseTask {
                     .build();
         }
 
-        log.debug("Updating deduction values");
+        log.debug("Updating deduction values for caseId: {}", caseData.getCcdCaseReference());
         updateDeductionValue(caseData, updatedData);
 
-        log.debug("Resetting flags");
+        log.debug("Resetting flags for caseId: {}", caseData.getCcdCaseReference());
         resetFlags(updatedData);
 
-        log.debug("Setting isSdoR2NewScreen to NO");
+        log.debug("Setting isSdoR2NewScreen to NO for caseId: {}", caseData.getCcdCaseReference());
         updatedData.isSdoR2NewScreen(NO).build();
 
-        log.debug("Updating flags based on track");
+        log.debug("Updating flags based on track for caseId: {}", caseData.getCcdCaseReference());
         updateFlagsBasedOnTrack(caseData, updatedData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -72,17 +72,17 @@ public class SetOrderDetailsFlags implements CaseTask {
 
     private void updateFlagsBasedOnTrack(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
         if (SdoHelper.isSmallClaimsTrack(caseData)) {
-            log.debug("Case is on Small Claims track");
+            log.debug("Case is on Small Claims track for caseId: {}", caseData.getCcdCaseReference());
             updatedData.setSmallClaimsFlag(YES).build();
             if (SdoHelper.isSDOR2ScreenForDRHSmallClaim(caseData)) {
-                log.debug("Enabling SdoR2 new screen for DRH Small Claim");
+                log.debug("Enabling SdoR2 new screen for DRH Small Claim for caseId: {}", caseData.getCcdCaseReference());
                 updatedData.isSdoR2NewScreen(YES).build();
             }
         } else if (SdoHelper.isFastTrack(caseData)) {
-            log.debug("Case is on Fast Track");
+            log.debug("Case is on Fast Track for caseId: {}", caseData.getCcdCaseReference());
             updatedData.setFastTrackFlag(YES).build();
             if (SdoHelper.isNihlFastTrack(caseData)) {
-                log.debug("Enabling SdoR2 new screen for NIHL Fast Track");
+                log.debug("Enabling SdoR2 new screen for NIHL Fast Track for caseId: {}", caseData.getCcdCaseReference());
                 updatedData.isSdoR2NewScreen(YES).build();
             }
         }
@@ -93,21 +93,21 @@ public class SetOrderDetailsFlags implements CaseTask {
                 .map(JudgementSum::getJudgementSum)
                 .map(d -> d + "%")
                 .ifPresent(deductionPercentage -> {
-                    log.debug("Updating DisposalHearingJudgementDeductionValue with value: {}", deductionPercentage);
+                    log.debug("Updating DisposalHearingJudgementDeductionValue with value: {} for caseId: {}", deductionPercentage, caseData.getCcdCaseReference());
                     DisposalHearingJudgementDeductionValue tempDisposalHearingJudgementDeductionValue =
                             DisposalHearingJudgementDeductionValue.builder()
                                     .value(deductionPercentage)
                                     .build();
                     updatedData.disposalHearingJudgementDeductionValue(tempDisposalHearingJudgementDeductionValue);
 
-                    log.debug("Updating FastTrackJudgementDeductionValue with value: {}", deductionPercentage);
+                    log.debug("Updating FastTrackJudgementDeductionValue with value: {} for caseId: {}", deductionPercentage, caseData.getCcdCaseReference());
                     FastTrackJudgementDeductionValue tempFastTrackJudgementDeductionValue =
                             FastTrackJudgementDeductionValue.builder()
                                     .value(deductionPercentage)
                                     .build();
                     updatedData.fastTrackJudgementDeductionValue(tempFastTrackJudgementDeductionValue).build();
 
-                    log.debug("Updating SmallClaimsJudgementDeductionValue with value: {}", deductionPercentage);
+                    log.debug("Updating SmallClaimsJudgementDeductionValue with value: {} for caseId: {}", deductionPercentage, caseData.getCcdCaseReference());
                     SmallClaimsJudgementDeductionValue tempSmallClaimsJudgementDeductionValue =
                             SmallClaimsJudgementDeductionValue.builder()
                                     .value(deductionPercentage)

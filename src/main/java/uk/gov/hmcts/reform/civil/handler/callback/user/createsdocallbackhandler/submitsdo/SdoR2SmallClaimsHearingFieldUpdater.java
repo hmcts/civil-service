@@ -18,7 +18,7 @@ public class SdoR2SmallClaimsHearingFieldUpdater implements SdoCaseDataFieldUpda
     public void update(CaseData caseData, CaseData.CaseDataBuilder<?, ?> dataBuilder) {
         if (SdoHelper.isSDOR2ScreenForDRHSmallClaim(caseData)
                 && caseData.getSdoR2SmallClaimsHearing() != null) {
-            log.debug("Handling SDO R2 Small Claims Hearing for case {}", caseData.getCcdCaseReference());
+            log.debug("Handling SDO R2 Small Claims Hearing for caseId: {}", caseData.getCcdCaseReference());
             dataBuilder.sdoR2SmallClaimsHearing(updateHearingAfterDeletingLocationList(caseData.getSdoR2SmallClaimsHearing()));
         }
     }

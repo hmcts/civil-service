@@ -16,6 +16,7 @@ public class FastTrackTrialFieldBuilder implements SdoCaseFieldBuilder {
 
     @Override
     public void build(CaseData.CaseDataBuilder<?, ?> updatedData) {
+        log.info("Building FastTrackTrial fields for caseId: {}", updatedData.build().getCcdCaseReference());
         updatedData.fastTrackTrial(FastTrackTrial.builder()
                 .input1("The time provisionally allowed for this trial is")
                 .date1(LocalDate.now().plusWeeks(22))

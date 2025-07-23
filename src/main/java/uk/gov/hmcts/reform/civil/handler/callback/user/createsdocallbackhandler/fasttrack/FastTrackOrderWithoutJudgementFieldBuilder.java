@@ -21,6 +21,7 @@ public class FastTrackOrderWithoutJudgementFieldBuilder implements SdoCaseFieldB
 
     @Override
     public void build(CaseData.CaseDataBuilder<?, ?> updatedData) {
+        log.info("Building FastTrackOrderWithoutJudgement fields for caseId: {}", updatedData.build().getCcdCaseReference());
         updatedData.fastTrackOrderWithoutJudgement(FastTrackOrderWithoutJudgement.builder()
                 .input(String.format(
                         "This order has been made without hearing. Each party has the right to apply to have this Order set aside or varied." +

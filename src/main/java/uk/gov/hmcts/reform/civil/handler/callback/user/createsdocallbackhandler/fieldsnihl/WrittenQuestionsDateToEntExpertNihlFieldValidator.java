@@ -18,9 +18,9 @@ public class WrittenQuestionsDateToEntExpertNihlFieldValidator implements NihlFi
     public void validate(CaseData caseData, List<String> errors) {
         if (caseData.getSdoR2QuestionsToEntExpert() != null
                 && caseData.getSdoR2QuestionsToEntExpert().getSdoWrittenQuestionsDate() != null) {
-            log.debug("Validating Written Questions Date To ENT Expert");
+            log.debug("Validating Written Questions Date To ENT Expert for caseId: {}", caseData.getCcdCaseReference());
             fieldsNihlUtils.validateFutureDate(caseData.getSdoR2QuestionsToEntExpert().getSdoWrittenQuestionsDate()).ifPresent(error -> {
-                log.warn("Written Questions Date To ENT Expert validation failed: {}", error);
+                log.warn("Written Questions Date To ENT Expert validation failed: {} for caseId: {}", error, caseData.getCcdCaseReference());
                 errors.add(error);
             });
         }

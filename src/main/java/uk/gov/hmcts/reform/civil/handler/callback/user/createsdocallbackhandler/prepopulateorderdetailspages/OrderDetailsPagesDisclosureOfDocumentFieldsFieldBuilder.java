@@ -54,7 +54,7 @@ public class OrderDetailsPagesDisclosureOfDocumentFieldsFieldBuilder implements 
 
     @Override
     public void build(CaseData.CaseDataBuilder<?, ?> updatedData) {
-        log.debug("Updating disclosure of document fields with calculated dates");
+        log.debug("Updating disclosure of document fields with calculated dates for caseId: {}", updatedData.build().getCcdCaseReference());
         FastTrackDisclosureOfDocuments tempFastTrackDisclosureOfDocuments = FastTrackDisclosureOfDocuments.builder()
                 .input1("Standard disclosure shall be provided by the parties by uploading to the Digital Portal their "
                         + "list of documents by 4pm on")
@@ -70,6 +70,6 @@ public class OrderDetailsPagesDisclosureOfDocumentFieldsFieldBuilder implements 
 
         updatedData.fastTrackDisclosureOfDocuments(tempFastTrackDisclosureOfDocuments).build();
         updatedData.sdoR2FastTrackWitnessOfFact(getSdoR2WitnessOfFact()).build();
-        log.debug("Disclosure of document fields updated successfully");
+        log.debug("Disclosure of document fields updated successfully for caseId: {}", updatedData.build().getCcdCaseReference());
     }
 }

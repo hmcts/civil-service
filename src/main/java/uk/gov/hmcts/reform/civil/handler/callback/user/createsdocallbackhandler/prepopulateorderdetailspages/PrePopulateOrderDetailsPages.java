@@ -85,43 +85,43 @@ public class PrePopulateOrderDetailsPages implements CaseTask {
     }
 
     public CallbackResponse execute(CallbackParams callbackParams) {
-        log.info("Executing PrePopulateOrderDetailsPages");
+        log.info("Executing PrePopulateOrderDetailsPages for caseId: {}", callbackParams.getCaseData().getCcdCaseReference());
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
 
         try {
-            log.debug("Setting initial order methods and CARM fields");
+            log.debug("Setting initial order methods and CARM fields for caseId: {}", caseData.getCcdCaseReference());
             updatedData
                     .smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodInPerson)
                     .fastTrackMethod(FastTrackMethod.fastTrackMethodInPerson)
                     .showCarmFields(featureToggleService.isCarmEnabledForCase(caseData) ? YES : NO);
 
-            log.debug("Updating case management location if Legal Advisor SDO");
+            log.debug("Updating case management location if Legal Advisor SDO for caseId: {}", caseData.getCcdCaseReference());
             Optional<RequestedCourt> preferredCourt = updateCaseManagementLocationIfLegalAdvisorSdo(updatedData, caseData);
 
-            log.debug("Fetching all location reference data");
+            log.debug("Fetching all location reference data for caseId: {}", caseData.getCcdCaseReference());
             List<LocationRefData> locationRefDataList = getAllLocationFromRefData(callbackParams);
 
-            log.debug("Creating dynamic locations list");
+            log.debug("Creating dynamic locations list for caseId: {}", caseData.getCcdCaseReference());
             DynamicList locationsList = createSDOCallbackHandlerUtils.getLocationList(
                     preferredCourt.orElse(null), false, locationRefDataList);
             setMethodInPerson(updatedData, locationsList);
 
-            log.debug("Creating dynamic hearing method list");
+            log.debug("Creating dynamic hearing method list for caseId: {}", caseData.getCcdCaseReference());
             DynamicList hearingMethodList = createSDOCallbackHandlerUtils.getDynamicHearingMethodList(callbackParams, caseData);
 
             handleCallbackVersionIfNeeded(callbackParams, updatedData, hearingMethodList);
 
-            log.debug("Setting checklist sections to SHOW");
+            log.debug("Setting checklist sections to SHOW for caseId: {}", caseData.getCcdCaseReference());
             createSDOCallbackHandlerUtils.setCheckList(updatedData, List.of(SHOW));
 
-            log.debug("Populating disposal hearing fields");
+            log.debug("Populating disposal hearing fields for caseId: {}", caseData.getCcdCaseReference());
             disposalHearingPopulator.setDisposalHearingFields(updatedData, caseData);
 
-            log.debug("Populating fast track fields");
+            log.debug("Populating fast track fields for caseId: {}", caseData.getCcdCaseReference());
             fastTrackPopulator.setFastTrackFields(updatedData);
 
-            log.debug("Populating small claims fields");
+            log.debug("Populating small claims fields for caseId: {}", caseData.getCcdCaseReference());
             smallClaimsPopulator.setSmallClaimsFields(updatedData, caseData);
 
             handleSdoR2FeaturesIfNeeded(caseData, updatedData, callbackParams, preferredCourt, hearingMethodList, locationRefDataList);
@@ -139,7 +139,7 @@ public class PrePopulateOrderDetailsPages implements CaseTask {
 
     private void handleCallbackVersionIfNeeded(CallbackParams callbackParams, CaseData.CaseDataBuilder<?, ?> updatedData, DynamicList hearingMethodList) {
         if (V_1.equals(callbackParams.getVersion())) {
-            log.debug("Setting hearing method values based on callback version");
+            log.debug("Setting hearing method values based on callback version for caseId: {}", updatedData.build().getCcdCaseReference());
             setHearingMethodValues(updatedData, hearingMethodList);
         }
     }
@@ -149,26 +149,26 @@ public class PrePopulateOrderDetailsPages implements CaseTask {
         if (CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
                 && DecisionOnRequestReconsiderationOptions.CREATE_SDO.equals(
                 caseData.getDecisionOnRequestReconsiderationOptions())) {
-            log.debug("Resetting fields for reconsideration");
+            log.debug("Resetting fields for reconsideration for caseId: {}", updatedData.build().getCcdCaseReference());
             orderDetailsPagesCaseFieldBuilders.forEach(builder -> builder.build(updatedData));
         }
 
         orderDetailsPagesCaseFieldBuilders.forEach(builder -> builder.build(updatedData));
 
-        log.debug("Populating DRH fields");
+        log.debug("Populating DRH fields for caseId: {}", updatedData.build().getCcdCaseReference());
         prePopulateSdoR2AndNihlFields.populateDRHFields(callbackParams, updatedData, preferredCourt, hearingMethodList, locationRefDataList);
 
-        log.debug("Populating NIHL fields");
+        log.debug("Populating NIHL fields for caseId: {}", updatedData.build().getCcdCaseReference());
         prePopulateSdoR2AndNihlFields.prePopulateNihlFields(updatedData, hearingMethodList, preferredCourt, locationRefDataList);
 
-        log.debug("Setting checklist for NIHL inclusion");
+        log.debug("Setting checklist for NIHL inclusion for caseId: {}", updatedData.build().getCcdCaseReference());
         setCheckListNihl(updatedData, List.of(IncludeInOrderToggle.INCLUDE));
 
     }
 
     private void setHearingMethodValues(CaseData.CaseDataBuilder<?, ?> updatedData,
                                         DynamicList hearingMethodList) {
-        log.debug("Setting hearing method values to IN_PERSON");
+        log.debug("Setting hearing method values to IN_PERSON for caseId: {}", updatedData.build().getCcdCaseReference());
         DynamicListElement hearingMethodInPerson = hearingMethodList.getListItems().stream()
                 .filter(elem -> elem.getLabel().equals(HearingMethod.IN_PERSON.getLabel()))
                 .findFirst()
@@ -181,14 +181,14 @@ public class PrePopulateOrderDetailsPages implements CaseTask {
 
     private void setMethodInPerson(CaseData.CaseDataBuilder<?, ?> updatedData,
                                    DynamicList locationsList) {
-        log.debug("Setting method to IN_PERSON for disposal hearing, fast track, and small claims");
+        log.debug("Setting method to IN_PERSON for disposal hearing, fast track, and small claims for caseId: {}", updatedData.build().getCcdCaseReference());
         updatedData.disposalHearingMethodInPerson(locationsList);
         updatedData.fastTrackMethodInPerson(locationsList);
         updatedData.smallClaimsMethodInPerson(locationsList);
     }
 
     private List<LocationRefData> getAllLocationFromRefData(CallbackParams callbackParams) {
-        log.debug("Fetching hearing court locations from reference data service");
+        log.debug("Fetching hearing court locations from reference data service for caseId: {}", callbackParams.getCaseData().getCcdCaseReference());
         return locationRefDataService.getHearingCourtLocations(
                 callbackParams.getParams().get(BEARER_TOKEN).toString());
     }
@@ -197,7 +197,7 @@ public class PrePopulateOrderDetailsPages implements CaseTask {
             CaseData.CaseDataBuilder<?, ?> updatedData,
             List<IncludeInOrderToggle> includeInOrderToggle
     ) {
-        log.debug("Setting checklist toggles for NIHL inclusion");
+        log.debug("Setting checklist toggles for NIHL inclusion for caseId: {}", updatedData.build().getCcdCaseReference());
         updatedData.sdoAltDisputeResolution(SdoR2FastTrackAltDisputeResolution.builder().includeInOrderToggle(
                 includeInOrderToggle).build());
         updatedData.sdoVariationOfDirections(SdoR2VariationOfDirections.builder().includeInOrderToggle(
@@ -218,23 +218,23 @@ public class PrePopulateOrderDetailsPages implements CaseTask {
         if (featureToggleService.isCarmEnabledForCase(updatedData.build())) {
             updatedData.sdoR2SmallClaimsMediationSectionToggle(includeInOrderToggle);
         }
-        log.debug("Checklist toggles set successfully for NIHL inclusion");
+        log.debug("Checklist toggles set successfully for NIHL inclusion for caseId: {}", updatedData.build().getCcdCaseReference());
     }
 
     private Optional<RequestedCourt> updateCaseManagementLocationIfLegalAdvisorSdo(CaseData.CaseDataBuilder<?, ?> updatedData, CaseData caseData) {
-        log.debug("Checking if case qualifies for Legal Advisor SDO based on claim amount and location");
+        log.debug("Checking if case qualifies for Legal Advisor SDO based on claim amount and location for caseId: {}", caseData.getCcdCaseReference());
         Optional<RequestedCourt> preferredCourt;
         if (isSpecClaim1000OrLessAndCcmcc(ccmccAmount).test(caseData)) {
-            log.debug("Case qualifies for Legal Advisor SDO, fetching preferred court");
+            log.debug("Case qualifies for Legal Advisor SDO, fetching preferred court for caseId: {}", caseData.getCcdCaseReference());
             preferredCourt = locationHelper.getCaseManagementLocationWhenLegalAdvisorSdo(caseData, true);
             preferredCourt.map(RequestedCourt::getCaseLocation)
                     .ifPresent(location -> {
                         updatedData.caseManagementLocation(location);
-                        log.debug("Case management location set to: {}", location);
+                        log.debug("Case management location set to: {} for caseId: {}", location, caseData.getCcdCaseReference());
                     });
             return preferredCourt;
         } else {
-            log.debug("Case does not qualify for Legal Advisor SDO, fetching standard case management location");
+            log.debug("Case does not qualify for Legal Advisor SDO, fetching standard case management location for caseId: {}", caseData.getCcdCaseReference());
             return locationHelper.getCaseManagementLocation(caseData);
         }
     }

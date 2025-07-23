@@ -12,7 +12,7 @@ public class WelshLanguageUsageFieldBuilder implements OrderDetailsPagesCaseFiel
 
     @Override
     public void build(CaseData.CaseDataBuilder<?, ?> updatedData) {
-        log.debug("Setting Welsh language usage descriptions");
+        log.debug("Setting Welsh language usage descriptions for caseId: {}", updatedData.build().getCcdCaseReference());
         updatedData.sdoR2FastTrackUseOfWelshLanguage(SdoR2WelshLanguageUsage.builder()
                 .description(SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION)
                 .build());

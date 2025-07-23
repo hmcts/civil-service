@@ -19,7 +19,7 @@ public class DisclosureOfDocumentsFieldBuilder implements SdoCaseFieldBuilder {
 
     @Override
     public void build(CaseData.CaseDataBuilder<?, ?> updatedData) {
-        log.info("Setting disclosure of documents");
+        log.info("Setting disclosure of documents for caseId: {}", updatedData.build().getCcdCaseReference());
         updatedData.disposalHearingDisclosureOfDocuments(
                 DisposalHearingDisclosureOfDocuments.builder()
                         .input1("The parties shall serve on each other copies of the documents upon "

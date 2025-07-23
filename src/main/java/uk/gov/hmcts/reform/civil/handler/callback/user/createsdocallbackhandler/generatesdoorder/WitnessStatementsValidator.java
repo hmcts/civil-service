@@ -28,42 +28,42 @@ public class WitnessStatementsValidator implements GenerateSdoOrderValidator {
     @Override
     public void validate(CaseData caseData, List<String> errors) {
         if (nonNull(caseData.getSmallClaimsWitnessStatement())) {
-            log.debug("Validating Small Claims Witness Statement");
+            log.debug("Validating Small Claims Witness Statement for caseId: {}", caseData.getCcdCaseReference());
             validateAndAddWitnessErrors(
                     caseData.getSmallClaimsWitnessStatement().getInput2(),
                     caseData.getSmallClaimsWitnessStatement().getInput3(),
                     errors
             );
         } else if (nonNull(caseData.getFastTrackWitnessOfFact())) {
-            log.debug("Validating Fast Track Witness of Fact");
+            log.debug("Validating Fast Track Witness of Fact for caseId: {}", caseData.getCcdCaseReference());
             validateAndAddWitnessErrors(
                     caseData.getFastTrackWitnessOfFact().getInput2(),
                     caseData.getFastTrackWitnessOfFact().getInput3(),
                     errors
             );
         } else if (isSdoR2EnabledForDRHSmallClaim(caseData)) {
-            log.debug("Validating DRH Fields for SdoR2 Small Claim");
+            log.debug("Validating DRH Fields for SdoR2 Small Claim for caseId: {}", caseData.getCcdCaseReference());
             errors.addAll(validateDRHFields(caseData));
         }
     }
 
     private void validateAndAddWitnessErrors(String input1, String input2, List<String> errors) {
-        log.debug("Validating witness inputs");
+        log.debug("Validating witness inputs for input1: {}, input2: {} ", input1, input2);
         String errorMessage = validateNegativeWitness(input1, input2);
         if (!errorMessage.isEmpty()) {
-            log.warn("Validation error: {}", errorMessage);
+            log.warn("Validation error: {} ", errorMessage);
             errors.add(errorMessage);
         }
     }
 
     private boolean isSdoR2EnabledForDRHSmallClaim(CaseData caseData) {
         boolean enabled = SdoHelper.isSDOR2ScreenForDRHSmallClaim(caseData);
-        log.debug("SdoR2 enabled for DRH Small Claim: {}", enabled);
+        log.debug("SdoR2 enabled for DRH Small Claim: {} for caseId: {}", enabled, caseData.getCcdCaseReference());
         return enabled;
     }
 
     private List<String> validateDRHFields(CaseData caseData) {
-        log.debug("Validating DRH fields");
+        log.debug("Validating DRH fields for caseId: {}", caseData.getCcdCaseReference());
         List<String> errors = new ArrayList<>();
         LocalDate today = LocalDate.now();
         validatePpiDate(caseData, today, errors);
@@ -92,7 +92,7 @@ public class WitnessStatementsValidator implements GenerateSdoOrderValidator {
 
     private void validatePpiDate(CaseData caseData, LocalDate today, List<String> errors) {
         if (Objects.nonNull(caseData.getSdoR2SmallClaimsPPI()) && Objects.nonNull(caseData.getSdoR2SmallClaimsPPI().getPpiDate())) {
-            log.debug("Validating PPI date");
+            log.debug("Validating PPI date for caseId: {}", caseData.getCcdCaseReference());
             validateFutureDate(caseData.getSdoR2SmallClaimsPPI().getPpiDate(), today).ifPresent(errors::add);
         }
     }
@@ -101,7 +101,7 @@ public class WitnessStatementsValidator implements GenerateSdoOrderValidator {
         if (Objects.nonNull(caseData.getSdoR2SmallClaimsWitnessStatements())
                 && caseData.getSdoR2SmallClaimsWitnessStatements().getIsRestrictWitness() == YES
                 && nonNull(caseData.getSdoR2SmallClaimsWitnessStatements().getSdoR2SmallClaimsRestrictWitness().getNoOfWitnessClaimant())) {
-            log.debug("Validating number of claimant witnesses");
+            log.debug("Validating number of claimant witnesses for caseId: {}", caseData.getCcdCaseReference());
             validateGreaterThanZero(caseData.getSdoR2SmallClaimsWitnessStatements().getSdoR2SmallClaimsRestrictWitness().getNoOfWitnessClaimant()).ifPresent(errors::add);
         }
     }
@@ -110,7 +110,7 @@ public class WitnessStatementsValidator implements GenerateSdoOrderValidator {
         if (Objects.nonNull(caseData.getSdoR2SmallClaimsWitnessStatements())
                 && caseData.getSdoR2SmallClaimsWitnessStatements().getIsRestrictWitness() == YES
                 && nonNull(caseData.getSdoR2SmallClaimsWitnessStatements().getSdoR2SmallClaimsRestrictWitness().getNoOfWitnessDefendant())) {
-            log.debug("Validating number of defendant witnesses");
+            log.debug("Validating number of defendant witnesses for caseId: {}", caseData.getCcdCaseReference());
             validateGreaterThanZero(caseData.getSdoR2SmallClaimsWitnessStatements().getSdoR2SmallClaimsRestrictWitness().getNoOfWitnessDefendant()).ifPresent(errors::add);
         }
     }
@@ -118,7 +118,7 @@ public class WitnessStatementsValidator implements GenerateSdoOrderValidator {
     private void validateTrialOnOptionsOpenDate(CaseData caseData, LocalDate today, List<String> errors) {
         if (Objects.nonNull(caseData.getSdoR2SmallClaimsHearing())
                 && caseData.getSdoR2SmallClaimsHearing().getTrialOnOptions() == HearingOnRadioOptions.OPEN_DATE) {
-            log.debug("Validating Trial On Options Open Date");
+            log.debug("Validating Trial On Options Open Date for caseId: {}", caseData.getCcdCaseReference());
             validateFutureDate(
                     caseData.getSdoR2SmallClaimsHearing().getSdoR2SmallClaimsHearingFirstOpenDateAfter().getListFrom(),
                     today
@@ -129,7 +129,7 @@ public class WitnessStatementsValidator implements GenerateSdoOrderValidator {
     private void validateTrialOnOptionsHearingWindowDateTo(CaseData caseData, LocalDate today, List<String> errors) {
         if (Objects.nonNull(caseData.getSdoR2SmallClaimsHearing())
                 && caseData.getSdoR2SmallClaimsHearing().getTrialOnOptions() == HearingOnRadioOptions.HEARING_WINDOW) {
-            log.debug("Validating Trial On Options Hearing Window Date To");
+            log.debug("Validating Trial On Options Hearing Window Date To for caseId: {}", caseData.getCcdCaseReference());
             validateFutureDate(
                     caseData.getSdoR2SmallClaimsHearing().getSdoR2SmallClaimsHearingWindow().getDateTo(),
                     today
@@ -140,7 +140,7 @@ public class WitnessStatementsValidator implements GenerateSdoOrderValidator {
     private void validateTrialOnOptionsHearingWindowListFrom(CaseData caseData, LocalDate today, List<String> errors) {
         if (Objects.nonNull(caseData.getSdoR2SmallClaimsHearing())
                 && caseData.getSdoR2SmallClaimsHearing().getTrialOnOptions() == HearingOnRadioOptions.HEARING_WINDOW) {
-            log.debug("Validating Trial On Options Hearing Window List From");
+            log.debug("Validating Trial On Options Hearing Window List From for caseId: {}", caseData.getCcdCaseReference());
             validateFutureDate(
                     caseData.getSdoR2SmallClaimsHearing().getSdoR2SmallClaimsHearingWindow().getListFrom(),
                     today
@@ -150,7 +150,7 @@ public class WitnessStatementsValidator implements GenerateSdoOrderValidator {
 
     private void validateImpNotesDate(CaseData caseData, LocalDate today, List<String> errors) {
         if (Objects.nonNull(caseData.getSdoR2SmallClaimsImpNotes())) {
-            log.debug("Validating Important Notes Date");
+            log.debug("Validating Important Notes Date for caseId: {}", caseData.getCcdCaseReference());
             validateFutureDate(caseData.getSdoR2SmallClaimsImpNotes().getDate(), today).ifPresent(errors::add);
         }
     }

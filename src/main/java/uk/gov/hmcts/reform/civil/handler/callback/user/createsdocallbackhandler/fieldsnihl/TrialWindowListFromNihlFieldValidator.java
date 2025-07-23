@@ -19,9 +19,9 @@ public class TrialWindowListFromNihlFieldValidator implements NihlFieldValidator
         if (caseData.getSdoR2Trial() != null
                 && caseData.getSdoR2Trial().getSdoR2TrialWindow() != null
                 && caseData.getSdoR2Trial().getSdoR2TrialWindow().getListFrom() != null) {
-            log.debug("Validating Trial Window List From");
+            log.debug("Validating Trial Window List From for caseId: {}", caseData.getCcdCaseReference());
             fieldsNihlUtils.validateFutureDate(caseData.getSdoR2Trial().getSdoR2TrialWindow().getListFrom()).ifPresent(error -> {
-                log.warn("Trial Window List From validation failed: {}", error);
+                log.warn("Trial Window List From validation failed: {} for caseId: {}", error, caseData.getCcdCaseReference());
                 errors.add(error);
             });
         }

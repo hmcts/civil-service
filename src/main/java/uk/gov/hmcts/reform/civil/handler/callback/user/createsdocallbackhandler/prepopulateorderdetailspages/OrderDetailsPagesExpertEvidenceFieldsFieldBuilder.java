@@ -19,7 +19,7 @@ public class OrderDetailsPagesExpertEvidenceFieldsFieldBuilder implements OrderD
 
     @Override
     public void build(CaseData.CaseDataBuilder<?, ?> updatedData) {
-        log.debug("Updating expert evidence fields with calculated dates");
+        log.debug("Updating expert evidence fields with calculated dates for caseId: {}", updatedData.build().getCcdCaseReference());
         FastTrackPersonalInjury tempFastTrackPersonalInjury = FastTrackPersonalInjury.builder()
                 .input1("The Claimant has permission to rely upon the written expert evidence already uploaded to the"
                         + " Digital Portal with the particulars of claim")
@@ -33,6 +33,6 @@ public class OrderDetailsPagesExpertEvidenceFieldsFieldBuilder implements OrderD
                 .build();
 
         updatedData.fastTrackPersonalInjury(tempFastTrackPersonalInjury).build();
-        log.debug("Expert evidence fields updated successfully");
+        log.debug("Expert evidence fields updated successfully for caseId: {}", updatedData.build().getCcdCaseReference());
     }
 }

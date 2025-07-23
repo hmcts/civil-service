@@ -18,9 +18,9 @@ public class QuestionsShallBeAnsweredDateToEntExpertNihlFieldValidator implement
     public void validate(CaseData caseData, List<String> errors) {
         if (caseData.getSdoR2QuestionsToEntExpert() != null
                 && caseData.getSdoR2QuestionsToEntExpert().getSdoQuestionsShallBeAnsweredDate() != null) {
-            log.debug("Validating Questions Shall Be Answered Date To ENT Expert");
+            log.debug("Validating Questions Shall Be Answered Date To ENT Expert for caseId: {}", caseData.getCcdCaseReference());
             fieldsNihlUtils.validateFutureDate(caseData.getSdoR2QuestionsToEntExpert().getSdoQuestionsShallBeAnsweredDate()).ifPresent(error -> {
-                log.warn("Questions Shall Be Answered Date To ENT Expert validation failed: {}", error);
+                log.warn("Questions Shall Be Answered Date To ENT Expert validation failed: {} for caseId: {}", error, caseData.getCcdCaseReference());
                 errors.add(error);
             });
         }

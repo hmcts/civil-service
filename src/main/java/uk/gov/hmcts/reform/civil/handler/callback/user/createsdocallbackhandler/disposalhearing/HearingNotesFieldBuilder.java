@@ -19,7 +19,7 @@ public class HearingNotesFieldBuilder implements SdoCaseFieldBuilder {
 
     @Override
     public void build(CaseData.CaseDataBuilder<?, ?> updatedData) {
-        log.info("Setting hearing notes");
+        log.info("Setting hearing notes for caseId: {}", updatedData.build().getCcdCaseReference());
         updatedData.disposalHearingNotes(DisposalHearingNotes.builder()
                 .input(
                         "This Order has been made without a hearing. Each party has the right to apply to "

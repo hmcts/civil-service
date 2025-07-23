@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.handler.callback.user;
+package uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler;
 
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.generatesdoorder.GenerateSdoOrder;
 import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.prepopulateorderdetailspages.PrePopulateOrderDetailsPages;
-import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.SetOrderDetailsFlags;
 import uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler.submitsdo.SubmitSDO;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -52,14 +51,14 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     @Override
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
-            .put(callbackKey(ABOUT_TO_START), this::prePopulateOrderDetailsPages)
-            .put(callbackKey(V_1, ABOUT_TO_START), this::prePopulateOrderDetailsPages)
-            .put(callbackKey(MID, "order-details-navigation"), this::setOrderDetailsFlags)
-            .put(callbackKey(MID, "generate-sdo-order"), this::generateSdoOrder)
-            .put(callbackKey(V_1, MID, "generate-sdo-order"), this::generateSdoOrder)
-            .put(callbackKey(ABOUT_TO_SUBMIT), this::submitSDO)
-            .put(callbackKey(SUBMITTED), this::buildConfirmation)
-            .build();
+                .put(callbackKey(ABOUT_TO_START), this::prePopulateOrderDetailsPages)
+                .put(callbackKey(V_1, ABOUT_TO_START), this::prePopulateOrderDetailsPages)
+                .put(callbackKey(MID, "order-details-navigation"), this::setOrderDetailsFlags)
+                .put(callbackKey(MID, "generate-sdo-order"), this::generateSdoOrder)
+                .put(callbackKey(V_1, MID, "generate-sdo-order"), this::generateSdoOrder)
+                .put(callbackKey(ABOUT_TO_SUBMIT), this::submitSDO)
+                .put(callbackKey(SUBMITTED), this::buildConfirmation)
+                .build();
     }
 
     @Override
@@ -87,15 +86,15 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
 
         return SubmittedCallbackResponse.builder()
-            .confirmationHeader(getHeader(caseData))
-            .confirmationBody(getBody(caseData))
-            .build();
+                .confirmationHeader(getHeader(caseData))
+                .confirmationBody(getBody(caseData))
+                .build();
     }
 
     private String getHeader(CaseData caseData) {
         return format(
-            CONFIRMATION_HEADER,
-            caseData.getLegacyCaseReference()
+                CONFIRMATION_HEADER,
+                caseData.getLegacyCaseReference()
         );
     }
 
@@ -106,24 +105,24 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         Party respondent2 = caseData.getRespondent2();
 
         String initialBody = format(
-            CONFIRMATION_SUMMARY_1v1,
-            applicant1Name,
-            respondent1Name
+                CONFIRMATION_SUMMARY_1v1,
+                applicant1Name,
+                respondent1Name
         );
 
         if (applicant2 != null) {
             initialBody = format(
-                CONFIRMATION_SUMMARY_2v1,
-                applicant1Name,
-                applicant2.getPartyName(),
-                respondent1Name
+                    CONFIRMATION_SUMMARY_2v1,
+                    applicant1Name,
+                    applicant2.getPartyName(),
+                    respondent1Name
             );
         } else if (respondent2 != null) {
             initialBody = format(
-                CONFIRMATION_SUMMARY_1v2,
-                applicant1Name,
-                respondent1Name,
-                respondent2.getPartyName()
+                    CONFIRMATION_SUMMARY_1v2,
+                    applicant1Name,
+                    respondent1Name,
+                    respondent2.getPartyName()
             );
         }
         return initialBody + format(FEEDBACK_LINK, "Feedback: Please provide judicial feedback");

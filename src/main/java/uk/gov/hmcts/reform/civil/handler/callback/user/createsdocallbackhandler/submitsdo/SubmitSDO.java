@@ -34,7 +34,7 @@ public class SubmitSDO implements CaseTask {
     private final Optional<UpdateWaCourtLocationsService> updateWaCourtLocationsService;
 
     public CallbackResponse execute(CallbackParams callbackParams) {
-        log.info("Executing SubmitSDO callback for case {}", callbackParams.getCaseData().getCcdCaseReference());
+        log.info("Executing SubmitSDO callback for caseId: {}", callbackParams.getCaseData().getCcdCaseReference());
         CaseData.CaseDataBuilder<?, ?> dataBuilder = getSharedData(callbackParams);
         CaseData caseData = callbackParams.getCaseData();
         CaseDocument document = caseData.getSdoOrderDocument();
@@ -65,7 +65,7 @@ public class SubmitSDO implements CaseTask {
                     dataBuilder
             ));
         }
-        log.info("SubmitSDO callback executed successfully for case {}", caseData.getCcdCaseReference());
+        log.info("SubmitSDO callback executed successfully for caseId: {}", caseData.getCcdCaseReference());
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(dataBuilder.build().toMap(objectMapper))
                 .build();

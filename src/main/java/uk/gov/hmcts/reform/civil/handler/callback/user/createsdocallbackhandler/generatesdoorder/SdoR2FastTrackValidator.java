@@ -19,10 +19,10 @@ public class SdoR2FastTrackValidator implements GenerateSdoOrderValidator {
     @Override
     public void validate(CaseData caseData, List<String> errors) {
         if (isSdoR2EnabledForNihlFastTrack(caseData)) {
-            log.debug("Validating Nihl Fast Track fields");
+            log.debug("Validating Nihl Fast Track fields for caseId: {}", caseData.getCcdCaseReference());
             List<String> errorsNihl = validateFieldsNihl.validateFieldsNihl(caseData);
             if (!errorsNihl.isEmpty()) {
-                log.warn("Nihl Fast Track validation errors: {}", errorsNihl);
+                log.warn("Nihl Fast Track validation errors: {} for caseId: {}", errorsNihl, caseData.getCcdCaseReference());
                 errors.addAll(errorsNihl);
             }
         }
@@ -30,7 +30,7 @@ public class SdoR2FastTrackValidator implements GenerateSdoOrderValidator {
 
     private boolean isSdoR2EnabledForNihlFastTrack(CaseData caseData) {
         boolean enabled = SdoHelper.isNihlFastTrack(caseData);
-        log.debug("SdoR2 enabled for Nihl Fast Track: {}", enabled);
+        log.debug("SdoR2 enabled for Nihl Fast Track: {} for caseId: {}", enabled, caseData.getCcdCaseReference());
         return enabled;
     }
 }

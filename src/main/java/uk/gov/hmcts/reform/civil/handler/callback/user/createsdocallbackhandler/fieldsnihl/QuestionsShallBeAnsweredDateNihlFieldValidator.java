@@ -17,9 +17,9 @@ public class QuestionsShallBeAnsweredDateNihlFieldValidator implements NihlField
     @Override
     public void validate(CaseData caseData, List<String> errors) {
         if (caseData.getSdoR2QuestionsClaimantExpert() != null && caseData.getSdoR2QuestionsClaimantExpert().getSdoQuestionsShallBeAnsweredDate() != null) {
-            log.debug("Validating Questions Shall Be Answered Date");
+            log.debug("Validating Questions Shall Be Answered Date for caseId: {}", caseData.getCcdCaseReference());
             fieldsNihlUtils.validateFutureDate(caseData.getSdoR2QuestionsClaimantExpert().getSdoQuestionsShallBeAnsweredDate()).ifPresent(error -> {
-                log.warn("Questions Shall Be Answered Date validation failed: {}", error);
+                log.warn("Questions Shall Be Answered Date validation failed: {} for caseId: {}", error, caseData.getCcdCaseReference());
                 errors.add(error);
             });
         }

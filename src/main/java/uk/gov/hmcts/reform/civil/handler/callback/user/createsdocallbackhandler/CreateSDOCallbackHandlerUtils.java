@@ -68,21 +68,24 @@ public class CreateSDOCallbackHandlerUtils {
     }
 
     public DynamicList getDynamicHearingMethodList(CallbackParams callbackParams, CaseData caseData) {
-        logger.info("Getting dynamic hearing method list for caseData: {}", caseData);
+        logger.info("Getting dynamic hearing method list for caseId: {}", caseData.getCcdCaseReference());
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         String serviceId = caseData.getCaseAccessCategory().equals(CaseCategory.SPEC_CLAIM)
                 ? SPEC_SERVICE_ID : UNSPEC_SERVICE_ID;
         Optional<CategorySearchResult> categorySearchResult = categoryService.findCategoryByCategoryIdAndServiceId(
                 authToken, HEARING_CHANNEL, serviceId
         );
-        DynamicList hearingMethodList = HearingMethodUtils.getHearingMethodList(categorySearchResult.orElse(null));
-        List<DynamicListElement> hearingMethodListWithoutNotInAttendance = hearingMethodList
-                .getListItems()
-                .stream()
-                .filter(elem -> !elem.getLabel().equals(HearingMethod.NOT_IN_ATTENDANCE.getLabel()))
+        List<DynamicListElement> elementList = Optional.ofNullable(HearingMethodUtils.getHearingMethodList(categorySearchResult.orElse(null)))
+                .map(DynamicList::getListItems)
+                .orElse(List.of());
+
+        List<DynamicListElement> filteredList = elementList.stream()
+                .filter(element -> element.getLabel() != null && !element.getLabel().equals(HearingMethod.NOT_IN_ATTENDANCE.getLabel()))
                 .toList();
-        hearingMethodList.setListItems(hearingMethodListWithoutNotInAttendance);
-        logger.info("Dynamic hearing method list created with {} items", hearingMethodList.getListItems().size());
+
+        DynamicList hearingMethodList = DynamicList.fromDynamicListElementList(filteredList);
+
+        logger.info("Dynamic hearing method list created with {} items for caseId: {}", hearingMethodList.getListItems().size(), caseData.getCcdCaseReference());
         return hearingMethodList;
     }
 
@@ -90,7 +93,7 @@ public class CreateSDOCallbackHandlerUtils {
             CaseData.CaseDataBuilder<?, ?> updatedData,
             List<OrderDetailsPagesSectionsToggle> checkList
     ) {
-        logger.info("Setting checklist for caseData: {}", updatedData.build());
+        logger.info("Setting checklist for caseId: {}", updatedData.build().getCcdCaseReference());
         updatedData.fastTrackAltDisputeResolutionToggle(checkList);
         updatedData.fastTrackVariationOfDirectionsToggle(checkList);
         updatedData.fastTrackSettlementToggle(checkList);
@@ -120,7 +123,7 @@ public class CreateSDOCallbackHandlerUtils {
         if (featureToggleService.isCarmEnabledForCase(updatedData.build())) {
             updatedData.smallClaimsMediationSectionToggle(checkList);
         }
-        logger.info("Checklist set for caseData: {}", updatedData.build());
+        logger.info("Checklist set for caseId: {}", updatedData.build().getCcdCaseReference());
     }
 
     private String getLocationEpimms(LocationRefData location) {

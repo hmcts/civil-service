@@ -19,6 +19,7 @@ public class FastTrackBuildingDisputeFieldBuilder implements SdoCaseFieldBuilder
 
     @Override
     public void build(CaseData.CaseDataBuilder<?, ?> updatedData) {
+        log.info("Building FastTrackBuildingDispute fields for caseId: {}", updatedData.build().getCcdCaseReference());
         updatedData.fastTrackBuildingDispute(FastTrackBuildingDispute.builder()
                 .input1(
                         "The claimant must prepare a Scott Schedule of the defects, items of damage, or any other relevant matters")

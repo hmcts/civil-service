@@ -28,12 +28,12 @@ public class FastTrackCreditHireFieldBuilder implements SdoCaseFieldBuilder {
 
     @Override
     public void build(CaseData.CaseDataBuilder<?, ?> updatedData) {
+        log.info("Building FastTrackCreditHire fields for caseId: {}", updatedData.build().getCcdCaseReference());
         updatedData.sdoR2FastTrackCreditHire(getSdoR2FastTrackCreditHire());
         updatedData.fastTrackCreditHire(getFastTrackCreditHire());
     }
 
     private FastTrackCreditHire getFastTrackCreditHire() {
-        log.debug("Building FastTrackCreditHire");
         String partiesLiaseString = "The parties are to liaise and use reasonable endeavours to agree the basic hire rate no ";
         return FastTrackCreditHire.builder()
                 .input1("""
@@ -69,7 +69,6 @@ public class FastTrackCreditHireFieldBuilder implements SdoCaseFieldBuilder {
     }
 
     private SdoR2FastTrackCreditHire getSdoR2FastTrackCreditHire() {
-        log.debug("Building SdoR2FastTrackCreditHire");
         List<AddOrRemoveToggle> addOrRemoveToggleList = List.of(AddOrRemoveToggle.ADD);
         return SdoR2FastTrackCreditHire.builder()
                 .input1("""

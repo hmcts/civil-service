@@ -19,11 +19,11 @@ public class FastTrackWitnessOfFactFieldBuilder implements SdoCaseFieldBuilder {
 
     @Override
     public void build(CaseData.CaseDataBuilder<?, ?> updatedData) {
+        log.info("Building FastTrackTrial fields for caseId: {}", updatedData.build().getCcdCaseReference());
         updatedData.fastTrackWitnessOfFact(getFastTrackWitnessOfFact());
     }
 
     private FastTrackWitnessOfFact getFastTrackWitnessOfFact() {
-        log.debug("Building FastTrackWitnessOfFact");
         return FastTrackWitnessOfFact.builder()
                 .input1("Each party must upload to the Digital Portal copies of the statements of all witnesses of "
                         + "fact on whom they intend to rely.")

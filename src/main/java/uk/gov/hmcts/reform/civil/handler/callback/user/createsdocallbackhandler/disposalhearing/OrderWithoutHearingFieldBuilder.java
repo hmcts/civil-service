@@ -21,7 +21,7 @@ public class OrderWithoutHearingFieldBuilder implements SdoCaseFieldBuilder {
 
     @Override
     public void build(CaseData.CaseDataBuilder<?, ?> updatedData) {
-        log.info("Setting order without hearing");
+        log.info("Setting order without hearing for caseId: {}", updatedData.build().getCcdCaseReference());
         updatedData.disposalOrderWithoutHearing(DisposalOrderWithoutHearing.builder()
                 .input(String.format(
                         "This order has been made without hearing. Each party has the right "

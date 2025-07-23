@@ -15,7 +15,7 @@ public class SdoR2TrialFieldUpdater implements SdoCaseDataFieldUpdater {
     @Override
     public void update(CaseData caseData, CaseData.CaseDataBuilder<?, ?> dataBuilder) {
         if (caseData.getSdoR2Trial() != null) {
-            log.debug("Handling SDO R2 Trial for case {}", caseData.getCcdCaseReference());
+            log.debug("Handling SDO R2 Trial for caseId: {}", caseData.getCcdCaseReference());
             SdoR2Trial sdoR2Trial = caseData.getSdoR2Trial();
             if (caseData.getSdoR2Trial().getHearingCourtLocationList() != null) {
                 sdoR2Trial.setHearingCourtLocationList(DynamicList.builder().value(

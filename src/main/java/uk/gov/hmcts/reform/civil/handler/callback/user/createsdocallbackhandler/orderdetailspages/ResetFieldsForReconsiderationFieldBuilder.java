@@ -11,7 +11,7 @@ public class ResetFieldsForReconsiderationFieldBuilder implements OrderDetailsPa
 
     @Override
     public void build(CaseData.CaseDataBuilder<?, ?> updatedData) {
-        log.debug("Resetting fields related to reconsideration");
+        log.debug("Resetting fields related to reconsideration for caseId: {}", updatedData.build().getCcdCaseReference());
         updatedData.drawDirectionsOrderRequired(null);
         updatedData.drawDirectionsOrderSmallClaims(null);
         updatedData.fastClaims(null);

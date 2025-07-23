@@ -19,6 +19,7 @@ public class FastTrackDisclosureOfDocumentsFieldBuilder implements SdoCaseFieldB
 
     @Override
     public void build(CaseData.CaseDataBuilder<?, ?> updatedData) {
+        log.info("Building FastTrackDisclosureOfDocuments fields for caseId: {}", updatedData.build().getCcdCaseReference());
         updatedData.fastTrackDisclosureOfDocuments(FastTrackDisclosureOfDocuments.builder()
                 .input1(
                         "Standard disclosure shall be provided by the parties by uploading to the Digital Portal their list of documents by 4pm on")

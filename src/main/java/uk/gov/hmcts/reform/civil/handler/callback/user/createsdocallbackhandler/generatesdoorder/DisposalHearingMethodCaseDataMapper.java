@@ -16,7 +16,7 @@ public class DisposalHearingMethodCaseDataMapper implements GenerateSdoOrderCase
                 && caseData.getHearingMethodValuesDisposalHearing().getValue() != null) {
 
             String disposalHearingMethodLabel = caseData.getHearingMethodValuesDisposalHearing().getValue().getLabel();
-            log.debug("Handling Disposal Hearing Method: {}", disposalHearingMethodLabel);
+            log.debug("Handling Disposal Hearing Method: {} for caseId: {}", disposalHearingMethodLabel, caseData.getCcdCaseReference());
             if (disposalHearingMethodLabel.equals(HearingMethod.IN_PERSON.getLabel())) {
                 updatedData.disposalHearingMethod(DisposalHearingMethod.disposalHearingMethodInPerson);
             } else if (disposalHearingMethodLabel.equals(HearingMethod.VIDEO.getLabel())) {

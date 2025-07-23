@@ -45,7 +45,7 @@ public class SmallClaimsPopulator {
     private final FeatureToggleService featureToggleService;
 
     public void setSmallClaimsFields(CaseData.CaseDataBuilder<?, ?> updatedData, CaseData caseData) {
-        log.info("Setting small claims fields for case {}", caseData.getCcdCaseReference());
+        log.info("Setting small claims fields for caseId: {}", caseData.getCcdCaseReference());
 
         updatedData.smallClaimsJudgesRecital(SmallClaimsJudgesRecital.builder()
                 .input(
@@ -61,24 +61,18 @@ public class SmallClaimsPopulator {
 
         updatedData.sdoR2SmallClaimsWitnessStatementOther(getSdoR2SmallClaimsWitnessStatements());
 
-        if (featureToggleService.isCarmEnabledForCase(caseData)) {
-            log.debug(
-                    "CARM is enabled for case {}, setting small claims mediation section statement.",
-                    caseData.getCcdCaseReference()
-            );
-            updatedData.smallClaimsMediationSectionStatement(SmallClaimsMediation.builder()
-                    .input(
-                            "If you failed to attend a mediation appointment, then the judge at the hearing may impose a sanction." +
-                                    " This could require you to pay costs, or could result in your claim or defence being dismissed." +
-                                    " You should deliver to every other party, and to the court, your explanation for non-attendance," +
-                                    " with any supporting documents, at least 14 days before the hearing." +
-                                    " Any other party who wishes to comment on the failure to attend the mediation" +
-                                    " appointment should deliver their comments, with any supporting documents," +
-                                    " to all parties and to the court at least 14 days before the hearing.")
-                    .build());
-        }
+        updatedData.smallClaimsMediationSectionStatement(SmallClaimsMediation.builder()
+                .input(
+                        "If you failed to attend a mediation appointment, then the judge at the hearing may impose a sanction." +
+                                " This could require you to pay costs, or could result in your claim or defence being dismissed." +
+                                " You should deliver to every other party, and to the court, your explanation for non-attendance," +
+                                " with any supporting documents, at least 14 days before the hearing." +
+                                " Any other party who wishes to comment on the failure to attend the mediation" +
+                                " appointment should deliver their comments, with any supporting documents," +
+                                " to all parties and to the court at least 14 days before the hearing.")
+                .build());
 
-        log.debug("SDO R2 is enabled, setting small claims flight delay.");
+        log.debug("SDO R2 is enabled, setting small claims flight delay for caseId: {}", caseData.getCcdCaseReference());
         updatedData.smallClaimsFlightDelay(SmallClaimsFlightDelay.builder()
                 .smallClaimsFlightDelayToggle(List.of(SHOW))
                 .relatedClaimsInput("""
@@ -118,7 +112,7 @@ public class SmallClaimsPopulator {
                         "Photographs and/or a plan of the accident location shall be prepared and" +
                                 " agreed by the parties and uploaded to the Digital Portal no later than 21 days before the hearing.")
                 .build());
-        log.info("Finished setting small claims fields for case {}", caseData.getCcdCaseReference());
+        log.info("Finished setting small claims fields for caseId: {}", caseData.getCcdCaseReference());
     }
 
     private SmallClaimsCreditHire getSmallClaimsCreditHire() {

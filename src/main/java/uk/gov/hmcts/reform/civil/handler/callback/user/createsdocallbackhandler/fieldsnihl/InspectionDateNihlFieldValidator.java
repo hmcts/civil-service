@@ -17,9 +17,9 @@ public class InspectionDateNihlFieldValidator implements NihlFieldValidator {
     @Override
     public void validate(CaseData caseData, List<String> errors) {
         if (caseData.getSdoR2DisclosureOfDocuments() != null && caseData.getSdoR2DisclosureOfDocuments().getInspectionDate() != null) {
-            log.debug("Validating Inspection Date");
+            log.debug("Validating Inspection Date for caseId: {}", caseData.getCcdCaseReference());
             fieldsNihlUtils.validateFutureDate(caseData.getSdoR2DisclosureOfDocuments().getInspectionDate()).ifPresent(error -> {
-                log.warn("Inspection Date validation failed: {}", error);
+                log.warn("Inspection Date validation failed: {} for caseId: {}", error, caseData.getCcdCaseReference());
                 errors.add(error);
             });
         }

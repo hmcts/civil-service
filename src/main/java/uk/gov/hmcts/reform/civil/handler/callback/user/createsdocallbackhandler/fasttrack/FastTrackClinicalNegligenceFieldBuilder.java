@@ -12,6 +12,7 @@ public class FastTrackClinicalNegligenceFieldBuilder implements SdoCaseFieldBuil
 
     @Override
     public void build(CaseData.CaseDataBuilder<?, ?> updatedData) {
+        log.info("Building FastTrackClinicalNegligence fields for caseId: {}", updatedData.build().getCcdCaseReference());
         updatedData.fastTrackClinicalNegligence(FastTrackClinicalNegligence.builder()
                 .input1("Documents should be retained as follows:")
                 .input2(

@@ -18,9 +18,9 @@ public class JointMeetingOfExpertsDateNihlFieldValidator implements NihlFieldVal
     public void validate(CaseData caseData, List<String> errors) {
         if (caseData.getSdoR2PermissionToRelyOnExpert() != null
                 && caseData.getSdoR2PermissionToRelyOnExpert().getSdoJointMeetingOfExpertsDate() != null) {
-            log.debug("Validating Joint Meeting Of Experts Date");
+            log.debug("Validating Joint Meeting Of Experts Date for caseId: {}", caseData.getCcdCaseReference());
             fieldsNihlUtils.validateFutureDate(caseData.getSdoR2PermissionToRelyOnExpert().getSdoJointMeetingOfExpertsDate()).ifPresent(error -> {
-                log.warn("Joint Meeting Of Experts Date validation failed: {}", error);
+                log.warn("Joint Meeting Of Experts Date validation failed: {} for caseId: {}", error, caseData.getCcdCaseReference());
                 errors.add(error);
             });
         }

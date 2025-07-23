@@ -19,7 +19,7 @@ public class WitnessOfFactFieldBuilder implements SdoCaseFieldBuilder {
 
     @Override
     public void build(CaseData.CaseDataBuilder<?, ?> updatedData) {
-        log.info("Setting witness of fact");
+        log.info("Setting witness of fact for caseId: {}", updatedData.build().getCcdCaseReference());
         updatedData.disposalHearingWitnessOfFact(DisposalHearingWitnessOfFact.builder()
                 .input3(
                         "The claimant must upload to the Digital Portal copies of the witness statements "

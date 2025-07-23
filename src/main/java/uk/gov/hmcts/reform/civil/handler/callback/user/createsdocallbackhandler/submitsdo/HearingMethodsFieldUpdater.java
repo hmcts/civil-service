@@ -14,7 +14,7 @@ public class HearingMethodsFieldUpdater implements SdoCaseDataFieldUpdater {
 
     @Override
     public void update(CaseData caseData, CaseData.CaseDataBuilder<?, ?> dataBuilder) {
-        log.debug("Handling hearing methods for case {}", caseData.getCcdCaseReference());
+        log.debug("Handling hearing methods for caseId: {}", caseData.getCcdCaseReference());
         dataBuilder.disposalHearingMethodInPerson(submitSdoUtils.deleteLocationList(caseData.getDisposalHearingMethodInPerson()));
         dataBuilder.fastTrackMethodInPerson(submitSdoUtils.deleteLocationList(caseData.getFastTrackMethodInPerson()));
         dataBuilder.smallClaimsMethodInPerson(submitSdoUtils.deleteLocationList(caseData.getSmallClaimsMethodInPerson()));

@@ -17,9 +17,9 @@ public class ImportantNotesDateNihlFieldValidator implements NihlFieldValidator 
     @Override
     public void validate(CaseData caseData, List<String> errors) {
         if (caseData.getSdoR2ImportantNotesDate() != null) {
-            log.debug("Validating Important Notes Date");
+            log.debug("Validating Important Notes Date for caseId: {}", caseData.getCcdCaseReference());
             fieldsNihlUtils.validateFutureDate(caseData.getSdoR2ImportantNotesDate()).ifPresent(error -> {
-                log.warn("Important Notes Date validation failed: {}", error);
+                log.warn("Important Notes Date validation failed: {} for caseId: {}", error, caseData.getCcdCaseReference());
                 errors.add(error);
             });
         }

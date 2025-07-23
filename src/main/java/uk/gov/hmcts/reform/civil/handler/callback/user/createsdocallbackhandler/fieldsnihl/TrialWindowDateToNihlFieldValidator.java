@@ -18,9 +18,9 @@ public class TrialWindowDateToNihlFieldValidator implements NihlFieldValidator {
     public void validate(CaseData caseData, List<String> errors) {
         if (caseData.getSdoR2Trial() != null
                 && caseData.getSdoR2Trial().getSdoR2TrialWindow().getDateTo() != null) {
-            log.debug("Validating Trial Window Date To");
+            log.debug("Validating Trial Window Date To for caseId: {}", caseData.getCcdCaseReference());
             fieldsNihlUtils.validateFutureDate(caseData.getSdoR2Trial().getSdoR2TrialWindow().getDateTo()).ifPresent(error -> {
-                log.warn("Trial Window Date To validation failed: {}", error);
+                log.warn("Trial Window Date To validation failed: {} for caseId: {}", error, caseData.getCcdCaseReference());
                 errors.add(error);
             });
         }

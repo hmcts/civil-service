@@ -19,6 +19,7 @@ public class FastTrackRoadTrafficAccidentFieldBuilder implements SdoCaseFieldBui
 
     @Override
     public void build(CaseData.CaseDataBuilder<?, ?> updatedData) {
+        log.info("Building FastTrackRoadTrafficAccident fields for caseId: {}", updatedData.build().getCcdCaseReference());
         updatedData.fastTrackRoadTrafficAccident(FastTrackRoadTrafficAccident.builder()
                 .input(
                         "Photographs and/or a plan of the accident location shall be prepared and agreed by the parties and uploaded to the Digital Portal by 4pm on")

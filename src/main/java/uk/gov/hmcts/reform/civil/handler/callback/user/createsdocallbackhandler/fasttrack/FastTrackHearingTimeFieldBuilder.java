@@ -18,6 +18,7 @@ public class FastTrackHearingTimeFieldBuilder implements SdoCaseFieldBuilder {
 
     @Override
     public void build(CaseData.CaseDataBuilder<?, ?> updatedData) {
+        log.info("Building FastTrackHearingTime fields for caseId: {}", updatedData.build().getCcdCaseReference());
         updatedData.fastTrackHearingTime(FastTrackHearingTime.builder()
                 .dateFrom(LocalDate.now().plusWeeks(22))
                 .dateTo(LocalDate.now().plusWeeks(30))

@@ -18,9 +18,9 @@ public class RepliesDateNihlFieldValidator implements NihlFieldValidator {
     public void validate(CaseData caseData, List<String> errors) {
         if (caseData.getSdoR2EvidenceAcousticEngineer() != null
                 && caseData.getSdoR2EvidenceAcousticEngineer().getSdoRepliesDate() != null) {
-            log.debug("Validating Replies Date");
+            log.debug("Validating Replies Date for caseId: {}", caseData.getCcdCaseReference());
             fieldsNihlUtils.validateFutureDate(caseData.getSdoR2EvidenceAcousticEngineer().getSdoRepliesDate()).ifPresent(error -> {
-                log.warn("Replies Date validation failed: {}", error);
+                log.warn("Replies Date validation failed: {} for caseId: {}", error, caseData.getCcdCaseReference());
                 errors.add(error);
             });
         }

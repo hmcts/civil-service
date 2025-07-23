@@ -19,7 +19,7 @@ public class QuestionsToExpertsFieldBuilder implements SdoCaseFieldBuilder {
 
     @Override
     public void build(CaseData.CaseDataBuilder<?, ?> updatedData) {
-        log.info("Setting questions to experts");
+        log.info("Setting questions to experts for caseId: {}", updatedData.build().getCcdCaseReference());
         updatedData.disposalHearingQuestionsToExperts(
                 DisposalHearingQuestionsToExperts.builder()
                         .date(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(6)))

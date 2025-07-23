@@ -17,9 +17,9 @@ public class AddendumReportDateNihlFieldValidator implements NihlFieldValidator 
     @Override
     public void validate(CaseData caseData, List<String> errors) {
         if (caseData.getSdoR2AddendumReport() != null && caseData.getSdoR2AddendumReport().getSdoAddendumReportDate() != null) {
-            log.debug("Validating Addendum Report Date");
+            log.debug("Validating Addendum Report Date for caseId: {}", caseData.getCcdCaseReference());
             fieldsNihlUtils.validateFutureDate(caseData.getSdoR2AddendumReport().getSdoAddendumReportDate()).ifPresent(error -> {
-                log.warn("Addendum Report Date validation failed: {}", error);
+                log.warn("Addendum Report Date validation failed: {} for caseId: {}", error, caseData.getCcdCaseReference());
                 errors.add(error);
             });
         }

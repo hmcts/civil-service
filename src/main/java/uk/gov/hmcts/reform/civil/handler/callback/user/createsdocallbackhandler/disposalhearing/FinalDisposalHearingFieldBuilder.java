@@ -14,7 +14,7 @@ public class FinalDisposalHearingFieldBuilder implements SdoCaseFieldBuilder {
 
     @Override
     public void build(CaseData.CaseDataBuilder<?, ?> updatedData) {
-        log.info("Setting final disposal hearing");
+        log.info("Setting final disposal hearing for caseId: {}", updatedData.build().getCcdCaseReference());
         updatedData.disposalHearingFinalDisposalHearing(
                 DisposalHearingFinalDisposalHearing.builder()
                         .input("This claim will be listed for final disposal before a judge on the first "

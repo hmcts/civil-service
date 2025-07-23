@@ -21,7 +21,7 @@ public class DisposalHearingPopulator {
     private final List<SdoCaseFieldBuilder> disposalHearingBuilders;
 
     public void setDisposalHearingFields(CaseData.CaseDataBuilder<?, ?> updatedData, CaseData caseData) {
-        log.info("Setting disposal hearing fields for case data");
+        log.info("Setting disposal hearing fields for caseId: {}", caseData.getCcdCaseReference());
         disposalHearingBuilders.forEach(disposalHearingBuilder -> disposalHearingBuilder.build(updatedData));
         updateDeductionValue(caseData, updatedData);
     }
@@ -31,7 +31,7 @@ public class DisposalHearingPopulator {
                 .map(JudgementSum::getJudgementSum)
                 .map(d -> d + "%")
                 .ifPresent(deductionPercentage -> {
-                    log.info("Updating deduction value to {}", deductionPercentage);
+                    log.info("Updating deduction value to {} for caseId {}", deductionPercentage, caseData.getCcdCaseReference());
                     DisposalHearingJudgementDeductionValue tempDisposalHearingJudgementDeductionValue =
                             DisposalHearingJudgementDeductionValue.builder()
                                     .value(deductionPercentage)

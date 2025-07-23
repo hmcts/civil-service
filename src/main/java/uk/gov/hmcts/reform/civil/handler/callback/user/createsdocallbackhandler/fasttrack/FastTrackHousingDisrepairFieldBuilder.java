@@ -19,6 +19,7 @@ public class FastTrackHousingDisrepairFieldBuilder implements SdoCaseFieldBuilde
 
     @Override
     public void build(CaseData.CaseDataBuilder<?, ?> updatedData) {
+        log.info("Building FastTrackHousingDisrepair fields for caseId: {}", updatedData.build().getCcdCaseReference());
         updatedData.fastTrackHousingDisrepair(FastTrackHousingDisrepair.builder()
                 .input1(
                         "The claimant must prepare a Scott Schedule of the items in disrepair.")

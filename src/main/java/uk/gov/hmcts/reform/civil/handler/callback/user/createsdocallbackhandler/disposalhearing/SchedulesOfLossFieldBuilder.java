@@ -19,7 +19,7 @@ public class SchedulesOfLossFieldBuilder implements SdoCaseFieldBuilder {
 
     @Override
     public void build(CaseData.CaseDataBuilder<?, ?> updatedData) {
-        log.info("Setting schedules of loss");
+        log.info("Setting schedules of loss for caseId: {}", updatedData.build().getCcdCaseReference());
         updatedData.disposalHearingSchedulesOfLoss(DisposalHearingSchedulesOfLoss.builder()
                 .input2(
                         "If there is a claim for ongoing or future loss in the original schedule of losses, "

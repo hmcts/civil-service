@@ -17,9 +17,9 @@ public class ServiceReportDateNihlFieldValidator implements NihlFieldValidator {
     @Override
     public void validate(CaseData caseData, List<String> errors) {
         if (caseData.getSdoR2FurtherAudiogram() != null && caseData.getSdoR2FurtherAudiogram().getSdoServiceReportDate() != null) {
-            log.debug("Validating Service Report Date");
+            log.debug("Validating Service Report Date for caseId: {}", caseData.getCcdCaseReference());
             fieldsNihlUtils.validateFutureDate(caseData.getSdoR2FurtherAudiogram().getSdoServiceReportDate()).ifPresent(error -> {
-                log.warn("Service Report Date validation failed: {}", error);
+                log.warn("Service Report Date validation failed: {} for caseId: {}", error, caseData.getCcdCaseReference());
                 errors.add(error);
             });
         }

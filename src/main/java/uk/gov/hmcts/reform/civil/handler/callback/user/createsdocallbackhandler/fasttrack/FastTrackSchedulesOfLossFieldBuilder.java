@@ -19,6 +19,7 @@ public class FastTrackSchedulesOfLossFieldBuilder implements SdoCaseFieldBuilder
 
     @Override
     public void build(CaseData.CaseDataBuilder<?, ?> updatedData) {
+        log.info("Building FastTrackSchedulesOfLoss fields for caseId: {}", updatedData.build().getCcdCaseReference());
         updatedData.fastTrackSchedulesOfLoss(FastTrackSchedulesOfLoss.builder()
                 .input1(
                         "The claimant must upload to the Digital Portal an up-to-date schedule of loss by 4pm on")

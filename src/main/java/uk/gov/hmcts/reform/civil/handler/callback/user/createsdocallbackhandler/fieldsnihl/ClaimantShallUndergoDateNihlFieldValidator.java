@@ -17,9 +17,9 @@ public class ClaimantShallUndergoDateNihlFieldValidator implements NihlFieldVali
     @Override
     public void validate(CaseData caseData, List<String> errors) {
         if (caseData.getSdoR2FurtherAudiogram() != null && caseData.getSdoR2FurtherAudiogram().getSdoClaimantShallUndergoDate() != null) {
-            log.debug("Validating Claimant Shall Undergo Date");
+            log.debug("Validating Claimant Shall Undergo Date for caseId: {}", caseData.getCcdCaseReference());
             fieldsNihlUtils.validateFutureDate(caseData.getSdoR2FurtherAudiogram().getSdoClaimantShallUndergoDate()).ifPresent(error -> {
-                log.warn("Claimant Shall Undergo Date validation failed: {}", error);
+                log.warn("Claimant Shall Undergo Date validation failed: {} for caseId: {}", error, caseData.getCcdCaseReference());
                 errors.add(error);
             });
         }

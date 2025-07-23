@@ -16,11 +16,11 @@ public class ValidateFieldsNihl {
     private final List<NihlFieldValidator> nihlFieldValidators;
 
     public List<String> validateFieldsNihl(CaseData caseData) {
-        log.info("Validating NIHL fields");
+        log.info("Validating NIHL fields for caseId: {}", caseData.getCcdCaseReference());
         ArrayList<String> errors = new ArrayList<>();
 
         nihlFieldValidators.forEach(nihlFieldValidator -> nihlFieldValidator.validate(caseData, errors));
-        log.info("Validation completed with {} errors", errors.size());
+        log.info("Validation completed with {} errors for caseId: {}", errors.size(), caseData.getCcdCaseReference());
         return errors;
     }
 }

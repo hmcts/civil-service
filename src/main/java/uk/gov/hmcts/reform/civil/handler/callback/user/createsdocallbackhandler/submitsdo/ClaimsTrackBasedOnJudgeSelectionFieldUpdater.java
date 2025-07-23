@@ -19,19 +19,19 @@ public class ClaimsTrackBasedOnJudgeSelectionFieldUpdater implements SdoCaseData
         switch (caseAccessCategory) {
             case UNSPEC_CLAIM:
                 if (SdoHelper.isSmallClaimsTrack(caseData)) {
-                    log.debug("Setting allocated track to SMALL_CLAIM for case {}", caseData.getCcdCaseReference());
+                    log.debug("Setting allocated track to SMALL_CLAIM for caseId: {}", caseData.getCcdCaseReference());
                     dataBuilder.allocatedTrack(SMALL_CLAIM);
                 } else if (SdoHelper.isFastTrack(caseData)) {
-                    log.debug("Setting allocated track to FAST_CLAIM for case {}", caseData.getCcdCaseReference());
+                    log.debug("Setting allocated track to FAST_CLAIM for caseId: {}", caseData.getCcdCaseReference());
                     dataBuilder.allocatedTrack(FAST_CLAIM);
                 }
                 break;
             case SPEC_CLAIM:
                 if (SdoHelper.isSmallClaimsTrack(caseData)) {
-                    log.debug("Setting response claim track to SMALL_CLAIM for case {}", caseData.getCcdCaseReference());
+                    log.debug("Setting response claim track to SMALL_CLAIM for caseId: {}", caseData.getCcdCaseReference());
                     dataBuilder.responseClaimTrack(SMALL_CLAIM.name());
                 } else if (SdoHelper.isFastTrack(caseData)) {
-                    log.debug("Setting response claim track to FAST_CLAIM for case {}", caseData.getCcdCaseReference());
+                    log.debug("Setting response claim track to FAST_CLAIM for caseId: {}", caseData.getCcdCaseReference());
                     dataBuilder.responseClaimTrack(FAST_CLAIM.name());
                 }
                 break;

@@ -19,7 +19,7 @@ public class MedicalEvidenceFieldBuilder implements SdoCaseFieldBuilder {
 
     @Override
     public void build(CaseData.CaseDataBuilder<?, ?> updatedData) {
-        log.info("Setting medical evidence");
+        log.info("Setting medical evidence for caseId: {}", updatedData.build().getCcdCaseReference());
         updatedData.disposalHearingMedicalEvidence(DisposalHearingMedicalEvidence.builder()
                 .input(
                         "The claimant has permission to rely upon the written expert evidence already "

@@ -16,7 +16,7 @@ public class FastTrackHearingMethodCaseDataMapper implements GenerateSdoOrderCas
                 && caseData.getHearingMethodValuesFastTrack().getValue() != null) {
 
             String fastTrackHearingMethodLabel = caseData.getHearingMethodValuesFastTrack().getValue().getLabel();
-            log.debug("Handling Fast Track Hearing Method: {}", fastTrackHearingMethodLabel);
+            log.debug("Handling Fast Track Hearing Method: {} for caseId: {}", fastTrackHearingMethodLabel, caseData.getCcdCaseReference());
             if (fastTrackHearingMethodLabel.equals(HearingMethod.IN_PERSON.getLabel())) {
                 updatedData.fastTrackMethod(FastTrackMethod.fastTrackMethodInPerson);
             } else if (fastTrackHearingMethodLabel.equals(HearingMethod.VIDEO.getLabel())) {

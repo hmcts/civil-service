@@ -16,7 +16,7 @@ public class SmallClaimsHearingMethodCaseDataMapper implements GenerateSdoOrderC
                 && caseData.getHearingMethodValuesSmallClaims().getValue() != null) {
 
             String smallClaimsHearingMethodLabel = caseData.getHearingMethodValuesSmallClaims().getValue().getLabel();
-            log.debug("Handling Small Claims Hearing Method: {}", smallClaimsHearingMethodLabel);
+            log.debug("Handling Small Claims Hearing Method: {} for caseId: {}", smallClaimsHearingMethodLabel, caseData.getCcdCaseReference());
             if (smallClaimsHearingMethodLabel.equals(HearingMethod.IN_PERSON.getLabel())) {
                 updatedData.smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodInPerson);
             } else if (smallClaimsHearingMethodLabel.equals(HearingMethod.VIDEO.getLabel())) {

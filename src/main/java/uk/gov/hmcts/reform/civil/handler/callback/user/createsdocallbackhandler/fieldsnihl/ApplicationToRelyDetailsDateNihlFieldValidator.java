@@ -20,13 +20,13 @@ public class ApplicationToRelyDetailsDateNihlFieldValidator implements NihlField
                 && caseData.getSdoR2QuestionsClaimantExpert().getSdoApplicationToRelyOnFurther() != null
                 && caseData.getSdoR2QuestionsClaimantExpert().getSdoApplicationToRelyOnFurther().getApplicationToRelyOnFurtherDetails() != null
                 && caseData.getSdoR2QuestionsClaimantExpert().getSdoApplicationToRelyOnFurther().getApplicationToRelyOnFurtherDetails().getApplicationToRelyDetailsDate() != null) {
-            log.debug("Validating Application To Rely Details Date");
+            log.debug("Validating Application To Rely Details Date for caseId: {}", caseData.getCcdCaseReference());
             fieldsNihlUtils.validateFutureDate(caseData.getSdoR2QuestionsClaimantExpert()
                             .getSdoApplicationToRelyOnFurther()
                             .getApplicationToRelyOnFurtherDetails()
                             .getApplicationToRelyDetailsDate())
                     .ifPresent(error -> {
-                        log.warn("Application To Rely Details Date validation failed: {}", error);
+                        log.warn("Application To Rely Details Date validation failed: {} for caseId: {}", error, caseData.getCcdCaseReference());
                         errors.add(error);
                     });
         }

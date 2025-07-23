@@ -19,9 +19,9 @@ public class TrialFirstOpenDateAfterNihlFieldValidator implements NihlFieldValid
         if (caseData.getSdoR2Trial() != null
                 && caseData.getSdoR2Trial().getSdoR2TrialFirstOpenDateAfter() != null
                 && caseData.getSdoR2Trial().getSdoR2TrialFirstOpenDateAfter().getListFrom() != null) {
-            log.debug("Validating Trial First Open Date After");
+            log.debug("Validating Trial First Open Date After for caseId: {}", caseData.getCcdCaseReference());
             fieldsNihlUtils.validateFutureDate(caseData.getSdoR2Trial().getSdoR2TrialFirstOpenDateAfter().getListFrom()).ifPresent(error -> {
-                log.warn("Trial First Open Date After validation failed: {}", error);
+                log.warn("Trial First Open Date After validation failed: {} for caseId: {}", error, caseData.getCcdCaseReference());
                 errors.add(error);
             });
         }

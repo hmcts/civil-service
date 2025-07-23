@@ -19,6 +19,7 @@ public class FastTrackPersonalInjuryFieldBuilder implements SdoCaseFieldBuilder 
 
     @Override
     public void build(CaseData.CaseDataBuilder<?, ?> updatedData) {
+        log.info("Building FastTrackPersonalInjury fields for caseId: {}", updatedData.build().getCcdCaseReference());
         updatedData.fastTrackPersonalInjury(FastTrackPersonalInjury.builder()
                 .input1(
                         "The claimant has permission to rely upon the written expert evidence already uploaded to the Digital Portal with the particulars of claim and in" +

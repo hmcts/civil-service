@@ -19,6 +19,7 @@ public class FastTrackNotesFieldBuilder implements SdoCaseFieldBuilder {
 
     @Override
     public void build(CaseData.CaseDataBuilder<?, ?> updatedData) {
+        log.info("Building FastTrackNotes fields for caseId: {}", updatedData.build().getCcdCaseReference());
         updatedData.fastTrackNotes(FastTrackNotes.builder()
                 .input(
                         "This Order has been made without a hearing. Each party has the right to apply to have this Order set aside or varied." +

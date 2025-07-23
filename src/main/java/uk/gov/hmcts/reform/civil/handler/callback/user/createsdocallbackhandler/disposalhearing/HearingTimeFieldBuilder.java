@@ -14,7 +14,7 @@ public class HearingTimeFieldBuilder implements SdoCaseFieldBuilder {
 
     @Override
     public void build(CaseData.CaseDataBuilder<?, ?> updatedData) {
-        log.info("Setting hearing time");
+        log.info("Setting hearing time for caseId: {}", updatedData.build().getCcdCaseReference());
         updatedData.disposalHearingHearingTime(DisposalHearingHearingTime.builder()
                 .input(
                         "This claim will be listed for final disposal before a judge on the first "
