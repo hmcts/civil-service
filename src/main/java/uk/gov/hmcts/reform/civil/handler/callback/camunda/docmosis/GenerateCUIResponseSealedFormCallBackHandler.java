@@ -98,7 +98,7 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
 
     private void addToSystemGeneratedDocuments(CaseData.CaseDataBuilder<?, ?> caseDataBuilder, CaseDocument document, CaseData caseData) {
         if (featureToggleService.isWelshEnabledForMainCase() && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
-            caseDataBuilder.respondent1ClaimResponseDocumentSpec(document)
+            caseDataBuilder
                 .bilingualHint(YesOrNo.YES)
                 .preTranslationDocuments(List.of(ElementUtils.element(document)));
         } else {
@@ -107,8 +107,8 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
                     document,
                     caseData
                 ));
-            assignCategoryId.assignCategoryIdToCaseDocument(document, DocCategory.DEF1_DEFENSE_DQ.getValue());
         }
+        assignCategoryId.assignCategoryIdToCaseDocument(document, DocCategory.DEF1_DEFENSE_DQ.getValue());
     }
 
     private List<DocumentMetaData> fetchDocumentsToStitch(CaseData caseData, CaseDocument sealedForm) {
