@@ -63,7 +63,7 @@ public class JudgementService {
             BigDecimal interest = interestCalculator.calculateInterest(caseData);
             claimAmount = claimAmount.add(interest);
         }
-        if (isLipVLipFullAdmitSetDate(caseData) && featureToggleService.isLrAdmissionBulkEnabled()) {
+        if (isLipVLipFullAdmitSetDate(caseData) && featureToggleService.isJudgmentOnlineLive()) {
             BigDecimal interest = interestCalculator.calculateInterest(caseData);
             claimAmount = claimAmount.add(interest);
         } else {
