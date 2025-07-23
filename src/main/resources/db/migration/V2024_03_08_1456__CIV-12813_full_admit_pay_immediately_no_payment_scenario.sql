@@ -2,7 +2,7 @@
  * Add scenario
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
-VALUES ('Scenario.AAA6.ClaimantIntent.FullAdmit.Claimant', '{"Notice.AAA6.DefResponse.FullAdmit.PayImmediately.Claimant"}', '{"Notice.AAA6.ClaimantIntent.FullAdmit.Claimant": ["respondent1PartyName", "fullAdmitPayImmediatelyPaymentAmount", "respondent1AdmittedAmountPaymentDeadlineEn", "respondent1AdmittedAmountPaymentDeadlineCy"]}');
+VALUES ('Scenario.AAA6.ClaimantIntent.FullAdmit.Claimant', '{"Notice.AAA6.DefResponse.FullAdmit.PayImmediately.Claimant"}', '{"Notice.AAA6.ClaimantIntent.FullAdmit.Claimant": ["respondent1PartyName", "respondent1AdmittedAmountPaymentDeadlineEn", "respondent1AdmittedAmountPaymentDeadlineCy"]}');
 
 /**
  * Add notification template
