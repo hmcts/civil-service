@@ -8,7 +8,6 @@ import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
-import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimAmountBreakup;
@@ -43,8 +42,6 @@ import java.util.function.Function;
 
 import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
@@ -125,9 +122,8 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
         Optional<SolicitorReferences> solicitorReferences = ofNullable(caseData.getSolicitorReferences());
         BigDecimal interest = interestCalculator.calculateInterest(caseData);
         List<SpecifiedParty> respondents = getRespondents(caseData);
-        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
 
-        SealedClaimFormForSpec.SealedClaimFormForSpecBuilder sealedClaimFormBuilder =  SealedClaimFormForSpec.builder()
+        return SealedClaimFormForSpec.builder()
             .ccdCaseReference(formatCcdCaseReference(caseData))
             .referenceNumber(caseData.getLegacyCaseReference())
             .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
@@ -185,25 +181,8 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
                                  ? MonetaryConversions.penniesToPounds(BigDecimal.valueOf(
                                      Integer.parseInt(caseData.getFixedCosts().getFixedCostAmount()))).toString()
                                  : (BigDecimal.valueOf(0)).toString())
-            .respondentsOrgRegistered(getRespondentsOrgRegistered(caseData));
-
-        if (caseData.isRespondentSolicitorRegistered()) {
-            sealedClaimFormBuilder.respondentRepresentativeOrganisationName(respondents.get(0).getRepresentative().getOrganisationName());
-        }
-        if (multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP && caseData.isRespondentTwoSolicitorRegistered() && isRespondent2(caseData)) {
-            sealedClaimFormBuilder.respondentRepresentativeOrganisationName(respondents.get(1).getRepresentative().getOrganisationName());
-        }
-
-        return sealedClaimFormBuilder.build();
-    }
-
-    private boolean isRespondent2(CaseData caseData) {
-        if (caseData.getRespondent2ResponseDate() != null) {
-            return caseData.getRespondent1ResponseDate() == null
-                || caseData.getRespondent2ResponseDate().isAfter(caseData.getRespondent1ResponseDate());
-        }
-
-        return false;
+            .respondentsOrgRegistered(getRespondentsOrgRegistered(caseData))
+            .build();
     }
 
     private LocalDate getInterestFromDate(CaseData caseData) {

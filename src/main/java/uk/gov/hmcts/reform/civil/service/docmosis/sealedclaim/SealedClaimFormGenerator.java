@@ -68,11 +68,10 @@ public class SealedClaimFormGenerator implements TemplateDataGeneratorWithAuth<S
         String hearingCourtLocation = locationRefDataUtil.getPreferredCourtData(
             caseData, authorisation, false);
         List<Party> applicants = getApplicants(caseData, multiPartyScenario);
-        List<Party> respondents = getRespondents(caseData, multiPartyScenario);
 
         SealedClaimForm.SealedClaimFormBuilder sealedClaimFormBuilder = SealedClaimForm.builder()
             .applicants(applicants)
-            .respondents(respondents)
+            .respondents(getRespondents(caseData, multiPartyScenario))
             .claimValue(caseData.getClaimValue().formData())
             .statementOfTruth(caseData.getApplicantSolicitor1ClaimStatementOfTruth())
             .claimDetails(caseData.getDetailsOfClaim())
