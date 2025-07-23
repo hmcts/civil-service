@@ -38,6 +38,8 @@ public class HandleAdmitPartOfClaim implements CaseTask {
 
     public CallbackResponse execute(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        log.info("Executing HandleAdmitPartOfClaim for caseId: {}", caseData.getCcdCaseReference());
+
         List<String> errors = validatePaymentDate(caseData);
 
         if (featureToggleService.isLrAdmissionBulkEnabled()) {
@@ -69,6 +71,7 @@ public class HandleAdmitPartOfClaim implements CaseTask {
     }
 
     private List<String> validatePaymentDate(CaseData caseData) {
+        log.info("Validating payment date for caseId: {}", caseData.getCcdCaseReference());
         return paymentDateValidator.validate(Optional.ofNullable(caseData.getRespondToAdmittedClaim())
                 .orElseGet(() -> RespondToClaim.builder().build()));
     }
@@ -80,6 +83,7 @@ public class HandleAdmitPartOfClaim implements CaseTask {
     }
 
     private void updateResponseClaimTrack(CallbackParams callbackParams, CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
+        log.info("Updating response claim track for caseId: {}", caseData.getCcdCaseReference());
         if (SpecJourneyConstantLRSpec.DEFENDANT_RESPONSE_SPEC.equals(callbackParams.getRequest().getEventId())) {
             AllocatedTrack allocatedTrack = getAllocatedTrack(caseData);
             updatedCaseData.responseClaimTrack(allocatedTrack.name());
@@ -87,17 +91,20 @@ public class HandleAdmitPartOfClaim implements CaseTask {
     }
 
     private CallbackResponse buildSuccessResponse(CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
+        log.info("Successfully updated case data for HandleAdmitPartOfClaim");
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(updatedCaseData.build().toMap(objectMapper))
                 .build();
     }
 
     private AllocatedTrack getAllocatedTrack(CaseData caseData) {
+        log.info("Determining allocated track for caseId: {}", caseData.getCcdCaseReference());
         return AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(), null, null,
                 featureToggleService, caseData);
     }
 
     private void validateAdmittedClaimOwingAmount(List<String> errors, CaseData caseData) {
+        log.info("Validating admitted claim owing amount for caseId: {}", caseData.getCcdCaseReference());
         if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION
                 && caseData.getSpecDefenceAdmittedRequired() == NO
                 && YES.equals(caseData.getIsRespondent1())

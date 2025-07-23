@@ -19,6 +19,7 @@ public class ValidateLengthOfUnemployment implements CaseTask {
 
     public CallbackResponse execute(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        log.info("Executing ValidateLengthOfUnemployment for caseId: {}", caseData.getCcdCaseReference());
         List<String> errors = validateLengthOfUnemployment(caseData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -27,6 +28,7 @@ public class ValidateLengthOfUnemployment implements CaseTask {
     }
 
     private List<String> validateLengthOfUnemployment(CaseData caseData) {
+        log.info("Validating length of unemployment for caseId: {}", caseData.getCcdCaseReference());
         List<String> errors = new ArrayList<>();
 
         if (caseData.getRespondToClaimAdmitPartUnemployedLRspec() != null) {
@@ -35,9 +37,9 @@ public class ValidateLengthOfUnemployment implements CaseTask {
                     && (lengthOfUnemployment.getNumberOfYearsInUnemployment().contains(".")
                     || lengthOfUnemployment.getNumberOfMonthsInUnemployment().contains("."))) {
                 errors.add("Length of time unemployed must be a whole number, for example, 10.");
+                log.debug("CaseId {}: Validation error added - Length of time unemployed must be a whole number", caseData.getCcdCaseReference());
             }
         }
-
         return errors;
     }
 }

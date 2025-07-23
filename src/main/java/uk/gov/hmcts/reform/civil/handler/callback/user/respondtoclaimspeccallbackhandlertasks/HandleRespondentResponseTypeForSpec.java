@@ -13,19 +13,24 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
-@Slf4j
 public class HandleRespondentResponseTypeForSpec implements CaseTask {
 
     private final ObjectMapper objectMapper;
 
     public CallbackResponse execute(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        log.info("Executing HandleRespondentResponseTypeForSpec for caseId: {}", caseData.getCcdCaseReference());
+
         if (caseData.getRespondent1ClaimResponseTypeForSpec() != RespondentResponseTypeSpec.FULL_ADMISSION
                 || caseData.getRespondent2ClaimResponseTypeForSpec() != RespondentResponseTypeSpec.FULL_ADMISSION) {
+            log.debug("CaseId {}: Setting specDefenceFullAdmittedRequired to NO", caseData.getCcdCaseReference());
             caseData = caseData.toBuilder().specDefenceFullAdmittedRequired(NO).build();
         }
+
+        log.info("CaseId {}: Returning callback response", caseData.getCcdCaseReference());
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(caseData.toMap(objectMapper))
                 .build();

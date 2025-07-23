@@ -22,6 +22,8 @@ import static uk.gov.hmcts.reform.civil.utils.MediationUnavailableDatesUtils.che
 public class ValidateMediationUnavailableDates implements CaseTask {
 
     public CallbackResponse execute(CallbackParams callbackParams) {
+        log.info("Executing mediation unavailable dates validation for caseId: {}", callbackParams.getCaseData().getCcdCaseReference());
+
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<>();
 

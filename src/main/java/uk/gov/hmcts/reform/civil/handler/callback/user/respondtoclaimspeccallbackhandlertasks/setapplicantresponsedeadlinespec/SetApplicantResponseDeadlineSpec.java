@@ -196,7 +196,6 @@ public class SetApplicantResponseDeadlineSpec implements CaseTask {
             updatedData.respondent2DetailsForClaimDetailsTab(updatedRespondent2.toBuilder().flags(null).build());
         }
 
-        // moving statement of truth value to correct field, this was not possible in mid event.
         StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
         Respondent1DQ.Respondent1DQBuilder dq = caseData.getRespondent1DQ().toBuilder()
                 .respondent1DQStatementOfTruth(statementOfTruth)
@@ -207,7 +206,7 @@ public class SetApplicantResponseDeadlineSpec implements CaseTask {
         handleCourtLocationForRespondent1DQ(caseData, dq, callbackParams);
         updatedData.respondent1DQ(dq.build());
         requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabRespondent1Spec(callbackParams, updatedData);
-        // resetting statement of truth to make sure it's empty the next time it appears in the UI.
+
         updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
     }
 

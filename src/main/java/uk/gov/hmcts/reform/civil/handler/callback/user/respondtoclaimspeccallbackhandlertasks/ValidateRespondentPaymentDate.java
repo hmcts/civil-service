@@ -22,6 +22,8 @@ public class ValidateRespondentPaymentDate implements CaseTask {
     private final PaymentDateValidator paymentDateValidator;
 
     public CallbackResponse execute(CallbackParams callbackParams) {
+        log.info("Executing respondent payment date validation for caseId: {}", callbackParams.getCaseData().getCcdCaseReference());
+
         CaseData caseData = callbackParams.getCaseData();
 
         List<String> errors = paymentDateValidator

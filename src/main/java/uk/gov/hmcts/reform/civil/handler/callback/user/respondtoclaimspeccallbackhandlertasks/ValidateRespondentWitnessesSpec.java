@@ -29,48 +29,65 @@ public class ValidateRespondentWitnessesSpec implements CaseTask, WitnessesValid
     private final RespondToClaimSpecUtils respondToClaimSpecUtils;
 
     public CallbackResponse execute(CallbackParams callbackParams) {
+        log.info("Executing respondent witnesses validation for caseId: {}", callbackParams.getCaseData().getCcdCaseReference());
+
         CaseData caseData = callbackParams.getCaseData();
         MultiPartyScenario scenario = MultiPartyScenario.getMultiPartyScenario(caseData);
 
         if (!ONE_V_ONE.equals(scenario)) {
+            log.debug("CaseId {}: Handling multi-party scenario", caseData.getCcdCaseReference());
             return handleMultiPartyScenario(callbackParams, caseData);
         }
+
         return validateR1Witnesses(caseData);
     }
 
     private CallbackResponse handleMultiPartyScenario(CallbackParams callbackParams, CaseData caseData) {
+        log.info("Handling multi-party scenario for caseId: {}", caseData.getCcdCaseReference());
+
         if (isSolicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONE)) {
+            log.debug("CaseId {}: Solicitor represents only Respondent 1", caseData.getCcdCaseReference());
             return validateR1Witnesses(caseData);
         } else if (isSolicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)) {
+            log.debug("CaseId {}: Solicitor represents only Respondent 2", caseData.getCcdCaseReference());
             return validateWitnesses(caseData.getRespondent2DQ());
         } else if (isRespondent2HasDifferentResponse(caseData)) {
+            log.debug("CaseId {}: Respondent 2 has different response", caseData.getCcdCaseReference());
             return validateWitnesses(caseData.getRespondent2DQ());
         }
+
         return validateR1Witnesses(caseData);
     }
 
     private boolean isSolicitorRepresentsOnlyOneOfRespondents(CallbackParams callbackParams, CaseRole caseRole) {
+        log.debug("Checking if solicitor represents only one of the respondents for caseId: {}", callbackParams.getCaseData().getCcdCaseReference());
         return respondToClaimSpecUtils.isSolicitorRepresentsOnlyOneOfRespondents(callbackParams, caseRole);
     }
 
     private boolean isRespondent2HasDifferentResponse(CaseData caseData) {
+        log.debug("Checking if Respondent 2 has different response for caseId: {}", caseData.getCcdCaseReference());
         return respondent2HasSameLegalRep(caseData)
                 && caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO
                 && caseData.getRespondent2DQ() != null && caseData.getRespondent2DQ().getRespondent2DQWitnesses() != null;
     }
 
     private CallbackResponse validateR1Witnesses(CaseData caseData) {
+        log.info("Validating witnesses for Respondent 1 for caseId: {}", caseData.getCcdCaseReference());
+
         List<String> errors = new ArrayList<>();
         if (caseData.getRespondent1DQWitnessesRequiredSpec() == YES
                 && caseData.getRespondent1DQWitnessesDetailsSpec() == null) {
+            log.warn("CaseId {}: Witness details required for Respondent 1", caseData.getCcdCaseReference());
             errors.add("Witness details required");
         }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(errors)
                 .build();
     }
 
     private boolean respondent2HasSameLegalRep(CaseData caseData) {
+        log.debug("Checking if Respondent 2 has the same legal representative for caseId: {}", caseData.getCcdCaseReference());
         return caseData.getRespondent2SameLegalRepresentative() != null
                 && caseData.getRespondent2SameLegalRepresentative() == YES;
     }
