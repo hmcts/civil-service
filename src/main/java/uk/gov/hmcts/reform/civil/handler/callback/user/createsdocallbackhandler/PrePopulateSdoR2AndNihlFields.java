@@ -88,9 +88,8 @@ public class PrePopulateSdoR2AndNihlFields {
         setSmallClaimsFields(updatedData, courtList, hearingMethodList, preferredCourt, locationRefDataList);
 
         CaseData caseData = callbackParams.getCaseData();
-        if (featureToggleService.isCarmEnabledForCase(caseData)) {
-            setCarmFields(updatedData);
-        }
+
+        setCarmFields(updatedData);
 
         if (featureToggleService.isWelshEnabledForMainCase()
                 && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {

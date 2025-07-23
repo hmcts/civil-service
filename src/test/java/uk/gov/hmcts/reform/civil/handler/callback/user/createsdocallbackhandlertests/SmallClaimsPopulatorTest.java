@@ -69,7 +69,6 @@ class SmallClaimsPopulatorTest {
 
     @Test
     void shouldSetSmallClaimsFields_whenCarmEnabledForCase() {
-        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
         when(workingDayIndicator.getNextWorkingDay(any(LocalDate.class))).thenReturn(LocalDate.now().plusDays(1));
         when(deadlinesCalculator.plusWorkingDays(any(LocalDate.class), any(Integer.class))).thenReturn(LocalDate.now().plusDays(5));
 

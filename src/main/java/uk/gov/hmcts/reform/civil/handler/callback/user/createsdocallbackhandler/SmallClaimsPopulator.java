@@ -61,12 +61,7 @@ public class SmallClaimsPopulator {
 
         updatedData.sdoR2SmallClaimsWitnessStatementOther(getSdoR2SmallClaimsWitnessStatements());
 
-        if (featureToggleService.isCarmEnabledForCase(caseData)) {
-            log.debug(
-                    "CARM is enabled for case {}, setting small claims mediation section statement.",
-                    caseData.getCcdCaseReference()
-            );
-            updatedData.smallClaimsMediationSectionStatement(SmallClaimsMediation.builder()
+        updatedData.smallClaimsMediationSectionStatement(SmallClaimsMediation.builder()
                     .input(
                             "If you failed to attend a mediation appointment, then the judge at the hearing may impose a sanction." +
                                     " This could require you to pay costs, or could result in your claim or defence being dismissed." +
@@ -76,7 +71,6 @@ public class SmallClaimsPopulator {
                                     " appointment should deliver their comments, with any supporting documents," +
                                     " to all parties and to the court at least 14 days before the hearing.")
                     .build());
-        }
 
         log.debug("SDO R2 is enabled, setting small claims flight delay.");
         updatedData.smallClaimsFlightDelay(SmallClaimsFlightDelay.builder()
