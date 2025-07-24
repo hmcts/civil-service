@@ -9,6 +9,8 @@ import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_ADMISSION;
@@ -29,7 +31,7 @@ public class PaymentTimeRouteCaseDataUpdater implements SetApplicantResponseDead
                 && ifResponseTypeIsPartOrFullAdmission(caseData)) {
             log.debug("Defence admit part payment time route is IMMEDIATELY and response type is part or full admission for caseId: {}", caseData.getCcdCaseReference());
             LocalDate whenBePaid = deadlineCalculatorService.calculateExtendedDeadline(
-                    LocalDate.now(),
+                    ZonedDateTime.now(ZoneId.of("Europe/London")).toLocalDateTime(),
                     RespondentResponsePartAdmissionPaymentTimeLRspec.DAYS_TO_PAY_IMMEDIATELY);
             RespondToClaimAdmitPartLRspec admitPartLRspec = RespondToClaimAdmitPartLRspec.builder()
                     .whenWillThisAmountBePaid(whenBePaid)

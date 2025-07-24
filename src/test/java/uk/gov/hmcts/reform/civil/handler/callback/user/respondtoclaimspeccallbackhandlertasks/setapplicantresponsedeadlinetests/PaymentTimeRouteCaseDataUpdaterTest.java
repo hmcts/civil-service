@@ -14,7 +14,7 @@ import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExte
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
@@ -31,8 +31,10 @@ class PaymentTimeRouteCaseDataUpdaterTest {
     @Test
     void shouldUpdateCaseDataWhenPaymentTimeIsImmediately() {
         LocalDate expectedDate = LocalDate.now().plusDays(RespondentResponsePartAdmissionPaymentTimeLRspec.DAYS_TO_PAY_IMMEDIATELY);
-        when(deadlineCalculatorService.calculateExtendedDeadline(any(LocalDate.class), any(Integer.class)))
-                .thenReturn(expectedDate);
+        when(deadlineCalculatorService.calculateExtendedDeadline(
+            org.mockito.ArgumentMatchers.any(java.time.LocalDateTime.class),
+            anyInt()
+        )).thenReturn(expectedDate);
 
         CaseData caseData = CaseData.builder()
                 .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
@@ -45,5 +47,83 @@ class PaymentTimeRouteCaseDataUpdaterTest {
         RespondToClaimAdmitPartLRspec admitPartLRspec = updatedData.build().getRespondToClaimAdmitPartLRspec();
         assertThat(admitPartLRspec).isNotNull();
         assertThat(admitPartLRspec.getWhenWillThisAmountBePaid()).isEqualTo(expectedDate);
+    }
+
+    @Test
+    void shouldUpdateWhenRespondent2IsPartAdmission() {
+        LocalDate expectedDate = LocalDate.now().plusDays(RespondentResponsePartAdmissionPaymentTimeLRspec.DAYS_TO_PAY_IMMEDIATELY);
+        when(deadlineCalculatorService.calculateExtendedDeadline(
+            org.mockito.ArgumentMatchers.any(java.time.LocalDateTime.class),
+            anyInt()
+        )).thenReturn(expectedDate);
+
+        CaseData caseData = CaseData.builder()
+                .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
+                .respondent2ClaimResponseTypeForSpec(PART_ADMISSION)
+                .build();
+
+        CaseData.CaseDataBuilder<?, ?> updatedData = CaseData.builder();
+        updater.update(caseData, updatedData);
+
+        RespondToClaimAdmitPartLRspec admitPartLRspec = updatedData.build().getRespondToClaimAdmitPartLRspec();
+        assertThat(admitPartLRspec).isNotNull();
+        assertThat(admitPartLRspec.getWhenWillThisAmountBePaid()).isEqualTo(expectedDate);
+    }
+
+    @Test
+    void shouldUpdateWhenRespondent1IsFullAdmission() {
+        LocalDate expectedDate = LocalDate.now().plusDays(RespondentResponsePartAdmissionPaymentTimeLRspec.DAYS_TO_PAY_IMMEDIATELY);
+        when(deadlineCalculatorService.calculateExtendedDeadline(
+            org.mockito.ArgumentMatchers.any(java.time.LocalDateTime.class),
+            anyInt()
+        )).thenReturn(expectedDate);
+
+        CaseData caseData = CaseData.builder()
+                .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
+                .respondent1ClaimResponseTypeForSpec(
+                    uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_ADMISSION)
+                .build();
+
+        CaseData.CaseDataBuilder<?, ?> updatedData = CaseData.builder();
+        updater.update(caseData, updatedData);
+
+        RespondToClaimAdmitPartLRspec admitPartLRspec = updatedData.build().getRespondToClaimAdmitPartLRspec();
+        assertThat(admitPartLRspec).isNotNull();
+        assertThat(admitPartLRspec.getWhenWillThisAmountBePaid()).isEqualTo(expectedDate);
+    }
+
+    @Test
+    void shouldUpdateWhenRespondent2IsFullAdmission() {
+        LocalDate expectedDate = LocalDate.now().plusDays(RespondentResponsePartAdmissionPaymentTimeLRspec.DAYS_TO_PAY_IMMEDIATELY);
+        when(deadlineCalculatorService.calculateExtendedDeadline(
+            org.mockito.ArgumentMatchers.any(java.time.LocalDateTime.class),
+            anyInt()
+        )).thenReturn(expectedDate);
+
+        CaseData caseData = CaseData.builder()
+                .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
+                .respondent2ClaimResponseTypeForSpec(
+                    uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_ADMISSION)
+                .build();
+
+        CaseData.CaseDataBuilder<?, ?> updatedData = CaseData.builder();
+        updater.update(caseData, updatedData);
+
+        RespondToClaimAdmitPartLRspec admitPartLRspec = updatedData.build().getRespondToClaimAdmitPartLRspec();
+        assertThat(admitPartLRspec).isNotNull();
+        assertThat(admitPartLRspec.getWhenWillThisAmountBePaid()).isEqualTo(expectedDate);
+    }
+
+    @Test
+    void shouldNotUpdateWhenNeitherIsAdmission() {
+        CaseData caseData = CaseData.builder()
+                .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
+                .respondent1ClaimResponseTypeForSpec(null)
+                .respondent2ClaimResponseTypeForSpec(null)
+                .build();
+        CaseData.CaseDataBuilder<?, ?> updatedData = CaseData.builder();
+        updater.update(caseData, updatedData);
+        RespondToClaimAdmitPartLRspec admitPartLRspec = updatedData.build().getRespondToClaimAdmitPartLRspec();
+        assertThat(admitPartLRspec).isNull();
     }
 }
