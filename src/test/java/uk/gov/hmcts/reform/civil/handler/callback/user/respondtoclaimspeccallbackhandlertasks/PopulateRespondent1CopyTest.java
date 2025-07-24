@@ -21,7 +21,7 @@ import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -100,7 +100,7 @@ class PopulateRespondent1CopyTest {
         when(userService.getUserInfo(any())).thenReturn(userInfo);
         when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("RESPONDENTSOLICITORONE"));
 
-        Map<CallbackParams.Params, Object> params = new HashMap<>();
+        Map<CallbackParams.Params, Object> params =  new EnumMap<>(CallbackParams.Params.class);
         params.put(BEARER_TOKEN, "testBearerToken");
 
         CallbackParams callbackParams = CallbackParams.builder()
@@ -124,7 +124,7 @@ class PopulateRespondent1CopyTest {
         when(userService.getUserInfo(any())).thenReturn(userInfo);
         when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("RESPONDENTSOLICITORONE"));
 
-        Map<CallbackParams.Params, Object> params = new HashMap<>();
+        Map<CallbackParams.Params, Object> params =  new EnumMap<>(CallbackParams.Params.class);
         params.put(BEARER_TOKEN, "testBearerToken");
 
         CallbackParams callbackParams = CallbackParams.builder()
@@ -150,7 +150,7 @@ class PopulateRespondent1CopyTest {
                 "RESPONDENTSOLICITORTWO"
         ));
 
-        Map<CallbackParams.Params, Object> params = new HashMap<>();
+        Map<CallbackParams.Params, Object> params =  new EnumMap<>(CallbackParams.Params.class);
         params.put(BEARER_TOKEN, "testBearerToken");
 
         CallbackParams callbackParams = CallbackParams.builder()
@@ -178,7 +178,7 @@ class PopulateRespondent1CopyTest {
                 .respondent2(null)
                 .build();
 
-        Map<CallbackParams.Params, Object> params = new HashMap<>();
+        Map<CallbackParams.Params, Object> params =  new EnumMap<>(CallbackParams.Params.class);
         params.put(BEARER_TOKEN, "testBearerToken");
 
         CallbackParams callbackParams = CallbackParams.builder()
@@ -207,7 +207,7 @@ class PopulateRespondent1CopyTest {
                 .ccdCaseReference(1234L)
                 .build();
 
-        Map<CallbackParams.Params, Object> params = new HashMap<>();
+        Map<CallbackParams.Params, Object> params =  new EnumMap<>(CallbackParams.Params.class);
         params.put(BEARER_TOKEN, "testBearerToken");
 
         CallbackParams callbackParams = CallbackParams.builder()
@@ -237,7 +237,7 @@ class PopulateRespondent1CopyTest {
                 .ccdCaseReference(1234L)
                 .build();
 
-        Map<CallbackParams.Params, Object> params = new HashMap<>();
+        Map<CallbackParams.Params, Object> params =  new EnumMap<>(CallbackParams.Params.class);
         params.put(BEARER_TOKEN, "testBearerToken");
 
         CallbackParams callbackParams = CallbackParams.builder()

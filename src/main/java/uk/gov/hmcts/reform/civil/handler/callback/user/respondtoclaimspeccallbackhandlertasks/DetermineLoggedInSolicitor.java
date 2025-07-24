@@ -45,21 +45,20 @@ public class DetermineLoggedInSolicitor implements CaseTask {
     }
 
     private void updateSolicitorRoles(CallbackParams callbackParams, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
-        var caseData = callbackParams.getCaseData();
-        log.info("Updating solicitor roles for caseId: {}", caseData.getCcdCaseReference());
+        log.info("Updating solicitor roles for caseId: {}", callbackParams.getCaseData().getCcdCaseReference());
 
         if (solicitorHasCaseRole(callbackParams, RESPONDENTSOLICITORONE)) {
-            log.debug("Solicitor has RESPONDENTSOLICITORONE role for caseId: {}", caseData.getCcdCaseReference());
+            log.debug("Solicitor has RESPONDENTSOLICITORONE role for caseId: {}", callbackParams.getCaseData().getCcdCaseReference());
             updatedCaseData.isRespondent1(YES);
             updatedCaseData.isRespondent2(NO);
             updatedCaseData.isApplicant1(NO);
         } else if (solicitorHasCaseRole(callbackParams, RESPONDENTSOLICITORTWO)) {
-            log.debug("Solicitor has RESPONDENTSOLICITORTWO role for caseId: {}", caseData.getCcdCaseReference());
+            log.debug("Solicitor has RESPONDENTSOLICITORTWO role for caseId: {}", callbackParams.getCaseData().getCcdCaseReference());
             updatedCaseData.isRespondent1(NO);
             updatedCaseData.isRespondent2(YES);
             updatedCaseData.isApplicant1(NO);
         } else if (solicitorHasCaseRole(callbackParams, APPLICANTSOLICITORONE)) {
-            log.debug("Solicitor has APPLICANTSOLICITORONE role for caseId: {}", caseData.getCcdCaseReference());
+            log.debug("Solicitor has APPLICANTSOLICITORONE role for caseId: {}", callbackParams.getCaseData().getCcdCaseReference());
             updatedCaseData.isRespondent1(NO);
             updatedCaseData.isRespondent2(NO);
             updatedCaseData.isApplicant1(YES);

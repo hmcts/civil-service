@@ -115,8 +115,11 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 import static java.lang.String.format;
+import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.InstanceOfAssertFactories.list;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -179,8 +182,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     private PaymentDateValidator validator;
     @MockBean
     private UnavailableDateValidator dateValidator;
-    @Autowired
-    private ExitSurveyContentService exitSurveyContentService;
     @MockBean
     private FeatureToggleService toggleService;
     @MockBean
@@ -195,14 +196,10 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     private StateFlow mockedStateFlow;
     @MockBean
     private SimpleStateFlowEngine stateFlowEngine;
-    @MockBean
-    private SimpleStateFlowBuilder simpleStateFlowBuilder;
     @Mock
     private DateOfBirthValidator dateOfBirthValidator;
     @MockBean
     private LocationReferenceDataService locationRefDataService;
-    @Autowired
-    private AssignCategoryId assignCategoryId;
     @MockBean
     private CourtLocationUtils courtLocationUtils;
     @MockBean
@@ -213,8 +210,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     private DQResponseDocumentUtils dqResponseDocumentUtils;
     @MockBean
     private InterestCalculator interestCalculator;
-    @Autowired
-    private FrcDocumentsUtils frcDocumentsUtils;
 
     @Spy
     private List<RespondToClaimConfirmationTextSpecGenerator> confirmationTextGenerators = List.of(
@@ -236,7 +231,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     );
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         ReflectionTestUtils.setField(handler, "objectMapper", new ObjectMapper()
                 .registerModule(new JavaTimeModule())
                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS));
@@ -334,7 +329,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
-        var objectMapper = new ObjectMapper();
         objectMapper.findAndRegisterModules();
         objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
@@ -520,10 +514,10 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         //Then
         var actualCaseData = getCaseData(response);
 
-        assertThat(actualCaseData.getDefendantResponseDocuments().size()).isEqualTo(2);
+        assertThat(actualCaseData.getDefendantResponseDocuments()).hasSize(2);
         assertThat(actualCaseData.getDefendantResponseDocuments().get(0).getValue().getDocumentName()).isEqualTo("doc-1");
         assertThat(actualCaseData.getDefendantResponseDocuments().get(1).getValue().getDocumentName()).isEqualTo("doc-2");
-        assertThat(actualCaseData.getRespondent2DQ().getRespondent2DQDraftDirections()).isEqualTo(null);
+        assertThat(actualCaseData.getRespondent2DQ().getRespondent2DQDraftDirections()).isNull();
 
         verify(dqResponseDocumentUtils, times(1)).buildDefendantResponseDocuments(any(CaseData.class));
     }
@@ -578,10 +572,10 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         //Then
         var actualCaseData = getCaseData(response);
 
-        assertThat(actualCaseData.getDefendantResponseDocuments().size()).isEqualTo(1);
+        assertThat(actualCaseData.getDefendantResponseDocuments()).hasSize(1);
         assertThat(actualCaseData.getDefendantResponseDocuments().get(0).getValue().getDocumentName()).isEqualTo(
                 "doc-name");
-        assertThat(actualCaseData.getRespondent1DQ().getRespondent1DQDraftDirections()).isEqualTo(null);
+        assertThat(actualCaseData.getRespondent1DQ().getRespondent1DQDraftDirections()).isNull();
 
         verify(dqResponseDocumentUtils, times(1)).buildDefendantResponseDocuments(any(CaseData.class));
     }
@@ -787,7 +781,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
         // Given
-        assertThat(response.getData().get("respondent2DocumentGeneration")).isEqualTo("userRespondent2");
+        assertThat(response.getData()).containsEntry("respondent2DocumentGeneration", "userRespondent2");
     }
 
     @Test
@@ -866,7 +860,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     class DefendAllOfClaimTests {
 
         @Test
-        public void testNotSpecDefendantResponse() {
+        void testNotSpecDefendantResponse() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             CallbackParams params = callbackParamsOf(caseData, MID, "track");
@@ -883,7 +877,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        public void testSpecDefendantResponseValidationError() {
+        void testSpecDefendantResponseValidationError() {
             // Given
             CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefenceFastTrack()
@@ -904,7 +898,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        public void testSpecDefendantResponseFastTrack() {
+        void testSpecDefendantResponseFastTrack() {
             // Given
             CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefenceFastTrack()
@@ -920,7 +914,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getErrors()).isNull();
 
             assertThat(response.getData()).isNotNull();
-            assertThat(response.getData().get("responseClaimTrack")).isEqualTo(AllocatedTrack.FAST_CLAIM.name());
+            assertThat(response.getData()).containsEntry("responseClaimTrack", AllocatedTrack.FAST_CLAIM.name());
             // need to be non-null to ensure previous data is cleaned
             assertThat(response.getData().get("respondent1ClaimResponsePaymentAdmissionForSpec"))
                     .isNotNull();
@@ -1021,7 +1015,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        public void testSpecDefendantResponseFastTrackDefendantPaid() {
+        void testSpecDefendantResponseFastTrackDefendantPaid() {
             // Given
             CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefenceFastTrack()
@@ -1047,13 +1041,13 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getErrors()).isNull();
 
             assertThat(response.getData()).isNotNull();
-            assertThat(response.getData().get("responseClaimTrack")).isEqualTo(AllocatedTrack.FAST_CLAIM.name());
-            assertThat(response.getData().get("respondent1ClaimResponsePaymentAdmissionForSpec"))
-                    .isEqualTo(RespondentResponseTypeSpecPaidStatus.PAID_FULL_OR_MORE_THAN_CLAIMED_AMOUNT.name());
+            assertThat(response.getData()).containsEntry("responseClaimTrack", AllocatedTrack.FAST_CLAIM.name());
+            assertThat(response.getData())
+                    .containsEntry("respondent1ClaimResponsePaymentAdmissionForSpec", RespondentResponseTypeSpecPaidStatus.PAID_FULL_OR_MORE_THAN_CLAIMED_AMOUNT.name());
         }
 
         @Test
-        public void testSpecDefendantResponseFastTrackDefendantPaidLessThanClaimed() {
+        void testSpecDefendantResponseFastTrackDefendantPaidLessThanClaimed() {
             // Given
             CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefenceFastTrack()
@@ -1080,9 +1074,9 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getErrors()).isNull();
 
             assertThat(response.getData()).isNotNull();
-            assertThat(response.getData().get("responseClaimTrack")).isEqualTo(AllocatedTrack.FAST_CLAIM.name());
-            assertThat(response.getData().get("respondent1ClaimResponsePaymentAdmissionForSpec"))
-                    .isEqualTo(RespondentResponseTypeSpecPaidStatus.PAID_LESS_THAN_CLAIMED_AMOUNT.name());
+            assertThat(response.getData()).containsEntry("responseClaimTrack", AllocatedTrack.FAST_CLAIM.name());
+            assertThat(response.getData())
+                    .containsEntry("respondent1ClaimResponsePaymentAdmissionForSpec", RespondentResponseTypeSpecPaidStatus.PAID_LESS_THAN_CLAIMED_AMOUNT.name());
         }
     }
 
@@ -1090,7 +1084,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     class MidSpecHandleResponseType {
 
         @Test
-        public void testHandleRespondentResponseTypeForSpec() {
+        void testHandleRespondentResponseTypeForSpec() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                     .respondent1ClaimResponseTypeForSpec(FULL_ADMISSION).build();
@@ -1128,7 +1122,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response).isNotNull();
             assertThat(response.getErrors()).isNull();
             assertThat(response.getData()).isNotNull();
-            assertThat(response.getData()).extracting("showConditionFlags").asList()
+            assertThat(response.getData())
+                    .extracting("showConditionFlags", as(list(String.class)))
                     .contains(DefendantResponseShowTag.TIMELINE_UPLOAD.name());
         }
 
@@ -1150,7 +1145,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response).isNotNull();
             assertThat(response.getErrors()).isNull();
             assertThat(response.getData()).isNotNull();
-            assertThat(response.getData()).extracting("showConditionFlags").asList()
+            assertThat(response.getData())
+                    .extracting("showConditionFlags", as(list(String.class)))
                     .contains(DefendantResponseShowTag.TIMELINE_MANUALLY.name());
         }
     }
@@ -1159,7 +1155,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     class AdmitsPartOfTheClaimTest {
 
         @Test
-        public void testSpecDefendantResponseAdmitPartOfClaimValidationError() {
+        void testSpecDefendantResponseAdmitPartOfClaimValidationError() {
             // Given
             CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentAdmitPartOfClaimFastTrack()
@@ -1181,7 +1177,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        public void testSpecDefendantResponseAdmitPartOfClaimFastTrack() {
+        void testSpecDefendantResponseAdmitPartOfClaimFastTrack() {
             // Given
             CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentAdmitPartOfClaimFastTrack()
@@ -1198,11 +1194,11 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getErrors()).isNull();
 
             assertThat(response.getData()).isNotNull();
-            assertThat(response.getData().get("responseClaimTrack")).isEqualTo(AllocatedTrack.FAST_CLAIM.name());
+            assertThat(response.getData()).containsEntry("responseClaimTrack", AllocatedTrack.FAST_CLAIM.name());
         }
 
         @Test
-        public void testSpecDefendantResponseAdmitPartOfClaimFastTrackStillOwes() {
+        void testSpecDefendantResponseAdmitPartOfClaimFastTrackStillOwes() {
             // Given
             CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentAdmitPartOfClaimFastTrack()
@@ -1224,7 +1220,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getErrors()).isNull();
 
             assertThat(response.getData()).isNotNull();
-            assertThat(response.getData().get("responseClaimTrack")).isEqualTo(AllocatedTrack.FAST_CLAIM.name());
+            assertThat(response.getData()).containsEntry("responseClaimTrack", AllocatedTrack.FAST_CLAIM.name());
             assertEquals(0, new BigDecimal(response.getData().get("respondToAdmittedClaimOwingAmount").toString())
                     .compareTo(
                             new BigDecimal(response.getData().get("respondToAdmittedClaimOwingAmountPounds").toString())
@@ -1232,7 +1228,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        public void testSpecDefendantResponseAdmitPartOfClaimFastTrackRespondent2() {
+        void testSpecDefendantResponseAdmitPartOfClaimFastTrackRespondent2() {
             // Given
             CaseData caseData = CaseData.builder()
                     .caseAccessCategory(SPEC_CLAIM)
@@ -1268,7 +1264,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        public void shouldSetIntermediateAllocatedTrack_whenInvoked() {
+        void shouldSetIntermediateAllocatedTrack_whenInvoked() {
             // New multi and intermediate track change track logic
             // total claim amount is 100000, so track is intermediate, as this is the upper limit
             when(toggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
@@ -1284,7 +1280,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        public void shouldSetMultiAllocatedTrack_whenInvoked() {
+        void shouldSetMultiAllocatedTrack_whenInvoked() {
             // New multi and intermediate track change track logic
             // total claim amount is 100001, so track is multi
             when(toggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
@@ -1300,7 +1296,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        public void testValidateLengthOfUnemploymentWithError() {
+        void testValidateLengthOfUnemploymentWithError() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().generateYearsAndMonthsIncorrectInput().build();
             CallbackParams params = callbackParamsOf(caseData,
@@ -1321,32 +1317,23 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        public void testValidateRespondentPaymentDate() {
+        void testValidateRespondentPaymentDate() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().generatePaymentDateForAdmitPartResponse().build();
-            CallbackParams params = callbackParamsOf(caseData, MID, "validate-payment-date",
-                    "DEFENDANT_RESPONSE_SPEC"
-            );
+            CallbackParams params = callbackParamsOf(caseData, MID, "validate-payment-date", "DEFENDANT_RESPONSE_SPEC");
             when(validator.validate(any())).thenReturn(List.of("Validation error"));
 
             // When
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                    .handle(params);
-
-            List<String> expectedErrorArray = new ArrayList<>();
-            expectedErrorArray.add("Date for when will the amount be paid must be today or in the future.");
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             // Then
+            List<String> expectedErrorArray = List.of("Validation error");
             assertThat(response).isNotNull();
-            /*
-             * It was not possible to capture the error message generated by @FutureOrPresent in the class
-             * */
-            //assertThat(response.getErrors()).isEqualTo(expectedErrorArray);
-            assertEquals("Validation error", response.getErrors().get(0));
+            assertThat(response.getErrors()).isEqualTo(expectedErrorArray);
         }
 
         @Test
-        public void testValidateRepaymentDate() {
+        void testValidateRepaymentDate() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().generateRepaymentDateForAdmitPartResponse().build();
             CallbackParams params = callbackParamsOf(caseData, MID,
@@ -1364,7 +1351,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        public void testValidateDefendant2RepaymentDate() {
+        void testValidateDefendant2RepaymentDate() {
             CaseData caseData = CaseDataBuilder.builder().generateDefendant2RepaymentDateForAdmitPartResponse().build();
             CallbackParams params = callbackParamsOf(caseData, MID,
                     "validate-repayment-plan-2", "DEFENDANT_RESPONSE_SPEC"
@@ -1512,7 +1499,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void defendantResponseDoesNotPopulateNextDeadline1vs2DSSolicitor2Only() {
             // Given
             LocalDateTime dateTime = LocalDateTime.of(2023, 6, 6, 6, 6, 6);
-            LocalDate date = dateTime.toLocalDate();
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(time.now()).thenReturn(dateTime);
             when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
@@ -1542,7 +1528,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                     .handle(params);
 
-            var objectMapper = new ObjectMapper();
             objectMapper.findAndRegisterModules();
             objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
@@ -1555,7 +1540,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void defendantResponseDoesPopulateNextDeadline1vs2DSSolicitor2AfterSolicitor1() {
             // Given
             LocalDateTime dateTime = LocalDateTime.of(2023, 6, 6, 6, 6, 6);
-            LocalDate date = dateTime.toLocalDate();
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(time.now()).thenReturn(dateTime);
             when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
@@ -1585,7 +1569,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                     .handle(params);
 
-            var objectMapper = new ObjectMapper();
             objectMapper.findAndRegisterModules();
             objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
@@ -1598,7 +1581,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void defendantResponseDoesPopulateNextDeadline1vs2DSSolicitor1AfterSolicitor2() {
             // Given
             LocalDateTime dateTime = LocalDateTime.of(2023, 6, 6, 6, 6, 6);
-            LocalDate date = dateTime.toLocalDate();
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(time.now()).thenReturn(dateTime);
             when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
@@ -1629,7 +1611,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                     .handle(params);
 
-            var objectMapper = new ObjectMapper();
             objectMapper.findAndRegisterModules();
             objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
@@ -1642,7 +1623,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void defendantResponseDoesNotPopulateNextDeadline1vs2DSSolicitor1BeforeSolicitor2() {
             // Given
             LocalDateTime dateTime = LocalDateTime.of(2023, 6, 6, 6, 6, 6);
-            LocalDate date = dateTime.toLocalDate();
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(time.now()).thenReturn(dateTime);
             when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
@@ -1673,7 +1653,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                     .handle(params);
 
-            var objectMapper = new ObjectMapper();
             objectMapper.findAndRegisterModules();
             objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
@@ -1687,7 +1666,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void defendantResponseDoesNotPopulateNextDeadline1vs2DSSolicitor1BeforeSolicitor2ExtendedDeadline() {
             // Given
             LocalDateTime dateTime = LocalDateTime.of(2023, 6, 6, 6, 6, 6);
-            LocalDate date = dateTime.toLocalDate();
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(time.now()).thenReturn(dateTime);
             when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
@@ -1719,7 +1697,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                     .handle(params);
 
-            var objectMapper = new ObjectMapper();
             objectMapper.findAndRegisterModules();
             objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
@@ -1733,7 +1710,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void defendantResponseDoesPopulateNextDeadline1vs1Solicitor1() {
             // Given
             LocalDateTime dateTime = LocalDateTime.of(2023, 6, 6, 6, 6, 6);
-            LocalDate date = dateTime.toLocalDate();
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(time.now()).thenReturn(dateTime);
             when(mockedStateFlow.isFlagSet(any())).thenReturn(false);
@@ -1762,7 +1738,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                     .handle(params);
 
-            var objectMapper = new ObjectMapper();
             objectMapper.findAndRegisterModules();
             objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
@@ -1776,7 +1751,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Given
             when(toggleService.isWelshEnabledForMainCase()).thenReturn(true);
             LocalDateTime dateTime = LocalDateTime.of(2023, 6, 6, 6, 6, 6);
-            LocalDate date = dateTime.toLocalDate();
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(time.now()).thenReturn(dateTime);
             when(mockedStateFlow.isFlagSet(any())).thenReturn(false);
@@ -2474,8 +2448,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnNoError_whenWitnessRequiredAndDetailsProvided() {
             // Given
-            List<Element<Witness>> testWitness = wrapElements(Witness.builder().name("test witness").build());
-            Witnesses witnesses = Witnesses.builder().witnessesToAppear(YES).details(testWitness).build();
+            List<Element<Witness>> testWitness = wrapElements(Witness.builder().firstName("test witness").build());
             CaseData caseData = CaseDataBuilder.builder()
                     .respondent1DQ(Respondent1DQ.builder().build())
                     .respondent1DQWitnessesRequiredSpec(YES)
@@ -2566,9 +2539,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // When
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
-            LocalDateTime responseDeadline = caseData.getApplicant1ResponseDeadline();
-            String claimNumber = caseData.getLegacyCaseReference();
-
             // Then
             assertThat(response.getConfirmationBody())
                     .contains(caseData.getApplicant1().getPartyName())
@@ -2601,9 +2571,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             // When
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
-
-            LocalDateTime responseDeadline = caseData.getApplicant1ResponseDeadline();
-            String claimNumber = caseData.getLegacyCaseReference();
 
             // Then
             assertThat(response.getConfirmationBody())
@@ -3159,6 +3126,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             // Then
             verify(postcodeValidator).validate("postal code");
+            assertNotNull(response.getData());
         }
 
         @Test
@@ -3181,6 +3149,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             // Then
             verify(postcodeValidator).validate("postal code");
+            assertNotNull(response.getData());
         }
     }
 
@@ -3220,7 +3189,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData())
                     .extracting("respondToCourtLocation")
                     .extracting("responseCourtLocations")
-                    .extracting("list_items").asList()
+                    .extracting("list_items")
+                    .asInstanceOf(list(Object.class))
                     .extracting("label")
                     .containsExactly(locationValues.getListItems().get(0).getLabel());
             assertThat(response.getData().get("showCarmFields")).isEqualTo("Yes");
@@ -3258,7 +3228,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData())
                     .extracting("respondToCourtLocation")
                     .extracting("responseCourtLocations")
-                    .extracting("list_items").asList()
+                    .extracting("list_items")
+                    .asInstanceOf(list(Object.class))
                     .extracting("label")
                     .containsExactly(locationValues.getListItems().get(0).getLabel());
             assertThat(response.getData().get("showCarmFields")).isEqualTo("No");
@@ -3342,7 +3313,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        public void testDetermineLoggedInSolicitorForRespondentSolicitor1() {
+        void testDetermineLoggedInSolicitorForRespondentSolicitor1() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                     .build();
@@ -3364,7 +3335,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        public void testDetermineLoggedInSolicitorForRespondentSolicitor2() {
+        void testDetermineLoggedInSolicitorForRespondentSolicitor2() {
             // Given
             when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
             when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).thenReturn(false);
@@ -3388,7 +3359,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        public void testDetermineLoggedInSolicitorForApplicantSolicitor() {
+        void testDetermineLoggedInSolicitorForApplicantSolicitor() {
             // Given
             when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(false);
             when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).thenReturn(false);
@@ -3414,7 +3385,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     class MidValidateMediationUnavailabiltyDates {
 
         @Test
-        public void testValidateResp2UnavailableDateWhenAvailabilityIsNo() {
+        void testValidateResp2UnavailableDateWhenAvailabilityIsNo() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                     .addRespondent2(YES)
                     .respondent2(PartyBuilder.builder().individual().build())
@@ -3435,7 +3406,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        public void testValidateResp2UnavailableDateWhenAvailabilityIsYesAndSingleDate() {
+        void testValidateResp2UnavailableDateWhenAvailabilityIsYesAndSingleDate() {
 
             List<Element<UnavailableDate>> unAvailableDates = Stream.of(
                     UnavailableDate.builder()
@@ -3469,7 +3440,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        public void testValidateResp1UnavailableDateWhenAvailabilityIsNo() {
+        void testValidateResp1UnavailableDateWhenAvailabilityIsNo() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                     .addRespondent2(YES)
                     .respondent2(PartyBuilder.builder().individual().build())
@@ -3490,7 +3461,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        public void testValidateResp1UnavailableDateWhenAvailabilityIsYesAndSingleDate() {
+        void testValidateResp1UnavailableDateWhenAvailabilityIsYesAndSingleDate() {
 
             List<Element<UnavailableDate>> unAvailableDates = Stream.of(
                     UnavailableDate.builder()
@@ -3524,7 +3495,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        public void testValidateResp1UnavailableDateWhenAvailabilityIsYesAndSingleDateErrored() {
+        void testValidateResp1UnavailableDateWhenAvailabilityIsYesAndSingleDateErrored() {
 
             List<Element<UnavailableDate>> unAvailableDates = Stream.of(
                     UnavailableDate.builder()
@@ -3558,7 +3529,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        public void testResp1UnavailableDateWhenAvailabilityIsYesAndSingleDateIsBeyondYear() {
+        void testResp1UnavailableDateWhenAvailabilityIsYesAndSingleDateIsBeyondYear() {
 
             List<Element<UnavailableDate>> unAvailableDates = Stream.of(
                     UnavailableDate.builder()
@@ -3593,7 +3564,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        public void testResp1UnavailableDateWhenDateToIsBeforeDateFrom() {
+        void testResp1UnavailableDateWhenDateToIsBeforeDateFrom() {
 
             List<Element<UnavailableDate>> unAvailableDates = Stream.of(
                     UnavailableDate.builder()
@@ -3628,7 +3599,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        public void testResp1UnavailableDateWhenDateFromIsBeforeToday() {
+        void testResp1UnavailableDateWhenDateFromIsBeforeToday() {
 
             List<Element<UnavailableDate>> unAvailableDates = Stream.of(
                     UnavailableDate.builder()
@@ -3662,7 +3633,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        public void testResp1UnavailableDateWhenDateToIsBeforeToday() {
+        void testResp1UnavailableDateWhenDateToIsBeforeToday() {
 
             List<Element<UnavailableDate>> unAvailableDates = Stream.of(
                     UnavailableDate.builder()
@@ -3697,7 +3668,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        public void testResp1UnavailableDateWhenDateToIsBeyondOneYear() {
+        void testResp1UnavailableDateWhenDateToIsBeyondOneYear() {
 
             List<Element<UnavailableDate>> unAvailableDates = Stream.of(
                     UnavailableDate.builder()
@@ -3742,7 +3713,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        public void testValidateRespondentExpertsMultipartyResSol1() {
+        void testValidateRespondentExpertsMultipartyResSol1() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                     .addRespondent2(YES)
@@ -3765,7 +3736,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        public void testValidateRespondentExpertsMultipartyResSol2() {
+        void testValidateRespondentExpertsMultipartyResSol2() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                     .addRespondent2(YES)
@@ -3793,7 +3764,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class MidValidateUnavailableDates {
         @Test
-        public void testValidateRespondentExpertsMultiparty() {
+        void testValidateRespondentExpertsMultiparty() {
             // Given
             List<Element<UnavailableDate>> dates = Stream.of(
                     UnavailableDate.builder()
@@ -3818,7 +3789,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        public void shouldThrowError_whenValidateRespondentExpertsMultipartyWithNoUnavailableDates() {
+        void shouldThrowError_whenValidateRespondentExpertsMultipartyWithNoUnavailableDates() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                     .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM)
@@ -3841,7 +3812,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class HideHadPaidSomeAmount {
         @Test
-        public void hideHadPaidSomeAmountFOr1V1() {
+        void hideHadPaidSomeAmountFOr1V1() {
 
             // Given
             CaseData caseData =
@@ -3858,12 +3829,13 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .handle(params);
 
             // Then
-            assertThat(response.getData()).extracting("showConditionFlags").asList()
-                    .contains("WHEN_WILL_CLAIM_BE_PAID");
+            assertThat(response.getData())
+                    .extracting("showConditionFlags", as(list(String.class)))
+                    .contains(DefendantResponseShowTag.WHEN_WILL_CLAIM_BE_PAID.name());
         }
 
         @Test
-        public void hideHadPaidSomeAmountFOr1V2() {
+        void hideHadPaidSomeAmountFOr1V2() {
 
             // Given
             CaseData caseData =
@@ -3880,12 +3852,13 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .handle(params);
 
             // Then
-            assertThat(response.getData()).extracting("showConditionFlags").asList()
-                    .contains("WHEN_WILL_CLAIM_BE_PAID");
+            assertThat(response.getData())
+                    .extracting("showConditionFlags", as(list(String.class)))
+                    .contains(DefendantResponseShowTag.WHEN_WILL_CLAIM_BE_PAID.name());
         }
 
         @Test
-        public void hideHadPaidSomeAmountFOr1V2IfNOCFlagIsOff() {
+        void hideHadPaidSomeAmountFOr1V2IfNOCFlagIsOff() {
 
             // Given
             CaseData caseData =
@@ -3902,12 +3875,13 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .handle(params);
 
             // Then
-            assertThat(response.getData()).extracting("showConditionFlags").asList()
-                    .contains("SHOW_ADMITTED_AMOUNT_SCREEN");
+            assertThat(response.getData())
+                    .extracting("showConditionFlags", as(list(String.class)))
+                    .contains(DefendantResponseShowTag.SHOW_ADMITTED_AMOUNT_SCREEN.name());
         }
 
         @Test
-        public void shouldsetspecDefenceFullAdmittedRequiredFor1V1() {
+        void shouldsetspecDefenceFullAdmittedRequiredFor1V1() {
             // Given
             CaseData caseData =
                     CaseDataBuilder.builder().atStateClaimDetailsNotified().isRespondent1(YES)
@@ -3927,7 +3901,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        public void shouldsetspecDefenceFullAdmitted2RequiredFOr1V2() {
+        void shouldsetspecDefenceFullAdmitted2RequiredFOr1V2() {
 
             // Given
             CaseData caseData =

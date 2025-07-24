@@ -29,7 +29,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.Defendan
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.WHY_2_DOES_NOT_PAY_IMMEDIATELY;
 
 @ExtendWith(MockitoExtension.class)
-public class ShowConditionFlagsCaseUpdaterTest {
+class ShowConditionFlagsCaseUpdaterTest {
 
     @Mock
     private FeatureToggleService featureToggleService;

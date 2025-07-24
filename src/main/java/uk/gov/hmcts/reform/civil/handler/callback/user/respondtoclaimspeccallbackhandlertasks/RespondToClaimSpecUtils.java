@@ -54,6 +54,8 @@ public class RespondToClaimSpecUtils {
 
     static final String UNKNOWN_MP_SCENARIO = "Unknown mp scenario";
     private static final String DEF2 = "Defendant 2";
+    public static final String ADDING_ONLY_RESPONDENT_1_DISPUTES_TAG = "CaseId {}: Adding ONLY_RESPONDENT_1_DISPUTES tag";
+    public static final String ADDING_ONLY_RESPONDENT_2_DISPUTES_TAG = "CaseId {}: Adding ONLY_RESPONDENT_2_DISPUTES tag";
     private final LocationReferenceDataService locationRefDataService;
     private final UserService userService;
     private final IStateFlowEngine stateFlowEngine;
@@ -157,7 +159,7 @@ public class RespondToClaimSpecUtils {
                 && caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION)
                 || caseData.getClaimant1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION
                 || caseData.getClaimant2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
-            log.debug("CaseId {}: Adding ONLY_RESPONDENT_1_DISPUTES tag", caseData.getCcdCaseReference());
+            log.debug(ADDING_ONLY_RESPONDENT_1_DISPUTES_TAG, caseData.getCcdCaseReference());
             tags.add(ONLY_RESPONDENT_1_DISPUTES);
         }
     }
@@ -172,11 +174,11 @@ public class RespondToClaimSpecUtils {
                 log.debug("CaseId {}: Adding BOTH_RESPONDENTS_DISPUTE tag", caseData.getCcdCaseReference());
                 tags.add(DefendantResponseShowTag.BOTH_RESPONDENTS_DISPUTE);
             } else {
-                log.debug("CaseId {}: Adding ONLY_RESPONDENT_1_DISPUTES tag", caseData.getCcdCaseReference());
+                log.debug(ADDING_ONLY_RESPONDENT_1_DISPUTES_TAG, caseData.getCcdCaseReference());
                 tags.add(ONLY_RESPONDENT_1_DISPUTES);
             }
         } else if (caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
-            log.debug("CaseId {}: Adding ONLY_RESPONDENT_2_DISPUTES tag", caseData.getCcdCaseReference());
+            log.debug(ADDING_ONLY_RESPONDENT_2_DISPUTES_TAG, caseData.getCcdCaseReference());
             tags.add(DefendantResponseShowTag.ONLY_RESPONDENT_2_DISPUTES);
         }
     }
@@ -186,11 +188,11 @@ public class RespondToClaimSpecUtils {
 
         if (caseData.getShowConditionFlags().contains(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1)
                 && caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
-            log.debug("CaseId {}: Adding ONLY_RESPONDENT_1_DISPUTES tag", caseData.getCcdCaseReference());
+            log.debug(ADDING_ONLY_RESPONDENT_1_DISPUTES_TAG, caseData.getCcdCaseReference());
             tags.add(ONLY_RESPONDENT_1_DISPUTES);
         } else if (caseData.getShowConditionFlags().contains(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_2)
                 && caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
-            log.debug("CaseId {}: Adding ONLY_RESPONDENT_2_DISPUTES tag", caseData.getCcdCaseReference());
+            log.debug(ADDING_ONLY_RESPONDENT_2_DISPUTES_TAG, caseData.getCcdCaseReference());
             tags.add(DefendantResponseShowTag.ONLY_RESPONDENT_2_DISPUTES);
         }
     }

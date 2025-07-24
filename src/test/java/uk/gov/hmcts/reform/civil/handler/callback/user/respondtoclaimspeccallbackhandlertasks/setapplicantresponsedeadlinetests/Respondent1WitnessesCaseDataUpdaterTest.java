@@ -29,7 +29,7 @@ class Respondent1WitnessesCaseDataUpdaterTest {
     @BeforeEach
     void setUp() {
 
-        List<Element<Witness>> testWitness = wrapElements(Witness.builder().name("test witness").build());
+        List<Element<Witness>> testWitness = wrapElements(Witness.builder().firstName("test witness").build());
 
         caseData = CaseData.builder()
                 .respondent1DQ(Respondent1DQ.builder()
