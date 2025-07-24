@@ -136,12 +136,16 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
 
         if (nonNull(newCourtLocation)) {
             boolean isLipCase = caseData.isApplicantLiP() || caseData.isRespondent1LiP() || caseData.isRespondent2LiP();
-            if (!isLipCase) {
-                log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
-                caseDataBuilder.eaCourtLocation(YES);
+            if (featureToggleService.isWelshEnabledForMainCase()) {
+
             } else {
-                boolean isLipCaseEaCourt = isLipCaseWithProgressionEnabledAndCourtWhiteListed(caseData, newCourtLocation.getEpimmsId());
-                caseDataBuilder.eaCourtLocation(isLipCaseEaCourt ? YesOrNo.YES : YesOrNo.NO);
+                if (!isLipCase) {
+                    log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
+                    caseDataBuilder.eaCourtLocation(YES);
+                } else {
+                    boolean isLipCaseEaCourt = isLipCaseWithProgressionEnabledAndCourtWhiteListed(caseData, newCourtLocation.getEpimmsId());
+                    caseDataBuilder.eaCourtLocation(isLipCaseEaCourt ? YesOrNo.YES : YesOrNo.NO);
+                }
             }
         }
 
