@@ -94,7 +94,7 @@ public class HearingValuesService {
         String baseUrl = manageCaseBaseUrlConfiguration.getManageCaseBaseUrl();
         String hmctsServiceID = getHmctsServiceID(caseData, paymentsConfiguration);
 
-        return ServiceHearingValuesModel.builder()
+        ServiceHearingValuesModel hearingValuesModel = ServiceHearingValuesModel.builder()
             .hmctsServiceID(hmctsServiceID)
             .hmctsInternalCaseName(getHmctsInternalCaseName(caseData))
             .publicCaseName(getPublicCaseName(caseData))
@@ -128,6 +128,8 @@ public class HearingValuesService {
             .hearingChannels(getHearingChannels(authToken, hmctsServiceID, caseData, categoryService))
             .caseFlags(getCaseFlags(caseData))
             .build();
+        log.info("Returning hearing values for case id: " + caseId);
+        return hearingValuesModel;
     }
 
     private CaseData retrieveCaseData(long caseId) {
