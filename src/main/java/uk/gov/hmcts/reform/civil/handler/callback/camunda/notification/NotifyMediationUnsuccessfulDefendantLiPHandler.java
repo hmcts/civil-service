@@ -57,8 +57,7 @@ public class NotifyMediationUnsuccessfulDefendantLiPHandler extends CallbackHand
             CLAIMANT_NAME, caseData.getApplicant1().getPartyName()
         ));
         addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
         return properties;
     }
 
@@ -68,8 +67,7 @@ public class NotifyMediationUnsuccessfulDefendantLiPHandler extends CallbackHand
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString()
         ));
         addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
         return properties;
     }
 
