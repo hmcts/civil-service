@@ -444,7 +444,7 @@ wiremock:
   applicationPort: 8080
   imagePullPolicy: Always
   releaseNameOverride : ${SERVICE_NAME}-wiremock
-  verbose: true
+  verbose: false
   ingressHost: wiremock-${SERVICE_NAME}.preview.platform.hmcts.net
   volumes:
     - name: wiremock-mocks

@@ -25,7 +25,8 @@ public class JudgementService {
         + " this case will proceed offline, you will receive any further updates by post.";
     private static final String JUDGEMENT_BY_COURT_NOT_OFFLINE = "The judgment request will be processed and a County"
         + " Court Judgment (CCJ) will be issued, you will receive any further updates by email.";
-    private static final String JUDGEMENT_ORDER = "The judgment will order the defendant to pay £%s , including the claim fee and interest, if applicable, as shown:";
+    private static final String JUDGEMENT_ORDER =
+        "The judgment will order the defendant to pay £%s , including the claim fee and interest, if applicable, as shown:";
     private static final String JUDGEMENT_ORDER_V2 = "The judgment will order the defendant to pay £%s"
         + ", including the claim fee, any fixed costs if claimed and interest if applicable, as shown:";
     private final FeatureToggleService featureToggleService;
@@ -60,11 +61,7 @@ public class JudgementService {
         BigDecimal claimAmount = caseData.getTotalClaimAmount();
         if (isLrFullAdmitRepaymentPlan(caseData)
             || isLrFullAdmitPayImmediately(caseData)) {
-            BigDecimal interest = interestCalculator.calculateInterest(caseData);
-            claimAmount = claimAmount.add(interest);
-        }
-        if (isLipVLipFullAdmitSetDate(caseData) && featureToggleService.isLrAdmissionBulkEnabled()) {
-            BigDecimal interest = interestCalculator.calculateInterest(caseData);
+            BigDecimal interest = getLatestInterest(caseData);
             claimAmount = claimAmount.add(interest);
         } else {
             if (caseData.isPartAdmitClaimSpec()) {
@@ -78,9 +75,7 @@ public class JudgementService {
         if (caseData.getOutstandingFeeInPounds() != null) {
             return caseData.getOutstandingFeeInPounds();
         }
-        return caseData.isLipvLipOneVOne()
-            ? caseData.getCcjPaymentDetails().getCcjJudgmentAmountClaimFee()
-            : MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence());
+        return MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence());
     }
 
     public BigDecimal ccjJudgmentPaidAmount(CaseData caseData) {
@@ -106,14 +101,17 @@ public class JudgementService {
     }
 
     public BigDecimal ccjJudgementSubTotal(CaseData caseData) {
-        if (isLrFullAdmitRepaymentPlan(caseData) || isLRPartAdmitRepaymentPlan(caseData) || isLrPayImmediatelyPlan(caseData)) {
+        if (isLrFullAdmitRepaymentPlan(caseData)
+            || isLRPartAdmitRepaymentPlan(caseData)
+            || isLipvLipPartAdmit(caseData)
+            || isLrPayImmediatelyPlan(caseData)) {
             return (ccjJudgmentClaimAmount(caseData)
                 .add(ccjJudgmentClaimFee(caseData))
                 .add(ccjJudgmentFixedCost(caseData))).setScale(2);
         } else {
             return (ccjJudgmentClaimAmount(caseData)
                 .add(ccjJudgmentClaimFee(caseData))
-                .add((!isLipVLipFullAdmitSetDate(caseData) || !featureToggleService.isLrAdmissionBulkEnabled()) ? ccjJudgmentInterest(caseData) : ZERO)
+                .add(ccjJudgmentInterest(caseData))
                 .add(ccjJudgmentFixedCost(caseData))).setScale(2);
         }
     }
@@ -165,6 +163,16 @@ public class JudgementService {
             && isOneVOne(caseData);
     }
 
+    public boolean isLipvLip(CaseData caseData) {
+        return caseData.isApplicantLiP() && caseData.isRespondent1LiP();
+    }
+
+    public boolean isLipvLipPartAdmit(CaseData caseData) {
+        return isLipvLip(caseData)
+            && caseData.isPartAdmitClaimSpec()
+            && (caseData.isPayImmediately() || caseData.isPayByInstallment() || caseData.isPayBySetDate());
+    }
+
     public boolean isLrPayImmediatelyPlan(CaseData caseData) {
         return isLrvLrOneVOneBulkAdmissionsEnabled(caseData)
             && caseData.isPayImmediately();
@@ -179,7 +187,7 @@ public class JudgementService {
         return caseData.getCcjPaymentDetails().getCcjJudgmentFixedCostOption();
     }
 
-    public boolean isLipVLipFullAdmitSetDate(CaseData caseData) {
-        return caseData.isLipvLipOneVOne() && caseData.isPayBySetDate() && caseData.isFullAdmitClaimSpec();
+    public BigDecimal getLatestInterest(CaseData caseData) {
+        return interestCalculator.calculateInterest(caseData);
     }
 }
