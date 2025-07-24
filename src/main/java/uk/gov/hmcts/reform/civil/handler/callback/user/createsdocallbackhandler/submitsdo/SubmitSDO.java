@@ -72,8 +72,7 @@ public class SubmitSDO implements CaseTask {
     }
 
     private CaseData.CaseDataBuilder<?, ?> getSharedData(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> dataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> dataBuilder = callbackParams.getCaseData().toBuilder();
         dataBuilder.businessProcess(BusinessProcess.ready(CREATE_SDO));
         return dataBuilder;
     }

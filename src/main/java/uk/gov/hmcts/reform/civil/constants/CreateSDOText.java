@@ -7,19 +7,19 @@ public class CreateSDOText {
     public static final String UNSPEC_SERVICE_ID = "AAA7";
     public static final String CONFIRMATION_HEADER = "# Your order has been issued"
             + "%n## Claim number: %s";
-    public static final String CONFIRMATION_SUMMARY_1v1 = "<br/>The Directions Order has been sent to:"
+    public static final String CONFIRMATION_SUMMARY_1_V_1 = "<br/>The Directions Order has been sent to:"
             + "<br/>%n%n<strong>Claimant 1</strong>%n"
             + "<br/>%s"
             + "<br/>%n%n<strong>Defendant 1</strong>%n"
             + "<br/>%s";
-    public static final String CONFIRMATION_SUMMARY_2v1 = "<br/>The Directions Order has been sent to:"
+    public static final String CONFIRMATION_SUMMARY_2_V_1 = "<br/>The Directions Order has been sent to:"
             + "<br/>%n%n<strong>Claimant 1</strong>%n"
             + "<br/>%s"
             + "<br/>%n%n<strong>Claimant 2</strong>%n"
             + "<br/>%s"
             + "<br/>%n%n<strong>Defendant 1</strong>%n"
             + "<br/>%s";
-    public static final String CONFIRMATION_SUMMARY_1v2 = "<br/>The Directions Order has been sent to:"
+    public static final String CONFIRMATION_SUMMARY_1_V_2 = "<br/>The Directions Order has been sent to:"
             + "<br/>%n%n<strong>Claimant 1</strong>%n"
             + "<br/>%s"
             + "<br/>%n%n<strong>Defendant 1</strong>%n"

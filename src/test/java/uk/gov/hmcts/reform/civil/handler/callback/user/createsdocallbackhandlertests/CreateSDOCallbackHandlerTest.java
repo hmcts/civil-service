@@ -18,7 +18,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
-import uk.gov.hmcts.reform.civil.bankholidays.NonWorkingDaysCollection;
 import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
@@ -116,7 +115,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Stream;
 
 import static java.lang.String.format;
@@ -135,9 +133,9 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SDO;
 import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.CONFIRMATION_HEADER;
-import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.CONFIRMATION_SUMMARY_1v1;
-import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.CONFIRMATION_SUMMARY_1v2;
-import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.CONFIRMATION_SUMMARY_2v1;
+import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.CONFIRMATION_SUMMARY_1_V_1;
+import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.CONFIRMATION_SUMMARY_1_V_2;
+import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.CONFIRMATION_SUMMARY_2_V_1;
 import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.ERROR_MESSAGE_DATE_MUST_BE_IN_THE_FUTURE;
 import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.ERROR_MESSAGE_NUMBER_CANNOT_BE_LESS_THAN_ZERO;
 import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.ERROR_MINTI_DISPOSAL_NOT_ALLOWED;
@@ -226,9 +224,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     private CreateSDOCallbackHandler handler;
 
     @Autowired
-    private AssignCategoryId assignCategoryId;
-
-    @Autowired
     private ObjectMapper objectMapper;
 
     @MockBean
@@ -244,22 +239,13 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     private SdoGeneratorService sdoGeneratorService;
 
     @MockBean
-    private NonWorkingDaysCollection nonWorkingDaysCollection;
-
-    @MockBean
     private CategoryService categoryService;
-
-    @Mock
-    private LocationHelper locationHelper;
 
     @Mock
     private GenerateSdoOrder generateSdoOrder;
 
     @Mock
     private PrePopulateOrderDetailsPages prePopulateOrderDetailsPages;
-
-    @Mock
-    private SubmitSDO submitSDO;
 
     @Mock
     private SetOrderDetailsFlags setOrderDetailsFlags;
@@ -700,7 +686,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPopulateDefaultFieldsForNihl() {
-            List<FastTrack> fastTrackList = new ArrayList<FastTrack>();
+            List<FastTrack> fastTrackList = new ArrayList<>();
             fastTrackList.add(FastTrack.fastClaimNoiseInducedHearingLoss);
 
             String preSelectedCourt = "214320";
@@ -1103,17 +1089,14 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     class AboutToSubmitCallback {
 
         private CallbackParams params;
-        private CaseData caseData;
-        private String userId;
 
-        private static final String EMAIL = "example@email.com";
         private final LocalDateTime submittedDate = LocalDateTime.now();
 
         @BeforeEach
         void setup() {
             List<String> items = List.of("label 1", "label 2", "label 3");
             DynamicList localOptions = DynamicList.fromList(items, Object::toString, items.get(0), false);
-            caseData = CaseDataBuilder.builder().atStateClaimDraft()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                     .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
                     .build().toBuilder()
                     .disposalHearingMethodInPerson(localOptions)
@@ -1122,7 +1105,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .setFastTrackFlag(YES)
                     .build();
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            userId = UUID.randomUUID().toString();
 
             given(time.now()).willReturn(submittedDate);
 
@@ -1151,15 +1133,10 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class AboutToSubmitCallbackVariableCase {
 
-        private String userId;
-
-        private static final String EMAIL = "example@email.com";
         private final LocalDateTime submittedDate = LocalDateTime.now();
 
         @BeforeEach
         void setup() {
-            userId = UUID.randomUUID().toString();
-
             given(time.now()).willReturn(submittedDate);
             when(featureToggleService.isHmcForLipEnabled()).thenReturn(false);
         }
@@ -1192,15 +1169,10 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class AboutToSubmitCallbackWelshParty {
 
-        private String userId;
-
-        private static final String EMAIL = "example@email.com";
         private final LocalDateTime submittedDate = LocalDateTime.now();
 
         @BeforeEach
         void setup() {
-            userId = UUID.randomUUID().toString();
-
             given(time.now()).willReturn(submittedDate);
             when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         }
@@ -1340,14 +1312,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 prePopulateOrderDetailsPages,
                 new SubmitSDO(objectMapper, List.of(), featureToggleService, Optional.empty()),
                 setOrderDetailsFlags);
-
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("123456").build())
-                .build();
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
 
         verifyNoInteractions(updateWaCourtLocationsService);
     }
@@ -1732,13 +1696,12 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     class MidEventPrePopulateOrderDetailsPagesCallback extends LocationRefSampleDataBuilder {
         private LocalDate newDate;
         private LocalDate nextWorkingDayDate;
-        private LocalDateTime localDateTime;
 
         @BeforeEach
         void setup() {
             newDate = LocalDate.of(2020, 1, 15);
             nextWorkingDayDate = LocalDate.of(2023, 12, 15);
-            localDateTime = LocalDateTime.of(2020, 1, 1, 12, 0, 0);
+            LocalDateTime localDateTime = LocalDateTime.of(2020, 1, 1, 12, 0, 0);
             when(time.now()).thenReturn(localDateTime);
             when(workingDayIndicator.getNextWorkingDay(any(LocalDate.class))).thenReturn(nextWorkingDayDate);
             when(deadlinesCalculator.plusWorkingDays(any(LocalDate.class), anyInt())).thenReturn(newDate);
@@ -1957,13 +1920,14 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .isEqualTo("The claimant must prepare a Scott Schedule of the defects, items of damage, "
                             + "or any other relevant matters");
             assertThat(response.getData()).extracting("fastTrackBuildingDispute").extracting("input2")
-                    .isEqualTo("The columns should be headed:\n"
-                            + "  •  Item\n"
-                            + "  •  Alleged defect\n"
-                            + "  •  Claimant’s costing\n"
-                            + "  •  Defendant’s response\n"
-                            + "  •  Defendant’s costing\n"
-                            + "  •  Reserved for Judge’s use");
+                    .isEqualTo("""
+                            The columns should be headed:
+                              •  Item
+                              •  Alleged defect
+                              •  Claimant’s costing
+                              •  Defendant’s response
+                              •  Defendant’s costing
+                              •  Reserved for Judge’s use""");
             assertThat(response.getData()).extracting("fastTrackBuildingDispute").extracting("input3")
                     .isEqualTo("The claimant must upload to the Digital Portal the Scott Schedule with the relevant columns"
                             + " completed by 4pm on");
@@ -1992,23 +1956,26 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                             + "to the pages in that bundle.");
 
             assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting("input1")
-                    .isEqualTo("If impecuniosity is alleged by the claimant and not admitted by the defendant, the "
-                            + "claimant's disclosure as ordered earlier in this Order must include:\n"
-                            + "a) Evidence of all income from all sources for a period of 3 months prior to the "
-                            + "commencement of hire until the earlier of:\n "
-                            + "     i) 3 months after cessation of hire\n"
-                            + "     ii) the repair or replacement of the claimant's vehicle\n"
-                            + "b) Copies of all bank, credit card, and saving account statements for a period of 3"
-                            + " months prior to the commencement of hire until the earlier of:\n"
-                            + "     i) 3 months after cessation of hire\n"
-                            + "     ii) the repair or replacement of the claimant's vehicle\n"
-                            + "c) Evidence of any loan, overdraft or other credit facilities available to the "
-                            + "claimant.");
+                    .isEqualTo("""
+                            If impecuniosity is alleged by the claimant and not admitted by the defendant, the \
+                            claimant's disclosure as ordered earlier in this Order must include:
+                            a) Evidence of all income from all sources for a period of 3 months prior to the \
+                            commencement of hire until the earlier of:
+                             \
+                                 i) 3 months after cessation of hire
+                                 ii) the repair or replacement of the claimant's vehicle
+                            b) Copies of all bank, credit card, and saving account statements for a period of 3\
+                             months prior to the commencement of hire until the earlier of:
+                                 i) 3 months after cessation of hire
+                                 ii) the repair or replacement of the claimant's vehicle
+                            c) Evidence of any loan, overdraft or other credit facilities available to the \
+                            claimant.""");
             assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting(
                             "sdoR2FastTrackCreditHireDetails").extracting("input2")
-                    .isEqualTo("The claimant must upload to the Digital Portal a witness statement addressing\n"
-                            + "a) the need to hire a replacement vehicle; and\n"
-                            + "b) impecuniosity");
+                    .isEqualTo("""
+                            The claimant must upload to the Digital Portal a witness statement addressing
+                            a) the need to hire a replacement vehicle; and
+                            b) impecuniosity""");
             assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting(
                             "sdoR2FastTrackCreditHireDetails").extracting("date1")
                     .isEqualTo(nextWorkingDayDate.toString());
@@ -2046,11 +2013,12 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("fastTrackHousingDisrepair").extracting("input1")
                     .isEqualTo("The claimant must prepare a Scott Schedule of the items in disrepair.");
             assertThat(response.getData()).extracting("fastTrackHousingDisrepair").extracting("input2")
-                    .isEqualTo("The columns should be headed:\n"
-                            + "  •  Item\n"
-                            + "  •  Alleged disrepair\n"
-                            + "  •  Defendant’s response\n"
-                            + "  •  Reserved for Judge’s use");
+                    .isEqualTo("""
+                            The columns should be headed:
+                              •  Item
+                              •  Alleged disrepair
+                              •  Defendant’s response
+                              •  Reserved for Judge’s use""");
             assertThat(response.getData()).extracting("fastTrackHousingDisrepair").extracting("input3")
                     .isEqualTo("The claimant must upload to the Digital Portal the Scott Schedule with the relevant "
                             + "columns completed by 4pm on");
@@ -2127,22 +2095,25 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).doesNotHaveToString("smallClaimsFlightDelay");
 
             assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("input1")
-                    .isEqualTo("If impecuniosity is alleged by the claimant and not admitted by the defendant, the "
-                            + "claimant's disclosure as ordered earlier in this Order must include:\n"
-                            + "a) Evidence of all income from all sources for a period of 3 months prior to the "
-                            + "commencement of hire until the earlier of:\n "
-                            + "     i) 3 months after cessation of hire\n"
-                            + "     ii) the repair or replacement of the claimant's vehicle\n"
-                            + "b) Copies of all bank, credit card, and saving account statements for a period of 3"
-                            + " months prior to the commencement of hire until the earlier of:\n"
-                            + "     i) 3 months after cessation of hire\n"
-                            + "     ii) the repair or replacement of the claimant's vehicle\n"
-                            + "c) Evidence of any loan, overdraft or other credit facilities available to the "
-                            + "claimant.");
+                    .isEqualTo("""
+                            If impecuniosity is alleged by the claimant and not admitted by the defendant, the \
+                            claimant's disclosure as ordered earlier in this Order must include:
+                            a) Evidence of all income from all sources for a period of 3 months prior to the \
+                            commencement of hire until the earlier of:
+                             \
+                                 i) 3 months after cessation of hire
+                                 ii) the repair or replacement of the claimant's vehicle
+                            b) Copies of all bank, credit card, and saving account statements for a period of 3\
+                             months prior to the commencement of hire until the earlier of:
+                                 i) 3 months after cessation of hire
+                                 ii) the repair or replacement of the claimant's vehicle
+                            c) Evidence of any loan, overdraft or other credit facilities available to the \
+                            claimant.""");
             assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("input2")
-                    .isEqualTo("The claimant must upload to the Digital Portal a witness statement addressing\n"
-                            + "a) the need to hire a replacement vehicle; and\n"
-                            + "b) impecuniosity");
+                    .isEqualTo("""
+                            The claimant must upload to the Digital Portal a witness statement addressing
+                            a) the need to hire a replacement vehicle; and
+                            b) impecuniosity""");
             assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("date1")
                     .isEqualTo(nextWorkingDayDate.toString());
             assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("input3")
@@ -2254,18 +2225,20 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData()).extracting("smallClaimsFlightDelay").extracting("relatedClaimsInput")
-                    .isEqualTo("In the event that the Claimant(s) or Defendant(s) are aware if other \n"
-                            + "claims relating to the same flight they must notify the court \n"
-                            + "where the claim is being managed within 14 days of receipt of \n"
-                            + "this Order providing all relevant details of those claims including \n"
-                            + "case number(s), hearing date(s) and copy final substantive order(s) \n"
-                            + "if any, to assist the Court with ongoing case management which may \n"
-                            + "include the cases being heard together.");
+                    .isEqualTo("""
+                            In the event that the Claimant(s) or Defendant(s) are aware if other\s
+                            claims relating to the same flight they must notify the court\s
+                            where the claim is being managed within 14 days of receipt of\s
+                            this Order providing all relevant details of those claims including\s
+                            case number(s), hearing date(s) and copy final substantive order(s)\s
+                            if any, to assist the Court with ongoing case management which may\s
+                            include the cases being heard together.""");
             assertThat(response.getData()).extracting("smallClaimsFlightDelay").extracting("legalDocumentsInput")
-                    .isEqualTo("Any arguments as to the law to be applied to this claim, together with \n"
-                            + "copies of legal authorities or precedents relied on, shall be uploaded \n"
-                            + "to the Digital Portal not later than 3 full working days before the \n"
-                            + "final hearing date.");
+                    .isEqualTo("""
+                            Any arguments as to the law to be applied to this claim, together with\s
+                            copies of legal authorities or precedents relied on, shall be uploaded\s
+                            to the Digital Portal not later than 3 full working days before the\s
+                            final hearing date.""");
 
         }
 
@@ -2756,7 +2729,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void fastTRackSdoR2NihlPathTwo() {
 
-            List<FastTrack> fastTrackList = new ArrayList<FastTrack>();
+            List<FastTrack> fastTrackList = new ArrayList<>();
             fastTrackList.add(FastTrack.fastClaimBuildingDispute);
             fastTrackList.add(FastTrack.fastClaimNoiseInducedHearingLoss);
 
@@ -2782,7 +2755,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void fastTrackFlagSetToYesNihlPathOne() {
-            List<FastTrack> fastTrackList = new ArrayList<FastTrack>();
+            List<FastTrack> fastTrackList = new ArrayList<>();
             fastTrackList.add(FastTrack.fastClaimBuildingDispute);
             fastTrackList.add(FastTrack.fastClaimNoiseInducedHearingLoss);
 
@@ -2992,7 +2965,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldGenerateAndSaveSdoOrder_whenNihl() {
-            List<FastTrack> fastTrackList = new ArrayList<FastTrack>();
+            List<FastTrack> fastTrackList = new ArrayList<>();
             fastTrackList.add(FastTrack.fastClaimNoiseInducedHearingLoss);
             CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimDraft()
@@ -3018,7 +2991,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         @ParameterizedTest
         @ValueSource(booleans = {true, false})
         void shouldValidateFieldsForNihl(boolean valid) {
-            List<FastTrack> fastTrackList = new ArrayList<FastTrack>();
+            List<FastTrack> fastTrackList = new ArrayList<>();
             fastTrackList.add(FastTrack.fastClaimNoiseInducedHearingLoss);
 
             LocalDate testDate = valid ? LocalDate.now().plusDays(1) : LocalDate.now();
@@ -3110,7 +3083,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             );
 
             String body = format(
-                    CONFIRMATION_SUMMARY_1v1,
+                    CONFIRMATION_SUMMARY_1_V_1,
                     "Mr. John Rambo",
                     "Mr. Sole Trader"
             ) + format(FEEDBACK_LINK, "Feedback: Please provide judicial feedback");
@@ -3137,7 +3110,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             );
 
             String body = format(
-                    CONFIRMATION_SUMMARY_1v2,
+                    CONFIRMATION_SUMMARY_1_V_2,
                     "Mr. John Rambo",
                     "Mr. Sole Trader",
                     "Mr. John Rambo"
@@ -3165,7 +3138,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             );
 
             String body = format(
-                    CONFIRMATION_SUMMARY_2v1,
+                    CONFIRMATION_SUMMARY_2_V_1,
                     "Mr. John Rambo",
                     "Mr. Jason Rambo",
                     "Mr. Sole Trader"

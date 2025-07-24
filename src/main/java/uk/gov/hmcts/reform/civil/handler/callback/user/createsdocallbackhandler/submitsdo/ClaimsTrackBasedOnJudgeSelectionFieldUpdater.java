@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.createsdocallbackhandler
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
@@ -15,8 +14,7 @@ public class ClaimsTrackBasedOnJudgeSelectionFieldUpdater implements SdoCaseData
 
     @Override
     public void update(CaseData caseData, CaseData.CaseDataBuilder<?, ?> dataBuilder) {
-        CaseCategory caseAccessCategory = caseData.getCaseAccessCategory();
-        switch (caseAccessCategory) {
+        switch (caseData.getCaseAccessCategory()) {
             case UNSPEC_CLAIM:
                 if (SdoHelper.isSmallClaimsTrack(caseData)) {
                     log.debug("Setting allocated track to SMALL_CLAIM for caseId: {}", caseData.getCcdCaseReference());

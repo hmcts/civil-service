@@ -31,9 +31,9 @@ import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.CONFIRMATION_HEADER;
-import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.CONFIRMATION_SUMMARY_1v1;
-import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.CONFIRMATION_SUMMARY_1v2;
-import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.CONFIRMATION_SUMMARY_2v1;
+import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.CONFIRMATION_SUMMARY_1_V_1;
+import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.CONFIRMATION_SUMMARY_1_V_2;
+import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.CONFIRMATION_SUMMARY_2_V_1;
 import static uk.gov.hmcts.reform.civil.constants.CreateSDOText.FEEDBACK_LINK;
 
 @SpringBootTest(classes = {
@@ -81,7 +81,7 @@ class CreateSDOSubmittedCallbackTest extends BaseCallbackHandlerTest {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
         CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
         SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
-        SubmittedCallbackResponse expected = generateExpectedResponse(CONFIRMATION_SUMMARY_1v1, "Mr. John Rambo", "Mr. Sole Trader");
+        SubmittedCallbackResponse expected = generateExpectedResponse(CONFIRMATION_SUMMARY_1_V_1, "Mr. John Rambo", "Mr. Sole Trader");
         assertThat(response).usingRecursiveComparison().isEqualTo(expected);
     }
 
@@ -90,7 +90,7 @@ class CreateSDOSubmittedCallbackTest extends BaseCallbackHandlerTest {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().multiPartyClaimTwoDefendantSolicitors().build();
         CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
         SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
-        SubmittedCallbackResponse expected = generateExpectedResponse(CONFIRMATION_SUMMARY_1v2, "Mr. John Rambo", "Mr. Sole Trader", "Mr. John Rambo");
+        SubmittedCallbackResponse expected = generateExpectedResponse(CONFIRMATION_SUMMARY_1_V_2, "Mr. John Rambo", "Mr. Sole Trader", "Mr. John Rambo");
         assertThat(response).usingRecursiveComparison().isEqualTo(expected);
     }
 
@@ -99,7 +99,7 @@ class CreateSDOSubmittedCallbackTest extends BaseCallbackHandlerTest {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().multiPartyClaimTwoApplicants().build();
         CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
         SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
-        SubmittedCallbackResponse expected = generateExpectedResponse(CONFIRMATION_SUMMARY_2v1, "Mr. John Rambo", "Mr. Jason Rambo", "Mr. Sole Trader");
+        SubmittedCallbackResponse expected = generateExpectedResponse(CONFIRMATION_SUMMARY_2_V_1, "Mr. John Rambo", "Mr. Jason Rambo", "Mr. Sole Trader");
         assertThat(response).usingRecursiveComparison().isEqualTo(expected);
     }
 }
