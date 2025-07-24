@@ -123,7 +123,6 @@ public class TranslatedDocumentUploadedDefendantNotificationHandlerTest {
             when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("hmctsSignature"));
             when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("phoneContact"));
             when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("openingHours"));
-            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
             when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmail"));
             //Given
