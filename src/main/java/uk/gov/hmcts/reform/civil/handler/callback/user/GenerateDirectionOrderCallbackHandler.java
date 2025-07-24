@@ -254,9 +254,11 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
 
         if (!BLANK_TEMPLATE_TO_BE_USED_AFTER_A_HEARING.equals(caseData.getFinalOrderDownloadTemplateOptions().getValue().getLabel())) {
             CaseDocument documentDownload = judgeOrderDownloadGenerator.generate(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
+            log.info("Generated template document {} for caseId {}", documentDownload, caseData.getCcdCaseReference());
             caseDataBuilder.finalOrderDownloadTemplateDocument(documentDownload);
             caseDataBuilder.showOrderAfterHearingDatePage(NO);
         } else {
+            log.info("I am in else part for case ID {}", caseData.getCcdCaseReference());
             caseDataBuilder.showOrderAfterHearingDatePage(YES);
         }
 
@@ -277,6 +279,8 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         }
 
         CaseDocument documentDownload = judgeOrderDownloadGenerator.generate(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
+        log.info("addingHearingDateToTemplate Generated template document {} for caseId {}",
+                 documentDownload, caseData.getCcdCaseReference());
         caseDataBuilder.finalOrderDownloadTemplateDocument(documentDownload);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -611,6 +615,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         log.info("FinalOrderDownloadTemplateDocument {}, getFinalOrderSelectionfor {} case {}",
                  finalDocument, caseData.getFinalOrderSelection(), caseData.getCcdCaseReference());
         if (caseData.getFinalOrderSelection() == null && finalDocument != null) {
+            log.info("I am in  If  for caseId {}", caseData.getCcdCaseReference());
             finalDocument = toCaseDocument(caseData.getUploadOrderDocumentFromTemplate(), JUDGE_FINAL_ORDER);
         }
         UserDetails userDetails = userService.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
@@ -618,21 +623,26 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         finalDocument.getDocumentLink().setCategoryID("caseManagementOrders");
         finalDocument.getDocumentLink().setDocumentFileName(getDocumentFilename(caseData, finalDocument, judgeName));
         if (caseData.getFinalOrderSelection() == null && finalDocument != null) {
+            log.info("I am here againn in  If  for caseId {}", caseData.getCcdCaseReference());
             finalDocument.setDocumentName(getDocumentFilename(caseData, finalDocument, judgeName));
         }
 
+        log.info("finalDocument {} caseId {}", finalDocument, caseData.getCcdCaseReference());
         List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
         finalCaseDocuments.add(element(finalDocument));
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         if (featureToggleService.isWelshEnabledForMainCase()
                 && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
+            log.info("featureToggleService.isWelshEnabledForMainCas in  If  for caseId {}", caseData.getCcdCaseReference());
             List<Element<CaseDocument>> preTranslationDocuments = caseData.getPreTranslationDocuments();
             preTranslationDocuments.addAll(finalCaseDocuments);
             caseDataBuilder.preTranslationDocuments(preTranslationDocuments);
             caseDataBuilder.bilingualHint(YesOrNo.YES);
             // Do not trigger business process when document is hidden
         } else {
+            log.info("Else featureToggleService.isWelshEnabledForMainCas in  If  for caseId {}", caseData.getCcdCaseReference());
             if (!isEmpty(caseData.getFinalOrderDocumentCollection())) {
+                log.info("Else  isEmpty featureToggleService.isWelshEnabledForMainCas in  If  for caseId {}", caseData.getCcdCaseReference());
                 finalCaseDocuments.addAll(caseData.getFinalOrderDocumentCollection());
             }
             caseDataBuilder.finalOrderDocumentCollection(finalCaseDocuments);
