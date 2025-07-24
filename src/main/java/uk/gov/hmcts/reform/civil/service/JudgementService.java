@@ -62,10 +62,6 @@ public class JudgementService {
             || isLrFullAdmitPayImmediately(caseData)) {
             BigDecimal interest = interestCalculator.calculateInterest(caseData);
             claimAmount = claimAmount.add(interest);
-        }
-        if (isLipVLipFullAdmitSetDate(caseData) && featureToggleService.isJudgmentOnlineLive()) {
-            BigDecimal interest = interestCalculator.calculateInterest(caseData);
-            claimAmount = claimAmount.add(interest);
         } else {
             if (caseData.isPartAdmitClaimSpec()) {
                 claimAmount = caseData.getRespondToAdmittedClaimOwingAmountPounds();
