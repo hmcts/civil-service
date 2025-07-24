@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.DirectionsQuestionnaireForm;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.Witnesses;
+import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.Representative;
 import uk.gov.hmcts.reform.civil.model.dq.DQ;
 import uk.gov.hmcts.reform.civil.model.dq.FurtherInformation;
 import uk.gov.hmcts.reform.civil.model.dq.FutureApplications;
@@ -150,6 +151,8 @@ public class DQGeneratorFormBuilder {
             .disclosureReport(shouldDisplayDisclosureReport(caseData) ? dq.getDisclosureReport() : null)
             .vulnerabilityQuestions(dq.getVulnerabilityQuestions())
             .requestedCourt(respondentTemplateForDQGenerator.getRequestedCourt(dq, authorisation));
+
+        setRepresentativeOrganisationName(builder, caseData);
         return builder;
     }
 
@@ -289,6 +292,30 @@ public class DQGeneratorFormBuilder {
                 return caseData.getRespondent1DQ();
             }
         }
+    }
+
+    private void setRepresentativeOrganisationName(DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder builder,
+                                                   CaseData caseData) {
+        String businessProcess = Optional.ofNullable(caseData.getBusinessProcess())
+            .map(BusinessProcess::getCamundaEvent)
+            .orElse(null);
+
+        if (StringUtils.equalsAny(businessProcess, "CLAIMANT_RESPONSE", "CLAIMANT_RESPONSE_SPEC")) {
+            setOrgNameFromParties(builder, builder.build().getApplicants());
+        } else if (StringUtils.equalsAny(businessProcess, "DEFENDANT_RESPONSE", "DEFENDANT_RESPONSE_SPEC")) {
+            setOrgNameFromParties(builder, builder.build().getRespondents());
+        }
+    }
+
+    private void setOrgNameFromParties(DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder builder,
+                                       List<Party> parties) {
+        Optional.ofNullable(parties)
+            .filter(p -> !p.isEmpty())
+            .map(p -> p.get(0))
+            .map(Party::getRepresentative)
+            .map(Representative::getOrganisationName)
+            .filter(StringUtils::isNotBlank)
+            .ifPresent(builder::representativeOrganisationName);
     }
 
     private int countWitnessesIncludingDefendant(Witnesses witnesses, CaseData caseData) {
