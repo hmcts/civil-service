@@ -1759,7 +1759,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                 .finalOrderDocumentCollection(new ArrayList<>())
-                .finalOrderDocument(finalOrder)
+                .finalOrderDownloadTemplateDocument(finalOrder)
                 .finalOrderFurtherHearingToggle(List.of(FinalOrderToggle.SHOW))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -1788,7 +1788,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                 .finalOrderDocumentCollection(finalCaseDocuments)
-                .finalOrderDocument(finalOrder)
+                .finalOrderDownloadTemplateDocument(finalOrder)
                 .finalOrderFurtherHearingToggle(List.of(FinalOrderToggle.SHOW))
                 .build();
             caseData = caseData.toBuilder().claimantBilingualLanguagePreference("BOTH").build();
@@ -1819,7 +1819,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                 .finalOrderDocumentCollection(finalCaseDocuments)
-                .finalOrderDocument(finalOrder)
+                .finalOrderDownloadTemplateDocument(finalOrder)
                 .finalOrderFurtherHearingToggle(List.of(FinalOrderToggle.SHOW))
                 .build();
             caseData = caseData.toBuilder().claimantBilingualLanguagePreference("BOTH").build();
@@ -1849,7 +1849,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                 .finalOrderDocumentCollection(finalCaseDocuments)
-                .finalOrderDocument(finalOrder)
+                .finalOrderDownloadTemplateDocument(finalOrder)
                 .finalOrderFurtherHearingToggle(List.of(FinalOrderToggle.SHOW))
                 .build();
             caseData = caseData.toBuilder().caseDataLiP(CaseDataLiP.builder()
@@ -1885,6 +1885,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                                                                   .build()).build())
                 .finalOrderDocumentCollection(finalCaseDocuments)
                 .uploadOrderDocumentFromTemplate(uploadedDocument)
+                .finalOrderDownloadTemplateDocument(finalOrder)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             // When
@@ -1914,6 +1915,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                                                                   .label(BLANK_TEMPLATE_BEFORE_HEARING.getLabel())
                                                                   .build()).build())
                 .finalOrderDocumentCollection(finalCaseDocuments)
+                .finalOrderDownloadTemplateDocument(finalOrder)
                 .uploadOrderDocumentFromTemplate(uploadedDocument)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -1941,7 +1943,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
                 .finalOrderDocumentCollection(finalCaseDocuments)
-                .finalOrderDocument(finalOrder)
+                .finalOrderDownloadTemplateDocument(finalOrder)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             // When
@@ -1963,7 +1965,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                 .finalOrderFurtherHearingToggle(null)
                 .finalOrderDocumentCollection(finalCaseDocuments)
-                .finalOrderDocument(finalOrder)
+                .finalOrderDownloadTemplateDocument(finalOrder)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             // When
@@ -1987,7 +1989,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                 .finalOrderFurtherHearingToggle(toggle)
                 .finalOrderDocumentCollection(finalCaseDocuments)
-                .finalOrderDocument(finalOrder)
+                .finalOrderDownloadTemplateDocument(finalOrder)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             // When
@@ -2008,7 +2010,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                 .finalOrderFurtherHearingToggle(toggle)
-                .finalOrderDocument(finalOrder)
+                .finalOrderDownloadTemplateDocument(finalOrder)
                 .finalOrderFurtherHearingComplex(FinalOrderFurtherHearing.builder()
                                                      .hearingNotesText("test text hearing notes assisted order").build())
                 .build();
@@ -2031,7 +2033,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
                 .freeFormHearingNotes("test text hearing notes free form order")
-                .finalOrderDocument(finalOrder)
+                .finalOrderDownloadTemplateDocument(finalOrder)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             // When
@@ -2052,7 +2054,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                 .finalOrderFurtherHearingToggle(toggle)
-                .finalOrderDocument(finalOrder)
+                .finalOrderDownloadTemplateDocument(finalOrder)
                 .hearingNotes(HearingNotes.builder().notes("preexisting hearing notes").build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -2075,7 +2077,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
                 .finalOrderFurtherHearingToggle(toggle)
                 .hearingNotes(HearingNotes.builder().notes("preexisting hearing notes").build())
-                .finalOrderDocument(finalOrder)
+                .finalOrderDownloadTemplateDocument(finalOrder)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             // When
@@ -2097,7 +2099,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
                 .finalOrderFurtherHearingToggle(toggle)
                 .hearingNotes(HearingNotes.builder().notes("preexisting hearing notes").build())
-                .finalOrderDocument(finalOrder)
+                .finalOrderDownloadTemplateDocument(finalOrder)
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                 .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
                 .finalOrderAllocateToTrack(YES)
@@ -2124,7 +2126,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
                 .finalOrderFurtherHearingToggle(toggle)
                 .hearingNotes(HearingNotes.builder().notes("preexisting hearing notes").build())
-                .finalOrderDocument(finalOrder)
+                .finalOrderDownloadTemplateDocument(finalOrder)
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                 .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
                 .finalOrderAllocateToTrack(YES)
@@ -2152,7 +2154,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
                 .finalOrderFurtherHearingToggle(toggle)
                 .hearingNotes(HearingNotes.builder().notes("preexisting hearing notes").build())
-                .finalOrderDocument(finalOrder)
+                .finalOrderDownloadTemplateDocument(finalOrder)
                 .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
                 .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
                 .finalOrderAllocateToTrack(YES)
@@ -2180,7 +2182,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
                 .finalOrderFurtherHearingToggle(toggle)
                 .hearingNotes(HearingNotes.builder().notes("preexisting hearing notes").build())
-                .finalOrderDocument(finalOrder)
+                .finalOrderDownloadTemplateDocument(finalOrder)
                 .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
                 .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
                 .finalOrderAllocateToTrack(NO)
@@ -2214,7 +2216,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
                 .finalOrderFurtherHearingToggle(toggle)
                 .hearingNotes(HearingNotes.builder().notes("preexisting hearing notes").build())
-                .finalOrderDocument(finalOrder)
+                .finalOrderDownloadTemplateDocument(finalOrder)
                 .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
                 .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
                 .finalOrderAllocateToTrack(NO)
@@ -2249,7 +2251,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
                 .finalOrderFurtherHearingToggle(toggle)
                 .hearingNotes(HearingNotes.builder().notes("preexisting hearing notes").build())
-                .finalOrderDocument(finalOrder)
+                .finalOrderDownloadTemplateDocument(finalOrder)
                 .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
                 .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
                 .finalOrderAllocateToTrack(NO)
@@ -2274,7 +2276,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                 .finalOrderFurtherHearingToggle(null)
                 .finalOrderDocumentCollection(finalCaseDocuments)
-                .finalOrderDocument(finalOrder)
+                .finalOrderDownloadTemplateDocument(finalOrder)
                 .ccdState(PREPARE_FOR_HEARING_CONDUCT_HEARING)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -2297,7 +2299,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
                 .finalOrderFurtherHearingToggle(null)
                 .finalOrderDocumentCollection(finalCaseDocuments)
-                .finalOrderDocument(finalOrder)
+                .finalOrderDownloadTemplateDocument(finalOrder)
                 .ccdState(PREPARE_FOR_HEARING_CONDUCT_HEARING)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -2320,7 +2322,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                 .finalOrderFurtherHearingToggle(List.of(FinalOrderToggle.SHOW))
                 .finalOrderDocumentCollection(finalCaseDocuments)
-                .finalOrderDocument(finalOrder)
+                .finalOrderDownloadTemplateDocument(finalOrder)
                 .allocatedTrack(AllocatedTrack.MULTI_CLAIM)
                 .ccdState(PREPARE_FOR_HEARING_CONDUCT_HEARING)
                 .build();

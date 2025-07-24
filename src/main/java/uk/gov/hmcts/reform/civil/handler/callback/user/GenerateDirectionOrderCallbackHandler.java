@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -98,6 +99,7 @@ import static uk.gov.hmcts.reform.civil.model.finalorders.OrderAfterHearingDateT
 import static uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.JudgeOrderDownloadGenerator.BLANK_TEMPLATE_TO_BE_USED_AFTER_A_HEARING;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
@@ -159,7 +161,6 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     private final JudgeFinalOrderGenerator judgeFinalOrderGenerator;
     private final JudgeOrderDownloadGenerator judgeOrderDownloadGenerator;
     private final DocumentHearingLocationHelper locationHelper;
-    private String ext = "";
     private final UserService userService;
     private final WorkingDayIndicator workingDayIndicator;
     private final FeatureToggleService featureToggleService;
@@ -604,17 +605,19 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
 
     private CallbackResponse addGeneratedDocumentToCollection(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        UserDetails userDetails = userService.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
-        CaseDocument finalDocument = caseData.getFinalOrderDocument();
-
-        if (caseData.getFinalOrderSelection() == null) {
+        CaseDocument finalDocument1 = caseData.getFinalOrderDocument();
+        log.info("finalDocument1 {} for case {}", finalDocument1, caseData.getCcdCaseReference());
+        CaseDocument finalDocument = caseData.getFinalOrderDownloadTemplateDocument();
+        log.info("FinalOrderDownloadTemplateDocument {}, getFinalOrderSelectionfor {} case {}",
+                 finalDocument, caseData.getFinalOrderSelection(), caseData.getCcdCaseReference());
+        if (caseData.getFinalOrderSelection() == null && finalDocument != null) {
             finalDocument = toCaseDocument(caseData.getUploadOrderDocumentFromTemplate(), JUDGE_FINAL_ORDER);
         }
-
+        UserDetails userDetails = userService.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
         String judgeName = userDetails.getFullName();
         finalDocument.getDocumentLink().setCategoryID("caseManagementOrders");
         finalDocument.getDocumentLink().setDocumentFileName(getDocumentFilename(caseData, finalDocument, judgeName));
-        if (caseData.getFinalOrderSelection() == null) {
+        if (caseData.getFinalOrderSelection() == null && finalDocument != null) {
             finalDocument.setDocumentName(getDocumentFilename(caseData, finalDocument, judgeName));
         }
 
@@ -784,7 +787,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
 
     private String getDocumentFilename(CaseData caseData, CaseDocument document, String judgeName) {
         StringBuilder updatedFileName = new StringBuilder();
-        ext = FilenameUtils.getExtension(document.getDocumentLink().getDocumentFileName());
+        String ext = FilenameUtils.getExtension(document.getDocumentLink().getDocumentFileName());
         updatedFileName
             .append(document.getCreatedDatetime().toLocalDate().toString());
         if (caseData.getFinalOrderSelection() == null) {
