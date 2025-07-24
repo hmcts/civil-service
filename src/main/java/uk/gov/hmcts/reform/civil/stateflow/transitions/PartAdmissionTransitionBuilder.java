@@ -61,6 +61,7 @@ public class PartAdmissionTransitionBuilder extends MidTransitionBuilder {
             .moveTo(PART_ADMIT_NOT_SETTLED_NO_MEDIATION, transitions)
             .onlyWhen(isClaimantNotSettlePartAdmitClaim.and(not(agreedToMediation)).and(not(isCarmApplicableCase))
                           .and(not(isCarmApplicableLipCase))
+                          .and(not(fullDefenceProceed))
                           .and(not(takenOfflineByStaff)), transitions)
             .set((c, flags) -> {
                 flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), isRespondentResponseLangIsBilingual.test(c));
