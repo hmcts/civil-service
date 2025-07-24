@@ -83,10 +83,13 @@ public class HearingValuesService {
     private final FeatureToggleService featuretoggleService;
 
     public ServiceHearingValuesModel getValues(Long caseId, String authToken) throws Exception {
+        log.info("Getting hearing values for case id: " + caseId);
         CaseData caseData = retrieveCaseData(caseId);
         populateMissingFields(caseId, caseData);
 
+        log.info("Checking LR v LR for case id: " + caseId);
         isLrVLr(caseData);
+        log.info("Completed LR v LR check for case id: " + caseId);
 
         String baseUrl = manageCaseBaseUrlConfiguration.getManageCaseBaseUrl();
         String hmctsServiceID = getHmctsServiceID(caseData, paymentsConfiguration);
@@ -145,7 +148,9 @@ public class HearingValuesService {
     private void isLrVLr(CaseData caseData) throws IncludesLitigantInPersonException {
         if (caseData.isApplicantLiP() || caseData.isRespondent1LiP() || caseData.isRespondent2LiP()) {
             if (featuretoggleService.isHmcForLipEnabled()) {
-                isEarlyAdopter(caseData);
+                if (!featuretoggleService.isWelshEnabledForMainCase()) {
+                    isEarlyAdopter(caseData);
+                }
             } else {
                 throw new IncludesLitigantInPersonException();
             }
