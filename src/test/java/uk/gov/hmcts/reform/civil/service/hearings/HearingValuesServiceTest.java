@@ -589,7 +589,6 @@ public class HearingValuesServiceTest {
             assertDoesNotThrow(() -> hearingValuesService.getValues(caseId, "auth"));
         }
 
-
         @SneakyThrows
         @Test
         void shouldThrowErrorIfApplicantLiPPresent() {
