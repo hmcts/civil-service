@@ -1276,7 +1276,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                     .handle(params);
             // Then
-            assertThat(response.getData().get("responseClaimTrack")).isEqualTo(AllocatedTrack.INTERMEDIATE_CLAIM.name());
+            assertThat(response.getData()).containsEntry("responseClaimTrack", AllocatedTrack.INTERMEDIATE_CLAIM.name());
         }
 
         @Test
@@ -1292,7 +1292,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                     .handle(params);
             // Then
-            assertThat(response.getData().get("responseClaimTrack")).isEqualTo(AllocatedTrack.MULTI_CLAIM.name());
+            assertThat(response.getData()).containsEntry("responseClaimTrack", AllocatedTrack.MULTI_CLAIM.name());
         }
 
         @Test
@@ -3193,7 +3193,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .asInstanceOf(list(Object.class))
                     .extracting("label")
                     .containsExactly(locationValues.getListItems().get(0).getLabel());
-            assertThat(response.getData().get("showCarmFields")).isEqualTo("Yes");
+            assertThat(response.getData()).containsEntry("showCarmFields", "Yes");
         }
 
         @Test
@@ -3232,7 +3232,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .asInstanceOf(list(Object.class))
                     .extracting("label")
                     .containsExactly(locationValues.getListItems().get(0).getLabel());
-            assertThat(response.getData().get("showCarmFields")).isEqualTo("No");
+            assertThat(response.getData()).containsEntry("showCarmFields", "No");
         }
 
         @Test

@@ -32,7 +32,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @ExtendWith(MockitoExtension.class)
-class ValidateRespondentWitnessesTest {
+class ValidateRespondentWitnessesSpecTest {
 
     @InjectMocks
     private ValidateRespondentWitnessesSpec validateRespondentWitnesses;
@@ -315,6 +315,33 @@ class ValidateRespondentWitnessesTest {
         try (MockedStatic<MultiPartyScenario> mockedScenario = mockStatic(MultiPartyScenario.class)) {
             mockedScenario.when(() -> MultiPartyScenario.getMultiPartyScenario(caseData)).thenReturn(ONE_V_TWO_ONE_LEGAL_REP);
             lenient().when(respondToClaimSpecUtils.isRespondent2HasSameLegalRep(caseData)).thenReturn(true);
+            when(respondToClaimSpecUtils.isSolicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONE)).thenReturn(false);
+            when(respondToClaimSpecUtils.isSolicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)).thenReturn(false);
+
+            CallbackResponse response = validateRespondentWitnesses.execute(callbackParams);
+
+            assertThat(response).isNotNull();
+        }
+    }
+
+    @Test
+    void shouldValidateWitnessesWhenRespondent2HasDifferentResponse() {
+        Witnesses respondent2DQWitnesses = Witnesses.builder()
+                .witnessesToAppear(YES)
+                .build();
+        Respondent2DQ respondent2DQ = Respondent2DQ.builder()
+                .respondent2DQWitnesses(respondent2DQWitnesses)
+                .build();
+        caseData = CaseData.builder()
+                .respondentResponseIsSame(NO)
+                .respondent2DQ(respondent2DQ)
+                .respondent2SameLegalRepresentative(YES)
+                .build();
+
+        when(callbackParams.getCaseData()).thenReturn(caseData);
+
+        try (MockedStatic<MultiPartyScenario> mockedScenario = mockStatic(MultiPartyScenario.class)) {
+            mockedScenario.when(() -> MultiPartyScenario.getMultiPartyScenario(caseData)).thenReturn(MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP);
             when(respondToClaimSpecUtils.isSolicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONE)).thenReturn(false);
             when(respondToClaimSpecUtils.isSolicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)).thenReturn(false);
 

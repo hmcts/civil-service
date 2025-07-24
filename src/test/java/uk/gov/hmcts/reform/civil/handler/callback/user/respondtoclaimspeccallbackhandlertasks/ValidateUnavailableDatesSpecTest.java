@@ -24,7 +24,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @ExtendWith(MockitoExtension.class)
-class ValidateUnavailableDatesTest {
+class ValidateUnavailableDatesSpecTest {
 
     @InjectMocks
     private ValidateUnavailableDatesSpec validateUnavailableDates;

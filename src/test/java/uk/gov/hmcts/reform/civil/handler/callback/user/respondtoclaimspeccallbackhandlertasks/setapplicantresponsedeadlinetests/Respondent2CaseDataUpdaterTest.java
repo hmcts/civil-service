@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.RespondToClaimSpecUtils;
 import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.setapplicantresponsedeadlinespec.Respondent2CaseDataUpdater;
@@ -14,7 +15,10 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.service.Time;
 
+import java.time.LocalDateTime;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class Respondent2CaseDataUpdaterTest {
@@ -64,5 +68,24 @@ class Respondent2CaseDataUpdaterTest {
         CaseData updatedCaseData = updatedData.build();
         assertThat(updatedCaseData.getRespondent2().getPrimaryAddress().getAddressLine1()).isEqualTo("Triple street");
         assertThat(updatedCaseData.getRespondent2().getPrimaryAddress().getPostCode()).isEqualTo("Postcode");
+    }
+
+    @Test
+    void shouldUpdateRespondent2ClaimResponseTypeAndResponseDateWhenConditionsAreMet() {
+        LocalDateTime responseDate = LocalDateTime.now();
+        caseData = caseData.toBuilder()
+                .respondentResponseIsSame(YesOrNo.YES)
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                .build();
+
+        when(time.now()).thenReturn(responseDate);
+        when(respondToClaimSpecUtils.isRespondent2HasSameLegalRep(caseData)).thenReturn(true);
+
+        CaseData.CaseDataBuilder<?, ?> updatedData = CaseData.builder();
+        updater.update(caseData, updatedData);
+
+        CaseData updatedCaseData = updatedData.build();
+        assertThat(updatedCaseData.getRespondent2ClaimResponseTypeForSpec()).isEqualTo(RespondentResponseTypeSpec.FULL_DEFENCE);
+        assertThat(updatedCaseData.getRespondent2ResponseDate()).isEqualTo(responseDate);
     }
 }
