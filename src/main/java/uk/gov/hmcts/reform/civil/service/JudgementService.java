@@ -60,7 +60,7 @@ public class JudgementService {
         BigDecimal claimAmount = caseData.getTotalClaimAmount();
         if (isLrFullAdmitRepaymentPlan(caseData)
             || isLrFullAdmitPayImmediately(caseData)) {
-            BigDecimal interest = interestCalculator.calculateInterest(caseData);
+            BigDecimal interest = getLatestInterest(caseData);
             claimAmount = claimAmount.add(interest);
         } else {
             if (caseData.isPartAdmitClaimSpec()) {
@@ -175,7 +175,7 @@ public class JudgementService {
         return caseData.getCcjPaymentDetails().getCcjJudgmentFixedCostOption();
     }
 
-    public boolean isLipVLipFullAdmitSetDate(CaseData caseData) {
-        return caseData.isLipvLipOneVOne() && caseData.isPayBySetDate() && caseData.isFullAdmitClaimSpec();
+    public BigDecimal getLatestInterest(CaseData caseData) {
+        return interestCalculator.calculateInterest(caseData);
     }
 }
