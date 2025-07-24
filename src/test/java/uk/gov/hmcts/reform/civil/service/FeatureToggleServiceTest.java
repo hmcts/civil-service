@@ -327,10 +327,8 @@ class FeatureToggleServiceTest {
     }
 
     @ParameterizedTest
-    @ValueSource(booleans = {true, false})
+    @ValueSource(booleans = {true})
     void shouldReturnCorrectValue_whenIsLrAdmissionBulkEnabled(Boolean toggleStat) {
-        var lrAdmission = "lr-admission-bulk";
-        givenToggle(lrAdmission, toggleStat);
 
         assertThat(featureToggleService.isLrAdmissionBulkEnabled()).isEqualTo(toggleStat);
     }

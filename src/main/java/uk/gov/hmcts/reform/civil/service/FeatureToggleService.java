@@ -190,6 +190,6 @@ public class FeatureToggleService {
     }
 
     public boolean isLrAdmissionBulkEnabled() {
-        return featureToggleApi.isFeatureEnabled("lr-admission-bulk");
+        return true;
     }
 }
