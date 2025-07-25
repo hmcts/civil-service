@@ -196,10 +196,10 @@ public class JudgmentsOnlineHelper {
     }
 
     @NotNull
-    public static String calculateRepaymentBreakdownSummaryWithoutClaimInterest(JudgmentDetails activeJudgment, boolean isDefaultJudgment) {
+    public static String calculateRepaymentBreakdownSummaryWithoutClaimInterest(JudgmentDetails activeJudgment, boolean isJudgmentTextSame) {
         BigDecimal totalAmount = MonetaryConversions.penniesToPounds(new BigDecimal(activeJudgment.getTotalAmount()));
         StringBuilder repaymentBreakdown = new StringBuilder();
-        if (isDefaultJudgment) {
+        if (isJudgmentTextSame) {
             getJudgmentSummaryText(totalAmount, repaymentBreakdown);
         } else {
             getJudgmentSummaryTextForLRAdmission(totalAmount, repaymentBreakdown);
