@@ -96,4 +96,11 @@ class DefRepresentedDefendantLipEmailDTOGeneratorTest {
             .containsEntry(CLAIM_16_DIGIT_NUMBER, "1234567890123456")
             .containsEntry(CLAIM_NUMBER, "LEGACY123456");
     }
+
+    @Test
+    void shouldAlwaysReturnTrueForShouldNotify() {
+        CaseData caseData = CaseData.builder().build();
+        Boolean result = generator.getShouldNotify(caseData);
+        assertThat(result).isTrue();
+    }
 }

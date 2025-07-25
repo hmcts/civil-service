@@ -38,4 +38,10 @@ public class DefRepresentedDefendantLipEmailDTOGenerator extends DefendantEmailD
         ));
         return properties;
     }
+
+    //In case of Lip v Lip to Lip v Lr or lr v lip to lr to lr - An email will be sent to claimant lip/lr, defendant lip, defendant lr
+    @Override
+    public Boolean getShouldNotify(CaseData caseData) {
+        return Boolean.TRUE;
+    }
 }
