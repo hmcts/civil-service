@@ -216,6 +216,9 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                     } else if ((originalDocument.getValue().getDocumentType() != DocumentType.SEALED_CLAIM)
                         || (featureToggleService.isWelshEnabledForMainCase()
                         && originalDocument.getValue().getDocumentType() == DocumentType.SEALED_CLAIM)) {
+                        if (originalDocument.getValue().getDocumentType().equals((DocumentType.DEFENDANT_DEFENCE))) {
+                            caseDataBuilder.respondent1ClaimResponseDocumentSpec(originalDocument.getValue());
+                        }
                         systemGeneratedDocuments.add(originalDocument);
                     }
                 }

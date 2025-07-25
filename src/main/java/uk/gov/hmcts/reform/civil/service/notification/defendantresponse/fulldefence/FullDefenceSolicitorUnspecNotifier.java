@@ -56,8 +56,7 @@ public abstract class  FullDefenceSolicitorUnspecNotifier extends FullDefenceSol
                 CASEMAN_REF, caseData.getLegacyCaseReference()
             ));
             addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
             return properties;
         } else {
             //if there are 2 respondents on the case, concatenate the names together for the template subject line
@@ -72,8 +71,7 @@ public abstract class  FullDefenceSolicitorUnspecNotifier extends FullDefenceSol
                 CASEMAN_REF, caseData.getLegacyCaseReference()
             ));
             addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
             return properties;
         }
     }
