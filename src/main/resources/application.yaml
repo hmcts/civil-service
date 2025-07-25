@@ -224,6 +224,13 @@ dashboard:
   api:
     url: http://localhost:4000
 
+migration:
+  batchsize: 500
+  wait-time-mins: 10
+  csvFile:
+    decrypt:
+      key: DUMMY_KEY
+
 notifications:
   govNotifyApiKey: ${GOV_NOTIFY_API_KEY:}
   hmctsSignature: "Online Civil Claims \n HM Courts & Tribunal Service"
