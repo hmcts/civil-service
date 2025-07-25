@@ -5,6 +5,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.QueryCollectionType;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
@@ -204,6 +205,16 @@ public class CaseQueriesUtil {
             .orElseThrow(() -> new IllegalArgumentException("No query found for queryId " + queryId));
     }
 
+    private static boolean isWelshQuery(CaseData caseData, List<String> roles) {
+        if (isLIPClaimant(roles)) {
+            return caseData.isClaimantBilingual();
+        }
+        if (isLIPDefendant(roles)) {
+            return caseData.isRespondentResponseBilingual();
+        }
+        return false;
+    }
+
     public static LatestQuery buildLatestQuery(CaseMessage latestCaseMessage) {
         return Optional.ofNullable(latestCaseMessage)
             .map(caseMessage -> LatestQuery.builder()
@@ -211,6 +222,12 @@ public class CaseQueriesUtil {
                 .isHearingRelated(caseMessage.getIsHearingRelated())
                 .build())
             .orElse(null);
+    }
+
+    public static LatestQuery buildLatestQuery(CaseMessage latestCaseMessage, CaseData caseData, List<String> roles) {
+        return buildLatestQuery(latestCaseMessage).toBuilder()
+            .isWelsh(isWelshQuery(caseData, roles) ? YesOrNo.YES : YesOrNo.NO)
+            .build();
     }
 
     public static void assignCategoryIdToAttachments(CaseMessage latestCaseMessage,
