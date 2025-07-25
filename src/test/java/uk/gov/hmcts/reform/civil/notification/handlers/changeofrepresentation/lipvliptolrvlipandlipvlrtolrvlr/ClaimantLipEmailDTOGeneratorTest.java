@@ -80,4 +80,11 @@ class ClaimantLipEmailDTOGeneratorTest {
             mockedStatic.verify(() -> ClaimantLipRepresentedNocHelper.getLipProperties(caseData), times(1));
         }
     }
+
+    @Test
+    void shouldAlwaysReturnTrueForShouldNotify() {
+        CaseData caseData = CaseData.builder().build();
+        Boolean result = claimantLipEmailDTOGenerator.getShouldNotify(caseData);
+        assertThat(result).isTrue();
+    }
 }

@@ -833,7 +833,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
             CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                 .ccjPaymentPaidSomeOption(YesOrNo.YES)
                 .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(500.0))
-                .ccjJudgmentLipInterest(BigDecimal.valueOf(300))
+                .ccjJudgmentLipInterest(BigDecimal.valueOf(300.00))
                 .ccjJudgmentAmountClaimFee(BigDecimal.valueOf(0))
                 .build();
             CaseData caseData = CaseData.builder()
@@ -842,6 +842,9 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
                 .applicant1Represented(YesOrNo.NO)
                 .totalClaimAmount(BigDecimal.valueOf(1000))
                 .ccjPaymentDetails(ccjPaymentDetails)
+                .claimFee(Fee.builder()
+                    .calculatedAmountInPence(BigDecimal.valueOf(0))
+                    .build())
                 .defendantDetailsSpec(DynamicList.builder()
                                           .value(DynamicListElement.builder()
                                                      .label("John Doe")

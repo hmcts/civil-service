@@ -68,8 +68,7 @@ public class FullDefenceRespondentSolicitorTwoCCSpecNotifier extends FullDefence
             CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
         addAllFooterItems(caseData, properties, getConfiguration(),
-                          getFeatureToggleService().isQueryManagementLRsEnabled(),
-                          getFeatureToggleService().isLipQueryManagementEnabled(caseData));
+                          getFeatureToggleService().isPublicQueryManagementEnabled(caseData));
         return properties;
     }
 

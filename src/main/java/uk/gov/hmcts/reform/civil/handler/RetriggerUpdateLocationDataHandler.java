@@ -31,6 +31,7 @@ public class RetriggerUpdateLocationDataHandler extends BaseExternalTaskHandler 
         String caseManagementLocation = externalTask.getVariable("caseManagementLocation");
         String courtLocation = externalTask.getVariable("courtLocation");
         String applicant1DQRequestedCourt = externalTask.getVariable("applicant1DQRequestedCourt");
+        String respondent1DQRequestedCourt = externalTask.getVariable("respondent1DQRequestedCourt");
         String region = externalTask.getVariable("region");
 
         String caseIds = externalTask.getVariable("caseIds");
@@ -49,6 +50,7 @@ public class RetriggerUpdateLocationDataHandler extends BaseExternalTaskHandler 
                     caseManagementLocation,
                     courtLocation,
                     applicant1DQRequestedCourt,
+                    respondent1DQRequestedCourt,
                     eventSummary,
                     eventDescription
                 );
