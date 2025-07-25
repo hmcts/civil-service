@@ -5,6 +5,7 @@ import java.time.format.DateTimeParseException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.StringSubstitutor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.entities.DashboardNotificationsEntity;
 import uk.gov.hmcts.reform.dashboard.entities.NotificationTemplateEntity;
@@ -14,8 +15,9 @@ import uk.gov.hmcts.reform.dashboard.entities.TaskListEntity;
 import uk.gov.hmcts.reform.dashboard.repositories.NotificationTemplateRepository;
 import uk.gov.hmcts.reform.dashboard.repositories.ScenarioRepository;
 import uk.gov.hmcts.reform.dashboard.repositories.TaskItemTemplateRepository;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -48,6 +50,7 @@ public class DashboardScenariosService {
     }
 
     @SuppressWarnings("java:S1172")
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.REPEATABLE_READ)
     public void recordScenarios(String authorisation, String scenarioReference,
                                 String uniqueCaseIdentifier, ScenarioRequestParams scenarioRequestParams) {
 
