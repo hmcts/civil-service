@@ -31,4 +31,10 @@ public class ClaimantLipEmailDTOGenerator extends ClaimantEmailDTOGenerator {
         properties.putAll(ClaimantLipRepresentedNocHelper.getLipProperties(caseData));
         return properties;
     }
+
+    //In case of Lip v Lip to LR v Lip or lip v lr to lr to lr - An email will be sent to claimant lip, defendant lip/lr, claimant lr
+    @Override
+    public Boolean getShouldNotify(CaseData caseData) {
+        return Boolean.TRUE;
+    }
 }
