@@ -15,7 +15,7 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
+import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
@@ -89,7 +89,7 @@ class CaseProceedOfflineClaimantNotificationHandlerTest extends BaseCallbackHand
 
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
             when(toggleService.isGaForLipsEnabled()).thenReturn(true);
-            when(toggleService.isLipQueryManagementEnabled(any())).thenReturn(false);
+            when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -134,7 +134,7 @@ class CaseProceedOfflineClaimantNotificationHandlerTest extends BaseCallbackHand
 
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
             when(toggleService.isGaForLipsEnabled()).thenReturn(true);
-            when(toggleService.isLipQueryManagementEnabled(any())).thenReturn(false);
+            when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -178,7 +178,7 @@ class CaseProceedOfflineClaimantNotificationHandlerTest extends BaseCallbackHand
 
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
             when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
-            when(toggleService.isLipQueryManagementEnabled(any())).thenReturn(false);
+            when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
@@ -211,7 +211,7 @@ class CaseProceedOfflineClaimantNotificationHandlerTest extends BaseCallbackHand
 
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
             when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
-            when(toggleService.isLipQueryManagementEnabled(any())).thenReturn(true);
+            when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
@@ -248,7 +248,7 @@ class CaseProceedOfflineClaimantNotificationHandlerTest extends BaseCallbackHand
                     .build();
 
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
-            when(toggleService.isLipQueryManagementEnabled(any())).thenReturn(false);
+            when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(

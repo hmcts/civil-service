@@ -29,10 +29,6 @@ public class InterestCalculator {
     protected static final BigDecimal EIGHT_PERCENT_INTEREST_RATE = valueOf(8);
     public static final BigDecimal NUMBER_OF_DAYS_IN_YEAR = new BigDecimal(365L);
 
-    public BigDecimal calculateInterestForJO(CaseData caseData) {
-        return this.calculateInterest(caseData, getToDateForJO(caseData));
-    }
-
     public BigDecimal calculateInterest(CaseData caseData) {
         return this.calculateInterest(caseData, getToDate(caseData));
     }
@@ -57,6 +53,10 @@ public class InterestCalculator {
         return interestAmount;
     }
 
+    public BigDecimal claimAmountPlusInterestToDate(CaseData caseData) {
+        return caseData.getTotalClaimAmount().add(calculateInterest(caseData));
+    }
+
     private BigDecimal calculateInterestAmount(CaseData caseData, BigDecimal interestRate, LocalDate interestToDate) {
         if (InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE.equals(caseData.getInterestClaimFrom())) {
             LocalDate interestFromDate = getSubmittedDate(caseData);
@@ -66,16 +66,6 @@ public class InterestCalculator {
                 caseData.getInterestFromSpecificDate(), interestToDate);
         }
         return ZERO;
-    }
-
-    private LocalDate getToDateForJO(CaseData caseData) {
-        if (Objects.isNull(caseData.getInterestClaimUntil())) {
-            return LocalDate.now();
-        } else if (InterestClaimUntilType.UNTIL_CLAIM_SUBMIT_DATE.equals(caseData.getInterestClaimUntil())) {
-            return getSubmittedDate(caseData);
-        } else {
-            return LocalDate.now().minusDays(1);
-        }
     }
 
     private LocalDate getToDate(CaseData caseData) {

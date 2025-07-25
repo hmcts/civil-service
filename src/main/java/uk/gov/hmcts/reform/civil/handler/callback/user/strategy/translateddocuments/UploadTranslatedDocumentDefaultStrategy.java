@@ -218,6 +218,9 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                     } else if ((originalDocument.getValue().getDocumentType() != DocumentType.SEALED_CLAIM)
                         || (featureToggleService.isWelshEnabledForMainCase()
                         && originalDocument.getValue().getDocumentType() == DocumentType.SEALED_CLAIM)) {
+                        if (originalDocument.getValue().getDocumentType().equals((DocumentType.DEFENDANT_DEFENCE))) {
+                            caseDataBuilder.respondent1ClaimResponseDocumentSpec(originalDocument.getValue());
+                        }
                         systemGeneratedDocuments.add(originalDocument);
                     }
                 }
@@ -366,7 +369,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
             }
         }
 
-        if (caseData.isLRvLipOneVOne() && featureToggleService.isGaForWelshEnabled()) {
+        if (caseData.isLRvLipOneVOne() && featureToggleService.isWelshEnabledForMainCase()) {
             if (caseData.getCcdState() == CaseState.AWAITING_APPLICANT_INTENTION) {
                 return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_CLAIMANT_LR_INTENTION;
             }

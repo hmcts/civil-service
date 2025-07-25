@@ -6,7 +6,7 @@ import uk.gov.hmcts.reform.civil.callback.DashboardCallbackHandler;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
+import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
@@ -14,6 +14,8 @@ import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
 import java.util.List;
 import java.util.Map;
+
+import static java.util.Objects.nonNull;
 
 @Service
 public class CaseDismissDefendantDashboardNotificationHandler extends DashboardCallbackHandler {
@@ -70,7 +72,7 @@ public class CaseDismissDefendantDashboardNotificationHandler extends DashboardC
     }
 
     private boolean defendantQueryAwaitingAResponse(CaseData caseData) {
-        // todo CIV-17287
-        return featureToggleService.isLipQueryManagementEnabled(caseData);
+        return featureToggleService.isPublicQueryManagementEnabled(caseData)
+            && nonNull(caseData.getQueries()) && caseData.getQueries().hasAQueryAwaitingResponse();
     }
 }

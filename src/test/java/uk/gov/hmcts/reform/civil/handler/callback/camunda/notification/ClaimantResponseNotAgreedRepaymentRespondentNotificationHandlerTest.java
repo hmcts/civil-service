@@ -33,6 +33,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CNBC_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT_WELSH;
@@ -80,7 +81,6 @@ class ClaimantResponseNotAgreedRepaymentRespondentNotificationHandlerTest extend
             when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("welshHmctsSignature"));
             when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("welshPhoneContact"));
             when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
-            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
             when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
         }
@@ -89,7 +89,8 @@ class ClaimantResponseNotAgreedRepaymentRespondentNotificationHandlerTest extend
         void shouldNotifyClaimantSolicitor_whenInvoked() {
             when(notificationsProperties.getNotifyClaimantLrTemplate()).thenReturn("template-id");
             given(organisationDetailsService.getApplicantLegalOrganisationName(any())).willReturn(ORGANISATION_NAME);
-
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .respondent1OrgRegistered(YesOrNo.YES)
                 .build();
@@ -111,7 +112,9 @@ class ClaimantResponseNotAgreedRepaymentRespondentNotificationHandlerTest extend
         void shouldNotifyClaimantLip_whenInvoked() {
             given(featureToggleService.isLipVLipEnabled()).willReturn(true);
             when(notificationsProperties.getNotifyClaimantLipTemplateManualDetermination()).thenReturn("template-id-manual-determination");
-
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .applicant1Represented(YesOrNo.NO)
                 .build();
@@ -129,9 +132,34 @@ class ClaimantResponseNotAgreedRepaymentRespondentNotificationHandlerTest extend
             );
         }
 
+        @Test
+        void shouldNotifyClaimantLipWelsh_whenInvoked() {
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+            given(featureToggleService.isLipVLipEnabled()).willReturn(true);
+            when(notificationsProperties.getNotifyClaimantLipTemplateManualDeterminationForWelsh()).thenReturn(
+                "template-id-manual-determination");
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .applicant1Represented(YesOrNo.NO)
+                .claimantBilingualLanguagePreference("BOTH")
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId("NOTIFY_CLAIMANT_FOR_RESPONDENT1_REJECT_REPAYMENT")
+                    .build()).build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "rambo@email.com",
+                "template-id-manual-determination",
+                getNotificationDataMapLip(caseData),
+                "claimant-reject-repayment-respondent-notification-000DC001"
+            );
+        }
+
         @NotNull
         public Map<String, String> getNotificationDataMapSolicitorSpec(CaseData caseData) {
-            Map<String, String> properties = new HashMap<>(addCommonProperties());
+            Map<String, String> properties = new HashMap<>(addCommonProperties(false));
             properties.putAll(Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getApplicantLegalOrganisationName(caseData),
@@ -143,7 +171,7 @@ class ClaimantResponseNotAgreedRepaymentRespondentNotificationHandlerTest extend
 
         @NotNull
         public Map<String, String> getNotificationDataMapLip(CaseData caseData) {
-            Map<String, String> properties = new HashMap<>(addCommonProperties());
+            Map<String, String> properties = new HashMap<>(addCommonProperties(true));
             properties.putAll(Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                 CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1())
@@ -152,7 +180,7 @@ class ClaimantResponseNotAgreedRepaymentRespondentNotificationHandlerTest extend
         }
 
         @NotNull
-        public Map<String, String> addCommonProperties() {
+        public Map<String, String> addCommonProperties(boolean isLipCase) {
             Map<String, String> expectedProperties = new HashMap<>();
             expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
             expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
@@ -160,9 +188,16 @@ class ClaimantResponseNotAgreedRepaymentRespondentNotificationHandlerTest extend
             expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
             expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
             expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
-            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
             expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
             expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+            if (isLipCase) {
+                expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+                expectedProperties.put(CNBC_CONTACT, configuration.getCnbcContact());
+            } else {
+                expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getRaiseQueryLr());
+                expectedProperties.put(CNBC_CONTACT, configuration.getRaiseQueryLr());
+            }
+
             return expectedProperties;
         }
     }
