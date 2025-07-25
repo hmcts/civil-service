@@ -23,7 +23,7 @@ def versions = [
   junit             : '5.11.4',
   junitPlatform     : '1.11.4',
   springBoot        : springBoot.class.package.implementationVersion,
-  springStatemachine: '4.0.0',
+  springStatemachine: '4.0.1',
   lombok            : '1.18.38',
   springSecurity    : '5.8.16',
   camunda           : '7.20.0',
