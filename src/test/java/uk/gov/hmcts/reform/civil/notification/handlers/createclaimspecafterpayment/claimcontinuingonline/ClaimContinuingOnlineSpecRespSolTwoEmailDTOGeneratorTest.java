@@ -83,4 +83,34 @@ public class ClaimContinuingOnlineSpecRespSolTwoEmailDTOGeneratorTest {
                 CLAIM_DETAILS_NOTIFICATION_DEADLINE, formatLocalDate(caseData.getRespondent2ResponseDeadline().toLocalDate(), DATE)
         );
     }
+
+    @Test
+    void shouldNotify_whenAddRespondent2YesAndRespondent2IsNotLiP() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .addRespondent2(YesOrNo.YES)
+            .respondent2Represented(YesOrNo.YES) // Not a LiP
+            .build();
+
+        assertThat(generator.getShouldNotify(caseData)).isTrue();
+    }
+
+    @Test
+    void shouldNotNotify_whenAddRespondent2No() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .addRespondent2(YesOrNo.NO)
+            .respondent2Represented(YesOrNo.YES)
+            .build();
+
+        assertThat(generator.getShouldNotify(caseData)).isFalse();
+    }
+
+    @Test
+    void shouldNotNotify_whenRespondent2IsLiP() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .addRespondent2(YesOrNo.YES)
+            .respondent2Represented(YesOrNo.NO) // LiP
+            .build();
+
+        assertThat(generator.getShouldNotify(caseData)).isFalse();
+    }
 }
