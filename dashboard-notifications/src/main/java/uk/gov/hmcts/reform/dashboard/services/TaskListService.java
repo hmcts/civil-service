@@ -67,7 +67,10 @@ public class TaskListService {
                 .forEach(duplicateEntity -> taskListRepository.deleteById(duplicateEntity.getId()));
         }
 
-        return taskListRepository.save(beingUpdated);
+        log.info("Saving task list = {}", beingUpdated);
+        var savedTask = taskListRepository.save(beingUpdated);
+        log.info("Successfully saved task list = {}", savedTask);
+        return savedTask;
     }
 
     @Transactional
