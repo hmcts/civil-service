@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.AirlineEpimsService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.FeesService;
@@ -31,8 +32,11 @@ import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataServ
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -177,6 +181,47 @@ class SubmitClaimTaskTest {
         assertThat(response.getData().get("allPartyNames")).isEqualTo("Clay Mint V Defendant Inc., Dave Indentoo");
         assertThat(response.getData().get("caseListDisplayDefendantSolicitorReferences"))
             .isEqualTo("1234, 5678");
+    }
+
+    @Test
+    void shouldSetTheCourtLocationName() {
+        List<LocationRefData> locations = new ArrayList<>();
+        locations.add(LocationRefData.builder().courtName("Court Name").regionId("2").epimmsId("420219")
+                          .siteName("Civil National Business Centre").build());
+        when(locationRefDataService.getCourtLocationsByEpimmsIdAndCourtType(any(), any())).thenReturn(locations);
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
+        CaseData caseData = CaseData.builder()
+            .applicant1(Party.builder()
+                            .individualFirstName("Clay")
+                            .individualLastName("Mint")
+                            .partyName("Clay Mint")
+                            .type(Party.Type.INDIVIDUAL)
+                            .build())
+            .totalClaimAmount(new BigDecimal("1000"))
+            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("test@gmail.com").build())
+            .interestClaimFrom(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE)
+            .respondent1(Party.builder().companyName("Defendant Inc.").type(Party.Type.COMPANY).build())
+            .solicitorReferences(SolicitorReferences.builder().respondentSolicitor1Reference("1234").build())
+            .build();
+
+        when(userService.getUserDetails("authToken")).thenReturn(UserDetails.builder().id("userId").build());
+        when(specReferenceNumberRepository.getSpecReferenceNumber()).thenReturn("12345");
+
+        FlightDelayDetails flightDelayDetails = FlightDelayDetails.builder()
+            .airlineList(
+                DynamicList.builder()
+                    .value(DynamicListElement.builder().code("OTHER").label("OTHER")
+                               .build()).build()).build();
+
+        AboutToStartOrSubmitCallbackResponse response =
+            (AboutToStartOrSubmitCallbackResponse) submitClaimTask.submitClaim(
+                caseData,
+                "eventId",
+                "authToken",
+                NO,
+                flightDelayDetails
+            );
+        assertThat(response.getData()).containsEntry("locationName", "Civil National Business Centre");
     }
 }
 
