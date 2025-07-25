@@ -100,10 +100,7 @@ public class DashboardNotificationService {
             log.info("Existing notification not present reference = {}", notification.getReference());
         }
 
-        log.info("Saving notification = {}", updated);
-        var savedNotification = dashboardNotificationsRepository.save(updated);
-        log.info("Successfully saved notification = {}", savedNotification);
-        return savedNotification;
+        return dashboardNotificationsRepository.save(updated);
     }
 
     public void deleteById(UUID id) {

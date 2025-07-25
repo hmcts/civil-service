@@ -67,22 +67,20 @@ public class DashboardScenariosService {
 
     private void createNotificationsForScenario(
         ScenarioEntity scenario, String uniqueCaseIdentifier, ScenarioRequestParams scenarioRequestParams) {
-        log.info("Creating {} notifications for scenario = {}, caseId = {}", scenario.getNotificationsToCreate().size(), scenario.getName(), uniqueCaseIdentifier);
 
         scenario.getNotificationsToCreate().forEach((templateName, requestParamsKeys) -> {
 
             Optional<NotificationTemplateEntity> notificationTemplate = notificationTemplateRepository
                 .findByName(templateName);
+
             // build notification eng and wales
             //Supported templates "The ${animal} jumped over the ${target}."
             // "The number is ${undefined.property:-42}."
             List<String> keys =  Arrays.asList(requestParamsKeys);
             notificationTemplate.ifPresent(template -> {
-                log.info("Found notifications template = {} for name = {}", template, templateName);
                 Map<String, Object> templateParams = scenarioRequestParams.getParams().entrySet().stream()
                     .filter(e -> !keys.isEmpty() && keys.contains(e.getKey()))
                     .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-                log.info("templateParams = {}", templateParams);
 
                 StringSubstitutor stringSubstitutor = new StringSubstitutor(templateParams);
 
@@ -126,7 +124,6 @@ public class DashboardScenariosService {
                 );
 
                 // insert new record in notifications table
-                log.info("About to save notification = {}", notification);
                 dashboardNotificationService.saveOrUpdate(notification);
             });
         });
@@ -139,7 +136,6 @@ public class DashboardScenariosService {
 
         List<TaskItemTemplateEntity> taskItemTemplate = taskItemTemplateRepository
             .findByScenarioName(scenarioReference);
-        log.info("Found {} task items templates for scenario = {}", taskItemTemplate.size(), scenarioReference);
 
         // TaskItemTemplates will have templateName, citizenRole and taskStatusSequence (Minimum two values,
         // if not different, just same value)
@@ -168,18 +164,15 @@ public class DashboardScenariosService {
                 taskItemEntity.getTaskNameEn(),
                 taskItemEntity.getHintTextEn()
             );
-            log.info("About to save taskItem = {}", taskItemEntity);
             taskListService.saveOrUpdate(taskItemEntity);
         });
     }
 
     private void deleteNotificationForScenario(ScenarioEntity scenario, String uniqueCaseIdentifier) {
-        log.info("Deleting notifications for scenario = {}, caseId = {}", scenario.getName(), uniqueCaseIdentifier);
         Arrays.asList(scenario.getNotificationsToDelete()).forEach(templateName -> {
 
             Optional<NotificationTemplateEntity> templateToRemove = notificationTemplateRepository
                 .findByName(templateName);
-            log.info("Found notifications template = {} for name = {}", templateToRemove, templateName);
 
             templateToRemove.ifPresent(template -> {
                 int noOfRowsRemoved = dashboardNotificationService.deleteByNameAndReferenceAndCitizenRole(
