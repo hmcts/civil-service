@@ -73,9 +73,6 @@ public class DashboardScenariosService {
 
             Optional<NotificationTemplateEntity> notificationTemplate = notificationTemplateRepository
                 .findByName(templateName);
-
-
-
             // build notification eng and wales
             //Supported templates "The ${animal} jumped over the ${target}."
             // "The number is ${undefined.property:-42}."
