@@ -413,6 +413,9 @@ public class NotificationsProperties {
     private String notifyLiPClaimantDefendantResponded;
 
     @NotEmpty
+    private String notifyLiPClaimantDefendantRespondedWelshLip;
+
+    @NotEmpty
     private String notifyLiPClaimantDefendantChangedContactDetails;
 
     @NotEmpty

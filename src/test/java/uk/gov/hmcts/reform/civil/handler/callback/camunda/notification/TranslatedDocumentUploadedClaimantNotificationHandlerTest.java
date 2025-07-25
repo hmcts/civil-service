@@ -116,7 +116,8 @@ public class TranslatedDocumentUploadedClaimantNotificationHandlerTest {
 
         @Test
         void  shouldNotifyLipClaimantForClaimIssueTranslatedDoc_whenR2EnabledAndClaimIssuedInBilingual() {
-            when(notificationsProperties.getNotifyClaimantLiPTranslatedDocumentUploadedWhenClaimIssuedInBilingual()).thenReturn(CLAIMANT_LIP_EMAIL_TEMPLATE_BILINGUAL);
+            when(notificationsProperties.getNotifyLiPClaimantDefendantRespondedWelshLip()).thenReturn(
+                CLAIMANT_LIP_EMAIL_TEMPLATE_BILINGUAL);
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
@@ -147,7 +148,8 @@ public class TranslatedDocumentUploadedClaimantNotificationHandlerTest {
 
         @Test
         void  shouldNotifyLipClaimantForClaimIssueTranslatedDoc_whenR2EnabledAndClaimIssuedInEnglish() {
-            when(notificationsProperties.getNotifyClaimantLiPTranslatedDocumentUploadedWhenClaimIssuedInEnglish()).thenReturn(CLAIMANT_LIP_EMAIL_TEMPLATE_ENGLISH);
+            when(notificationsProperties.getNotifyLiPClaimantDefendantResponded()).thenReturn(
+                CLAIMANT_LIP_EMAIL_TEMPLATE_ENGLISH);
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));

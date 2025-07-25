@@ -96,9 +96,9 @@ public class TranslatedDocumentUploadedClaimantNotificationHandler extends Callb
     private String addTemplate(CaseData caseData) {
         if (caseData.isApplicantNotRepresented() && featureToggleService.isLipVLipEnabled()) {
             if (caseData.isClaimantBilingual()) {
-                return notificationsProperties.getNotifyClaimantLiPTranslatedDocumentUploadedWhenClaimIssuedInBilingual();
+                return notificationsProperties.getNotifyLiPClaimantDefendantRespondedWelshLip();
             }
-            return notificationsProperties.getNotifyClaimantLiPTranslatedDocumentUploadedWhenClaimIssuedInEnglish();
+            return notificationsProperties.getNotifyLiPClaimantDefendantResponded();
         }
         return notificationsProperties.getNotifyClaimantTranslatedDocumentUploaded();
     }
