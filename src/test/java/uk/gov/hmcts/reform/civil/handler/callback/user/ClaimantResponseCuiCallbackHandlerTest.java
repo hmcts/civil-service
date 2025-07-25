@@ -614,7 +614,10 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldAddActiveJudgmentWhenClaimantAcceptedRepaymentPlanAndJudgmentOnlineLiveEnabled() {
             when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
-            JudgmentDetails activeJudgment = JudgmentDetails.builder().build();
+            JudgmentDetails activeJudgment = JudgmentDetails.builder()
+                .totalAmount("10100.00")
+                .claimFeeAmount("100.00")
+                .orderedAmount("10000").build();
             given(judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(any()))
                 .willReturn(activeJudgment);
             CaseData caseData = CaseDataBuilder.builder()
@@ -645,6 +648,7 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(updatedCaseData.getActiveJudgment()).isNotNull();
             assertThat(updatedCaseData.getJoIsLiveJudgmentExists()).isEqualTo(YES);
             assertThat(updatedCaseData.getJoJudgementByAdmissionIssueDate()).isEqualTo(now);
+            assertThat(updatedCaseData.getJoRepaymentSummaryObject()).isNotNull();
         }
 
         @Test
