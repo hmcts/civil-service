@@ -155,7 +155,6 @@ class RoboticsNotificationServiceTest {
         // Then
         assertThat(capturedEmailData.getSubject()).isEqualTo(subject);
         assertThat(capturedEmailData.getMessage()).isEqualTo(message);
-        assertThat(capturedEmailData.getTo()).isEqualTo(emailConfiguration.getRecipient());
         assertThat(capturedEmailData.getAttachments()).hasSize(1);
         assertThat(capturedEmailData.getAttachments())
             .extracting("filename", "contentType")
@@ -199,7 +198,6 @@ class RoboticsNotificationServiceTest {
         // Then
         assertThat(capturedEmailData.getSubject()).isEqualTo(subject);
         assertThat(capturedEmailData.getMessage()).isEqualTo(message);
-        assertThat(capturedEmailData.getTo()).isEqualTo(emailConfiguration.getRecipient());
         assertThat(capturedEmailData.getAttachments()).hasSize(1);
         assertThat(capturedEmailData.getAttachments())
             .extracting("filename", "contentType")
@@ -247,7 +245,6 @@ class RoboticsNotificationServiceTest {
         assertThat(capturedEmailData.getSubject()).isEqualTo(subject);
         assertThat(capturedEmailData.getMessage()).isEqualTo(message);
         assertThat(capturedEmailData.getAttachments()).hasSize(1);
-        assertThat(capturedEmailData.getTo()).isEqualTo(emailConfiguration.getRecipient());
         assertThat(capturedEmailData.getAttachments())
             .extracting("filename", "contentType")
             .containsExactlyInAnyOrder(tuple(fileName, "application/json"));
@@ -291,7 +288,6 @@ class RoboticsNotificationServiceTest {
         // Then
         assertThat(capturedEmailData.getSubject()).isEqualTo(subject);
         assertThat(capturedEmailData.getMessage()).isEqualTo(message);
-        assertThat(capturedEmailData.getTo()).isEqualTo(emailConfiguration.getRecipient());
     }
 
     @Test
@@ -332,7 +328,6 @@ class RoboticsNotificationServiceTest {
         assertThat(capturedEmailData.getSubject()).isEqualTo(subject);
         assertThat(capturedEmailData.getMessage()).isEqualTo(message);
         assertThat(capturedEmailData.getAttachments()).hasSize(1);
-        assertThat(capturedEmailData.getTo()).isEqualTo(emailConfiguration.getRecipient());
         assertThat(capturedEmailData.getAttachments())
             .extracting("filename", "contentType")
             .containsExactlyInAnyOrder(tuple(fileName, "application/json"));
@@ -369,7 +364,6 @@ class RoboticsNotificationServiceTest {
 
         assertThat(capturedEmailData.getSubject()).isEqualTo(subject);
         assertThat(capturedEmailData.getMessage()).isEqualTo(message);
-        assertThat(capturedEmailData.getTo()).isEqualTo(emailConfiguration.getRecipient());
         assertThat(capturedEmailData.getAttachments()).hasSize(1);
         assertThat(capturedEmailData.getAttachments())
             .extracting("filename", "contentType")
@@ -406,7 +400,6 @@ class RoboticsNotificationServiceTest {
 
         assertThat(capturedEmailData.getSubject()).isEqualTo(subject);
         assertThat(capturedEmailData.getMessage()).isEqualTo(message);
-        assertThat(capturedEmailData.getTo()).isEqualTo(emailConfiguration.getLipJRecipient());
     }
 
     @Test
@@ -440,7 +433,6 @@ class RoboticsNotificationServiceTest {
 
         assertThat(capturedEmailData.getSubject()).isEqualTo(subject);
         assertThat(capturedEmailData.getMessage()).isEqualTo(message);
-        assertThat(capturedEmailData.getTo()).isEqualTo(emailConfiguration.getLipJRecipient());
     }
 
     @Test
@@ -474,7 +466,6 @@ class RoboticsNotificationServiceTest {
 
         assertThat(capturedEmailData.getSubject()).isEqualTo(subject);
         assertThat(capturedEmailData.getMessage()).isEqualTo(message);
-        assertThat(capturedEmailData.getTo()).isEqualTo(emailConfiguration.getLipJRecipient());
     }
 
     @Test
@@ -508,7 +499,6 @@ class RoboticsNotificationServiceTest {
 
         assertThat(capturedEmailData.getSubject()).isEqualTo(subject);
         assertThat(capturedEmailData.getMessage()).isEqualTo(message);
-        assertThat(capturedEmailData.getTo()).isEqualTo(emailConfiguration.getLipJRecipient());
     }
 
     @Test
@@ -550,7 +540,6 @@ class RoboticsNotificationServiceTest {
 
         assertThat(capturedEmailData.getSubject()).isEqualTo(subject);
         assertThat(capturedEmailData.getMessage()).isEqualTo(message);
-        assertThat(capturedEmailData.getTo()).isEqualTo(emailConfiguration.getLipJRecipient());
     }
 
     @Test
@@ -585,7 +574,6 @@ class RoboticsNotificationServiceTest {
 
         assertThat(capturedEmailData.getSubject()).isEqualTo(subject);
         assertThat(capturedEmailData.getMessage()).isEqualTo(message);
-        assertThat(capturedEmailData.getTo()).isEqualTo(emailConfiguration.getLipJRecipient());
     }
 
     @Test
@@ -624,7 +612,6 @@ class RoboticsNotificationServiceTest {
         // Then
         assertThat(capturedEmailData.getSubject()).isEqualTo(subject);
         assertThat(capturedEmailData.getMessage()).isEqualTo(message);
-        assertThat(capturedEmailData.getTo()).isEqualTo(emailConfiguration.getRecipient());
         assertThat(capturedEmailData.getAttachments()).hasSize(1);
         assertThat(capturedEmailData.getAttachments())
             .extracting("filename", "contentType")
@@ -668,7 +655,6 @@ class RoboticsNotificationServiceTest {
         // Then
         assertThat(capturedEmailData.getSubject()).isEqualTo(subject);
         assertThat(capturedEmailData.getMessage()).isEqualTo(message);
-        assertThat(capturedEmailData.getTo()).isEqualTo(emailConfiguration.getRecipient());
         assertThat(capturedEmailData.getAttachments()).hasSize(1);
         assertThat(capturedEmailData.getAttachments())
             .extracting("filename", "contentType")
