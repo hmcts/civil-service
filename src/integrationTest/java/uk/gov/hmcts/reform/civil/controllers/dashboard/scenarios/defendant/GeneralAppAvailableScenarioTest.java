@@ -38,7 +38,7 @@ public class GeneralAppAvailableScenarioTest extends BaseIntegrationTest {
             .andExpectAll(
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].reference").value(caseId.toString()),
-                jsonPath("$[0].taskNameEn").value(
+                jsonPath("$[*].taskNameEn").value(
                     "<a href={GENERAL_APPLICATIONS_RESPONSE_APPLICATION_SUMMARY_URL} rel=\"noopener noreferrer\" class=\"govuk-link\">View applications</a>"),
                 jsonPath("$[0].currentStatusEn").value("Available")
             );
