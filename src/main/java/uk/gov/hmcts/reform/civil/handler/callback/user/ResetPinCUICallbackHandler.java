@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.notification.handlers.resetpin.ResetPinDefendantLipNotifier;
@@ -33,11 +34,12 @@ public class ResetPinCUICallbackHandler extends CallbackHandler {
 
     private final DefendantPinToPostLRspecService defendantPinToPostLRspecService;
     private final ResetPinDefendantLipNotifier resetPinDefendantLipNotifier;
+    private final PinInPostConfiguration pipInPostConfiguration;
     private final ObjectMapper objectMapper;
-    private static final String ERROR_MESSAGE_DEFENDANT_LIP_EMAIL_MISSING = "Defendant email is missing. Please update defendant details" +
-        " with Manage contact information event and then perform RESET PIN";
+    private static final String ERROR_MESSAGE_DEFENDANT_LIP_EMAIL_MISSING = "The defendant email address is missing." +
+        " Please update the defendant details using the manage contact information event and then perform reset pin event.";
 
-    private static final String ERROR_MESSAGE_ACCESS_CODE = "Access code is unavailable, the defendant user already linked to the claim";
+    private static final String ERROR_MESSAGE_ACCESS_CODE = "Re set PIN is not required, please ask user to access their claim using ";
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -66,7 +68,7 @@ public class ResetPinCUICallbackHandler extends CallbackHandler {
         }
 
         if (StringUtils.isEmpty(lipAccessCode)) {
-            errors.add(ERROR_MESSAGE_ACCESS_CODE);
+            errors.add(ERROR_MESSAGE_ACCESS_CODE + pipInPostConfiguration.getRespondToClaimUrl());
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()

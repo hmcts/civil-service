@@ -9,6 +9,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
@@ -25,6 +26,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 
@@ -35,6 +37,8 @@ public class ResetPinCUICallbackHandlerTest extends BaseCallbackHandlerTest {
     private DefendantPinToPostLRspecService defendantPinToPostLRspecService;
     @Mock
     private ResetPinDefendantLipNotifier resetPinDefendantLipNotifier;
+    @Mock
+    private PinInPostConfiguration pipInPostConfiguration;
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
@@ -46,6 +50,7 @@ public class ResetPinCUICallbackHandlerTest extends BaseCallbackHandlerTest {
         handler = new ResetPinCUICallbackHandler(
             defendantPinToPostLRspecService,
             resetPinDefendantLipNotifier,
+            pipInPostConfiguration,
             objectMapper
         );
     }
@@ -122,7 +127,8 @@ public class ResetPinCUICallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getErrors()).containsExactly(
-                "Defendant email is missing. Please update defendant details with Manage contact information event and then perform RESET PIN"
+                "The defendant email address is missing. Please update the defendant details using the manage contact information" +
+                    " event and then perform reset pin event."
             );
         }
 
@@ -154,12 +160,14 @@ public class ResetPinCUICallbackHandlerTest extends BaseCallbackHandlerTest {
                                                    .build())
                 .build();
 
+            when(pipInPostConfiguration.getRespondToClaimUrl()).thenReturn("dummy_respond_to_claim_url");
+
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getErrors()).containsExactly(
-                "Access code is unavailable, the defendant user already linked to the claim"
+                "Re set PIN is not required, please ask user to access their claim using dummy_respond_to_claim_url"
             );
         }
     }
