@@ -53,6 +53,10 @@ public class InterestCalculator {
         return interestAmount;
     }
 
+    public BigDecimal claimAmountPlusInterestToDate(CaseData caseData) {
+        return caseData.getTotalClaimAmount().add(calculateInterest(caseData));
+    }
+
     private BigDecimal calculateInterestAmount(CaseData caseData, BigDecimal interestRate, LocalDate interestToDate) {
         if (InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE.equals(caseData.getInterestClaimFrom())) {
             LocalDate interestFromDate = getSubmittedDate(caseData);
