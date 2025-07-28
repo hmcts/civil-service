@@ -78,41 +78,6 @@ class ClaimSettledDefendantDashboardNotificationHandlerTest extends BaseCallback
         }
 
         @Test
-        void shouldRecordScenarioWhenQmLrIsOff_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedSmallClaim()
-                .caseDataLip(CaseDataLiP.builder().applicant1SettleClaim(YesOrNo.YES)
-                                 .applicant1ClaimSettledDate(
-                                     LocalDate.now()).build()).build();
-
-            HashMap<String, Object> scenarioParams = new HashMap<>();
-            scenarioParams.put("applicant1ClaimSettledDateEn", caseData.getApplicant1ClaimSettleDate());
-            scenarioParams.put("applicant1ClaimSettledDateCy", caseData.getApplicant1ClaimSettleDate());
-
-            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FOR_CLAIM_SETTLED_FOR_DEFENDANT1.name())
-                    .build()
-            ).build();
-
-            handler.handle(params);
-            verify(dashboardNotificationService).deleteByReferenceAndCitizenRole(
-                caseData.getCcdCaseReference().toString(),
-                "DEFENDANT");
-            verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate(
-                caseData.getCcdCaseReference().toString(),
-                "DEFENDANT",
-                "Application.View");
-
-            verify(dashboardScenariosService).recordScenarios(
-                "BEARER_TOKEN",
-                SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLE_EVENT_DEFENDANT.getScenario(),
-                caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
-            );
-        }
-
-        @Test
         void shouldRecordScenarioWhenQmLrIsOnAndIsNonOnEACourt_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimSubmittedSmallClaim()

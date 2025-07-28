@@ -123,7 +123,6 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
                 .build();
         }
 
-
         if (!initiateGeneralApplicationService.respondentAssigned(caseData)) {
             errors.add(RESP_NOT_ASSIGNED_ERROR);
         }
