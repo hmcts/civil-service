@@ -493,32 +493,6 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     }
 
     @Test
-    void shouldPopulateGaForLipsFlagIfFeatureFlagIsOn_LRVsLIPQueryManagementOff() {
-        when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPreSdoCNBC(), true));
-
-        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseDataForConsentUnconsentCheck(null).toBuilder()
-            .applicant1Represented(YES).respondent1Represented(NO).respondent2Represented(NO).build();
-
-        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
-            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
-
-        assertThat(result.getGeneralApplications().size()).isEqualTo(1);
-        assertThat(result.getGeneralApplications().get(0).getValue().getIsGaRespondentOneLip())
-            .isNotNull();
-        assertThat(result.getGeneralApplications().get(0).getValue().getIsGaRespondentTwoLip())
-            .isNotNull();
-        assertThat(result.getGeneralApplications().get(0).getValue().getIsGaApplicantLip())
-            .isNotNull();
-        assertThat(result.getGeneralApplications().get(0).getValue().getIsGaRespondentOneLip())
-            .isEqualTo(NO);
-        assertThat(result.getGeneralApplications().get(0).getValue().getIsGaRespondentTwoLip())
-            .isEqualTo(NO);
-        assertThat(result.getGeneralApplications().get(0).getValue().getIsGaApplicantLip())
-            .isEqualTo(NO);
-    }
-
-    @Test
     void shouldPopulateGaForLipsFlagIfFeatureFlagIsOn_LRVsLIPQueryManagementOn() {
         when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPreSdoCNBC(), true));
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
@@ -710,24 +684,6 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         String actual = "2022-02-15T12:00";
 
         assertThat(givenDate).isEqualTo(actual).isNotNull();
-    }
-
-    @Test
-    void shouldPopulatePartyNameDetailsQMOff() {
-        when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPreSdoCNBC(), true));
-        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseDataForConsentUnconsentCheck(GARespondentOrderAgreement.builder().hasAgreed(NO).build());
-
-        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
-            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
-
-        assertThat(result.getGeneralApplications().size()).isEqualTo(1);
-        assertThat(result.getGeneralApplications().get(0).getValue().getClaimant1PartyName()).isEqualTo("Applicant1");
-        assertThat(result.getGeneralApplications().get(0).getValue().getClaimant2PartyName()).isEqualTo("Applicant2");
-        assertThat(result.getGeneralApplications().get(0).getValue().getDefendant1PartyName()).isEqualTo("Respondent1");
-        assertThat(result.getGeneralApplications().get(0).getValue().getDefendant2PartyName()).isEqualTo("Respondent2");
-        assertThat(result.getGeneralApplications().get(0).getValue().getCaseNameGaInternal()).isEqualTo("Internal caseName");
-        assertThat(result.getGeneralApplications().get(0).getValue().getGaWaTrackLabel()).isEqualTo(FAST_CLAIM_TRACK.getValue());
     }
 
     @Test
