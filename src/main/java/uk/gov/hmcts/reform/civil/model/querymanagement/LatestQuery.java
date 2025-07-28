@@ -14,5 +14,6 @@ public class LatestQuery {
 
     private String queryId;
     private YesOrNo isHearingRelated;
+    private YesOrNo isWelsh;
 
 }
