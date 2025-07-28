@@ -57,7 +57,6 @@ class LocationServiceTest {
                                                                                   .build())
                                                                 .build()).build();
 
-
     @Test
     void shouldThrowException_whenApplicationMadeAfterSDOMainCaseCMLNotInRefDataQMOn() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
