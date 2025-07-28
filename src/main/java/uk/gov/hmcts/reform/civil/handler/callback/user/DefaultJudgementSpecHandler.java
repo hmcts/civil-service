@@ -372,6 +372,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         BigDecimal claimFeePounds = JudgmentsOnlineHelper.getClaimFeePounds(caseData, claimfee);
         BigDecimal fixedCost = getFixedCosts(caseData, interestCalculator);
         BigDecimal partialPaymentPounds = getPartialPayment(caseData);
+        BigDecimal claimAmountWithInterest = caseData.getTotalClaimAmount().add(interest);
         //calculate the relevant total, total claim value + interest if any, claim fee for case,
         // and subtract any partial payment
         BigDecimal subTotal = getSubTotal(caseData, interest, claimFeePounds, fixedCost);
@@ -395,10 +396,14 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             repaymentBreakdown.append(", including the claim fee and interest, if applicable, as shown:");
         }
 
-        repaymentBreakdown.append("\n").append("### Claim amount \n £").append(caseData.getTotalClaimAmount().setScale(2));
-
-        if (!toggleService.isJudgmentOnlineLive() && interest.compareTo(BigDecimal.ZERO) != 0) {
-            repaymentBreakdown.append("\n ### Claim interest amount \n").append("£").append(interest.setScale(2));
+        if (!toggleService.isJudgmentOnlineLive()) {
+            repaymentBreakdown.append("\n").append("### Claim amount \n £").append(caseData.getTotalClaimAmount().setScale(
+                2));
+            if (interest.compareTo(BigDecimal.ZERO) != 0) {
+                repaymentBreakdown.append("\n ### Claim interest amount \n").append("£").append(interest.setScale(2));
+            }
+        } else {
+            repaymentBreakdown.append("\n").append("### Claim amount \n £").append(claimAmountWithInterest.setScale(2));
         }
 
         if ((caseData.getFixedCosts() != null

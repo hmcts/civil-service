@@ -1676,7 +1676,6 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT, caseDataBefore.toMap(mapper));
 
             when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
-            when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData responseData = mapper.convertValue(response.getData(), CaseData.class);
