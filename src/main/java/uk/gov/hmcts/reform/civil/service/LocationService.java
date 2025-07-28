@@ -94,18 +94,16 @@ public class LocationService {
     }
 
     private CaseLocationCivil assignCaseManagementLocationToMainCaseLocation(CaseData caseData, String authToken) {
-        List<LocationRefData>  locationRefDataList = locationRefDataService.getHearingCourtLocations(authToken);
-        log.info("Hearing court locations found : {} for caseId {}", locationRefDataList, caseData.getCcdCaseReference());
+        String epimmsId = caseData.getCaseManagementLocation().getBaseLocation();
         log.info("Case managementLocation region {} and  base Location {} caseId {}",
                  caseData.getCaseManagementLocation().getRegion(),
-                 caseData.getCaseManagementLocation().getBaseLocation(), caseData.getCcdCaseReference());
-        var foundLocations = locationRefDataList.stream()
-            .filter(location -> location.getEpimmsId().equals(caseData.getCaseManagementLocation().getBaseLocation())).toList();
+                 epimmsId, caseData.getCcdCaseReference());
+        List<LocationRefData>  locationRefDataList = locationRefDataService.getCourtLocationsByEpimmsIdWithCML(authToken, epimmsId);
 
-        log.info("Filtered hearing court locations found : {} for caseId {}", foundLocations, caseData.getCcdCaseReference());
+        log.info("Filtered hearing court locations found : {} for caseId {}", locationRefDataList, caseData.getCcdCaseReference());
         LocationRefData caseManagementLocationDetails;
-        if (!foundLocations.isEmpty()) {
-            caseManagementLocationDetails = foundLocations.get(0);
+        if (!locationRefDataList.isEmpty()) {
+            caseManagementLocationDetails = locationRefDataList.get(0);
         } else {
             throw new IllegalArgumentException(String.format("Base Court Location for General applications not found, in location data for caseId %s",
                                                              caseData.getCcdCaseReference()));
