@@ -397,7 +397,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
 
         repaymentBreakdown.append("\n").append("### Claim amount \n £").append(caseData.getTotalClaimAmount().setScale(2));
 
-        if (!toggleService.isLrAdmissionBulkEnabled() && interest.compareTo(BigDecimal.ZERO) != 0) {
+        if (!toggleService.isJudgmentOnlineLive() && interest.compareTo(BigDecimal.ZERO) != 0) {
             repaymentBreakdown.append("\n ### Claim interest amount \n").append("£").append(interest.setScale(2));
         }
 
@@ -540,7 +540,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     }
 
     private String getDJJudgmentTabSummaryObject(JudgmentDetails activeJudgment, BigDecimal interest) {
-        return featureToggleService.isLrAdmissionBulkEnabled()
+        return featureToggleService.isJudgmentOnlineLive()
             ? JudgmentsOnlineHelper.calculateRepaymentBreakdownSummaryWithoutClaimInterest(activeJudgment, true)
             : JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(activeJudgment, interest);
     }
