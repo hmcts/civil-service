@@ -10,7 +10,7 @@ update dbs.scenario set notifications_to_delete = '{"Notice.AAA6.ClaimantIntent.
           "Notice.AAA6.DefResponse.PartAdmit.PayImmediately.Claimant",
           "Notice.AAA6.DefResponse.OrgOrLtdCompany.FullOrPartAdmit.PayByInstallments.Claimant",
           "Notice.AAA6.DefResponse.FullOrPartAdmit.PayBySetDate.Claimant",
-          "Notice.AAA6.DefResponse.FullOrPartAdmit.PayByInstalments.Claimant"}';
+          "Notice.AAA6.DefResponse.FullOrPartAdmit.PayByInstalments.Claimant"}'
 where name = 'Scenario.AAA6.JudgmentsOnline.IssuedCCJ.Claimant';
 
 UPDATE dbs.dashboard_notifications_templates
