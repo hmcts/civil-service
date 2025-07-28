@@ -75,7 +75,6 @@ class ClaimSettledDefendantDashboardNotificationHandlerTest extends BaseCallback
         @BeforeEach
         void setup() {
             when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-            when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(false);
         }
 
         @Test
@@ -115,7 +114,6 @@ class ClaimSettledDefendantDashboardNotificationHandlerTest extends BaseCallback
 
         @Test
         void shouldRecordScenarioWhenQmLrIsOnAndIsNonOnEACourt_whenInvoked() {
-            when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimSubmittedSmallClaim()
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation("test").region(
@@ -153,7 +151,6 @@ class ClaimSettledDefendantDashboardNotificationHandlerTest extends BaseCallback
 
         @Test
         void shouldRecordScenarioWhenQmLrIsOnEaCourt_whenInvoked() {
-            when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
             when(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimSubmittedSmallClaim()
