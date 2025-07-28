@@ -102,17 +102,20 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
 
-        CaseMessage latestCaseMessage = featureToggleService.isPublicQueryManagementEnabled(caseData)
+        boolean isPublicQmEnabled =  featureToggleService.isPublicQueryManagementEnabled(caseData);
+        CaseMessage latestCaseMessage = isPublicQmEnabled
             ? getLatestQuery(caseData) : getUserQueriesByRole(caseData, roles).latest();
 
         assignCategoryIdToAttachments(latestCaseMessage, assignCategoryId, roles);
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder().qmLatestQuery(
-            buildLatestQuery(latestCaseMessage));
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
 
         if (featureToggleService.isPublicQueryManagementEnabled(caseData)) {
-            caseDataBuilder.queries(caseData.getQueries().toBuilder().partyName(PUBLIC_QUERIES_PARTY_NAME).build());
+            caseDataBuilder
+                .queries(caseData.getQueries().toBuilder().partyName(PUBLIC_QUERIES_PARTY_NAME).build())
+                .qmLatestQuery(buildLatestQuery(latestCaseMessage, caseData, roles));;
             clearOldQueryCollections(caseDataBuilder);
         } else if (!isLIPClaimant(roles) && !isLIPDefendant(roles)) {
+            caseDataBuilder.qmLatestQuery(buildLatestQuery(latestCaseMessage));
             updateQueryCollectionPartyName(roles, MultiPartyScenario.getMultiPartyScenario(caseData), caseDataBuilder);
         }
 
