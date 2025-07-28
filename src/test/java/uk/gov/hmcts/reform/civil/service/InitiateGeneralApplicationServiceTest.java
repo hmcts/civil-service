@@ -760,32 +760,6 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     }
 
     @Test
-    void shouldPopulateApplicantDetailsQMOff() {
-        when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPreSdoCNBC(), true));
-        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseDataForConsentUnconsentCheck(GARespondentOrderAgreement.builder().hasAgreed(NO).build());
-
-        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
-            .email(APPLICANT_EMAIL_ID_CONSTANT).id(STRING_NUM_CONSTANT).build(), CallbackParams.builder().toString());
-
-        assertThat(result.getGeneralApplications().size()).isEqualTo(1);
-        assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppApplnSolicitor().getId())
-            .isEqualTo(STRING_NUM_CONSTANT);
-
-        assertThat(result.getGeneralApplications().get(0).getValue()
-                       .getGeneralAppRespondentSolicitors().size()).isEqualTo(4);
-
-        assertThat(result.getGeneralApplications().get(0).getValue().getLocationName())
-            .isEqualTo("site name of CNBC");
-        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getAddress())
-            .isEqualTo("Address of CNBC");
-        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getPostcode())
-            .isEqualTo("M5 4RR");
-        assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppRespondentSolicitors()
-                       .stream().filter(e -> STRING_NUM_CONSTANT.equals(e.getValue().getId())).count()).isEqualTo(0);
-    }
-
-    @Test
     void shouldPopulateApplicantDetailsQMOn() {
         when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPreSdoCNBC(), true));
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
@@ -968,24 +942,6 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
             .isEqualTo(NO);
         assertThat(result.getGeneralApplications().get(0).getValue().getIsGaApplicantLip())
             .isEqualTo(NO);
-    }
-
-    @Test
-    void shouldPopulateWorkAllocationLocationOnAboutToSubmit_beforeSDOHasBeenMadeQMOff() {
-        when(locationService.getWorkAllocationLocation(any(), anyString())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPreSdoCNBC(), true));
-        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-            .getCaseDataForWorkAllocation(CASE_ISSUED, UNSPEC_CLAIM, INDIVIDUAL, applicant1DQ, respondent1DQ,
-                                          respondent2DQ);
-        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
-            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
-
-        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
-            .isEqualTo("420219");
-        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getRegion())
-            .isEqualTo("2");
-        assertThat(result.getGeneralApplications().get(0).getValue().getIsCcmccLocation()).isEqualTo(YES);
-        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementCategory().getValue().getLabel())
-            .isEqualTo("Civil");
     }
 
     @Test
