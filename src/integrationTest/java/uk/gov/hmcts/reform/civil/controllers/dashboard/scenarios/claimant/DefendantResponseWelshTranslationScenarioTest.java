@@ -12,6 +12,8 @@ import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.dashboard.data.TaskStatus;
 
+import java.time.LocalDateTime;
+
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -71,6 +73,7 @@ public class DefendantResponseWelshTranslationScenarioTest extends DashboardBase
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build()
             .toBuilder()
             .applicant1Represented(YesOrNo.NO)
+            .respondent1ResponseDeadline(LocalDateTime.MAX)
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .caseDataLiP(CaseDataLiP.builder()
