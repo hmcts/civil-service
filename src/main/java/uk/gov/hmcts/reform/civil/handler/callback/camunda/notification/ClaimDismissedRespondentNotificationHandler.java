@@ -113,8 +113,7 @@ public class ClaimDismissedRespondentNotificationHandler extends CallbackHandler
             CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
         addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
 
         return properties;
     }
@@ -128,7 +127,7 @@ public class ClaimDismissedRespondentNotificationHandler extends CallbackHandler
 
     private String getSolicitorClaimDismissedProperty(CaseData caseData) {
         return claimDismissedEmailTemplater.getSolicitorClaimDismissedProperty(
-            stateFlowEngine.evaluate(caseData).getStateHistory()
+            stateFlowEngine.getStateFlow(caseData).getStateHistory()
                 .stream()
                 .map(State::getName)
                 .toList(),

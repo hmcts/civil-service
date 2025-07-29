@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/refdata/external/v1/organisations"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": "{\"name\":\"Civil-Organisation1\",\"organisationIdentifier\":\"Q1KOKP2\",\"contactInformation\":[{\"addressLine1\":\"38DelisleRoad\",\"addressLine2\":null,\"addressLine3\":null,\"townCity\":\"London\",\"county\":\"London\",\"country\":null,\"postCode\":\"SE280JE\",\"dxAddress\":[]}],\"status\":\"ACTIVE\",\"sraRegulated\":false,\"superUser\":{\"firstName\":\"Civil\",\"lastName\":\"Organisation1\",\"email\":\"hmcts.civil+organisation.1.superuser@gmail.com\"},\"paymentAccount\":[\"PBA0088192\",\"PBA0078095\"]}"
+  }
+}

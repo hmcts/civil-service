@@ -85,8 +85,7 @@ public class ClaimSetAsideJudgmentDefendantNotificationHandler extends CallbackH
             CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
         addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
         return properties;
     }
 
@@ -146,8 +145,7 @@ public class ClaimSetAsideJudgmentDefendantNotificationHandler extends CallbackH
             CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
         addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
         return properties;
     }
 
@@ -158,8 +156,7 @@ public class ClaimSetAsideJudgmentDefendantNotificationHandler extends CallbackH
             PARTY_NAME, caseData.getRespondent1().getPartyName()
         ));
         addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
         return properties;
     }
 }

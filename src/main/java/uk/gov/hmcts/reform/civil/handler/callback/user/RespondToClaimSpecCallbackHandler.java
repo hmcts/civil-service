@@ -80,6 +80,8 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -157,6 +159,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     private static final List<CaseEvent> EVENTS = Collections.singletonList(DEFENDANT_RESPONSE_SPEC);
     private static final String DEF2 = "Defendant 2";
     public static final String ERROR_DEFENDANT_RESPONSE_SPEC_SUBMITTED = "There is a problem \n You have already submitted the defendant's response";
+    private static final int RESPONSE_CLAIM_SPEC_DEADLINE_EXTENSION_MONTHS = 24;
     public static final String ERROR_RESPONSE_TO_CLAIM_OWING_AMOUNT = "This amount equals or exceeds the claim amount plus interest.";
     private final DateOfBirthValidator dateOfBirthValidator;
     private final UnavailableDateValidator unavailableDateValidator;
@@ -398,10 +401,19 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             currentShowFlags.add(WHEN_WILL_CLAIM_BE_PAID);
         }
         updatedCaseData.showConditionFlags(currentShowFlags);
+        check1v1PartAdmitLRBulkAdmission(updatedCaseData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.build().toMap(objectMapper))
             .build();
+    }
+
+    private void check1v1PartAdmitLRBulkAdmission(CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
+        CaseData caseData = updatedCaseData.build();
+        if (featureToggleService.isLrAdmissionBulkEnabled()) {
+            updatedCaseData.partAdmit1v1Defendant(MultiPartyScenario.isOneVOne(caseData)
+                                                      && caseData.isPartAdmitClaimSpec() ? YES : NO);
+        }
     }
 
     private Set<DefendantResponseShowTag> checkNecessaryFinancialDetails(CaseData caseData) {
@@ -1202,10 +1214,12 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             updatedCaseData.showCarmFields(NO);
         }
         if (toggleService.isLrAdmissionBulkEnabled()) {
-            updatedCaseData.totalClaimAmountPlusInterest(caseData.getClaimAmountInPounds());
-            BigDecimal interest = interestCalculator.calculateInterest(caseData);
-            BigDecimal totalAmountWithInterest = caseData.getTotalClaimAmount().add(interest);
+            updatedCaseData.totalClaimAmountPlusInterest(caseData.getClaimAmountInPounds().setScale(2));
+            updatedCaseData.totalClaimAmountPlusInterestString(caseData.getClaimAmountInPounds().setScale(2).toString());
+            BigDecimal interest = interestCalculator.calculateInterest(caseData).setScale(2);
+            BigDecimal totalAmountWithInterest = caseData.getTotalClaimAmount().add(interest).setScale(2);
             updatedCaseData.totalClaimAmountPlusInterestAdmitPart(totalAmountWithInterest);
+            updatedCaseData.totalClaimAmountPlusInterestAdmitPartString(totalAmountWithInterest.toString());
         }
 
         updatedCaseData.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1().toBuilder().flags(null).build());
@@ -1423,7 +1437,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
 
     private CallbackResponse setApplicantResponseDeadline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        LocalDateTime responseDate = time.now();
         Party updatedRespondent1;
 
         if (NO.equals(caseData.getSpecAoSApplicantCorrespondenceAddressRequired())) {
@@ -1443,7 +1456,12 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder()
             .respondent1(updatedRespondent1)
             .respondent1Copy(null);
+        updatedData.claimDismissedDeadline(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(
+            RESPONSE_CLAIM_SPEC_DEADLINE_EXTENSION_MONTHS,
+            LocalDate.now()
+        ));
 
+        LocalDateTime responseDate = time.now();
         if (respondent2HasSameLegalRep(caseData)
             && caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == YES) {
             updatedData.respondent2ClaimResponseTypeForSpec(caseData.getRespondent1ClaimResponseTypeForSpec());
@@ -1468,7 +1486,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             && caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == IMMEDIATELY
             && ifResponseTypeIsPartOrFullAdmission(caseData)) {
             LocalDate whenBePaid = deadlineCalculatorService.calculateExtendedDeadline(
-                LocalDate.now(),
+                ZonedDateTime.now(ZoneId.of("Europe/London")).toLocalDateTime(),
                 RespondentResponsePartAdmissionPaymentTimeLRspec.DAYS_TO_PAY_IMMEDIATELY);
             updatedData.respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
                                                           .whenWillThisAmountBePaid(whenBePaid).build());
@@ -1669,7 +1687,12 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 .build();
         }
         assembleResponseDocumentsSpec(caseData, updatedData);
-
+        if (featureToggleService.isWelshEnabledForMainCase() && caseData.isLipvLROneVOne()
+            && caseData.isClaimantBilingual()) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .data(updatedData.build().toMap(objectMapper))
+                .build();
+        }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
             .state(CaseState.AWAITING_APPLICANT_INTENTION.name())

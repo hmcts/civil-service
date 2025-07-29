@@ -29,6 +29,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isLip
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.applicantOutOfTimeNotBeingTakenOffline;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceNotProceed;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceProceed;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.isRespondentResponseLangIsBilingual;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE_NOT_PROCEED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE_PROCEED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.IN_MEDIATION;
@@ -49,13 +50,20 @@ public class FullDefenceTransitionBuilder extends MidTransitionBuilder {
                 // for carm cases, fullDefenceProcced is tracked with lipFullDefenceProceed
                 // and move to in mediation if applicant does not settle
                 .or(isCarmApplicableLipCase.and(lipFullDefenceProceed.or(fullDefenceProceed))), transitions)
+            .set((c, flags) -> {
+                flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), isRespondentResponseLangIsBilingual.test(c));
+            }, transitions)
             .moveTo(IN_MEDIATION, transitions)
             // for carm LR cases
             .onlyWhen(isCarmApplicableCase.and(fullDefenceProceed), transitions)
+            .set((c, flags) -> {
+                flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), isRespondentResponseLangIsBilingual.test(c));
+            }, transitions)
             .moveTo(FULL_DEFENCE_PROCEED, transitions)
             .onlyWhen(fullDefenceProceed.and(allAgreedToLrMediationSpec).and(agreedToMediation.negate()).and(declinedMediation.negate())
                           .and(isCarmApplicableLipCase.negate()).and(isCarmApplicableCase.negate()), transitions)
             .set((c, flags) -> {
+                flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), isRespondentResponseLangIsBilingual.test(c));
                 flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), true);
                 flags.put(FlowFlag.MINTI_ENABLED.name(), featureToggleService.isMultiOrIntermediateTrackEnabled(c));
                 flags.put(FlowFlag.SDO_ENABLED.name(),
@@ -66,6 +74,7 @@ public class FullDefenceTransitionBuilder extends MidTransitionBuilder {
                           .and(allAgreedToLrMediationSpec.negate().and(agreedToMediation.negate()).or(declinedMediation))
                           .and(applicantOutOfTimeNotBeingTakenOffline.negate()).and(demageMultiClaim), transitions)
             .set((c, flags) -> {
+                flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), isRespondentResponseLangIsBilingual.test(c));
                 flags.put(FlowFlag.IS_MULTI_TRACK.name(), true);
                 flags.put(FlowFlag.MINTI_ENABLED.name(), featureToggleService.isMultiOrIntermediateTrackEnabled(c));
                 flags.put(FlowFlag.SDO_ENABLED.name(),
@@ -78,6 +87,7 @@ public class FullDefenceTransitionBuilder extends MidTransitionBuilder {
                           .and(applicantOutOfTimeNotBeingTakenOffline.negate()).and(demageMultiClaim.negate()).and(isLipCase.negate()
                                                                                                                        .and(not(CaseData::isLipvLROneVOne))), transitions)
             .set((c, flags) -> {
+                flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), isRespondentResponseLangIsBilingual.test(c));
                 flags.put(FlowFlag.SDO_ENABLED.name(),
                     JudicialReferralUtils.shouldMoveToJudicialReferral(c, featureToggleService.isMultiOrIntermediateTrackEnabled(c)));
                 flags.put(FlowFlag.MINTI_ENABLED.name(), featureToggleService.isMultiOrIntermediateTrackEnabled(c));
@@ -86,11 +96,13 @@ public class FullDefenceTransitionBuilder extends MidTransitionBuilder {
             .onlyWhen((fullDefenceProceed.or(isClaimantNotSettleFullDefenceClaim).or(isDefendantNotPaidFullDefenceClaim).or(lipFullDefenceProceed))
                 .and(not(agreedToMediation)).and(isCarmApplicableLipCase.negate()).and(isLipCase.or(CaseData::isLipvLROneVOne)), transitions)
             .set((c, flags) -> {
+                flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), isRespondentResponseLangIsBilingual.test(c));
                 flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), false);
                 flags.put(FlowFlag.SETTLE_THE_CLAIM.name(), false);
             }, transitions)
             .moveTo(FULL_DEFENCE_PROCEED, transitions).onlyWhen(isClaimantSettleTheClaim.and(not(agreedToMediation)), transitions)
             .set((c, flags) -> {
+                flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), isRespondentResponseLangIsBilingual.test(c));
                 flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), false);
                 flags.put(FlowFlag.SETTLE_THE_CLAIM.name(), true);
             }, transitions)

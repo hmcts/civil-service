@@ -275,6 +275,11 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             updatedData.showCarmFields(NO);
         }
 
+        if (featureToggleService.isWelshEnabledForMainCase()
+            && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
+            updatedData.bilingualHint(YesOrNo.YES);
+        }
+
         /**
          * Update case management location to preferred logic and return preferred location when legal advisor SDO,
          * otherwise return preferred location only.
@@ -1383,6 +1388,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse generateSdoOrder(CallbackParams callbackParams) {
+        log.info("generateSdoOrder ccdCaseReference: {} legacyCaseReference: {}",
+                 callbackParams.getCaseData().getCcdCaseReference(), callbackParams.getCaseData().getLegacyCaseReference());
         CaseData caseData = V_1.equals(callbackParams.getVersion())
             ? mapHearingMethodFields(callbackParams.getCaseData())
             : callbackParams.getCaseData();
@@ -1518,13 +1525,12 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         CaseDocument document = caseData.getSdoOrderDocument();
         if (document != null) {
-            if (featureToggleService.isGaForWelshEnabled()
-                && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual()
-                || caseData.isLipClaimantSpecifiedBilingualDocuments() || caseData.isLipDefendantSpecifiedBilingualDocuments())) {
+            if (featureToggleService.isWelshEnabledForMainCase()
+                && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
                 List<Element<CaseDocument>> sdoDocuments = callbackParams.getCaseData()
-                    .getPreTranslationSdoOrderDocuments();
+                    .getPreTranslationDocuments();
                 sdoDocuments.add(element(document));
-                dataBuilder.preTranslationSdoOrderDocuments(sdoDocuments);
+                dataBuilder.preTranslationDocuments(sdoDocuments);
             } else {
                 List<Element<CaseDocument>> generatedDocuments = callbackParams.getCaseData()
                     .getSystemGeneratedCaseDocuments();

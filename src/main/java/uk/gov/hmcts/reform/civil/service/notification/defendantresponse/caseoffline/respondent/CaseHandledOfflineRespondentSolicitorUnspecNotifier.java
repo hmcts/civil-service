@@ -39,7 +39,6 @@ public class CaseHandledOfflineRespondentSolicitorUnspecNotifier extends CaseHan
         if (is1v1Or2v1Case(caseData)) {
             return notificationsProperties.getSolicitorDefendantResponseCaseTakenOffline();
         } else {
-
             return notificationsProperties.getSolicitorDefendantResponseCaseTakenOfflineMultiparty();
         }
     }
@@ -66,14 +65,12 @@ public class CaseHandledOfflineRespondentSolicitorUnspecNotifier extends CaseHan
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return NotificationUtils.caseOfflineNotificationAddProperties(caseData, caseData.getRespondent1OrganisationPolicy(), organisationService,
-                                                                      featureToggleService.isQueryManagementLRsEnabled(),
-                                                                      featureToggleService.isLipQueryManagementEnabled(caseData), configuration);
+                                                                      featureToggleService.isPublicQueryManagementEnabled(caseData), configuration);
     }
 
     public Map<String, String> addPropertiesRespondent2(CaseData caseData) {
         return NotificationUtils.caseOfflineNotificationAddProperties(caseData, caseData.getRespondent2OrganisationPolicy(), organisationService,
-                                                                      featureToggleService.isQueryManagementLRsEnabled(),
-                                                                      featureToggleService.isLipQueryManagementEnabled(caseData), configuration);
+                                                                      featureToggleService.isPublicQueryManagementEnabled(caseData), configuration);
     }
 
 }

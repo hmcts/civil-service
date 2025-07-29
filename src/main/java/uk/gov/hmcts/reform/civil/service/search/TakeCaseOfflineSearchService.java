@@ -7,7 +7,6 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
@@ -30,7 +29,8 @@ public class TakeCaseOfflineSearchService extends ElasticSearchService {
                 .minimumShouldMatch(1)
                 .should(boolQuery()
                             .must(rangeQuery("data.applicant1ResponseDeadline").lt("now"))
-                            .must(beState(AWAITING_APPLICANT_INTENTION)))
+                            .must(beState(AWAITING_APPLICANT_INTENTION))
+                            .mustNot(matchQuery("data.isMintiLipCase", "Yes")))
                 .should(boolQuery()
                             .must(rangeQuery("data.addLegalRepDeadlineRes1").lt("now"))
                             .must(beState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT)))
@@ -42,12 +42,6 @@ public class TakeCaseOfflineSearchService extends ElasticSearchService {
         );
         log.info("Take Case Offline query: {}", query);
         return query;
-    }
-
-    @Override
-    Query queryInMediationCases(int startIndex, LocalDate claimMovedDate, boolean carmEnabled, boolean initialSearch,
-                                String searchAfterValue) {
-        return null;
     }
 
     private QueryBuilder beState(CaseState caseState) {

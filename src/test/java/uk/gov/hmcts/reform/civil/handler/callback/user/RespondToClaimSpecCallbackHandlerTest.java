@@ -31,10 +31,10 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
@@ -1179,6 +1179,40 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         }
 
+        @Test
+        void shouldPauseLipVsLrCaseIfClaimantLipIsWelsh() {
+            // Given
+            when(toggleService.isWelshEnabledForMainCase()).thenReturn(true);
+            LocalDateTime dateTime = LocalDateTime.of(2023, 6, 6, 6, 6, 6);
+            LocalDate date = dateTime.toLocalDate();
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(time.now()).thenReturn(dateTime);
+            when(mockedStateFlow.isFlagSet(any())).thenReturn(false);
+            when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondent1v1FullDefenceSpec()
+                .ccdCaseReference(123456789)
+                .claimantBilingualLanguagePreference("BOTH")
+                .applicant1Represented(NO)
+                .respondent1Represented(YES)
+                .addRespondent2(NO)
+                .respondent1DQ()
+                .respondent1(PartyBuilder.builder().individual().build())
+                .respondent1Copy(PartyBuilder.builder().individual().build())
+                .respondent1ResponseDate(LocalDateTime.now())
+                .respondent1ResponseDeadline(dateTime)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any()))
+                .thenReturn(dateTime);
+            // When
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            // Then
+            assertThat(response.getState()).isNull();
+        }
+
         @Nested
         class UpdateExperts {
             @Test
@@ -1219,7 +1253,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 // Then
                 assertThat(response.getData())
                     .extracting("responseClaimExpertSpecRequired").isEqualTo("Yes");
-                assertThat(response.getData()).extracting("respondent1DQExperts").extracting("expertRequired").isEqualTo("Yes");
+                assertThat(response.getData()).extracting("respondent1DQExperts").extracting("expertRequired").isEqualTo(
+                    "Yes");
                 assertThat(response.getData()).extracting("nextDeadline").isEqualTo(localDateTime.toLocalDate().toString());
             }
 
@@ -1250,7 +1285,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 // Then
                 assertThat(response.getData())
                     .extracting("responseClaimExpertSpecRequired").isEqualTo("No");
-                assertThat(response.getData()).extracting("respondent1DQExperts").extracting("expertRequired").isEqualTo("No");
+                assertThat(response.getData()).extracting("respondent1DQExperts").extracting("expertRequired").isEqualTo(
+                    "No");
                 assertThat(response.getData()).extracting("nextDeadline").isEqualTo(localDateTime.toLocalDate().toString());
             }
 
@@ -1527,9 +1563,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         // Then
 
-        Witnesses actualRespondent1DQWitnesses = objectMapper.convertValue(response.getData().get(
-            "respondent1DQWitnesses"), new TypeReference<>() {
-            });
+        Witnesses actualRespondent1DQWitnesses =
+            objectMapper.convertValue(response.getData().get("respondent1DQWitnesses"), new TypeReference<>() {});
         Witness actualRespondent1Witness = unwrapElements(actualRespondent1DQWitnesses.getDetails()).get(0);
         assertThat(actualRespondent1Witness.getPartyID()).isNotNull();
         assertThat(actualRespondent1Witness.getFirstName()).isEqualTo("Witness");
@@ -1540,9 +1575,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         assertThat(actualRespondent1Witness.getEventAdded()).isEqualTo("Defendant Response Event");
         assertThat(actualRespondent1Witness.getDateAdded()).isEqualTo(date);
 
-        Witnesses actualRespondent2DQWitnesses = objectMapper.convertValue(response.getData().get(
-            "respondent2DQWitnesses"), new TypeReference<>() {
-            });
+        Witnesses actualRespondent2DQWitnesses =
+            objectMapper.convertValue(response.getData().get("respondent2DQWitnesses"), new TypeReference<>() {});
         Witness respondent2Witness = unwrapElements(actualRespondent2DQWitnesses.getDetails()).get(0);
         assertThat(respondent2Witness.getPartyID()).isNotNull();
         assertThat(respondent2Witness.getFirstName()).isEqualTo("Witness");
@@ -1704,7 +1738,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             UserInfo userInfo = UserInfo.builder().uid("798").build();
             when(userService.getUserInfo(anyString())).thenReturn(userInfo);
             LocalDate whenWillPay = LocalDate.now().plusDays(5);
-            given(deadlineExtensionCalculatorService.calculateExtendedDeadline(any(), anyInt())).willReturn(whenWillPay);
+            given(deadlineExtensionCalculatorService.calculateExtendedDeadline(any(LocalDateTime.class), anyInt())).willReturn(whenWillPay);
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -1937,7 +1971,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                            .build())
                 .build());
 
-        when(dqResponseDocumentUtils.buildDefendantResponseDocuments(any(CaseData.class))).thenReturn(newResponseDocuments);
+        when(dqResponseDocumentUtils.buildDefendantResponseDocuments(any(CaseData.class))).thenReturn(
+            newResponseDocuments);
 
         CaseData caseData = CaseDataBuilder.builder()
             .setIntermediateTrackClaim()
@@ -1999,7 +2034,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                            .createdDatetime(LocalDateTime.now())
                            .build())
                 .build());
-        when(dqResponseDocumentUtils.buildDefendantResponseDocuments(any(CaseData.class))).thenReturn(expectedResponseDocuments);
+        when(dqResponseDocumentUtils.buildDefendantResponseDocuments(any(CaseData.class))).thenReturn(
+            expectedResponseDocuments);
 
         CaseData caseData = CaseDataBuilder.builder()
             .setIntermediateTrackClaim()
@@ -2022,7 +2058,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         var actualCaseData = getCaseData(response);
 
         assertThat(actualCaseData.getDefendantResponseDocuments().size()).isEqualTo(1);
-        assertThat(actualCaseData.getDefendantResponseDocuments().get(0).getValue().getDocumentName()).isEqualTo("doc-name");
+        assertThat(actualCaseData.getDefendantResponseDocuments().get(0).getValue().getDocumentName()).isEqualTo(
+            "doc-name");
         assertThat(actualCaseData.getRespondent1DQ().getRespondent1DQDraftDirections()).isEqualTo(null);
 
         verify(dqResponseDocumentUtils, times(1)).buildDefendantResponseDocuments(any(CaseData.class));
@@ -2557,6 +2594,66 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getConfirmationBody())
                 .contains(caseData.getApplicant1().getPartyName())
                 .contains(DateFormatHelper.formatLocalDate(whenWillPay, DATE));
+        }
+
+        @Test
+        void specificSummary_whenPartialAdmitPayImmediately_LrAdmissionBulkEnabled() {
+            // Given
+            when(toggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
+            BigDecimal admitted = BigDecimal.valueOf(1000);
+            LocalDate whenWillPay = LocalDate.now().plusDays(5);
+            CaseData caseData = CaseDataBuilder.builder()
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .atStateApplicantRespondToDefenceAndProceed()
+                .build().toBuilder()
+                .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
+                                                   .whenWillThisAmountBePaid(whenWillPay).build())
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
+                .respondToAdmittedClaimOwingAmountPounds(admitted)
+                .respondentClaimResponseTypeForSpecGeneric(RespondentResponseTypeSpec.PART_ADMISSION)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+            // When
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            // Then
+            assertThat(response.getConfirmationBody())
+                .contains(caseData.getApplicant1().getPartyName())
+                .contains("the claimant can request a County Court Judgment against you.");
+        }
+
+        @Test
+        void specificSummary_whenPartialAdmitPayImmediately1v2_LrAdmissionBulkEnabled() {
+            // Given
+            when(toggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
+            BigDecimal admitted = BigDecimal.valueOf(1000);
+            LocalDate whenWillPay = LocalDate.now().plusDays(5);
+            CaseData caseData = CaseDataBuilder.builder()
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .atStateApplicantRespondToDefenceAndProceed()
+                .build().toBuilder()
+                .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
+                                                   .whenWillThisAmountBePaid(whenWillPay).build())
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
+                .respondToAdmittedClaimOwingAmountPounds(admitted)
+                .respondentClaimResponseTypeForSpecGeneric(RespondentResponseTypeSpec.PART_ADMISSION)
+                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2SameLegalRepresentative(NO)
+                .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .isRespondent2(YES)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+            // When
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            // Then
+            assertThat(response.getConfirmationBody())
+                .contains(caseData.getApplicant1().getPartyName())
+                .contains("the claimant can request a County Court Judgment against you.");
         }
 
         @Test
@@ -3451,7 +3548,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             assertThat(response).isNotNull();
-            assertThat(response.getErrors()).contains("Unavailability Date must not be more than three months in the future.");
+            assertThat(response.getErrors()).contains(
+                "Unavailability Date must not be more than three months in the future.");
         }
 
         @Test
@@ -3485,7 +3583,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             assertThat(response).isNotNull();
-            assertThat(response.getErrors()).contains("Unavailability Date From cannot be after Unavailability Date To. Please enter valid range.");
+            assertThat(response.getErrors()).contains(
+                "Unavailability Date From cannot be after Unavailability Date To. Please enter valid range.");
         }
 
         @Test
@@ -3553,7 +3652,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             assertThat(response).isNotNull();
-            assertThat(response.getErrors()).contains("Unavailability Date From cannot be after Unavailability Date To. Please enter valid range.");
+            assertThat(response.getErrors()).contains(
+                "Unavailability Date From cannot be after Unavailability Date To. Please enter valid range.");
         }
 
         @Test
@@ -3587,7 +3687,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             assertThat(response).isNotNull();
-            assertThat(response.getErrors()).contains("Unavailability Date To must not be more than three months in the future.");
+            assertThat(response.getErrors()).contains(
+                "Unavailability Date To must not be more than three months in the future.");
         }
 
     }
@@ -3765,7 +3866,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Then
             assertThat(response.getData()).extracting("showConditionFlags").asList()
                 .contains("SHOW_ADMITTED_AMOUNT_SCREEN");
-            ;
         }
 
         @Test
@@ -3816,6 +3916,43 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void handleEventsReturnsTheExpectedCallbackEvents() {
         assertThat(handler.handledEvents()).containsOnly(DEFENDANT_RESPONSE_SPEC);
+    }
+
+    @Test
+    void shouldSetClaimDismissedDeadlineTo24MonthsInFuture() {
+        // Given
+        LocalDateTime localDateTime = LocalDateTime.now();
+        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(true);
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(false);
+        when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any())).thenReturn(localDateTime);
+        when(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(24, LocalDate.now()))
+            .thenReturn(LocalDateTime.now().plusMonths(24));
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .claimDismissedDeadline(LocalDateTime.now().plusMonths(6))
+            .atStateClaimDetailsNotified()
+            .respondent2(PartyBuilder.builder().individual().build())
+            .addRespondent2(YES)
+            .respondent1(PartyBuilder.builder().individual().build())
+            .respondent1Copy(PartyBuilder.builder().individual().build())
+            .respondent1DQ(Respondent1DQ.builder().build())
+            .respondent2DQ(Respondent2DQ.builder().build())
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        // When
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+            .handle(params);
+
+        // Then
+        Object deadlineValue = response.getData().get("claimDismissedDeadline");
+        assertThat(deadlineValue).isNotNull();
+
+        LocalDate expectedDate = LocalDate.now().plusMonths(24);
+        LocalDate actualDate = LocalDateTime.parse(deadlineValue.toString()).toLocalDate();
+
+        assertThat(actualDate).isEqualTo(expectedDate);
     }
 
     private CaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {

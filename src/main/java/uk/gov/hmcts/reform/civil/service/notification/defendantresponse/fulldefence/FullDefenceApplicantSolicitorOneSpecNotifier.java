@@ -49,7 +49,11 @@ public class FullDefenceApplicantSolicitorOneSpecNotifier extends FullDefenceSol
             && (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
             || RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec()))
         ) {
-            emailTemplate = notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpec();
+            if (featureToggleService.isJudgmentOnlineLive()) {
+                emailTemplate = notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpecJBA();
+            } else {
+                emailTemplate = notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpec();
+            }
         } else {
             if (MultiPartyScenario.getMultiPartyScenario(caseData).equals(ONE_V_TWO_TWO_LEGAL_REP)) {
                 emailTemplate = notificationsProperties.getClaimantSolicitorDefendantResponse1v2DSForSpec();
@@ -93,8 +97,7 @@ public class FullDefenceApplicantSolicitorOneSpecNotifier extends FullDefenceSol
                 CASEMAN_REF, caseData.getLegacyCaseReference()
             ));
             addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
             return properties;
         } else {
             HashMap<String, String> properties = new HashMap<>(Map.of(
@@ -106,8 +109,7 @@ public class FullDefenceApplicantSolicitorOneSpecNotifier extends FullDefenceSol
                 CASEMAN_REF, caseData.getLegacyCaseReference()
             ));
             addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
             return properties;
         }
     }

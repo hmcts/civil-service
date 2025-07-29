@@ -12,8 +12,10 @@ import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.welshenhancements.PreTranslationDocumentType;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dq.DirectionQuestionnaireLipGeneratorFactory;
@@ -63,16 +65,21 @@ public class GenerateDirectionQuestionnaireLipCallBackHandler extends CallbackHa
         CaseDocument sealedDQForm = directionQuestionnaireLipGeneratorFactory
             .getDirectionQuestionnaire()
             .generate(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
-        if (featureToggleService.isGaForWelshEnabled()
+        if (featureToggleService.isWelshEnabledForMainCase()
             && sealedDQForm.getDocumentName().contains("claimant")
-            && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual()
-            || caseData.isLipClaimantSpecifiedBilingualDocuments()
-            || caseData.isLipDefendantSpecifiedBilingualDocuments())) {
+            && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
             assignCategoryId.assignCategoryIdToCaseDocument(sealedDQForm, DocCategory.DQ_APP1.getValue());
             List<Element<CaseDocument>> translatedDocuments = callbackParams.getCaseData()
                 .getPreTranslationDocuments();
             translatedDocuments.add(element(sealedDQForm));
+            caseDataBuilder.bilingualHint(YesOrNo.YES);
             caseDataBuilder.preTranslationDocuments(translatedDocuments);
+            caseDataBuilder.preTranslationDocumentType(PreTranslationDocumentType.LIP_CLAIMANT_DQ);
+        } else if (featureToggleService.isWelshEnabledForMainCase()
+            && sealedDQForm.getDocumentName().contains("defendant")
+            && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
+            assignCategoryId.assignCategoryIdToCaseDocument(sealedDQForm, DocCategory.DQ_DEF1.getValue());
+            caseDataBuilder.respondent1OriginalDqDoc(sealedDQForm);
         } else {
             caseDataBuilder
                 .systemGeneratedCaseDocuments(systemGeneratedDocumentService

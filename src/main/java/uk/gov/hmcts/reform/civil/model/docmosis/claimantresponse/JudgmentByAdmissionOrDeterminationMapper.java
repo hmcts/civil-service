@@ -233,12 +233,20 @@ public class JudgmentByAdmissionOrDeterminationMapper {
             .installmentAmount(caseData.isPayByInstallment()
                                    ? String.valueOf(MonetaryConversions.penniesToPounds(caseData.getRespondent1RepaymentPlan().getPaymentAmount()))
                                    : null)
-            .ccjJudgmentAmount(judgementService.ccjJudgmentClaimAmount(caseData).setScale(2).toString())
+            .ccjJudgmentAmount(getJudgmentAmount(caseData).setScale(2).toString())
             .ccjInterestToDate(totalInterest)
             .claimFee(getClaimCosts(caseData))
             .ccjSubtotal(judgementService.ccjJudgementSubTotal(caseData).setScale(2).toString())
             .ccjFinalTotal(judgementService.ccjJudgmentFinalTotal(caseData).setScale(2).toString())
             .build();
+    }
+
+    private BigDecimal getJudgmentAmount(CaseData caseData) {
+        if (caseData.isLipvLipOneVOne() && caseData.isPayBySetDate() && caseData.isFullAdmitClaimSpec()) {
+            BigDecimal interest = judgementService.getLatestInterest(caseData);
+            return judgementService.ccjJudgmentClaimAmount(caseData).add(interest);
+        }
+        return judgementService.ccjJudgmentClaimAmount(caseData);
     }
 
     public JudgmentByAdmissionOrDetermination toNonDivergentWelshDocs(CaseData caseData, JudgmentByAdmissionOrDetermination builder) {
@@ -318,8 +326,8 @@ public class JudgmentByAdmissionOrDeterminationMapper {
     }
 
     private String getClaimCosts(CaseData caseData) {
-        return (judgementService.isLrFullAdmitRepaymentPlan(caseData)
-            || judgementService.isLRPartAdmitRepaymentPlan(caseData))
+        return (judgementService.isLRAdmissionRepaymentPlan(caseData)
+               || judgementService.isLrPayImmediatelyPlan(caseData))
             ? (getClaimFee(caseData).add(judgementService.ccjJudgmentFixedCost(caseData))).toString()
             : getClaimFee(caseData).toString();
     }
