@@ -1,13 +1,22 @@
 package uk.gov.hmcts.reform.civil.service.robotics.mapper;
 
-import camundajar.impl.scala.Option;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.enums.*;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
+import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
+import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCaseman;
@@ -441,7 +450,9 @@ public class EventHistoryMapper {
         ClaimantLiPResponse applicant1Response = Optional.ofNullable(caseData.getCaseDataLiP())
             .map(CaseDataLiP::getApplicant1LiPResponse).orElse(null);
         Optional<RepaymentPlanLRspec> repaymentPlan = Optional.ofNullable(caseData.getRespondent1RepaymentPlan());
-        BigDecimal repaymentAmount = applicant1Response != null ? caseData.getApplicant1SuggestInstalmentsPaymentAmountForDefendantSpec() : repaymentPlan.map(RepaymentPlanLRspec::getPaymentAmount).orElse(null);
+        BigDecimal repaymentAmount = applicant1Response != null && applicant1Response.hasCourtDecisionInFavourOfClaimant()
+            ? caseData.getApplicant1SuggestInstalmentsPaymentAmountForDefendantSpec()
+            : repaymentPlan.map(RepaymentPlanLRspec::getPaymentAmount).orElse(null);
         return isResponsePayByInstallment
             ? MonetaryConversions.penniesToPounds(
             Optional.ofNullable(repaymentAmount).map(amount -> amount.setScale(2)).orElse(ZERO))
@@ -449,11 +460,19 @@ public class EventHistoryMapper {
     }
 
     @Nullable
-    private LocalDate getFirstInstallmentDate(boolean isResponsePayByInstallment, Optional<RepaymentPlanLRspec> repaymentPlan, ClaimantLiPResponse applicant1Response) {
-        return isResponsePayByInstallment
-            ? repaymentPlan.map(RepaymentPlanLRspec::getFirstRepaymentDate)
-            .orElse(null)
-            : null;
+    private LocalDate getFirstInstallmentDate(CaseData caseData) {
+        boolean isResponsePayByInstallment = caseData.isPayByInstallment();
+        ClaimantLiPResponse applicant1Response = Optional.ofNullable(caseData.getCaseDataLiP())
+            .map(CaseDataLiP::getApplicant1LiPResponse).orElse(null);
+        LocalDate firstInstallmentDate = null;
+        if (applicant1Response != null && applicant1Response.hasCourtDecisionInFavourOfClaimant()) {
+            firstInstallmentDate = caseData.getApplicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec();
+        } else {
+            Optional<RepaymentPlanLRspec> repaymentPlan = ofNullable(caseData.getRespondent1RepaymentPlan());
+            firstInstallmentDate = repaymentPlan.map(RepaymentPlanLRspec::getFirstRepaymentDate).orElse(null);
+        }
+
+        return isResponsePayByInstallment ? firstInstallmentDate : null;
     }
 
     private void buildBreathingSpaceEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData,
@@ -649,18 +668,6 @@ public class EventHistoryMapper {
 
     private void buildJudgmentByAdmissionEventDetails(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         boolean isResponsePayByInstallment = caseData.isPayByInstallment();
-        ClaimantLiPResponse applicant1Response = Optional.ofNullable(caseData.getCaseDataLiP())
-            .map(CaseDataLiP::getApplicant1LiPResponse).orElse(null);
-       // Optional<RepaymentPlanLRspec> repaymentPlan = Optional.ofNullable(caseData.getRespondent1RepaymentPlan());
-        if (applicant1Response == null && applicant1Response.hasCourtDecisionInFavourOfClaimant()) {
-        //getPaymentAmount
-            caseData.getApplicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec();
-        //repaymentFrequency
-            caseData.getApplicant1SuggestInstalmentsPaymentAmountForDefendantSpec();
-        //getFirstRepaymentDate
-            caseData.getApplicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec();
-        }
-
         EventDetails judgmentByAdmissionEvent = EventDetails.builder()
             .amountOfJudgment(getAmountOfJudgmentForAdmission(caseData))
             .amountOfCosts(caseData.getCcjPaymentDetails().getCcjJudgmentFixedCostAmount()
@@ -671,10 +678,10 @@ public class EventHistoryMapper {
                                    ? caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid().atStartOfDay()
                                    : null)
             .installmentAmount(getInstallmentAmount(isResponsePayByInstallment, caseData))
-            .installmentPeriod(featureToggleService.isJOLiveFeedActive() ? getJBAInstallmentPeriod(caseData) : (isResponsePayByInstallment
-                                   ? getInstallmentPeriodForRequestJudgmentByAdmission(repaymentPlan)
-                                   : null))
-            .firstInstallmentDate(getFirstInstallmentDate(isResponsePayByInstallment, repaymentPlan))
+            .installmentPeriod(featureToggleService.isJOLiveFeedActive() ? getJBAInstallmentPeriod(caseData) : isResponsePayByInstallment
+                                   ? getInstallmentPeriodForRequestJudgmentByAdmission(caseData)
+                                   : null)
+            .firstInstallmentDate(getFirstInstallmentDate(caseData))
             .dateOfJudgment(getJbADate(caseData))
             .jointJudgment(false)
             .judgmentToBeRegistered(true)
@@ -2463,7 +2470,6 @@ public class EventHistoryMapper {
     private String getInstallmentPeriod(CaseData data) {
         if (data.getPaymentTypeSelection().equals(DJPaymentTypeSelection.REPAYMENT_PLAN)) {
             if (data.getRepaymentFrequency().equals(RepaymentFrequencyDJ.ONCE_ONE_WEEK)) {
-
                 return "WK";
             } else if (data.getRepaymentFrequency().equals(RepaymentFrequencyDJ.ONCE_TWO_WEEKS)) {
                 return "FOR";
@@ -2481,40 +2487,21 @@ public class EventHistoryMapper {
     private String getInstallmentPeriodForRequestJudgmentByAdmission(CaseData caseData) {
         ClaimantLiPResponse applicant1Response = Optional.ofNullable(caseData.getCaseDataLiP())
             .map(CaseDataLiP::getApplicant1LiPResponse).orElse(null);
-        String repaymentFrequency = null;
         if (applicant1Response != null && applicant1Response.hasCourtDecisionInFavourOfClaimant()) {
-            repaymentFrequency = Optional.ofNullable(caseData.getApplicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec()).map(PaymentFrequencyClaimantResponseLRspec::getLabel).orElse(null);
+            return mapToRepaymentPlanFrequency(Optional.ofNullable(caseData.getApplicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec()).map(Enum::name).orElse(""));
         } else {
-            return getRespondent1RepaymentPlanFrequency(Optional.ofNullable(caseData.getRespondent1RepaymentPlan()));
+            return mapToRepaymentPlanFrequency(ofNullable(caseData.getRespondent1RepaymentPlan()).map(RepaymentPlanLRspec::getRepaymentFrequency).map(
+                Enum::name).orElse(""));
         }
     }
 
-    private String getRespondent1RepaymentPlanFrequency(Optional<RepaymentPlanLRspec> repaymentPlanLRspec) {
-        return repaymentPlanLRspec.map(RepaymentPlanLRspec::getRepaymentFrequency).map(repaymentFrequency -> {
-            switch (repaymentFrequency) {
-                case ONCE_ONE_WEEK:
-                    return "WK";
-                case ONCE_TWO_WEEKS:
-                    return "FOR";
-                case ONCE_ONE_MONTH:
-                    return "MTH";
-                default:
-                    return null;
-            }
-        }).orElse(null);
-    }
-
-    private String getApplicant1RepaymentPlanFrequency(String frequency) {
-            switch (frequency) {
-                case "ONCE_ONE_WEEK":
-                    return "WK";
-                case "ONCE_TWO_WEEKS":
-                    return "FOR";
-                case "ONCE_ONE_MONTH":
-                    return "MTH";
-                default:
-                    return null;
-            };
+    private String mapToRepaymentPlanFrequency(String frequency) {
+        return switch (frequency) {
+            case "ONCE_ONE_WEEK" -> "WK";
+            case "ONCE_TWO_WEEKS" -> "FOR";
+            case "ONCE_ONE_MONTH" -> "MTH";
+            default -> null;
+        };
     }
 
     private String getJBAInstallmentPeriod(CaseData caseData) {
