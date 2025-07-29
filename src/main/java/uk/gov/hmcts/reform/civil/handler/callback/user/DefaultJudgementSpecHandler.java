@@ -511,8 +511,10 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         if (featureToggleService.isJudgmentOnlineLive()) {
             JudgmentDetails activeJudgment = djOnlineMapper.addUpdateActiveJudgment(caseData);
             caseData.setActiveJudgment(activeJudgment);
-            BigDecimal interest = interestCalculator.calculateInterest(caseData);
-            caseData.setJoRepaymentSummaryObject(getDJJudgmentTabSummaryObject(activeJudgment, interest));
+            caseData.setJoRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummaryWithoutClaimInterest(
+                activeJudgment,
+                true
+            ));
             caseData.setJoIsLiveJudgmentExists(YesOrNo.YES);
             caseData.setJoDJCreatedDate(LocalDateTime.now());
         }
@@ -542,12 +544,6 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             .data(caseDataBuilder.build().toMap(objectMapper))
             .state(nextState)
             .build();
-    }
-
-    private String getDJJudgmentTabSummaryObject(JudgmentDetails activeJudgment, BigDecimal interest) {
-        return featureToggleService.isJudgmentOnlineLive()
-            ? JudgmentsOnlineHelper.calculateRepaymentBreakdownSummaryWithoutClaimInterest(activeJudgment, true)
-            : JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(activeJudgment, interest);
     }
 
     private BigDecimal calculateOverallTotal(BigDecimal partialPaymentPounds, BigDecimal subTotal) {
