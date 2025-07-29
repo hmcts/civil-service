@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.advice;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,12 +16,13 @@ import static uk.gov.hmcts.reform.civil.utils.ContentCachingRequestWrapperUtil.g
 @Slf4j
 @ControllerAdvice
 @RequiredArgsConstructor
+@Order(3)
 public class UncaughtExceptionHandler {
 
     @ExceptionHandler(value = RuntimeException.class)
     public ResponseEntity<Object> runtimeException(Exception exception,
                                                    ContentCachingRequestWrapper contentCachingRequestWrapper) {
-        log.debug(exception.getMessage(), exception);
+        log.error(exception.getMessage(), exception);
         String errorMessage = "Runtime exception of type %s occurred with message: %s for case %s run by user %s";
         final String formattedMessage = errorMessage.formatted(exception.getClass().getName(), exception.getMessage(),
                                                                getCaseId(contentCachingRequestWrapper),
