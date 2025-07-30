@@ -6,7 +6,11 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.interestcalc.*;
+import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
+import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
+import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
+import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
+import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestType;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
