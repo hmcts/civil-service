@@ -677,7 +677,7 @@ public class EventHistoryMapper {
                                    ? caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid().atStartOfDay()
                                    : null)
             .installmentAmount(getInstallmentAmount(isResponsePayByInstallment, caseData))
-            .installmentPeriod(featureToggleService.isJOLiveFeedActive() ? getJBAInstallmentPeriod(caseData) : getInstallmentPeriodForRequestJudgmentByAdmission(caseData))
+            .installmentPeriod(getJBAInstallmentPeriod(caseData))
             .firstInstallmentDate(getFirstInstallmentDate(caseData))
             .dateOfJudgment(getJbADate(caseData))
             .jointJudgment(false)
@@ -2507,12 +2507,15 @@ public class EventHistoryMapper {
     }
 
     private String getJBAInstallmentPeriod(CaseData caseData) {
+        boolean joLiveFeedActive = featureToggleService.isJOLiveFeedActive();
         if (caseData.isPayByInstallment()) {
-            return getInstallmentPeriod(caseData);
-        } else if (caseData.isPayBySetDate()) {
+            return getInstallmentPeriodForRequestJudgmentByAdmission(caseData);
+        } else if (joLiveFeedActive && caseData.isPayBySetDate()) {
             return "FUL";
-        } else {
+        } else if (joLiveFeedActive) {
             return "FW";
+        } else {
+            return null;
         }
     }
 
