@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
-import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
 import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
@@ -678,9 +677,7 @@ public class EventHistoryMapper {
                                    ? caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid().atStartOfDay()
                                    : null)
             .installmentAmount(getInstallmentAmount(isResponsePayByInstallment, caseData))
-            .installmentPeriod(featureToggleService.isJOLiveFeedActive() ? getJBAInstallmentPeriod(caseData) : isResponsePayByInstallment
-                                   ? getInstallmentPeriodForRequestJudgmentByAdmission(caseData)
-                                   : null)
+            .installmentPeriod(featureToggleService.isJOLiveFeedActive() ? getJBAInstallmentPeriod(caseData) : getInstallmentPeriodForRequestJudgmentByAdmission(caseData))
             .firstInstallmentDate(getFirstInstallmentDate(caseData))
             .dateOfJudgment(getJbADate(caseData))
             .jointJudgment(false)
@@ -2485,13 +2482,18 @@ public class EventHistoryMapper {
     }
 
     private String getInstallmentPeriodForRequestJudgmentByAdmission(CaseData caseData) {
-        ClaimantLiPResponse applicant1Response = Optional.ofNullable(caseData.getCaseDataLiP())
-            .map(CaseDataLiP::getApplicant1LiPResponse).orElse(null);
-        if (applicant1Response != null && applicant1Response.hasCourtDecisionInFavourOfClaimant()) {
-            return mapToRepaymentPlanFrequency(Optional.ofNullable(caseData.getApplicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec()).map(Enum::name).orElse(""));
+        boolean isResponsePayByInstallment = caseData.isPayByInstallment();
+        if (isResponsePayByInstallment) {
+            ClaimantLiPResponse applicant1Response = Optional.ofNullable(caseData.getCaseDataLiP())
+                .map(CaseDataLiP::getApplicant1LiPResponse).orElse(null);
+            if (applicant1Response != null && applicant1Response.hasCourtDecisionInFavourOfClaimant()) {
+                return mapToRepaymentPlanFrequency(Optional.ofNullable(caseData.getApplicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec()).map(Enum::name).orElse(""));
+            } else {
+                return mapToRepaymentPlanFrequency(ofNullable(caseData.getRespondent1RepaymentPlan()).map(RepaymentPlanLRspec::getRepaymentFrequency).map(
+                    Enum::name).orElse(""));
+            }
         } else {
-            return mapToRepaymentPlanFrequency(ofNullable(caseData.getRespondent1RepaymentPlan()).map(RepaymentPlanLRspec::getRepaymentFrequency).map(
-                Enum::name).orElse(""));
+            return null;
         }
     }
 
@@ -2506,13 +2508,7 @@ public class EventHistoryMapper {
 
     private String getJBAInstallmentPeriod(CaseData caseData) {
         if (caseData.isPayByInstallment()) {
-            PaymentFrequencyLRspec repaymentFrequency = caseData.getRespondent1RepaymentPlan().getRepaymentFrequency();
-            return switch (repaymentFrequency) {
-                case ONCE_ONE_WEEK -> "WK";
-                case ONCE_TWO_WEEKS -> "FOR";
-                case ONCE_ONE_MONTH -> "MTH";
-                default -> null;
-            };
+            return getInstallmentPeriod(caseData);
         } else if (caseData.isPayBySetDate()) {
             return "FUL";
         } else {
