@@ -55,17 +55,11 @@ public class DashboardNotificationsParamsMapper {
                         && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
                         return null;
                     } else {
-                        return caseData.getFinalOrderDocumentCollection() != null && caseData.getFinalOrderDocumentCollection().size() > 0
-                            ? caseData.getFinalOrderDocumentCollection()
-                                .get(0).getValue().getDocumentLink().getDocumentBinaryUrl()
-                            : null;
+                        return getFirstFinalOrderUrlIfPresent(caseData);
                     }
                 }
                 case UPDATE_TASK_LIST_CONFIRM_ORDER_REVIEW_CLAIMANT, UPDATE_TASK_LIST_CONFIRM_ORDER_REVIEW_DEFENDANT -> {
-                    return caseData.getFinalOrderDocumentCollection() != null && caseData.getFinalOrderDocumentCollection().size() > 0
-                        ? caseData.getFinalOrderDocumentCollection()
-                            .get(0).getValue().getDocumentLink().getDocumentBinaryUrl()
-                        : null;
+                    return getFirstFinalOrderUrlIfPresent(caseData);
                 }
                 case CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_DEFENDANT, CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_CLAIMANT -> {
                     return caseData.getOrderSDODocumentDJCollection()
@@ -83,6 +77,13 @@ public class DashboardNotificationsParamsMapper {
             }
         }
         return null;
+    }
+
+    private String getFirstFinalOrderUrlIfPresent(CaseData caseData) {
+        return caseData.getFinalOrderDocumentCollection() != null && caseData.getFinalOrderDocumentCollection().size() > 0
+            ? caseData.getFinalOrderDocumentCollection()
+            .get(0).getValue().getDocumentLink().getDocumentBinaryUrl()
+            : null;
     }
 
     private String addToHiddenDocumentInfo(CaseData caseData, CaseEvent caseEvent) {
