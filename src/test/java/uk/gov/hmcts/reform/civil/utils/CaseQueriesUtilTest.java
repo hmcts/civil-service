@@ -7,6 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
@@ -16,7 +18,10 @@ import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.QueryCollectionType;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseQueriesCollection;
@@ -110,8 +115,40 @@ class CaseQueriesUtilTest {
             .build();
 
         LatestQuery result = CaseQueriesUtil.buildLatestQuery(caseMessage);
+        assertEquals("id", result.getQueryId());
+        assertNull(result.getIsWelsh());
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = {
+        "CLAIMANT, WELSH, ENGLISH, YES",
+        "CLAIMANT, BOTH, ENGLISH, YES",
+        "CLAIMANT, ENGLISH, WELSH, NO",
+        "CLAIMANT, ENGLISH, ENGLISH, NO",
+        "DEFENDANT, ENGLISH, WELSH, YES",
+        "DEFENDANT, ENGLISH, BOTH, YES",
+        "DEFENDANT, WELSH, ENGLISH, NO",
+        "DEFENDANT, ENGLISH, ENGLISH, NO",
+        "OTHER_ROLE, NULL, WELSH, NO",
+        "OTHER_ROLE, WELSH, NULL, NO",
+        "OTHER_ROLE, NULL, NULL, NO"
+    }, nullValues = "NULL")
+    void shouldBuildLatestQueryFromCaseMessage_withLanguagePreference(String caseRole, String claimantLanguage, String defendantLanguage, YesOrNo expected) {
+        OffsetDateTime createdOn = OffsetDateTime.now();
+        List<String> roles = List.of(caseRole);
+        CaseData caseData = CaseData.builder()
+            .claimantBilingualLanguagePreference(claimantLanguage)
+            .caseDataLiP(respondentResponseWithLanguagePreference(defendantLanguage))
+            .build();
+        CaseMessage caseMessage = buildCaseMessage("id", "Query 3")
+            .toBuilder()
+            .createdOn(createdOn)
+            .build();
+
+        LatestQuery result = CaseQueriesUtil.buildLatestQuery(caseMessage, caseData, roles);
 
         assertEquals("id", result.getQueryId());
+        assertEquals(expected, result.getIsWelsh());
     }
 
     @Test
@@ -1030,5 +1067,12 @@ class CaseQueriesUtilTest {
     @Test
     void shouldNotError_whenNoOldQueriesExistWhileLoggingMigrationSuccess() {
         CaseQueriesUtil.logMigrationSuccess(CaseData.builder().build());
+    }
+
+    private CaseDataLiP respondentResponseWithLanguagePreference(String languagePreference) {
+        return CaseDataLiP.builder()
+            .respondent1LiPResponse(
+                RespondentLiPResponse.builder().respondent1ResponseLanguage(languagePreference).build()
+            ).build();
     }
 }
