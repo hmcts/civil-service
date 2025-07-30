@@ -183,7 +183,25 @@ public class DashboardController {
     }
 
     @DeleteMapping(path = {
-        "notifications/{ccd-case-identifier}/role/{role-type}"
+        "notifications/{ccd-case-identifier}/role/{role-type}/{template-name}"
+    }, consumes = MediaType.ALL_VALUE)
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "OK"),
+        @ApiResponse(responseCode = "401", description = "Not Authorized"),
+        @ApiResponse(responseCode = "400", description = "Bad Request")})
+    public ResponseEntity<Void> deleteTemplateNotificationsForCaseIdentifierAndRole(
+        @PathVariable("ccd-case-identifier") String ccdCaseIdentifier,
+        @PathVariable("role-type") String roleType,
+        @PathVariable("template-name") String templateName,
+        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
+    ) {
+        log.info("Received UUID for deleting notification : {} for case: {} and role {}", templateName, ccdCaseIdentifier, roleType);
+        dashboardNotificationService.deleteByNameAndReferenceAndCitizenRole(templateName, ccdCaseIdentifier, roleType);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @DeleteMapping(path = {
+        "notifications/{ccd-case-identifier}/role/{role-type}/"
     }, consumes = MediaType.ALL_VALUE)
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK"),
@@ -198,6 +216,7 @@ public class DashboardController {
         dashboardNotificationService.deleteByReferenceAndCitizenRole(ccdCaseIdentifier, roleType);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
 
     @PostMapping(path = "/scenarios/{scenario_ref}/{unique_case_identifier}")
     @ApiResponses(value = {
