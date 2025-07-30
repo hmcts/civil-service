@@ -183,7 +183,7 @@ public class DashboardController {
     }
 
     @DeleteMapping(path = {
-        "notifications/{ccd-case-identifier}/role/{role-type}/"
+        "notifications/{ccd-case-identifier}/role/{role-type}"
     }, consumes = MediaType.ALL_VALUE)
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK"),
