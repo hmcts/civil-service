@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PartyData;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
+import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceType;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
@@ -446,7 +447,8 @@ public class EventHistoryMapper {
     }
 
     @Nullable
-    private BigDecimal getInstallmentAmount(boolean isResponsePayByInstallment, CaseData caseData) {
+    private BigDecimal getInstallmentAmount(CaseData caseData) {
+        boolean isResponsePayByInstallment = caseData.isPayByInstallment();
         ClaimantLiPResponse applicant1Response = Optional.ofNullable(caseData.getCaseDataLiP())
             .map(CaseDataLiP::getApplicant1LiPResponse).orElse(null);
         Optional<RepaymentPlanLRspec> repaymentPlan = Optional.ofNullable(caseData.getRespondent1RepaymentPlan());
@@ -667,17 +669,15 @@ public class EventHistoryMapper {
     }
 
     private void buildJudgmentByAdmissionEventDetails(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        boolean isResponsePayByInstallment = caseData.isPayByInstallment();
+
         EventDetails judgmentByAdmissionEvent = EventDetails.builder()
             .amountOfJudgment(getAmountOfJudgmentForAdmission(caseData))
             .amountOfCosts(caseData.getCcjPaymentDetails().getCcjJudgmentFixedCostAmount()
                                .add(caseData.getCcjPaymentDetails().getCcjJudgmentAmountClaimFee()).setScale(2))
             .amountPaidBeforeJudgment(caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeAmountInPounds().setScale(2))
             .isJudgmentForthwith(caseData.isPayImmediately())
-            .paymentInFullDate(caseData.isPayBySetDate()
-                                   ? caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid().atStartOfDay()
-                                   : null)
-            .installmentAmount(getInstallmentAmount(isResponsePayByInstallment, caseData))
+            .paymentInFullDate(getPaymentInFullDate(caseData))
+            .installmentAmount(getInstallmentAmount(caseData))
             .installmentPeriod(getJBAInstallmentPeriod(caseData))
             .firstInstallmentDate(getFirstInstallmentDate(caseData))
             .dateOfJudgment(getJbADate(caseData))
@@ -694,6 +694,14 @@ public class EventHistoryMapper {
             .eventDetails(judgmentByAdmissionEvent)
             .eventDetailsText("")
             .build()));
+    }
+
+    @Nullable
+    private static LocalDateTime getPaymentInFullDate(CaseData caseData) {
+        RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec = caseData.getRespondToClaimAdmitPartLRspec();
+        return caseData.isPayBySetDate()
+            ? respondToClaimAdmitPartLRspec.getWhenWillThisAmountBePaid().atStartOfDay()
+            : null;
     }
 
     @NotNull
