@@ -39,7 +39,10 @@ public class InterestCalculator {
     private BigDecimal calculateInterest(CaseData caseData, LocalDate interestToDate) {
         log.info("Calculating interest for case id: {}", caseData.getCcdCaseReference());
         BigDecimal interestAmount = ZERO;
-        if (caseData.getClaimInterest() == YesOrNo.YES) {
+        if (!validateInterestCalculationRequestData(caseData)) {
+            log.error("Interest calculation request data is invalid for case id: {}", caseData.getCcdCaseReference());
+            return interestAmount;
+        } else  if (caseData.getClaimInterest() == YesOrNo.YES) {
             if (InterestClaimOptions.SAME_RATE_INTEREST.equals(caseData.getInterestClaimOptions())) {
                 SameRateInterestSelection sameRateInterestSelection = caseData.getSameRateInterestSelection();
                 if (sameRateInterestSelection != null && SameRateInterestType.SAME_RATE_INTEREST_8_PC
@@ -63,6 +66,25 @@ public class InterestCalculator {
         }
         log.info("Interest calculated for case id: {}, amount: {}", caseData.getCcdCaseReference(), interestAmount);
         return interestAmount;
+    }
+
+    private boolean validateInterestCalculationRequestData(CaseData caseData) {
+       if (caseData.getClaimInterest() == YesOrNo.YES) {
+            if (InterestClaimOptions.SAME_RATE_INTEREST.equals(caseData.getInterestClaimOptions())) {
+                SameRateInterestSelection sameRateInterestSelection = caseData.getSameRateInterestSelection();
+                if (sameRateInterestSelection == null) {
+                    log.error("No same rate interest selection selected for case id: {}", caseData.getCcdCaseReference());
+                    return false;
+                } else if (caseData.getInterestClaimFrom() == null) {
+                    log.error("No interest claim from selected for case id: {}", caseData.getCcdCaseReference());
+                    return false;
+                } else if (caseData.getInterestClaimFrom() == InterestClaimFromType.FROM_A_SPECIFIC_DATE && caseData.getInterestFromSpecificDate() == null) {
+                    log.error("No interest claim from date selected for case id: {}", caseData.getCcdCaseReference());
+                    return false;
+                }
+            }
+        }
+       return true;
     }
 
     public BigDecimal claimAmountPlusInterestToDate(CaseData caseData) {
