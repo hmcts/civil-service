@@ -40,11 +40,13 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.OPENING_HOURS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PHONE_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.SPEC_UNSPEC_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_HMCTS_SIGNATURE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_OPENING_HOURS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_PHONE_CONTACT;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @ExtendWith(MockitoExtension.class)
 public class TranslatedDocumentUploadedClaimantNotificationHandlerTest {
@@ -194,6 +196,7 @@ public class TranslatedDocumentUploadedClaimantNotificationHandlerTest {
             Map<String, String> expectedProperties = new HashMap<>(addCommonProperties());
             expectedProperties.put(CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference());
             expectedProperties.put(CLAIMANT_NAME, caseData.getApplicant1().getPartyName());
+            expectedProperties.put(RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
             expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
             expectedProperties.put(CNBC_CONTACT, configuration.getCnbcContact());
             return expectedProperties;
