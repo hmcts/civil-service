@@ -34,7 +34,6 @@ public class NotifySetAsideJudgementErrorScenarioTest extends DashboardBaseInteg
             .build();
 
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
-        when(featureToggleService.isGeneralApplicationsEnabled()).thenReturn(true);
 
         defendantNotifySetAsideJudgementDashboardNotificationHandler.handle(callbackParams(caseData));
 

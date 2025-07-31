@@ -27,7 +27,6 @@ public class DefendantRecordJudgementScenarioTest extends  DashboardBaseIntegrat
                 .respondent1Represented(YesOrNo.NO)
                 .buildJudgmentOnlineCaseDataWithDeterminationMeans();
 
-        when(featureToggleService.isGeneralApplicationsEnabled()).thenReturn(true);
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
         handler.handle(callbackParams(caseData));
