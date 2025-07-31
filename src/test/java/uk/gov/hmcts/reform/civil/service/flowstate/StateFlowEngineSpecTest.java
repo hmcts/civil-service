@@ -56,7 +56,7 @@ class StateFlowEngineSpecTest {
 
     @BeforeEach
     void setup() {
-        given(featureToggleService.isGeneralApplicationsEnabled()).willReturn(false);
+        given(featureToggleService.isJOLiveFeedActive()).willReturn(false);
     }
 
     static Stream<Arguments> caseDataStream() {
@@ -200,7 +200,7 @@ class StateFlowEngineSpecTest {
 
         // Then Claim will have GENERAL_APPLICATION_ENABLED and RPA_CONTINUOUS_FEED
         assertThat(stateFlow.getFlags()).contains(
-            entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+            entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false));
     }
 
     @ParameterizedTest(name = "{index}: The state flow flag ONE_RESPONDENT_REPRESENTATIVE is set to true (for appropriate cases)")
@@ -236,8 +236,8 @@ class StateFlowEngineSpecTest {
 
     static Stream<Arguments> commonFlagNames() {
         return Stream.of(
-            arguments(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), (StubbingFn)(featureToggleService)
-                -> when(featureToggleService.isGeneralApplicationsEnabled()))
+            arguments(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), (StubbingFn)(featureToggleService)
+                -> when(featureToggleService.isJOLiveFeedActive()))
         );
     }
 

@@ -216,10 +216,7 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
     }
 
     public boolean switchTheGAFlagIfLipExists(CaseData caseData) {
-        if (caseData.isLipCase()) {
-            return featureToggleService.isGaForLipsEnabled();
-        }
-        return featureToggleService.isGeneralApplicationsEnabled();
+        return (caseData.isLipCase());
     }
 
     private Boolean getMainClaimCcdState(CaseData caseData) {
