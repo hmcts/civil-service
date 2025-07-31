@@ -32,7 +32,7 @@ public class Message {
     private String subject;
     private String messageContent;
     private YesOrNo isUrgent;
-    private String messageID;
+    private String messageId;
 
     @Builder.Default
     private List<Element<MessageReply>> history = new ArrayList<>();
@@ -45,7 +45,7 @@ public class Message {
             .messageContent(reply.getMessageContent())
             .recipientRoleType(this.senderRoleType)
             .updatedTime(time.now())
-            .messageID(UUID.randomUUID().toString().substring(0, 16))
+            .messageId(UUID.randomUUID().toString().substring(0, 16))
             .build();
     }
 

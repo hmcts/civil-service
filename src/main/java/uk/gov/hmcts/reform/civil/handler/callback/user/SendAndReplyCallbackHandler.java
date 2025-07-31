@@ -18,11 +18,9 @@ import uk.gov.hmcts.reform.civil.enums.sendandreply.SendAndReplyOption;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.sendandreply.Message;
-import uk.gov.hmcts.reform.civil.model.wa.AdditionalProperties;
 import uk.gov.hmcts.reform.civil.model.wa.ClientContext;
-import uk.gov.hmcts.reform.civil.model.wa.TaskData;
+import uk.gov.hmcts.reform.civil.model.wa.Task;
 import uk.gov.hmcts.reform.civil.model.wa.UserTask;
-import uk.gov.hmcts.reform.civil.model.wa.WaMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SendAndReplyMessageService;
 
@@ -66,45 +64,9 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::handleAboutToStart,
             callbackKey(MID, "populate-message-history"), this::populateMessageHistory,
-            callbackKey(MID, "check-wa-msg-id"), this::checkWaMessageId,
             callbackKey(ABOUT_TO_SUBMIT), this::handleAboutToSubmit,
             callbackKey(SUBMITTED), this::handleSubmitted
         );
-    }
-
-    private CallbackResponse checkWaMessageId(CallbackParams params) {
-        CaseData caseData = params.getCaseData();
-
-        if (!REPLY.equals(caseData.getSendAndReplyOption())) {
-            return emptyCallbackResponse(params);
-        }
-
-        WaMapper waMapper = params.getWaMapper();
-        log.info("wa mapper " + waMapper);
-        if (waMapper != null) {
-            ClientContext clientContext = waMapper.getClientContext();
-            log.info("handler client context " + clientContext);
-            if (clientContext != null) {
-                UserTask userTask = clientContext.getUserTask();
-                log.info("user task " + userTask);
-                if (userTask != null) {
-                    TaskData taskData = userTask.getTaskData();
-                    log.info("taskData " + taskData);
-                    if (taskData != null) {
-                        log.info(taskData.getName());
-                        log.info(taskData.getId());
-                        AdditionalProperties additionalProperties = taskData.getAdditionalProperties();
-                        if (additionalProperties != null) {
-                            log.info(additionalProperties.getMessageId());
-                        }
-                    }
-                }
-            }
-        } else {
-            log.info("null wa mapper");
-        }
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .build();
     }
 
     private CallbackResponse populateMessageHistory(CallbackParams params) {
@@ -141,8 +103,7 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(builder.sendAndReplyOption(null)
-                      .messageWaTaskDetails(null).build().toMap(objectMapper)).build();
+            .data(builder.sendAndReplyOption(null).build().toMap(objectMapper)).build();
     }
 
     private Element<Message> getMessageToReplyTo(CaseData caseData) {
@@ -156,6 +117,7 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
         String userAuth = params.getParams().get(BEARER_TOKEN).toString();
 
         List<Element<Message>> messagesNew;
+        Task taskToComplete = null;
 
         if (SendAndReplyOption.SEND.equals(caseData.getSendAndReplyOption())) {
             messagesNew = messageService.addMessage(
@@ -169,12 +131,6 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
                 .sendMessageMetadata(null)
                 .sendMessageContent(null);
         } else {
-            // MessageWaTaskDetails messageWaTaskDetails = messageService.addTaskInfo(
-            //    caseData.getMessages(),
-            //    caseData.getMessagesToReplyTo().getValue().getCode(),
-            //    userAuth,
-            //    caseData
-            // );
             messagesNew = messageService.addReplyToMessage(
                 caseData.getMessages(),
                 caseData.getMessagesToReplyTo().getValue().getCode(),
@@ -182,10 +138,13 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
                 userAuth, caseData
             );
             builder.messages(messagesNew)
-                // .messageWaTaskDetails(messageWaTaskDetails)
                 .messagesToReplyTo(null)
                 .messageReplyMetadata(null)
                 .messageHistory(null);
+
+            Message messageToReplyTo = messageService.getMessageById(caseData.getMessages(), caseData.getMessagesToReplyTo().getValue().getCode()).getValue();
+            taskToComplete = messageService.getTaskToComplete(messageToReplyTo.getMessageId(), userAuth, builder.build());
+            builder.clientContext(ClientContext.builder().userTask(UserTask.builder().taskData(taskToComplete).completeTask(true).build()).build());
         }
 
         Element<Message> lastMessageElement = messagesNew.stream()
@@ -219,13 +178,13 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
             builder.lastMessageJudgeLabel("Judge");
         }
 
+//        builder.clientContext(ClientContext.builder().userTask(UserTask.builder().taskData(TaskData.builder().id("My test task id").build()).build()).build());
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(builder.build().toMap(objectMapper)).build();
+            .data(builder.build().toMap(objectMapper))
+            .build();
     }
 
     private CallbackResponse handleSubmitted(CallbackParams params) {
-        messageService.completeJudicialTask(params.getParams().get(BEARER_TOKEN).toString(),
-                                            params.getCaseData());
         if (SendAndReplyOption.SEND.equals(params.getCaseData().getSendAndReplyOption())) {
             return SubmittedCallbackResponse.builder()
                 .confirmationHeader(SEND_MESSAGE_CONFIRMATION_HEADER)

@@ -16,8 +16,6 @@ import uk.gov.hmcts.reform.civil.model.sendandreply.MessageReply;
 import uk.gov.hmcts.reform.civil.model.sendandreply.Message;
 import uk.gov.hmcts.reform.civil.model.sendandreply.MessageWaTaskDetails;
 import uk.gov.hmcts.reform.civil.model.sendandreply.SendMessageMetadata;
-import uk.gov.hmcts.reform.civil.model.wa.CompleteTaskRequest;
-import uk.gov.hmcts.reform.civil.model.wa.CompletionOptions;
 import uk.gov.hmcts.reform.civil.model.wa.GetTasksResponse;
 import uk.gov.hmcts.reform.civil.model.wa.RequestContext;
 import uk.gov.hmcts.reform.civil.model.wa.SearchOperator;
@@ -39,6 +37,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
@@ -121,7 +120,7 @@ public class SendAndReplyMessageService {
                 .subjectType(messageMetaData.getSubjectType())
                 .subject(messageMetaData.getSubject())
                 .messageContent(messageContent)
-                .messageID(UUID.randomUUID().toString().substring(0, 16))
+                .messageId(UUID.randomUUID().toString().substring(0, 16))
                 .build())
         );
         return messageList;
@@ -157,9 +156,36 @@ public class SendAndReplyMessageService {
         return messages;
     }
 
+
+    public List<Task> getTasks(CaseData caseData, String userAuth) {
+        SearchTaskRequest request = new SearchTaskRequest(
+            RequestContext.ALL_WORK,
+            List.of(new SearchParameterList(
+                SearchParameterKey.CASE_ID, SearchOperator.IN,
+                List.of(String.valueOf(caseData.getCcdCaseReference()))
+            )));
+        log.info("wa task search request: {}", request);
+        ResponseEntity<GetTasksResponse<Task>> response = waTaskManagementApiClient.searchWithCriteria(
+            authTokenGenerator.generate(),
+            userAuth,
+            request
+        );
+        log.info("response from wa api: {}", response);
+        response.getBody().getTasks().forEach(task -> log.info("TASK: {}", task.getTaskTitle()));
+
+        return response.getBody().getTasks();
+    }
+
+    public Task getTaskToComplete(String messageId, String userAuth, CaseData caseData) {
+        List<Task> availableTasks = getTasks(caseData, userAuth);
+        if (nonNull(availableTasks) && !availableTasks.isEmpty()) {
+            return availableTasks.stream().filter(task -> nonNull(task.getAdditionalProperties()) && task.getAdditionalProperties().get("messageId").equals(messageId)).findFirst().orElse(null);
+        }
+        return null;
+    }
+
     public MessageWaTaskDetails addTaskInfo(List<Element<Message>> messages, String messageId, String userAuth, CaseData caseData) {
         Element<Message> messageToReplace = getMessageById(messages, messageId);
-        log.info("userAuth " + userAuth);
         MessageReply messageForHistory = buildReplyOutOfMessage(messageToReplace.getValue());
         log.info("message for history id  add task info " + messageForHistory.getMessageID());
 
@@ -202,16 +228,6 @@ public class SendAndReplyMessageService {
         }
 
         return null;
-    }
-
-    public void completeJudicialTask(String userAuth, CaseData caseData) {
-        log.info("trying to complete task 0bcf956b-4527-11f0-b4be-4edf1b6429b1");
-        waTaskManagementApiClient.completeTask(userAuth,
-                                               authTokenGenerator.generate(),
-                                               "0bcf956b-4527-11f0-b4be-4edf1b6429b1",
-                                               new CompleteTaskRequest(new CompletionOptions(true))
-        );
-        log.info("task 0bcf956b-4527-11f0-b4be-4edf1b6429b1 completd");
     }
 
     public Element<Message> getMessageById(List<Element<Message>> messages, String code) {
@@ -286,7 +302,7 @@ public class SendAndReplyMessageService {
             .recipientRoleType(message.getRecipientRoleType())
             .subject(message.getSubject())
             .subjectType(message.getSubjectType())
-            .messageID(message.getMessageID())
+            .messageID(message.getMessageId())
             .build();
     }
 }

@@ -14,7 +14,7 @@ import uk.gov.hmcts.reform.civil.model.wa.Task;
 
 import javax.validation.Valid;
 
-@FeignClient(name = "wa", url = "${wa.task-management.api.url}", configuration =
+@FeignClient(name = "wa", url = "${task-management.api.url}", configuration =
     FeignClientProperties.FeignClientConfiguration.class)
 public interface WaTaskManagementApiClient {
 
