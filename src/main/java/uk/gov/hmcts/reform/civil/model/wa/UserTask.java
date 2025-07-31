@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 public class UserTask {
 
     @JsonProperty("task_data")
-    private TaskData taskData;
+    private Task taskData;
     @JsonProperty("complete_task")
     private boolean completeTask;
 }

@@ -8,6 +8,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -29,6 +30,8 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SendAndReplyMessageService;
+import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.civil.service.taskmanagement.WaTaskManagementService;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -56,6 +59,16 @@ class SendAndReplyCallbackHandlerTest {
 
     @Mock
     SendAndReplyMessageService messageService;
+
+    @Mock
+    WaTaskManagementService taskManagementService;
+
+    @Mock
+    UserService userService;
+
+    @Mock
+    AuthTokenGenerator authTokenGenerator;
+
     @InjectMocks
     private SendAndReplyCallbackHandler handler;
     @Mock
@@ -63,7 +76,7 @@ class SendAndReplyCallbackHandlerTest {
 
     @BeforeEach
     void  setup() {
-        handler = new SendAndReplyCallbackHandler(messageService, new ObjectMapper(), featureToggleService);
+        handler = new SendAndReplyCallbackHandler(messageService, new ObjectMapper(), userService, featureToggleService, taskManagementService);
     }
 
     @Test

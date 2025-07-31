@@ -1,28 +1,19 @@
 package uk.gov.hmcts.reform.civil.model.wa;
 
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.ToString;
 
 import java.util.List;
 
+@Getter
 @EqualsAndHashCode
 @ToString
-public class GetTasksResponse<T extends Task> {
+@Builder
+public class GetTasksResponse {
 
-    private final List<T> tasks;
+    private List<Task> tasks;
+    private long totalRecords;
 
-    private final long totalRecords;
-
-    public GetTasksResponse(List<T> tasks, long totalRecords) {
-        this.tasks = tasks;
-        this.totalRecords = totalRecords;
-    }
-
-    public List<T> getTasks() {
-        return tasks;
-    }
-
-    public long getTotalRecords() {
-        return totalRecords;
-    }
 }

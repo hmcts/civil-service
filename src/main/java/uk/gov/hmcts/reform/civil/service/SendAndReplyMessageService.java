@@ -2,10 +2,7 @@ package uk.gov.hmcts.reform.civil.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
-import uk.gov.hmcts.reform.civil.client.WaTaskManagementApiClient;
 import uk.gov.hmcts.reform.civil.enums.sendandreply.RecipientOption;
 import uk.gov.hmcts.reform.civil.enums.sendandreply.RolePool;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -14,17 +11,7 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.sendandreply.MessageReply;
 import uk.gov.hmcts.reform.civil.model.sendandreply.Message;
-import uk.gov.hmcts.reform.civil.model.sendandreply.MessageWaTaskDetails;
 import uk.gov.hmcts.reform.civil.model.sendandreply.SendMessageMetadata;
-import uk.gov.hmcts.reform.civil.model.wa.CompleteTaskRequest;
-import uk.gov.hmcts.reform.civil.model.wa.CompletionOptions;
-import uk.gov.hmcts.reform.civil.model.wa.GetTasksResponse;
-import uk.gov.hmcts.reform.civil.model.wa.RequestContext;
-import uk.gov.hmcts.reform.civil.model.wa.SearchOperator;
-import uk.gov.hmcts.reform.civil.model.wa.SearchParameterKey;
-import uk.gov.hmcts.reform.civil.model.wa.SearchParameterList;
-import uk.gov.hmcts.reform.civil.model.wa.SearchTaskRequest;
-import uk.gov.hmcts.reform.civil.model.wa.Task;
 import uk.gov.hmcts.reform.civil.ras.model.RoleAssignmentResponse;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
@@ -102,8 +89,6 @@ public class SendAndReplyMessageService {
     private final TableMarkupService tableMarkupService;
     private final UserService userService;
     private final Time time;
-    private final WaTaskManagementApiClient waTaskManagementApiClient;
-    private final AuthTokenGenerator authTokenGenerator;
 
     public List<Element<Message>> addMessage(
         List<Element<Message>> messages,
@@ -121,7 +106,7 @@ public class SendAndReplyMessageService {
                 .subjectType(messageMetaData.getSubjectType())
                 .subject(messageMetaData.getSubject())
                 .messageContent(messageContent)
-                .messageID(UUID.randomUUID().toString().substring(0, 16))
+                .messageId(UUID.randomUUID().toString())
                 .build())
         );
         return messageList;
@@ -146,7 +131,6 @@ public class SendAndReplyMessageService {
 
         //Move current base message to history
         MessageReply messageForHistory = buildReplyOutOfMessage(messageToReplace.getValue());
-        log.info("message for history id add reply " + messageForHistory.getMessageID());
         Element<MessageReply> newHistoryMessage = element(messageForHistory);
 
         //Switch out current base message with reply info
@@ -155,63 +139,6 @@ public class SendAndReplyMessageService {
         messageToReplace.getValue().getHistory().add(0, newHistoryMessage);
 
         return messages;
-    }
-
-    public MessageWaTaskDetails addTaskInfo(List<Element<Message>> messages, String messageId, String userAuth, CaseData caseData) {
-        Element<Message> messageToReplace = getMessageById(messages, messageId);
-        log.info("userAuth " + userAuth);
-        MessageReply messageForHistory = buildReplyOutOfMessage(messageToReplace.getValue());
-        log.info("message for history id  add task info " + messageForHistory.getMessageID());
-
-        try {
-            SearchTaskRequest request = new SearchTaskRequest(
-                RequestContext.AVAILABLE_TASKS,
-                List.of(new SearchParameterList(
-                    SearchParameterKey.CASE_ID, SearchOperator.IN,
-                    List.of(String.valueOf(caseData.getCcdCaseReference()))
-                )));
-            log.info("wa task search request " + request);
-            ResponseEntity<GetTasksResponse<Task>> response = waTaskManagementApiClient.searchWithCriteria(
-                authTokenGenerator.generate(),
-                userAuth,
-                request
-            );
-            log.info("response from wa api " + response);
-
-            GetTasksResponse<Task> body = response.getBody();
-            log.info("body " + body);
-            if (body != null) {
-                List<Task> tasks = body.getTasks();
-                log.info("tasks from wa api " + tasks);
-                if (!tasks.isEmpty()) {
-                    List<Task> task = tasks.stream().filter(t -> t.getAdditionalProperties().entrySet().stream()
-                        .anyMatch(e -> e.getKey().equals("messageId") && e.getValue().equals(
-                            messageForHistory.getMessageID()))).toList();
-                    log.info("filtered tasks " + task);
-                    if (!task.isEmpty()) {
-                        return MessageWaTaskDetails.builder()
-                            .taskId(task.get(0).getId())
-                            .messageID(messageForHistory.getMessageID())
-                            .build();
-                    }
-                }
-            }
-        } catch (Exception e) {
-            log.error("failed call wa api " + e.getMessage());
-            throw e;
-        }
-
-        return null;
-    }
-
-    public void completeJudicialTask(String userAuth, CaseData caseData) {
-        log.info("trying to complete task 0bcf956b-4527-11f0-b4be-4edf1b6429b1");
-        waTaskManagementApiClient.completeTask(userAuth,
-                                               authTokenGenerator.generate(),
-                                               "0bcf956b-4527-11f0-b4be-4edf1b6429b1",
-                                               new CompleteTaskRequest(new CompletionOptions(true))
-        );
-        log.info("task 0bcf956b-4527-11f0-b4be-4edf1b6429b1 completd");
     }
 
     public Element<Message> getMessageById(List<Element<Message>> messages, String code) {
@@ -286,7 +213,6 @@ public class SendAndReplyMessageService {
             .recipientRoleType(message.getRecipientRoleType())
             .subject(message.getSubject())
             .subjectType(message.getSubjectType())
-            .messageID(message.getMessageID())
             .build();
     }
 }

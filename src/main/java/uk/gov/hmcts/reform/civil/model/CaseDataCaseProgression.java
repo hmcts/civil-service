@@ -424,7 +424,7 @@ public class CaseDataCaseProgression extends CaseDataCaseSdo implements Mappable
     private Message lastMessage;
     private String lastMessageAllocatedTrack;
     private String lastMessageJudgeLabel;
-    private MessageWaTaskDetails messageWaTaskDetails;
+    private String waTaskToCompleteId;
 
     //QueryManagement
     private final CaseQueriesCollection qmApplicantSolicitorQueries;

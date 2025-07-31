@@ -24,5 +24,4 @@ public class MessageReply {
     private SubjectOption subjectType;
     private String subject;
     private String messageContent;
-    private String messageID;
 }
