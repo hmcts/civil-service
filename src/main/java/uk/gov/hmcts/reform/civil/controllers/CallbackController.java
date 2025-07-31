@@ -20,7 +20,11 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandlerFactory;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
+import uk.gov.hmcts.reform.civil.constants.WorkAllocationConstants;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.wa.WaMapper;
+import uk.gov.hmcts.reform.civil.utils.WaMapperUtils;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -52,6 +56,7 @@ public class CallbackController {
         @PathVariable("callback-type") String callbackType,
         @NotNull @RequestBody CallbackRequest callback,
         @PathVariable("version") Optional<CallbackVersion> version,
+        @RequestHeader(value = WorkAllocationConstants.CLIENT_CONTEXT_HEADER_PARAMETER, required = false) String clientContext,
         @PathVariable("page-id") Optional<String> pageId
     ) {
         final CaseDetails caseDetails = callback.getCaseDetails();
@@ -62,16 +67,31 @@ public class CallbackController {
                  caseId,  caseDetailsBefore == null ? null : caseDetailsBefore.getId(), callback.getEventId(), callbackType, pageId, version
         );
 
+        log.info("client context " + clientContext);
+        WaMapper waMapper = WaMapperUtils.getWaMapper(clientContext);
+        CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
         CallbackParams callbackParams = CallbackParams.builder()
             .request(callback)
             .type(CallbackType.fromValue(callbackType))
             .params(java.util.Map.of(CallbackParams.Params.BEARER_TOKEN, authorisation))
             .version(version.orElse(null))
             .pageId(pageId.orElse(null))
-            .caseData(caseDetailsConverter.toCaseData(caseDetails))
+            .caseData(caseData)
             .caseDataBefore(caseDetailsBefore != null ? caseDetailsConverter.toCaseData(caseDetailsBefore) : null)
+            .waMapper(waMapper)
             .build();
 
+        log.info("event id " + callback.getEventId());
+
+        // if (CaseEvent.valueOf(callback.getEventId()).equals(CaseEvent.SEND_AND_REPLY)
+        //    && REPLY.equals(caseData.getSendAndReplyOption()) && callbackType.equals("submitted")) {
+        //    log.info("updating client context callback controller");
+        //    return new ResponseEntity<>(
+        //        callbackHandlerFactory.dispatch(callbackParams),
+        //        createClientContext(waMapper, caseData),
+        //        HttpStatus.OK
+        //    );
+        //}
         return callbackHandlerFactory.dispatch(callbackParams);
     }
 }
