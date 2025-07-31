@@ -69,11 +69,14 @@ public class InterestCalculator {
     }
 
     private boolean validateInterestCalculationRequestData(CaseData caseData) {
-       if (caseData.getClaimInterest() == YesOrNo.YES) {
+        if (caseData.getClaimInterest() == YesOrNo.YES) {
             if (InterestClaimOptions.SAME_RATE_INTEREST.equals(caseData.getInterestClaimOptions())) {
                 SameRateInterestSelection sameRateInterestSelection = caseData.getSameRateInterestSelection();
                 if (sameRateInterestSelection == null) {
-                    log.error("No same rate interest selection selected for case id: {}", caseData.getCcdCaseReference());
+                    log.error(
+                        "No same rate interest selection selected for case id: {}",
+                        caseData.getCcdCaseReference()
+                    );
                     return false;
                 } else if (caseData.getInterestClaimFrom() == null) {
                     log.error("No interest claim from selected for case id: {}", caseData.getCcdCaseReference());
@@ -84,7 +87,7 @@ public class InterestCalculator {
                 }
             }
         }
-       return true;
+        return true;
     }
 
     public BigDecimal claimAmountPlusInterestToDate(CaseData caseData) {
