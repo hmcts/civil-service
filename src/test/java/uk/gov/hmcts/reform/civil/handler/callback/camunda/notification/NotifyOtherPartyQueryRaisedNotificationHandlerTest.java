@@ -48,6 +48,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_OTHER_PARTY_FOR_RAISED_QUERY;
@@ -366,6 +367,39 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
                     getNotificationDataMapLip(false),
                     "a-query-has-been-raised-notification-000DC001"
                 );
+            }
+
+            @Test
+            void shouldNotSendOtherPartyEmail_whenQueryRaisedOnLipCase_withoutDefendantUserDetails() {
+                when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
+                CaseQueriesCollection query = CaseQueriesCollection.builder()
+                    .roleOnCase(CaseRole.APPLICANTSOLICITORONE.toString())
+                    .caseMessages(wrapElements(CaseMessage.builder()
+                                                   .id("1")
+                                                   .build()))
+                    .build();
+
+                when(runtimeService.getProcessVariables(any())).thenReturn(QueryManagementVariables.builder()
+                                                                               .queryId("1").build());
+                when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("APPLICANTSOLICITORONE"));
+
+                CaseData caseData;
+
+                caseData = CaseDataBuilder.builder().atStateClaimIssued().build().toBuilder()
+                    .caseDataLiP(CaseDataLiP.builder()
+                                     .respondent1LiPResponse(RespondentLiPResponse.builder()
+                                                                 .respondent1ResponseLanguage("ENGLSH").build())
+                                     .build())
+                    .respondent1Represented(YesOrNo.NO)
+                    .queries(query)
+                    .businessProcess(BusinessProcess.builder().processInstanceId("123").build())
+                    .build();
+
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+                handler.handle(params);
+
+                verifyNoInteractions(notificationService);
             }
 
             @Test

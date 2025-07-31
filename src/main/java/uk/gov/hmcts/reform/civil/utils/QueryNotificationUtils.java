@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
@@ -141,10 +142,12 @@ public class QueryNotificationUtils {
                 emailDetailsList.add(createLipOnCaseEmailDetails(email, lipName, lipOtherPartyWelsh));
                 break;
             case "lipRespondent":
-                email = caseData.getDefendantUserDetails().getEmail();
-                lipName = caseData.getRespondent1().getPartyName();
-                lipOtherPartyWelsh = caseData.isRespondentResponseBilingual() ? "WELSH" : "NON_WELSH";
-                emailDetailsList.add(createLipOnCaseEmailDetails(email, lipName, lipOtherPartyWelsh));
+                if (nonNull(caseData.getDefendantUserDetails())) {
+                    email = caseData.getDefendantUserDetails().getEmail();
+                    lipName = caseData.getRespondent1().getPartyName();
+                    lipOtherPartyWelsh = caseData.isRespondentResponseBilingual() ? "WELSH" : "NON_WELSH";
+                    emailDetailsList.add(createLipOnCaseEmailDetails(email, lipName, lipOtherPartyWelsh));
+                }
                 break;
             case "lrApplicant":
                 email = caseData.getApplicantSolicitor1UserDetails().getEmail();

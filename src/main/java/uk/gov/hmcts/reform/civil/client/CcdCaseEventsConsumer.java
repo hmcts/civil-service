@@ -5,6 +5,7 @@ import com.azure.messaging.servicebus.ServiceBusReceiverClient;
 import com.azure.messaging.servicebus.ServiceBusSessionReceiverClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.config.CcdEventServiceBusConfiguration;
@@ -13,6 +14,7 @@ import uk.gov.hmcts.reform.civil.service.servicebus.CcdEventMessageReceiverServi
 @Slf4j
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+@ConditionalOnProperty("reference.database.enabled")
 @SuppressWarnings("PMD.DoNotUseThreads")
 public class CcdCaseEventsConsumer implements Runnable {
 
