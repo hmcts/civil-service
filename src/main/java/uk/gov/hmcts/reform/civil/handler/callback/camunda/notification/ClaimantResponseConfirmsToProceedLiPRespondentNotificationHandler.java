@@ -88,8 +88,7 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
 
     private boolean shouldSendNotification(CaseData caseData, String eventId) {
         return Objects.nonNull(caseData.getRespondent1().getPartyEmail())
-            && ((!caseData.isClaimantBilingual()
-            || NOTIFY_LIP_RESPONDENT_CLAIMANT_CONFIRM_TO_PROCEED_TRANSLATED_DOC.name().equals(eventId))
+            && ((!caseData.isClaimantBilingual() || NOTIFY_LIP_RESPONDENT_CLAIMANT_CONFIRM_TO_PROCEED_TRANSLATED_DOC.name().equals(eventId))
             || (featureToggleService.isDefendantNoCOnlineForCase(caseData)
             && (NO.equals(caseData.getApplicant1ProceedWithClaim()) || caseData.isClaimantIntentionSettlePartAdmit())));
     }
