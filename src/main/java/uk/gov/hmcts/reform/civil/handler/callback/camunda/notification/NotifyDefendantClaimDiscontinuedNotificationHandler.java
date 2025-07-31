@@ -74,7 +74,7 @@ public class NotifyDefendantClaimDiscontinuedNotificationHandler extends Callbac
             if (emailId != null) {
                 notificationService.sendMail(
                     emailId,
-                    getLIPTemplate(),
+                    getLIPTemplate(caseData),
                     addPropertiesLip(caseData),
                     getReferenceTemplate(caseData)
                 );
@@ -88,8 +88,10 @@ public class NotifyDefendantClaimDiscontinuedNotificationHandler extends Callbac
         return notificationsProperties.getNotifyClaimDiscontinuedLRTemplate();
     }
 
-    private String getLIPTemplate() {
-        return notificationsProperties.getNotifyClaimDiscontinuedLipTemplate();
+    private String getLIPTemplate(CaseData caseData) {
+        return caseData.isRespondentResponseBilingual()
+            ? notificationsProperties.getNotifyClaimDiscontinuedWelshLipTemplate() :
+            notificationsProperties.getNotifyClaimDiscontinuedLipTemplate();
     }
 
     private String getReferenceTemplate(CaseData caseData) {

@@ -478,6 +478,7 @@ notifications:
   notifyLiPOrderTranslatedTemplate: "d1eb5d79-6d1f-4b05-bbdf-a18fda06cf01"
   notifyClaimDiscontinuedLRTemplate: "445e95e4-4d15-4757-9cb2-a75a47b73ac9"
   notifyClaimDiscontinuedLipTemplate: "68342b9f-f9ad-4efc-a465-fb84fb60e3ce"
+  notifyClaimDiscontinuedWelshLipTemplate: "21d87aec-4344-4c07-a90c-0e9579f80b89"
 
   notifyClaimantLrValidationDiscontinuanceFailureTemplate: "f7f08517-0284-4602-916a-af6819c06477"
 
