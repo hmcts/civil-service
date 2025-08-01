@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -17,6 +18,9 @@ import uk.gov.hmcts.reform.civil.enums.sendandreply.SendAndReplyOption;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.sendandreply.Message;
+import uk.gov.hmcts.reform.civil.model.wa.ClientContext;
+import uk.gov.hmcts.reform.civil.model.wa.Task;
+import uk.gov.hmcts.reform.civil.model.wa.UserTask;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SendAndReplyMessageService;
 
@@ -37,6 +41,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 @SuppressWarnings("unchecked")
 public class SendAndReplyCallbackHandler extends CallbackHandler {
 
@@ -112,6 +117,7 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
         String userAuth = params.getParams().get(BEARER_TOKEN).toString();
 
         List<Element<Message>> messagesNew;
+        Task taskToComplete = null;
 
         if (SendAndReplyOption.SEND.equals(caseData.getSendAndReplyOption())) {
             messagesNew = messageService.addMessage(
@@ -135,6 +141,10 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
                 .messagesToReplyTo(null)
                 .messageReplyMetadata(null)
                 .messageHistory(null);
+
+            Message messageToReplyTo = messageService.getMessageById(caseData.getMessages(), caseData.getMessagesToReplyTo().getValue().getCode()).getValue();
+            taskToComplete = messageService.getTaskToComplete(messageToReplyTo.getMessageId(), userAuth, builder.build());
+            builder.clientContext(ClientContext.builder().userTask(UserTask.builder().taskData(taskToComplete).completeTask(true).build()).build());
         }
 
         Element<Message> lastMessageElement = messagesNew.stream()
@@ -168,8 +178,10 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
             builder.lastMessageJudgeLabel("Judge");
         }
 
+//        builder.clientContext(ClientContext.builder().userTask(UserTask.builder().taskData(TaskData.builder().id("My test task id").build()).build()).build());
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(builder.build().toMap(objectMapper)).build();
+            .data(builder.build().toMap(objectMapper))
+            .build();
     }
 
     private CallbackResponse handleSubmitted(CallbackParams params) {

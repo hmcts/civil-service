@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sendandreply.RolePool;
 import uk.gov.hmcts.reform.civil.enums.sendandreply.SubjectOption;
@@ -13,11 +14,13 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
+@Slf4j
 public class Message {
 
     private LocalDateTime sentTime;
@@ -29,6 +32,7 @@ public class Message {
     private String subject;
     private String messageContent;
     private YesOrNo isUrgent;
+    private String messageId;
 
     @Builder.Default
     private List<Element<MessageReply>> history = new ArrayList<>();
@@ -41,6 +45,7 @@ public class Message {
             .messageContent(reply.getMessageContent())
             .recipientRoleType(this.senderRoleType)
             .updatedTime(time.now())
+            .messageId(UUID.randomUUID().toString().substring(0, 16))
             .build();
     }
 
