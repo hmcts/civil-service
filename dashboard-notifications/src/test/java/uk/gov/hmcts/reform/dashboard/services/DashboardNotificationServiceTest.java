@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.dashboard.repositories.NotificationActionRepository;
 import uk.gov.hmcts.reform.idam.client.IdamApi;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
+import javax.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.List;
@@ -42,6 +43,8 @@ public class DashboardNotificationServiceTest {
 
     @Mock
     private IdamApi idamApi;
+    @Mock
+    private EntityManager entityManager;
 
     @InjectMocks
     private DashboardNotificationService dashboardNotificationService;

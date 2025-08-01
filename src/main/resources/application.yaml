@@ -838,3 +838,8 @@ court_location_dmn:
 
 stitch-bundle:
   wait-time-in-milliseconds: ${WAIT_TIME_IN_MILLISECONDS:3000}
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE

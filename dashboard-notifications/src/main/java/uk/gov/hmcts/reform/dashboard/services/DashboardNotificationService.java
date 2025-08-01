@@ -5,6 +5,7 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.reform.dashboard.data.Notification;
 import uk.gov.hmcts.reform.dashboard.entities.DashboardNotificationsEntity;
 import uk.gov.hmcts.reform.dashboard.entities.NotificationActionEntity;
@@ -12,7 +13,7 @@ import uk.gov.hmcts.reform.dashboard.repositories.DashboardNotificationsReposito
 import uk.gov.hmcts.reform.dashboard.repositories.NotificationActionRepository;
 import uk.gov.hmcts.reform.idam.client.IdamApi;
 
-import javax.transaction.Transactional;
+import javax.persistence.EntityManager;
 import java.time.OffsetDateTime;
 import java.util.Comparator;
 import java.util.List;
@@ -31,15 +32,17 @@ public class DashboardNotificationService {
     private final NotificationActionRepository notificationActionRepository;
 
     private final IdamApi idamApi;
+    private final EntityManager entityManager;
 
     private final String clickAction = "Click";
 
     @Autowired
     public DashboardNotificationService(DashboardNotificationsRepository dashboardNotificationsRepository,
-                                        NotificationActionRepository notificationActionRepository, IdamApi idamApi) {
+                                        NotificationActionRepository notificationActionRepository, IdamApi idamApi, EntityManager entityManager) {
         this.dashboardNotificationsRepository = dashboardNotificationsRepository;
         this.notificationActionRepository = notificationActionRepository;
         this.idamApi = idamApi;
+        this.entityManager = entityManager;
     }
 
     public List<DashboardNotificationsEntity> getAll() {
@@ -100,7 +103,9 @@ public class DashboardNotificationService {
             log.info("Existing notification not present reference = {}", notification.getReference());
         }
 
-        return dashboardNotificationsRepository.save(updated);
+        DashboardNotificationsEntity dashboardNotificationsEntity = dashboardNotificationsRepository.save(updated);
+        this.entityManager.flush();
+        return dashboardNotificationsEntity;
     }
 
     public void deleteById(UUID id) {
