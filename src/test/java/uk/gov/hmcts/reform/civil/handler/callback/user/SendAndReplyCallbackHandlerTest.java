@@ -34,7 +34,6 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -466,7 +465,6 @@ class SendAndReplyCallbackHandlerTest {
         void shouldReturnExpectedResponse_WhenAboutToSubmitIsInvoked_MessageIsSentToDistrictJudge_Intermediate_TotalClaimAmount() {
             String messageContent = "Message Content";
             SendMessageMetadata messageMetaData = SendMessageMetadata.builder().build();
-            when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
 
             Message expectedMessage = Message.builder()
                 .messageContent(messageContent)
@@ -507,7 +505,6 @@ class SendAndReplyCallbackHandlerTest {
         void shouldReturnExpectedResponse_WhenAboutToSubmitIsInvoked_MessageIsSentToDistrictJudge_Multi_TotalClaimAmount() {
             String messageContent = "Message Content";
             SendMessageMetadata messageMetaData = SendMessageMetadata.builder().build();
-            when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
 
             Message expectedMessage = Message.builder()
                 .messageContent(messageContent)

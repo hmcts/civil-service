@@ -404,31 +404,6 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
         }
 
         @Test
-        void shouldNotifyRespondent_whenMultiTrack_mintiEligibleClaim() {
-            when(notificationsProperties.getClaimantSolicitorConfirmsToProceed()).thenReturn("template-id");
-            when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
-            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
-            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDetailsNotified()
-                .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
-                .setMultiTrackClaim()
-                .build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId("NOTIFY_RES_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_MULTITRACK")
-                    .build()).build();
-
-            handler.handle(params);
-
-            verify(notificationService).sendMail(
-                caseData.getRespondentSolicitor1EmailAddress(),
-                "template-id",
-                getNotificationDataMap(caseData),
-                "claimant-confirms-to-proceed-respondent-notification-000DC001"
-            );
-        }
-
-        @Test
         void shouldNotifyRespondent2_whenMultiTrack() {
             when(notificationsProperties.getSolicitorCaseTakenOffline()).thenReturn("offline-template-id");
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();

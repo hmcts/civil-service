@@ -65,9 +65,8 @@ public class FullDefenceTransitionBuilder extends MidTransitionBuilder {
             .set((c, flags) -> {
                 flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), isRespondentResponseLangIsBilingual.test(c));
                 flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), true);
-                flags.put(FlowFlag.MINTI_ENABLED.name(), featureToggleService.isMultiOrIntermediateTrackEnabled(c));
                 flags.put(FlowFlag.SDO_ENABLED.name(),
-                    JudicialReferralUtils.shouldMoveToJudicialReferral(c, featureToggleService.isMultiOrIntermediateTrackEnabled(c)));
+                    JudicialReferralUtils.shouldMoveToJudicialReferral(c, true));
             }, transitions)
             .moveTo(FULL_DEFENCE_PROCEED, transitions)
             .onlyWhen(fullDefenceProceed
@@ -76,9 +75,8 @@ public class FullDefenceTransitionBuilder extends MidTransitionBuilder {
             .set((c, flags) -> {
                 flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), isRespondentResponseLangIsBilingual.test(c));
                 flags.put(FlowFlag.IS_MULTI_TRACK.name(), true);
-                flags.put(FlowFlag.MINTI_ENABLED.name(), featureToggleService.isMultiOrIntermediateTrackEnabled(c));
                 flags.put(FlowFlag.SDO_ENABLED.name(),
-                    JudicialReferralUtils.shouldMoveToJudicialReferral(c, featureToggleService.isMultiOrIntermediateTrackEnabled(c)));
+                    JudicialReferralUtils.shouldMoveToJudicialReferral(c, true));
             }, transitions)
             .moveTo(FULL_DEFENCE_PROCEED, transitions)
             .onlyWhen(fullDefenceProceed
@@ -89,8 +87,7 @@ public class FullDefenceTransitionBuilder extends MidTransitionBuilder {
             .set((c, flags) -> {
                 flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), isRespondentResponseLangIsBilingual.test(c));
                 flags.put(FlowFlag.SDO_ENABLED.name(),
-                    JudicialReferralUtils.shouldMoveToJudicialReferral(c, featureToggleService.isMultiOrIntermediateTrackEnabled(c)));
-                flags.put(FlowFlag.MINTI_ENABLED.name(), featureToggleService.isMultiOrIntermediateTrackEnabled(c));
+                    JudicialReferralUtils.shouldMoveToJudicialReferral(c, true));
             }, transitions)
             .moveTo(FULL_DEFENCE_PROCEED, transitions)
             .onlyWhen((fullDefenceProceed.or(isClaimantNotSettleFullDefenceClaim).or(isDefendantNotPaidFullDefenceClaim).or(lipFullDefenceProceed))

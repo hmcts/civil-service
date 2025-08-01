@@ -13,14 +13,12 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.core.io.ByteArrayResource;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.DownloadedDocumentResponse;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.ComplexityBand;
@@ -58,7 +56,6 @@ import uk.gov.hmcts.reform.civil.model.finalorders.OrderAfterHearingDateType;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMade;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
@@ -153,13 +150,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         + " Standard Direction Order (SDO) otherwise use Not suitable for SDO.";
     public static final String NOT_ALLOWED_FOR_TRACK = "The Make an order event is not available for Small Claims and Fast Track cases until the track has"
         + " been allocated. You must use the Standard Direction Order (SDO) to proceed.";
-    private static final String BEARER_TOKEN = "BEARER_TOKEN";
-    private static final byte[] bytes = {116, 101, 115, 116};
-    private static final CaseDocumentBuilder CASE_DOCUMENT = CaseDocumentBuilder.builder()
-        .documentType(JUDGE_FINAL_ORDER);
-    private static final DownloadedDocumentResponse downloadedDocumentResponse =
-        new DownloadedDocumentResponse(new ByteArrayResource("test".getBytes()), "TEST_DOCUMENT_1.pdf",
-                                       "application/pdf");
 
     @Mock
     private LocationReferenceDataService locationRefDataService;
@@ -187,9 +177,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         .courtName("Court Name example").region("Region").regionId("2").courtVenueId("666")
         .courtTypeId("10").courtLocationCode("121")
         .epimmsId("000000").build();
-
-    private static final DynamicList SMALL_CLAIMS_OPTIONS = fromList(List.of(
-        BLANK_TEMPLATE_AFTER_HEARING.getLabel(), BLANK_TEMPLATE_BEFORE_HEARING.getLabel()));
 
     private static final DynamicList FAST_INT_OPTIONS = fromList(List.of(
         BLANK_TEMPLATE_AFTER_HEARING.getLabel(), BLANK_TEMPLATE_BEFORE_HEARING.getLabel(), FIX_DATE_CMC.getLabel()));
@@ -1735,12 +1722,12 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                                                      .build())
                 .build();
 
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             // When
             when(judgeFinalOrderGenerator.generate(any(), any())).thenReturn(finalOrder);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsOf(caseData, MID, PAGE_ID));
             // Then
             assertThat(response.getErrors().get(0)).isEqualTo(FURTHER_HEARING_OTHER_ALT_LOCATION);
+
         }
     }
 
@@ -1773,6 +1760,8 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                            .getValue().getDocumentLink().getCategoryID()).isEqualTo("caseManagementOrders");
             assertThat(updatedData.getFinalOrderDocumentCollection().get(0)
                            .getValue().getDocumentLink().getDocumentFileName()).isEqualTo(fileName);
+            assertThat(finalCaseDocuments).hasSize(1);
+
         }
 
         @Test
@@ -2038,6 +2027,8 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             // Then
             assertThat(response.getData()).extracting("hearingNotes").extracting("notes").isEqualTo("test text hearing notes free form order");
+            assertThat(toggle).hasSize(1);
+
         }
 
         @Test
@@ -2202,8 +2193,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                                                                             .surname("Judy")
                                                                             .roles(Collections.emptyList()).build());
 
-            when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
-
             List<FinalOrderToggle> toggle = new ArrayList<>();
             toggle.add(FinalOrderToggle.SHOW);
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
@@ -2224,6 +2213,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             verify(updateWaCourtLocationsService).updateCourtListingWALocations(any(), any());
+            assertThat(response.getData()).extracting("caseManagementLocation").isNotNull();
         }
 
         @Test
@@ -2236,8 +2226,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             handler = new GenerateDirectionOrderCallbackHandler(locationRefDataService, mapper, judgeFinalOrderGenerator,
                                                                 judgeOrderDownloadGenerator, locationHelper, theUserService,
                                                                 workingDayIndicator, featureToggleService, Optional.empty());
-
-            when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
 
             List<FinalOrderToggle> toggle = new ArrayList<>();
             toggle.add(FinalOrderToggle.SHOW);
@@ -2259,6 +2247,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             verifyNoInteractions(updateWaCourtLocationsService);
+            assertThat(response.getData()).extracting("caseManagementLocation").isNotNull();
         }
 
         @Test

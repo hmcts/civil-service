@@ -8,7 +8,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaim.CalculateTotalClaimAmountTask;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimAmountBreakup;
 import uk.gov.hmcts.reform.civil.model.ClaimAmountBreakupDetails;
@@ -19,7 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class CalculateTotalClaimAmountTaskTest {
@@ -32,7 +30,7 @@ class CalculateTotalClaimAmountTaskTest {
 
     @BeforeEach
     public void setUp() {
-        calculateTotalClaimAmountTask = new CalculateTotalClaimAmountTask(featureToggleService, new ObjectMapper());
+        calculateTotalClaimAmountTask = new CalculateTotalClaimAmountTask(new ObjectMapper());
     }
 
     @Test
@@ -50,19 +48,19 @@ class CalculateTotalClaimAmountTaskTest {
             .claimAmountBreakup(claimAmountBreakup)
             .build();
 
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(false);
-
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse)
             calculateTotalClaimAmountTask.calculateTotalClaimAmount(caseData);
 
         String actualBreakupSummary = (String) response.getData().get("claimAmountBreakupSummaryObject");
 
         String expectedBreakupSummary =
-            " | Description | Amount | \n" +
-            " |---|---| \n" +
-            " | Claim 1 | £ 10.00 |\n" +
-            " | Claim 2 | £ 20.00 |\n" +
-            " | **Total** | £ 30.00 | ";
+                """
+                         | Description | Amount |\s
+                         |---|---|\s
+                         | Claim 1 | £ 10.00 |
+                         | Claim 2 | £ 20.00 |
+                         | **Total** | £ 30.00 | \
+                        """;
 
         System.out.println("expected \n" + expectedBreakupSummary);
         System.out.println("actual \n" + actualBreakupSummary);

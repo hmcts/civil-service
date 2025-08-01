@@ -13,15 +13,14 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.event.HearingFeeUnpaidEvent;
 import uk.gov.hmcts.reform.civil.event.HearingFeePaidEvent;
+import uk.gov.hmcts.reform.civil.event.HearingFeeUnpaidEvent;
 import uk.gov.hmcts.reform.civil.event.NoHearingFeeDueEvent;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.FeePaymentOutcomeDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.HearingFeeDueSearchService;
 
 import java.util.Map;
@@ -58,9 +57,6 @@ class HearingFeeDueHandlerTest {
     @Mock
     private ApplicationEventPublisher applicationEventPublisher;
 
-    @Mock
-    private FeatureToggleService featureToggleService;
-
     @InjectMocks
     private HearingFeeDueHandler handler;
 
@@ -78,7 +74,6 @@ class HearingFeeDueHandlerTest {
         Map<String, Object> data = Map.of("data", caseData);
         Set<CaseDetails> caseDetails = Set.of(CaseDetails.builder().id(caseId).data(data).build());
 
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
         when(searchService.getCases()).thenReturn(caseDetails);
         when(coreCaseDataService.getCase(caseId)).thenReturn(caseDetails.iterator().next());
         when(caseDetailsConverter.toCaseData(caseDetails.iterator().next())).thenReturn(caseData);
@@ -91,13 +86,12 @@ class HearingFeeDueHandlerTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldEmitHearingFeePaidEvent_whenCasesFoundPaid(boolean toggle) {
+    void shouldEmitHearingFeePaidEvent_whenCasesFoundPaid() {
         long caseId = 1L;
         CaseData caseData = CaseDataBuilder.builder().atStateHearingFeeDuePaid().build();
         Map<String, Object> data = Map.of("data", caseData);
         Set<CaseDetails> caseDetails = Set.of(CaseDetails.builder().id(caseId).data(data).build());
 
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(toggle);
         when(searchService.getCases()).thenReturn(caseDetails);
         when(coreCaseDataService.getCase(caseId)).thenReturn(caseDetails.iterator().next());
         when(caseDetailsConverter.toCaseData(caseDetails.iterator().next())).thenReturn(caseData);
@@ -110,7 +104,7 @@ class HearingFeeDueHandlerTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldEmitHearingFeePaidEvent_whenCasesFoundPaidWithHWF(boolean toggle) {
+    void shouldEmitHearingFeePaidEvent_whenCasesFoundPaidWithHWF() {
         long caseId = 1L;
         CaseData caseData = CaseDataBuilder.builder()
             .atStateHearingFeeDuePaidWithHwf()
@@ -123,7 +117,6 @@ class HearingFeeDueHandlerTest {
         Map<String, Object> data = Map.of("data", caseData);
         Set<CaseDetails> caseDetails = Set.of(CaseDetails.builder().id(caseId).data(data).build());
 
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(toggle);
         when(searchService.getCases()).thenReturn(caseDetails);
         when(coreCaseDataService.getCase(caseId)).thenReturn(caseDetails.iterator().next());
         when(caseDetailsConverter.toCaseData(caseDetails.iterator().next())).thenReturn(caseData);
@@ -136,13 +129,12 @@ class HearingFeeDueHandlerTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldEmitHearingFeeUnpaidEvent_whenCasesFoundUnpaid(boolean toggle) {
+    void shouldEmitHearingFeeUnpaidEvent_whenCasesFoundUnpaid() {
         long caseId = 1L;
         CaseData caseData = CaseDataBuilder.builder().atStateHearingFeeDueUnpaid().build();
         Map<String, Object> data = Map.of("data", caseData);
         Set<CaseDetails> caseDetails = Set.of(CaseDetails.builder().id(caseId).data(data).build());
 
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(toggle);
         when(searchService.getCases()).thenReturn(caseDetails);
         when(coreCaseDataService.getCase(caseId)).thenReturn(caseDetails.iterator().next());
         when(caseDetailsConverter.toCaseData(caseDetails.iterator().next())).thenReturn(caseData);

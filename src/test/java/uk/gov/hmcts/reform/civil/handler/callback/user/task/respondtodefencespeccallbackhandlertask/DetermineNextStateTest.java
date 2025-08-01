@@ -29,7 +29,6 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRTLStatus;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.DirectionsQuestionnairePreparer;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowStateAllowedEventService;
@@ -37,6 +36,7 @@ import uk.gov.hmcts.reform.civil.service.flowstate.FlowStateAllowedEventService;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Map;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -77,9 +77,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
 
     @Mock
     private FlowStateAllowedEventService flowStateAllowedEventService;
-
-    @Mock
-    private DirectionsQuestionnairePreparer directionsQuestionnairePreparer;
 
     @Mock
     private ObjectMapper objectMapper;
@@ -310,8 +307,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
             .responseClaimTrack(MULTI_CLAIM.name())
             .build();
 
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
-
         String resultState;
         if (postTranslation) {
             resultState = determineNextState.determineNextStatePostTranslation(caseData, callbackParams(caseData));
@@ -338,8 +333,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
             .caseAccessCategory(CaseCategory.SPEC_CLAIM)
             .responseClaimTrack(INTERMEDIATE_CLAIM.name())
             .build();
-
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
 
         String resultState;
         if (postTranslation) {

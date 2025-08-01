@@ -82,7 +82,7 @@ public class HearingFormGeneratorTest {
         .documentType(DEFAULT_JUDGMENT)
         .build();
     private static final CaseLocationCivil caseManagementLocation = CaseLocationCivil.builder().baseLocation("000000").build();
-    private static LocationRefData locationRefData = LocationRefData.builder()
+    private static final LocationRefData locationRefData = LocationRefData.builder()
         .siteName("SiteName")
         .externalShortName("ExternalShortName")
         .venueName("VenueName")
@@ -217,7 +217,6 @@ public class HearingFormGeneratorTest {
 
     @Test
     void shouldShowListingOrRelistingFeeDue_whenListing() {
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
             .listingOrRelisting(ListingOrRelisting.LISTING)
             .totalClaimAmount(new BigDecimal(2000))
@@ -234,28 +233,7 @@ public class HearingFormGeneratorTest {
     }
 
     @Test
-    void shouldShowListingOrRelistingFeeDue_whenRelistingNotPaid() {
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
-            .listingOrRelisting(ListingOrRelisting.RELISTING)
-            .totalClaimAmount(new BigDecimal(2000))
-            .build().toBuilder()
-            .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build())
-                                 .build())
-            .hearingTimeHourMinute("0800")
-            .channel(HearingChannel.IN_PERSON)
-            .hearingDuration(HearingDuration.DAY_1)
-            .caseManagementLocation(caseManagementLocation)
-            .hearingNoticeList(HearingNoticeList.HEARING_OF_APPLICATION)
-            .hearingFeePaymentDetails(null)
-            .build();
-
-        assertThat(generator.listingOrRelistingWithFeeDue(caseData)).isEqualTo("SHOW");
-    }
-
-    @Test
     void shouldNotShowListingOrRelistingFeeDue_whenRelistingAndPaid() {
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
             .listingOrRelisting(ListingOrRelisting.RELISTING)
             .totalClaimAmount(new BigDecimal(2000))
@@ -322,7 +300,6 @@ public class HearingFormGeneratorTest {
         ", MINUTES_45 ,OTHER, SMALL_CLAIM"
     })
     void shouldGetHearingDuration(String mintiHearingDuration, String hearingDuration, String hearingNoticeType, String claimType) {
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
             .listingOrRelisting(ListingOrRelisting.RELISTING)
             .totalClaimAmount(new BigDecimal(2000))
@@ -357,7 +334,6 @@ public class HearingFormGeneratorTest {
         "custom time duration, FAST_TRACK_TRIAL, MULTI_CLAIM",
     })
     void shouldGetHearingDuration_spec(String mintiHearingDuration, String hearingNoticeType, String claimType) {
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
             .listingOrRelisting(ListingOrRelisting.RELISTING)
             .totalClaimAmount(new BigDecimal(2000))

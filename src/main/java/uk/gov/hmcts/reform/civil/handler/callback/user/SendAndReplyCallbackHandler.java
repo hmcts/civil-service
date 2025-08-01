@@ -37,7 +37,6 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
 @RequiredArgsConstructor
-@SuppressWarnings("unchecked")
 public class SendAndReplyCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(SEND_AND_REPLY);
@@ -152,8 +151,7 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
                 caseData.getClaimAmountInPounds(),
                 caseData.getClaimType(),
                 caseData.getPersonalInjuryType(),
-                featureToggleService,
-                caseData
+                    caseData
             );
         }
         builder.lastMessageAllocatedTrack(AllocatedTrack.toStringValueForMessage(allocatedTrack));

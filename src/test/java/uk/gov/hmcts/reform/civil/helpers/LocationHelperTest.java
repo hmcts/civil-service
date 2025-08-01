@@ -30,8 +30,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 
@@ -248,7 +246,6 @@ class LocationHelperTest {
         "MULTI_CLAIM, YES, 123456, region 1"
     })
     void whenSpecMultiOrIntermediateAndLip_courtIsCnbcSpec(String claimTrack, String represented, String epimm, String region) {
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
         CaseData caseData = CaseData.builder()
             .caseAccessCategory(SPEC_CLAIM)
             .totalClaimAmount(BigDecimal.valueOf(1000000))
