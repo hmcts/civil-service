@@ -411,7 +411,6 @@ class CcdClaimStatusDashboardFactoryTest {
             .responseClaimTrack(AllocatedTrack.INTERMEDIATE_CLAIM.name())
             .applicant1ProceedWithClaim(YesOrNo.YES)
             .build();
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
             claim, featureToggleService, Collections.emptyList()));
         assertThat(status).isEqualTo(DashboardClaimStatus.WAITING_COURT_REVIEW);

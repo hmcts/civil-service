@@ -6,13 +6,11 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.SmallClaimMedicalLRspec;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 
@@ -20,26 +18,22 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 public class ClaimantResponseConfirmsToProceedEmailHelper {
 
     private final NotificationsProperties notificationsProperties;
-    private final FeatureToggleService featureToggleService;
 
-    public ClaimantResponseConfirmsToProceedEmailHelper(NotificationsProperties notificationsProperties, FeatureToggleService featureToggleService) {
+    public ClaimantResponseConfirmsToProceedEmailHelper(NotificationsProperties notificationsProperties) {
         this.notificationsProperties = notificationsProperties;
-        this.featureToggleService = featureToggleService;
     }
 
     public String getTemplate(CaseData caseData, boolean isApplicant) {
         if (caseData.getCaseAccessCategory().equals(SPEC_CLAIM)) {
             boolean proceedsWithAction = rejectedAll(caseData) && mediationRejected(caseData);
             if (isApplicant) {
-                return  proceedsWithAction ? notificationsProperties.getClaimantSolicitorConfirmsToProceedSpecWithAction()
-                    : notificationsProperties.getClaimantSolicitorConfirmsToProceedSpec();
+                return proceedsWithAction ? notificationsProperties.getClaimantSolicitorConfirmsToProceedSpecWithAction()
+                        : notificationsProperties.getClaimantSolicitorConfirmsToProceedSpec();
             }
 
             return proceedsWithAction ? notificationsProperties.getRespondentSolicitorNotifyToProceedSpecWithAction()
-                : notificationsProperties.getRespondentSolicitorNotifyToProceedSpec();
+                    : notificationsProperties.getRespondentSolicitorNotifyToProceedSpec();
 
-        } else if (caseData.getAllocatedTrack().equals(MULTI_CLAIM) && !featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
-            return notificationsProperties.getSolicitorCaseTakenOffline();
         }
 
         return notificationsProperties.getClaimantSolicitorConfirmsToProceed();

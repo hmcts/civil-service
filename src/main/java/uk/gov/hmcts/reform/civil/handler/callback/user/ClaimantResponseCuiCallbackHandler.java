@@ -147,8 +147,7 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
         requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabApplicant(callbackParams, builder);
 
         if ((AllocatedTrack.MULTI_CLAIM.name().equals(caseData.getResponseClaimTrack())
-            || AllocatedTrack.INTERMEDIATE_CLAIM.name().equals(caseData.getResponseClaimTrack()))
-            && featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
+            || AllocatedTrack.INTERMEDIATE_CLAIM.name().equals(caseData.getResponseClaimTrack()))) {
             builder.isMintiLipCase(YES);
         }
 

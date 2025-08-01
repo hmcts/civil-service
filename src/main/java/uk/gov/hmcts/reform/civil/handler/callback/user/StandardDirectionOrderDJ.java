@@ -725,12 +725,10 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
             caseDataBuilder.eaCourtLocation(isLipCaseEaCourt ? YesOrNo.YES : YesOrNo.NO);
         }
 
-        if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
-            updateWaCourtLocationsService.ifPresent(service -> service.updateCourtListingWALocations(
+        updateWaCourtLocationsService.ifPresent(service -> service.updateCourtListingWALocations(
                 callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
                 caseDataBuilder
-            ));
-        }
+        ));
 
         var state = "CASE_PROGRESSION";
         return AboutToStartOrSubmitCallbackResponse.builder()

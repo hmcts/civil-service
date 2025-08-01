@@ -9,7 +9,7 @@ import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.FixedRecoverableCosts;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.INTERMEDIATE_CLAIM;
@@ -18,12 +18,10 @@ import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.INTERMEDIATE_CLAIM;
 @AllArgsConstructor
 public class FrcDocumentsUtils {
 
-    private final FeatureToggleService featureToggleService;
     private final AssignCategoryId assignCategoryId;
 
     public void assembleDefendantsFRCDocuments(CaseData caseData) {
-        if (!featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)
-            && !INTERMEDIATE_CLAIM.equals(caseData.getAllocatedTrack())) {
+        if (!INTERMEDIATE_CLAIM.equals(caseData.getAllocatedTrack())) {
             return;
         }
 
@@ -51,8 +49,7 @@ public class FrcDocumentsUtils {
     }
 
     public void assembleClaimantsFRCDocuments(CaseData caseData) {
-        if (!featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)
-            && !INTERMEDIATE_CLAIM.equals(caseData.getAllocatedTrack())) {
+        if (!INTERMEDIATE_CLAIM.equals(caseData.getAllocatedTrack())) {
             return;
         }
 

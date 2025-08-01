@@ -596,7 +596,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         ClaimType claimType = ClaimTypeHelper.getClaimTypeFromClaimTypeUnspec(caseData.getClaimTypeUnSpec());
         dataBuilder.claimType(claimType);
         dataBuilder.allocatedTrack(getAllocatedTrack(caseData.getClaimValue().toPounds(), claimType, caseData.getPersonalInjuryType(),
-                                                     toggleService, caseData));
+                caseData));
 
         dataBuilder.submittedDate(time.now());
 

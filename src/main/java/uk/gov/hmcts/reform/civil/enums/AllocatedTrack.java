@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.enums;
 
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.math.BigDecimal;
 
@@ -16,10 +15,10 @@ public enum AllocatedTrack {
     INTERMEDIATE_CLAIM;
 
     public static AllocatedTrack getAllocatedTrack(BigDecimal statementOfValueInPounds, ClaimType claimType, PersonalInjuryType personalInjuryType,
-                                                             FeatureToggleService featureToggleService, CaseData caseData) {
+                                                   CaseData caseData) {
         Boolean intermediateOrMultiTrackValue = isValueGreaterThan(statementOfValueInPounds, 25000);
-        if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData) && intermediateOrMultiTrackValue.equals(true)) {
-            log.info("isMultiOrIntermediateTrackEnabled toggle is on, for case {}, claim value {}",
+        if (intermediateOrMultiTrackValue.equals(true)) {
+            log.info("isMultiOrIntermediateTrack true, for case {}, claim value {}",
                      caseData != null ? caseData.getCcdCaseReference() : "Unknown Case", statementOfValueInPounds);
             return isIntermediateOrMultiTrack(statementOfValueInPounds) ? INTERMEDIATE_CLAIM : MULTI_CLAIM;
         }

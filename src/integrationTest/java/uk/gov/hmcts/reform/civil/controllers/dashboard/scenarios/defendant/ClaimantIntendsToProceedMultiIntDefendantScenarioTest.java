@@ -11,8 +11,6 @@ import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -34,8 +32,6 @@ public class ClaimantIntendsToProceedMultiIntDefendantScenarioTest extends Dashb
             .ccdState(CaseState.AWAITING_APPLICANT_INTENTION)
             .responseClaimTrack(AllocatedTrack.INTERMEDIATE_CLAIM.name())
             .build();
-
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
 
         handler.handle(callbackParams(caseData));
 
@@ -67,8 +63,6 @@ public class ClaimantIntendsToProceedMultiIntDefendantScenarioTest extends Dashb
             .ccdState(CaseState.AWAITING_APPLICANT_INTENTION)
             .responseClaimTrack(AllocatedTrack.MULTI_CLAIM.name())
             .build();
-
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
 
         handler.handle(callbackParams(caseData));
 

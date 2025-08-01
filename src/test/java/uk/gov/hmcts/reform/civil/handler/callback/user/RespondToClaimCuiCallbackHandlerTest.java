@@ -147,12 +147,11 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo("READY");
             assertThat(response.getState()).isEqualTo(CaseState.AWAITING_APPLICANT_INTENTION.name());
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getResponseClaimTrack()).isNotNull();
         }
 
         @Test
         void shouldUpdateBusinessProcessAndClaimStatus_when_is_multi_track() {
-            when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
-
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .totalClaimAmount(BigDecimal.valueOf(150000))
@@ -179,7 +178,6 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldExtendDeadline() {
-            when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
             when(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(24, LocalDate.now()))
                 .thenReturn(LocalDateTime.now().plusMonths(24));
 
@@ -296,8 +294,6 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                              .build())
                                    .respondent1DQWitnesses(Witnesses.builder().witnessesToAppear(YES)
                                                                .details(wrapElements(Witness.builder()
-                                                                                         .name(
-                                                                                             "John Smith")
                                                                                          .firstName("Jane")
                                                                                          .lastName("Smith")
 
@@ -335,8 +331,6 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                              .build())
                                    .respondent1DQWitnesses(Witnesses.builder().witnessesToAppear(YES)
                                                                .details(wrapElements(Witness.builder()
-                                                                                         .name(
-                                                                                             "John Smith")
                                                                                          .firstName("Jane")
                                                                                          .lastName("Smith")
 

@@ -139,8 +139,8 @@ class FeatureToggleServiceTest {
                 "ea-courts-whitelisted-for-ga-lips",
                 location,
                 false
-            )).thenReturn(isFeatureEnabled);
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(isFeatureEnabled);
+            )).thenReturn(true);
+            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
         }
 
         boolean result = featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(location);
@@ -199,20 +199,6 @@ class FeatureToggleServiceTest {
         }
 
         assertThat(featureToggleService.isCarmEnabledForCase(caseData)).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenMultiOrIntermediateTrackEnabled(Boolean toggleStat) {
-        var caseFileKey = "multi-or-intermediate-track";
-
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
-            .build();
-        if (toggleStat) {
-            when(featureToggleApi.isFeatureEnabledForDate(eq(caseFileKey), anyLong(), eq(false)))
-                .thenReturn(true);
-        }
-        assertThat(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).isEqualTo(toggleStat);
     }
 
     private void givenToggle(String feature, boolean state) {
@@ -274,8 +260,8 @@ class FeatureToggleServiceTest {
                 "case-progression-location-whitelist",
                 location,
                 true
-            )).thenReturn(isFeatureEnabled);
-            when(featureToggleService.isCaseProgressionEnabled()).thenReturn(isFeatureEnabled);
+            )).thenReturn(true);
+            when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         }
 
         boolean result = featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(location);

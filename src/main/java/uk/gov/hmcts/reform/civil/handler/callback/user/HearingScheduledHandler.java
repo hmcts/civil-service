@@ -200,24 +200,21 @@ public class HearingScheduledHandler extends CallbackHandler {
         }
 
         CaseState caseState = caseDataBuilder.build().getCcdState();
-        if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
-            caseState = determinePostState(caseState, caseData);
-            calculateHearingFeeAndDueDate(caseDataBuilder, caseData, claimTrack);
-        } else {
-            // If hearing notice type if FAST or SMALL and it is a first time being listed, calculate fee and fee due date.
-            // If relisted, do not recalculate fee and fee due date, and move state to PREPARE_FOR_HEARING_CONDUCT_HEARING
-            if (!caseData.getHearingNoticeList().equals(HearingNoticeList.OTHER)) {
-                if (ListingOrRelisting.LISTING.equals(caseData.getListingOrRelisting())) {
-                    calculateHearingFeeAndDueDate(caseDataBuilder, caseData, claimTrack);
-                    caseState = caseState.equals(CASE_PROGRESSION) ? HEARING_READINESS : caseState;
-                } else {
-                    caseState = caseState.equals(CASE_PROGRESSION) ? PREPARE_FOR_HEARING_CONDUCT_HEARING : caseState;
-                }
-                // If hearing notice type is OTHER and is being listed, do not calculate fee and fee due date
-                // If relisted, again do not calculate fee and fee due date, but move state to PREPARE_FOR_HEARING_CONDUCT_HEARING
-            } else if (caseData.getHearingNoticeList().equals(HearingNoticeList.OTHER)) {
+
+        caseState = determinePostState(caseState, caseData);
+        calculateHearingFeeAndDueDate(caseDataBuilder, caseData, claimTrack);
+        // If hearing notice type if FAST or SMALL and it is a first time being listed, calculate fee and fee due date.
+        // If relisted, do not recalculate fee and fee due date, and move state to PREPARE_FOR_HEARING_CONDUCT_HEARING
+        if (!caseData.getHearingNoticeList().equals(HearingNoticeList.OTHER)) {
+            if (ListingOrRelisting.LISTING.equals(caseData.getListingOrRelisting())) {
+                caseState = caseState.equals(CASE_PROGRESSION) ? HEARING_READINESS : caseState;
+            } else {
                 caseState = caseState.equals(CASE_PROGRESSION) ? PREPARE_FOR_HEARING_CONDUCT_HEARING : caseState;
             }
+            // If hearing notice type is OTHER and is being listed, do not calculate fee and fee due date
+            // If relisted, again do not calculate fee and fee due date, but move state to PREPARE_FOR_HEARING_CONDUCT_HEARING
+        } else {
+            caseState = caseState.equals(CASE_PROGRESSION) ? PREPARE_FOR_HEARING_CONDUCT_HEARING : caseState;
         }
 
         caseDataBuilder.businessProcess(BusinessProcess.ready(HEARING_SCHEDULED));
@@ -256,8 +253,7 @@ public class HearingScheduledHandler extends CallbackHandler {
         if (caseData.getHearingNoticeList().equals(HearingNoticeList.OTHER)) {
             return;
         }
-        if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)
-            && ListingOrRelisting.RELISTING.equals(caseData.getListingOrRelisting())) {
+        if (ListingOrRelisting.RELISTING.equals(caseData.getListingOrRelisting())) {
             caseDataBuilder.hearingDueDate(calculateHearingDueDate(time.now().toLocalDate(), caseData.getHearingDate()));
             return;
         }

@@ -11,7 +11,6 @@ import java.time.ZoneId;
 
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseContainsLiP;
-import static uk.gov.hmcts.reform.civil.utils.JudgeReallocatedClaimTrack.judgeReallocatedTrackOrAlreadyMinti;
 
 @Slf4j
 @Service
@@ -87,19 +86,6 @@ public class FeatureToggleService {
 
     public boolean isGaForLipsEnabled() {
         return featureToggleApi.isFeatureEnabled("GaForLips");
-    }
-
-    public boolean isMultiOrIntermediateTrackEnabled(CaseData caseData) {
-        ZoneId zoneId = ZoneId.systemDefault();
-        long epoch;
-        if (caseData.getSubmittedDate() == null) {
-            epoch = LocalDateTime.now().atZone(zoneId).toEpochSecond();
-        } else {
-            epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
-        }
-        boolean multiOrIntermediateTrackEnabled = featureToggleApi.isFeatureEnabledForDate("multi-or-intermediate-track", epoch, false);
-        boolean judgeReallocatedTrackOrAlreadyMinti = judgeReallocatedTrackOrAlreadyMinti(caseData, multiOrIntermediateTrackEnabled);
-        return multiOrIntermediateTrackEnabled || judgeReallocatedTrackOrAlreadyMinti;
     }
 
     public boolean isDashboardEnabledForCase(CaseData caseData) {

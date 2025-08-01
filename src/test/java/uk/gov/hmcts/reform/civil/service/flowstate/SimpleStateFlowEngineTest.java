@@ -2253,14 +2253,13 @@ class SimpleStateFlowEngineTest {
                     entry("ONE_RESPONDENT_REPRESENTATIVE", true)
                 );
             } else if (flowState == TAKEN_OFFLINE_AFTER_SDO) {
-                assertThat(stateFlow.getFlags()).hasSize(15).contains(
+                assertThat(stateFlow.getFlags()).hasSize(14).contains(
                     entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                     entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
                     entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                     entry(FlowFlag.SDO_ENABLED.name(), true),
-                    entry(FlowFlag.MINTI_ENABLED.name(), false),
                     entry(FlowFlag.PUBLIC_QUERIES_ENABLED.name(), false),
                     entry(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), false)
                 );
@@ -2607,12 +2606,11 @@ class SimpleStateFlowEngineTest {
                     CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(15).contains(
+            assertThat(stateFlow.getFlags()).hasSize(14).contains(
                 entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                 entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.MINTI_ENABLED.name(), false),
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.SDO_ENABLED.name(), true),
                 entry(FlowFlag.PUBLIC_QUERIES_ENABLED.name(), false),
@@ -2737,7 +2735,7 @@ class SimpleStateFlowEngineTest {
                     CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(15).contains(
+            assertThat(stateFlow.getFlags()).hasSize(14).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.SDO_ENABLED.name(), true)
             );
@@ -2785,7 +2783,7 @@ class SimpleStateFlowEngineTest {
                     FULL_DEFENCE_PROCEED.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(17).contains(
+            assertThat(stateFlow.getFlags()).hasSize(16).contains(
                 entry("BULK_CLAIM_ENABLED", false),
                 entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                 entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
@@ -2793,10 +2791,9 @@ class SimpleStateFlowEngineTest {
                 entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
                 entry("TWO_RESPONDENT_REPRESENTATIVES", true),
                 entry(FlowFlag.IS_MULTI_TRACK.name(), true),
-                entry(FlowFlag.MINTI_ENABLED.name(), false),
                 entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
                 entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
-                entry(FlowFlag.SDO_ENABLED.name(), false),
+                entry(FlowFlag.SDO_ENABLED.name(), true),
                 entry(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), false),
                 entry(FlowFlag.PUBLIC_QUERIES_ENABLED.name(), false)
             );

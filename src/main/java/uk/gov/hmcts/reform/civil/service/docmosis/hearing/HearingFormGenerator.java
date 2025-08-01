@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.hearing.HearingForm;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
@@ -48,7 +47,6 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
     private final DocumentManagementService documentManagementService;
     private final DocumentGeneratorService documentGeneratorService;
     private final AssignCategoryId assignCategoryId;
-    private final FeatureToggleService featureToggleService;
     private final LocationReferenceDataService locationRefDataService;
     private LocationRefData caseManagementLocationDetails;
     private final DocumentHearingLocationHelper documentHearingLocationHelper;
@@ -111,8 +109,7 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
     }
 
     public String getHearingDuration(CaseData caseData) {
-        if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)
-            && isClaimMultiOrIntermediate(caseData)
+        if (isClaimMultiOrIntermediate(caseData)
             && caseData.getHearingNoticeList().equals(FAST_TRACK_TRIAL)) {
             return caseData.getHearingDurationMinti();
         } else {
@@ -129,11 +126,7 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
             && SUCCESS.equals(caseData.getHearingFeePaymentDetails().getStatus());
         boolean isHWFFullRemissionGranted = caseData.hearingFeePaymentDoneWithHWF();
 
-        if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
-            if (isRelisting && hasPaidFee) {
-                return DO_NOT_SHOW;
-            }
-        } else if (isRelisting) {
+        if (isRelisting) {
             return DO_NOT_SHOW;
         }
 

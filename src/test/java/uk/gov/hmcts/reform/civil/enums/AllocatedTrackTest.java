@@ -3,14 +3,10 @@ package uk.gov.hmcts.reform.civil.enums;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.math.BigDecimal;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.INTERMEDIATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
@@ -205,10 +201,8 @@ class AllocatedTrackTest {
             names = {"PERSONAL_INJURY", "CLINICAL_NEGLIGENCE", "PROFESSIONAL_NEGLIGENCE", "BREACH_OF_CONTRACT", "CONSUMER",
                 "CONSUMER_CREDIT", "OTHER"})
         void shouldReturnCorrectTrackWhenOver25000LessThan100000AndUnspecified(ClaimType claimType) {
-            FeatureToggleService toggleService = mock(FeatureToggleService.class);
-            when(toggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
-            assertThat(getAllocatedTrack(BigDecimal.valueOf(25001), claimType, null, toggleService, any())).isEqualTo(INTERMEDIATE_CLAIM);
-            assertThat(getAllocatedTrack(BigDecimal.valueOf(25000), claimType, null, toggleService, any())).isNotEqualTo(INTERMEDIATE_CLAIM);
+            assertThat(getAllocatedTrack(BigDecimal.valueOf(25001), claimType, null, null)).isEqualTo(INTERMEDIATE_CLAIM);
+            assertThat(getAllocatedTrack(BigDecimal.valueOf(25000), claimType, null, null)).isNotEqualTo(INTERMEDIATE_CLAIM);
 
         }
 
@@ -218,10 +212,8 @@ class AllocatedTrackTest {
             names = {"PERSONAL_INJURY", "CLINICAL_NEGLIGENCE", "PROFESSIONAL_NEGLIGENCE", "BREACH_OF_CONTRACT", "CONSUMER",
                 "CONSUMER_CREDIT", "OTHER"})
         void shouldReturnCorrectTrackWhenOver100000AndUnspecified(ClaimType claimType) {
-            FeatureToggleService toggleService = mock(FeatureToggleService.class);
-            when(toggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
-            assertThat(getAllocatedTrack(BigDecimal.valueOf(100001), claimType, null, toggleService, any())).isEqualTo(MULTI_CLAIM);
-            assertThat(getAllocatedTrack(BigDecimal.valueOf(99999), claimType, null, toggleService, any())).isNotEqualTo(MULTI_CLAIM);
+            assertThat(getAllocatedTrack(BigDecimal.valueOf(100001), claimType, null, null)).isEqualTo(MULTI_CLAIM);
+            assertThat(getAllocatedTrack(BigDecimal.valueOf(99999), claimType, null, null)).isNotEqualTo(MULTI_CLAIM);
         }
     }
 }

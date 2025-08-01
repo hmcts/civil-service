@@ -259,9 +259,8 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
     }
 
     private boolean isMintiClaim(CaseData caseData) {
-        return featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)
-            && (AllocatedTrack.INTERMEDIATE_CLAIM.name().equals(caseData.getResponseClaimTrack())
-            || AllocatedTrack.MULTI_CLAIM.name().equals(caseData.getResponseClaimTrack()));
+        return AllocatedTrack.INTERMEDIATE_CLAIM.name().equals(caseData.getResponseClaimTrack())
+                || AllocatedTrack.MULTI_CLAIM.name().equals(caseData.getResponseClaimTrack());
     }
 
     private boolean isClaimantProceeding(CaseData caseData) {

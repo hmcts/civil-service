@@ -57,6 +57,7 @@ import java.util.Optional;
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -95,8 +96,6 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
     private DefaultJudgmentOrderFormGenerator defaultJudgmentOrderFormGenerator;
     @MockBean
     private LocationReferenceDataService locationRefDataService;
-    @MockBean
-    private UserDetails userDetails;
     @MockBean
     private WorkingDayIndicator workingDayIndicator;
     @MockBean
@@ -381,11 +380,18 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                 .isEqualTo("The claimant must prepare a Scott Schedule of the defects, items of damage "
                                + "or any other relevant matters");
             assertThat(response.getData()).extracting("trialBuildingDispute").extracting("input2")
-                .isEqualTo("The columns should be headed: \n - Item \n - "
-                               + "Alleged Defect "
-                               + "\n - Claimant's costing\n - Defendant's"
-                               + " response\n - Defendant's costing"
-                               + " \n - Reserved for Judge's use");
+                .isEqualTo("""
+                        The columns should be headed:\s
+                         - Item\s
+                         - \
+                        Alleged Defect \
+                        
+                         - Claimant's costing
+                         - Defendant's\
+                         response
+                         - Defendant's costing\
+                        \s
+                         - Reserved for Judge's use""");
             assertThat(response.getData()).extracting("trialBuildingDispute").extracting("input3")
                 .isEqualTo("The claimant must upload to the Digital Portal the "
                                + "Scott Schedule with the relevant "
@@ -417,26 +423,34 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                                + " the pages in that bundle");
 
             assertThat(response.getData()).extracting("sdoDJR2TrialCreditHire").extracting("input1")
-                .isEqualTo("If impecuniosity is alleged by the claimant and not admitted "
-                               + "by the defendant, the claimant's "
-                               + "disclosure as ordered earlier in this order must "
-                               + "include:\n"
-                               + "a. Evidence of all income from all sources for a period "
-                               + "of 3 months prior to the "
-                               + "commencement of hire until the earlier of \n    i) 3 months "
-                               + "after cessation of hire or \n    ii) "
-                               + "the repair or replacement of the claimant's vehicle;\n"
-                               + "b. Copy statements of all bank, credit card and savings "
-                               + "account statements for a period of 3 months "
-                               + "prior to the commencement of hire until the earlier of \n    i)"
-                               + " 3 months after cessation of hire "
-                               + "or \n    ii) the repair or replacement of the claimant's vehicle;\n"
-                               + "c. Evidence of any loan, overdraft or other credit "
-                               + "facilities available to the claimant");
+                .isEqualTo("""
+                        If impecuniosity is alleged by the claimant and not admitted \
+                        by the defendant, the claimant's \
+                        disclosure as ordered earlier in this order must \
+                        include:
+                        a. Evidence of all income from all sources for a period \
+                        of 3 months prior to the \
+                        commencement of hire until the earlier of\s
+                            i) 3 months \
+                        after cessation of hire or\s
+                            ii) \
+                        the repair or replacement of the claimant's vehicle;
+                        b. Copy statements of all bank, credit card and savings \
+                        account statements for a period of 3 months \
+                        prior to the commencement of hire until the earlier of\s
+                            i)\
+                         3 months after cessation of hire \
+                        or\s
+                            ii) the repair or replacement of the claimant's vehicle;
+                        c. Evidence of any loan, overdraft or other credit \
+                        facilities available to the claimant""");
             assertThat(response.getData()).extracting("sdoDJR2TrialCreditHire").extracting("sdoDJR2TrialCreditHireDetails").extracting("input2")
-                .isEqualTo("The claimant must upload to the Digital Portal a witness "
-                               + "statement addressing \na) the need to hire a replacement "
-                               + "vehicle; and \nb) impecuniosity");
+                .isEqualTo("""
+                        The claimant must upload to the Digital Portal a witness \
+                        statement addressing\s
+                        a) the need to hire a replacement \
+                        vehicle; and\s
+                        b) impecuniosity""");
             assertThat(response.getData()).extracting("sdoDJR2TrialCreditHire").extracting("sdoDJR2TrialCreditHireDetails").extracting("input3")
                 .isEqualTo("This statement must be uploaded to the Digital Portal by 4pm on");
             assertThat(response.getData()).extracting("sdoDJR2TrialCreditHire").extracting("sdoDJR2TrialCreditHireDetails").extracting("date1")
@@ -476,8 +490,13 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                 .isEqualTo("The claimant must prepare a Scott Schedule of the items "
                                + "in disrepair");
             assertThat(response.getData()).extracting("trialHousingDisrepair").extracting("input2")
-                .isEqualTo("The columns should be headed: \n - Item \n - Alleged disrepair "
-                               + "\n - Defendant's Response \n - Reserved for Judge's Use");
+                .isEqualTo("""
+                        The columns should be headed:\s
+                         - Item\s
+                         - Alleged disrepair \
+                        
+                         - Defendant's Response\s
+                         - Reserved for Judge's Use""");
             assertThat(response.getData()).extracting("trialHousingDisrepair").extracting("input3")
                 .isEqualTo("The claimant must upload to the Digital Portal the "
                                + "Scott Schedule with the relevant columns "
@@ -913,8 +932,6 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldNotCallUpdateWaCourtLocationsServiceWhenNotPresent_AndMintiEnabled() {
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
-
         handler = new StandardDirectionOrderDJ(mapper, defaultJudgmentOrderFormGenerator, locationRefDataService, featureToggleService,
                                                userService, assignCategoryId, categoryService, locationHelper,
                                                Optional.empty(), deadlinesCalculator, workingDayIndicator);
@@ -927,12 +944,11 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         verifyNoInteractions(updateWaCourtLocationsService);
+        assertNotNull(response);
     }
 
     @Test
     void shouldCallUpdateWaCourtLocationsServiceWhenPresent_AndMintiEnabled() {
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
-
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
             .caseManagementLocation(CaseLocationCivil.builder().baseLocation("123456").build())
             .build();
@@ -941,6 +957,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         verify(updateWaCourtLocationsService).updateCourtListingWALocations(any(), any());
+        assertNotNull(response);
     }
 
     @Nested

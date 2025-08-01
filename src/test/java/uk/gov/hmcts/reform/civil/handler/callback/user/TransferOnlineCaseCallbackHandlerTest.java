@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -31,6 +32,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
@@ -85,9 +87,10 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData())
-                .extracting("transferCourtLocationList")
-                .extracting("list_items")
-                .asList().hasSize(3);
+                    .extracting("transferCourtLocationList")
+                    .extracting("list_items")
+                    .asInstanceOf(InstanceOfAssertFactories.LIST)
+                    .hasSize(3);
         }
     }
 
@@ -320,7 +323,6 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldCallUpdateWaCourtLocationsServiceWhenPresent_AndMintiEnabled() {
-            when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
             given(courtLocationUtils.findPreferredLocationData(any(), any()))
                 .willReturn(LocationRefData.builder().siteName("")
                                 .epimmsId("222")
@@ -338,6 +340,7 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             verify(updateWaCourtLocationsService).updateCourtListingWALocations(any(), any());
+            assertNotNull(response.getData());
         }
 
         @Test
@@ -345,7 +348,6 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
             handler = new TransferOnlineCaseCallbackHandler(objectMapper, locationRefDataService, courtLocationUtils,
                                                             featureToggleService,
                                                             Optional.empty());
-            when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
             given(courtLocationUtils.findPreferredLocationData(any(), any()))
                 .willReturn(LocationRefData.builder().siteName("")
                                 .epimmsId("222")
@@ -363,6 +365,7 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             verifyNoInteractions(updateWaCourtLocationsService);
+            assertNotNull(response.getData());
         }
     }
 

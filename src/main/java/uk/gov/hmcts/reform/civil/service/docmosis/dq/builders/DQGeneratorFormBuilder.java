@@ -38,7 +38,6 @@ import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.INTERMEDIATE_CLAIM;
-import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
@@ -112,11 +111,8 @@ public class DQGeneratorFormBuilder {
             witnessesIncludingDefendants = countWitnessesIncludingDefendant(witnesses, caseData);
         }
 
-        boolean specAndSmallClaim = false;
-        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
-            && SMALL_CLAIM.equals(caseData.getResponseClaimTrack())) {
-            specAndSmallClaim = true;
-        }
+        boolean specAndSmallClaim = SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+                && SMALL_CLAIM.equals(caseData.getResponseClaimTrack());
 
         builder.fileDirectionsQuestionnaire(dq.getFileDirectionQuestionnaire())
             .fixedRecoverableCosts(FixedRecoverableCostsSection.from(INTERMEDIATE_CLAIM.toString().equals(getClaimTrack(
@@ -372,13 +368,8 @@ public class DQGeneratorFormBuilder {
 
     private boolean shouldDisplayDisclosureReport(CaseData caseData) {
         // This is to hide disclosure report from prod
-        if (MULTI_CLAIM.equals(caseData.getAllocatedTrack())) {
-            return featureToggleService.isMultiOrIntermediateTrackEnabled(caseData);
-        } else if (UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
-            && FAST_CLAIM.equals(caseData.getAllocatedTrack())) {
-            return false;
-        }
-        return true;
+        return !UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+                || !FAST_CLAIM.equals(caseData.getAllocatedTrack());
     }
 
     private boolean isRespondent2(CaseData caseData) {

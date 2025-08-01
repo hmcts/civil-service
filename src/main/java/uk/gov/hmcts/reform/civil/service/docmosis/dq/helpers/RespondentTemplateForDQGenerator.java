@@ -20,7 +20,6 @@ import uk.gov.hmcts.reform.civil.model.dq.HearingSupport;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
@@ -36,7 +35,6 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.INTERMEDIATE_CLAIM;
-import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -49,7 +47,6 @@ public class RespondentTemplateForDQGenerator {
 
     private final SetApplicantsForDQGenerator setApplicantsForDQGenerator;
     private final GetRespondentsForDQGenerator respondentsForDQGenerator;
-    private final FeatureToggleService featureToggleService;
     private final LocationReferenceDataService locationRefDataService;
     static final String SMALL_CLAIM = "SMALL_CLAIM";
 
@@ -201,14 +198,8 @@ public class RespondentTemplateForDQGenerator {
     }
 
     private boolean shouldDisplayDisclosureReport(CaseData caseData) {
-        // This is to hide disclosure report from prod
-        if (MULTI_CLAIM.equals(caseData.getAllocatedTrack())) {
-            return featureToggleService.isMultiOrIntermediateTrackEnabled(caseData);
-        } else if (UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
-            && FAST_CLAIM.equals(caseData.getAllocatedTrack())) {
-            return false;
-        }
-        return true;
+        return !UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+                || !FAST_CLAIM.equals(caseData.getAllocatedTrack());
     }
 
     public RequestedCourt getRequestedCourt(DQ dq, String authorisation) {
@@ -239,14 +230,11 @@ public class RespondentTemplateForDQGenerator {
         if (hearing == null || hearing.getHearingLength() == null) {
             return null;
         }
-        switch (hearing.getHearingLength()) {
-            case LESS_THAN_DAY:
-                return hearing.getHearingLengthHours() + " hours";
-            case ONE_DAY:
-                return "One day";
-            default:
-                return hearing.getHearingLengthDays() + " days";
-        }
+        return switch (hearing.getHearingLength()) {
+            case LESS_THAN_DAY -> hearing.getHearingLengthHours() + " hours";
+            case ONE_DAY -> "One day";
+            default -> hearing.getHearingLengthDays() + " days";
+        };
     }
 
     private Hearing getHearing(DQ dq) {
