@@ -1545,12 +1545,16 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         // LiP check ensures LiP cases will not automatically get whitelisted, and instead will have their own ea court check.
         boolean isLipCase = (caseData.isApplicantLiP() || caseData.isRespondent1LiP() || caseData.isRespondent2LiP());
-        if (!isLipCase) {
-            log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
+        if (featureToggleService.isWelshEnabledForMainCase()) {
             dataBuilder.eaCourtLocation(YES);
         } else {
-            boolean isLipCaseEaCourt = isLipCaseWithProgressionEnabledAndCourtWhiteListed(caseData);
-            dataBuilder.eaCourtLocation(isLipCaseEaCourt ? YesOrNo.YES : YesOrNo.NO);
+            if (!isLipCase) {
+                log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
+                dataBuilder.eaCourtLocation(YES);
+            } else {
+                boolean isLipCaseEaCourt = isLipCaseWithProgressionEnabledAndCourtWhiteListed(caseData);
+                dataBuilder.eaCourtLocation(isLipCaseEaCourt ? YesOrNo.YES : YesOrNo.NO);
+            }
         }
 
         dataBuilder.disposalHearingMethodInPerson(deleteLocationList(
