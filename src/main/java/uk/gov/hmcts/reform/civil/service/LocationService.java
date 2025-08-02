@@ -72,16 +72,12 @@ public class LocationService {
     }
 
     private boolean hasSDOBeenMade(CaseData caseData) {
-        if (featureToggleService.isQueryManagementLRsEnabled()) {
-            log.info("hasSDOBeenMade If for caseId {}", caseData.getCcdCaseReference());
-            return (!statesBeforeSDO.contains(caseData.getCcdState())
-                && !settleDiscontinueStates.contains(caseData.getCcdState()))
-                || (!statesBeforeSDO.contains(caseData.getPreviousCCDState())
-                && settleDiscontinueStates.contains(caseData.getCcdState()));
-        } else {
-            log.info("hasSDOBeenMade Else for caseId {}", caseData.getCcdCaseReference());
-            return !statesBeforeSDO.contains(caseData.getCcdState());
-        }
+        log.info("hasSDOBeenMade If for caseId {}", caseData.getCcdCaseReference());
+        return (!statesBeforeSDO.contains(caseData.getCcdState())
+            && !settleDiscontinueStates.contains(caseData.getCcdState()))
+            || (!statesBeforeSDO.contains(caseData.getPreviousCCDState())
+            && settleDiscontinueStates.contains(caseData.getCcdState()));
+
     }
 
     public LocationRefData getWorkAllocationLocationDetails(String baseLocation, String authToken) {
