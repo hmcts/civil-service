@@ -97,10 +97,10 @@ public class DashboardNotificationsParamsMapperTest {
             .documentType(documentType)
             .createdDatetime(LocalDateTime.of(2024, Month.APRIL, 4, 14, 14))
             .documentLink(Document.builder()
-                              .documentUrl("fake-url")
-                              .documentFileName("file-name.pdf")
-                              .documentBinaryUrl("binary-url")
-                              .build())
+                .documentUrl("fake-url")
+                .documentFileName("file-name.pdf")
+                .documentBinaryUrl("binary-url")
+                .build())
             .build();
     }
 
@@ -138,9 +138,11 @@ public class DashboardNotificationsParamsMapperTest {
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 
-        assertThat(result).extracting("djDefendantNotificationMessage").isEqualTo("<u>make an application to set aside (remove) or vary the judgment</u>");
+        assertThat(result).extracting("djDefendantNotificationMessage").isEqualTo(
+            "<a href=\"{GENERAL_APPLICATIONS_INITIATION_PAGE_URL}\" class=\"govuk-link\">make an application to set aside (remove) or vary the judgment</a>");
 
-        assertThat(result).extracting("djClaimantNotificationMessage").isEqualTo("<u>make an application to vary the judgment</u>");
+        assertThat(result).extracting("djClaimantNotificationMessage")
+            .isEqualTo("<a href=\"{GENERAL_APPLICATIONS_INITIATION_PAGE_URL}\" class=\"govuk-link\">make an application to vary the judgment</a>");
 
         assertThat(result).extracting("claimFee").isEqualTo("£1");
 
@@ -236,8 +238,6 @@ public class DashboardNotificationsParamsMapperTest {
     @EnumSource(PaymentFrequency.class)
     void shouldMapParameters_WhenRecordJudgmentDeterminationOfMeans(PaymentFrequency paymentFrequency) {
 
-        when(featureToggleService.isGeneralApplicationsEnabled()).thenReturn(true);
-
         caseData = caseData.toBuilder()
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
@@ -246,9 +246,9 @@ public class DashboardNotificationsParamsMapperTest {
             .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
             .joJudgmentRecordReason(JudgmentRecordedReason.DETERMINATION_OF_MEANS)
             .joInstalmentDetails(JudgmentInstalmentDetails.builder()
-                                     .startDate(LocalDate.of(2022, 12, 12))
-                                     .amount("120")
-                                     .paymentFrequency(paymentFrequency).build())
+                .startDate(LocalDate.of(2022, 12, 12))
+                .amount("120")
+                .paymentFrequency(paymentFrequency).build())
             .joAmountOrdered("1200")
             .joAmountCostOrdered("1100")
             .joPaymentPlan(JudgmentPaymentPlan.builder().type(PaymentPlanSelection.PAY_IN_INSTALMENTS).build())
@@ -260,39 +260,40 @@ public class DashboardNotificationsParamsMapperTest {
 
         if (paymentFrequency.equals(PaymentFrequency.WEEKLY)) {
             assertThat(result).extracting("paymentFrequencyMessage").isEqualTo("You must pay the claim amount of £23.00" +
-                                                                                   " in weekly instalments of £1.20." +
-                                                                                   " The first payment is due on 12 December 2022");
+                " in weekly instalments of £1.20." +
+                " The first payment is due on 12 December 2022");
             assertThat(result).extracting("paymentFrequencyMessageCy").isEqualTo("Rhaid i chi dalu swm yr hawliad," +
-                                                                                     " sef £23.00 mewn rhandaliadau wythnosol o £1.20." +
-                                                                                     " Bydd y taliad cyntaf yn ddyledus ar 12 Rhagfyr 2022");
+                " sef £23.00 mewn rhandaliadau wythnosol o £1.20." +
+                " Bydd y taliad cyntaf yn ddyledus ar 12 Rhagfyr 2022");
         } else if (paymentFrequency.equals(PaymentFrequency.EVERY_TWO_WEEKS)) {
             assertThat(result).extracting("paymentFrequencyMessage").isEqualTo("You must pay the claim amount of £23.00" +
-                                                                                   " in biweekly instalments of £1.20." +
-                                                                                   " The first payment is due on 12 December 2022");
+                " in biweekly instalments of £1.20." +
+                " The first payment is due on 12 December 2022");
             assertThat(result).extracting("paymentFrequencyMessageCy").isEqualTo("Rhaid i chi dalu swm yr hawliad," +
-                                                                                     " sef £23.00 mewn rhandaliadau bob pythefnos o £1.20." +
-                                                                                     " Bydd y taliad cyntaf yn ddyledus ar 12 Rhagfyr 2022");
+                " sef £23.00 mewn rhandaliadau bob pythefnos o £1.20." +
+                " Bydd y taliad cyntaf yn ddyledus ar 12 Rhagfyr 2022");
         } else {
             assertThat(result).extracting("paymentFrequencyMessage").isEqualTo("You must pay the claim amount of £23.00" +
-                                                                                   " in monthly instalments of £1.20." +
-                                                                                   " The first payment is due on 12 December 2022");
+                " in monthly instalments of £1.20." +
+                " The first payment is due on 12 December 2022");
             assertThat(result).extracting("paymentFrequencyMessageCy").isEqualTo("Rhaid i chi dalu swm yr hawliad, " +
-                                                                                     "sef £23.00 mewn rhandaliadau misol o £1.20." +
-                                                                                     " Bydd y taliad cyntaf yn ddyledus ar 12 Rhagfyr 2022");
+                "sef £23.00 mewn rhandaliadau misol o £1.20." +
+                " Bydd y taliad cyntaf yn ddyledus ar 12 Rhagfyr 2022");
         }
     }
 
     @Test
     public void shouldMapParameters_WhenGeneralApplicationsIsEnabled() {
 
-        when(featureToggleService.isGeneralApplicationsEnabled()).thenReturn(true);
         caseData = caseData.toBuilder().build();
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 
-        assertThat(result).extracting("djDefendantNotificationMessage").isEqualTo("<a href=\"{GENERAL_APPLICATIONS_INITIATION_PAGE_URL}\" class=\"govuk-link\">make an application to set aside (remove) or vary the judgment</a>");
+        assertThat(result).extracting("djDefendantNotificationMessage").isEqualTo(
+            "<a href=\"{GENERAL_APPLICATIONS_INITIATION_PAGE_URL}\" class=\"govuk-link\">make an application to set aside (remove) or vary the judgment</a>");
 
-        assertThat(result).extracting("djClaimantNotificationMessage").isEqualTo("<a href=\"{GENERAL_APPLICATIONS_INITIATION_PAGE_URL}\" class=\"govuk-link\">make an application to vary the judgment</a>");
+        assertThat(result).extracting("djClaimantNotificationMessage")
+            .isEqualTo("<a href=\"{GENERAL_APPLICATIONS_INITIATION_PAGE_URL}\" class=\"govuk-link\">make an application to vary the judgment</a>");
     }
 
     @ParameterizedTest
@@ -307,31 +308,38 @@ public class DashboardNotificationsParamsMapperTest {
             .respondent1Represented(YesOrNo.NO)
             .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
             .activeJudgment(JudgmentDetails.builder()
-                                .state(ISSUED)
-                                .paymentPlan(JudgmentPaymentPlan.builder().type(PAY_IN_INSTALMENTS).build())
-                                .orderedAmount("150001")
-                                .totalAmount("150001")
-                                .instalmentDetails(JudgmentInstalmentDetails.builder()
-                                       .amount("20001")
-                                       .paymentFrequency(paymentFrequency)
-                                       .startDate(LocalDate.of(2050, Month.AUGUST, 8))
-                                       .build())
-                                .build())
-            .build();;
+                .state(ISSUED)
+                .paymentPlan(JudgmentPaymentPlan.builder().type(PAY_IN_INSTALMENTS).build())
+                .orderedAmount("150001")
+                .totalAmount("150001")
+                .instalmentDetails(JudgmentInstalmentDetails.builder()
+                    .amount("20001")
+                    .paymentFrequency(paymentFrequency)
+                    .startDate(LocalDate.of(2050, Month.AUGUST, 8))
+                    .build())
+                .build())
+            .build();
+        ;
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 
         assertThat(result).extracting("ccjDefendantAdmittedAmount").isEqualTo(BigDecimal.valueOf(1500.01));
 
         if (paymentFrequency.equals(PaymentFrequency.WEEKLY)) {
-            assertThat(result).extracting("ccjPaymentMessageEn").isEqualTo("in weekly instalments of £200.01. The first payment is due on 8 August 2050");
-            assertThat(result).extracting("ccjPaymentMessageCy").isEqualTo("mewn rhandaliadau wythnosol o £200.01. Bydd y taliad cyntaf yn ddyledus ar 8 Awst 2050");
+            assertThat(result).extracting("ccjPaymentMessageEn")
+                .isEqualTo("in weekly instalments of £200.01. The first payment is due on 8 August 2050");
+            assertThat(result).extracting("ccjPaymentMessageCy")
+                .isEqualTo("mewn rhandaliadau wythnosol o £200.01. Bydd y taliad cyntaf yn ddyledus ar 8 Awst 2050");
         } else if (paymentFrequency.equals(PaymentFrequency.EVERY_TWO_WEEKS)) {
-            assertThat(result).extracting("ccjPaymentMessageEn").isEqualTo("in biweekly instalments of £200.01. The first payment is due on 8 August 2050");
-            assertThat(result).extracting("ccjPaymentMessageCy").isEqualTo("mewn rhandaliadau bob pythefnos o £200.01. Bydd y taliad cyntaf yn ddyledus ar 8 Awst 2050");
+            assertThat(result).extracting("ccjPaymentMessageEn")
+                .isEqualTo("in biweekly instalments of £200.01. The first payment is due on 8 August 2050");
+            assertThat(result).extracting("ccjPaymentMessageCy")
+                .isEqualTo("mewn rhandaliadau bob pythefnos o £200.01. Bydd y taliad cyntaf yn ddyledus ar 8 Awst 2050");
         } else {
-            assertThat(result).extracting("ccjPaymentMessageEn").isEqualTo("in monthly instalments of £200.01. The first payment is due on 8 August 2050");
-            assertThat(result).extracting("ccjPaymentMessageCy").isEqualTo("mewn rhandaliadau misol o £200.01. Bydd y taliad cyntaf yn ddyledus ar 8 Awst 2050");
+            assertThat(result).extracting("ccjPaymentMessageEn")
+                .isEqualTo("in monthly instalments of £200.01. The first payment is due on 8 August 2050");
+            assertThat(result).extracting("ccjPaymentMessageCy")
+                .isEqualTo("mewn rhandaliadau misol o £200.01. Bydd y taliad cyntaf yn ddyledus ar 8 Awst 2050");
         }
     }
 
@@ -346,12 +354,13 @@ public class DashboardNotificationsParamsMapperTest {
             .respondent1Represented(YesOrNo.NO)
             .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
             .activeJudgment(JudgmentDetails.builder()
-                                .state(ISSUED)
-                                .paymentPlan(JudgmentPaymentPlan.builder().type(PAY_IMMEDIATELY).build())
-                                .orderedAmount("150001")
-                                .totalAmount("150001")
-                                .build())
-            .build();;
+                .state(ISSUED)
+                .paymentPlan(JudgmentPaymentPlan.builder().type(PAY_IMMEDIATELY).build())
+                .orderedAmount("150001")
+                .totalAmount("150001")
+                .build())
+            .build();
+        ;
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 
@@ -371,15 +380,16 @@ public class DashboardNotificationsParamsMapperTest {
             .respondent1Represented(YesOrNo.NO)
             .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
             .activeJudgment(JudgmentDetails.builder()
-                                .state(ISSUED)
-                                .paymentPlan(JudgmentPaymentPlan.builder()
-                                                 .type(PAY_BY_DATE)
-                                                 .paymentDeadlineDate(LocalDate.of(2050, Month.AUGUST, 19))
-                                                 .build())
-                                .orderedAmount("150001")
-                                .totalAmount("150001")
-                                .build())
-            .build();;
+                .state(ISSUED)
+                .paymentPlan(JudgmentPaymentPlan.builder()
+                    .type(PAY_BY_DATE)
+                    .paymentDeadlineDate(LocalDate.of(2050, Month.AUGUST, 19))
+                    .build())
+                .orderedAmount("150001")
+                .totalAmount("150001")
+                .build())
+            .build();
+        ;
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 
@@ -433,16 +443,16 @@ public class DashboardNotificationsParamsMapperTest {
         caseData = caseData.toBuilder().respondent1ResponseDeadline(null)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
             .respondToClaim(RespondToClaim.builder()
-                                .howMuchWasPaid(new BigDecimal("100050"))
-                                .whenWasThisAmountPaid(LocalDate.parse("2023-03-29"))
-                                .build())
+                .howMuchWasPaid(new BigDecimal("100050"))
+                .whenWasThisAmountPaid(LocalDate.parse("2023-03-29"))
+                .build())
             .build();
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 
         assertThat(result).extracting("claimSettledAmount").isEqualTo("£1000.50");
         assertThat(result).extracting("claimSettledObjectionsDeadline").isEqualTo(LocalDate.parse("2023-04-17")
-                                                                        .atTime(END_OF_DAY));
+            .atTime(END_OF_DAY));
         assertThat(result).extracting("claimSettledDateEn").isEqualTo("29 March 2023");
         assertThat(result).extracting("claimSettledDateCy").isEqualTo("29 Mawrth 2023");
     }
@@ -453,9 +463,9 @@ public class DashboardNotificationsParamsMapperTest {
         caseData = caseData.toBuilder().respondent1ResponseDeadline(null)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .respondToAdmittedClaim(RespondToClaim.builder()
-                                        .howMuchWasPaid(new BigDecimal("100055"))
-                                        .whenWasThisAmountPaid(LocalDate.parse("2023-03-29"))
-                                        .build())
+                .howMuchWasPaid(new BigDecimal("100055"))
+                .whenWasThisAmountPaid(LocalDate.parse("2023-03-29"))
+                .build())
             .build();
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
@@ -469,7 +479,7 @@ public class DashboardNotificationsParamsMapperTest {
     public void shouldMapParameters_whenHwFPartRemissionGranted() {
         caseData = caseData.toBuilder().hwfFeeType(FeeType.CLAIMISSUED)
             .claimIssuedHwfDetails(HelpWithFeesDetails.builder().remissionAmount(BigDecimal.valueOf(2500))
-                                       .outstandingFeeInPounds(BigDecimal.valueOf(100)).build()).build();
+                .outstandingFeeInPounds(BigDecimal.valueOf(100)).build()).build();
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 
@@ -528,7 +538,7 @@ public class DashboardNotificationsParamsMapperTest {
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
             .applicant1ResponseDeadline(LocalDate.parse("2020-03-29").atStartOfDay())
             .respondToClaim(RespondToClaim.builder()
-                                .build())
+                .build())
             .build();
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
@@ -542,7 +552,7 @@ public class DashboardNotificationsParamsMapperTest {
     public void shouldMapParameters_whenHearingFeeHwFPartRemissionGranted() {
         caseData = caseData.toBuilder().hwfFeeType(FeeType.HEARING)
             .hearingHwfDetails(HelpWithFeesDetails.builder().remissionAmount(BigDecimal.valueOf(2500))
-                                       .outstandingFeeInPounds(BigDecimal.valueOf(100)).build()).build();
+                .outstandingFeeInPounds(BigDecimal.valueOf(100)).build()).build();
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 
@@ -633,21 +643,21 @@ public class DashboardNotificationsParamsMapperTest {
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
             .applicant1ResponseDeadline(LocalDate.parse("2020-03-29").atStartOfDay())
             .respondToClaim(RespondToClaim.builder()
-                                .build())
+                .build())
             .drawDirectionsOrderRequired(YES)
             .drawDirectionsOrderSmallClaims(YesOrNo.NO)
             .orderType(OrderType.DECIDE_DAMAGES)
             .fastTrackDisclosureOfDocuments(FastTrackDisclosureOfDocuments.builder()
-                                                .date3(date)
-                                                .build())
+                .date3(date)
+                .build())
             .build();
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 
         assertThat(result).extracting("sdoDocumentUploadRequestedDateEn")
-                .isEqualTo(DateUtils.formatDate(date));
+            .isEqualTo(DateUtils.formatDate(date));
         assertThat(result).extracting("sdoDocumentUploadRequestedDateCy")
-                .isEqualTo(DateUtils.formatDateInWelsh(date, false));
+            .isEqualTo(DateUtils.formatDateInWelsh(date, false));
     }
 
     @Test
