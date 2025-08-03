@@ -211,12 +211,14 @@ public class DashboardClaimInfoService {
                     .orElse(Collections.emptyList());
         return isClaimant
             ? dashboardClaimStatusFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
-            caseData,
-            featureToggleService, events
+                caseData,
+                featureToggleService,
+                events
         ))
             : dashboardClaimStatusFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
-            caseData,
-            featureToggleService, events
+                caseData,
+                featureToggleService,
+                events
         ));
     }
 }

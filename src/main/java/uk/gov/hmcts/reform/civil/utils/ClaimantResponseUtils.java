@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.PaymentType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 
@@ -94,9 +95,19 @@ public class ClaimantResponseUtils {
     }
 
     public BigDecimal getDefendantAdmittedAmount(CaseData caseData) {
+        return getDefendantAdmittedAmount(caseData, false);
+    }
+
+    public BigDecimal getDefendantAdmittedAmount(CaseData caseData, boolean addFixedCosts) {
         BigDecimal interest = interestCalculator.calculateInterest(caseData);
+        BigDecimal fixedCosts = BigDecimal.ZERO;
         if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_ADMISSION) {
-            return caseData.getTotalClaimAmount().add(getClaimFee(caseData)).add(interest);
+            if (addFixedCosts && (caseData.getFixedCosts() != null && YesOrNo.YES.equals(caseData.getFixedCosts().getClaimFixedCosts()))) {
+                fixedCosts = MonetaryConversions.penniesToPounds(
+                    BigDecimal.valueOf(Integer.parseInt(
+                        caseData.getFixedCosts().getFixedCostAmount())));
+            }
+            return caseData.getTotalClaimAmount().add(getClaimFee(caseData)).add(interest).add(fixedCosts);
         } else {
             return caseData.getRespondToAdmittedClaimOwingAmountPounds();
         }
