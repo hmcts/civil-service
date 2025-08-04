@@ -19,7 +19,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.RespondentSolicitorDetails;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
-import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.prd.model.ContactInformation;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
@@ -142,7 +141,6 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
         }
 
         updateDefendantQueryCollectionPartyName(caseDataBuilder);
-        resetLanguagePreference(caseDataBuilder, caseData, replacedSolicitorCaseRole);
         clearLRIndividuals(replacedSolicitorCaseRole, caseDataBuilder.build(), caseDataBuilder, caseData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -159,24 +157,6 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
                 ONE_V_TWO_TWO_LEGAL_REP,
                 caseDataBuilder
             );
-        }
-    }
-
-    private void resetLanguagePreference(CaseData.CaseDataBuilder<?, ?> updatedCaseDataBuilder, CaseData caseData, String caseRole) {
-        if (featureToggleService.isWelshEnabledForMainCase()) {
-            if (CaseRole.APPLICANTSOLICITORONE.getFormattedName().equals(caseRole) && caseData.isClaimantBilingual()) {
-                updatedCaseDataBuilder
-                        .claimantBilingualLanguagePreference(null)
-                        .claimantLanguagePreferenceDisplay(null);
-            } else if (CaseRole.RESPONDENTSOLICITORONE.getFormattedName().equals(caseRole) && caseData.isRespondentResponseBilingual()) {
-                CaseDataLiP caseDataLiP = caseData.getCaseDataLiP();
-                updatedCaseDataBuilder
-                        .caseDataLiP(caseDataLiP.toBuilder()
-                                .respondent1LiPResponse(
-                                    caseDataLiP.getRespondent1LiPResponse().toBuilder().respondent1ResponseLanguage(null).build()
-                                ).build())
-                        .defendantLanguagePreferenceDisplay(null);
-            }
         }
     }
 
