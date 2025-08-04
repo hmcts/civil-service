@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.dashboard.services;
 
-import java.util.HashMap;
-import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,9 +12,12 @@ import uk.gov.hmcts.reform.dashboard.repositories.NotificationActionRepository;
 import uk.gov.hmcts.reform.idam.client.IdamApi;
 
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.time.OffsetDateTime;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -32,7 +33,8 @@ public class DashboardNotificationService {
     private final NotificationActionRepository notificationActionRepository;
 
     private final IdamApi idamApi;
-    private final EntityManager entityManager;
+    @PersistenceContext
+    private EntityManager entityManager;
 
     private final String clickAction = "Click";
 
@@ -75,9 +77,9 @@ public class DashboardNotificationService {
         DashboardNotificationsEntity updated = notification;
         if (nonNull(notification.getDashboardNotificationsTemplates())) {
             log.info("Query for dashboard notifications using notification reference= {}, citizenRole = {}, templateId = {}",
-                     notification.getReference(),
-                     notification.getCitizenRole(),
-                     notification.getDashboardNotificationsTemplates().getId()
+                notification.getReference(),
+                notification.getCitizenRole(),
+                notification.getDashboardNotificationsTemplates().getId()
             );
             List<DashboardNotificationsEntity> existingNotification = dashboardNotificationsRepository
                 .findByReferenceAndCitizenRoleAndDashboardNotificationsTemplatesId(
@@ -86,8 +88,8 @@ public class DashboardNotificationService {
                 );
 
             log.info("Found {} dashboard notifications in database for reference {}",
-                     nonNull(existingNotification) ? existingNotification.size() : null,
-                     notification.getReference());
+                nonNull(existingNotification) ? existingNotification.size() : null,
+                notification.getReference());
             if (nonNull(existingNotification) && !existingNotification.isEmpty()) {
                 DashboardNotificationsEntity dashboardNotification = existingNotification.get(0);
                 updated = notification.toBuilder().id(dashboardNotification.getId()).build();

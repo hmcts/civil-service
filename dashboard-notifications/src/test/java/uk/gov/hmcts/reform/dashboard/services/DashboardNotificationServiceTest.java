@@ -43,8 +43,6 @@ public class DashboardNotificationServiceTest {
 
     @Mock
     private IdamApi idamApi;
-    @Mock
-    private EntityManager entityManager;
 
     @InjectMocks
     private DashboardNotificationService dashboardNotificationService;
