@@ -56,7 +56,7 @@ class SettlementNoResponseFromDefendantEventProcessorTest {
 
     @Test
     void shouldCreateClaimantDashboardNotifications() {
-        Party respondent = new Party().toBuilder().partyName("Respondent Party Name").build();
+        Party respondent = Party.builder().type(Party.Type.INDIVIDUAL).partyName("Respondent Party Name").build();
         CaseData caseData = new CaseDataBuilder().atStateClaimDraft().build();
         CaseData updated = caseData.toBuilder()
             .ccdCaseReference(CASE_ID)
