@@ -14,10 +14,19 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.hmc.client.HearingsApi;
 import uk.gov.hmcts.reform.hmc.exception.HmcException;
-import uk.gov.hmcts.reform.hmc.model.hearing.*;
+import uk.gov.hmcts.reform.hmc.model.hearing.CaseDetailsHearing;
+import uk.gov.hmcts.reform.hmc.model.hearing.HearingDetails;
+import uk.gov.hmcts.reform.hmc.model.hearing.HearingGetResponse;
+import uk.gov.hmcts.reform.hmc.model.hearing.HearingRequestDetails;
+import uk.gov.hmcts.reform.hmc.model.hearing.HearingResponse;
+import uk.gov.hmcts.reform.hmc.model.hearing.PartyDetailsModel;
 import uk.gov.hmcts.reform.hmc.model.hearings.CaseHearing;
 import uk.gov.hmcts.reform.hmc.model.hearings.HearingsResponse;
-import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.*;
+import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotified;
+import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedResponse;
+import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedResponses;
+import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedServiceData;
+import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.UnNotifiedHearingResponse;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
@@ -154,7 +163,7 @@ class HearingsServiceTest {
     @Nested
     class UpdatedPartiedNotifiedResponses {
         private final LocalDateTime time = LocalDateTime.of(2023, 5, 1, 15, 0);
-        private final  PartiesNotified partiesNotified = PartiesNotified.builder().serviceData(null).build();
+        private final PartiesNotified partiesNotified = PartiesNotified.builder().serviceData(null).build();
 
         @Test
         void shouldUpdatePartiesResponses_whenInvoked() {

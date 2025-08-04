@@ -9,7 +9,14 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.ras.client.RoleAssignmentsApi;
-import uk.gov.hmcts.reform.civil.ras.model.*;
+import uk.gov.hmcts.reform.civil.ras.model.GrantType;
+import uk.gov.hmcts.reform.civil.ras.model.QueryRequest;
+import uk.gov.hmcts.reform.civil.ras.model.RoleAssignment;
+import uk.gov.hmcts.reform.civil.ras.model.RoleAssignmentRequest;
+import uk.gov.hmcts.reform.civil.ras.model.RoleAssignmentResponse;
+import uk.gov.hmcts.reform.civil.ras.model.RoleAssignmentServiceResponse;
+import uk.gov.hmcts.reform.civil.ras.model.RoleCategory;
+import uk.gov.hmcts.reform.civil.ras.model.RoleRequest;
 
 import java.util.List;
 import java.util.Map;
@@ -17,7 +24,10 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.clearInvocations;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.ras.model.RoleType.ORGANISATION;
 
 @ExtendWith(SpringExtension.class)

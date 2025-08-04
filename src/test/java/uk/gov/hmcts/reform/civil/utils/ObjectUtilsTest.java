@@ -4,7 +4,11 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static uk.gov.hmcts.reform.civil.utils.ObjectUtils.*;
+import static uk.gov.hmcts.reform.civil.utils.ObjectUtils.fifthNonNull;
+import static uk.gov.hmcts.reform.civil.utils.ObjectUtils.firstNonNull;
+import static uk.gov.hmcts.reform.civil.utils.ObjectUtils.fourthNonNull;
+import static uk.gov.hmcts.reform.civil.utils.ObjectUtils.secondNonNull;
+import static uk.gov.hmcts.reform.civil.utils.ObjectUtils.thirdNonNull;
 
 class ObjectUtilsTest {
 

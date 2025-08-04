@@ -17,7 +17,11 @@ import java.util.Map;
 import static org.mockito.ArgumentMatchers.refEq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
-import static uk.gov.hmcts.reform.civil.service.BulkPrintService.*;
+import static uk.gov.hmcts.reform.civil.service.BulkPrintService.ADDITIONAL_DATA_CASE_IDENTIFIER_KEY;
+import static uk.gov.hmcts.reform.civil.service.BulkPrintService.ADDITIONAL_DATA_CASE_REFERENCE_NUMBER_KEY;
+import static uk.gov.hmcts.reform.civil.service.BulkPrintService.ADDITIONAL_DATA_LETTER_TYPE_KEY;
+import static uk.gov.hmcts.reform.civil.service.BulkPrintService.RECIPIENTS;
+import static uk.gov.hmcts.reform.civil.service.BulkPrintService.XEROX_TYPE_PARAMETER;
 
 @ExtendWith(SpringExtension.class)
 class BulkPrintServiceTest {
