@@ -11,12 +11,11 @@ import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
-import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
+import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 import java.util.HashMap;
@@ -44,7 +43,7 @@ class SettlementNoResponseFromDefendantEventProcessorTest {
     @InjectMocks
     private SettlementNoResponseFromDefendantEventProcessor handler;
 
-    static final Long CASE_ID = 1111111111111111L;
+    static final Long CASE_ID = 1594901956117591L;
     static final String AUTH_TOKEN = "mock_token";
 
     @BeforeEach
@@ -56,19 +55,12 @@ class SettlementNoResponseFromDefendantEventProcessorTest {
 
     @Test
     void shouldCreateClaimantDashboardNotifications() {
-        Party respondent = Party.builder().type(Party.Type.INDIVIDUAL).partyName("Respondent Party Name").build();
-        CaseData caseData = new CaseDataBuilder().atStateClaimDraft().build();
-        CaseData updated = caseData.toBuilder()
-            .ccdCaseReference(CASE_ID)
-            .respondent1(respondent)
-            .build();
-        CaseDetails caseDetails = CaseDetailsBuilder.builder().data(updated).build();
+        CaseData caseData = new CaseDataBuilder().atStateClaimSubmitted().build();
+        CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
         when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
-        when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(updated);
-
+        when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
         HashMap<String, Object> scenarioParams = new HashMap<>();
         scenarioParams.put("ccdCaseReference", CASE_ID);
-        scenarioParams.put("respondent1PartyName", "Respondent Party Name");
 
         when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
