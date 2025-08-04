@@ -105,7 +105,7 @@ class SystemGeneratedDocumentServiceTest {
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
         //When
         List<Element<CaseDocument>> result = systemGeneratedDocumentService
-            .getHearingDocumentsWithAddedDocumentWelsh(translatedDocument, callbackParams.getCaseData());
+            .getCourtOfficerOrdersWithAddedDocument(translatedDocument, callbackParams.getCaseData());
 
         //Then
         assertThat(result.get(0)).isNotNull();
