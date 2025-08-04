@@ -231,7 +231,8 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
             caseDataBuilder.previewCourtOfficerOrder(courtOfficerOrderDocuments.get(0).getValue());
         }
 
-        if (featureToggleService.isWelshEnabledForMainCase() && caseData.getRespondent1OriginalDqDoc() != null) {
+        if (featureToggleService.isWelshEnabledForMainCase() && caseData.getRespondent1OriginalDqDoc() != null &&
+            isContainsSpecifiedDocType(translatedDocuments, DEFENDANT_RESPONSE)) {
             systemGeneratedDocuments.add(element(caseData.getRespondent1OriginalDqDoc()));
             caseDataBuilder.respondent1OriginalDqDoc(null);
         }
@@ -379,7 +380,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
 
     private boolean isContainsSpecifiedDocType(List<Element<TranslatedDocument>> translatedDocuments,
                                                TranslatedDocumentType translatedDocumentType) {
-        return translatedDocuments.stream()
+        return translatedDocuments != null && translatedDocuments.stream()
             .map(Element::getValue)
             .map(TranslatedDocument::getDocumentType)
             .anyMatch(type -> translatedDocumentType.equals(type)
