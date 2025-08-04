@@ -29,7 +29,7 @@ public class DashboardScenarioTransactionalService implements IDashboardScenario
     }
 
     @Override
-    public void createScenario(String bearerToken, String caseReference, DashboardScenarios scenario, ScenarioRequestParams params) {
+    public void createScenario(String bearerToken, DashboardScenarios scenario, String caseReference, ScenarioRequestParams params) {
         TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
 
         transactionTemplate.executeWithoutResult(status -> {

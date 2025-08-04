@@ -5,5 +5,5 @@ import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 public interface IDashboardScenarioService {
 
-    void createScenario(String bearerToken, String caseReference, DashboardScenarios scenario, ScenarioRequestParams params);
+    void createScenario(String bearerToken, DashboardScenarios scenario, String caseReference, ScenarioRequestParams params);
 }

@@ -16,7 +16,7 @@ import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class FullAdmitPayImmediatelyNoPaymentFromDefendantProcessor {
+public class SettlementNoResponseFromDefendantProcessor {
 
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
@@ -30,7 +30,7 @@ public class FullAdmitPayImmediatelyNoPaymentFromDefendantProcessor {
         CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
         dashboardScenariosService.createScenario(
             userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword()),
-            DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_FULL_ADMIT_CLAIMANT,
+            DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_SETTLEMENT_NO_RESPONSE_CLAIMANT,
             caseData.getCcdCaseReference().toString(),
             ScenarioRequestParams.builder()
                 .params(mapper.mapCaseDataToParams(caseData)).build()
