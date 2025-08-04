@@ -11,17 +11,14 @@ import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
-import uk.gov.hmcts.reform.civil.utils.DateUtils;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.HashMap;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -30,7 +27,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
-class FullAdmitPayImmediatelyNoPaymentFromDefendantEventProcessorTest {
+class SettlementNoResponseFromDefendantEventProcessorTest {
 
     @Mock
     private UserService userService;
@@ -45,7 +42,7 @@ class FullAdmitPayImmediatelyNoPaymentFromDefendantEventProcessorTest {
     @Mock
     private CaseDetailsConverter caseDetailsConverter;
     @InjectMocks
-    private FullAdmitPayImmediatelyNoPaymentFromDefendantProcessor handler;
+    private SettlementNoResponseFromDefendantEventProcessor handler;
 
     static final Long CASE_ID = 1111111111111111L;
     static final String AUTH_TOKEN = "mock_token";
@@ -59,14 +56,11 @@ class FullAdmitPayImmediatelyNoPaymentFromDefendantEventProcessorTest {
 
     @Test
     void shouldCreateClaimantDashboardNotifications() {
-        LocalDate whenWillThisAmountBePaid = LocalDate.now().plusDays(5);
+        Party respondent = new Party().toBuilder().partyName("Respondent Party Name").build();
         CaseData caseData = new CaseDataBuilder().atStateClaimDraft().build();
         CaseData updated = caseData.toBuilder()
             .ccdCaseReference(CASE_ID)
-            .totalClaimAmount(BigDecimal.valueOf(124.67))
-            .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
-                .whenWillThisAmountBePaid(whenWillThisAmountBePaid)
-                .build())
+            .respondent1(respondent)
             .build();
         CaseDetails caseDetails = CaseDetailsBuilder.builder().data(updated).build();
         when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
@@ -74,8 +68,7 @@ class FullAdmitPayImmediatelyNoPaymentFromDefendantEventProcessorTest {
 
         HashMap<String, Object> scenarioParams = new HashMap<>();
         scenarioParams.put("ccdCaseReference", CASE_ID);
-        scenarioParams.put("fullAdmitPayImmediatelyPaymentAmount", "£124.67");
-        scenarioParams.put("responseToClaimAdmitPartPaymentDeadline", DateUtils.formatDate(whenWillThisAmountBePaid));
+        scenarioParams.put("respondent1PartyName", "Respondent Party Name");
 
         when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
@@ -83,7 +76,7 @@ class FullAdmitPayImmediatelyNoPaymentFromDefendantEventProcessorTest {
 
         verify(dashboardScenariosService).createScenario(
             AUTH_TOKEN,
-            DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_FULL_ADMIT_CLAIMANT,
+            DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_SETTLEMENT_NO_RESPONSE_CLAIMANT,
             CASE_ID.toString(),
             ScenarioRequestParams.builder().params(scenarioParams).build()
         );

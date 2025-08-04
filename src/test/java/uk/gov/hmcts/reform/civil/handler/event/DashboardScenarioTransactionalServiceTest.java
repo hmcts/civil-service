@@ -50,7 +50,7 @@ class DashboardScenarioTransactionalServiceTest {
         }).when(transactionTemplate).executeWithoutResult(any());
 
         // Act
-        service.createScenario(bearerToken, caseReference, scenario, params);
+        service.createScenario(bearerToken, scenario, caseReference, params);
 
         // Assert
         verify(dashboardScenariosService, times(1)).recordScenarios(

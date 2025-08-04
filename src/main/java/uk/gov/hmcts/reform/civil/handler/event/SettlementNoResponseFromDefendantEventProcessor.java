@@ -16,7 +16,7 @@ import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class SettlementNoResponseFromDefendantProcessor {
+public class SettlementNoResponseFromDefendantEventProcessor {
 
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;

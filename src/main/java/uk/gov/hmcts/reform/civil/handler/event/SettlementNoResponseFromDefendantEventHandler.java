@@ -9,10 +9,10 @@ import uk.gov.hmcts.reform.civil.event.SettlementNoResponseFromDefendantEvent;
 @RequiredArgsConstructor
 public class SettlementNoResponseFromDefendantEventHandler {
 
-    private final SettlementNoResponseFromDefendantProcessor SettlementNoResponseFromDefendantProcessor;
+    private final SettlementNoResponseFromDefendantEventProcessor settlementNoResponseFromDefendantEventProcessor;
 
     @EventListener
     public void createClaimantDashboardScenario(SettlementNoResponseFromDefendantEvent event) {
-        SettlementNoResponseFromDefendantProcessor.createClaimantDashboardScenario(event.getCaseId());
+        settlementNoResponseFromDefendantEventProcessor.createClaimantDashboardScenario(event.getCaseId());
     }
 }
