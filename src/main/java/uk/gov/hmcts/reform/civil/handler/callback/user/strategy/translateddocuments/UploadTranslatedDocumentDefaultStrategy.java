@@ -151,12 +151,10 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                             == DocumentType.NOTICE_OF_DISCONTINUANCE_DEFENDANT).findFirst();
                     noticeOfDiscontinuanceOpt.ifPresent(noticeOfDiscontinuance -> {
                         preTranslationDocuments.remove(noticeOfDiscontinuance);
-                        if (!caseData.isJudgeOrderVerificationRequired()) {
-                            caseDataBuilder.applicant1NoticeOfDiscontinueAllPartyViewDoc(caseData.getApplicant1NoticeOfDiscontinueCWViewDoc());
-                            caseDataBuilder.applicant1NoticeOfDiscontinueCWViewDoc(null);
-                            caseDataBuilder.respondent1NoticeOfDiscontinueCWViewDoc(null);
-                            caseDataBuilder.respondent1NoticeOfDiscontinueAllPartyViewDoc(noticeOfDiscontinuance.getValue());
-                        }
+                        caseDataBuilder.applicant1NoticeOfDiscontinueAllPartyViewDoc(caseData.getApplicant1NoticeOfDiscontinueCWViewDoc());
+                        caseDataBuilder.applicant1NoticeOfDiscontinueCWViewDoc(null);
+                        caseDataBuilder.respondent1NoticeOfDiscontinueCWViewDoc(null);
+                        caseDataBuilder.respondent1NoticeOfDiscontinueAllPartyViewDoc(noticeOfDiscontinuance.getValue());
                     });
                 } else if (document.getValue().getDocumentType().equals(SETTLEMENT_AGREEMENT)) {
                     Optional<Element<CaseDocument>> preTranslationSettlementAgreement =
@@ -339,8 +337,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                 return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_ORDER;
             } else if (Objects.nonNull(translatedDocuments)
                 && isContainsSpecifiedDocType(translatedDocuments, NOTICE_OF_DISCONTINUANCE_DEFENDANT)) {
-                return caseData.isJudgeOrderVerificationRequired() ? null :
-                    CaseEvent.UPLOAD_TRANSLATED_DISCONTINUANCE_DOC;
+                return CaseEvent.UPLOAD_TRANSLATED_DISCONTINUANCE_DOC;
             } else if (Objects.nonNull(translatedDocuments)
                 && translatedDocuments.get(0).getValue().getDocumentType().equals(SETTLEMENT_AGREEMENT)) {
                 return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_SETTLEMENT_AGREEMENT;
