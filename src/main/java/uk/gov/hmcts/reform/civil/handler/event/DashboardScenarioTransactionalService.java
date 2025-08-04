@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 
 @Service
 @Slf4j

@@ -12,7 +12,13 @@ import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import javax.persistence.EntityManager;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class DashboardScenarioTransactionalServiceTest {
 
