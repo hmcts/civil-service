@@ -11,6 +11,7 @@ import org.json.JSONException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.civil.client.EvidenceManagementApiClient;
 import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
@@ -35,6 +36,7 @@ import static au.com.dius.pact.consumer.dsl.LambdaDsl.newJsonBody;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 
 @PactTestFor(providerName = "em_newBundle")
 @MockServerConfig(hostInterface = "localhost", port = "6663")
@@ -55,14 +57,19 @@ public class NewBundleApiConsumerTest extends BaseContractTest {
     @Test
     @PactTestFor(pactMethod = "postCreateBundleServiceRequest")
     public void verifyNewBundle() {
-        BundleCreateResponse response = evidenceManagementApiClient.createNewBundle(
+        ResponseEntity<BundleCreateResponse> response = evidenceManagementApiClient.createNewBundle(
             AUTHORIZATION_TOKEN,
             SERVICE_AUTH_TOKEN,
             getBundleCreateRequest()
         );
-        assertThat(response.getDocumentTaskId(), is(equalTo(123)));
+
+        assertThat(response.getStatusCode().is2xxSuccessful(), is(true));
+        assertThat(response.getBody(), is(notNullValue()));
+
+        BundleCreateResponse responseBody = response.getBody();
+        assertThat(responseBody.getDocumentTaskId(), is(equalTo(123)));
         assertThat(
-            response.getData().getCaseBundles().get(0).getValue().getStitchedDocument().getDocumentUrl(),
+            responseBody.getData().getCaseBundles().get(0).getValue().getStitchedDocument().getDocumentUrl(),
             is(equalTo("documentStitchedUrl"))
         );
     }

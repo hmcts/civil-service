@@ -16,7 +16,7 @@ import uk.gov.hmcts.reform.civil.model.bundle.BundleCreateResponse;
 public interface EvidenceManagementApiClient {
 
     @PostMapping(value = "/api/new-bundle", consumes = "application/json")
-    BundleCreateResponse createNewBundle(
+    ResponseEntity<BundleCreateResponse> createNewBundle(
         @RequestHeader("Authorization") String authorization,
         @RequestHeader("ServiceAuthorization") String serviceAuthorization,
         @RequestBody BundleCreateRequest bundleCreateRequest

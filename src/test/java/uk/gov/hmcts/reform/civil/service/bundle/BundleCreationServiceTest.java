@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -18,6 +19,8 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
+import uk.gov.hmcts.reform.civil.model.bundle.BundleCreateRequest;
+import uk.gov.hmcts.reform.civil.model.bundle.BundleCreateResponse;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
@@ -164,43 +167,68 @@ class BundleCreationServiceTest {
     }
 
     @Test
-    void testBundleApiClientIsInvokedThroughEvent() throws Exception {
-        //Given: case details with all document type
+    void testBundleApiClientIsInvokedThroughEvent() {
+        // Given: valid case details and bundle request/response
         CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
-        given(bundleRequestMapper.mapCaseDataToBundleCreateRequest(any(), any(), any(), any())).willReturn(null);
-        given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(null);
+
+        BundleCreateRequest dummyRequest = BundleCreateRequest.builder().build();
+
+        BundleCreateResponse dummyResponse = BundleCreateResponse.builder()
+            .documentTaskId(123)
+            .build();
+
+        ResponseEntity<BundleCreateResponse> responseEntity = ResponseEntity.ok(dummyResponse);
+
+        // Mocking necessary services
         given(coreCaseDataService.getCase(1L)).willReturn(caseDetails);
         given(userConfig.getUserName()).willReturn("test");
         given(userConfig.getPassword()).willReturn("test");
-        given(objectMapper.convertValue(caseDetails.getData(), CaseData.class)).willReturn(caseData);
-        given(authTokenGenerator.generate()).willReturn("test");
-        given(userService.getAccessToken("test", "test")).willReturn("test");
+        given(userService.getAccessToken("test", "test")).willReturn("access-token");
+        given(authTokenGenerator.generate()).willReturn("service-token");
+        given(caseDetailsConverter.toCaseData(caseDetails)).willReturn(caseData);
+        given(bundleRequestMapper.mapCaseDataToBundleCreateRequest(
+            any(), any(), any(), any())
+        ).willReturn(dummyRequest);
+        given(evidenceManagementApiClient.createNewBundle(anyString(), anyString(), any()))
+            .willReturn(responseEntity);
 
-        //When: bundlecreation service is called
+        // When: bundle creation is triggered via event
         bundlingService.createBundle(new BundleCreationTriggerEvent(1L));
 
-        //Then: BundleRest API should be called
+        // Then: Verify API was called
         verify(evidenceManagementApiClient).createNewBundle(anyString(), anyString(), any());
     }
 
     @Test
-    void testBundleApiClientIsInvokedThroughCaseReference() throws Exception {
-        //Given: case details with all document type
+    void testBundleApiClientIsInvokedThroughCaseReference() {
+        // Given: valid case details and bundle request/response
         CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
-        given(bundleRequestMapper.mapCaseDataToBundleCreateRequest(any(), any(), any(), any())).willReturn(null);
-        given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(null);
+
+        BundleCreateRequest dummyRequest = BundleCreateRequest.builder().build();
+
+        BundleCreateResponse dummyResponse = BundleCreateResponse.builder()
+            .documentTaskId(123)
+            .build();
+
+        ResponseEntity<BundleCreateResponse> responseEntity = ResponseEntity.ok(dummyResponse);
+
+        // Mocking necessary services
         given(coreCaseDataService.getCase(1L)).willReturn(caseDetails);
         given(userConfig.getUserName()).willReturn("test");
         given(userConfig.getPassword()).willReturn("test");
-        given(objectMapper.convertValue(caseDetails.getData(), CaseData.class)).willReturn(caseData);
-        given(authTokenGenerator.generate()).willReturn("test");
-        given(userService.getAccessToken("test", "test")).willReturn("test");
+        given(userService.getAccessToken("test", "test")).willReturn("access-token");
+        given(authTokenGenerator.generate()).willReturn("service-token");
+        given(caseDetailsConverter.toCaseData(caseDetails)).willReturn(caseData);
+        given(bundleRequestMapper.mapCaseDataToBundleCreateRequest(
+            any(), any(), any(), any())
+        ).willReturn(dummyRequest);
+        given(evidenceManagementApiClient.createNewBundle(anyString(), anyString(), any()))
+            .willReturn(responseEntity);
 
-        //When: bundlecreation service is called
+        // When: bundle creation is triggered via case reference
         bundlingService.createBundle(1L);
 
-        //Then: BundleRest API should be called
+        // Then: Verify API was called
         verify(evidenceManagementApiClient).createNewBundle(anyString(), anyString(), any());
     }
-
 }
