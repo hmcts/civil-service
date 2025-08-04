@@ -26,7 +26,7 @@ import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineH
 import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.getPartialPayment;
 import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.isNonDivergentForDJ;
 import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary;
-import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.calculateRepaymentBreakdownSummaryForLRImmediatePlan;
+import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.calculateRepaymentBreakdownSummaryWithoutClaimInterest;
 
 public class JudgmentsOnlineHelperTest {
 
@@ -170,6 +170,6 @@ public class JudgmentsOnlineHelperTest {
             .amountAlreadyPaid("10")
             .build();
 
-        assertThat(calculateRepaymentBreakdownSummaryForLRImmediatePlan(activeJudgment)).isNotNull();
+        assertThat(calculateRepaymentBreakdownSummaryWithoutClaimInterest(activeJudgment, false)).isNotNull();
     }
 }
