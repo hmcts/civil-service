@@ -24,9 +24,6 @@ public class DefendantAdmittedAmountParamsBuilder extends DashboardNotifications
             params.put(
                 "defendantAdmittedAmount",
                 "£" + this.removeDoubleZeros(formatAmount(defendantAdmittedAmount)));
-            params.put(
-                "fullAdmitPayImmediatelyPaymentAmount",
-                "£" + this.removeDoubleZeros(formatAmount(defendantAdmittedAmount)));
         }
     }
 }

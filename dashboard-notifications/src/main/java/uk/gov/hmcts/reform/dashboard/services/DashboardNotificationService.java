@@ -11,8 +11,6 @@ import uk.gov.hmcts.reform.dashboard.repositories.DashboardNotificationsReposito
 import uk.gov.hmcts.reform.dashboard.repositories.NotificationActionRepository;
 import uk.gov.hmcts.reform.idam.client.IdamApi;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.time.OffsetDateTime;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -33,18 +31,15 @@ public class DashboardNotificationService {
     private final NotificationActionRepository notificationActionRepository;
 
     private final IdamApi idamApi;
-    @PersistenceContext
-    private EntityManager entityManager;
 
     private final String clickAction = "Click";
 
     @Autowired
     public DashboardNotificationService(DashboardNotificationsRepository dashboardNotificationsRepository,
-                                        NotificationActionRepository notificationActionRepository, IdamApi idamApi, EntityManager entityManager) {
+                                        NotificationActionRepository notificationActionRepository, IdamApi idamApi) {
         this.dashboardNotificationsRepository = dashboardNotificationsRepository;
         this.notificationActionRepository = notificationActionRepository;
         this.idamApi = idamApi;
-        this.entityManager = entityManager;
     }
 
     public List<DashboardNotificationsEntity> getAll() {
@@ -105,9 +100,7 @@ public class DashboardNotificationService {
             log.info("Existing notification not present reference = {}", notification.getReference());
         }
 
-        DashboardNotificationsEntity dashboardNotificationsEntity = dashboardNotificationsRepository.save(updated);
-        this.entityManager.flush();
-        return dashboardNotificationsEntity;
+        return dashboardNotificationsRepository.save(updated);
     }
 
     public void deleteById(UUID id) {
