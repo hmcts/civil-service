@@ -231,8 +231,8 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
             caseDataBuilder.previewCourtOfficerOrder(courtOfficerOrderDocuments.get(0).getValue());
         }
 
-        if (featureToggleService.isWelshEnabledForMainCase() && caseData.getRespondent1OriginalDqDoc() != null &&
-            isContainsSpecifiedDocType(translatedDocuments, DEFENDANT_RESPONSE)) {
+        if (featureToggleService.isWelshEnabledForMainCase() && caseData.getRespondent1OriginalDqDoc() != null
+            && isContainsSpecifiedDocType(translatedDocuments, DEFENDANT_RESPONSE)) {
             systemGeneratedDocuments.add(element(caseData.getRespondent1OriginalDqDoc()));
             caseDataBuilder.respondent1OriginalDqDoc(null);
         }
