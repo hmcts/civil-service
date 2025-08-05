@@ -235,8 +235,7 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                                  YesOrNo applicantRepresented,
                                                                  YesOrNo respondent1Represented,
                                                                  YesOrNo eaCourtLocation) {
-
-
+            
             if (NO.equals(respondent1Represented)) {
                 when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(isCPAndWhitelisted);
                 if (!isCPAndWhitelisted) {
