@@ -35,7 +35,7 @@ public class ClaimantFullAdmitPayImmediatelyCCJCallbackHandler extends CallbackH
     private CallbackResponse setFullAdmitPayImmediateCCJBusinessProcess(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData().toBuilder()
             .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE_FA_IMMEDIATE_CCJ))
-           .build();
+            .build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(mapper))
