@@ -60,6 +60,9 @@ class JudicialRefDataServiceTest {
 
     @Test
     void shouldReturnLocations_whenLRDReturnsAllLocations() {
+
+        when(authTokenGenerator.generate()).thenReturn("service_token");
+
         List<JudgeRefData> judgeRefData = Arrays.asList(
             JudgeRefData.builder().title("Mr").surname("Murphy").emailId("mr.murphy@email.com").build(),
             JudgeRefData.builder().title("Mr").surname("McGee").emailId("mr.mcgee@email.com").build(),
@@ -67,7 +70,6 @@ class JudicialRefDataServiceTest {
             JudgeRefData.builder().title("Mrs").surname("Lee").emailId("mrs.lee@email.com").build()
         );
 
-        when(authTokenGenerator.generate()).thenReturn("service_token");
         when(restTemplate.exchange(
             uriCaptor.capture(),
             httpMethodCaptor.capture(),

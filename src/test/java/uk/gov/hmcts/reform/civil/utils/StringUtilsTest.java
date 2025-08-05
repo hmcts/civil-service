@@ -11,7 +11,6 @@ import static uk.gov.hmcts.reform.civil.utils.StringUtils.textToPlural;
 
 class StringUtilsTest {
 
-
     @Test
     void shouldReturnNull_whenAllValuesPassedAreNull() {
         String result = joinNonNull(", ", null, null);

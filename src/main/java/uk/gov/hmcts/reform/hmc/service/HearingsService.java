@@ -49,6 +49,7 @@ public class HearingsService {
             throw new HmcException(e);
         }
     }
+
     @SuppressWarnings("rawtypes")
     public ResponseEntity updatePartiesNotifiedResponse(String authToken, String hearingId,
                                                         int requestVersion, LocalDateTime receivedDateTime,

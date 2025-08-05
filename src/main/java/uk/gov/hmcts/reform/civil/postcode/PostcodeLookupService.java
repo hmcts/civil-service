@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.exceptions.PostcodeLookupException;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+
 /**
  * Service for postcode validation and country lookup.
  *
@@ -28,6 +29,7 @@ import java.util.Map;
  *  @author gergelykiss
  * @version 1.0
  */
+
 @Service
 @Slf4j
 @SuppressWarnings({"All", "java:S2139"}) // CVE-2024-22259 not applicable, logging with rethrow intentional

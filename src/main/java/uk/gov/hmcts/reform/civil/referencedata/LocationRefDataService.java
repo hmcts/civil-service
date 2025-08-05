@@ -30,6 +30,7 @@ import static org.apache.logging.log4j.util.Strings.concat;
  * applications using safe URI construction methods.</p>
  *
  * <h3>CVE-2024-22259 Mitigation</h3>
+ *
  * <p>This class is <strong>not vulnerable</strong> to CVE-2024-22259 as it exclusively uses
  * {@code UriComponentsBuilder.build()} and never uses the vulnerable {@code buildAndExpand()} method.
  * All inputs are either static constants or business-validated parameters.</p>
@@ -50,11 +51,12 @@ public class LocationRefDataService {
     private final RestTemplate restTemplate;
     private final LRDConfiguration lrdConfiguration;
     private final AuthTokenGenerator authTokenGenerator;
-    private static final String LOCATION_REFERENCE_DATA_LOOKUP_FAILED="Location Reference Data Lookup Failed - ?";
-    private static final String IS_CASE_MANAGEMENT_LOCATION="is_case_management_location";
-    private static final String COURT_TYPE_ID="court_type_id";
-    private static final String LOCATION_TYPE="location_type";
-    private static final String COURT="Court";
+    private static final String LOCATION_REFERENCE_DATA_LOOKUP_FAILED = "Location Reference Data Lookup Failed - ?";
+    private static final String IS_CASE_MANAGEMENT_LOCATION = "is_case_management_location";
+    private static final String COURT_TYPE_ID = "court_type_id";
+    private static final String LOCATION_TYPE = "location_type";
+    private static final String COURT = "Court";
+    
     @SuppressWarnings("unused")
     public LocationRefData getCcmccLocation(String authToken) {
         try {

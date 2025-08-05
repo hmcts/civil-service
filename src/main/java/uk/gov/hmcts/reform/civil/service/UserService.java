@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.utils.MaskHelper;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+
 /**
  * Service for user operations via IDAM client.
  *
@@ -18,6 +19,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
  * @author gergelykiss
  * @version 1.0
  */
+
 @SuppressWarnings("deprecation") // TO-REVIEW: Migrate deprecated IDAM methods after project analysis
 @Service
 @Slf4j

@@ -20,6 +20,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 /**
  * Unit tests for {@link FeatureToggleAspect}.
  *
@@ -35,6 +36,7 @@ import static org.mockito.Mockito.when;
  * </ul>
  * </p>
  */
+
 @SuppressWarnings("deprecation") // Coordinated migration with UserService IDAM modernization
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {

@@ -15,6 +15,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
+
 /**
  * Unit tests for {@link UserService}.
  *
@@ -29,6 +30,7 @@ import static org.mockito.Mockito.when;
  * @author gergelykiss
  * @version 1.0
  */
+
 @SuppressWarnings("deprecation") // TO-REVIEW: Refactor tests when UserService.getUserDetails() migrated to getUserInfo()@ExtendWith(MockitoExtension.class)
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {

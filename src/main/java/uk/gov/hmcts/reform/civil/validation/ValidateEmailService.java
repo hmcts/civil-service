@@ -16,6 +16,7 @@ import static java.util.regex.Pattern.CASE_INSENSITIVE;
 import static java.util.regex.Pattern.compile;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.split;
+
 /**
  * Service for recipient validation following GOV.UK Notify standards.
  *
@@ -24,6 +25,7 @@ import static org.apache.commons.lang3.StringUtils.split;
  *
  * @see <a href="https://github.com/alphagov/notifications-utils">GOV.UK Notifications Utils</a>
  */
+
 @SuppressWarnings("java:S3776") // Class contains complex validation logic mirroring GOV Notify patterns
 @Slf4j
 @Service
