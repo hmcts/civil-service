@@ -6,6 +6,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.ClaimantFullAdmitPayImmediatelyCCJNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -42,6 +43,7 @@ public class FullAdmitPayImmediatelyNoPaymentFromDefendantScenarioTest extends D
             .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
                                                .whenWillThisAmountBePaid(whenWillThisAmountBePaid)
                                                .build())
+            .applicant1Represented(YesOrNo.NO)
             .build();
 
         CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).id(Long.valueOf(caseId)).build();

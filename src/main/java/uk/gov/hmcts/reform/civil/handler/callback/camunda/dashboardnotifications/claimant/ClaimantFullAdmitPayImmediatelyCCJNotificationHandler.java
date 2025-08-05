@@ -38,6 +38,11 @@ public class ClaimantFullAdmitPayImmediatelyCCJNotificationHandler extends Dashb
     }
 
     @Override
+    public boolean shouldRecordScenario(CaseData caseData) {
+        return caseData.isApplicant1NotRepresented();
+    }
+
+    @Override
     public String getScenario(CaseData caseData) {
         return SCENARIO_AAA6_CLAIMANT_INTENT_FULL_ADMIT_CLAIMANT.getScenario();
     }
