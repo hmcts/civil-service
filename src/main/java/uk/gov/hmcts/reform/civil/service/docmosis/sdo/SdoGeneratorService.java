@@ -35,7 +35,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static java.util.Objects.nonNull;
-import static uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper.getFastTrackAllocation;
 
 @Slf4j
 @Service
@@ -72,7 +71,7 @@ public class SdoGeneratorService {
             docmosisTemplate = DocmosisTemplates.SDO_FAST_TRACK_NIHL;
             templateData = getTemplateDataFastNihl(caseData, judgeName, isJudge, authorisation);
         } else if (SdoHelper.isFastTrack(caseData)) {
-            docmosisTemplate = featureToggleService.isFastTrackUpliftsEnabled() ? DocmosisTemplates.SDO_FAST_FAST_TRACK_INT_R2 : DocmosisTemplates.SDO_FAST_R2;
+            docmosisTemplate = DocmosisTemplates.SDO_FAST_FAST_TRACK_INT_R2;
             templateData = getTemplateDataFast(caseData, judgeName, isJudge, authorisation);
         } else {
             docmosisTemplate =  DocmosisTemplates.SDO_R2_DISPOSAL;
@@ -315,7 +314,6 @@ public class SdoGeneratorService {
             )
             // SNI-5142
             .fastTrackMethodToggle(true)
-            .fastTrackAllocation(getFastTrackAllocation(caseData, featureToggleService.isFastTrackUpliftsEnabled()))
             .showBundleInfo(SdoHelper.hasFastTrackVariable(caseData, "fastTrackTrialBundleToggle"));
 
         sdoDocumentFormBuilder
