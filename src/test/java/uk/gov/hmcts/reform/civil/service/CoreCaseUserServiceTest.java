@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -285,8 +286,8 @@ class CoreCaseUserServiceTest {
 
             List<String> caseRoles = service.getUserCaseRoles(CASE_ID, USER_ID);
 
-            assertThat(caseRoles.contains("[RESPONDENTSOLICITORONE]"));
-            assertThat(!caseRoles.contains("[RESPONDENTSOLICITORTWO]"));
+            Assertions.assertTrue(caseRoles.contains("[RESPONDENTSOLICITORONE]"));
+            Assertions.assertFalse(caseRoles.contains("[RESPONDENTSOLICITORTWO]"));
         }
     }
 }

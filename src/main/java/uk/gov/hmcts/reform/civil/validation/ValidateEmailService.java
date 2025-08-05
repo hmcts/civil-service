@@ -16,7 +16,15 @@ import static java.util.regex.Pattern.CASE_INSENSITIVE;
 import static java.util.regex.Pattern.compile;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.split;
-
+/**
+ * Service for recipient validation following GOV.UK Notify standards.
+ *
+ * <p>Contains validation methods that replicate GOV.UK Notifications service
+ * validation logic to ensure consistency with official platform requirements.</p>
+ *
+ * @see <a href="https://github.com/alphagov/notifications-utils">GOV.UK Notifications Utils</a>
+ */
+@SuppressWarnings("java:S3776") // Class contains complex validation logic mirroring GOV Notify patterns
 @Slf4j
 @Service
 public class ValidateEmailService {
@@ -40,9 +48,9 @@ public class ValidateEmailService {
         return isValid(email) ? emptyList() : List.of(ERROR_MESSAGE);
     }
 
-    /*
-    Mimic gov notify validation
-    see https://github.com/alphagov/notifications-utils/blob/master/notifications_utils/recipients.py#L494-L534
+    /**
+     * Validates recipient using GOV.UK Notify validation rules.
+     * Reference: <a href="https://github.com/alphagov/notifications-utils/blob/master/notifications_utils/recipients.py#L494-L534">Notify validation rules</a>
      */
     private boolean isValid(String email) {
 

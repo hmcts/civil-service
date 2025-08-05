@@ -45,11 +45,11 @@ public class HearingsService {
                 authTokenGenerator.generate(),
                 hearingId);
         } catch (FeignException e) {
-            log.error("Failed to retrieve patries notified with Id: %s from HMC", hearingId);
+            log.error("Failed to retrieve parties notified with Id: {} from HMC", hearingId);
             throw new HmcException(e);
         }
     }
-
+    @SuppressWarnings("rawtypes")
     public ResponseEntity updatePartiesNotifiedResponse(String authToken, String hearingId,
                                                         int requestVersion, LocalDateTime receivedDateTime,
                                                         PartiesNotified payload) {

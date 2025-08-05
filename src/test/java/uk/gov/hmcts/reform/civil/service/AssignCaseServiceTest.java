@@ -21,7 +21,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseRole.DEFENDANT;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 
 @ExtendWith(SpringExtension.class)
-public class AssignCaseServiceTest {
+class AssignCaseServiceTest {
 
     private static final String AUTHORIZATION = "authorisation";
     private static final String CASE_ID = "1";

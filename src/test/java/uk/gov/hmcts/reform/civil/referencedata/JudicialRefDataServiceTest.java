@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.referencedata;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -77,7 +78,7 @@ class JudicialRefDataServiceTest {
 
         List<JudgeRefData> judgeRefDataReturn = refDataService.getJudgeReferenceData("ABC", "user_token");
 
-        assertThat(judgeRefDataReturn.size()).isEqualTo(4);
+        Assertions.assertEquals(4, judgeRefDataReturn.size());
         assertThat(judgeRefDataReturn).isEqualTo(judgeRefData);
         verify(jrdConfiguration, times(1)).getUrl();
         verify(jrdConfiguration, times(1)).getEndpoint();
@@ -88,13 +89,13 @@ class JudicialRefDataServiceTest {
     }
 
     private ResponseEntity<List<JudgeRefData>> getJudgeRefDataResponse() {
-        List<JudgeRefData> responseData = new ArrayList<JudgeRefData>();
+        List<JudgeRefData> responseData = new ArrayList<>();
         responseData.add(getJudicialRefData("Mr", "Murphy", "mr.murphy@email.com"));
         responseData.add(getJudicialRefData("Mr", "McGee", "mr.mcgee@email.com"));
         responseData.add(getJudicialRefData("Mr", "Brad", "mr.brad@email.com"));
         responseData.add(getJudicialRefData("Mrs", "Lee", "mrs.lee@email.com"));
 
-        return new ResponseEntity<List<JudgeRefData>>(responseData, OK);
+        return new ResponseEntity<>(responseData, OK);
     }
 
     private JudgeRefData getJudicialRefData(String title, String surname, String emailId) {

@@ -9,7 +9,16 @@ import uk.gov.hmcts.reform.civil.utils.MaskHelper;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
-
+/**
+ * Service for user operations via IDAM client.
+ *
+ * <p><strong>Technical Debt:</strong> This service uses deprecated IDAM methods that require
+ * full project analysis before migration to new API methods.</p>
+ *
+ * @author gergelykiss
+ * @version 1.0
+ */
+@SuppressWarnings("deprecation") // TO-REVIEW: Migrate deprecated IDAM methods after project analysis
 @Service
 @Slf4j
 public class UserService {

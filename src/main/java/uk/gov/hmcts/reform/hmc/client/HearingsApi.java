@@ -44,7 +44,7 @@ public interface HearingsApi {
         @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorization,
         @PathVariable("id") String id
     );
-
+    @SuppressWarnings("rawtypes")
     @PutMapping(value = PARTIES_NOTIFIED_ENDPOINT + "/{id}", consumes = "application/json")
     ResponseEntity updatePartiesNotifiedRequest(
         @RequestHeader(AUTHORIZATION) String authorisation,

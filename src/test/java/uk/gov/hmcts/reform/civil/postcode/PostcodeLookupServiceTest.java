@@ -5,7 +5,6 @@ import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,15 +26,15 @@ class PostcodeLookupServiceTest {
     private PostcodeLookupService postcodeLookupService;
 
     @Test
-    public void shouldReturnFalseWhenCountryIsNullGivenPostCodeIsValid() {
+    void shouldReturnFalseWhenCountryIsNullGivenPostCodeIsValid() {
 
-        ResponseEntity<String> responseEntity = new ResponseEntity<String>("Ok", HttpStatus.ACCEPTED);
+        ResponseEntity<String> responseEntity = new ResponseEntity<>("Ok", HttpStatus.ACCEPTED);
         when(postcodeLookupConfiguration.getUrl()).thenReturn("https://api.ordnancesurvey.co.uk/opennames/v1/find");
         when(postcodeLookupConfiguration.getAccessKey()).thenReturn("dummy");
         when(restTemplate.exchange(
             ArgumentMatchers.anyString(),
             ArgumentMatchers.any(HttpMethod.class),
-            ArgumentMatchers.<HttpEntity<?>>any(),
+            ArgumentMatchers.any(),
             ArgumentMatchers.<Class<String>>any()
         )).thenReturn(responseEntity);
 
@@ -43,7 +42,7 @@ class PostcodeLookupServiceTest {
     }
 
     @Test
-    public void shouldReturnExpcetionWhenUrlIsEmpty() {
+    void shouldReturnExceptionWhenUrlIsEmpty() {
         assertThrows(
             RuntimeException.class, () -> postcodeLookupService.validatePostCodeForDefendant("IG11 7YL")
         );

@@ -15,7 +15,21 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
-
+/**
+ * Unit tests for {@link UserService}.
+ *
+ * <p><strong>Technical Debt:</strong> Contains tests for deprecated
+ * {@link UserService#getUserDetails(String)} method. Migration to
+ * {@link UserService#getUserInfo(String)} pending project-wide impact analysis.</p>
+ *
+ * @see UserService - main service class being tested
+ * @see IdamClient#getUserDetails(String) - deprecated method under test
+ * @see IdamClient#getUserInfo(String) - target replacement method
+ *
+ * @author gergelykiss
+ * @version 1.0
+ */
+@SuppressWarnings("deprecation") // TO-REVIEW: Refactor tests when UserService.getUserDetails() migrated to getUserInfo()@ExtendWith(MockitoExtension.class)
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
 
@@ -45,7 +59,7 @@ class UserServiceTest {
     private UserService userService;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         userService = new UserService(idamClient, false);
     }
 

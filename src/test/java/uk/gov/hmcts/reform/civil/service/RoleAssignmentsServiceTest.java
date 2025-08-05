@@ -23,7 +23,6 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -38,16 +37,16 @@ class RoleAssignmentsServiceTest {
 
     private static final String USER_AUTH_TOKEN = "Bearer caa-user-xyz";
     private static final String SERVICE_TOKEN = "Bearer service-token";
-    private static final String ACTORID = "1111111";
+    private static final String ACTOR_ID = "1111111";
     private static final String CASE_ID = "123456789";
     private static final List<String> ROLE_TYPE = List.of("test_role_type_case");
     private static final List<String> ROLE_NAME = List.of("test_role_name_judge", "test_role_name_judge_lead");
-    private static RoleAssignmentServiceResponse RAS_RESPONSE = RoleAssignmentServiceResponse
+    private static final RoleAssignmentServiceResponse RAS_RESPONSE = RoleAssignmentServiceResponse
         .builder()
         .roleAssignmentResponse(
             List.of(RoleAssignmentResponse
                         .builder()
-                        .actorId(ACTORID)
+                        .actorId(ACTOR_ID)
                         .build()
             )
         )
@@ -75,25 +74,26 @@ class RoleAssignmentsServiceTest {
             .roleAssignmentResponse(
                 List.of(RoleAssignmentResponse
                             .builder()
-                            .actorId(ACTORID)
+                            .actorId(ACTOR_ID)
                             .roleLabel("Role Label")
                             .build()
                 )
             )
             .build();
         when(roleAssignmentApi.getRoleAssignments(
-            eq(USER_AUTH_TOKEN),
-            eq(SERVICE_TOKEN),
-            eq(null),
-            eq(null),
-            eq(100),
-            eq(null),
-            eq(null),
-            eq(QueryRequest.builder().actorId(ACTORID).roleName(ROLE_NAME).build()),
-            eq(true))
+                 USER_AUTH_TOKEN,
+                 SERVICE_TOKEN,
+                 null,
+                 null,
+                 100,
+                 null,
+                 null,
+                 QueryRequest.builder().actorId(ACTOR_ID).roleName(ROLE_NAME).build(),
+                 true
+             )
         ).thenReturn(expected);
 
-        var actual = roleAssignmentsService.getRoleAssignmentsWithLabels(ACTORID, USER_AUTH_TOKEN, ROLE_NAME);
+        var actual = roleAssignmentsService.getRoleAssignmentsWithLabels(ACTOR_ID, USER_AUTH_TOKEN, ROLE_NAME);
 
         assertEquals(expected, actual);
     }
@@ -104,7 +104,7 @@ class RoleAssignmentsServiceTest {
             .roleAssignmentResponse(
                 List.of(RoleAssignmentResponse
                             .builder()
-                            .actorId(ACTORID)
+                            .actorId(ACTOR_ID)
                             .roleLabel("Role Label")
                             .build()
                 )
@@ -118,26 +118,32 @@ class RoleAssignmentsServiceTest {
             .build();
 
         when(roleAssignmentApi.getRoleAssignments(
-            eq(USER_AUTH_TOKEN),
-            eq(SERVICE_TOKEN),
-            eq(null),
-            eq(null),
-            eq(null),
-            eq("roleName"),
-            eq(null),
-            eq(queryRequest),
-            eq(true))
+                 USER_AUTH_TOKEN,
+                 SERVICE_TOKEN,
+                 null,
+                 null,
+                 null,
+                 "roleName",
+                 null,
+                 queryRequest,
+                 true
+             )
         ).thenReturn(expected);
 
-        var actual = roleAssignmentsService.queryRoleAssignmentsByCaseIdAndRole(CASE_ID, ROLE_TYPE, ROLE_NAME, USER_AUTH_TOKEN);
+        var actual = roleAssignmentsService.queryRoleAssignmentsByCaseIdAndRole(
+            CASE_ID,
+            ROLE_TYPE,
+            ROLE_NAME,
+            USER_AUTH_TOKEN
+        );
 
         assertEquals(expected, actual);
     }
 
     @Test
     void shouldReturn() {
-        var roleAssignmentsExpected = roleAssignmentsService.getRoleAssignments(ACTORID, USER_AUTH_TOKEN);
-        assertEquals(roleAssignmentsExpected, RAS_RESPONSE);
+        var roleAssignmentsExpected = roleAssignmentsService.getRoleAssignments(ACTOR_ID, USER_AUTH_TOKEN);
+        assertEquals(RAS_RESPONSE, roleAssignmentsExpected);
     }
 
     @Test
@@ -145,14 +151,14 @@ class RoleAssignmentsServiceTest {
         RoleAssignmentRequest request = RoleAssignmentRequest.builder()
             .roleRequest(
                 RoleRequest.builder()
-                    .assignerId(ACTORID)
+                    .assignerId(ACTOR_ID)
                     .reference("civil-hearings-system-user")
                     .process("civil-system-user")
                     .replaceExisting(true)
                     .build())
             .requestedRoles(List.of(
                 RoleAssignment.builder()
-                    .actorId(ACTORID)
+                    .actorId(ACTOR_ID)
                     .actorIdType("IDAM")
                     .roleType(ORGANISATION)
                     .classification("PUBLIC")
@@ -164,10 +170,10 @@ class RoleAssignmentsServiceTest {
                     .build()
             )).build();
 
-        roleAssignmentsService.assignUserRoles(ACTORID, USER_AUTH_TOKEN, request);
+        roleAssignmentsService.assignUserRoles(ACTOR_ID, USER_AUTH_TOKEN, request);
 
         verify(roleAssignmentApi, times(1))
-            .createRoleAssignment(eq(USER_AUTH_TOKEN), eq(SERVICE_TOKEN), eq(request));
+            .createRoleAssignment(USER_AUTH_TOKEN, SERVICE_TOKEN, request);
     }
 
 }
