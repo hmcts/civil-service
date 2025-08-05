@@ -115,7 +115,7 @@ class GenerateDirectionQuestionnaireLipCallBackHandlerTest extends BaseCallbackH
         handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
         verify(directionsQuestionnaireLipGenerator).generate(caseData, BEARER_TOKEN);
         verify(assignCategoryId).assignCategoryIdToCaseDocument(any(), eq(DocCategory.DQ_APP1.getValue()));
-        verify(assignCategoryId).assignCategoryIdToCaseDocument(any(), eq(DocCategory.APP1_DQ.getValue()));
+        // No longer expect duplicate copy with APP1_DQ category
     }
 
     @Test
@@ -169,7 +169,7 @@ class GenerateDirectionQuestionnaireLipCallBackHandlerTest extends BaseCallbackH
         handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
         verify(directionQuestionnaireLipResponseGenerator).generate(caseData, BEARER_TOKEN);
         verify(assignCategoryId).assignCategoryIdToCaseDocument(any(), eq(DocCategory.DQ_APP1.getValue()));
-        verify(assignCategoryId).assignCategoryIdToCaseDocument(any(), eq(DocCategory.APP1_DQ.getValue()));
+        // No longer expect duplicate copy with APP1_DQ category
     }
 
     @Test
@@ -217,7 +217,7 @@ class GenerateDirectionQuestionnaireLipCallBackHandlerTest extends BaseCallbackH
 
         verify(directionsQuestionnaireLipGenerator).generate(caseData, BEARER_TOKEN);
         verify(assignCategoryId).assignCategoryIdToCaseDocument(any(), eq(DocCategory.DQ_APP1.getValue()));
-        verify(assignCategoryId).assignCategoryIdToCaseDocument(any(), eq(DocCategory.APP1_DQ.getValue()));
+        // No longer expect duplicate copy with APP1_DQ category
     }
 
     @Test
@@ -269,6 +269,28 @@ class GenerateDirectionQuestionnaireLipCallBackHandlerTest extends BaseCallbackH
         assertThat(response.getData().get("respondent1OriginalDqDoc")).isNotNull();
         verify(directionsQuestionnaireLipGenerator).generate(caseData, BEARER_TOKEN);
         verify(assignCategoryId).assignCategoryIdToCaseDocument(any(), eq(DocCategory.DQ_DEF1.getValue()));
+        verifyNoMoreInteractions(assignCategoryId);
+    }
+
+    @Test
+    void shouldNotCreateDuplicateDocuments_whenClaimantDQGenerated() {
+        // Given
+        given(directionQuestionnaireLipGeneratorFactory.getDirectionQuestionnaire()).willReturn(directionsQuestionnaireLipGenerator);
+        given(directionsQuestionnaireLipGenerator.generate(any(CaseData.class), anyString())).willReturn(FORM);
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
+
+        CaseData caseData = CaseData.builder().build();
+
+        // When
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
+
+        // Then
+        assertThat(response).isNotNull();
+        verify(directionsQuestionnaireLipGenerator).generate(caseData, BEARER_TOKEN);
+        verify(systemGeneratedDocumentService).getSystemGeneratedDocumentsWithAddedDocument(any(CaseDocument.class), any(CaseData.class));
+
+        // Should only assign one category ID for claimant DQ (DQ_APP1), not create duplicate with APP1_DQ
+        verify(assignCategoryId).assignCategoryIdToCaseDocument(any(), eq(DocCategory.DQ_APP1.getValue()));
         verifyNoMoreInteractions(assignCategoryId);
     }
 }
