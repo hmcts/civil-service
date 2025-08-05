@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 @ExtendWith(MockitoExtension.class)
-public class ClaimantFullAdmitPayImmediatelyCCJCallbackHandlerTest extends BaseCallbackHandlerTest {
+class ClaimantFullAdmitPayImmediatelyCCJCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @InjectMocks
     private ClaimantFullAdmitPayImmediatelyCCJCallbackHandler handler;
