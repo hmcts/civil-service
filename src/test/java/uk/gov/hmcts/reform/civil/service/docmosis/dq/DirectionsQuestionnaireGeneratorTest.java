@@ -293,11 +293,11 @@ class DirectionsQuestionnaireGeneratorTest {
         @Test
         void shouldGenerateDQ_specRespondent() {
             when(documentGeneratorService.generateDocmosisDocument(
-                any(MappableObject.class), eq(DocmosisTemplates.DEFENDANT_RESPONSE_SPEC)))
+                any(MappableObject.class), eq(DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_FAST_TRACK_INT)))
                 .thenReturn(new DocmosisDocument(
-                    DocmosisTemplates.DEFENDANT_RESPONSE_SPEC.getDocumentTitle(), bytes));
+                    DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_FAST_TRACK_INT.getDocumentTitle(), bytes));
 
-            String expectedTitle = format(DocmosisTemplates.DEFENDANT_RESPONSE_SPEC.getDocumentTitle(),
+            String expectedTitle = format(DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_FAST_TRACK_INT.getDocumentTitle(),
                 "defendant", REFERENCE_NUMBER
             );
             when(documentManagementService.uploadDocument(
@@ -319,7 +319,7 @@ class DirectionsQuestionnaireGeneratorTest {
                 .uploadDocument(BEARER_TOKEN, new PDF(expectedTitle, bytes, DIRECTIONS_QUESTIONNAIRE));
             verify(documentGeneratorService).generateDocmosisDocument(
                 any(DirectionsQuestionnaireForm.class),
-                eq(DocmosisTemplates.DEFENDANT_RESPONSE_SPEC)
+                eq(DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_FAST_TRACK_INT)
             );
         }
 
@@ -365,11 +365,11 @@ class DirectionsQuestionnaireGeneratorTest {
         @Test
         void specGenerate_defendantDQ() {
             when(documentGeneratorService.generateDocmosisDocument(
-                any(MappableObject.class), eq(DocmosisTemplates.DEFENDANT_RESPONSE_SPEC)))
+                any(MappableObject.class), eq(DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_FAST_TRACK_INT)))
                 .thenReturn(new DocmosisDocument(
                     DocmosisTemplates.DEFENDANT_RESPONSE_SPEC.getDocumentTitle(), bytes));
 
-            String expectedTitle = format(DocmosisTemplates.DEFENDANT_RESPONSE_SPEC.getDocumentTitle(),
+            String expectedTitle = format(DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_FAST_TRACK_INT.getDocumentTitle(),
                 "defendant", REFERENCE_NUMBER
             );
             when(documentManagementService.uploadDocument(
@@ -391,7 +391,7 @@ class DirectionsQuestionnaireGeneratorTest {
                 .uploadDocument(BEARER_TOKEN, new PDF(expectedTitle, bytes, DIRECTIONS_QUESTIONNAIRE));
             verify(documentGeneratorService).generateDocmosisDocument(
                 any(DirectionsQuestionnaireForm.class),
-                eq(DocmosisTemplates.DEFENDANT_RESPONSE_SPEC)
+                eq(DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_FAST_TRACK_INT)
             );
         }
 

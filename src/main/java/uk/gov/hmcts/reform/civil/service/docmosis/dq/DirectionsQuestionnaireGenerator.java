@@ -59,15 +59,14 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
     }
 
     protected DocmosisTemplates getTemplateId(CaseData caseData) {
-        boolean isFastTrackOrMinti = featureToggleService.isFastTrackUpliftsEnabled() || featureToggleService.isMultiOrIntermediateTrackEnabled(caseData);
+        boolean isMinti = featureToggleService.isMultiOrIntermediateTrackEnabled(caseData);
         DocmosisTemplates templateId;
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             if (isClaimantResponse(caseData)) {
-                templateId = isFastTrackOrMinti
+                templateId = isMinti
                     ? DocmosisTemplates.CLAIMANT_RESPONSE_SPEC_FAST_TRACK_INT : DocmosisTemplates.CLAIMANT_RESPONSE_SPEC;
             } else {
-                templateId = featureToggleService.isFastTrackUpliftsEnabled()
-                    ? DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_FAST_TRACK_INT : DocmosisTemplates.DEFENDANT_RESPONSE_SPEC;
+                templateId = DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_FAST_TRACK_INT;
             }
         } else {
             templateId = getDocmosisTemplate(caseData);
@@ -76,26 +75,26 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
     }
 
     private DocmosisTemplates getDocmosisTemplate(CaseData caseData) {
-        boolean isFastTrackOrMinti = featureToggleService.isFastTrackUpliftsEnabled() || featureToggleService.isMultiOrIntermediateTrackEnabled(caseData);
-        DocmosisTemplates templateId = isFastTrackOrMinti ? DQ_RESPONSE_1V1_FAST_TRACK_INT : DQ_RESPONSE_1V1;
+        boolean isMinti = featureToggleService.isMultiOrIntermediateTrackEnabled(caseData);
+        DocmosisTemplates templateId = isMinti ? DQ_RESPONSE_1V1_FAST_TRACK_INT : DQ_RESPONSE_1V1;
         switch (getMultiPartyScenario(caseData)) {
             case ONE_V_TWO_TWO_LEGAL_REP:
                 if (isClaimantResponse(caseData) && isClaimantMultipartyProceed(caseData)) {
-                    templateId = isFastTrackOrMinti
+                    templateId = isMinti
                         ? DQ_RESPONSE_1V2_DS_FAST_TRACK_INT : DQ_RESPONSE_1V2_DS;
                 }
                 break;
             case ONE_V_TWO_ONE_LEGAL_REP:
                 if (!isClaimantResponse(caseData)
                     || (isClaimantResponse(caseData) && isClaimantMultipartyProceed(caseData))) {
-                    templateId = isFastTrackOrMinti
+                    templateId = isMinti
                         ? DocmosisTemplates.DQ_RESPONSE_1V2_SS_FAST_TRACK_INT : DocmosisTemplates.DQ_RESPONSE_1V2_SS;
                 }
                 break;
             case TWO_V_ONE:
                 if (!isClaimantResponse(caseData)
                     || (isClaimantResponse(caseData) && isClaimantMultipartyProceed(caseData))) {
-                    templateId = isFastTrackOrMinti
+                    templateId = isMinti
                         ? DocmosisTemplates.DQ_RESPONSE_2V1_FAST_TRACK_INT : DocmosisTemplates.DQ_RESPONSE_2V1;
                 }
                 break;
@@ -107,8 +106,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
     public CaseDocument generateDQFor1v2SingleSolDiffResponse(CaseData caseData,
                                                               String authorisation,
                                                               String respondent) {
-        boolean isFastTrackOrMinti = featureToggleService.isFastTrackUpliftsEnabled() || featureToggleService.isMultiOrIntermediateTrackEnabled(caseData);
-        DocmosisTemplates templateId = isFastTrackOrMinti ? DQ_RESPONSE_1V1_FAST_TRACK_INT : DQ_RESPONSE_1V1;
+        boolean isMinti = featureToggleService.isMultiOrIntermediateTrackEnabled(caseData);
+        DocmosisTemplates templateId = isMinti ? DQ_RESPONSE_1V1_FAST_TRACK_INT : DQ_RESPONSE_1V1;
         DirectionsQuestionnaireForm templateData;
 
         if (respondent.equals("ONE")) {
@@ -133,8 +132,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
     public Optional<CaseDocument> generateDQFor1v2DiffSol(CaseData caseData,
                                                           String authorisation,
                                                           String respondent) {
-        boolean isFastTrackOrMinti = featureToggleService.isFastTrackUpliftsEnabled() || featureToggleService.isMultiOrIntermediateTrackEnabled(caseData);
-        DocmosisTemplates templateId = isFastTrackOrMinti ? DQ_RESPONSE_1V1_FAST_TRACK_INT : DQ_RESPONSE_1V1;
+        boolean isMinti = featureToggleService.isMultiOrIntermediateTrackEnabled(caseData);
+        DocmosisTemplates templateId = isMinti ? DQ_RESPONSE_1V1_FAST_TRACK_INT : DQ_RESPONSE_1V1;
 
         String fileName = getFileName(caseData, templateId);
         LocalDateTime responseDate = getResponseDate(caseData, respondent);
