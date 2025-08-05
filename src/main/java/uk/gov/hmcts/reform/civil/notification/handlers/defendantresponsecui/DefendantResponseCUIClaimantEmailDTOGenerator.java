@@ -22,7 +22,9 @@ public class DefendantResponseCUIClaimantEmailDTOGenerator extends ClaimantEmail
 
     @Override
     protected String getEmailTemplateId(CaseData caseData) {
-        return notificationsProperties.getNotifyLiPClaimantDefendantResponded();
+        return caseData.isClaimantBilingual()
+            ? notificationsProperties.getNotifyLiPClaimantDefendantRespondedWelshLip() :
+            notificationsProperties.getNotifyLiPClaimantDefendantResponded();
     }
 
     @Override

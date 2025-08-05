@@ -192,11 +192,11 @@ public class NotificationForClaimantRepresented extends CallbackHandler implemen
             return isRespondentLip ? notificationsProperties.getNotifyRespondentLipForClaimantRepresentedTemplate() :
                 notificationsProperties.getNoticeOfChangeOtherParties();
         }
-        if (isBilingual) {
-            return notificationsProperties.getNotifyClaimantLipForNoLongerAccessWelshTemplate();
-        }
         if (isApplicantSolicitorNotify) {
             return notificationsProperties.getNoticeOfChangeApplicantLipSolicitorTemplate();
+        }
+        if (isBilingual) {
+            return notificationsProperties.getNotifyClaimantLipForNoLongerAccessWelshTemplate();
         }
         return notificationsProperties.getNotifyClaimantLipForNoLongerAccessTemplate();
     }

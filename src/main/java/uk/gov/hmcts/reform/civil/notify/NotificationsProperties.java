@@ -413,6 +413,9 @@ public class NotificationsProperties {
     private String notifyLiPClaimantDefendantResponded;
 
     @NotEmpty
+    private String notifyLiPClaimantDefendantRespondedWelshLip;
+
+    @NotEmpty
     private String notifyLiPClaimantDefendantChangedContactDetails;
 
     @NotEmpty
@@ -642,6 +645,9 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String notifyClaimDiscontinuedLipTemplate;
+
+    @NotEmpty
+    private String notifyClaimDiscontinuedWelshLipTemplate;
 
     @NotEmpty
     private String notifyLRCaseStayed;

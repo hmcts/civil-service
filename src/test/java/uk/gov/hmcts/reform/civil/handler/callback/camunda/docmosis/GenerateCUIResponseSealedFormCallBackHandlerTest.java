@@ -199,6 +199,47 @@ class GenerateCUIResponseSealedFormCallBackHandlerTest extends BaseCallbackHandl
     }
 
     @Test
+    void shouldNotCreateDuplicateDocuments_whenStitchingEnabledAndStitchedDocumentCreated() {
+        //Given
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+        ReflectionTestUtils.setField(handler, "stitchEnabled", true);
+        
+        List<Element<CaseDocument>> documents = List.of(
+                element(CaseDocument.builder().documentName("Stitched document").build()));
+        given(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(any(CaseDocument.class), any(CaseData.class))).willReturn(documents);
+        when(civilStitchService.generateStitchedCaseDocument(anyList(), anyString(), anyLong(), eq(DEFENDANT_DEFENCE),
+                                                             anyString())).thenReturn(STITCHED_DOC);
+        given(formGenerator.generate(any(CaseData.class), anyString())).willReturn(FORM);
+        
+        List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
+        systemGeneratedCaseDocuments.add(element(DIRECTIONS_QUESTIONNAIRE_DOC));
+        CaseData caseData = CaseDataBuilder.builder()
+                 .ccdCaseReference(1L)
+                .applicant1Represented(YesOrNo.NO)
+                .respondent1Represented(YesOrNo.NO)
+                .systemGeneratedCaseDocuments(systemGeneratedCaseDocuments).build();
+
+        //When
+        var response = (AboutToStartOrSubmitCallbackResponse)handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
+        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+
+        //Then
+        // Should only have the stitched document, not both stitched and original
+        long stitchedDocCount = updatedData.getSystemGeneratedCaseDocuments().stream()
+                .filter(doc -> doc.getValue().getDocumentName().equals(STITCHED_DOC.getDocumentName()))
+                .count();
+        long originalFormCount = updatedData.getSystemGeneratedCaseDocuments().stream()
+                .filter(doc -> doc.getValue().getDocumentName().equals(FORM.getDocumentName()))
+                .count();
+        
+        assertThat(stitchedDocCount).isEqualTo(1);
+        assertThat(originalFormCount).isEqualTo(0); // Original form should NOT be added when stitching occurs
+        
+        verify(formGenerator).generate(caseData, BEARER_TOKEN);
+    }
+
+    @Test
     void shouldGenerateForm_whenIsLipVLipEnabledStitchingBilingual() {
         //Given
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
