@@ -53,6 +53,7 @@ public class ClaimContinuingOnlineSpecRespSolTwoEmailDTOGenerator extends RespSo
         return properties;
     }
 
+    @Override
     public Boolean getShouldNotify(CaseData caseData) {
         return YesOrNo.YES.equals(caseData.getAddRespondent2()) && !caseData.isRespondent2LiP();
     }
