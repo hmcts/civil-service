@@ -7,14 +7,7 @@ import java.time.LocalDate;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-/** Stores all public holidays retrieved from Gov uk API: gov.uk/bank-holidays.json .
- *
- * @author Irfan
- *
- * @version 1.0
- */
-
-
+// Stores all public holidays from: gov.uk/bank-holidays.json retrieved from Gov uk API.
 @Service
 public class PublicHolidaysCollection {
 
