@@ -150,7 +150,7 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
         String template;
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             template = getSpecTemplate(callbackParams, caseData);
-        } else if (MULTI_CLAIM.equals(caseData.getAllocatedTrack()) && !featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
+        } else if (MULTI_CLAIM.equals(caseData.getAllocatedTrack())) {
             template = notificationsProperties.getSolicitorCaseTakenOffline();
         } else {
             template = notificationsProperties.getClaimantSolicitorConfirmsToProceed();

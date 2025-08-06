@@ -40,7 +40,6 @@ public class LocationHelper {
     private final String ccmccEpimsId;
     private final String cnbcRegionId;
     private final String cnbcEpimsId;
-    private final FeatureToggleService featureToggleService;
 
     public LocationHelper(
         @Value("${genApp.lrd.ccmcc.amountPounds}") BigDecimal ccmccAmount,
@@ -55,7 +54,6 @@ public class LocationHelper {
         this.ccmccEpimsId = ccmccEpimsId;
         this.cnbcEpimsId = cnbcEpimsId;
         this.cnbcRegionId = cnbcRegionId;
-        this.featureToggleService = featureToggleService;
     }
 
     public Optional<RequestedCourt> getCaseManagementLocation(CaseData caseData) {
@@ -98,8 +96,7 @@ public class LocationHelper {
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory()) && ccmccAmount.compareTo(getClaimValue(caseData)) <= 0) {
             log.debug("Case {}, specified claim under 1000.", caseData.getCcdCaseReference());
 
-            if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)
-                && isMultiOrIntTrackSpec(caseData)
+            if (isMultiOrIntTrackSpec(caseData)
                 && caseData.isLipCase()) {
                 log.debug("Case {}, specified claim under 1000 for multiTrack", caseData.getCcdCaseReference());
                 return Optional.of(RequestedCourt.builder().caseLocation(getCnbcCaseLocation()).build());

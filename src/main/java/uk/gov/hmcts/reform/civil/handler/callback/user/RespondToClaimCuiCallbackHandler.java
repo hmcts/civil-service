@@ -153,8 +153,7 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
                 caseData.getTotalClaimAmount(),
                 null,
                 null,
-                featureToggleService,
-                caseData
+                    caseData
             ).name())
             .applicant1ResponseDeadline(applicantDeadline)
             .nextDeadline(applicantDeadline.toLocalDate());

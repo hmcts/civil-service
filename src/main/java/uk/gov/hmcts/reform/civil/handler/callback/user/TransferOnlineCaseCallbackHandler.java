@@ -126,12 +126,11 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
         if (nonNull(newCourtLocation)) {
             caseDataBuilder.caseManagementLocation(LocationHelper.buildCaseLocation(newCourtLocation));
             caseDataBuilder.locationName(newCourtLocation.getSiteName());
-            if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
-                updateWaCourtLocationsService.ifPresent(service -> service.updateCourtListingWALocations(
+
+            updateWaCourtLocationsService.ifPresent(service -> service.updateCourtListingWALocations(
                     callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
                     caseDataBuilder
-                ));
-            }
+            ));
         }
 
         if (nonNull(newCourtLocation)) {

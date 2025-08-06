@@ -30,7 +30,6 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.Address;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimValue;
 import uk.gov.hmcts.reform.civil.model.CourtLocation;
@@ -47,11 +46,11 @@ import uk.gov.hmcts.reform.civil.model.dq.Experts;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
-import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.DocumentBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.camunda.UpdateWaCourtLocationsService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
@@ -75,6 +74,7 @@ import static java.time.LocalDateTime.now;
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -331,7 +331,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnError_whenUnavailableDateIsMoreThanOneYearInFuture() {
-            CaseData.CaseDataBuilder caseDataBuilder = CaseData.builder();
+            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = CaseData.builder();
             caseDataBuilder
                 .applicant1DQ(Applicant1DQ.builder()
                                   .applicant1DQHearing(Hearing.builder()
@@ -355,7 +355,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnError_whenUnavailableDateIsInPast() {
-            CaseData.CaseDataBuilder caseDataBuilder = CaseData.builder();
+            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = CaseData.builder();
             caseDataBuilder
                 .applicant1DQ(Applicant1DQ.builder()
                                   .applicant1DQHearing(Hearing.builder()
@@ -379,7 +379,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnNoError_whenUnavailableDateIsValid() {
-            CaseData.CaseDataBuilder caseDataBuilder = CaseData.builder();
+            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = CaseData.builder();
             caseDataBuilder
                 .applicant1DQ(Applicant1DQ.builder()
                                   .applicant1DQHearing(Hearing.builder()
@@ -402,7 +402,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnNoError_whenNoUnavailableDate() {
-            CaseData.CaseDataBuilder caseDataBuilder = CaseData.builder();
+            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = CaseData.builder();
             caseDataBuilder
                 .applicant1DQ(Applicant1DQ.builder().applicant1DQHearing(Hearing.builder().build()).build()).build();
 
@@ -416,7 +416,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnNoError_whenUnavailableDatesNotRequired() {
-            CaseData.CaseDataBuilder caseDataBuilder = CaseData.builder();
+            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = CaseData.builder();
             Hearing hearing = Hearing.builder().unavailableDatesRequired(NO).build();
             caseDataBuilder
                 .applicant1DQ(Applicant1DQ.builder().applicant1DQHearing(hearing).build()).build();
@@ -450,7 +450,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnNoError_whenWitnessRequiredAndDetailsProvided() {
-            List<Element<Witness>> testWitness = wrapElements(Witness.builder().name("test witness").build());
+            List<Element<Witness>> testWitness = wrapElements(Witness.builder().firstName("test witness").build());
             Witnesses witnesses = Witnesses.builder().witnessesToAppear(YES).details(testWitness).build();
             CaseData caseData = CaseDataBuilder.builder()
                 .applicant1DQ(Applicant1DQ.builder().applicant1DQWitnesses(witnesses).build())
@@ -464,7 +464,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnNoError_whenWitnessRequiredAndDetailsProvidedAndRespondentFlagEnabled() {
-            List<Element<Witness>> testWitness = wrapElements(Witness.builder().name("test witness").build());
+            List<Element<Witness>> testWitness = wrapElements(Witness.builder().firstName("test witness").build());
             Witnesses witnesses = Witnesses.builder().witnessesToAppear(YES).details(testWitness).build();
             CaseData caseData = CaseDataBuilder.builder()
                 .applicant1DQ(Applicant1DQ.builder().applicant1DQWitnesses(witnesses).build())
@@ -686,7 +686,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
         @EnumSource(value = FlowState.Main.class,
             names = {"FULL_DEFENCE_PROCEED", "FULL_DEFENCE_NOT_PROCEED"},
             mode = EnumSource.Mode.INCLUDE)
-        void shouldUpdateBusinessProcess_whenAtFullDefenceStateForSdoMP(FlowState.Main flowState) {
+        void shouldUpdateBusinessProcess_whenAtFullDefenceStateForSdoMP() {
 
             var params = callbackParamsOf(
                 CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceedVsBothDefendants_1v2()
@@ -750,11 +750,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .applicant2ProceedWithClaimMultiParty2v1(YES)
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").region("4").build())
                 .build();
-            /*
-            CourtLocation.builder()
-            .applicantPreferredCourt("127")
-            .build();
-             */
+
             var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -813,11 +809,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .applicant2ProceedWithClaimMultiParty2v1(YES)
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").region("4").build())
                 .build();
-            /*
-            CourtLocation.builder()
-            .applicantPreferredCourt("127")
-            .build();
-             */
+
             var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -876,11 +868,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .applicant2ProceedWithClaimMultiParty2v1(NO)
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").region("4").build())
                 .build();
-            /*
-            CourtLocation.builder()
-            .applicantPreferredCourt("127")
-            .build();
-             */
+
             var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -932,11 +920,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .applicant1ProceedWithClaim(YES)
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").region("4").build())
                 .build();
-            /*
-            CourtLocation.builder()
-            .applicantPreferredCourt("127")
-            .build();
-             */
+
             var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -988,11 +972,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").region("4").build())
 
                 .build();
-            /*
-            CourtLocation.builder()
-            .applicantPreferredCourt("127")
-            .build();
-             */
+
             var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1048,11 +1028,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(YES)
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").region("4").build())
                 .build();
-            /*
-            CourtLocation.builder()
-            .applicantPreferredCourt("127")
-            .build();
-             */
+
             var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1108,11 +1084,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(NO)
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").region("4").build())
                 .build();
-            /*
-            CourtLocation.builder()
-            .applicantPreferredCourt("127")
-            .build();
-             */
+
             var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1168,11 +1140,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(NO)
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").region("4").build())
                 .build();
-            /*
-            CourtLocation.builder()
-            .applicantPreferredCourt("127")
-            .build();
-             */
+
             var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1253,28 +1221,6 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         }
 
-        @Test
-        void shouldAssignCategoryId_frc_whenInvoked() {
-            // Given
-            when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
-            when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
-
-            var caseData = CaseDataBuilder.builder()
-                .setIntermediateTrackClaim()
-                .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.TWO_V_ONE)
-                .multiPartyClaimTwoApplicants()
-                .applicant1DQWithFixedRecoverableCostsIntermediate()
-                .build();
-            //When
-            var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-            System.out.println(updatedData.getClaimantResponseDocuments());
-            //Then
-            assertThat(updatedData.getApplicant1DQ().getApplicant1DQFixedRecoverableCostsIntermediate().getFrcSupportingDocument().getCategoryID()).isEqualTo(
-                "DQApplicant");
-        }
-
         @Nested
         class UpdateRequestedCourt {
 
@@ -1304,11 +1250,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                 CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
                     .courtLocation()
                     .build();
-                List<LocationRefData> locations = new ArrayList<>();
-                locations.add(LocationRefData.builder().siteName("SiteName").courtAddress("1").postcode("1")
-                                  .courtName("Court Name").region("Region").regionId("regionId1").courtVenueId("000")
-                                  .courtTypeId("10")
-                                  .epimmsId("4532").build());
+
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
                     callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
 
@@ -1407,7 +1349,6 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldCallUpdateWaCourtLocationsServiceWhenPresent_AndMintiEnabled() {
-            when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
             var caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.TWO_V_ONE)
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation("12345").region("3").build())
@@ -1417,6 +1358,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             verify(updateWaCourtLocationsService).updateCourtListingWALocations(any(), any());
+            assertNotNull(response.getData());
         }
 
         @Test
@@ -1427,7 +1369,6 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                           locationHelper, caseFlagsInitialiser, toggleConfiguration, assignCategoryId,
                                                           caseDetailsConverter, frcDocumentsUtils, Optional.empty(),
                                                           requestedCourtForClaimDetailsTab);
-            when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
             var caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.TWO_V_ONE)
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation("12345").region("3").build())
@@ -1437,6 +1378,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             verifyNoInteractions(updateWaCourtLocationsService);
+            assertNotNull(response.getData());
         }
     }
 

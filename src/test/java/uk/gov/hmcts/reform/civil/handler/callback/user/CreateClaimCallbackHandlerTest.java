@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -45,7 +46,6 @@ import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
-import uk.gov.hmcts.reform.civil.service.CoreCaseEventDataService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -145,9 +145,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     private FeatureToggleService featureToggleService;
 
     @Autowired
-    private ValidateEmailService validateEmailService;
-
-    @Autowired
     private CreateClaimCallbackHandler handler;
 
     @Autowired
@@ -167,15 +164,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private CaseFlagsInitialiser caseFlagInitialiser;
-
-    @MockBean
-    CoreCaseEventDataService coreCaseEventDataService;
-
-    @Autowired
-    private AssignCategoryId assignCategoryId;
-
-    @Autowired
-    private PartyValidator partyValidator;
 
     @Value("${civil.response-pack-url}")
     private String responsePackLink;
@@ -744,7 +732,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     class MidEventParticularsOfClaimCallback {
 
         private final String pageId = "particulars-of-claim";
-        private final CaseData.CaseDataBuilder caseDataBuilder =
+        private final CaseData.CaseDataBuilder<?, ?> caseDataBuilder =
             CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder();
 
         @Test
@@ -1341,6 +1329,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
+            Assertions.assertNotNull(organisation);
             assertThat(response.getData()).extracting("applicant1OrganisationPolicy")
                 .extracting("Organisation")
                 .extracting("OrganisationID")
@@ -1481,14 +1470,13 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData())
                 .containsEntry("legacyCaseReference", REFERENCE_NUMBER)
                 .containsEntry("submittedDate", submittedDate.format(DateTimeFormatter.ISO_DATE_TIME))
-                .containsEntry("allocatedTrack", MULTI_CLAIM.name());
+                .containsEntry("allocatedTrack", INTERMEDIATE_CLAIM.name());
         }
 
         @Test
         void shouldSetIntermediateAllocatedTrack_whenInvoked() {
             // New multi and intermediate track change track logic
             // claim amount is 100000.00, so track is intermediate, as this is the upper limit
-            when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData()).containsEntry("allocatedTrack", INTERMEDIATE_CLAIM.name());
         }
@@ -1497,7 +1485,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldSetMultiAllocatedTrack_whenInvoked() {
             // New multi and intermediate track change track logic
             // claim amount is 100000.01, so track is multi
-            when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
             CaseData caseDataUpdated = CaseDataBuilder.builder().atStateClaimDraft()
                 .claimValue(ClaimValue.builder()
                     .statementOfValueInPennies(BigDecimal.valueOf(10000001))

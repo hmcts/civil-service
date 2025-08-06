@@ -113,18 +113,16 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
 
         clearTempDocuments(builder);
 
-        if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
-            if ((AllocatedTrack.MULTI_CLAIM.name().equals(caseData.getResponseClaimTrack())
+        if ((AllocatedTrack.MULTI_CLAIM.name().equals(caseData.getResponseClaimTrack())
                 || AllocatedTrack.INTERMEDIATE_CLAIM.name().equals(caseData.getResponseClaimTrack())
                 && caseData.isLipCase())) {
-                builder.isMintiLipCase(YES);
-            }
+            builder.isMintiLipCase(YES);
+        }
 
-            updateWaCourtLocationsService.ifPresent(service -> service.updateCourtListingWALocations(
+        updateWaCourtLocationsService.ifPresent(service -> service.updateCourtListingWALocations(
                 callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
                 builder
-            ));
-        }
+        ));
 
         requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabApplicantSpec(callbackParams, builder);
         builder.nextDeadline(null);
@@ -219,8 +217,7 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
     }
 
     private void updateCaselocationDetails(CallbackParams callbackParams, CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder) {
-        if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)
-            && isMultiOrIntTrackSpec(caseData)
+        if (isMultiOrIntTrackSpec(caseData)
             && caseData.isLipCase()) {
             // If case is Multi or Intermediate, and has a LIP involved, and even if transferred online
             // CML should be set/maintained at CNBC for transfer offline tasks (takeCaseOfflineMinti)
@@ -246,7 +243,7 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
 
     private String putCaseStateInJudicialReferral(CaseData caseData) {
         if (caseData.isRespondentResponseFullDefence()
-            && JudicialReferralUtils.shouldMoveToJudicialReferral(caseData, featureToggleService.isMultiOrIntermediateTrackEnabled(caseData))) {
+                && JudicialReferralUtils.shouldMoveToJudicialReferral(caseData, true)) {
             return CaseState.JUDICIAL_REFERRAL.name();
         }
         return null;

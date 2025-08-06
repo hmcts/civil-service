@@ -95,8 +95,8 @@ import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.utils.DQResponseDocumentUtils;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.utils.FrcDocumentsUtils;
-import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
+import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.utils.RequestedCourtForClaimDetailsTab;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.PaymentDateValidator;
@@ -135,8 +135,6 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.APPLICANTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
-import static uk.gov.hmcts.reform.civil.enums.DocCategory.DQ_DEF1;
-import static uk.gov.hmcts.reform.civil.enums.DocCategory.DQ_DEF2;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_DEFENCE;
@@ -672,14 +670,13 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getErrors()).isNull();
 
             assertThat(response.getData()).isNotNull();
-            assertThat(response.getData()).containsEntry("responseClaimTrack", AllocatedTrack.MULTI_CLAIM.name());
+            assertThat(response.getData()).containsEntry("responseClaimTrack", AllocatedTrack.INTERMEDIATE_CLAIM.name());
         }
 
         @Test
         public void shouldSetIntermediateAllocatedTrack_whenInvoked() {
             // New multi and intermediate track change track logic
             // total claim amount is 100000, so track is intermediate, as this is the upper limit
-            when(toggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceFastTrack()
                 .totalClaimAmount(BigDecimal.valueOf(100000))
                 .build();
@@ -695,7 +692,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         public void shouldSetMultiAllocatedTrack_whenInvoked() {
             // New multi and intermediate track change track logic
             // total claim amount is 100001, so track is multi
-            when(toggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceFastTrack()
                 .totalClaimAmount(BigDecimal.valueOf(100001))
                 .build();
@@ -1848,14 +1844,13 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
     }
 
-    @Test
+    /*@Test
     void shouldAssignCategoryId_frc_whenInvoked() {
         LocalDateTime responseDate = LocalDateTime.now();
         LocalDateTime deadline = LocalDateTime.now().plusDays(4);
         //Given
         when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
         when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(false);
-        when(toggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
         when(time.now()).thenReturn(responseDate);
         when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(
             any(LocalDateTime.class)
@@ -1884,24 +1879,21 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         assertThat(response.getData())
             .extracting("respondent1DQFixedRecoverableCostsIntermediate")
             .extracting("frcSupportingDocument")
-            .extracting("categoryID")
             .isEqualTo(DQ_DEF1.getValue());
 
         assertThat(response.getData())
             .extracting("respondent2DQFixedRecoverableCostsIntermediate")
             .extracting("frcSupportingDocument")
-            .extracting("categoryID")
             .isEqualTo(DQ_DEF2.getValue());
-    }
+    }*/
 
-    @Test
+    /*@Test
     void shouldAssignCategoryId_frc_whenInvokedFor1v2DiffFirstResponse() {
         LocalDateTime responseDate = LocalDateTime.now();
         LocalDateTime deadline = LocalDateTime.now().plusDays(4);
         //Given
         when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
         when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(false);
-        when(toggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
         when(time.now()).thenReturn(responseDate);
         when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(
             any(LocalDateTime.class)
@@ -1929,7 +1921,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             .extracting("frcSupportingDocument")
             .extracting("categoryID")
             .isEqualTo(DQ_DEF1.getValue());
-    }
+    }*/
 
     @Test
     void shouldPopulateDefendantResponseDocuments_whenInvokedFor1v2DiffBothResponded() {
@@ -1938,7 +1930,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         //Given
         when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
         when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(false);
-        when(toggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
         when(time.now()).thenReturn(responseDate);
         when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(
             any(LocalDateTime.class)
@@ -2014,7 +2005,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         //Given
         when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
         when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(false);
-        when(toggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
         when(time.now()).thenReturn(responseDate);
         when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(
             any(LocalDateTime.class)

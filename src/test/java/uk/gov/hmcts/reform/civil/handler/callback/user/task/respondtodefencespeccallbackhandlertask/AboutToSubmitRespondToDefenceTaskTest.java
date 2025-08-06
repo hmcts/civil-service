@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTim
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
-import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentByAdmissionOnlineMapper;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -92,9 +91,6 @@ class AboutToSubmitRespondToDefenceTaskTest {
 
     @Mock
     private CaseDetailsConverter caseDetailsConverter;
-
-    @Mock
-    private JudgmentByAdmissionOnlineMapper judgmentByAdmissionOnlineMapper;
 
     @Mock
     private FrcDocumentsUtils frcDocumentsUtils;
@@ -193,7 +189,7 @@ class AboutToSubmitRespondToDefenceTaskTest {
     void shouldAddEventAndDateToApplicantWitnesses() {
         Witnesses witnesses = Witnesses.builder()
             .witnessesToAppear(YES)
-            .details(wrapElements(Witness.builder().name("John Smith").reasonForWitness("reason").build()))
+            .details(wrapElements(Witness.builder().firstName("John Smith").reasonForWitness("reason").build()))
             .build();
 
         CaseData fullDefenceData = CaseDataBuilder.builder().atState(FULL_DEFENCE_PROCEED).build();
@@ -229,8 +225,6 @@ class AboutToSubmitRespondToDefenceTaskTest {
 
     @Test
     void shouldCallUpdateWaCourtLocationsServiceWhenPresent_AndMintiEnabled() {
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
-
         CaseData caseData = CaseDataBuilder.builder()
             .applicant1DQWithExperts()
             .applicant1DQWithWitnesses()
@@ -240,13 +234,12 @@ class AboutToSubmitRespondToDefenceTaskTest {
         AboutToStartOrSubmitCallbackResponse response =
             (AboutToStartOrSubmitCallbackResponse) task.execute(callbackParams(caseData));
 
+        assertNotNull(response);
         verify(updateWaCourtLocationsService).updateCourtListingWALocations(any(), any());
     }
 
     @Test
     void shouldNotCallUpdateWaCourtLocationsServiceWhenNotPresent_AndMintiEnabled() {
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
-
         task = new AboutToSubmitRespondToDefenceTask(objectMapper, time, locationRefDataService,
                                                      courtLocationUtils, featureToggleService,
                                                      locationHelper, caseFlagsInitialiser,
@@ -265,6 +258,7 @@ class AboutToSubmitRespondToDefenceTaskTest {
         AboutToStartOrSubmitCallbackResponse response =
             (AboutToStartOrSubmitCallbackResponse) task.execute(callbackParams(caseData));
 
+        assertNotNull(response);
         verifyNoInteractions(updateWaCourtLocationsService);
     }
 
