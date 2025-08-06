@@ -67,8 +67,7 @@ public class ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandl
                 CASEMAN_REF, caseData.getLegacyCaseReference()
             ));
             addAllFooterItems(caseData, properties, configuration,
-                              featureToggleService.isQueryManagementLRsEnabled(),
-                              featureToggleService.isLipQueryManagementEnabled(caseData));
+                              featureToggleService.isPublicQueryManagementEnabled(caseData));
             return properties;
         }
         HashMap<String, String> properties = new HashMap<>(Map.of(
@@ -78,8 +77,7 @@ public class ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandl
             CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
         addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
 
         return properties;
     }
