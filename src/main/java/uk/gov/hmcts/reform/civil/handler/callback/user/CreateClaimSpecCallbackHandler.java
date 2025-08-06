@@ -349,7 +349,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     static final String PAY_FEE_MESSAGE = "# Please now pay your claim fee%n# using the link below";
 
     private String getHeader(CaseData caseData) {
-        if (areRespondentsRepresentedAndRegistered(caseData) || isPinInPostCaseMatched(caseData)) {
+        if (areRespondentsRepresentedAndRegistered(caseData) || isCaseMatched(caseData)) {
             return format(PAY_FEE_MESSAGE);
         }
         return format(
@@ -364,7 +364,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
         return
             ((areRespondentsRepresentedAndRegistered(caseData)
-                || isPinInPostCaseMatched(caseData))
+                || isCaseMatched(caseData))
                 ? getConfirmationSummary(caseData)
                 : format(LIP_CONFIRMATION_BODY, format(
                     CASE_DOC_LOCATION,
@@ -492,7 +492,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
         return
             ((areRespondentsRepresentedAndRegistered(caseData)
-                || isPinInPostCaseMatched(caseData))
+                || isCaseMatched(caseData))
                 ? getSpecConfirmationSummary(caseData)
                 : format(
                 SPEC_LIP_CONFIRMATION_BODY_PBAV3,
@@ -555,11 +555,10 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             .build();
     }
 
-    private boolean isPinInPostCaseMatched(CaseData caseData) {
+    private boolean isCaseMatched(CaseData caseData) {
         return (caseData.getRespondent1Represented() == NO
             && caseData.getAddRespondent2() == NO
-            && caseData.getAddApplicant2() == NO
-            && toggleService.isPinInPostEnabled());
+            && caseData.getAddApplicant2() == NO);
     }
 
     private boolean areRespondentsRepresentedAndRegistered(CaseData caseData) {
