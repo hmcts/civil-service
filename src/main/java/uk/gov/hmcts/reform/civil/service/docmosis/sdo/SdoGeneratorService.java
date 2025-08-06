@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper.getFastTrackAllocation;
 
 @Slf4j
 @Service
@@ -314,6 +315,7 @@ public class SdoGeneratorService {
             )
             // SNI-5142
             .fastTrackMethodToggle(true)
+            .fastTrackAllocation(getFastTrackAllocation(caseData))
             .showBundleInfo(SdoHelper.hasFastTrackVariable(caseData, "fastTrackTrialBundleToggle"));
 
         sdoDocumentFormBuilder

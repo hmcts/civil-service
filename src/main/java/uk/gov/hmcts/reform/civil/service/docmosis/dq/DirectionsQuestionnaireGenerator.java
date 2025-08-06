@@ -65,11 +65,10 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
     }
 
     protected DocmosisTemplates getTemplateId(CaseData caseData) {
-        boolean isMinti = featureToggleService.isMultiOrIntermediateTrackEnabled(caseData);
         DocmosisTemplates templateId;
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             if (isClaimantResponse(caseData)) {
-                templateId = isMinti
+                templateId = featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)
                     ? DocmosisTemplates.CLAIMANT_RESPONSE_SPEC_FAST_TRACK_INT : DocmosisTemplates.CLAIMANT_RESPONSE_SPEC;
             } else {
                 templateId = DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_FAST_TRACK_INT;
