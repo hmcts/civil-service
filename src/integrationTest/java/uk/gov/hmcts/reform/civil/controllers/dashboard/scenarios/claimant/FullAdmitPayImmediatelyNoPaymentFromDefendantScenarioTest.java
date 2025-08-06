@@ -6,8 +6,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.ClaimantFullAdmitPayImmediatelyCCJNotificationHandler;
+import uk.gov.hmcts.reform.civil.event.FullAdmitPayImmediatelyNoPaymentFromDefendantEvent;
+import uk.gov.hmcts.reform.civil.handler.event.FullAdmitPayImmediatelyNoPaymentFromDefendantEventHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class FullAdmitPayImmediatelyNoPaymentFromDefendantScenarioTest extends DashboardBaseIntegrationTest {
 
     @Autowired
-    private ClaimantFullAdmitPayImmediatelyCCJNotificationHandler handler;
+    private FullAdmitPayImmediatelyNoPaymentFromDefendantEventHandler handler;
     @MockBean
     private CoreCaseDataService coreCaseDataService;
 
@@ -43,15 +43,16 @@ public class FullAdmitPayImmediatelyNoPaymentFromDefendantScenarioTest extends D
             .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
                                                .whenWillThisAmountBePaid(whenWillThisAmountBePaid)
                                                .build())
-            .applicant1Represented(YesOrNo.NO)
             .build();
 
         CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).id(Long.valueOf(caseId)).build();
 
         when(coreCaseDataService.getCase(Long.valueOf(caseId))).thenReturn(caseDetails);
         when(userService.getAccessToken(any(), any())).thenReturn(BEARER_TOKEN);
+        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(false);
 
-        handler.handle(callbackParams(caseData));
+        handler.createClaimantDashboardScenario(new FullAdmitPayImmediatelyNoPaymentFromDefendantEvent(Long.valueOf(
+            caseId)));
 
         //Verify Notification is created
         doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "CLAIMANT").andExpect(status().isOk()).andExpectAll(
