@@ -97,7 +97,6 @@ allprojects {
         entry 'guava'
       }
 
-
       dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-common', version: '1.9.25'
       dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk7', version: '1.9.25'
       dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8', version: '1.9.25'
@@ -266,7 +265,7 @@ sonarqube {
     property "sonar.cpd.exclusions", "**/*DocumentManagementService.java, **/*Spec*.java, **/*CcdDashboardClaimantClaimMatcher.java, **/*CcdDashboardDefendantClaimMatcher.java"
     property "sonar.exclusions", "**/hmc/model/**, **/model/hearingvalues/**, **/handler/callback/camunda/dashboardnotifications/claimant/CCJRequestedDashboardNotificationHandler.java, **/handler/callback/camunda/dashboardnotifications/claimant/ClaimantCCJResponseNotificationHandler.java" +
       ", **/handler/callback/camunda/dashboardnotifications/claimant/ClaimantResponseNotificationHandler.java, **/utils/**, **/filters/**, **/handler/callback/camunda/dashboardnotifications/defendant/MoreTimeRequestedDashboardNotificationDefendantHandler.java, **/handler/callback/camunda/dashboardnotifications/claimant/ClaimantMediationSuccessfulDashboardNotificationHandler.java, **/handler/callback/camunda/dashboardnotifications/claimant/ClaimSettledDashboardNotificationHandler.java, **/handler/callback/camunda/dashboardnotifications/claimant/HearingScheduledClaimantNotificationHandler.java, **/handler/callback/camunda/dashboardnotifications/defendant/SettleClaimPaidInFullDefendantDashboardNotificationHandler.java, **/handler/callback/camunda/dashboardnotifications/defendant/DefendantNotifyDiscontinuanceDashboardNotificationHandler.java" +
-      ",**/utils/CaseQueriesUtil.java, **/handler/callback/user/RaiseQueryCallbackHandler.java, **/handler/callback/user/RespondQueryCallbackHandler.java, **/service/servicebus/CcdCaseEventsExecutor.java, **/handler/callback/camunda/dashboardnotifications/claimant/ClaimantFullAdmitPayImmediatelyCCJNotificationHandler.java"
+      ",**/utils/CaseQueriesUtil.java, **/handler/callback/user/RaiseQueryCallbackHandler.java, **/handler/callback/user/RespondQueryCallbackHandler.java, **/service/servicebus/CcdCaseEventsExecutor.java, **/tasklisteners/MigrateCasesTaskListener.java, **/migration/MigrationTask.java, **/migration/CustomRequestScopeAttr.java, **/handler/callback/camunda/dashboardnotifications/claimant/ClaimantFullAdmitPayImmediatelyCCJNotificationHandler.java"
     property "sonar.host.url", "https://sonar.reform.hmcts.net/"
     property "sonar.web.javaOpts", "-Xmx2G"
   }
@@ -405,6 +404,7 @@ dependencies {
 
   implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: versions.jackson
   implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: versions.jackson
+  implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-csv', version: versions.jacksonDatabind
 
   implementation group: 'org.camunda.bpm', name: 'camunda-external-task-client', version: versions.camunda
   implementation group: 'org.camunda.community.rest', name: 'camunda-platform-7-rest-client-spring-boot-starter', version: versions.camunda
