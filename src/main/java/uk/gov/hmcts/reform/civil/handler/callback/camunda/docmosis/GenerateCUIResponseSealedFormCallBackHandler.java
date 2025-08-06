@@ -87,9 +87,12 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
                                                                     authToken);
                 log.info("Civil stitch service for response cui sealed form {} for caseId {}", stitchedDocument, caseId);
                 addToSystemGeneratedDocuments(caseDataBuilder, stitchedDocument, caseData);
+            } else {
+                addToSystemGeneratedDocuments(caseDataBuilder, sealedForm, caseData);
             }
+        } else {
+            addToSystemGeneratedDocuments(caseDataBuilder, sealedForm, caseData);
         }
-        addToSystemGeneratedDocuments(caseDataBuilder, sealedForm, caseData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
