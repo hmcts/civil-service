@@ -30,6 +30,7 @@ import uk.gov.hmcts.reform.civil.service.docmosis.dq.helpers.SetApplicantsForDQG
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
@@ -301,7 +302,7 @@ public class DQGeneratorFormBuilder {
             .orElse(null);
 
         if (StringUtils.equalsAny(businessProcess, "CLAIMANT_RESPONSE", "CLAIMANT_RESPONSE_SPEC")) {
-            setOrgNameFromParties(builder, builder.build().getApplicants());
+            setOrgNameFromParties(builder, Collections.singletonList(builder.build().getApplicant()));
         } else if (StringUtils.equalsAny(businessProcess, "DEFENDANT_RESPONSE", "DEFENDANT_RESPONSE_SPEC")) {
             setOrgNameFromParties(builder, builder.build().getRespondents());
         }
