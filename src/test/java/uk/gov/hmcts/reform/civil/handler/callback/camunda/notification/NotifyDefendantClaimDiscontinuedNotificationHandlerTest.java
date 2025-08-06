@@ -10,10 +10,11 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
@@ -34,8 +35,10 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DISCONTINUANCE_DEFENDANT1;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CNBC_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LEGAL_ORG_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
@@ -88,6 +91,8 @@ class NotifyDefendantClaimDiscontinuedNotificationHandlerTest extends BaseCallba
                 TEMPLATE_ID);
             when(notificationsProperties.getNotifyClaimDiscontinuedLipTemplate()).thenReturn(
                 TEMPLATE_ID);
+            when(notificationsProperties.getNotifyClaimDiscontinuedWelshLipTemplate()).thenReturn(
+                TEMPLATE_ID);
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
@@ -97,13 +102,15 @@ class NotifyDefendantClaimDiscontinuedNotificationHandlerTest extends BaseCallba
             when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("welshHmctsSignature"));
             when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("welshPhoneContact"));
             when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
-            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
             when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
         }
 
         @Test
         void shouldNotifyDefendantLRClaimDiscontinued_whenInvoked() {
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             CaseData caseData = CaseDataBuilder.builder()
                 .legacyCaseReference(REFERENCE_NUMBER)
                 .ccdCaseReference(12345L)
@@ -130,6 +137,8 @@ class NotifyDefendantClaimDiscontinuedNotificationHandlerTest extends BaseCallba
 
         @Test
         void shouldNotifyRespondentLip_whenInvoked() {
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithDeterminationMeans();
             caseData = caseData.toBuilder()
                 .applicant1(Party.builder()
@@ -139,7 +148,42 @@ class NotifyDefendantClaimDiscontinuedNotificationHandlerTest extends BaseCallba
                                  .type(Party.Type.INDIVIDUAL).partyEmail("respondentLip@example.com").build())
                 .respondent1Represented(null)
                 .legacyCaseReference("000DC001")
-                .specRespondent1Represented(YesOrNo.NO)
+                .specRespondent1Represented(NO)
+                .caseAccessCategory(CaseCategory.SPEC_CLAIM).build();
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(NOTIFY_DISCONTINUANCE_DEFENDANT1.name()).build()
+            ).build();
+
+            handler.handle(params);
+
+            verify(notificationService, times(1)).sendMail(
+                "respondentLip@example.com",
+                TEMPLATE_ID,
+                getNotificationLipDataMap(caseData),
+                "defendant-claim-discontinued-000DC001"
+            );
+        }
+
+        @Test
+        void shouldNotifyRespondentWelshLip_whenInvoked() {
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
+            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithDeterminationMeans();
+            caseData = caseData.toBuilder()
+                .applicant1(Party.builder()
+                                .individualFirstName("Applicant1").individualLastName("ApplicantLastName")
+                                .partyName("Applicant1")
+                                .type(Party.Type.INDIVIDUAL).partyEmail("applicantLip@example.com").build())
+                .respondent1(Party.builder().partyName("Respondent1").individualFirstName("Respondent1")
+                                 .individualLastName("RespondentLastName")
+                                 .type(Party.Type.INDIVIDUAL).partyEmail("respondentLip@example.com").build())
+                .respondent1Represented(NO)
+                .legacyCaseReference("000DC001")
+                .specRespondent1Represented(NO)
+                .caseDataLiP(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder()
+                                                                              .respondent1ResponseLanguage("BOTH")
+                                                                              .build()).build())
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM).build();
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -165,9 +209,9 @@ class NotifyDefendantClaimDiscontinuedNotificationHandlerTest extends BaseCallba
                                 .type(Party.Type.INDIVIDUAL).partyEmail("applicantLip@example.com").build())
                 .respondent1(Party.builder().partyName("Respondent1").individualFirstName("Respondent1").individualLastName("RespondentLastName")
                                  .type(Party.Type.INDIVIDUAL).build())
-                .respondent1Represented(YesOrNo.NO)
+                .respondent1Represented(NO)
                 .legacyCaseReference("000DC001")
-                .specRespondent1Represented(YesOrNo.NO)
+                .specRespondent1Represented(NO)
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM).build();
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -191,9 +235,10 @@ class NotifyDefendantClaimDiscontinuedNotificationHandlerTest extends BaseCallba
         expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
         expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
         expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
-        expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
         expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
         expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+        expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+        expectedProperties.put(CNBC_CONTACT, configuration.getCnbcContact());
         return expectedProperties;
     }
 
@@ -210,9 +255,10 @@ class NotifyDefendantClaimDiscontinuedNotificationHandlerTest extends BaseCallba
         expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
         expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
         expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
-        expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
         expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
         expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+        expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getRaiseQueryLr());
+        expectedProperties.put(CNBC_CONTACT, configuration.getRaiseQueryLr());
         return expectedProperties;
     }
 

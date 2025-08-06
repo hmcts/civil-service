@@ -2238,7 +2238,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void summary_when_all_finals_order_issued_on_LR_bulk_admission() {
                 given(featureToggleService.isPinInPostEnabled()).willReturn(true);
-                given(featureToggleService.isJudgmentOnlineLive()).willReturn(true);
+                given(featureToggleService.isLrAdmissionBulkEnabled()).willReturn(true);
                 CaseData caseData = CaseData.builder()
                     .respondent1Represented(YesOrNo.YES)
                     .applicant1Represented(YesOrNo.YES)
@@ -2259,6 +2259,34 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 assertThat(response.getConfirmationBody())
                     .contains("by selecting 'Request Judgment by Admission'");
+            }
+
+            @Test
+            void summary_when_part_admit_pay_immediately_selected() {
+                given(featureToggleService.isPinInPostEnabled()).willReturn(true);
+                given(featureToggleService.isLrAdmissionBulkEnabled()).willReturn(true);
+                CaseData caseData = CaseData.builder()
+                    .respondent1Represented(YesOrNo.YES)
+                    .applicant1Represented(YesOrNo.YES)
+                    //.applicant1AcceptFullAdmitPaymentPlanSpec(YES)
+                    .applicant1(Party.builder().type(COMPANY).companyName("Applicant1").build())
+                    .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                    .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
+                    .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder().whenWillThisAmountBePaid(LocalDate.now().plusDays(1)).build())
+                    .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
+                    .applicant1AcceptAdmitAmountPaidSpec(YesOrNo.YES)
+                    .respondForImmediateOption(YesOrNo.YES)
+                    .respondent1(Party.builder()
+                                     .primaryAddress(Address.builder().build())
+                                     .type(Party.Type.INDIVIDUAL).build()).build();
+
+                CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
+
+                SubmittedCallbackResponse response = (SubmittedCallbackResponse) respondToDefenceSpecCallbackHandler
+                    .handle(params);
+
+                assertThat(response.getConfirmationBody())
+                    .contains("They must make sure you have the money within 5 days of the claimant response.");
             }
         }
     }
@@ -2462,7 +2490,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             given(workingDayIndicator.isWorkingDay(any())).willReturn(true);
             LocalDate whenWillPay = LocalDate.now();
-            given(deadlineCalculatorService.calculateExtendedDeadline(any(), anyInt())).willReturn(whenWillPay);
+            given(deadlineCalculatorService.calculateExtendedDeadline(any(LocalDateTime.class), anyInt())).willReturn(whenWillPay);
 
             RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec =
                 RespondToClaimAdmitPartLRspec.builder()
@@ -2490,7 +2518,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
 
             LocalDate whenWillPay = LocalDate.now().plusDays(5);
-            given(deadlineCalculatorService.calculateExtendedDeadline(any(), anyInt())).willReturn(whenWillPay);
+            given(deadlineCalculatorService.calculateExtendedDeadline(any(LocalDateTime.class), anyInt())).willReturn(whenWillPay);
 
             RespondToClaim respondToAdmittedClaim =
                 RespondToClaim.builder()
@@ -2520,7 +2548,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             given(workingDayIndicator.isWorkingDay(any())).willReturn(true);
             LocalDate whenWillPay = LocalDate.now();
-            given(deadlineCalculatorService.calculateExtendedDeadline(any(), anyInt())).willReturn(whenWillPay);
+            given(deadlineCalculatorService.calculateExtendedDeadline(any(LocalDate.class), anyInt())).willReturn(whenWillPay);
 
             CaseData caseData = CaseData.builder()
                 .respondent1ResponseDate(LocalDateTime.now())
