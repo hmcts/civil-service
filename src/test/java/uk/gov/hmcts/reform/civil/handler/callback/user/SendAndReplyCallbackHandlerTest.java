@@ -240,7 +240,7 @@ class SendAndReplyCallbackHandlerTest {
                 .sendMessageContent(messageContent)
                 .build();
 
-            when(messageService.addMessage(null, messageMetaData, messageContent, AUTH_TOKEN, caseData))
+            when(messageService.addMessage(null, messageMetaData, messageContent, AUTH_TOKEN))
                 .thenReturn(wrapElements(expectedMessages));
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
@@ -259,7 +259,7 @@ class SendAndReplyCallbackHandlerTest {
             assertThat(responseCaseData.getLastMessageJudgeLabel()).isNull();
 
             verify(messageService, times(1))
-                .addMessage(null, messageMetaData, messageContent, AUTH_TOKEN, caseData);
+                .addMessage(null, messageMetaData, messageContent, AUTH_TOKEN);
         }
 
         @Test
@@ -280,7 +280,7 @@ class SendAndReplyCallbackHandlerTest {
                 .sendMessageContent(messageContent)
                 .build();
 
-            when(messageService.addMessage(null, messageMetaData, messageContent, AUTH_TOKEN, caseData))
+            when(messageService.addMessage(null, messageMetaData, messageContent, AUTH_TOKEN))
                 .thenReturn(wrapElements(expectedMessages));
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
@@ -299,7 +299,7 @@ class SendAndReplyCallbackHandlerTest {
             assertThat(responseCaseData.getLastMessageJudgeLabel()).isEqualTo("Judge");
 
             verify(messageService, times(1))
-                .addMessage(null, messageMetaData, messageContent, AUTH_TOKEN, caseData);
+                .addMessage(null, messageMetaData, messageContent, AUTH_TOKEN);
         }
 
         @Test
@@ -320,7 +320,7 @@ class SendAndReplyCallbackHandlerTest {
                 .sendMessageContent(messageContent)
                 .build();
 
-            when(messageService.addMessage(null, messageMetaData, messageContent, AUTH_TOKEN, caseData))
+            when(messageService.addMessage(null, messageMetaData, messageContent, AUTH_TOKEN))
                 .thenReturn(wrapElements(expectedMessages));
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
@@ -339,7 +339,7 @@ class SendAndReplyCallbackHandlerTest {
             assertThat(responseCaseData.getLastMessageJudgeLabel()).isEqualTo("CJ");
 
             verify(messageService, times(1))
-                .addMessage(null, messageMetaData, messageContent, AUTH_TOKEN, caseData);
+                .addMessage(null, messageMetaData, messageContent, AUTH_TOKEN);
         }
 
         @Test
@@ -360,7 +360,7 @@ class SendAndReplyCallbackHandlerTest {
                 .sendMessageContent(messageContent)
                 .build();
 
-            when(messageService.addMessage(null, messageMetaData, messageContent, AUTH_TOKEN, caseData))
+            when(messageService.addMessage(null, messageMetaData, messageContent, AUTH_TOKEN))
                 .thenReturn(wrapElements(expectedMessages));
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
@@ -379,7 +379,7 @@ class SendAndReplyCallbackHandlerTest {
             assertThat(responseCaseData.getLastMessageJudgeLabel()).isEqualTo("DJ");
 
             verify(messageService, times(1))
-                .addMessage(null, messageMetaData, messageContent, AUTH_TOKEN, caseData);
+                .addMessage(null, messageMetaData, messageContent, AUTH_TOKEN);
         }
 
         @Test
@@ -400,7 +400,7 @@ class SendAndReplyCallbackHandlerTest {
                 .sendMessageContent(messageContent)
                 .build();
 
-            when(messageService.addMessage(null, messageMetaData, messageContent, AUTH_TOKEN, caseData))
+            when(messageService.addMessage(null, messageMetaData, messageContent, AUTH_TOKEN))
                 .thenReturn(wrapElements(expectedMessages));
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
@@ -419,7 +419,7 @@ class SendAndReplyCallbackHandlerTest {
             assertThat(responseCaseData.getLastMessageJudgeLabel()).isEqualTo("Judge");
 
             verify(messageService, times(1))
-                .addMessage(null, messageMetaData, messageContent, AUTH_TOKEN, caseData);
+                .addMessage(null, messageMetaData, messageContent, AUTH_TOKEN);
         }
 
         @Test
@@ -440,7 +440,7 @@ class SendAndReplyCallbackHandlerTest {
                 .sendMessageContent(messageContent)
                 .build();
 
-            when(messageService.addMessage(null, messageMetaData, messageContent, AUTH_TOKEN, caseData))
+            when(messageService.addMessage(null, messageMetaData, messageContent, AUTH_TOKEN))
                 .thenReturn(wrapElements(expectedMessages));
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
@@ -459,7 +459,7 @@ class SendAndReplyCallbackHandlerTest {
             assertThat(responseCaseData.getLastMessageJudgeLabel()).isEqualTo("Judge");
 
             verify(messageService, times(1))
-                .addMessage(null, messageMetaData, messageContent, AUTH_TOKEN, caseData);
+                .addMessage(null, messageMetaData, messageContent, AUTH_TOKEN);
         }
 
         @Test
@@ -481,7 +481,7 @@ class SendAndReplyCallbackHandlerTest {
                 .sendMessageContent(messageContent)
                 .build();
 
-            when(messageService.addMessage(null, messageMetaData, messageContent, AUTH_TOKEN, caseData))
+            when(messageService.addMessage(null, messageMetaData, messageContent, AUTH_TOKEN))
                 .thenReturn(wrapElements(expectedMessages));
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
@@ -500,7 +500,7 @@ class SendAndReplyCallbackHandlerTest {
             assertThat(responseCaseData.getLastMessageJudgeLabel()).isEqualTo("DJ");
 
             verify(messageService, times(1))
-                .addMessage(null, messageMetaData, messageContent, AUTH_TOKEN, caseData);
+                .addMessage(null, messageMetaData, messageContent, AUTH_TOKEN);
         }
 
         @Test
@@ -522,7 +522,7 @@ class SendAndReplyCallbackHandlerTest {
                 .sendMessageContent(messageContent)
                 .build();
 
-            when(messageService.addMessage(null, messageMetaData, messageContent, AUTH_TOKEN, caseData))
+            when(messageService.addMessage(null, messageMetaData, messageContent, AUTH_TOKEN))
                 .thenReturn(wrapElements(expectedMessages));
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
@@ -541,7 +541,7 @@ class SendAndReplyCallbackHandlerTest {
             assertThat(responseCaseData.getLastMessageJudgeLabel()).isEqualTo("DJ");
 
             verify(messageService, times(1))
-                .addMessage(null, messageMetaData, messageContent, AUTH_TOKEN, caseData);
+                .addMessage(null, messageMetaData, messageContent, AUTH_TOKEN);
         }
 
         @Test
