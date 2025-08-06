@@ -301,8 +301,10 @@ public class DQGeneratorFormBuilder {
             .map(BusinessProcess::getCamundaEvent)
             .orElse(null);
 
-        if (StringUtils.equalsAny(businessProcess, "CLAIMANT_RESPONSE", "CLAIMANT_RESPONSE_SPEC")) {
+        if (StringUtils.equals(businessProcess, "CLAIMANT_RESPONSE")) {
             setOrgNameFromParties(builder, Collections.singletonList(builder.build().getApplicant()));
+        } else if (StringUtils.equals(businessProcess, "CLAIMANT_RESPONSE_SPEC")) {
+            setOrgNameFromParties(builder, builder.build().getApplicants());
         } else if (StringUtils.equalsAny(businessProcess, "DEFENDANT_RESPONSE", "DEFENDANT_RESPONSE_SPEC")) {
             setOrgNameFromParties(builder, builder.build().getRespondents());
         }
