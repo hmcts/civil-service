@@ -330,7 +330,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     }
 
     //--------v1 callback overloaded, return to single param
-    private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
+    SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         if (null != callbackParams.getRequest().getEventId()
             && callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC")) {

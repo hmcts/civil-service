@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -2652,5 +2653,68 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                         ) + exitSurveyContentService.applicantSurvey())
                     .build());
         }
+    }
+
+    @Test
+    void shouldReturnPbaHeader_whenCaseIsMatched() {
+        CaseData caseData = CaseData.builder()
+            .respondent1Represented(NO)
+            .addRespondent2(NO)
+            .addApplicant2(NO)
+            .legacyCaseReference("000MC001")
+            .ccdCaseReference(123L)
+            .build();
+
+        CallbackParams params = CallbackParams.builder()
+            .caseData(caseData)
+            .request(CallbackRequest.builder().eventId("CREATE_CLAIM_SPEC").build())
+            .build();
+
+        SubmittedCallbackResponse response = handler.buildConfirmation(params);
+
+        Assertions.assertTrue(response.getConfirmationHeader().contains("Please now pay your claim fee"));
+        Assertions.assertTrue(response.getConfirmationBody().contains("Pay your claim fee"));
+    }
+
+    @Test
+    void shouldReturnPbaHeader_whenRespondentsAreRepresentedAndRegistered() {
+        CaseData caseData = CaseData.builder()
+            .respondent1Represented(YES)
+            .respondent1OrgRegistered(YES)
+            .respondent2Represented(YES)
+            .respondent2OrgRegistered(YES)
+            .legacyCaseReference("000MC001")
+            .ccdCaseReference(123L)
+            .build();
+
+        CallbackParams params = CallbackParams.builder()
+            .caseData(caseData)
+            .request(CallbackRequest.builder().eventId("CREATE_CLAIM_SPEC").build())
+            .build();
+
+        SubmittedCallbackResponse response = handler.buildConfirmation(params);
+
+        Assertions.assertTrue(response.getConfirmationBody().contains("Pay your claim fee"));
+    }
+
+    @Test
+    void shouldReturnLipConfirmationBody_whenNotMatchedAndNotRepresented() {
+        CaseData caseData = CaseData.builder()
+            .respondent1Represented(NO)
+            .addRespondent2(YES)
+            .addApplicant2(YES)
+            .legacyCaseReference("000MC001")
+            .ccdCaseReference(123L)
+            .build();
+
+        CallbackParams params = CallbackParams.builder()
+            .caseData(caseData)
+            .request(CallbackRequest.builder().eventId("CREATE_CLAIM_SPEC").build())
+            .build();
+
+        SubmittedCallbackResponse response = handler.buildConfirmation(params);
+
+        Assertions.assertTrue(response.getConfirmationBody().contains("Your claim will not be issued until payment is confirmed"));
+        Assertions.assertTrue(response.getConfirmationBody().contains("sealed claim form"));
     }
 }
