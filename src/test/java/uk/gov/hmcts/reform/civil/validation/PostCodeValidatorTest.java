@@ -46,16 +46,58 @@ public class PostCodeValidatorTest {
             when(postcodeLookupService.validatePostCodeForDefendant(any())).thenReturn(false);
             List<String> errors = postcodeValidator.validate("TEST");
 
-            assertThat(errors).containsOnly("Postcode must be in England or Wales");
+            assertThat(errors).contains("Postcode format is invalid");
         }
 
         @Test
         void returnTrue_whenInputisFound() {
             when(postcodeLookupService.validatePostCodeForDefendant(any())).thenReturn(true);
-            List<String> errors = postcodeValidator.validate("BA12SS");
+            List<String> errors = postcodeValidator.validate("BA1 2SS");
 
             assertThat(errors).isEmpty();
         }
-    }
 
+        @Test
+        void returnError_whenInputContainsMaliciousCharacters() {
+            List<String> errors = postcodeValidator.validate("BA1<script>alert('xss')</script>2SS");
+
+            assertThat(errors).containsOnly("Postcode format is invalid");
+        }
+
+        @Test
+        void returnError_whenInputTooLong() {
+            List<String> errors = postcodeValidator.validate("VERYLONGPOSTCODEINPUT");
+
+            assertThat(errors).containsOnly("Postcode format is invalid");
+        }
+
+        @Test
+        void returnError_whenInputInvalidFormat() {
+            List<String> errors = postcodeValidator.validate("INVALID");
+
+            assertThat(errors).containsOnly("Postcode format is invalid");
+        }
+
+        @Test
+        void normalizeSpacesInPostcode() {
+            when(postcodeLookupService.validatePostCodeForDefendant("BA1 2SS")).thenReturn(true);
+            List<String> errors = postcodeValidator.validate("BA1    2SS");
+
+            assertThat(errors).isEmpty();
+        }
+
+        @Test
+        void handleEmptyStringInput() {
+            List<String> errors = postcodeValidator.validate("");
+
+            assertThat(errors).containsOnly("Please enter Postcode");
+        }
+
+        @Test
+        void handleWhitespaceOnlyInput() {
+            List<String> errors = postcodeValidator.validate("   ");
+
+            assertThat(errors).containsOnly("Please enter Postcode");
+        }
+    }
 }

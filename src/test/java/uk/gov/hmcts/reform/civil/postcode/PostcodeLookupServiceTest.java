@@ -28,20 +28,52 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class PostcodeLookupServiceTest {
 
-    @Mock
-    private RestTemplate restTemplate;
-
-    @Mock
-    private PostcodeLookupConfiguration postcodeLookupConfiguration;
-
-    private PostcodeLookupService postcodeLookupService;
-
     private static final String VALID_URL = "https://api.ordnancesurvey.co.uk/opennames/v1/find";
     private static final String API_KEY = "test-api-key";
+    @Mock
+    private RestTemplate restTemplate;
+    @Mock
+    private PostcodeLookupConfiguration postcodeLookupConfiguration;
+    private PostcodeLookupService postcodeLookupService;
 
     @BeforeEach
     void setUp() {
         postcodeLookupService = new PostcodeLookupService(restTemplate, postcodeLookupConfiguration);
+    }
+
+    private void setupMocks(String responseBody, HttpStatus status) {
+        when(postcodeLookupConfiguration.getUrl()).thenReturn(VALID_URL);
+        when(postcodeLookupConfiguration.getAccessKey()).thenReturn(API_KEY);
+
+        ResponseEntity<String> responseEntity = new ResponseEntity<>(responseBody, status);
+        when(restTemplate.exchange(
+            anyString(),
+            eq(HttpMethod.GET),
+            any(HttpEntity.class),
+            eq(String.class)
+        )).thenReturn(responseEntity);
+    }
+
+    private void verifyRestTemplateCall() {
+        verify(restTemplate).exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(String.class));
+    }
+
+    private String createSuccessResponse(String postcode, String country) {
+        String cleanPostcode = postcode.replaceAll("\\s+", "");
+        return String.format(
+            """
+                {
+                    "results": [
+                        {
+                            "GAZETTEER_ENTRY": {
+                                "NAME1": "%s",
+                                "COUNTRY": "%s"
+                            }
+                        }
+                    ]
+                }
+                """, cleanPostcode, country
+        );
     }
 
     @Nested
@@ -120,17 +152,17 @@ class PostcodeLookupServiceTest {
         }
 
         @Test
-        void shouldThrowException_whenResultsArrayIsEmpty() {
+        void shouldReturnFalse_whenResultsArrayIsEmpty() {
             // Arrange
             String postcode = "SW1A 1AA";
             String responseJson = "{\"results\":[]}";
             setupMocks(responseJson, HttpStatus.OK);
 
-            // Act & Assert
-            // The service has a bug - it tries to access index 0 without checking if array is empty
-            assertThatThrownBy(() -> postcodeLookupService.validatePostCodeForDefendant(postcode))
-                .isInstanceOf(PostcodeLookupException.class)
-                .hasMessageContaining("Postcode lookup service failed for: " + postcode);
+            // Act
+            boolean result = postcodeLookupService.validatePostCodeForDefendant(postcode);
+
+            // Assert
+            assertThat(result).isFalse();
         }
 
         @Test
@@ -195,11 +227,9 @@ class PostcodeLookupServiceTest {
             when(postcodeLookupConfiguration.getAccessKey()).thenReturn(API_KEY);
 
             // Act & Assert
-            assertThatThrownBy(() -> postcodeLookupService.validatePostCodeForDefendant("SW1A 1AA"))
-                .isInstanceOf(PostcodeLookupException.class)
-                .hasMessageContaining("Postcode lookup service failed for: SW1A 1AA")
-                .hasCauseInstanceOf(IllegalArgumentException.class)
-                .hasRootCauseMessage("Postcode url cannot be blank or empty");
+            assertThatThrownBy(() -> postcodeLookupService.validatePostCodeForDefendant("SW1A 1AA")).isInstanceOf(
+                PostcodeLookupException.class).hasMessageContaining("Postcode lookup service failed for: SW1A 1AA").hasCauseInstanceOf(
+                IllegalArgumentException.class).hasRootCauseMessage("Postcode url cannot be blank or empty");
         }
 
         @Test
@@ -209,11 +239,9 @@ class PostcodeLookupServiceTest {
             when(postcodeLookupConfiguration.getAccessKey()).thenReturn("");
 
             // Act & Assert
-            assertThatThrownBy(() -> postcodeLookupService.validatePostCodeForDefendant("SW1A 1AA"))
-                .isInstanceOf(PostcodeLookupException.class)
-                .hasMessageContaining("Postcode lookup service failed for: SW1A 1AA")
-                .hasCauseInstanceOf(IllegalStateException.class)
-                .hasRootCauseMessage("Postcode API key is not configured");
+            assertThatThrownBy(() -> postcodeLookupService.validatePostCodeForDefendant("SW1A 1AA")).isInstanceOf(
+                PostcodeLookupException.class).hasMessageContaining("Postcode lookup service failed for: SW1A 1AA").hasCauseInstanceOf(
+                IllegalStateException.class).hasRootCauseMessage("Postcode API key is not configured");
         }
 
         @Test
@@ -223,11 +251,9 @@ class PostcodeLookupServiceTest {
             when(postcodeLookupConfiguration.getAccessKey()).thenReturn(null);
 
             // Act & Assert
-            assertThatThrownBy(() -> postcodeLookupService.validatePostCodeForDefendant("SW1A 1AA"))
-                .isInstanceOf(PostcodeLookupException.class)
-                .hasMessageContaining("Postcode lookup service failed for: SW1A 1AA")
-                .hasCauseInstanceOf(IllegalStateException.class)
-                .hasRootCauseMessage("Postcode API key is not configured");
+            assertThatThrownBy(() -> postcodeLookupService.validatePostCodeForDefendant("SW1A 1AA")).isInstanceOf(
+                PostcodeLookupException.class).hasMessageContaining("Postcode lookup service failed for: SW1A 1AA").hasCauseInstanceOf(
+                IllegalStateException.class).hasRootCauseMessage("Postcode API key is not configured");
         }
 
         @Test
@@ -243,10 +269,9 @@ class PostcodeLookupServiceTest {
             )).thenThrow(new RestClientException("Connection timeout"));
 
             // Act & Assert
-            assertThatThrownBy(() -> postcodeLookupService.validatePostCodeForDefendant("SW1A 1AA"))
-                .isInstanceOf(PostcodeLookupException.class)
-                .hasMessageContaining("Postcode lookup service failed for: SW1A 1AA")
-                .hasCauseInstanceOf(RestClientException.class);
+            assertThatThrownBy(() -> postcodeLookupService.validatePostCodeForDefendant("SW1A 1AA")).isInstanceOf(
+                PostcodeLookupException.class).hasMessageContaining("Postcode lookup service failed for: SW1A 1AA").hasCauseInstanceOf(
+                RestClientException.class);
         }
 
         @Test
@@ -256,9 +281,8 @@ class PostcodeLookupServiceTest {
             setupMocks("invalid json", HttpStatus.OK);
 
             // Act & Assert
-            assertThatThrownBy(() -> postcodeLookupService.validatePostCodeForDefendant(postcode))
-                .isInstanceOf(PostcodeLookupException.class)
-                .hasMessageContaining("Postcode lookup service failed for: " + postcode);
+            assertThatThrownBy(() -> postcodeLookupService.validatePostCodeForDefendant(postcode)).isInstanceOf(
+                PostcodeLookupException.class).hasMessageContaining("Postcode lookup service failed for: " + postcode);
         }
 
         @Test
@@ -319,12 +343,7 @@ class PostcodeLookupServiceTest {
             postcodeLookupService.validatePostCodeForDefendant(postcode);
 
             // Assert
-            verify(restTemplate).exchange(
-                anyString(),
-                eq(HttpMethod.GET),
-                any(HttpEntity.class),
-                eq(String.class)
-            );
+            verify(restTemplate).exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(String.class));
         }
 
         @Test
@@ -354,43 +373,5 @@ class PostcodeLookupServiceTest {
                 eq(String.class)
             );
         }
-    }
-
-    private void setupMocks(String responseBody, HttpStatus status) {
-        when(postcodeLookupConfiguration.getUrl()).thenReturn(VALID_URL);
-        when(postcodeLookupConfiguration.getAccessKey()).thenReturn(API_KEY);
-
-        ResponseEntity<String> responseEntity = new ResponseEntity<>(responseBody, status);
-        when(restTemplate.exchange(
-            anyString(),
-            eq(HttpMethod.GET),
-            any(HttpEntity.class),
-            eq(String.class)
-        )).thenReturn(responseEntity);
-    }
-
-    private void verifyRestTemplateCall() {
-        verify(restTemplate).exchange(
-            anyString(),
-            eq(HttpMethod.GET),
-            any(HttpEntity.class),
-            eq(String.class)
-        );
-    }
-
-    private String createSuccessResponse(String postcode, String country) {
-        String cleanPostcode = postcode.replaceAll("\\s+", "");
-        return String.format("""
-            {
-                "results": [
-                    {
-                        "GAZETTEER_ENTRY": {
-                            "NAME1": "%s",
-                            "COUNTRY": "%s"
-                        }
-                    }
-                ]
-            }
-            """, cleanPostcode, country);
     }
 }
