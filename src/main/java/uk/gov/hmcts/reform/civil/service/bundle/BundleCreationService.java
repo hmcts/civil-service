@@ -58,6 +58,10 @@ public class BundleCreationService {
     private BundleCreateResponse createNewBundleRequest(String authorization, String serviceAuthorization,
                                               BundleCreateRequest bundleCreateRequest) {
 
-        return evidenceManagementApiClient.createNewBundle(authorization, serviceAuthorization, bundleCreateRequest);
+        BundleCreateResponse response = evidenceManagementApiClient.createNewBundle(authorization, serviceAuthorization, bundleCreateRequest);
+        if (response != null && response.getErrors() != null && !response.getErrors().isEmpty()){
+            log.error("Bundle creation errors for documentTaskId {}: {}", response.getDocumentTaskId(), response.getErrors());
+        }
+        return response;
     }
 }
