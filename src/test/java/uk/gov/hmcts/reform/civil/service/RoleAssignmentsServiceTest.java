@@ -1,8 +1,13 @@
 package uk.gov.hmcts.reform.civil.service;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -21,6 +26,7 @@ import uk.gov.hmcts.reform.civil.ras.model.RoleRequest;
 import java.util.List;
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.clearInvocations;
@@ -174,6 +180,155 @@ class RoleAssignmentsServiceTest {
 
         verify(roleAssignmentApi, times(1))
             .createRoleAssignment(USER_AUTH_TOKEN, SERVICE_TOKEN, request);
+    }
+
+    @Test
+    void getRoleAssignments_shouldLogDebugWhenDebugEnabled() {
+        // Setup logger to capture debug logs
+        Logger logger = (Logger) LoggerFactory.getLogger(RoleAssignmentsService.class);
+        ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
+        listAppender.start();
+        logger.addAppender(listAppender);
+        Level originalLevel = logger.getLevel();
+        logger.setLevel(Level.DEBUG);
+
+        try {
+            // Act
+            roleAssignmentsService.getRoleAssignments(ACTOR_ID, USER_AUTH_TOKEN);
+
+            // Assert
+            List<ILoggingEvent> logsList = listAppender.list;
+            assertThat(logsList).hasSize(1);
+            assertThat(logsList.get(0).getLevel()).isEqualTo(Level.DEBUG);
+            // The service logs actorId as the message due to incorrect log.debug usage
+            assertThat(logsList.get(0).getFormattedMessage()).isEqualTo(ACTOR_ID);
+        } finally {
+            logger.setLevel(originalLevel);
+            logger.detachAppender(listAppender);
+        }
+    }
+
+    @Test
+    void getRoleAssignmentsWithLabels_shouldLogDebugWhenDebugEnabled() {
+        // Setup logger to capture debug logs
+        Logger logger = (Logger) LoggerFactory.getLogger(RoleAssignmentsService.class);
+        ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
+        listAppender.start();
+        logger.addAppender(listAppender);
+        Level originalLevel = logger.getLevel();
+        logger.setLevel(Level.DEBUG);
+
+        try {
+            // Setup mock
+            RoleAssignmentServiceResponse expected = RoleAssignmentServiceResponse.builder()
+                .roleAssignmentResponse(List.of(RoleAssignmentResponse.builder().actorId(ACTOR_ID).build()))
+                .build();
+            when(roleAssignmentApi.getRoleAssignments(
+                     USER_AUTH_TOKEN,
+                     SERVICE_TOKEN,
+                     null,
+                     null,
+                     100,
+                     null,
+                     null,
+                     QueryRequest.builder().actorId(ACTOR_ID).roleName(ROLE_NAME).build(),
+                     true
+                 )
+            ).thenReturn(expected);
+
+            // Act
+            roleAssignmentsService.getRoleAssignmentsWithLabels(ACTOR_ID, USER_AUTH_TOKEN, ROLE_NAME);
+
+            // Assert
+            List<ILoggingEvent> logsList = listAppender.list;
+            assertThat(logsList).hasSize(1);
+            assertThat(logsList.get(0).getLevel()).isEqualTo(Level.DEBUG);
+            // The service logs actorId as the message due to incorrect log.debug usage
+            assertThat(logsList.get(0).getFormattedMessage()).isEqualTo(ACTOR_ID);
+        } finally {
+            logger.setLevel(originalLevel);
+            logger.detachAppender(listAppender);
+        }
+    }
+
+    @Test
+    void queryRoleAssignmentsByCaseIdAndRole_shouldLogDebugWhenDebugEnabled() {
+        // Setup logger to capture debug logs
+        Logger logger = (Logger) LoggerFactory.getLogger(RoleAssignmentsService.class);
+        ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
+        listAppender.start();
+        logger.addAppender(listAppender);
+        Level originalLevel = logger.getLevel();
+        logger.setLevel(Level.DEBUG);
+
+        try {
+            // Setup mock
+            RoleAssignmentServiceResponse expected = RoleAssignmentServiceResponse.builder()
+                .roleAssignmentResponse(List.of(RoleAssignmentResponse.builder().actorId(ACTOR_ID).build()))
+                .build();
+            QueryRequest queryRequest = QueryRequest.builder()
+                .roleType(ROLE_TYPE)
+                .roleName(ROLE_NAME)
+                .attributes(Map.of("caseId", List.of(CASE_ID)))
+                .build();
+            when(roleAssignmentApi.getRoleAssignments(
+                     USER_AUTH_TOKEN,
+                     SERVICE_TOKEN,
+                     null,
+                     null,
+                     null,
+                     "roleName",
+                     null,
+                     queryRequest,
+                     true
+                 )
+            ).thenReturn(expected);
+
+            // Act
+            roleAssignmentsService.queryRoleAssignmentsByCaseIdAndRole(CASE_ID, ROLE_TYPE, ROLE_NAME, USER_AUTH_TOKEN);
+
+            // Assert
+            List<ILoggingEvent> logsList = listAppender.list;
+            assertThat(logsList).hasSize(1);
+            assertThat(logsList.get(0).getLevel()).isEqualTo(Level.DEBUG);
+            // The service logs caseId as the message due to incorrect log.debug usage
+            assertThat(logsList.get(0).getFormattedMessage()).isEqualTo(CASE_ID);
+        } finally {
+            logger.setLevel(originalLevel);
+            logger.detachAppender(listAppender);
+        }
+    }
+
+    @Test
+    void assignUserRoles_shouldLogDebugWhenDebugEnabled() {
+        // Setup logger to capture debug logs
+        Logger logger = (Logger) LoggerFactory.getLogger(RoleAssignmentsService.class);
+        ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
+        listAppender.start();
+        logger.addAppender(listAppender);
+        Level originalLevel = logger.getLevel();
+        logger.setLevel(Level.DEBUG);
+
+        try {
+            // Setup request
+            RoleAssignmentRequest request = RoleAssignmentRequest.builder()
+                .roleRequest(RoleRequest.builder().assignerId(ACTOR_ID).build())
+                .requestedRoles(List.of(RoleAssignment.builder().actorId(ACTOR_ID).build()))
+                .build();
+
+            // Act
+            roleAssignmentsService.assignUserRoles(ACTOR_ID, USER_AUTH_TOKEN, request);
+
+            // Assert
+            List<ILoggingEvent> logsList = listAppender.list;
+            assertThat(logsList).hasSize(1);
+            assertThat(logsList.get(0).getLevel()).isEqualTo(Level.DEBUG);
+            // The service logs actorId as the message due to incorrect log.debug usage
+            assertThat(logsList.get(0).getFormattedMessage()).isEqualTo(ACTOR_ID);
+        } finally {
+            logger.setLevel(originalLevel);
+            logger.detachAppender(listAppender);
+        }
     }
 
 }

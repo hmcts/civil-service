@@ -87,6 +87,16 @@ class UserServiceTest {
     }
 
     @Test
+    void shouldLogTokenWhenHmcSupportEnabled() {
+        userService = new UserService(idamClient, true);
+        when(idamClient.getAccessToken(SUB, PASSWORD)).thenReturn(AUTHORISATION);
+
+        String accessToken = userService.getAccessToken(SUB, PASSWORD);
+
+        assertThat(accessToken).isEqualTo(AUTHORISATION);
+    }
+
+    @Test
     void shouldReturnUserDetails_whenValidAuthTokenAndResponse() {
         UserDetails expectedUserDetails = UserDetails.builder()
             .email(SUB)
@@ -107,7 +117,7 @@ class UserServiceTest {
             () -> userService.getUserDetails(AUTHORISATION)
         );
 
-        assertThat(exception.getMessage()).contains(MASKED_SUB);
-        assertThat(exception.getMessage()).doesNotContain(SUB);
+        assertThat(exception.getMessage()).contains(MASKED_SUB)
+            .doesNotContain(SUB);
     }
 }

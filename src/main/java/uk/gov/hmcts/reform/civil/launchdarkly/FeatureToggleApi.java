@@ -11,6 +11,7 @@ import java.io.IOException;
 
 @Slf4j
 @Service
+@SuppressWarnings("deprecation")
 public class FeatureToggleApi {
 
     private final LDClientInterface internalClient;

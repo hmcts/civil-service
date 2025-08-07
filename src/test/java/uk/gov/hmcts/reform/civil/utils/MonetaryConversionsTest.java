@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.civil.utils;
 
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
@@ -11,9 +13,21 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class MonetaryConversionsTest {
 
     @Test
-    void shouldThrowNullPointer_whenGivenNullAmount() {
+    void constructor_ShouldBePrivate() throws NoSuchMethodException {
+        Constructor<MonetaryConversions> constructor = MonetaryConversions.class.getDeclaredConstructor();
+        assertThat(Modifier.isPrivate(constructor.getModifiers())).isTrue();
+    }
+
+    @Test
+    void shouldThrowNullPointer_whenGivenNullAmountForPenniesToPounds() {
         assertThrows(NullPointerException.class, () ->
             MonetaryConversions.penniesToPounds(null));
+    }
+
+    @Test
+    void shouldThrowNullPointer_whenGivenNullAmountForPoundsToPennies() {
+        assertThrows(NullPointerException.class, () ->
+            MonetaryConversions.poundsToPennies(null));
     }
 
     @Test
@@ -74,5 +88,10 @@ class MonetaryConversionsTest {
     void shouldConvertToTwoAndHalfThousandPennies_whenTwentyFivePounds() {
         BigInteger converted = MonetaryConversions.poundsToPennies(new BigDecimal("25.00"));
         assertThat(converted).isEqualTo(new BigInteger("2500"));
+    }
+
+    @Test
+    void constantHundred_ShouldHaveExpectedValue() {
+        assertThat(MonetaryConversions.HUNDRED).isEqualByComparingTo("100");
     }
 }

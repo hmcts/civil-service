@@ -56,7 +56,7 @@ public class LocationRefDataService {
     private static final String COURT_TYPE_ID = "court_type_id";
     private static final String LOCATION_TYPE = "location_type";
     private static final String COURT = "Court";
-    
+
     @SuppressWarnings("unused")
     public LocationRefData getCcmccLocation(String authToken) {
         try {
@@ -259,14 +259,14 @@ public class LocationRefDataService {
         return builder.build().toUri();
     }
 
-    private HttpEntity<String> getHeaders(String authToken) {
+    HttpEntity<String> getHeaders(String authToken) {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", authToken);
         headers.add("ServiceAuthorization", authTokenGenerator.generate());
         return new HttpEntity<>(headers);
     }
 
-    private List<LocationRefData> onlyEnglandAndWalesLocations(List<LocationRefData> locationRefData) {
+    List<LocationRefData> onlyEnglandAndWalesLocations(List<LocationRefData> locationRefData) {
         return locationRefData == null
             ? new ArrayList<>()
             : locationRefData.stream().filter(location -> !"Scotland".equals(location.getRegion()))

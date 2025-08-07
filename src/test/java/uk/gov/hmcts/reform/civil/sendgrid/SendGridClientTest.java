@@ -17,17 +17,21 @@ import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.core.io.InputStreamSource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.clearInvocations;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -36,16 +40,16 @@ import static org.mockito.Mockito.when;
 class SendGridClientTest {
 
     private static final Response SUCCESSFUL_RESPONSE = new Response(
-            202,
-            "response body",
-            Map.of()
+        202,
+        "response body",
+        Map.of()
     );
     private static final EmailData EMAIL_DATA = EmailData.builder()
-            .to("to@server.net")
-            .subject("my email")
-            .message("My email message")
-            .attachments(List.of())
-            .build();
+        .to("to@server.net")
+        .subject("my email")
+        .message("My email message")
+        .attachments(List.of())
+        .build();
     private static final String EMAIL_FROM = "from@server.net";
 
     @MockBean
@@ -57,6 +61,15 @@ class SendGridClientTest {
     @Autowired
     private SendGridClient sendGridClient;
 
+    @Test
+    void shouldCallRecoveryMethod() {
+        // This test ensures the recovery method exists and is callable
+        EmailSendFailedException exception = new EmailSendFailedException(new RuntimeException("Test failure"));
+
+        assertDoesNotThrow(() -> sendGridClient.logSendMessageWithAttachmentFailure(exception, EMAIL_FROM, EMAIL_DATA)
+        );
+    }
+
     @Nested
     class InvalidDataProvided {
 
@@ -64,8 +77,8 @@ class SendGridClientTest {
         @NullAndEmptySource
         void shouldThrowIllegalArgumentException_whenFromIsNullOrBlank(String from) {
             assertThrows(
-                    IllegalArgumentException.class,
-                    () -> sendGridClient.sendEmail(from, EMAIL_DATA)
+                IllegalArgumentException.class,
+                () -> sendGridClient.sendEmail(from, EMAIL_DATA)
             );
         }
 
@@ -73,14 +86,14 @@ class SendGridClientTest {
         @NullAndEmptySource
         void shouldThrowIllegalArgumentException_whenToIsNullOrBlank(String to) {
             EmailData emailData = EmailData.builder()
-                    .to(to)
-                    .subject("my email")
-                    .message("My email message")
-                    .attachments(List.of())
-                    .build();
+                .to(to)
+                .subject("my email")
+                .message("My email message")
+                .attachments(List.of())
+                .build();
             assertThrows(
-                    IllegalArgumentException.class,
-                    () -> sendGridClient.sendEmail(EMAIL_FROM, emailData)
+                IllegalArgumentException.class,
+                () -> sendGridClient.sendEmail(EMAIL_FROM, emailData)
             );
         }
 
@@ -88,22 +101,22 @@ class SendGridClientTest {
         @NullAndEmptySource
         void shouldThrowIllegalArgumentException_whenSubjectIsNullOrBlank(String subject) {
             EmailData emailData = EmailData.builder()
-                    .to("to@server.net")
-                    .subject(subject)
-                    .message("My email message")
-                    .attachments(List.of())
-                    .build();
+                .to("to@server.net")
+                .subject(subject)
+                .message("My email message")
+                .attachments(List.of())
+                .build();
             assertThrows(
-                    IllegalArgumentException.class,
-                    () -> sendGridClient.sendEmail(EMAIL_FROM, emailData)
+                IllegalArgumentException.class,
+                () -> sendGridClient.sendEmail(EMAIL_FROM, emailData)
             );
         }
 
         @Test
         void shouldThrowIllegalArgumentException_whenEmailIsNull() {
             assertThrows(
-                    IllegalArgumentException.class,
-                    () -> sendGridClient.sendEmail(EMAIL_FROM, null)
+                IllegalArgumentException.class,
+                () -> sendGridClient.sendEmail(EMAIL_FROM, null)
             );
         }
     }
@@ -135,12 +148,33 @@ class SendGridClientTest {
         void shouldSendEmail_whenEmptyMessageIsProvided() {
             when(sendGrid.api(any(Request.class))).thenReturn(SUCCESSFUL_RESPONSE);
 
-            sendGridClient.sendEmail(EMAIL_FROM, EmailData.builder()
+            sendGridClient.sendEmail(
+                EMAIL_FROM, EmailData.builder()
                     .to("to@server.net")
                     .subject("subject")
                     .message("")
                     .attachments(List.of())
-                    .build());
+                    .build()
+            );
+
+            verify(sendGrid).api(requestCaptor.capture());
+            Request capturedRequest = requestCaptor.getValue();
+            assertTrue(capturedRequest.getBody().contains("\"content\":[{\"type\":\"text/plain\",\"value\":\" \"}]"));
+        }
+
+        @Test
+        @SneakyThrows
+        void shouldSendEmail_whenNullMessageIsProvided() {
+            when(sendGrid.api(any(Request.class))).thenReturn(SUCCESSFUL_RESPONSE);
+
+            sendGridClient.sendEmail(
+                EMAIL_FROM, EmailData.builder()
+                    .to("to@server.net")
+                    .subject("subject")
+                    .message(null)
+                    .attachments(List.of())
+                    .build()
+            );
 
             verify(sendGrid).api(requestCaptor.capture());
             Request capturedRequest = requestCaptor.getValue();
@@ -152,12 +186,14 @@ class SendGridClientTest {
         void shouldSendEmail_whenAttachmentIsProvided() {
             when(sendGrid.api(any(Request.class))).thenReturn(SUCCESSFUL_RESPONSE);
 
-            sendGridClient.sendEmail(EMAIL_FROM, EmailData.builder()
+            sendGridClient.sendEmail(
+                EMAIL_FROM, EmailData.builder()
                     .to("to@server.net")
                     .subject("subject")
                     .message("message")
                     .attachments(List.of(EmailAttachment.pdf(new byte[]{1, 2, 3}, "test.pdf")))
-                    .build());
+                    .build()
+            );
 
             verify(sendGrid).api(requestCaptor.capture());
             Request capturedRequest = requestCaptor.getValue();
@@ -173,8 +209,8 @@ class SendGridClientTest {
         void shouldThrowEmailSendFailedException_whenSendGridThrowsIOException() {
             when(sendGrid.api(any(Request.class))).thenThrow(new IOException("expected exception"));
             assertThrows(
-                    EmailSendFailedException.class,
-                    () -> sendGridClient.sendEmail(EMAIL_FROM, EMAIL_DATA)
+                EmailSendFailedException.class,
+                () -> sendGridClient.sendEmail(EMAIL_FROM, EMAIL_DATA)
             );
         }
 
@@ -182,20 +218,43 @@ class SendGridClientTest {
         @SneakyThrows
         void shouldThrowEmailSendFailedException_whenSendGridThrows400Response() {
             when(sendGrid.api(any(Request.class)))
-                    .thenReturn(new Response(400, "bad request", Map.of()));
+                .thenReturn(new Response(400, "bad request", Map.of()));
 
             EmailSendFailedException emailSendFailedException = assertThrows(
-                    EmailSendFailedException.class,
-                    () -> sendGridClient.sendEmail(EMAIL_FROM, EMAIL_DATA)
+                EmailSendFailedException.class,
+                () -> sendGridClient.sendEmail(EMAIL_FROM, EMAIL_DATA)
             );
 
             Throwable causeThrowable = emailSendFailedException.getCause();
-            assertTrue(causeThrowable instanceof HttpException);
+            assertInstanceOf(HttpException.class, causeThrowable);
             HttpException cause = (HttpException) causeThrowable;
             assertEquals(
-                    "SendGrid returned a non-success response (400); body: bad request",
-                    cause.getMessage()
+                "SendGrid returned a non-success response (400); body: bad request",
+                cause.getMessage()
             );
+        }
+
+        @Test
+        void shouldThrowEmailSendFailedException_whenAttachmentInputStreamFails() throws IOException {
+            InputStreamSource mockInputStreamSource = mock(InputStreamSource.class);
+            when(mockInputStreamSource.getInputStream()).thenThrow(new IOException("Input stream error"));
+
+            EmailAttachment attachment = new EmailAttachment(mockInputStreamSource, "application/pdf", "test.pdf");
+
+            EmailData emailData = EmailData.builder()
+                .to("to@server.net")
+                .subject("subject")
+                .message("message")
+                .attachments(List.of(attachment))
+                .build();
+
+            EmailSendFailedException exception = assertThrows(
+                EmailSendFailedException.class,
+                () -> sendGridClient.sendEmail(EMAIL_FROM, emailData)
+            );
+
+            assertEquals("Could not open input stream for attachment test.pdf", exception.getMessage());
+            assertInstanceOf(IOException.class, exception.getCause());
         }
     }
 }

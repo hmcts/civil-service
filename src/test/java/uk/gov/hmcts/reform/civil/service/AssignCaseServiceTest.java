@@ -78,4 +78,22 @@ class AssignCaseServiceTest {
         assignCaseService.assignCase(AUTHORIZATION, CASE_ID, Optional.of(CLAIMANT));
         verify(organisationService, never()).findOrganisation(anyString());
     }
+
+    @Test
+    void shouldUseDefaultCaseRoleWhenNoneProvided() {
+        assignCaseService.assignCase(AUTHORIZATION, CASE_ID, Optional.empty());
+        verify(coreCaseUserService, times(1))
+            .assignCase(CASE_ID, UID, null, RESPONDENTSOLICITORONE);
+    }
+
+    @Test
+    void shouldHandleOrganisationServiceException() {
+        given(organisationService.findOrganisation(anyString()))
+            .willThrow(new RuntimeException("Service unavailable"));
+
+        assignCaseService.assignCase(AUTHORIZATION, CASE_ID, Optional.of(RESPONDENTSOLICITORONE));
+
+        verify(coreCaseUserService, times(1))
+            .assignCase(CASE_ID, UID, null, RESPONDENTSOLICITORONE);
+    }
 }

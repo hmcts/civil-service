@@ -31,6 +31,17 @@ class BankHolidaysTest {
     }
 
     @Test
+    void countries_PrivateConstructor_CanBeInvoked() throws Exception {
+        // Arrange
+        Constructor<BankHolidays.Countries> constructor = BankHolidays.Countries.class.getDeclaredConstructor();
+        constructor.setAccessible(true);
+
+        // Act & Assert - This covers the private constructor execution
+        BankHolidays.Countries instance = constructor.newInstance();
+        assertThat(instance).isNotNull();
+    }
+
+    @Test
     void class_HasJsonIgnorePropertiesAnnotation() {
         // Assert
         assertThat(BankHolidays.class.isAnnotationPresent(JsonIgnoreProperties.class)).isTrue();
@@ -128,6 +139,19 @@ class BankHolidaysTest {
 
             // Assert
             assertThat(Modifier.isPrivate(constructor.getModifiers())).isTrue();
+        }
+
+        @Test
+        void englandAndWales_ConstantValue_IsCorrect() throws NoSuchFieldException, IllegalAccessException {
+            // Act
+            Field field = BankHolidays.Countries.class.getDeclaredField("ENGLAND_AND_WALES");
+            field.setAccessible(true);
+            String value = (String) field.get(null);
+
+            // Assert
+            assertThat(value).isEqualTo("england-and-wales");
+            assertThat(Modifier.isStatic(field.getModifiers())).isTrue();
+            assertThat(Modifier.isFinal(field.getModifiers())).isTrue();
         }
     }
 

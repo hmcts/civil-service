@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.referencedata;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -23,6 +22,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
@@ -80,7 +81,7 @@ class JudicialRefDataServiceTest {
 
         List<JudgeRefData> judgeRefDataReturn = refDataService.getJudgeReferenceData("ABC", "user_token");
 
-        Assertions.assertEquals(4, judgeRefDataReturn.size());
+        assertEquals(4, judgeRefDataReturn.size());
         assertThat(judgeRefDataReturn).isEqualTo(judgeRefData);
         verify(jrdConfiguration, times(1)).getUrl();
         verify(jrdConfiguration, times(1)).getEndpoint();
@@ -102,5 +103,23 @@ class JudicialRefDataServiceTest {
 
     private JudgeRefData getJudicialRefData(String title, String surname, String emailId) {
         return JudgeRefData.builder().title(title).surname(surname).emailId(emailId).build();
+    }
+
+    @Test
+    void shouldReturnEmptyList_whenRestTemplateThrowsException() {
+        when(authTokenGenerator.generate()).thenReturn("service_token");
+
+        when(restTemplate.exchange(
+            any(URI.class),
+            any(HttpMethod.class),
+            any(HttpEntity.class),
+            ArgumentMatchers.<ParameterizedTypeReference<List<JudgeRefData>>>any()
+        )).thenThrow(new RuntimeException("Connection failed"));
+
+        List<JudgeRefData> result = refDataService.getJudgeReferenceData("ABC", "user_token");
+
+        assertThat(result).isEmpty();
+        verify(jrdConfiguration, times(1)).getUrl();
+        verify(jrdConfiguration, times(1)).getEndpoint();
     }
 }

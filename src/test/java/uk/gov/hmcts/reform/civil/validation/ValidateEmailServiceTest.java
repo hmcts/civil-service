@@ -1,7 +1,10 @@
 package uk.gov.hmcts.reform.civil.validation;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.stream.Stream;
 
@@ -25,6 +28,106 @@ class ValidateEmailServiceTest {
     @MethodSource("invalidEmailAddresses")
     void shouldReturnAnErrorMessageIfEmailIsInvalid(String email) {
         assertThat(validateEmailService.validate(email)).contains(ERROR_MESSAGE);
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    void shouldReturnErrorForNullOrEmptyEmail(String email) {
+        assertThat(validateEmailService.validate(email)).contains(ERROR_MESSAGE);
+    }
+
+    @Test
+    void shouldHandleEmailWithWhitespace() {
+        assertThat(validateEmailService.validate("  email@domain.com  ")).isEmpty();
+    }
+
+    @Test
+    void shouldRejectEmailWithHostnamePartTooLong() {
+        // Create a hostname part that's 64 characters (limit is 63)
+        String longPart = "a".repeat(64);
+        String email = format("email@%s.com", longPart);
+        assertThat(validateEmailService.validate(email)).contains(ERROR_MESSAGE);
+    }
+
+    @Test
+    void shouldRejectEmailWithHostnameTooLong() {
+        // Create a hostname that's 254 characters (limit is 253)
+        String longHostname = "a".repeat(60) + "." + "b".repeat(60) + "." + "c".repeat(60) + "." + "d".repeat(60) + "." + "e".repeat(10) + ".com";
+        String email = "email@" + longHostname;
+        assertThat(validateEmailService.validate(email)).contains(ERROR_MESSAGE);
+    }
+
+    @Test
+    void shouldHandleInternationalDomainNames() {
+        // Test IDN conversion
+        assertThat(validateEmailService.validate("test@münchen.de")).isEmpty();
+    }
+
+    @Test
+    void shouldRejectInvalidIDNConversion() {
+        // This should fail IDN conversion
+        String email = "test@" + "\u0000invalid.com";
+        assertThat(validateEmailService.validate(email)).contains(ERROR_MESSAGE);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "test@xn--mnchen-3ya.de",  // IDN encoded domain
+        "test@example.xn--jxalpdlp", // Greek TLD
+        "test@xn--a-ecp.com"        // Domain with IDN prefix
+    })
+    void shouldAcceptValidIDNDomains(String email) {
+        assertThat(validateEmailService.validate(email)).isEmpty();
+    }
+
+    @Test
+    void shouldRejectEmailWithSingleHostPart() {
+        assertThat(validateEmailService.validate("email@localhost")).contains(ERROR_MESSAGE);
+    }
+
+    @Test
+    void shouldAcceptMaxLengthEmail() {
+        // Create an email exactly 320 characters long
+        // Local part: 64 chars, @ = 1 char, domain needs to be 255 chars
+        // But HOST_MAX_LENGTH is 253, not 255
+        String localPart = "a".repeat(64);
+        // Domain must be <= 253 chars
+        // 63 + 1 + 63 + 1 + 63 + 1 + 57 + 1 + 3 = 253
+        String domainPart1 = "b".repeat(63);
+        String domainPart2 = "c".repeat(63);
+        String domainPart3 = "d".repeat(63);
+        String domainPart4 = "e".repeat(57);
+        String domain = domainPart1 + "." + domainPart2 + "." + domainPart3 + "." + domainPart4 + ".com";
+        String email = localPart + "@" + domain;
+        // 64 + 1 + 253 = 318 chars total
+        assertThat(email).hasSize(318);
+        assertThat(validateEmailService.validate(email)).isEmpty();
+    }
+
+    @Test
+    void shouldRejectEmailExceedingMaxLength() {
+        // Create an email 321 characters long
+        // Local part: 65 chars (exceeds 64 limit), @ = 1 char, domain = 255 chars
+        String localPart = "a".repeat(65);
+        // Create a valid domain that's 255 chars
+        String domainPart1 = "b".repeat(63);
+        String domainPart2 = "c".repeat(63);
+        String domainPart3 = "d".repeat(63);
+        String domainPart4 = "e".repeat(59);
+        String domain = domainPart1 + "." + domainPart2 + "." + domainPart3 + "." + domainPart4 + ".com";
+        String email = localPart + "@" + domain;
+        assertThat(email).hasSize(321);
+        assertThat(validateEmailService.validate(email)).contains(ERROR_MESSAGE);
+    }
+
+    @Test
+    void shouldAcceptValidTwoLetterTLD() {
+        assertThat(validateEmailService.validate("email@example.uk")).isEmpty();
+    }
+
+    @Test
+    void shouldRejectInvalidTLD() {
+        assertThat(validateEmailService.validate("email@example.a")).contains(ERROR_MESSAGE);
     }
 
     //See https://github.com/alphagov/notifications-utils/blob/master/tests/test_recipient_validation.py#L104-L121
