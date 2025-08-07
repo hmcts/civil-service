@@ -2657,6 +2657,7 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldReturnPbaHeader_whenCaseIsMatched() {
+        // Given
         CaseData caseData = CaseData.builder()
             .respondent1Represented(NO)
             .addRespondent2(NO)
@@ -2670,14 +2671,17 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             .request(CallbackRequest.builder().eventId("CREATE_CLAIM_SPEC").build())
             .build();
 
+        // When
         SubmittedCallbackResponse response = handler.buildConfirmation(params);
 
+        // Then
         Assertions.assertTrue(response.getConfirmationHeader().contains("Please now pay your claim fee"));
         Assertions.assertTrue(response.getConfirmationBody().contains("Pay your claim fee"));
     }
 
     @Test
     void shouldReturnPbaHeader_whenRespondentsAreRepresentedAndRegistered() {
+        // Given
         CaseData caseData = CaseData.builder()
             .respondent1Represented(YES)
             .respondent1OrgRegistered(YES)
@@ -2692,13 +2696,16 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             .request(CallbackRequest.builder().eventId("CREATE_CLAIM_SPEC").build())
             .build();
 
+        // When
         SubmittedCallbackResponse response = handler.buildConfirmation(params);
 
+        // Then
         Assertions.assertTrue(response.getConfirmationBody().contains("Pay your claim fee"));
     }
 
     @Test
     void shouldReturnLipConfirmationBody_whenNotMatchedAndNotRepresented() {
+        // Given
         CaseData caseData = CaseData.builder()
             .respondent1Represented(NO)
             .addRespondent2(YES)
@@ -2712,8 +2719,10 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             .request(CallbackRequest.builder().eventId("CREATE_CLAIM_SPEC").build())
             .build();
 
+        // When
         SubmittedCallbackResponse response = handler.buildConfirmation(params);
 
+        // Then
         Assertions.assertTrue(response.getConfirmationBody().contains("Your claim will not be issued until payment is confirmed"));
         Assertions.assertTrue(response.getConfirmationBody().contains("sealed claim form"));
     }
