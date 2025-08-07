@@ -2726,4 +2726,9 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         Assertions.assertTrue(response.getConfirmationBody().contains("Your claim will not be issued until payment is confirmed"));
         Assertions.assertTrue(response.getConfirmationBody().contains("sealed claim form"));
     }
+
+    @Test
+    void handleEventsReturnsTheExpectedCallbackEvent() {
+        assertThat(handler.handledEvents()).contains(CREATE_CLAIM_SPEC);
+    }
 }
