@@ -53,8 +53,8 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 @ExtendWith(MockitoExtension.class)
 class UploadTranslatedDocumentDefaultStrategyTest {
 
-    private static final String FILE_NAME_1 = "claimant";
-    private static final String FILE_NAME_2 = "defendant";
+    private static final String FILE_NAME_1 = "claimant.pdf";
+    private static final String FILE_NAME_2 = "defendant.txt";
 
     private UploadTranslatedDocumentDefaultStrategy uploadTranslatedDocumentDefaultStrategy;
 
@@ -141,7 +141,7 @@ class UploadTranslatedDocumentDefaultStrategyTest {
             .documentType(DocumentType.CLAIMANT_DEFENCE)
             .documentLink(Document.builder().documentFileName("claimant_response.pdf")
                               .categoryID("aapId").build())
-            .documentName("claimant response")
+            .documentName("claimant_response.pdf")
             .build();
 
         List<Element<CaseDocument>> preTranslatedDocuments = new ArrayList<>(List.of(
@@ -166,8 +166,9 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData.toBuilder().preTranslationDocuments(preTranslatedDocuments).build()).build();
         List<Element<CaseDocument>> documents = List.of(
             element(CaseDocument.builder().documentName(FILE_NAME_1).build()),
-            element(CaseDocument.builder().documentName("claimant response").build()),
-            element(CaseDocument.builder().documentName("claimant response").build()));
+            element(CaseDocument.builder().documentName("claimant_response.pdf").build()),
+            element(CaseDocument.builder().documentName("claimant_response.pdf").build())
+        );
         @SuppressWarnings("unchecked")
         List<Element<TranslatedDocument>> expectedTranslatedDocs = (List<Element<TranslatedDocument>>) any(List.class);
         given(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
