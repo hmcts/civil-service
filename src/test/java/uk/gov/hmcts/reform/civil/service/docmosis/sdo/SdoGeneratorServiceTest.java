@@ -22,7 +22,6 @@ import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate;
-import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.IncludeInOrderToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
@@ -95,7 +94,6 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SDO_ORDER;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_FAST_FAST_TRACK_INT_R2;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_FAST_R2;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_FAST_TRACK_NIHL;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_R2_DISPOSAL;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_SMALL_DRH;
@@ -324,75 +322,7 @@ public class SdoGeneratorServiceTest {
     }
 
     @Test
-    public void shouldGenerateSdoFastTrackDocument() {
-        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(SDO_FAST_R2)))
-            .thenReturn(new DocmosisDocument(SDO_FAST_R2.getDocumentTitle(), bytes));
-        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameFast, bytes, SDO_ORDER)))
-            .thenReturn(CASE_DOCUMENT_FAST);
-
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateNotificationAcknowledged()
-            .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
-            .atStateSdoFastTrackTrial()
-            .build()
-            .toBuilder()
-            .drawDirectionsOrderRequired(YesOrNo.NO)
-            .claimsTrack(ClaimsTrack.fastTrack)
-            .build();
-
-        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
-
-        //assertThat(caseDocument).isNotNull();
-        verify(documentManagementService)
-            .uploadDocument(BEARER_TOKEN, new PDF(fileNameFast, bytes, SDO_ORDER));
-    }
-
-    @Test
-    public void shouldGenerateSdoFastTrackDocumentInPerson() {
-        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(SDO_FAST_R2)))
-            .thenReturn(new DocmosisDocument(SDO_FAST_R2.getDocumentTitle(), bytes));
-        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameFast, bytes, SDO_ORDER)))
-            .thenReturn(CASE_DOCUMENT_FAST);
-
-        LocationRefData locationRefData = LocationRefData.builder().build();
-        String locationLabel = "String 1";
-        DynamicList formValue = DynamicList.fromList(
-            Collections.singletonList(locationLabel),
-            Object::toString,
-            locationLabel,
-            false
-        );
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateNotificationAcknowledged()
-            .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
-            .atStateSdoFastTrackTrial()
-            .build()
-            .toBuilder()
-            .drawDirectionsOrderRequired(YesOrNo.NO)
-            .claimsTrack(ClaimsTrack.fastTrack)
-            .fastTrackMethod(FastTrackMethod.fastTrackMethodInPerson)
-            .fastTrackMethodInPerson(formValue)
-            .build();
-        when(documentHearingLocationHelper.getHearingLocation(locationLabel, caseData, BEARER_TOKEN))
-            .thenReturn(locationRefData);
-
-        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
-
-        assertThat(caseDocument).isNotNull();
-        verify(documentManagementService)
-            .uploadDocument(BEARER_TOKEN, new PDF(fileNameFast, bytes, SDO_ORDER));
-        verify(documentGeneratorService).generateDocmosisDocument(
-            argThat((MappableObject templateData) ->
-                        templateData instanceof SdoDocumentFormFast
-                            && locationRefData.equals(((SdoDocumentFormFast) templateData).getHearingLocation())),
-            any(DocmosisTemplates.class)
-        );
-    }
-
-    @Test
     public void shouldGenerateSdoFastTrackDocumentWithR2TemplateAndFastTrackUpLiftsEnabled() {
-        when(featureToggleService.isFastTrackUpliftsEnabled()).thenReturn(true);
-
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(SDO_FAST_FAST_TRACK_INT_R2)))
             .thenReturn(new DocmosisDocument(SDO_FAST_FAST_TRACK_INT_R2.getDocumentTitle(), bytes));
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameFast, bytes, SDO_ORDER)))
