@@ -46,19 +46,9 @@ public class ClaimIssuedPaymentSuccessfulTransitionBuilder extends MidTransition
             // 3. Def1 registered, Def 2 unrepresented
             .moveTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT, transitions)
             .onlyWhen(pendingClaimIssuedUnrepresentedDefendentPredicate(), transitions)
-            .set(flags -> {
-                if (featureToggleService.isPinInPostEnabled()) {
-                    flags.put(FlowFlag.PIP_ENABLED.name(), true);
-                }
-            }, transitions)
             .moveTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC, transitions)
             .onlyWhen(oneVsOneCase.and(respondent1NotRepresented).and(specClaim), transitions)
-            .set(flags -> {
-                if (featureToggleService.isPinInPostEnabled()) {
-                    flags.put(FlowFlag.PIP_ENABLED.name(), true);
-                }
-                flags.put(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true);
-            }, transitions)
+            .set(flags -> flags.put(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true), transitions)
             // Unregistered
             // 1. Both def1 and def2 unregistered
             // 2. Def1 unregistered, Def2 registered

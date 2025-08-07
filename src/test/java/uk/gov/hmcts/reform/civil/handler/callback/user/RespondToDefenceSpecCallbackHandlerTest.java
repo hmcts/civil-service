@@ -387,7 +387,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPopulateResponse_whenInvokedAndSystemGeneratedContainsResponseDoc() {
             // Given
-            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
             var testDocument1 = CaseDocument.builder()
                 .documentName("response_sealed_form.pdf")
                 .documentType(SEALED_CLAIM)
@@ -958,8 +957,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .build(),
                 ABOUT_TO_SUBMIT
             );
-            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
-
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData()).extracting("applicant1DQExperts").isNotNull();
@@ -998,7 +995,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .build(),
                 ABOUT_TO_SUBMIT
             );
-            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getState()).isEqualTo(IN_MEDIATION.toString());
@@ -1408,7 +1404,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldChangeCaseState_WhenRespondentRepaymentPlanAndFlagV2WithJudgementLive() {
-            given(featureToggleService.isPinInPostEnabled()).willReturn(true);
             given(featureToggleService.isJudgmentOnlineLive()).willReturn(true);
             CaseData caseData = CaseData.builder()
                 .respondent1Represented(YesOrNo.NO)
@@ -1431,7 +1426,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldChangeCaseState_WhenRespondentRepaymentPlanAndFlagV2WithJudgementLiveAndLrVLr() {
-            given(featureToggleService.isPinInPostEnabled()).willReturn(true);
             given(featureToggleService.isJudgmentOnlineLive()).willReturn(true);
             CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                 .ccjPaymentPaidSomeOption(YesOrNo.YES)
@@ -1470,7 +1464,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldChangeCaseState_WhenRespondentRepaymentPlanAndFlagV2WithJudgementLiveAndLrVLrAdmissionBulk() {
-            given(featureToggleService.isPinInPostEnabled()).willReturn(true);
             given(featureToggleService.isJudgmentOnlineLive()).willReturn(true);
             given(featureToggleService.isLrAdmissionBulkEnabled()).willReturn(true);
             CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
@@ -1510,7 +1503,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldChangeCaseState_WhenRespondentPaymentSetByDateAndFlagV2WithJudgementLive() {
-            given(featureToggleService.isPinInPostEnabled()).willReturn(true);
             given(featureToggleService.isJudgmentOnlineLive()).willReturn(true);
             CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                 .ccjPaymentPaidSomeOption(YesOrNo.YES)
@@ -1550,7 +1542,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldChangeCaseState_WhenRespondentPaymentImmediatelyAndFlagV2WithJudgementLive() {
-            given(featureToggleService.isPinInPostEnabled()).willReturn(true);
             given(featureToggleService.isJudgmentOnlineLive()).willReturn(true);
             CaseData caseData = CaseData.builder()
                 .respondent1Represented(YesOrNo.NO)
@@ -1573,7 +1564,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldChangeCaseState_WhenApplicant1AcceptFullAdmitPaymentPlanSpecNoAndFlagV2() {
-            given(featureToggleService.isPinInPostEnabled()).willReturn(true);
             CaseData caseData = CaseData.builder().applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.NO)
                 .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
@@ -1592,7 +1582,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldChangeCaseState_WhenApplicant1AcceptFullAdmitPaymentPlanAndFlagV2() {
             //Given
-            given(featureToggleService.isPinInPostEnabled()).willReturn(true);
             CaseData caseData = CaseData.builder().applicant1AcceptFullAdmitPaymentPlanSpec(YES)
                 .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
@@ -1613,7 +1602,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldChangeCaseState_WhenApplicant1AcceptPartAdmitPaymentPlanSpecAndFlagV2() {
             //Given
-            given(featureToggleService.isPinInPostEnabled()).willReturn(true);
             CaseData caseData = CaseData.builder().applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES)
                 .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())
                 .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
@@ -1633,7 +1621,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldChangeCaseState_WhenApplicant1AcceptPartAdmitPaymentPlanSpecNoAndFlagV2() {
-            given(featureToggleService.isPinInPostEnabled()).willReturn(true);
             CaseData caseData = CaseData.builder().applicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.NO)
                 .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())
                 .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
@@ -1696,7 +1683,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldChangeCaseState_WhenApplicant1NotAcceptPartAdmitAmountWithoutMediationAndFlagV2() {
-            given(featureToggleService.isPinInPostEnabled()).willReturn(true);
             CaseData caseData = CaseData.builder().applicant1AcceptAdmitAmountPaidSpec(NO)
                 .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())
                 .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
@@ -1719,7 +1705,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldChangeCaseState_WhenApplicant1NotAcceptPartAdmitAmountWithFastTrackAndFlagV2() {
-            given(featureToggleService.isPinInPostEnabled()).willReturn(true);
             CaseData caseData = CaseData.builder().applicant1AcceptAdmitAmountPaidSpec(NO)
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                 .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
@@ -1977,7 +1962,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation("11111").region("2").build())
                 .build();
 
-            given(featureToggleService.isPinInPostEnabled()).willReturn(true);
             when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
             var params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
 
@@ -2006,7 +1990,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation("11111").region("2").build())
                 .build();
 
-            given(featureToggleService.isPinInPostEnabled()).willReturn(true);
             when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
             var params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
 
@@ -2168,7 +2151,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void summary_when_all_finals_order_issued() {
-            given(featureToggleService.isPinInPostEnabled()).willReturn(true);
             given(featureToggleService.isJudgmentOnlineLive()).willReturn(true);
             CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                 .ccjPaymentPaidSomeOption(YesOrNo.YES)
@@ -2240,7 +2222,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @Test
             void summary_when_all_finals_order_issued_on_LR_bulk_admission() {
-                given(featureToggleService.isPinInPostEnabled()).willReturn(true);
                 given(featureToggleService.isLrAdmissionBulkEnabled()).willReturn(true);
                 CaseData caseData = CaseData.builder()
                     .respondent1Represented(YesOrNo.YES)
@@ -2266,7 +2247,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @Test
             void summary_when_part_admit_pay_immediately_selected() {
-                given(featureToggleService.isPinInPostEnabled()).willReturn(true);
                 given(featureToggleService.isLrAdmissionBulkEnabled()).willReturn(true);
                 CaseData caseData = CaseData.builder()
                     .respondent1Represented(YesOrNo.YES)
@@ -2299,8 +2279,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldGetOneVOneFullDefenceFlagV2() {
-            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
-
             CaseData caseData = CaseData.builder()
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
                 .totalClaimAmount(BigDecimal.valueOf(5000_00))
@@ -2318,8 +2296,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldGetOneVOnePartAdmitFlagV2() {
-            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
-
             CaseData caseData = CaseData.builder()
                 .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
                 .specDefenceAdmittedRequired(YES)
@@ -2338,8 +2314,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldGetOneVOnePartAdmitBySetDateFlagV2() {
-            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
-
             CaseData caseData = CaseData.builder()
                 .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
                 .defenceAdmitPartPaymentTimeRouteRequired(BY_SET_DATE)
@@ -2360,8 +2334,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @ParameterizedTest
         @EnumSource(value = RespondentResponsePartAdmissionPaymentTimeLRspec.class)
         void shouldGetOneVOnePartAdmitImmediatelyFlagV2(RespondentResponsePartAdmissionPaymentTimeLRspec type) {
-            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
-
             CaseData caseData = CaseData.builder()
                 .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
                 .defenceAdmitPartPaymentTimeRouteRequired(type)
@@ -2381,8 +2353,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldGetOneVOneFullAdmitFlagV2() {
-            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
-
             CaseData caseData = CaseData.builder()
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
                 .specDefenceFullAdmittedRequired(YES)
@@ -2400,8 +2370,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldGetOneVOneFullAdmitBySetDateFlagV2() {
-            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
-
             CaseData caseData = CaseData.builder()
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
                 .defenceAdmitPartPaymentTimeRouteRequired(BY_SET_DATE)
@@ -2422,7 +2390,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @EnumSource(value = RespondentResponsePartAdmissionPaymentTimeLRspec.class)
         void shouldGetOneVOneFullAdmitBySetDateFlagV2Parameterized(
             RespondentResponsePartAdmissionPaymentTimeLRspec type) {
-            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
 
             CaseData caseData = CaseData.builder()
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
@@ -2444,8 +2411,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldGetOneVOneCounterClaimFlagV2() {
-            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
-
             CaseData caseData = CaseData.builder()
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
                 .totalClaimAmount(BigDecimal.valueOf(5000_00))
@@ -2463,8 +2428,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldGetNullFlagV2() {
-            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
-
             CaseData caseData = CaseData.builder()
                 .respondent2(PartyBuilder.builder().company().build())
                 .totalClaimAmount(BigDecimal.valueOf(5000_00))
@@ -2489,8 +2452,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     class SetUpPaymentDateToStringField {
         @Test
         void shouldSetUpPaymentDateToString() {
-            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
-
             given(workingDayIndicator.isWorkingDay(any())).willReturn(true);
             LocalDate whenWillPay = LocalDate.now();
             given(deadlineCalculatorService.calculateExtendedDeadline(any(LocalDateTime.class), anyInt())).willReturn(whenWillPay);
@@ -2518,8 +2479,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSetUpPaymentDateToStringForPartAdmitPaid() {
-            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
-
             LocalDate whenWillPay = LocalDate.now().plusDays(5);
             given(deadlineCalculatorService.calculateExtendedDeadline(any(LocalDateTime.class), anyInt())).willReturn(whenWillPay);
 
@@ -2547,8 +2506,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSetUpPaymentDateForResponseDateToString() {
-            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
-
             given(workingDayIndicator.isWorkingDay(any())).willReturn(true);
             LocalDate whenWillPay = LocalDate.now();
             given(deadlineCalculatorService.calculateExtendedDeadline(any(LocalDate.class), anyInt())).willReturn(whenWillPay);
@@ -2612,8 +2569,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldConvertPartAdmitPaidValueFromPenniesToPounds() {
-            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
-
             RespondToClaim respondToAdmittedClaim =
                 RespondToClaim.builder()
                     .howMuchWasPaid(BigDecimal.valueOf(1050))
@@ -3049,8 +3004,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldSetTheJudgmentSummaryDetailsToProceedWithoutDefendantSolicitor() {
             String expected = "The Judgement request will be reviewed by the court, this case will proceed offline, you will receive any further updates by post.";
 
-            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
-
             Fee fee = Fee.builder().version("1").code("CODE").calculatedAmountInPence(BigDecimal.valueOf(100)).build();
             CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                 .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(10000))
@@ -3078,8 +3031,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnCorrectSummaryForAllFinalsOrderIssued() {
             String expected = "The judgment request will be processed and a County"
                 + " Court Judgment (CCJ) will be issued, you will receive any further updates by email.";
-
-            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
             when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             Fee fee = Fee.builder().version("1").code("CODE").calculatedAmountInPence(BigDecimal.valueOf(100)).build();
@@ -3171,9 +3122,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldUpdateToCaseSettled_whenClaimantChooseToSettle() {
-
-            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
-
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)

@@ -93,7 +93,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
             .atStateMediationUnsuccessful(MultiPartyScenario.ONE_V_ONE)
             .build();
 
-        when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
         CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
         String resultState = determineNextState.determineNextStatePostTranslation(caseData, callbackParams(caseData));
         var response = (AboutToStartOrSubmitCallbackResponse) determineNextState.handle(params);
@@ -155,7 +154,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
                 .build();
         }
 
-        when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         BusinessProcess businessProcess = BusinessProcess.builder().build();
 
@@ -175,8 +173,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
             .atStateMediationUnsuccessful(MultiPartyScenario.ONE_V_ONE)
             .build();
 
-        when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
-
         String resultState;
         if (postTranslation) {
             resultState = determineNextState.determineNextStatePostTranslation(caseData, callbackParams(caseData));
@@ -195,7 +191,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
         CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
         BusinessProcess businessProcess = BusinessProcess.builder().build();
 
-        when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
@@ -254,8 +249,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
             .applicant1AcceptPartAdmitPaymentPlanSpec(NO)
             .build();
 
-        when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
-
         String resultState;
         if (postTranslation) {
             resultState = determineNextState.determineNextStatePostTranslation(caseData, callbackParams(caseData));
@@ -280,8 +273,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .responseClaimTrack(FAST_CLAIM.name())
             .build();
-
-        when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
 
         String resultState;
         if (postTranslation) {
@@ -368,8 +359,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
             .caseManagementLocation(CaseLocationCivil.builder().baseLocation("11111").region("2").build())
             .build();
 
-        when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
-
         String resultState;
         if (postTranslation) {
             resultState = determineNextState.determineNextStatePostTranslation(caseData, callbackParams(caseData));
@@ -399,7 +388,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
             .defenceRouteRequired(SpecJourneyConstantLRSpec.DISPUTES_THE_CLAIM)
             .build();
 
-        when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         String resultState;
@@ -419,7 +407,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
         CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
         BusinessProcess businessProcess = BusinessProcess.builder().build();
 
-        when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
@@ -482,7 +469,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
             .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
             .build();
 
-        when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
         String resultState;
@@ -511,7 +497,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
             .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
             .build();
 
-        when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         String resultState = determineNextState.determineNextState(caseData, callbackParams(caseData),
                                                                    builder, "", businessProcess);
