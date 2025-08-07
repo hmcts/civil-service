@@ -367,7 +367,7 @@ class DirectionsQuestionnaireGeneratorTest {
             when(documentGeneratorService.generateDocmosisDocument(
                 any(MappableObject.class), eq(DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_FAST_TRACK_INT)))
                 .thenReturn(new DocmosisDocument(
-                    DocmosisTemplates.DEFENDANT_RESPONSE_SPEC.getDocumentTitle(), bytes));
+                    DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_FAST_TRACK_INT.getDocumentTitle(), bytes));
 
             String expectedTitle = format(DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_FAST_TRACK_INT.getDocumentTitle(),
                 "defendant", REFERENCE_NUMBER
@@ -400,7 +400,7 @@ class DirectionsQuestionnaireGeneratorTest {
             when(documentGeneratorService.generateDocmosisDocument(
                 any(MappableObject.class), eq(DocmosisTemplates.CLAIMANT_RESPONSE_SPEC)))
                 .thenReturn(new DocmosisDocument(
-                    DocmosisTemplates.DEFENDANT_RESPONSE_SPEC.getDocumentTitle(), bytes));
+                    DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_FAST_TRACK_INT.getDocumentTitle(), bytes));
 
             String expectedTitle = format(DocmosisTemplates.CLAIMANT_RESPONSE_SPEC.getDocumentTitle(),
                 "claimant", REFERENCE_NUMBER
@@ -2668,7 +2668,7 @@ class DirectionsQuestionnaireGeneratorTest {
             when(documentGeneratorService.generateDocmosisDocument(
                 any(MappableObject.class), eq(DocmosisTemplates.CLAIMANT_RESPONSE_SPEC_FAST_TRACK_INT)))
                 .thenReturn(new DocmosisDocument(
-                    DocmosisTemplates.DEFENDANT_RESPONSE_SPEC.getDocumentTitle(), bytes));
+                    DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_FAST_TRACK_INT.getDocumentTitle(), bytes));
 
             String expectedTitle = format(DocmosisTemplates.CLAIMANT_RESPONSE_SPEC_FAST_TRACK_INT.getDocumentTitle(),
                                           "claimant", REFERENCE_NUMBER
@@ -2702,7 +2702,7 @@ class DirectionsQuestionnaireGeneratorTest {
             when(documentGeneratorService.generateDocmosisDocument(
                 any(MappableObject.class), eq(DocmosisTemplates.CLAIMANT_RESPONSE_SPEC_FAST_TRACK_INT)))
                 .thenReturn(new DocmosisDocument(
-                    DocmosisTemplates.DEFENDANT_RESPONSE_SPEC.getDocumentTitle(), bytes));
+                    DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_FAST_TRACK_INT.getDocumentTitle(), bytes));
 
             String expectedTitle = format(DocmosisTemplates.CLAIMANT_RESPONSE_SPEC_FAST_TRACK_INT.getDocumentTitle(),
                                           "claimant", REFERENCE_NUMBER
