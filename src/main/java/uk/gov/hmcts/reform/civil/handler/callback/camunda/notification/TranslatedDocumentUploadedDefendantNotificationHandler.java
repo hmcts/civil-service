@@ -60,8 +60,7 @@ public class TranslatedDocumentUploadedDefendantNotificationHandler extends Call
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
         ));
         addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
         return properties;
     }
 
@@ -71,12 +70,17 @@ public class TranslatedDocumentUploadedDefendantNotificationHandler extends Call
         if (StringUtils.isNotEmpty(caseData.getRespondent1().getPartyEmail())) {
             notificationService.sendMail(
                 caseData.getRespondent1().getPartyEmail(),
-                notificationsProperties.getNotifyDefendantTranslatedDocumentUploaded(),
+                getRespondent1LipEmailTemplate(caseData),
                 addProperties(caseData),
                 String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
             );
         }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
+    }
+
+    private String getRespondent1LipEmailTemplate(CaseData caseData) {
+        return caseData.isRespondentResponseBilingual() ? notificationsProperties.getNotifyDefendantTranslatedDocumentUploaded()
+            : notificationsProperties.getRespondent1LipClaimUpdatedTemplate();
     }
 }
 

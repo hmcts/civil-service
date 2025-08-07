@@ -29,7 +29,6 @@ import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_DE
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCnbcContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getRespondentLegalOrganizationName;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.shouldSendMediationNotificationDefendant1LRCarm;
@@ -89,8 +88,7 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
 
     private boolean shouldSendNotification(CaseData caseData, String eventId) {
         return Objects.nonNull(caseData.getRespondent1().getPartyEmail())
-            && ((!caseData.isClaimantBilingual()
-            || NOTIFY_LIP_RESPONDENT_CLAIMANT_CONFIRM_TO_PROCEED_TRANSLATED_DOC.name().equals(eventId))
+            && ((!caseData.isClaimantBilingual() || NOTIFY_LIP_RESPONDENT_CLAIMANT_CONFIRM_TO_PROCEED_TRANSLATED_DOC.name().equals(eventId))
             || (featureToggleService.isDefendantNoCOnlineForCase(caseData)
             && (NO.equals(caseData.getApplicant1ProceedWithClaim()) || caseData.isClaimantIntentionSettlePartAdmit())));
     }
@@ -130,10 +128,7 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
                 CASEMAN_REF, caseData.getLegacyCaseReference()
             ));
             addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
-            addCnbcContact(caseData, properties, configuration,
-                           featureToggleService.isQueryManagementLRsEnabled());
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
             return properties;
         }
         if (shouldSendMediationNotificationDefendant1LRCarm(
@@ -149,10 +144,7 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
                 APPLICANT_ONE_NAME, getPartyNameBasedOnType(caseData.getApplicant1())
             ));
             addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
-            addCnbcContact(caseData, properties, configuration,
-                           featureToggleService.isQueryManagementLRsEnabled());
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
             return properties;
         }
         HashMap<String, String> lipProperties = new HashMap<>(Map.of(
@@ -160,8 +152,7 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
             RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
         ));
         addAllFooterItems(caseData, lipProperties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
         return lipProperties;
     }
 

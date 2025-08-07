@@ -1182,7 +1182,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPauseLipVsLrCaseIfClaimantLipIsWelsh() {
             // Given
-            when(toggleService.isGaForWelshEnabled()).thenReturn(true);
+            when(toggleService.isWelshEnabledForMainCase()).thenReturn(true);
             LocalDateTime dateTime = LocalDateTime.of(2023, 6, 6, 6, 6, 6);
             LocalDate date = dateTime.toLocalDate();
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
@@ -1738,10 +1738,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             UserInfo userInfo = UserInfo.builder().uid("798").build();
             when(userService.getUserInfo(anyString())).thenReturn(userInfo);
             LocalDate whenWillPay = LocalDate.now().plusDays(5);
-            given(deadlineExtensionCalculatorService.calculateExtendedDeadline(
-                any(),
-                anyInt()
-            )).willReturn(whenWillPay);
+            given(deadlineExtensionCalculatorService.calculateExtendedDeadline(any(LocalDateTime.class), anyInt())).willReturn(whenWillPay);
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 

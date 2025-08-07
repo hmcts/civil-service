@@ -3,13 +3,17 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -44,6 +48,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CNBC_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_HMCTS_SIGNATURE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
@@ -61,10 +66,16 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     public static final String TASK_ID = "QueryResponseNotify";
     private static final String TEMPLATE_ID = "template-id";
+    private static final String TEMPLATE_ID_LIP = "template-id-lip";
+    private static final String TEMPLATE_ID_LIP_WELSH = "template-id-lip-welsh";
+    private static final String TEMPLATE_PUBLIC_LIP_ID = "template-public-lip-id";
+    private static final String TEMPLATE_PUBLIC_WELSH_LIP_ID = "template-public-welsh-lip-id";
+    private static final String TEMPLATE_PUBLIC_lR_ID = "template-public-lr-id";
     @Mock
     private NotificationService notificationService;
     @Mock
@@ -320,7 +331,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
     }
 
     @NotNull
-    private Map<String, String> getNotificationDataForLip(LocalDateTime now) {
+    private Map<String, String> getNotificationDataForLip(LocalDateTime now, boolean publicQmEnabled) {
         Map<String, String> expectedProperties = new HashMap<>(Map.of(
             "partyReferences",
             "Claimant reference: 12345 - Defendant reference: 6789",
@@ -339,9 +350,17 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
         expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
         expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
         expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
-        expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
-        expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
-        expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+        if (publicQmEnabled) {
+            expectedProperties.put(LIP_CONTACT, configuration.getRaiseQueryLip());
+            expectedProperties.put(LIP_CONTACT_WELSH, configuration.getRaiseQueryLipWelsh());
+            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getRaiseQueryLr());
+            expectedProperties.put(CNBC_CONTACT, configuration.getRaiseQueryLr());
+        } else {
+            expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
+            expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+            expectedProperties.put(CNBC_CONTACT, configuration.getCnbcContact());
+        }
         return expectedProperties;
     }
 
@@ -360,9 +379,10 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
         expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
         expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
         expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
-        expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
         expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
         expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+        expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getRaiseQueryLr());
+        expectedProperties.put(CNBC_CONTACT, configuration.getRaiseQueryLr());
         return expectedProperties;
     }
 
@@ -373,6 +393,9 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
             when(organisationService.findOrganisationById(any()))
                 .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
             when(notificationsProperties.getQueryResponseReceived()).thenReturn(TEMPLATE_ID);
+            when(notificationsProperties.getQueryLrPublicResponseReceived()).thenReturn(TEMPLATE_PUBLIC_lR_ID);
+            when(notificationsProperties.getQueryLipWelshPublicResponseReceived()).thenReturn(TEMPLATE_PUBLIC_WELSH_LIP_ID);
+            when(notificationsProperties.getQueryLipPublicResponseReceived()).thenReturn(TEMPLATE_PUBLIC_LIP_ID);
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getHmctsSignature()).thenReturn((String) configMap.get("hmctsSignature"));
             when(configuration.getPhoneContact()).thenReturn((String) configMap.get("phoneContact"));
@@ -380,13 +403,15 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
             when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("welshHmctsSignature"));
             when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("welshPhoneContact"));
             when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
-            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
             when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
         }
 
-        @Test
-        void shouldNotifyApplicantLR_whenResponseToQueryReceivedMultipleFollowUpQueries() {
+        @ParameterizedTest
+        @ValueSource(booleans = {true, false})
+        void shouldNotifyApplicantLR_whenResponseToQueryReceivedMultipleFollowUpQueries(boolean publicQuery) {
+            when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(publicQuery);
             when(runtimeService.getProcessVariables(any()))
                 .thenReturn(QueryManagementVariables.builder()
                                 .queryId("7")
@@ -403,14 +428,16 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
 
             verify(notificationService).sendMail(
                 "applicant@email.com",
-                TEMPLATE_ID,
+                publicQuery ? TEMPLATE_PUBLIC_lR_ID : TEMPLATE_ID,
                 getNotificationDataMap(caseData, now.minusHours(1).toLocalDateTime()),
                 "response-to-query-notification-000DC001"
             );
         }
 
-        @Test
-        void shouldNotifyRespondent1LR_whenResponseToQueryReceivedMultipleFollowUpQueries() {
+        @ParameterizedTest
+        @ValueSource(booleans = {true, false})
+        void shouldNotifyRespondent1LR_whenResponseToQueryReceivedMultipleFollowUpQueries(boolean publicQuery) {
+            when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(publicQuery);
             when(runtimeService.getProcessVariables(any()))
                 .thenReturn(QueryManagementVariables.builder()
                                 .queryId("11")
@@ -427,14 +454,16 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
 
             verify(notificationService).sendMail(
                 "respondent1@email.com",
-                TEMPLATE_ID,
+                publicQuery ? TEMPLATE_PUBLIC_lR_ID : TEMPLATE_ID,
                 getNotificationDataMap(caseData, now.minusHours(1).toLocalDateTime()),
                 "response-to-query-notification-000DC001"
             );
         }
 
-        @Test
-        void shouldNotifyRespondent2LR_whenResponseToQueryReceivedMultipleFollowUpQueries() {
+        @ParameterizedTest
+        @ValueSource(booleans = {true, false})
+        void shouldNotifyRespondent2LR_whenResponseToQueryReceivedMultipleFollowUpQueries(boolean publicQuery) {
+            when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(publicQuery);
             when(runtimeService.getProcessVariables(any()))
                 .thenReturn(QueryManagementVariables.builder()
                                 .queryId("15")
@@ -451,14 +480,16 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
 
             verify(notificationService).sendMail(
                 "respondent2@email.com",
-                TEMPLATE_ID,
+                publicQuery ? TEMPLATE_PUBLIC_lR_ID : TEMPLATE_ID,
                 getNotificationDataMap(caseData, now.minusHours(1).toLocalDateTime()),
                 "response-to-query-notification-000DC001"
             );
         }
 
-        @Test
-        void shouldNotifyApplicantLR_whenResponseToQueryReceivedNoFollowUpQueries() {
+        @ParameterizedTest
+        @ValueSource(booleans = {true, false})
+        void shouldNotifyApplicantLR_whenResponseToQueryReceivedNoFollowUpQueries(boolean publicQuery) {
+            when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(publicQuery);
             when(runtimeService.getProcessVariables(any()))
                 .thenReturn(QueryManagementVariables.builder()
                                 .queryId("5")
@@ -475,14 +506,16 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
 
             verify(notificationService).sendMail(
                 "applicant@email.com",
-                TEMPLATE_ID,
+                publicQuery ? TEMPLATE_PUBLIC_lR_ID : TEMPLATE_ID,
                 getNotificationDataMap(caseData, now.toLocalDateTime()),
                 "response-to-query-notification-000DC001"
             );
         }
 
-        @Test
-        void shouldNotifyRespondent1LR_whenResponseToQueryReceivedNoFollowUpQueries() {
+        @ParameterizedTest
+        @ValueSource(booleans = {true, false})
+        void shouldNotifyRespondent1LR_whenResponseToQueryReceivedNoFollowUpQueries(boolean publicQuery) {
+            when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(publicQuery);
             when(runtimeService.getProcessVariables(any()))
                 .thenReturn(QueryManagementVariables.builder()
                                 .queryId("9")
@@ -499,14 +532,16 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
 
             verify(notificationService).sendMail(
                 "respondent1@email.com",
-                TEMPLATE_ID,
+                publicQuery ? TEMPLATE_PUBLIC_lR_ID : TEMPLATE_ID,
                 getNotificationDataMap(caseData, now.toLocalDateTime()),
                 "response-to-query-notification-000DC001"
             );
         }
 
-        @Test
-        void shouldNotifyRespondent2LR_whenResponseToQueryReceivedNoFollowUpQueries() {
+        @ParameterizedTest
+        @ValueSource(booleans = {true, false})
+        void shouldNotifyRespondent2LR_whenResponseToQueryReceivedNoFollowUpQueries(boolean publicQuery) {
+            when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(publicQuery);
             when(runtimeService.getProcessVariables(any()))
                 .thenReturn(QueryManagementVariables.builder()
                                 .queryId("5")
@@ -523,7 +558,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
 
             verify(notificationService).sendMail(
                 "respondent2@email.com",
-                TEMPLATE_ID,
+                publicQuery ? TEMPLATE_PUBLIC_lR_ID : TEMPLATE_ID,
                 getNotificationDataMap(caseData, now.toLocalDateTime()),
                 "response-to-query-notification-000DC001"
             );
@@ -542,13 +577,21 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
             when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("welshHmctsSignature"));
             when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("welshPhoneContact"));
             when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
-            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
             when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
+            when(notificationsProperties.getQueryLipWelshPublicResponseReceived()).thenReturn(TEMPLATE_PUBLIC_WELSH_LIP_ID);
+            when(notificationsProperties.getQueryLipPublicResponseReceived()).thenReturn(TEMPLATE_PUBLIC_LIP_ID);
+            when(notificationsProperties.getQueryLipResponseReceivedEnglish()).thenReturn(TEMPLATE_ID_LIP);
+            when(notificationsProperties.getQueryLipResponseReceivedWelsh()).thenReturn(TEMPLATE_ID_LIP_WELSH);
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
+            when(configuration.getRaiseQueryLip()).thenReturn((String) configMap.get("raiseQueryLip"));
+            when(configuration.getRaiseQueryLipWelsh()).thenReturn((String) configMap.get("raiseQueryLipWelsh"));
         }
 
         @NotNull
-        private Map<String, String> getNotificationDataMapLipRes(LocalDateTime now) {
+        private Map<String, String> getNotificationDataMapLipRes(LocalDateTime now, boolean publicQmEnabled) {
             Map<String, String> expectedProperties = new HashMap<>(Map.of(
                 "partyReferences",
                 "Claimant reference: 12345 - Defendant reference: 6789",
@@ -567,14 +610,24 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
             expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
             expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
             expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
-            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
-            expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
-            expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+            if (publicQmEnabled) {
+                expectedProperties.put(LIP_CONTACT, configuration.getRaiseQueryLip());
+                expectedProperties.put(LIP_CONTACT_WELSH, configuration.getRaiseQueryLipWelsh());
+                expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getRaiseQueryLr());
+                expectedProperties.put(CNBC_CONTACT, configuration.getRaiseQueryLr());
+            } else {
+                expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
+                expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+                expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+                expectedProperties.put(CNBC_CONTACT, configuration.getCnbcContact());
+            }
             return expectedProperties;
         }
 
-        @Test
-        void shouldNotifyClaimantLip_whenResponseToQueryReceivedNoFollowUpQueries() {
+        @ParameterizedTest
+        @ValueSource(booleans = {true, false})
+        void shouldNotifyClaimantLip_whenResponseToQueryReceivedNoFollowUpQueries(boolean publicQuery) {
+            when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(publicQuery);
             when(runtimeService.getProcessVariables(any()))
                 .thenReturn(QueryManagementVariables.builder()
                                 .queryId("5")
@@ -583,23 +636,26 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
                 any(),
                 any()
             )).thenReturn(List.of(CaseRole.CLAIMANT.toString()));
-            when(notificationsProperties.getQueryLipResponseReceivedEnglish()).thenReturn(TEMPLATE_ID);
             OffsetDateTime now = OffsetDateTime.now();
-            CaseData caseData = createCaseDataWithQueries(now);
+            CaseData caseData = createCaseDataWithQueries(now).toBuilder()
+                .applicant1Represented(YesOrNo.NO)
+                .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             handler.handle(params);
 
             verify(notificationService).sendMail(
                 "rambo@email.com",
-                TEMPLATE_ID,
-                getNotificationDataForLip(now.toLocalDateTime()),
+                publicQuery ? TEMPLATE_PUBLIC_LIP_ID : TEMPLATE_ID_LIP,
+                getNotificationDataForLip(now.toLocalDateTime(), publicQuery),
                 "response-to-query-notification-000DC001"
             );
         }
 
-        @Test
-        void shouldNotifyClaimantLipForBilingual_whenResponseToQueryReceivedNoFollowUpQueries() {
+        @ParameterizedTest
+        @ValueSource(booleans = {true, false})
+        void shouldNotifyClaimantLipForBilingual_whenResponseToQueryReceivedNoFollowUpQueries(boolean publicQuery) {
+            when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(publicQuery);
             when(runtimeService.getProcessVariables(any()))
                 .thenReturn(QueryManagementVariables.builder()
                                 .queryId("5")
@@ -608,25 +664,27 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
                 any(),
                 any()
             )).thenReturn(List.of(CaseRole.CLAIMANT.toString()));
-            when(notificationsProperties.getQueryLipResponseReceivedWelsh()).thenReturn(TEMPLATE_ID);
-
             OffsetDateTime now = OffsetDateTime.now();
             CaseData caseData = createCaseDataWithQueries(now);
-            caseData = caseData.toBuilder().claimantBilingualLanguagePreference(Language.BOTH.toString()).build();
+            caseData = caseData.toBuilder()
+                .applicant1Represented(YesOrNo.NO)
+                .claimantBilingualLanguagePreference(Language.BOTH.toString()).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             handler.handle(params);
 
             verify(notificationService).sendMail(
                 "rambo@email.com",
-                TEMPLATE_ID,
-                getNotificationDataForLip(now.toLocalDateTime()),
+                publicQuery ? TEMPLATE_PUBLIC_WELSH_LIP_ID : TEMPLATE_ID_LIP_WELSH,
+                getNotificationDataForLip(now.toLocalDateTime(), publicQuery),
                 "response-to-query-notification-000DC001"
             );
         }
 
-        @Test
-        void shouldNotifyDefendantLip_whenResponseToQueryReceivedNoFollowUpQueries() {
+        @ParameterizedTest
+        @ValueSource(booleans = {true, false})
+        void shouldNotifyDefendantLip_whenResponseToQueryReceivedNoFollowUpQueries(boolean publicQuery) {
+            when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(publicQuery);
             when(runtimeService.getProcessVariables(any()))
                 .thenReturn(QueryManagementVariables.builder()
                                 .queryId("15")
@@ -635,26 +693,29 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
                 any(),
                 any()
             )).thenReturn(List.of(CaseRole.DEFENDANT.toString()));
-            when(notificationsProperties.getQueryLipResponseReceivedEnglish()).thenReturn(TEMPLATE_ID);
 
             OffsetDateTime now = OffsetDateTime.now();
             CaseData caseData = createCaseDataWithQueries(now);
             caseData = caseData.toBuilder()
-                .defendantUserDetails(IdamUserDetails.builder().email("sole.trader@email.com").build()).build();
+                .defendantUserDetails(IdamUserDetails.builder().email("sole.trader@email.com").build())
+                .respondent1Represented(YesOrNo.NO)
+                .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             handler.handle(params);
 
             verify(notificationService).sendMail(
                 "sole.trader@email.com",
-                TEMPLATE_ID,
-                getNotificationDataMapLipRes(now.toLocalDateTime()),
+                publicQuery ? TEMPLATE_PUBLIC_LIP_ID : TEMPLATE_ID_LIP,
+                getNotificationDataMapLipRes(now.toLocalDateTime(), publicQuery),
                 "response-to-query-notification-000DC001"
             );
         }
 
-        @Test
-        void shouldNotifyDefendantLipBilingual_whenResponseToQueryReceivedNoFollowUpQueries() {
+        @ParameterizedTest
+        @ValueSource(booleans = {true, false})
+        void shouldNotifyDefendantLipBilingual_whenResponseToQueryReceivedNoFollowUpQueries(boolean publicQuery) {
+            when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(publicQuery);
             when(runtimeService.getProcessVariables(any()))
                 .thenReturn(QueryManagementVariables.builder()
                                 .queryId("15")
@@ -663,10 +724,10 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
                 any(),
                 any()
             )).thenReturn(List.of(CaseRole.DEFENDANT.toString()));
-            when(notificationsProperties.getQueryLipResponseReceivedWelsh()).thenReturn(TEMPLATE_ID);
             OffsetDateTime now = OffsetDateTime.now();
             CaseData caseData = createCaseDataWithQueries(now);
             caseData = caseData.toBuilder()
+                .respondent1Represented(YesOrNo.NO)
                 .defendantUserDetails(IdamUserDetails.builder().email("sole.trader@email.com").build())
                 .caseDataLiP(CaseDataLiP.builder().respondent1LiPResponse(
                     RespondentLiPResponse.builder().respondent1ResponseLanguage(Language.BOTH.toString()).build()).build())
@@ -677,8 +738,8 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
 
             verify(notificationService).sendMail(
                 "sole.trader@email.com",
-                TEMPLATE_ID,
-                getNotificationDataMapLipRes(now.toLocalDateTime()),
+                publicQuery ? TEMPLATE_PUBLIC_WELSH_LIP_ID : TEMPLATE_ID_LIP_WELSH,
+                getNotificationDataMapLipRes(now.toLocalDateTime(), publicQuery),
                 "response-to-query-notification-000DC001"
             );
         }

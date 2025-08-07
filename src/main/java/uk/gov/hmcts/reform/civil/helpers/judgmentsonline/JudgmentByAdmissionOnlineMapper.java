@@ -85,10 +85,16 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
         JudgmentDetails activeJudgmentDetails = addUpdateActiveJudgment(caseData);
         builder.activeJudgment(activeJudgmentDetails);
         CaseData data = builder.build();
-        BigDecimal interest = (!judgementService.isLrFullAdmitRepaymentPlan(data)
-            && !judgementService.isLRPartAdmitRepaymentPlan(data))
-            ? interestCalculator.calculateInterest(data) : null;
+        boolean isLrAdmissionRepaymentPlan = judgementService.isLRAdmissionRepaymentPlan(data);
+        BigDecimal interest = (!isLrAdmissionRepaymentPlan) ? interestCalculator.calculateInterest(data) : null;
         super.updateJudgmentTabDataWithActiveJudgment(activeJudgmentDetails, builder, interest);
+
+        if (isLrAdmissionRepaymentPlan) {
+            builder.joRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummaryForLRAdmission(
+                activeJudgmentDetails,
+                interest
+            ));
+        }
         return builder;
     }
 
@@ -216,7 +222,8 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
     private String addInterest(BigInteger orderAmount, BigInteger totalInterest, CaseData caseData) {
         if (judgementService.isLrFullAdmitRepaymentPlan(caseData)
             || judgementService.isLRPartAdmitRepaymentPlan(caseData)
-            || judgementService.isLrPayImmediatelyPlan(caseData)) {
+            || judgementService.isLrPayImmediatelyPlan(caseData)
+            || judgementService.isLipvLipPartAdmit(caseData)) {
             return orderAmount.toString();
         } else {
             return orderAmount.add(totalInterest).toString();
@@ -227,7 +234,8 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
                                        BigInteger claimFeeAmount, BigInteger costs, CaseData caseData) {
         if (judgementService.isLrFullAdmitRepaymentPlan(caseData)
             || judgementService.isLRPartAdmitRepaymentPlan(caseData)
-            || judgementService.isLrPayImmediatelyPlan(caseData)) {
+            || judgementService.isLrPayImmediatelyPlan(caseData)
+            || judgementService.isLipvLipPartAdmit(caseData)) {
             return orderAmount.add(claimFeeAmount).add(costs).toString();
         } else {
             return orderAmount.add(totalInterest).add(claimFeeAmount).add(costs).toString();

@@ -92,7 +92,7 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
             builder.messagesToReplyTo(messageService.createMessageSelectionList(caseData.getMessages()));
         }
 
-        if (featureToggleService.isGaForWelshEnabled()
+        if (featureToggleService.isWelshEnabledForMainCase()
             && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
             builder.bilingualHint(YesOrNo.YES);
         }
@@ -118,7 +118,7 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
                 caseData.getMessages(),
                 caseData.getSendMessageMetadata(),
                 caseData.getSendMessageContent(),
-                userAuth, caseData
+                userAuth
             );
 
             builder.messages(messagesNew)
