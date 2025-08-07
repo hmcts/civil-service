@@ -895,9 +895,7 @@ class UploadTranslatedDocumentDefaultStrategyTest {
             .extracting("businessProcess")
             .extracting("camundaEvent")
             .isEqualTo(CaseEvent.COURT_OFFICER_ORDER.name());
-        assertThat(response.getData()).extracting("previewCourtOfficerOrder")
-            .isNotNull();
-        assertThat(response.getData()).extracting("translatedCourtOfficerOrder")
+        assertThat(response.getData()).extracting("courtOfficersOrders")
             .isNotNull();
     }
 
