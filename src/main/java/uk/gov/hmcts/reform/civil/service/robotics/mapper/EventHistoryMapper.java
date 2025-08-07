@@ -707,7 +707,8 @@ public class EventHistoryMapper {
         RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec = caseData.getRespondToClaimAdmitPartLRspec();
         if (hasCourtDecisionInFavourOfClaimant(caseData)) {
             return caseData.isPayBySetDate()
-                ? Optional.ofNullable(caseData.getApplicant1RequestedPaymentDateForDefendantSpec()).map(PaymentBySetDate::getPaymentSetDate).map(LocalDate::atStartOfDay).orElse(null)
+                ? Optional.ofNullable(caseData.getApplicant1RequestedPaymentDateForDefendantSpec())
+                .map(PaymentBySetDate::getPaymentSetDate).map(LocalDate::atStartOfDay).orElse(null)
                 : null;
         }
         return caseData.isPayBySetDate()
