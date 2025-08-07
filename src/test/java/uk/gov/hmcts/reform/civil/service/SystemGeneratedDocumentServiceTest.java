@@ -14,13 +14,14 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.HEARING_NOTICE;
+import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.COURT_OFFICER_ORDER;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 class SystemGeneratedDocumentServiceTest {
 
     private static final String FILE_NAME_1 = "Some file 1";
 
-    private SystemGeneratedDocumentService systemGeneratedDocumentService = new SystemGeneratedDocumentService();
+    private final SystemGeneratedDocumentService systemGeneratedDocumentService = new SystemGeneratedDocumentService();
 
     @Test
     void shouldAddDocumentToSystemGeneratedDocuments() {
@@ -81,6 +82,30 @@ class SystemGeneratedDocumentServiceTest {
         //When
         List<Element<CaseDocument>> result = systemGeneratedDocumentService
             .getHearingDocumentsWithAddedDocumentWelsh(translatedDocument, callbackParams.getCaseData());
+
+        //Then
+        assertThat(result.get(0)).isNotNull();
+        assertThat(result.get(0).getValue().getDocumentName()).isEqualTo(FILE_NAME_1);
+    }
+
+    @Test
+    void shouldGetAddTranslatedCourtOfficersOrderToCollection() {
+        //Given
+        TranslatedDocument translatedDocument1 = TranslatedDocument
+            .builder()
+            .documentType(COURT_OFFICER_ORDER)
+            .file(Document.builder().documentFileName(FILE_NAME_1).build())
+            .build();
+
+        List<Element<TranslatedDocument>> translatedDocument = List.of(
+            element(translatedDocument1)
+        );
+        CaseData caseData = CaseData.builder().courtOfficersOrders(new ArrayList<>())
+            .build();
+        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        //When
+        List<Element<CaseDocument>> result = systemGeneratedDocumentService
+            .getCourtOfficerOrdersWithAddedDocument(translatedDocument, callbackParams.getCaseData());
 
         //Then
         assertThat(result.get(0)).isNotNull();
