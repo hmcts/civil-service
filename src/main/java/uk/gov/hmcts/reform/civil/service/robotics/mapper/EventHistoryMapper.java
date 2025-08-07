@@ -464,7 +464,7 @@ public class EventHistoryMapper {
         Optional<RepaymentPlanLRspec> repaymentPlan = Optional.ofNullable(caseData.getRespondent1RepaymentPlan());
         BigDecimal repaymentAmount = hasCourtDecisionInFavourOfClaimant(caseData)
             ? caseData.getApplicant1SuggestInstalmentsPaymentAmountForDefendantSpec()
-            : repaymentPlan.map(RepaymentPlanLRspec::getPaymentAmount).orElse(null);
+            : repaymentPlan.map(RepaymentPlanLRspec::getPaymentAmount).orElse(ZERO);
         return payByInstallment
             ? MonetaryConversions.penniesToPounds(
             Optional.ofNullable(repaymentAmount).map(amount -> amount.setScale(2)).orElse(ZERO))
