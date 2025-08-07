@@ -41,7 +41,6 @@ public enum DocmosisTemplates {
     DEFAULT_JUDGMENT_NON_DIVERGENT_SPEC_PIN_LIP_DEFENDANT_LETTER("CV-CMC-LET-ENG-LIP-JO0004.docx", "default_judgment_non_divergent_spec_pin_letter.pdf"),
     SETTLE_CLAIM_MARKED_PAID_IN_FULL_LIP_DEFENDANT_LETTER("CV-SPC-LET-ENG-LIP-SD0001.docx", "settle_claim_paid_in_full_letter.pdf"),
     SETTLE_CLAIM_MARKED_PAID_IN_FULL_LIP_DEFENDANT_LETTER_WELSH("CV-SPC-LET-WEL-LIP-SD0001.docx", "settle_claim_paid_in_full_letter.pdf"),
-    DEFENDANT_RESPONSE_SPEC("CV-SPC-HRN-ENG-01357.docx", "%s_directions_questionnaire_form_%s.pdf"),
     DEFENDANT_RESPONSE_SPEC_FAST_TRACK_INT("CV-SPC-HRN-ENG-01358.docx", "%s_directions_questionnaire_form_%s.pdf"),
     CLAIMANT_RESPONSE_SPEC("CV-SPC-HRN-ENG-01356.docx", "%s_directions_questionnaire_form_%s.pdf"),
     CLAIMANT_RESPONSE_SPEC_FAST_TRACK_INT("CV-SPC-HRN-ENG-01359.docx", "%s_directions_questionnaire_form_%s.pdf"),
