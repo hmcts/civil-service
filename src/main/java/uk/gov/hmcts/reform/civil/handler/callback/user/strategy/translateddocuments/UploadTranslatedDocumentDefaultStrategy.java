@@ -129,6 +129,10 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                                 .filter(item -> item.getValue().getDocumentType()
                                     == DocumentType.INTERLOCUTORY_JUDGEMENT)
                                 .findFirst();
+                        preTranslationInterlocJudgment.ifPresent(originalDoc -> renameTranslatedDocument(
+                            originalDoc,
+                            document
+                        ));
                         preTranslationInterlocJudgment.ifPresent(preTranslationDocuments::remove);
                         preTranslationInterlocJudgment.ifPresent(systemGeneratedDocuments::add);
                     }
@@ -189,10 +193,15 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                             preTranslationDocuments.stream()
                                 .filter(item -> item.getValue().getDocumentType() == DocumentType.COURT_OFFICER_ORDER)
                                 .findFirst();
-                        preTranslationCourtOfficerOrder.ifPresent(originalDoc -> renameTranslatedDocument(
-                            originalDoc,
-                            document
-                        ));
+                        preTranslationCourtOfficerOrder.ifPresent(originalDoc -> {
+                            document.getValue().getFile().setDocumentFileName(
+                                String.format(
+                                    "Translated_%s.%s",
+                                    getBaseFileName(originalDoc.getValue().getDocumentLink().getDocumentFileName()),
+                                    getFileType(document.getValue().getFile().getDocumentFileName())
+                                )
+                            );
+                        });
                         preTranslationCourtOfficerOrder.ifPresent(preTranslationDocuments::remove);
                         preTranslationCourtOfficerOrder.ifPresent(courtOfficerOrderDocuments::add);
                     }
