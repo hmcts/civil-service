@@ -267,7 +267,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
             });
         }
         if (!courtOfficerOrderDocuments.isEmpty()) {
-            caseDataBuilder.previewCourtOfficerOrder(courtOfficerOrderDocuments.get(0).getValue());
+            caseDataBuilder.courtOfficersOrders(courtOfficerOrderDocuments);
         }
 
         if (featureToggleService.isWelshEnabledForMainCase() && caseData.getRespondent1OriginalDqDoc() != null) {
@@ -335,12 +335,9 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
             systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(addToSystemGenerated, caseData);
 
         if (!addToCourtOfficerOrders.isEmpty()) {
-            CaseDocument translatedCourtOfficerOrder = CaseDocument.toCaseDocument(
-                addToCourtOfficerOrders.get(0).getValue().getFile(),
-                addToCourtOfficerOrders.get(0).getValue().getCorrespondingDocumentType(
-                    addToCourtOfficerOrders.get(0).getValue().getDocumentType())
-            );
-            caseDataBuilder.translatedCourtOfficerOrder(translatedCourtOfficerOrder);
+            List<Element<CaseDocument>> updatedCourtOfficeOrder =
+                systemGeneratedDocumentService.getCourtOfficerOrdersWithAddedDocument(addToCourtOfficerOrders, caseDataBuilder.build());
+            caseDataBuilder.courtOfficersOrders(updatedCourtOfficeOrder);
         }
 
         if (!addToHearingDocuments.isEmpty()) {
