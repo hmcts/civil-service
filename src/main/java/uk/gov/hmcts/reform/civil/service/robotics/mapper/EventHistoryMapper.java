@@ -2503,9 +2503,8 @@ public class EventHistoryMapper {
         return "FUL";
     }
 
-    private String getInstallmentPeriodForRequestJudgmentByAdmission(CaseData caseData) {
-        boolean isResponsePayByInstallment = caseData.isPayByInstallment();
-        if (isResponsePayByInstallment) {
+    private String getInstallmentPeriodForRequestJudgmentByAdmission(boolean payByInstallment, CaseData caseData) {
+        if (payByInstallment) {
             if (hasCourtDecisionInFavourOfClaimant(caseData)) {
                 return mapToRepaymentPlanFrequency(Optional.ofNullable(caseData.getApplicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec()).map(Enum::name).orElse(""));
             } else {
@@ -2528,8 +2527,9 @@ public class EventHistoryMapper {
 
     private String getJBAInstallmentPeriod(CaseData caseData) {
         boolean joLiveFeedActive = featureToggleService.isJOLiveFeedActive();
-        if (caseData.isPayByInstallment()) {
-            return getInstallmentPeriodForRequestJudgmentByAdmission(caseData);
+        boolean payByInstallment = hasCourtDecisionInFavourOfClaimant(caseData) ? caseData.applicant1SuggestedPayByInstalments() : caseData.isPayByInstallment();
+        if (payByInstallment) {
+            return getInstallmentPeriodForRequestJudgmentByAdmission(payByInstallment, caseData);
         } else if (joLiveFeedActive && caseData.isPayBySetDate()) {
             return "FUL";
         } else if (joLiveFeedActive) {
