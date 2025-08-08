@@ -46,7 +46,7 @@ public class SendDroOrderToLipBulkPrintCallbackHandlerTest extends BaseCallbackH
 
     @Test
     void shouldNotCallRecordScenario_whenWelshFlagIsDisabled() {
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, CaseData.builder().build())
@@ -75,7 +75,7 @@ public class SendDroOrderToLipBulkPrintCallbackHandlerTest extends BaseCallbackH
     @Test
     void shouldDownloadDocumentAndPrintLetterSuccessfullyForDefendantLiP() {
 
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         // given
         CaseData caseData = CaseDataBuilder.builder()
             .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(DECISION_MADE_ON_APPLICATIONS).build())).build();
@@ -93,7 +93,7 @@ public class SendDroOrderToLipBulkPrintCallbackHandlerTest extends BaseCallbackH
     @Test
     void shouldDownloadDocumentAndPrintLetterSuccessfullyForClaimantLiP() {
 
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         // given
         CaseData caseData = CaseDataBuilder.builder()
             .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(DECISION_MADE_ON_APPLICATIONS).build())).build();

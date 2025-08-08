@@ -5,6 +5,11 @@ public enum CamundaProcessIdentifier {
     ClaimantConfirmProceedNotifyParties,
     RejectRepaymentPlanNotifyParties,
     LitigationFriendAddedNotifier,
+    ChangeOfRepresentationNotifyParties,
+    //NoC - Lip v Lip to LR v Lip
+    ClaimantLipRepresentedWithNoCNotifier,
+    //NoC - Lip v Lip to Lip v Lr or Lr v Lip to Lr v Lr
+    DefendantLipRepresentedWithNoCNotifier,
     GenerateDJFormNotifyParties,
     ClaimProceedsOfflineUnspecNotifyApplicantSolicitor,
     UnspecNotifyClaimNotifier,
@@ -12,6 +17,12 @@ public enum CamundaProcessIdentifier {
     AcknowledgeClaimUnspecNotifyParties,
     GenerateOrderNotifyPartiesCourtOfficerOrder,
     GenerateOrderNotifyParties,
+    TakenOfflineCaseForSpecNotifier,
+    RaisingClaimAgainstSpecLitigantInPersonForNotifier,
+    ClaimSubmissionNotifyParties,
+    ContinuingClaimOnlineSpecClaimNotifier,
+    MediationSuccessfulNotifyParties,
+    MediationUnsuccessfulNotifyParties,
     DismissCaseNotifier,
     HwFOutcomeNotifyParties,
     DefendantResponseUnspecFullDefenceNotifyParties,
@@ -25,6 +36,7 @@ public enum CamundaProcessIdentifier {
     JudgmentVariedDeterminationOfMeansNotifyParties,
     ClaimSubmittedApplicantNotifier,
     ClaimantLipHelpWithFeesNotifier,
+    DiscontinuanceClaimNotifyParties,
     ExtendResponseDeadlineNotifier,
     DefendantResponseCUINotify,
     TakeCaseOfflineNotifier,
@@ -44,5 +56,6 @@ public enum CamundaProcessIdentifier {
     Respondent1NotifyOthersTrialReady,
     Respondent2NotifyOthersTrialReady,
     AmendRestitchBundleNotify,
-    CreateSDONotify,
+    BundleCreationNotify,
+    CreateSDONotify
 }

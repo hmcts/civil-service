@@ -175,7 +175,8 @@ public class JudgmentsOnlineHelper {
     public static String calculateRepaymentBreakdownSummary(JudgmentDetails activeJudgment, BigDecimal interest) {
         BigDecimal totalAmount = MonetaryConversions.penniesToPounds(new BigDecimal(activeJudgment.getTotalAmount()));
         StringBuilder repaymentBreakdown = new StringBuilder();
-
+        //creates  the text on the page, based on calculated values
+        getJudgmentSummaryText(totalAmount, repaymentBreakdown);
         getClaimAmountBreakdownSummary(activeJudgment, totalAmount, repaymentBreakdown);
         getClaimInterestBreakdownSummary(interest, repaymentBreakdown);
         repaymentJoBreakdownSummary(activeJudgment, totalAmount, repaymentBreakdown);
@@ -183,20 +184,42 @@ public class JudgmentsOnlineHelper {
     }
 
     @NotNull
-    public static String calculateRepaymentBreakdownSummaryForLRImmediatePlan(JudgmentDetails activeJudgment) {
+    public static String calculateRepaymentBreakdownSummaryForLRAdmission(JudgmentDetails activeJudgment, BigDecimal interest) {
         BigDecimal totalAmount = MonetaryConversions.penniesToPounds(new BigDecimal(activeJudgment.getTotalAmount()));
         StringBuilder repaymentBreakdown = new StringBuilder();
 
+        getJudgmentSummaryTextForLRAdmission(totalAmount, repaymentBreakdown);
+        getClaimAmountBreakdownSummary(activeJudgment, totalAmount, repaymentBreakdown);
+        getClaimInterestBreakdownSummary(interest, repaymentBreakdown);
+        repaymentJoBreakdownSummary(activeJudgment, totalAmount, repaymentBreakdown);
+        return repaymentBreakdown.toString();
+    }
+
+    @NotNull
+    public static String calculateRepaymentBreakdownSummaryWithoutClaimInterest(JudgmentDetails activeJudgment, boolean isSameJudgmentText) {
+        BigDecimal totalAmount = MonetaryConversions.penniesToPounds(new BigDecimal(activeJudgment.getTotalAmount()));
+        StringBuilder repaymentBreakdown = new StringBuilder();
+        if (isSameJudgmentText) {
+            getJudgmentSummaryText(totalAmount, repaymentBreakdown);
+        } else {
+            getJudgmentSummaryTextForLRAdmission(totalAmount, repaymentBreakdown);
+        }
         getClaimAmountBreakdownSummary(activeJudgment, totalAmount, repaymentBreakdown);
         repaymentJoBreakdownSummary(activeJudgment, totalAmount, repaymentBreakdown);
         return repaymentBreakdown.toString();
     }
 
-    private static void getClaimAmountBreakdownSummary(JudgmentDetails activeJudgment, BigDecimal totalAmount, StringBuilder repaymentBreakdown) {
-        //creates  the text on the page, based on calculated values
-        repaymentBreakdown.append("The judgment will order the defendants to pay £").append(totalAmount);
-        repaymentBreakdown.append(", including the claim fee and interest, if applicable, as shown:");
+    private static void getJudgmentSummaryTextForLRAdmission(BigDecimal totalAmount, StringBuilder repaymentBreakdown) {
+        repaymentBreakdown.append("The judgment will order the defendant to pay £").append(totalAmount);
+        repaymentBreakdown.append(", including the claim fee, any fixed costs if claimed and interest if applicable, as shown:");
+    }
 
+    private static void getJudgmentSummaryText(BigDecimal totalAmount, StringBuilder repaymentBreakdown) {
+        repaymentBreakdown.append("The judgment will order the defendant to pay £").append(totalAmount);
+        repaymentBreakdown.append(", including the claim fee and interest, if applicable, as shown:");
+    }
+
+    private static void getClaimAmountBreakdownSummary(JudgmentDetails activeJudgment, BigDecimal totalAmount, StringBuilder repaymentBreakdown) {
         BigDecimal orderedAmount = MonetaryConversions.penniesToPounds(new BigDecimal(activeJudgment.getOrderedAmount()));
         if (null != orderedAmount) {
             repaymentBreakdown.append("\n").append("### Claim amount \n £").append(orderedAmount.setScale(2));

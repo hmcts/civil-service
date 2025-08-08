@@ -107,8 +107,7 @@ public class CaseHandledOfflineApplicantSolicitorSpecNotifier extends CaseHandle
             CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
         addAllFooterItems(caseData, properties, getNotificationsSignatureConfiguration(),
-                          getFeatureToggleService().isQueryManagementLRsEnabled(),
-                          getFeatureToggleService().isLipQueryManagementEnabled(caseData));
+                          getFeatureToggleService().isPublicQueryManagementEnabled(caseData));
         return properties;
     }
 
@@ -118,8 +117,7 @@ public class CaseHandledOfflineApplicantSolicitorSpecNotifier extends CaseHandle
                 CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString()
             ));
         addAllFooterItems(caseData, properties, getNotificationsSignatureConfiguration(),
-                          getFeatureToggleService().isQueryManagementLRsEnabled(),
-                          getFeatureToggleService().isLipQueryManagementEnabled(caseData));
+                          getFeatureToggleService().isPublicQueryManagementEnabled(caseData));
         return properties;
     }
 
@@ -131,8 +129,7 @@ public class CaseHandledOfflineApplicantSolicitorSpecNotifier extends CaseHandle
             CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
         addAllFooterItems(caseData, properties, getNotificationsSignatureConfiguration(),
-                          getFeatureToggleService().isQueryManagementLRsEnabled(),
-                          getFeatureToggleService().isLipQueryManagementEnabled(caseData));
+                          getFeatureToggleService().isPublicQueryManagementEnabled(caseData));
         return properties;
     }
 

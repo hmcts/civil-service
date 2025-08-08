@@ -25,6 +25,7 @@ import java.util.Optional;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
 @RequiredArgsConstructor
@@ -62,11 +63,11 @@ public class TranslatedDocumentUploadedClaimantNotificationHandler extends Callb
         if (caseData.isApplicantNotRepresented() && featureToggleService.isLipVLipEnabled()) {
             HashMap<String, String> properties = new HashMap<>(Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-                CLAIMANT_NAME, caseData.getApplicant1().getPartyName()
+                CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
+                RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
             ));
             addAllFooterItems(caseData, properties, configuration,
-                              featureToggleService.isQueryManagementLRsEnabled(),
-                              featureToggleService.isLipQueryManagementEnabled(caseData));
+                              featureToggleService.isPublicQueryManagementEnabled(caseData));
             return properties;
         }
         HashMap<String, String> properties = new HashMap<>(Map.of(
@@ -76,8 +77,7 @@ public class TranslatedDocumentUploadedClaimantNotificationHandler extends Callb
             CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
         addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
         return properties;
     }
 
@@ -98,9 +98,9 @@ public class TranslatedDocumentUploadedClaimantNotificationHandler extends Callb
     private String addTemplate(CaseData caseData) {
         if (caseData.isApplicantNotRepresented() && featureToggleService.isLipVLipEnabled()) {
             if (caseData.isClaimantBilingual()) {
-                return notificationsProperties.getNotifyClaimantLiPTranslatedDocumentUploadedWhenClaimIssuedInBilingual();
+                return notificationsProperties.getNotifyLiPClaimantDefendantRespondedWelshLip();
             }
-            return notificationsProperties.getNotifyClaimantLiPTranslatedDocumentUploadedWhenClaimIssuedInEnglish();
+            return notificationsProperties.getNotifyLiPClaimantDefendantResponded();
         }
         return notificationsProperties.getNotifyClaimantTranslatedDocumentUploaded();
     }

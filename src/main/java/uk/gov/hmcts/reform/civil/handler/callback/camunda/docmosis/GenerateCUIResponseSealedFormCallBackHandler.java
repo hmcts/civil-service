@@ -87,9 +87,12 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
                                                                     authToken);
                 log.info("Civil stitch service for response cui sealed form {} for caseId {}", stitchedDocument, caseId);
                 addToSystemGeneratedDocuments(caseDataBuilder, stitchedDocument, caseData);
+            } else {
+                addToSystemGeneratedDocuments(caseDataBuilder, sealedForm, caseData);
             }
+        } else {
+            addToSystemGeneratedDocuments(caseDataBuilder, sealedForm, caseData);
         }
-        addToSystemGeneratedDocuments(caseDataBuilder, sealedForm, caseData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -98,7 +101,7 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
 
     private void addToSystemGeneratedDocuments(CaseData.CaseDataBuilder<?, ?> caseDataBuilder, CaseDocument document, CaseData caseData) {
         if (featureToggleService.isWelshEnabledForMainCase() && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
-            caseDataBuilder.respondent1ClaimResponseDocumentSpec(document)
+            caseDataBuilder
                 .bilingualHint(YesOrNo.YES)
                 .preTranslationDocuments(List.of(ElementUtils.element(document)));
         } else {
@@ -107,8 +110,8 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
                     document,
                     caseData
                 ));
-            assignCategoryId.assignCategoryIdToCaseDocument(document, DocCategory.DEF1_DEFENSE_DQ.getValue());
         }
+        assignCategoryId.assignCategoryIdToCaseDocument(document, DocCategory.DEF1_DEFENSE_DQ.getValue());
     }
 
     private List<DocumentMetaData> fetchDocumentsToStitch(CaseData caseData, CaseDocument sealedForm) {

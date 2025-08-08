@@ -63,9 +63,16 @@ public class ClaimantResponseNotAgreedRepaymentRespondentNotificationHandler ext
 
     private String addTemplate(CaseData caseData) {
         return (caseData.isApplicant1NotRepresented() && featureToggleService.isLipVLipEnabled())
-            ? notificationsProperties.getNotifyClaimantLipTemplateManualDetermination()
+            ? getTemplateForLip(caseData)
             : notificationsProperties.getNotifyClaimantLrTemplate();
 
+    }
+
+    private String getTemplateForLip(CaseData caseData) {
+        if (featureToggleService.isGaForWelshEnabled() && caseData.isClaimantBilingual()) {
+            return notificationsProperties.getNotifyClaimantLipTemplateManualDeterminationForWelsh();
+        }
+        return notificationsProperties.getNotifyClaimantLipTemplateManualDetermination();
     }
 
     @Override
@@ -81,8 +88,7 @@ public class ClaimantResponseNotAgreedRepaymentRespondentNotificationHandler ext
                 CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1())
             ));
             addAllFooterItems(caseData, lipProperties, configuration,
-                              featureToggleService.isQueryManagementLRsEnabled(),
-                              featureToggleService.isLipQueryManagementEnabled(caseData));
+                              featureToggleService.isPublicQueryManagementEnabled(caseData));
             return lipProperties;
         } else {
             HashMap<String, String> properties = new HashMap<>(Map.of(
@@ -92,8 +98,7 @@ public class ClaimantResponseNotAgreedRepaymentRespondentNotificationHandler ext
                 CASEMAN_REF, caseData.getLegacyCaseReference()
             ));
             addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
             return properties;
         }
     }

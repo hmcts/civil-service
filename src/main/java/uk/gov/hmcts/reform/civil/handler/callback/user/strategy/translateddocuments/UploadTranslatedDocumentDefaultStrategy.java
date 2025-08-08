@@ -151,12 +151,10 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                             == DocumentType.NOTICE_OF_DISCONTINUANCE_DEFENDANT).findFirst();
                     noticeOfDiscontinuanceOpt.ifPresent(noticeOfDiscontinuance -> {
                         preTranslationDocuments.remove(noticeOfDiscontinuance);
-                        if (!caseData.isJudgeOrderVerificationRequired()) {
-                            caseDataBuilder.applicant1NoticeOfDiscontinueAllPartyViewDoc(caseData.getApplicant1NoticeOfDiscontinueCWViewDoc());
-                            caseDataBuilder.applicant1NoticeOfDiscontinueCWViewDoc(null);
-                            caseDataBuilder.respondent1NoticeOfDiscontinueCWViewDoc(null);
-                            caseDataBuilder.respondent1NoticeOfDiscontinueAllPartyViewDoc(noticeOfDiscontinuance.getValue());
-                        }
+                        caseDataBuilder.applicant1NoticeOfDiscontinueAllPartyViewDoc(caseData.getApplicant1NoticeOfDiscontinueCWViewDoc());
+                        caseDataBuilder.applicant1NoticeOfDiscontinueCWViewDoc(null);
+                        caseDataBuilder.respondent1NoticeOfDiscontinueCWViewDoc(null);
+                        caseDataBuilder.respondent1NoticeOfDiscontinueAllPartyViewDoc(noticeOfDiscontinuance.getValue());
                     });
                 } else if (document.getValue().getDocumentType().equals(SETTLEMENT_AGREEMENT)) {
                     Optional<Element<CaseDocument>> preTranslationSettlementAgreement =
@@ -218,6 +216,9 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                     } else if ((originalDocument.getValue().getDocumentType() != DocumentType.SEALED_CLAIM)
                         || (featureToggleService.isWelshEnabledForMainCase()
                         && originalDocument.getValue().getDocumentType() == DocumentType.SEALED_CLAIM)) {
+                        if (originalDocument.getValue().getDocumentType().equals((DocumentType.DEFENDANT_DEFENCE))) {
+                            caseDataBuilder.respondent1ClaimResponseDocumentSpec(originalDocument.getValue());
+                        }
                         systemGeneratedDocuments.add(originalDocument);
                     }
                 }
@@ -225,7 +226,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
             });
         }
         if (!courtOfficerOrderDocuments.isEmpty()) {
-            caseDataBuilder.previewCourtOfficerOrder(courtOfficerOrderDocuments.get(0).getValue());
+            caseDataBuilder.courtOfficersOrders(courtOfficerOrderDocuments);
         }
 
         if (featureToggleService.isWelshEnabledForMainCase() && caseData.getRespondent1OriginalDqDoc() != null) {
@@ -293,12 +294,9 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
             systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(addToSystemGenerated, caseData);
 
         if (!addToCourtOfficerOrders.isEmpty()) {
-            CaseDocument translatedCourtOfficerOrder = CaseDocument.toCaseDocument(
-                addToCourtOfficerOrders.get(0).getValue().getFile(),
-                addToCourtOfficerOrders.get(0).getValue().getCorrespondingDocumentType(
-                    addToCourtOfficerOrders.get(0).getValue().getDocumentType())
-            );
-            caseDataBuilder.translatedCourtOfficerOrder(translatedCourtOfficerOrder);
+            List<Element<CaseDocument>> updatedCourtOfficeOrder =
+                systemGeneratedDocumentService.getCourtOfficerOrdersWithAddedDocument(addToCourtOfficerOrders, caseDataBuilder.build());
+            caseDataBuilder.courtOfficersOrders(updatedCourtOfficeOrder);
         }
 
         if (!addToHearingDocuments.isEmpty()) {
@@ -335,8 +333,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                 return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_ORDER;
             } else if (Objects.nonNull(translatedDocuments)
                 && isContainsSpecifiedDocType(translatedDocuments, NOTICE_OF_DISCONTINUANCE_DEFENDANT)) {
-                return caseData.isJudgeOrderVerificationRequired() ? null :
-                    CaseEvent.UPLOAD_TRANSLATED_DISCONTINUANCE_DOC;
+                return CaseEvent.UPLOAD_TRANSLATED_DISCONTINUANCE_DOC;
             } else if (Objects.nonNull(translatedDocuments)
                 && translatedDocuments.get(0).getValue().getDocumentType().equals(SETTLEMENT_AGREEMENT)) {
                 return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_SETTLEMENT_AGREEMENT;
@@ -366,7 +363,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
             }
         }
 
-        if (caseData.isLRvLipOneVOne() && featureToggleService.isGaForWelshEnabled()) {
+        if (caseData.isLRvLipOneVOne() && featureToggleService.isWelshEnabledForMainCase()) {
             if (caseData.getCcdState() == CaseState.AWAITING_APPLICANT_INTENTION) {
                 return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_CLAIMANT_LR_INTENTION;
             }
