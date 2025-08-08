@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
@@ -223,15 +222,15 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
         );
 
         if (nonNull(taskToComplete)) {
-            if (!nonNull(taskToComplete.getAssignee())) {
+            if (taskToComplete.getTaskState().equals("unassigned")) {
                 UserDetails userDetails = userService.getUserDetails(userAuth);
                 waTaskManagementService.claimTask(userAuth, taskToComplete.getId());
                 taskToComplete.toBuilder().assignee(userDetails.getId()).build();
             }
 
-        return ClientContext.builder()
-            .userTask(UserTask.builder().taskData(taskToComplete).completeTask(true).build())
-            .build();
+            return ClientContext.builder()
+                .userTask(UserTask.builder().taskData(taskToComplete).completeTask(true).build())
+                .build();
         }
 
         return null;

@@ -10,6 +10,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.enums.sendandreply.RolePool;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -52,6 +54,7 @@ class SendAndReplyMessageServiceTest {
 
     private static final String USER_AUTH = "auth";
     private static final String USER_NAME = "Test User";
+    private static final UUID MESSAGE_ID = UUID.randomUUID();
 
     private static final UserDetails USER_DETAILS = UserDetails.builder()
         .id("uid")
@@ -178,13 +181,18 @@ class SendAndReplyMessageServiceTest {
                 )
             );
 
-            List<Element<Message>> actual = messageService.addMessage(
-                null,
-                MESSAGE_METADATA,
-                MESSAGE_CONTENT,
-                USER_AUTH,
-                caseData
-            );
+            List<Element<Message>> actual = null;
+            try (MockedStatic<UUID> mockedStatic = Mockito.mockStatic(UUID.class)) {
+                mockedStatic.when(UUID::randomUUID).thenReturn(MESSAGE_ID);
+
+                actual = messageService.addMessage(
+                    null,
+                    MESSAGE_METADATA,
+                    MESSAGE_CONTENT,
+                    USER_AUTH,
+                    caseData
+                );
+            }
 
             assertEquals(
                 List.of(buildExpectedMessage(expectedSenderRoleCategory, expectedUserRoleLabel)),
@@ -212,13 +220,18 @@ class SendAndReplyMessageServiceTest {
             List<Element<Message>> messages = new ArrayList<>();
             messages.add(element(message));
 
-            List<Element<Message>> actual = messageService.addMessage(
-                messages,
-                MESSAGE_METADATA,
-                MESSAGE_CONTENT,
-                USER_AUTH,
-                caseData
-            );
+            List<Element<Message>> actual = null;
+            try (MockedStatic<UUID> mockedStatic = Mockito.mockStatic(UUID.class)) {
+                mockedStatic.when(UUID::randomUUID).thenReturn(MESSAGE_ID);
+
+                actual = messageService.addMessage(
+                    messages,
+                    MESSAGE_METADATA,
+                    MESSAGE_CONTENT,
+                    USER_AUTH,
+                    caseData
+                );
+            }
 
             assertEquals(List.of(
                 message,
@@ -242,13 +255,18 @@ class SendAndReplyMessageServiceTest {
             List<Element<Message>> messages = new ArrayList<>();
             messages.add(element(message));
 
-            List<Element<Message>> actual = messageService.addMessage(
-                messages,
-                MESSAGE_METADATA,
-                MESSAGE_CONTENT,
-                USER_AUTH,
-                caseData
-            );
+            List<Element<Message>> actual = null;
+            try (MockedStatic<UUID> mockedStatic = Mockito.mockStatic(UUID.class)) {
+                mockedStatic.when(UUID::randomUUID).thenReturn(MESSAGE_ID);
+
+                actual = messageService.addMessage(
+                    messages,
+                    MESSAGE_METADATA,
+                    MESSAGE_CONTENT,
+                    USER_AUTH,
+                    caseData
+                );
+            }
 
             assertEquals(List.of(
                 message,
@@ -275,13 +293,18 @@ class SendAndReplyMessageServiceTest {
             List<Element<Message>> messages = new ArrayList<>();
             messages.add(element(message));
 
-            List<Element<Message>> actual = messageService.addMessage(
-                messages,
-                MESSAGE_METADATA,
-                MESSAGE_CONTENT,
-                USER_AUTH,
-                caseData
-            );
+            List<Element<Message>> actual = null;
+            try (MockedStatic<UUID> mockedStatic = Mockito.mockStatic(UUID.class)) {
+                mockedStatic.when(UUID::randomUUID).thenReturn(MESSAGE_ID);
+
+                actual = messageService.addMessage(
+                    messages,
+                    MESSAGE_METADATA,
+                    MESSAGE_CONTENT,
+                    USER_AUTH,
+                    caseData
+                );
+            }
 
             assertEquals(List.of(
                 message,
@@ -307,13 +330,18 @@ class SendAndReplyMessageServiceTest {
             List<Element<Message>> messages = new ArrayList<>();
             messages.add(element(message));
 
-            List<Element<Message>> actual = messageService.addMessage(
-                messages,
-                MESSAGE_METADATA,
-                MESSAGE_CONTENT,
-                USER_AUTH,
-                caseData
-            );
+            List<Element<Message>> actual = null;
+            try (MockedStatic<UUID> mockedStatic = Mockito.mockStatic(UUID.class)) {
+                mockedStatic.when(UUID::randomUUID).thenReturn(MESSAGE_ID);
+
+                actual = messageService.addMessage(
+                    messages,
+                    MESSAGE_METADATA,
+                    MESSAGE_CONTENT,
+                    USER_AUTH,
+                    caseData
+                );
+            }
 
             assertEquals(List.of(
                 message,
@@ -341,13 +369,18 @@ class SendAndReplyMessageServiceTest {
             List<Element<Message>> messages = new ArrayList<>();
             messages.add(element(message));
 
-            List<Element<Message>> actual = messageService.addMessage(
-                messages,
-                MESSAGE_METADATA,
-                MESSAGE_CONTENT,
-                USER_AUTH,
-                caseData
-            );
+            List<Element<Message>> actual = null;
+            try (MockedStatic<UUID> mockedStatic = Mockito.mockStatic(UUID.class)) {
+                mockedStatic.when(UUID::randomUUID).thenReturn(MESSAGE_ID);
+
+                actual = messageService.addMessage(
+                    messages,
+                    MESSAGE_METADATA,
+                    MESSAGE_CONTENT,
+                    USER_AUTH,
+                    caseData
+                );
+            }
 
             assertEquals(List.of(
                 message,
@@ -373,13 +406,18 @@ class SendAndReplyMessageServiceTest {
             List<Element<Message>> messages = new ArrayList<>();
             messages.add(element(message));
 
-            List<Element<Message>> actual = messageService.addMessage(
-                messages,
-                MESSAGE_METADATA,
-                MESSAGE_CONTENT,
-                USER_AUTH,
-                caseData
-            );
+            List<Element<Message>> actual = null;
+            try (MockedStatic<UUID> mockedStatic = Mockito.mockStatic(UUID.class)) {
+                mockedStatic.when(UUID::randomUUID).thenReturn(MESSAGE_ID);
+
+                actual = messageService.addMessage(
+                    messages,
+                    MESSAGE_METADATA,
+                    MESSAGE_CONTENT,
+                    USER_AUTH,
+                    caseData
+                );
+            }
 
             assertEquals(List.of(
                 message,
@@ -407,13 +445,18 @@ class SendAndReplyMessageServiceTest {
             List<Element<Message>> messages = new ArrayList<>();
             messages.add(element(message));
 
-            List<Element<Message>> actual = messageService.addMessage(
-                messages,
-                MESSAGE_METADATA,
-                MESSAGE_CONTENT,
-                USER_AUTH,
-                caseData
-            );
+            List<Element<Message>> actual = null;
+            try (MockedStatic<UUID> mockedStatic = Mockito.mockStatic(UUID.class)) {
+                mockedStatic.when(UUID::randomUUID).thenReturn(MESSAGE_ID);
+
+                actual = messageService.addMessage(
+                    messages,
+                    MESSAGE_METADATA,
+                    MESSAGE_CONTENT,
+                    USER_AUTH,
+                    caseData
+                );
+            }
 
             assertEquals(List.of(
                 message,
@@ -440,13 +483,18 @@ class SendAndReplyMessageServiceTest {
             List<Element<Message>> messages = new ArrayList<>();
             messages.add(element(message));
 
-            List<Element<Message>> actual = messageService.addMessage(
-                messages,
-                MESSAGE_METADATA,
-                MESSAGE_CONTENT,
-                USER_AUTH,
-                caseData
-            );
+            List<Element<Message>> actual = null;
+            try (MockedStatic<UUID> mockedStatic = Mockito.mockStatic(UUID.class)) {
+                mockedStatic.when(UUID::randomUUID).thenReturn(MESSAGE_ID);
+
+                actual = messageService.addMessage(
+                    messages,
+                    MESSAGE_METADATA,
+                    MESSAGE_CONTENT,
+                    USER_AUTH,
+                    caseData
+                );
+            }
 
             assertEquals(List.of(
                 message,
@@ -473,13 +521,18 @@ class SendAndReplyMessageServiceTest {
             List<Element<Message>> messages = new ArrayList<>();
             messages.add(element(message));
 
-            List<Element<Message>> actual = messageService.addMessage(
-                messages,
-                MESSAGE_METADATA,
-                MESSAGE_CONTENT,
-                USER_AUTH,
-                caseData
-            );
+            List<Element<Message>> actual = null;
+            try (MockedStatic<UUID> mockedStatic = Mockito.mockStatic(UUID.class)) {
+                mockedStatic.when(UUID::randomUUID).thenReturn(MESSAGE_ID);
+
+                actual = messageService.addMessage(
+                    messages,
+                    MESSAGE_METADATA,
+                    MESSAGE_CONTENT,
+                    USER_AUTH,
+                    caseData
+                );
+            }
 
             assertEquals(List.of(
                 message,
@@ -504,13 +557,18 @@ class SendAndReplyMessageServiceTest {
             List<Element<Message>> messages = new ArrayList<>();
             messages.add(element(message));
 
-            List<Element<Message>> actual = messageService.addMessage(
-                messages,
-                MESSAGE_METADATA,
-                MESSAGE_CONTENT,
-                USER_AUTH,
-                caseData
-            );
+            List<Element<Message>> actual = null;
+            try (MockedStatic<UUID> mockedStatic = Mockito.mockStatic(UUID.class)) {
+                mockedStatic.when(UUID::randomUUID).thenReturn(MESSAGE_ID);
+
+                actual = messageService.addMessage(
+                    messages,
+                    MESSAGE_METADATA,
+                    MESSAGE_CONTENT,
+                    USER_AUTH,
+                    caseData
+                );
+            }
 
             assertEquals(List.of(
                 message,
@@ -537,13 +595,19 @@ class SendAndReplyMessageServiceTest {
             List<Element<Message>> messages = new ArrayList<>();
             messages.add(element(message));
 
-            List<Element<Message>> actual = messageService.addMessage(
-                messages,
-                MESSAGE_METADATA,
-                MESSAGE_CONTENT,
-                USER_AUTH,
-                caseData
-            );
+            List<Element<Message>> actual = null;
+
+            try (MockedStatic<UUID> mockedStatic = Mockito.mockStatic(UUID.class)) {
+                mockedStatic.when(UUID::randomUUID).thenReturn(MESSAGE_ID);
+
+               actual = messageService.addMessage(
+                    messages,
+                    MESSAGE_METADATA,
+                    MESSAGE_CONTENT,
+                    USER_AUTH,
+                    caseData
+                );
+            }
 
             assertEquals(List.of(
                 message,
@@ -559,6 +623,7 @@ class SendAndReplyMessageServiceTest {
 
         private Message buildExpectedMessage(RolePool expectedUserRole, String expectedUserRoleLabel) {
             return Message.builder()
+                .messageId(MESSAGE_ID.toString())
                 .messageContent(MESSAGE_CONTENT)
                 .sentTime(NOW)
                 .updatedTime(NOW)

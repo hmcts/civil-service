@@ -29,7 +29,6 @@ public class WaTaskManagementService {
 
     public List<Task> getAllTasks(String caseId, String userAuth) {
         SearchTaskRequest request = SearchTaskRequest.builder()
-            .requestContext(RequestContext.ALL_WORK)
             .searchParameters(List.of(
                 SearchParameterList.builder()
                     .key(SearchParameterKey.CASE_ID)
@@ -52,7 +51,7 @@ public class WaTaskManagementService {
 
     public Task getTaskToComplete(String caseId, String userAuth, Predicate<Task> filterPredicate) {
         List<Task> availableTasks = getAllTasks(caseId, userAuth);
-        if (nonNull(availableTasks) && !availableTasks.isEmpty()) {
+        if (!availableTasks.isEmpty()) {
             return availableTasks.stream().filter(filterPredicate).findFirst().orElse(null);
         }
         return null;
