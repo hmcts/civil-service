@@ -21,10 +21,10 @@ public class FeatureToggleService {
     private final FeatureToggleApi featureToggleApi;
 
     public boolean isFeatureEnabled(String feature) {
-        if(feature.equals("isJudgmentOnlineLive")) {
+        if (feature.equals("isJudgmentOnlineLive")) {
             return true;
         }
-        if(feature.equals("isJOLiveFeedActive")) {
+        if (feature.equals("isJOLiveFeedActive")) {
             return true;
         }
         return this.featureToggleApi.isFeatureEnabled(feature);
