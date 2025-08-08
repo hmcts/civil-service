@@ -74,5 +74,5 @@ public class DirectionsQuestionnaireForm implements MappableObject {
     private final List<HearingLipSupportRequirements> hearingLipSupportRequirements;
     private final String lipStatementOfTruthName;
     private final DocumentsToBeConsideredSection documentsToBeConsidered;
-
+    private final String representativeOrganisationName;
 }
