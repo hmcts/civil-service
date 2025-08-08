@@ -21,6 +21,12 @@ public class FeatureToggleService {
     private final FeatureToggleApi featureToggleApi;
 
     public boolean isFeatureEnabled(String feature) {
+        if(feature.equals("isJudgmentOnlineLive")) {
+            return true;
+        }
+        if(feature.equals("isJOLiveFeedActive")) {
+            return true;
+        }
         return this.featureToggleApi.isFeatureEnabled(feature);
     }
 
@@ -69,7 +75,7 @@ public class FeatureToggleService {
     }
 
     public boolean isJudgmentOnlineLive() {
-        return featureToggleApi.isFeatureEnabled("isJudgmentOnlineLive");
+        return true;
     }
 
     public boolean isCjesServiceAvailable() {
@@ -139,8 +145,7 @@ public class FeatureToggleService {
     }
 
     public boolean isJOLiveFeedActive() {
-        return isJudgmentOnlineLive()
-            && featureToggleApi.isFeatureEnabled("isJOLiveFeedActive");
+        return true;
     }
 
     public boolean isDefendantNoCOnlineForCase(CaseData caseData)  {

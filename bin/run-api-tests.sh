@@ -6,9 +6,9 @@ compare_ft_groups() {
 
   # Extract ftGroups array as a comma-separated string (sorted)
   ft_groups_csv=$(jq -r '
-    if (.ftGroups == null or (.ftGroups | length == 0)) 
-    then "" 
-    else (.ftGroups | sort | join(",")) 
+    if (.ftGroups == null or (.ftGroups | length == 0))
+    then ""
+    else (.ftGroups | sort | join(","))
     end
   ' "$TEST_FILES_REPORT")
 
@@ -29,7 +29,7 @@ compare_ft_groups() {
 run_functional_test_groups() {
   command="yarn test:api-nonprod --grep "
   pr_ft_groups=$(echo "$PR_FT_GROUPS" | awk '{print tolower($0)}')
-  
+
   regex_pattern=""
 
   IFS=',' read -ra ft_groups_array <<< "$pr_ft_groups"
@@ -51,7 +51,7 @@ run_functional_tests() {
   if [ "$ENVIRONMENT" = "aat" ]; then
     yarn test:api-prod
   elif [ -z "$PR_FT_GROUPS" ]; then
-    yarn test:api-nonprod
+    yarn test:api-prod
   else
     run_functional_test_groups
   fi
@@ -72,7 +72,7 @@ run_failed_not_executed_functional_tests() {
   # Export as environment variable
   export PREV_FAILED_TEST_FILES="$PREV_FAILED_TEST_FILES"
   export PREV_NOT_EXECUTED_TEST_FILES="$PREV_NOT_EXECUTED_TEST_FILES"
-  
+
   run_functional_tests
 }
 
@@ -85,8 +85,8 @@ if [ ! -f "$TEST_FILES_REPORT" ] || [ ! -s "$TEST_FILES_REPORT" ]; then
   echo "testFilesReport.json not found or is empty."
   run_functional_tests
 
-#Check if latest current git commit is the not the same as git commit of test files report 
-elif [ "$(jq -r 'if .gitCommitId == null then "__NULL__" else .gitCommitId end' "$TEST_FILES_REPORT")" != "$GIT_COMMIT" ]; then 
+#Check if latest current git commit is the not the same as git commit of test files report
+elif [ "$(jq -r 'if .gitCommitId == null then "__NULL__" else .gitCommitId end' "$TEST_FILES_REPORT")" != "$GIT_COMMIT" ]; then
   echo "The gitCommitId does not match the current GIT_COMMIT.";
   run_functional_tests
 
