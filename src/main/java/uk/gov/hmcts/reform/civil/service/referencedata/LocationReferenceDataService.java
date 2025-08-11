@@ -134,7 +134,7 @@ public class LocationReferenceDataService {
 
     public List<LocationRefData> getCourtLocationsByEpimmsIdWithCML(String authToken, String epimmsId) {
         try {
-            return locationReferenceDataApiClient.getCourtVenueByEpimmsIdWithCMLAndType(
+            return locationReferenceDataApiClient.getCourtVenueByEpimmsIdWithCMLAndCourtType(
                 authTokenGenerator.generate(),
                 authToken, epimmsId, IS_CASE_MANAGEMENT_LOCATION, CIVIL_COURT_TYPE_ID, LOCATION_TYPE
             );
