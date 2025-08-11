@@ -155,10 +155,15 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                         Optional<Element<CaseDocument>> preTranslationFinalOrderDoc = preTranslationDocuments.stream()
                             .filter(item -> item.getValue().getDocumentType() == DocumentType.JUDGE_FINAL_ORDER)
                             .findFirst();
-                        preTranslationFinalOrderDoc.ifPresent(originalDoc -> renameTranslatedDocument(
-                            originalDoc,
-                            document
-                        ));
+                        preTranslationFinalOrderDoc.ifPresent(originalDoc -> {
+                            document.getValue().getFile().setDocumentFileName(
+                                String.format(
+                                    "Translated_%s.%s",
+                                    getBaseFileName(originalDoc.getValue().getDocumentLink().getDocumentFileName()),
+                                    getFileType(document.getValue().getFile().getDocumentFileName())
+                                )
+                            );
+                        });
                         preTranslationFinalOrderDoc.ifPresent(preTranslationDocuments::remove);
                         preTranslationFinalOrderDoc.ifPresent(finalOrderDocuments::add);
                     }
