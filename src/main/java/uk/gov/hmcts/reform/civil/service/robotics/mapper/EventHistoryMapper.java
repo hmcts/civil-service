@@ -473,8 +473,8 @@ public class EventHistoryMapper {
 
     @Nullable
     private LocalDate getFirstInstallmentDate(CaseData caseData) {
-        if (hasCourtDecisionInFavourOfClaimant(caseData) && caseData.applicant1SuggestedPayByInstalments()) {
-            return caseData.getApplicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec();
+        if (hasCourtDecisionInFavourOfClaimant(caseData)) {
+            return caseData.applicant1SuggestedPayByInstalments() ? caseData.getApplicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec() : null;
         } else {
             return caseData.isPayByInstallment() ? ofNullable(caseData.getRespondent1RepaymentPlan()).map(RepaymentPlanLRspec::getFirstRepaymentDate).orElse(null) : null;
         }
@@ -706,10 +706,15 @@ public class EventHistoryMapper {
     private LocalDateTime getPaymentInFullDate(CaseData caseData) {
         RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec = caseData.getRespondToClaimAdmitPartLRspec();
         if (hasCourtDecisionInFavourOfClaimant(caseData)) {
-            return caseData.applicant1SuggestedPayBySetDate()
-                ? Optional.ofNullable(caseData.getApplicant1RequestedPaymentDateForDefendantSpec())
-                .map(PaymentBySetDate::getPaymentSetDate).map(LocalDate::atStartOfDay).orElse(null)
-                : null;
+            if(caseData.applicant1SuggestedPayBySetDate()) {
+                return Optional.ofNullable(caseData.getApplicant1RequestedPaymentDateForDefendantSpec())
+                    .map(PaymentBySetDate::getPaymentSetDate).map(LocalDate::atStartOfDay).orElse(null);
+            } else if (caseData.applicant1SuggestedPayImmediately()) {
+                return Optional.ofNullable(caseData.getApplicant1SuggestPayImmediatelyPaymentDateForDefendantSpec())
+                    .map(LocalDate::atStartOfDay).orElse(null);
+            } else {
+                return null;
+            }
         }
         return caseData.isPayBySetDate()
             ? respondToClaimAdmitPartLRspec.getWhenWillThisAmountBePaid().atStartOfDay()
