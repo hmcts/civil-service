@@ -101,33 +101,39 @@ public class LocationService {
             .map(CaseData::getCaseManagementLocation)
             .map(uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil::getBaseLocation)
             .orElse(null);
-        LocationRefData caseManagementLocationDetails;
-        if (StringUtils.isNotEmpty(epimmsId)) {
-            log.info("Case managementLocation region {} and  base Location {} caseId {}",
-                     caseData.getCaseManagementLocation().getRegion(),
-                     epimmsId, caseData.getCcdCaseReference());
 
-            List<LocationRefData> locationRefDataList = locationRefDataService.getCourtLocationsByEpimmsIdWithCML(authToken, epimmsId);
-
-            log.info("CML court locations found : {} for caseId {}", locationRefDataList, caseData.getCcdCaseReference());
-            if (CollectionUtils.isNotEmpty(locationRefDataList)) {
-                caseManagementLocationDetails = locationRefDataList.get(0);
-            } else {
-                throw new IllegalArgumentException(String.format("Base Court Location for General applications not found, in location data for caseId %s",
-                                                                 caseData.getCcdCaseReference()));
-            }
-        } else {
-            throw new IllegalArgumentException(String.format("Base Court Location for main applications not found, in case data for caseId %s",
-                                                             caseData.getCcdCaseReference()));
+        if (StringUtils.isEmpty(epimmsId)) {
+            throw new IllegalArgumentException(String.format(
+                "Base Court Location for main applications not found, in case data for caseId %s",
+                caseData.getCcdCaseReference()
+            ));
         }
-        CaseLocationCivil courtLocation;
-        courtLocation = CaseLocationCivil.builder()
+
+        log.info("Case managementLocation region {} and base Location {} caseId {}",
+                 caseData.getCaseManagementLocation().getRegion(),
+                 epimmsId, caseData.getCcdCaseReference());
+
+        List<LocationRefData> locationRefDataList =
+            locationRefDataService.getCourtLocationsByEpimmsIdWithCML(authToken, epimmsId);
+
+        log.info("CML court locations found : {} for caseId {}",
+                 locationRefDataList, caseData.getCcdCaseReference());
+
+        if (CollectionUtils.isEmpty(locationRefDataList)) {
+            throw new IllegalArgumentException(String.format(
+                "Base Court Location for General applications not found, in location data for caseId %s",
+                caseData.getCcdCaseReference()
+            ));
+        }
+
+        LocationRefData caseManagementLocationDetails = locationRefDataList.get(0);
+
+        return CaseLocationCivil.builder()
             .region(caseManagementLocationDetails.getRegionId())
             .baseLocation(caseManagementLocationDetails.getEpimmsId())
             .siteName(caseManagementLocationDetails.getSiteName())
             .address(caseManagementLocationDetails.getCourtAddress())
             .postcode(caseManagementLocationDetails.getPostcode())
             .build();
-        return courtLocation;
     }
 }
