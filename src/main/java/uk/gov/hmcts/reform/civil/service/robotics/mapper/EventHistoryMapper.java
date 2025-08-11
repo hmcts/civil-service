@@ -706,7 +706,7 @@ public class EventHistoryMapper {
     private LocalDateTime getPaymentInFullDate(CaseData caseData) {
         RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec = caseData.getRespondToClaimAdmitPartLRspec();
         if (hasCourtDecisionInFavourOfClaimant(caseData)) {
-            return caseData.isPayBySetDate()
+            return caseData.applicant1SuggestedPayBySetDate()
                 ? Optional.ofNullable(caseData.getApplicant1RequestedPaymentDateForDefendantSpec())
                 .map(PaymentBySetDate::getPaymentSetDate).map(LocalDate::atStartOfDay).orElse(null)
                 : null;
