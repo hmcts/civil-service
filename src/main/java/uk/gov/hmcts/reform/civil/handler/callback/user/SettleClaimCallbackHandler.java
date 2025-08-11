@@ -71,7 +71,7 @@ public class SettleClaimCallbackHandler extends CallbackHandler {
                                                                                                        CLAIMANT,
                                                                                                        APPLICATION_VIEW
                 );
-            } else if (!featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation())) {
+            } else if (!featureToggleService.isLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation())) {
                 taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate(caseData.getCcdCaseReference().toString(),
                                                                                                        CLAIMANT,
                                                                                                        APPLICATION_VIEW
@@ -85,7 +85,7 @@ public class SettleClaimCallbackHandler extends CallbackHandler {
                                                                                                        DEFENDANT,
                                                                                                        APPLICATION_VIEW
                 );
-            } else if (!featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation())) {
+            } else if (!featureToggleService.isLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation())) {
                 taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate(caseData.getCcdCaseReference().toString(),
                                                                                                        DEFENDANT,
                                                                                                        APPLICATION_VIEW

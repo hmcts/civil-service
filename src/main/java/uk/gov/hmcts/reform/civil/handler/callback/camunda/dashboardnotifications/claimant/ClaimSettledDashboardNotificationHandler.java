@@ -62,7 +62,7 @@ public class ClaimSettledDashboardNotificationHandler extends DashboardCallbackH
 
         if (!isLrQmEnabled) {
             inactiveGAItems(caseId);
-        } else if (!featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation())) {
+        } else if (!featureToggleService.isLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation())) {
             inactiveGAItems(caseId);
         }
     }

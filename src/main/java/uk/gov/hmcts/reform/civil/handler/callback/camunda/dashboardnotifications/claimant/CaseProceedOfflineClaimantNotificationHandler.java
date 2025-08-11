@@ -68,9 +68,9 @@ public class CaseProceedOfflineClaimantNotificationHandler extends DashboardCall
     public Map<String, Boolean> getScenarios(CaseData caseData) {
         return Map.of(
             SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_CLAIMANT.getScenario(),
-            featureToggleService.isGaForLipsEnabled(),
+            true,
             SCENARIO_AAA6_GENERAL_APPLICATION_AVAILABLE_CLAIMANT.getScenario(),
-            featureToggleService.isGaForLipsEnabled() && caseData.getGeneralApplications().size() > 0,
+            (caseData.getGeneralApplications() != null && !caseData.getGeneralApplications().isEmpty()),
             SCENARIO_AAA6_LIP_QM_CASE_OFFLINE_OPEN_QUERIES_CLAIMANT.getScenario(), claimantQueryAwaitingAResponse(caseData)
         );
     }

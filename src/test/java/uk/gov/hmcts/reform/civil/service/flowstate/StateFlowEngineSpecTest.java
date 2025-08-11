@@ -69,23 +69,13 @@ class StateFlowEngineSpecTest {
             arguments(CaseDataBuilderSpec.builder().atStateClaimSubmittedTwoRespondentDifferentSolicitorSpec().build()),
             //AC 4 (2v1)
             arguments(CaseDataBuilderSpec.builder().atStateClaimSubmitted2v1().build()),
-            //AC 5 (1V1 unrepresented defendant)
-            arguments(CaseDataBuilderSpec.builder().atStateSpec1v1DefendantUnrepresentedClaimSubmitted().build()),
-            //AC 6 (2V1 unrepresented defendant)
-            arguments(CaseDataBuilderSpec.builder().atStateSpec2v1DefendantUnrepresentedClaimSubmitted().build()),
-            //AC 7 (1V2 one unrepresented defendant)
+            //AC 5 (1V2 one unrepresented defendant)
             arguments(CaseDataBuilderSpec.builder().atStateSpec1v2OneDefendantUnrepresentedClaimSubmitted().build()),
-            //AC 8 (1V2 both defendants unrepresented )
-            arguments(CaseDataBuilderSpec.builder().atStateSpec1v2BothDefendantUnrepresentedClaimSubmitted().build()),
-            //AC 9 (1V1  defendant represented, solicitor unregistered)
-            arguments(CaseDataBuilderSpec.builder().atStateSpec1v1DefendantUnregisteredClaimSubmitted().build()),
-            //AC 10 (2V1  defendant represented, solicitor unregistered )
+            //AC 6 (2V1  defendant represented, solicitor unregistered )
             arguments(CaseDataBuilderSpec.builder().atStateSpec2v1DefendantUnregisteredClaimSubmitted().build()),
-            //AC 11 1v2 def 1 represented solicitor unregistered, and def 2 solicitor registered
+            //AC 7 1v2 def 1 represented solicitor unregistered, and def 2 solicitor registered
             arguments(CaseDataBuilderSpec.builder().atStateSpec1v2Solicitor1UnregisteredSolicitor2RegisteredAndRepresented().build()),
-            //AC 13 1v2 defendant 1 represented solicitor unregistered,and defendant 2 unrepresented
-            arguments(CaseDataBuilderSpec.builder().atStateSpec1v2OneDefendantRepresentedUnregisteredOtherUnrepresentedClaimSubmitted().build()),
-            //AC 14 1v2 Both defendants represented and both defendant solicitors unregistered
+            //AC 8 1v2 Both defendants represented and both defendant solicitors unregistered
             arguments(CaseDataBuilderSpec.builder().atStateSpec1v2DifferentSolicitorBothDefendantRepresentedAndUnregistered().build())
         );
     }
