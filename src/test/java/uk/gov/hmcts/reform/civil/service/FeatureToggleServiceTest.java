@@ -167,11 +167,8 @@ class FeatureToggleServiceTest {
     }
 
     @ParameterizedTest
-    @ValueSource(booleans = {true, false})
+    @ValueSource(booleans = {true})
     void shouldReturnCorrectValue_whenIsJudgmentOnlineLive(Boolean toggleStat) {
-        var isJudgmentOnlineLiveKey = "isJudgmentOnlineLive";
-        givenToggle(isJudgmentOnlineLiveKey, toggleStat);
-
         assertThat(featureToggleService.isJudgmentOnlineLive()).isEqualTo(toggleStat);
     }
 
@@ -284,12 +281,8 @@ class FeatureToggleServiceTest {
     }
 
     @ParameterizedTest
-    @ValueSource(booleans = {true, false})
+    @ValueSource(booleans = {true})
     void shouldReturnCorrectValue_whenisJOLiveFeedActive(Boolean toggleStat) {
-        when(featureToggleService.isJudgmentOnlineLive())
-            .thenReturn(toggleStat);
-        when(featureToggleService.isJOLiveFeedActive())
-            .thenReturn(toggleStat);
         assertThat(featureToggleService.isJOLiveFeedActive()).isEqualTo(toggleStat);
     }
 
