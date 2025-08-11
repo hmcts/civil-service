@@ -132,8 +132,8 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
 
         if (initiateGeneralApplicationService.caseContainsLiP(caseData)) {
-            if (caseData.isRespondentResponseBilingual() && !featureToggleService.isGaForWelshEnabled() && !caseData.isLipvLROneVOne()
-                && !(caseEvent == INITIATE_GENERAL_APPLICATION_COSC)) {
+            if ((caseData.isRespondentResponseBilingual() && !featureToggleService.isGaForWelshEnabled() && !caseData.isLipvLROneVOne()
+                && !(caseEvent == INITIATE_GENERAL_APPLICATION_COSC))) {
                 errors.add(LR_VS_LIP);
             } else if (featureToggleService.isDefendantNoCOnlineForCase(caseData) && caseData.isLipvLROneVOne()
                 && caseData.isClaimantBilingual() && !featureToggleService.isGaForWelshEnabled()) {
