@@ -53,8 +53,8 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 @ExtendWith(MockitoExtension.class)
 class UploadTranslatedDocumentDefaultStrategyTest {
 
-    private static final String FILE_NAME_1 = "claimant";
-    private static final String FILE_NAME_2 = "defendant";
+    private static final String FILE_NAME_1 = "claimant.pdf";
+    private static final String FILE_NAME_2 = "defendant.txt";
 
     private UploadTranslatedDocumentDefaultStrategy uploadTranslatedDocumentDefaultStrategy;
 
@@ -141,7 +141,7 @@ class UploadTranslatedDocumentDefaultStrategyTest {
             .documentType(DocumentType.CLAIMANT_DEFENCE)
             .documentLink(Document.builder().documentFileName("claimant_response.pdf")
                               .categoryID("aapId").build())
-            .documentName("claimant response")
+            .documentName("claimant_response.pdf")
             .build();
 
         List<Element<CaseDocument>> preTranslatedDocuments = new ArrayList<>(List.of(
@@ -166,8 +166,9 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData.toBuilder().preTranslationDocuments(preTranslatedDocuments).build()).build();
         List<Element<CaseDocument>> documents = List.of(
             element(CaseDocument.builder().documentName(FILE_NAME_1).build()),
-            element(CaseDocument.builder().documentName("claimant response").build()),
-            element(CaseDocument.builder().documentName("claimant response").build()));
+            element(CaseDocument.builder().documentName("claimant_response.pdf").build()),
+            element(CaseDocument.builder().documentName("claimant_response.pdf").build())
+        );
         @SuppressWarnings("unchecked")
         List<Element<TranslatedDocument>> expectedTranslatedDocs = (List<Element<TranslatedDocument>>) any(List.class);
         given(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
@@ -493,7 +494,7 @@ class UploadTranslatedDocumentDefaultStrategyTest {
 
         List<Element<CaseDocument>> preTranslationDocuments = new ArrayList<>();
         preTranslationDocuments.add(element(CaseDocument.toCaseDocument(
-            Document.builder().build(),
+            Document.builder().documentFileName("manual_determination.pdf").build(),
             DocumentType.LIP_MANUAL_DETERMINATION
         )));
 
@@ -536,7 +537,8 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         );
 
         List<Element<CaseDocument>> preTranslationDocuments = new ArrayList<>();
-        preTranslationDocuments.add(element(CaseDocument.toCaseDocument(Document.builder().build(),
+        preTranslationDocuments.add(element(CaseDocument.toCaseDocument(
+            Document.builder().documentFileName("final_order.pdf").build(),
                                                                         DocumentType.JUDGE_FINAL_ORDER
         )));
 
@@ -578,7 +580,8 @@ class UploadTranslatedDocumentDefaultStrategyTest {
             element(translatedDocument1)
         );
         List<Element<CaseDocument>> preTranslationDocuments = new ArrayList<>();
-        preTranslationDocuments.add(element(CaseDocument.toCaseDocument(Document.builder().build(),
+        preTranslationDocuments.add(element(CaseDocument.toCaseDocument(
+            Document.builder().documentFileName("settlement_agreement.pdf").build(),
                                                                         DocumentType.SETTLEMENT_AGREEMENT)));
         CaseData caseData = CaseDataBuilder.builder()
             .atStatePendingClaimIssued()
@@ -620,7 +623,8 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         );
 
         List<Element<CaseDocument>> preTranslationDocuments = new ArrayList<>();
-        preTranslationDocuments.add(element(CaseDocument.toCaseDocument(Document.builder().build(),
+        preTranslationDocuments.add(element(CaseDocument.toCaseDocument(
+            Document.builder().documentFileName("decision_made.pdf").build(),
                                                                         DocumentType.DECISION_MADE_ON_APPLICATIONS)));
 
         CaseData caseData = CaseDataBuilder.builder()
@@ -705,7 +709,8 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         );
 
         List<Element<CaseDocument>> preTranslationDocuments = new ArrayList<>();
-        preTranslationDocuments.add(element(CaseDocument.toCaseDocument(Document.builder().build(),
+        preTranslationDocuments.add(element(CaseDocument.toCaseDocument(
+            Document.builder().documentFileName("claimant_dq.pdf").build(),
                                                                         DocumentType.CLAIMANT_CLAIM_FORM)));
 
         CaseData caseData = CaseDataBuilder.builder()
@@ -758,7 +763,8 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         );
 
         List<Element<CaseDocument>> preTranslationDocuments = new ArrayList<>();
-        preTranslationDocuments.add(element(CaseDocument.toCaseDocument(Document.builder().build(),
+        preTranslationDocuments.add(element(CaseDocument.toCaseDocument(
+            Document.builder().documentFileName("sealed_form.pdf").build(),
                                                                         DocumentType.SEALED_CLAIM)));
 
         CaseData caseData = CaseDataBuilder.builder()
@@ -816,7 +822,7 @@ class UploadTranslatedDocumentDefaultStrategyTest {
 
         List<Element<CaseDocument>> preTranslationDocuments = new ArrayList<>();
         preTranslationDocuments.add(element(CaseDocument.toCaseDocument(
-            Document.builder().build(),
+            Document.builder().documentFileName("sealed_form.pdf").build(),
             DocumentType.SEALED_CLAIM
         )));
 
