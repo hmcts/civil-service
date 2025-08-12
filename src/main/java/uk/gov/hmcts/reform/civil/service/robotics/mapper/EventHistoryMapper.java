@@ -706,7 +706,7 @@ public class EventHistoryMapper {
     private LocalDateTime getPaymentInFullDate(CaseData caseData) {
         RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec = caseData.getRespondToClaimAdmitPartLRspec();
         if (hasCourtDecisionInFavourOfClaimant(caseData)) {
-            if(caseData.applicant1SuggestedPayBySetDate()) {
+            if (caseData.applicant1SuggestedPayBySetDate()) {
                 return Optional.ofNullable(caseData.getApplicant1RequestedPaymentDateForDefendantSpec())
                     .map(PaymentBySetDate::getPaymentSetDate).map(LocalDate::atStartOfDay).orElse(null);
             } else if (caseData.applicant1SuggestedPayImmediately()) {
@@ -2537,7 +2537,7 @@ public class EventHistoryMapper {
             return getInstallmentPeriodForRequestJudgmentByAdmission(payByInstallment, caseData);
         } else if (joLiveFeedActive && caseData.isPayBySetDate()) {
             return "FUL";
-        } else if (joLiveFeedActive) {
+        } else if (joLiveFeedActive && caseData.isPayImmediately()) {
             return "FW";
         } else {
             return null;
