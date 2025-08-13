@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 
@@ -89,6 +90,15 @@ class LocationServiceTest {
             .getCaseDataForWorkAllocation(CaseState.CASE_DISCONTINUED, SPEC_CLAIM, INDIVIDUAL, null, respondent1DQ,
                                           respondent2DQ).toBuilder()
             .previousCCDState(null).build();
+        when(locationRefDataService.getCourtLocationsByEpimmsIdWithCML(any(), any())).thenReturn(new ArrayList<>(List.of()));
+
+        assertThrows(IllegalArgumentException.class, () -> service.getWorkAllocationLocation(caseData, "authToken"));
+    }
+
+    @Test
+    void shouldThrowException_whenApplicationMadeAfterSDOMainCaseCMLNotInCaseData() {
+        when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
+        CaseData caseData = CaseDataBuilder.builder().build();
         when(locationRefDataService.getCourtLocationsByEpimmsIdWithCML(any(), any())).thenReturn(new ArrayList<>(List.of()));
 
         assertThrows(IllegalArgumentException.class, () -> service.getWorkAllocationLocation(caseData, "authToken"));
