@@ -103,9 +103,9 @@ public class LocationService {
             .orElse(null);
 
         if (StringUtils.isEmpty(epimmsId)) {
+            String caseRef = (caseData != null) ? String.valueOf(caseData.getCcdCaseReference()) : "unknown";
             throw new IllegalArgumentException(String.format(
-                "Base Court Location for main applications not found, in case data for caseId %s",
-                caseData.getCcdCaseReference()
+                "Base Court Location for main applications not found, in case data for caseId %s", caseRef
             ));
         }
 
