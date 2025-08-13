@@ -86,7 +86,7 @@ wa:
 task-management:
   enabled: true
   api:
-    url: http://wa-task-management-api-demo.service.core-compute-demo.internal
+    url: http://fake-task-management-api
 
 send-letter:
   url: ${SEND_LETTER_URL:http://localhost:8765}
