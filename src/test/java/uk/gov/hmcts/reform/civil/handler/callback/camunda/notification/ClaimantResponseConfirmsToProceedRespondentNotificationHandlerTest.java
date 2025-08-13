@@ -99,7 +99,6 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
             when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("welshHmctsSignature"));
             when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("welshPhoneContact"));
             when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
-            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
             when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
@@ -108,7 +107,8 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
         @Test
         void shouldNotifyRespondentSolicitor_whenInvoked() {
             when(notificationsProperties.getClaimantSolicitorConfirmsToProceed()).thenReturn("template-id");
-
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId("NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED")
@@ -127,7 +127,8 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
         @Test
         void shouldNotifyRespondentSolicitor_whenInvoked_spec() {
             when(notificationsProperties.getRespondentSolicitorNotifyToProceedSpec()).thenReturn("spec-template-id");
-
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .setClaimTypeToSpecClaim()
@@ -153,7 +154,8 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
         void shouldNotifyRespondentSolicitor_whenSpecRejectAllNoMediation() {
             when(notificationsProperties.getRespondentSolicitorNotifyToProceedSpecWithAction()).thenReturn(
                 "spec-template-no-mediation");
-
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .setClaimTypeToSpecClaim()
@@ -181,6 +183,8 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
         @Test
         void shouldNotifyRespondentSolicitor2_whenInvoked_spec() {
             when(notificationsProperties.getRespondentSolicitorNotifyToProceedSpec()).thenReturn("spec-template-id");
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .setClaimTypeToSpecClaim()
@@ -205,7 +209,8 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
         @Test
         void shouldNotifyApplicantSolicitor_whenInvoked_spec() {
             when(notificationsProperties.getClaimantSolicitorConfirmsToProceedSpec()).thenReturn("spec-template-id");
-
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .setClaimTypeToSpecClaim()
@@ -231,7 +236,8 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
         void shouldNotifyApplicantSolicitor_whenSpecRejectAllNoMediation() {
             when(notificationsProperties.getClaimantSolicitorConfirmsToProceedSpecWithAction()).thenReturn(
                 "spec-template-no-mediation");
-
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .setClaimTypeToSpecClaim()
@@ -259,7 +265,8 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
         @Test
         void shouldNotifyRespondentSolicitor2withNoIntentionToProceed_whenInvoked() {
             when(notificationsProperties.getClaimantSolicitorConfirmsNotToProceed()).thenReturn("template-id");
-
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(YesOrNo.YES)
@@ -282,7 +289,8 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
         @Test
         void shouldNotifyRespondentSolicitor2withIntentionToProceed_whenInvoked() {
             when(notificationsProperties.getClaimantSolicitorConfirmsToProceed()).thenReturn("template-id");
-
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(YesOrNo.NO)
@@ -305,7 +313,8 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
         @Test
         void shouldNotifyRespondentSolicitor1withNoIntentionToProceed_whenInvoked() {
             when(notificationsProperties.getClaimantSolicitorConfirmsNotToProceed()).thenReturn("template-id");
-
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(YesOrNo.NO)
@@ -328,7 +337,8 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
         @Test
         void shouldNotifyApplicantSolicitor_whenInvoked() {
             when(notificationsProperties.getClaimantSolicitorConfirmsToProceed()).thenReturn("template-id");
-
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId("NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC")
@@ -347,7 +357,9 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
         @Test
         void shouldNotNotifyRespondent_whenInvokedWithNoSolicitorRepresentedWithEmail() {
             when(notificationsProperties.getRespondent1LipClaimUpdatedTemplate()).thenReturn("spec-template-id");
-
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .respondent1Represented(null)
                 .specRespondent1Represented(YesOrNo.NO)
@@ -370,7 +382,8 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
         @Test
         void shouldNotifyRespondent_whenMultiTrack() {
             when(notificationsProperties.getSolicitorCaseTakenOffline()).thenReturn("offline-template-id");
-
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
@@ -394,7 +407,8 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
         void shouldNotifyRespondent_whenMultiTrack_mintiEligibleClaim() {
             when(notificationsProperties.getClaimantSolicitorConfirmsToProceed()).thenReturn("template-id");
             when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
-
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
@@ -417,7 +431,8 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
         @Test
         void shouldNotifyRespondent2_whenMultiTrack() {
             when(notificationsProperties.getSolicitorCaseTakenOffline()).thenReturn("offline-template-id");
-
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
@@ -461,6 +476,9 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
                 .applicant1OrganisationPolicy(OrganisationPolicy.builder().build())
                 .setMultiTrackClaim()
                 .build();
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(notificationEvent.name())
@@ -474,7 +492,7 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
 
         @NotNull
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
-            Map<String, String> properties = addCommonProperties();
+            Map<String, String> properties = addCommonProperties(false);
             properties.put(CLAIM_REFERENCE_NUMBER, CASE_ID.toString());
             properties.put(PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789");
             properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name");
@@ -484,7 +502,7 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
 
         @NotNull
         private Map<String, String> getNotificationDataMapLRvLiP(CaseData caseData) {
-            Map<String, String> properties = addCommonProperties();
+            Map<String, String> properties = addCommonProperties(true);
             properties.put(CLAIM_REFERENCE_NUMBER, CASE_ID.toString());
             properties.put(RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
             properties.put(PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789");
@@ -495,7 +513,7 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
 
         @NotNull
         public Map<String, String> getNotificationDataMapSpec(CaseData caseData, CaseEvent caseEvent) {
-            Map<String, String> properties = addCommonProperties();
+            Map<String, String> properties = addCommonProperties(false);
             properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganisationName(caseData, caseEvent));
             properties.put(CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString());
             properties.put(RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
@@ -506,7 +524,7 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
         }
 
         @NotNull
-        public Map<String, String> addCommonProperties() {
+        public Map<String, String> addCommonProperties(boolean isLipCase) {
             Map<String, String> expectedProperties = new HashMap<>();
             expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
             expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
@@ -518,6 +536,13 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
             expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
             expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
             expectedProperties.put(CNBC_CONTACT, configuration.getCnbcContact());
+            if (isLipCase) {
+                expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+                expectedProperties.put(CNBC_CONTACT, configuration.getCnbcContact());
+            } else {
+                expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getRaiseQueryLr());
+                expectedProperties.put(CNBC_CONTACT, configuration.getRaiseQueryLr());
+            }
             return expectedProperties;
         }
 

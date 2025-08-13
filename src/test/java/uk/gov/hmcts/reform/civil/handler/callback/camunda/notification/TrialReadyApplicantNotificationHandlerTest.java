@@ -35,6 +35,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CNBC_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HEARING_DATE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
@@ -84,7 +85,6 @@ class TrialReadyApplicantNotificationHandlerTest {
             when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("welshHmctsSignature"));
             when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("welshPhoneContact"));
             when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
-            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
             when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
         }
@@ -94,6 +94,8 @@ class TrialReadyApplicantNotificationHandlerTest {
             when(notificationsProperties.getSolicitorTrialReady()).thenReturn("template-id");
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
 
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
@@ -111,6 +113,10 @@ class TrialReadyApplicantNotificationHandlerTest {
         @Test
         void shouldNotNotifyApplicant_whenInvokedWithNoSolicitorRepresentedWithNoEmail() {
             when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn("cui-template-id");
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
+
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck()
                 .applicant1(PartyBuilder.builder().company().partyEmail(null).build())
                 .claimantUserDetails(new IdamUserDetails().toBuilder().email("email@email.com").build())
@@ -132,7 +138,9 @@ class TrialReadyApplicantNotificationHandlerTest {
         @Test
         void shouldNotNotifyApplicant_whenInvokedWithNoSolicitorRepresentedWithEmail() {
             when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn("cui-template-id");
-
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck()
                 .applicant1Represented(YesOrNo.NO)
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
@@ -157,6 +165,8 @@ class TrialReadyApplicantNotificationHandlerTest {
                 CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData),
                 CASEMAN_REF, "000DC001"
             ));
+            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+            expectedProperties.put(CNBC_CONTACT, configuration.getCnbcContact());
             return expectedProperties;
         }
 
@@ -170,6 +180,8 @@ class TrialReadyApplicantNotificationHandlerTest {
                 CLAIM_LEGAL_ORG_NAME_SPEC, "org name",
                 CASEMAN_REF, "000DC001"
             ));
+            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getRaiseQueryLr());
+            expectedProperties.put(CNBC_CONTACT, configuration.getRaiseQueryLr());
             return expectedProperties;
         }
 

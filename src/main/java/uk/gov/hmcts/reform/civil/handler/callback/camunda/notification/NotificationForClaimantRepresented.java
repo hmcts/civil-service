@@ -125,8 +125,7 @@ public class NotificationForClaimantRepresented extends CallbackHandler implemen
             CLAIMANT_NAME, caseData.getApplicant1().getPartyName()
         ));
         addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
         return properties;
     }
 
@@ -141,8 +140,7 @@ public class NotificationForClaimantRepresented extends CallbackHandler implemen
                 CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
         addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
 
         return properties;
     }
@@ -158,8 +156,7 @@ public class NotificationForClaimantRepresented extends CallbackHandler implemen
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
         ));
         addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
 
         return properties;
     }
@@ -195,11 +192,11 @@ public class NotificationForClaimantRepresented extends CallbackHandler implemen
             return isRespondentLip ? notificationsProperties.getNotifyRespondentLipForClaimantRepresentedTemplate() :
                 notificationsProperties.getNoticeOfChangeOtherParties();
         }
-        if (isBilingual) {
-            return notificationsProperties.getNotifyClaimantLipForNoLongerAccessWelshTemplate();
-        }
         if (isApplicantSolicitorNotify) {
             return notificationsProperties.getNoticeOfChangeApplicantLipSolicitorTemplate();
+        }
+        if (isBilingual) {
+            return notificationsProperties.getNotifyClaimantLipForNoLongerAccessWelshTemplate();
         }
         return notificationsProperties.getNotifyClaimantLipForNoLongerAccessTemplate();
     }

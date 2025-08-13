@@ -33,6 +33,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CNBC_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT_WELSH;
@@ -95,12 +96,14 @@ class NotifyClaimantAmendRestitchBundleHandlerTest {
         when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("welshHmctsSignature"));
         when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("welshPhoneContact"));
         when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
-        when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
         when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
         when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
         if (represented.equals(YesOrNo.YES)) {
             when(notificationsProperties.getNotifyLRBundleRestitched()).thenReturn(TEMPLATE_LR_ID);
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
         } else {
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             if (bilingual == YesOrNo.YES) {
                 caseData = caseData.toBuilder().claimantBilingualLanguagePreference("BOTH").build();
                 when(notificationsProperties.getNotifyLipUpdateTemplateBilingual()).thenReturn(BILINGUAL_TEMPLATE_ID);
@@ -121,21 +124,21 @@ class NotifyClaimantAmendRestitchBundleHandlerTest {
             verify(notificationService).sendMail(
                 "claimant@hmcts.net",
                 expectedTemplateId,
-                getNotificationDataMap(caseData),
+                getNotificationDataMap(caseData, true),
                 "amend-restitch-bundle-claimant-notification-1594901956117591"
             );
         } else {
             verify(notificationService).sendMail(
                 "claimantLR@hmcts.net",
                 expectedTemplateId,
-                getNotificationDataMap(caseData),
+                getNotificationDataMap(caseData, false),
                 "amend-restitch-bundle-claimant-notification-1594901956117591"
             );
         }
     }
 
     @NotNull
-    private Map<String, String> getNotificationDataMap(CaseData caseData) {
+    private Map<String, String> getNotificationDataMap(CaseData caseData, boolean isLipCase) {
         Map<String, String> properties = new HashMap<>(addCommonProperties());
         properties.put(CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString());
         properties.put(PARTY_NAME, "John Doe");
@@ -143,6 +146,13 @@ class NotifyClaimantAmendRestitchBundleHandlerTest {
         properties.put(BUNDLE_RESTITCH_DATE, LocalDate.now().format(DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.UK)));
         properties.put(PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData));
         properties.put(CASEMAN_REF, caseData.getLegacyCaseReference());
+        if (isLipCase) {
+            properties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+            properties.put(CNBC_CONTACT, configuration.getCnbcContact());
+        } else {
+            properties.put(SPEC_UNSPEC_CONTACT, configuration.getRaiseQueryLr());
+            properties.put(CNBC_CONTACT, configuration.getRaiseQueryLr());
+        }
         return properties;
     }
 

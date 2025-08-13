@@ -170,8 +170,7 @@ public class ChangeOfRepresentationNotificationHandler extends CallbackHandler i
             caseData.getCcdCaseReference().toString()
         ));
         addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
         return properties;
     }
 
@@ -183,8 +182,7 @@ public class ChangeOfRepresentationNotificationHandler extends CallbackHandler i
             CLAIM_NUMBER, caseData.getLegacyCaseReference()
         ));
         addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
         return properties;
     }
 
