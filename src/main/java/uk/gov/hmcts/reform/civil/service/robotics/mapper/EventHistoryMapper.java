@@ -397,57 +397,89 @@ public class EventHistoryMapper {
         return applicant1Response != null && applicant1Response.hasCourtDecisionInFavourOfClaimant();
     }
 
-    private Event prepareDefaultJudgment(EventHistory.EventHistoryBuilder builder, CaseData caseData,
+    private Event prepareDefaultJudgment(EventHistory.EventHistoryBuilder eventHistoryBuilder, CaseData caseData,
                                          String litigiousPartyID) {
 
-        BigDecimal claimInterest = caseData.getTotalInterest() != null
-            ? caseData.getTotalInterest() : ZERO;
-        BigDecimal amountClaimedWithInterest = caseData.getTotalClaimAmount().add(claimInterest);
-        var partialPaymentPennies = isNotEmpty(caseData.getPartialPaymentAmount())
-            ? new BigDecimal(caseData.getPartialPaymentAmount()) : null;
-        var partialPaymentPounds = isNotEmpty(partialPaymentPennies)
-            ? MonetaryConversions.penniesToPounds(partialPaymentPennies) : null;
+        // Monetary amounts
+        BigDecimal totalInterest = caseData.getTotalInterest() != null ? caseData.getTotalInterest() : ZERO;
+        BigDecimal amountClaimedWithInterest = caseData.getTotalClaimAmount().add(totalInterest);
 
-        LocalDateTime paymentInFullDate;
-        if (caseData.getPaymentTypeSelection().equals(DJPaymentTypeSelection.IMMEDIATELY)) {
-            paymentInFullDate = hasCourtDecisionInFavourOfClaimant(caseData) && caseData.applicant1SuggestedPayImmediately()
-                ? Optional.ofNullable(caseData.getApplicant1SuggestPayImmediatelyPaymentDateForDefendantSpec()).map(LocalDate::atStartOfDay).orElse(null)
-                : LocalDateTime.now();
-        } else if (caseData.getPaymentTypeSelection().equals(DJPaymentTypeSelection.SET_DATE)) {
-            paymentInFullDate = hasCourtDecisionInFavourOfClaimant(caseData) && caseData.applicant1SuggestedPayImmediately()
-                ? ofNullable(caseData.getApplicant1RequestedPaymentDateForDefendantSpec()).map(
-                PaymentBySetDate::getPaymentSetDate).map(LocalDate::atStartOfDay).orElse(null) : caseData.getPaymentSetDate().atStartOfDay();
-        } else {
-            paymentInFullDate = null;
-        }
+        // Partial payment handling
+        BigDecimal partialPaymentAmountInPennies = isNotEmpty(caseData.getPartialPaymentAmount())
+            ? new BigDecimal(caseData.getPartialPaymentAmount())
+            : null;
+        BigDecimal partialPaymentAmountInPounds = isNotEmpty(partialPaymentAmountInPennies)
+            ? MonetaryConversions.penniesToPounds(partialPaymentAmountInPennies)
+            : null;
+
+        // Common flags and dates
+        boolean isImmediate = DJPaymentTypeSelection.IMMEDIATELY.equals(caseData.getPaymentTypeSelection());
+        boolean isRepaymentPlan = DJPaymentTypeSelection.REPAYMENT_PLAN.equals(caseData.getPaymentTypeSelection());
+        LocalDateTime dateOfDjCreated = getDateOfDjCreated(caseData);
+        LocalDateTime paymentInFullDate = computePaymentInFullDate(caseData);
+
+        // Costs and installments
+        BigDecimal amountOfCosts = (caseData.isApplicantLipOneVOne() && featureToggleService.isLipVLipEnabled())
+            ? MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence())
+            : JudgmentsOnlineHelper.getFixedCostsOfJudgmentForDJ(caseData).add(
+            JudgmentsOnlineHelper.getClaimFeeOfJudgmentForDJ(caseData));
+
+        BigDecimal installmentAmount = isRepaymentPlan
+            ? getInstallmentAmount(caseData.getRepaymentSuggestion()).setScale(2)
+            : ZERO;
+
+        BigDecimal amountPaidBeforeJudgment = (caseData.getPartialPayment() == YesOrNo.YES) ? partialPaymentAmountInPounds : ZERO;
+
+        boolean isJointJudgment = caseData.getRespondent2() != null;
 
         return Event.builder()
-            .eventSequence(prepareEventSequence(builder.build()))
+            .eventSequence(prepareEventSequence(eventHistoryBuilder.build()))
             .eventCode(DEFAULT_JUDGMENT_GRANTED.getCode())
-            .dateReceived(getDateOfDjCreated(caseData))
+            .dateReceived(dateOfDjCreated)
             .litigiousPartyID(litigiousPartyID)
             .eventDetailsText("")
             .eventDetails(EventDetails.builder()
                               .miscText("")
                               .amountOfJudgment(amountClaimedWithInterest.setScale(2))
-                              .amountOfCosts((caseData.isApplicantLipOneVOne() && featureToggleService.isLipVLipEnabled())
-                                                 ? MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence())
-                                                 : JudgmentsOnlineHelper.getFixedCostsOfJudgmentForDJ(caseData).add(
-                                                     JudgmentsOnlineHelper.getClaimFeeOfJudgmentForDJ(caseData)))
-                              .amountPaidBeforeJudgment((caseData.getPartialPayment() == YesOrNo.YES) ? partialPaymentPounds : ZERO)
-                              .isJudgmentForthwith(caseData.getPaymentTypeSelection().equals(DJPaymentTypeSelection.IMMEDIATELY))
+                              .amountOfCosts(amountOfCosts)
+                              .amountPaidBeforeJudgment(amountPaidBeforeJudgment)
+                              .isJudgmentForthwith(isImmediate)
                               .paymentInFullDate(paymentInFullDate)
-                              .installmentAmount(caseData.getPaymentTypeSelection().equals(DJPaymentTypeSelection.REPAYMENT_PLAN)
-                                                     ? getInstallmentAmount(caseData.getRepaymentSuggestion()).setScale(2)
-                                                     : ZERO)
+                              .installmentAmount(installmentAmount)
                               .installmentPeriod(getInstallmentPeriod(caseData))
                               .firstInstallmentDate(caseData.getRepaymentDate())
-                              .dateOfJudgment(getDateOfDjCreated(caseData))
-                              .jointJudgment(caseData.getRespondent2() != null)
+                              .dateOfJudgment(dateOfDjCreated)
+                              .jointJudgment(isJointJudgment)
                               .judgmentToBeRegistered(false)
                               .build())
             .build();
     }
+
+    private LocalDateTime computePaymentInFullDate(CaseData caseData) {
+        DJPaymentTypeSelection paymentTypeSelection = caseData.getPaymentTypeSelection();
+        boolean claimantFavouredImmediate = hasCourtDecisionInFavourOfClaimant(caseData)
+            && caseData.applicant1SuggestedPayImmediately();
+
+        if (paymentTypeSelection == DJPaymentTypeSelection.IMMEDIATELY) {
+            return claimantFavouredImmediate
+                ? Optional.ofNullable(caseData.getApplicant1SuggestPayImmediatelyPaymentDateForDefendantSpec())
+                .map(LocalDate::atStartOfDay)
+                .orElse(null)
+                : LocalDateTime.now();
+        }
+
+        if (paymentTypeSelection == DJPaymentTypeSelection.SET_DATE) {
+            return claimantFavouredImmediate
+                ? Optional.ofNullable(caseData.getApplicant1RequestedPaymentDateForDefendantSpec())
+                .map(PaymentBySetDate::getPaymentSetDate)
+                .map(LocalDate::atStartOfDay)
+                .orElse(null)
+                : caseData.getPaymentSetDate().atStartOfDay();
+        }
+
+        return null;
+    }
+
 
     private LocalDateTime getDateOfDjCreated(CaseData caseData) {
         return featureToggleService.isJOLiveFeedActive() && Objects.nonNull(caseData.getJoDJCreatedDate())
