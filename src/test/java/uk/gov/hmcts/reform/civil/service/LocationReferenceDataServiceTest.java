@@ -715,4 +715,64 @@ class LocationReferenceDataServiceTest {
         }
     }
 
+    @Nested
+    class AdditionalCoverageTests {
+
+        @Test
+        void shouldReturnEmptyList_whenGetHearingCourtLocationsThrowsException() {
+            when(authTokenGenerator.generate()).thenReturn("service_token");
+            when(locationReferenceDataApiClient.getHearingVenue(
+                anyString(), anyString(), anyString(), anyString(), anyString()
+            )).thenThrow(new RuntimeException("boom"));
+
+            List<LocationRefData> result = refDataService.getHearingCourtLocations("user_token");
+
+            assertThat(result).isEmpty();
+        }
+
+        @Test
+        void shouldReturnEmptyLocation_whenCourtVenueByLocationCodeReturnsNullOrEmpty() {
+            when(authTokenGenerator.generate()).thenReturn("service_token");
+
+            // Null case
+            when(locationReferenceDataApiClient.getCourtVenueByLocationCode(
+                anyString(), anyString(), anyString(), anyString(), anyString(), anyString()
+            )).thenReturn(null);
+
+            LocationRefData resultNull = refDataService.getCourtLocation("user_token", "123");
+            assertThat(resultNull).isEqualTo(LocationRefData.builder().build());
+
+            // Empty case
+            when(locationReferenceDataApiClient.getCourtVenueByLocationCode(
+                anyString(), anyString(), anyString(), anyString(), anyString(), anyString()
+            )).thenReturn(Collections.emptyList());
+
+            LocationRefData resultEmpty = refDataService.getCourtLocation("user_token", "123");
+            assertThat(resultEmpty).isEqualTo(LocationRefData.builder().build());
+        }
+
+        @Test
+        void shouldThrowException_whenGetCourtLocationFails() {
+            when(authTokenGenerator.generate()).thenReturn("service_token");
+            when(locationReferenceDataApiClient.getCourtVenueByLocationCode(
+                anyString(), anyString(), anyString(), anyString(), anyString(), anyString()
+            )).thenThrow(new RuntimeException("API failure"));
+
+            assertThrows(RuntimeException.class,
+                         () -> refDataService.getCourtLocation("user_token", "123"));
+        }
+
+        @Test
+        void shouldReturnEmptyList_whenGetCourtLocationsByEpimmsIdWithCMLThrowsException() {
+            when(authTokenGenerator.generate()).thenReturn("service_token");
+            when(locationReferenceDataApiClient.getCourtVenueByEpimmsIdWithCMLAndCourtType(
+                anyString(), anyString(), anyString(), anyString(), anyString(), anyString()
+            )).thenThrow(new RuntimeException("error"));
+
+            List<LocationRefData> result =
+                refDataService.getCourtLocationsByEpimmsIdWithCML("user_token", "epimms123");
+
+            assertThat(result).isEmpty();
+        }
+    }
 }
