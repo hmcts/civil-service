@@ -309,7 +309,9 @@ public class EventHistoryMapper {
         buildCoscEvent(builder, caseData);
         buildTakenOfflineAfterDefendantNoCDeadlinePassed(builder, caseData);
         buildQueriesEvent(builder, caseData);
-        return eventHistorySequencer.sortEvents(builder.build());
+        EventHistory eventHistory = eventHistorySequencer.sortEvents(builder.build());
+        log.debug("Event history: {}", eventHistory);
+        return eventHistory;
     }
 
     private void buildTakenOfflineAfterDefendantNoCDeadlinePassed(EventHistory.EventHistoryBuilder builder,
