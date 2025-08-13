@@ -9241,25 +9241,6 @@ class EventHistoryMapperTest {
         assertEquals(BigDecimal.valueOf(1000).setScale(2), result);
     }
 
-    //Defendant proposes repayment plan claimant accepts
-         // pay by Set by date
-         //pay in installment
-         // pay Immediately
-    //Defendant proposes - claimant rejects - court favors claimant
-        //  Set by date - pay by Set by date (different date)
-        //  Set by date - pay in installment
-        //  Set by date - pay Immediately
-
-    //Defendant proposes - claimant rejects - court favors claimant
-        //  Installment - pay by Set by date
-        //  Installment - pay in installment
-        //  Installment - pay Immediately
-
-    //Defendant proposes - claimant rejects - court favors claimant
-        //  Immediately - pay by Set by date
-        //  Immediately - pay in installment
-        //  Immediately - pay Immediately
-
     @Test
     public void shouldGenerateRPA_ForFullAdmit_WhenClaimRejectsDefendentSetByDateAndCourtFavoursClaimant_SuggestsBySetDate() {
         when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);

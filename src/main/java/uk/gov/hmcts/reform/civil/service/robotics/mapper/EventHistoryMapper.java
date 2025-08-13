@@ -480,7 +480,6 @@ public class EventHistoryMapper {
         return null;
     }
 
-
     private LocalDateTime getDateOfDjCreated(CaseData caseData) {
         return featureToggleService.isJOLiveFeedActive() && Objects.nonNull(caseData.getJoDJCreatedDate())
             ? caseData.getJoDJCreatedDate()
