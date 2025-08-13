@@ -48,6 +48,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CNBC_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT_WELSH;
@@ -96,7 +97,6 @@ class BundleCreatedNotificationHandlerTest extends BaseCallbackHandlerTest {
             when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("welshHmctsSignature"));
             when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("welshPhoneContact"));
             when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
-            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
             when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
         }
@@ -106,6 +106,8 @@ class BundleCreatedNotificationHandlerTest extends BaseCallbackHandlerTest {
             when(notificationsProperties.getBundleCreationTemplate()).thenReturn(TEMPLATE_ID);
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             //Given: Case data at hearing scheduled state and callback param with Notify applicant event
             CaseData caseData = CaseDataBuilder.builder().atStateHearingDateScheduled().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -129,6 +131,8 @@ class BundleCreatedNotificationHandlerTest extends BaseCallbackHandlerTest {
             when(notificationsProperties.getBundleCreationTemplate()).thenReturn(TEMPLATE_ID);
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             //Given: Case data at hearing scheduled state and callback param with Notify respondent1 event
             CaseData caseData = CaseDataBuilder.builder().atStateHearingDateScheduled().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -152,6 +156,8 @@ class BundleCreatedNotificationHandlerTest extends BaseCallbackHandlerTest {
             when(notificationsProperties.getBundleCreationTemplate()).thenReturn(TEMPLATE_ID);
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             //Given: Case data at hearing scheduled state and callback param with Notify respondent2 event and
             // different solicitor for respondent2
             CaseData caseData = CaseDataBuilder.builder()
@@ -177,7 +183,9 @@ class BundleCreatedNotificationHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldNotifyRespondentLip_whenIsNotRepresented() {
             when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn(TEMPLATE_ID);
-
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             //Given: Case data at hearing scheduled state and callback param with Notify respondent1 Lip
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateHearingDateScheduled().build().toBuilder()
@@ -205,7 +213,9 @@ class BundleCreatedNotificationHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldNotifyRespondentLip_whenIsNotRepresentedBilingual() {
             when(notificationsProperties.getNotifyLipUpdateTemplateBilingual()).thenReturn(TEMPLATE_ID_BILINGUAL);
-
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             //Given: Case data at hearing scheduled state and callback param with Notify respondent1 Lip
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateHearingDateScheduled().build().toBuilder()
@@ -269,7 +279,7 @@ class BundleCreatedNotificationHandlerTest extends BaseCallbackHandlerTest {
 
         @NotNull
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
-            Map<String, String> notificationData = new HashMap<>(addCommonProperties());
+            Map<String, String> notificationData = new HashMap<>(addCommonProperties(false));
             notificationData.put(CLAIM_REFERENCE_NUMBER, CASE_ID.toString());
             notificationData.put(CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData));
             notificationData.put(PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789");
@@ -280,7 +290,7 @@ class BundleCreatedNotificationHandlerTest extends BaseCallbackHandlerTest {
 
         @NotNull
         private Map<String, String> getNotificationLipDataMap(CaseData caseData) {
-            Map<String, String> notificationData = new HashMap<>(addCommonProperties());
+            Map<String, String> notificationData = new HashMap<>(addCommonProperties(true));
             notificationData.put(CLAIM_REFERENCE_NUMBER, CASE_ID.toString());
             notificationData.put(CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData));
             notificationData.put(PARTY_NAME, "John Doe");
@@ -288,7 +298,7 @@ class BundleCreatedNotificationHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @NotNull
-        public Map<String, String> addCommonProperties() {
+        public Map<String, String> addCommonProperties(boolean isLipCase) {
             Map<String, String> expectedProperties = new HashMap<>();
             expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
             expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
@@ -296,9 +306,15 @@ class BundleCreatedNotificationHandlerTest extends BaseCallbackHandlerTest {
             expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
             expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
             expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
-            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
             expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
             expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+            if (isLipCase) {
+                expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+                expectedProperties.put(CNBC_CONTACT, configuration.getCnbcContact());
+            } else {
+                expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getRaiseQueryLr());
+                expectedProperties.put(CNBC_CONTACT, configuration.getRaiseQueryLr());
+            }
             return expectedProperties;
         }
     }
@@ -311,6 +327,7 @@ class BundleCreatedNotificationHandlerTest extends BaseCallbackHandlerTest {
             .atStateHearingDateScheduled()
             .respondent2SameLegalRepresentative(YesOrNo.YES)
             .respondentSolicitor2EmailAddress("respondentsolicitor2@example.com").build();
+
         CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
             CallbackRequest.builder().eventId(NOTIFY_RESPONDENT_SOLICITOR2_FOR_BUNDLE_CREATED.name()).build()
         ).build();

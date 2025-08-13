@@ -154,10 +154,13 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
             JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseDataBuilder.build());
 
             BigDecimal interest = interestCalculator.calculateInterest(data);
+
+            String joSummaryObject = data.isLipvLipOneVOne() ? JudgmentsOnlineHelper.calculateRepaymentBreakdownSummaryWithoutClaimInterest(
+                activeJudgment, true) : getJudgmentRepaymentSummaryObject(data, interest, activeJudgment);
             caseDataBuilder
                 .activeJudgment(activeJudgment)
                 .joIsLiveJudgmentExists(YesOrNo.YES)
-                .joRepaymentSummaryObject(getJudgmentRepaymentSummaryObject(data, interest, activeJudgment))
+                .joRepaymentSummaryObject(joSummaryObject)
                 .joJudgementByAdmissionIssueDate(LocalDateTime.now());
         }
 
@@ -169,7 +172,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
 
     private String getJudgmentRepaymentSummaryObject(CaseData caseData, BigDecimal interest, JudgmentDetails activeJudgment) {
         return judgementService.isLrPayImmediatelyPlan(caseData)
-            ? JudgmentsOnlineHelper.calculateRepaymentBreakdownSummaryForLRImmediatePlan(activeJudgment)
+            ? JudgmentsOnlineHelper.calculateRepaymentBreakdownSummaryWithoutClaimInterest(activeJudgment, false)
             : JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(activeJudgment, interest);
     }
 
