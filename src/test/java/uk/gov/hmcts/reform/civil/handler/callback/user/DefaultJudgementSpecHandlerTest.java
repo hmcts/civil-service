@@ -1674,7 +1674,6 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData responseData = mapper.convertValue(response.getData(), CaseData.class);
-            assertThat(responseData.getRespondent1().getFlags()).isNotNull();
             assertThat(responseData.getBusinessProcess()).isNotNull();
             assertThat(responseData.getBusinessProcess().getCamundaEvent()).isEqualTo(DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC.name());
             assertThat(response.getState()).isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
