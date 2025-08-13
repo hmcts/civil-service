@@ -102,16 +102,19 @@ public class LocationService {
             .map(uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil::getBaseLocation)
             .orElse(null);
 
+        String caseRef = (caseData != null) ? String.valueOf(caseData.getCcdCaseReference()) : "unknown";
         if (StringUtils.isEmpty(epimmsId)) {
-            String caseRef = (caseData != null) ? String.valueOf(caseData.getCcdCaseReference()) : "unknown";
             throw new IllegalArgumentException(String.format(
                 "Base Court Location for main applications not found, in case data for caseId %s", caseRef
             ));
         }
 
-        log.info("Case managementLocation region {} and base Location {} caseId {}",
-                 caseData.getCaseManagementLocation().getRegion(),
-                 epimmsId, caseData.getCcdCaseReference());
+        String region = Optional.of(caseData)
+            .map(CaseData::getCaseManagementLocation)
+            .map(uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil::getRegion)
+            .orElse("unknown");
+
+        log.info("Case managementLocation region {} and base Location {} caseId {}", region, epimmsId, caseRef);
 
         List<LocationRefData> locationRefDataList =
             locationRefDataService.getCourtLocationsByEpimmsIdWithCML(authToken, epimmsId);
