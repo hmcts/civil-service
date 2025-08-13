@@ -28,7 +28,8 @@ public abstract class OrderCallbackHandler extends DashboardWithParamsCallbackHa
     }
 
     protected boolean isEligibleForReconsideration(CaseData caseData) {
-        return featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation())
+        return (featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation())
+            || featureToggleService.isWelshEnabledForMainCase())
             && caseData.isSmallClaim()
             && caseData.getTotalClaimAmount().compareTo(BigDecimal.valueOf(10000)) <= 0
             && (isNull(caseData.getDecisionOnRequestReconsiderationOptions())

@@ -132,8 +132,8 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
 
         boolean isCaseProgression = CaseState.CASE_PROGRESSION.equals(caseData.getCcdState());
         boolean isBaseLocationValid = baseLocation != null;
-        boolean isFeatureToggleEnabled = featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(
-            baseLocation);
+        boolean isFeatureToggleEnabled = (featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(
+            baseLocation) || featureToggleService.isWelshEnabledForMainCase());
         Optional<LocalDateTime> sdoTime = getSDOTime();
         boolean isSDOTimeBeforeCPRelease = sdoTime.isPresent()
             && sdoTime.get().isBefore(LocalDateTime.of(2024, 12, 5, 0, 0));
@@ -174,7 +174,8 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
         Optional<LocalDateTime> sdoTime = getSDOTime();
         return CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
             && baseLocation != null
-            && featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation())
+            && (featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation())
+            || featureToggleService.isWelshEnabledForMainCase())
             && !isSDOOrderLegalAdviserCreated()
             && !isSDOOrderInReview()
             && !isSDOOrderInReviewOtherParty()
