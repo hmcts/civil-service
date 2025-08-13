@@ -889,10 +889,53 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
 
         if (NO.equals(respondent1Represented)) {
             when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(isCPAndWhitelisted);
-        } else {
-            when(featureToggleService.isLocationWhiteListedForCaseProgression(any())).thenReturn(isCPAndWhitelisted);
+            if (!isCPAndWhitelisted) {
+                when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
+            }
         }
+        CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                        .region("2")
+                                        .baseLocation("111")
+                                        .build())
+            .transferCourtLocationList(DynamicList.builder().value(DynamicListElement.builder()
+                                                                       .label("Site 1 - Adr 1 - AAA 111").build()).build()).build();
 
+        CallbackParams params = callbackParamsOf(caseData.toBuilder()
+                                                     .applicant1Represented(applicantRepresented)
+                                                     .respondent1Represented(respondent1Represented)
+                                                     .build(), ABOUT_TO_SUBMIT);
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
+
+        assertEquals(eaCourtLocation, responseCaseData.getEaCourtLocation());
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        //LR scenarios trigger and ignore hmcLipEnabled
+        "true, YES, YES, YES, true",
+        "false, YES, YES, YES, true",
+        // LiP vs LR - ignore HMC court
+        "true,  NO, YES, NO, false",
+        "false,  NO, YES, NO, false",
+        //LR vs LiP - ignore HMC court
+        "true, YES, NO, YES, true",
+        "false, YES, NO, YES, true",
+        //LiP vs LiP - ignore HMC court
+        "true, NO, NO, YES, true",
+        "false, NO, NO, YES, true",
+        "false, NO, NO, NO, false",
+        "true, NO, NO, YES, false"
+    })
+    void shouldPopulateHmcLipEnabled_whenLiPAndHmcLipEnabledAndWelshConsidered(boolean isCPAndWhitelisted, YesOrNo applicantRepresented,
+                                                             YesOrNo respondent1Represented,
+                                                             YesOrNo eaCourtLocation, boolean isWelshEnabled) {
+
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(isWelshEnabled);
+        if (!isWelshEnabled && NO.equals(respondent1Represented)) {
+            when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(isCPAndWhitelisted);
+        }
         CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
             .caseManagementLocation(CaseLocationCivil.builder()
                                         .region("2")
