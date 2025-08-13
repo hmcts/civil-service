@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentHandler;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.LegalRepresentativeOneDocumentHandler;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -66,6 +67,7 @@ public abstract class DocumentUploadTask<L1 extends LegalRepresentativeOneDocume
     public CallbackResponse uploadDocuments(CaseData caseData, CaseData caseDataBefore, String selectedRole) {
 
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        caseDataBuilder.evidenceUploadNotificationSent(YesOrNo.NO);
         // If notification has already been populated in current day, we want to append to that existing notification
         StringBuilder notificationTextBuilder = initiateNotificationTextBuilder(caseData);
         applyDocumentUploadDate(caseDataBuilder, LocalDateTime.now());
