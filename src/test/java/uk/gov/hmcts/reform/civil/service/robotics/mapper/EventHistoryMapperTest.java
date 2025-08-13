@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.enums.DebtPaymentOptions;
 import uk.gov.hmcts.reform.civil.enums.MediationDecision;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.PartyRole;
+import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyClaimantResponseLRspec;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.PaymentType;
 import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
@@ -9241,122 +9242,524 @@ class EventHistoryMapperTest {
         assertEquals(BigDecimal.valueOf(1000).setScale(2), result);
     }
 
-    @Test
-    public void shouldGenerateRPA_ForFullAdmit_WhenClaimRejectsDefendentSetByDateAndCourtFavoursClaimant_SuggestsBySetDate() {
-        when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
-        LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
-        LocalDate whenWillPay = LocalDate.now().plusDays(5);
-        LocalDate claimantProposedDate = now().plusDays(3);
-        ClaimantLiPResponse claimantLiPResponse = ClaimantLiPResponse
-            .builder()
-            .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)
-            .applicant1SuggestedImmediatePaymentDeadLine(LocalDate.now().plusDays(3))
-            .build();
+    @Nested
+    public class ForFullAdmit {
 
-        CaseDataLiP caseDataLip = CaseDataLiP
-            .builder()
-            .applicant1LiPResponse(claimantLiPResponse)
-            .build();
+        @Nested
+        class DefendantProposedSetByDateClaimRejectsCourtFavoursClaimant {
+            @Test
+            void claimProposesDifferentSetByDate() {
+                when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
+                LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
+                LocalDate whenWillPay = LocalDate.now().plusDays(5);
+                PaymentBySetDate claimantSuggestedPayByDate = PaymentBySetDate.builder().paymentSetDate(LocalDate.now().plusDays(1)).build();
 
-        CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
-            .ccjPaymentPaidSomeOption(NO)
-            .ccjJudgmentAmountClaimAmount(BigDecimal.valueOf(1500))
-            .ccjJudgmentFixedCostAmount(BigDecimal.valueOf(40))
-            .ccjJudgmentAmountClaimFee(BigDecimal.valueOf(40))
-            .ccjPaymentPaidSomeAmountInPounds(ZERO)
-            .build();
+                ClaimantLiPResponse claimantLiPResponse = ClaimantLiPResponse
+                    .builder()
+                    .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)
+                    .build();
 
-        RespondToClaimAdmitPartLRspec paymentDetails = RespondToClaimAdmitPartLRspec.builder()
-            .whenWillThisAmountBePaid(whenWillPay)
-            .build();
+                CaseDataLiP caseDataLip = CaseDataLiP
+                    .builder()
+                    .applicant1LiPResponse(claimantLiPResponse)
+                    .build();
 
-        CaseData caseData = CaseDataBuilder.builder()
-            .setClaimTypeToSpecClaim()
-            .atStateSpec1v1ClaimSubmitted()
-            .atStateRespondent1v1FullAdmissionSpec().build().toBuilder()
-            .ccjPaymentDetails(ccjPaymentDetails)
-            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
-            .respondToClaimAdmitPartLRspec(paymentDetails)
-            .applicant1ResponseDate(now)
-            .totalInterest(BigDecimal.ZERO)
-            .joJudgementByAdmissionIssueDate(now)
-            .caseDataLiP(caseDataLip)
-            .applicant1AcceptFullAdmitPaymentPlanSpec(NO)
-            .applicant1RepaymentOptionForDefendantSpec(PaymentType.SET_DATE)
-            .applicant1RequestedPaymentDateForDefendantSpec(PaymentBySetDate.builder().paymentSetDate(claimantProposedDate).build())
-            .build();
+                CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
+                    .ccjPaymentPaidSomeOption(NO)
+                    .ccjJudgmentAmountClaimAmount(BigDecimal.valueOf(1500))
+                    .ccjJudgmentFixedCostAmount(BigDecimal.valueOf(40))
+                    .ccjJudgmentAmountClaimFee(BigDecimal.valueOf(40))
+                    .ccjPaymentPaidSomeAmountInPounds(ZERO)
+                    .build();
 
-        var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
-        assertThat(eventHistory).isNotNull();
-        assertThat(eventHistory).extracting("judgmentByAdmission").isNotNull();
-        assertThat(eventHistory).extracting("judgmentByAdmission").asList()
-            .extracting("eventCode").asString().contains("240");
-        assertThat(eventHistory).extracting("judgmentByAdmission").asList()
-            .extracting("eventDetails").asList()
-            .extracting("isJudgmentForthwith").contains(false);
-        assertThat(eventHistory).extracting("judgmentByAdmission").asList()
-            .extracting("eventDetails").asList()
-            .extracting("paymentInFullDate").contains(claimantProposedDate.atStartOfDay());
-        assertThat(eventHistory).extracting("miscellaneous").asList()
-            .extracting("eventDetailsText").asString().contains(RPA_REASON_JUDGMENT_BY_ADMISSION);
-    }
+                RespondToClaimAdmitPartLRspec paymentDetails = RespondToClaimAdmitPartLRspec.builder()
+                    .whenWillThisAmountBePaid(whenWillPay)
+                    .build();
 
-    @Test
-    public void shouldGenerateRPA_ForFullAdmit_WhenClaimRejectsRepaymentPlanAndCourtFavoursClaimant_PayImmediately() {
-        when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
-        LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
-        LocalDate whenWillPay = LocalDate.now().plusDays(5);
+                CaseData caseData = CaseDataBuilder.builder()
+                    .setClaimTypeToSpecClaim()
+                    .atStateSpec1v1ClaimSubmitted()
+                    .atStateRespondent1v1FullAdmissionSpec().build().toBuilder()
+                    .ccjPaymentDetails(ccjPaymentDetails)
+                    .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
+                    .respondToClaimAdmitPartLRspec(paymentDetails)
+                    .applicant1ResponseDate(now)
+                    .totalInterest(BigDecimal.ZERO)
+                    .joJudgementByAdmissionIssueDate(now)
+                    .caseDataLiP(caseDataLip)
+                    .applicant1AcceptFullAdmitPaymentPlanSpec(NO)
+                    .applicant1RepaymentOptionForDefendantSpec(PaymentType.SET_DATE)
+                    .applicant1AcceptFullAdmitPaymentPlanSpec(NO)
+                    .applicant1RequestedPaymentDateForDefendantSpec(claimantSuggestedPayByDate)
+                    .build();
 
-        ClaimantLiPResponse claimantLiPResponse = ClaimantLiPResponse
-            .builder()
-            .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)
-            .applicant1SuggestedImmediatePaymentDeadLine(LocalDate.now().plusDays(3))
-            .build();
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
+                List<Event> judgmentByAdmission = eventHistory.getJudgmentByAdmission();
+                assertThat(judgmentByAdmission).isNotNull();
+                Event event = judgmentByAdmission.get(0);
+                assertThat(event).isNotNull();
+                assertThat(event.getEventCode()).isEqualTo("240");
+                EventDetails eventDetails = event.getEventDetails();
+                assertThat(eventDetails).isNotNull();
+                assertThat(eventDetails.getPaymentInFullDate()).isEqualTo(claimantSuggestedPayByDate.getPaymentSetDate().atStartOfDay());
+                assertThat(eventDetails.getAmountOfJudgment()).isEqualByComparingTo(BigDecimal.valueOf(1500));
+                assertThat(eventDetails.getAmountOfCosts()).isEqualByComparingTo(BigDecimal.valueOf(80));
+                assertThat(eventDetails.getAmountPaidBeforeJudgment()).isEqualByComparingTo(BigDecimal.valueOf(0));
+                assertThat(eventDetails.getAgreedExtensionDate()).isNull();
+                assertThat(eventDetails.getFirstInstallmentDate()).isNull();
+                assertThat(eventDetails.getInstallmentPeriod()).isNull();
+                assertThat(eventDetails.getInstallmentAmount()).isNull();
 
-        CaseDataLiP caseDataLip = CaseDataLiP
-            .builder()
-            .applicant1LiPResponse(claimantLiPResponse)
-            .build();
+            }
 
-        CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
-            .ccjPaymentPaidSomeOption(NO)
-            .ccjJudgmentAmountClaimAmount(BigDecimal.valueOf(1500))
-            .ccjJudgmentFixedCostAmount(BigDecimal.valueOf(40))
-            .ccjJudgmentAmountClaimFee(BigDecimal.valueOf(40))
-            .ccjPaymentPaidSomeAmountInPounds(ZERO)
-            .build();
+            @Test
+            void claimProposesPayByInstallment() {
+                when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
+                LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
+                LocalDate whenWillPay = LocalDate.now().plusDays(5);
+                LocalDate climantSuggestedFirstInstallmentDate = LocalDate.now().plusDays(1);
 
-        RespondToClaimAdmitPartLRspec paymentDetails = RespondToClaimAdmitPartLRspec.builder()
-            .whenWillThisAmountBePaid(whenWillPay)
-            .build();
+                ClaimantLiPResponse claimantLiPResponse = ClaimantLiPResponse
+                    .builder()
+                    .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)
+                    .build();
 
-        CaseData caseData = CaseDataBuilder.builder()
-            .setClaimTypeToSpecClaim()
-            .atStateSpec1v1ClaimSubmitted()
-            .atStateRespondent1v1FullAdmissionSpec().build().toBuilder()
-            .ccjPaymentDetails(ccjPaymentDetails)
-            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
-            .respondToClaimAdmitPartLRspec(paymentDetails)
-            .applicant1ResponseDate(now)
-            .totalInterest(BigDecimal.ZERO)
-            .joJudgementByAdmissionIssueDate(now)
-            .caseDataLiP(caseDataLip)
-            .applicant1AcceptFullAdmitPaymentPlanSpec(NO)
-            .applicant1RepaymentOptionForDefendantSpec(PaymentType.IMMEDIATELY)
-            .build();
+                CaseDataLiP caseDataLip = CaseDataLiP
+                    .builder()
+                    .applicant1LiPResponse(claimantLiPResponse)
+                    .build();
 
-        var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
-        assertThat(eventHistory).isNotNull();
-        assertThat(eventHistory).extracting("judgmentByAdmission").isNotNull();
-        assertThat(eventHistory).extracting("judgmentByAdmission").asList()
-            .extracting("eventCode").asString().contains("240");
-        assertThat(eventHistory).extracting("judgmentByAdmission").asList()
-            .extracting("eventDetails").asList()
-            .extracting("isJudgmentForthwith").contains(true);
-        assertThat(eventHistory).extracting("judgmentByAdmission").asList()
-            .extracting("eventDetails").asList()
-            .extracting("paymentInFullDate").containsNull();
-        assertThat(eventHistory).extracting("miscellaneous").asList()
-            .extracting("eventDetailsText").asString().contains(RPA_REASON_JUDGMENT_BY_ADMISSION);
+                CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
+                    .ccjPaymentPaidSomeOption(NO)
+                    .ccjJudgmentAmountClaimAmount(BigDecimal.valueOf(1500))
+                    .ccjJudgmentFixedCostAmount(BigDecimal.valueOf(40))
+                    .ccjJudgmentAmountClaimFee(BigDecimal.valueOf(40))
+                    .ccjPaymentPaidSomeAmountInPounds(ZERO)
+                    .build();
+
+                RespondToClaimAdmitPartLRspec paymentDetails = RespondToClaimAdmitPartLRspec.builder()
+                    .whenWillThisAmountBePaid(whenWillPay)
+                    .build();
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .setClaimTypeToSpecClaim()
+                    .atStateSpec1v1ClaimSubmitted()
+                    .atStateRespondent1v1FullAdmissionSpec().build().toBuilder()
+                    .ccjPaymentDetails(ccjPaymentDetails)
+                    .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
+                    .respondToClaimAdmitPartLRspec(paymentDetails)
+                    .applicant1ResponseDate(now)
+                    .totalInterest(BigDecimal.ZERO)
+                    .joJudgementByAdmissionIssueDate(now)
+                    .caseDataLiP(caseDataLip)
+                    .applicant1AcceptFullAdmitPaymentPlanSpec(NO)
+                    .applicant1RepaymentOptionForDefendantSpec(PaymentType.REPAYMENT_PLAN)
+                    .applicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec(PaymentFrequencyClaimantResponseLRspec.ONCE_ONE_WEEK)
+                    .applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec(climantSuggestedFirstInstallmentDate)
+                    .applicant1SuggestInstalmentsPaymentAmountForDefendantSpec(BigDecimal.valueOf(100))
+                    .build();
+
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
+                List<Event> judgmentByAdmission = eventHistory.getJudgmentByAdmission();
+                assertThat(judgmentByAdmission).isNotNull();
+                Event event = judgmentByAdmission.get(0);
+                assertThat(event).isNotNull();
+                assertThat(event.getEventCode()).isEqualTo("240");
+                EventDetails eventDetails = event.getEventDetails();
+                assertThat(eventDetails).isNotNull();
+                assertThat(eventDetails.getPaymentInFullDate()).isNull();
+                assertThat(eventDetails.getAmountOfJudgment()).isEqualByComparingTo(BigDecimal.valueOf(1500));
+                assertThat(eventDetails.getAmountOfCosts()).isEqualByComparingTo(BigDecimal.valueOf(80));
+                assertThat(eventDetails.getAmountPaidBeforeJudgment()).isEqualByComparingTo(BigDecimal.valueOf(0));
+                assertThat(eventDetails.getAgreedExtensionDate()).isNull();
+                assertThat(eventDetails.getFirstInstallmentDate()).isEqualTo(climantSuggestedFirstInstallmentDate);
+                assertThat(eventDetails.getInstallmentPeriod()).isEqualTo("WK");
+                assertThat(eventDetails.getInstallmentAmount()).isEqualByComparingTo(BigDecimal.valueOf(1));
+            }
+
+            @Test
+            void claimProposesPayImmediately() {
+                when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
+                LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
+                LocalDate whenWillPay = LocalDate.now().plusDays(5);
+                LocalDate claimantSuggestedDate = LocalDate.now().plusDays(1);
+
+                ClaimantLiPResponse claimantLiPResponse = ClaimantLiPResponse
+                    .builder()
+                    .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)
+                    .applicant1SuggestedImmediatePaymentDeadLine(LocalDate.now().plusDays(3))
+                    .build();
+
+                CaseDataLiP caseDataLip = CaseDataLiP
+                    .builder()
+                    .applicant1LiPResponse(claimantLiPResponse)
+                    .build();
+
+                CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
+                    .ccjPaymentPaidSomeOption(NO)
+                    .ccjJudgmentAmountClaimAmount(BigDecimal.valueOf(1500))
+                    .ccjJudgmentFixedCostAmount(BigDecimal.valueOf(40))
+                    .ccjJudgmentAmountClaimFee(BigDecimal.valueOf(40))
+                    .ccjPaymentPaidSomeAmountInPounds(ZERO)
+                    .build();
+
+                RespondToClaimAdmitPartLRspec paymentDetails = RespondToClaimAdmitPartLRspec.builder()
+                    .whenWillThisAmountBePaid(whenWillPay)
+                    .build();
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .setClaimTypeToSpecClaim()
+                    .atStateSpec1v1ClaimSubmitted()
+                    .atStateRespondent1v1FullAdmissionSpec().build().toBuilder()
+                    .ccjPaymentDetails(ccjPaymentDetails)
+                    .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
+                    .respondToClaimAdmitPartLRspec(paymentDetails)
+                    .applicant1ResponseDate(now)
+                    .totalInterest(BigDecimal.ZERO)
+                    .joJudgementByAdmissionIssueDate(now)
+                    .caseDataLiP(caseDataLip)
+                    .applicant1AcceptFullAdmitPaymentPlanSpec(NO)
+                    .applicant1RepaymentOptionForDefendantSpec(PaymentType.IMMEDIATELY)
+                    .applicant1SuggestPayImmediatelyPaymentDateForDefendantSpec(claimantSuggestedDate)
+                    .build();
+
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
+                List<Event> judgmentByAdmission = eventHistory.getJudgmentByAdmission();
+                assertThat(judgmentByAdmission).isNotNull();
+                Event event = judgmentByAdmission.get(0);
+                assertThat(event).isNotNull();
+                assertThat(event.getEventCode()).isEqualTo("240");
+                EventDetails eventDetails = event.getEventDetails();
+                assertThat(eventDetails).isNotNull();
+                assertThat(eventDetails.getPaymentInFullDate()).isEqualTo(claimantSuggestedDate.atStartOfDay());
+                assertThat(eventDetails.getAmountOfJudgment()).isEqualByComparingTo(BigDecimal.valueOf(1500));
+                assertThat(eventDetails.getAmountOfCosts()).isEqualByComparingTo(BigDecimal.valueOf(80));
+                assertThat(eventDetails.getAmountPaidBeforeJudgment()).isEqualByComparingTo(BigDecimal.valueOf(0));
+                assertThat(eventDetails.getAgreedExtensionDate()).isNull();
+                assertThat(eventDetails.getFirstInstallmentDate()).isNull();
+                assertThat(eventDetails.getInstallmentPeriod()).isNull();
+                assertThat(eventDetails.getInstallmentAmount()).isNull();
+            }
+        }
+
+        @Nested
+        class DefendantProposedPayByInstallmentClaimRejectsCourtFavoursClaimant {
+
+            @Test
+            void claimProposesPayBySetDate() {
+                when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
+                LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
+                LocalDate whenWillPay = LocalDate.now().plusDays(5);
+                PaymentBySetDate claimantSuggestedPayByDate = PaymentBySetDate.builder().paymentSetDate(LocalDate.now().plusDays(1)).build();
+
+                ClaimantLiPResponse claimantLiPResponse = ClaimantLiPResponse
+                    .builder()
+                    .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)
+                    .build();
+
+                CaseDataLiP caseDataLip = CaseDataLiP
+                    .builder()
+                    .applicant1LiPResponse(claimantLiPResponse)
+                    .build();
+
+                CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
+                    .ccjPaymentPaidSomeOption(NO)
+                    .ccjJudgmentAmountClaimAmount(BigDecimal.valueOf(1500))
+                    .ccjJudgmentFixedCostAmount(BigDecimal.valueOf(40))
+                    .ccjJudgmentAmountClaimFee(BigDecimal.valueOf(40))
+                    .ccjPaymentPaidSomeAmountInPounds(ZERO)
+                    .build();
+
+                RepaymentPlanLRspec defendantRepaymentPlan = RepaymentPlanLRspec.builder()
+                    .firstRepaymentDate(whenWillPay)
+                    .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
+                    .paymentAmount(BigDecimal.valueOf(100)).build();
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .setClaimTypeToSpecClaim()
+                    .atStateSpec1v1ClaimSubmitted()
+                    .atStateRespondent1v1FullAdmissionSpec().build().toBuilder()
+                    .ccjPaymentDetails(ccjPaymentDetails)
+                    .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
+                    .respondent1RepaymentPlan(defendantRepaymentPlan)
+                    .applicant1ResponseDate(now)
+                    .totalInterest(BigDecimal.ZERO)
+                    .joJudgementByAdmissionIssueDate(now)
+                    .caseDataLiP(caseDataLip)
+                    .applicant1AcceptFullAdmitPaymentPlanSpec(NO)
+                    .applicant1RepaymentOptionForDefendantSpec(PaymentType.SET_DATE)
+                    .applicant1RequestedPaymentDateForDefendantSpec(claimantSuggestedPayByDate)
+                    .build();
+
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
+                List<Event> judgmentByAdmission = eventHistory.getJudgmentByAdmission();
+                assertThat(judgmentByAdmission).isNotNull();
+                Event event = judgmentByAdmission.get(0);
+                assertThat(event).isNotNull();
+                assertThat(event.getEventCode()).isEqualTo("240");
+                EventDetails eventDetails = event.getEventDetails();
+                assertThat(eventDetails).isNotNull();
+                assertThat(eventDetails.getPaymentInFullDate()).isEqualTo(claimantSuggestedPayByDate.getPaymentSetDate().atStartOfDay());
+                assertThat(eventDetails.getAmountOfJudgment()).isEqualByComparingTo(BigDecimal.valueOf(1500));
+                assertThat(eventDetails.getAmountOfCosts()).isEqualByComparingTo(BigDecimal.valueOf(80));
+                assertThat(eventDetails.getAmountPaidBeforeJudgment()).isEqualByComparingTo(BigDecimal.valueOf(0));
+                assertThat(eventDetails.getAgreedExtensionDate()).isNull();
+                assertThat(eventDetails.getFirstInstallmentDate()).isNull();
+                assertThat(eventDetails.getInstallmentPeriod()).isNull();
+                assertThat(eventDetails.getInstallmentAmount()).isNull();
+            }
+
+            @Test
+            void claimProposesPayByInstallment() {
+                when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
+                LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
+                LocalDate whenWillPay = LocalDate.now().plusDays(5);
+                LocalDate claimantSuggestedDate = LocalDate.now().plusDays(1);
+
+                ClaimantLiPResponse claimantLiPResponse = ClaimantLiPResponse
+                    .builder()
+                    .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)
+                    .build();
+
+                CaseDataLiP caseDataLip = CaseDataLiP
+                    .builder()
+                    .applicant1LiPResponse(claimantLiPResponse)
+                    .build();
+
+                CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
+                    .ccjPaymentPaidSomeOption(NO)
+                    .ccjJudgmentAmountClaimAmount(BigDecimal.valueOf(1500))
+                    .ccjJudgmentFixedCostAmount(BigDecimal.valueOf(40))
+                    .ccjJudgmentAmountClaimFee(BigDecimal.valueOf(40))
+                    .ccjPaymentPaidSomeAmountInPounds(ZERO)
+                    .build();
+
+                RepaymentPlanLRspec defendantRepaymentPlan = RepaymentPlanLRspec.builder()
+                    .firstRepaymentDate(whenWillPay)
+                    .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
+                    .paymentAmount(BigDecimal.valueOf(100)).build();
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .setClaimTypeToSpecClaim()
+                    .atStateSpec1v1ClaimSubmitted()
+                    .atStateRespondent1v1FullAdmissionSpec().build().toBuilder()
+                    .ccjPaymentDetails(ccjPaymentDetails)
+                    .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
+                    .respondent1RepaymentPlan(defendantRepaymentPlan)
+                    .applicant1ResponseDate(now)
+                    .totalInterest(BigDecimal.ZERO)
+                    .joJudgementByAdmissionIssueDate(now)
+                    .caseDataLiP(caseDataLip)
+                    .applicant1AcceptFullAdmitPaymentPlanSpec(NO)
+                    .applicant1RepaymentOptionForDefendantSpec(PaymentType.REPAYMENT_PLAN)
+                    .applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec(claimantSuggestedDate)
+                    .applicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec(PaymentFrequencyClaimantResponseLRspec.ONCE_ONE_WEEK)
+                    .applicant1SuggestInstalmentsPaymentAmountForDefendantSpec(BigDecimal.valueOf(150))
+                    .build();
+
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
+                List<Event> judgmentByAdmission = eventHistory.getJudgmentByAdmission();
+                assertThat(judgmentByAdmission).isNotNull();
+                Event event = judgmentByAdmission.get(0);
+                assertThat(event).isNotNull();
+                assertThat(event.getEventCode()).isEqualTo("240");
+                EventDetails eventDetails = event.getEventDetails();
+                assertThat(eventDetails).isNotNull();
+                assertThat(eventDetails.getPaymentInFullDate()).isNull();
+                assertThat(eventDetails.getAmountOfJudgment()).isEqualByComparingTo(BigDecimal.valueOf(1500));
+                assertThat(eventDetails.getAmountOfCosts()).isEqualByComparingTo(BigDecimal.valueOf(80));
+                assertThat(eventDetails.getAmountPaidBeforeJudgment()).isEqualByComparingTo(BigDecimal.valueOf(0));
+                assertThat(eventDetails.getAgreedExtensionDate()).isNull();
+                assertThat(eventDetails.getFirstInstallmentDate()).isEqualTo(claimantSuggestedDate);
+                assertThat(eventDetails.getInstallmentPeriod()).isEqualTo("WK");
+                assertThat(eventDetails.getInstallmentAmount()).isEqualByComparingTo(BigDecimal.valueOf(1.50));
+            }
+
+            @Test
+            void claimProposesPayImmediately() {
+                when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
+                LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
+                LocalDate whenWillPay = LocalDate.now().plusDays(5);
+                LocalDate claimantSuggestedDate = LocalDate.now().plusDays(1);
+
+                ClaimantLiPResponse claimantLiPResponse = ClaimantLiPResponse
+                    .builder()
+                    .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)
+                    .build();
+
+                CaseDataLiP caseDataLip = CaseDataLiP
+                    .builder()
+                    .applicant1LiPResponse(claimantLiPResponse)
+                    .build();
+
+                CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
+                    .ccjPaymentPaidSomeOption(NO)
+                    .ccjJudgmentAmountClaimAmount(BigDecimal.valueOf(1500))
+                    .ccjJudgmentFixedCostAmount(BigDecimal.valueOf(40))
+                    .ccjJudgmentAmountClaimFee(BigDecimal.valueOf(40))
+                    .ccjPaymentPaidSomeAmountInPounds(ZERO)
+                    .build();
+
+                RepaymentPlanLRspec defendantRepaymentPlan = RepaymentPlanLRspec.builder()
+                    .firstRepaymentDate(whenWillPay)
+                    .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
+                    .paymentAmount(BigDecimal.valueOf(100)).build();
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .setClaimTypeToSpecClaim()
+                    .atStateSpec1v1ClaimSubmitted()
+                    .atStateRespondent1v1FullAdmissionSpec().build().toBuilder()
+                    .ccjPaymentDetails(ccjPaymentDetails)
+                    .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
+                    .respondent1RepaymentPlan(defendantRepaymentPlan)
+                    .applicant1ResponseDate(now)
+                    .totalInterest(BigDecimal.ZERO)
+                    .joJudgementByAdmissionIssueDate(now)
+                    .caseDataLiP(caseDataLip)
+                    .applicant1AcceptFullAdmitPaymentPlanSpec(NO)
+                    .applicant1RepaymentOptionForDefendantSpec(PaymentType.IMMEDIATELY)
+                    .applicant1SuggestPayImmediatelyPaymentDateForDefendantSpec(claimantSuggestedDate)
+                    .build();
+
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
+                List<Event> judgmentByAdmission = eventHistory.getJudgmentByAdmission();
+                assertThat(judgmentByAdmission).isNotNull();
+                Event event = judgmentByAdmission.get(0);
+                assertThat(event).isNotNull();
+                assertThat(event.getEventCode()).isEqualTo("240");
+                EventDetails eventDetails = event.getEventDetails();
+                assertThat(eventDetails).isNotNull();
+                assertThat(eventDetails.getPaymentInFullDate()).isEqualTo(claimantSuggestedDate.atStartOfDay());
+                assertThat(eventDetails.getAmountOfJudgment()).isEqualByComparingTo(BigDecimal.valueOf(1500));
+                assertThat(eventDetails.getAmountOfCosts()).isEqualByComparingTo(BigDecimal.valueOf(80));
+                assertThat(eventDetails.getAmountPaidBeforeJudgment()).isEqualByComparingTo(BigDecimal.valueOf(0));
+                assertThat(eventDetails.getAgreedExtensionDate()).isNull();
+                assertThat(eventDetails.getFirstInstallmentDate()).isNull();
+                assertThat(eventDetails.getInstallmentPeriod()).isNull();
+                assertThat(eventDetails.getInstallmentAmount()).isNull();
+            }
+
+        }
+
+        @Nested
+        class DefendantProposedPayImmediatelyClaimRejectsCourtFavoursDefendant {
+            @Test
+            void claimProposesPayBySetDate() {
+                when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
+                LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
+                LocalDate claimantSuggestedDate = LocalDate.now().plusDays(1);
+
+                ClaimantLiPResponse claimantLiPResponse = ClaimantLiPResponse
+                    .builder()
+                    .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)
+                    .build();
+
+                CaseDataLiP caseDataLip = CaseDataLiP
+                    .builder()
+                    .applicant1LiPResponse(claimantLiPResponse)
+                    .build();
+
+                CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
+                    .ccjPaymentPaidSomeOption(NO)
+                    .ccjJudgmentAmountClaimAmount(BigDecimal.valueOf(1500))
+                    .ccjJudgmentFixedCostAmount(BigDecimal.valueOf(40))
+                    .ccjJudgmentAmountClaimFee(BigDecimal.valueOf(40))
+                    .ccjPaymentPaidSomeAmountInPounds(ZERO)
+                    .build();
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .setClaimTypeToSpecClaim()
+                    .atStateSpec1v1ClaimSubmitted()
+                    .atStateRespondent1v1FullAdmissionSpec().build().toBuilder()
+                    .ccjPaymentDetails(ccjPaymentDetails)
+                    .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+                    .applicant1ResponseDate(now)
+                    .totalInterest(BigDecimal.ZERO)
+                    .joJudgementByAdmissionIssueDate(now)
+                    .caseDataLiP(caseDataLip)
+                    .applicant1AcceptFullAdmitPaymentPlanSpec(NO)
+                    .applicant1RepaymentOptionForDefendantSpec(PaymentType.SET_DATE)
+                    .applicant1RequestedPaymentDateForDefendantSpec(PaymentBySetDate.builder().paymentSetDate(claimantSuggestedDate).build())
+                    .build();
+
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
+                List<Event> judgmentByAdmission = eventHistory.getJudgmentByAdmission();
+                assertThat(judgmentByAdmission).isNotNull();
+                Event event = judgmentByAdmission.get(0);
+                assertThat(event).isNotNull();
+                assertThat(event.getEventCode()).isEqualTo("240");
+                EventDetails eventDetails = event.getEventDetails();
+                assertThat(eventDetails).isNotNull();
+                assertThat(eventDetails.getPaymentInFullDate()).isEqualTo(claimantSuggestedDate.atStartOfDay());
+                assertThat(eventDetails.getAmountOfJudgment()).isEqualByComparingTo(BigDecimal.valueOf(1500));
+                assertThat(eventDetails.getAmountOfCosts()).isEqualByComparingTo(BigDecimal.valueOf(80));
+                assertThat(eventDetails.getAmountPaidBeforeJudgment()).isEqualByComparingTo(BigDecimal.valueOf(0));
+                assertThat(eventDetails.getAgreedExtensionDate()).isNull();
+                assertThat(eventDetails.getFirstInstallmentDate()).isNull();
+                assertThat(eventDetails.getInstallmentPeriod()).isNull();
+                assertThat(eventDetails.getInstallmentAmount()).isNull();
+            }
+
+            @Test
+            void claimProposesPayByInstallment() {
+                when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
+                LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
+                LocalDate claimantSuggestedDate = LocalDate.now().plusDays(1);
+
+                ClaimantLiPResponse claimantLiPResponse = ClaimantLiPResponse
+                    .builder()
+                    .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)
+                    .build();
+
+                CaseDataLiP caseDataLip = CaseDataLiP
+                    .builder()
+                    .applicant1LiPResponse(claimantLiPResponse)
+                    .build();
+
+                CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
+                    .ccjPaymentPaidSomeOption(NO)
+                    .ccjJudgmentAmountClaimAmount(BigDecimal.valueOf(1500))
+                    .ccjJudgmentFixedCostAmount(BigDecimal.valueOf(40))
+                    .ccjJudgmentAmountClaimFee(BigDecimal.valueOf(40))
+                    .ccjPaymentPaidSomeAmountInPounds(ZERO)
+                    .build();
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .setClaimTypeToSpecClaim()
+                    .atStateSpec1v1ClaimSubmitted()
+                    .atStateRespondent1v1FullAdmissionSpec().build().toBuilder()
+                    .ccjPaymentDetails(ccjPaymentDetails)
+                    .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+                    .applicant1ResponseDate(now)
+                    .totalInterest(BigDecimal.ZERO)
+                    .joJudgementByAdmissionIssueDate(now)
+                    .caseDataLiP(caseDataLip)
+                    .applicant1AcceptFullAdmitPaymentPlanSpec(NO)
+                    .applicant1RepaymentOptionForDefendantSpec(PaymentType.REPAYMENT_PLAN)
+                    .applicant1AcceptFullAdmitPaymentPlanSpec(NO)
+                    .applicant1RepaymentOptionForDefendantSpec(PaymentType.REPAYMENT_PLAN)
+                    .applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec(claimantSuggestedDate)
+                    .applicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec(PaymentFrequencyClaimantResponseLRspec.ONCE_ONE_WEEK)
+                    .applicant1SuggestInstalmentsPaymentAmountForDefendantSpec(BigDecimal.valueOf(150))
+                    .build();
+
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
+                List<Event> judgmentByAdmission = eventHistory.getJudgmentByAdmission();
+                assertThat(judgmentByAdmission).isNotNull();
+                Event event = judgmentByAdmission.get(0);
+                assertThat(event).isNotNull();
+                assertThat(event.getEventCode()).isEqualTo("240");
+                EventDetails eventDetails = event.getEventDetails();
+                assertThat(eventDetails).isNotNull();
+                assertThat(eventDetails.getPaymentInFullDate()).isNull();
+                assertThat(eventDetails.getAmountOfJudgment()).isEqualByComparingTo(BigDecimal.valueOf(1500));
+                assertThat(eventDetails.getAmountOfCosts()).isEqualByComparingTo(BigDecimal.valueOf(80));
+                assertThat(eventDetails.getAmountPaidBeforeJudgment()).isEqualByComparingTo(BigDecimal.valueOf(0));
+                assertThat(eventDetails.getAgreedExtensionDate()).isNull();
+                assertThat(eventDetails.getFirstInstallmentDate()).isEqualTo(claimantSuggestedDate);
+                assertThat(eventDetails.getInstallmentPeriod()).isEqualTo("WK");
+                assertThat(eventDetails.getInstallmentAmount()).isEqualByComparingTo(BigDecimal.valueOf(1.50));
+            }
+        }
     }
 }
