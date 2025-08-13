@@ -432,7 +432,6 @@ public class EventHistoryMapper {
 
         boolean isJointJudgment = caseData.getRespondent2() != null;
 
-
         return Event.builder()
             .eventSequence(prepareEventSequence(eventHistoryBuilder.build()))
             .eventCode(DEFAULT_JUDGMENT_GRANTED.getCode())
@@ -480,7 +479,6 @@ public class EventHistoryMapper {
 
         return null;
     }
-
 
     private LocalDateTime getDateOfDjCreated(CaseData caseData) {
         return featureToggleService.isJOLiveFeedActive() && Objects.nonNull(caseData.getJoDJCreatedDate())
