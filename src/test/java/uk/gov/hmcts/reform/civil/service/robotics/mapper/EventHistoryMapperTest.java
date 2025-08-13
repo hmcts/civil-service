@@ -9241,15 +9241,12 @@ class EventHistoryMapperTest {
         assertEquals(BigDecimal.valueOf(1000).setScale(2), result);
     }
 
-
     @Test
     public void shouldGenerateRPA_ForFullAdmit_WhenClaimRejectsDefendentSetByDateAndCourtFavoursClaimant_SuggestsBySetDate() {
         when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
         LocalDate whenWillPay = LocalDate.now().plusDays(5);
         LocalDate claimantProposedDate = now().plusDays(3);
-
-
         ClaimantLiPResponse claimantLiPResponse = ClaimantLiPResponse
             .builder()
             .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)
