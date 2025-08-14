@@ -108,10 +108,10 @@ public class SubmitClaimTask {
 
         addOrgPolicy2ForSameLegalRepresentative(dataBuilder.build(), dataBuilder);
 
-        boolean pinInPostCaseMatched = isPinInPostCaseMatched(caseData);
-        log.info("Pin In Post Case Matched {} for caseId {}", pinInPostCaseMatched, caseData.getCcdCaseReference());
-        if (pinInPostCaseMatched) {
-            log.info("Pin In Post Matched for caseId {}", caseData.getCcdCaseReference());
+        boolean caseMatched = isCaseMatched(caseData);
+        log.info("Post Case Matched {} for caseId {}", caseMatched, caseData.getCcdCaseReference());
+        if (caseMatched) {
+            log.info("Matched for caseId {}", caseData.getCcdCaseReference());
             dataBuilder.respondent1PinToPostLRspec(defendantPinToPostLRspecService.buildDefendantPinToPost());
         }
 
@@ -300,14 +300,12 @@ public class SubmitClaimTask {
         }
     }
 
-    private boolean isPinInPostCaseMatched(CaseData caseData) {
-        log.info("Respondent1Represented =={}== AddRespondent2 =={}== AddApplicant2 =={}== and isPinInPostEnabled {} for caseId ={}=",
-            caseData.getRespondent1Represented(), caseData.getAddRespondent2(), caseData.getAddApplicant2(),
-            featureToggleService.isPinInPostEnabled(), caseData.getCcdCaseReference());
+    private boolean isCaseMatched(CaseData caseData) {
+        log.info("Respondent1Represented =={}== AddRespondent2 =={}== AddApplicant2 =={}== for caseId ={}=",
+            caseData.getRespondent1Represented(), caseData.getAddRespondent2(), caseData.getAddApplicant2(), caseData.getCcdCaseReference());
         return (caseData.getRespondent1Represented() == NO
             && caseData.getAddRespondent2() == NO
-            && caseData.getAddApplicant2() == NO
-            && featureToggleService.isPinInPostEnabled());
+            && caseData.getAddApplicant2() == NO);
     }
 
     private List<String> getPbaAccounts(String authToken) {

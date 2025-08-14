@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.civil.model.docmosis.dq.DirectionsQuestionnaireForm;
 import uk.gov.hmcts.reform.civil.model.dq.RequirementsLip;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dq.builders.DQGeneratorFormBuilder;
@@ -314,4 +315,34 @@ class DirectionsQuestionnaireLipGeneratorTest {
         assertNull(form.getLipExperts());
     }
 
+    @Test
+    void shouldReturnLipTemplate_whenRespondentNotRepresented() {
+        //Given
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
+            .build().toBuilder()
+            .respondent1Represented(YesOrNo.NO)
+            .build();
+
+        //When
+        DocmosisTemplates template = generator.getTemplateId(caseData);
+
+        //Then
+        assertThat(template).isEqualTo(DocmosisTemplates.DQ_LR_V_LIP_RESPONSE);
+    }
+
+    @Test
+    void shouldCallSuperTemplateId_whenRespondentRepresented() {
+        //Given
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
+            .build().toBuilder()
+            .respondent1Represented(YesOrNo.YES)
+            .build();
+
+        //When
+        DocmosisTemplates template = generator.getTemplateId(caseData);
+
+        //Then
+        assertNotNull(template);
+        assertThat(template).isNotEqualTo(DocmosisTemplates.DQ_LR_V_LIP_RESPONSE);
+    }
 }

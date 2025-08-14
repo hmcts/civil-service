@@ -102,7 +102,6 @@ public class DJRespondentReceivedNotificationHandler extends CallbackHandler imp
         CaseData caseData = callbackParams.getCaseData();
         EmailTemplateReference emailTemplate = identifyTemplate(caseData);
         if ((caseData.isLRvLipOneVOne() || (caseData.isLipvLipOneVOne() && toggleService.isLipVLipEnabled()))
-            && toggleService.isPinInPostEnabled()
             && V_1.equals(callbackParams.getVersion())) {
             if (caseData.getRespondent1().getPartyEmail() != null) {
                 notificationService.sendMail(

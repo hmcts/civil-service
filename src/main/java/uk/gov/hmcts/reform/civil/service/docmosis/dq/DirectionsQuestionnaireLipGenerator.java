@@ -108,7 +108,7 @@ public class DirectionsQuestionnaireLipGenerator extends DirectionsQuestionnaire
 
     @Override
     protected DocmosisTemplates getTemplateId(CaseData caseData) {
-        if (caseData.isRespondent1NotRepresented() && featureToggleService.isPinInPostEnabled()) {
+        if (caseData.isRespondent1NotRepresented()) {
             return DQ_LR_V_LIP_RESPONSE;
         }
         return super.getTemplateId(caseData);
