@@ -62,6 +62,9 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 class SendAndReplyCallbackHandlerTest {
 
     private static final String AUTH_TOKEN = "BEARER_TOKEN";
+    private static final Long CASE_ID = 1L;
+    private static final String TASK_ID = "task-id";
+    private static final String USER_ID = "user-id";
 
     @Mock
     SendAndReplyMessageService messageService;
@@ -613,11 +616,6 @@ class SendAndReplyCallbackHandlerTest {
     @Nested
     class Submitted {
 
-        private static Long CASE_ID = 1L;
-        private static String TASK_ID = "task-id";
-        private static String USER_ID = "user-id";
-        private static String USER_TOKEN = "BEARER_TOKEN";
-
         @Test
         void shouldReturnExpectedSubmittedCallbackResponse_whenInvokedWithSendOption() {
 
@@ -664,8 +662,8 @@ class SendAndReplyCallbackHandlerTest {
                 .taskState("unassigned")
                 .build();
 
-            when(userService.getUserDetails(USER_TOKEN)).thenReturn(UserDetails.builder().id(USER_ID).build());
-            when(taskManagementService.getTaskToComplete(eq(CASE_ID.toString()), eq(USER_TOKEN), any())).thenReturn(task);
+            when(userService.getUserDetails(AUTH_TOKEN)).thenReturn(UserDetails.builder().id(USER_ID).build());
+            when(taskManagementService.getTaskToComplete(eq(CASE_ID.toString()), eq(AUTH_TOKEN), any())).thenReturn(task);
 
             CaseData caseData = CaseData.builder()
                 .ccdCaseReference(CASE_ID)
@@ -688,7 +686,7 @@ class SendAndReplyCallbackHandlerTest {
                                        .build())
                     .build());
 
-            verify(taskManagementService).claimTask(USER_TOKEN, TASK_ID);
+            verify(taskManagementService).claimTask(AUTH_TOKEN, TASK_ID);
         }
 
         @Test

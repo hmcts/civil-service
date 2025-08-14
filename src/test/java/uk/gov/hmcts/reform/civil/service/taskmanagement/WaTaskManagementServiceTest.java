@@ -32,9 +32,9 @@ import static org.mockito.Mockito.when;
 @ExtendWith(SpringExtension.class)
 class WaTaskManagementServiceTest {
 
-    static String S2S_TOKEN = "s2s";
-    static String USER_TOKEN = "user-token";
-    static String CASE_ID = "1111222233334444";
+    private static final String S2S_TOKEN = "s2s";
+    private static final String USER_TOKEN = "user-token";
+    private static final String CASE_ID = "1111222233334444";
 
     @Mock
     private WaTaskManagementApiClient taskManagementClient;
@@ -46,7 +46,7 @@ class WaTaskManagementServiceTest {
     private WaTaskManagementService taskManagementService;
 
     @BeforeEach
-    public void setupTests() {
+    void setupTests() {
         when(authTokenGenerator.generate()).thenReturn(S2S_TOKEN);
     }
 

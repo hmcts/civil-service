@@ -22,8 +22,8 @@ public class HttpResponseHeadersService {
 
     public void addClientContextHeader(CallbackResponse callbackResponse, HttpServletResponse response) {
         try {
-            if (callbackResponse instanceof TaskCompletionSubmittedCallbackResponse) {
-                ClientContext clientContext = ((TaskCompletionSubmittedCallbackResponse) callbackResponse).getClientContext();
+            if (callbackResponse instanceof TaskCompletionSubmittedCallbackResponse submittedResponse) {
+                ClientContext clientContext = submittedResponse.getClientContext();
                 Task taskToComplete = clientContext.getUserTask().getTaskData();
                 log.info(
                     "Setting client context to complete the [{}] WA task: [{}]",
@@ -43,8 +43,7 @@ public class HttpResponseHeadersService {
         try {
             String jsonString = mapper.writeValueAsString(clientContext);
             byte[] encodedBytes = Base64.getEncoder().encode(jsonString.getBytes());
-            String encodedString = new String(encodedBytes);
-            return encodedString;
+            return new String(encodedBytes);
 
         } catch (Exception ex) {
             log.error("Exception while serializing client context: {}", ex.getMessage());

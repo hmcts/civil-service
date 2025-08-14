@@ -32,7 +32,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.Predicate;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
@@ -42,7 +41,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_AND_REPLY;
 import static uk.gov.hmcts.reform.civil.enums.sendandreply.SendAndReplyOption.REPLY;
-import static uk.gov.hmcts.reform.civil.model.taskmanagement.PermissionTypes.CLAIM;
+import static uk.gov.hmcts.reform.civil.service.taskmanagement.TaskCompletionPredicate.taskToCompleteFilter;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
@@ -234,12 +233,5 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
         }
 
         return null;
-    }
-
-    private Predicate<Task> taskToCompleteFilter(CaseData caseData) {
-        return task ->
-            nonNull(task.getAdditionalProperties())
-                && task.getPermissions().getValues().contains(CLAIM)
-                && task.getAdditionalProperties().get("messageId").equals(caseData.getLastMessage().getMessageId());
     }
 }

@@ -40,7 +40,7 @@ public class WaTaskManagementService {
                 SearchParameterList.builder()
                     .key(SearchParameterKey.CASE_ID)
                     .operator(SearchOperator.IN)
-                    .values(List.of(caseId.toString()))
+                    .values(List.of(caseId))
                     .build()))
             .build();
 
@@ -50,6 +50,7 @@ public class WaTaskManagementService {
             userAuth,
             request
         );
+
         log.info("response from wa api: {}", response);
         response.getTasks().forEach(task -> log.info("TASK: {}", task.getTaskTitle()));
 

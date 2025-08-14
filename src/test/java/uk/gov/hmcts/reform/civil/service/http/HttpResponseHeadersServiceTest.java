@@ -21,7 +21,6 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -56,7 +55,7 @@ class HttpResponseHeadersServiceTest {
 
         headerSpyService.addClientContextHeader(callbackResponse, mockedResponse);
 
-        verify(mockedResponse).addHeader(eq("client-context"), eq(expectedEncodedContext));
+        verify(mockedResponse).addHeader("client-context", expectedEncodedContext);
     }
 
     @Test
@@ -99,6 +98,5 @@ class HttpResponseHeadersServiceTest {
         byte[] decodedBytes = Base64.getDecoder().decode(encodedClientContext);
         String decodedString = new String(decodedBytes);
         return mapper.readValue(decodedString, HashMap.class);
-
     }
 }
