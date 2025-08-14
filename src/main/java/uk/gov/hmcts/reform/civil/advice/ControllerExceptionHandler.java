@@ -14,7 +14,6 @@ import org.springframework.web.util.ContentCachingRequestWrapper;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentUploadException;
 import uk.gov.hmcts.reform.civil.exceptions.CaseDataInvalidException;
 import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
-import uk.gov.hmcts.reform.civil.exceptions.IncludesLitigantInPersonException;
 import uk.gov.hmcts.reform.civil.exceptions.MissingFieldsUpdatedException;
 import uk.gov.hmcts.reform.civil.exceptions.UserNotFoundOnCaseException;
 import uk.gov.hmcts.reform.civil.service.pininpost.exception.PinNotMatchException;
@@ -121,21 +120,5 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
             getUserId(contentCachingRequestWrapper)
         ));
         return new ResponseEntity<>(userNotFoundOnCaseException.getMessage(), new HttpHeaders(), HttpStatus.NOT_FOUND);
-    }
-
-    @ExceptionHandler(IncludesLitigantInPersonException.class)
-    public ResponseEntity<Object> litigantInPersonException(IncludesLitigantInPersonException includesLitigantInPersonException,
-                                                            ContentCachingRequestWrapper contentCachingRequestWrapper) {
-        String errorMessage = "Action not accepted on case with message: %s for case %s run by user %s";
-        log.error(errorMessage.formatted(
-            includesLitigantInPersonException.getMessage(),
-            getCaseId(contentCachingRequestWrapper),
-            getUserId(contentCachingRequestWrapper)
-        ));
-        return new ResponseEntity<>(
-            includesLitigantInPersonException.getMessage(),
-            new HttpHeaders(),
-            HttpStatus.INTERNAL_SERVER_ERROR
-        );
     }
 }

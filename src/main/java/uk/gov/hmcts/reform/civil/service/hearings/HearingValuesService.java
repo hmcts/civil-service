@@ -10,14 +10,12 @@ import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
 import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
 import uk.gov.hmcts.reform.civil.exceptions.MissingFieldsUpdatedException;
 import uk.gov.hmcts.reform.civil.exceptions.NotEarlyAdopterCourtException;
-import uk.gov.hmcts.reform.civil.exceptions.IncludesLitigantInPersonException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.ServiceHearingValuesModel;
 import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.EarlyAdoptersService;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 
@@ -80,7 +78,6 @@ public class HearingValuesService {
     private final ObjectMapper mapper;
     private final CaseFlagsInitialiser caseFlagInitialiser;
     private final EarlyAdoptersService earlyAdoptersService;
-    private final FeatureToggleService featuretoggleService;
 
     public ServiceHearingValuesModel getValues(Long caseId, String authToken) throws Exception {
         CaseData caseData = retrieveCaseData(caseId);
@@ -142,13 +139,9 @@ public class HearingValuesService {
         }
     }
 
-    private void isLrVLr(CaseData caseData) throws IncludesLitigantInPersonException {
+    private void isLrVLr(CaseData caseData) {
         if (caseData.isApplicantLiP() || caseData.isRespondent1LiP() || caseData.isRespondent2LiP()) {
-            if (featuretoggleService.isHmcForLipEnabled()) {
-                isEarlyAdopter(caseData);
-            } else {
-                throw new IncludesLitigantInPersonException();
-            }
+            isEarlyAdopter(caseData);
         }
     }
 

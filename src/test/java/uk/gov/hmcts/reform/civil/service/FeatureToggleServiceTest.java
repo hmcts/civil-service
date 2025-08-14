@@ -310,15 +310,6 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsHmcForLipEnabled(Boolean toggleStat) {
-        var hmcCui = "hmc-cui-enabled";
-        givenToggle(hmcCui, toggleStat);
-
-        assertThat(featureToggleService.isHmcForLipEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsQMForLRs(Boolean toggleStat) {
         var caseFlagsKey = "query-management";
         givenToggle(caseFlagsKey, toggleStat);
