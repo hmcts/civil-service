@@ -83,9 +83,9 @@ public class RoboticsDataMapper {
 
         RoboticsCaseData build = roboticsBuilder.build();
         try {
-            log.info("Robotics Case Data: {}", build.toJsonString());
+            log.debug("Robotics Case Data: {}", build.toJsonString());
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            log.debug("Failed to convert robotics case data to json string", e);
         }
         return build;
     }
