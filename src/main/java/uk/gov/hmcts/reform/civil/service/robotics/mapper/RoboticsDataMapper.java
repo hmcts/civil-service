@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.service.robotics.mapper;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -82,11 +81,7 @@ public class RoboticsDataMapper {
         }
 
         RoboticsCaseData build = roboticsBuilder.build();
-        try {
-            log.debug("Robotics Case Data: {}", build.toJsonString());
-        } catch (JsonProcessingException e) {
-            log.debug("Failed to convert robotics case data to json string", e);
-        }
+        log.debug("Robotics Case Data: {}", build.toString());
         return build;
     }
 
