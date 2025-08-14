@@ -9251,7 +9251,7 @@ class EventHistoryMapperTest {
                 @Nested
                 class CourtFavoursClaimant {
                     @Test
-                    void claimProposesDifferentSetByDate() {
+                    void claimantProposesDifferentSetByDate() {
                         when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
@@ -9317,7 +9317,7 @@ class EventHistoryMapperTest {
                     }
 
                     @Test
-                    void claimProposesPayByInstallment() {
+                    void claimantProposesPayByInstallment() {
                         when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
@@ -9383,7 +9383,7 @@ class EventHistoryMapperTest {
                     }
 
                     @Test
-                    void claimProposesPayImmediately() {
+                    void claimantProposesPayImmediately() {
                         when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
@@ -9452,7 +9452,7 @@ class EventHistoryMapperTest {
                 @Nested
                 class CourtFavoursDefendant {
                     @Test
-                    void claimProposesDifferentSetByDate() {
+                    void claimantProposesDifferentSetByDate() {
                         when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
@@ -9518,7 +9518,7 @@ class EventHistoryMapperTest {
                     }
 
                     @Test
-                    void claimProposesPayByInstallment() {
+                    void claimantProposesPayByInstallment() {
                         when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
@@ -9584,7 +9584,7 @@ class EventHistoryMapperTest {
                     }
 
                     @Test
-                    void claimProposesPayImmediately() {
+                    void claimantProposesPayImmediately() {
                         when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
@@ -9658,7 +9658,7 @@ class EventHistoryMapperTest {
                 @Nested
                 class CourtFavoursClaimant {
                     @Test
-                    void claimProposesPayBySetDate() {
+                    void claimantProposesPayBySetDate() {
                         when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
@@ -9723,7 +9723,7 @@ class EventHistoryMapperTest {
                     }
 
                     @Test
-                    void claimProposesPayByInstallment() {
+                    void claimantProposesPayByInstallment() {
                         when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
@@ -9790,7 +9790,7 @@ class EventHistoryMapperTest {
                     }
 
                     @Test
-                    void claimProposesPayImmediately() {
+                    void claimantProposesPayImmediately() {
                         when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
@@ -9858,7 +9858,7 @@ class EventHistoryMapperTest {
                 @Nested
                 class CourtFavoursDefendant {
                     @Test
-                    void claimProposesPayBySetDate() {
+                    void claimantProposesPayBySetDate() {
                         when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
@@ -9924,7 +9924,7 @@ class EventHistoryMapperTest {
                     }
 
                     @Test
-                    void claimProposesPayByInstallment() {
+                    void claimantProposesPayByInstallment() {
                         when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
@@ -9991,7 +9991,7 @@ class EventHistoryMapperTest {
                     }
 
                     @Test
-                    void claimProposesPayImmediately() {
+                    void claimantProposesPayImmediately() {
                         when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
@@ -10060,7 +10060,7 @@ class EventHistoryMapperTest {
             @Nested
             class DefendantProposedPayImmediatelyClaimRejectsCourtFavoursDefendant {
                 @Test
-                void claimProposesPayBySetDate() {
+                void claimantProposesPayBySetDate() {
                     when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
                     LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                     LocalDate claimantSuggestedDate = LocalDate.now().plusDays(1);
@@ -10118,7 +10118,7 @@ class EventHistoryMapperTest {
                 }
 
                 @Test
-                void claimProposesPayByInstallment() {
+                void claimantProposesPayByInstallment() {
                     when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
                     LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                     LocalDate claimantSuggestedDate = LocalDate.now().plusDays(1);
@@ -10188,7 +10188,7 @@ class EventHistoryMapperTest {
                 @Nested
                 class CourtFavoursClaimant {
                     @Test
-                    void claimProposesDifferentSetByDate() {
+                    void claimantProposesDifferentSetByDate() {
                         when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
@@ -10254,7 +10254,7 @@ class EventHistoryMapperTest {
                     }
 
                     @Test
-                    void claimProposesPayByInstallment() {
+                    void claimantProposesPayByInstallment() {
                         when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
@@ -10320,7 +10320,7 @@ class EventHistoryMapperTest {
                     }
 
                     @Test
-                    void claimProposesPayImmediately() {
+                    void claimantProposesPayImmediately() {
                         when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
@@ -10389,7 +10389,7 @@ class EventHistoryMapperTest {
                 @Nested
                 class CourtFavoursDefendant {
                     @Test
-                    void claimProposesDifferentSetByDate() {
+                    void claimantProposesDifferentSetByDate() {
                         when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
@@ -10455,7 +10455,7 @@ class EventHistoryMapperTest {
                     }
 
                     @Test
-                    void claimProposesPayByInstallment() {
+                    void claimantProposesPayByInstallment() {
                         when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
@@ -10521,7 +10521,7 @@ class EventHistoryMapperTest {
                     }
 
                     @Test
-                    void claimProposesPayImmediately() {
+                    void claimantProposesPayImmediately() {
                         when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
@@ -10595,7 +10595,7 @@ class EventHistoryMapperTest {
                 @Nested
                 class CourtFavoursClaimant {
                     @Test
-                    void claimProposesPayBySetDate() {
+                    void claimantProposesPayBySetDate() {
                         when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
@@ -10660,7 +10660,7 @@ class EventHistoryMapperTest {
                     }
 
                     @Test
-                    void claimProposesPayByInstallment() {
+                    void claimantProposesPayByInstallment() {
                         when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
@@ -10727,7 +10727,7 @@ class EventHistoryMapperTest {
                     }
 
                     @Test
-                    void claimProposesPayImmediately() {
+                    void claimantProposesPayImmediately() {
                         when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
@@ -10795,7 +10795,7 @@ class EventHistoryMapperTest {
                 @Nested
                 class CourtFavoursDefendant {
                     @Test
-                    void claimProposesPayBySetDate() {
+                    void claimantProposesPayBySetDate() {
                         when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
@@ -10860,7 +10860,7 @@ class EventHistoryMapperTest {
                     }
 
                     @Test
-                    void claimProposesPayByInstallment() {
+                    void claimantProposesPayByInstallment() {
                         when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
@@ -10927,7 +10927,7 @@ class EventHistoryMapperTest {
                     }
 
                     @Test
-                    void claimProposesPayImmediately() {
+                    void claimantProposesPayImmediately() {
                         when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
@@ -10998,7 +10998,7 @@ class EventHistoryMapperTest {
                 @Nested
                 class CourtFavoursClaimant {
                     @Test
-                    void claimProposesPayBySetDate() {
+                    void claimantProposesPayBySetDate() {
                         when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate claimantSuggestedDate = LocalDate.now().plusDays(1);
@@ -11056,7 +11056,7 @@ class EventHistoryMapperTest {
                     }
 
                     @Test
-                    void claimProposesPayByInstallment() {
+                    void claimantProposesPayByInstallment() {
                         when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate claimantSuggestedDate = LocalDate.now().plusDays(1);
@@ -11121,7 +11121,7 @@ class EventHistoryMapperTest {
                 @Nested
                 class CourtFavoursDefendant {
                     @Test
-                    void claimProposesPayBySetDate() {
+                    void claimantProposesPayBySetDate() {
                         when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate claimantSuggestedDate = LocalDate.now().plusDays(1);
@@ -11185,7 +11185,7 @@ class EventHistoryMapperTest {
                     }
 
                     @Test
-                    void claimProposesPayByInstallment() {
+                    void claimantProposesPayByInstallment() {
                         when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate claimantSuggestedDate = LocalDate.now().plusDays(1);
