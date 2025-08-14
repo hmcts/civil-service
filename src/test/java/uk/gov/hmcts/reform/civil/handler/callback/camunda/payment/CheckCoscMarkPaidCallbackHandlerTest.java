@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.payment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.camunda.bpm.engine.RuntimeService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -22,7 +21,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -44,9 +42,6 @@ class CheckCoscMarkPaidCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
-
-    @MockBean
-    private RuntimeService runTimeService;
 
     private final LocalDateTime nowMock = LocalDateTime.of(2024, 10, 8, 0, 0, 0);
     private final LocalDate expectedlocalDate = LocalDate.of(2024, 10, 8).plusDays(30);
@@ -87,8 +82,8 @@ class CheckCoscMarkPaidCallbackHandlerTest extends BaseCallbackHandlerTest {
         CaseData data = getCaseData(response);
 
         assertThat(response.getErrors()).isNull();
-        assertNull(data.getCoscSchedulerDeadline());
-        assertNull(data.getCoSCApplicationStatus());
+        assertThat(data.getCoscSchedulerDeadline()).isNull();
+        assertThat(data.getCoSCApplicationStatus()).isNull();
     }
 
     @Test
@@ -106,8 +101,8 @@ class CheckCoscMarkPaidCallbackHandlerTest extends BaseCallbackHandlerTest {
         CaseData data = getCaseData(response);
 
         assertThat(response.getErrors()).isNull();
-        assertNull(data.getCoscSchedulerDeadline());
-        assertNull(data.getCoSCApplicationStatus());
+        assertThat(data.getCoscSchedulerDeadline()).isNull();
+        assertThat(data.getCoSCApplicationStatus()).isNull();
     }
 
     @Test
