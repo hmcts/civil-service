@@ -749,8 +749,10 @@ public class EventHistoryMapper {
                 return null;
             }
         }
-        return caseData.isPayBySetDate()
-            ? respondToClaimAdmitPartLRspec.getWhenWillThisAmountBePaid().atStartOfDay()
+        return caseData.isPayBySetDate() || caseData.isPayImmediately()
+            ? Optional.ofNullable(respondToClaimAdmitPartLRspec)
+            .map(RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid)
+            .map(LocalDate::atStartOfDay).orElse(null)
             : null;
     }
 
@@ -1746,13 +1748,13 @@ public class EventHistoryMapper {
     }
 
     public boolean isStayClaim(DQ dq) {
-        return ofNullable(dq.getFileDirectionQuestionnaire())
+        return ofNullable(dq).map(DQ::getFileDirectionQuestionnaire)
             .map(FileDirectionsQuestionnaire::getOneMonthStayRequested)
             .orElse(NO) == YES;
     }
 
     public String getPreferredCourtCode(DQ dq) {
-        return ofNullable(dq.getRequestedCourt())
+        return ofNullable(dq).map(DQ::getRequestedCourt)
             .map(RequestedCourt::getResponseCourtCode)
             .orElse("");
     }
