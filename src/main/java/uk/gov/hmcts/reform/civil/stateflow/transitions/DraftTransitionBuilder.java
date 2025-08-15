@@ -19,7 +19,6 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.CASE_PROGRESS
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.CLAIM_STATE_DURING_NOC;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.DASHBOARD_SERVICE_ENABLED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.DEFENDANT_NOC_ONLINE;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.GENERAL_APPLICATION_ENABLED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.IS_JO_LIVE_FEED_ACTIVE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.JO_ONLINE_LIVE_ENABLED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.PUBLIC_QUERIES_ENABLED;
@@ -44,7 +43,6 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                 // camunda diagram for TAKE_CASE_OFFLINE is changed
                 Map.ofEntries(
                     Map.entry(FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), true),
-                    Map.entry(GENERAL_APPLICATION_ENABLED.name(), switchTheGAFlagIfLipExists(c)),
                     Map.entry(DASHBOARD_SERVICE_ENABLED.name(), isDashBoardEnabledForCase(c)),
                     Map.entry(CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled()),
                     Map.entry(BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()),
@@ -67,7 +65,6 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                 Map.ofEntries(
                     Map.entry(FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), false),
                     Map.entry(FlowFlag.TWO_RESPONDENT_REPRESENTATIVES.name(), true),
-                    Map.entry(GENERAL_APPLICATION_ENABLED.name(), switchTheGAFlagIfLipExists(c)),
                     Map.entry(DASHBOARD_SERVICE_ENABLED.name(), isDashBoardEnabledForCase(c)),
                     Map.entry(CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled()),
                     Map.entry(BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()),
@@ -86,7 +83,6 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
             .set((c, flags) -> flags.putAll(
                 Map.ofEntries(
                     Map.entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true),
-                    Map.entry(GENERAL_APPLICATION_ENABLED.name(), switchTheGAFlagIfLipExists(c)),
                     Map.entry(DASHBOARD_SERVICE_ENABLED.name(), isDashBoardEnabledForCase(c)),
                     Map.entry(CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled()),
                     Map.entry(BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()),
@@ -108,7 +104,6 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                 Map.ofEntries(
                     Map.entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true),
                     Map.entry(FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), false),
-                    Map.entry(GENERAL_APPLICATION_ENABLED.name(), switchTheGAFlagIfLipExists(c)),
                     Map.entry(DASHBOARD_SERVICE_ENABLED.name(), isDashBoardEnabledForCase(c)),
                     Map.entry(CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled()),
                     Map.entry(BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()),
@@ -129,7 +124,6 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                 Map.ofEntries(
                     Map.entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false),
                     Map.entry(FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true),
-                    Map.entry(GENERAL_APPLICATION_ENABLED.name(), switchTheGAFlagIfLipExists(c)),
                     Map.entry(DASHBOARD_SERVICE_ENABLED.name(), isDashBoardEnabledForCase(c)),
                     Map.entry(CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled()),
                     Map.entry(BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()),
@@ -150,7 +144,6 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                 Map.ofEntries(
                     Map.entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true),
                     Map.entry(FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true),
-                    Map.entry(GENERAL_APPLICATION_ENABLED.name(), switchTheGAFlagIfLipExists(c)),
                     Map.entry(DASHBOARD_SERVICE_ENABLED.name(), isDashBoardEnabledForCase(c)),
                     Map.entry(CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled()),
                     Map.entry(BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()),
