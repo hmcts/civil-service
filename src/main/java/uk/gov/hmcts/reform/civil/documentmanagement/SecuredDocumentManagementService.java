@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.document.utils.InMemoryMultipartFile;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.net.URI;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Collections;
 import java.util.Optional;
@@ -79,6 +80,15 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
                 .findFirst()
                 .orElseThrow(() -> new DocumentUploadException(originalFileName));
 
+            final LocalDateTime adjustedCreatedOn = document.createdOn
+                .toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime();
+
+            final LocalDateTime createdDatetime = LocalDateTimeHelper.fromUTC(adjustedCreatedOn);
+
+            log.info(" {}  {}  {}  {}", originalFileName, document.createdOn, adjustedCreatedOn, createdDatetime);
+
             return CaseDocument.builder()
                 .documentLink(uk.gov.hmcts.reform.civil.documentmanagement.model.Document.builder()
                                   .documentUrl(document.links.self.href)
@@ -88,10 +98,7 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
                                   .build())
                 .documentName(originalFileName)
                 .documentType(pdf.getDocumentType())
-                .createdDatetime(LocalDateTimeHelper.fromUTC(document.createdOn
-                                                                 .toInstant()
-                                                                 .atZone(ZoneId.systemDefault())
-                                                                 .toLocalDateTime()))
+                .createdDatetime(createdDatetime)
                 .documentSize(document.size)
                 .createdBy(CREATED_BY)
                 .build();
