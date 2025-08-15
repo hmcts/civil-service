@@ -703,8 +703,7 @@ public class CaseDataBuilder {
     private String partialPaymentAmount;
     private LocalDate nextDeadline;
 
-    private CaseQueriesCollection qmApplicantCitizenQueries;
-    private CaseQueriesCollection qmRespondentCitizenQueries;
+    private CaseQueriesCollection queries;
 
     public CaseDataBuilder claimantBilingualLanguagePreference(String claimantBilingualLanguagePreference) {
         this.claimantBilingualLanguagePreference = claimantBilingualLanguagePreference;
@@ -2528,16 +2527,30 @@ public class CaseDataBuilder {
         CaseDataBuilder caseDataBuilder = atStateClaimDraft();
         caseDataBuilder.caseManagementLocation(CaseLocationCivil.builder().region("2").baseLocation("41112").build());
         caseDataBuilder.applicant1DQ(Applicant1DQ.builder()
-            .applicant1DQRequestedCourt(RequestedCourt.builder().responseCourtCode("court4")
-                                            .caseLocation(CaseLocationCivil.builder()
-                                                              .baseLocation("dummy base").region("dummy region")
-                                                              .build())
-                                            .responseCourtName("testCourt")
-                                            .responseCourtCode("0000")
-                                            .reasonForHearingAtSpecificCourt("reason")
-                                            .otherPartyPreferredSite("site")
-                                            .build())
-                .build());
+                                         .applicant1DQRequestedCourt(RequestedCourt.builder().responseCourtCode("court4")
+                                                                         .caseLocation(CaseLocationCivil.builder()
+                                                                                           .baseLocation("dummy base").region(
+                                                                                 "dummy region")
+                                                                                           .build())
+                                                                         .responseCourtName("testCourt")
+                                                                         .responseCourtCode("0000")
+                                                                         .reasonForHearingAtSpecificCourt("reason")
+                                                                         .otherPartyPreferredSite("site")
+                                                                         .build())
+                                         .build());
+        caseDataBuilder.respondent1DQ(Respondent1DQ.builder()
+                                          .respondent1DQRequestedCourt(RequestedCourt.builder().responseCourtCode(
+                                                  "court4")
+                                                                           .caseLocation(CaseLocationCivil.builder()
+                                                                                             .baseLocation("dummy base").region(
+                                                                                   "dummy region")
+                                                                                             .build())
+                                                                           .responseCourtName("testCourt")
+                                                                           .responseCourtCode("0000")
+                                                                           .reasonForHearingAtSpecificCourt("reason")
+                                                                           .otherPartyPreferredSite("site")
+                                                                           .build())
+                                          .build());
         return caseDataBuilder;
     }
 
@@ -4271,7 +4284,7 @@ public class CaseDataBuilder {
                                         .createdOn(queryCreationDatetime)
                                         .build())
                                 .build());
-        this.qmApplicantCitizenQueries = CaseQueriesCollection.builder()
+        this.queries = CaseQueriesCollection.builder()
             .partyName("Claimant")
             .roleOnCase("applicant-citizen")
             .caseMessages(caseMessages).build();
@@ -4280,9 +4293,9 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder includesApplicantCitizenQueryResponse(OffsetDateTime queryCreationDatetime) {
         includesApplicantCitizenQuery(queryCreationDatetime);
-        this.qmApplicantCitizenQueries = this.qmApplicantCitizenQueries.toBuilder().caseMessages(
+        this.queries = this.queries.toBuilder().caseMessages(
             Stream.concat(
-                this.qmApplicantCitizenQueries.getCaseMessages().stream(),
+                this.queries.getCaseMessages().stream(),
                 List.of(Element.<CaseMessage>builder()
                             .id(UUID.randomUUID())
                             .value(
@@ -4298,9 +4311,9 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder includesApplicantCitizenQueryFollowUp(OffsetDateTime queryCreationDatetime) {
         includesApplicantCitizenQueryResponse(queryCreationDatetime);
-        this.qmApplicantCitizenQueries = this.qmApplicantCitizenQueries.toBuilder().caseMessages(
+        this.queries = this.queries.toBuilder().caseMessages(
                 Stream.concat(
-                    this.qmApplicantCitizenQueries.getCaseMessages().stream(),
+                    this.queries.getCaseMessages().stream(),
                     List.of(Element.<CaseMessage>builder()
                                 .id(UUID.randomUUID())
                                 .value(
@@ -4326,7 +4339,7 @@ public class CaseDataBuilder {
                                      .createdOn(queryCreationDatetime)
                                      .build())
                              .build());
-        this.qmRespondentCitizenQueries = CaseQueriesCollection.builder()
+        this.queries = CaseQueriesCollection.builder()
             .partyName("Defendant")
             .roleOnCase("respondent-citizen")
             .caseMessages(caseMessages).build();
@@ -4335,9 +4348,9 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder includesRespondentCitizenQueryResponse(OffsetDateTime queryCreationDatetime) {
         includesRespondentCitizenQuery(queryCreationDatetime);
-        this.qmRespondentCitizenQueries = this.qmRespondentCitizenQueries.toBuilder().caseMessages(
+        this.queries = this.queries.toBuilder().caseMessages(
             Stream.concat(
-                this.qmRespondentCitizenQueries.getCaseMessages().stream(),
+                this.queries.getCaseMessages().stream(),
                 List.of(Element.<CaseMessage>builder()
                             .id(UUID.randomUUID())
                             .value(
@@ -4353,9 +4366,9 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder includesRespondentCitizenQueryFollowUp(OffsetDateTime queryCreationDatetime) {
         includesRespondentCitizenQueryResponse(queryCreationDatetime);
-        this.qmRespondentCitizenQueries = this.qmRespondentCitizenQueries.toBuilder().caseMessages(
+        this.queries = this.queries.toBuilder().caseMessages(
                 Stream.concat(
-                    this.qmRespondentCitizenQueries.getCaseMessages().stream(),
+                    this.queries.getCaseMessages().stream(),
                     List.of(Element.<CaseMessage>builder()
                                 .id(UUID.randomUUID())
                                 .value(
@@ -7245,6 +7258,16 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder specClaim1v1LrVsLipBilingual() {
+        this.caseAccessCategory = SPEC_CLAIM;
+        this.respondent1Represented = NO;
+        this.ccdCaseReference = CASE_ID;
+        this.caseDataLiP = CaseDataLiP.builder()
+            .respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage(Language.BOTH.toString()).build()).build();
+        setClaimTypeToSpecClaim();
+        return this;
+    }
+
     public CaseDataBuilder specClaim1v1LipvLr() {
         atStateClaimDraft();
         legacyCaseReference(LEGACY_CASE_REFERENCE);
@@ -8142,9 +8165,8 @@ public class CaseDataBuilder {
             .anyRepresented(anyRepresented)
             .partialPaymentAmount(partialPaymentAmount)
             .nextDeadline(nextDeadline)
-            .qmApplicantCitizenQueries(qmApplicantCitizenQueries)
-            .qmRespondentCitizenQueries(qmRespondentCitizenQueries)
             .fixedCosts(fixedCosts)
+            .queries(queries)
             .build();
     }
 

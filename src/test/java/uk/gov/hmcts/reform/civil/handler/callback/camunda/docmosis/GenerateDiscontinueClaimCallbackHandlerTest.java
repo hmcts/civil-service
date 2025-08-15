@@ -345,6 +345,7 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldGenerateNoticeOfDiscontinueDocForAllParties_whenNoCourtPermissionRequired_1vs2_correspondenceAddress() {
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
             when(formGenerator.generateDocs(any(CaseData.class), anyString(), any(Address.class), anyString(), anyString())).thenReturn(getCaseDocument());
             when(organisationService.findOrganisationById(anyString())).thenReturn(getOrganisation());
             Address serviceAddress = Address.builder().addressLine1("Service").postCode("S3RV 1C3").build();
@@ -397,7 +398,7 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
 
     @Test
     void shouldSetTheValuesInPreTranslationCollectionForWelshTranslation() {
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         when(formGenerator.generateDocs(
             any(CaseData.class),
             anyString(), any(Address.class), anyString(), anyString()
@@ -407,6 +408,7 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
             .applicant1(getApplicant1PartyDetails())
             .respondent1Represented(YesOrNo.NO)
             .typeOfDiscontinuance(DiscontinuanceTypeList.PART_DISCONTINUANCE)
+            .courtPermissionNeeded(SettleDiscontinueYesOrNoList.NO)
             .caseDataLiP(CaseDataLiP.builder()
                              .respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH")
                                                          .build()).build())

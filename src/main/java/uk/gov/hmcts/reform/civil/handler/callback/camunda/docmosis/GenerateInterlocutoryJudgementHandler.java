@@ -12,11 +12,8 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.CaseDataParent;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
-import uk.gov.hmcts.reform.civil.model.citizenui.ChooseHowToProceed;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
-import uk.gov.hmcts.reform.civil.model.citizenui.dto.RepaymentDecisionType;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.PreTranslationDocumentType;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -57,7 +54,7 @@ public class GenerateInterlocutoryJudgementHandler extends CallbackHandler {
 
     private CallbackResponse generateInterlocutoryJudgementDoc(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (isGenerateInterlocDocNotPermitted(callbackParams)) {
+        if (isGenerateInterlocutoryDocNotPermitted(callbackParams)) {
             return SubmittedCallbackResponse.builder().build();
         }
 
@@ -66,7 +63,7 @@ public class GenerateInterlocutoryJudgementHandler extends CallbackHandler {
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
         CaseData updatedCaseData;
-        if (featureToggleService.isGaForWelshEnabled()
+        if (featureToggleService.isWelshEnabledForMainCase()
             && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
             List<Element<CaseDocument>> preTranslationDocuments = caseData.getPreTranslationDocuments();
             preTranslationDocuments.add(element(interlocutoryJudgementDoc));
@@ -88,27 +85,17 @@ public class GenerateInterlocutoryJudgementHandler extends CallbackHandler {
             .build();
     }
 
-    private ChooseHowToProceed getChooseHowToProceed(CaseData caseData) {
+    private boolean hasClaimantRejectedCourtDecision(CaseData caseData) {
         return Optional.ofNullable(caseData)
             .map(CaseData::getCaseDataLiP)
             .map(CaseDataLiP::getApplicant1LiPResponse)
-            .map(ClaimantLiPResponse::getApplicant1ChoosesHowToProceed)
-            .orElse(null);
+            .filter(ClaimantLiPResponse::hasClaimantRejectedCourtDecision)
+            .isPresent();
     }
 
-    private RepaymentDecisionType getRepaymentDecisionType(CaseData caseData) {
-        return Optional.ofNullable(caseData).map(CaseDataParent::getCaseDataLiP)
-            .map(CaseDataLiP::getApplicant1LiPResponse)
-            .map(ClaimantLiPResponse::getClaimantCourtDecision)
-            .orElse(null);
-    }
-
-    private boolean isGenerateInterlocDocNotPermitted(CallbackParams callbackParams) {
+    private boolean isGenerateInterlocutoryDocNotPermitted(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        ChooseHowToProceed chooseHowToProceed = getChooseHowToProceed(caseData);
-        RepaymentDecisionType repaymentDecisionType = getRepaymentDecisionType(caseData);
-        boolean isCompanyOROrganisation = caseData.getApplicant1().isCompanyOROrganisation();
-        return isCompanyOROrganisation || chooseHowToProceed != ChooseHowToProceed.REQUEST_A_CCJ || repaymentDecisionType != RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT;
+        boolean isCompanyOROrganisation = caseData.getRespondent1().isCompanyOROrganisation();
+        return isCompanyOROrganisation || !hasClaimantRejectedCourtDecision(caseData);
     }
 }
-

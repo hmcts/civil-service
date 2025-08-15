@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
@@ -116,13 +117,14 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
     private void isLipWelshApplicant(CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder,
                                      CaseDocument sealedForm,
                                      CaseDocument copy) {
-        if (featureToggleService.isGaForWelshEnabled() && caseData.isLipvLROneVOne()
+        if (featureToggleService.isWelshEnabledForMainCase() && caseData.isLipvLROneVOne()
             && caseData.isClaimantBilingual()
             && CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT.equals(caseData.getCcdState())) {
             List<Element<CaseDocument>> preTranslationDocs =
                 Optional.ofNullable(caseData.getPreTranslationDocuments()).orElseGet(ArrayList::new);
             preTranslationDocs.add(ElementUtils.element(sealedForm));
             builder.preTranslationDocuments(preTranslationDocs);
+            builder.bilingualHint(YesOrNo.YES);
             builder.preTranslationDocumentType(PreTranslationDocumentType.DEFENDANT_SEALED_CLAIM_FORM_FOR_LIP_VS_LR);
         } else {
             caseData.getSystemGeneratedCaseDocuments().add(ElementUtils.element(sealedForm));
@@ -162,7 +164,7 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
                 LocalDate.now().toString()
             ));
         }
-        if (featureToggleService.isGaForWelshEnabled() && caseData.isLipvLROneVOne()
+        if (featureToggleService.isWelshEnabledForMainCase() && caseData.isLipvLROneVOne()
             && caseData.isClaimantBilingual() && caseData.getRespondent1OriginalDqDoc() != null
             && CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT.equals(caseData.getCcdState())) {
             documents.add(

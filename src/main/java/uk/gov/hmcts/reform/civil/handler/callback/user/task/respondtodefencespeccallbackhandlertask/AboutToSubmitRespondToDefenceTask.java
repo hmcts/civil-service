@@ -104,7 +104,7 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
         BusinessProcess businessProcess = BusinessProcess.ready(CLAIMANT_RESPONSE_SPEC);
         nextState = determineNextState.determineNextState(caseData, callbackParams, builder, nextState, businessProcess);
 
-        is1v1RespondImmediately(oldCaseData, caseData, builder);
+        is1v1RespondImmediately(caseData, builder);
 
         frcDocumentsUtils.assembleClaimantsFRCDocuments(caseData);
 
@@ -114,6 +114,12 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
         clearTempDocuments(builder);
 
         if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
+            if ((AllocatedTrack.MULTI_CLAIM.name().equals(caseData.getResponseClaimTrack())
+                || AllocatedTrack.INTERMEDIATE_CLAIM.name().equals(caseData.getResponseClaimTrack())
+                && caseData.isLipCase())) {
+                builder.isMintiLipCase(YES);
+            }
+
             updateWaCourtLocationsService.ifPresent(service -> service.updateCourtListingWALocations(
                 callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
                 builder
@@ -336,17 +342,13 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
         return locationRefDataService.getCourtLocationsForDefaultJudgments(authToken);
     }
 
-    private void is1v1RespondImmediately(CaseData oldCaseData, CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder) {
+    private void is1v1RespondImmediately(CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder) {
         if (featureToggleService.isJudgmentOnlineLive()
             && isOneVOne(caseData)
             && caseData.isPayImmediately()
             && ((caseData.isFullAdmitClaimSpec() && caseData.getApplicant1ProceedWithClaim() == null)
             || caseData.isPartAdmitImmediatePaymentClaimSettled())) {
             builder.respondForImmediateOption(YesOrNo.YES);
-            //persist fixedCost
-            if (featureToggleService.isLrAdmissionBulkEnabled() && nonNull(oldCaseData.getFixedCosts())) {
-                builder.fixedCosts(oldCaseData.getFixedCosts());
-            }
         }
     }
 

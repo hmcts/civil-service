@@ -6,7 +6,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.callback.DashboardCallbackHandler;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
+import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
@@ -76,9 +76,8 @@ public class CaseProceedOfflineClaimantNotificationHandler extends DashboardCall
     }
 
     private boolean claimantQueryAwaitingAResponse(CaseData caseData) {
-        return featureToggleService.isLipQueryManagementEnabled(caseData)
-            && nonNull(caseData.getQmApplicantCitizenQueries())
-            ? caseData.getQmApplicantCitizenQueries().hasAQueryAwaitingResponse() : false;
+        return featureToggleService.isPublicQueryManagementEnabled(caseData)
+            && nonNull(caseData.getQueries()) && caseData.getQueries().hasAQueryAwaitingResponse();
     }
 
     @Override

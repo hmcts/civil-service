@@ -3,11 +3,11 @@ package uk.gov.hmcts.reform.civil.service;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
@@ -40,6 +40,8 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardMapperTestConfiguration;
+import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.utils.ClaimantResponseUtils;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
 
@@ -54,6 +56,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.JUDGE_FINAL_ORDER;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SDO_ORDER;
@@ -67,22 +70,22 @@ import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.RESPONSE_DEAD
 import static uk.gov.hmcts.reform.civil.service.DeadlinesCalculator.END_OF_DAY;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest(classes = {DashboardMapperTestConfiguration.class})
 public class DashboardNotificationsParamsMapperTest {
-
-    private DashboardNotificationsParamsMapper mapper;
 
     private CaseData caseData;
 
-    @Mock
+    @MockBean
     private FeatureToggleService featureToggleService;
 
-    @Mock
+    @MockBean
     private ClaimantResponseUtils claimantResponseUtils;
+
+    @Autowired
+    private DashboardNotificationsParamsMapper mapper;
 
     @BeforeEach
     void setup() {
-        mapper = new DashboardNotificationsParamsMapper(featureToggleService, claimantResponseUtils);
         caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
     }
 
@@ -111,7 +114,7 @@ public class DashboardNotificationsParamsMapperTest {
             new IdValue<>("2", Bundle.builder().createdOn(Optional.of(now)).build()),
             new IdValue<>("3", Bundle.builder().createdOn(Optional.of(now.minusDays(2))).build())
         );
-        when(claimantResponseUtils.getDefendantAdmittedAmount(any())).thenReturn(BigDecimal.valueOf(100));
+        when(claimantResponseUtils.getDefendantAdmittedAmount(any(), anyBoolean())).thenReturn(BigDecimal.valueOf(100));
 
         LocalDateTime applicant1ResponseDeadline = LocalDateTime.of(2024, 3, 21, 16, 0);
         caseData = caseData.toBuilder()
@@ -564,6 +567,36 @@ public class DashboardNotificationsParamsMapperTest {
         assertThat(result).extracting("orderDocument").isEqualTo("binary-url");
     }
 
+    @ParameterizedTest
+    @EnumSource(value = CaseEvent.class, names = {
+        "CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT",
+        "CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT",
+        "UPDATE_TASK_LIST_CONFIRM_ORDER_REVIEW_CLAIMANT",
+        "UPDATE_TASK_LIST_CONFIRM_ORDER_REVIEW_DEFENDANT"
+    })
+    void shouldNotThrowExceptionWhenNoFinalOrders(CaseEvent caseEvent) {
+        caseData = caseData.toBuilder().finalOrderDocumentCollection(new ArrayList<>()).build();
+
+        Map<String, Object> result = mapper.mapCaseDataToParams(caseData, caseEvent);
+
+        assertThat(result).doesNotContainKey("orderDocument");
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = CaseEvent.class, names = {
+        "CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT",
+        "CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT",
+        "UPDATE_TASK_LIST_CONFIRM_ORDER_REVIEW_CLAIMANT",
+        "UPDATE_TASK_LIST_CONFIRM_ORDER_REVIEW_DEFENDANT"
+    })
+    void shouldNotThrowExceptionWhenFinalOrdersNull(CaseEvent caseEvent) {
+        caseData = caseData.toBuilder().finalOrderDocumentCollection(null).build();
+
+        Map<String, Object> result = mapper.mapCaseDataToParams(caseData, caseEvent);
+
+        assertThat(result).doesNotContainKey("orderDocument");
+    }
+
     @Test
     void shouldMapOrderParameters_whenEventIsSdoDj() {
         List<Element<CaseDocument>> sdoDjCaseDocuments = new ArrayList<>();
@@ -583,7 +616,11 @@ public class DashboardNotificationsParamsMapperTest {
     void shouldMapOrderParameters_whenEventIsSdo() {
         List<Element<CaseDocument>> systemGeneratedDocuments = new ArrayList<>();
         systemGeneratedDocuments.add(element(generateOrder(SDO_ORDER)));
-        caseData = caseData.toBuilder().systemGeneratedCaseDocuments(systemGeneratedDocuments).build();
+        List<Element<CaseDocument>> preTranslationDocuments = new ArrayList<>();
+        preTranslationDocuments.add(element(generateOrder(SDO_ORDER)));
+        caseData = caseData.toBuilder()
+            .systemGeneratedCaseDocuments(systemGeneratedDocuments)
+            .preTranslationDocuments(preTranslationDocuments).build();
 
         Map<String, Object> resultClaimant =
             mapper.mapCaseDataToParams(caseData, CaseEvent.CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT);
@@ -592,6 +629,8 @@ public class DashboardNotificationsParamsMapperTest {
 
         assertThat(resultClaimant).extracting("orderDocument").isEqualTo("binary-url");
         assertThat(resultDefendant).extracting("orderDocument").isEqualTo("binary-url");
+        assertThat(resultClaimant).extracting("hiddenOrderDocument").isEqualTo("binary-url");
+        assertThat(resultDefendant).extracting("hiddenOrderDocument").isEqualTo("binary-url");
     }
 
     @Test

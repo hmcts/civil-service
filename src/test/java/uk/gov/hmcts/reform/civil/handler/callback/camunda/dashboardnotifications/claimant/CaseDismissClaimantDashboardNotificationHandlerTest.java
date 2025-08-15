@@ -13,7 +13,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
+import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
@@ -61,7 +61,7 @@ class CaseDismissClaimantDashboardNotificationHandlerTest extends BaseCallbackHa
 
         HashMap<String, Object> scenarioParams = new HashMap<>();
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        when(featureToggleService.isLipQueryManagementEnabled(any())).thenReturn(false);
+        when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
         when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
         // When
@@ -101,7 +101,7 @@ class CaseDismissClaimantDashboardNotificationHandlerTest extends BaseCallbackHa
 
         HashMap<String, Object> scenarioParams = new HashMap<>();
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        when(featureToggleService.isLipQueryManagementEnabled(any())).thenReturn(true);
+        when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
         when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
         // When

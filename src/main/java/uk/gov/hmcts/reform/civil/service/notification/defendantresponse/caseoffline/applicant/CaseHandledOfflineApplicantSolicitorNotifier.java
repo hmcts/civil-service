@@ -39,8 +39,8 @@ public abstract class CaseHandledOfflineApplicantSolicitorNotifier implements No
     public Map<String, String> addProperties(CaseData caseData) {
         return NotificationUtils.caseOfflineNotificationAddProperties(caseData,
                                                                       caseData.getApplicant1OrganisationPolicy(), organisationService,
-                                                                      featureToggleService.isQueryManagementLRsEnabled(),
-                                                                      featureToggleService.isLipQueryManagementEnabled(caseData), configuration);
+                                                                      featureToggleService.isPublicQueryManagementEnabled(caseData),
+                                                                      configuration);
     }
 
     public abstract void notifyApplicantSolicitorForCaseHandedOffline(CaseData caseData);

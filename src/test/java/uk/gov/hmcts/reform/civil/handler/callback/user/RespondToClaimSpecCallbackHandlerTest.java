@@ -1182,7 +1182,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPauseLipVsLrCaseIfClaimantLipIsWelsh() {
             // Given
-            when(toggleService.isGaForWelshEnabled()).thenReturn(true);
+            when(toggleService.isWelshEnabledForMainCase()).thenReturn(true);
             LocalDateTime dateTime = LocalDateTime.of(2023, 6, 6, 6, 6, 6);
             LocalDate date = dateTime.toLocalDate();
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
@@ -1738,10 +1738,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             UserInfo userInfo = UserInfo.builder().uid("798").build();
             when(userService.getUserInfo(anyString())).thenReturn(userInfo);
             LocalDate whenWillPay = LocalDate.now().plusDays(5);
-            given(deadlineExtensionCalculatorService.calculateExtendedDeadline(
-                any(),
-                anyInt()
-            )).willReturn(whenWillPay);
+            given(deadlineExtensionCalculatorService.calculateExtendedDeadline(any(LocalDateTime.class), anyInt())).willReturn(whenWillPay);
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -2597,6 +2594,66 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getConfirmationBody())
                 .contains(caseData.getApplicant1().getPartyName())
                 .contains(DateFormatHelper.formatLocalDate(whenWillPay, DATE));
+        }
+
+        @Test
+        void specificSummary_whenPartialAdmitPayImmediately_LrAdmissionBulkEnabled() {
+            // Given
+            when(toggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
+            BigDecimal admitted = BigDecimal.valueOf(1000);
+            LocalDate whenWillPay = LocalDate.now().plusDays(5);
+            CaseData caseData = CaseDataBuilder.builder()
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .atStateApplicantRespondToDefenceAndProceed()
+                .build().toBuilder()
+                .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
+                                                   .whenWillThisAmountBePaid(whenWillPay).build())
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
+                .respondToAdmittedClaimOwingAmountPounds(admitted)
+                .respondentClaimResponseTypeForSpecGeneric(RespondentResponseTypeSpec.PART_ADMISSION)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+            // When
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            // Then
+            assertThat(response.getConfirmationBody())
+                .contains(caseData.getApplicant1().getPartyName())
+                .contains("the claimant can request a County Court Judgment against you.");
+        }
+
+        @Test
+        void specificSummary_whenPartialAdmitPayImmediately1v2_LrAdmissionBulkEnabled() {
+            // Given
+            when(toggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
+            BigDecimal admitted = BigDecimal.valueOf(1000);
+            LocalDate whenWillPay = LocalDate.now().plusDays(5);
+            CaseData caseData = CaseDataBuilder.builder()
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .atStateApplicantRespondToDefenceAndProceed()
+                .build().toBuilder()
+                .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
+                                                   .whenWillThisAmountBePaid(whenWillPay).build())
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
+                .respondToAdmittedClaimOwingAmountPounds(admitted)
+                .respondentClaimResponseTypeForSpecGeneric(RespondentResponseTypeSpec.PART_ADMISSION)
+                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2SameLegalRepresentative(NO)
+                .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .isRespondent2(YES)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+            // When
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            // Then
+            assertThat(response.getConfirmationBody())
+                .contains(caseData.getApplicant1().getPartyName())
+                .contains("the claimant can request a County Court Judgment against you.");
         }
 
         @Test

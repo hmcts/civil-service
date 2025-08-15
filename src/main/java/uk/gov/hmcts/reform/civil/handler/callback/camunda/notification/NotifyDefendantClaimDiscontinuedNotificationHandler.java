@@ -24,6 +24,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DISCONTINUANCE
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getRespondentLegalOrganizationName;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
 @RequiredArgsConstructor
@@ -70,12 +71,15 @@ public class NotifyDefendantClaimDiscontinuedNotificationHandler extends Callbac
                 getReferenceTemplate(caseData)
             );
         } else {
-            notificationService.sendMail(
-                caseData.getRespondent1().getPartyEmail(),
-                getLIPTemplate(),
-                addPropertiesLip(caseData),
-                getReferenceTemplate(caseData)
-            );
+            String emailId = caseData.getRespondent1().getPartyEmail();
+            if (emailId != null) {
+                notificationService.sendMail(
+                    emailId,
+                    getLIPTemplate(caseData),
+                    addPropertiesLip(caseData),
+                    getReferenceTemplate(caseData)
+                );
+            }
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder().build();
@@ -85,8 +89,10 @@ public class NotifyDefendantClaimDiscontinuedNotificationHandler extends Callbac
         return notificationsProperties.getNotifyClaimDiscontinuedLRTemplate();
     }
 
-    private String getLIPTemplate() {
-        return notificationsProperties.getNotifyClaimDiscontinuedLipTemplate();
+    private String getLIPTemplate(CaseData caseData) {
+        return caseData.isRespondentResponseBilingual()
+            ? notificationsProperties.getNotifyClaimDiscontinuedWelshLipTemplate() :
+            notificationsProperties.getNotifyClaimDiscontinuedLipTemplate();
     }
 
     private String getReferenceTemplate(CaseData caseData) {
@@ -104,19 +110,17 @@ public class NotifyDefendantClaimDiscontinuedNotificationHandler extends Callbac
             CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
         addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
         return properties;
     }
 
     public Map<String, String> addPropertiesLip(CaseData caseData) {
         HashMap<String, String> properties = new HashMap<>(Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            RESPONDENT_NAME, caseData.getRespondent1().getPartyName()
+            RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
         ));
         addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
         return properties;
     }
 }

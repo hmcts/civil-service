@@ -86,6 +86,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_ONE;
@@ -164,12 +165,7 @@ class EventHistoryMapperTest {
         @Test
         void shouldPrepareMiscellaneousEvent_whenClaimWith1v1UnregisteredDefendant() {
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOffline1v1UnregisteredDefendant().build();
-            if (caseData.getRespondent2OrgRegistered() != null
-                && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
-            }
+
             Event expectedEvent = Event.builder()
                 .eventSequence(1)
                 .eventCode("999")
@@ -5729,13 +5725,13 @@ class EventHistoryMapperTest {
 
         @ParameterizedTest
         @CsvSource({
-            "LR_QUERY",
-            "LIP_QUERY",
+            "PROD_LR_QUERY",
+            "PUBLIC_QUERY"
         })
         void shouldPrepareExpectedEvents_whenClaimTakenOfflineAfterClaimIssuedQueryExists(String queryType) {
-            when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
             CaseData caseData;
-            if (queryType.equals("LR_QUERY")) {
+            if (queryType.equals("PROD_LR_QUERY")) {
+                when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
                 caseData = CaseDataBuilder.builder()
                     .atStateTakenOfflineByStaff()
                     .takenOfflineDate(time.now())
@@ -5745,11 +5741,12 @@ class EventHistoryMapperTest {
                                                      .build())
                     .build();
             } else {
+                when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
                 caseData = CaseDataBuilder.builder()
                     .atStateTakenOfflineByStaff()
                     .takenOfflineDate(time.now())
                     .build().toBuilder()
-                    .qmApplicantCitizenQueries(CaseQueriesCollection.builder()
+                    .queries(CaseQueriesCollection.builder()
                                                    .roleOnCase("APPLICANT")
                                                    .build())
                     .build();
@@ -5807,11 +5804,11 @@ class EventHistoryMapperTest {
 
         @Test
         void shouldPrepareExpectedEvents_whenClaimTakenOfflineAfterNocDeadlinePassedRes1QueryEnabled() {
-            when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
+            when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateTakenOfflineDefendant1NocDeadlinePassed()
                 .build().toBuilder()
-                .qmApplicantSolicitorQueries(CaseQueriesCollection.builder()
+                .queries(CaseQueriesCollection.builder()
                                                  .roleOnCase("APPLICANT")
                                                  .build())
                 .build();
@@ -5858,11 +5855,11 @@ class EventHistoryMapperTest {
 
         @Test
         void shouldPrepareExpectedEvents_whenClaimTakenOfflineAfterNocDeadlinePassedRes2QueryEnabled() {
-            when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
+            when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateTakenOfflineDefendant2NocDeadlinePassed()
                 .build().toBuilder()
-                .qmApplicantSolicitorQueries(CaseQueriesCollection.builder()
+                .queries(CaseQueriesCollection.builder()
                                                  .roleOnCase("APPLICANT")
                                                  .build())
                 .build();
@@ -5909,11 +5906,11 @@ class EventHistoryMapperTest {
 
         @Test
         void shouldPrepareExpectedEvents_whenClaimTakenOfflineAfterNocDeadlinePassedRes2QueryDisabled() {
-            when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(false);
+            when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateTakenOfflineDefendant2NocDeadlinePassed()
                 .build().toBuilder()
-                .qmApplicantSolicitorQueries(CaseQueriesCollection.builder()
+                .queries(CaseQueriesCollection.builder()
                                                  .roleOnCase("APPLICANT")
                                                  .build())
                 .build();
@@ -9185,5 +9182,58 @@ class EventHistoryMapperTest {
                     .asList().containsExactly(expectedEvent);
             }
         }
+    }
+
+    @Test
+    void shouldCalculateAmountOfJudgmentForAdmission_WithInterest() {
+        // Arrange
+        CaseData caseData = mock(CaseData.class);
+        CCJPaymentDetails ccjPaymentDetails = mock(CCJPaymentDetails.class);
+        when(caseData.getCcjPaymentDetails()).thenReturn(ccjPaymentDetails);
+        when(ccjPaymentDetails.getCcjJudgmentAmountClaimAmount()).thenReturn(BigDecimal.valueOf(1000));
+        when(caseData.getTotalInterest()).thenReturn(BigDecimal.valueOf(200));
+        when(caseData.isLipvLipOneVOne()).thenReturn(false);
+
+        // Act
+        BigDecimal result = mapper.getAmountOfJudgmentForAdmission(caseData);
+
+        // Assert
+        assertEquals(BigDecimal.valueOf(1200).setScale(2), result);
+    }
+
+    @Test
+    void shouldCalculateAmountOfJudgmentForAdmission_LipVLipScenario() {
+        // Arrange
+        CaseData caseData = mock(CaseData.class);
+        CCJPaymentDetails ccjPaymentDetails = mock(CCJPaymentDetails.class);
+        when(caseData.getCcjPaymentDetails()).thenReturn(ccjPaymentDetails);
+        when(ccjPaymentDetails.getCcjJudgmentAmountClaimAmount()).thenReturn(BigDecimal.valueOf(1000));
+        when(ccjPaymentDetails.getCcjJudgmentLipInterest()).thenReturn(BigDecimal.valueOf(150));
+        when(caseData.isLipvLipOneVOne()).thenReturn(true);
+        when(caseData.isPartAdmitClaimSpec()).thenReturn(false);
+
+        // Act
+        BigDecimal result = mapper.getAmountOfJudgmentForAdmission(caseData);
+
+        // Assert
+        assertEquals(BigDecimal.valueOf(1150).setScale(2), result);
+    }
+
+    @Test
+    void shouldCalculateAmountOfJudgmentWithoutInterestForPartAdmission_LipVLipScenario() {
+        // Arrange
+        CaseData caseData = mock(CaseData.class);
+        CCJPaymentDetails ccjPaymentDetails = mock(CCJPaymentDetails.class);
+        when(caseData.getCcjPaymentDetails()).thenReturn(ccjPaymentDetails);
+        when(ccjPaymentDetails.getCcjJudgmentAmountClaimAmount()).thenReturn(BigDecimal.valueOf(1000));
+        when(ccjPaymentDetails.getCcjJudgmentLipInterest()).thenReturn(BigDecimal.valueOf(150));
+        when(caseData.isLipvLipOneVOne()).thenReturn(true);
+        when(caseData.isPartAdmitClaimSpec()).thenReturn(true);
+
+        // Act
+        BigDecimal result = mapper.getAmountOfJudgmentForAdmission(caseData);
+
+        // Assert
+        assertEquals(BigDecimal.valueOf(1000).setScale(2), result);
     }
 }

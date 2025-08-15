@@ -25,6 +25,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
+import static uk.gov.hmcts.reform.civil.notification.handlers.claimantresponsecui.confirmproceed.ClaimantConfirmProceedDefendantEmailDTOGenerator.NO_EMAIL_OPERATION;
 
 class NotifierTest {
 
@@ -105,6 +106,19 @@ class NotifierTest {
     }
 
     @Test
+    void shouldNotifyPartiesSuccessfullyWithNoOp() {
+        final Set<EmailDTO> expected = getEmailDTOS();
+        expected.stream().toList().get(0).setEmailTemplate(NO_EMAIL_OPERATION);
+
+        when(emailGenerator.getPartiesToNotify(caseData, taskId)).thenReturn(expected);
+
+        notifier.notifyParties(caseData, "eventId", "taskId");
+
+        verify(emailGenerator, times(1)).getPartiesToNotify(caseData, taskId);
+        verify(notificationService, times(2)).sendMail(anyString(), anyString(), anyMap(), anyString());
+    }
+
+    @Test
     void shouldHandleErrorsWhenNotifyPartiesAndContinueToNextEmail() {
         final Set<EmailDTO> expected = getEmailDTOS();
 
@@ -119,7 +133,7 @@ class NotifierTest {
                 CASE_ID.toString(),
                 "eventId",
                 "taskId",
-                Map.of("Errors", "[java.lang.Exception: Notification Service error null]")
+                Map.of("Errors", "[Failed to send email to respondentsolicitor@example.com : java.lang.Exception: Notification Service error null]")
             );
         verify(emailGenerator, times(1)).getPartiesToNotify(caseData, taskId);
         verify(notificationService, times(3)).sendMail(anyString(), anyString(), anyMap(), anyString());

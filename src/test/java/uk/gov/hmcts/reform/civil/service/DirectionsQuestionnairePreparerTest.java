@@ -11,6 +11,8 @@ import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.service.docmosis.dq.DirectionsQuestionnaireGenerator;
@@ -71,6 +73,35 @@ class DirectionsQuestionnairePreparerTest {
     }
 
     @Test
+    void shouldPrepareDirectionsQuestionnaire_singleResponse_ClaimantDqPreTranslation() {
+        // Given
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
+        CaseData caseData = CaseData.builder()
+            .ccdState(CaseState.AWAITING_APPLICANT_INTENTION)
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+            .applicant1Represented(YES)
+            .respondent1Represented(NO)
+            .caseDataLiP(CaseDataLiP.builder()
+                             .respondent1LiPResponse(RespondentLiPResponse.builder()
+                                                         .respondent1ResponseLanguage("WELSH")
+                                                         .build())
+                             .build())
+            .build();
+        String userToken = "userToken";
+
+        CaseDocument caseDocument = CaseDocument.builder().documentName("directionsQuestionnaire").build();
+        when(directionsQuestionnaireGenerator.generate(any(CaseData.class), eq(userToken)))
+            .thenReturn(caseDocument);
+
+        // When
+        CaseData result = preparer.prepareDirectionsQuestionnaire(caseData, userToken);
+
+        // Then
+        verify(directionsQuestionnaireGenerator).generate(any(CaseData.class), eq(userToken));
+        assertEquals(1, result.getPreTranslationDocuments().size());
+    }
+
+    @Test
     void shouldPrepareDirectionsQuestionnaire_singleResponseForWelshLip() {
         // Given
         CaseData caseData = CaseData.builder()
@@ -85,7 +116,7 @@ class DirectionsQuestionnairePreparerTest {
         CaseDocument caseDocument = CaseDocument.builder().documentName("directionsQuestionnaire").build();
         when(directionsQuestionnaireGenerator.generate(any(CaseData.class), eq(userToken)))
             .thenReturn(caseDocument);
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         // When
         CaseData result = preparer.prepareDirectionsQuestionnaire(caseData, userToken);
 

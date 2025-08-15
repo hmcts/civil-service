@@ -224,6 +224,13 @@ dashboard:
   api:
     url: http://localhost:4000
 
+migration:
+  batchsize: 100
+  wait-time-mins: 5
+  csvFile:
+    decrypt:
+      key: DUMMY_KEY
+
 notifications:
   govNotifyApiKey: ${GOV_NOTIFY_API_KEY:}
   hmctsSignature: "Online Civil Claims \n HM Courts & Tribunal Service"
@@ -276,6 +283,7 @@ notifications:
   claimantSolicitorDefendantResponse1v2DSForSpec: "684d7f7d-7520-4161-8e0a-32afda832125"
   claimantSolicitorDefendantResponseForSpec: "2df7c3e2-de71-437e-9787-538922ebc293"
   claimantSolicitorImmediatelyDefendantResponseForSpec: "0935f427-063f-4c06-8a1c-da2e05a6871f"
+  claimantSolicitorImmediatelyDefendantResponseForSpecJBA: "f05e1e4d-726e-49cf-8a31-bce9fc36fb4b"
   respondentSolicitorDefendantResponseForSpec: "99ffd73f-dbb0-47bb-86c8-28298cf564db"
   respondentSolicitorDefResponseSpecWithClaimantAction: "0daaf9e7-fa2c-4662-9391-9d64b535e233"
   respondentDefendantResponseForSpec: "2c4435ae-af57-4988-9e79-cb28db4bba49"
@@ -341,6 +349,7 @@ notifications:
 
   notifyClaimantLrTemplate: "cee63486-8f75-42ea-baca-5e602e248ab6"
   notifyClaimantLipTemplateManualDetermination: "16046f1d-2443-47b2-980b-ecc1d6842fb7"
+  notifyClaimantLipTemplateManualDeterminationForWelsh: "1b8175df-05c4-4a8b-8f37-a0c489835d2e"
   notifyClaimantAfterClaimIssue: "04bc79ee-2f8f-44d8-8bb6-a7fd5ad93e4f"
   notifyDefendantLrTemplate: "651ac972-fb4b-49cb-aace-9317ccd069f1"
   notifyDefendantLipTemplate: "f2521805-bfec-42b9-99f5-9fda3dfb6a99"
@@ -396,6 +405,7 @@ notifications:
   notifyLiPClaimantClaimSubmittedAndPayClaimFeeTemplate: "2c4be8ac-4c19-4204-a02c-8e5229efdf61"
   notifyLiPClaimantClaimSubmittedAndHelpWithFeeTemplate: "d0965148-3e75-4b94-8f10-f0111d12124f"
   notifyLiPClaimantDefendantResponded: "b8438371-b070-453e-934c-41219e4cba15"
+  notifyLiPClaimantDefendantRespondedWelshLip: "4073eab6-dffd-4904-8508-fd497ef28f1e"
   notifyLiPClaimantDefendantChangedContactDetails: "7cf18066-c3c1-46b0-bc45-435edb38aa1b"
 
   notifyApplicant1EnteredBreathingSpaceLip: "7e34af74-ec20-476b-aea5-6a6508d3acaf"
@@ -476,6 +486,7 @@ notifications:
   notifyLiPOrderTranslatedTemplate: "d1eb5d79-6d1f-4b05-bbdf-a18fda06cf01"
   notifyClaimDiscontinuedLRTemplate: "445e95e4-4d15-4757-9cb2-a75a47b73ac9"
   notifyClaimDiscontinuedLipTemplate: "68342b9f-f9ad-4efc-a465-fb84fb60e3ce"
+  notifyClaimDiscontinuedWelshLipTemplate: "21d87aec-4344-4c07-a90c-0e9579f80b89"
 
   notifyClaimantLrValidationDiscontinuanceFailureTemplate: "f7f08517-0284-4602-916a-af6819c06477"
 
@@ -496,6 +507,14 @@ notifications:
   notifyOtherPartyQueryResponseReceived: "bbb1c567-b5a1-4910-bf00-871163e7f318"
   queryLipResponseReceivedEnglish: "29d4ca19-460c-4133-a9ae-6e470e6cc443"
   queryLipResponseReceivedWelsh: "1464b8a5-3ec6-484d-9e61-527326045633"
+  notifyOtherPartyPublicQueryRaised: "0d2c9b47-a84f-4ea2-a4b6-52c1db909076"
+  notifyOtherLipPartyPublicQueryRaised: "5bced03b-b3ce-49bc-8efb-b5ab35ef21eb"
+  notifyOtherLipPartyWelshPublicQueryRaised: "0b9b41cc-d30f-44c2-8901-f34e1e19e623"
+  queryLrPublicResponseReceived: "cd51bd5e-f4e7-47d3-9f8f-7a59d8612526"
+  queryLipPublicResponseReceived: "b097eb54-3e00-4272-9b77-426b23a71ce1"
+  queryLipWelshPublicResponseReceived: "d1ff72f3-db0e-44c9-83e9-5c6a43681d69"
+  partAdmitPayImmediatelyAgreedClaimant: "c8f80d91-5f4f-4396-9955-6c5da13a818b"
+  partAdmitPayImmediatelyAgreedDefendant: "d653484b-2e1d-4e65-bea5-b58f23a3f242"
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
