@@ -2568,11 +2568,14 @@ public class EventHistoryMapper {
     private String getJBAInstallmentPeriod(CaseData caseData) {
         boolean joLiveFeedActive = featureToggleService.isJOLiveFeedActive();
         boolean payByInstallment = hasCourtDecisionInFavourOfClaimant(caseData) ? caseData.applicant1SuggestedPayByInstalments() : caseData.isPayByInstallment();
-        if (payByInstallment) {
+        if (!joLiveFeedActive && payByInstallment) {
             return getInstallmentPeriodForRequestJudgmentByAdmission(payByInstallment, caseData);
-        } else if (joLiveFeedActive && caseData.isPayBySetDate()) {
+        }
+        boolean payBySetDate = hasCourtDecisionInFavourOfClaimant(caseData) ? caseData.applicant1SuggestedPayBySetDate() : caseData.isPayBySetDate();
+        boolean payImmediately = hasCourtDecisionInFavourOfClaimant(caseData) ? caseData.applicant1SuggestedPayImmediately() : caseData.isPayImmediately();
+        if (joLiveFeedActive && payBySetDate) {
             return "FUL";
-        } else if (joLiveFeedActive && caseData.isPayImmediately()) {
+        } else if (joLiveFeedActive && payImmediately) {
             return "FW";
         } else {
             return null;
