@@ -55,7 +55,6 @@ public enum CamundaProcessIdentifier {
     CaseProceedsInCasemanNotify,
     ApplicantNotifyOthersTrialReady,
     Respondent1NotifyOthersTrialReady,
-    Respondent2NotifyOthersTrialReady
     Respondent2NotifyOthersTrialReady,
     AmendRestitchBundleNotify,
     BundleCreationNotify,
