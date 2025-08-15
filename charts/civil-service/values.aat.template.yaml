@@ -30,6 +30,8 @@ java:
     ROLE_INITIALISATION_ENABLED: true
     CASE_FLAGS_LOGGING_ENABLED: true
     COURT_LOCATION_WA_DMN_ENABLED: true
+    TASK_MANAGEMENT_ENABLED: false
+
   keyVaults:
     civil:
       resourceGroup: civil
