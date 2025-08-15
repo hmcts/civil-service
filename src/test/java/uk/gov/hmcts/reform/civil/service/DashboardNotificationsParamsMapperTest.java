@@ -577,6 +577,36 @@ public class DashboardNotificationsParamsMapperTest {
         assertThat(result).extracting("orderDocument").isEqualTo("binary-url");
     }
 
+    @ParameterizedTest
+    @EnumSource(value = CaseEvent.class, names = {
+        "CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT",
+        "CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT",
+        "UPDATE_TASK_LIST_CONFIRM_ORDER_REVIEW_CLAIMANT",
+        "UPDATE_TASK_LIST_CONFIRM_ORDER_REVIEW_DEFENDANT"
+    })
+    void shouldNotThrowExceptionWhenNoFinalOrders(CaseEvent caseEvent) {
+        caseData = caseData.toBuilder().finalOrderDocumentCollection(new ArrayList<>()).build();
+
+        Map<String, Object> result = mapper.mapCaseDataToParams(caseData, caseEvent);
+
+        assertThat(result).doesNotContainKey("orderDocument");
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = CaseEvent.class, names = {
+        "CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT",
+        "CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT",
+        "UPDATE_TASK_LIST_CONFIRM_ORDER_REVIEW_CLAIMANT",
+        "UPDATE_TASK_LIST_CONFIRM_ORDER_REVIEW_DEFENDANT"
+    })
+    void shouldNotThrowExceptionWhenFinalOrdersNull(CaseEvent caseEvent) {
+        caseData = caseData.toBuilder().finalOrderDocumentCollection(null).build();
+
+        Map<String, Object> result = mapper.mapCaseDataToParams(caseData, caseEvent);
+
+        assertThat(result).doesNotContainKey("orderDocument");
+    }
+
     @Test
     void shouldMapOrderParameters_whenEventIsSdoDj() {
         List<Element<CaseDocument>> sdoDjCaseDocuments = new ArrayList<>();
