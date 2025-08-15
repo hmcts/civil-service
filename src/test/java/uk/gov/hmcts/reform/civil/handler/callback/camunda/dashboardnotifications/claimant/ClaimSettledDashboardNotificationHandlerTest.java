@@ -169,7 +169,7 @@ class ClaimSettledDashboardNotificationHandlerTest  extends BaseCallbackHandlerT
 
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
             when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
-            when(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).thenReturn(true);
+            when(featureToggleService.isLocationWhiteListed(any())).thenReturn(true);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FOR_CLAIM_SETTLED_FOR_CLAIMANT1.name()).build()

@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -54,11 +53,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIGGER_UPDATE_GA_LOC
 
     @Nested
     class AboutToSubmitCallback {
-
-        @BeforeEach
-        public void before() {
-            when(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).thenReturn(true);
-        }
 
         @Test
         void shouldTriggerGeneralApplicationEvent_whenCaseHasGeneralApplication() {
@@ -121,7 +115,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIGGER_UPDATE_GA_LOC
                                                        true, true,
                                                        getOriginalStatusOfGeneralApplication()
                 );
-            when(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).thenReturn(false);
+            when(featureToggleService.isLocationWhiteListed(any())).thenReturn(false);
             when(helperService.updateApplicationLocationDetailsInClaim(any(), any())).thenReturn(caseData);
             CallbackParams params = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, caseData)
@@ -147,7 +141,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIGGER_UPDATE_GA_LOC
                                                        true, true,
                                                        getOriginalStatusOfGeneralApplication()
                 );
-            when(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).thenReturn(false);
+            when(featureToggleService.isLocationWhiteListed(any())).thenReturn(false);
             when(helperService.updateApplicationLocationDetailsInClaim(any(), any())).thenReturn(caseData);
             CallbackParams params = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, caseData)
@@ -197,7 +191,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIGGER_UPDATE_GA_LOC
                 CaseLocationCivil.builder().baseLocation("00000")
                     .region("2").build()).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            when(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).thenReturn(false);
+            when(featureToggleService.isLocationWhiteListed(any())).thenReturn(false);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getErrors()).isNull();

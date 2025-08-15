@@ -261,9 +261,8 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
         params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
         given(initiateGeneralAppService.caseContainsLiP(any())).willReturn(true);
-        given(featureToggleService.isGaForLipsEnabled()).willReturn(true);
         given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
-        given(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).willReturn(true);
+        given(featureToggleService.isLocationWhiteListed(any())).willReturn(true);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         assertThat(response.getErrors()).isEmpty();
     }
@@ -288,9 +287,8 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
         params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION_COSC.name());
         given(initiateGeneralAppService.caseContainsLiP(any())).willReturn(true);
-        given(featureToggleService.isGaForLipsEnabled()).willReturn(true);
         given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
-        given(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).willReturn(true);
+        given(featureToggleService.isLocationWhiteListed(any())).willReturn(true);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         assertThat(response.getErrors()).isEmpty();
     }
@@ -314,7 +312,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
         params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
         given(initiateGeneralAppService.caseContainsLiP(any())).willReturn(true);
-        given(featureToggleService.isGaForLipsEnabled()).willReturn(true);
         given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
         given(featureToggleService.isDefendantNoCOnlineForCase(any())).willReturn(true);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -340,9 +337,8 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
         params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
         given(initiateGeneralAppService.caseContainsLiP(any())).willReturn(true);
-        given(featureToggleService.isGaForLipsEnabled()).willReturn(true);
         given(featureToggleService.isGaForWelshEnabled()).willReturn(true);
-        given(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).willReturn(true);
+        given(featureToggleService.isLocationWhiteListed(any())).willReturn(true);
         given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
         given(featureToggleService.isDefendantNoCOnlineForCase(any())).willReturn(true);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -363,29 +359,8 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
         params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
         given(initiateGeneralAppService.caseContainsLiP(any())).willReturn(true);
-        given(featureToggleService.isGaForLipsEnabled()).willReturn(true);
-        given(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).willReturn(false);
+        given(featureToggleService.isLocationWhiteListed(any())).willReturn(false);
         given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
-
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        assertThat(response.getErrors()).isNotNull();
-    }
-
-    @Test
-    void shouldThrowError_whenLRVsLiPAndLipsNotEnabled() {
-
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateClaimIssued1v1LiP()
-            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-            .caseManagementLocation(CaseLocationCivil.builder()
-                                        .baseLocation("45678")
-                                        .region("4").build())
-            .build();
-
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-        params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
-        given(initiateGeneralAppService.caseContainsLiP(any())).willReturn(true);
-        given(featureToggleService.isGaForLipsEnabled()).willReturn(false);
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         assertThat(response.getErrors()).isNotNull();
@@ -407,7 +382,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
         params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
         given(initiateGeneralAppService.caseContainsLiP(any())).willReturn(true);
-        given(featureToggleService.isGaForLipsEnabled()).willReturn(true);
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         assertThat(response.getErrors()).isNotNull();
@@ -430,9 +404,8 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
         params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
         given(initiateGeneralAppService.caseContainsLiP(any())).willReturn(true);
-        given(featureToggleService.isGaForLipsEnabled()).willReturn(true);
         given(featureToggleService.isGaForWelshEnabled()).willReturn(true);
-        given(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).willReturn(true);
+        given(featureToggleService.isLocationWhiteListed(any())).willReturn(true);
         given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -457,9 +430,8 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
 
         given(initiateGeneralAppService.caseContainsLiP(any())).willReturn(true);
-        given(featureToggleService.isGaForLipsEnabled()).willReturn(true);
         given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
-        given(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).willReturn(true);
+        given(featureToggleService.isLocationWhiteListed(any())).willReturn(true);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         assertThat(response.getErrors()).isEmpty();
     }
@@ -478,8 +450,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
         params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
         given(initiateGeneralAppService.caseContainsLiP(any())).willReturn(true);
-        given(featureToggleService.isGaForLipsEnabled()).willReturn(true);
-        given(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).willReturn(true);
+        given(featureToggleService.isLocationWhiteListed(any())).willReturn(true);
         given(initiateGeneralAppService.respondentAssigned(any())).willReturn(false);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         assertThat(response.getErrors()).isNotNull();

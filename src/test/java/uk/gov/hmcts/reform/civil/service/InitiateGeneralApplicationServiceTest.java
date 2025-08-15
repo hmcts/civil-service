@@ -192,8 +192,6 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
 
         when(authTokenGenerator.generate()).thenReturn(STRING_CONSTANT);
 
-        when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
-
         when(time.now()).thenReturn(SUBMITTED_DATE);
         when(feesService.getFeeForGA(any(GeneralApplication.class), any())).thenReturn(Fee.builder().build());
     }
@@ -469,7 +467,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     }
 
     @Test
-    void shouldPopulateGaForLipsFlagIfFeatureFlagIsOn() {
+    void shouldPopulateGaForLips() {
         when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPreSdoCNBC(), true));
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataForConsentUnconsentCheck(null);
@@ -493,7 +491,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     }
 
     @Test
-    void shouldPopulateGaForLipsFlagIfFeatureFlagIsOn_LRVsLIPQueryManagementOff() {
+    void shouldPopulateGaForLips_LRVsLIPQueryManagementOff() {
         when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPreSdoCNBC(), true));
         when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(false);
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
@@ -519,7 +517,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     }
 
     @Test
-    void shouldPopulateGaForLipsFlagIfFeatureFlagIsOn_LRVsLIPQueryManagementOn() {
+    void shouldPopulateGaForLips_LRVsLIPQueryManagementOn() {
         when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPreSdoCNBC(), true));
         when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
@@ -545,7 +543,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     }
 
     @Test
-    void shouldPopulateGaForLipsFlagIfFeatureFlagIsOn_LRVsLIPCaseSettled() {
+    void shouldPopulateGaForLips_LRVsLIPCaseSettled() {
         when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPreSdoCNBC(), true));
         when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
@@ -569,26 +567,6 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
             .isEqualTo(NO);
         assertThat(result.getGeneralApplications().get(0).getValue().getIsGaApplicantLip())
             .isEqualTo(NO);
-    }
-
-    @Test
-    void shouldNotPopulateGaForLipsFlagIfFeatureFlagIsOff() {
-        when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPreSdoCNBC(), true));
-        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseDataForConsentUnconsentCheck(null);
-
-        when(featureToggleService.isGaForLipsEnabled()).thenReturn(false);
-
-        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
-            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
-
-        assertThat(result.getGeneralApplications().size()).isEqualTo(1);
-        assertThat(result.getGeneralApplications().get(0).getValue().getIsGaRespondentOneLip())
-            .isNull();
-        assertThat(result.getGeneralApplications().get(0).getValue().getIsGaRespondentTwoLip())
-            .isNull();
-        assertThat(result.getGeneralApplications().get(0).getValue().getIsGaApplicantLip())
-            .isNull();
     }
 
     @Test
