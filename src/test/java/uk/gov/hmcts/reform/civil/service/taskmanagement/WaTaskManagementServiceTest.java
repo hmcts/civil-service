@@ -10,6 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.client.WaTaskManagementApiClient;
 import uk.gov.hmcts.reform.civil.model.taskmanagement.GetTasksResponse;
@@ -18,6 +19,7 @@ import uk.gov.hmcts.reform.civil.model.taskmanagement.SearchParameterKey;
 import uk.gov.hmcts.reform.civil.model.taskmanagement.SearchParameterList;
 import uk.gov.hmcts.reform.civil.model.taskmanagement.SearchTaskRequest;
 import uk.gov.hmcts.reform.civil.model.taskmanagement.Task;
+import org.camunda.community.rest.exception.RemoteProcessEngineException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +27,10 @@ import java.util.function.Predicate;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -71,6 +77,14 @@ class WaTaskManagementServiceTest {
             assertEquals(expectedTasks, actual);
         }
 
+        @Test
+        void getAllTasks_shouldThrowHttpClientErrorException_whenRemoteProcessEngineExceptionIsThrown() {
+            when(taskManagementClient.searchWithCriteria(anyString(), anyString(), any(SearchTaskRequest.class)))
+                .thenThrow(new RemoteProcessEngineException("Task management error",  new Throwable()));
+
+            assertThrows(HttpClientErrorException.class, () -> taskManagementService.getAllTasks(CASE_ID, USER_TOKEN));
+        }
+
         @ParameterizedTest
         @ValueSource(booleans = {true, false})
         void getTaskToComplete_shouldReturnExpectedTask(boolean makeMatch) {
@@ -107,6 +121,16 @@ class WaTaskManagementServiceTest {
             taskManagementService.claimTask(USER_TOKEN, taskId);
 
             verify(taskManagementClient).claimTask(S2S_TOKEN, USER_TOKEN, taskId);
+        }
+
+        @Test
+        void claimTask_shouldThrowHttpClientErrorException_whenRemoteProcessEngineExceptionIsThrown() {
+            String taskId = "TaskId";
+            doThrow(new RemoteProcessEngineException("Task management error", new Throwable()))
+                .when(taskManagementClient)
+                .claimTask(anyString(), anyString(), anyString());
+
+            assertThrows(HttpClientErrorException.class, () -> taskManagementService.claimTask(USER_TOKEN, taskId));
         }
     }
 

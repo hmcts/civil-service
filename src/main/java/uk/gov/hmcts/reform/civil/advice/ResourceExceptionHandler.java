@@ -89,16 +89,6 @@ public class ResourceExceptionHandler {
         return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.NOT_ACCEPTABLE);
     }
 
-    @ExceptionHandler(value =  FeignException.BadRequest.class)
-    public ResponseEntity<Object> badRequestFeign(Exception exception,
-                                                    ContentCachingRequestWrapper contentCachingRequestWrapper) {
-        log.debug(exception.getMessage(), exception);
-        String errorMessage = "Bad request feign error with message: %s for case %s run by user %s";
-        log.error(errorMessage.formatted(exception.getMessage(), getCaseId(contentCachingRequestWrapper),
-                                         getUserId(contentCachingRequestWrapper)));
-        return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.BAD_REQUEST);
-    }
-
     @ExceptionHandler(value =  FeignException.Unauthorized.class)
     public ResponseEntity<Object> unauthorizedFeign(Exception exception,
                                                     ContentCachingRequestWrapper contentCachingRequestWrapper) {
@@ -127,16 +117,6 @@ public class ResourceExceptionHandler {
         log.error(errorMessage.formatted(exception.getMessage(), getCaseId(contentCachingRequestWrapper),
                                          getUserId(contentCachingRequestWrapper)));
         return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.NOT_FOUND);
-    }
-
-    @ExceptionHandler(value = FeignException.UnsupportedMediaType.class)
-    public ResponseEntity<Object> feignUnsupportedMediaType(Exception exception,
-                                                  ContentCachingRequestWrapper contentCachingRequestWrapper) {
-        log.debug(exception.getMessage(), exception);
-        String errorMessage = "Unsupported mediatype feign error with message: %s for case %s run by user %s";
-        log.error(errorMessage.formatted(exception.getMessage(), getCaseId(contentCachingRequestWrapper),
-                                         getUserId(contentCachingRequestWrapper)));
-        return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(value = NoSuchMethodError.class)

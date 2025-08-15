@@ -2,8 +2,11 @@ package uk.gov.hmcts.reform.civil.service.taskmanagement;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.camunda.community.rest.exception.RemoteProcessEngineException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.client.WaTaskManagementApiClient;
 import uk.gov.hmcts.reform.civil.model.taskmanagement.GetTasksResponse;
@@ -45,14 +48,18 @@ public class WaTaskManagementService {
             .build();
 
         log.info("wa task search request: {}", request);
-        GetTasksResponse response = taskManagementClient.searchWithCriteria(
-            authTokenGenerator.generate(),
-            userAuth,
-            request
-        );
 
-        log.info("response from wa api: {}", response);
-        response.getTasks().forEach(task -> log.info("TASK: {}", task.getTaskTitle()));
+        GetTasksResponse response;
+        try {
+            response = taskManagementClient.searchWithCriteria(
+                authTokenGenerator.generate(),
+                userAuth,
+                request
+            );
+        } catch (RemoteProcessEngineException e) {
+            log.error("There was an issue retrieving tasks from task management api: {}", e.getMessage());
+            throw new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+        }
 
         return response.getTasks();
     }
@@ -64,6 +71,7 @@ public class WaTaskManagementService {
         }
 
         List<Task> availableTasks = getAllTasks(caseId, userAuth);
+
         if (!availableTasks.isEmpty()) {
             return availableTasks.stream().filter(filterPredicate).findFirst().orElse(null);
         }
@@ -72,8 +80,15 @@ public class WaTaskManagementService {
 
     public void claimTask(String authorization, String taskId) {
         if (taskManagementEnabled) {
-            taskManagementClient.claimTask(authTokenGenerator.generate(), authorization, taskId);
+            try {
+                taskManagementClient.claimTask(authTokenGenerator.generate(), authorization, taskId);
+            } catch (RemoteProcessEngineException e) {
+                log.error("There was an issue claiming the task [{}] from task management api: {}", taskId, e.getMessage());
+                throw new HttpClientErrorException(HttpStatus.BAD_GATEWAY, e.getMessage());
+            }
+
+        } else {
+            log.info("Claim task - WA integration is disabled");
         }
-        log.info("Claim task - WA integration is disabled");
     }
 }
