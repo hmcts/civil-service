@@ -87,7 +87,8 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
 
             final LocalDateTime createdDatetime = LocalDateTimeHelper.fromUTC(adjustedCreatedOn);
 
-            log.info(" {}  {}  {}  {}", originalFileName, document.createdOn, adjustedCreatedOn, createdDatetime);
+            log.info("XXXXX {}  {}  {}  {} {}", originalFileName, document.createdOn, adjustedCreatedOn,
+                     createdDatetime, adjustedCreatedOn.equals(createdDatetime) ? "YYYYY" : "ZZZZ");
 
             return CaseDocument.builder()
                 .documentLink(uk.gov.hmcts.reform.civil.documentmanagement.model.Document.builder()
