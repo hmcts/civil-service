@@ -65,17 +65,17 @@ class LocationHelperTest {
                                                       .courtLocationCode("123")
                                                       .regionId("regionId")
                                                       .region("region name")
-                                                      .epimmsId("epimms")
+                                                      .epimmsId("99999")
                                                       .build());
         RequestedCourt requestedCourt = RequestedCourt.builder()
-            .responseCourtCode("123")
+            .caseLocation(CaseLocationCivil.builder().baseLocation("99999").build())
             .build();
         helper.updateCaseManagementLocation(updatedData, requestedCourt, () -> locations);
         Assertions.assertThat(updatedData.build().getCaseManagementLocation())
             .isNotNull()
             .isEqualTo(CaseLocationCivil.builder()
                            .region("regionId")
-                           .baseLocation("epimms")
+                           .baseLocation("99999")
                            .build());
     }
 
