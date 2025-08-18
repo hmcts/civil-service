@@ -2570,7 +2570,7 @@ public class EventHistoryMapper {
     private String getJBAInstallmentPeriod(CaseData caseData) {
         boolean joLiveFeedActive = featureToggleService.isJOLiveFeedActive();
         boolean payByInstallment = hasCourtDecisionInFavourOfClaimant(caseData) ? caseData.applicant1SuggestedPayByInstalments() : caseData.isPayByInstallment();
-        if (!joLiveFeedActive && payByInstallment) {
+        if (payByInstallment) {
             return getInstallmentPeriodForRequestJudgmentByAdmission(payByInstallment, caseData);
         }
         boolean payBySetDate = hasCourtDecisionInFavourOfClaimant(caseData) ? caseData.applicant1SuggestedPayBySetDate() : caseData.isPayBySetDate();

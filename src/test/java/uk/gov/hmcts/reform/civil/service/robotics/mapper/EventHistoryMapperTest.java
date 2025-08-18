@@ -8976,8 +8976,8 @@ class EventHistoryMapperTest {
         }
 
         @Test
-        @Ignore
         public void shouldGenerateRPA_ForFullAdmit_WhenLipClaimAgreedRepaymentPlan_JoLiveFeed() {
+            when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
             LocalDate whenWillPay = LocalDate.now().plusDays(5);
             CCJPaymentDetails ccjPaymentDetails = buildCcjPaymentDetails();
             RepaymentPlanLRspec respondent1RepaymentPlan = RepaymentPlanLRspec.builder()
