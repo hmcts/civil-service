@@ -10,9 +10,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.client.WaTaskManagementApiClient;
+import uk.gov.hmcts.reform.civil.exceptions.InternalServerErrorException;
 import uk.gov.hmcts.reform.civil.model.taskmanagement.GetTasksResponse;
 import uk.gov.hmcts.reform.civil.model.taskmanagement.SearchOperator;
 import uk.gov.hmcts.reform.civil.model.taskmanagement.SearchParameterKey;
@@ -78,11 +78,11 @@ class WaTaskManagementServiceTest {
         }
 
         @Test
-        void getAllTasks_shouldThrowHttpClientErrorException_whenRemoteProcessEngineExceptionIsThrown() {
+        void getAllTasks_shouldThrowInternalServerErrorException_whenRemoteProcessEngineExceptionIsThrown() {
             when(taskManagementClient.searchWithCriteria(anyString(), anyString(), any(SearchTaskRequest.class)))
                 .thenThrow(new RemoteProcessEngineException("Task management error",  new Throwable()));
 
-            assertThrows(HttpClientErrorException.class, () -> taskManagementService.getAllTasks(CASE_ID, USER_TOKEN));
+            assertThrows(InternalServerErrorException.class, () -> taskManagementService.getAllTasks(CASE_ID, USER_TOKEN));
         }
 
         @ParameterizedTest
@@ -124,13 +124,13 @@ class WaTaskManagementServiceTest {
         }
 
         @Test
-        void claimTask_shouldThrowHttpClientErrorException_whenRemoteProcessEngineExceptionIsThrown() {
+        void claimTask_shouldThrowInternalServerErrorException_whenRemoteProcessEngineExceptionIsThrown() {
             String taskId = "TaskId";
             doThrow(new RemoteProcessEngineException("Task management error", new Throwable()))
                 .when(taskManagementClient)
                 .claimTask(anyString(), anyString(), anyString());
 
-            assertThrows(HttpClientErrorException.class, () -> taskManagementService.claimTask(USER_TOKEN, taskId));
+            assertThrows(InternalServerErrorException.class, () -> taskManagementService.claimTask(USER_TOKEN, taskId));
         }
     }
 

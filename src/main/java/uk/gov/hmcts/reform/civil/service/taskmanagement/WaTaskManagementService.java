@@ -4,11 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.community.rest.exception.RemoteProcessEngineException;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.client.WaTaskManagementApiClient;
+import uk.gov.hmcts.reform.civil.exceptions.InternalServerErrorException;
 import uk.gov.hmcts.reform.civil.model.taskmanagement.GetTasksResponse;
 import uk.gov.hmcts.reform.civil.model.taskmanagement.SearchOperator;
 import uk.gov.hmcts.reform.civil.model.taskmanagement.SearchParameterKey;
@@ -58,7 +57,7 @@ public class WaTaskManagementService {
             );
         } catch (RemoteProcessEngineException e) {
             log.error("There was an issue retrieving tasks from task management api: {}", e.getMessage());
-            throw new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+            throw new InternalServerErrorException(e.getMessage());
         }
 
         return response.getTasks();
@@ -84,7 +83,7 @@ public class WaTaskManagementService {
                 taskManagementClient.claimTask(authTokenGenerator.generate(), authorization, taskId);
             } catch (RemoteProcessEngineException e) {
                 log.error("There was an issue claiming the task [{}] from task management api: {}", taskId, e.getMessage());
-                throw new HttpClientErrorException(HttpStatus.BAD_GATEWAY, e.getMessage());
+                throw new InternalServerErrorException(e.getMessage());
             }
 
         } else {
