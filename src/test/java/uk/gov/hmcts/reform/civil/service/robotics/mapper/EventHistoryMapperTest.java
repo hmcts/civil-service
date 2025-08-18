@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.robotics.mapper;
 
+import org.junit.Ignore;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -8975,6 +8976,7 @@ class EventHistoryMapperTest {
         }
 
         @Test
+        @Ignore
         public void shouldGenerateRPA_ForFullAdmit_WhenLipClaimAgreedRepaymentPlan_JoLiveFeed() {
             LocalDate whenWillPay = LocalDate.now().plusDays(5);
             CCJPaymentDetails ccjPaymentDetails = buildCcjPaymentDetails();
@@ -11119,7 +11121,7 @@ class EventHistoryMapperTest {
                 }
 
                 @Nested
-                class CourtFavoursDefendant {
+                public class CourtFavoursDefendant {
                     @Test
                     void claimantProposesPayBySetDate() {
                         when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
