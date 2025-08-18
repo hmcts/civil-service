@@ -3,9 +3,11 @@ package uk.gov.hmcts.reform.civil.utils;
 import org.junit.jupiter.api.Test;
 
 import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 class CaseMigrationEncryptionUtilTest {
 
@@ -38,13 +40,33 @@ class CaseMigrationEncryptionUtilTest {
     }
 
     @Test
-    void shouldDetectEncryptedFileFormat() {
+    void shouldDetectEncryptedFileFormat() throws Exception {
         // Arrange
-        String validEncryptedContent = "dGVzdElWOnRlc3RFbmNyeXB0ZWREYXRh"; // Base64 encoded IV:data
-        String invalidContent = "InvalidContent";
+        String secretKeyString = "testSecretKey123";
+        String originalData = "Some test data";
+        SecretKey secretKey = CaseMigrationEncryptionUtil.getKeyFromString(secretKeyString);
+        String encryptedData = CaseMigrationEncryptionUtil.encrypt(originalData, secretKey);
+
+        Path encryptedFile = Files.createTempFile("encrypted", ".txt");
+        Files.writeString(encryptedFile, encryptedData, StandardCharsets.UTF_8);
 
         // Act & Assert
-        assertEquals(true, CaseMigrationEncryptionUtil.isFileEncrypted(validEncryptedContent));
-        assertEquals(false, CaseMigrationEncryptionUtil.isFileEncrypted(invalidContent));
+        assertTrue(CaseMigrationEncryptionUtil.isFileEncrypted(encryptedFile.toString()));
+
+        // Clean up
+        Files.deleteIfExists(encryptedFile);
+    }
+
+    @Test
+    void shouldReturnFalseForInvalidEncryptedFile() throws Exception {
+        // Arrange
+        Path invalidFile = Files.createTempFile("invalid", ".txt");
+        Files.writeString(invalidFile, "This is not encrypted", StandardCharsets.UTF_8);
+
+        // Act & Assert
+        assertFalse(CaseMigrationEncryptionUtil.isFileEncrypted(invalidFile.toString()));
+
+        // Clean up
+        Files.deleteIfExists(invalidFile);
     }
 }
