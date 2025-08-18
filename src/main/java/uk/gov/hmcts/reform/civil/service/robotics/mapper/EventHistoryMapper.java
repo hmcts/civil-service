@@ -310,7 +310,7 @@ public class EventHistoryMapper {
         buildTakenOfflineAfterDefendantNoCDeadlinePassed(builder, caseData);
         buildQueriesEvent(builder, caseData);
         EventHistory eventHistory = eventHistorySequencer.sortEvents(builder.build());
-        log.debug("Event history: {}", eventHistory);
+        log.info("Event history: {}", eventHistory);
         return eventHistory;
     }
 
@@ -724,6 +724,8 @@ public class EventHistoryMapper {
             .judgmentToBeRegistered(true)
             .miscText("")
             .build();
+
+        log.info("judgmentByAdmissionEvent: {}", judgmentByAdmissionEvent);
 
         builder.judgmentByAdmission((Event.builder()
             .eventSequence(prepareEventSequence(builder.build()))

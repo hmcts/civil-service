@@ -81,7 +81,7 @@ public class RoboticsDataMapper {
         }
 
         RoboticsCaseData build = roboticsBuilder.build();
-        log.debug("Robotics Case Data: {}", build.toString());
+        log.info("Robotics Case Data: {}", build.toString());
         return build;
     }
 
