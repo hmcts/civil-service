@@ -424,7 +424,9 @@ class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
                 .responseClaimTrack("SMALL_CLAIM")
                 .totalClaimAmount(BigDecimal.valueOf(500))
-                .applicant1Represented(YesOrNo.NO).build();
+                .applicant1Represented(YesOrNo.NO)
+                .specRespondent1Represented(YesOrNo.NO)
+                .respondent1Represented(YesOrNo.NO).build();
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT.name()).build()
@@ -514,6 +516,8 @@ class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
                 .responseClaimTrack("SMALL_CLAIM")
                 .totalClaimAmount(totalClaimAmount)
                 .applicant1Represented(YesOrNo.NO)
+                .specRespondent1Represented(YesOrNo.NO)
+                .respondent1Represented(YesOrNo.NO)
                 .decisionOnRequestReconsiderationOptions(decisionOnRequestReconsiderationOptions)
                 .build();
 
