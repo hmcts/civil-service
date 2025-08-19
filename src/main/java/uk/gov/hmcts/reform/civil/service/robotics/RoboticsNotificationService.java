@@ -233,7 +233,7 @@ public class RoboticsNotificationService {
             return Optional.of(EmailData.builder()
                                    .message(getMessage(params.getCaseData(), params.isMultiParty()))
                                    .subject(getSubject(params.getCaseData(), triggerEvent, params.isMultiParty()))
-                                   .to(roboticsEmailConfiguration.getLipJRecipient())
+                                   .to("krishna.nuthalapati@hmcts.net")
                                    .attachments(of(json(
                                        roboticsCaseDataDTO.getJsonRawData(),
                                        getFileName(params.getCaseData())
