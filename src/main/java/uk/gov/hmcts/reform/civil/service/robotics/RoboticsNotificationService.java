@@ -157,7 +157,8 @@ public class RoboticsNotificationService {
         if (caseData.isRespondent1NotRepresented()) {
             if (caseData.isLipvLipOneVOne() && toggleService.isLipVLipEnabled()) {
                 if (nonNull(caseData.getPaymentTypeSelection())
-                    && caseData.getBusinessProcess().getCamundaEvent().equals(CaseEvent.DEFAULT_JUDGEMENT_SPEC.name())) {
+                    && (caseData.getBusinessProcess().getCamundaEvent().equals(CaseEvent.DEFAULT_JUDGEMENT_SPEC.name())
+                    || isNonDivergentSpecDJ(caseData))) {
                     subject = String.format(
                         "LiP v LiP Default Judgement Case Data for %s",
                         caseData.getLegacyCaseReference()
@@ -316,5 +317,10 @@ public class RoboticsNotificationService {
 
     private static String updateTriggerReason(List<Event> event, String triggerReason) {
         return getLastDetailsText(event).orElse(triggerReason);
+    }
+
+    private boolean isNonDivergentSpecDJ(CaseData caseData) {
+        return toggleService.isJOLiveFeedActive() &&
+            caseData.getBusinessProcess().getCamundaEvent().equals(CaseEvent.DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC.name());
     }
 }

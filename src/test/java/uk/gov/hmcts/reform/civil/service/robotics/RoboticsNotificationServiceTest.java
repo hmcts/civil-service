@@ -4,6 +4,8 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -511,8 +513,9 @@ class RoboticsNotificationServiceTest {
         assertThat(capturedEmailData.getTo()).isEqualTo(emailConfiguration.getLipJRecipient());
     }
 
-    @Test
-    void shouldNotifyDefaultJudgementLiP_whenLipvsLiPEnabled() {
+    @ParameterizedTest
+    @CsvSource({"DEFAULT_JUDGEMENT_SPEC", "DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC"})
+    void shouldNotifyDefaultJudgementLiP_whenLipvsLiPEnabled(String camundaEvent) {
         //Given
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
             .toBuilder()
@@ -521,11 +524,13 @@ class RoboticsNotificationServiceTest {
             .caseAccessCategory(SPEC_CLAIM).paymentTypeSelection(
                 DJPaymentTypeSelection.SET_DATE)
             .businessProcess(BusinessProcess.builder()
-                .camundaEvent(CaseEvent.DEFAULT_JUDGEMENT_SPEC.name())
+                .camundaEvent(camundaEvent)
                 .build())
             .build();
         when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+        when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
         String lastEventText = "event text";
         RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder()
             .events(EventHistory.builder()
