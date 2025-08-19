@@ -320,7 +320,7 @@ public class RoboticsNotificationService {
     }
 
     private boolean isNonDivergentSpecDJ(CaseData caseData) {
-        return toggleService.isJOLiveFeedActive() &&
-            caseData.getBusinessProcess().getCamundaEvent().equals(CaseEvent.DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC.name());
+        return toggleService.isJOLiveFeedActive()
+            && caseData.getBusinessProcess().getCamundaEvent().equals(CaseEvent.DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC.name());
     }
 }
