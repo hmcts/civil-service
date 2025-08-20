@@ -34,7 +34,8 @@ public class NoticeOfDiscontinuanceFormGenerator implements TemplateDataGenerato
     private final FeatureToggleService featureToggleService;
 
     public CaseDocument generateDocs(CaseData caseData, String partyName, Address address, String partyType, String authorisation) {
-        NoticeOfDiscontinuanceForm templateData = getNoticeOfDiscontinueData(caseData, partyName, address);
+        boolean isQMEnabled = featureToggleService.isPublicQueryManagementEnabled(caseData);
+        NoticeOfDiscontinuanceForm templateData = getNoticeOfDiscontinueData(caseData, partyName, address, isQMEnabled);
         DocmosisTemplates docmosisTemplate = isBilingual(caseData) ? NOTICE_OF_DISCONTINUANCE_BILINGUAL_PDF : NOTICE_OF_DISCONTINUANCE_PDF;
         DocmosisDocument docmosisDocument =
                 documentGeneratorService.generateDocmosisDocument(templateData, docmosisTemplate);
@@ -57,7 +58,7 @@ public class NoticeOfDiscontinuanceFormGenerator implements TemplateDataGenerato
         return String.format(docmosisTemplate.getDocumentTitle(), partyTypeAndCaseRef);
     }
 
-    private NoticeOfDiscontinuanceForm getNoticeOfDiscontinueData(CaseData caseData, String partyName, Address address) {
+    private NoticeOfDiscontinuanceForm getNoticeOfDiscontinueData(CaseData caseData, String partyName, Address address, boolean isQMEnabled) {
         var noticeOfDiscontinueBuilder = NoticeOfDiscontinuanceForm.builder()
                 .caseNumber(caseData.getLegacyCaseReference())
                 .claimReferenceNumber(caseData.getLegacyCaseReference())
@@ -95,7 +96,9 @@ public class NoticeOfDiscontinuanceFormGenerator implements TemplateDataGenerato
                 .discontinuingAgainstOneDefendant(getDiscontinueAgainstOneDefendant(caseData))
                 .discontinuingAgainstBothDefendants(nonNull(caseData.getIsDiscontinuingAgainstBothDefendants())
                         ? caseData.getIsDiscontinuingAgainstBothDefendants().getDisplayedValue() : null)
-                .welshDate(formatDateInWelsh(LocalDate.now(), false));
+                .welshDate(formatDateInWelsh(LocalDate.now(), false))
+                .isQMEnabled(isQMEnabled)
+                .isRespondent1LiP(caseData.isRespondent1LiP());
         return noticeOfDiscontinueBuilder.build();
     }
 
@@ -126,4 +129,5 @@ public class NoticeOfDiscontinuanceFormGenerator implements TemplateDataGenerato
     private boolean isBilingual(CaseData caseData) {
         return isWelshHearingSelected(caseData) || caseData.isRespondentResponseBilingual();
     }
+
 }

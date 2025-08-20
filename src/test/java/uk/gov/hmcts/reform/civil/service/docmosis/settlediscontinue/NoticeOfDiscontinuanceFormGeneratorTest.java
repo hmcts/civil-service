@@ -211,6 +211,70 @@ class NoticeOfDiscontinuanceFormGeneratorTest {
             .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, NOTICE_OF_DISCONTINUANCE));
     }
 
+    @Test
+    void shouldIncludeQMPublicInformation_whenValidWithQMPublicIsOnAndWelsh() {
+        when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
+        String fileName = String.format(
+            NOTICE_OF_DISCONTINUANCE_PDF.getDocumentTitle(), "party_type_" + REFERENCE_NUMBER);
+
+        CaseDocument caseDocument = CaseDocumentBuilder.builder()
+            .documentName(fileName)
+            .documentType(NOTICE_OF_DISCONTINUANCE)
+            .build();
+
+        when(documentGeneratorService.generateDocmosisDocument(any(NoticeOfDiscontinuanceForm.class), eq(NOTICE_OF_DISCONTINUANCE_PDF)))
+            .thenReturn(new DocmosisDocument(NOTICE_OF_DISCONTINUANCE_PDF.getDocumentTitle(), bytes));
+
+        when(documentManagementService
+                 .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, NOTICE_OF_DISCONTINUANCE)))
+            .thenReturn(caseDocument);
+
+        CaseData caseData = getCaseData();
+
+        CaseDocument caseDoc = formGenerator.generateDocs(caseData,
+                                                          caseData.getRespondent1().getPartyName(),
+                                                          caseData.getRespondent1().getPrimaryAddress(),
+                                                          "party_type",
+                                                          BEARER_TOKEN);
+        assertThat(caseDoc).isNotNull();
+
+        verify(documentManagementService)
+            .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, NOTICE_OF_DISCONTINUANCE));
+    }
+
+    @Test
+    void shouldIncludeQMPublicInformation_whenValidWithQMPublicIsOnAndWelshIsOff() {
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
+        when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
+        String fileName = String.format(
+            NOTICE_OF_DISCONTINUANCE_PDF.getDocumentTitle(), REFERENCE_NUMBER);
+
+        CaseDocument caseDocument = CaseDocumentBuilder.builder()
+            .documentName(fileName)
+            .documentType(NOTICE_OF_DISCONTINUANCE)
+            .build();
+
+        when(documentGeneratorService.generateDocmosisDocument(any(NoticeOfDiscontinuanceForm.class), eq(NOTICE_OF_DISCONTINUANCE_PDF)))
+            .thenReturn(new DocmosisDocument(NOTICE_OF_DISCONTINUANCE_PDF.getDocumentTitle(), bytes));
+
+        when(documentManagementService
+                 .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, NOTICE_OF_DISCONTINUANCE)))
+            .thenReturn(caseDocument);
+
+        CaseData caseData = getCaseData();
+
+        CaseDocument caseDoc = formGenerator.generateDocs(caseData,
+                                                          caseData.getRespondent2().getPartyName(),
+                                                          caseData.getRespondent2().getPrimaryAddress(),
+                                                          "party_type",
+                                                          BEARER_TOKEN);
+        assertThat(caseDoc).isNotNull();
+
+        verify(documentManagementService)
+            .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, NOTICE_OF_DISCONTINUANCE));
+    }
+
     private CaseData getCaseData() {
         return CaseDataBuilder.builder().atStateClaimIssued().build().toBuilder()
                 .legacyCaseReference(REFERENCE_NUMBER)
