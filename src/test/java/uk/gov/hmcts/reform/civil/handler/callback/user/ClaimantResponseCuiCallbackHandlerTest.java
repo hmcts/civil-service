@@ -14,6 +14,8 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.MediationDecision;
 import uk.gov.hmcts.reform.civil.enums.PaymentType;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
@@ -677,6 +679,29 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedCaseData = getCaseData(response);
             assertThat(updatedCaseData.getClaimantBilingualLanguagePreference()).isEqualTo("WELSH");
+        }
+
+        @Test
+        void shouldUpdateDefendantPaymentDeadlineForPartAdmitImmediateWhenClaimantAcceptedRepaymentPlan() {
+            when(paymentDateService.getFormattedPaymentDate(any())).thenReturn("2021-01-01");
+            CaseData caseData = CaseDataBuilder.builder()
+                .applicant1ResponseDate(LocalDateTime.now())
+                .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
+                .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("DEFENDANT_NAME").build())
+                .respondent1Represented(NO)
+                .specRespondent1Represented(NO)
+                .applicant1Represented(NO)
+                .applicant1DQ(Applicant1DQ.builder().applicant1DQLanguage(WelshLanguageRequirements.builder().documents(
+                    Language.WELSH).build()).build())
+                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .applicant1AcceptPartAdmitPaymentPlanSpec(YES)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedCaseData = getCaseData(response);
+            assertThat(updatedCaseData.getWhenToBePaidText()).isEqualTo("2021-01-01");
         }
     }
 
