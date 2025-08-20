@@ -228,15 +228,9 @@ public class LocationHelper {
     }
 
     private boolean matches(LocationRefData locationRefData, RequestedCourt preferredCourt) {
-        return (StringUtils.isNotBlank(preferredCourt.getResponseCourtCode())
-            && preferredCourt.getResponseCourtCode().equals(locationRefData.getCourtLocationCode()))
-            ||
-            (preferredCourt.getCaseLocation() != null
-                && StringUtils.equals(preferredCourt.getCaseLocation().getRegion(), locationRefData.getRegionId())
-                && StringUtils.equals(
-                preferredCourt.getCaseLocation().getBaseLocation(),
-                locationRefData.getEpimmsId()
-            ));
+        return preferredCourt.getCaseLocation() != null
+            && preferredCourt.getCaseLocation().getBaseLocation() != null
+            && preferredCourt.getCaseLocation().getBaseLocation().equals(locationRefData.getEpimmsId());
     }
 
     /**

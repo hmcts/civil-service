@@ -87,7 +87,7 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData())
                 .extracting("transferCourtLocationList")
                 .extracting("list_items")
-                .asList().hasSize(3);
+                .asList().hasSize(4);
         }
     }
 
