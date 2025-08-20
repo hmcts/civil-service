@@ -50,6 +50,7 @@ import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.service.PaymentDateService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.citizen.UpdateCaseManagementDetailsService;
 import uk.gov.hmcts.reform.civil.service.citizenui.ResponseOneVOneShowTagService;
@@ -118,6 +119,9 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Mock
     private Time time;
 
+    @Mock
+    private PaymentDateService paymentDateService;
+
     private static final String courtLocation = "Site 1 - Adr 1 - AAA 111";
     private static final String LIVERPOOL_SITE_NAME = "Liverpool Civil and Family Court";
 
@@ -136,8 +140,12 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
         handler = new ClaimantResponseCuiCallbackHandler(responseOneVOneShowTagService, featureToggleService,
                                                          judgementService, mapper,
                                                          time,
-                                                         updateCaseManagementLocationDetailsService, deadlinesCalculator,
-                                                         caseFlagsInitialiser, judgmentByAdmissionOnlineMapper, requestedCourtForClaimDetailsTab
+                                                         updateCaseManagementLocationDetailsService,
+                                                         deadlinesCalculator,
+                                                         caseFlagsInitialiser,
+                                                         judgmentByAdmissionOnlineMapper,
+                                                         requestedCourtForClaimDetailsTab,
+                                                         paymentDateService
         );
     }
 
