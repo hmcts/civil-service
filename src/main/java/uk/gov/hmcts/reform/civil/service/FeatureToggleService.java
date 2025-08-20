@@ -123,7 +123,7 @@ public class FeatureToggleService {
     }
 
     public boolean isCoSCEnabled() {
-        return featureToggleApi.isFeatureEnabled("isCoSCEnabled");
+        return true;
     }
 
     public boolean isCaseProgressionEnabledAndLocationWhiteListed(String location) {
