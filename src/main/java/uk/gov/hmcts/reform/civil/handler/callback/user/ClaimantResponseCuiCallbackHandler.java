@@ -72,7 +72,7 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
     private final CaseFlagsInitialiser caseFlagsInitialiser;
     private final JudgmentByAdmissionOnlineMapper judgmentByAdmissionOnlineMapper;
     private final RequestedCourtForClaimDetailsTab requestedCourtForClaimDetailsTab;
-    private PaymentDateService paymentDateService;
+    private final PaymentDateService paymentDateService;
 
     @Override
     protected Map<String, Callback> callbacks() {
