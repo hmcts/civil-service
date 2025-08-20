@@ -12,12 +12,9 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.PaymentDateService;
 
-import java.time.LocalDate;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
-import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
-import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 
 @Component
 @RequiredArgsConstructor
@@ -31,12 +28,10 @@ public class PayImmediatelyConfText implements RespondToResponseConfirmationText
         if (!isDefendantFullOrPartAdmitPayImmediately(caseData)) {
             return Optional.empty();
         }
-        LocalDate whenBePaid = paymentDateService.getPaymentDateAdmittedClaim(caseData);
-        if (whenBePaid == null) {
+        String formattedWhenBePaid = paymentDateService.getFormattedPaymentDate(caseData);
+        if (formattedWhenBePaid == null) {
             throw new IllegalStateException("Unable to format the payment date.");
         }
-
-        String formattedWhenBePaid = formatLocalDate(whenBePaid, DATE);
 
         String admitImmediatePayText = caseData.isPartAdmitClaimSpec() && isLrPayImmediatelyPlan(caseData, featureToggleService)
             ? "They must make sure you have the money within 5 days of the claimant response."
