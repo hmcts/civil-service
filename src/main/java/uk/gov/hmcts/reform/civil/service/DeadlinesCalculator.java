@@ -78,6 +78,7 @@ public class DeadlinesCalculator {
     public LocalDate calculateRespondentPaymentDateAdmittedClaim(LocalDateTime responseDate) {
         LocalDateTime dateTime = responseDate;
         if (is4pmOrAfter(responseDate)) {
+            //add one day if after 4pm
             dateTime = responseDate.plusDays(1);
         }
         return calculateFirstWorkingDay(dateTime.toLocalDate().plusDays(5));

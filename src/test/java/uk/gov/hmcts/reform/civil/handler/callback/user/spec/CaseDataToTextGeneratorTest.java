@@ -27,6 +27,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -48,6 +49,9 @@ class CaseDataToTextGeneratorTest {
 
     @MockBean
     private FeatureToggleService featureToggleService;
+
+    @Mock
+    private PaymentDateService paymentDateService;
 
     @SuppressWarnings("rawtypes")
     private final List<CaseDataToTextGeneratorIntentionConfig> intentionConfigs = List.of(
@@ -143,7 +147,8 @@ class CaseDataToTextGeneratorTest {
         @Bean
         public PaymentDateService paymentDateService() {
             PaymentDateService mockPaymentDateService = mock(PaymentDateService.class);
-            when(mockPaymentDateService.getPaymentDateAdmittedClaim(any())).thenReturn(LocalDate.EPOCH);
+            when(mockPaymentDateService.getPaymentDate(any())).thenReturn(Optional.of(LocalDate.EPOCH));
+            when(mockPaymentDateService.getFormattedPaymentDate(any())).thenReturn(LocalDate.EPOCH.toString());
             return mockPaymentDateService;
         }
     }
@@ -176,9 +181,6 @@ class CaseDataToTextGeneratorTest {
     private PayImmediatelyConfText generatorConf;
     @InjectMocks
     private PartialAdmitPayImmediatelyConfirmationText generatorHeader;
-
-    @Mock
-    private PaymentDateService paymentDateService;
 
     private CaseData buildFullAdmitPayImmediatelyWithoutWhenBePaidProceedCaseData() {
         return CaseData.builder()
