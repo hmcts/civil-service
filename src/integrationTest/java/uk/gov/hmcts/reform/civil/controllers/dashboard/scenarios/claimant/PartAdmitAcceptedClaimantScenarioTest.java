@@ -54,7 +54,7 @@ public class PartAdmitAcceptedClaimantScenarioTest extends DashboardBaseIntegrat
                 jsonPath("$[0].titleEn").value("Immediate payment"),
                 jsonPath("$[0].descriptionEn").value(
                     "<p class=\"govuk-body\">Mr. Sole Trader has said that they will pay you £500" +
-                        ",plus the claim fee,immediately " +
+                        ", plus the claim fee, immediately " +
                         "in full and final settlement of your claim and you have accepted this offer. " +
                         "Funds must be received in your account by 19 March 2024.</p> " +
                         "<p class=\"govuk-body\">If you don't receive the money by then, " +
@@ -62,7 +62,7 @@ public class PartAdmitAcceptedClaimantScenarioTest extends DashboardBaseIntegrat
                 jsonPath("$[0].titleCy").value("Talu ar unwaith"),
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Mae Mr. Sole Trader wedi dweud y byddant yn talu £500" +
-                        ",ynghyd â ffi’r hawliad,i chi ar " +
+                        ", ynghyd â ffi’r hawliad, i chi ar " +
                         "unwaith fel setliad llawn a therfynol o’ch hawliad ac rydych wedi derbyn y cynnig hwn. " +
                         "Rhaid i’r arian gyrraedd eich cyfrif erbyn 19 Mawrth 2024.</p> " +
                         "<p class=\"govuk-body\">Os nad ydych wedi cael yr arian erbyn hynny, gallwch " +
