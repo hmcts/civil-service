@@ -36,6 +36,7 @@ import uk.gov.hmcts.reform.civil.service.querymanagement.QueryManagementVariable
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -75,7 +76,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
     private static final String TEMPLATE_ID_LIP_WELSH = "template-id-lip-welsh";
     private static final String TEMPLATE_PUBLIC_LIP_ID = "template-public-lip-id";
     private static final String TEMPLATE_PUBLIC_WELSH_LIP_ID = "template-public-welsh-lip-id";
-    private static final String TEMPLATE_PUBLIC_lR_ID = "template-public-lr-id";
+    private static final String TEMPLATE_PUBLIC_LR_ID = "template-public-lr-id";
     @Mock
     private NotificationService notificationService;
     @Mock
@@ -95,254 +96,254 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
 
     private CaseData createCaseDataWithMultipleFollowUpQueries(OffsetDateTime now) {
         CaseQueriesCollection caseQueriesCollection = CaseQueriesCollection.builder()
-            .caseMessages(wrapElements(
-                CaseMessage.builder()
-                    .id("1")
-                    .createdBy("LR")
-                    .build(),
-                CaseMessage.builder()
-                    .id("5")
-                    .createdBy("admin")
-                    .createdOn(now.minusHours(3))
-                    .parentId("1")
-                    .build(),
-                CaseMessage.builder()
-                    .id("6")
-                    .createdBy("LR")
-                    .createdOn(now.minusHours(2))
-                    .parentId("1")
-                    .build(),
-                CaseMessage.builder()
-                    .id("7")
-                    .createdBy("admin")
-                    .createdOn(now.minusHours(1))
-                    .parentId("1")
-                    .build(),
-                CaseMessage.builder()
-                    .id("7")
-                    .createdBy("admin")
-                    .createdOn(now)
-                    .parentId("1")
-                    .build(),
-                CaseMessage.builder()
-                    .id("8")
-                    .createdBy("LR")
-                    .parentId("80")
-                    .createdOn(now.plusDays(1))
-                    .build(),
-                CaseMessage.builder()
-                    .id("2")
-                    .createdBy("LR")
-                    .build(),
-                CaseMessage.builder()
-                    .id("9")
-                    .createdBy("admin")
-                    .createdOn(now.minusHours(2))
-                    .parentId("2")
-                    .build(),
-                CaseMessage.builder()
-                    .id("10")
-                    .createdBy("LR")
-                    .createdOn(now.minusHours(1))
-                    .parentId("2")
-                    .build(),
-                CaseMessage.builder()
-                    .id("11")
-                    .createdBy("admin")
-                    .createdOn(now)
-                    .parentId("2")
-                    .build(),
-                CaseMessage.builder()
-                    .id("8")
-                    .createdBy("LR")
-                    .parentId("80")
-                    .createdOn(now.plusDays(1))
-                    .build(),
-                CaseMessage.builder()
-                    .id("3")
-                    .createdBy("LR")
-                    .build(),
-                CaseMessage.builder()
-                    .id("13")
-                    .createdBy("admin")
-                    .createdOn(now.minusHours(2))
-                    .parentId("3")
-                    .build(),
-                CaseMessage.builder()
-                    .id("14")
-                    .createdBy("LR")
-                    .createdOn(now.minusHours(1))
-                    .parentId("3")
-                    .build(),
-                CaseMessage.builder()
-                    .id("15")
-                    .createdBy("admin")
-                    .createdOn(now)
-                    .parentId("3")
-                    .build(),
-                CaseMessage.builder()
-                    .id("8")
-                    .createdBy("LR")
-                    .parentId("80")
-                    .createdOn(now.plusDays(1))
-                    .build(),
-                CaseMessage.builder()
-                    .id("5")
-                    .createdBy("Lip")
-                    .build(),
-                CaseMessage.builder()
-                    .id("13")
-                    .createdBy("admin")
-                    .createdOn(now.minusHours(2))
-                    .parentId("5")
-                    .build(),
-                CaseMessage.builder()
-                    .id("14")
-                    .createdBy("Lip")
-                    .createdOn(now.minusHours(1))
-                    .parentId("5")
-                    .build(),
-                CaseMessage.builder()
-                    .id("15")
-                    .createdBy("admin")
-                    .createdOn(now)
-                    .parentId("5")
-                    .build(),
-                CaseMessage.builder()
-                    .id("8")
-                    .createdBy("LR")
-                    .parentId("80")
-                    .createdOn(now.plusDays(1))
-                    .build()
-            ))
-            .build();
+                                                                           .caseMessages(wrapElements(
+                                                                                   CaseMessage.builder()
+                                                                                              .id("1")
+                                                                                              .createdBy("LR")
+                                                                                              .build(),
+                                                                                   CaseMessage.builder()
+                                                                                              .id("5")
+                                                                                              .createdBy("admin")
+                                                                                              .createdOn(now.minusHours(3))
+                                                                                              .parentId("1")
+                                                                                              .build(),
+                                                                                   CaseMessage.builder()
+                                                                                              .id("6")
+                                                                                              .createdBy("LR")
+                                                                                              .createdOn(now.minusHours(2))
+                                                                                              .parentId("1")
+                                                                                              .build(),
+                                                                                   CaseMessage.builder()
+                                                                                              .id("7")
+                                                                                              .createdBy("admin")
+                                                                                              .createdOn(now.minusHours(1))
+                                                                                              .parentId("1")
+                                                                                              .build(),
+                                                                                   CaseMessage.builder()
+                                                                                              .id("7")
+                                                                                              .createdBy("admin")
+                                                                                              .createdOn(now)
+                                                                                              .parentId("1")
+                                                                                              .build(),
+                                                                                   CaseMessage.builder()
+                                                                                              .id("8")
+                                                                                              .createdBy("LR")
+                                                                                              .parentId("80")
+                                                                                              .createdOn(now.plusDays(1))
+                                                                                              .build(),
+                                                                                   CaseMessage.builder()
+                                                                                              .id("2")
+                                                                                              .createdBy("LR")
+                                                                                              .build(),
+                                                                                   CaseMessage.builder()
+                                                                                              .id("9")
+                                                                                              .createdBy("admin")
+                                                                                              .createdOn(now.minusHours(2))
+                                                                                              .parentId("2")
+                                                                                              .build(),
+                                                                                   CaseMessage.builder()
+                                                                                              .id("10")
+                                                                                              .createdBy("LR")
+                                                                                              .createdOn(now.minusHours(1))
+                                                                                              .parentId("2")
+                                                                                              .build(),
+                                                                                   CaseMessage.builder()
+                                                                                              .id("11")
+                                                                                              .createdBy("admin")
+                                                                                              .createdOn(now)
+                                                                                              .parentId("2")
+                                                                                              .build(),
+                                                                                   CaseMessage.builder()
+                                                                                              .id("8")
+                                                                                              .createdBy("LR")
+                                                                                              .parentId("80")
+                                                                                              .createdOn(now.plusDays(1))
+                                                                                              .build(),
+                                                                                   CaseMessage.builder()
+                                                                                              .id("3")
+                                                                                              .createdBy("LR")
+                                                                                              .build(),
+                                                                                   CaseMessage.builder()
+                                                                                              .id("13")
+                                                                                              .createdBy("admin")
+                                                                                              .createdOn(now.minusHours(2))
+                                                                                              .parentId("3")
+                                                                                              .build(),
+                                                                                   CaseMessage.builder()
+                                                                                              .id("14")
+                                                                                              .createdBy("LR")
+                                                                                              .createdOn(now.minusHours(1))
+                                                                                              .parentId("3")
+                                                                                              .build(),
+                                                                                   CaseMessage.builder()
+                                                                                              .id("15")
+                                                                                              .createdBy("admin")
+                                                                                              .createdOn(now)
+                                                                                              .parentId("3")
+                                                                                              .build(),
+                                                                                   CaseMessage.builder()
+                                                                                              .id("8")
+                                                                                              .createdBy("LR")
+                                                                                              .parentId("80")
+                                                                                              .createdOn(now.plusDays(1))
+                                                                                              .build(),
+                                                                                   CaseMessage.builder()
+                                                                                              .id("5")
+                                                                                              .createdBy("Lip")
+                                                                                              .build(),
+                                                                                   CaseMessage.builder()
+                                                                                              .id("13")
+                                                                                              .createdBy("admin")
+                                                                                              .createdOn(now.minusHours(2))
+                                                                                              .parentId("5")
+                                                                                              .build(),
+                                                                                   CaseMessage.builder()
+                                                                                              .id("14")
+                                                                                              .createdBy("Lip")
+                                                                                              .createdOn(now.minusHours(1))
+                                                                                              .parentId("5")
+                                                                                              .build(),
+                                                                                   CaseMessage.builder()
+                                                                                              .id("15")
+                                                                                              .createdBy("admin")
+                                                                                              .createdOn(now)
+                                                                                              .parentId("5")
+                                                                                              .build(),
+                                                                                   CaseMessage.builder()
+                                                                                              .id("8")
+                                                                                              .createdBy("LR")
+                                                                                              .parentId("80")
+                                                                                              .createdOn(now.plusDays(1))
+                                                                                              .build()
+                                                                           ))
+                                                                           .build();
 
         return CaseDataBuilder.builder().atStateClaimIssued().build()
-            .toBuilder()
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder()
-                                                .email("applicant@email.com")
-                                                .build())
-            .respondentSolicitor1EmailAddress("respondent1@email.com")
-            .respondentSolicitor2EmailAddress("respondent2@email.com")
-            .queries(caseQueriesCollection)
-            .businessProcess(BusinessProcess.builder()
-                                 .processInstanceId("123")
-                                 .build())
-            .build();
+                              .toBuilder()
+                              .applicantSolicitor1UserDetails(IdamUserDetails.builder()
+                                                                             .email("applicant@email.com")
+                                                                             .build())
+                              .respondentSolicitor1EmailAddress("respondent1@email.com")
+                              .respondentSolicitor2EmailAddress("respondent2@email.com")
+                              .queries(caseQueriesCollection)
+                              .businessProcess(BusinessProcess.builder()
+                                                              .processInstanceId("123")
+                                                              .build())
+                              .build();
     }
 
     private CaseData createCaseDataWithQueries(OffsetDateTime now) {
         CaseQueriesCollection caseQueries = CaseQueriesCollection.builder()
-            .caseMessages(wrapElements(
-                CaseMessage.builder()
-                    .id("1")
-                    .createdBy("LR")
-                    .createdOn(now)
-                    .build(),
-                CaseMessage.builder()
-                    .id("5")
-                    .createdBy("admin")
-                    .createdOn(now)
-                    .parentId("1")
-                    .build(),
-                CaseMessage.builder()
-                    .id("8")
-                    .createdBy("LR")
-                    .parentId("80")
-                    .createdOn(now.plusDays(1))
-                    .build(),
-                CaseMessage.builder()
-                    .id("2")
-                    .createdBy("LR")
-                    .createdOn(now)
-                    .build(),
-                CaseMessage.builder()
-                    .id("9")
-                    .createdBy("admin")
-                    .createdOn(now)
-                    .parentId("2")
-                    .build(),
-                CaseMessage.builder()
-                    .id("8")
-                    .createdBy("LR")
-                    .parentId("80")
-                    .createdOn(now.plusDays(1))
-                    .build(),
-                CaseMessage.builder()
-                    .id("3")
-                    .createdBy("LR")
-                    .createdOn(now)
-                    .build(),
-                CaseMessage.builder()
-                    .id("13")
-                    .createdBy("admin")
-                    .createdOn(now)
-                    .parentId("3")
-                    .build(),
-                CaseMessage.builder()
-                    .id("8")
-                    .createdBy("LR")
-                    .parentId("80")
-                    .createdOn(now.plusDays(1))
-                    .build(),
-                CaseMessage.builder()
-                    .id("144")
-                    .createdBy("Lip")
-                    .build(),
-                CaseMessage.builder()
-                    .id("13")
-                    .createdBy("admin")
-                    .createdOn(now.minusHours(2))
-                    .parentId("144")
-                    .build(),
-                CaseMessage.builder()
-                    .id("14")
-                    .createdBy("Lip")
-                    .createdOn(now.minusHours(1))
-                    .parentId("144")
-                    .build(),
-                CaseMessage.builder()
-                    .id("15")
-                    .createdBy("admin")
-                    .createdOn(now)
-                    .parentId("144")
-                    .build(),
-                CaseMessage.builder()
-                    .id("8")
-                    .createdBy("Lip")
-                    .parentId("80")
-                    .createdOn(now.plusDays(1))
-                    .build()
-            ))
-            .build();
+                                                                 .caseMessages(wrapElements(
+                                                                         CaseMessage.builder()
+                                                                                    .id("1")
+                                                                                    .createdBy("LR")
+                                                                                    .createdOn(now)
+                                                                                    .build(),
+                                                                         CaseMessage.builder()
+                                                                                    .id("5")
+                                                                                    .createdBy("admin")
+                                                                                    .createdOn(now)
+                                                                                    .parentId("1")
+                                                                                    .build(),
+                                                                         CaseMessage.builder()
+                                                                                    .id("8")
+                                                                                    .createdBy("LR")
+                                                                                    .parentId("80")
+                                                                                    .createdOn(now.plusDays(1))
+                                                                                    .build(),
+                                                                         CaseMessage.builder()
+                                                                                    .id("2")
+                                                                                    .createdBy("LR")
+                                                                                    .createdOn(now)
+                                                                                    .build(),
+                                                                         CaseMessage.builder()
+                                                                                    .id("9")
+                                                                                    .createdBy("admin")
+                                                                                    .createdOn(now)
+                                                                                    .parentId("2")
+                                                                                    .build(),
+                                                                         CaseMessage.builder()
+                                                                                    .id("8")
+                                                                                    .createdBy("LR")
+                                                                                    .parentId("80")
+                                                                                    .createdOn(now.plusDays(1))
+                                                                                    .build(),
+                                                                         CaseMessage.builder()
+                                                                                    .id("3")
+                                                                                    .createdBy("LR")
+                                                                                    .createdOn(now)
+                                                                                    .build(),
+                                                                         CaseMessage.builder()
+                                                                                    .id("13")
+                                                                                    .createdBy("admin")
+                                                                                    .createdOn(now)
+                                                                                    .parentId("3")
+                                                                                    .build(),
+                                                                         CaseMessage.builder()
+                                                                                    .id("8")
+                                                                                    .createdBy("LR")
+                                                                                    .parentId("80")
+                                                                                    .createdOn(now.plusDays(1))
+                                                                                    .build(),
+                                                                         CaseMessage.builder()
+                                                                                    .id("144")
+                                                                                    .createdBy("Lip")
+                                                                                    .build(),
+                                                                         CaseMessage.builder()
+                                                                                    .id("13")
+                                                                                    .createdBy("admin")
+                                                                                    .createdOn(now.minusHours(2))
+                                                                                    .parentId("144")
+                                                                                    .build(),
+                                                                         CaseMessage.builder()
+                                                                                    .id("14")
+                                                                                    .createdBy("Lip")
+                                                                                    .createdOn(now.minusHours(1))
+                                                                                    .parentId("144")
+                                                                                    .build(),
+                                                                         CaseMessage.builder()
+                                                                                    .id("15")
+                                                                                    .createdBy("admin")
+                                                                                    .createdOn(now)
+                                                                                    .parentId("144")
+                                                                                    .build(),
+                                                                         CaseMessage.builder()
+                                                                                    .id("8")
+                                                                                    .createdBy("Lip")
+                                                                                    .parentId("80")
+                                                                                    .createdOn(now.plusDays(1))
+                                                                                    .build()
+                                                                 ))
+                                                                 .build();
 
         return CaseDataBuilder.builder().atStateClaimIssued().build()
-            .toBuilder()
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder()
-                                                .email("applicant@email.com")
-                                                .build())
-            .respondentSolicitor1EmailAddress("respondent1@email.com")
-            .respondentSolicitor2EmailAddress("respondent2@email.com")
-            .queries(caseQueries)
-            .businessProcess(BusinessProcess.builder()
-                                 .processInstanceId("123")
-                                 .build())
-            .build();
+                              .toBuilder()
+                              .applicantSolicitor1UserDetails(IdamUserDetails.builder()
+                                                                             .email("applicant@email.com")
+                                                                             .build())
+                              .respondentSolicitor1EmailAddress("respondent1@email.com")
+                              .respondentSolicitor2EmailAddress("respondent2@email.com")
+                              .queries(caseQueries)
+                              .businessProcess(BusinessProcess.builder()
+                                                              .processInstanceId("123")
+                                                              .build())
+                              .build();
     }
 
     @NotNull
     private Map<String, String> getNotificationDataForLip(LocalDateTime now, boolean publicQmEnabled) {
         Map<String, String> expectedProperties = new HashMap<>(Map.of(
-            "partyReferences",
-            "Claimant reference: 12345 - Defendant reference: 6789",
-            "name",
-            "Mr. John Rambo",
-            "claimReferenceNumber",
-            "1594901956117591",
-            "casemanRef",
-            "000DC001",
-            QUERY_DATE,
-            formatLocalDate(now.toLocalDate(), DATE)
+                "partyReferences",
+                "Claimant reference: 12345 - Defendant reference: 6789",
+                "name",
+                "Mr. John Rambo",
+                "claimReferenceNumber",
+                "1594901956117591",
+                "casemanRef",
+                "000DC001",
+                QUERY_DATE,
+                formatLocalDate(now.toLocalDate(), DATE)
         ));
         expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
         expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
@@ -367,11 +368,11 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
     @NotNull
     private Map<String, String> getNotificationDataMap(CaseData caseData, LocalDateTime now) {
         Map<String, String> expectedProperties = new HashMap<>(Map.of(
-            CLAIM_REFERENCE_NUMBER, "1594901956117591",
-            CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
-            CASEMAN_REF, "000DC001",
-            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
-            QUERY_DATE, formatLocalDate(now.toLocalDate(), DATE)
+                CLAIM_REFERENCE_NUMBER, "1594901956117591",
+                CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
+                CASEMAN_REF, "000DC001",
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+                QUERY_DATE, formatLocalDate(now.toLocalDate(), DATE)
         ));
         expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
         expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
@@ -391,9 +392,9 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
         @BeforeEach
         void setUp() {
             when(organisationService.findOrganisationById(any()))
-                .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
+                    .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
             when(notificationsProperties.getQueryResponseReceived()).thenReturn(TEMPLATE_ID);
-            when(notificationsProperties.getQueryLrPublicResponseReceived()).thenReturn(TEMPLATE_PUBLIC_lR_ID);
+            when(notificationsProperties.getQueryLrPublicResponseReceived()).thenReturn(TEMPLATE_PUBLIC_LR_ID);
             when(notificationsProperties.getQueryLipWelshPublicResponseReceived()).thenReturn(TEMPLATE_PUBLIC_WELSH_LIP_ID);
             when(notificationsProperties.getQueryLipPublicResponseReceived()).thenReturn(TEMPLATE_PUBLIC_LIP_ID);
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
@@ -413,24 +414,24 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
         void shouldNotifyApplicantLR_whenResponseToQueryReceivedMultipleFollowUpQueries(boolean publicQuery) {
             when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(publicQuery);
             when(runtimeService.getProcessVariables(any()))
-                .thenReturn(QueryManagementVariables.builder()
-                                .queryId("7")
-                                .build());
+                    .thenReturn(QueryManagementVariables.builder()
+                                                        .queryId("7")
+                                                        .build());
             when(coreCaseUserService.getUserCaseRoles(
-                any(),
-                any()
+                    any(),
+                    any()
             )).thenReturn(List.of(CaseRole.APPLICANTSOLICITORONE.toString()));
-            OffsetDateTime now = OffsetDateTime.now();
+            OffsetDateTime now = OffsetDateTime.of(2025, 8, 20, 10, 0, 0, 0, ZoneOffset.UTC);
             CaseData caseData = createCaseDataWithMultipleFollowUpQueries(now);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             handler.handle(params);
 
             verify(notificationService).sendMail(
-                "applicant@email.com",
-                publicQuery ? TEMPLATE_PUBLIC_lR_ID : TEMPLATE_ID,
-                getNotificationDataMap(caseData, now.minusHours(1).toLocalDateTime()),
-                "response-to-query-notification-000DC001"
+                    "applicant@email.com",
+                    publicQuery ? TEMPLATE_PUBLIC_LR_ID : TEMPLATE_ID,
+                    getNotificationDataMap(caseData, now.minusHours(1).toLocalDateTime()),
+                    "response-to-query-notification-000DC001"
             );
         }
 
@@ -439,24 +440,24 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
         void shouldNotifyRespondent1LR_whenResponseToQueryReceivedMultipleFollowUpQueries(boolean publicQuery) {
             when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(publicQuery);
             when(runtimeService.getProcessVariables(any()))
-                .thenReturn(QueryManagementVariables.builder()
-                                .queryId("11")
-                                .build());
+                    .thenReturn(QueryManagementVariables.builder()
+                                                        .queryId("11")
+                                                        .build());
             when(coreCaseUserService.getUserCaseRoles(
-                any(),
-                any()
+                    any(),
+                    any()
             )).thenReturn(List.of(CaseRole.RESPONDENTSOLICITORONE.toString()));
-            OffsetDateTime now = OffsetDateTime.now();
+            OffsetDateTime now = OffsetDateTime.of(2025, 8, 20, 10, 0, 0, 0, ZoneOffset.UTC);
             CaseData caseData = createCaseDataWithMultipleFollowUpQueries(now);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             handler.handle(params);
 
             verify(notificationService).sendMail(
-                "respondent1@email.com",
-                publicQuery ? TEMPLATE_PUBLIC_lR_ID : TEMPLATE_ID,
-                getNotificationDataMap(caseData, now.minusHours(1).toLocalDateTime()),
-                "response-to-query-notification-000DC001"
+                    "respondent1@email.com",
+                    publicQuery ? TEMPLATE_PUBLIC_LR_ID : TEMPLATE_ID,
+                    getNotificationDataMap(caseData, now.minusHours(1).toLocalDateTime()),
+                    "response-to-query-notification-000DC001"
             );
         }
 
@@ -465,24 +466,24 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
         void shouldNotifyRespondent2LR_whenResponseToQueryReceivedMultipleFollowUpQueries(boolean publicQuery) {
             when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(publicQuery);
             when(runtimeService.getProcessVariables(any()))
-                .thenReturn(QueryManagementVariables.builder()
-                                .queryId("15")
-                                .build());
+                    .thenReturn(QueryManagementVariables.builder()
+                                                        .queryId("15")
+                                                        .build());
             when(coreCaseUserService.getUserCaseRoles(
-                any(),
-                any()
+                    any(),
+                    any()
             )).thenReturn(List.of(CaseRole.RESPONDENTSOLICITORTWO.toString()));
-            OffsetDateTime now = OffsetDateTime.now();
+            OffsetDateTime now = OffsetDateTime.of(2025, 8, 20, 10, 0, 0, 0, ZoneOffset.UTC);
             CaseData caseData = createCaseDataWithMultipleFollowUpQueries(now);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             handler.handle(params);
 
             verify(notificationService).sendMail(
-                "respondent2@email.com",
-                publicQuery ? TEMPLATE_PUBLIC_lR_ID : TEMPLATE_ID,
-                getNotificationDataMap(caseData, now.minusHours(1).toLocalDateTime()),
-                "response-to-query-notification-000DC001"
+                    "respondent2@email.com",
+                    publicQuery ? TEMPLATE_PUBLIC_LR_ID : TEMPLATE_ID,
+                    getNotificationDataMap(caseData, now.minusHours(1).toLocalDateTime()),
+                    "response-to-query-notification-000DC001"
             );
         }
 
@@ -491,24 +492,24 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
         void shouldNotifyApplicantLR_whenResponseToQueryReceivedNoFollowUpQueries(boolean publicQuery) {
             when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(publicQuery);
             when(runtimeService.getProcessVariables(any()))
-                .thenReturn(QueryManagementVariables.builder()
-                                .queryId("5")
-                                .build());
+                    .thenReturn(QueryManagementVariables.builder()
+                                                        .queryId("5")
+                                                        .build());
             when(coreCaseUserService.getUserCaseRoles(
-                any(),
-                any()
+                    any(),
+                    any()
             )).thenReturn(List.of(CaseRole.APPLICANTSOLICITORONE.toString()));
-            OffsetDateTime now = OffsetDateTime.now();
+            OffsetDateTime now = OffsetDateTime.of(2025, 8, 20, 10, 0, 0, 0, ZoneOffset.UTC);
             CaseData caseData = createCaseDataWithQueries(now);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             handler.handle(params);
 
             verify(notificationService).sendMail(
-                "applicant@email.com",
-                publicQuery ? TEMPLATE_PUBLIC_lR_ID : TEMPLATE_ID,
-                getNotificationDataMap(caseData, now.toLocalDateTime()),
-                "response-to-query-notification-000DC001"
+                    "applicant@email.com",
+                    publicQuery ? TEMPLATE_PUBLIC_LR_ID : TEMPLATE_ID,
+                    getNotificationDataMap(caseData, now.toLocalDateTime()),
+                    "response-to-query-notification-000DC001"
             );
         }
 
@@ -517,24 +518,24 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
         void shouldNotifyRespondent1LR_whenResponseToQueryReceivedNoFollowUpQueries(boolean publicQuery) {
             when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(publicQuery);
             when(runtimeService.getProcessVariables(any()))
-                .thenReturn(QueryManagementVariables.builder()
-                                .queryId("9")
-                                .build());
+                    .thenReturn(QueryManagementVariables.builder()
+                                                        .queryId("9")
+                                                        .build());
             when(coreCaseUserService.getUserCaseRoles(
-                any(),
-                any()
+                    any(),
+                    any()
             )).thenReturn(List.of(CaseRole.RESPONDENTSOLICITORONE.toString()));
-            OffsetDateTime now = OffsetDateTime.now();
+            OffsetDateTime now = OffsetDateTime.of(2025, 8, 20, 10, 0, 0, 0, ZoneOffset.UTC);
             CaseData caseData = createCaseDataWithQueries(now);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             handler.handle(params);
 
             verify(notificationService).sendMail(
-                "respondent1@email.com",
-                publicQuery ? TEMPLATE_PUBLIC_lR_ID : TEMPLATE_ID,
-                getNotificationDataMap(caseData, now.toLocalDateTime()),
-                "response-to-query-notification-000DC001"
+                    "respondent1@email.com",
+                    publicQuery ? TEMPLATE_PUBLIC_LR_ID : TEMPLATE_ID,
+                    getNotificationDataMap(caseData, now.toLocalDateTime()),
+                    "response-to-query-notification-000DC001"
             );
         }
 
@@ -543,24 +544,24 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
         void shouldNotifyRespondent2LR_whenResponseToQueryReceivedNoFollowUpQueries(boolean publicQuery) {
             when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(publicQuery);
             when(runtimeService.getProcessVariables(any()))
-                .thenReturn(QueryManagementVariables.builder()
-                                .queryId("5")
-                                .build());
+                    .thenReturn(QueryManagementVariables.builder()
+                                                        .queryId("5")
+                                                        .build());
             when(coreCaseUserService.getUserCaseRoles(
-                any(),
-                any()
+                    any(),
+                    any()
             )).thenReturn(List.of(CaseRole.RESPONDENTSOLICITORTWO.toString()));
-            OffsetDateTime now = OffsetDateTime.now();
+            OffsetDateTime now = OffsetDateTime.of(2025, 8, 20, 10, 0, 0, 0, ZoneOffset.UTC);
             CaseData caseData = createCaseDataWithQueries(now);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             handler.handle(params);
 
             verify(notificationService).sendMail(
-                "respondent2@email.com",
-                publicQuery ? TEMPLATE_PUBLIC_lR_ID : TEMPLATE_ID,
-                getNotificationDataMap(caseData, now.toLocalDateTime()),
-                "response-to-query-notification-000DC001"
+                    "respondent2@email.com",
+                    publicQuery ? TEMPLATE_PUBLIC_LR_ID : TEMPLATE_ID,
+                    getNotificationDataMap(caseData, now.toLocalDateTime()),
+                    "response-to-query-notification-000DC001"
             );
         }
     }
@@ -593,16 +594,16 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
         @NotNull
         private Map<String, String> getNotificationDataMapLipRes(LocalDateTime now, boolean publicQmEnabled) {
             Map<String, String> expectedProperties = new HashMap<>(Map.of(
-                "partyReferences",
-                "Claimant reference: 12345 - Defendant reference: 6789",
-                "name",
-                "Mr. Sole Trader",
-                "claimReferenceNumber",
-                "1594901956117591",
-                "casemanRef",
-                "000DC001",
-                QUERY_DATE,
-                formatLocalDate(now.toLocalDate(), DATE)
+                    "partyReferences",
+                    "Claimant reference: 12345 - Defendant reference: 6789",
+                    "name",
+                    "Mr. Sole Trader",
+                    "claimReferenceNumber",
+                    "1594901956117591",
+                    "casemanRef",
+                    "000DC001",
+                    QUERY_DATE,
+                    formatLocalDate(now.toLocalDate(), DATE)
             ));
             expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
             expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
@@ -629,26 +630,26 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
         void shouldNotifyClaimantLip_whenResponseToQueryReceivedNoFollowUpQueries(boolean publicQuery) {
             when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(publicQuery);
             when(runtimeService.getProcessVariables(any()))
-                .thenReturn(QueryManagementVariables.builder()
-                                .queryId("5")
-                                .build());
+                    .thenReturn(QueryManagementVariables.builder()
+                                                        .queryId("5")
+                                                        .build());
             when(coreCaseUserService.getUserCaseRoles(
-                any(),
-                any()
+                    any(),
+                    any()
             )).thenReturn(List.of(CaseRole.CLAIMANT.toString()));
-            OffsetDateTime now = OffsetDateTime.now();
+            OffsetDateTime now = OffsetDateTime.of(2025, 8, 20, 10, 0, 0, 0, ZoneOffset.UTC);
             CaseData caseData = createCaseDataWithQueries(now).toBuilder()
-                .applicant1Represented(YesOrNo.NO)
-                .build();
+                                                              .applicant1Represented(YesOrNo.NO)
+                                                              .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             handler.handle(params);
 
             verify(notificationService).sendMail(
-                "rambo@email.com",
-                publicQuery ? TEMPLATE_PUBLIC_LIP_ID : TEMPLATE_ID_LIP,
-                getNotificationDataForLip(now.toLocalDateTime(), publicQuery),
-                "response-to-query-notification-000DC001"
+                    "rambo@email.com",
+                    publicQuery ? TEMPLATE_PUBLIC_LIP_ID : TEMPLATE_ID_LIP,
+                    getNotificationDataForLip(now.toLocalDateTime(), publicQuery),
+                    "response-to-query-notification-000DC001"
             );
         }
 
@@ -657,27 +658,27 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
         void shouldNotifyClaimantLipForBilingual_whenResponseToQueryReceivedNoFollowUpQueries(boolean publicQuery) {
             when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(publicQuery);
             when(runtimeService.getProcessVariables(any()))
-                .thenReturn(QueryManagementVariables.builder()
-                                .queryId("5")
-                                .build());
+                    .thenReturn(QueryManagementVariables.builder()
+                                                        .queryId("5")
+                                                        .build());
             when(coreCaseUserService.getUserCaseRoles(
-                any(),
-                any()
+                    any(),
+                    any()
             )).thenReturn(List.of(CaseRole.CLAIMANT.toString()));
-            OffsetDateTime now = OffsetDateTime.now();
+            OffsetDateTime now = OffsetDateTime.of(2025, 8, 20, 10, 0, 0, 0, ZoneOffset.UTC);
             CaseData caseData = createCaseDataWithQueries(now);
             caseData = caseData.toBuilder()
-                .applicant1Represented(YesOrNo.NO)
-                .claimantBilingualLanguagePreference(Language.BOTH.toString()).build();
+                               .applicant1Represented(YesOrNo.NO)
+                               .claimantBilingualLanguagePreference(Language.BOTH.toString()).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             handler.handle(params);
 
             verify(notificationService).sendMail(
-                "rambo@email.com",
-                publicQuery ? TEMPLATE_PUBLIC_WELSH_LIP_ID : TEMPLATE_ID_LIP_WELSH,
-                getNotificationDataForLip(now.toLocalDateTime(), publicQuery),
-                "response-to-query-notification-000DC001"
+                    "rambo@email.com",
+                    publicQuery ? TEMPLATE_PUBLIC_WELSH_LIP_ID : TEMPLATE_ID_LIP_WELSH,
+                    getNotificationDataForLip(now.toLocalDateTime(), publicQuery),
+                    "response-to-query-notification-000DC001"
             );
         }
 
@@ -686,29 +687,29 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
         void shouldNotifyDefendantLip_whenResponseToQueryReceivedNoFollowUpQueries(boolean publicQuery) {
             when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(publicQuery);
             when(runtimeService.getProcessVariables(any()))
-                .thenReturn(QueryManagementVariables.builder()
-                                .queryId("15")
-                                .build());
+                    .thenReturn(QueryManagementVariables.builder()
+                                                        .queryId("15")
+                                                        .build());
             when(coreCaseUserService.getUserCaseRoles(
-                any(),
-                any()
+                    any(),
+                    any()
             )).thenReturn(List.of(CaseRole.DEFENDANT.toString()));
 
-            OffsetDateTime now = OffsetDateTime.now();
+            OffsetDateTime now = OffsetDateTime.of(2025, 8, 20, 10, 0, 0, 0, ZoneOffset.UTC);
             CaseData caseData = createCaseDataWithQueries(now);
             caseData = caseData.toBuilder()
-                .defendantUserDetails(IdamUserDetails.builder().email("sole.trader@email.com").build())
-                .respondent1Represented(YesOrNo.NO)
-                .build();
+                               .defendantUserDetails(IdamUserDetails.builder().email("sole.trader@email.com").build())
+                               .respondent1Represented(YesOrNo.NO)
+                               .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             handler.handle(params);
 
             verify(notificationService).sendMail(
-                "sole.trader@email.com",
-                publicQuery ? TEMPLATE_PUBLIC_LIP_ID : TEMPLATE_ID_LIP,
-                getNotificationDataMapLipRes(now.toLocalDateTime(), publicQuery),
-                "response-to-query-notification-000DC001"
+                    "sole.trader@email.com",
+                    publicQuery ? TEMPLATE_PUBLIC_LIP_ID : TEMPLATE_ID_LIP,
+                    getNotificationDataMapLipRes(now.toLocalDateTime(), publicQuery),
+                    "response-to-query-notification-000DC001"
             );
         }
 
@@ -717,30 +718,30 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
         void shouldNotifyDefendantLipBilingual_whenResponseToQueryReceivedNoFollowUpQueries(boolean publicQuery) {
             when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(publicQuery);
             when(runtimeService.getProcessVariables(any()))
-                .thenReturn(QueryManagementVariables.builder()
-                                .queryId("15")
-                                .build());
+                    .thenReturn(QueryManagementVariables.builder()
+                                                        .queryId("15")
+                                                        .build());
             when(coreCaseUserService.getUserCaseRoles(
-                any(),
-                any()
+                    any(),
+                    any()
             )).thenReturn(List.of(CaseRole.DEFENDANT.toString()));
-            OffsetDateTime now = OffsetDateTime.now();
+            OffsetDateTime now = OffsetDateTime.of(2025, 8, 20, 10, 0, 0, 0, ZoneOffset.UTC);
             CaseData caseData = createCaseDataWithQueries(now);
             caseData = caseData.toBuilder()
-                .respondent1Represented(YesOrNo.NO)
-                .defendantUserDetails(IdamUserDetails.builder().email("sole.trader@email.com").build())
-                .caseDataLiP(CaseDataLiP.builder().respondent1LiPResponse(
-                    RespondentLiPResponse.builder().respondent1ResponseLanguage(Language.BOTH.toString()).build()).build())
-                .build();
+                               .respondent1Represented(YesOrNo.NO)
+                               .defendantUserDetails(IdamUserDetails.builder().email("sole.trader@email.com").build())
+                               .caseDataLiP(CaseDataLiP.builder().respondent1LiPResponse(
+                                       RespondentLiPResponse.builder().respondent1ResponseLanguage(Language.BOTH.toString()).build()).build())
+                               .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             handler.handle(params);
 
             verify(notificationService).sendMail(
-                "sole.trader@email.com",
-                publicQuery ? TEMPLATE_PUBLIC_WELSH_LIP_ID : TEMPLATE_ID_LIP_WELSH,
-                getNotificationDataMapLipRes(now.toLocalDateTime(), publicQuery),
-                "response-to-query-notification-000DC001"
+                    "sole.trader@email.com",
+                    publicQuery ? TEMPLATE_PUBLIC_WELSH_LIP_ID : TEMPLATE_ID_LIP_WELSH,
+                    getNotificationDataMapLipRes(now.toLocalDateTime(), publicQuery),
+                    "response-to-query-notification-000DC001"
             );
         }
     }
