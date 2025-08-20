@@ -1533,7 +1533,7 @@ public class CaseDataBuilder {
             .applicant1DQRequestedCourt(RequestedCourt.builder()
                 .responseCourtCode("court4")
                 .caseLocation(CaseLocationCivil.builder()
-                    .baseLocation("dummy base").region("dummy region")
+                    .baseLocation("00000").region("dummy region")
                     .build()).build())
             .applicant1DQHearingSupport(HearingSupport.builder().requirements(List.of()).build())
             .applicant1DQFurtherInformation(FurtherInformation.builder().futureApplications(NO).build())
