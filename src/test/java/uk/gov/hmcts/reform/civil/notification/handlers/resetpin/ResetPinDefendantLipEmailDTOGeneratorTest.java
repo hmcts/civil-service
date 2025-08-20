@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -93,7 +94,8 @@ class ResetPinDefendantLipEmailDTOGeneratorTest {
         when(pipInPostConfiguration.getRespondToClaimUrl()).thenReturn("dummy_respond_to_claim_url");
         when(pipInPostConfiguration.getCuiFrontEndUrl()).thenReturn("dummy_cui_front_end_url");
 
-        Map<String, String> properties = emailDTOGenerator.addProperties(caseData);
+        Map<String, String> initialProps = new HashMap<>();
+        Map<String, String> properties = emailDTOGenerator.addCustomProperties(initialProps, caseData);
 
         assertThat(properties).containsEntry(RESPONDENT_NAME, "Mr. Sole Trader");
         assertThat(properties).containsEntry(CLAIMANT_NAME, "Claimant Name");

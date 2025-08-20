@@ -241,6 +241,96 @@ class RaiseQueryCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldReturnConcurrencyError_whenPublicQueryManagementEnabledAndMessageThreadSizeIsEven() {
+            when(featureToggleService.isPublicQueryManagementEnabled(any(CaseData.class))).thenReturn(true);
+
+            CaseMessage latestMessage = CaseMessage.builder()
+                .id(QUERY_ID)
+                .createdOn(NOW)
+                .build();
+
+            CaseMessage olderMessage = CaseMessage.builder()
+                .id(QUERY_ID) // Same ID for the thread
+                .createdOn(NOW.minusMinutes(5))
+                .build();
+
+            CaseQueriesCollection caseQueriesCollection = CaseQueriesCollection.builder()
+                .caseMessages(wrapElements(latestMessage, olderMessage))
+                .build();
+
+            CaseData caseData = CaseData.builder()
+                .ccdCaseReference(CASE_ID)
+                .queries(caseQueriesCollection)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNotNull();
+            assertThat(response.getErrors()).containsOnly("Consecutive follow up messages are not allowed for query management.");
+            assertThat(response.getData()).isNull();
+        }
+
+        @Test
+        void shouldNotReturnConcurrencyError_whenPublicQueryManagementEnabledAndMessageThreadSizeIsOdd() {
+            when(featureToggleService.isPublicQueryManagementEnabled(any(CaseData.class))).thenReturn(true);
+
+            CaseMessage latestMessage = CaseMessage.builder()
+                .id(QUERY_ID)
+                .createdOn(NOW)
+                .build();
+
+            CaseQueriesCollection caseQueriesCollection = CaseQueriesCollection.builder()
+                .caseMessages(wrapElements(latestMessage))
+                .build();
+
+            CaseData caseData = CaseData.builder()
+                .ccdCaseReference(CASE_ID)
+                .queries(caseQueriesCollection)
+                .build();
+
+            when(userService.getUserInfo(any())).thenReturn(UserInfo.builder().uid(USER_ID).build());
+            when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(APPLICANTSOLICITORONE.name()));
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData()).isNotNull();
+        }
+
+        @Test
+        void shouldNotReturnConcurrencyError_whenPublicQueryManagementDisabled() {
+            when(featureToggleService.isPublicQueryManagementEnabled(any(CaseData.class))).thenReturn(false);
+
+            CaseMessage latestUserMessage = CaseMessage.builder()
+                .id(QUERY_ID)
+                .createdOn(NOW)
+                .build();
+
+            CaseQueriesCollection applicantQueries = CaseQueriesCollection.builder()
+                .caseMessages(wrapElements(latestUserMessage))
+                .build();
+
+            CaseData caseData = CaseData.builder()
+                .ccdCaseReference(CASE_ID)
+                .qmApplicantSolicitorQueries(applicantQueries)
+                .build();
+
+            when(userService.getUserInfo(any())).thenReturn(UserInfo.builder().uid(USER_ID).build());
+            when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(APPLICANTSOLICITORONE.name()));
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData()).isNotNull();
+        }
+
+        @Test
         public void shouldPopulateLatestQueryWithApplicantQueryData() {
             when(coreCaseUserService.getUserCaseRoles(CASE_ID.toString(), USER_ID)).thenReturn(List.of(
                 APPLICANTSOLICITORONE.name()));
