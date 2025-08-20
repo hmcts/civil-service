@@ -49,14 +49,14 @@ public class PartAdmitImmediatelyClaimSettledScenarioTest extends DashboardBaseI
                 jsonPath("$[0].titleEn").value("Immediate payment"),
                 jsonPath("$[0].descriptionEn")
                     .value(
-                        "<p class=\"govuk-body\">Mr. John Rambo has accepted your offer to pay £100,plus the claim fee and any fixed costs claimed," +
+                        "<p class=\"govuk-body\">Mr. John Rambo has accepted your offer to pay £100, plus the claim fee and any fixed costs claimed, " +
                             "immediately in full and final settlement of the claim. " +
                             "Funds must be received in <a href={VIEW_INFO_ABOUT_CLAIMANT} class=\"govuk-link\">their account</a> by 1 January 2024.</p><p class=\"govuk-body\">" +
                             "If they don't receive the money by then, they can request a County Court Judgment (CCJ).</p>"),
                 jsonPath("$[0].titleCy").value("Talu ar unwaith"),
                 jsonPath("$[0].descriptionCy")
                     .value(
-                        "<p class=\"govuk-body\">Mae Mr. John Rambo wedi derbyn eich cynnig i dalu £100,ynghyd â ffi’r hawliad ac unrhyw gostau sefydlog a hawlir,yn " +
+                        "<p class=\"govuk-body\">Mae Mr. John Rambo wedi derbyn eich cynnig i dalu £100, ynghyd â ffi’r hawliad ac unrhyw gostau sefydlog a hawlir, yn " +
                             "llawn ar unwaith fel setliad llawn a therfynol o’r hawliad.  Rhaid i’r arian fod yn " +
                             "<a href={VIEW_INFO_ABOUT_CLAIMANT} class=\"govuk-link\">ei g/chyfrif</a> erbyn 1 Ionawr 2024.</p>" +
                             "<p class=\"govuk-body\"> Os na fydd yr arian wedi cyrraedd erbyn hynny, " +
