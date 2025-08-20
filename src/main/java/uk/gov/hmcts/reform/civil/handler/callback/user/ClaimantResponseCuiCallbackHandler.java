@@ -134,7 +134,6 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
             builder.claimMovedToMediationOn(LocalDate.now());
         }
 
-
         if (isDefendantPartAdmitPayImmediatelyAccepted(caseData)) {
             String whenBePaid = paymentDateService.getFormattedPaymentDate(caseData);
             builder.whenToBePaidText(whenBePaid);
