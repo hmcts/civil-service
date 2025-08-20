@@ -93,11 +93,6 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
         CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder();
         updatedCaseData.showResponseOneVOneFlag(responseOneVOneService.setUpOneVOneFlow(caseData));
 
-        if (isDefendantPartAdmitPayImmediatelyAccepted(caseData)) {
-            String whenBePaid = paymentDateService.getFormattedPaymentDate(caseData);
-            updatedCaseData.whenToBePaidText(whenBePaid);
-        }
-
         Optional<BigDecimal> howMuchWasPaid = Optional.ofNullable(caseData.getRespondToAdmittedClaim())
             .map(RespondToClaim::getHowMuchWasPaid);
 
@@ -138,6 +133,13 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
             || NO.equals(caseData.getCaseDataLiP().getApplicant1SettleClaim())))) {
             builder.claimMovedToMediationOn(LocalDate.now());
         }
+
+
+        if (isDefendantPartAdmitPayImmediatelyAccepted(caseData)) {
+            String whenBePaid = paymentDateService.getFormattedPaymentDate(caseData);
+            builder.whenToBePaidText(whenBePaid);
+        }
+
         updateCcjRequestPaymentDetails(builder, caseData);
         updateLanguagePreference(builder, caseData);
         populateDQPartyIds(builder);
