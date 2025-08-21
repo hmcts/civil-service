@@ -7,7 +7,7 @@ from dbs.task_list
 WHERE EXISTS (
   SELECT -1
   FROM dbs.task_item_template
-  WHERE dbs.task_item_template.id = dbs.task_list.task_item_template_id
+  WHERE dbs.task_item_template.id = dbs.task
     and dbs.task_item_template.category_en = 'Applications and messages to the court'
 );
 
