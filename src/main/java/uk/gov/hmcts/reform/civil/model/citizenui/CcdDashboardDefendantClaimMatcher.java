@@ -395,11 +395,12 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean pausedForTranslationAfterResponse() {
-        if (!featureToggleService.isLipVLipEnabled()) {
-            return false;
-        }
-        return (caseData.getRespondent1ClaimResponseTypeForSpec() != null && caseData.getCcdState() == CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT)
-            || (caseData.getApplicant1ResponseDate() != null && caseData.getCcdState() == CaseState.AWAITING_APPLICANT_INTENTION);
+        if (!featureToggleService.isWelshEnabledForMainCase() && (caseData.isClaimUnderTranslationAfterDefResponse() && caseData.isRespondentResponseBilingual())
+            || (caseData.isClaimUnderTranslationAfterClaimantResponse() && caseData.isClaimantBilingual())) {
+            return true;
+        } else return featureToggleService.isWelshEnabledForMainCase()
+            && (caseData.isClaimUnderTranslationAfterDefResponse() || caseData.isClaimUnderTranslationAfterClaimantResponse())
+            && (caseData.isRespondentResponseBilingual() || caseData.isClaimantBilingual());
     }
 
     @Override
