@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
+import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.WelshLanguageRequirements;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
@@ -50,6 +51,7 @@ import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPay
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.service.PaymentDateService.DART_FORMATTER;
 import static uk.gov.hmcts.reform.civil.utils.ExpertUtils.addEventAndDateAddedToApplicantExperts;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateDQPartyIds;
 import static uk.gov.hmcts.reform.civil.utils.WitnessUtils.addEventAndDateAddedToApplicantWitnesses;
@@ -135,8 +137,10 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
         }
 
         if (isDefendantPartAdmitPayImmediatelyAccepted(caseData)) {
-            String whenBePaid = paymentDateService.getFormattedPaymentDate(caseData);
-            builder.whenToBePaidText(whenBePaid);
+            LocalDate whenBePaid = paymentDateService.calculatePaymentDeadline();
+            builder.whenToBePaidText(whenBePaid.format(DART_FORMATTER));
+            builder.respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
+                                                      .whenWillThisAmountBePaid(whenBePaid).build());
         }
 
         updateCcjRequestPaymentDetails(builder, caseData);
