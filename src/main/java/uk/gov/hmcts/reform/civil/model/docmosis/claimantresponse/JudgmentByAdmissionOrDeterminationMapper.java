@@ -209,6 +209,8 @@ public class JudgmentByAdmissionOrDeterminationMapper {
 
         String totalInterest = judgementService.ccjJudgmentInterest(caseData).setScale(2).toString();
 
+        LocalDate payByDate = getPayByDate(caseData);
+
         JudgmentByAdmissionOrDetermination.JudgmentByAdmissionOrDeterminationBuilder builder = new JudgmentByAdmissionOrDetermination.JudgmentByAdmissionOrDeterminationBuilder();
         return builder
             .claimReferenceNumber(caseData.getLegacyCaseReference())
@@ -223,8 +225,8 @@ public class JudgmentByAdmissionOrDeterminationMapper {
             .totalClaimAmount(totalClaimAmount)
             .totalInterestAmount(totalInterest)
             .paymentPlan(getPaymentTypeForNonDivergent(caseData))
-            .payByDate(caseData.getRespondToClaimAdmitPartLRspec() != null
-                           ? DateFormatHelper.formatLocalDate(caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid(), DateFormatHelper.DATE) : null)
+            .payByDate(payByDate != null
+                           ? DateFormatHelper.formatLocalDate(payByDate, DateFormatHelper.DATE) : null)
             .paymentStr(caseData.isPayByInstallment() ? getRepaymentString(caseData.getRespondent1RepaymentPlan().getRepaymentFrequency()) : null)
             .repaymentFrequency(caseData.isPayByInstallment()
                                     ? getRepaymentFrequency(caseData.getRespondent1RepaymentPlan().getRepaymentFrequency()) : null)
@@ -314,6 +316,9 @@ public class JudgmentByAdmissionOrDeterminationMapper {
     }
 
     private String getPaymentTypeForNonDivergent(CaseData caseData) {
+        if (caseData.hasApplicant1CourtDecisionInFavourOfClaimant()) {
+            return getPaymentTypeInClaimantFavour(caseData);
+        }
         if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired() != null
             && caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == IMMEDIATELY) {
             return "IMMEDIATELY";
@@ -330,5 +335,27 @@ public class JudgmentByAdmissionOrDeterminationMapper {
                || judgementService.isLrPayImmediatelyPlan(caseData))
             ? (getClaimFee(caseData).add(judgementService.ccjJudgmentFixedCost(caseData))).toString()
             : getClaimFee(caseData).toString();
+    }
+
+    private String getPaymentTypeInClaimantFavour(CaseData caseData) {
+        PaymentType claimantSuggestedPaymentType = caseData.getApplicant1RepaymentOptionForDefendantSpec();
+        if (claimantSuggestedPaymentType == PaymentType.IMMEDIATELY) {
+            return "IMMEDIATELY";
+        } else if (claimantSuggestedPaymentType == PaymentType.REPAYMENT_PLAN) {
+            return "REPAYMENT_PLAN";
+        } else if (claimantSuggestedPaymentType == PaymentType.SET_DATE) {
+            return "SET_DATE";
+        }
+        return null;
+    }
+
+    private LocalDate getPayByDate(CaseData caseData) {
+        if (caseData.hasApplicant1CourtDecisionInFavourOfClaimant()) {
+            return caseData.getApplicant1RequestedPaymentDateForDefendantSpec() != null
+                ? caseData.getApplicant1RequestedPaymentDateForDefendantSpec().getPaymentSetDate() : null;
+        } else if (caseData.getRespondToClaimAdmitPartLRspec() != null) {
+            return caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid();
+        }
+        return null;
     }
 }
