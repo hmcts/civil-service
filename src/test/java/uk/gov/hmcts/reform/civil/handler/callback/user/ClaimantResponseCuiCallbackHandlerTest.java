@@ -82,6 +82,7 @@ import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPay
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.dq.HearingLength.ONE_DAY;
+import static uk.gov.hmcts.reform.civil.service.PaymentDateService.DART_FORMATTER;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @ExtendWith(MockitoExtension.class)
@@ -683,7 +684,8 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldUpdateDefendantPaymentDeadlineForPartAdmitImmediateWhenClaimantAcceptedRepaymentPlan() {
-            when(paymentDateService.getFormattedPaymentDate(any())).thenReturn("2021-01-01");
+            LocalDate paymentDeadline = LocalDate.now().plusDays(1);
+            when(paymentDateService.calculatePaymentDeadline()).thenReturn(paymentDeadline);
             CaseData caseData = CaseDataBuilder.builder()
                 .applicant1ResponseDate(LocalDateTime.now())
                 .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
@@ -701,7 +703,7 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedCaseData = getCaseData(response);
-            assertThat(updatedCaseData.getWhenToBePaidText()).isEqualTo("2021-01-01");
+            assertThat(updatedCaseData.getWhenToBePaidText()).isEqualTo(paymentDeadline.format(DART_FORMATTER));
         }
     }
 
