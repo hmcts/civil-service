@@ -416,7 +416,8 @@ public class EventHistoryMapper {
                               .amountOfJudgment(amountClaimedWithInterest.setScale(2))
                               .amountOfCosts((caseData.isApplicantLipOneVOne() && featureToggleService.isLipVLipEnabled())
                                                  ? MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence())
-                                                 : JudgmentsOnlineHelper.getCostOfJudgmentForDJ(caseData))
+                                                 : JudgmentsOnlineHelper.getFixedCostsOfJudgmentForDJ(caseData).add(
+                                                     JudgmentsOnlineHelper.getClaimFeeOfJudgmentForDJ(caseData)))
                               .amountPaidBeforeJudgment((caseData.getPartialPayment() == YesOrNo.YES) ? partialPaymentPounds : ZERO)
                               .isJudgmentForthwith(caseData.getPaymentTypeSelection().equals(DJPaymentTypeSelection.IMMEDIATELY))
                               .paymentInFullDate(paymentInFullDate)
