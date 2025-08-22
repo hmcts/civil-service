@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
 import uk.gov.hmcts.reform.civil.documentmanagement.SecuredDocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DownloadedDocumentResponse;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -22,13 +21,12 @@ import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
-import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.judgmentonline.JudgmentByAdmissionLiPDefendantLetter;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.service.BulkPrintService;
 import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
-import uk.gov.hmcts.reform.civil.stitch.service.CivilStitchService;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 
@@ -39,9 +37,6 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -59,14 +54,13 @@ class JudgmentByAdmissionPiPLetterGeneratorTest {
     private static final String BEARER_TOKEN = "Bearer Token";
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
     private static final String CLAIM_REFERENCE = "ABC";
-    private static String fileNameTrial = "PinAndPost.pdf";;
+    private static String fileNameTrial = null;
     private static final String fileName = String.format(JUDGMENT_BY_ADMISSION_PIN_IN_POST_LIP_DEFENDANT_LETTER.getDocumentTitle(), CLAIM_REFERENCE);
     private static final String PIN = "1234789";
     private static final String JUDGMENT_BY_ADMISSION_LETTER = "judgment-by-admission-letter";
-    private static final CaseDocument CASE_DOCUMENT_TRIAL = CaseDocument.builder()
+    private static final CaseDocument CASE_DOCUMENT_TRIAL = CaseDocumentBuilder.builder()
         .documentName(fileNameTrial)
         .documentType(DocumentType.JUDGMENT_BY_ADMISSION_NON_DIVERGENT_SPEC_PIP_LETTER)
-        .documentLink(Document.builder().documentFileName(fileName).documentBinaryUrl("Binary/url").documentUrl("url").build())
         .build();
 
     private static final Address RESPONDENT_ADDRESS = Address.builder().addressLine1("123 road")
@@ -82,7 +76,6 @@ class JudgmentByAdmissionPiPLetterGeneratorTest {
 
     private static final CaseData CASE_DATA = CaseData.builder()
         .legacyCaseReference(CLAIM_REFERENCE)
-        .ccdCaseReference(16543480L)
         .applicant1(Party.builder()
                         .type(Party.Type.INDIVIDUAL)
                         .individualTitle("Mr.")
@@ -92,12 +85,6 @@ class JudgmentByAdmissionPiPLetterGeneratorTest {
         .respondent1Represented(YesOrNo.NO)
         .respondent1PinToPostLRspec(DefendantPinToPostLRspec.builder().accessCode(PIN).build())
         .submittedDate(LocalDateTime.now())
-        .systemGeneratedCaseDocuments(List.of(
-            Element.<CaseDocument>builder()
-                .value(CaseDocument.builder().documentType(DocumentType.JUDGMENT_BY_ADMISSION_DEFENDANT)
-                           .documentName("DefendantJBA.pdf")
-                           .documentLink(Document.builder().documentFileName("DefendantJBA.pdf").documentBinaryUrl("Binary/url").documentUrl("url").build())
-                           .createdDatetime(LocalDateTime.now()).build()).build()))
         .build();
     private static final byte[] LETTER_CONTENT = new byte[]{37, 80, 68, 70, 45, 49, 46, 53, 10, 37, -61, -92};
 
@@ -125,27 +112,11 @@ class JudgmentByAdmissionPiPLetterGeneratorTest {
     @MockBean
     private GeneralAppFeesService generalAppFeesService;
 
-    @MockBean
-    private CivilStitchService civilStitchService;
-
     private static final String forename = "Judge";
 
     private static final String surname = "Dredd";
 
     private static final List<String> roles = List.of("role");
-
-    private static final CaseDocument STITCHED_DOC =
-        CaseDocument.builder()
-            .createdBy("James")
-            .documentName("Stitched document")
-            .documentSize(0L)
-            .documentType(DocumentType.JUDGMENT_BY_ADMISSION_NON_DIVERGENT_SPEC_PIP_LETTER)
-            .createdDatetime(LocalDateTime.now())
-            .documentLink(Document.builder()
-                              .documentUrl("fake-url")
-                              .documentFileName("file-name")
-                              .documentBinaryUrl("binary-url")
-                              .build()).build();
 
     @Test
     void shouldDefaultJudgmentSpecPiPLetterGenerator_whenValidDataIsProvided() {
@@ -160,8 +131,6 @@ class JudgmentByAdmissionPiPLetterGeneratorTest {
         when(pipInPostConfiguration.getRespondToClaimUrl()).thenReturn("Response URL");
         when(generalAppFeesService.getFeeForJOWithApplicationType(any())).thenReturn(Fee.builder().calculatedAmountInPence(
             BigDecimal.valueOf(1000)).build());
-        when(civilStitchService.generateStitchedCaseDocument(anyList(), anyString(), anyLong(), eq(DocumentType.JUDGMENT_BY_ADMISSION_NON_DIVERGENT_SPEC_PIP_LETTER),
-                                                             anyString())).thenReturn(STITCHED_DOC);
 
         byte[] letterContentByteData = generator.generateAndPrintJudgmentByAdmissionLetter(CASE_DATA, BEARER_TOKEN);
 
