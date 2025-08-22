@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.dq.helpers;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.ExpertReportsSent;
@@ -9,12 +10,14 @@ import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.FixedRecoverableCostsSection;
+import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.DirectionsQuestionnaireForm;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.Experts;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.WelshLanguageRequirements;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.Witnesses;
+import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.Representative;
 import uk.gov.hmcts.reform.civil.model.dq.DQ;
 import uk.gov.hmcts.reform.civil.model.dq.HearingSupport;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
@@ -30,6 +33,7 @@ import java.text.NumberFormat;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
@@ -55,6 +59,7 @@ public class RespondentTemplateForDQGenerator {
 
     public DirectionsQuestionnaireForm getRespondent2TemplateData(CaseData caseData, String defendantIdentifier, String authorisation) {
         DQ dq = caseData.getRespondent2DQ();
+        List<Party> respondents = respondentsForDQGenerator.getRespondents(caseData, defendantIdentifier);
 
         return  DirectionsQuestionnaireForm.builder()
             .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
@@ -64,7 +69,8 @@ public class RespondentTemplateForDQGenerator {
                              ? caseData.getRespondent1ResponseDate().toLocalDate()
                              : caseData.getRespondent2ResponseDate().toLocalDate())
             .applicant(setApplicantsForDQGenerator.getApplicant1DQParty(caseData))
-            .respondents(respondentsForDQGenerator.getRespondents(caseData, defendantIdentifier))
+            .respondents(respondents)
+            .representativeOrganisationName(getOrgNameFromParties(respondents))
             .fileDirectionsQuestionnaire(dq.getFileDirectionQuestionnaire())
             .fixedRecoverableCosts(FixedRecoverableCostsSection.from(INTERMEDIATE_CLAIM.toString().equals(getClaimTrack(caseData))
                                                                          ? dq.getFixedRecoverableCostsIntermediate()
@@ -89,12 +95,13 @@ public class RespondentTemplateForDQGenerator {
             .vulnerabilityQuestions(dq.getVulnerabilityQuestions())
             .allocatedTrack(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                                 ? caseData.getAllocatedTrack().name() : caseData.getResponseClaimTrack())
-            .requestedCourt(getRequestedCourt(dq, authorisation))
-            .build();
+            .requestedCourt(getRequestedCourt(dq, authorisation)).build();
     }
 
     public DirectionsQuestionnaireForm getRespondent1TemplateData(CaseData caseData, String defendantIdentifier, String authorisation) {
         DQ dq = caseData.getRespondent1DQ();
+
+        List<Party> respondents = respondentsForDQGenerator.getRespondents(caseData, defendantIdentifier);
 
         return DirectionsQuestionnaireForm.builder()
             .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
@@ -102,7 +109,7 @@ public class RespondentTemplateForDQGenerator {
             .solicitorReferences(DocmosisTemplateDataUtils.fetchSolicitorReferences(caseData))
             .submittedOn(caseData.getRespondent1ResponseDate().toLocalDate())
             .applicant(setApplicantsForDQGenerator.getApplicant1DQParty(caseData))
-            .respondents(respondentsForDQGenerator.getRespondents(caseData, defendantIdentifier))
+            .representativeOrganisationName(getOrgNameFromParties(respondents))
             .fileDirectionsQuestionnaire(dq.getFileDirectionQuestionnaire())
             .fixedRecoverableCosts(FixedRecoverableCostsSection.from(INTERMEDIATE_CLAIM.toString().equals(getClaimTrack(caseData))
                                                                          ? dq.getFixedRecoverableCostsIntermediate()
@@ -128,6 +135,16 @@ public class RespondentTemplateForDQGenerator {
             .allocatedTrack(getClaimTrack(caseData))
             .requestedCourt(getRequestedCourt(dq, authorisation))
             .build();
+    }
+
+    private String getOrgNameFromParties(List<Party> parties) {
+        return Optional.ofNullable(parties)
+            .filter(p -> !p.isEmpty())
+            .map(p -> p.get(0))
+            .map(Party::getRepresentative)
+            .map(Representative::getOrganisationName)
+            .filter(StringUtils::isNotBlank)
+            .orElse("");
     }
 
     private static YesOrNo getDeterWithoutHearing(CaseData caseData, DQ dq) {
