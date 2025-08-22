@@ -53,4 +53,6 @@ public class NoticeOfDiscontinuanceForm implements MappableObject {
     private final String postCode;
     private final String claimReferenceNumber;
     private final String welshDate;
+    private final boolean isQMEnabled;
+    private final boolean isRespondent1LiP;
 }
