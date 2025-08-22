@@ -76,7 +76,7 @@ class NoticeOfDiscontinuanceFormGeneratorTest {
                                                           caseData.getRespondent1().getPartyName(),
                                                           caseData.getRespondent1().getPrimaryAddress(),
                                                           "party_type",
-                                                          BEARER_TOKEN);
+                                                          BEARER_TOKEN, false);
         assertThat(caseDoc).isNotNull();
 
         verify(documentManagementService)
@@ -111,7 +111,7 @@ class NoticeOfDiscontinuanceFormGeneratorTest {
                                                           caseData.getRespondent1().getPartyName(),
                                                           caseData.getRespondent1().getPrimaryAddress(),
                                                           "party_type",
-                                                          BEARER_TOKEN);
+                                                          BEARER_TOKEN, false);
         assertThat(caseDoc).isNotNull();
 
         verify(documentManagementService)
@@ -142,7 +142,7 @@ class NoticeOfDiscontinuanceFormGeneratorTest {
                                                           caseData.getApplicant1().getPartyName(),
                                                           caseData.getApplicant1().getPrimaryAddress(),
                                                           "party_type",
-                                                          BEARER_TOKEN);
+                                                          BEARER_TOKEN, false);
         assertThat(caseDoc).isNotNull();
 
         verify(documentManagementService)
@@ -173,7 +173,7 @@ class NoticeOfDiscontinuanceFormGeneratorTest {
                                                           caseData.getRespondent2().getPartyName(),
                                                           caseData.getRespondent2().getPrimaryAddress(),
                                                           "party_type",
-                                                          BEARER_TOKEN);
+                                                          BEARER_TOKEN, false);
         assertThat(caseDoc).isNotNull();
 
         verify(documentManagementService)
@@ -204,7 +204,7 @@ class NoticeOfDiscontinuanceFormGeneratorTest {
                                                           caseData.getRespondent1().getPartyName(),
                                                           caseData.getRespondent1().getPrimaryAddress(),
                                                           "party_type",
-                                                          BEARER_TOKEN);
+                                                          BEARER_TOKEN, false);
         assertThat(caseDoc).isNotNull();
 
         verify(documentManagementService)
@@ -236,7 +236,7 @@ class NoticeOfDiscontinuanceFormGeneratorTest {
                                                           caseData.getRespondent1().getPartyName(),
                                                           caseData.getRespondent1().getPrimaryAddress(),
                                                           "party_type",
-                                                          BEARER_TOKEN);
+                                                          BEARER_TOKEN, false);
         assertThat(caseDoc).isNotNull();
 
         verify(documentManagementService)
@@ -244,7 +244,7 @@ class NoticeOfDiscontinuanceFormGeneratorTest {
     }
 
     @Test
-    void shouldIncludeQMPublicInformation_whenValidWithQMPublicIsOnAndWelshIsOff() {
+    void shouldIncludeQMPublicInformation_whenWhenIsNotLipAndWelshIsOff() {
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
         when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
         String fileName = String.format(
@@ -268,7 +268,39 @@ class NoticeOfDiscontinuanceFormGeneratorTest {
                                                           caseData.getRespondent2().getPartyName(),
                                                           caseData.getRespondent2().getPrimaryAddress(),
                                                           "party_type",
-                                                          BEARER_TOKEN);
+                                                          BEARER_TOKEN, false);
+        assertThat(caseDoc).isNotNull();
+
+        verify(documentManagementService)
+            .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, NOTICE_OF_DISCONTINUANCE));
+    }
+
+    @Test
+    void shouldIncludeQMPublicInformation_whenWhenIsLipAndWelshIsOff() {
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
+        when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
+        String fileName = String.format(
+            NOTICE_OF_DISCONTINUANCE_PDF.getDocumentTitle(), REFERENCE_NUMBER);
+
+        CaseDocument caseDocument = CaseDocumentBuilder.builder()
+            .documentName(fileName)
+            .documentType(NOTICE_OF_DISCONTINUANCE)
+            .build();
+
+        when(documentGeneratorService.generateDocmosisDocument(any(NoticeOfDiscontinuanceForm.class), eq(NOTICE_OF_DISCONTINUANCE_PDF)))
+            .thenReturn(new DocmosisDocument(NOTICE_OF_DISCONTINUANCE_PDF.getDocumentTitle(), bytes));
+
+        when(documentManagementService
+                 .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, NOTICE_OF_DISCONTINUANCE)))
+            .thenReturn(caseDocument);
+
+        CaseData caseData = getCaseData();
+
+        CaseDocument caseDoc = formGenerator.generateDocs(caseData,
+                                                          caseData.getRespondent2().getPartyName(),
+                                                          caseData.getRespondent2().getPrimaryAddress(),
+                                                          "party_type",
+                                                          BEARER_TOKEN, true);
         assertThat(caseDoc).isNotNull();
 
         verify(documentManagementService)

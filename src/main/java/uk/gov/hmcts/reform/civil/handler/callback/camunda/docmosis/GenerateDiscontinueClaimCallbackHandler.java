@@ -83,7 +83,7 @@ public class GenerateDiscontinueClaimCallbackHandler extends CallbackHandler {
 
     private void buildDocuments(CallbackParams callbackParams, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
         CaseData caseData = callbackParams.getCaseData();
-
+        boolean isRespondentLiP;
         Optional<Organisation> applicantLegalOrganisation = getLegalOrganization(caseData.getApplicant1OrganisationPolicy()
                                                                                      .getOrganisation().getOrganisationID());
         String appSolOrgName = getLegalName(applicantLegalOrganisation,
@@ -98,6 +98,7 @@ public class GenerateDiscontinueClaimCallbackHandler extends CallbackHandler {
         String respondent1Name;
         Address respondent1Address;
         if (!caseData.isRespondent1LiP()) {
+            isRespondentLiP = false;
             Optional<Organisation> respondentLegalOrganisation = getLegalOrganization(caseData.getRespondent1OrganisationPolicy()
                                                                                          .getOrganisation().getOrganisationID());
             respondent1Name = getLegalName(respondentLegalOrganisation, caseData.getRespondent1DQ() != null
@@ -109,6 +110,7 @@ public class GenerateDiscontinueClaimCallbackHandler extends CallbackHandler {
                                                  caseData.getSpecRespondentCorrespondenceAddressdetails(),
                                                  caseData.getCaseAccessCategory());
         } else {
+            isRespondentLiP = true;
             respondent1Name = caseData.getRespondent1().getPartyName();
             respondent1Address = caseData.getRespondent1().getPrimaryAddress();
         }
@@ -116,17 +118,18 @@ public class GenerateDiscontinueClaimCallbackHandler extends CallbackHandler {
         CaseDocument applicant1DiscontinueDoc = generateForm(appSolOrgName,
                                                              applicant1SolicitorAddress,
                                                              "claimant",
-                                                             callbackParams);
+                                                             callbackParams, false);
         boolean generateRespondent2Form = (YES.equals(caseData.getAddRespondent2())
             && !YES.equals(caseData.getRespondent2SameLegalRepresentative()));
         CaseDocument respondent1DiscontinueDoc = generateForm(respondent1Name, respondent1Address,
-                                                              generateRespondent2Form ? "defendant1" : "defendant", callbackParams);
+                                                              generateRespondent2Form ? "defendant1" : "defendant", callbackParams, isRespondentLiP);
         CaseDocument respondent2DiscontinueDoc = null;
 
         if (generateRespondent2Form) {
             String respondent2Name;
             Address respondent2Address;
             if (!caseData.isRespondent2LiP()) {
+                isRespondentLiP = false;
                 Optional<Organisation> respondentLegalOrganisation = getLegalOrganization(caseData.getRespondent2OrganisationPolicy()
                                                                                               .getOrganisation().getOrganisationID());
                 respondent2Name = getLegalName(respondentLegalOrganisation, caseData.getRespondent2DQ() != null
@@ -138,10 +141,11 @@ public class GenerateDiscontinueClaimCallbackHandler extends CallbackHandler {
                                                      caseData.getSpecRespondent2CorrespondenceAddressdetails(),
                                                      caseData.getCaseAccessCategory());
             } else {
+                isRespondentLiP = true;
                 respondent2Name = caseData.getRespondent2().getPartyName();
                 respondent2Address = caseData.getRespondent2().getPrimaryAddress();
             }
-            respondent2DiscontinueDoc = generateForm(respondent2Name, respondent2Address, "defendant2", callbackParams);
+            respondent2DiscontinueDoc = generateForm(respondent2Name, respondent2Address, "defendant2", callbackParams, isRespondentLiP);
         }
         if (featureToggleService.isWelshEnabledForMainCase()
             && caseData.isRespondent1LiP()
@@ -181,9 +185,9 @@ public class GenerateDiscontinueClaimCallbackHandler extends CallbackHandler {
         }
     }
 
-    private CaseDocument generateForm(String partyName, Address address, String partyType, CallbackParams callbackParams) {
+    private CaseDocument generateForm(String partyName, Address address, String partyType, CallbackParams callbackParams, boolean isRespondentLiP) {
         return formGenerator.generateDocs(
-            callbackParams.getCaseData(), partyName, address, partyType, callbackParams.getParams().get(BEARER_TOKEN).toString());
+            callbackParams.getCaseData(), partyName, address, partyType, callbackParams.getParams().get(BEARER_TOKEN).toString(), isRespondentLiP);
     }
 
     private void assignDiscontinuanceCategoryId(CaseDocument caseDocument) {
