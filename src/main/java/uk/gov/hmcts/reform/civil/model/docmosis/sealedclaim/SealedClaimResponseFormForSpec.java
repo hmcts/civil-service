@@ -60,4 +60,5 @@ public class SealedClaimResponseFormForSpec implements MappableObject {
     private final String allocatedTrack;
     private final RespondentResponseTypeSpec responseType;
     private final YesOrNo mediation;
+    private final String respondentRepresentativeOrganisationName;
 }
