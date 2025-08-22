@@ -34,6 +34,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
@@ -92,6 +93,7 @@ public class RespondentTemplateForDQGenerator {
             .furtherInformation(dq.getFurtherInformation())
             .welshLanguageRequirements(getWelshLanguageRequirements(dq))
             .statementOfTruth(dq.getStatementOfTruth())
+            .statementOfTruthText(getStatementOfTruthText())
             .vulnerabilityQuestions(dq.getVulnerabilityQuestions())
             .allocatedTrack(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                                 ? caseData.getAllocatedTrack().name() : caseData.getResponseClaimTrack())
@@ -131,10 +133,23 @@ public class RespondentTemplateForDQGenerator {
             .furtherInformation(dq.getFurtherInformation())
             .welshLanguageRequirements(getWelshLanguageRequirements(dq))
             .statementOfTruth(dq.getStatementOfTruth())
+            .statementOfTruthText(getStatementOfTruthText())
             .vulnerabilityQuestions(dq.getVulnerabilityQuestions())
             .allocatedTrack(getClaimTrack(caseData))
             .requestedCourt(getRequestedCourt(dq, authorisation))
             .build();
+    }
+
+    private String getStatementOfTruthText() {
+        String statementOfTruth = "The defendant believes that the facts stated in the response are true.";
+        statementOfTruth += String.format(
+            "\n\n\nI am duly authorised by the defendant to sign this statement.\n\n"
+                + "The defendant understands that the proceedings for contempt of court "
+                + "may be brought against anyone who makes, or causes to be made, "
+                + "a false statement in a document verified by a statement of truth "
+                + "without an honest belief in its truth."
+        );
+        return statementOfTruth;
     }
 
     private String getOrgNameFromParties(List<Party> parties) {
