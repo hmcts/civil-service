@@ -300,7 +300,10 @@ public class LocationRefSampleDataBuilder {
                 .courtLocationCode("court2").build(),
             LocationRefData.builder()
                 .epimmsId("333").siteName("Site 3").courtAddress("Adr 3").postcode("CCC 333")
-                .courtLocationCode("court3").build()
+                .courtLocationCode("court3").build(),
+            LocationRefData.builder()
+                .epimmsId("00000").siteName("Site 5").courtAddress("Adr 5").postcode("YYY 111")
+                .courtLocationCode("court5").build()
         ));
     }
 
@@ -317,7 +320,10 @@ public class LocationRefSampleDataBuilder {
                 .courtLocationCode("court3").build(),
             LocationRefData.builder()
                 .epimmsId("444").siteName("A Site 3").courtAddress("Adr 3").postcode("AAA 111")
-                .courtLocationCode("court4").build()
+                .courtLocationCode("court4").build(),
+            LocationRefData.builder()
+                .epimmsId("00000").siteName("Site 5").courtAddress("Adr 5").postcode("YYY 111")
+                .courtLocationCode("court5").build()
         ));
     }
 }
