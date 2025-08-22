@@ -21,7 +21,8 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaymentPlan;
 import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.checkIfDateDifferenceIsGreaterThan31Days;
-import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.getCostOfJudgmentForDJ;
+import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.getFixedCostsOfJudgmentForDJ;
+import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.getClaimFeeOfJudgmentForDJ;
 import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.getMoneyValue;
 import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.getPartialPayment;
 import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.isNonDivergentForDJ;
@@ -94,7 +95,8 @@ public class JudgmentsOnlineHelperTest {
             .repaymentSummaryObject(
                 REPAYMENT_SUMMARY_OBJECT)
             .build();
-        assertThat(getCostOfJudgmentForDJ(caseData)).isEqualTo("172.00");
+        assertThat(getFixedCostsOfJudgmentForDJ(caseData).add(getClaimFeeOfJudgmentForDJ(caseData)))
+            .isEqualTo("172.00");
     }
 
     @Test
