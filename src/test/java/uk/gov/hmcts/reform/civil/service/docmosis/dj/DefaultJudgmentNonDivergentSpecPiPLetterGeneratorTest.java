@@ -14,12 +14,15 @@ import uk.gov.hmcts.reform.civil.documentmanagement.SecuredDocumentManagementSer
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DownloadedDocumentResponse;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.judgmentonline.DefaultJudgmentNonDivergentSpecLipDefendantLetter;
@@ -28,6 +31,7 @@ import uk.gov.hmcts.reform.civil.service.BulkPrintService;
 import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
+import uk.gov.hmcts.reform.civil.stitch.service.CivilStitchService;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -37,6 +41,9 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -57,14 +64,14 @@ class DefaultJudgmentNonDivergentSpecPiPLetterGeneratorTest {
     private static final String BEARER_TOKEN = "Bearer Token";
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
     private static final String CLAIM_REFERENCE = "ABC";
-    private static String fileNameTrial = null;
+    private static String fileNameTrial = "PinAndPost.pdf";
     private static final String fileName = String.format(DEFAULT_JUDGMENT_NON_DIVERGENT_SPEC_PIN_LIP_DEFENDANT_LETTER.getDocumentTitle(), CLAIM_REFERENCE);
     private static final String PIN = "1234789";
-    private static final CaseDocument CASE_DOCUMENT_TRIAL = CaseDocumentBuilder.builder()
+    private static final CaseDocument CASE_DOCUMENT_TRIAL = CaseDocument.builder()
         .documentName(fileNameTrial)
-        .documentType(DEFAULT_JUDGMENT_SDO_ORDER)
+        .documentType(DEFAULT_JUDGMENT_NON_DIVERGENT_SPEC_PIN_IN_LETTER)
+        .documentLink(Document.builder().documentFileName(fileName).documentBinaryUrl("Binary/url").documentUrl("url").build())
         .build();
-
     private static final Address RESPONDENT_ADDRESS = Address.builder().addressLine1("123 road")
         .postTown("London")
         .postCode("EX12RT")
@@ -78,6 +85,7 @@ class DefaultJudgmentNonDivergentSpecPiPLetterGeneratorTest {
 
     private static final CaseData CASE_DATA = CaseData.builder()
         .legacyCaseReference(CLAIM_REFERENCE)
+        .ccdCaseReference(12325480L)
         .applicant1(Party.builder()
                         .type(Party.Type.INDIVIDUAL)
                         .individualTitle("Mr.")
@@ -87,9 +95,27 @@ class DefaultJudgmentNonDivergentSpecPiPLetterGeneratorTest {
         .respondent1Represented(YesOrNo.NO)
         .respondent1PinToPostLRspec(DefendantPinToPostLRspec.builder().accessCode(PIN).build())
         .submittedDate(LocalDateTime.now())
+        .defaultJudgmentDocuments(List.of(
+            Element.<CaseDocument>builder()
+                .value(CaseDocument.builder().documentType(DocumentType.DEFAULT_JUDGMENT_DEFENDANT1)
+                .documentName("DefendantDJ.pdf")
+                .documentLink(Document.builder().documentFileName("DefendantDJ.pdf").documentBinaryUrl("Binary/url").documentUrl("url").build())
+                .createdDatetime(LocalDateTime.now()).build()).build()))
         .build();
     private static final byte[] LETTER_CONTENT = new byte[]{37, 80, 68, 70, 45, 49, 46, 53, 10, 37, -61, -92};
     private static final String DEFAULT_JUDGMENT_NON_DIVERGENT_SPEC_PIN_IN_LETTER_REF = "default-judgment-non-divergent-spec-pin_in_letter";
+    private static final CaseDocument STITCHED_DOC =
+        CaseDocument.builder()
+            .createdBy("John")
+            .documentName("Stitched document")
+            .documentSize(0L)
+            .documentType(DEFAULT_JUDGMENT_NON_DIVERGENT_SPEC_PIN_IN_LETTER)
+            .createdDatetime(LocalDateTime.now())
+            .documentLink(Document.builder()
+                              .documentUrl("fake-url")
+                              .documentFileName("file-name")
+                              .documentBinaryUrl("binary-url")
+                              .build()).build();
 
     @MockBean
     private SecuredDocumentManagementService documentManagementService;
@@ -112,6 +138,9 @@ class DefaultJudgmentNonDivergentSpecPiPLetterGeneratorTest {
     @MockBean
     private GeneralAppFeesService generalAppFeesService;
 
+    @MockBean
+    private CivilStitchService civilStitchService;
+
     @BeforeEach
     void setUp() {
         fileNameTrial = LocalDate.now() + "_Judge Dredd" + ".pdf";
@@ -129,6 +158,8 @@ class DefaultJudgmentNonDivergentSpecPiPLetterGeneratorTest {
         when(pipInPostConfiguration.getRespondToClaimUrl()).thenReturn("Response URL");
         when(generalAppFeesService.getFeeForJOWithApplicationType(any())).thenReturn(Fee.builder().calculatedAmountInPence(
             BigDecimal.valueOf(1000)).build());
+        when(civilStitchService.generateStitchedCaseDocument(anyList(), anyString(), anyLong(), eq(DEFAULT_JUDGMENT_NON_DIVERGENT_SPEC_PIN_IN_LETTER),
+                                                             anyString())).thenReturn(STITCHED_DOC);
 
         byte[] letterContentByteData = generator.generateAndPrintDefaultJudgementSpecLetter(CASE_DATA, BEARER_TOKEN);
 
