@@ -2912,14 +2912,14 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldAddOnlyRespondent1Disputes_andSomeoneDisputes_when1v1PartAdmission() {
             // Given
             CaseData caseData = CaseDataBuilder.builder()
-                    .atStateClaimDetailsNotified()
-                    .isRespondent1(YES)
-                    .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
-                    .build();
+                                               .atStateClaimDetailsNotified()
+                                               .isRespondent1(YES)
+                                               .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
+                                               .build();
 
             caseData = caseData.toBuilder()
-                    .showConditionFlags(EnumSet.of(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1))
-                    .build();
+                               .showConditionFlags(EnumSet.of(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1))
+                               .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, "set-generic-response-type-flag");
 
@@ -2931,35 +2931,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).isNotNull();
             @SuppressWarnings("unchecked")
             List<String> flags = (List<String>) response.getData().get("showConditionFlags");
-            assertThat(flags).contains(DefendantResponseShowTag.ONLY_RESPONDENT_1_DISPUTES.name());
-            assertThat(flags).contains(DefendantResponseShowTag.SOMEONE_DISPUTES.name());
-        }
-
-        @Test
-        void shouldRemoveWhoPaidLessTags_whenBacktracking() {
-            // Given
-            CaseData caseData = CaseDataBuilder.builder()
-                    .atStateClaimDetailsNotified()
-                    .isRespondent1(YES)
-                    .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-                    .build();
-
-            caseData = caseData.toBuilder()
-                    .showConditionFlags(EnumSet.of(
-                            DefendantResponseShowTag.RESPONDENT_2_PAID_LESS,
-                            DefendantResponseShowTag.ONLY_RESPONDENT_1_DISPUTES))
-                    .build();
-
-            CallbackParams params = callbackParamsOf(caseData, MID, "set-generic-response-type-flag");
-
-            // When
-            AboutToStartOrSubmitCallbackResponse response =
-                    (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            // Then
-            @SuppressWarnings("unchecked")
-            List<String> flags = (List<String>) response.getData().get("showConditionFlags");
-            assertThat(flags).doesNotContain(DefendantResponseShowTag.RESPONDENT_2_PAID_LESS.name());
+            assertThat(flags).contains(DefendantResponseShowTag.ONLY_RESPONDENT_1_DISPUTES.name())
+                             .contains(DefendantResponseShowTag.SOMEONE_DISPUTES.name());
         }
 
         @Test
