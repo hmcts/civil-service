@@ -48,7 +48,7 @@ public class PostDJNonDivergentPinInLetterLiPDefendant1Handler extends CallbackH
 
     private CallbackResponse postInPINLetterToLiPDefendant1(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (isRespondent1Lip(caseData) && caseData.getRespondent1() != null && caseData.getRespondent1().getPartyEmail() != null) {
+        if (isRespondent1Lip(caseData) && caseData.getRespondent1() != null) {
             djNonDivergentSpecPiPLetterGenerator
                 .generateAndPrintDefaultJudgementSpecLetter(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
         }
