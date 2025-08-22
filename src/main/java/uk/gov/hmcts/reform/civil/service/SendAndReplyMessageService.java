@@ -34,15 +34,13 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 public class SendAndReplyMessageService {
 
     public static final String DATE_TIME_PATTERN = "dd MMM yyyy, hh:mm:ss a";
-    private final FeatureToggleService featureToggleService;
 
     // Order is important here as we only use the first matching role when mapping against a users role assignments.
     // Senior roles should always be before their non-senior counterpart.
-    Map<String, RolePool> buildSupportedRolesMap(CaseData caseData) {
+    Map<String, RolePool> buildSupportedRolesMap() {
         Map<String, RolePool> supportedRolesMap = new LinkedHashMap<>();
-        if (featureToggleService.isPublicQueryManagementEnabled(caseData)) {
-            supportedRolesMap.put("wlu-admin", RolePool.WLU_ADMIN);
-        }
+        supportedRolesMap.put("wlu-team-leader", RolePool.WLU_ADMIN);
+        supportedRolesMap.put("wlu-admin", RolePool.WLU_ADMIN);
         supportedRolesMap.put("ctsc-team-leader", RolePool.ADMIN);
         supportedRolesMap.put("ctsc", RolePool.ADMIN);
         supportedRolesMap.put("hearing-centre-team-leader", RolePool.ADMIN);
@@ -57,11 +55,10 @@ public class SendAndReplyMessageService {
         return supportedRolesMap;
     }
 
-    List<String> buildSupportedRolesList(CaseData caseData) {
+    List<String> buildSupportedRolesList() {
         List<String> supportedRolesList = new ArrayList<>();
-        if (featureToggleService.isPublicQueryManagementEnabled(caseData)) {
-            supportedRolesList.add("wlu-admin");
-        }
+        supportedRolesList.add("wlu-team-leader");
+        supportedRolesList.add("wlu-admin");
         supportedRolesList.add("ctsc-team-leader");
         supportedRolesList.add("ctsc");
         supportedRolesList.add("hearing-centre-team-leader");
@@ -92,11 +89,11 @@ public class SendAndReplyMessageService {
     public List<Element<Message>> addMessage(
         List<Element<Message>> messages,
         SendMessageMetadata messageMetaData,
-        String messageContent, String userAuth, CaseData caseData) {
+        String messageContent, String userAuth) {
         List<Element<Message>> messageList = ofNullable(messages).orElse(new ArrayList<>());
 
         messageList.add(element(
-            createBaseMessageWithSenderDetails(userAuth, caseData)
+            createBaseMessageWithSenderDetails(userAuth)
                 .toBuilder()
                 .updatedTime(time.now())
                 .sentTime(time.now())
@@ -110,11 +107,11 @@ public class SendAndReplyMessageService {
         return messageList;
     }
 
-    public Message createBaseMessageWithSenderDetails(String userAuth, CaseData caseData) {
+    public Message createBaseMessageWithSenderDetails(String userAuth) {
         UserDetails details = userService.getUserDetails(userAuth);
-        RoleAssignmentResponse role = getFirstSupportedRole(userAuth, details.getId(), caseData);
+        RoleAssignmentResponse role = getFirstSupportedRole(userAuth, details.getId());
         String senderName = String.format("%s, %s", details.getFullName(), role.getRoleLabel());
-        Map<String, RolePool> supportRoleMap = buildSupportedRolesMap(caseData);
+        Map<String, RolePool> supportRoleMap = buildSupportedRolesMap();
 
         return Message.builder()
             .senderName(senderName)
@@ -125,7 +122,7 @@ public class SendAndReplyMessageService {
     public List<Element<Message>> addReplyToMessage(List<Element<Message>> messages, String messageId, MessageReply messageReply,
                                                     String userAuth, CaseData caseData) {
         Element<Message> messageToReplace = getMessageById(messages, messageId);
-        Message baseMessageDetails = createBaseMessageWithSenderDetails(userAuth, caseData);
+        Message baseMessageDetails = createBaseMessageWithSenderDetails(userAuth);
 
         //Move current base message to history
         MessageReply messageForHistory = buildReplyOutOfMessage(messageToReplace.getValue());
@@ -143,8 +140,8 @@ public class SendAndReplyMessageService {
         return messages.stream().filter(message -> code.equals(message.getId().toString())).findFirst().orElse(null);
     }
 
-    private RoleAssignmentResponse getFirstSupportedRole(String auth, String userId, CaseData caseData) {
-        List<String> supportedRolesList = buildSupportedRolesList(caseData);
+    private RoleAssignmentResponse getFirstSupportedRole(String auth, String userId) {
+        List<String> supportedRolesList = buildSupportedRolesList();
         var roleAssignments = roleAssignmentsService.getRoleAssignmentsWithLabels(userId, auth, supportedRolesList);
 
         RoleAssignmentResponse roleAssignment = roleAssignments.getRoleAssignmentResponse().stream()

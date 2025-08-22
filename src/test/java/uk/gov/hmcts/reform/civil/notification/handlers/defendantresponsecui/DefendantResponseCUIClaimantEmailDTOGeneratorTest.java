@@ -52,6 +52,18 @@ public class DefendantResponseCUIClaimantEmailDTOGeneratorTest {
     }
 
     @Test
+    void shouldReturnWelshEmailTemplate() {
+        CaseData caseData = CaseData.builder().claimantBilingualLanguagePreference("BOTH").build();
+
+        String expectedTemplateId = "template-id";
+        when(notificationsProperties.getNotifyLiPClaimantDefendantRespondedWelshLip()).thenReturn(expectedTemplateId);
+
+        String actualTemplateId = emailDTOGenerator.getEmailTemplateId(caseData);
+
+        assertThat(actualTemplateId).isEqualTo(expectedTemplateId);
+    }
+
+    @Test
     void shouldReturnCorrectReferenceTemplate() {
         String referenceTemplate = emailDTOGenerator.getReferenceTemplate();
 
