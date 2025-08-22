@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import uk.gov.hmcts.reform.civil.model.search.Query;
+import uk.gov.hmcts.reform.civil.utils.DateUtils;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -14,6 +15,7 @@ import java.util.List;
 
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
+import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 import static org.mockito.Mockito.mockStatic;
 
 @SuppressWarnings("unchecked")
@@ -41,11 +43,17 @@ class CaseHearingDateSearchServiceTest extends ElasticSearchServiceTest {
 
     @Override
     protected Query buildQuery(int fromValue) {
-        String targetDate = LocalDate.of(2023, 07, 24).format(DateTimeFormatter.ISO_DATE);
+        String targetMaxDateString = DateUtils.addDaysSkippingWeekends(
+            LocalDate.now(), 10).format(DateTimeFormatter.ISO_DATE);
+        String targetMinDateString = DateUtils.addDaysSkippingWeekends(
+            LocalDate.now(), 3).format(DateTimeFormatter.ISO_DATE);
         BoolQueryBuilder query = boolQuery()
-            .minimumShouldMatch(1)
-            .should(boolQuery()
-                        .must(matchQuery("data.hearingDate", targetDate)));
+            .mustNot(matchQuery("state", "PREPARE_FOR_HEARING_CONDUCT_HEARING"))
+            .must(boolQuery()
+                      .minimumShouldMatch(1)
+                      .should(rangeQuery("data.hearingDate").lte(targetMaxDateString).gte(
+                          targetMinDateString))
+            );
         return new Query(query, List.of("reference"), fromValue);
     }
 }
