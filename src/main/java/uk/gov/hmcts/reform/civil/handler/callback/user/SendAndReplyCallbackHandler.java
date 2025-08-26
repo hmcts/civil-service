@@ -118,7 +118,7 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
                 caseData.getMessages(),
                 caseData.getSendMessageMetadata(),
                 caseData.getSendMessageContent(),
-                userAuth, caseData
+                userAuth
             );
 
             builder.messages(messagesNew)
