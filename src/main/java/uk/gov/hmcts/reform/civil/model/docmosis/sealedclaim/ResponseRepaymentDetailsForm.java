@@ -151,7 +151,7 @@ public class ResponseRepaymentDetailsForm {
         if (caseData.isPayImmediately()) {
             Optional<LocalDate> whenWillThisAmountBePaid = Optional.ofNullable(caseData.getRespondToClaimAdmitPartLRspec()).map(
                 RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid);
-            whenWillThisAmountBePaid.ifPresent( paymentDate ->
+            whenWillThisAmountBePaid.ifPresent(paymentDate ->
                 addPayByDatePayImmediately(builder, totalAmount, paymentDate)
             );
         } else if (caseData.isPayByInstallment()) {
