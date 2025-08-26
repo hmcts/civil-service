@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
+import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.EventTemplateData;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.EvidenceTemplateData;
@@ -148,7 +149,11 @@ public class ResponseRepaymentDetailsForm {
 
     private static void addRepaymentMethod(CaseData caseData, ResponseRepaymentDetailsFormBuilder builder, BigDecimal totalAmount) {
         if (caseData.isPayImmediately()) {
-            addPayByDatePayImmediately(builder, totalAmount, caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid());
+            Optional<LocalDate> whenWillThisAmountBePaid = Optional.ofNullable(caseData.getRespondToClaimAdmitPartLRspec()).map(
+                RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid);
+            whenWillThisAmountBePaid.ifPresent( paymentDate ->
+                addPayByDatePayImmediately(builder, totalAmount, paymentDate)
+            );
         } else if (caseData.isPayByInstallment()) {
             addRepaymentPlan(caseData, builder, totalAmount);
         } else if (caseData.isPayBySetDate()) {
