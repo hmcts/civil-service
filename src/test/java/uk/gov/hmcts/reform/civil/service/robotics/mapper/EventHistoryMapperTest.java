@@ -9438,7 +9438,7 @@ class EventHistoryMapperTest {
                         assertThat(event.getEventCode()).isEqualTo("240");
                         EventDetails eventDetails = event.getEventDetails();
                         assertThat(eventDetails).isNotNull();
-                        assertThat(eventDetails.getPaymentInFullDate()).isEqualTo(claimantSuggestedDate.atStartOfDay());
+                        assertThat(eventDetails.getPaymentInFullDate()).isNull();
                         assertThat(eventDetails.getAmountOfJudgment()).isEqualByComparingTo(BigDecimal.valueOf(1500));
                         assertThat(eventDetails.getAmountOfCosts()).isEqualByComparingTo(BigDecimal.valueOf(80));
                         assertThat(eventDetails.getAmountPaidBeforeJudgment()).isEqualByComparingTo(BigDecimal.valueOf(0));
@@ -9845,7 +9845,7 @@ class EventHistoryMapperTest {
                         assertThat(event.getEventCode()).isEqualTo("240");
                         EventDetails eventDetails = event.getEventDetails();
                         assertThat(eventDetails).isNotNull();
-                        assertThat(eventDetails.getPaymentInFullDate()).isEqualTo(claimantSuggestedDate.atStartOfDay());
+                        assertThat(eventDetails.getPaymentInFullDate()).isNull();
                         assertThat(eventDetails.getAmountOfJudgment()).isEqualByComparingTo(BigDecimal.valueOf(1500));
                         assertThat(eventDetails.getAmountOfCosts()).isEqualByComparingTo(BigDecimal.valueOf(80));
                         assertThat(eventDetails.getAmountPaidBeforeJudgment()).isEqualByComparingTo(BigDecimal.valueOf(0));
@@ -10375,7 +10375,7 @@ class EventHistoryMapperTest {
                         assertThat(event.getEventCode()).isEqualTo("240");
                         EventDetails eventDetails = event.getEventDetails();
                         assertThat(eventDetails).isNotNull();
-                        assertThat(eventDetails.getPaymentInFullDate()).isEqualTo(claimantSuggestedDate.atStartOfDay());
+                        assertThat(eventDetails.getPaymentInFullDate()).isNull();
                         assertThat(eventDetails.getAmountOfJudgment()).isEqualByComparingTo(BigDecimal.valueOf(1500));
                         assertThat(eventDetails.getAmountOfCosts()).isEqualByComparingTo(BigDecimal.valueOf(80));
                         assertThat(eventDetails.getAmountPaidBeforeJudgment()).isEqualByComparingTo(BigDecimal.valueOf(0));
@@ -10782,7 +10782,7 @@ class EventHistoryMapperTest {
                         assertThat(event.getEventCode()).isEqualTo("240");
                         EventDetails eventDetails = event.getEventDetails();
                         assertThat(eventDetails).isNotNull();
-                        assertThat(eventDetails.getPaymentInFullDate()).isEqualTo(claimantSuggestedDate.atStartOfDay());
+                        assertThat(eventDetails.getPaymentInFullDate()).isNull();
                         assertThat(eventDetails.getAmountOfJudgment()).isEqualByComparingTo(BigDecimal.valueOf(1500));
                         assertThat(eventDetails.getAmountOfCosts()).isEqualByComparingTo(BigDecimal.valueOf(80));
                         assertThat(eventDetails.getAmountPaidBeforeJudgment()).isEqualByComparingTo(BigDecimal.valueOf(0));
@@ -11175,7 +11175,7 @@ class EventHistoryMapperTest {
                         assertThat(event.getEventCode()).isEqualTo("240");
                         EventDetails eventDetails = event.getEventDetails();
                         assertThat(eventDetails).isNotNull();
-                        assertThat(eventDetails.getPaymentInFullDate().toLocalDate()).isEqualTo(now.toLocalDate());
+                        assertThat(eventDetails.getPaymentInFullDate()).isNull();
                         assertThat(eventDetails.getAmountOfJudgment()).isEqualByComparingTo(BigDecimal.valueOf(1500));
                         assertThat(eventDetails.getAmountOfCosts()).isEqualByComparingTo(BigDecimal.valueOf(80));
                         assertThat(eventDetails.getAmountPaidBeforeJudgment()).isEqualByComparingTo(BigDecimal.valueOf(0));

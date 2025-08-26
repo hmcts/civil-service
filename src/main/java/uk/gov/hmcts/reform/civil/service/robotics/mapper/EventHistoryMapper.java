@@ -744,14 +744,11 @@ public class EventHistoryMapper {
             if (caseData.applicant1SuggestedPayBySetDate()) {
                 return Optional.ofNullable(caseData.getApplicant1RequestedPaymentDateForDefendantSpec())
                     .map(PaymentBySetDate::getPaymentSetDate).map(LocalDate::atStartOfDay).orElse(null);
-            } else if (caseData.applicant1SuggestedPayImmediately()) {
-                return Optional.ofNullable(caseData.getApplicant1SuggestPayImmediatelyPaymentDateForDefendantSpec())
-                    .map(LocalDate::atStartOfDay).orElse(null);
             } else {
                 return null;
             }
         }
-        return caseData.isPayBySetDate() || caseData.isPayImmediately()
+        return caseData.isPayBySetDate()
             ? Optional.ofNullable(respondToClaimAdmitPartLRspec)
             .map(RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid)
             .map(LocalDate::atStartOfDay).orElse(null)
