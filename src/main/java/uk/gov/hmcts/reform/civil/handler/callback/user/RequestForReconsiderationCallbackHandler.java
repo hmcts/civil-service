@@ -90,7 +90,7 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
         } else if (caseData.isLipCase() && caseData.getEaCourtLocation() == YES
             && caseData.getIsReferToJudgeClaim() == YesOrNo.YES) {
             errors.add(ERROR_MESSAGE_EVENT_NOT_ALLOWED);
-        }else {
+        } else {
             Optional<Element<CaseDocument>> sdoDocLatest = callbackParams.getCaseData().getSystemGeneratedCaseDocuments()
                 .stream().filter(caseDocumentElement -> caseDocumentElement.getValue().getDocumentType()
                     .equals(DocumentType.SDO_ORDER))
