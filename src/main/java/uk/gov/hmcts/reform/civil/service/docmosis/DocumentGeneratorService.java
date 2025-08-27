@@ -25,6 +25,7 @@ public class DocumentGeneratorService {
     private final ObjectMapper mapper;
 
     public DocmosisDocument generateDocmosisDocument(MappableObject templateData, DocmosisTemplates template) {
+        log.info("templateData->{}", templateData.toMap(mapper).toString());
         return generateDocmosisDocument(templateData.toMap(mapper), template, "pdf");
     }
 
