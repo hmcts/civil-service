@@ -9,6 +9,8 @@ import org.camunda.bpm.engine.variable.Variables;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
@@ -17,6 +19,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -91,9 +94,15 @@ public class CoscApplicationAfterPaymentTaskHandlerTest {
                                                                     .build());
     }
 
-    @Test
-    void testStartTheEvent() {
+    @ParameterizedTest
+    @CsvSource(value = {
+        "NULL, true",
+        "YES, true",
+        "NO, false"
+    }, nullValues = "NULL")
+    void testStartTheEvent(YesOrNo applicant1Represented, boolean applicantRepresented) {
         CaseData caseData = CaseData.builder()
+            .applicant1Represented(applicant1Represented)
             .contactDetailsUpdatedEvent(
                 ContactDetailsUpdatedEvent.builder()
                     .description("Best description")
@@ -124,7 +133,7 @@ public class CoscApplicationAfterPaymentTaskHandlerTest {
         handler.execute(mockExternalTask, externalTaskService);
 
         variables.putValue(JUDGMENT_MARK_PAID_FULL, false);
-        variables.putValue(IS_CLAIMANT_LR, false);
+        variables.putValue(IS_CLAIMANT_LR, applicantRepresented);
         verify(coreCaseDataService).startUpdate(CIVIL_CASE_ID, CHECK_PAID_IN_FULL_SCHED_DEADLINE);
         verify(coreCaseDataService).submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class));
         verify(externalTaskService).complete(mockExternalTask, variables);
