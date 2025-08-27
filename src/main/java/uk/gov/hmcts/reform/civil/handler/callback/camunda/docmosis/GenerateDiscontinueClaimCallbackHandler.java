@@ -83,7 +83,7 @@ public class GenerateDiscontinueClaimCallbackHandler extends CallbackHandler {
 
     private void buildDocuments(CallbackParams callbackParams, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
         CaseData caseData = callbackParams.getCaseData();
-        boolean isRespondentLiP;
+        boolean isRespondentLiP = false;
         Optional<Organisation> applicantLegalOrganisation = getLegalOrganization(caseData.getApplicant1OrganisationPolicy()
                                                                                      .getOrganisation().getOrganisationID());
         String appSolOrgName = getLegalName(applicantLegalOrganisation,
