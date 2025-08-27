@@ -15,10 +15,6 @@ management:
   health:
     case-document-am-api:
       enabled: true
-logging:
-  level:
-    org.flywaydb: DEBUG
-    org.springframework.boot.autoconfigure.flyway: DEBUG
 spring:
   config:
     import: "optional:configtree:/mnt/secrets/civil/"
