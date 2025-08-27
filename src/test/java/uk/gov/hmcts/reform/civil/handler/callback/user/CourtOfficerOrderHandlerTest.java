@@ -274,6 +274,25 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldAddADocumentInCollectionWhenWelshFTisOn_onAboutToSubmit() {
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
+            // Given
+            caseData = caseData.toBuilder()
+                .previewCourtOfficerOrder(courtOfficerOrder)
+                .courtOfficersOrders(new ArrayList<>())
+                .claimantBilingualLanguagePreference("ENGLISH")
+                .build();
+            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
+            // Then
+            assertThat(updatedData.getCourtOfficersOrders()).hasSize(1);
+            assertThat(updatedData.getPreviewCourtOfficerOrder()).isNull();
+            assertThat(updatedData.getCurrentCamundaBusinessProcessName()).isEqualTo("COURT_OFFICER_ORDER");
+        }
+
+        @Test
         void shouldNotHideDocumentIfWelshDisabled_onAboutToSubmit() {
             when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
             // Given
