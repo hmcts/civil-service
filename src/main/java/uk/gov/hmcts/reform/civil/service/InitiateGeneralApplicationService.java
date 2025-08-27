@@ -354,8 +354,12 @@ public class InitiateGeneralApplicationService {
     }
 
     private void setBusinessProcess(CaseData caseData, UserDetails userDetails, GeneralApplication.GeneralApplicationBuilder applicationBuilder) {
-        int numberOfDeadlineDays = 5;
-        LocalDateTime deadline = deadlinesCalculator.calculateApplicantResponseDeadline(LocalDateTime.now(), numberOfDeadlineDays);
+        LocalDateTime deadline = null;
+        if (!(featureToggleService.isGaForWelshEnabled()
+            && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual()))) {
+            int numberOfDeadlineDays = 5;
+            deadline = deadlinesCalculator.calculateApplicantResponseDeadline(LocalDateTime.now(), numberOfDeadlineDays);
+        }
         applicationBuilder
             .businessProcess(BusinessProcess.ready(INITIATE_GENERAL_APPLICATION))
             .generalAppType(caseData.getGeneralAppType())
