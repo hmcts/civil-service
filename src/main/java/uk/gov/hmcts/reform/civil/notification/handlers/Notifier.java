@@ -10,9 +10,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static java.lang.String.*;
 import static java.lang.String.format;
-import static java.util.stream.Collectors.*;
+import static java.lang.String.join;
+import static java.util.stream.Collectors.joining;
 
 @Slf4j
 public abstract class Notifier extends BaseNotifier {
@@ -24,11 +24,16 @@ public abstract class Notifier extends BaseNotifier {
                        PartiesEmailGenerator partiesNotifier) {
         super(notificationService);
         this.caseTaskTrackingService = caseTaskTrackingService;
-        this.partiesNotifier = partiesNotifier;
+        this.partiesNotifier         = partiesNotifier;
     }
 
     public String notifyParties(CaseData caseData, String eventId, String taskId) {
-        log.info("Notifying parties for case ID: {} and eventId: {} and taskId: {} ", caseData.getCcdCaseReference(), eventId, taskId);
+        log.info(
+            "Notifying parties for case ID: {} and eventId: {} and taskId: {} ",
+            caseData.getCcdCaseReference(),
+            eventId,
+            taskId
+        );
         final Set<EmailDTO> partiesToEmail = partiesNotifier.getPartiesToNotify(caseData, taskId);
         final List<String> errors = sendNotification(partiesToEmail);
         if (!errors.isEmpty()) {
@@ -38,8 +43,9 @@ public abstract class Notifier extends BaseNotifier {
         }
 
         String attempted = partiesToEmail.stream()
-            .map(p -> p.getTargetEmail() + " : " + p.getReference() + " : " + p.getEmailTemplate())
-            .collect(joining(" | "));
+                                         .map(p -> p.getTargetEmail() + " : " + p.getReference() + " : "
+                                                   + p.getEmailTemplate())
+                                         .collect(joining(" | "));
 
         return format("Attempted: %s || Errors: %s", attempted, join(" | ", errors));
     }
