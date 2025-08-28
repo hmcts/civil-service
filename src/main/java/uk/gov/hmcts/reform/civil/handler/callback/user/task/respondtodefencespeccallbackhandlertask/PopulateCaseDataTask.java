@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.CaseTask;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
+import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
@@ -23,6 +24,7 @@ import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,8 +33,10 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_2;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_ADMISSION;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.service.PaymentDateService.DART_FORMATTER;
 
 @Component
 @RequiredArgsConstructor
@@ -58,6 +62,13 @@ public class PopulateCaseDataTask implements CaseTask {
             String whenBePaid = paymentDateService.getFormattedPaymentDate(caseData);
             updatedCaseData.showResponseOneVOneFlag(responseOneVOneShowTagService.setUpOneVOneFlow(caseData));
             updatedCaseData.whenToBePaidText(whenBePaid);
+        }
+
+        if (isDefendantPartAdmitPayImmediatelyAccepted(caseData)) {
+            LocalDate whenBePaid = paymentDateService.calculatePaymentDeadline();
+            updatedCaseData.whenToBePaidText(whenBePaid.format(DART_FORMATTER));
+            updatedCaseData.respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
+                                                      .whenWillThisAmountBePaid(whenBePaid).build());
         }
 
         updatedCaseData.respondent1Copy(caseData.getRespondent1())
@@ -96,6 +107,13 @@ public class PopulateCaseDataTask implements CaseTask {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.build().toMap(objectMapper))
             .build();
+    }
+
+    private boolean isDefendantPartAdmitPayImmediatelyAccepted(CaseData caseData) {
+        return caseData.getDefenceAdmitPartPaymentTimeRouteRequired() != null
+            && IMMEDIATELY.equals(caseData.getDefenceAdmitPartPaymentTimeRouteRequired())
+            && (PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec()))
+            && caseData.hasApplicantAcceptedRepaymentPlan();
     }
 
     private boolean isDefendantFullAdmitPayImmediately(CaseData caseData) {
