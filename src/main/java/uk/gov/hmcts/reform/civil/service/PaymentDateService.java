@@ -21,7 +21,7 @@ public class PaymentDateService {
 
     private static final String DATE_PATTERN = "dd MMMM yyyy";
     private final DeadlineExtensionCalculatorService deadlineCalculatorService;
-    public static final DateTimeFormatter DART_FORMATTER = DateTimeFormatter.ofPattern(DATE_PATTERN, Locale.ENGLISH);
+    public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern(DATE_PATTERN, Locale.ENGLISH);
 
     public String getFormattedPaymentDate(CaseData caseData) {
         return this.getPaymentDate(caseData).map(this::formatDate).orElse(null);
@@ -54,6 +54,6 @@ public class PaymentDateService {
     }
 
     public String formatDate(LocalDate date) {
-        return Optional.ofNullable(date).map(localDate -> localDate.format(DART_FORMATTER)).orElse(null);
+        return Optional.ofNullable(date).map(localDate -> localDate.format(DATE_FORMATTER)).orElse(null);
     }
 }

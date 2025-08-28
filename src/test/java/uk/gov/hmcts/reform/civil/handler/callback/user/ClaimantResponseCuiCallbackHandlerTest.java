@@ -82,7 +82,7 @@ import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPay
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.dq.HearingLength.ONE_DAY;
-import static uk.gov.hmcts.reform.civil.service.PaymentDateService.DART_FORMATTER;
+import static uk.gov.hmcts.reform.civil.service.PaymentDateService.DATE_FORMATTER;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @ExtendWith(MockitoExtension.class)
@@ -703,7 +703,7 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedCaseData = getCaseData(response);
-            assertThat(updatedCaseData.getWhenToBePaidText()).isEqualTo(paymentDeadline.format(DART_FORMATTER));
+            assertThat(updatedCaseData.getWhenToBePaidText()).isEqualTo(paymentDeadline.format(DATE_FORMATTER));
         }
     }
 
