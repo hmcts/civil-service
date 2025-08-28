@@ -35,8 +35,6 @@ public class NoticeOfDiscontinuanceFormGenerator implements TemplateDataGenerato
 
     public CaseDocument generateDocs(CaseData caseData, String partyName, Address address, String partyType, String authorisation, boolean isRespondentLiP) {
         boolean isQMEnabled = featureToggleService.isPublicQueryManagementEnabled(caseData);
-        log.info("isQMEnabled->{}", isQMEnabled);
-        log.info("isRespondentLiP->{}", isRespondentLiP);
         NoticeOfDiscontinuanceForm templateData = getNoticeOfDiscontinueData(caseData, partyName, address, isQMEnabled, isRespondentLiP);
         DocmosisTemplates docmosisTemplate = isBilingual(caseData) ? NOTICE_OF_DISCONTINUANCE_BILINGUAL_PDF : NOTICE_OF_DISCONTINUANCE_PDF;
         DocmosisDocument docmosisDocument =
