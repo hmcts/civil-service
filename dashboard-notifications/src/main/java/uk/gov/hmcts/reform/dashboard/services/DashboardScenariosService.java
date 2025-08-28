@@ -1,10 +1,9 @@
 package uk.gov.hmcts.reform.dashboard.services;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeParseException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.StringSubstitutor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.entities.DashboardNotificationsEntity;
 import uk.gov.hmcts.reform.dashboard.entities.NotificationTemplateEntity;
@@ -15,8 +14,9 @@ import uk.gov.hmcts.reform.dashboard.repositories.NotificationTemplateRepository
 import uk.gov.hmcts.reform.dashboard.repositories.ScenarioRepository;
 import uk.gov.hmcts.reform.dashboard.repositories.TaskItemTemplateRepository;
 
-import javax.transaction.Transactional;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -76,7 +76,7 @@ public class DashboardScenariosService {
             // build notification eng and wales
             //Supported templates "The ${animal} jumped over the ${target}."
             // "The number is ${undefined.property:-42}."
-            List<String> keys =  Arrays.asList(requestParamsKeys);
+            List<String> keys = Arrays.asList(requestParamsKeys);
             notificationTemplate.ifPresent(template -> {
                 Map<String, Object> templateParams = scenarioRequestParams.getParams().entrySet().stream()
                     .filter(e -> !keys.isEmpty() && keys.contains(e.getKey()))
@@ -86,8 +86,8 @@ public class DashboardScenariosService {
 
                 String notificationDeadlineValue = template.getDeadlineParam() != null
                     ? Optional.ofNullable(
-                        scenarioRequestParams.getParams().get(template.getDeadlineParam())
-                    ).map(Object::toString).orElse(null)
+                    scenarioRequestParams.getParams().get(template.getDeadlineParam())
+                ).map(Object::toString).orElse(null)
                     : null;
                 LocalDateTime notificationDeadline = Optional.ofNullable(notificationDeadlineValue)
                     .map(value -> {
