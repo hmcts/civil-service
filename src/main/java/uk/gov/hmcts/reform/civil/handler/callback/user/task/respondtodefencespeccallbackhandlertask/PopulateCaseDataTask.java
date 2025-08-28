@@ -36,7 +36,7 @@ import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_AD
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.service.PaymentDateService.DART_FORMATTER;
+import static uk.gov.hmcts.reform.civil.service.PaymentDateService.DATE_FORMATTER;
 
 @Component
 @RequiredArgsConstructor
@@ -66,7 +66,7 @@ public class PopulateCaseDataTask implements CaseTask {
 
         if (isDefendantPartAdmitPayImmediatelyAccepted(caseData)) {
             LocalDate whenBePaid = paymentDateService.calculatePaymentDeadline();
-            updatedCaseData.whenToBePaidText(whenBePaid.format(DART_FORMATTER));
+            updatedCaseData.whenToBePaidText(whenBePaid.format(DATE_FORMATTER));
             updatedCaseData.respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
                                                       .whenWillThisAmountBePaid(whenBePaid).build());
         }

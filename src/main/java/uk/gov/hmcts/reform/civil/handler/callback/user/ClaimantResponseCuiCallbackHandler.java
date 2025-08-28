@@ -51,7 +51,7 @@ import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPay
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.service.PaymentDateService.DART_FORMATTER;
+import static uk.gov.hmcts.reform.civil.service.PaymentDateService.DATE_FORMATTER;
 import static uk.gov.hmcts.reform.civil.utils.ExpertUtils.addEventAndDateAddedToApplicantExperts;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateDQPartyIds;
 import static uk.gov.hmcts.reform.civil.utils.WitnessUtils.addEventAndDateAddedToApplicantWitnesses;
@@ -138,7 +138,7 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
 
         if (isDefendantPartAdmitPayImmediatelyAccepted(caseData)) {
             LocalDate whenBePaid = paymentDateService.calculatePaymentDeadline();
-            builder.whenToBePaidText(whenBePaid.format(DART_FORMATTER));
+            builder.whenToBePaidText(whenBePaid.format(DATE_FORMATTER));
             builder.respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
                                                       .whenWillThisAmountBePaid(whenBePaid).build());
         }
