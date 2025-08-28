@@ -108,7 +108,7 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
 
     private boolean isDefendantPartAdmitPayImmediatelyAccepted(CaseData caseData) {
         return caseData.getDefenceAdmitPartPaymentTimeRouteRequired() != null
-            && caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == IMMEDIATELY
+            && IMMEDIATELY.equals(caseData.getDefenceAdmitPartPaymentTimeRouteRequired())
             && (PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec()))
             && caseData.hasApplicantAcceptedRepaymentPlan();
     }
