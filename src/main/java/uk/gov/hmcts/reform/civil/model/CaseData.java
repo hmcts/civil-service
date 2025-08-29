@@ -170,6 +170,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     private final List<Element<GeneralApplicationsDetails>> claimantGaAppDetails;
     private final List<Element<GeneralApplicationsDetails>> gaDetailsMasterCollection;
+    private final List<Element<GeneralApplicationsDetails>> gaDetailsTranslationCollection;
     private final List<Element<GADetailsRespondentSol>> respondentSolGaAppDetails;
     private final List<Element<GADetailsRespondentSol>> respondentSolTwoGaAppDetails;
     private final SolicitorReferences solicitorReferences;
@@ -673,7 +674,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public boolean isRespondent1LiP() {
-        return YesOrNo.NO == getRespondent1Represented();
+        return YesOrNo.NO.equals(getRespondent1Represented());
     }
 
     @JsonIgnore
