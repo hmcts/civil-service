@@ -175,8 +175,10 @@ public class OrderMadeDefendantNotificationHandler extends OrderCallbackHandler 
             caseData.getCcdCaseReference().toString(),
             "DEFENDANT"
         );
-        if ((getFeatureToggleService().isGaForLipsEnabledAndLocationWhiteListed(caseData
-                                                                            .getCaseManagementLocation().getBaseLocation()))) {
+        if (getFeatureToggleService().isGaForLipsEnabledAndLocationWhiteListed(caseData
+                                                                                   .getCaseManagementLocation()
+                                                                                   .getBaseLocation()) ||
+            getFeatureToggleService().isCuiGaNroEnabled()) {
             taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(
                 caseData.getCcdCaseReference().toString(),
                 "DEFENDANT",

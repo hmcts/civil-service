@@ -60,9 +60,11 @@ public class ClaimSettledDashboardNotificationHandler extends DashboardCallbackH
         final String caseId = String.valueOf(caseData.getCcdCaseReference());
         boolean isLrQmEnabled = featureToggleService.isQueryManagementLRsEnabled();
 
-        if (!isLrQmEnabled) {
+        if (!isLrQmEnabled && !featureToggleService.isCuiGaNroEnabled()) {
             inactiveGAItems(caseId);
-        } else if (!featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation())) {
+        } else if (!featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation()
+                                                                                      .getBaseLocation()) &&
+            !featureToggleService.isCuiGaNroEnabled()) {
             inactiveGAItems(caseId);
         }
     }
