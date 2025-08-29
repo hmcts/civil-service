@@ -5,19 +5,30 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @ExtendWith(MockitoExtension.class)
 class CaseTakenOfflineAppLipSolOne1EmailDTOGeneratorTest {
@@ -69,6 +80,36 @@ class CaseTakenOfflineAppLipSolOne1EmailDTOGeneratorTest {
             String templateId = generator.getEmailTemplateId(data);
             assertThat(templateId).isEqualTo("no-response-id");
         }
+    }
+
+    @Test
+    void shouldReturnCorrectReferenceTemplate() {
+        assertThat(generator.getReferenceTemplate())
+            .isEqualTo(CASE_TAKEN_OFFLINE_APPLICANT_NOTIFICATION);
+    }
+
+    @Test
+    void shouldAddCustomProperties() {
+        Party party = Party.builder().build();
+        String caseReference = "1111";
+        CaseData caseData = CaseData.builder()
+            .legacyCaseReference(caseReference)
+            .applicant1(party)
+            .build();
+
+        String allPartyNames = "all party names";
+        String applicantName = "applicantName";
+        MockedStatic<PartyUtils> partyUtilsMockedStatic = Mockito.mockStatic(PartyUtils.class);
+        partyUtilsMockedStatic.when(() -> getAllPartyNames(any())).thenReturn(allPartyNames);
+        partyUtilsMockedStatic.when(() -> getPartyNameBasedOnType(party, false)).thenReturn(applicantName);
+
+        Map<String, String> properties = new HashMap<>();
+        Map<String, String> updatedProperties = generator.addCustomProperties(properties, caseData);
+
+        assertThat(updatedProperties.size()).isEqualTo(3);
+        assertThat(updatedProperties).containsEntry(CLAIM_REFERENCE_NUMBER, caseReference);
+        assertThat(updatedProperties).containsEntry(CLAIMANT_NAME, applicantName);
+        assertThat(updatedProperties).containsEntry(CLAIMANT_V_DEFENDANT, allPartyNames);
     }
 
 }
