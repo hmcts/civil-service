@@ -299,6 +299,7 @@ class AboutToSubmitRespondToDefenceTaskTest {
     @Test
     void shouldSetRespondOptionWhenImmediatePartPaymentPlanSelected_ApplicantConfirmsNotToProceed1v1() {
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+        when(paymentDateService.calculatePaymentDeadline()).thenReturn(LocalDate.now().plusDays(5));
 
         CaseData caseData = CaseDataBuilder.builder()
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
