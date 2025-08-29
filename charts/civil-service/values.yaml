@@ -92,7 +92,8 @@ java:
     CCD_EVENTS_SUBSCRIPTION_NAME: "civil-ccd-case-events-sub-{{ .Values.global.environment }}"
     CCD_EVENTS_TOPIC_NAME: "ccd-case-events-{{ .Values.global.environment }}"
     WAIT_TIME_IN_MILLISECONDS: 3000
-
+    TASK_MANAGEMENT_ENABLED: true
+    TASK_MANAGEMENT_API_URL: http://wa-task-management-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
   keyVaults:
     civil:
       resourceGroup: civil

@@ -8,6 +8,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -17,6 +18,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sendandreply.RolePool;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimValue;
+import uk.gov.hmcts.reform.civil.model.callback.TaskCompletionSubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -25,16 +27,22 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.sendandreply.Message;
 import uk.gov.hmcts.reform.civil.model.sendandreply.MessageReply;
 import uk.gov.hmcts.reform.civil.model.sendandreply.SendMessageMetadata;
+import uk.gov.hmcts.reform.civil.model.taskmanagement.ClientContext;
+import uk.gov.hmcts.reform.civil.model.taskmanagement.Task;
+import uk.gov.hmcts.reform.civil.model.taskmanagement.UserTask;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
-import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SendAndReplyMessageService;
+import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.civil.service.taskmanagement.WaTaskManagementService;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -49,13 +57,27 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
+@SuppressWarnings("unchecked")
 @ExtendWith(MockitoExtension.class)
 class SendAndReplyCallbackHandlerTest {
 
     private static final String AUTH_TOKEN = "BEARER_TOKEN";
+    private static final Long CASE_ID = 1L;
+    private static final String TASK_ID = "task-id";
+    private static final String USER_ID = "user-id";
 
     @Mock
     SendAndReplyMessageService messageService;
+
+    @Mock
+    WaTaskManagementService taskManagementService;
+
+    @Mock
+    UserService userService;
+
+    @Mock
+    AuthTokenGenerator authTokenGenerator;
+
     @InjectMocks
     private SendAndReplyCallbackHandler handler;
     @Mock
@@ -63,7 +85,7 @@ class SendAndReplyCallbackHandlerTest {
 
     @BeforeEach
     void  setup() {
-        handler = new SendAndReplyCallbackHandler(messageService, new ObjectMapper(), featureToggleService);
+        handler = new SendAndReplyCallbackHandler(messageService, new ObjectMapper(), userService, featureToggleService, taskManagementService);
     }
 
     @Test
@@ -595,9 +617,10 @@ class SendAndReplyCallbackHandlerTest {
     class Submitted {
 
         @Test
-        void shouldReturnExpectedSubmittedCallbackResponse_whenInvokedWithLiftStayForSendingMessage() {
+        void shouldReturnExpectedSubmittedCallbackResponse_whenInvokedWithSendOption() {
 
-            CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+            CaseData caseData = CaseData.builder()
+                .ccdCaseReference(CASE_ID)
                 .sendAndReplyOption(SEND).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
@@ -612,10 +635,12 @@ class SendAndReplyCallbackHandlerTest {
         }
 
         @Test
-        void shouldReturnExpectedSubmittedCallbackResponse_whenInvokedWithLiftStayForReplyingToMessage() {
-
-            CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        void shouldReturnExpectedSubmittedCallbackResponse_whenInvokedWithReplyOption_andNoTaskToComplete() {
+            when(taskManagementService.getTaskToComplete(any(), any(), any())).thenReturn(null);
+            CaseData caseData = CaseData.builder()
+                .ccdCaseReference(CASE_ID)
                 .sendAndReplyOption(REPLY).build();
+
             CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
@@ -625,6 +650,75 @@ class SendAndReplyCallbackHandlerTest {
                         "# Reply sent")
                     .confirmationBody(
                         "<br /><h2 class=\"govuk-heading-m\">What happens next</h2><br />A task has been created to review your reply.")
+                    .build());
+        }
+
+        @Test
+        void shouldReturnExpectedSubmittedCallbackResponse_whenInvokedWithReplyOption_andTaskToCompleteIsUnassigned() {
+            Task task = Task.builder()
+                .id(TASK_ID)
+                .assignee(USER_ID)
+                .taskTitle("My Task")
+                .taskState("unassigned")
+                .build();
+
+            when(userService.getUserDetails(AUTH_TOKEN)).thenReturn(UserDetails.builder().id(USER_ID).build());
+            when(taskManagementService.getTaskToComplete(eq(CASE_ID.toString()), eq(AUTH_TOKEN), any())).thenReturn(task);
+
+            CaseData caseData = CaseData.builder()
+                .ccdCaseReference(CASE_ID)
+                .sendAndReplyOption(REPLY).build();
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
+            TaskCompletionSubmittedCallbackResponse response = (TaskCompletionSubmittedCallbackResponse) handler.handle(params);
+
+            assertThat(response).usingRecursiveComparison().isEqualTo(
+                TaskCompletionSubmittedCallbackResponse.builder()
+                    .confirmationHeader(
+                        "# Reply sent")
+                    .confirmationBody(
+                        "<br /><h2 class=\"govuk-heading-m\">What happens next</h2><br />A task has been created to review your reply.")
+                    .clientContext(ClientContext.builder().userTask(
+                                           UserTask.builder()
+                                               .completeTask(true)
+                                               .taskData(task)
+                                               .build())
+                                       .build())
+                    .build());
+
+            verify(taskManagementService).claimTask(AUTH_TOKEN, TASK_ID);
+        }
+
+        @Test
+        void shouldReturnExpectedSubmittedCallbackResponse_whenInvokedWithReplyOption_andTaskToCompleteIsAssigned() {
+            Task task = Task.builder()
+                .id(TASK_ID)
+                .assignee(USER_ID)
+                .taskTitle("My Task")
+                .taskState("assigned")
+                .build();
+
+            when(taskManagementService.getTaskToComplete(any(), any(), any())).thenReturn(task);
+
+            CaseData caseData = CaseData.builder()
+                .ccdCaseReference(CASE_ID)
+                .sendAndReplyOption(REPLY).build();
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
+            TaskCompletionSubmittedCallbackResponse response = (TaskCompletionSubmittedCallbackResponse) handler.handle(params);
+
+            assertThat(response).usingRecursiveComparison().isEqualTo(
+                TaskCompletionSubmittedCallbackResponse.builder()
+                    .confirmationHeader(
+                        "# Reply sent")
+                    .confirmationBody(
+                        "<br /><h2 class=\"govuk-heading-m\">What happens next</h2><br />A task has been created to review your reply.")
+                    .clientContext(ClientContext.builder().userTask(
+                            UserTask.builder()
+                                .completeTask(true)
+                                .taskData(task)
+                                .build())
+                                       .build())
                     .build());
         }
     }
