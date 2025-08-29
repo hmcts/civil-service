@@ -140,7 +140,9 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
                 && caseData.isClaimantBilingual() && !featureToggleService.isGaForWelshEnabled()) {
                 errors.add(LR_VS_LIP);
             } else if (!(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(caseData
-                                                              .getCaseManagementLocation().getBaseLocation()))) {
+                                                                                                                                                                                                                                                                                                           .getCaseManagementLocation()
+                                                                                                                                                                                                                                                                                                           .getBaseLocation())) &&
+                !(featureToggleService.isCuiGaNroEnabled())) {
                 errors.add(NOT_IN_EA_REGION);
             } else {
                 /*

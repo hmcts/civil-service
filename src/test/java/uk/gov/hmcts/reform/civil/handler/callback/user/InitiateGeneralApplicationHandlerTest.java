@@ -372,6 +372,29 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Test
+    void shouldThrowError_whenLRVsLiPCourtIsNotWhitelistedForNroNotEnabled() {
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimIssued1v1LiP()
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                        .baseLocation("45678")
+                                        .region("4").build())
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
+        given(initiateGeneralAppService.caseContainsLiP(any())).willReturn(true);
+        given(featureToggleService.isGaForLipsEnabled()).willReturn(true);
+        given(featureToggleService.isCuiGaNroEnabled()).willReturn(false);
+        given(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).willReturn(false);
+        given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        assertThat(response.getErrors()).isNotNull();
+    }
+
+    @Test
     void shouldThrowError_whenLRVsLiPAndLipsNotEnabled() {
 
         CaseData caseData = CaseDataBuilder.builder()
@@ -433,6 +456,33 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         given(featureToggleService.isGaForLipsEnabled()).willReturn(true);
         given(featureToggleService.isGaForWelshEnabled()).willReturn(true);
         given(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).willReturn(true);
+        given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        assertThat(response.getErrors()).isEmpty();
+    }
+
+    @Test
+    void shouldNotThrowError_whenLRVsLiPAndLiPIsBilingualGaForWelshEnabledForNro() {
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimIssued1v1LiP()
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+            .defendantUserDetails(IdamUserDetails.builder().email("abc@defendant").build())
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                        .baseLocation("45678")
+                                        .region("4").build())
+            .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(
+                RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH").build()).build())
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
+        given(initiateGeneralAppService.caseContainsLiP(any())).willReturn(true);
+        given(featureToggleService.isGaForLipsEnabled()).willReturn(true);
+        given(featureToggleService.isGaForWelshEnabled()).willReturn(true);
+        given(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).willReturn(false);
+        given(featureToggleService.isCuiGaNroEnabled()).willReturn(true);
         given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
