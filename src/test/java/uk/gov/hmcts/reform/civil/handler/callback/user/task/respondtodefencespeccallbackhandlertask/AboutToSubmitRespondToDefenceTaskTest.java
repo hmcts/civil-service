@@ -32,6 +32,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.DocumentBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.PaymentDateService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.camunda.UpdateWaCourtLocationsService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
@@ -108,6 +109,9 @@ class AboutToSubmitRespondToDefenceTaskTest {
     @Mock
     private RequestedCourtForClaimDetailsTab requestedCourtForClaimDetailsTab;
 
+    @Mock
+    private PaymentDateService paymentDateService;
+
     private final LocalDateTime localDateTime = now();
 
     private ObjectMapper objectMapper;
@@ -123,7 +127,8 @@ class AboutToSubmitRespondToDefenceTaskTest {
                                                      caseDetailsConverter, frcDocumentsUtils,
                                                      dqResponseDocumentUtils, determineNextState,
                                                      Optional.of(updateWaCourtLocationsService),
-                                                     requestedCourtForClaimDetailsTab
+                                                     requestedCourtForClaimDetailsTab,
+                                                     paymentDateService
         );
 
         Address address = Address.builder()
@@ -253,7 +258,8 @@ class AboutToSubmitRespondToDefenceTaskTest {
                                                      caseDetailsConverter, frcDocumentsUtils,
                                                      dqResponseDocumentUtils, determineNextState,
                                                      Optional.empty(),
-                                                     requestedCourtForClaimDetailsTab
+                                                     requestedCourtForClaimDetailsTab,
+                                                     paymentDateService
         );
 
         CaseData caseData = CaseDataBuilder.builder()

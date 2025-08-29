@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
@@ -24,6 +25,7 @@ import uk.gov.hmcts.reform.civil.model.dq.Experts;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.PaymentDateService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.camunda.UpdateWaCourtLocationsService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
@@ -47,9 +49,12 @@ import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.dq.Expert.fromSmallClaimExpertDetails;
+import static uk.gov.hmcts.reform.civil.service.PaymentDateService.DATE_FORMATTER;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ExpertUtils.addEventAndDateAddedToApplicantExperts;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateDQPartyIds;
@@ -75,6 +80,7 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
     private final DetermineNextState determineNextState;
     private final Optional<UpdateWaCourtLocationsService> updateWaCourtLocationsService;
     private final RequestedCourtForClaimDetailsTab requestedCourtForClaimDetailsTab;
+    private final PaymentDateService paymentDateService;
     @Value("${court-location.specified-claim.epimms-id}") String cnbcEpimsId;
     @Value("${court-location.specified-claim.region-id}") String cnbcRegionId;
 
@@ -129,6 +135,12 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
         requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabApplicantSpec(callbackParams, builder);
         builder.nextDeadline(null);
         builder.previousCCDState(caseData.getCcdState());
+        if (isDefendantPartAdmitPayImmediatelyAccepted(caseData)) {
+            LocalDate whenBePaid = paymentDateService.calculatePaymentDeadline();
+            builder.whenToBePaidText(whenBePaid.format(DATE_FORMATTER));
+            builder.respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
+                                                              .whenWillThisAmountBePaid(whenBePaid).build());
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(builder.build().toMap(objectMapper))
@@ -147,6 +159,13 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
             builder.claimMovedToMediationOn(LocalDate.now());
             log.info("Moved Claim to mediation for Case : {}", caseData.getCcdCaseReference());
         }
+    }
+
+    private boolean isDefendantPartAdmitPayImmediatelyAccepted(CaseData caseData) {
+        return caseData.getDefenceAdmitPartPaymentTimeRouteRequired() != null
+            && IMMEDIATELY.equals(caseData.getDefenceAdmitPartPaymentTimeRouteRequired())
+            && (PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec()))
+            && caseData.hasApplicantAcceptedRepaymentPlan();
     }
 
     private static void assignApplicant2DQExpertsIfPresent(CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder) {
