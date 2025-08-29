@@ -165,7 +165,7 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
         return caseData.getDefenceAdmitPartPaymentTimeRouteRequired() != null
             && IMMEDIATELY.equals(caseData.getDefenceAdmitPartPaymentTimeRouteRequired())
             && (PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec()))
-            && caseData.hasApplicantAcceptedRepaymentPlan();
+            && YES.equals(caseData.getApplicant1AcceptAdmitAmountPaidSpec());
     }
 
     private static void assignApplicant2DQExpertsIfPresent(CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder) {
