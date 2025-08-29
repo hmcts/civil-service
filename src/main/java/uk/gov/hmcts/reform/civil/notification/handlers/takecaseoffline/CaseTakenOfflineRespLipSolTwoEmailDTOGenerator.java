@@ -2,27 +2,27 @@ package uk.gov.hmcts.reform.civil.notification.handlers.takecaseoffline;
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.notification.handlers.ClaimantEmailDTOGenerator;
+import uk.gov.hmcts.reform.civil.notification.handlers.DefendantTwoEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
-import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
 import java.util.Map;
 
-@Component
-public class CaseTakenOfflineAppLipSolOneEmailDTOGenerator extends ClaimantEmailDTOGenerator {
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
-    private static final String REFERENCE_TEMPLATE = "case-taken-offline-applicant-notification-%s";
+@Component
+public class CaseTakenOfflineRespLipSolTwoEmailDTOGenerator extends DefendantTwoEmailDTOGenerator {
+
+    private static final String REFERENCE_TEMPLATE = "case-taken-offline-respondent-notification-%s";
     private final NotificationsProperties notificationsProperties;
 
-    public CaseTakenOfflineAppLipSolOneEmailDTOGenerator(NotificationsProperties notificationsProperties) {
+    public CaseTakenOfflineRespLipSolTwoEmailDTOGenerator(NotificationsProperties notificationsProperties) {
         this.notificationsProperties = notificationsProperties;
     }
 
     @Override
     protected String getEmailTemplateId(CaseData caseData) {
-        return caseData.isClaimantBilingual()
-            ? notificationsProperties.getClaimantLipClaimUpdatedBilingualTemplate()
-            : notificationsProperties.getClaimantLipClaimUpdatedTemplate();
+        return caseData.isRespondentResponseBilingual() ? notificationsProperties.getNotifyDefendantTranslatedDocumentUploaded()
+            : notificationsProperties.getRespondent1LipClaimUpdatedTemplate();
     }
 
     @Override
@@ -32,9 +32,8 @@ public class CaseTakenOfflineAppLipSolOneEmailDTOGenerator extends ClaimantEmail
 
     @Override
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
+        properties.put(RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent2()));
         properties.put(CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference());
-        properties.put(CLAIMANT_NAME, caseData.getApplicant1().getPartyName());
-        properties.put(CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData));
         return properties;
     }
 }
