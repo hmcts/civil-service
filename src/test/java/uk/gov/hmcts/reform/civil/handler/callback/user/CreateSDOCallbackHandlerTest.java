@@ -260,7 +260,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .thenReturn(LocalDate.now().plusDays(5));
             when(deadlinesCalculator.getOrderSetAsideOrVariedApplicationDeadline(ArgumentMatchers.any(LocalDateTime.class)))
                 .thenReturn(LocalDate.now().plusDays(7));
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
         }
 
         @Test
@@ -327,7 +327,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
                 categorySearchResult));
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .atStateClaimIssuedDisposalHearingSDOInPersonHearing()
                 .claimantBilingualLanguagePreference("BOTH")
@@ -376,7 +376,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
                 categorySearchResult));
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                 .caseDataLip(CaseDataLiP.builder()
                                  .respondent1LiPResponse(RespondentLiPResponse.builder()
@@ -429,7 +429,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
                 categorySearchResult));
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                 .caseDataLip(CaseDataLiP.builder()
                                  .respondent1LiPResponse(RespondentLiPResponse.builder()
@@ -482,7 +482,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
                 categorySearchResult));
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                 .caseDataLip(CaseDataLiP.builder()
                                  .respondent1LiPResponse(RespondentLiPResponse.builder()
@@ -1374,7 +1374,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(locationsFromDynamicList(dynamicList)).containsExactly(
                 "Site 1 - Adr 1 - AAA 111",
                 "Site 2 - Adr 2 - BBB 222",
-                "Site 3 - Adr 3 - CCC 333"
+                "Site 3 - Adr 3 - CCC 333",
+                "Site 5 - Adr 5 - YYY 111"
             );
         }
 
@@ -1407,7 +1408,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(locationsFromDynamicList(dynamicList)).containsExactly(
                 "Site 1 - Adr 1 - AAA 111",
                 "Site 2 - Adr 2 - BBB 222",
-                "Site 3 - Adr 3 - CCC 333"
+                "Site 3 - Adr 3 - CCC 333",
+                "Site 5 - Adr 5 - YYY 111"
             );
         }
 
@@ -1446,7 +1448,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(locationsFromDynamicList(dynamicList)).containsExactly(
                 "Site 1 - Adr 1 - AAA 111",
                 "Site 2 - Adr 2 - BBB 222",
-                "Site 3 - Adr 3 - CCC 333"
+                "Site 3 - Adr 3 - CCC 333",
+                "Site 5 - Adr 5 - YYY 111"
             );
         }
 
@@ -1465,7 +1468,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                                           .responseCourtCode("court3")
                                           .caseLocation(
                                               CaseLocationCivil.builder()
-                                                  .baseLocation("dummy base")
+                                                  .baseLocation("00000")
                                                   .region("dummy region")
                                                   .build()
                                           ).build()
@@ -1491,9 +1494,10 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(locationsFromDynamicList(dynamicList)).containsExactly(
                 "Site 1 - Adr 1 - AAA 111",
                 "Site 2 - Adr 2 - BBB 222",
-                "Site 3 - Adr 3 - CCC 333"
+                "Site 3 - Adr 3 - CCC 333",
+                "Site 5 - Adr 5 - YYY 111"
             );
-            assertThat(dynamicList.getValue().getLabel()).isEqualTo("Site 3 - Adr 3 - CCC 333");
+            assertThat(dynamicList.getValue().getLabel()).isEqualTo("Site 5 - Adr 5 - YYY 111");
         }
     }
 
@@ -1756,11 +1760,12 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 "A Site 3 - Adr 3 - AAA 111",
                 "Site 1 - Adr 1 - VVV 111",
                 "Site 2 - Adr 2 - BBB 222",
-                "Site 3 - Adr 3 - CCC 333"
+                "Site 3 - Adr 3 - CCC 333",
+                "Site 5 - Adr 5 - YYY 111"
             );
             Optional<LocationRefData> shouldBeSelected = getSampleCourLocationsRefObjectToSort().stream()
-                .filter(locationRefData -> locationRefData.getCourtLocationCode().equals(
-                    caseData.getApplicant1DQ().getApplicant1DQRequestedCourt().getResponseCourtCode()))
+                .filter(locationRefData -> locationRefData.getEpimmsId().equals(
+                    caseData.getApplicant1DQ().getApplicant1DQRequestedCourt().getCaseLocation().getBaseLocation()))
                 .findFirst();
             assertThat(shouldBeSelected).isPresent();
             assertThat(dynamicList.getValue()).isNotNull()
@@ -2490,7 +2495,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 "A Site 3 - Adr 3 - AAA 111",
                 "Site 1 - Adr 1 - VVV 111",
                 "Site 2 - Adr 2 - BBB 222",
-                "Site 3 - Adr 3 - CCC 333"
+                "Site 3 - Adr 3 - CCC 333",
+                "Site 5 - Adr 5 - YYY 111"
             );
         }
 
@@ -2523,7 +2529,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 "A Site 3 - Adr 3 - AAA 111",
                 "Site 1 - Adr 1 - VVV 111",
                 "Site 2 - Adr 2 - BBB 222",
-                "Site 3 - Adr 3 - CCC 333"
+                "Site 3 - Adr 3 - CCC 333",
+                "Site 5 - Adr 5 - YYY 111"
             );
         }
 

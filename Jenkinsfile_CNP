@@ -11,7 +11,6 @@ import uk.gov.hmcts.contino.GithubAPI
 def type = "java"
 def product = "civil"
 def component = "service"
-def ccdBranch = "master"
 def camundaBranch = "master"
 def dmnBranch = "master"
 def yarnBuilder = new uk.gov.hmcts.contino.YarnBuilder(this)
@@ -98,10 +97,6 @@ def checkForEnableHelmLabel(branch_name) {
   return new GithubAPI(this).getLabelsbyPattern(branch_name, "pr-values: enableHelm").contains("pr-values: enableHelm")
 }
 
-def checkForRunFailedTestFiles(branch_name) {
-  return new GithubAPI(this).getLabelsbyPattern(branch_name, "runFailedTestFiles").contains("runFailedTestFiles")
-}
-
 def getCivilCcdDefinitionBranch() {
   def githubApi = new GithubAPI(this)
   for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "civilDefinitionBranch:")) {
@@ -134,7 +129,7 @@ withPipeline(type, product, component) {
   }
 
   before('smoketest:preview') {
-    env.URL = "https://xui-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+    env.URL = "https://civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.CIVIL_SERVICE_URL = "https://civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.WIREMOCK_URL = "https://wiremock-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
 
@@ -170,11 +165,7 @@ withPipeline(type, product, component) {
   }
 
   before('functionalTest:preview') {
-    if(checkForRunFailedTestFiles(env.BRANCH_NAME)) {
-      echo "GitHub label: 'runFailedTestFiles' currently on PR"
-      copyPrevFailedAndNotExecutedTestFilesJson();
-      env.RUN_PREV_FAILED_AND_NOT_EXECUTED_TEST_FILES = true
-    }
+    copyPrevFailedAndNotExecutedTestFilesJson();
   }
 
   afterAlways('functionalTest:preview') {
@@ -191,7 +182,7 @@ withPipeline(type, product, component) {
       ./bin/import-ccd-definition.sh "-e *-nonprod.json,*COS-nonprod.json,AuthorisationCaseType-shuttered.json"
       ./bin/import-bpmn-diagram.sh .
     """
-    env.URL = "https://civil-service-xui-staging.aat.platform.hmcts.net"
+    env.URL = "https://civil-service-staging.aat.platform.hmcts.net"
     env.CIVIL_SERVICE_URL = "https://civil-service-staging.aat.platform.hmcts.net"
     env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
     env.IDAM_API_URL = "https://idam-api.aat.platform.hmcts.net"
@@ -205,6 +196,10 @@ withPipeline(type, product, component) {
 
   afterAlways('smoketest:aat') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/smokeTest/**/*'
+  }
+
+  before('functionalTest:aat') {
+    copyPrevFailedAndNotExecutedTestFilesJson();
   }
 
   afterAlways('functionalTest:aat') {

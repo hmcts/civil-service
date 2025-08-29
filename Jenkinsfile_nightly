@@ -94,17 +94,18 @@ withNightlyPipeline(type, product, component) {
 
   //enableMutationTest()
   if(!runPrevFailedAndNotExecutedTestFiles && !forceGreenBuild) {
-    // enableFortifyScan()
+    enableFortifyScan()
+
+    afterAlways('fortify-scan') {
+      steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
+    }
   }
   //enableSecurityScan()
 
   enableFullFunctionalTest(200)
 
   if(!forceGreenBuild) {
-    before('fullFunctionalTest') {
-      if(runPrevFailedAndNotExecutedTestFiles) {
-        copyPrevFailedAndNotExecutedTestFilesJson()
-      }
+    afterAlways('DependencyCheckNightly') {
       sh """
         ./bin/pull-latest-ccd-files.sh ${ccdBranch}
       """
@@ -112,13 +113,15 @@ withNightlyPipeline(type, product, component) {
       yarnBuilder.yarn('install-dependencies')
     }
 
+    before('fullFunctionalTest') {
+      if(runPrevFailedAndNotExecutedTestFiles) {
+        copyPrevFailedAndNotExecutedTestFilesJson()
+      }
+    }
+
     afterAlways('fullFunctionalTest') {
       archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/functional/**/*'
       env.TESTS_FOR_ACCESSIBILITY = false
-    }
-
-    afterAlways('fortify-scan') {
-      steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
     }
   }
 }

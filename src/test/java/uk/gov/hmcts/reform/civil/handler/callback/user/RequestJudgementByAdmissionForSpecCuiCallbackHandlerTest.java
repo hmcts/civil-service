@@ -215,7 +215,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
         @Test
         void shouldNotSetCcjJudgmentAmountShowInterestToNoWhenPayBySetDateAndLrAdmissionBulkEnabled() {
             when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
-            when(interestCalculator.calculateInterestForJO(any())).thenReturn(BigDecimal.valueOf(0));
+            when(interestCalculator.calculateInterest(any())).thenReturn(BigDecimal.valueOf(0));
             LocalDate whenWillPay = LocalDate.of(2024, 11, 11);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
@@ -298,7 +298,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             BigDecimal claimAmount = getCaseData(response).getCcjPaymentDetails().getCcjJudgmentAmountClaimAmount();
-            assertThat(claimAmount).isEqualTo(BigDecimal.valueOf(500));
+            assertThat(claimAmount).isEqualTo(BigDecimal.valueOf(500).setScale(2));
 
             BigDecimal claimFee = getCaseData(response).getCcjPaymentDetails().getCcjJudgmentAmountClaimFee();
             assertThat(claimFee).isEqualTo(MonetaryConversions.penniesToPounds(fee.getCalculatedAmountInPence()));
@@ -828,12 +828,12 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
 
         @Test
         void shouldSetUpBusinessProcessAndCaseStateForLip() {
-            BigDecimal subToatal = BigDecimal.valueOf(1300);
+            BigDecimal subToatal = BigDecimal.valueOf(1300).setScale(2);
             BigDecimal stillOwed = new BigDecimal("1295.00");
             CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                 .ccjPaymentPaidSomeOption(YesOrNo.YES)
                 .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(500.0))
-                .ccjJudgmentLipInterest(BigDecimal.valueOf(300))
+                .ccjJudgmentLipInterest(BigDecimal.valueOf(300.00))
                 .ccjJudgmentAmountClaimFee(BigDecimal.valueOf(0))
                 .build();
             CaseData caseData = CaseData.builder()
@@ -842,6 +842,9 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
                 .applicant1Represented(YesOrNo.NO)
                 .totalClaimAmount(BigDecimal.valueOf(1000))
                 .ccjPaymentDetails(ccjPaymentDetails)
+                .claimFee(Fee.builder()
+                    .calculatedAmountInPence(BigDecimal.valueOf(0))
+                    .build())
                 .defendantDetailsSpec(DynamicList.builder()
                                           .value(DynamicListElement.builder()
                                                      .label("John Doe")
@@ -865,7 +868,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
             assertThat(ccjPaymentDetails.getCcjPaymentPaidSomeOption()).isEqualTo(ccjResponseForJudgement.getCcjPaymentPaidSomeOption());
             assertThat(MonetaryConversions.penniesToPounds(ccjPaymentDetails.getCcjPaymentPaidSomeAmount())).isEqualTo(
                 ccjResponseForJudgement.getCcjPaymentPaidSomeAmountInPounds());
-            assertThat(caseData.getTotalClaimAmount()).isEqualTo(ccjResponseForJudgement.getCcjJudgmentAmountClaimAmount());
+            assertThat(caseData.getTotalClaimAmount().setScale(2)).isEqualTo(ccjResponseForJudgement.getCcjJudgmentAmountClaimAmount());
             assertThat(subToatal).isEqualTo(ccjResponseForJudgement.getCcjJudgmentSummarySubtotalAmount());
             assertThat(stillOwed).isEqualTo(ccjResponseForJudgement.getCcjJudgmentTotalStillOwed());
 
@@ -907,6 +910,42 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
                 .extracting("businessProcess")
                 .extracting("camundaEvent")
                 .isEqualTo(JUDGEMENT_BY_ADMISSION_NON_DIVERGENT_SPEC.name());
+        }
+
+        @Test
+        void shouldUpdateJudgmentTabDetailsForLipvLip() {
+            CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
+                .ccjPaymentPaidSomeOption(YesOrNo.YES)
+                .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(500.0))
+                .ccjJudgmentLipInterest(BigDecimal.valueOf(300.00))
+                .ccjJudgmentAmountClaimFee(BigDecimal.valueOf(0))
+                .build();
+            CaseData caseData = CaseData.builder()
+                .respondent1Represented(YesOrNo.NO)
+                .specRespondent1Represented(YesOrNo.NO)
+                .applicant1Represented(YesOrNo.NO)
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .ccjPaymentDetails(ccjPaymentDetails)
+                .respondent1(PartyBuilder.builder().individual().build())
+                .activeJudgment(activeJudgment)
+                .claimFee(Fee.builder()
+                              .calculatedAmountInPence(BigDecimal.valueOf(0))
+                              .build())
+                .defendantDetailsSpec(DynamicList.builder()
+                                          .value(DynamicListElement.builder()
+                                                     .label("John Doe")
+                                                     .build())
+                                          .build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(caseData);
+            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            CaseData data = getCaseData(response);
+            assertThat(data.getActiveJudgment()).isNotNull();
+            assertThat(data.getJoRepaymentSummaryObject()).isNotNull();
         }
 
     }

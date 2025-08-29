@@ -87,9 +87,14 @@ public class CourtOfficerOrderHandler extends CallbackHandler {
             && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
             List<Element<CaseDocument>> preTranslationDocuments = caseData.getPreTranslationDocuments();
             preTranslationDocuments.add(element(caseData.getPreviewCourtOfficerOrder()));
+            caseDataBuilder.bilingualHint(YesOrNo.YES);
             caseDataBuilder.previewCourtOfficerOrder(null);
             caseDataBuilder.preTranslationDocuments(preTranslationDocuments);
         } else {
+            if (featureToggleService.isWelshEnabledForMainCase() && caseData.getPreviewCourtOfficerOrder() != null) {
+                caseDataBuilder.build().getCourtOfficersOrders().add(element(caseData.getPreviewCourtOfficerOrder()));
+                caseDataBuilder.previewCourtOfficerOrder(null);
+            }
             caseDataBuilder.businessProcess(BusinessProcess.ready(COURT_OFFICER_ORDER));
         }
         return AboutToStartOrSubmitCallbackResponse.builder()

@@ -132,8 +132,8 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
 
         boolean isCaseProgression = CaseState.CASE_PROGRESSION.equals(caseData.getCcdState());
         boolean isBaseLocationValid = baseLocation != null;
-        boolean isFeatureToggleEnabled = featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(
-            baseLocation);
+        boolean isFeatureToggleEnabled = (featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(
+            baseLocation) || featureToggleService.isWelshEnabledForMainCase());
         Optional<LocalDateTime> sdoTime = getSDOTime();
         boolean isSDOTimeBeforeCPRelease = sdoTime.isPresent()
             && sdoTime.get().isBefore(LocalDateTime.of(2024, 12, 5, 0, 0));
@@ -148,7 +148,7 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
 
     @Override
     public boolean decisionMadeDocumentsAreInTranslation() {
-        return (featureToggleService.isGaForWelshEnabled() && caseData.getPreTranslationDocuments() != null
+        return (featureToggleService.isWelshEnabledForMainCase() && caseData.getPreTranslationDocuments() != null
             && caseData.getPreTranslationDocuments().stream().map(
                     Element::getValue)
                 .map(CaseDocument::getDocumentType)
@@ -158,7 +158,7 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
 
     @Override
     public boolean sdoDocumentsAreInTranslation() {
-        return (featureToggleService.isGaForWelshEnabled() && caseData.getPreTranslationDocuments() != null
+        return (featureToggleService.isWelshEnabledForMainCase() && caseData.getPreTranslationDocuments() != null
             && caseData.getPreTranslationDocuments().stream().map(
                     Element::getValue)
             .map(CaseDocument::getDocumentType).anyMatch(type -> DocumentType.SDO_ORDER.equals(type))
@@ -174,7 +174,8 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
         Optional<LocalDateTime> sdoTime = getSDOTime();
         return CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
             && baseLocation != null
-            && featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation())
+            && (featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation())
+            || featureToggleService.isWelshEnabledForMainCase())
             && !isSDOOrderLegalAdviserCreated()
             && !isSDOOrderInReview()
             && !isSDOOrderInReviewOtherParty()
@@ -305,5 +306,17 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
     private boolean isWaitingForClaimantIntentDocUpload() {
         return caseData.isRespondentResponseFullDefence() && caseData.getApplicant1ResponseDate() != null
             && caseData.getCcdState() == CaseState.AWAITING_APPLICANT_INTENTION && caseData.isClaimantBilingual();
+    }
+
+    @Override
+    public boolean awaitingHearingNoticeTranslationNotSettledOrDiscontinued() {
+        return awaitingHearingNoticeTranslation() && !isSettled() && !isCasedDiscontinued();
+    }
+
+    private boolean awaitingHearingNoticeTranslation() {
+        return caseData.getPreTranslationDocuments() != null
+            && caseData.getPreTranslationDocuments().stream().anyMatch(
+                element -> element.getValue().getDocumentType() == DocumentType.HEARING_FORM
+        );
     }
 }

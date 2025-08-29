@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service.robotics.mapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
@@ -415,7 +416,8 @@ public class EventHistoryMapper {
                               .amountOfJudgment(amountClaimedWithInterest.setScale(2))
                               .amountOfCosts((caseData.isApplicantLipOneVOne() && featureToggleService.isLipVLipEnabled())
                                                  ? MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence())
-                                                 : JudgmentsOnlineHelper.getCostOfJudgmentForDJ(caseData))
+                                                 : JudgmentsOnlineHelper.getFixedCostsOfJudgmentForDJ(caseData).add(
+                                                     JudgmentsOnlineHelper.getClaimFeeOfJudgmentForDJ(caseData)))
                               .amountPaidBeforeJudgment((caseData.getPartialPayment() == YesOrNo.YES) ? partialPaymentPounds : ZERO)
                               .isJudgmentForthwith(caseData.getPaymentTypeSelection().equals(DJPaymentTypeSelection.IMMEDIATELY))
                               .paymentInFullDate(paymentInFullDate)
@@ -653,11 +655,7 @@ public class EventHistoryMapper {
         boolean isResponsePayByInstallment = caseData.isPayByInstallment();
         Optional<RepaymentPlanLRspec> repaymentPlan = Optional.ofNullable(caseData.getRespondent1RepaymentPlan());
         EventDetails judgmentByAdmissionEvent = EventDetails.builder()
-            .amountOfJudgment(caseData.getCcjPaymentDetails().getCcjJudgmentAmountClaimAmount()
-                                  .add(caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()
-                                           ? caseData.getCcjPaymentDetails().getCcjJudgmentLipInterest() :
-                                           Optional.ofNullable(caseData.getTotalInterest()).orElse(ZERO))
-                                  .setScale(2))
+            .amountOfJudgment(getAmountOfJudgmentForAdmission(caseData))
             .amountOfCosts(caseData.getCcjPaymentDetails().getCcjJudgmentFixedCostAmount()
                                .add(caseData.getCcjPaymentDetails().getCcjJudgmentAmountClaimFee()).setScale(2))
             .amountPaidBeforeJudgment(caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeAmountInPounds().setScale(2))
@@ -684,6 +682,18 @@ public class EventHistoryMapper {
             .eventDetails(judgmentByAdmissionEvent)
             .eventDetailsText("")
             .build()));
+    }
+
+    @NotNull
+    protected BigDecimal getAmountOfJudgmentForAdmission(CaseData caseData) {
+        return caseData.getCcjPaymentDetails().getCcjJudgmentAmountClaimAmount()
+            .add(caseData.isLipvLipOneVOne() && !caseData.isPartAdmitClaimSpec()
+                ? caseData.getCcjPaymentDetails().getCcjJudgmentLipInterest() : totalInterestForLrClaim(caseData)).setScale(2);
+    }
+
+    private BigDecimal totalInterestForLrClaim(CaseData caseData) {
+        return featureToggleService.isLrAdmissionBulkEnabled() ? ZERO : Optional.ofNullable(caseData.getTotalInterest()).orElse(
+            ZERO);
     }
 
     private void buildRespondentDivergentResponse(EventHistory.EventHistoryBuilder builder, CaseData caseData,
@@ -1122,7 +1132,7 @@ public class EventHistoryMapper {
     }
 
     private void buildQueriesEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        if (!isCaseOffline(caseData) || !featureToggleService.isQueryManagementLRsEnabled()) {
+        if (!isCaseOffline(caseData)) {
             return;
         }
         if (!hasActiveQueries(caseData)) {
@@ -1145,9 +1155,13 @@ public class EventHistoryMapper {
     }
 
     private boolean hasActiveQueries(CaseData caseData) {
-        return caseData.getQmApplicantSolicitorQueries() != null
-            || caseData.getQmRespondentSolicitor1Queries() != null
-            || caseData.getQmRespondentSolicitor2Queries() != null;
+        if (featureToggleService.isPublicQueryManagementEnabled(caseData)) {
+            return caseData.getQueries() != null;
+        } else {
+            return caseData.getQmApplicantSolicitorQueries() != null
+                || caseData.getQmRespondentSolicitor1Queries() != null
+                || caseData.getQmRespondentSolicitor2Queries() != null;
+        }
     }
 
     private boolean isCaseOffline(CaseData caseData) {

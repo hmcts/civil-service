@@ -40,6 +40,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT2_STAY_LIFTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_STAY_LIFTED;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CNBC_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT_WELSH;
@@ -87,7 +88,6 @@ class NotifyDefendantStayLiftedHandlerTest {
             when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("welshHmctsSignature"));
             when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("welshPhoneContact"));
             when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
-            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
             when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
         }
@@ -110,13 +110,14 @@ class NotifyDefendantStayLiftedHandlerTest {
                 .build();
             CallbackParams params = CallbackParams.builder().caseData(caseData)
                 .request(CallbackRequest.builder().eventId(caseEvent.toString()).build()).build();
-
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             when(notificationsProperties.getNotifyLRStayLifted()).thenReturn("solicitor-template");
 
             CallbackResponse response = handler.sendNotification(params);
 
             if (isDefendant2) {
-                Map<String, String> expectedProperties = new HashMap<>(addCommonProperties());
+                Map<String, String> expectedProperties = new HashMap<>(addCommonProperties(false));
                 expectedProperties.put("claimReferenceNumber", "1594901956117591");
                 expectedProperties.put("name", "Jim Jameson");
                 expectedProperties.put("claimantvdefendant", "Mr. John Rambo V Jack Jackson");
@@ -130,7 +131,7 @@ class NotifyDefendantStayLiftedHandlerTest {
                     "stay-lifted-defendant-notification-1594901956117591"
                 );
             } else {
-                Map<String, String> expectedProperties = new HashMap<>(addCommonProperties());
+                Map<String, String> expectedProperties = new HashMap<>(addCommonProperties(false));
                 expectedProperties.put("claimReferenceNumber", "1594901956117591");
                 expectedProperties.put("name", "Jack Jackson");
                 expectedProperties.put("claimantvdefendant", "Mr. John Rambo V Jack Jackson");
@@ -194,6 +195,9 @@ class NotifyDefendantStayLiftedHandlerTest {
                 .type(ABOUT_TO_SUBMIT)
                 .build();
 
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             if (isRespondentLiP && isRespondentBilingual) {
                 when(notificationsProperties.getNotifyLipUpdateTemplateBilingual()).thenReturn("bilingual-template");
             } else if (isRespondentLiP) {
@@ -202,7 +206,7 @@ class NotifyDefendantStayLiftedHandlerTest {
                 when(notificationsProperties.getNotifyLRStayLifted()).thenReturn("solicitor-template");
             }
 
-            Map<String, String> expectedProperties = new HashMap<>(addCommonProperties());
+            Map<String, String> expectedProperties = new HashMap<>(addCommonProperties(true));
             expectedProperties.put("claimReferenceNumber", "1594901956117591");
             expectedProperties.put("name", "Jack Jackson");
             expectedProperties.put("claimantvdefendant", "John Doe V Jack Jackson");
@@ -221,7 +225,7 @@ class NotifyDefendantStayLiftedHandlerTest {
         }
 
         @NotNull
-        public Map<String, String> addCommonProperties() {
+        public Map<String, String> addCommonProperties(boolean isLipCase) {
             Map<String, String> expectedProperties = new HashMap<>();
             expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
             expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
@@ -229,9 +233,15 @@ class NotifyDefendantStayLiftedHandlerTest {
             expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
             expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
             expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
-            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
             expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
             expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+            if (isLipCase) {
+                expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+                expectedProperties.put(CNBC_CONTACT, configuration.getCnbcContact());
+            } else {
+                expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getRaiseQueryLr());
+                expectedProperties.put(CNBC_CONTACT, configuration.getRaiseQueryLr());
+            }
             return expectedProperties;
         }
 

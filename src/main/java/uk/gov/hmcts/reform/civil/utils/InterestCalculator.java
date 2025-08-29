@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.utils;
 
 import lombok.NoArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -8,6 +9,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
+import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestType;
 
 import java.math.BigDecimal;
@@ -23,38 +25,73 @@ import static uk.gov.hmcts.reform.civil.utils.MonetaryConversions.HUNDRED;
 
 @Component
 @NoArgsConstructor
+@Log4j2
 public class InterestCalculator {
 
     public static final int TO_FULL_PENNIES = 2;
     protected static final BigDecimal EIGHT_PERCENT_INTEREST_RATE = valueOf(8);
     public static final BigDecimal NUMBER_OF_DAYS_IN_YEAR = new BigDecimal(365L);
 
-    public BigDecimal calculateInterestForJO(CaseData caseData) {
-        return this.calculateInterest(caseData, getToDateForJO(caseData));
-    }
-
     public BigDecimal calculateInterest(CaseData caseData) {
         return this.calculateInterest(caseData, getToDate(caseData));
     }
 
     private BigDecimal calculateInterest(CaseData caseData, LocalDate interestToDate) {
+        log.info("Calculating interest for case id: {}", caseData.getCcdCaseReference());
         BigDecimal interestAmount = ZERO;
-        if (caseData.getClaimInterest() == YesOrNo.YES) {
+        if (!validateInterestCalculationRequestData(caseData)) {
+            log.error("Interest calculation request data is invalid for case id: {}", caseData.getCcdCaseReference());
+            return interestAmount;
+        } else  if (caseData.getClaimInterest() == YesOrNo.YES) {
             if (InterestClaimOptions.SAME_RATE_INTEREST.equals(caseData.getInterestClaimOptions())) {
-                if (SameRateInterestType.SAME_RATE_INTEREST_8_PC
-                    .equals(caseData.getSameRateInterestSelection().getSameRateInterestType())) {
+                SameRateInterestSelection sameRateInterestSelection = caseData.getSameRateInterestSelection();
+                if (sameRateInterestSelection != null && SameRateInterestType.SAME_RATE_INTEREST_8_PC
+                    .equals(sameRateInterestSelection.getSameRateInterestType())) {
                     interestAmount = calculateInterestAmount(caseData, EIGHT_PERCENT_INTEREST_RATE, interestToDate);
-                }
-                if (SameRateInterestType.SAME_RATE_INTEREST_DIFFERENT_RATE
-                    .equals(caseData.getSameRateInterestSelection().getSameRateInterestType())) {
+                } else if (sameRateInterestSelection != null && SameRateInterestType.SAME_RATE_INTEREST_DIFFERENT_RATE
+                    .equals(sameRateInterestSelection.getSameRateInterestType())) {
                     interestAmount = calculateInterestAmount(caseData,
-                        caseData.getSameRateInterestSelection().getDifferentRate(), interestToDate);
+                                                             sameRateInterestSelection.getDifferentRate(), interestToDate);
+                } else {
+                    log.error("No same rate interest type selected for case id: {}", caseData.getCcdCaseReference());
                 }
             } else if (InterestClaimOptions.BREAK_DOWN_INTEREST.equals(caseData.getInterestClaimOptions())) {
                 interestAmount = caseData.getBreakDownInterestTotal();
+            } else {
+                log.error("No interest claim options selected for case id: {}", caseData.getCcdCaseReference());
+            }
+        } else {
+            log.info("Interest not calculated for case id: {}, claim interest is no", caseData.getCcdCaseReference());
+            return interestAmount;
+        }
+        log.info("Interest calculated for case id: {}, amount: {}", caseData.getCcdCaseReference(), interestAmount);
+        return interestAmount;
+    }
+
+    private boolean validateInterestCalculationRequestData(CaseData caseData) {
+        if (caseData.getClaimInterest() == YesOrNo.YES) {
+            if (InterestClaimOptions.SAME_RATE_INTEREST.equals(caseData.getInterestClaimOptions())) {
+                SameRateInterestSelection sameRateInterestSelection = caseData.getSameRateInterestSelection();
+                if (sameRateInterestSelection == null) {
+                    log.error(
+                        "No same rate interest selection selected for case id: {}",
+                        caseData.getCcdCaseReference()
+                    );
+                    return false;
+                } else if (caseData.getInterestClaimFrom() == null) {
+                    log.error("No interest claim from selected for case id: {}", caseData.getCcdCaseReference());
+                    return false;
+                } else if (caseData.getInterestClaimFrom() == InterestClaimFromType.FROM_A_SPECIFIC_DATE && caseData.getInterestFromSpecificDate() == null) {
+                    log.error("No interest claim from date selected for case id: {}", caseData.getCcdCaseReference());
+                    return false;
+                }
             }
         }
-        return interestAmount;
+        return true;
+    }
+
+    public BigDecimal claimAmountPlusInterestToDate(CaseData caseData) {
+        return caseData.getTotalClaimAmount().add(calculateInterest(caseData));
     }
 
     private BigDecimal calculateInterestAmount(CaseData caseData, BigDecimal interestRate, LocalDate interestToDate) {
@@ -66,16 +103,6 @@ public class InterestCalculator {
                 caseData.getInterestFromSpecificDate(), interestToDate);
         }
         return ZERO;
-    }
-
-    private LocalDate getToDateForJO(CaseData caseData) {
-        if (Objects.isNull(caseData.getInterestClaimUntil())) {
-            return LocalDate.now();
-        } else if (InterestClaimUntilType.UNTIL_CLAIM_SUBMIT_DATE.equals(caseData.getInterestClaimUntil())) {
-            return getSubmittedDate(caseData);
-        } else {
-            return LocalDate.now().minusDays(1);
-        }
     }
 
     private LocalDate getToDate(CaseData caseData) {

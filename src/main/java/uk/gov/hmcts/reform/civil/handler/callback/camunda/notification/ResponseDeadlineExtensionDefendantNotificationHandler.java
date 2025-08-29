@@ -88,8 +88,7 @@ public class ResponseDeadlineExtensionDefendantNotificationHandler
                 caseData.getRespondentSolicitor1AgreedDeadlineExtension(), DATE
             )));
         addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
 
         return properties;
     }

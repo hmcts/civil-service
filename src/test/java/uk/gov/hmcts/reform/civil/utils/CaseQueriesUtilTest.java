@@ -7,15 +7,21 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.QueryCollectionType;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseQueriesCollection;
@@ -27,11 +33,13 @@ import java.time.OffsetDateTime;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.QueryCollectionType.APPLICANT_SOLICITOR_QUERIES;
 import static uk.gov.hmcts.reform.civil.enums.QueryCollectionType.RESPONDENT_SOLICITOR_ONE_QUERIES;
 import static uk.gov.hmcts.reform.civil.enums.QueryCollectionType.RESPONDENT_SOLICITOR_TWO_QUERIES;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
@@ -107,8 +115,40 @@ class CaseQueriesUtilTest {
             .build();
 
         LatestQuery result = CaseQueriesUtil.buildLatestQuery(caseMessage);
+        assertEquals("id", result.getQueryId());
+        assertNull(result.getIsWelsh());
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = {
+        "CLAIMANT, WELSH, ENGLISH, YES",
+        "CLAIMANT, BOTH, ENGLISH, YES",
+        "CLAIMANT, ENGLISH, WELSH, NO",
+        "CLAIMANT, ENGLISH, ENGLISH, NO",
+        "DEFENDANT, ENGLISH, WELSH, YES",
+        "DEFENDANT, ENGLISH, BOTH, YES",
+        "DEFENDANT, WELSH, ENGLISH, NO",
+        "DEFENDANT, ENGLISH, ENGLISH, NO",
+        "OTHER_ROLE, NULL, WELSH, NO",
+        "OTHER_ROLE, WELSH, NULL, NO",
+        "OTHER_ROLE, NULL, NULL, NO"
+    }, nullValues = "NULL")
+    void shouldBuildLatestQueryFromCaseMessage_withLanguagePreference(String caseRole, String claimantLanguage, String defendantLanguage, YesOrNo expected) {
+        OffsetDateTime createdOn = OffsetDateTime.now();
+        List<String> roles = List.of(caseRole);
+        CaseData caseData = CaseData.builder()
+            .claimantBilingualLanguagePreference(claimantLanguage)
+            .caseDataLiP(respondentResponseWithLanguagePreference(defendantLanguage))
+            .build();
+        CaseMessage caseMessage = buildCaseMessage("id", "Query 3")
+            .toBuilder()
+            .createdOn(createdOn)
+            .build();
+
+        LatestQuery result = CaseQueriesUtil.buildLatestQuery(caseMessage, caseData, roles);
 
         assertEquals("id", result.getQueryId());
+        assertEquals(expected, result.getIsWelsh());
     }
 
     @Test
@@ -249,7 +289,7 @@ class CaseQueriesUtilTest {
                                                .build())
             .build();
 
-        CaseQueriesUtil.assignCategoryIdToCaseworkerAttachments(caseData, queries.get(1).getValue(), assignCategoryId);
+        CaseQueriesUtil.assignCategoryIdToCaseworkerAttachments(caseData, queries.get(1).getValue(), assignCategoryId, false);
 
         List<Document> documents = unwrapElements(queries.get(1).getValue().getAttachments());
 
@@ -267,7 +307,7 @@ class CaseQueriesUtilTest {
                                                .build())
             .build();
 
-        CaseQueriesUtil.assignCategoryIdToCaseworkerAttachments(caseData, queries.get(1).getValue(), assignCategoryId);
+        CaseQueriesUtil.assignCategoryIdToCaseworkerAttachments(caseData, queries.get(1).getValue(), assignCategoryId, false);
 
         List<Document> documents = unwrapElements(queries.get(1).getValue().getAttachments());
 
@@ -285,12 +325,30 @@ class CaseQueriesUtilTest {
                                                .build())
             .build();
 
-        CaseQueriesUtil.assignCategoryIdToCaseworkerAttachments(caseData, queries.get(1).getValue(), assignCategoryId);
+        CaseQueriesUtil.assignCategoryIdToCaseworkerAttachments(caseData, queries.get(1).getValue(), assignCategoryId, false);
 
         List<Document> documents = unwrapElements(queries.get(1).getValue().getAttachments());
 
         assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(0).getCategoryID());
         assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(1).getCategoryID());
+    }
+
+    @Test
+    void shouldAssignCategoryIDToAttachments_whenCaseworker_QmLip_isOn() {
+        List<Element<CaseMessage>> queries = buildCaseMessageWithFollowUpQuery();
+        CaseData caseData = CaseData.builder()
+            .ccdCaseReference(1L)
+            .qmRespondentSolicitor2Queries(CaseQueriesCollection.builder()
+                                               .caseMessages(queries)
+                                               .build())
+            .build();
+
+        CaseQueriesUtil.assignCategoryIdToCaseworkerAttachments(caseData, queries.get(1).getValue(), assignCategoryId, true);
+
+        List<Document> documents = unwrapElements(queries.get(1).getValue().getAttachments());
+
+        assertEquals(DocCategory.CASEWORKER_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(0).getCategoryID());
+        assertEquals(DocCategory.CASEWORKER_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(1).getCategoryID());
     }
 
     @Test
@@ -913,4 +971,108 @@ class CaseQueriesUtilTest {
         assertNull(result);
     }
 
+    @Test
+    void shouldMigrateAllQueries_whenOldQueriesExist() {
+        List<Element<CaseMessage>> applicantMessages = wrapElements(CaseMessage.builder().id("app1").createdOn(OffsetDateTime.now()).build());
+        List<Element<CaseMessage>> respondent1Messages = wrapElements(CaseMessage.builder().id("res1").createdOn(OffsetDateTime.now().plusHours(1)).build());
+        List<Element<CaseMessage>> respondent2Messages = wrapElements(CaseMessage.builder().id("res2").createdOn(OffsetDateTime.now().plusHours(2)).build());
+
+        CaseData.CaseDataBuilder builder = CaseData.builder()
+            .qmApplicantSolicitorQueries(CaseQueriesCollection.builder().caseMessages(applicantMessages).build())
+            .qmRespondentSolicitor1Queries(CaseQueriesCollection.builder().caseMessages(respondent1Messages).build())
+            .qmRespondentSolicitor2Queries(CaseQueriesCollection.builder().caseMessages(respondent2Messages).build());
+
+        CaseQueriesUtil.migrateAllQueries(builder);
+
+        CaseData updatedCaseData = builder.build();
+        assertThat(updatedCaseData.getQueries()).isNotNull();
+        assertThat(updatedCaseData.getQueries().getPartyName()).isEqualTo("All queries");
+        assertThat(updatedCaseData.getQueries().getCaseMessages()).hasSize(3);
+        assertThat(unwrapElements(updatedCaseData.getQueries().getCaseMessages()).stream().map(CaseMessage::getId))
+            .containsExactlyInAnyOrder("app1", "res1", "res2");
+    }
+
+    @Test
+    void shouldNotMigrateQueries_whenNoOldQueriesExist() {
+        CaseData.CaseDataBuilder builder = CaseData.builder();
+
+        CaseQueriesUtil.migrateAllQueries(builder);
+
+        CaseData updatedCaseData = builder.build();
+        assertThat(updatedCaseData.getQueries()).isNull();
+    }
+
+    @Test
+    void shouldNotConsumeOriginalException() {
+        CaseData.CaseDataBuilder builder = CaseData.builder()
+            .qmApplicantSolicitorQueries(CaseQueriesCollection.builder().caseMessages(List.of(element(CaseMessage.builder().build()))).build());
+
+        try (MockedStatic<CaseQueriesUtil> mockedStatic = mockStatic(CaseQueriesUtil.class)) {
+            NullPointerException expectedException = new NullPointerException("Simulated migration failure");
+            mockedStatic.when(() -> CaseQueriesUtil.migrateAllQueries(any(CaseData.CaseDataBuilder.class)))
+                .thenCallRealMethod();
+            mockedStatic.when(() -> CaseQueriesUtil.hasOldQueries(any(CaseData.class)))
+                .thenCallRealMethod();
+            mockedStatic.when(() -> CaseQueriesUtil.migrateQueries(any(CaseQueriesCollection.class), any(CaseData.CaseDataBuilder.class)))
+                .thenThrow(expectedException);
+
+            NullPointerException thrownException = assertThrows(NullPointerException.class, () ->
+                CaseQueriesUtil.migrateAllQueries(builder));
+
+            assertThat(thrownException).isEqualTo(expectedException);
+        }
+    }
+
+    @Test
+    void shouldClearOldQueryCollections_whenOldQueriesExist() {
+        CaseData.CaseDataBuilder builder = CaseData.builder()
+            .qmApplicantSolicitorQueries(CaseQueriesCollection.builder().build())
+            .qmRespondentSolicitor1Queries(CaseQueriesCollection.builder().build())
+            .qmRespondentSolicitor2Queries(CaseQueriesCollection.builder().build());
+
+        CaseQueriesUtil.clearOldQueryCollections(builder);
+
+        CaseData updatedCaseData = builder.build();
+        assertThat(updatedCaseData.getQmApplicantSolicitorQueries()).isNull();
+        assertThat(updatedCaseData.getQmRespondentSolicitor1Queries()).isNull();
+        assertThat(updatedCaseData.getQmRespondentSolicitor2Queries()).isNull();
+    }
+
+    @Test
+    void shouldNotClearOldQueryCollections_whenNoOldQueriesExist() {
+        CaseData.CaseDataBuilder builder = CaseData.builder();
+
+        CaseQueriesUtil.clearOldQueryCollections(builder);
+
+        CaseData updatedCaseData = builder.build();
+        assertThat(updatedCaseData.getQmApplicantSolicitorQueries()).isNull();
+        assertThat(updatedCaseData.getQmRespondentSolicitor1Queries()).isNull();
+        assertThat(updatedCaseData.getQmRespondentSolicitor2Queries()).isNull();
+    }
+
+    @Test
+    void shouldNotError_whenOldQueriesExistWhileLoggingMigrationSuccess() {
+        List<Element<CaseMessage>> applicantMessages = wrapElements(CaseMessage.builder().id("app1").createdOn(OffsetDateTime.now()).build());
+        List<Element<CaseMessage>> respondent1Messages = wrapElements(CaseMessage.builder().id("res1").createdOn(OffsetDateTime.now().plusHours(1)).build());
+        List<Element<CaseMessage>> respondent2Messages = wrapElements(CaseMessage.builder().id("res2").createdOn(OffsetDateTime.now().plusHours(2)).build());
+
+        CaseData.CaseDataBuilder builder = CaseData.builder()
+            .qmApplicantSolicitorQueries(CaseQueriesCollection.builder().caseMessages(applicantMessages).build())
+            .qmRespondentSolicitor1Queries(CaseQueriesCollection.builder().caseMessages(respondent1Messages).build())
+            .qmRespondentSolicitor2Queries(CaseQueriesCollection.builder().caseMessages(respondent2Messages).build());
+
+        CaseQueriesUtil.logMigrationSuccess(builder.build());
+    }
+
+    @Test
+    void shouldNotError_whenNoOldQueriesExistWhileLoggingMigrationSuccess() {
+        CaseQueriesUtil.logMigrationSuccess(CaseData.builder().build());
+    }
+
+    private CaseDataLiP respondentResponseWithLanguagePreference(String languagePreference) {
+        return CaseDataLiP.builder()
+            .respondent1LiPResponse(
+                RespondentLiPResponse.builder().respondent1ResponseLanguage(languagePreference).build()
+            ).build();
+    }
 }
