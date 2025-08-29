@@ -103,16 +103,6 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         + "months of the claim being issued. The exact date when you must notify the claim details will be provided "
         + "when you first notify the Defendant legal representative of the claim. <br/>[Pay your claim fee](%s)";
 
-    public static final String CONFIRMATION_BODY_COS = "<br />Your claim will not be issued until payment is " +
-        "confirmed. [Pay your claim fee](%s)"
-        + "<br />Your claim will not be issued until payment is confirmed."
-        + " Once payment is confirmed you will receive an email. The claim will then progress offline."
-        + "%n%nTo continue the claim you need to send the <a href=\"%s\" target=\"_blank\">sealed claim form</a>, "
-        + "a <a href=\"%s\" target=\"_blank\">response pack</a> and any supporting documents to "
-        + "the defendant within 4 months. "
-        + "%n%nOnce you have served the claim, send the Certificate of Service and supporting documents to the County"
-        + " Court Claims Centre.";
-
     public static final String CONFIRMATION_BODY_LIP_COS = "<br />Your claim will not be issued until payment is "
         + "confirmed. [Pay your claim fee](%s)"
         + "%n%nYour claim will not be issued until payment is confirmed. Once payment is confirmed you will receive "
@@ -171,7 +161,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .put(callbackKey(MID, "appOrgPolicy"), this::validateApplicantSolicitorOrgPolicy)
             .put(callbackKey(MID, "repOrgPolicy"), this::validateRespondentSolicitorOrgPolicy)
             .put(callbackKey(MID, "rep2OrgPolicy"), this::validateRespondentSolicitor2OrgPolicy)
-            .put(callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth)
+            .put(callbackKey(MID, "statement-of-truth"), this::emptyCallbackResponse)
             .put(callbackKey(MID, "populateClaimantSolicitor"), this::populateClaimantSolicitor)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::submitClaim)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
@@ -377,20 +367,6 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         return organisationService.findOrganisation(authToken)
             .map(Organisation::getPaymentAccount)
             .orElse(emptyList());
-    }
-
-    private CallbackResponse resetStatementOfTruth(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-
-        // resetting statement of truth field, this resets in the page, but the data is still sent to the db.
-        // must be to do with the way XUI cache data entered through the lifecycle of an event.
-        CaseData updatedCaseData = caseData.toBuilder()
-            .uiStatementOfTruth(null)
-            .build();
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseData.toMap(objectMapper))
-            .build();
     }
 
     private void clearOrganisationPolicyId(CaseData caseData, CaseData.CaseDataBuilder caseDataBuilder) {
