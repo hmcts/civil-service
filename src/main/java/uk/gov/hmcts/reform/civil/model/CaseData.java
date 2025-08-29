@@ -643,6 +643,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @Builder.Default
     private final List<Element<CaseDocument>> courtOfficersOrders = new ArrayList<>();
+    private final YesOrNo isReferToJudgeClaim;
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending
