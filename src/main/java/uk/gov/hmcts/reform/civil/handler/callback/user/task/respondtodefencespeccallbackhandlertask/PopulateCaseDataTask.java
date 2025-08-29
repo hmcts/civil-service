@@ -113,7 +113,7 @@ public class PopulateCaseDataTask implements CaseTask {
         return caseData.getDefenceAdmitPartPaymentTimeRouteRequired() != null
             && IMMEDIATELY.equals(caseData.getDefenceAdmitPartPaymentTimeRouteRequired())
             && (PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec()))
-            && caseData.hasApplicantAcceptedRepaymentPlan();
+            && YES.equals(caseData.getApplicant1AcceptAdmitAmountPaidSpec());
     }
 
     private boolean isDefendantFullAdmitPayImmediately(CaseData caseData) {
