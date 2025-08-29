@@ -337,6 +337,34 @@ class AboutToSubmitRespondToDefenceTaskTest {
         assertThat(getCaseData(response)).extracting("nextDeadline").isNull();
     }
 
+    @Test
+    void shouldSetPaymentDeadlineWhenDefendantProposesImmediatePartPaymentPlanAndClaimantAcceptsIt() {
+        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+        when(paymentDateService.calculatePaymentDeadline()).thenReturn(LocalDate.now().plusDays(5));
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+            .applicant1AcceptAdmitAmountPaidSpec(YES)
+            .applicant1DQWithExperts()
+            .applicant1DQWithWitnesses()
+            .respondent1Represented(NO)
+            .respondent1(PartyBuilder.builder().individual().build())
+            .specRespondent1Represented(NO)
+            .applicant1Represented(YES)
+            .applicant1(PartyBuilder.builder().individual().build())
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
+            .applicant1AcceptPartAdmitPaymentPlanSpec(YES)
+            .build();
+
+        AboutToStartOrSubmitCallbackResponse response =
+            (AboutToStartOrSubmitCallbackResponse) task.execute(callbackParams(caseData));
+
+        assertNotNull(response);
+        CaseData caseData1 = getCaseData(response);
+        assertThat(caseData1.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid()).isNotNull();
+    }
+
     private CaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {
         return objectMapper.convertValue(response.getData(), CaseData.class);
     }
