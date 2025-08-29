@@ -11,8 +11,9 @@ public class CaseTakenOfflineAllPartiesEmailGenerator extends AllPartiesEmailGen
     public CaseTakenOfflineAllPartiesEmailGenerator(
             CaseTakenOfflineAppSolOneEmailDTOGenerator appSolOneGenerator,
             CaseTakenOfflineRespSolOneEmailDTOGenerator respSolOneGenerator,
-            CaseTakenOfflineRespSolTwoEmailDTOGenerator respSolTwoGenerator
+            CaseTakenOfflineRespSolTwoEmailDTOGenerator respSolTwoGenerator,
+            CaseTakenOfflineAppLipSolOneEmailDTOGenerator appLipSolOneGenerator
     ) {
-        super(List.of(appSolOneGenerator, respSolOneGenerator, respSolTwoGenerator));
+        super(List.of(appSolOneGenerator, respSolOneGenerator, respSolTwoGenerator, appLipSolOneGenerator));
     }
 }
