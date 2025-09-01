@@ -41,11 +41,16 @@ public class CaseCategoriesService {
             : caseData.getResponseClaimTrack(); //spec
 
         String categoryKey = String.format(CATEGORY_KEY, hmctsServiceID, allocatedTrack);
+        log.info("Searching for category. hmctsServiceID={}, allocatedTrack={}, categoryKey={}, categoryType={}",
+                 hmctsServiceID, allocatedTrack, categoryKey, categoryType);
 
         if (caseTypeResult.isPresent()) {
             CategorySearchResult categorySearchResult = caseTypeResult.get();
+            log.debug("CategorySearchResult found with {} categories", categorySearchResult.getCategories().size());
+
             Category categoryResult = categorySearchResult.getCategories().stream().filter(c -> c.getKey().equals(
                 categoryKey)).collect(toSingleton());
+            log.info("Category found: parentKey={}, key={}", categoryResult.getParentKey(), categoryResult.getKey());
 
             return CaseCategoryModel.builder()
                 .categoryParent(categoryResult.getParentKey())
