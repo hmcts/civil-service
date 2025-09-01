@@ -234,14 +234,10 @@ public class InitiateGeneralApplicationService {
     }
 
     private boolean hasSDOBeenMade(CaseData caseData) {
-        if (featureToggleService.isQueryManagementLRsEnabled()) {
-            return (!statesBeforeSDO.contains(caseData.getCcdState())
-                && !settleDiscontinueStates.contains(caseData.getCcdState()))
-                || (!statesBeforeSDO.contains(caseData.getPreviousCCDState())
-                && settleDiscontinueStates.contains(caseData.getCcdState()));
-        } else {
-            return !statesBeforeSDO.contains(caseData.getCcdState());
-        }
+        return (!statesBeforeSDO.contains(caseData.getCcdState())
+            && !settleDiscontinueStates.contains(caseData.getCcdState()))
+            || (!statesBeforeSDO.contains(caseData.getPreviousCCDState())
+            && settleDiscontinueStates.contains(caseData.getCcdState()));
     }
 
     private void setGeneralAppEvidenceDocument(CaseData caseData, GeneralApplication.GeneralApplicationBuilder applicationBuilder) {
