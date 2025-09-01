@@ -139,10 +139,10 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
             } else if (featureToggleService.isDefendantNoCOnlineForCase(caseData) && caseData.isLipvLROneVOne()
                 && caseData.isClaimantBilingual() && !featureToggleService.isGaForWelshEnabled()) {
                 errors.add(LR_VS_LIP);
-            } else if (!(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(caseData
-                                                                                                                                                                                                                                                                                                           .getCaseManagementLocation()
-                                                                                                                                                                                                                                                                                                           .getBaseLocation())) &&
-                !(featureToggleService.isCuiGaNroEnabled())) {
+            } else if (
+                !(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation()
+                                                                                    .getBaseLocation()))
+                    && !(featureToggleService.isCuiGaNroEnabled())) {
                 errors.add(NOT_IN_EA_REGION);
             } else {
                 /*
