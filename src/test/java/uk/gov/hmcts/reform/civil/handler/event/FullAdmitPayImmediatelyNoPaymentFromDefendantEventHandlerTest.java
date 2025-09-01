@@ -71,8 +71,8 @@ class FullAdmitPayImmediatelyNoPaymentFromDefendantEventHandlerTest {
             .ccdCaseReference(CASE_ID)
             .totalClaimAmount(BigDecimal.valueOf(124.67))
             .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
-                                               .whenWillThisAmountBePaid(whenWillThisAmountBePaid)
-                                               .build())
+                .whenWillThisAmountBePaid(whenWillThisAmountBePaid)
+                .build())
             .build();
         CaseDetails caseDetails = CaseDetailsBuilder.builder().data(updated).build();
         when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);

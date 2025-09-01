@@ -86,26 +86,25 @@ public class DefendantNocDashboardNotificationHandler extends CallbackHandler {
 
         if (isNull(caseData.getTrialReadyApplicant()) && SdoHelper.isFastTrack(caseData)) {
             dashboardScenariosService.recordScenarios(
-                    authToken,
-                    SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT_TRIAL_ARRANGEMENTS_TASK_LIST.getScenario(),
-                    caseData.getCcdCaseReference().toString(),
-                    params);
+                authToken,
+                SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT_TRIAL_ARRANGEMENTS_TASK_LIST.getScenario(),
+                caseData.getCcdCaseReference().toString(),
+                params
+            );
         }
         PaymentDetails hearingFeePaymentDetails = caseData.getHearingFeePaymentDetails();
 
-        boolean isHearingFeeNotPaid =
-                (isNull(hearingFeePaymentDetails) || hearingFeePaymentDetails.getStatus() != PaymentStatus.SUCCESS)
-                        && !caseData.isHWFTypeHearing();
-        boolean isFeePaymentOutcomeNotDone = caseData.isHWFTypeHearing()
-                && isNull(caseData.getFeePaymentOutcomeDetails().getHwfFullRemissionGrantedForHearingFee())
-                && (isNull(hearingFeePaymentDetails) || hearingFeePaymentDetails.getStatus() != PaymentStatus.SUCCESS);
+        boolean isHearingFeeNotPaid = (isNull(hearingFeePaymentDetails) || hearingFeePaymentDetails.getStatus() != PaymentStatus.SUCCESS) && !caseData.isHWFTypeHearing();
+        boolean isFeePaymentOutcomeNotDone = caseData.isHWFTypeHearing() && isNull(caseData.getFeePaymentOutcomeDetails().getHwfFullRemissionGrantedForHearingFee())
+            && (isNull(hearingFeePaymentDetails) || hearingFeePaymentDetails.getStatus() != PaymentStatus.SUCCESS);
 
         if (isHearingFeeNotPaid || isFeePaymentOutcomeNotDone) {
             dashboardScenariosService.recordScenarios(
-                    authToken,
-                    SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT_HEARING_FEE_TASK_LIST.getScenario(),
-                    caseData.getCcdCaseReference().toString(),
-                    params);
+                authToken,
+                SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT_HEARING_FEE_TASK_LIST.getScenario(),
+                caseData.getCcdCaseReference().toString(),
+                params
+            );
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder().build();

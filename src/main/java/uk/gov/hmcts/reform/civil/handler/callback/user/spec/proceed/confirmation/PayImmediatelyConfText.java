@@ -1,14 +1,12 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation;
 
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
-import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
-import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.config.ClaimUrlsConfiguration;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationTextGenerator;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -17,7 +15,9 @@ import uk.gov.hmcts.reform.civil.service.PaymentDateService;
 import java.time.LocalDate;
 import java.util.Optional;
 
-import org.springframework.stereotype.Component;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 
 @Component
 @RequiredArgsConstructor
@@ -68,11 +68,11 @@ public class PayImmediatelyConfText implements RespondToResponseConfirmationText
 
     private boolean isDefendantFullOrPartAdmitPayImmediately(CaseData caseData) {
         return caseData.getDefenceAdmitPartPaymentTimeRouteRequired() != null
-                && IMMEDIATELY.equals(caseData.getDefenceAdmitPartPaymentTimeRouteRequired())
-                && ((RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-                                && null == caseData.getApplicant1ProceedWithClaim())
-                        || (caseData.isPartAdmitImmediatePaymentClaimSettled()
-                                && YES == caseData.getRespondForImmediateOption()));
+            && IMMEDIATELY.equals(caseData.getDefenceAdmitPartPaymentTimeRouteRequired())
+            && ((RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+            && null == caseData.getApplicant1ProceedWithClaim())
+            || (caseData.isPartAdmitImmediatePaymentClaimSettled()
+            && YES == caseData.getRespondForImmediateOption()));
     }
 
     public boolean isLrPayImmediatelyPlan(CaseData caseData, FeatureToggleService featureToggleService) {

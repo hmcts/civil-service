@@ -38,18 +38,16 @@ public class NocLipCaseOfflineAllFinalOrdersClaimantScenarioTest extends Dashboa
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
 
-        JudgmentDetails activeJudgment = JudgmentDetails.builder()
-                .judgmentId(123)
-                .state(JudgmentState.ISSUED)
-                .build();
+        JudgmentDetails activeJudgment = JudgmentDetails.builder().judgmentId(123).state(JudgmentState.ISSUED).build();
 
-        CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build().toBuilder()
-                .legacyCaseReference("reference")
-                .ccdCaseReference(Long.valueOf(caseId))
-                .previousCCDState(All_FINAL_ORDERS_ISSUED)
-                .applicant1Represented(YesOrNo.NO)
-                .activeJudgment(activeJudgment)
-                .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
+            .toBuilder()
+            .legacyCaseReference("reference")
+            .ccdCaseReference(Long.valueOf(caseId))
+            .previousCCDState(All_FINAL_ORDERS_ISSUED)
+            .applicant1Represented(YesOrNo.NO)
+            .activeJudgment(activeJudgment)
+            .build();
 
         handler.handle(callbackParamsTest(caseData));
 
@@ -78,14 +76,12 @@ public class NocLipCaseOfflineAllFinalOrdersClaimantScenarioTest extends Dashboa
 
     private static CallbackParams callbackParamsTest(CaseData caseData) {
         return CallbackParamsBuilder.builder()
-                .of(ABOUT_TO_SUBMIT, caseData)
-                .request(CallbackRequest.builder()
-                        .eventId(CaseEvent.CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_NOC.name())
-                        .caseDetails(CaseDetails.builder()
-                                .state(All_FINAL_ORDERS_ISSUED.toString())
-                                .build())
-                        .build())
-                .params(Map.of(CallbackParams.Params.BEARER_TOKEN, BEARER_TOKEN))
-                .build();
+            .of(ABOUT_TO_SUBMIT, caseData)
+            .request(CallbackRequest.builder().eventId(
+                CaseEvent.CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_NOC.name())
+                         .caseDetails(CaseDetails.builder().state(All_FINAL_ORDERS_ISSUED.toString()).build()).build())
+            .params(Map.of(CallbackParams.Params.BEARER_TOKEN, BEARER_TOKEN))
+            .build();
     }
+
 }
