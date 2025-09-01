@@ -63,36 +63,23 @@ public class SettleClaimCallbackHandler extends CallbackHandler {
 
     private CallbackResponse inactivateTaskListAndBuildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        boolean isLrQmEnabled = featureToggleService.isQueryManagementLRsEnabled();
 
-        if (caseData.isApplicantLiP()) {
-            if (!isLrQmEnabled) {
-                taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate(caseData.getCcdCaseReference().toString(),
-                                                                                                       CLAIMANT,
-                                                                                                       APPLICATION_VIEW
-                );
-            } else if (!featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation())) {
-                taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate(caseData.getCcdCaseReference().toString(),
-                                                                                                       CLAIMANT,
-                                                                                                       APPLICATION_VIEW
-                );
-            }
-
+        if (caseData.isApplicantLiP() && !featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation())) {
+            taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate(
+                caseData.getCcdCaseReference().toString(),
+                CLAIMANT,
+                APPLICATION_VIEW
+            );
         }
-        if (caseData.isRespondent1LiP()) {
-            if (!isLrQmEnabled) {
-                taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate(caseData.getCcdCaseReference().toString(),
-                                                                                                       DEFENDANT,
-                                                                                                       APPLICATION_VIEW
-                );
-            } else if (!featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation())) {
-                taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate(caseData.getCcdCaseReference().toString(),
-                                                                                                       DEFENDANT,
-                                                                                                       APPLICATION_VIEW
-                );
-            }
 
+        if (caseData.isRespondent1LiP() && !featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation())) {
+            taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate(
+                caseData.getCcdCaseReference().toString(),
+                DEFENDANT,
+                APPLICATION_VIEW
+            );
         }
+
         return SubmittedCallbackResponse.builder()
             .confirmationHeader("# Claim marked as settled")
             .confirmationBody("<br />")
