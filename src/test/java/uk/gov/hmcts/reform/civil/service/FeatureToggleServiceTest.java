@@ -35,7 +35,7 @@ class FeatureToggleServiceTest {
     }
 
     @ParameterizedTest
-    @ValueSource(booleans = {true})
+    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenMyFeatureIsEnabledOrDisabled(Boolean toggleState) {
         givenToggle("myFeature", toggleState);
 
@@ -43,7 +43,7 @@ class FeatureToggleServiceTest {
     }
 
     @ParameterizedTest
-    @ValueSource(booleans = {true})
+    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsGAForLipInvoked(Boolean toggleStat) {
         var caseFlagsKey = "GaForLips";
         givenToggle(caseFlagsKey, toggleStat);
@@ -52,7 +52,7 @@ class FeatureToggleServiceTest {
     }
 
     @ParameterizedTest
-    @ValueSource(booleans = {true})
+    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsAmendBundleEnabledInvoked(Boolean toggleStat) {
         var caseFlagsKey = "amend-bundle-enabled";
         givenToggle(caseFlagsKey, toggleStat);
@@ -61,7 +61,7 @@ class FeatureToggleServiceTest {
     }
 
     @ParameterizedTest
-    @ValueSource(booleans = {true})
+    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsBulkClaimInvoked(Boolean toggleStat) {
         var bulkClaimKey = "bulk_claim_enabled";
         givenToggle(bulkClaimKey, toggleStat);
@@ -70,7 +70,7 @@ class FeatureToggleServiceTest {
     }
 
     @ParameterizedTest
-    @ValueSource(booleans = {true})
+    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsLipVLipInvoked(Boolean toggleStat) {
         var lipVlipKey = "cuiReleaseTwoEnabled";
         givenToggle(lipVlipKey, toggleStat);
@@ -79,7 +79,7 @@ class FeatureToggleServiceTest {
     }
 
     @ParameterizedTest
-    @ValueSource(booleans = {true})
+    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsGeneralApplicationsEnabledInvoked(Boolean toggleStat) {
         var generalApplicationsKey = "general_applications_enabled";
         givenToggle(generalApplicationsKey, toggleStat);
@@ -88,7 +88,7 @@ class FeatureToggleServiceTest {
     }
 
     @ParameterizedTest
-    @ValueSource(booleans = {true})
+    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsPinInPostEnabledInvoked(Boolean toggleStat) {
         var pinInPostKey = "pin-in-post";
         givenToggle(pinInPostKey, toggleStat);
@@ -97,7 +97,7 @@ class FeatureToggleServiceTest {
     }
 
     @ParameterizedTest
-    @ValueSource(booleans = {true})
+    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenEnableRPAEmailsInvoked(Boolean toggleStat) {
         var enableRPAEmailsKey = "enable-rpa-emails";
         givenToggle(enableRPAEmailsKey, toggleStat);
@@ -106,7 +106,7 @@ class FeatureToggleServiceTest {
     }
 
     @ParameterizedTest
-    @ValueSource(booleans = {true})
+    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenFastTrackUpliftsEnabled(Boolean toggleStat) {
         var caseFileKey = "fast-track-uplifts";
         givenToggle(caseFileKey, toggleStat);
@@ -115,7 +115,7 @@ class FeatureToggleServiceTest {
     }
 
     @ParameterizedTest
-    @ValueSource(booleans = {true})
+    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenLocationWhiteListed(Boolean toggleStat) {
         final String feature = "case-progression-location-whitelist";
         String location = "000000";
@@ -149,7 +149,7 @@ class FeatureToggleServiceTest {
     }
 
     @ParameterizedTest
-    @ValueSource(booleans = {true})
+    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsTransferCaseOnlineEnabled(Boolean toggleStat) {
         var transferCaseOnlineKey = "isTransferOnlineCaseEnabled";
         givenToggle(transferCaseOnlineKey, toggleStat);
@@ -158,7 +158,7 @@ class FeatureToggleServiceTest {
     }
 
     @ParameterizedTest
-    @ValueSource(booleans = {true})
+    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenCaseProgressionEnabled(Boolean toggleStat) {
         var caseFileKey = "cui-case-progression";
         givenToggle(caseFileKey, toggleStat);
@@ -167,7 +167,7 @@ class FeatureToggleServiceTest {
     }
 
     @ParameterizedTest
-    @ValueSource(booleans = {true})
+    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsJudgmentOnlineLive(Boolean toggleStat) {
         var isJudgmentOnlineLiveKey = "isJudgmentOnlineLive";
         givenToggle(isJudgmentOnlineLiveKey, toggleStat);
@@ -176,7 +176,7 @@ class FeatureToggleServiceTest {
     }
 
     @ParameterizedTest
-    @ValueSource(booleans = {true})
+    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenisCjesServiceAvailableEnabled(Boolean toggleStat) {
         var key = "isCjesServiceAvailable";
         givenToggle(key, toggleStat);
@@ -185,7 +185,7 @@ class FeatureToggleServiceTest {
     }
 
     @ParameterizedTest
-    @ValueSource(booleans = {true})
+    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsCarmEnabled(Boolean toggleStat) {
         var carmDateKey = "cam-enabled-for-case";
 
@@ -202,7 +202,7 @@ class FeatureToggleServiceTest {
     }
 
     @ParameterizedTest
-    @ValueSource(booleans = {true})
+    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenMultiOrIntermediateTrackEnabled(Boolean toggleStat) {
         var caseFileKey = "multi-or-intermediate-track";
 
@@ -233,7 +233,7 @@ class FeatureToggleServiceTest {
     }
 
     @ParameterizedTest
-    @ValueSource(booleans = {true})
+    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsDashboardEnabledForCase(Boolean toggleStat) {
         var cuiReKey = "cuiReleaseTwoEnabled";
         var dashboardKey = "is-dashboard-enabled-for-case";
@@ -245,14 +245,14 @@ class FeatureToggleServiceTest {
 
         if (toggleStat) {
             when(featureToggleApi.isFeatureEnabledForDate(eq(dashboardKey), anyLong(), eq(false)))
-                    .thenReturn(true);
+                .thenReturn(true);
         }
 
         assertThat(featureToggleService.isDashboardEnabledForCase(caseData)).isEqualTo(toggleStat);
     }
 
     @ParameterizedTest
-    @ValueSource(booleans = {true})
+    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsCoSCEnabled(Boolean toggleStat) {
         var isCoSCEnabledKey = "isCoSCEnabled";
         givenToggle(isCoSCEnabledKey, toggleStat);
@@ -284,7 +284,7 @@ class FeatureToggleServiceTest {
     }
 
     @ParameterizedTest
-    @ValueSource(booleans = {true})
+    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenisJOLiveFeedActive(Boolean toggleStat) {
         when(featureToggleService.isJudgmentOnlineLive())
             .thenReturn(toggleStat);
@@ -294,7 +294,7 @@ class FeatureToggleServiceTest {
     }
 
     @ParameterizedTest
-    @ValueSource(booleans = {true})
+    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsDefendantNoCOnlineForCase(Boolean toggleStat) {
         var nocOnlineKey = "is-defendant-noc-online-for-case";
 
@@ -309,7 +309,7 @@ class FeatureToggleServiceTest {
     }
 
     @ParameterizedTest
-    @ValueSource(booleans = {true})
+    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsHmcForLipEnabled(Boolean toggleStat) {
         var hmcCui = "hmc-cui-enabled";
         givenToggle(hmcCui, toggleStat);
@@ -318,16 +318,7 @@ class FeatureToggleServiceTest {
     }
 
     @ParameterizedTest
-    @ValueSource(booleans = {true})
-    void shouldReturnCorrectValue_whenIsQMForLRs(Boolean toggleStat) {
-        var caseFlagsKey = "query-management";
-        givenToggle(caseFlagsKey, toggleStat);
-
-        assertThat(featureToggleService.isQueryManagementLRsEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true})
+    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenPublicQueryEnabledLr(Boolean toggleStat) {
         var lrPublicQuery = "public-query-management";
         givenToggle(lrPublicQuery, toggleStat);
@@ -339,7 +330,7 @@ class FeatureToggleServiceTest {
     }
 
     @ParameterizedTest
-    @ValueSource(booleans = {true})
+    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenPublicQueryEnabledLip(Boolean toggleStat) {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
             .applicant1Represented(YesOrNo.NO)
@@ -351,7 +342,7 @@ class FeatureToggleServiceTest {
     }
 
     @ParameterizedTest
-    @ValueSource(booleans = {true})
+    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenPublicQueryEnabled(Boolean toggleStat) {
         when(featureToggleService.isQMPdfGeneratorDisabled()).thenReturn(toggleStat);
 
