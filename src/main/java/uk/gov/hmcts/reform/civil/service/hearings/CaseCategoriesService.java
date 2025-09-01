@@ -41,7 +41,8 @@ public class CaseCategoriesService {
             : caseData.getResponseClaimTrack(); //spec
 
         String categoryKey = String.format(CATEGORY_KEY, hmctsServiceID, allocatedTrack);
-        log.info("Searching for category caseNumber={}, hmctsServiceID={}, allocatedTrack={}, categoryKey={}, categoryType={}", caseData.getCcdCaseReference(), hmctsServiceID, allocatedTrack, categoryKey, categoryType);
+        log.info("Searching for category caseNumber={}, hmctsServiceID={}, allocatedTrack={}, categoryKey={}, categoryType={}",
+                 caseData.getCcdCaseReference(), hmctsServiceID, allocatedTrack, categoryKey, categoryType);
 
         if (caseTypeResult.isPresent()) {
             CategorySearchResult categorySearchResult = caseTypeResult.get();
