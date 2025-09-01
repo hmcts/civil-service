@@ -46,7 +46,7 @@ public class CaseCategoriesService {
 
         if (caseTypeResult.isPresent()) {
             CategorySearchResult categorySearchResult = caseTypeResult.get();
-            log.info("CategorySearchResult found with {} categories", categorySearchResult.getCategories().size());
+            log.info("CategorySearchResult found with {} categories", categorySearchResult.getCategories() == null ? null : categorySearchResult.getCategories().size());
 
             Category categoryResult = categorySearchResult.getCategories().stream().filter(c -> c.getKey().equals(
                 categoryKey)).collect(toSingleton());
