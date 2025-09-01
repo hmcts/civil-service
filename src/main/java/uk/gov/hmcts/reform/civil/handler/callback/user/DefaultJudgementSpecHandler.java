@@ -35,7 +35,6 @@ import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -517,7 +516,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
                 true
             ));
             caseData.setJoIsLiveJudgmentExists(YesOrNo.YES);
-            caseData.setJoDJCreatedDate(LocalDateTime.now(ZoneId.of("Europe/London")));
+            caseData.setJoDJCreatedDate(time.now());
         }
 
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();

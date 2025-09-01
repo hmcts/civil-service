@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
+import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
 import java.math.BigDecimal;
@@ -56,6 +57,8 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
     private final FeatureToggleService featureToggleService;
     private final JudgmentByAdmissionOnlineMapper judgmentByAdmissionOnlineMapper;
     private final InterestCalculator interestCalculator;
+    private final Time time;
+
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -161,7 +164,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
                 .activeJudgment(activeJudgment)
                 .joIsLiveJudgmentExists(YesOrNo.YES)
                 .joRepaymentSummaryObject(joSummaryObject)
-                .joJudgementByAdmissionIssueDate(LocalDateTime.now());
+                .joJudgementByAdmissionIssueDate(time.now());
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
