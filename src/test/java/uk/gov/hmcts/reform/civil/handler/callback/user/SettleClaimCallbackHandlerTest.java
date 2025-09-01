@@ -149,7 +149,7 @@ class SettleClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void should_disable_task_list_items_when_qmlr_is_on_and_non_eaCourt() {
-            when(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).thenReturn(false);
+            when(featureToggleService.isLocationWhiteListed(any())).thenReturn(false);
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
             caseData = caseData.toBuilder()
                 .ccdCaseReference(1234L)
