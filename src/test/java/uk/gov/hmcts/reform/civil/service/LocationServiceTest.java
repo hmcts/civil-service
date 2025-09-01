@@ -61,7 +61,6 @@ class LocationServiceTest {
 
     @Test
     void shouldThrowException_whenApplicationMadeAfterSDOMainCaseCMLNotInRefDataQMoff() {
-        when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(false);
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getCaseDataForWorkAllocation(CaseState.JUDICIAL_REFERRAL, SPEC_CLAIM, INDIVIDUAL, null, respondent1DQ,
                                           respondent2DQ
@@ -73,7 +72,6 @@ class LocationServiceTest {
 
     @Test
     void shouldThrowException_whenApplicationMadeAfterSDOMainCaseCMLNotInRefDataQMOn() {
-        when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getCaseDataForWorkAllocation(CaseState.JUDICIAL_REFERRAL, SPEC_CLAIM, INDIVIDUAL, null, respondent1DQ,
                                           respondent2DQ
@@ -85,7 +83,6 @@ class LocationServiceTest {
 
     @Test
     void shouldThrowException_whenApplicationMadeAfterSDOMainCaseCMLNotInRefDataCaseDiscontinued() {
-        when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getCaseDataForWorkAllocation(CaseState.CASE_DISCONTINUED, SPEC_CLAIM, INDIVIDUAL, null, respondent1DQ,
                                           respondent2DQ).toBuilder()
@@ -97,7 +94,6 @@ class LocationServiceTest {
 
     @Test
     void shouldThrowException_whenApplicationMadeAfterSDOMainCaseCMLNotInCaseData() {
-        when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder().build();
         when(locationRefDataService.getCourtLocationsByEpimmsIdWithCML(any(), any())).thenReturn(new ArrayList<>(List.of()));
 
@@ -106,7 +102,6 @@ class LocationServiceTest {
 
     @Test
     void shouldNotThrowException_whenApplicationMadeAfterSDOMainCaseCMLInRefData() {
-        when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getCaseDataForWorkAllocation(CaseState.CASE_DISCONTINUED, SPEC_CLAIM, INDIVIDUAL, null, respondent1DQ,
                                           respondent2DQ).toBuilder()
