@@ -61,6 +61,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     private static final String authToken = "Bearer TestAuthToken";
 
     private ObjectMapper mapper;
+
     @Nested
     class AboutToSubmitCallback {
 
@@ -244,8 +245,6 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
             verify(helperService, times(1)).triggerEvent(caseData, TRIGGER_LOCATION_UPDATE);
             verifyNoMoreInteractions(helperService);
         }
-
-
 
         @Test
         void shouldNotTriggerGeneralApplicationEvent_whenCaseHasNoGeneralApplicationLip() {
