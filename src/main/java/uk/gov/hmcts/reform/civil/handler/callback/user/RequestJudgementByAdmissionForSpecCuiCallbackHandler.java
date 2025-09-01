@@ -28,7 +28,6 @@ import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -58,7 +57,6 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
     private final JudgmentByAdmissionOnlineMapper judgmentByAdmissionOnlineMapper;
     private final InterestCalculator interestCalculator;
     private final Time time;
-
 
     @Override
     protected Map<String, Callback> callbacks() {
