@@ -488,6 +488,7 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     private YesOrNo claimFixedCostsOnEntryDJ;
 
     private YesOrNo mediationFileSentToMmt;
+    private YesOrNo evidenceUploadNotificationSent;
 
     @JsonIgnore
     public boolean isResponseAcceptedByClaimant() {
@@ -592,6 +593,11 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     @JsonIgnore
     public boolean applicant1SuggestedPayBySetDate() {
         return applicant1RepaymentOptionForDefendantSpec == PaymentType.SET_DATE;
+    }
+
+    @JsonIgnore
+    public boolean applicant1SuggestedPayByInstalments() {
+        return applicant1RepaymentOptionForDefendantSpec == PaymentType.REPAYMENT_PLAN;
     }
 
     @JsonIgnore

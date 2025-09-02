@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.handler.callback.user.createsdo;
+package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -1087,7 +1087,10 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     class AboutToSubmitCallback {
 
         private CallbackParams params;
+        private CaseData caseData;
+        private String userId;
 
+        private static final String EMAIL = "example@email.com";
         private final LocalDateTime submittedDate = LocalDateTime.now();
 
         @BeforeEach
@@ -1103,6 +1106,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .setFastTrackFlag(YES)
                     .build();
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            userId = UUID.randomUUID().toString();
 
             given(time.now()).willReturn(submittedDate);
 
@@ -1358,7 +1362,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(locationsFromDynamicList(dynamicList)).containsExactly(
                     "Site 1 - Adr 1 - AAA 111",
                     "Site 2 - Adr 2 - BBB 222",
-                    "Site 3 - Adr 3 - CCC 333"
+                    "Site 3 - Adr 3 - CCC 333",
+                    "Site 5 - Adr 5 - YYY 111"
             );
         }
 
@@ -1389,9 +1394,10 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(dynamicList).isNotNull();
             assertThat(locationsFromDynamicList(dynamicList)).containsExactly(
-                    "Site 1 - Adr 1 - AAA 111",
-                    "Site 2 - Adr 2 - BBB 222",
-                    "Site 3 - Adr 3 - CCC 333"
+                "Site 1 - Adr 1 - AAA 111",
+                "Site 2 - Adr 2 - BBB 222",
+                "Site 3 - Adr 3 - CCC 333",
+                "Site 5 - Adr 5 - YYY 111"
             );
         }
 
@@ -1428,9 +1434,10 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(dynamicList).isNotNull();
             assertThat(locationsFromDynamicList(dynamicList)).containsExactly(
-                    "Site 1 - Adr 1 - AAA 111",
-                    "Site 2 - Adr 2 - BBB 222",
-                    "Site 3 - Adr 3 - CCC 333"
+                "Site 1 - Adr 1 - AAA 111",
+                "Site 2 - Adr 2 - BBB 222",
+                "Site 3 - Adr 3 - CCC 333",
+                "Site 5 - Adr 5 - YYY 111"
             );
         }
 
@@ -1440,21 +1447,21 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPrePopulateDisposalHearingPageSpec3() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build()
-                    .toBuilder()
-                    .caseAccessCategory(SPEC_CLAIM)
-                    .totalClaimAmount(BigDecimal.valueOf(10000))
-                    .applicant1DQ(Applicant1DQ.builder()
-                            .applicant1DQRequestedCourt(
-                                    RequestedCourt.builder()
-                                            .responseCourtCode("court3")
-                                            .caseLocation(
-                                                    CaseLocationCivil.builder()
-                                                            .baseLocation("dummy base")
-                                                            .region("dummy region")
-                                                            .build()
-                                            ).build()
-                            ).build()
-                    ).build();
+                .toBuilder()
+                .caseAccessCategory(SPEC_CLAIM)
+                .totalClaimAmount(BigDecimal.valueOf(10000))
+                .applicant1DQ(Applicant1DQ.builder()
+                                  .applicant1DQRequestedCourt(
+                                      RequestedCourt.builder()
+                                          .responseCourtCode("court3")
+                                          .caseLocation(
+                                              CaseLocationCivil.builder()
+                                                  .baseLocation("00000")
+                                                  .region("dummy region")
+                                                  .build()
+                                          ).build()
+                                  ).build()
+                ).build();
 
             given(locationRefDataService.getHearingCourtLocations(any()))
                     .willReturn(getSampleCourLocationsRefObject());
@@ -1473,11 +1480,12 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(dynamicList).isNotNull();
             assertThat(locationsFromDynamicList(dynamicList)).containsExactly(
-                    "Site 1 - Adr 1 - AAA 111",
-                    "Site 2 - Adr 2 - BBB 222",
-                    "Site 3 - Adr 3 - CCC 333"
+                "Site 1 - Adr 1 - AAA 111",
+                "Site 2 - Adr 2 - BBB 222",
+                "Site 3 - Adr 3 - CCC 333",
+                "Site 5 - Adr 5 - YYY 111"
             );
-            assertThat(dynamicList.getValue().getLabel()).isEqualTo("Site 3 - Adr 3 - CCC 333");
+            assertThat(dynamicList.getValue().getLabel()).isEqualTo("Site 5 - Adr 5 - YYY 111");
         }
     }
 
@@ -1736,15 +1744,16 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(dynamicList).isNotNull();
             assertThat(locationsFromDynamicList(dynamicList)).containsExactly(
-                    "A Site 3 - Adr 3 - AAA 111",
-                    "Site 1 - Adr 1 - VVV 111",
-                    "Site 2 - Adr 2 - BBB 222",
-                    "Site 3 - Adr 3 - CCC 333"
+                "A Site 3 - Adr 3 - AAA 111",
+                "Site 1 - Adr 1 - VVV 111",
+                "Site 2 - Adr 2 - BBB 222",
+                "Site 3 - Adr 3 - CCC 333",
+                "Site 5 - Adr 5 - YYY 111"
             );
             Optional<LocationRefData> shouldBeSelected = getSampleCourLocationsRefObjectToSort().stream()
-                    .filter(locationRefData -> locationRefData.getCourtLocationCode().equals(
-                            caseData.getApplicant1DQ().getApplicant1DQRequestedCourt().getResponseCourtCode()))
-                    .findFirst();
+                .filter(locationRefData -> locationRefData.getEpimmsId().equals(
+                    caseData.getApplicant1DQ().getApplicant1DQRequestedCourt().getCaseLocation().getBaseLocation()))
+                .findFirst();
             assertThat(shouldBeSelected).isPresent();
             assertThat(dynamicList.getValue()).isNotNull()
                     .extracting("label").isEqualTo(LocationReferenceDataService.getDisplayEntry(shouldBeSelected.get()));
@@ -2480,10 +2489,11 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(dynamicList).isNotNull();
             assertThat(locationsFromDynamicList(dynamicList)).containsExactly(
-                    "A Site 3 - Adr 3 - AAA 111",
-                    "Site 1 - Adr 1 - VVV 111",
-                    "Site 2 - Adr 2 - BBB 222",
-                    "Site 3 - Adr 3 - CCC 333"
+                "A Site 3 - Adr 3 - AAA 111",
+                "Site 1 - Adr 1 - VVV 111",
+                "Site 2 - Adr 2 - BBB 222",
+                "Site 3 - Adr 3 - CCC 333",
+                "Site 5 - Adr 5 - YYY 111"
             );
         }
 
@@ -2513,10 +2523,11 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(dynamicList).isNotNull();
             assertThat(locationsFromDynamicList(dynamicList)).containsExactly(
-                    "A Site 3 - Adr 3 - AAA 111",
-                    "Site 1 - Adr 1 - VVV 111",
-                    "Site 2 - Adr 2 - BBB 222",
-                    "Site 3 - Adr 3 - CCC 333"
+                "A Site 3 - Adr 3 - AAA 111",
+                "Site 1 - Adr 1 - VVV 111",
+                "Site 2 - Adr 2 - BBB 222",
+                "Site 3 - Adr 3 - CCC 333",
+                "Site 5 - Adr 5 - YYY 111"
             );
         }
 

@@ -9,9 +9,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notification.handlers.resetpin.ResetPinDefendantLipNotifier;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
@@ -24,6 +26,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 @ExtendWith(MockitoExtension.class)
@@ -33,6 +37,8 @@ public class ResetPinCUICallbackHandlerTest extends BaseCallbackHandlerTest {
     private DefendantPinToPostLRspecService defendantPinToPostLRspecService;
     @Mock
     private ResetPinDefendantLipNotifier resetPinDefendantLipNotifier;
+    @Mock
+    private PinInPostConfiguration pipInPostConfiguration;
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
@@ -44,6 +50,7 @@ public class ResetPinCUICallbackHandlerTest extends BaseCallbackHandlerTest {
         handler = new ResetPinCUICallbackHandler(
             defendantPinToPostLRspecService,
             resetPinDefendantLipNotifier,
+            pipInPostConfiguration,
             objectMapper
         );
     }
@@ -102,4 +109,66 @@ public class ResetPinCUICallbackHandlerTest extends BaseCallbackHandlerTest {
         }
     }
 
+    @Nested
+    class AboutToStartCallback {
+
+        @Test
+        void shouldReturnErrorWhenDefendantEmailIsMissing() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued()
+                .respondent1(null)
+                .addRespondent1PinToPostLRspec(DefendantPinToPostLRspec.builder()
+                                                   .accessCode("000MC08")
+                                                   .build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).containsExactly(
+                "The defendant email address is missing. Please update the defendant details using the manage contact information" +
+                    " event and then perform reset pin event."
+            );
+        }
+
+        @Test
+        void shouldNotReturnErrorWhenDefendantEmailIsPresent() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued()
+                .respondent1(Party.builder()
+                                 .partyEmail("test@gmail.com").build())
+                .addRespondent1PinToPostLRspec(DefendantPinToPostLRspec.builder()
+                                                   .accessCode("000MC08")
+                                                   .build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNullOrEmpty();
+        }
+
+        @Test
+        void shouldReturnErrorWhenAccessCodeIsMissing() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued()
+                .respondent1(Party.builder().partyEmail("test@gmail.com").build())
+                .addRespondent1PinToPostLRspec(DefendantPinToPostLRspec.builder()
+                                                   .accessCode(null)
+                                                   .build())
+                .build();
+
+            when(pipInPostConfiguration.getRespondToClaimUrl()).thenReturn("dummy_respond_to_claim_url");
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).containsExactly(
+                "Re set PIN is not required, please ask user to access their claim using dummy_respond_to_claim_url"
+            );
+        }
+    }
 }
