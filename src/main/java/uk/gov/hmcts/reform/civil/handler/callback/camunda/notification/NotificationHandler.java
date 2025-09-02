@@ -62,11 +62,8 @@ public class NotificationHandler extends CallbackHandler {
         final Notifier notifier = notifierFactory.getNotifier(taskId);
         final String summary = notifier.notifyParties(caseData, NOTIFY_EVENT.toString(), taskId);
 
-        CaseData.CaseDataBuilder updatedCaseDataBuilder = caseData.toBuilder()
-            .notificationSummary(summary);
-
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toBuilder().notificationSummary(summary).build().toMap(objectMapper))
             .build();
     }
 
@@ -74,21 +71,28 @@ public class NotificationHandler extends CallbackHandler {
         final CaseData caseData = callbackParams.getCaseData();
         final String caseId = caseData.getCcdCaseReference().toString();
         StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId, RECORD_NOTIFICATIONS);
-        String summary = caseData.getNotificationSummary();
-        CaseDataContent caseContent = getCaseContent(startEventResponse, summary);
+        String fullSummary = caseData.getNotificationSummary();
+        CaseDataContent caseContent = getCaseContent(startEventResponse, fullSummary);
         coreCaseDataService.submitUpdate(caseId, caseContent);
         return SubmittedCallbackResponse.builder().build();
     }
 
-    private CaseDataContent getCaseContent(StartEventResponse startEventResponse, String summary) {
+    private CaseDataContent getCaseContent(StartEventResponse startEventResponse, String fullSummary) {
         Map<String, Object> data = startEventResponse.getCaseDetails().getData();
+        String[] parts = fullSummary.split(" \\|\\| Errors: ");
+        String cleanSummary = parts[0]; // "Attempted: ..."
+        String errors = parts.length > 1 ? parts[1] : null;
+
+        Event.EventBuilder eventBuilder = Event.builder()
+                                               .id(startEventResponse.getEventId())
+                                               .summary(cleanSummary);
+        if (errors != null && !errors.isEmpty()) {
+            eventBuilder.description("Errors: " + errors);
+        }
         return CaseDataContent.builder()
-            .eventToken(startEventResponse.getToken())
-            .event(Event.builder()
-                       .id(startEventResponse.getEventId())
-                       .summary(summary)
-                       .build())
-            .data(data)
-            .build();
+                              .eventToken(startEventResponse.getToken())
+                              .event(eventBuilder.build())
+                              .data(data)
+                              .build();
     }
 }
