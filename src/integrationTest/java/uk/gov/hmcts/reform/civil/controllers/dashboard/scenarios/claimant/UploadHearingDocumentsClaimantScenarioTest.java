@@ -29,7 +29,6 @@ public class UploadHearingDocumentsClaimantScenarioTest extends DashboardBaseInt
     void shouldCreateUploadDocumentCaseProgresionScenario() throws Exception {
 
         String caseId = "12345188432991";
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
 
         DynamicListElement selectedCourt = DynamicListElement.builder()

@@ -231,7 +231,6 @@ class SendFinalOrderBulkPrintServiceTest {
         CaseData caseData = buildCaseDataForTranslatedOrder(claimant);
         given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
             .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
-        given(featureToggleService.isCaseProgressionEnabled()).willReturn(true);
 
         // when
         sendFinalOrderBulkPrintService.sendTranslatedFinalOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_CLAIMANT);
@@ -247,7 +246,6 @@ class SendFinalOrderBulkPrintServiceTest {
         CaseData caseData = buildCaseDataForTranslatedOrder(defendant);
         given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
             .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
-        given(featureToggleService.isCaseProgressionEnabled()).willReturn(true);
 
         // when
         sendFinalOrderBulkPrintService.sendTranslatedFinalOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
@@ -266,7 +264,6 @@ class SendFinalOrderBulkPrintServiceTest {
             .respondent1Represented(YesOrNo.NO)
             .applicant1Represented(YesOrNo.NO)
             .build();
-        given(featureToggleService.isCaseProgressionEnabled()).willReturn(false);
 
         // when
         sendFinalOrderBulkPrintService.sendTranslatedFinalOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_CLAIMANT);
@@ -286,7 +283,6 @@ class SendFinalOrderBulkPrintServiceTest {
             .applicant1Represented(YesOrNo.NO)
             .claimantBilingualLanguagePreference(Language.BOTH.toString())
             .build();
-        given(featureToggleService.isCaseProgressionEnabled()).willReturn(true);
 
         // when
         sendFinalOrderBulkPrintService.sendTranslatedFinalOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_CLAIMANT);

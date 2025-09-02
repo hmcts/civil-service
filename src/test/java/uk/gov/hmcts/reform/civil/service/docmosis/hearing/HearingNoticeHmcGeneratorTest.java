@@ -159,10 +159,7 @@ class HearingNoticeHmcGeneratorTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldGenerateHearingNoticeHmc_1v1_whenHearingFeeHasBeenPaid(boolean isCaseProgressionEnabled) {
-
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(isCaseProgressionEnabled);
-
+    void shouldGenerateHearingNoticeHmc_1v1_whenHearingFeeHasBeenPaid() {
         var hearing = baseHearing.toBuilder()
                     .hearingDetails(HearingDetails.builder()
                                         .hearingType("AAA7-TRI")
@@ -225,8 +222,6 @@ class HearingNoticeHmcGeneratorTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void shouldOnlyIgnoreFeeDetails_1v1_whenHearingFeeHasBeenPaidThroughHwFAndCPToggleEnabled(boolean isCaseProgressionEnabled) {
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(isCaseProgressionEnabled);
-
         var hearing = baseHearing.toBuilder()
             .hearingDetails(HearingDetails.builder()
                                 .hearingType("AAA7-TRI")
@@ -291,9 +286,7 @@ class HearingNoticeHmcGeneratorTest {
 
     @ParameterizedTest
     @CsvSource({"true, false", "false, false", "true, true", "false, false"})
-    void shouldGenerateHearingNoticeHmc_1v1_whenHearingFeeHasNotBeenPaid(boolean isCaseProgressionEnabled, boolean isWelsh) {
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(isCaseProgressionEnabled);
-
+    void shouldGenerateHearingNoticeHmc_1v1_whenHearingFeeHasNotBeenPaid(boolean isWelsh) {
         var hearing = baseHearing.toBuilder()
             .hearingDetails(HearingDetails.builder()
                                 .hearingType("AAA7-TRI")
@@ -359,8 +352,6 @@ class HearingNoticeHmcGeneratorTest {
     @ParameterizedTest
     @CsvSource({"true, false", "false, false", "true, true", "false, false"})
     void shouldGenerateHearingNoticeHmc_1v2DS_whenHearingFeeHasBeenPaid(boolean isCaseProgressionEnabled, boolean isWelsh) {
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(isCaseProgressionEnabled);
-
         var hearing = baseHearing.toBuilder()
             .hearingDetails(HearingDetails.builder()
                                 .hearingType("AAA7-DIS")
@@ -427,8 +418,6 @@ class HearingNoticeHmcGeneratorTest {
     @ParameterizedTest
     @CsvSource({"true, false", "false, false", "true, true", "false, false"})
     void shouldGenerateHearingNoticeHmcDisputeResolution_1v2DS_whenHearingFeeHasBeenPaid(boolean isCaseProgressionEnabled, boolean isWelsh) {
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(isCaseProgressionEnabled);
-
         var hearing = baseHearing.toBuilder()
             .hearingDetails(HearingDetails.builder()
                                 .hearingType("AAA7-DRH")
@@ -500,8 +489,6 @@ class HearingNoticeHmcGeneratorTest {
         "AAA7-DRH, dispute resolution hearing, false"
     })
     void shouldGenerateHearingNoticeHmc_2v1_whenHearingFeeHasBeenPaid_whenHearingType(String hearingType, String expectedTitle, boolean isCaseProgressionEnabled) {
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(isCaseProgressionEnabled);
-
         var hearing = baseHearing.toBuilder()
             .hearingDetails(HearingDetails.builder()
                                 .hearingType(hearingType)
@@ -567,8 +554,6 @@ class HearingNoticeHmcGeneratorTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void shouldGenerateHearingNoticeHmc_2v1_whenHearingFeeHasBeenPaid_noSolicitorReferences(boolean isCaseProgressionEnabled) {
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(isCaseProgressionEnabled);
-
         var hearing = baseHearing.toBuilder()
             .hearingDetails(HearingDetails.builder()
                                 .hearingType("AAA7-DRH")
@@ -632,8 +617,6 @@ class HearingNoticeHmcGeneratorTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void shouldReturnListOfExpectedCaseDocuments(boolean isCaseProgressionEnabled) {
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(isCaseProgressionEnabled);
-
         var hearing = baseHearing.toBuilder()
             .hearingDetails(HearingDetails.builder()
                                 .hearingType("AAA7-TRI")
@@ -678,8 +661,6 @@ class HearingNoticeHmcGeneratorTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void shouldReturnListOfExpectedCaseDocumentsSpec(boolean isCaseProgressionEnabled) {
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(isCaseProgressionEnabled);
-
         var hearing = baseHearing.toBuilder()
             .hearingDetails(HearingDetails.builder()
                                 .hearingType("AAA7-TRI")
@@ -724,8 +705,6 @@ class HearingNoticeHmcGeneratorTest {
 
     @Test
     void shouldReturnListOfExpectedCaseDocumentsSpec_WhenIsWelshHearingNotice() {
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
-
         var hearing = baseHearing.toBuilder()
             .hearingDetails(HearingDetails.builder()
                                 .hearingType("AAA7-TRI")

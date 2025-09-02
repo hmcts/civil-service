@@ -38,18 +38,13 @@ public class DecisionOutcomeCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse changeState(CallbackParams callbackParams) {
-        if (featureToggleService.isCaseProgressionEnabled()) {
-            CaseData caseData = callbackParams.getCaseData().toBuilder()
+        CaseData caseData = callbackParams.getCaseData().toBuilder()
                 .build();
-            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-            caseDataBuilder.businessProcess(BusinessProcess.ready(MOVE_TO_DECISION_OUTCOME));
-            return AboutToStartOrSubmitCallbackResponse.builder()
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        caseDataBuilder.businessProcess(BusinessProcess.ready(MOVE_TO_DECISION_OUTCOME));
+        return AboutToStartOrSubmitCallbackResponse.builder()
                 .state(DECISION_OUTCOME.name()).data(caseDataBuilder.build().toMap(objectMapper))
                 .build();
-        }
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .state(DECISION_OUTCOME.name())
-            .build();
     }
 
     @Override

@@ -103,14 +103,11 @@ public class SendFinalOrderBulkPrintService {
     }
 
     private boolean checkTranslatedFinalOrderDocumentAvailable(CaseData caseData, String task) {
-        if (featureToggleService.isCaseProgressionEnabled()) {
-            List<Element<CaseDocument>> systemGeneratedDocuments = caseData.getSystemGeneratedCaseDocuments();
-            return (!caseData.getSystemGeneratedCaseDocuments().isEmpty())
+        List<Element<CaseDocument>> systemGeneratedDocuments = caseData.getSystemGeneratedCaseDocuments();
+        return (!caseData.getSystemGeneratedCaseDocuments().isEmpty())
                 && isEligibleToGetTranslatedOrder(caseData, task)
                 && systemGeneratedDocuments
                 .get(systemGeneratedDocuments.size() - 1).getValue().getDocumentType().equals(ORDER_NOTICE_TRANSLATED_DOCUMENT);
-        }
-        return false;
     }
 
     private boolean isDefendantPrint(String task) {

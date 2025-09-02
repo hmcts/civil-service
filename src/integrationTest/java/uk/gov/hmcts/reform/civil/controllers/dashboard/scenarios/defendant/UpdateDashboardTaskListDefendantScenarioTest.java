@@ -33,7 +33,6 @@ public class UpdateDashboardTaskListDefendantScenarioTest
             .responseClaimTrack("SMALL_CLAIM")
             .build();
 
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         handler.handle(callbackParams(caseData));
 
         //Verify Notification is created
@@ -64,7 +63,6 @@ public class UpdateDashboardTaskListDefendantScenarioTest
             .responseClaimTrack("FAST_CLAIM")
             .build();
 
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         handler.handle(callbackParams(caseData));
 
         //Verify Notification is created
@@ -101,7 +99,6 @@ public class UpdateDashboardTaskListDefendantScenarioTest
             .responseClaimTrack("FAST_CLAIM")
             .build();
 
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         handler.handle(callbackParams(caseData));
 
         //Verify Notification is created

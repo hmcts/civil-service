@@ -27,12 +27,6 @@ public class HearingFeeHwfRejectedScenarioTest extends DashboardBaseIntegrationT
     @Autowired
     private HwFDashboardNotificationsHandler hwFDashboardNotificationsHandler;
 
-    @BeforeEach
-    public void before() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
-    }
-
     @Test
     void should_create_hearing_fee_hwf_rejected_scenario() throws Exception {
         String caseId = "12345";

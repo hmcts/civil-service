@@ -487,7 +487,6 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
                     UpholdingPreviousOrderReason.builder()
                         .reasonForReconsiderationTxtYes("Reason1").build()).decisionOnRequestReconsiderationOptions(
                     DecisionOnRequestReconsiderationOptions.CREATE_GENERAL_ORDER).build();
-            when(featureToggleService.isCaseProgressionEnabled()).thenReturn(false);
             CallbackParams params = CallbackParams.builder()
                 .caseData(caseData)
                 .type(CallbackType.SUBMITTED)
@@ -505,7 +504,6 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
                     UpholdingPreviousOrderReason.builder()
                         .reasonForReconsiderationTxtYes("Reason1").build()).decisionOnRequestReconsiderationOptions(
                     DecisionOnRequestReconsiderationOptions.CREATE_GENERAL_ORDER).build();
-            when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
             CallbackParams params = CallbackParams.builder()
                 .caseData(caseData)
                 .type(CallbackType.SUBMITTED)

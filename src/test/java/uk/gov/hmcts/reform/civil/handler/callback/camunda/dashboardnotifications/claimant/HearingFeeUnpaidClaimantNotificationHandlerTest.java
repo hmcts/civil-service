@@ -68,10 +68,6 @@ class HearingFeeUnpaidClaimantNotificationHandlerTest {
 
     @Nested
     class AboutToSubmitCallback {
-        @BeforeEach
-        void setup() {
-            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
-        }
 
         @Test
         void shouldRecordScenario_notTrialReady_whenInvoked() {

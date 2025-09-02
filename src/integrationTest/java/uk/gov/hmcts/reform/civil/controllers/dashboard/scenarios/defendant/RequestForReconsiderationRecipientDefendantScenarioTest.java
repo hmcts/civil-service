@@ -43,7 +43,6 @@ public class RequestForReconsiderationRecipientDefendantScenarioTest extends Das
                 CaseDocument.builder().documentLink(Document.builder().documentBinaryUrl("url").build()).build())))
             .requestForReconsiderationDeadline(LocalDateTime.of(2024, 6, 14, 16, 0))
             .build();
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
 
         handler.handle(callbackParams(caseData));
 

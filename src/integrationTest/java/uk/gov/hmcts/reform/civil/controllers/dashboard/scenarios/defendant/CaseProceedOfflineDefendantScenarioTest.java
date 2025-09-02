@@ -65,8 +65,6 @@ public class CaseProceedOfflineDefendantScenarioTest extends DashboardBaseIntegr
 
     @Test
     void should_create_case_proceed_offline__claimant_scenario_without_tasks() throws Exception {
-
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         String caseId = "72016577183";
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
@@ -115,7 +113,6 @@ public class CaseProceedOfflineDefendantScenarioTest extends DashboardBaseIntegr
             .activeJudgment(JudgmentDetails.builder().state(JudgmentState.ISSUED).build())
             .previousCCDState(CaseState.All_FINAL_ORDERS_ISSUED)
             .build();
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         when(featureToggleService.isCoSCEnabled()).thenReturn(true);
 
         handler.handle(callbackParams(caseData));

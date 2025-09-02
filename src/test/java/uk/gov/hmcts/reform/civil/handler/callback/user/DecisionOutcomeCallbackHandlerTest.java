@@ -58,8 +58,6 @@ class DecisionOutcomeCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackRequest.builder().eventId(UPDATE_DASHBOARD_TASK_LIST_DEFENDANT_DECISION_OUTCOME.name()).build()
         ).build();
 
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
-
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
             .handle(params);
 

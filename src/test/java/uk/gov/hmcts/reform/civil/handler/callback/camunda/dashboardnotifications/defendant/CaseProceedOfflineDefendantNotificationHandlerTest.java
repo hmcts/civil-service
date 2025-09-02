@@ -142,7 +142,6 @@ class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCallbackHan
                 .previousCCDState(CASE_PROGRESSION).build();
 
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
-            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
             when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
@@ -175,7 +174,6 @@ class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCallbackHan
                 .previousCCDState(CASE_PROGRESSION).build();
 
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
-            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
             when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
@@ -212,36 +210,6 @@ class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCallbackHan
                     .previousCCDState(PENDING_CASE_ISSUED).build();
 
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
-            when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
-            HashMap<String, Object> scenarioParams = new HashMap<>();
-            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(CREATE_DEFENDANT_DASHBOARD_NOTIFICATION_FOR_CASE_PROCEED_OFFLINE.name()).build()
-            ).build();
-
-            // When
-            handler.handle(params);
-
-            // Then
-            verify(dashboardScenariosService, never()).recordScenarios(
-                "BEARER_TOKEN",
-                SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT.getScenario(),
-                caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
-            );
-        }
-
-        @Test
-        void shouldNotRecordScenario_whenCaseProgressionIsNotEnabledAndIsOnCaseProgressionState() {
-            // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
-                .respondent1Represented(YesOrNo.NO)
-                .ccdCaseReference(12890L)
-                .previousCCDState(CASE_PROGRESSION).build();
-
-            when(toggleService.isLipVLipEnabled()).thenReturn(true);
-            when(toggleService.isCaseProgressionEnabled()).thenReturn(false);
             when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
@@ -318,7 +286,6 @@ class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCallbackHan
                 .generalApplications(gaApplications)
                 .build();
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
-            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
             when(toggleService.isCoSCEnabled()).thenReturn(true);
             when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
 
@@ -351,7 +318,6 @@ class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCallbackHan
                 .previousCCDState(CaseState.All_FINAL_ORDERS_ISSUED).build();
 
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
-            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
             when(toggleService.isCoSCEnabled()).thenReturn(true);
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);

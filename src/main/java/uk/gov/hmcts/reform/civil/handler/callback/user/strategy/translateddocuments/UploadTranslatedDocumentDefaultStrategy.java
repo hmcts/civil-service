@@ -107,7 +107,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
         List<Element<CaseDocument>> courtOfficerOrderDocuments = new ArrayList<>();
         List<Element<CaseDocument>> hearingDocuments = caseData.getHearingDocuments();
 
-        if (featureToggleService.isCaseProgressionEnabled() && Objects.nonNull(translatedDocuments)) {
+        if (Objects.nonNull(translatedDocuments)) {
             translatedDocuments.forEach(document -> {
                 if (document.getValue().getDocumentType().equals(STANDARD_DIRECTION_ORDER)) {
                     if (Objects.nonNull(preTranslationDocuments)) {
@@ -309,7 +309,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
         List<Element<TranslatedDocument>> addToHearingDocuments = new ArrayList<>();
         List<Element<TranslatedDocument>> addToFinalOrders = new ArrayList<>();
         List<Element<TranslatedDocument>> addToCourtOfficerOrders = new ArrayList<>();
-        if (featureToggleService.isCaseProgressionEnabled() && Objects.nonNull(translatedDocuments)) {
+        if (Objects.nonNull(translatedDocuments)) {
             translatedDocuments.forEach(document -> {
                 if (document.getValue().getDocumentType().equals(ORDER_NOTICE)) {
                     document.getValue().getFile().setCategoryID("orders");
@@ -362,43 +362,41 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
     }
 
     private CaseEvent getBusinessProcessEvent(CaseData caseData) {
-        if (featureToggleService.isCaseProgressionEnabled()) {
-            List<Element<TranslatedDocument>> translatedDocuments = caseData.getTranslatedDocuments();
+        List<Element<TranslatedDocument>> translatedDocuments = caseData.getTranslatedDocuments();
 
-            if (Objects.nonNull(translatedDocuments) && translatedDocuments.size() > 0
+        if (Objects.nonNull(translatedDocuments) && translatedDocuments.size() > 0
                 && translatedDocuments.get(0).getValue().getDocumentType().equals(ORDER_NOTICE)) {
-                return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_ORDER_NOTICE;
-            } else if (Objects.nonNull(translatedDocuments)
+            return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_ORDER_NOTICE;
+        } else if (Objects.nonNull(translatedDocuments)
                 && translatedDocuments.get(0).getValue().getDocumentType().equals(STANDARD_DIRECTION_ORDER)) {
-                return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_SDO;
-            } else if (Objects.nonNull(translatedDocuments)
+            return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_SDO;
+        } else if (Objects.nonNull(translatedDocuments)
                 && ((translatedDocuments.get(0).getValue().getDocumentType().equals(INTERLOCUTORY_JUDGMENT))
                 || (translatedDocuments.get(0).getValue().getDocumentType().equals(MANUAL_DETERMINATION)))) {
-                return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_CLAIMANT_REJECTS_REPAYMENT_PLAN;
-            } else if (Objects.nonNull(translatedDocuments)
+            return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_CLAIMANT_REJECTS_REPAYMENT_PLAN;
+        } else if (Objects.nonNull(translatedDocuments)
                 && (translatedDocuments.get(0).getValue().getDocumentType().equals(FINAL_ORDER))) {
-                return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_ORDER;
-            } else if (Objects.nonNull(translatedDocuments)
+            return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_ORDER;
+        } else if (Objects.nonNull(translatedDocuments)
                 && isContainsSpecifiedDocType(translatedDocuments, NOTICE_OF_DISCONTINUANCE_DEFENDANT)) {
-                return CaseEvent.UPLOAD_TRANSLATED_DISCONTINUANCE_DOC;
-            } else if (Objects.nonNull(translatedDocuments)
+            return CaseEvent.UPLOAD_TRANSLATED_DISCONTINUANCE_DOC;
+        } else if (Objects.nonNull(translatedDocuments)
                 && translatedDocuments.get(0).getValue().getDocumentType().equals(SETTLEMENT_AGREEMENT)) {
-                return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_SETTLEMENT_AGREEMENT;
-            } else if (Objects.nonNull(translatedDocuments)
+            return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_SETTLEMENT_AGREEMENT;
+        } else if (Objects.nonNull(translatedDocuments)
                 && translatedDocuments.get(0).getValue().getDocumentType().equals(COURT_OFFICER_ORDER)) {
-                return CaseEvent.COURT_OFFICER_ORDER;
-            } else if (Objects.nonNull(translatedDocuments)
+            return CaseEvent.COURT_OFFICER_ORDER;
+        } else if (Objects.nonNull(translatedDocuments)
                 && translatedDocuments.get(0).getValue().getDocumentType().equals(DECISION_MADE_ON_APPLICATIONS)) {
-                return CaseEvent.DECISION_ON_RECONSIDERATION_REQUEST;
-            } else if (Objects.nonNull(translatedDocuments)
+            return CaseEvent.DECISION_ON_RECONSIDERATION_REQUEST;
+        } else if (Objects.nonNull(translatedDocuments)
                 && translatedDocuments.get(0).getValue().getDocumentType().equals(HEARING_NOTICE)) {
-                return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_HEARING_NOTICE;
-            } else if (Objects.nonNull(translatedDocuments)
+            return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_HEARING_NOTICE;
+        } else if (Objects.nonNull(translatedDocuments)
                 && isContainsSpecifiedDocType(translatedDocuments, DEFENDANT_RESPONSE)
                 && caseData.isLipvLROneVOne()
                 && featureToggleService.isWelshEnabledForMainCase()) {
-                return CaseEvent.UPLOAD_TRANSLATED_DEFENDANT_SEALED_FORM;
-            }
+            return CaseEvent.UPLOAD_TRANSLATED_DEFENDANT_SEALED_FORM;
         }
 
         if ((caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled())

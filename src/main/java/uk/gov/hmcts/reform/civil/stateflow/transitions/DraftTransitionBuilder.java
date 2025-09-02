@@ -15,7 +15,6 @@ import java.util.function.Predicate;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.BULK_CLAIM_ENABLED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.CASE_PROGRESSION_ENABLED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.CLAIM_STATE_DURING_NOC;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.DASHBOARD_SERVICE_ENABLED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.DEFENDANT_NOC_ONLINE;
@@ -46,7 +45,6 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     Map.entry(FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), true),
                     Map.entry(GENERAL_APPLICATION_ENABLED.name(), switchTheGAFlagIfLipExists(c)),
                     Map.entry(DASHBOARD_SERVICE_ENABLED.name(), isDashBoardEnabledForCase(c)),
-                    Map.entry(CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled()),
                     Map.entry(BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()),
                     Map.entry(JO_ONLINE_LIVE_ENABLED.name(), featureToggleService.isJudgmentOnlineLive()),
                     Map.entry(IS_JO_LIVE_FEED_ACTIVE.name(), featureToggleService.isJOLiveFeedActive()),
@@ -69,7 +67,6 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     Map.entry(FlowFlag.TWO_RESPONDENT_REPRESENTATIVES.name(), true),
                     Map.entry(GENERAL_APPLICATION_ENABLED.name(), switchTheGAFlagIfLipExists(c)),
                     Map.entry(DASHBOARD_SERVICE_ENABLED.name(), isDashBoardEnabledForCase(c)),
-                    Map.entry(CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled()),
                     Map.entry(BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()),
                     Map.entry(JO_ONLINE_LIVE_ENABLED.name(), featureToggleService.isJudgmentOnlineLive()),
                     Map.entry(IS_JO_LIVE_FEED_ACTIVE.name(), featureToggleService.isJOLiveFeedActive()),
@@ -88,7 +85,6 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     Map.entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true),
                     Map.entry(GENERAL_APPLICATION_ENABLED.name(), switchTheGAFlagIfLipExists(c)),
                     Map.entry(DASHBOARD_SERVICE_ENABLED.name(), isDashBoardEnabledForCase(c)),
-                    Map.entry(CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled()),
                     Map.entry(BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()),
                     Map.entry(JO_ONLINE_LIVE_ENABLED.name(), featureToggleService.isJudgmentOnlineLive()),
                     Map.entry(IS_JO_LIVE_FEED_ACTIVE.name(), featureToggleService.isJOLiveFeedActive()),
@@ -110,7 +106,6 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     Map.entry(FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), false),
                     Map.entry(GENERAL_APPLICATION_ENABLED.name(), switchTheGAFlagIfLipExists(c)),
                     Map.entry(DASHBOARD_SERVICE_ENABLED.name(), isDashBoardEnabledForCase(c)),
-                    Map.entry(CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled()),
                     Map.entry(BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()),
                     Map.entry(JO_ONLINE_LIVE_ENABLED.name(), featureToggleService.isJudgmentOnlineLive()),
                     Map.entry(IS_JO_LIVE_FEED_ACTIVE.name(), featureToggleService.isJOLiveFeedActive()),
@@ -131,7 +126,6 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     Map.entry(FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true),
                     Map.entry(GENERAL_APPLICATION_ENABLED.name(), switchTheGAFlagIfLipExists(c)),
                     Map.entry(DASHBOARD_SERVICE_ENABLED.name(), isDashBoardEnabledForCase(c)),
-                    Map.entry(CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled()),
                     Map.entry(BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()),
                     Map.entry(JO_ONLINE_LIVE_ENABLED.name(), featureToggleService.isJudgmentOnlineLive()),
                     Map.entry(IS_JO_LIVE_FEED_ACTIVE.name(), featureToggleService.isJOLiveFeedActive()),
@@ -152,7 +146,6 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     Map.entry(FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true),
                     Map.entry(GENERAL_APPLICATION_ENABLED.name(), switchTheGAFlagIfLipExists(c)),
                     Map.entry(DASHBOARD_SERVICE_ENABLED.name(), isDashBoardEnabledForCase(c)),
-                    Map.entry(CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled()),
                     Map.entry(BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()),
                     Map.entry(JO_ONLINE_LIVE_ENABLED.name(), featureToggleService.isJudgmentOnlineLive()),
                     Map.entry(IS_JO_LIVE_FEED_ACTIVE.name(), featureToggleService.isJOLiveFeedActive()),

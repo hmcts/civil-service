@@ -76,7 +76,6 @@ class DashboardClaimStatusFactoryTest {
 
     @BeforeEach
     void prepare() {
-        Mockito.when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
         Mockito.when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
     }
 

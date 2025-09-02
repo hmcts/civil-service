@@ -18,8 +18,6 @@ public abstract class CaseProgressionDashboardCallbackHandler extends DashboardC
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return featureToggleService.isCaseProgressionEnabled()
-            ? Map.of(callbackKey(ABOUT_TO_SUBMIT), this::configureDashboardScenario)
-            : Map.of(callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse);
+        return Map.of(callbackKey(ABOUT_TO_SUBMIT), this::configureDashboardScenario);
     }
 }

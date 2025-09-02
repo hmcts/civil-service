@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -138,11 +137,6 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
         + "Claimant 2 - Documentary evidence for trial\n"
         + "Claimant 2 - Bundle";
     private static final String PAGE_ID = "validateValuesApplicant";
-
-    @BeforeEach
-    void setup() {
-        given(featureToggleService.isCaseProgressionEnabled()).willReturn(false);
-    }
 
     @Test
     void givenAboutToStart_assignCaseProgAllocatedTrackUnSpec() {
@@ -671,7 +665,6 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
         given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
         given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(false);
         given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
-        given(featureToggleService.isCaseProgressionEnabled()).willReturn(true);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 

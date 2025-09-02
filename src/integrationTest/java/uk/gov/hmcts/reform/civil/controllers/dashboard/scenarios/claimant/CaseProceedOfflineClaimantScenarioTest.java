@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -53,7 +52,7 @@ public class CaseProceedOfflineClaimantScenarioTest extends DashboardBaseIntegra
         doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "CLAIMANT")
             .andExpectAll(
                 status().is(HttpStatus.OK.value()),
-                jsonPath("$[0].reference").value(caseId.toString()),
+                jsonPath("$[0].reference").value(caseId),
                 jsonPath("$[0].taskNameEn").value(
                     "<a>Pay the hearing fee</a>"),
                 jsonPath("$[0].currentStatusEn").value("Inactive"),
@@ -66,8 +65,6 @@ public class CaseProceedOfflineClaimantScenarioTest extends DashboardBaseIntegra
 
     @Test
     void should_create_case_proceed_offline__claimant_scenario_without_tasks() throws Exception {
-
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         String caseId = "72016565145";
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()

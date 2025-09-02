@@ -31,8 +31,6 @@ public class DefendantDecisionReconsiderationScenarioTest extends DashboardBaseI
             .respondent1Represented(YesOrNo.NO)
             .build();
 
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
-
         decisionOnRequestForReconsiderationDefendantHandler.handle(callbackParams(caseData));
 
         doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, DEFENDANT)

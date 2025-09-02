@@ -490,7 +490,6 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("APPLICANTSOLICITORONE"));
-            when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
             when(documentService.generateLiPDocument(any(), anyString(), anyBoolean())).thenReturn(CaseDocument.builder().documentName("Name of document").build());
 
             //When: handler is called with ABOUT_TO_SUBMIT event
@@ -522,7 +521,6 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("RESPONDENTSOLICITORONE"));
-            when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
             when(documentService.generateLiPDocument(any(), anyString(), anyBoolean())).thenReturn(CaseDocument.builder().documentName("Name of document").build());
 
             //When: handler is called with ABOUT_TO_SUBMIT event
@@ -541,64 +539,6 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
         }
 
         @Test
-        void shouldPopulateReasonAndRequestorDetailsOfApplicantWhenRespondent1LiPWhenCuiCpDisabled() {
-            //Given : Casedata
-            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
-                .reasonForReconsiderationApplicant(ReasonForReconsideration.builder().reasonForReconsiderationTxt("Reason").build())
-                .applicant1(Party.builder()
-                                .individualFirstName("FirstName")
-                                .individualLastName("LastName")
-                                .type(Party.Type.INDIVIDUAL)
-                                .partyName("test").build())
-                .respondent1Represented(YesOrNo.NO).build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-            when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("APPLICANTSOLICITORONE"));
-            when(featureToggleService.isCaseProgressionEnabled()).thenReturn(false);
-
-            //When: handler is called with ABOUT_TO_SUBMIT event
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            //Then: setAsideDate should be set correctly
-            assertThat(response.getData()).extracting("reasonForReconsiderationApplicant")
-                .extracting("reasonForReconsiderationTxt")
-                .isEqualTo("Reason");
-            assertThat(response.getData()).extracting("reasonForReconsiderationApplicant")
-                .extracting("requestor")
-                .isEqualTo("Applicant - FirstName LastName");
-            assertThat(response.getData()).extracting("requestForReconsiderationDocument").isNull();
-        }
-
-        @Test
-        void shouldPopulateReasonAndRequestorDetailsOfRespondent1WhenApplicantLiPWhenCuiCpDisabled() {
-            //Given : Casedata
-            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
-                .reasonForReconsiderationRespondent1(ReasonForReconsideration.builder().reasonForReconsiderationTxt("Reason").build())
-                .respondent1(Party.builder()
-                                 .individualFirstName("FirstName")
-                                 .individualLastName("LastName")
-                                 .type(Party.Type.INDIVIDUAL)
-                                 .partyName("test").build())
-                .applicant1Represented(YesOrNo.NO).build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-            when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("RESPONDENTSOLICITORONE"));
-            when(featureToggleService.isCaseProgressionEnabled()).thenReturn(false);
-
-            //When: handler is called with ABOUT_TO_SUBMIT event
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            //Then: setAsideDate should be set correctly
-            assertThat(response.getData()).extracting("reasonForReconsiderationRespondent1")
-                .extracting("reasonForReconsiderationTxt")
-                .isEqualTo("Reason");
-            assertThat(response.getData()).extracting("reasonForReconsiderationRespondent1")
-                .extracting("requestor")
-                .isEqualTo("Defendant - FirstName LastName");
-            assertThat(response.getData()).extracting("requestForReconsiderationDocumentRes").isNull();
-        }
-
-        @Test
         void shouldPopulateOrderRequestedForReviewClaimantWhenItIsClaimantLiPRequest() {
             //Given : Casedata
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
@@ -610,7 +550,6 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("CLAIMANT"));
-            when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
             CaseDocument caseDocument = mock(CaseDocument.class);
             when(caseDocument.getDocumentName()).thenReturn("Generated document name");
             when(documentService.generateLiPDocument(
@@ -646,7 +585,6 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("DEFENDANT"));
-            when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
             CaseDocument caseDocument = mock(CaseDocument.class);
             when(caseDocument.getDocumentName()).thenReturn("Generated document for defendant");
             when(documentService.generateLiPDocument(

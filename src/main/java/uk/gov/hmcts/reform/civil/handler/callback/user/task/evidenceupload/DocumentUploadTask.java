@@ -92,9 +92,8 @@ public abstract class DocumentUploadTask<L1 extends LegalRepresentativeOneDocume
         clearDocumentCollections(caseDataBuilder);
         caseDataBuilder.notificationText(notificationTextBuilder.toString());
 
-        if (featureToggleService.isCaseProgressionEnabled()) {
-            caseDataBuilder.businessProcess(BusinessProcess.ready(EVIDENCE_UPLOADED));
-        }
+        caseDataBuilder.businessProcess(BusinessProcess.ready(EVIDENCE_UPLOADED));
+
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))

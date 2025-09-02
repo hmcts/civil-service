@@ -25,12 +25,6 @@ public class HearingFeeUnpaidScenarioTest extends DashboardBaseIntegrationTest {
     @Autowired
     private HearingFeeUnpaidClaimantNotificationHandler handler;
 
-    @BeforeEach
-    public void before() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
-    }
-
     @Test
     void should_create_hearing_fee_unpaid_scenario() throws Exception {
 

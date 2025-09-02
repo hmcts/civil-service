@@ -18,13 +18,13 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.sdo.ReasonForReconsideration;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.docmosis.sdo.LiPRequestReconsiderationGeneratorService;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
-import uk.gov.hmcts.reform.civil.model.common.Element;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -43,10 +43,10 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_FOR_RECONSIDE
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isApplicantSolicitor;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPClaimant;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPDefendant;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorOne;
-import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isApplicantSolicitor;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorTwo;
 
 @Service
@@ -155,7 +155,7 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
                 reasonForReconsideration.setReasonForReconsiderationTxt(REASON_NOT_PROVIDED);
             }
             updatedData.reasonForReconsiderationApplicant(reasonForReconsideration);
-            if (featureToggleService.isCaseProgressionEnabled() && caseData.isRespondent1LiP()) {
+            if (caseData.isRespondent1LiP()) {
                 updatedData.requestForReconsiderationDocument(documentGenerator.generateLiPDocument(
                     caseData,
                     callbackParams.getParams().get(BEARER_TOKEN).toString(),
@@ -176,7 +176,7 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
                 reasonForReconsideration.setReasonForReconsiderationTxt(REASON_NOT_PROVIDED);
             }
             updatedData.reasonForReconsiderationRespondent1(reasonForReconsideration);
-            if (featureToggleService.isCaseProgressionEnabled() && caseData.isApplicantLiP()) {
+            if (caseData.isApplicantLiP()) {
                 updatedData.requestForReconsiderationDocumentRes(documentGenerator.generateLiPDocument(
                     caseData,
                     callbackParams.getParams().get(BEARER_TOKEN).toString(),
@@ -194,7 +194,7 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
                 reasonForReconsideration.setReasonForReconsiderationTxt(REASON_NOT_PROVIDED);
             }
             updatedData.reasonForReconsiderationRespondent2(reasonForReconsideration);
-        } else if (featureToggleService.isCaseProgressionEnabled() && isLIPClaimant(roles)) {
+        } else if (isLIPClaimant(roles)) {
             ReasonForReconsideration reasonForReconsideration = Optional
                 .ofNullable(caseData.getReasonForReconsiderationApplicant())
                 .orElseGet(ReasonForReconsideration::new);
@@ -219,7 +219,7 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
 
             updatedData.orderRequestedForReviewClaimant(YES);
             updatedData.businessProcess(BusinessProcess.ready(REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI_CLAIMANT));
-        } else if (featureToggleService.isCaseProgressionEnabled() && isLIPDefendant(roles)) {
+        } else if (isLIPDefendant(roles)) {
             ReasonForReconsideration reasonForReconsideration = Optional
                 .ofNullable(caseData.getReasonForReconsiderationRespondent1())
                 .orElseGet(ReasonForReconsideration::new);

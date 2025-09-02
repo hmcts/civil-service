@@ -149,11 +149,6 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         + "Defendant 2 - Documentary evidence for trial";
     private static final String PAGE_ID = "validateValuesRespondent";
 
-    @BeforeEach
-    void setup() {
-        given(featureToggleService.isCaseProgressionEnabled()).willReturn(false);
-    }
-
     @Test
     void givenAboutToStart_assignCaseProgAllocatedTrackUnSpec() {
         // Given
@@ -1186,7 +1181,6 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
         given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(false);
         given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
-        given(featureToggleService.isCaseProgressionEnabled()).willReturn(true);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
