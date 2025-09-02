@@ -234,14 +234,10 @@ public class InitiateGeneralApplicationService {
     }
 
     private boolean hasSDOBeenMade(CaseData caseData) {
-        if (featureToggleService.isQueryManagementLRsEnabled()) {
-            return (!statesBeforeSDO.contains(caseData.getCcdState())
-                && !settleDiscontinueStates.contains(caseData.getCcdState()))
-                || (!statesBeforeSDO.contains(caseData.getPreviousCCDState())
-                && settleDiscontinueStates.contains(caseData.getCcdState()));
-        } else {
-            return !statesBeforeSDO.contains(caseData.getCcdState());
-        }
+        return (!statesBeforeSDO.contains(caseData.getCcdState())
+            && !settleDiscontinueStates.contains(caseData.getCcdState()))
+            || (!statesBeforeSDO.contains(caseData.getPreviousCCDState())
+            && settleDiscontinueStates.contains(caseData.getCcdState()));
     }
 
     private void setGeneralAppEvidenceDocument(CaseData caseData, GeneralApplication.GeneralApplicationBuilder applicationBuilder) {
@@ -358,8 +354,12 @@ public class InitiateGeneralApplicationService {
     }
 
     private void setBusinessProcess(CaseData caseData, UserDetails userDetails, GeneralApplication.GeneralApplicationBuilder applicationBuilder) {
-        int numberOfDeadlineDays = 5;
-        LocalDateTime deadline = deadlinesCalculator.calculateApplicantResponseDeadline(LocalDateTime.now(), numberOfDeadlineDays);
+        LocalDateTime deadline = null;
+        if (!(featureToggleService.isGaForWelshEnabled()
+            && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual()))) {
+            int numberOfDeadlineDays = 5;
+            deadline = deadlinesCalculator.calculateApplicantResponseDeadline(LocalDateTime.now(), numberOfDeadlineDays);
+        }
         applicationBuilder
             .businessProcess(BusinessProcess.ready(INITIATE_GENERAL_APPLICATION))
             .generalAppType(caseData.getGeneralAppType())
