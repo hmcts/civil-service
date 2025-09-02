@@ -245,7 +245,7 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
         }
 
         @Test
-        void shouldNotAllowEventForCaseWhereLAReferCaseToJudgeAndClaimHasLiP() {
+        void shouldNotAllowEventForCaseWhereLAReferCaseToJudgeAndCourtLocationIsEA() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted()
                 .totalClaimAmount(new BigDecimal(1200))
                 .eaCourtLocation(YesOrNo.YES)

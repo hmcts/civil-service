@@ -87,8 +87,7 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         if (callbackParams.getCaseData().getTotalClaimAmount().compareTo(BigDecimal.valueOf(10000)) > 0) {
             errors.add(ERROR_MESSAGE_SPEC_AMOUNT_GREATER_THAN_TEN_THOUSAND);
-        } else if (caseData.isLipCase() && caseData.getEaCourtLocation() == YES
-            && caseData.getIsReferToJudgeClaim() == YesOrNo.YES) {
+        } else if (caseData.getEaCourtLocation() == YES && caseData.getIsReferToJudgeClaim() == YesOrNo.YES) {
             errors.add(ERROR_MESSAGE_EVENT_NOT_ALLOWED);
         } else {
             Optional<Element<CaseDocument>> sdoDocLatest = callbackParams.getCaseData().getSystemGeneratedCaseDocuments()

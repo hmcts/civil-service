@@ -65,9 +65,7 @@ public class CreateReferToJudgeCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         boolean leadDefendantIs1 = locationHelper.leadDefendantIs1(caseData);
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        if (caseData.isLipCase()) {
-            caseDataBuilder.isReferToJudgeClaim(YesOrNo.YES);
-        }
+        caseDataBuilder.isReferToJudgeClaim(YesOrNo.YES);
 
         if (CaseCategory.UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             locationHelper.getClaimantRequestedCourt(caseData)
