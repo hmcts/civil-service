@@ -446,6 +446,8 @@ public class CaseDataBuilder {
 
     protected List<Element<CaseNote>> caseNotes;
 
+    protected String notificationSummary;
+
     //dates
     protected LocalDateTime submittedDate;
     protected LocalDateTime paymentSuccessfulDate;
@@ -916,6 +918,11 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder caseNotes(CaseNote caseNote) {
         this.caseNotes = wrapElements(caseNote);
+        return this;
+    }
+
+    public CaseDataBuilder notificationSummary(String notificationSummary) {
+        this.notificationSummary = notificationSummary;
         return this;
     }
 
@@ -7975,6 +7982,7 @@ public class CaseDataBuilder {
             .defendantSolicitorNotifyClaimDetailsOptions(defendantSolicitorNotifyClaimDetailsOptions)
             .selectLitigationFriend(selectLitigationFriend)
             .caseNotes(caseNotes)
+            .notificationSummary(notificationSummary)
             .hearingDueDate(hearingDueDate)
             .hearingDate(hearingDate)
             //ui field
