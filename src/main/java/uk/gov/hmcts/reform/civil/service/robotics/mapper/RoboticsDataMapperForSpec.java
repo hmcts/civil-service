@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.robotics.mapper;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
@@ -10,6 +11,7 @@ import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
+import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.CaseHeader;
 import uk.gov.hmcts.reform.civil.model.robotics.ClaimDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.LitigiousParty;
@@ -51,6 +53,7 @@ import static uk.gov.hmcts.reform.civil.utils.MonetaryConversions.penniesToPound
  * This class is skeleton to be refined after we have final version of RPA Json structure
  * and it's mapping with CaseData.
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RoboticsDataMapperForSpec {
@@ -73,8 +76,9 @@ public class RoboticsDataMapperForSpec {
             || caseData.getCcdState() == CASE_DISMISSED) {
             builder.noticeOfChange(RoboticsDataUtil.buildNoticeOfChange(caseData));
         }
-
-        return builder.build();
+        RoboticsCaseDataSpec build = builder.build();
+        log.info("Robotics Case Data: {}", build.toString());
+        return build;
     }
 
     private ClaimDetails buildClaimDetails(CaseData caseData) {
@@ -83,14 +87,33 @@ public class RoboticsDataMapperForSpec {
         BigDecimal amountClaimedWithInterest = caseData.getTotalClaimAmount().add(claimInterest);
         return ClaimDetails.builder()
             .amountClaimed(amountClaimedWithInterest)
-            .courtFee(ofNullable(caseData.getClaimFee())
-                .map(fee -> penniesToPounds(fee.getCalculatedAmountInPence()))
-                .orElse(null))
+            .courtFee(getCourtFee(caseData))
             .caseIssuedDate(ofNullable(caseData.getIssueDate())
                 .map(issueDate -> issueDate.format(ISO_DATE))
                 .orElse(null))
             .caseRequestReceivedDate(caseData.getSubmittedDate().toLocalDate().format(ISO_DATE))
             .build();
+    }
+
+    private BigDecimal getCourtFee(CaseData caseData) {
+        if (caseData.getClaimFee() == null) {
+            return null;
+        }
+
+        HelpWithFeesDetails hwfDetails = caseData.getClaimIssuedHwfDetails();
+        BigDecimal calculatedFee = penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence());
+
+        if (hwfDetails != null) {
+            if (hwfDetails.getRemissionAmount() != null
+                && hwfDetails.getRemissionAmount().compareTo(caseData.getClaimFee().getCalculatedAmountInPence()) == 0) {
+                return BigDecimal.ZERO;
+            }
+
+            if (hwfDetails.getOutstandingFeeInPounds() != null) {
+                return hwfDetails.getOutstandingFeeInPounds();
+            }
+        }
+        return calculatedFee;
     }
 
     private CaseHeader buildCaseHeader(CaseData caseData) {
