@@ -80,7 +80,9 @@ public class RoboticsDataMapper {
             roboticsBuilder.noticeOfChange(RoboticsDataUtil.buildNoticeOfChange(caseData));
         }
 
-        return roboticsBuilder.build();
+        RoboticsCaseData build = roboticsBuilder.build();
+        log.info("Robotics Case Data: {}", build.toString());
+        return build;
     }
 
     private ClaimDetails buildClaimDetails(CaseData caseData) {
