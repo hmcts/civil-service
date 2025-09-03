@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.model.docmosis.settleanddiscontinue;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import lombok.AllArgsConstructor;
@@ -53,4 +54,8 @@ public class NoticeOfDiscontinuanceForm implements MappableObject {
     private final String postCode;
     private final String claimReferenceNumber;
     private final String welshDate;
+    @JsonProperty("isQMEnabled")
+    private final boolean isQMEnabled;
+    @JsonProperty("isRespondent1LiP")
+    private final boolean isRespondent1LiP;
 }
