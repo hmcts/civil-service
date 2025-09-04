@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.migration;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,8 +30,6 @@ class MigrateCasesEventHandlerTest {
 
     @Mock
     private CaseReferenceCsvLoader caseReferenceCsvLoader;
-
-    private ObjectMapper objectMapper = new ObjectMapper();
 
     @Mock
     private MigrationTaskFactory migrationTaskFactory;
