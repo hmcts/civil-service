@@ -53,13 +53,9 @@ public class CaseProceedOfflineDefendantScenarioTest extends DashboardBaseIntegr
 
         //Verify NO task items are created
         doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "DEFENDANT")
-            .andExpectAll(
-                status().is(HttpStatus.OK.value()),
-                jsonPath("$[0].reference").value(caseId.toString()),
-                jsonPath("$[0].taskNameEn").value(
-                    "<a>Upload hearing documents</a>"),
-                jsonPath("$[0].currentStatusEn").value("Inactive")
-
+                .andExpectAll(
+                        status().is(HttpStatus.OK.value()),
+                        jsonPath("$[0]").doesNotExist()
             );
     }
 
