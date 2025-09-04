@@ -99,7 +99,7 @@ class UploadTranslatedDocumentDefaultStrategyTest {
             .builder()
             .atStatePendingClaimIssued()
             .build()
-            .builder()
+            .toBuilder()
             .ccdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT)
             .caseDataLiP(CaseDataLiP
                              .builder()
@@ -152,11 +152,11 @@ class UploadTranslatedDocumentDefaultStrategyTest {
             element(translatedDocument1)
         );
 
-        CaseData caseData = CaseDataBuilder
-            .builder()
-            .atStatePendingClaimIssued()
-            .build()
-            .builder()
+        CaseDataBuilder
+                .builder()
+                .atStatePendingClaimIssued()
+                .build();
+        CaseData caseData = CaseData.builder()
             .ccdState(CaseState.AWAITING_APPLICANT_INTENTION)
             .caseDataLiP(CaseDataLiP
                              .builder()
@@ -191,11 +191,16 @@ class UploadTranslatedDocumentDefaultStrategyTest {
     void shouldReturnExistingSystemGeneratedDocumentListWhenNothingReturnedFromService() {
         //Given
         CaseData caseData = CaseDataBuilder
-            .builder()
-            .atStatePendingClaimIssued()
-            .build()
-            .builder()
-            .ccdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT).build();
+                .builder()
+                .atStatePendingClaimIssued()
+                .build()
+                .toBuilder()
+                .caseDataLiP(CaseDataLiP
+                        .builder()
+                        .translatedDocuments(List.of(element(TranslatedDocument.builder()
+                                .documentType(CLAIM_ISSUE).build())))
+                        .build())
+                .ccdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT).build();
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
@@ -216,6 +221,11 @@ class UploadTranslatedDocumentDefaultStrategyTest {
                 .applicant1Represented(YesOrNo.NO)
                 .ccdState(CaseState.PENDING_CASE_ISSUED)
                 .ccdCaseReference(123L)
+                .caseDataLiP(CaseDataLiP
+                        .builder()
+                        .translatedDocuments(List.of(element(TranslatedDocument.builder()
+                                .documentType(CLAIM_ISSUE).build())))
+                        .build())
                 .build();
 
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
@@ -234,14 +244,19 @@ class UploadTranslatedDocumentDefaultStrategyTest {
     void shouldUpdateBusinessProcess_WhenLipVsLRAndCcdState_In_Awaiting_Claimant_Response_NocOnlineFlagEnabled() {
         //Given
         CaseData caseData = CaseDataBuilder.builder()
-            .atStateRespondentFullDefenceAfterNotifyClaimDetailsAwaiting1stRespondentResponse()
-            .build().toBuilder()
-            .respondent1Represented(YesOrNo.YES)
-            .specRespondent1Represented(YesOrNo.YES)
-            .applicant1Represented(YesOrNo.NO)
-            .ccdState(CaseState.AWAITING_APPLICANT_INTENTION)
-            .ccdCaseReference(123L)
-            .build();
+                .atStateRespondentFullDefenceAfterNotifyClaimDetailsAwaiting1stRespondentResponse()
+                .build().toBuilder()
+                .respondent1Represented(YesOrNo.YES)
+                .specRespondent1Represented(YesOrNo.YES)
+                .applicant1Represented(YesOrNo.NO)
+                .ccdState(CaseState.AWAITING_APPLICANT_INTENTION)
+                .ccdCaseReference(123L)
+                .caseDataLiP(CaseDataLiP
+                        .builder()
+                        .translatedDocuments(List.of(element(TranslatedDocument.builder()
+                                .documentType(CLAIM_ISSUE).build())))
+                        .build())
+                .build();
 
         when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
@@ -1101,7 +1116,6 @@ class UploadTranslatedDocumentDefaultStrategyTest {
             .ccdCaseReference(123L)
             .build();
 
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(

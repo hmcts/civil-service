@@ -20,7 +20,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOADED;
 @Component
 public abstract class DocumentUploadTask<L1 extends LegalRepresentativeOneDocumentHandler, L2 extends DocumentHandler> {
 
-    private final FeatureToggleService featureToggleService;
     private final ObjectMapper objectMapper;
     protected final List<L1> legalRepresentativeOneDocumentHandlers;
     protected final List<L2> legalRepresentativeTwoDocumentHandlers;
@@ -29,7 +28,6 @@ public abstract class DocumentUploadTask<L1 extends LegalRepresentativeOneDocume
                               ObjectMapper objectMapper,
                               List<L1> legalRepresentativeOneDocumentHandlers,
                               List<L2> legalRepresentativeTwoDocumentHandlers) {
-        this.featureToggleService = featureToggleService;
         this.objectMapper = objectMapper;
         this.legalRepresentativeOneDocumentHandlers = legalRepresentativeOneDocumentHandlers;
         this.legalRepresentativeTwoDocumentHandlers = legalRepresentativeTwoDocumentHandlers;
@@ -93,7 +91,6 @@ public abstract class DocumentUploadTask<L1 extends LegalRepresentativeOneDocume
         caseDataBuilder.notificationText(notificationTextBuilder.toString());
 
         caseDataBuilder.businessProcess(BusinessProcess.ready(EVIDENCE_UPLOADED));
-
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))

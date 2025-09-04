@@ -24,8 +24,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_FINAL_ORDER_TO_LIP_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_FINAL_ORDER_TO_LIP_DEFENDANT;

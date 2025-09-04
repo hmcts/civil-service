@@ -729,7 +729,6 @@ class CaseEventTaskHandlerTest {
                              Map.entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                              Map.entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                              Map.entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                             Map.entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
                              Map.entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                              Map.entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
                              Map.entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
@@ -744,7 +743,6 @@ class CaseEventTaskHandlerTest {
                 return Map.ofEntries(Map.entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                                      Map.entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                                      Map.entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                                     Map.entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
                                      Map.entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                                      Map.entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
                                      Map.entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
@@ -761,7 +759,6 @@ class CaseEventTaskHandlerTest {
                 return Map.ofEntries(Map.entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                                      Map.entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                                      Map.entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                                     Map.entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
                                      Map.entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                                      Map.entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
                                      Map.entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
@@ -776,7 +773,6 @@ class CaseEventTaskHandlerTest {
                 return Map.ofEntries(Map.entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                                      Map.entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                                      Map.entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                                     Map.entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
                                      Map.entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                                      Map.entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
                                      Map.entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
@@ -791,7 +787,6 @@ class CaseEventTaskHandlerTest {
                 return Map.ofEntries(Map.entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                                      Map.entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                                      Map.entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                                     Map.entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
                                      Map.entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                                      Map.entry(FlowFlag.MINTI_ENABLED.name(), false),
                                      Map.entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
@@ -807,7 +802,6 @@ class CaseEventTaskHandlerTest {
             Map<String, Boolean> expectedFlags = new HashMap<>();
             expectedFlags.put(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false);
             expectedFlags.put(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false);
-            expectedFlags.put(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false);
             expectedFlags.put(FlowFlag.BULK_CLAIM_ENABLED.name(), false);
             expectedFlags.put(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false);
             expectedFlags.put(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false);

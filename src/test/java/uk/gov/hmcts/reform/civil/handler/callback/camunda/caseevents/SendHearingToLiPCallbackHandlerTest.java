@@ -27,7 +27,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_HEARING_TO_LIP_CLAIMANT;
@@ -59,16 +58,6 @@ class SendHearingToLiPCallbackHandlerTest extends BaseCallbackHandlerTest {
     private static final String TEST = "test";
     private static final String UPLOAD_TIMESTAMP = "14 Apr 2024 00:00:00";
     private static final Document DOCUMENT_LINK = new Document("document/url", TEST, TEST, TEST, TEST, UPLOAD_TIMESTAMP);
-
-    @Test
-    void shouldNotCallRecordScenario_whenCaseProgressionIsDisabled() {
-        CallbackParams callbackParams = CallbackParamsBuilder.builder()
-            .of(ABOUT_TO_SUBMIT, CaseData.builder().build())
-            .build();
-
-        handler.handle(callbackParams);
-        verifyNoInteractions(dashboardScenariosService);
-    }
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {

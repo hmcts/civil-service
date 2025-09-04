@@ -104,7 +104,6 @@ class UploadHearingDocumentsClaimantHandlerTest extends BaseCallbackHandlerTest 
     void createDashboardNotificationsAfterNroChangesAndWelshEnabledForMainCase() {
 
         params.put("ccdCaseReference", "1239988");
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(false);
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
@@ -139,7 +138,6 @@ class UploadHearingDocumentsClaimantHandlerTest extends BaseCallbackHandlerTest 
     void createDashboardNotificationsAfterNroChangesAndWelshNotEnabledForMainCase() {
 
         params.put("ccdCaseReference", "1239988");
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(false);
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);

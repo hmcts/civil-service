@@ -205,7 +205,7 @@ class BundleRequestMapperTest {
 
     }
 
-   @Test
+    @Test
     void testBundleRequestMapperWithAllDocsAndCaseEvenEnable() {
         // Given
         //Add all type of documents and other request details in case data

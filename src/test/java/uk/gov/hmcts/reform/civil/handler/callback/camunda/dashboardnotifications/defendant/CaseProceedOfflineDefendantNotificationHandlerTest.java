@@ -19,8 +19,8 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
@@ -40,11 +40,9 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DEFENDANT_DASH
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_LIP_QM_CASE_OFFLINE_OPEN_QUERIES_DEFENDANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_AVAILABLE_DEFENDANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT_WITHOUT_TASK_CHANGES;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_LIP_QM_CASE_OFFLINE_OPEN_QUERIES_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_UPDATE_CASE_PROCEED_IN_CASE_MAN_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_UPDATE_CASE_PROCEED_IN_CASE_MAN_DEFENDANT_FAST_TRACK;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
@@ -85,53 +83,6 @@ class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCallbackHan
 
     @Nested
     class AboutToSubmitCallback {
-        @Test
-        void shouldRecordScenario_whenInvokedWithoutCPToggle() {
-            // Given
-            List<Element<GeneralApplication>> gaApplications = wrapElements(
-                GeneralApplication.builder()
-                    .caseLink(CaseLink.builder().caseReference("54326781").build())
-                    .build());
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
-                    .respondent1Represented(YesOrNo.NO)
-                    .ccdCaseReference(12890L)
-                .generalApplications(gaApplications)
-                    .previousCCDState(AWAITING_APPLICANT_INTENTION).build();
-
-            when(toggleService.isLipVLipEnabled()).thenReturn(true);
-            when(toggleService.isGaForLipsEnabled()).thenReturn(true);
-            when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
-            HashMap<String, Object> scenarioParams = new HashMap<>();
-            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder()
-                    .eventId(CREATE_DEFENDANT_DASHBOARD_NOTIFICATION_FOR_CASE_PROCEED_OFFLINE.name()).build()
-            ).build();
-            // When
-            handler.handle(params);
-
-            // Then
-            verifyDeleteNotificationsAndTaskListUpdates(caseData);
-            verify(dashboardScenariosService).recordScenarios(
-                "BEARER_TOKEN",
-                SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT.getScenario(),
-                caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
-            );
-            verify(dashboardScenariosService).recordScenarios(
-                "BEARER_TOKEN",
-                SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_DEFENDANT.getScenario(),
-                caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
-            );
-            verify(dashboardScenariosService).recordScenarios(
-                "BEARER_TOKEN",
-                SCENARIO_AAA6_GENERAL_APPLICATION_AVAILABLE_DEFENDANT.getScenario(),
-                caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
-            );
-
-        }
 
         @Test
         void shouldRecordScenario_whenInvokedForCaseProgressionFeatureToggle() {
@@ -236,6 +187,7 @@ class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCallbackHan
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
                     .respondent1Represented(YesOrNo.NO)
                     .ccdCaseReference(12890L)
+                    .previousCCDState(AWAITING_APPLICANT_INTENTION)
                     .build();
 
             when(toggleService.isLipVLipEnabled()).thenReturn(true);

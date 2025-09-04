@@ -221,7 +221,7 @@ class HearingNoticeHmcGeneratorTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldOnlyIgnoreFeeDetails_1v1_whenHearingFeeHasBeenPaidThroughHwFAndCPToggleEnabled(boolean isCaseProgressionEnabled) {
+    void shouldOnlyIgnoreFeeDetails_1v1_whenHearingFeeHasBeenPaidThroughHwFAndCPToggleEnabled() {
         var hearing = baseHearing.toBuilder()
             .hearingDetails(HearingDetails.builder()
                                 .hearingType("AAA7-TRI")
@@ -267,7 +267,7 @@ class HearingNoticeHmcGeneratorTest {
             .defendant(caseData.getRespondent1().getPartyName())
             .claimantReference(caseData.getSolicitorReferences().getApplicantSolicitor1Reference())
             .defendantReference(caseData.getSolicitorReferences().getRespondentSolicitor1Reference())
-            .feeAmount(isCaseProgressionEnabled ? null : "£1")
+            .feeAmount(null)
             .hearingSiteName("VenueName")
             .caseManagementLocation("CML-Site - CourtAddress - Postcode")
             .hearingLocation("SiteName - CourtAddress - Postcode")
@@ -275,7 +275,7 @@ class HearingNoticeHmcGeneratorTest {
             .totalHearingDuration("2 days")
             .hearingType("trial")
             .hearingTypePluralWelsh(null)
-            .hearingDueDate(isCaseProgressionEnabled ? null : LocalDate.of(2023, 1, 1))
+            .hearingDueDate(null)
             .partiesAttendingInPerson("Chloe Landale")
             .partiesAttendingByVideo("Michael Carver")
             .partiesAttendingByTelephone("Jenny Harper")
@@ -351,7 +351,7 @@ class HearingNoticeHmcGeneratorTest {
 
     @ParameterizedTest
     @CsvSource({"true, false", "false, false", "true, true", "false, false"})
-    void shouldGenerateHearingNoticeHmc_1v2DS_whenHearingFeeHasBeenPaid(boolean isCaseProgressionEnabled, boolean isWelsh) {
+    void shouldGenerateHearingNoticeHmc_1v2DS_whenHearingFeeHasBeenPaid(boolean isWelsh) {
         var hearing = baseHearing.toBuilder()
             .hearingDetails(HearingDetails.builder()
                                 .hearingType("AAA7-DIS")
@@ -417,7 +417,7 @@ class HearingNoticeHmcGeneratorTest {
 
     @ParameterizedTest
     @CsvSource({"true, false", "false, false", "true, true", "false, false"})
-    void shouldGenerateHearingNoticeHmcDisputeResolution_1v2DS_whenHearingFeeHasBeenPaid(boolean isCaseProgressionEnabled, boolean isWelsh) {
+    void shouldGenerateHearingNoticeHmcDisputeResolution_1v2DS_whenHearingFeeHasBeenPaid(boolean isWelsh) {
         var hearing = baseHearing.toBuilder()
             .hearingDetails(HearingDetails.builder()
                                 .hearingType("AAA7-DRH")
@@ -488,7 +488,7 @@ class HearingNoticeHmcGeneratorTest {
         "AAA7-DRH, dispute resolution hearing, true",
         "AAA7-DRH, dispute resolution hearing, false"
     })
-    void shouldGenerateHearingNoticeHmc_2v1_whenHearingFeeHasBeenPaid_whenHearingType(String hearingType, String expectedTitle, boolean isCaseProgressionEnabled) {
+    void shouldGenerateHearingNoticeHmc_2v1_whenHearingFeeHasBeenPaid_whenHearingType(String hearingType, String expectedTitle) {
         var hearing = baseHearing.toBuilder()
             .hearingDetails(HearingDetails.builder()
                                 .hearingType(hearingType)
@@ -553,7 +553,7 @@ class HearingNoticeHmcGeneratorTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldGenerateHearingNoticeHmc_2v1_whenHearingFeeHasBeenPaid_noSolicitorReferences(boolean isCaseProgressionEnabled) {
+    void shouldGenerateHearingNoticeHmc_2v1_whenHearingFeeHasBeenPaid_noSolicitorReferences() {
         var hearing = baseHearing.toBuilder()
             .hearingDetails(HearingDetails.builder()
                                 .hearingType("AAA7-DRH")
@@ -616,7 +616,7 @@ class HearingNoticeHmcGeneratorTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnListOfExpectedCaseDocuments(boolean isCaseProgressionEnabled) {
+    void shouldReturnListOfExpectedCaseDocuments() {
         var hearing = baseHearing.toBuilder()
             .hearingDetails(HearingDetails.builder()
                                 .hearingType("AAA7-TRI")
@@ -660,7 +660,7 @@ class HearingNoticeHmcGeneratorTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnListOfExpectedCaseDocumentsSpec(boolean isCaseProgressionEnabled) {
+    void shouldReturnListOfExpectedCaseDocumentsSpec() {
         var hearing = baseHearing.toBuilder()
             .hearingDetails(HearingDetails.builder()
                                 .hearingType("AAA7-TRI")
