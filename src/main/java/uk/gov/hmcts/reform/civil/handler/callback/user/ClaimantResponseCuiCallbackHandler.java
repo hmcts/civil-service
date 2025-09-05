@@ -138,7 +138,7 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
             builder
                 .activeJudgment(activeJudgmentDetails)
                 .joIsLiveJudgmentExists(YES)
-                .joJudgementByAdmissionIssueDate(LocalDateTime.now())
+                .joJudgementByAdmissionIssueDate(time.now())
                 .joRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummaryWithoutClaimInterest(
                     activeJudgmentDetails,
                     true

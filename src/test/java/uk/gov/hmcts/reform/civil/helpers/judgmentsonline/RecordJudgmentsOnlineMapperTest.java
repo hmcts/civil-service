@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.civil.helpers.judgmentsonline;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
@@ -9,6 +11,7 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 
@@ -20,9 +23,17 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class RecordJudgmentsOnlineMapperTest {
 
-    private RoboticsAddressMapper addressMapper = new RoboticsAddressMapper(new AddressLinesMapper());
+    private RoboticsAddressMapper addressMapper;
 
-    private RecordJudgmentOnlineMapper judgmentOnlineMapper = new RecordJudgmentOnlineMapper(addressMapper);
+    private RecordJudgmentOnlineMapper judgmentOnlineMapper;
+    @Mock
+    private Time time;
+
+    @BeforeEach
+    void setupTests() {
+        addressMapper = new RoboticsAddressMapper(new AddressLinesMapper());
+        judgmentOnlineMapper = new RecordJudgmentOnlineMapper(time, addressMapper);
+    }
 
     @Test
     void testIfActiveJudgmentIsAddedPayDate() {

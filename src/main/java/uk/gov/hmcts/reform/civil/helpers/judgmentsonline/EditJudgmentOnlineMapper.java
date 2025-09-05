@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.helpers.judgmentsonline;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
@@ -10,14 +9,18 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRTLStatus;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
+import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class EditJudgmentOnlineMapper extends JudgmentOnlineMapper {
+
+    public EditJudgmentOnlineMapper(Time time) {
+        super(time);
+    }
 
     @Override
     public JudgmentDetails addUpdateActiveJudgment(CaseData caseData) {

@@ -33,6 +33,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
+import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
@@ -57,6 +58,9 @@ class JudgmentByAdmissionMapperTest {
     private JudgementService judgementService;
     private JudgmentByAdmissionOnlineMapper judgmentByAdmissionOnlineMapper;
 
+    @Mock
+    Time time;
+
     @BeforeEach
     void setUp() {
         when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(false);
@@ -65,7 +69,7 @@ class JudgmentByAdmissionMapperTest {
         interestCalculator = new InterestCalculator();
         judgementService = new JudgementService(featureToggleService, interestCalculator);
         judgmentByAdmissionOnlineMapper =
-            new JudgmentByAdmissionOnlineMapper(addressMapper, judgementService, interestCalculator);
+            new JudgmentByAdmissionOnlineMapper(time, addressMapper, judgementService, interestCalculator);
     }
 
     @Test
