@@ -42,7 +42,6 @@ import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -59,8 +58,6 @@ class JudgmentByAdmissionMapperTest {
 
     @BeforeEach
     void setUp() {
-        when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(false);
-
         addressMapper = new RoboticsAddressMapper(new AddressLinesMapper());
         interestCalculator = new InterestCalculator();
         judgementService = new JudgementService(featureToggleService, interestCalculator);
@@ -89,9 +86,9 @@ class JudgmentByAdmissionMapperTest {
 
         assertNotNull(activeJudgment);
         assertEquals(JudgmentState.ISSUED, activeJudgment.getState());
-        assertEquals("15000", activeJudgment.getOrderedAmount());
+        assertEquals("14000", activeJudgment.getOrderedAmount());
         assertEquals("1000", activeJudgment.getCosts());
-        assertEquals("16000", activeJudgment.getTotalAmount());
+        assertEquals("15000", activeJudgment.getTotalAmount());
         assertEquals(YesOrNo.YES, activeJudgment.getIsRegisterWithRTL());
         assertEquals(JudgmentRTLStatus.ISSUED.getRtlState(), activeJudgment.getRtlState());
         assertEquals(LocalDate.now(), activeJudgment.getIssueDate());
@@ -110,7 +107,6 @@ class JudgmentByAdmissionMapperTest {
 
     @Test
     void testIfJudgmentByAdmissionLrBulkAdmission() {
-        when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
             .respondent1Represented(YES)
             .specRespondent1Represented(YES)
@@ -137,7 +133,7 @@ class JudgmentByAdmissionMapperTest {
 
     @Test
     void testIfJudgmentByPartAdmissionLrPayImmediatelyNotAddInterest() {
-        when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
+
         CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
             .respondent1Represented(YES)
             .specRespondent1Represented(YES)
@@ -164,7 +160,7 @@ class JudgmentByAdmissionMapperTest {
 
     @Test
     void testIfJudgmentByFullAdmissionLrPayImmeidatelyNotAddInterest() {
-        when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
+
         CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
             .respondent1Represented(YES)
             .specRespondent1Represented(YES)

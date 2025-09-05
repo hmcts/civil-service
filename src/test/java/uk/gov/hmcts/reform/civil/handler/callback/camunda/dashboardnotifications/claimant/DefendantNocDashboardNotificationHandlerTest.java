@@ -127,13 +127,14 @@ class DefendantNocDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
         void shouldRecordScenarioWhenHearingFeePaymentStatusIsNotPaid() {
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
-            CaseData caseData = CaseData.builder()
-                .ccdCaseReference(123455L)
-                .build();
+            CaseData caseData = CaseData.builder().ccdCaseReference(123455L).build();
 
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_NOC.name()).build()
-            ).build();
+            CallbackParams params = CallbackParamsBuilder.builder()
+                    .of(ABOUT_TO_SUBMIT, caseData)
+                    .request(CallbackRequest.builder()
+                            .eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_NOC.name())
+                            .build())
+                    .build();
 
             handler.handle(params);
 
@@ -338,7 +339,6 @@ class DefendantNocDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
         @Test
         void shouldRecordDefendantNocMovesOfflineScenarioWhenDefendantNocOnlineAndActiveJO() {
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-            when(toggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
             when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
             when(toggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
 
