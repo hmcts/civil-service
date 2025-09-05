@@ -30,7 +30,6 @@ public class UploadHearingDocumentsDefendantScenarioTest extends DashboardBaseIn
 
         String caseId = "1234518843299";
 
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
 
         DynamicListElement selectedCourt = DynamicListElement.builder()

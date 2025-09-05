@@ -66,7 +66,6 @@ class DecisionOnRequestForReconsiderationClaimantHandlerTest {
     @Test
     void shouldCreateDashboardNotifications_whenDashboardIsEnabled() {
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder()
             .atStateTrialReadyCheckLiP(false)
@@ -89,7 +88,6 @@ class DecisionOnRequestForReconsiderationClaimantHandlerTest {
     @Test
     void shouldNotCreateDashboardNotifications_whenApplicantRepresented() {
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder()
             .atStateTrialReadyCheckLiP(false)

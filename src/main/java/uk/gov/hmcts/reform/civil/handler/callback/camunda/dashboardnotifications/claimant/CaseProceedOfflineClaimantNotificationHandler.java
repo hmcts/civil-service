@@ -18,7 +18,6 @@ import java.util.Map;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_CASE_PROCEED_OFFLINE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_LIP_QM_CASE_OFFLINE_OPEN_QUERIES_CLAIMANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT_WITHOUT_TASK_CHANGES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_AVAILABLE_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_CLAIMANT;
@@ -58,10 +57,7 @@ public class CaseProceedOfflineClaimantNotificationHandler extends DashboardCall
 
     @Override
     public String getScenario(CaseData caseData) {
-        if (featureToggleService.isCaseProgressionEnabled()) {
-            return SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT_WITHOUT_TASK_CHANGES.getScenario();
-        }
-        return SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT.getScenario();
+        return SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT_WITHOUT_TASK_CHANGES.getScenario();
     }
 
     @Override
@@ -70,7 +66,7 @@ public class CaseProceedOfflineClaimantNotificationHandler extends DashboardCall
             SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_CLAIMANT.getScenario(),
             featureToggleService.isGaForLipsEnabled(),
             SCENARIO_AAA6_GENERAL_APPLICATION_AVAILABLE_CLAIMANT.getScenario(),
-            featureToggleService.isGaForLipsEnabled() && caseData.getGeneralApplications().size() > 0,
+            featureToggleService.isGaForLipsEnabled() && !caseData.getGeneralApplications().isEmpty(),
             SCENARIO_AAA6_LIP_QM_CASE_OFFLINE_OPEN_QUERIES_CLAIMANT.getScenario(), claimantQueryAwaitingAResponse(caseData)
         );
     }
@@ -93,10 +89,9 @@ public class CaseProceedOfflineClaimantNotificationHandler extends DashboardCall
     }
 
     public boolean shouldRecordScenarioInCaseProgression(CaseData caseData) {
-        return featureToggleService.isCaseProgressionEnabled()
-            && caseData.getPreviousCCDState() != null
-            && caseMovedInCaseManStatesCaseProgression.contains(caseData.getPreviousCCDState())
-            && caseData.isLipvLipOneVOne();
+        return caseData.getPreviousCCDState() != null
+                && caseMovedInCaseManStatesCaseProgression.contains(caseData.getPreviousCCDState())
+                && caseData.isLipvLipOneVOne();
     }
 
     @Override
