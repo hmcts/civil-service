@@ -6,7 +6,10 @@ import uk.gov.hmcts.reform.civil.model.search.Query;
 
 import java.util.List;
 
-import static org.elasticsearch.index.query.QueryBuilders.*;
+import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
+import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
+import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
+import static org.elasticsearch.index.query.QueryBuilders.existsQuery;
 
 class TakeCaseOfflineSearchServiceTest extends ElasticSearchServiceTest {
 
