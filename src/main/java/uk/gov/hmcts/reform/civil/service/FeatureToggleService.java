@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseContainsLiP;
 import static uk.gov.hmcts.reform.civil.utils.JudgeReallocatedClaimTrack.judgeReallocatedTrackOrAlreadyMinti;
 
 @Slf4j
@@ -160,10 +159,7 @@ public class FeatureToggleService {
 
     // if deleting this, also handle isQMPdfGeneratorEnabled() below
     public boolean isPublicQueryManagementEnabled(CaseData caseData) {
-        if (caseContainsLiP.test(caseData)) {
-            return isLipQueryManagementEnabled(caseData);
-        }
-        return featureToggleApi.isFeatureEnabled("public-query-management");
+        return true;
     }
 
     public boolean isQMPdfGeneratorDisabled() {
@@ -176,7 +172,7 @@ public class FeatureToggleService {
     }
 
     public boolean isWelshEnabledForMainCase() {
-        return featureToggleApi.isFeatureEnabled("enableWelshForMainCase");
+        return true;
     }
 
     public boolean isLipQueryManagementEnabled(CaseData caseData) {
