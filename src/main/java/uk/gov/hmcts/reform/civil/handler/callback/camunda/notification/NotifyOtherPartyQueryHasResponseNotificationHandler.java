@@ -41,6 +41,7 @@ import static uk.gov.hmcts.reform.civil.utils.QueryNotificationUtils.LEGAL_ORG;
 import static uk.gov.hmcts.reform.civil.utils.QueryNotificationUtils.LIP_NAME;
 import static uk.gov.hmcts.reform.civil.utils.QueryNotificationUtils.getOtherPartyEmailDetails;
 import static uk.gov.hmcts.reform.civil.utils.QueryNotificationUtils.getOtherPartyEmailDetailsPublicQuery;
+import static uk.gov.hmcts.reform.civil.utils.QueryNotificationUtils.isUnspecClaimNotReadyForNotification;
 
 @Service
 @RequiredArgsConstructor
@@ -104,6 +105,7 @@ public class NotifyOtherPartyQueryHasResponseNotificationHandler extends Callbac
                 });
             } else {
                 emailDetailsList.forEach(otherPartyEmailDetails -> {
+                    if (isUnspecClaimNotReadyForNotification(caseData, coreCaseUserService, parentQueryId)) return;
                     notificationService.sendMail(
                         otherPartyEmailDetails.get(EMAIL),
                         notificationsProperties.getQueryLrPublicResponseReceived(),
@@ -116,6 +118,7 @@ public class NotifyOtherPartyQueryHasResponseNotificationHandler extends Callbac
         } else {
             List<Map<String, String>> emailDetailsList = getOtherPartyEmailDetails(caseData, organisationService, coreCaseUserService, parentQueryId);
             emailDetailsList.forEach(otherPartyEmailDetails -> {
+                if (isUnspecClaimNotReadyForNotification(caseData, coreCaseUserService, parentQueryId)) return;
                 notificationService.sendMail(
                     otherPartyEmailDetails.get(EMAIL),
                     notificationsProperties.getNotifyOtherPartyQueryResponseReceived(),
