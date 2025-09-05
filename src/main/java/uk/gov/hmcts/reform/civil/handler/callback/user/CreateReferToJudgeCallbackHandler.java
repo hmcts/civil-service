@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -63,6 +64,8 @@ public class CreateReferToJudgeCallbackHandler extends CallbackHandler {
     private CallbackResponse submitReferToJudge(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         boolean leadDefendantIs1 = locationHelper.leadDefendantIs1(caseData);
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        caseDataBuilder.isReferToJudgeClaim(YesOrNo.YES);
 
         if (CaseCategory.UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             locationHelper.getClaimantRequestedCourt(caseData)
@@ -73,13 +76,13 @@ public class CreateReferToJudgeCallbackHandler extends CallbackHandler {
                                            callbackParams.getParams().get(BEARER_TOKEN).toString()),
                                        requestedCourt)
                                    .ifPresent(matchingLocation ->
-                                                  LocationHelper.updateWithLocation(caseData.toBuilder(), matchingLocation)
+                                                  LocationHelper.updateWithLocation(caseDataBuilder, matchingLocation)
                                    )
                 );
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseData.toBuilder().build().toMap(objectMapper))
+            .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
 
