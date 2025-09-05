@@ -9,9 +9,7 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
 import java.util.List;
 
-import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
-import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
-import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
+import static org.elasticsearch.index.query.QueryBuilders.*;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
 
@@ -30,7 +28,8 @@ public class TakeCaseOfflineSearchService extends ElasticSearchService {
                 .should(boolQuery()
                             .must(rangeQuery("data.applicant1ResponseDeadline").lt("now"))
                             .must(beState(AWAITING_APPLICANT_INTENTION))
-                            .mustNot(matchQuery("data.isMintiLipCase", "Yes")))
+                            .mustNot(matchQuery("data.isMintiLipCase", "Yes"))
+                            .mustNot(existsQuery("data.applicant1ResponseDate")))
                 .should(boolQuery()
                             .must(rangeQuery("data.addLegalRepDeadlineRes1").lt("now"))
                             .must(beState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT)))
