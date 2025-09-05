@@ -9,6 +9,7 @@ import java.util.List;
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
+import static org.elasticsearch.index.query.QueryBuilders.existsQuery;
 
 class TakeCaseOfflineSearchServiceTest extends ElasticSearchServiceTest {
 
@@ -24,7 +25,8 @@ class TakeCaseOfflineSearchServiceTest extends ElasticSearchServiceTest {
             .should(boolQuery()
                         .must(rangeQuery("data.applicant1ResponseDeadline").lt("now"))
                         .must(boolQuery().must(matchQuery("state", "AWAITING_APPLICANT_INTENTION")))
-                        .mustNot(matchQuery("data.isMintiLipCase", "Yes")))
+                        .mustNot(matchQuery("data.isMintiLipCase", "Yes"))
+                        .mustNot(existsQuery("data.applicant1ResponseDate")))
             .should(boolQuery()
                         .must(rangeQuery("data.addLegalRepDeadlineRes1").lt("now"))
                         .must(boolQuery().must(matchQuery("state", "AWAITING_RESPONDENT_ACKNOWLEDGEMENT"))))
