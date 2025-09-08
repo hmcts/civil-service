@@ -10,6 +10,7 @@ import java.util.List;
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class TakeCaseOfflineSearchServiceTest extends ElasticSearchServiceTest {
@@ -18,6 +19,7 @@ class TakeCaseOfflineSearchServiceTest extends ElasticSearchServiceTest {
 
     @BeforeEach
     void setup() {
+        featureToggleService = mock(FeatureToggleService.class);
         searchService = new TakeCaseOfflineSearchService(coreCaseDataService, featureToggleService);
     }
 
