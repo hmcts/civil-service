@@ -23,6 +23,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 import static java.util.Optional.ofNullable;
@@ -102,6 +103,7 @@ public class SendAndReplyMessageService {
                 .subjectType(messageMetaData.getSubjectType())
                 .subject(messageMetaData.getSubject())
                 .messageContent(messageContent)
+                .messageId(UUID.randomUUID().toString())
                 .build())
         );
         return messageList;
