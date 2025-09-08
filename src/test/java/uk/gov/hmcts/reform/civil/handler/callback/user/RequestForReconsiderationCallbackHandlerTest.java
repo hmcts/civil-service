@@ -79,7 +79,6 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
         = "You can no longer request a reconsideration because the deadline has expired";
 
     private static final String ERROR_MESSAGE_SPEC_AMOUNT_GREATER_THAN_THOUSAND = "You can only request a reconsideration for claims of £1,000 or less.";
-    private static final String ERROR_MESSAGE_EVENT_NOT_ALLOWED = "You can only request a reconsideration where a Legal Advisor has drawn the SDO.";
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvents() {
@@ -242,22 +241,6 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
 
             //Then: No errors should be displayed
             assertThat(response.getErrors().contains(ERROR_MESSAGE_SPEC_AMOUNT_GREATER_THAN_THOUSAND));
-        }
-
-        @Test
-        void shouldNotAllowEventForCaseWhereLAReferCaseToJudgeAndCourtLocationIsEA() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted()
-                .totalClaimAmount(new BigDecimal(1200))
-                .eaCourtLocation(YesOrNo.YES)
-                .respondent1Represented(YesOrNo.NO)
-                .build().toBuilder().isReferToJudgeClaim(YesOrNo.YES).build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-
-            //When: handler is called with ABOUT_TO_START event
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            //Then: No errors should be displayed
-            assertThat(response.getErrors().contains(ERROR_MESSAGE_EVENT_NOT_ALLOWED));
         }
     }
 

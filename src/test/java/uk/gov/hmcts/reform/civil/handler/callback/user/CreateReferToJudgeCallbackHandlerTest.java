@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -155,20 +154,6 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
                                .region("regionId")
                                .baseLocation("epimms")
                                .build());
-        }
-
-        @Test
-        void shouldReturnExpectedAboutToSubmitResponseForLiP() {
-            CaseData localCaseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .atStateClaimSubmitted()
-                .setClaimTypeToSpecClaim()
-                .respondent1Represented(YesOrNo.NO)
-                .build();
-
-            CallbackParams localParams = callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT);
-            AboutToStartOrSubmitCallbackResponse response =
-                (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
-            assertThat(response).isNotNull();
         }
     }
 

@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -71,7 +70,6 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
 
     private final LiPRequestReconsiderationGeneratorService documentGenerator;
     private final FeatureToggleService featureToggleService;
-    private static final String ERROR_MESSAGE_EVENT_NOT_ALLOWED = "You can only request a reconsideration where a Legal Advisor has drawn the SDO.";
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -84,11 +82,8 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
 
     private CallbackResponse validateRequestEligibilityAndGetPartyDetails(CallbackParams callbackParams) {
         List<String> errors = new ArrayList<>();
-        CaseData caseData = callbackParams.getCaseData();
         if (callbackParams.getCaseData().getTotalClaimAmount().compareTo(BigDecimal.valueOf(10000)) > 0) {
             errors.add(ERROR_MESSAGE_SPEC_AMOUNT_GREATER_THAN_TEN_THOUSAND);
-        } else if (caseData.getEaCourtLocation() == YES && caseData.getIsReferToJudgeClaim() == YesOrNo.YES) {
-            errors.add(ERROR_MESSAGE_EVENT_NOT_ALLOWED);
         } else {
             Optional<Element<CaseDocument>> sdoDocLatest = callbackParams.getCaseData().getSystemGeneratedCaseDocuments()
                 .stream().filter(caseDocumentElement -> caseDocumentElement.getValue().getDocumentType()

@@ -20,7 +20,6 @@ import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
 
 import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
@@ -106,8 +105,7 @@ public class OrderMadeDefendantNotificationHandler extends OrderCallbackHandler 
     @Override
     protected String getScenario(CaseData caseData, CallbackParams callbackParams) {
         if (isSDOEvent(callbackParams)
-            && isEligibleForReconsideration(caseData)
-            && Objects.isNull(caseData.getIsReferToJudgeClaim())) {
+            && isEligibleForReconsideration(caseData)) {
             return SCENARIO_AAA6_CP_SDO_MADE_BY_LA_DEFENDANT.getScenario();
         }
         if (isCarmApplicableCase(caseData)
