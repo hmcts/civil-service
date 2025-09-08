@@ -2,11 +2,13 @@ package uk.gov.hmcts.reform.civil.service.search;
 
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
@@ -40,5 +42,29 @@ class TakeCaseOfflineSearchServiceTest extends ElasticSearchServiceTest {
                         .must(boolQuery().must(matchQuery("state", "AWAITING_RESPONDENT_ACKNOWLEDGEMENT"))));
 
         return new Query(query, List.of("reference"), fromValue);
+    }
+
+    @Test
+    void shouldReturnQuery_whenWelshFeatureDisabled() {
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
+
+        Query query = searchService.query(0);
+
+        assertThat(query).isNotNull();
+        assertThat(query.toString()).contains("\"from\": 0");
+        assertThat(query.toString()).contains("\"_source\": [\"reference\"]");
+        assertThat(query.toString()).contains("\"query\"");
+    }
+
+    @Test
+    void shouldReturnQuery_whenWelshFeatureEnabled() {
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
+
+        Query query = searchService.query(0);
+
+        assertThat(query).isNotNull();
+        assertThat(query.toString()).contains("\"from\": 0");
+        assertThat(query.toString()).contains("\"_source\": [\"reference\"]");
+        assertThat(query.toString()).contains("\"query\"");
     }
 }
