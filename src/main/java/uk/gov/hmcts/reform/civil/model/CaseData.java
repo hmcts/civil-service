@@ -610,8 +610,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<CaseDocument>> gaDraftDocRespondentSolTwo;
 
     private final List<Element<CaseDocument>> gaRespondDoc;
-    private final List<Element<CaseDocument>> preTranslationGaDocsApplicant;
-    private final List<Element<CaseDocument>> preTranslationGaDocsRespondent;
 
     @Builder.Default
     private final List<Element<CaseDocument>> hearingDocuments = new ArrayList<>();
@@ -645,6 +643,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @Builder.Default
     private final List<Element<CaseDocument>> courtOfficersOrders = new ArrayList<>();
+    private final YesOrNo isReferToJudgeClaim;
 
     private final ClientContext clientContext;
 
