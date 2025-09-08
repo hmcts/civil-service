@@ -3,30 +3,33 @@ package uk.gov.hmcts.reform.civil.service.search;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import uk.gov.hmcts.reform.civil.model.search.Query;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.List;
 
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
-import static org.elasticsearch.index.query.QueryBuilders.existsQuery;
+import static org.mockito.Mockito.when;
 
 class TakeCaseOfflineSearchServiceTest extends ElasticSearchServiceTest {
 
+    private FeatureToggleService featureToggleService;
+
     @BeforeEach
     void setup() {
-        searchService = new TakeCaseOfflineSearchService(coreCaseDataService);
+        searchService = new TakeCaseOfflineSearchService(coreCaseDataService, featureToggleService);
     }
 
     @Override
     protected Query buildQuery(int fromValue) {
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
         BoolQueryBuilder query = boolQuery()
             .minimumShouldMatch(1)
             .should(boolQuery()
                         .must(rangeQuery("data.applicant1ResponseDeadline").lt("now"))
                         .must(boolQuery().must(matchQuery("state", "AWAITING_APPLICANT_INTENTION")))
-                        .mustNot(matchQuery("data.isMintiLipCase", "Yes"))
-                        .mustNot(existsQuery("data.applicant1ResponseDate")))
+                        .mustNot(matchQuery("data.isMintiLipCase", "Yes")))
             .should(boolQuery()
                         .must(rangeQuery("data.addLegalRepDeadlineRes1").lt("now"))
                         .must(boolQuery().must(matchQuery("state", "AWAITING_RESPONDENT_ACKNOWLEDGEMENT"))))
