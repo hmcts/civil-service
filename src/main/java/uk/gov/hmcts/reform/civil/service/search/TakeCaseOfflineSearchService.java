@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.List;
 
@@ -21,30 +22,54 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKN
 @Service
 public class TakeCaseOfflineSearchService extends ElasticSearchService {
 
-    public TakeCaseOfflineSearchService(CoreCaseDataService coreCaseDataService) {
+    private final FeatureToggleService featureToggleService;
+
+    public TakeCaseOfflineSearchService(CoreCaseDataService coreCaseDataService, FeatureToggleService featureToggleService) {
         super(coreCaseDataService);
+        this.featureToggleService = featureToggleService;
     }
 
     public Query query(int startIndex) {
-        Query query = new Query(
-            boolQuery()
-                .minimumShouldMatch(1)
-                .should(boolQuery()
-                            .must(rangeQuery("data.applicant1ResponseDeadline").lt("now"))
-                            .must(beState(AWAITING_APPLICANT_INTENTION))
-                            .mustNot(matchQuery("data.isMintiLipCase", "Yes"))
-                            .mustNot(existsQuery("data.applicant1ResponseDate")))
-                .should(boolQuery()
-                            .must(rangeQuery("data.addLegalRepDeadlineRes1").lt("now"))
-                            .must(beState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT)))
-                .should(boolQuery()
-                            .must(rangeQuery("data.addLegalRepDeadlineRes2").lt("now"))
-                            .must(beState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT))),
-            List.of("reference"),
-            startIndex
-        );
-        log.info("Take Case Offline query: {}", query);
-        return query;
+        if (featureToggleService.isWelshEnabledForMainCase()) {
+            Query query = new Query(
+                boolQuery()
+                    .minimumShouldMatch(1)
+                    .should(boolQuery()
+                                .must(rangeQuery("data.applicant1ResponseDeadline").lt("now"))
+                                .must(beState(AWAITING_APPLICANT_INTENTION))
+                                .mustNot(matchQuery("data.isMintiLipCase", "Yes"))
+                                .mustNot(existsQuery("data.applicant1ResponseDate")))
+                    .should(boolQuery()
+                                .must(rangeQuery("data.addLegalRepDeadlineRes1").lt("now"))
+                                .must(beState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT)))
+                    .should(boolQuery()
+                                .must(rangeQuery("data.addLegalRepDeadlineRes2").lt("now"))
+                                .must(beState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT))),
+                List.of("reference"),
+                startIndex
+            );
+            log.info("Take Case Offline query: {}", query);
+            return query;
+        } else {
+            Query query = new Query(
+                boolQuery()
+                    .minimumShouldMatch(1)
+                    .should(boolQuery()
+                                .must(rangeQuery("data.applicant1ResponseDeadline").lt("now"))
+                                .must(beState(AWAITING_APPLICANT_INTENTION))
+                                .mustNot(matchQuery("data.isMintiLipCase", "Yes")))
+                    .should(boolQuery()
+                                .must(rangeQuery("data.addLegalRepDeadlineRes1").lt("now"))
+                                .must(beState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT)))
+                    .should(boolQuery()
+                                .must(rangeQuery("data.addLegalRepDeadlineRes2").lt("now"))
+                                .must(beState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT))),
+                List.of("reference"),
+                startIndex
+            );
+            log.info("Take Case Offline query: {}", query);
+            return query;
+        }
     }
 
     private QueryBuilder beState(CaseState caseState) {
