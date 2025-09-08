@@ -233,4 +233,116 @@ class RoboticsDataMapperForSpecTest {
         return PreviousOrganisationCollectionItem.builder().value(
             PreviousOrganisation.builder().organisationName(name).toTimestamp(fromDate).build()).build();
     }
+
+    @Test
+    void shouldReturnNullCourtFee_whenClaimFeeIsNull() {
+        CaseData caseData = CaseData.builder()
+            .legacyCaseReference("reference")
+            .submittedDate(LocalDateTime.now())
+            .totalClaimAmount(BigDecimal.valueOf(10000))
+            .applicant1(Party.builder()
+                            .type(Party.Type.COMPANY)
+                            .companyName("Applicant")
+                            .build())
+            .respondent1(Party.builder()
+                             .type(Party.Type.COMPANY)
+                             .companyName("Respondent")
+                             .build())
+            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("solicitor@email.com").build())
+            .build();
+
+        RoboticsCaseDataSpec roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
+
+        Assertions.assertNull(roboticsCaseData.getClaimDetails().getCourtFee());
+    }
+
+    @Test
+    void shouldReturnCalculatedCourtFee_whenNoHwfDetailsProvided() {
+        CaseData caseData = CaseData.builder()
+            .legacyCaseReference("reference")
+            .submittedDate(LocalDateTime.now())
+            .claimFee(uk.gov.hmcts.reform.civil.model.Fee.builder()
+                          .calculatedAmountInPence(BigDecimal.valueOf(10000)) // £100
+                          .build())
+            .totalClaimAmount(BigDecimal.valueOf(5000))
+            .applicant1(Party.builder().type(Party.Type.COMPANY).companyName("Applicant").build())
+            .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("Respondent").build())
+            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("solicitor@email.com").build())
+            .build();
+
+        RoboticsCaseDataSpec roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
+
+        Assertions.assertEquals(0, roboticsCaseData.getClaimDetails().getCourtFee().compareTo(BigDecimal.valueOf(100)));
+    }
+
+    @Test
+    void shouldReturnZeroCourtFee_whenHwfRemissionEqualsFee() {
+        BigDecimal fullFee = BigDecimal.valueOf(20000); // £200
+
+        CaseData caseData = CaseData.builder()
+            .legacyCaseReference("reference")
+            .submittedDate(LocalDateTime.now())
+            .claimFee(uk.gov.hmcts.reform.civil.model.Fee.builder()
+                          .calculatedAmountInPence(fullFee)
+                          .build())
+            .claimIssuedHwfDetails(uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails.builder()
+                                       .remissionAmount(fullFee)
+                                       .build())
+            .totalClaimAmount(BigDecimal.valueOf(5000))
+            .applicant1(Party.builder().type(Party.Type.COMPANY).companyName("Applicant").build())
+            .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("Respondent").build())
+            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("solicitor@email.com").build())
+            .build();
+
+        RoboticsCaseDataSpec roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
+
+        Assertions.assertEquals(BigDecimal.ZERO, roboticsCaseData.getClaimDetails().getCourtFee());
+    }
+
+    @Test
+    void shouldReturnOutstandingFee_whenHwfOutstandingFeeIsPresent() {
+        CaseData caseData = CaseData.builder()
+            .legacyCaseReference("reference")
+            .submittedDate(LocalDateTime.now())
+            .claimFee(uk.gov.hmcts.reform.civil.model.Fee.builder()
+                          .calculatedAmountInPence(BigDecimal.valueOf(30000)) // £300
+                          .build())
+            .claimIssuedHwfDetails(uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails.builder()
+                                       .outstandingFeeInPounds(BigDecimal.valueOf(120))
+                                       .build())
+            .totalClaimAmount(BigDecimal.valueOf(5000))
+            .applicant1(Party.builder().type(Party.Type.COMPANY).companyName("Applicant").build())
+            .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("Respondent").build())
+            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("solicitor@email.com").build())
+            .build();
+
+        RoboticsCaseDataSpec roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
+
+        Assertions.assertEquals(0, roboticsCaseData.getClaimDetails().getCourtFee().compareTo(BigDecimal.valueOf(120)));
+    }
+
+    @Test
+    void shouldReturnCalculatedFee_whenRemissionNotEqualAndNoOutstandingFee() {
+        BigDecimal fullFee = BigDecimal.valueOf(25000); // £250
+        BigDecimal remission = BigDecimal.valueOf(5000); // partial remission
+
+        CaseData caseData = CaseData.builder()
+            .legacyCaseReference("reference")
+            .submittedDate(LocalDateTime.now())
+            .claimFee(uk.gov.hmcts.reform.civil.model.Fee.builder()
+                          .calculatedAmountInPence(fullFee)
+                          .build())
+            .claimIssuedHwfDetails(uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails.builder()
+                                       .remissionAmount(remission)
+                                       .build())
+            .totalClaimAmount(BigDecimal.valueOf(5000))
+            .applicant1(Party.builder().type(Party.Type.COMPANY).companyName("Applicant").build())
+            .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("Respondent").build())
+            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("solicitor@email.com").build())
+            .build();
+
+        RoboticsCaseDataSpec roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
+
+        Assertions.assertEquals(0, roboticsCaseData.getClaimDetails().getCourtFee().compareTo(BigDecimal.valueOf(250)));
+    }
 }
