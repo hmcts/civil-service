@@ -1,12 +1,12 @@
 package uk.gov.hmcts.reform.civil.helpers.judgmentsonline;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRTLStatus;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
+import uk.gov.hmcts.reform.civil.service.Time;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -15,8 +15,11 @@ import static java.util.Objects.nonNull;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class JudgmentPaidInFullOnlineMapper extends JudgmentOnlineMapper {
+
+    public JudgmentPaidInFullOnlineMapper(Time time) {
+        super(time);
+    }
 
     public JudgmentDetails addUpdateActiveJudgment(CaseData caseData, LocalDate paymentDate) {
 
