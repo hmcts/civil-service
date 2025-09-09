@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
@@ -22,6 +23,7 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideReason;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.Time;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -36,6 +38,9 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SET_ASIDE_JUDGMENT;
 @ExtendWith(MockitoExtension.class)
 class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
 
+    @Mock
+    Time time;
+
     private SetAsideJudgmentCallbackHandler handler;
 
     private SetAsideJudgmentOnlineMapper setAsideJudgmentOnlineMapper;
@@ -48,7 +53,7 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
     @BeforeEach
     void setup() {
         ObjectMapper objectMapper = new ObjectMapper().registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
-        setAsideJudgmentOnlineMapper = new SetAsideJudgmentOnlineMapper();
+        setAsideJudgmentOnlineMapper = new SetAsideJudgmentOnlineMapper(time);
         handler = new SetAsideJudgmentCallbackHandler(objectMapper, setAsideJudgmentOnlineMapper);
     }
 
