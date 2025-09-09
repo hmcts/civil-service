@@ -76,8 +76,10 @@ public class QueryNotificationUtils {
                 getLegalOrganizationNameForRespondent(caseData, true, organisationService)
             );
         } else if (isRespondentSolicitorTwo(roles)) {
-            properties.put(CLAIM_LEGAL_ORG_NAME_SPEC,
-                           getLegalOrganizationNameForRespondent(caseData, false, organisationService));
+            properties.put(
+                CLAIM_LEGAL_ORG_NAME_SPEC,
+                getLegalOrganizationNameForRespondent(caseData, false, organisationService)
+            );
         } else if (isLIPClaimant(roles)) {
             properties.put(PARTY_NAME, caseData.getApplicant1().getPartyName());
         } else if (isLIPDefendant(roles)) {
@@ -249,7 +251,7 @@ public class QueryNotificationUtils {
         return details;
     }
 
-    private static  Map<String, String> createLipOnCaseEmailDetails(String email, String lipName, String lipOtherPartyWelsh) {
+    private static Map<String, String> createLipOnCaseEmailDetails(String email, String lipName, String lipOtherPartyWelsh) {
         Map<String, String> details = new HashMap<>();
         details.put(EMAIL, email);
         details.put(LIP_NAME, lipName);
@@ -261,9 +263,9 @@ public class QueryNotificationUtils {
     public static boolean isUnspecClaimNotReadyForNotification(CaseData caseData, CoreCaseUserService coreCaseUserService, String queryId) {
         List<String> roles = getUserRoleForQuery(caseData, coreCaseUserService, queryId);
 
-     return UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory()) &&
-            !isOtherPartyApplicant(roles) &&
-            (CaseState.CASE_ISSUED == caseData.getCcdState() ||
-                CaseState.AWAITING_CASE_DETAILS_NOTIFICATION == caseData.getCcdState());
+        return UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+            && !isOtherPartyApplicant(roles)
+            && (CaseState.CASE_ISSUED == caseData.getCcdState()
+            || CaseState.AWAITING_CASE_DETAILS_NOTIFICATION == caseData.getCcdState());
     }
 }

@@ -105,7 +105,9 @@ public class NotifyOtherPartyQueryHasResponseNotificationHandler extends Callbac
                 });
             } else {
                 emailDetailsList.forEach(otherPartyEmailDetails -> {
-                    if (isUnspecClaimNotReadyForNotification(caseData, coreCaseUserService, parentQueryId)) return;
+                    if (isUnspecClaimNotReadyForNotification(caseData, coreCaseUserService, parentQueryId)) {
+                        return;
+                    }
                     notificationService.sendMail(
                         otherPartyEmailDetails.get(EMAIL),
                         notificationsProperties.getQueryLrPublicResponseReceived(),
@@ -118,7 +120,9 @@ public class NotifyOtherPartyQueryHasResponseNotificationHandler extends Callbac
         } else {
             List<Map<String, String>> emailDetailsList = getOtherPartyEmailDetails(caseData, organisationService, coreCaseUserService, parentQueryId);
             emailDetailsList.forEach(otherPartyEmailDetails -> {
-                if (isUnspecClaimNotReadyForNotification(caseData, coreCaseUserService, parentQueryId)) return;
+                if (isUnspecClaimNotReadyForNotification(caseData, coreCaseUserService, parentQueryId)) {
+                    return;
+                }
                 notificationService.sendMail(
                     otherPartyEmailDetails.get(EMAIL),
                     notificationsProperties.getNotifyOtherPartyQueryResponseReceived(),

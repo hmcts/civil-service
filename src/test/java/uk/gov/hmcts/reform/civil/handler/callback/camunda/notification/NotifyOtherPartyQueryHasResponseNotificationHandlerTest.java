@@ -349,7 +349,7 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
                         .build()
                 ))
                 .build();
-            return CaseDataBuilder.builder().atStateClaimIssued().build()
+            return CaseDataBuilder.builder().atStateAwaitingResponseFullDefenceReceived().build()
                 .toBuilder()
                 .respondent1(PartyBuilder.builder().build())
                 .respondent2(PartyBuilder.builder().build())
@@ -444,7 +444,7 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
                 ))
                 .build();
 
-            return CaseDataBuilder.builder().atStateClaimIssued().build()
+            return CaseDataBuilder.builder().atStateAwaitingResponseFullDefenceReceived().build()
                 .toBuilder()
                 .applicantSolicitor1UserDetails(IdamUserDetails.builder()
                                                     .email("applicant@email.com")
@@ -566,7 +566,7 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
                         .build()
                 ))
                 .build();
-            return CaseDataBuilder.builder().atStateClaimIssued().build()
+            return CaseDataBuilder.builder().atStateAwaitingResponseFullDefenceReceived().build()
                 .toBuilder()
                 .respondent1(PartyBuilder.builder().build())
                 .respondent2(PartyBuilder.builder().build())
@@ -628,7 +628,7 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
 
             CaseData caseData;
             if (isWelsh) {
-                caseData = CaseDataBuilder.builder().atStateClaimIssued().build().toBuilder()
+                caseData = CaseDataBuilder.builder().atStateAwaitingResponseFullDefenceReceived().build().toBuilder()
                     .applicant1Represented(YesOrNo.NO)
                     .claimantBilingualLanguagePreference("WELSH")
                     .respondentSolicitor1EmailAddress("respondent1@email.com")
@@ -638,7 +638,7 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
                                          .build())
                     .build();
             } else {
-                caseData = CaseDataBuilder.builder().atStateClaimIssued().build().toBuilder()
+                caseData = CaseDataBuilder.builder().atStateAwaitingResponseFullDefenceReceived().build().toBuilder()
                     .applicant1Represented(YesOrNo.NO)
                     .claimantBilingualLanguagePreference("ENGLISH")
                     .respondentSolicitor1EmailAddress("respondent1@email.com")
@@ -676,7 +676,7 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
 
             CaseData caseData;
             if (isWelsh) {
-                caseData = CaseDataBuilder.builder().atStateClaimIssued().build().toBuilder()
+                caseData = CaseDataBuilder.builder().atStateAwaitingResponseFullDefenceReceived().build().toBuilder()
                     .caseDataLiP(CaseDataLiP.builder()
                                      .respondent1LiPResponse(RespondentLiPResponse.builder()
                                                                  .respondent1ResponseLanguage("WELSH").build())
@@ -687,7 +687,7 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
                     .businessProcess(BusinessProcess.builder().processInstanceId("123").build())
                     .build();
             } else {
-                caseData = CaseDataBuilder.builder().atStateClaimIssued().build().toBuilder()
+                caseData = CaseDataBuilder.builder().atStateAwaitingResponseFullDefenceReceived().build().toBuilder()
                     .caseDataLiP(CaseDataLiP.builder()
                                      .respondent1LiPResponse(RespondentLiPResponse.builder()
                                                                  .respondent1ResponseLanguage("ENGLSH").build())
@@ -724,7 +724,7 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
             when(runtimeService.getProcessVariables(any())).thenReturn(QueryManagementVariables.builder().queryId("13").build());
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("DEFENDANT"));
 
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateAwaitingResponseFullDefenceReceived().build().toBuilder()
                 .respondent1Represented(YesOrNo.NO)
                 .applicant1Represented(YesOrNo.YES)
                 .defendantUserDetails(IdamUserDetails.builder().email("sole.trader@email.com").build())
@@ -758,7 +758,7 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
             when(runtimeService.getProcessVariables(any())).thenReturn(QueryManagementVariables.builder().queryId("13").build());
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("CLAIMANT"));
 
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateAwaitingResponseFullDefenceReceived().build().toBuilder()
                 .applicant1Represented(YesOrNo.NO)
                 .queries(query)
                 .businessProcess(BusinessProcess.builder()
@@ -790,7 +790,7 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
             when(runtimeService.getProcessVariables(any())).thenReturn(QueryManagementVariables.builder().queryId("13").build());
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("CLAIMANT"));
 
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateAwaitingResponseFullDefenceReceived().build().toBuilder()
                 .respondent1(PartyBuilder.builder().build())
                 .respondent2(PartyBuilder.builder().build())
                 .addRespondent2(YesOrNo.YES)
@@ -819,6 +819,76 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
             assertThat(emailTemplate.getAllValues().get(1)).isEqualTo(TEMPLATE_PUBLIC_QUERY_ID);
             assertThat(notificationDataMap.getAllValues().get(1)).isEqualTo(getNotificationDataMap(caseData, true));
             assertThat(reference.getAllValues().get(1)).isEqualTo("other-party-response-to-query-notification-000DC001");
+        }
+
+        @Test
+        void shouldNotNotifyOtherParty_whenIsUnpecClaim_and_CaseIssued() {
+            when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
+            CaseQueriesCollection query = CaseQueriesCollection.builder()
+                .roleOnCase(CaseRole.CLAIMANT.toString())
+                .caseMessages(wrapElements(
+                    CaseMessage.builder().id("3").createdBy("LIP").build(),
+                    CaseMessage.builder().id("13").createdBy("admin").createdOn(OffsetDateTime.now().minusHours(2)).parentId("3").build()))
+                .build();
+
+            when(runtimeService.getProcessVariables(any())).thenReturn(QueryManagementVariables.builder().queryId("13").build());
+            when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("CLAIMANT"));
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build().toBuilder()
+                .respondent1(PartyBuilder.builder().build())
+                .respondent2(PartyBuilder.builder().build())
+                .addRespondent2(YesOrNo.YES)
+                .applicant1Represented(YesOrNo.NO)
+                .queries(query)
+                .businessProcess(BusinessProcess.builder()
+                                     .processInstanceId("123")
+                                     .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            handler.handle(params);
+
+            verify(notificationService, times(0)).sendMail(
+                targetEmail.capture(),
+                emailTemplate.capture(),
+                notificationDataMap.capture(),
+                reference.capture()
+            );
+
+        }
+
+        @Test
+        void shouldNotNotifyOtherParty_whenIsUnpecClaim_and_awaiting_case_details_notification() {
+            when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
+            CaseQueriesCollection query = CaseQueriesCollection.builder()
+                .roleOnCase(CaseRole.CLAIMANT.toString())
+                .caseMessages(wrapElements(
+                    CaseMessage.builder().id("3").createdBy("LIP").build(),
+                    CaseMessage.builder().id("13").createdBy("admin").createdOn(OffsetDateTime.now().minusHours(2)).parentId("3").build()))
+                .build();
+
+            when(runtimeService.getProcessVariables(any())).thenReturn(QueryManagementVariables.builder().queryId("13").build());
+            when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("CLAIMANT"));
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified().build().toBuilder()
+                .respondent1(PartyBuilder.builder().build())
+                .respondent2(PartyBuilder.builder().build())
+                .addRespondent2(YesOrNo.YES)
+                .applicant1Represented(YesOrNo.NO)
+                .queries(query)
+                .businessProcess(BusinessProcess.builder()
+                                     .processInstanceId("123")
+                                     .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            handler.handle(params);
+
+            verify(notificationService, times(0)).sendMail(
+                targetEmail.capture(),
+                emailTemplate.capture(),
+                notificationDataMap.capture(),
+                reference.capture()
+            );
+
         }
 
     }
