@@ -746,6 +746,40 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
         }
 
         @Test
+        void shouldNotifyOtherParty_whenQueryResponseOnLipCase_OtherPartyLrApplicant_atStateClaimIssued() {
+            when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
+            CaseQueriesCollection query = CaseQueriesCollection.builder()
+                .roleOnCase(CaseRole.DEFENDANT.toString())
+                .caseMessages(wrapElements(
+                    CaseMessage.builder().id("3").createdBy("LIP").build(),
+                    CaseMessage.builder().id("13").createdBy("admin").createdOn(OffsetDateTime.now().minusHours(2)).parentId("3").build()))
+                .build();
+
+            when(runtimeService.getProcessVariables(any())).thenReturn(QueryManagementVariables.builder().queryId("13").build());
+            when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("DEFENDANT"));
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build().toBuilder()
+                .respondent1Represented(YesOrNo.NO)
+                .applicant1Represented(YesOrNo.YES)
+                .defendantUserDetails(IdamUserDetails.builder().email("sole.trader@email.com").build())
+                .queries(query)
+                .businessProcess(BusinessProcess.builder()
+                                     .processInstanceId("123")
+                                     .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            handler.handle(params);
+
+            verify(notificationService, times(0)).sendMail(
+                "applicantsolicitor@example.com",
+                TEMPLATE_PUBLIC_QUERY_ID,
+                getNotificationDataMap(caseData, true),
+                "other-party-response-to-query-notification-000DC001"
+            );
+        }
+
+        @Test
         void shouldNotifyOtherParty_whenQueryResponseOnLipCase_OtherPartyLrRespondent() {
             when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
             CaseQueriesCollection query = CaseQueriesCollection.builder()

@@ -435,6 +435,38 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
             }
 
             @Test
+            void shouldNotifyOtherParty_whenQueryRaisedOnLipCase_OtherPartyLrRespondent_atStateClaimIssued() {
+                when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
+                CaseQueriesCollection query = CaseQueriesCollection.builder()
+                    .roleOnCase(CaseRole.CLAIMANT.toString())
+                    .caseMessages(wrapElements(CaseMessage.builder()
+                                                   .id("1")
+                                                   .build()))
+                    .build();
+
+                when(runtimeService.getProcessVariables(any())).thenReturn(QueryManagementVariables.builder().queryId("1").build());
+                when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("CLAIMANT"));
+
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build().toBuilder()
+                    .applicant1Represented(YesOrNo.NO)
+                    .queries(query)
+                    .businessProcess(BusinessProcess.builder()
+                                         .processInstanceId("123")
+                                         .build())
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+                handler.handle(params);
+
+                verify(notificationService, times(0)).sendMail(
+                    "respondentsolicitor@example.com",
+                    TEMPLATE_ID,
+                    getNotificationDataMap(caseData, true),
+                    "a-query-has-been-raised-notification-000DC001"
+                );
+            }
+
+            @Test
             void shouldNotifyOtherParty_whenQueryRaisedOnLipCase_TwoRespondentRepresentative() {
                 when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
                 CaseQueriesCollection query = CaseQueriesCollection.builder()
