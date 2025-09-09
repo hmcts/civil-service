@@ -46,6 +46,7 @@ import java.util.Optional;
 import static java.util.Objects.nonNull;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -458,12 +459,8 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
 
                 handler.handle(params);
 
-                verify(notificationService, times(0)).sendMail(
-                    "respondentsolicitor@example.com",
-                    TEMPLATE_ID,
-                    getNotificationDataMap(caseData, true),
-                    "a-query-has-been-raised-notification-000DC001"
-                );
+                verify(notificationService, never()).sendMail(any(), any(), any(), any());
+
             }
 
             @Test
