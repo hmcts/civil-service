@@ -49,7 +49,6 @@ public class FullAdmitPayImmediatelyNoPaymentFromDefendantScenarioTest extends D
 
         when(coreCaseDataService.getCase(Long.valueOf(caseId))).thenReturn(caseDetails);
         when(userService.getAccessToken(any(), any())).thenReturn(BEARER_TOKEN);
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(false);
 
         handler.createClaimantDashboardScenario(new FullAdmitPayImmediatelyNoPaymentFromDefendantEvent(Long.valueOf(
             caseId)));
