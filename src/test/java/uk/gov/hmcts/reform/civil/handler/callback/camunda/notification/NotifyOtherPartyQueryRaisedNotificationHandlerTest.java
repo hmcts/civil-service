@@ -169,6 +169,26 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
 
             @ParameterizedTest
             @CsvSource({
+                "APPLICANTSOLICITORONE, respondent1@email.com, false",
+            })
+            void shouldNotifyOtherParty_whenQueryRaisedOnCase_OneRespondentRepresentative_atStateClaimIssued(String caseRole, String email, String toggle) {
+                when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(Boolean.valueOf(toggle));
+                when(runtimeService.getProcessVariables(any()))
+                    .thenReturn(QueryManagementVariables.builder()
+                                    .queryId("1")
+                                    .build());
+                when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(caseRole));
+                CaseData caseData = createCaseDataWithQueries1v1AtStateClaimIssued();
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+                handler.handle(params);
+
+                verify(notificationService, never()).sendMail(any(), any(), any(), any());
+
+            }
+
+            @ParameterizedTest
+            @CsvSource({
                 "RESPONDENTSOLICITORTWO, applicant@email.com, false",
                 "RESPONDENTSOLICITORONE, applicant@email.com, false",
                 "RESPONDENTSOLICITORTWO, applicant@email.com, true",
@@ -533,12 +553,7 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
                 handler.handle(params);
 
-                verify(notificationService, times(0)).sendMail(
-                    targetEmail.capture(),
-                    emailTemplate.capture(),
-                    notificationDataMap.capture(),
-                    reference.capture()
-                );
+                verify(notificationService, never()).sendMail(any(), any(), any(), any());
 
             }
 
@@ -568,12 +583,7 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
                 handler.handle(params);
 
-                verify(notificationService, times(0)).sendMail(
-                    targetEmail.capture(),
-                    emailTemplate.capture(),
-                    notificationDataMap.capture(),
-                    reference.capture()
-                );
+                verify(notificationService, never()).sendMail(any(), any(), any(), any());
 
             }
 
@@ -595,6 +605,35 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
                 .build();
 
             return CaseDataBuilder.builder().atStateAwaitingResponseFullDefenceReceived().build()
+                .toBuilder()
+                .applicantSolicitor1UserDetails(IdamUserDetails.builder()
+                                                    .email("applicant@email.com")
+                                                    .build())
+                .respondentSolicitor1EmailAddress("respondent1@email.com")
+                .qmApplicantSolicitorQueries(applicantQuery)
+                .qmRespondentSolicitor1Queries(respondent1Query)
+                .businessProcess(BusinessProcess.builder()
+                                     .processInstanceId("123")
+                                     .build())
+                .build();
+        }
+
+        private CaseData createCaseDataWithQueries1v1AtStateClaimIssued() {
+            CaseQueriesCollection applicantQuery = CaseQueriesCollection.builder()
+                .roleOnCase(CaseRole.APPLICANTSOLICITORONE.toString())
+                .caseMessages(wrapElements(CaseMessage.builder()
+                                               .id("1")
+                                               .build()))
+                .build();
+
+            CaseQueriesCollection respondent1Query = CaseQueriesCollection.builder()
+                .roleOnCase(CaseRole.RESPONDENTSOLICITORONE.toString())
+                .caseMessages(wrapElements(CaseMessage.builder()
+                                               .id("2")
+                                               .build()))
+                .build();
+
+            return CaseDataBuilder.builder().atStateClaimIssued().build()
                 .toBuilder()
                 .applicantSolicitor1UserDetails(IdamUserDetails.builder()
                                                     .email("applicant@email.com")
