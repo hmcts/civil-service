@@ -103,9 +103,12 @@ public class InformAgreedExtensionDateForSpecCallbackHandler extends CallbackHan
             isRespondent1 = NO;
         }
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
-        LocalDate issueDate = caseData.getIssueDate();
+        LocalDateTime currentResponseDeadline = caseData.getRespondent1ResponseDeadline();
 
-        if (LocalDate.now().isAfter(issueDate.plusDays(28))  && !isAdmin(callbackParams.getParams().get(BEARER_TOKEN).toString())) {
+
+        if (((caseData.getNextDeadline() != null && caseData.getNextDeadline().isBefore(LocalDate.now()))
+            || (currentResponseDeadline != null && currentResponseDeadline.isBefore(LocalDateTime.now())))
+            && !isAdmin(callbackParams.getParams().get(BEARER_TOKEN).toString())) {
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(List.of(ERROR_EXTENSION_DEADLINE_BEEN_PASSED))
                 .build();
