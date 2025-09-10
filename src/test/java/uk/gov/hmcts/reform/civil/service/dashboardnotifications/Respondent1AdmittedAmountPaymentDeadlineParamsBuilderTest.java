@@ -11,7 +11,6 @@ import java.util.HashMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsBuilder.END_OF_DAY;
 
 class Respondent1AdmittedAmountPaymentDeadlineParamsBuilderTest {
 
@@ -38,9 +37,14 @@ class Respondent1AdmittedAmountPaymentDeadlineParamsBuilderTest {
         builder.addParams(caseData, params);
 
         // Assert
-        assertThat(params).containsEntry("respondent1AdmittedAmountPaymentDeadline", paymentDate.atTime(END_OF_DAY));
-        assertThat(params).containsEntry("respondent1AdmittedAmountPaymentDeadlineEn", "1 October 2023");
-        assertThat(params).containsEntry("respondent1AdmittedAmountPaymentDeadlineCy", "1 Hydref 2023");
+        assertThat(params).containsEntry("descriptionEn",
+                                         "<p class=\"govuk-body\">You have offered to pay 0 by 1 October 2023 ." +
+            " The payment must be received in ''s account by then, if not they can request a county court judgment.</p><p class=\"govuk-body\">" +
+                                             "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a></p>");
+        assertThat(params).containsEntry("descriptionCy",
+                                         "<p class=\"govuk-body\">Rydych wedi cynnig talu 0 erbyn 1 Hydref 2023. " +
+            "Rhaid i’r taliad fod yng nghyfrif  erbyn y dyddiad hwnnw. Os nad yw, yna gallant wneud cais am ddyfarniad llys sirol." +
+                                             "</p><p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">Gweld eich ymateb</a></p>");
     }
 
     @Test
