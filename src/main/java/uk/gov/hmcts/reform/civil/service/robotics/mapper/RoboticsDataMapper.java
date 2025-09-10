@@ -66,11 +66,25 @@ public class RoboticsDataMapper {
     public RoboticsCaseData toRoboticsCaseData(CaseData caseData, String authToken) {
         log.info("Preparing Robotics data for unspec caseId {}", caseData.getCcdCaseReference());
         requireNonNull(caseData);
+        log.info("Starting RoboticsCaseData mapping for caseId={}", caseData.getCcdCaseReference());
+
+        var header = buildCaseHeader(caseData, authToken);
+        log.info("RoboticsCaseData CaseHeader built: {}", header);
+
+        var parties = buildLitigiousParties(caseData);
+        log.info("RoboticsCaseData LitigiousParties built: {}", parties);
+
+        var claimDetails = buildClaimDetails(caseData);
+        log.info("RoboticsCaseData ClaimDetails built: {}", claimDetails);
+
+        var events = eventHistoryMapper.buildEvents(caseData, authToken);
+        log.info("RoboticsCaseData Events built: {}", events);
+
         var roboticsBuilder = RoboticsCaseData.builder()
-            .header(buildCaseHeader(caseData, authToken))
-            .litigiousParties(buildLitigiousParties(caseData))
-            .claimDetails(buildClaimDetails(caseData))
-            .events(eventHistoryMapper.buildEvents(caseData, authToken));
+            .header(header)
+            .litigiousParties(parties)
+            .claimDetails(claimDetails)
+            .events(events);
 
         if (!(caseData.isLipvLipOneVOne())) {
             roboticsBuilder.solicitors(buildSolicitors(caseData));

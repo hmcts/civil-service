@@ -66,12 +66,29 @@ public class RoboticsDataMapperForSpec {
     public RoboticsCaseDataSpec toRoboticsCaseData(CaseData caseData, String authToken) {
         log.info("Preparing Robotics data for spec caseId {}", caseData.getCcdCaseReference());
         requireNonNull(caseData);
-        RoboticsCaseDataSpec.RoboticsCaseDataSpecBuilder builder = RoboticsCaseDataSpec.builder()
-            .header(buildCaseHeader(caseData))
-            .litigiousParties(buildLitigiousParties(caseData))
-            .solicitors(buildSolicitors(caseData))
-            .claimDetails(buildClaimDetails(caseData))
-            .events(eventHistoryMapper.buildEvents(caseData, authToken));
+        log.info("Starting RoboticsCaseData mapping for caseId={}", caseData.getCcdCaseReference());
+
+        var header = buildCaseHeader(caseData);
+        log.info("RoboticsCaseDataSpec CaseHeader built: {}", header);
+
+        var parties = buildLitigiousParties(caseData);
+        log.info("RoboticsCaseDataSpec LitigiousParties built: {}", parties);
+
+        var solicitors = buildSolicitors(caseData);
+        log.info("RoboticsCaseDataSpec Solicitors built: {}", solicitors);
+
+        var claimDetails = buildClaimDetails(caseData);
+        log.info("RoboticsCaseDataSpec ClaimDetails built: {}", claimDetails);
+
+        var events = eventHistoryMapper.buildEvents(caseData, authToken);
+        log.info("RoboticsCaseDataSpec Events built: {}", events);
+
+        var builder = RoboticsCaseDataSpec.builder()
+            .header(header)
+            .litigiousParties(parties)
+            .solicitors(solicitors)
+            .claimDetails(claimDetails)
+            .events(events);
 
         if (caseData.getCcdState() == PROCEEDS_IN_HERITAGE_SYSTEM
             || caseData.getCcdState() == CASE_DISMISSED) {
