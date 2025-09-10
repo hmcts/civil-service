@@ -44,26 +44,33 @@ public class RetriggerCasesEventHandler extends BaseExternalTaskHandler {
         String eventDescription = "Process ID: %s".formatted(externalTask.getProcessInstanceId());
         Map<String, Object> caseData = getCaseData(externalTask);
         String documentJson = externalTask.getVariable("document");
-
+        String ga = externalTask.getVariable("ga");
+        boolean isGaCase = "Yes".equalsIgnoreCase(ga);
         for (String caseId : caseIds.split(",")) {
             if (documentJson != null) {
                 handleDocumentUpdateFinalOrders(caseId, caseEvent, documentJson, externalTask.getProcessInstanceId());
                 break;
             }
             try {
-                log.info("" +
-                    "Retrigger CaseId: {} started", caseId);
                 externalTask.getAllVariables().put("caseId", caseId);
-                coreCaseDataService.triggerEvent(
-                    parseLong(caseId.trim()),
-                    caseEvent,
-                    caseData,
-                    eventSummary,
-                    eventDescription
-                );
-                log.info("Retrigger CaseId: {} finished. Case data: {}", caseId, caseData);
+                if (isGaCase) {
+                    log.info("Retrigger GA CaseId: {} started", caseId);
+                    coreCaseDataService.triggerGeneralApplicationEvent(parseLong(caseId.trim()),
+                                                                       caseEvent);
+                    log.info("Retrigger GA CaseId: {} finished. Case data: {}", caseId, caseData);
+                } else {
+                    log.info("Retrigger CaseId: {} started", caseId);
+                    coreCaseDataService.triggerEvent(
+                        parseLong(caseId.trim()),
+                        caseEvent,
+                        caseData,
+                        eventSummary,
+                        eventDescription
+                    );
+                    log.info("Retrigger CaseId: {} finished. Case data: {}", caseId, caseData);
+                }
             } catch (Exception e) {
-                log.error("ERROR Retrigger CaseId: {}. Case data: {},  {}", caseId, caseData, e.getMessage(), e);
+                log.error("ERROR Retrigger CaseId: {}. Case data: {}, isGaCase {}, {}", caseId, caseData, isGaCase, e.getMessage(), e);
             }
         }
         return ExternalTaskData.builder().build();
