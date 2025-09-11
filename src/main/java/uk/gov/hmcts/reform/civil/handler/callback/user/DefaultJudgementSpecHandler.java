@@ -515,7 +515,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
                 true
             ));
             caseData.setJoIsLiveJudgmentExists(YesOrNo.YES);
-            caseData.setJoDJCreatedDate(LocalDateTime.now());
+            caseData.setJoDJCreatedDate(time.now());
         }
 
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
