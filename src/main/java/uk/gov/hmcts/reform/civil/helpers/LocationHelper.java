@@ -59,14 +59,14 @@ public class LocationHelper {
     }
 
     public Optional<RequestedCourt> getCaseManagementLocation(CaseData caseData) {
-        return getCaseManagementLocationDefault(caseData, false);
+        return getCaseManagementLocationDefault(caseData);
     }
 
-    public Optional<RequestedCourt> getCaseManagementLocationWhenLegalAdvisorSdo(CaseData caseData, boolean legalAdvisorSdo) {
-        return getCaseManagementLocationDefault(caseData, legalAdvisorSdo);
+    public Optional<RequestedCourt> getCaseManagementLocationWhenLegalAdvisorSdo(CaseData caseData) {
+        return getCaseManagementLocationDefault(caseData);
     }
 
-    private Optional<RequestedCourt> getCaseManagementLocationDefault(CaseData caseData, boolean isLegalAdvisorSdo) {
+    private Optional<RequestedCourt> getCaseManagementLocationDefault(CaseData caseData) {
         List<RequestedCourt> prioritized = new ArrayList<>();
         boolean leadDefendantIs1 = leadDefendantIs1(caseData);
         Supplier<Party.Type> getDefendantType;
@@ -85,14 +85,9 @@ public class LocationHelper {
 
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
             && ccmccAmount.compareTo(getClaimValue(caseData)) >= 0) {
-            if (!isLegalAdvisorSdo) {
-                log.debug("Case {}, specified claim under 1000, CML set to CCMCC", caseData.getCcdCaseReference());
-                return Optional.of(RequestedCourt.builder().caseLocation(getCcmccCaseLocation()).build());
-            } else {
-                log.debug("Case {}, specified claim under 1000, Legal advisor,  CML set to preferred location", caseData.getCcdCaseReference());
-                assignSpecPreferredCourt(caseData, getDefendantType, getDefendantCourt, prioritized);
-                return prioritized.stream().findFirst();
-            }
+            log.debug("Case {}, specified claim under 1000, Legal advisor,  CML set to preferred location", caseData.getCcdCaseReference());
+            assignSpecPreferredCourt(caseData, getDefendantType, getDefendantCourt, prioritized);
+            return prioritized.stream().findFirst();
         }
 
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory()) && ccmccAmount.compareTo(getClaimValue(caseData)) < 0) {
