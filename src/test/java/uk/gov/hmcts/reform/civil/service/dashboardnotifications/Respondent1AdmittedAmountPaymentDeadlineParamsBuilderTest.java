@@ -40,10 +40,13 @@ class Respondent1AdmittedAmountPaymentDeadlineParamsBuilderTest {
 
         // Assert
         assertThat(params).containsEntry("descriptionEn",
-                                         "<p class=\"govuk-body\">You have offered to pay £100 by 1 October 2023. The payment must be received in John's account by then, " +
-                                             "if not they can request a county court judgment.</p><p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a></p>");
+                                         "<p class=\"govuk-body\">You have offered to pay £100 by 1 October 2023. The payment must be " +
+                                             "received in John's account by then, " +
+                                             "if not they can request a county court judgment.</p><p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" " +
+                                             "class=\"govuk-link\">View your response</a></p>");
         assertThat(params).containsEntry("descriptionCy",
-                                         "<p class=\"govuk-body\">Rydych wedi cynnig talu £100 erbyn 1 Hydref 2023. Rhaid i’r taliad fod yng nghyfrif John erbyn y dyddiad hwnnw. " +
+                                         "<p class=\"govuk-body\">Rydych wedi cynnig talu £100 erbyn 1 Hydref 2023. Rhaid i’r taliad fod " +
+                                             "yng nghyfrif John erbyn y dyddiad hwnnw. " +
                                              "Os nad yw, yna gallant wneud cais am ddyfarniad llys sirol." +
                                              "</p><p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">Gweld eich ymateb</a></p>");
     }
