@@ -49,14 +49,17 @@ public class Respondent1AdmittedAmountPaymentDeadlineParamsBuilder extends Dashb
             var amountIncludesTextCy = params.get("amountIncludesTextCy") != null ? params.get("amountIncludesTextCy").toString() : "";
             var applicant1PartyName = params.get("applicant1PartyName") != null ? params.get("applicant1PartyName").toString() : "";
             var descriptionEn = String.format("<p class=\"govuk-body\">You have offered to pay %s by %s%s. The payment must be received in %s's account by then, " +
-                                                  "if not they can request a county court judgment.</p><p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a></p>",
+                                                  "if not they can request a county court judgment.</p><p class=\"govuk-body\">" +
+                                                  "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a></p>",
                                               defendantAdmittedAmount,
                                               respondent1AdmittedAmountPaymentDeadlineEn,
                                               amountIncludesTextEn,
                                               applicant1PartyName);
 
-            var descriptionCy = String.format("<p class=\"govuk-body\">Rydych wedi cynnig talu %s erbyn %s%s. Rhaid i’r taliad fod yng nghyfrif %s erbyn y dyddiad hwnnw. Os nad yw, " +
-                                                  "yna gallant wneud cais am ddyfarniad llys sirol.</p><p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">Gweld eich ymateb</a></p>",
+            var descriptionCy = String.format("<p class=\"govuk-body\">Rydych wedi cynnig talu %s erbyn %s%s. Rhaid i’r taliad " +
+                                                  "fod yng nghyfrif %s erbyn y dyddiad hwnnw. Os nad yw, " +
+                                                  "yna gallant wneud cais am ddyfarniad llys sirol.</p><p class=\"govuk-body\">" +
+                                                  "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">Gweld eich ymateb</a></p>",
                                               defendantAdmittedAmount,
                                               respondent1AdmittedAmountPaymentDeadlineCy,
                                               amountIncludesTextCy,
