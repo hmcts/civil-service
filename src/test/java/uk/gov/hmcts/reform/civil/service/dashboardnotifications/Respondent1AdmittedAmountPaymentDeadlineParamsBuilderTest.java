@@ -62,4 +62,29 @@ class Respondent1AdmittedAmountPaymentDeadlineParamsBuilderTest {
         // Assert
         assertThat(params).isEmpty();
     }
+
+    @Test
+    void shouldAddPaymentDeadlineParamsWhenRespondWithPartAdmitPayImmediately() {
+        // Arrange
+        CaseData caseData = mock(CaseData.class);
+        RespondToClaimAdmitPartLRspec admitPartLRspec = mock(RespondToClaimAdmitPartLRspec.class);
+        LocalDate paymentDate = LocalDate.parse("2023-10-01");
+
+        when(caseData.isPartAdmitPayImmediatelyClaimSpec()).thenReturn(true);
+        when(caseData.getRespondToClaimAdmitPartLRspec()).thenReturn(admitPartLRspec);
+        when(admitPartLRspec.getWhenWillThisAmountBePaid()).thenReturn(paymentDate);
+
+        HashMap<String, Object> params = new HashMap<>();
+
+        // Act
+        builder.addParams(caseData, params);
+
+        // Assert
+        assertThat(params).containsEntry("descriptionEn",
+                                         "<p class=\"govuk-body\">You've said you owe £0 plus the claim fee and any fixed costs claimed and offered to pay  " +
+                                             "immediately. We will contact you when the claimant responds.</p>");
+        assertThat(params).containsEntry("descriptionCy",
+                                         "<p class=\"govuk-body\">Rydych chi wedi dweud bod £0 yn ddyledus gennych, a ffi’r hawliad ac unrhyw gostau sefydlog a " +
+                                             "hawlir ac rydych wedi cynnig i dalu  ar unwaith. Byddwn yn cysylltu â chi pan fydd yr hawlydd yn ymateb.</p>");
+    }
 }

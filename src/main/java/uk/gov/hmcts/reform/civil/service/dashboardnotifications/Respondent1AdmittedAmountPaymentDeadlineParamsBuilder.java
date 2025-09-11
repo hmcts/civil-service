@@ -19,8 +19,8 @@ public class Respondent1AdmittedAmountPaymentDeadlineParamsBuilder extends Dashb
             var amountIncludesTextEn = "";
             var amountIncludesTextCy = "";
 
-            var descriptionEn = String.format("<p class=\"govuk-body\">You've said you owe $%s plus the claim fee and " +
-                                                  "any fixed costs claimed and offered to pay $%s immediately. " +
+            var descriptionEn = String.format("<p class=\"govuk-body\">You've said you owe £%s plus the claim fee and " +
+                                                  "any fixed costs claimed and offered to pay %s immediately. " +
                                                   "We will contact you when the claimant responds." +
                                                   "</p>",
                                               defendantAdmittedAmount,
@@ -47,14 +47,14 @@ public class Respondent1AdmittedAmountPaymentDeadlineParamsBuilder extends Dashb
             var amountIncludesTextEn = "";
             var amountIncludesTextCy = "";
             var applicant1PartyName = "";
-            var descriptionEn = String.format("<p class=\"govuk-body\">You have offered to pay %s by %s %s. The payment must be received in %s''s account by then, " +
+            var descriptionEn = String.format("<p class=\"govuk-body\">You have offered to pay £%s by %s%s. The payment must be received in %s''s account by then, " +
                                                   "if not they can request a county court judgment.</p><p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a></p>",
                                               defendantAdmittedAmount,
                                               respondent1AdmittedAmountPaymentDeadlineEn,
                                               amountIncludesTextEn,
                                               applicant1PartyName);
 
-            var descriptionCy = String.format("<p class=\"govuk-body\">Rydych wedi cynnig talu %s erbyn %s%s. Rhaid i’r taliad fod yng nghyfrif %s erbyn y dyddiad hwnnw. Os nad yw, yna gallant wneud cais am ddyfarniad llys sirol.</p><p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">Gweld eich ymateb</a></p>",
+            var descriptionCy = String.format("<p class=\"govuk-body\">Rydych wedi cynnig talu £%s erbyn %s%s. Rhaid i’r taliad fod yng nghyfrif %s erbyn y dyddiad hwnnw. Os nad yw, yna gallant wneud cais am ddyfarniad llys sirol.</p><p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">Gweld eich ymateb</a></p>",
                                               defendantAdmittedAmount,
                                               respondent1AdmittedAmountPaymentDeadlineCy,
                                               amountIncludesTextCy,
