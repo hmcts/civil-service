@@ -2,7 +2,7 @@
  * Update scenario
  */
 UPDATE dbs.scenario
-SET notifications_to_create = '{"Notice.AAA6.DefResponse.FullOrPartAdmit.PayImmediately.Defendant" : ["defendantAdmittedAmount", "respondent1AdmittedAmountPaymentDeadlineEn", "amountIncludesTextEn", "amountIncludesTextCy", "respondent1AdmittedAmountPaymentDeadlineCy", "applicant1PartyName"]}'
+SET notifications_to_create = '{"Notice.AAA6.DefResponse.FullOrPartAdmit.PayImmediately.Defendant" : ["descriptionEn", "descriptionCy"]}'
 WHERE name ='Scenario.AAA6.DefResponse.FullOrPartAdmit.PayImmediately.Defendant';
 
 /**
