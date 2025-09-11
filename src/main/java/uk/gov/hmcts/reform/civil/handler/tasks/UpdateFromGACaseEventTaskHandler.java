@@ -121,9 +121,7 @@ public class UpdateFromGACaseEventTaskHandler extends BaseExternalTaskHandler {
             updateDocCollection(output, generalAppCaseData, "gaRespondDoc", civilCaseData, "gaRespondDoc");
             generalAppCaseData = mergeBundle(generalAppCaseData);
             updateDocCollectionField(output, civilCaseData, generalAppCaseData, "gaAddl");
-            if (featureToggleService.isGaForWelshEnabled() && (generalAppCaseData.getIsGaApplicantLip().equals(YES)
-                || generalAppCaseData.getIsGaRespondentOneLip().equals(YES)
-                || generalAppCaseData.getIsGaRespondentTwoLip().equals(YES))) {
+            if (featureToggleService.isGaForWelshEnabled() && (civilCaseData.isClaimantBilingual() || civilCaseData.isRespondentResponseBilingual())) {
                 if (generalAppCaseData.getParentClaimantIsApplicant() == YES) {
                     updateDocCollection(output, generalAppCaseData, "preTranslationGaDocsApplicant", civilCaseData, "gaAddlDocClaimant");
                 } else {
