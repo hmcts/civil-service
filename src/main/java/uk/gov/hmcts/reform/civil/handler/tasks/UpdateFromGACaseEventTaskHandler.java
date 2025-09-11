@@ -121,11 +121,14 @@ public class UpdateFromGACaseEventTaskHandler extends BaseExternalTaskHandler {
             updateDocCollection(output, generalAppCaseData, "gaRespondDoc", civilCaseData, "gaRespondDoc");
             generalAppCaseData = mergeBundle(generalAppCaseData);
             updateDocCollectionField(output, civilCaseData, generalAppCaseData, "gaAddl");
-            if (featureToggleService.isGaForWelshEnabled()) {
-                String toCivilApplicantList = generalAppCaseData.getParentClaimantIsApplicant() == YES ? "gaAddlDocClaimant" : "gaAddlDocRespondentSol";
-                String toCivilRespondentList = generalAppCaseData.getParentClaimantIsApplicant() == NO ? "gaAddlDocRespondentSol" : "gaAddlDocClaimant";
-                updateDocCollection(output, generalAppCaseData, "preTranslationGaDocsApplicant", civilCaseData, toCivilApplicantList);
-                updateDocCollection(output, generalAppCaseData, "preTranslationGaDocsRespondent", civilCaseData, toCivilRespondentList);
+            if (featureToggleService.isGaForWelshEnabled() && (generalAppCaseData.getIsGaApplicantLip().equals(YES)
+                || generalAppCaseData.getIsGaRespondentOneLip().equals(YES)
+                || generalAppCaseData.getIsGaRespondentTwoLip().equals(YES))) {
+                if (generalAppCaseData.getParentClaimantIsApplicant() == YES) {
+                    updateDocCollection(output, generalAppCaseData, "preTranslationGaDocsApplicant", civilCaseData, "gaAddlDocClaimant");
+                } else {
+                    updateDocCollection(output, generalAppCaseData, "preTranslationGaDocsRespondent", civilCaseData, "gaAddlDocRespondentSol");
+                }
             }
         } catch (Exception e) {
             log.error(e.getMessage());
