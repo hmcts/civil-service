@@ -60,14 +60,12 @@ public class DefendantResponsePayImmediatelyScenarioTest extends DashboardBaseIn
                 jsonPath("$[0].titleCy").value("Ymateb i’r hawliad"),
                 jsonPath("$[0].descriptionEn").value(
                     "<p class=\"govuk-body\">You've said you owe £1000 plus the claim fee and any fixed costs claimed and offered to pay " +
-                        DateUtils.formatDate(responseDeadline) +
-                        " immediately. We will contact you when the claimant responds.</p>"
+                        "Claimant John immediately. We will contact you when the claimant responds.</p>"
                 ),
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Rydych chi wedi dweud bod £1000 yn ddyledus gennych, a ffi’r hawliad ac unrhyw gostau sefydlog " +
                         "a hawlir ac rydych wedi cynnig i dalu " +
-                        DateUtils.formatDateInWelsh(responseDeadline, false) +
-                        " ar unwaith. Byddwn yn cysylltu â chi pan fydd yr hawlydd yn ymateb.</p>"
+                        "Claimant John ar unwaith. Byddwn yn cysylltu â chi pan fydd yr hawlydd yn ymateb.</p>"
                 )
 
             );
