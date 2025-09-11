@@ -37,6 +37,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import static java.lang.Long.parseLong;
 import static java.util.Objects.isNull;
 import static java.util.Optional.ofNullable;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @RequiredArgsConstructor
@@ -122,7 +123,7 @@ public class UpdateFromGACaseEventTaskHandler extends BaseExternalTaskHandler {
             updateDocCollectionField(output, civilCaseData, generalAppCaseData, "gaAddl");
             if (featureToggleService.isGaForWelshEnabled()) {
                 String toCivilApplicantList = generalAppCaseData.getParentClaimantIsApplicant() == YES ? "gaAddlDocClaimant" : "gaAddlDocRespondentSol";
-                String toCivilRespondentList = generalAppCaseData.getParentClaimantIsApplicant() == YES ? "gaAddlDocRespondentSol" : "gaAddlDocClaimant";
+                String toCivilRespondentList = generalAppCaseData.getParentClaimantIsApplicant() == NO ? "gaAddlDocRespondentSol" : "gaAddlDocClaimant";
                 updateDocCollection(output, generalAppCaseData, "preTranslationGaDocsApplicant", civilCaseData, toCivilApplicantList);
                 updateDocCollection(output, generalAppCaseData, "preTranslationGaDocsRespondent", civilCaseData, toCivilRespondentList);
             }
@@ -299,7 +300,7 @@ public class UpdateFromGACaseEventTaskHandler extends BaseExternalTaskHandler {
         }
         List<Element<GeneralApplicationsDetails>> gaAppDetails = civilCaseData.getClaimantGaAppDetails();
 
-        if (generalAppCaseData.getParentClaimantIsApplicant() == YesOrNo.NO
+        if (generalAppCaseData.getParentClaimantIsApplicant() == NO
             && ((generalAppCaseData.getGeneralAppInformOtherParty()) != null && YES.equals(generalAppCaseData.getGeneralAppInformOtherParty().getIsWithNotice())
                 || (generalAppCaseData.getGeneralAppRespondentAgreement() != null && generalAppCaseData.getGeneralAppRespondentAgreement().getHasAgreed().equals(YES)))) {
             return true;
