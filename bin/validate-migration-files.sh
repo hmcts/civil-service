@@ -8,7 +8,6 @@ JENKINS_MODE=false
 MIGRATION_DIR="src/main/resources/db/migration"
 TEMP_DIR="tmp"
 WORKING_DIR=$(pwd)
-JENKINS_MODE=false
 
 if [[ "${3:-}" == "--jenkins" ]]; then
   JENKINS_MODE=true
@@ -24,7 +23,23 @@ fi
 
 git fetch origin > /dev/null 2>&1
 
-NEW_MIGRATION_FILES=$(git diff --name-only origin/${BASE_BRANCH}...origin/${CURRENT_BRANCH} -- ${MIGRATION_DIR})
+FORBIDDEN_CHANGES=$(git diff --name-status origin/${BASE_BRANCH}...origin/${CURRENT_BRANCH} -- ${MIGRATION_DIR} | grep -E '^[MDR]')
+
+if [ -n "$FORBIDDEN_CHANGES" ]; then
+    echo "ERROR: Modifying, renaming, or deleting migration files is FORBIDDEN!"
+    echo "The following illegal changes were detected:"
+    echo "$FORBIDDEN_CHANGES"
+    echo ""
+    echo "Rules:"
+    echo "- Once a migration is merged, it cannot be changed"
+    echo "- Migrations cannot be renamed (changing timestamps is not allowed)"
+    echo "- Migrations cannot be deleted"
+    echo ""
+    echo "If you need to fix something, create a NEW migration file"
+    exit 1
+fi
+
+NEW_MIGRATION_FILES=$(git diff --diff-filter=A --name-only origin/${BASE_BRANCH}...origin/${CURRENT_BRANCH} -- ${MIGRATION_DIR})
 BASE_MIGRATION_FILES=$(git ls-tree -r --name-only origin/${BASE_BRANCH} -- ${MIGRATION_DIR})
 
 if [[ "${JENKINS_MODE}" = true ]]; then
@@ -71,6 +86,7 @@ if [[ ${#FORMAT_ERROR_FILES[@]} -gt 0 ]]; then
   for FORMAT_ERROR_FILE in "${FORMAT_ERROR_FILES[@]}"; do
     echo "    ${FORMAT_ERROR_FILE}"
   done
+  exit 1
 fi
 
 echo "Validating new migration files timestamps are newer than the latest base migration file timestamp..."
