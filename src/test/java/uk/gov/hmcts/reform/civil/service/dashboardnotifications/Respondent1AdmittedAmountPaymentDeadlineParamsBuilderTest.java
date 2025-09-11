@@ -82,10 +82,12 @@ class Respondent1AdmittedAmountPaymentDeadlineParamsBuilderTest {
 
         // Assert
         assertThat(params).containsEntry("descriptionEn",
-                                         "<p class=\"govuk-body\">You've said you owe £100 plus the claim fee and any fixed costs claimed and offered to pay 1 October 2023 immediately. " +
+                                         "<p class=\"govuk-body\">You've said you owe £100 plus the claim fee " +
+                                             "and any fixed costs claimed and offered to pay 1 October 2023 immediately. " +
                                              "We will contact you when the claimant responds.</p>");
         assertThat(params).containsEntry("descriptionCy",
-                                         "<p class=\"govuk-body\">Rydych chi wedi dweud bod £100 yn ddyledus gennych, a ffi’r hawliad ac unrhyw gostau sefydlog a hawlir ac " +
+                                         "<p class=\"govuk-body\">Rydych chi wedi dweud bod £100 yn ddyledus gennych, " +
+                                             "a ffi’r hawliad ac unrhyw gostau sefydlog a hawlir ac " +
                                              "rydych wedi cynnig i dalu 1 Hydref 2023 ar unwaith. Byddwn yn cysylltu â chi pan fydd yr hawlydd yn ymateb.</p>");
     }
 }

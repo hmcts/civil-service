@@ -15,7 +15,7 @@ public class Respondent1AdmittedAmountPaymentDeadlineParamsBuilder extends Dashb
     @Override
     public void addParams(CaseData caseData, HashMap<String, Object> params) {
         if (caseData.isPartAdmitPayImmediatelyClaimSpec()) {
-            var defendantAdmittedAmount = params.get("defendantAdmittedAmount")!=null ? params.get("defendantAdmittedAmount") : "";
+            var defendantAdmittedAmount = params.get("defendantAdmittedAmount") != null ? params.get("defendantAdmittedAmount") : "";
             LocalDate whenWillThisAmountBePaid = caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid();
             var amountIncludesTextEn = DateUtils.formatDate(whenWillThisAmountBePaid);
             var amountIncludesTextCy = DateUtils.formatDateInWelsh(whenWillThisAmountBePaid, false);
@@ -41,7 +41,7 @@ public class Respondent1AdmittedAmountPaymentDeadlineParamsBuilder extends Dashb
                 descriptionCy
             );
         } else if (nonNull(caseData.getRespondToClaimAdmitPartLRspec())) {
-            var defendantAdmittedAmount = params.get("defendantAdmittedAmount")!=null ? params.get("defendantAdmittedAmount") : "";
+            var defendantAdmittedAmount = params.get("defendantAdmittedAmount") != null ? params.get("defendantAdmittedAmount") : "";
             LocalDate whenWillThisAmountBePaid = caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid();
             var respondent1AdmittedAmountPaymentDeadlineEn = DateUtils.formatDate(whenWillThisAmountBePaid);
             var respondent1AdmittedAmountPaymentDeadlineCy = DateUtils.formatDateInWelsh(whenWillThisAmountBePaid, false);
