@@ -135,7 +135,7 @@ class SetAsideJudgmentsOnlineMapperTest {
         caseData.setActiveJudgment(defaultJudgmentOnlineMapper.addUpdateActiveJudgment(caseData));
         caseData.getActiveJudgment().setRtlState(rtlState);
         //When
-        SetAsideJudgmentOnlineMapper setAsideJudgmentOnlineMapper = new SetAsideJudgmentOnlineMapper();
+        SetAsideJudgmentOnlineMapper setAsideJudgmentOnlineMapper = new SetAsideJudgmentOnlineMapper(time);
         caseData.setActiveJudgment(setAsideJudgmentOnlineMapper.addUpdateActiveJudgment(caseData));
         //Then
         if (rtlState.equals("S")) {
