@@ -23,7 +23,8 @@ fi
 
 git fetch origin > /dev/null 2>&1
 
-FORBIDDEN_CHANGES=$(git diff --name-status origin/${BASE_BRANCH}...origin/${CURRENT_BRANCH} -- ${MIGRATION_DIR} | grep -E '^[MDR]')
+FORBIDDEN_CHANGES=$(git diff --name-status origin/${BASE_BRANCH}...origin/${CURRENT_BRANCH} -- ${MIGRATION_DIR} |
+grep -E '^[MDR]' || :)
 
 if [ -n "$FORBIDDEN_CHANGES" ]; then
     echo "ERROR: Modifying, renaming, or deleting migration files is FORBIDDEN!"
