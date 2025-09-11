@@ -84,27 +84,27 @@ public class LocationHelper {
         }
 
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
-            && ccmccAmount.compareTo(getClaimValue(caseData)) > 0) {
+            && ccmccAmount.compareTo(getClaimValue(caseData)) >= 0) {
             if (!isLegalAdvisorSdo) {
-                log.debug("Case {}, specified claim over 1000, CML set to CCMCC", caseData.getCcdCaseReference());
+                log.debug("Case {}, specified claim under 1000, CML set to CCMCC", caseData.getCcdCaseReference());
                 return Optional.of(RequestedCourt.builder().caseLocation(getCcmccCaseLocation()).build());
             } else {
-                log.debug("Case {}, specified claim over 1000, Legal advisor,  CML set to preferred location", caseData.getCcdCaseReference());
+                log.debug("Case {}, specified claim under 1000, Legal advisor,  CML set to preferred location", caseData.getCcdCaseReference());
                 assignSpecPreferredCourt(caseData, getDefendantType, getDefendantCourt, prioritized);
                 return prioritized.stream().findFirst();
             }
         }
 
-        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory()) && ccmccAmount.compareTo(getClaimValue(caseData)) <= 0) {
-            log.debug("Case {}, specified claim under 1000.", caseData.getCcdCaseReference());
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory()) && ccmccAmount.compareTo(getClaimValue(caseData)) < 0) {
+            log.debug("Case {}, specified claim over 1000.", caseData.getCcdCaseReference());
 
             if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)
                 && isMultiOrIntTrackSpec(caseData)
                 && caseData.isLipCase()) {
-                log.debug("Case {}, specified claim under 1000 for multiTrack", caseData.getCcdCaseReference());
+                log.debug("Case {}, specified claim over 1000 for multiTrack", caseData.getCcdCaseReference());
                 return Optional.of(RequestedCourt.builder().caseLocation(getCnbcCaseLocation()).build());
             } else {
-                log.debug("Case {}, specified claim under 1000 for not multiTrack", caseData.getCcdCaseReference());
+                log.debug("Case {}, specified claim over 1000 for not multiTrack", caseData.getCcdCaseReference());
                 assignSpecPreferredCourt(caseData, getDefendantType, getDefendantCourt, prioritized);
                 return prioritized.stream().findFirst();
             }
