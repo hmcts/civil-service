@@ -33,16 +33,17 @@ class Respondent1AdmittedAmountPaymentDeadlineParamsBuilderTest {
 
         HashMap<String, Object> params = new HashMap<>();
         params.put("defendantAdmittedAmount", "£100");
+        params.put("applicant1PartyName", "John");
 
         // Act
         builder.addParams(caseData, params);
 
         // Assert
         assertThat(params).containsEntry("descriptionEn",
-                                         "<p class=\"govuk-body\">You have offered to pay £100 by 1 October 2023. The payment must be received in ''s account by then, " +
+                                         "<p class=\"govuk-body\">You have offered to pay £100 by 1 October 2023. The payment must be received in John's account by then, " +
                                              "if not they can request a county court judgment.</p><p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a></p>");
         assertThat(params).containsEntry("descriptionCy",
-                                         "<p class=\"govuk-body\">Rydych wedi cynnig talu £100 erbyn 1 Hydref 2023. Rhaid i’r taliad fod yng nghyfrif  erbyn y dyddiad hwnnw. " +
+                                         "<p class=\"govuk-body\">Rydych wedi cynnig talu £100 erbyn 1 Hydref 2023. Rhaid i’r taliad fod yng nghyfrif John erbyn y dyddiad hwnnw. " +
                                              "Os nad yw, yna gallant wneud cais am ddyfarniad llys sirol." +
                                              "</p><p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">Gweld eich ymateb</a></p>");
     }
@@ -75,7 +76,7 @@ class Respondent1AdmittedAmountPaymentDeadlineParamsBuilderTest {
         when(admitPartLRspec.getWhenWillThisAmountBePaid()).thenReturn(paymentDate);
 
         HashMap<String, Object> params = new HashMap<>();
-        params.put("defendantAdmittedAmount", "100");
+        params.put("defendantAdmittedAmount", "£100");
 
         // Act
         builder.addParams(caseData, params);
