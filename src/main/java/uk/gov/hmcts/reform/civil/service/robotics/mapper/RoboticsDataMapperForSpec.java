@@ -1,25 +1,18 @@
 package uk.gov.hmcts.reform.civil.service.robotics.mapper;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
-import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.CaseHeader;
 import uk.gov.hmcts.reform.civil.model.robotics.ClaimDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.LitigiousParty;
-import uk.gov.hmcts.reform.civil.model.robotics.RoboticsAddresses;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseDataSpec;
 import uk.gov.hmcts.reform.civil.model.robotics.Solicitor;
-import uk.gov.hmcts.reform.civil.prd.model.ContactInformation;
-import uk.gov.hmcts.reform.civil.prd.model.DxAddress;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil;
@@ -30,9 +23,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
 
-import static io.jsonwebtoken.lang.Collections.isEmpty;
 import static java.time.format.DateTimeFormatter.ISO_DATE;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
@@ -55,13 +46,19 @@ import static uk.gov.hmcts.reform.civil.utils.MonetaryConversions.penniesToPound
  */
 @Slf4j
 @Service
-@RequiredArgsConstructor
-public class RoboticsDataMapperForSpec {
+public class RoboticsDataMapperForSpec extends BaseRoboticsDataMapper {
 
-    private final RoboticsAddressMapper addressMapper;
     private final EventHistoryMapper eventHistoryMapper;
     private final OrganisationService organisationService;
     private final FeatureToggleService featureToggleService;
+
+    public RoboticsDataMapperForSpec(RoboticsAddressMapper addressMapper, EventHistoryMapper eventHistoryMapper,
+                                     OrganisationService organisationService, FeatureToggleService featureToggleService) {
+        super(addressMapper);
+        this.eventHistoryMapper = eventHistoryMapper;
+        this.organisationService = organisationService;
+        this.featureToggleService = featureToggleService;
+    }
 
     public RoboticsCaseDataSpec toRoboticsCaseData(CaseData caseData, String authToken) {
         log.info("Preparing Robotics data for spec caseId {}", caseData.getCcdCaseReference());
@@ -219,51 +216,6 @@ public class RoboticsDataMapperForSpec {
         organisationDetails.ifPresent(buildOrganisationDetails(solicitorBuilder));
 
         return solicitorBuilder.build();
-    }
-
-    private Consumer<uk.gov.hmcts.reform.civil.prd.model.Organisation> buildOrganisation(
-        Solicitor.SolicitorBuilder<?, ?> solicitorBuilder, Address providedServiceAddress
-    ) {
-        return organisation -> {
-            List<ContactInformation> contactInformation = organisation.getContactInformation();
-            solicitorBuilder
-                .name(organisation.getName())
-                .addresses(fromProvidedAddress(contactInformation, providedServiceAddress))
-                .contactDX(getContactDX(contactInformation));
-        };
-    }
-
-    private RoboticsAddresses fromProvidedAddress(List<ContactInformation> contactInformation, Address provided) {
-        return Optional.ofNullable(provided)
-            .map(address -> addressMapper.toRoboticsAddresses(provided))
-            .orElse(addressMapper.toRoboticsAddresses(contactInformation));
-    }
-
-    private String getContactDX(List<ContactInformation> contactInformation) {
-        if (isEmpty(contactInformation)) {
-            return null;
-        }
-        List<DxAddress> dxAddresses = contactInformation.get(0).getDxAddress();
-        return isEmpty(dxAddresses) ? null : dxAddresses.get(0).getDxNumber();
-    }
-
-    private Optional<String> getOrganisationId(OrganisationPolicy respondent1OrganisationPolicy) {
-        return ofNullable(respondent1OrganisationPolicy)
-            .map(OrganisationPolicy::getOrganisation)
-            .map(Organisation::getOrganisationID);
-    }
-
-    private Consumer<SolicitorOrganisationDetails> buildOrganisationDetails(
-        Solicitor.SolicitorBuilder<?, ?> solicitorBuilder
-    ) {
-        return organisationDetails ->
-            solicitorBuilder
-                .name(organisationDetails.getOrganisationName())
-                .contactTelephoneNumber(organisationDetails.getPhoneNumber())
-                .contactFaxNumber(organisationDetails.getFax())
-                .contactDX(organisationDetails.getDx())
-                .contactEmailAddress(organisationDetails.getEmail())
-                .addresses(addressMapper.toRoboticsAddresses(organisationDetails.getAddress()));
     }
 
     private Solicitor buildApplicantSolicitor(CaseData caseData) {

@@ -42,7 +42,7 @@ import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.judgments.CjesMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper;
-import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForUnspec;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSpec;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 
@@ -63,7 +63,7 @@ public class TestingSupportController {
     private final FeatureToggleService featureToggleService;
     private final IStateFlowEngine stateFlowEngine;
     private final EventHistoryMapper eventHistoryMapper;
-    private final RoboticsDataMapper roboticsDataMapper;
+    private final RoboticsDataMapperForUnspec roboticsDataMapper;
     private final RoboticsDataMapperForSpec roboticsSpecDataMapper;
     private final CjesMapper cjesMapper;
     private final SystemUpdateUserConfiguration systemUserConfig;

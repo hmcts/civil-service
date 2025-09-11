@@ -43,7 +43,7 @@ import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistorySequencer;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
-import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForUnspec;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSpec;
 import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
 import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
@@ -75,7 +75,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
         TransitionsTestConfiguration.class,
         EventHistorySequencer.class,
         EventHistoryMapper.class,
-        RoboticsDataMapper.class,
+        RoboticsDataMapperForUnspec.class,
         RoboticsAddressMapper.class,
         AddressLinesMapper.class,
         OrganisationService.class
@@ -96,7 +96,7 @@ class RoboticsNotificationServiceTest {
     @Autowired
     RoboticsEmailConfiguration emailConfiguration;
     @Autowired
-    RoboticsDataMapper roboticsDataMapper;
+    RoboticsDataMapperForUnspec roboticsDataMapper;
     @MockBean
     FeatureToggleService featureToggleService;
 
