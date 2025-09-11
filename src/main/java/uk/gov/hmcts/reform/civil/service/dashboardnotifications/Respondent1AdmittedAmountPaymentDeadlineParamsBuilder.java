@@ -15,9 +15,10 @@ public class Respondent1AdmittedAmountPaymentDeadlineParamsBuilder extends Dashb
     @Override
     public void addParams(CaseData caseData, HashMap<String, Object> params) {
         if (caseData.isPartAdmitPayImmediatelyClaimSpec()) {
-            var defendantAdmittedAmount = 0;
-            var amountIncludesTextEn = "";
-            var amountIncludesTextCy = "";
+            var defendantAdmittedAmount = params.get("defendantAdmittedAmount")!=null ? params.get("defendantAdmittedAmount") : "";
+            LocalDate whenWillThisAmountBePaid = caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid();
+            var amountIncludesTextEn = DateUtils.formatDate(whenWillThisAmountBePaid);
+            var amountIncludesTextCy = DateUtils.formatDateInWelsh(whenWillThisAmountBePaid, false);
 
             var descriptionEn = String.format("<p class=\"govuk-body\">You've said you owe £%s plus the claim fee and " +
                                                   "any fixed costs claimed and offered to pay %s immediately. " +
@@ -40,13 +41,13 @@ public class Respondent1AdmittedAmountPaymentDeadlineParamsBuilder extends Dashb
                 descriptionCy
             );
         } else if (nonNull(caseData.getRespondToClaimAdmitPartLRspec())) {
-            var defendantAdmittedAmount = 0;
+            var defendantAdmittedAmount = params.get("defendantAdmittedAmount")!=null ? params.get("defendantAdmittedAmount") : "";
             LocalDate whenWillThisAmountBePaid = caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid();
             var respondent1AdmittedAmountPaymentDeadlineEn = DateUtils.formatDate(whenWillThisAmountBePaid);
             var respondent1AdmittedAmountPaymentDeadlineCy = DateUtils.formatDateInWelsh(whenWillThisAmountBePaid, false);
-            var amountIncludesTextEn = "";
-            var amountIncludesTextCy = "";
-            var applicant1PartyName = "";
+            var amountIncludesTextEn = params.get("amountIncludesTextEn") != null ? params.get("amountIncludesTextEn").toString() : "";
+            var amountIncludesTextCy = params.get("amountIncludesTextCy") != null ? params.get("amountIncludesTextCy").toString() : "";
+            var applicant1PartyName = params.get("applicant1PartyName") != null ? params.get("applicant1PartyName").toString() : "";
             var descriptionEn = String.format("<p class=\"govuk-body\">You have offered to pay £%s by %s%s. The payment must be received in %s''s account by then, " +
                                                   "if not they can request a county court judgment.</p><p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a></p>",
                                               defendantAdmittedAmount,
