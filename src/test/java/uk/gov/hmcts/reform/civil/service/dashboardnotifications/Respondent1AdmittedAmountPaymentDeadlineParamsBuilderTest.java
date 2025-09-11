@@ -32,7 +32,7 @@ class Respondent1AdmittedAmountPaymentDeadlineParamsBuilderTest {
         when(admitPartLRspec.getWhenWillThisAmountBePaid()).thenReturn(paymentDate);
 
         HashMap<String, Object> params = new HashMap<>();
-        params.put("defendantAdmittedAmount", "100");
+        params.put("defendantAdmittedAmount", "£100");
 
         // Act
         builder.addParams(caseData, params);
