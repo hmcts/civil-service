@@ -15,7 +15,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.robotics.JsonSchemaValidationService;
 import uk.gov.hmcts.reform.civil.service.robotics.RoboticsNotificationService;
 import uk.gov.hmcts.reform.civil.service.robotics.exception.JsonSchemaValidationException;
-import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForUnspec;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSpec;
 
 import java.util.Set;
@@ -39,7 +39,7 @@ class RoboticsNotifierTest {
     @Mock
     private JsonSchemaValidationService jsonSchemaValidationService;
     @Mock
-    private RoboticsDataMapper roboticsDataMapper;
+    private RoboticsDataMapperForUnspec roboticsDataMapper;
     @Mock
     private RoboticsDataMapperForSpec roboticsDataMapperForSpec;
     @Mock
