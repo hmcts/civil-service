@@ -109,7 +109,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             callbackKey(MID, "experts"), this::validateApplicantExperts,
             callbackKey(MID, "witnesses"), this::validateApplicantWitnesses,
             callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates,
-            callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth,
+            callbackKey(MID, "statement-of-truth"), this::emptyCallbackResponse,
             callbackKey(ABOUT_TO_SUBMIT), this::aboutToSubmit,
             callbackKey(SUBMITTED), this::buildConfirmation
         );
@@ -218,21 +218,6 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
-            .build();
-    }
-
-    private CallbackResponse resetStatementOfTruth(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-
-        // resetting statement of truth field, this resets in the page, but the data is still sent to the db.
-        // setting null here does not clear, need to overwrite with value.
-        // must be to do with the way XUI cache data entered through the lifecycle of an event.
-        CaseData updatedCaseData = caseData.toBuilder()
-            .uiStatementOfTruth(StatementOfTruth.builder().role("").build())
-            .build();
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseData.toMap(objectMapper))
             .build();
     }
 
