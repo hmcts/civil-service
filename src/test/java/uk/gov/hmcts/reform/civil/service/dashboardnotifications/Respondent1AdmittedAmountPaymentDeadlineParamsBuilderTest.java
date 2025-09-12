@@ -22,7 +22,7 @@ class Respondent1AdmittedAmountPaymentDeadlineParamsBuilderTest {
     }
 
     @Test
-    void shouldAddPaymentDeadlineParamsWhenRespondToClaimAdmitPartLRspecIsPresent() {
+    void shouldAddDescriptionParamsWhenRespondToClaimAdmitPartLRspecIsPresent() {
         // Arrange
         CaseData caseData = mock(CaseData.class);
         RespondToClaimAdmitPartLRspec admitPartLRspec = mock(RespondToClaimAdmitPartLRspec.class);
@@ -68,7 +68,7 @@ class Respondent1AdmittedAmountPaymentDeadlineParamsBuilderTest {
     }
 
     @Test
-    void shouldAddPaymentDeadlineParamsWhenRespondWithPartAdmitPayImmediately() {
+    void shouldAddPartAdmitPayImmediatelyDescriptionParams() {
         // Arrange
         CaseData caseData = mock(CaseData.class);
         RespondToClaimAdmitPartLRspec admitPartLRspec = mock(RespondToClaimAdmitPartLRspec.class);
