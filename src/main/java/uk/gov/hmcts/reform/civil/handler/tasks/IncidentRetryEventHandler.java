@@ -85,8 +85,12 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
                                             totalRetries.incrementAndGet();
                                             try {
                                                 boolean success = retryIncidentSafely(incident, serviceAuthorization);
-                                                if (success) successRetries.incrementAndGet();
-                                                else failedRetries.incrementAndGet();
+                                                if (success) {
+                                                    successRetries.incrementAndGet();
+                                                }
+                                                else {
+                                                    failedRetries.incrementAndGet();
+                                                }
                                             } catch (Exception e) {
                                                 failedRetries.incrementAndGet();
                                                 log.error("Unexpected error retrying incident {}: {}", incident.getId(), e.getMessage(), e);
