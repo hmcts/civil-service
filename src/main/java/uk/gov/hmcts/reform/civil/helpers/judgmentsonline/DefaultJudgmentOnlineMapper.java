@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.helpers.judgmentsonline;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
@@ -15,6 +14,7 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
+import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
@@ -25,12 +25,17 @@ import java.time.LocalDateTime;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class DefaultJudgmentOnlineMapper extends JudgmentOnlineMapper {
 
     boolean isNonDivergent =  false;
     private final InterestCalculator interestCalculator;
     private final RoboticsAddressMapper addressMapper;
+
+    public DefaultJudgmentOnlineMapper(Time time, InterestCalculator interestCalculator, RoboticsAddressMapper addressMapper) {
+        super(time);
+        this.interestCalculator = interestCalculator;
+        this.addressMapper = addressMapper;
+    }
 
     @Override
     public JudgmentDetails addUpdateActiveJudgment(CaseData caseData) {
