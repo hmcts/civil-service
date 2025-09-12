@@ -23,7 +23,6 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyBoolean;
 import static org.mockito.Mockito.anyList;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -144,11 +143,11 @@ class IncidentRetryEventHandlerTest {
         handler.handleTask(externalTask);
 
         verify(camundaRuntimeApi).getUnfinishedProcessInstancesWithIncidents(
-            eq("serviceAuth"),
-            eq(true),
-            eq(true),
-            eq("2025-01-01T00:00:00"),
-            eq("2025-12-31T23:59:59")
+            "serviceAuth",
+            true,
+            true,
+            "2025-01-01T00:00:00",
+            "2025-12-31T23:59:59"
         );
     }
 }

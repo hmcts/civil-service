@@ -12,7 +12,7 @@ public class IncidentRetryTaskListener {
     private static final String TOPIC = "INCIDENT_RETRY_EVENT";
 
     @Autowired
-    public IncidentRetryTaskListener(IncidentRetryEventHandler incidentRetryEventHandler,
+    private IncidentRetryTaskListener(IncidentRetryEventHandler incidentRetryEventHandler,
                                      ExternalTaskClient client) {
         TopicSubscriptionBuilder subscriptionBuilder = client.subscribe(TOPIC);
         subscriptionBuilder.handler(incidentRetryEventHandler).open();
