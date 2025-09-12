@@ -65,7 +65,7 @@ import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesRefe
 @Slf4j
 public class InitiateGeneralApplicationService {
 
-    public static final int GA_CLAIM_DEADLINE_EXTENSION_MONTHS = 24;
+    public static final int GA_CLAIM_DEADLINE_EXTENSION_MONTHS = 36;
     private final InitiateGeneralApplicationServiceHelper helper;
     private final GeneralAppsDeadlinesCalculator deadlinesCalculator;
     private final FeatureToggleService featureToggleService;
