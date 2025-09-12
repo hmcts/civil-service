@@ -7,7 +7,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimValue;
@@ -20,7 +19,6 @@ import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -34,13 +32,11 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 @ExtendWith(MockitoExtension.class)
 class LocationHelperTest {
 
-    private static final BigDecimal CCMCC_AMOUNT = BigDecimal.valueOf(1000);
     private static final String CCMCC_REGION_ID = "ccmccRegionId";
     private static final String CCMCC_EPIMS = "ccmccEpims";
     private static final String CNBC_EPIMS = "cnbcEpims";
     private static final String CNBC_REGION_ID = "cnbcRegionId";
-    @Mock
-    private FeatureToggleService featureToggleService;
+
     private LocationHelper helper;
     private final CaseLocationCivil claimantPreferredCourt = CaseLocationCivil.builder()
         .baseLocation("123456").region("region 1").build();
@@ -51,7 +47,7 @@ class LocationHelperTest {
 
     @BeforeEach
     void setup() {
-        helper = new LocationHelper(CCMCC_AMOUNT, CCMCC_EPIMS, CCMCC_REGION_ID, CNBC_EPIMS, CNBC_REGION_ID, featureToggleService);
+        helper = new LocationHelper(CCMCC_EPIMS, CCMCC_REGION_ID, CNBC_EPIMS, CNBC_REGION_ID);
     }
 
     @Test

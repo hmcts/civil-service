@@ -4,9 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.ClaimValue;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
@@ -15,13 +13,10 @@ import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -35,27 +30,20 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 public class LocationHelper {
 
     private static final Set<Party.Type> PEOPLE = EnumSet.of(Party.Type.INDIVIDUAL, Party.Type.SOLE_TRADER);
-    private final BigDecimal ccmccAmount;
     private final String ccmccRegionId;
     private final String ccmccEpimsId;
     private final String cnbcRegionId;
     private final String cnbcEpimsId;
-    private final FeatureToggleService featureToggleService;
 
     public LocationHelper(
-        @Value("${genApp.lrd.ccmcc.amountPounds}") BigDecimal ccmccAmount,
         @Value("${genApp.lrd.ccmcc.epimsId}") String ccmccEpimsId,
         @Value("${genApp.lrd.ccmcc.regionId}") String ccmccRegionId,
         @Value("${court-location.specified-claim.epimms-id}") String cnbcEpimsId,
-        @Value("${court-location.specified-claim.region-id}") String cnbcRegionId,
-        FeatureToggleService featureToggleService) {
-
-        this.ccmccAmount = ccmccAmount;
+        @Value("${court-location.specified-claim.region-id}") String cnbcRegionId) {
         this.ccmccRegionId = ccmccRegionId;
         this.ccmccEpimsId = ccmccEpimsId;
         this.cnbcEpimsId = cnbcEpimsId;
         this.cnbcRegionId = cnbcRegionId;
-        this.featureToggleService = featureToggleService;
     }
 
     public Optional<RequestedCourt> getCaseManagementLocation(CaseData caseData) {
@@ -120,25 +108,6 @@ public class LocationHelper {
         return StringUtils.isNotBlank(requestedCourt.getResponseCourtCode())
             || Optional.ofNullable(requestedCourt.getResponseCourtLocations())
             .map(DynamicList::getValue).isPresent();
-    }
-
-    private BigDecimal getClaimValue(CaseData caseData) {
-        // super claim type is not always loaded
-        return Stream.of(
-                caseData.getTotalClaimAmount(),
-                Optional.ofNullable(caseData.getClaimValue()).map(ClaimValue::toPounds).orElse(null)
-            )
-            .filter(Objects::nonNull)
-            .findFirst()
-            .orElse(BigDecimal.ZERO);
-    }
-
-    private CaseLocationCivil getCcmccCaseLocation() {
-        return CaseLocationCivil.builder().baseLocation(ccmccEpimsId).region(ccmccRegionId).build();
-    }
-
-    private CaseLocationCivil getCnbcCaseLocation() {
-        return CaseLocationCivil.builder().baseLocation(cnbcEpimsId).region(cnbcRegionId).build();
     }
 
     /**
@@ -280,11 +249,5 @@ public class LocationHelper {
     private boolean isValidCaseLocation(CaseLocationCivil caseLocation) {
         return caseLocation != null && StringUtils.isNotBlank(caseLocation.getBaseLocation())
             && StringUtils.isNotBlank(caseLocation.getRegion());
-    }
-
-    private boolean isMultiOrIntTrackSpec(CaseData caseData) {
-        return AllocatedTrack.INTERMEDIATE_CLAIM.name().equals(caseData.getResponseClaimTrack())
-            || AllocatedTrack.MULTI_CLAIM.name().equals(caseData.getResponseClaimTrack());
-
     }
 }
