@@ -92,13 +92,16 @@ class IncidentRetryEventHandlerTest {
         VariableValueDto variableValueDto = new VariableValueDto();
         variableValueDto.setValue("123");
 
+        HashMap<String, VariableValueDto> variables = new HashMap<>();
+        variables.put("caseId", variableValueDto);
+
         when(externalTask.getVariable("caseIds")).thenReturn("123");
         when(camundaRuntimeApi.getProcessInstancesByCaseId(any(), any(), anyBoolean(), anyBoolean()))
             .thenReturn(List.of(pi));
         when(camundaRuntimeApi.getOpenIncidents(any(), anyBoolean(), anyList()))
             .thenReturn(List.of(incident));
         when(camundaRuntimeApi.getProcessVariables("proc1", "serviceAuth"))
-            .thenReturn((HashMap<String, VariableValueDto>) Map.of("caseId", variableValueDto));
+            .thenReturn(variables);
 
         ExternalTaskData result = handler.handleTask(externalTask);
 
@@ -129,7 +132,6 @@ class IncidentRetryEventHandlerTest {
         ExternalTaskData result = handler.handleTask(externalTask);
 
         assertThat(result).isNotNull();
-        // still attempted even though exception occurred
         verify(camundaRuntimeApi).setJobRetries("serviceAuth", "job1", Map.of("retries", 1));
     }
 
