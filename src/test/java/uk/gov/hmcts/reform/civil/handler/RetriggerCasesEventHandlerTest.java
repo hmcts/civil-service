@@ -135,6 +135,28 @@ class RetriggerCasesEventHandlerTest {
     }
 
     @Test
+    void testHandleTask_RetriggerGACases() {
+        ExternalTask externalTask = mock(ExternalTask.class);
+        when(externalTask.getVariable("caseEvent")).thenReturn("RETRIGGER_GA_CASES");
+        when(externalTask.getVariable("caseIds")).thenReturn(" 1, 2 ");
+        when(externalTask.getVariable("caseData")).thenReturn(null);
+        when(externalTask.getVariable("document")).thenReturn(null);
+        when(externalTask.getVariable("ga")).thenReturn("yes");
+        when(externalTask.getProcessInstanceId()).thenReturn("1");
+
+        handler.handleTask(externalTask);
+
+        verify(coreCaseDataService).triggerGeneralApplicationEvent(
+            1L,
+            CaseEvent.RETRIGGER_GA_CASES
+        );
+        verify(coreCaseDataService).triggerGeneralApplicationEvent(
+            2L,
+            CaseEvent.RETRIGGER_GA_CASES
+        );
+    }
+
+    @Test
     void testHandleTask_RetriggerCasesWithMissingCaseEvent() {
         ExternalTask externalTask = mock(ExternalTask.class);
         when(externalTask.getVariable("caseEvent")).thenReturn(null);
