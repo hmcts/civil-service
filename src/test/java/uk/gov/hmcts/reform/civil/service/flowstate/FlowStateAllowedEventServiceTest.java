@@ -97,10 +97,9 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MEDIATION_UNSUCCESSFU
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MORE_INFORMATION_HWF;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MOVE_TO_DECISION_OUTCOME;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOC_REQUEST;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIMANT_CUI_FOR_DEADLINE_EXTENSION;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_CUI_FOR_DEADLINE_EXTENSION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM_DETAILS;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_EVENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_HEARING_PARTIES;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NO_REMISSION_HWF;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NotSuitable_SDO;
@@ -1249,8 +1248,7 @@ class FlowStateAllowedEventServiceTest {
                         ACKNOWLEDGEMENT_OF_SERVICE,
                         INFORM_AGREED_EXTENSION_DATE,
                         INFORM_AGREED_EXTENSION_DATE_SPEC,
-                        NOTIFY_DEFENDANT_CUI_FOR_DEADLINE_EXTENSION,
-                        NOTIFY_CLAIMANT_CUI_FOR_DEADLINE_EXTENSION,
+                        NOTIFY_EVENT,
                         EXTEND_RESPONSE_DEADLINE,
                         DEFENDANT_RESPONSE_SPEC,
                         DEFENDANT_RESPONSE_CUI,
