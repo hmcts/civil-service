@@ -83,31 +83,15 @@ public class LocationHelper {
                 .map(Respondent2DQ::getRespondent2DQRequestedCourt);
         }
 
-        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
-            && ccmccAmount.compareTo(getClaimValue(caseData)) >= 0) {
-            log.debug("Case {}, specified claim under 1000, Legal advisor,  CML set to preferred location", caseData.getCcdCaseReference());
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            log.info("Case {}, specified claim CML set to preferred location", caseData.getCcdCaseReference());
             assignSpecPreferredCourt(caseData, getDefendantType, getDefendantCourt, prioritized);
             return prioritized.stream().findFirst();
         }
 
-        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory()) && ccmccAmount.compareTo(getClaimValue(caseData)) < 0) {
-            log.debug("Case {}, specified claim over 1000.", caseData.getCcdCaseReference());
-
-            if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)
-                && isMultiOrIntTrackSpec(caseData)
-                && caseData.isLipCase()) {
-                log.debug("Case {}, specified claim over 1000 for multiTrack", caseData.getCcdCaseReference());
-                return Optional.of(RequestedCourt.builder().caseLocation(getCnbcCaseLocation()).build());
-            } else {
-                log.debug("Case {}, specified claim over 1000 for not multiTrack", caseData.getCcdCaseReference());
-                assignSpecPreferredCourt(caseData, getDefendantType, getDefendantCourt, prioritized);
-                return prioritized.stream().findFirst();
-            }
-        }
-
         if (UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             getClaimantRequestedCourt(caseData).ifPresent(requestedCourt -> {
-                log.debug("Case {}, Claimant has requested a court", caseData.getCcdCaseReference());
+                log.info("Case {}, unspec claim, Claimant has requested a court", caseData.getCcdCaseReference());
                 prioritized.add(requestedCourt);
             });
             return prioritized.stream().findFirst();
