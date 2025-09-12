@@ -1483,8 +1483,8 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         updatedData.caseListDisplayDefendantSolicitorReferences(getAllDefendantSolicitorReferencesSpec(caseData));
 
         if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired() != null
-            && caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == IMMEDIATELY
-            && ifResponseTypeIsPartOrFullAdmission(caseData)) {
+            && IMMEDIATELY.equals(caseData.getDefenceAdmitPartPaymentTimeRouteRequired())
+            && isFullAdmission(caseData)) {
             LocalDate whenBePaid = deadlineCalculatorService.calculateExtendedDeadline(
                 ZonedDateTime.now(ZoneId.of("Europe/London")).toLocalDateTime(),
                 RespondentResponsePartAdmissionPaymentTimeLRspec.DAYS_TO_PAY_IMMEDIATELY);
@@ -1707,14 +1707,10 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         );
     }
 
-    private boolean ifResponseTypeIsPartOrFullAdmission(CaseData caseData) {
-        return (RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-            || RespondentResponseTypeSpec.PART_ADMISSION.equals(
-            caseData.getRespondent2ClaimResponseTypeForSpec())
-            ) || (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+    private boolean isFullAdmission(CaseData caseData) {
+        return RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
             || RespondentResponseTypeSpec.FULL_ADMISSION.equals(
-            caseData.getRespondent2ClaimResponseTypeForSpec())
-            );
+            caseData.getRespondent2ClaimResponseTypeForSpec());
     }
 
     private void updateCorrespondenceAddress(CallbackParams callbackParams,
