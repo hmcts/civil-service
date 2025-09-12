@@ -1790,7 +1790,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     private Optional<RequestedCourt> updateCaseManagementLocationIfLegalAdvisorSdo(CaseData.CaseDataBuilder<?, ?> updatedData, CaseData caseData) {
         Optional<RequestedCourt> preferredCourt;
         if (isSpecClaim1000OrLessAndCcmcc(ccmccAmount).test(caseData)) {
-            preferredCourt = locationHelper.getCaseManagementLocationWhenLegalAdvisorSdo(caseData, true);
+            preferredCourt = locationHelper.getCaseManagementLocationWhenLegalAdvisorSdo(caseData);
             preferredCourt.map(RequestedCourt::getCaseLocation)
                 .ifPresent(updatedData::caseManagementLocation);
             return preferredCourt;
