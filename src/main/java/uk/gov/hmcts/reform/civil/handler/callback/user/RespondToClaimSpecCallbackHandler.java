@@ -289,10 +289,9 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     private CallbackResponse handleAdmitPartOfClaim(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = paymentDateValidator.validate(Optional.ofNullable(caseData.getRespondToAdmittedClaim())
-                                                                .orElseGet(() -> RespondToClaim.builder().build()));
-        if (featureToggleService.isLrAdmissionBulkEnabled()) {
-            validateAdmittedClaimOwingAmount(errors, caseData);
-        }
+                .orElseGet(() -> RespondToClaim.builder().build()));
+        validateAdmittedClaimOwingAmount(errors, caseData);
+
         if (!errors.isEmpty()) {
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(errors)
@@ -410,10 +409,8 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
 
     private void check1v1PartAdmitLRBulkAdmission(CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
         CaseData caseData = updatedCaseData.build();
-        if (featureToggleService.isLrAdmissionBulkEnabled()) {
-            updatedCaseData.partAdmit1v1Defendant(MultiPartyScenario.isOneVOne(caseData)
-                                                      && caseData.isPartAdmitClaimSpec() ? YES : NO);
-        }
+        updatedCaseData.partAdmit1v1Defendant(
+                MultiPartyScenario.isOneVOne(caseData) && caseData.isPartAdmitClaimSpec() ? YES : NO);
     }
 
     private Set<DefendantResponseShowTag> checkNecessaryFinancialDetails(CaseData caseData) {
@@ -1213,11 +1210,17 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         } else {
             updatedCaseData.showCarmFields(NO);
         }
-        if (toggleService.isLrAdmissionBulkEnabled()) {
-            updatedCaseData.totalClaimAmountPlusInterest(caseData.getClaimAmountInPounds().setScale(2));
-            updatedCaseData.totalClaimAmountPlusInterestString(caseData.getClaimAmountInPounds().setScale(2).toString());
+
+        BigDecimal claimAmount = caseData.getClaimAmountInPounds();
+        if (claimAmount == null) {
+            claimAmount = caseData.getTotalClaimAmount();
+        }
+        if (claimAmount != null) {
+            claimAmount = claimAmount.setScale(2);
+            updatedCaseData.totalClaimAmountPlusInterest(claimAmount);
+            updatedCaseData.totalClaimAmountPlusInterestString(claimAmount.toString());
             BigDecimal interest = interestCalculator.calculateInterest(caseData).setScale(2);
-            BigDecimal totalAmountWithInterest = caseData.getTotalClaimAmount().add(interest).setScale(2);
+            BigDecimal totalAmountWithInterest = claimAmount.add(interest).setScale(2);
             updatedCaseData.totalClaimAmountPlusInterestAdmitPart(totalAmountWithInterest);
             updatedCaseData.totalClaimAmountPlusInterestAdmitPartString(totalAmountWithInterest.toString());
         }
