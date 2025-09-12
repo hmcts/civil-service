@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.service.camunda.CamundaRuntimeApi;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ForkJoinPool;
@@ -27,6 +28,9 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
     private final AuthTokenGenerator authTokenGenerator;
 
     private static final int MAX_THREADS = 50;
+    private static final String CASE_ID_VARIABLE = "caseId";
+    private static final String RETRIES_FIELD = "retries";
+    private static final int RETRIES_COUNT = 1;
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
@@ -42,8 +46,11 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
         );
 
         List<String> caseIdList = (caseIds == null || caseIds.isBlank())
-            ? List.of()
-            : Stream.of(caseIds.split(",")).map(String::trim).filter(s -> !s.isEmpty()).toList();
+            ? Collections.emptyList()
+            : Stream.of(caseIds.split(","))
+            .map(String::trim)
+            .filter(s -> !s.isEmpty())
+            .toList(); // Java 16+ unmodifiable
 
         List<ProcessInstanceDto> processInstances = fetchProcessInstances(serviceAuthorization, caseIdList, incidentStartTime, incidentEndTime);
 
@@ -54,7 +61,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
 
         List<String> processInstanceIds = processInstances.stream()
             .map(ProcessInstanceDto::getId)
-            .collect(Collectors.toList());
+            .toList(); // Java 16+ unmodifiable
 
         List<IncidentDto> incidents = camundaRuntimeApi.getOpenIncidents(serviceAuthorization, true, processInstanceIds);
 
@@ -77,11 +84,13 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
             customThreadPool.submit(() ->
                                         incidents.parallelStream().forEach(incident -> {
                                             totalRetries.incrementAndGet();
-                                            boolean success = retryIncidentSafely(incident, serviceAuthorization);
-                                            if (success) {
-                                                successRetries.incrementAndGet();
-                                            } else {
+                                            try {
+                                                boolean success = retryIncidentSafely(incident, serviceAuthorization);
+                                                if (success) successRetries.incrementAndGet();
+                                                else failedRetries.incrementAndGet();
+                                            } catch (Exception e) {
                                                 failedRetries.incrementAndGet();
+                                                log.error("Unexpected error retrying incident {}: {}", incident.getId(), e.getMessage(), e);
                                             }
                                         })
             ).get();
@@ -105,11 +114,11 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
             return caseIdList.stream()
                 .flatMap(id -> camundaRuntimeApi.getProcessInstancesByCaseId(
                     serviceAuthorization,
-                    "caseId_eq_" + id,
+                    CASE_ID_VARIABLE + "_eq_" + id,
                     true,
                     true
                 ).stream())
-                .collect(Collectors.toList());
+                .toList(); // Java 16+ unmodifiable
         } else {
             return camundaRuntimeApi.getUnfinishedProcessInstancesWithIncidents(
                 serviceAuthorization, true, true, incidentStartTime, incidentEndTime
@@ -131,7 +140,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
                 incident.getId(), processInstanceId, jobId, incidentCaseId, incident.getActivityId()
             );
 
-            camundaRuntimeApi.setJobRetries(serviceAuthorization, jobId, Map.of("retries", 1));
+            camundaRuntimeApi.setJobRetries(serviceAuthorization, jobId, Map.of(RETRIES_FIELD, RETRIES_COUNT));
 
             log.info("Retries reset for job {} (processInstanceId={}, caseId={})", jobId, processInstanceId, incidentCaseId);
             return true;
@@ -145,8 +154,8 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
     private String fetchCaseId(String processInstanceId, String serviceAuthorization) {
         try {
             Map<String, VariableValueDto> variables = camundaRuntimeApi.getProcessVariables(processInstanceId, serviceAuthorization);
-            if (variables.containsKey("caseId") && variables.get("caseId").getValue() != null) {
-                return String.valueOf(variables.get("caseId").getValue());
+            if (variables.containsKey(CASE_ID_VARIABLE) && variables.get(CASE_ID_VARIABLE).getValue() != null) {
+                return String.valueOf(variables.get(CASE_ID_VARIABLE).getValue());
             }
         } catch (Exception e) {
             log.warn("Could not fetch caseId for processInstanceId={}", processInstanceId, e);
