@@ -32,11 +32,6 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 @ExtendWith(MockitoExtension.class)
 class LocationHelperTest {
 
-    private static final String CCMCC_REGION_ID = "ccmccRegionId";
-    private static final String CCMCC_EPIMS = "ccmccEpims";
-    private static final String CNBC_EPIMS = "cnbcEpims";
-    private static final String CNBC_REGION_ID = "cnbcRegionId";
-
     private LocationHelper helper;
     private final CaseLocationCivil claimantPreferredCourt = CaseLocationCivil.builder()
         .baseLocation("123456").region("region 1").build();
@@ -47,7 +42,7 @@ class LocationHelperTest {
 
     @BeforeEach
     void setup() {
-        helper = new LocationHelper(CCMCC_EPIMS, CCMCC_REGION_ID, CNBC_EPIMS, CNBC_REGION_ID);
+        helper = new LocationHelper();
     }
 
     @Test

@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.civil.helpers;
 
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -27,24 +27,10 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 
 @Slf4j
 @Component
+@NoArgsConstructor
 public class LocationHelper {
 
     private static final Set<Party.Type> PEOPLE = EnumSet.of(Party.Type.INDIVIDUAL, Party.Type.SOLE_TRADER);
-    private final String ccmccRegionId;
-    private final String ccmccEpimsId;
-    private final String cnbcRegionId;
-    private final String cnbcEpimsId;
-
-    public LocationHelper(
-        @Value("${genApp.lrd.ccmcc.epimsId}") String ccmccEpimsId,
-        @Value("${genApp.lrd.ccmcc.regionId}") String ccmccRegionId,
-        @Value("${court-location.specified-claim.epimms-id}") String cnbcEpimsId,
-        @Value("${court-location.specified-claim.region-id}") String cnbcRegionId) {
-        this.ccmccRegionId = ccmccRegionId;
-        this.ccmccEpimsId = ccmccEpimsId;
-        this.cnbcEpimsId = cnbcEpimsId;
-        this.cnbcRegionId = cnbcRegionId;
-    }
 
     public Optional<RequestedCourt> getCaseManagementLocation(CaseData caseData) {
         return getCaseManagementLocationDefault(caseData);
