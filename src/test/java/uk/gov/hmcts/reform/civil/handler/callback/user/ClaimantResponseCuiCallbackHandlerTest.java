@@ -650,6 +650,11 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
+            try {
+                when(time.now()).thenReturn(now);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
             AboutToStartOrSubmitCallbackResponse response;
             try (MockedStatic<LocalDateTime> mock = mockStatic(LocalDateTime.class, CALLS_REAL_METHODS)) {
                 mock.when(LocalDateTime::now).thenReturn(now);
