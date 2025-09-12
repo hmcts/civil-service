@@ -48,11 +48,11 @@ public interface CamundaRuntimeApi {
         @RequestParam("startedBefore") String startedBefore  // e.g. 2025-09-10T23:59:59Z
     );
 
-    @GetMapping("/incident")
+    @PostMapping("/incident")
     List<IncidentDto> getOpenIncidents(
         @RequestHeader("ServiceAuthorization") String serviceAuthorization,
         @RequestParam("open") boolean open,
-        @RequestParam("processInstanceIdIn") List<String> processInstanceIds
+        @RequestBody List<String> processInstanceIds
     );
 
     @PostMapping("/job/{jobId}/retries")
