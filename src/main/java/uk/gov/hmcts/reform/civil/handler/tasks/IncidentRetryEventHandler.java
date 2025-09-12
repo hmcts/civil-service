@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.service.camunda.CamundaRuntimeApi;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
@@ -96,8 +97,11 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
                                             }
                                         })
             ).get();
-        } catch (Exception e) {
-            log.error("Error executing parallel incident retries", e);
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt(); // restore the interrupted status
+            log.error("Incident retry execution was interrupted", ie);
+        } catch (ExecutionException ee) {
+            log.error("Error during parallel incident retries", ee.getCause());
         } finally {
             customThreadPool.shutdown();
         }
