@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.claimant;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import uk.gov.hmcts.reform.civil.controllers.CaseProgressionDashboardBaseIntegrationTest;
+import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.HearingFeePaidClaimantNotificationHandler;
@@ -17,7 +17,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 
-public class HearingFeePaidClaimantScenarioTest extends CaseProgressionDashboardBaseIntegrationTest {
+public class HearingFeePaidClaimantScenarioTest extends DashboardBaseIntegrationTest {
 
     @Autowired
     private HearingFeePaidClaimantNotificationHandler handler;

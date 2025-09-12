@@ -27,7 +27,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_HEARING_TO_LIP_CLAIMANT;
@@ -61,18 +60,6 @@ class SendHearingToLiPCallbackHandlerTest extends BaseCallbackHandlerTest {
     private static final Document DOCUMENT_LINK = new Document("document/url", TEST, TEST, TEST, TEST, UPLOAD_TIMESTAMP);
 
     @Test
-    void shouldNotCallRecordScenario_whenCaseProgressionIsDisabled() {
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(false);
-
-        CallbackParams callbackParams = CallbackParamsBuilder.builder()
-            .of(ABOUT_TO_SUBMIT, CaseData.builder().build())
-            .build();
-
-        handler.handle(callbackParams);
-        verifyNoInteractions(dashboardScenariosService);
-    }
-
-    @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
         assertThat(handler.handledEvents()).contains(SEND_HEARING_TO_LIP_DEFENDANT);
         assertThat(handler.handledEvents()).contains(SEND_HEARING_TO_LIP_CLAIMANT);
@@ -96,7 +83,6 @@ class SendHearingToLiPCallbackHandlerTest extends BaseCallbackHandlerTest {
             .respondent1Represented(YesOrNo.NO).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(SEND_HEARING_TO_LIP_DEFENDANT.name());
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         // when
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -114,7 +100,6 @@ class SendHearingToLiPCallbackHandlerTest extends BaseCallbackHandlerTest {
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(SEND_HEARING_TO_LIP_CLAIMANT.name());
         // when
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         // then
@@ -134,7 +119,6 @@ class SendHearingToLiPCallbackHandlerTest extends BaseCallbackHandlerTest {
 ;
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(SEND_HEARING_TO_LIP_DEFENDANT_HMC.name());
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         when(featureToggleService.isHmcForLipEnabled()).thenReturn(true);
         // when
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -156,7 +140,6 @@ class SendHearingToLiPCallbackHandlerTest extends BaseCallbackHandlerTest {
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(SEND_HEARING_TO_LIP_CLAIMANT_HMC.name());
         // when
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         when(featureToggleService.isHmcForLipEnabled()).thenReturn(true);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 

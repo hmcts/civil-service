@@ -189,8 +189,7 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
     public boolean isSDOOrderLegalAdviserCreated() {
         Optional<LocalDateTime> lastNonSdoOrderTime = getTimeOfLastNonSDOOrder();
         Optional<LocalDateTime> sdoTime = getSDOTime();
-        return featureToggleService.isCaseProgressionEnabled()
-            && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
+        return CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
             && isSDOMadeByLegalAdviser()
             && !isSDOOrderInReview()
             && !isSDOOrderInReviewOtherParty()
