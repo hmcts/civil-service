@@ -15,6 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class IncidentQueryRequest {
+
     private Boolean open;
     private List<String> processInstanceIds;
     private String incidentId;
