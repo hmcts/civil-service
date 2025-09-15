@@ -17,7 +17,6 @@ import java.util.List;
 public class IncidentQueryRequest {
     private Boolean open;
     private List<String> processInstanceIds;
-
     private String incidentId;
     private String incidentType;
     private String incidentMessage;
@@ -32,7 +31,6 @@ public class IncidentQueryRequest {
     private String configuration;
     private List<String> tenantIdIn;
     private List<String> jobDefinitionIdIn;
-
     private OffsetDateTime incidentTimestampBefore;
     private OffsetDateTime incidentTimestampAfter;
 }
