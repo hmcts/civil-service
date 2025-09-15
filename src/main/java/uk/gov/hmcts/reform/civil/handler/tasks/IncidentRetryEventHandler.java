@@ -11,6 +11,9 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.service.camunda.CamundaRuntimeApi;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +42,18 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
         String incidentStartTime = externalTask.getVariable("incidentStartTime");
         String incidentEndTime = externalTask.getVariable("incidentEndTime");
         String caseIds = externalTask.getVariable("caseIds");
+
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_INSTANT;
+
+        // default start = 24h ago if not provided
+        if (incidentStartTime == null || incidentStartTime.isBlank()) {
+            incidentStartTime = formatter.format(Instant.now().minus(24, ChronoUnit.HOURS));
+        }
+
+        // default end = now if not provided
+        if (incidentEndTime == null || incidentEndTime.isBlank()) {
+            incidentEndTime = formatter.format(Instant.now());
+        }
 
         log.info(
             "Incident retry process {} using date range {} → {}",

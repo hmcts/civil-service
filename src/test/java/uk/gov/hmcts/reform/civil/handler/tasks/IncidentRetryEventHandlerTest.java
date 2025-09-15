@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyBoolean;
 import static org.mockito.Mockito.doThrow;
@@ -158,6 +159,28 @@ class IncidentRetryEventHandlerTest {
             true,
             "2025-01-01T00:00:00",
             "2025-12-31T23:59:59"
+        );
+    }
+
+    @Test
+    void shouldDefaultDates_whenNotProvided() {
+        // no start or end date provided
+        when(externalTask.getVariable("incidentStartTime")).thenReturn(null);
+        when(externalTask.getVariable("incidentEndTime")).thenReturn("  ");
+        when(externalTask.getVariable("caseIds")).thenReturn("  ");
+
+        when(camundaRuntimeApi.getUnfinishedProcessInstancesWithIncidents(any(), anyBoolean(), anyBoolean(), any(), any()))
+            .thenReturn(List.of());
+
+        handler.handleTask(externalTask);
+
+        // Verify method was called with default ISO date strings
+        verify(camundaRuntimeApi).getUnfinishedProcessInstancesWithIncidents(
+            eq("serviceAuth"),
+            eq(true),
+            eq(true),
+            any(String.class),  // start ~ now-24h
+            any(String.class)   // end ~ now
         );
     }
 }
