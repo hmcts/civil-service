@@ -67,7 +67,10 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
 
         List<IncidentDto> incidents = Lists.partition(processInstanceIds, 500).stream()
             .flatMap(batch -> {
-                IncidentQueryRequest queryRequest = new IncidentQueryRequest(true, batch);
+                IncidentQueryRequest queryRequest = IncidentQueryRequest.builder()
+                    .open(true)
+                    .processInstanceIds(batch)
+                    .build();
                 return camundaRuntimeApi.getOpenIncidents(serviceAuthorization, queryRequest).stream();
             })
             .toList();

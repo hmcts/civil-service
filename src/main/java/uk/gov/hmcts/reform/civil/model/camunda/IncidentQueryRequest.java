@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.civil.model.camunda;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -10,6 +8,8 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class IncidentQueryRequest {
     private Boolean open;
     private List<String> processInstanceIds;
@@ -31,9 +31,4 @@ public class IncidentQueryRequest {
 
     private OffsetDateTime incidentTimestampBefore;
     private OffsetDateTime incidentTimestampAfter;
-
-    public IncidentQueryRequest(Boolean open, List<String> processInstanceIds) {
-        this.open = open;
-        this.processInstanceIds = processInstanceIds;
-    }
 }
