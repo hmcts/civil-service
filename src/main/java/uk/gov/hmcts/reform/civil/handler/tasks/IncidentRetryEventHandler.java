@@ -38,7 +38,6 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
-        String serviceAuthorization = authTokenGenerator.generate();
         String incidentStartTime = externalTask.getVariable("incidentStartTime");
         String incidentEndTime = externalTask.getVariable("incidentEndTime");
         String caseIds = externalTask.getVariable("caseIds");
@@ -68,6 +67,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
             .filter(s -> !s.isEmpty())
             .toList(); // Java 16+ unmodifiable
 
+        String serviceAuthorization = authTokenGenerator.generate();
         List<ProcessInstanceDto> processInstances = fetchProcessInstances(serviceAuthorization, caseIdList, incidentStartTime, incidentEndTime);
 
         if (processInstances.isEmpty()) {
