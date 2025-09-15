@@ -12,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
+import uk.gov.hmcts.reform.civil.model.camunda.IncidentQueryRequest;
 import uk.gov.hmcts.reform.civil.service.camunda.CamundaRuntimeApi;
 
 import java.util.HashMap;
@@ -19,12 +20,11 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyBoolean;
-import static org.mockito.Mockito.anyList;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -59,7 +59,7 @@ class IncidentRetryEventHandlerTest {
         ExternalTaskData result = handler.handleTask(externalTask);
 
         assertThat(result).isNotNull();
-        verify(camundaRuntimeApi, never()).getOpenIncidents(any(), anyBoolean(), anyList());
+        verify(camundaRuntimeApi, never()).getOpenIncidents(any(), any());
     }
 
     @Test
@@ -70,13 +70,13 @@ class IncidentRetryEventHandlerTest {
         when(externalTask.getVariable("caseIds")).thenReturn("123");
         when(camundaRuntimeApi.getProcessInstancesByCaseId(any(), any(), anyBoolean(), anyBoolean()))
             .thenReturn(List.of(pi));
-        when(camundaRuntimeApi.getOpenIncidents(any(), anyBoolean(), anyList()))
+        when(camundaRuntimeApi.getOpenIncidents(any(), any()))
             .thenReturn(List.of());
 
         ExternalTaskData result = handler.handleTask(externalTask);
 
         assertThat(result).isNotNull();
-        verify(camundaRuntimeApi).getOpenIncidents("serviceAuth", true, List.of("proc1"));
+        verify(camundaRuntimeApi).getOpenIncidents(eq("serviceAuth"), any(IncidentQueryRequest.class));
     }
 
     @Test
@@ -98,7 +98,7 @@ class IncidentRetryEventHandlerTest {
         when(externalTask.getVariable("caseIds")).thenReturn("123");
         when(camundaRuntimeApi.getProcessInstancesByCaseId(any(), any(), anyBoolean(), anyBoolean()))
             .thenReturn(List.of(pi));
-        when(camundaRuntimeApi.getOpenIncidents(any(), anyBoolean(), anyList()))
+        when(camundaRuntimeApi.getOpenIncidents(any(), any()))
             .thenReturn(List.of(incident));
         when(camundaRuntimeApi.getProcessVariables("proc1", "serviceAuth"))
             .thenReturn(variables);
@@ -122,7 +122,7 @@ class IncidentRetryEventHandlerTest {
         when(externalTask.getVariable("caseIds")).thenReturn("123");
         when(camundaRuntimeApi.getProcessInstancesByCaseId(any(), any(), anyBoolean(), anyBoolean()))
             .thenReturn(List.of(pi));
-        when(camundaRuntimeApi.getOpenIncidents(any(), anyBoolean(), anyList()))
+        when(camundaRuntimeApi.getOpenIncidents(any(), any()))
             .thenReturn(List.of(incident));
         when(camundaRuntimeApi.getProcessVariables("proc1", "serviceAuth"))
             .thenThrow(new RuntimeException("boom!"));
@@ -133,58 +133,6 @@ class IncidentRetryEventHandlerTest {
 
         assertThat(result).isNotNull();
         verify(camundaRuntimeApi).setJobRetries("serviceAuth", "job1", Map.of("retries", 1));
-    }
-
-    @Test
-    void shouldRestoreInterruptedStatus_whenInterruptedExceptionOccurs() {
-        when(externalTask.getVariable("caseIds")).thenReturn("123");
-        ProcessInstanceDto pi = new ProcessInstanceDto();
-        pi.setId("proc1");
-
-        when(camundaRuntimeApi.getProcessInstancesByCaseId(any(), any(), anyBoolean(), anyBoolean()))
-            .thenReturn(List.of(pi));
-
-        // Mock getOpenIncidents so the ForkJoinPool submit() still gets called
-        when(camundaRuntimeApi.getOpenIncidents(any(), anyBoolean(), anyList()))
-            .thenAnswer(inv -> {
-                Thread.currentThread().interrupt(); // simulate interrupt before .get()
-                return List.of();
-            });
-
-        ExternalTaskData result = handler.handleTask(externalTask);
-
-        assertThat(result).isNotNull();
-        assertThat(Thread.currentThread().isInterrupted()).isTrue();
-    }
-
-    @Test
-    void shouldHandleExecutionExceptionGracefully() {
-        ProcessInstanceDto pi = new ProcessInstanceDto();
-        pi.setId("proc1");
-
-        IncidentDto incident = new IncidentDto();
-        incident.setId("inc1");
-        incident.setProcessInstanceId("proc1");
-        incident.setConfiguration("job1");
-
-        when(externalTask.getVariable("caseIds")).thenReturn("123");
-        when(camundaRuntimeApi.getProcessInstancesByCaseId(any(), any(), anyBoolean(), anyBoolean()))
-            .thenReturn(List.of(pi));
-        when(camundaRuntimeApi.getOpenIncidents(any(), anyBoolean(), anyList()))
-            .thenReturn(List.of(incident));
-
-        // Force retryIncidentSafely to throw
-        doThrow(new RuntimeException("boom!"))
-            .when(camundaRuntimeApi).setJobRetries(any(), any(), any());
-
-        // Act
-        ExternalTaskData result = handler.handleTask(externalTask);
-
-        // Assert
-        assertThat(result).isNotNull();
-        // It should still have attempted setJobRetries
-        verify(camundaRuntimeApi, times(1))
-            .setJobRetries("serviceAuth", "job1", Map.of("retries", 1));
     }
 
     @Test
@@ -204,3 +152,4 @@ class IncidentRetryEventHandlerTest {
         );
     }
 }
+

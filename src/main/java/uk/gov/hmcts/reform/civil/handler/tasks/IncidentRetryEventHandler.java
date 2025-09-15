@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
+import com.google.common.collect.Lists;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.task.ExternalTask;
@@ -9,6 +10,7 @@ import org.camunda.community.rest.client.model.VariableValueDto;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
+import uk.gov.hmcts.reform.civil.model.camunda.IncidentQueryRequest;
 import uk.gov.hmcts.reform.civil.service.camunda.CamundaRuntimeApi;
 
 import java.util.Collections;
@@ -63,7 +65,12 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
             .map(ProcessInstanceDto::getId)
             .toList(); // Java 16+ unmodifiable
 
-        List<IncidentDto> incidents = camundaRuntimeApi.getOpenIncidents(serviceAuthorization, true, processInstanceIds);
+        List<IncidentDto> incidents = Lists.partition(processInstanceIds, 500).stream()
+            .flatMap(batch -> {
+                IncidentQueryRequest queryRequest = new IncidentQueryRequest(true, batch);
+                return camundaRuntimeApi.getOpenIncidents(serviceAuthorization, queryRequest).stream();
+            })
+            .toList();
 
         if (incidents.isEmpty()) {
             log.info("No open incidents found for these process instances.");

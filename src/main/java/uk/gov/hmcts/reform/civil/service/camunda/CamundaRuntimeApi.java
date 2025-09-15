@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
+import uk.gov.hmcts.reform.civil.model.camunda.IncidentQueryRequest;
 
 import java.util.HashMap;
 import java.util.List;
@@ -48,11 +49,17 @@ public interface CamundaRuntimeApi {
         @RequestParam("startedBefore") String startedBefore  // e.g. 2025-09-10T23:59:59Z
     );
 
-    @PostMapping("/incident")
+    @GetMapping("/incident")
     List<IncidentDto> getOpenIncidents(
         @RequestHeader("ServiceAuthorization") String serviceAuthorization,
         @RequestParam("open") boolean open,
         @RequestBody List<String> processInstanceIds
+    );
+
+    @PostMapping("/incident/query")
+    List<IncidentDto> getOpenIncidents(
+        @RequestHeader("ServiceAuthorization") String serviceAuthorization,
+        @RequestBody IncidentQueryRequest queryRequest
     );
 
     @PostMapping("/job/{jobId}/retries")
