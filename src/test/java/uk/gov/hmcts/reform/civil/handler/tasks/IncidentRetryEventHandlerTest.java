@@ -12,7 +12,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
-import uk.gov.hmcts.reform.civil.model.camunda.IncidentQueryRequest;
 import uk.gov.hmcts.reform.civil.service.camunda.CamundaRuntimeApi;
 
 import java.util.HashMap;
@@ -20,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyBoolean;
 import static org.mockito.Mockito.doThrow;
@@ -59,7 +57,7 @@ class IncidentRetryEventHandlerTest {
         ExternalTaskData result = handler.handleTask(externalTask);
 
         assertThat(result).isNotNull();
-        verify(camundaRuntimeApi, never()).getOpenIncidents(any(), any());
+        verify(camundaRuntimeApi, never()).getOpenIncidents(any(), any(), any());
     }
 
     @Test
@@ -70,13 +68,15 @@ class IncidentRetryEventHandlerTest {
         when(externalTask.getVariable("caseIds")).thenReturn("123");
         when(camundaRuntimeApi.getProcessInstancesByCaseId(any(), any(), anyBoolean(), anyBoolean()))
             .thenReturn(List.of(pi));
-        when(camundaRuntimeApi.getOpenIncidents(any(), any()))
+
+        // Mock the new GET-based batching method
+        when(camundaRuntimeApi.getOpenIncidents(any(), anyBoolean(), any()))
             .thenReturn(List.of());
 
         ExternalTaskData result = handler.handleTask(externalTask);
 
         assertThat(result).isNotNull();
-        verify(camundaRuntimeApi).getOpenIncidents(eq("serviceAuth"), any(IncidentQueryRequest.class));
+        verify(camundaRuntimeApi).getOpenIncidents("serviceAuth", true, "proc1");
     }
 
     @Test
@@ -98,8 +98,11 @@ class IncidentRetryEventHandlerTest {
         when(externalTask.getVariable("caseIds")).thenReturn("123");
         when(camundaRuntimeApi.getProcessInstancesByCaseId(any(), any(), anyBoolean(), anyBoolean()))
             .thenReturn(List.of(pi));
-        when(camundaRuntimeApi.getOpenIncidents(any(), any()))
+
+        // Mock batching to return single incident
+        when(camundaRuntimeApi.getOpenIncidents(any(), anyBoolean(), any()))
             .thenReturn(List.of(incident));
+
         when(camundaRuntimeApi.getProcessVariables("proc1", "serviceAuth"))
             .thenReturn(variables);
 
@@ -122,8 +125,9 @@ class IncidentRetryEventHandlerTest {
         when(externalTask.getVariable("caseIds")).thenReturn("123");
         when(camundaRuntimeApi.getProcessInstancesByCaseId(any(), any(), anyBoolean(), anyBoolean()))
             .thenReturn(List.of(pi));
-        when(camundaRuntimeApi.getOpenIncidents(any(), any()))
+        when(camundaRuntimeApi.getOpenIncidents(any(), anyBoolean(), any()))
             .thenReturn(List.of(incident));
+
         when(camundaRuntimeApi.getProcessVariables("proc1", "serviceAuth"))
             .thenThrow(new RuntimeException("boom!"));
         doThrow(new RuntimeException("job fail"))

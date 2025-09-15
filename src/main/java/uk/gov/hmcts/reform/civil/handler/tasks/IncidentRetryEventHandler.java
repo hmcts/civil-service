@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
-import com.google.common.collect.Lists;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.task.ExternalTask;
@@ -10,7 +9,6 @@ import org.camunda.community.rest.client.model.VariableValueDto;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
-import uk.gov.hmcts.reform.civil.model.camunda.IncidentQueryRequest;
 import uk.gov.hmcts.reform.civil.service.camunda.CamundaRuntimeApi;
 
 import java.util.Collections;
@@ -19,6 +17,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 @Slf4j
@@ -65,15 +64,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
             .map(ProcessInstanceDto::getId)
             .toList(); // Java 16+ unmodifiable
 
-        List<IncidentDto> incidents = Lists.partition(processInstanceIds, 500).stream()
-            .flatMap(batch -> {
-                IncidentQueryRequest queryRequest = IncidentQueryRequest.builder()
-                    .open(true)
-                    .processInstanceIds(batch)
-                    .build();
-                return camundaRuntimeApi.getOpenIncidents(serviceAuthorization, queryRequest).stream();
-            })
-            .toList();
+        List<IncidentDto> incidents = getOpenIncidentsBatched(serviceAuthorization, processInstanceIds);
 
         if (incidents.isEmpty()) {
             log.info("No open incidents found for these process instances.");
@@ -177,5 +168,20 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
             log.warn("Could not fetch caseId for processInstanceId={}", processInstanceId, e);
         }
         return "UNKNOWN";
+    }
+
+    private List<IncidentDto> getOpenIncidentsBatched(String serviceAuthorization, List<String> processInstanceIds) {
+        int batchSize = 50; // safe for URL length
+
+        return IntStream.range(0, (processInstanceIds.size() + batchSize - 1) / batchSize) // number of batches
+            .mapToObj(batchIndex -> {
+                int start = batchIndex * batchSize;
+                int end = Math.min(start + batchSize, processInstanceIds.size());
+                List<String> batch = processInstanceIds.subList(start, end);
+                String idsParam = String.join(",", batch);
+                return camundaRuntimeApi.getOpenIncidents(serviceAuthorization, true, idsParam);
+            })
+            .flatMap(List::stream) // flatten all batch results
+            .toList(); // Java 16+ immutable list
     }
 }
