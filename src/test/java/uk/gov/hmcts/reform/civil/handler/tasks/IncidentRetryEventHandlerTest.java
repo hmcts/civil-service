@@ -51,13 +51,18 @@ class IncidentRetryEventHandlerTest {
     @Test
     void shouldReturnEmptyData_whenNoProcessInstancesFound() {
         when(externalTask.getVariable("caseIds")).thenReturn(null);
-        when(camundaRuntimeApi.getUnfinishedProcessInstancesWithIncidents(any(), anyBoolean(), anyBoolean(), any(), any()))
-            .thenReturn(List.of());
+        when(camundaRuntimeApi.getUnfinishedProcessInstancesWithIncidents(
+            any(String.class),
+            anyBoolean(),
+            anyBoolean(),
+            any(String.class),
+            any(String.class)
+        )).thenReturn(List.of());
 
         ExternalTaskData result = handler.handleTask(externalTask);
 
         assertThat(result).isNotNull();
-        verify(camundaRuntimeApi, never()).getOpenIncidents(any(), any(), any());
+        verify(camundaRuntimeApi, never()).getOpenIncidents(any(String.class), anyBoolean(), any(String.class));
     }
 
     @Test
