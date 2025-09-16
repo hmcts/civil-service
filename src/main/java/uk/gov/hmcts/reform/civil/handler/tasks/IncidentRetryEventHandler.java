@@ -96,8 +96,11 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
                                                             incident,
                                                             serviceAuthorization
                                                         );
-                                                        if (success) successRetries.incrementAndGet();
-                                                        else failedRetries.incrementAndGet();
+                                                        if (success) {
+                                                            successRetries.incrementAndGet();
+                                                        } else {
+                                                            failedRetries.incrementAndGet();
+                                                        }
                                                     } catch (Exception e) {
                                                         failedRetries.incrementAndGet();
                                                         log.error(
