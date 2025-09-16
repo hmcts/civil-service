@@ -25,10 +25,13 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
@@ -82,7 +85,8 @@ class UploadTranslatedDocumentHandlerTest extends BaseCallbackHandlerTest {
             List<Element<TranslatedDocument>> translatedDocument = List.of(
                 element(translatedDocument1)
             );
-
+            when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any())).thenReturn(LocalDateTime.now()
+                                                                                                   .plusDays(28));
             CaseData caseData = CaseDataBuilder
                 .builder()
                 .atStatePendingClaimIssued()
