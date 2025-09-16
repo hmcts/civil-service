@@ -45,6 +45,7 @@ public interface CamundaRuntimeApi {
         @RequestHeader("ServiceAuthorization") String serviceAuthorization,
         @RequestParam("unfinished") boolean unfinished,
         @RequestParam("withIncident") boolean withIncident,
+        @RequestParam(value = "incidentMessageLike", required = false) String incidentMessageLike, // e.g. "%502%"
         @RequestParam("startedAfter") String startedAfter,   // e.g. 2025-09-10T12:00:00Z
         @RequestParam("startedBefore") String startedBefore, // e.g. 2025-09-10T23:59:59Z
         @RequestParam(value = "firstResult", required = false) Integer firstResult,  // pagination offset

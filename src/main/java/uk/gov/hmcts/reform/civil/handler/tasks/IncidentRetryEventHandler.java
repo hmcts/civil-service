@@ -40,6 +40,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
     public ExternalTaskData handleTask(ExternalTask externalTask) {
         String incidentStartTime = externalTask.getVariable("incidentStartTime");
         String incidentEndTime = externalTask.getVariable("incidentEndTime");
+        String incidentMessageLike = externalTask.getVariable("incidentMessageLike");
 
         DateTimeFormatter formatter = DateTimeFormatter.ISO_INSTANT;
 
@@ -63,7 +64,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
 
         do {
             processInstancesBatch = fetchProcessInstances(
-                serviceAuthorization, incidentStartTime, incidentEndTime,
+                serviceAuthorization, incidentStartTime, incidentEndTime, incidentMessageLike,
                 firstResult
             );
 
@@ -139,12 +140,14 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
     private List<ProcessInstanceDto> fetchProcessInstances(String serviceAuthorization,
                                                            String incidentStartTime,
                                                            String incidentEndTime,
+                                                           String incidentMessageLike,
                                                            int firstResult) {
         try {
             return camundaRuntimeApi.getUnfinishedProcessInstancesWithIncidents(
                 serviceAuthorization,
                 true,       // unfinished
                 true,       // withIncident
+                incidentMessageLike,
                 incidentStartTime,
                 incidentEndTime,
                 firstResult,

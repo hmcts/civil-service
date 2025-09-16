@@ -4,7 +4,6 @@ import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.community.rest.client.model.IncidentDto;
 import org.camunda.community.rest.client.model.ProcessInstanceDto;
 import org.camunda.community.rest.client.model.VariableValueDto;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -45,14 +44,10 @@ class IncidentRetryEventHandlerTest {
     @InjectMocks
     private IncidentRetryEventHandler handler;
 
-    @BeforeEach
-    void setUp() {
-    }
-
     @Test
     void shouldReturnEmptyData_whenNoProcessInstancesFound() {
         when(camundaRuntimeApi.getUnfinishedProcessInstancesWithIncidents(
-            any(), anyBoolean(), anyBoolean(), any(), any(), anyInt(), anyInt(), any(), any()
+            any(), anyBoolean(), anyBoolean(), any(), any(), any(), anyInt(), anyInt(), any(), any()
         )).thenReturn(List.of());
         when(authTokenGenerator.generate()).thenReturn("serviceAuth");
         when(externalTask.getVariable("incidentStartTime")).thenReturn("2025-01-01T00:00:00Z");
@@ -82,11 +77,11 @@ class IncidentRetryEventHandlerTest {
             .toList();
 
         when(camundaRuntimeApi.getUnfinishedProcessInstancesWithIncidents(
-            any(), anyBoolean(), anyBoolean(), any(), any(), eq(0), eq(pageSize), any(), any()
+            any(), anyBoolean(), anyBoolean(), any(), any(), any(), eq(0), eq(pageSize), any(), any()
         )).thenReturn(firstPage);
 
         when(camundaRuntimeApi.getUnfinishedProcessInstancesWithIncidents(
-            any(), anyBoolean(), anyBoolean(), any(), any(), eq(pageSize), eq(pageSize), any(), any()
+            any(), anyBoolean(), anyBoolean(), any(), any(), any(), eq(pageSize), eq(pageSize), any(), any()
         )).thenReturn(List.of());
 
         // 2️⃣ Stub process variables for all instances
@@ -142,7 +137,7 @@ class IncidentRetryEventHandlerTest {
         incident.setConfiguration("job1");
 
         when(camundaRuntimeApi.getUnfinishedProcessInstancesWithIncidents(
-            any(), anyBoolean(), anyBoolean(), any(), any(), anyInt(), anyInt(), any(), any()
+            any(), anyBoolean(), anyBoolean(), any(), any(), any(), anyInt(), anyInt(), any(), any()
         )).thenReturn(List.of(pi));
 
         when(camundaRuntimeApi.getOpenIncidents(any(), anyBoolean(), any())).thenReturn(List.of(incident));
