@@ -30,7 +30,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
     private final CamundaRuntimeApi camundaRuntimeApi;
     private final AuthTokenGenerator authTokenGenerator;
 
-    private static final int MAX_THREADS = 50;
+    private static final int MAX_THREADS = 10;
     private static final String CASE_ID_VARIABLE = "caseId";
     private static final String RETRIES_FIELD = "retries";
     private static final int RETRIES_COUNT = 1;
@@ -80,9 +80,14 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
         List<ProcessInstanceDto> processInstancesBatch;
 
         do {
+            log.info("Calling process instances for {}, {}, {}, {}",
+                     incidentStartTime, incidentEndTime, incidentMessageLike, firstResult);
             processInstancesBatch = fetchProcessInstances(
                 serviceAuthorization, incidentStartTime, incidentEndTime, incidentMessageLike, firstResult
             );
+
+            log.info("Extracted process instances for {}, {}, {}, {}",
+                     incidentStartTime, incidentEndTime, incidentMessageLike, firstResult);
 
             if (processInstancesBatch.isEmpty()) {
                 return;
@@ -92,7 +97,11 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
                 .map(ProcessInstanceDto::getId)
                 .toList();
 
+            log.info("Calling incidents for {} process instances with firstResult {}", processInstanceIds.size(), firstResult);
+
             List<IncidentDto> incidents = getOpenIncidentsBatched(serviceAuthorization, processInstanceIds);
+
+            log.info("Extracted {} incidents with firstResult {}", incidents.size(), firstResult);
 
             if (!incidents.isEmpty()) {
                 retryIncidents(incidents, serviceAuthorization, totalRetries, successRetries, failedRetries);

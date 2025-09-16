@@ -33,14 +33,6 @@ public interface CamundaRuntimeApi {
     );
 
     @GetMapping("/process-instance")
-    List<ProcessInstanceDto> getProcessInstancesByCaseId(
-        @RequestHeader("ServiceAuthorization") String serviceAuthorization,
-        @RequestParam(value = "variables", required = false) String variables,  // e.g. "caseId_eq_12345"
-        @RequestParam("unfinished") boolean unfinished,
-        @RequestParam(value = "withIncident", required = false) Boolean withIncident
-    );
-
-    @GetMapping("/process-instance")
     List<ProcessInstanceDto> getUnfinishedProcessInstancesWithIncidents(
         @RequestHeader("ServiceAuthorization") String serviceAuthorization,
         @RequestParam("unfinished") boolean unfinished,
@@ -49,7 +41,7 @@ public interface CamundaRuntimeApi {
         @RequestParam("startedAfter") String startedAfter,   // e.g. 2025-09-10T12:00:00Z
         @RequestParam("startedBefore") String startedBefore, // e.g. 2025-09-10T23:59:59Z
         @RequestParam(value = "firstResult", required = false) Integer firstResult,  // pagination offset
-        @RequestParam(value = "maxResults", required = false) Integer maxResults,    // pagination limit
+        @RequestParam(value = "maxResults", defaultValue = "50") Integer maxResults,    // pagination limit
         @RequestParam(value = "sortBy", required = false) String sortBy,             // e.g. "startTime"
         @RequestParam(value = "sortOrder", required = false) String sortOrder        // "asc" or "desc"
     );
