@@ -242,7 +242,12 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
                 int end = Math.min(start + batchSize, processInstanceIds.size());
                 List<String> batch = processInstanceIds.subList(start, end);
                 String idsParam = String.join(",", batch);
-                return camundaRuntimeApi.getOpenIncidents(serviceAuthorization, true, idsParam);
+                try {
+                    return camundaRuntimeApi.getOpenIncidents(serviceAuthorization, true, idsParam);
+                } catch (Exception e) {
+                    log.error("Error fetching incidents for batch {}-{}", start, end, e);
+                    return List.<IncidentDto>of(); // return empty list to continue processing
+                }
             })
             .flatMap(List::stream)
             .toList();
