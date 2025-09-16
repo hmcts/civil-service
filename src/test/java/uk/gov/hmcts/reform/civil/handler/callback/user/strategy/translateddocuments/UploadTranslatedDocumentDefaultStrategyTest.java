@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -99,7 +100,8 @@ class UploadTranslatedDocumentDefaultStrategyTest {
             element(translatedDocument1),
             element(translatedDocument2)
         );
-
+        when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any())).thenReturn(LocalDateTime.now()
+                                                                                               .plusDays(28));
         CaseData caseData = CaseDataBuilder
             .builder()
             .atStatePendingClaimIssued()
@@ -921,6 +923,8 @@ class UploadTranslatedDocumentDefaultStrategyTest {
             Document.builder().documentFileName("response_sealed_form.pdf").build(),
             DocumentType.DEFENDANT_DEFENCE
         )));
+        when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any())).thenReturn(LocalDateTime.now()
+                                                                                               .plusDays(28));
         CaseData caseData = CaseDataBuilder.builder()
             .atStatePendingClaimIssued()
             .build().toBuilder()
@@ -1093,6 +1097,8 @@ class UploadTranslatedDocumentDefaultStrategyTest {
             Document.builder().documentFileName("notice_of_discontinuance.pdf").build(),
             DocumentType.SEALED_CLAIM
         )));
+        when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any())).thenReturn(LocalDateTime.now()
+                                                                                               .plusDays(28));
         CaseData caseData = CaseDataBuilder.builder()
             .atStatePendingClaimIssued()
             .build().toBuilder()
