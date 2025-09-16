@@ -49,6 +49,7 @@ class IncidentRetryEventHandlerTest {
         when(camundaRuntimeApi.getUnfinishedProcessInstancesWithIncidents(
             any(), anyBoolean(), anyBoolean(), any(), any(), any(), anyInt(), anyInt(), any(), any()
         )).thenReturn(List.of());
+
         when(authTokenGenerator.generate()).thenReturn("serviceAuth");
         when(externalTask.getVariable("incidentStartTime")).thenReturn("2025-01-01T00:00:00Z");
         when(externalTask.getVariable("incidentEndTime")).thenReturn("2025-12-31T23:59:59Z");
@@ -67,7 +68,7 @@ class IncidentRetryEventHandlerTest {
 
         int pageSize = 50;
 
-        // 1️⃣ Stub pages of process instances
+        // Stub first page of process instances
         List<ProcessInstanceDto> firstPage = IntStream.rangeClosed(1, pageSize)
             .mapToObj(i -> {
                 ProcessInstanceDto pi = new ProcessInstanceDto();
@@ -84,7 +85,7 @@ class IncidentRetryEventHandlerTest {
             any(), anyBoolean(), anyBoolean(), any(), any(), any(), eq(pageSize), eq(pageSize), any(), any()
         )).thenReturn(List.of());
 
-        // 2️⃣ Stub process variables for all instances
+        // Stub process variables for all instances
         for (int i = 1; i <= pageSize; i++) {
             HashMap<String, VariableValueDto> vars = new HashMap<>();
             VariableValueDto varDto = new VariableValueDto();
@@ -93,8 +94,8 @@ class IncidentRetryEventHandlerTest {
             when(camundaRuntimeApi.getProcessVariables("proc" + i, "serviceAuth")).thenReturn(vars);
         }
 
+        // Stub incidents in batches
         int batchSize = 10;
-        // 3️⃣ Stub incidents per batch
         for (int batchStart = 0; batchStart < pageSize; batchStart += batchSize) {
             int end = Math.min(batchStart + batchSize, pageSize);
 
@@ -115,10 +116,8 @@ class IncidentRetryEventHandlerTest {
                 .thenReturn(batchIncidents);
         }
 
-        // 4️⃣ Execute handler
         ExternalTaskData result = handler.handleTask(externalTask);
 
-        // 5️⃣ Verify all incidents retried
         for (int i = 1; i <= pageSize; i++) {
             verify(camundaRuntimeApi).setJobRetries("serviceAuth", "job" + i, Map.of("retries", 1));
         }
