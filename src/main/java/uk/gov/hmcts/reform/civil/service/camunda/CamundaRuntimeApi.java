@@ -4,12 +4,7 @@ import org.camunda.community.rest.client.model.IncidentDto;
 import org.camunda.community.rest.client.model.ProcessInstanceDto;
 import org.camunda.community.rest.client.model.VariableValueDto;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -55,7 +50,7 @@ public interface CamundaRuntimeApi {
         @RequestParam("processInstanceIdIn") String processInstanceIdsCsv
     );
 
-    @PostMapping("/job/{jobId}/retries")
+    @PutMapping("/job/{jobId}/retries")
     void setJobRetries(
         @RequestHeader("ServiceAuthorization") String serviceAuthorization,
         @PathVariable("jobId") String jobId,
