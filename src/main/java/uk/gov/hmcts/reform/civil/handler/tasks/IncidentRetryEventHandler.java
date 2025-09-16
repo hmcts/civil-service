@@ -151,7 +151,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
 
     private String resolveStartTime(String incidentStartTime) {
         return (incidentStartTime == null || incidentStartTime.isBlank())
-            ? DateTimeFormatter.ISO_INSTANT.format(Instant.now().minus(24, ChronoUnit.HOURS))
+            ? DateTimeFormatter.ISO_INSTANT.format(Instant.now().minus(1, ChronoUnit.HOURS))
             : incidentStartTime;
     }
 
@@ -176,7 +176,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
                 incidentEndTime,
                 firstResult,
                 IncidentRetryEventHandler.PAGE_SIZE,
-                "startTime",
+                "instanceId",
                 "desc"
             );
         } catch (Exception e) {
