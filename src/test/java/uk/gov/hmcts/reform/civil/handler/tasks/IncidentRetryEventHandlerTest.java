@@ -74,10 +74,6 @@ class IncidentRetryEventHandlerTest {
             any(), anyBoolean(), anyBoolean(), any(), any(), any(), eq(0), eq(50), any(), any()
         )).thenReturn(processInstances);
 
-        when(camundaRuntimeApi.getUnfinishedProcessInstancesWithIncidents(
-            any(), anyBoolean(), anyBoolean(), any(), any(), any(), eq(50), eq(50), any(), any()
-        )).thenReturn(List.of());
-
         // Mock incidents and process variables for each instance
         for (ProcessInstanceDto pi : processInstances) {
             IncidentDto incident = newIncident(pi.getId(), "inc-" + pi.getId(), "job-" + pi.getId());
