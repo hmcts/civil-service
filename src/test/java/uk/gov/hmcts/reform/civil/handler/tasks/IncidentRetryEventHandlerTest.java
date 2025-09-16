@@ -66,16 +66,19 @@ class IncidentRetryEventHandlerTest {
 
     @Test
     void shouldRetryIncidentsWithPagination() {
-        int pageSize = 50;
-        int batchSize = 10;
-
         when(authTokenGenerator.generate()).thenReturn("serviceAuth");
         when(externalTask.getVariable("incidentStartTime")).thenReturn("2025-01-01T00:00:00Z");
         when(externalTask.getVariable("incidentEndTime")).thenReturn("2025-12-31T23:59:59Z");
 
+        int pageSize = 50;
+        int batchSize = 10;
+
         // 1️⃣ Stub pages of process instances
         List<ProcessInstanceDto> firstPage = IntStream.rangeClosed(1, pageSize)
-            .mapToObj(i -> { ProcessInstanceDto pi = new ProcessInstanceDto(); pi.setId("proc" + i); return pi; })
+            .mapToObj(i -> {
+                ProcessInstanceDto pi = new ProcessInstanceDto();
+                pi.setId("proc" + i); return pi;
+            })
             .toList();
 
         when(camundaRuntimeApi.getUnfinishedProcessInstancesWithIncidents(
