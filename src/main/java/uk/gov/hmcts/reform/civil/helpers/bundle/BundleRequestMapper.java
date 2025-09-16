@@ -420,6 +420,7 @@ public class BundleRequestMapper {
         bundlingRequestDocuments.addAll(mapParticularsOfClaimDocs(caseData));
         List<Element<CaseDocument>> clAndDfDocList = caseData.getDefendantResponseDocuments();
         clAndDfDocList.addAll(caseData.getClaimantResponseDocuments());
+        clAndDfDocList.addAll(caseData.getSystemGeneratedCaseDocuments());
         List<Element<CaseDocument>> sortedDefendantDefenceAndClaimantReply =
             bundleDocumentsRetrieval.getSortedDefendantDefenceAndClaimantReply(clAndDfDocList);
         sortedDefendantDefenceAndClaimantReply.forEach(caseDocumentElement -> {
