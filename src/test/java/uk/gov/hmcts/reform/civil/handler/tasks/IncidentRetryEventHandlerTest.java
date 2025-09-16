@@ -77,7 +77,8 @@ class IncidentRetryEventHandlerTest {
         List<ProcessInstanceDto> firstPage = IntStream.rangeClosed(1, pageSize)
             .mapToObj(i -> {
                 ProcessInstanceDto pi = new ProcessInstanceDto();
-                pi.setId("proc" + i); return pi;
+                pi.setId("proc" + i);
+                return pi;
             })
             .toList();
 
