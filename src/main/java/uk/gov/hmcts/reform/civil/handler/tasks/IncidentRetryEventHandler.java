@@ -40,7 +40,6 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
     public ExternalTaskData handleTask(ExternalTask externalTask) {
         String incidentStartTime = externalTask.getVariable("incidentStartTime");
         String incidentEndTime = externalTask.getVariable("incidentEndTime");
-        String incidentMessageLike = externalTask.getVariable("incidentMessageLike");
 
         DateTimeFormatter formatter = DateTimeFormatter.ISO_INSTANT;
 
@@ -62,6 +61,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
         AtomicInteger successRetries = new AtomicInteger(0);
         AtomicInteger failedRetries = new AtomicInteger(0);
 
+        String incidentMessageLike = externalTask.getVariable("incidentMessageLike");
         do {
             processInstancesBatch = fetchProcessInstances(
                 serviceAuthorization, incidentStartTime, incidentEndTime, incidentMessageLike,
