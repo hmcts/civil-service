@@ -38,38 +38,54 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
-        String incidentStartTime = externalTask.getVariable("incidentStartTime");
-        String incidentEndTime = externalTask.getVariable("incidentEndTime");
-
-        DateTimeFormatter formatter = DateTimeFormatter.ISO_INSTANT;
-
-        if (incidentStartTime == null || incidentStartTime.isBlank()) {
-            incidentStartTime = formatter.format(Instant.now().minus(24, ChronoUnit.HOURS));
-        }
-        if (incidentEndTime == null || incidentEndTime.isBlank()) {
-            incidentEndTime = formatter.format(Instant.now());
-        }
+        String incidentStartTime = resolveStartTime(externalTask.getVariable("incidentStartTime"));
+        String incidentEndTime = resolveEndTime(externalTask.getVariable("incidentEndTime"));
+        String incidentMessageLike = externalTask.getVariable("incidentMessageLike");
 
         log.info("Incident retry process using date range {} → {}", incidentStartTime, incidentEndTime);
 
         String serviceAuthorization = authTokenGenerator.generate();
+        AtomicInteger totalRetries = new AtomicInteger();
+        AtomicInteger successRetries = new AtomicInteger();
+        AtomicInteger failedRetries = new AtomicInteger();
+
+        processAllIncidents(
+            serviceAuthorization,
+            incidentStartTime,
+            incidentEndTime,
+            incidentMessageLike,
+            totalRetries,
+            successRetries,
+            failedRetries
+        );
+
+        log.info(
+            "Incident retry completed. Total={}, Success={}, Failed={}",
+            totalRetries.get(), successRetries.get(), failedRetries.get()
+        );
+
+        return ExternalTaskData.builder().build();
+    }
+
+    private void processAllIncidents(
+        String serviceAuthorization,
+        String incidentStartTime,
+        String incidentEndTime,
+        String incidentMessageLike,
+        AtomicInteger totalRetries,
+        AtomicInteger successRetries,
+        AtomicInteger failedRetries
+    ) {
         int firstResult = 0;
         List<ProcessInstanceDto> processInstancesBatch;
 
-        // Metrics counters
-        AtomicInteger totalRetries = new AtomicInteger(0);
-        AtomicInteger successRetries = new AtomicInteger(0);
-        AtomicInteger failedRetries = new AtomicInteger(0);
-
-        String incidentMessageLike = externalTask.getVariable("incidentMessageLike");
         do {
             processInstancesBatch = fetchProcessInstances(
-                serviceAuthorization, incidentStartTime, incidentEndTime, incidentMessageLike,
-                firstResult
+                serviceAuthorization, incidentStartTime, incidentEndTime, incidentMessageLike, firstResult
             );
 
             if (processInstancesBatch.isEmpty()) {
-                break;
+                return;
             }
 
             List<String> processInstanceIds = processInstancesBatch.stream()
@@ -79,62 +95,70 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
             List<IncidentDto> incidents = getOpenIncidentsBatched(serviceAuthorization, processInstanceIds);
 
             if (!incidents.isEmpty()) {
-                log.info(
-                    "Retrying {} incidents across {} process instances",
-                    incidents.size(),
-                    processInstancesBatch.size()
-                );
-
-                int poolSize = Math.min(MAX_THREADS, incidents.size());
-                ForkJoinPool customThreadPool = new ForkJoinPool(poolSize);
-
-                try {
-                    customThreadPool.submit(() ->
-                                                incidents.parallelStream().forEach(incident -> {
-                                                    totalRetries.incrementAndGet();
-                                                    try {
-                                                        boolean success = retryIncidentSafely(
-                                                            incident,
-                                                            serviceAuthorization
-                                                        );
-                                                        if (success) {
-                                                            successRetries.incrementAndGet();
-                                                            log.info("Successfully retried incident {}: {}",
-                                                                     incident.getId(),
-                                                                     incident.getProcessInstanceId());
-                                                        } else {
-                                                            failedRetries.incrementAndGet();
-                                                        }
-                                                    } catch (Exception e) {
-                                                        failedRetries.incrementAndGet();
-                                                        log.error(
-                                                            "Unexpected error retrying incident {}: {}",
-                                                            incident.getId(),
-                                                            e.getMessage(),
-                                                            e
-                                                        );
-                                                    }
-                                                })
-                    ).get();
-                } catch (InterruptedException ie) {
-                    Thread.currentThread().interrupt();
-                    log.error("Incident retry execution was interrupted", ie);
-                } catch (ExecutionException ee) {
-                    log.error("Error during parallel incident retries", ee.getCause());
-                } finally {
-                    customThreadPool.shutdown();
-                }
+                retryIncidents(incidents, serviceAuthorization, totalRetries, successRetries, failedRetries);
             }
 
             firstResult += PAGE_SIZE;
         } while (processInstancesBatch.size() == PAGE_SIZE);
+    }
 
-        log.info(
-            "Incident retry completed. Total={}, Success={}, Failed={}",
-            totalRetries.get(), successRetries.get(), failedRetries.get()
-        );
+    private void retryIncidents(
+        List<IncidentDto> incidents,
+        String serviceAuthorization,
+        AtomicInteger totalRetries,
+        AtomicInteger successRetries,
+        AtomicInteger failedRetries
+    ) {
+        log.info("Retrying {} incidents across process instances", incidents.size());
+        int poolSize = Math.min(MAX_THREADS, incidents.size());
+        ForkJoinPool customThreadPool = new ForkJoinPool(poolSize);
 
-        return ExternalTaskData.builder().build();
+        try {
+            customThreadPool.submit(() ->
+                                        incidents.parallelStream().forEach(incident ->
+                                                                               handleIncidentRetry(incident, serviceAuthorization, totalRetries, successRetries, failedRetries))
+            ).get();
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+            log.error("Incident retry execution was interrupted", ie);
+        } catch (ExecutionException ee) {
+            log.error("Error during parallel incident retries", ee.getCause());
+        } finally {
+            customThreadPool.shutdown();
+        }
+    }
+
+    private void handleIncidentRetry(
+        IncidentDto incident,
+        String serviceAuthorization,
+        AtomicInteger totalRetries,
+        AtomicInteger successRetries,
+        AtomicInteger failedRetries
+    ) {
+        totalRetries.incrementAndGet();
+        try {
+            if (retryIncidentSafely(incident, serviceAuthorization)) {
+                successRetries.incrementAndGet();
+                log.info("Successfully retried incident {}: {}", incident.getId(), incident.getProcessInstanceId());
+            } else {
+                failedRetries.incrementAndGet();
+            }
+        } catch (Exception e) {
+            failedRetries.incrementAndGet();
+            log.error("Unexpected error retrying incident {}: {}", incident.getId(), e.getMessage(), e);
+        }
+    }
+
+    private String resolveStartTime(String incidentStartTime) {
+        return (incidentStartTime == null || incidentStartTime.isBlank())
+            ? DateTimeFormatter.ISO_INSTANT.format(Instant.now().minus(24, ChronoUnit.HOURS))
+            : incidentStartTime;
+    }
+
+    private String resolveEndTime(String incidentEndTime) {
+        return (incidentEndTime == null || incidentEndTime.isBlank())
+            ? DateTimeFormatter.ISO_INSTANT.format(Instant.now())
+            : incidentEndTime;
     }
 
     private List<ProcessInstanceDto> fetchProcessInstances(String serviceAuthorization,
