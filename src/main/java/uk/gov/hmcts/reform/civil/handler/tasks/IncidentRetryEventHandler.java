@@ -17,10 +17,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.IntStream;
 
 @Slf4j
 @Component
@@ -99,7 +99,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
 
             log.info("Calling incidents for {} process instances with firstResult {}", processInstanceIds.size(), firstResult);
 
-            List<IncidentDto> incidents = getOpenIncidentsBatched(serviceAuthorization, processInstanceIds);
+            List<IncidentDto> incidents = getLatestIncidentsForProcessInstances(serviceAuthorization, processInstanceIds);
 
             log.info("Extracted {} incidents with firstResult {}", incidents.size(), firstResult);
 
@@ -242,23 +242,29 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
         return "UNKNOWN";
     }
 
-    private List<IncidentDto> getOpenIncidentsBatched(String serviceAuthorization, List<String> processInstanceIds) {
-        int batchSize = 10; // safe for URL length
-
-        return IntStream.range(0, (processInstanceIds.size() + batchSize - 1) / batchSize)
-            .mapToObj(batchIndex -> {
-                int start = batchIndex * batchSize;
-                int end = Math.min(start + batchSize, processInstanceIds.size());
-                List<String> batch = processInstanceIds.subList(start, end);
-                String idsParam = String.join(",", batch);
+    private List<IncidentDto> getLatestIncidentsForProcessInstances(
+        String serviceAuthorization,
+        List<String> processInstanceIds
+    ) {
+        return processInstanceIds.stream()
+            .map(processInstanceId -> {
                 try {
-                    return camundaRuntimeApi.getOpenIncidents(serviceAuthorization, true, idsParam);
+                    // Call the API for a single process instance
+                    List<IncidentDto> incidents = camundaRuntimeApi.getLatestOpenIncidentForProcessInstance(
+                        serviceAuthorization,
+                        true,                   // open incidents only
+                        processInstanceId,       // single process instance
+                        "incidentTimestamp",     // use default sortBy
+                        "desc",                  // use default sortOrder
+                        1                        // use default maxResults
+                    );
+                    return incidents.isEmpty() ? null : incidents.get(0);
                 } catch (Exception e) {
-                    log.error("Error fetching incidents for batch {}-{}", start, end, e);
-                    return List.<IncidentDto>of(); // return empty list to continue processing
+                    log.error("Error fetching latest incident for process instance {}", processInstanceId, e);
+                    return null;
                 }
             })
-            .flatMap(List::stream)
+            .filter(Objects::nonNull)
             .toList();
     }
 }
