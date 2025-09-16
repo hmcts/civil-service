@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocument;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
@@ -65,6 +66,8 @@ class UploadTranslatedDocumentDefaultStrategyTest {
     private FeatureToggleService featureToggleService;
     @Mock
     private AssignCategoryId assignCategoryId;
+    @Mock
+    private DeadlinesCalculator deadlinesCalculator;
     private ObjectMapper objectMapper;
 
     @BeforeEach
@@ -73,7 +76,9 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         objectMapper.registerModule(new JavaTimeModule());
         uploadTranslatedDocumentDefaultStrategy = new UploadTranslatedDocumentDefaultStrategy(systemGeneratedDocumentService,
                                                                                               objectMapper, assignCategoryId,
-                                                                                              featureToggleService);
+                                                                                              featureToggleService,
+                                                                                              deadlinesCalculator
+        );
     }
 
     @Test

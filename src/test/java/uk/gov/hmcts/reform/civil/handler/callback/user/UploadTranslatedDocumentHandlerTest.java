@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocument;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
@@ -44,6 +45,8 @@ class UploadTranslatedDocumentHandlerTest extends BaseCallbackHandlerTest {
 
     @Mock
     private UploadTranslatedDocumentV1Strategy uploadTranslatedDocumentV1Strategy;
+    @Mock
+    private DeadlinesCalculator deadlinesCalculator;
 
     private static final String FILE_NAME_1 = "Some file 1";
 
@@ -55,7 +58,8 @@ class UploadTranslatedDocumentHandlerTest extends BaseCallbackHandlerTest {
             systemGeneratedDocumentService,
             objectMapper,
             assignCategoryId,
-            featureToggleService
+            featureToggleService,
+            deadlinesCalculator
         );
         UploadTranslatedDocumentStrategyFactory uploadTranslatedDocumentStrategyFactory = new UploadTranslatedDocumentStrategyFactory(
             uploadTranslatedDocumentDefaultStrategy,
