@@ -23,7 +23,6 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyBoolean;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -132,7 +131,6 @@ class IncidentRetryEventHandlerTest {
 
         when(camundaRuntimeApi.getOpenIncidents(any(), anyBoolean(), any())).thenReturn(List.of(incident));
         when(camundaRuntimeApi.getProcessVariables("proc1", "serviceAuth")).thenThrow(new RuntimeException("fail"));
-        doThrow(new RuntimeException("fail")).when(camundaRuntimeApi).setJobRetries(any(), any(), any());
 
         ExternalTaskData result = handler.handleTask(externalTask);
 
