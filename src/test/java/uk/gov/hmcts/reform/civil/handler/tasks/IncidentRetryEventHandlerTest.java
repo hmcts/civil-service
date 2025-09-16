@@ -25,6 +25,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyBoolean;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -148,5 +149,79 @@ class IncidentRetryEventHandlerTest {
 
         assertThat(result).isNotNull();
         verify(camundaRuntimeApi).setJobRetries("serviceAuth", "job1", Map.of("retries", 1));
+    }
+
+    @Test
+    void shouldHandleFetchProcessInstancesExceptionGracefully() {
+        when(authTokenGenerator.generate()).thenReturn("serviceAuth");
+        when(externalTask.getVariable("incidentStartTime")).thenReturn("2025-01-01T00:00:00Z");
+        when(externalTask.getVariable("incidentEndTime")).thenReturn("2025-12-31T23:59:59Z");
+
+        // Simulate exception when fetching process instances
+        when(camundaRuntimeApi.getUnfinishedProcessInstancesWithIncidents(
+            any(), anyBoolean(), anyBoolean(), any(), any(), any(), anyInt(), anyInt(), any(), any()
+        )).thenThrow(new RuntimeException("API failure"));
+
+        ExternalTaskData result = handler.handleTask(externalTask);
+
+        assertThat(result).isNotNull();
+        // No incidents should be retried
+        verify(camundaRuntimeApi, never()).getOpenIncidents(any(), anyBoolean(), anyString());
+    }
+
+    @Test
+    void shouldHandleGetOpenIncidentsExceptionGracefully() {
+        ProcessInstanceDto pi = new ProcessInstanceDto();
+        pi.setId("proc1");
+
+        when(authTokenGenerator.generate()).thenReturn("serviceAuth");
+        when(externalTask.getVariable("incidentStartTime")).thenReturn("2025-01-01T00:00:00Z");
+        when(externalTask.getVariable("incidentEndTime")).thenReturn("2025-12-31T23:59:59Z");
+
+        when(camundaRuntimeApi.getUnfinishedProcessInstancesWithIncidents(
+            any(), anyBoolean(), anyBoolean(), any(), any(), any(), anyInt(), anyInt(), any(), any()
+        )).thenReturn(List.of(pi));
+
+        // Simulate exception when fetching incidents
+        when(camundaRuntimeApi.getOpenIncidents(any(), anyBoolean(), anyString()))
+            .thenThrow(new RuntimeException("Incident API failure"));
+
+        ExternalTaskData result = handler.handleTask(externalTask);
+
+        assertThat(result).isNotNull();
+        // Job retries should not be called due to incident fetch failure
+        verify(camundaRuntimeApi, never()).setJobRetries(any(), any(), any());
+    }
+
+    @Test
+    void shouldHandleSetJobRetriesExceptionGracefully() {
+        ProcessInstanceDto pi = new ProcessInstanceDto();
+        pi.setId("proc1");
+
+        IncidentDto incident = new IncidentDto();
+        incident.setId("inc1");
+        incident.setProcessInstanceId("proc1");
+        incident.setConfiguration("job1");
+
+        when(authTokenGenerator.generate()).thenReturn("serviceAuth");
+        when(externalTask.getVariable("incidentStartTime")).thenReturn("2025-01-01T00:00:00Z");
+        when(externalTask.getVariable("incidentEndTime")).thenReturn("2025-12-31T23:59:59Z");
+
+        when(camundaRuntimeApi.getUnfinishedProcessInstancesWithIncidents(
+            any(), anyBoolean(), anyBoolean(), any(), any(), any(), anyInt(), anyInt(), any(), any()
+        )).thenReturn(List.of(pi));
+
+        when(camundaRuntimeApi.getOpenIncidents(any(), anyBoolean(), any())).thenReturn(List.of(incident));
+
+        // Simulate exception when setting retries
+        doThrow(new RuntimeException("Failed to set retries"))
+            .when(camundaRuntimeApi)
+            .setJobRetries(any(), any(), any());
+
+        ExternalTaskData result = handler.handleTask(externalTask);
+
+        assertThat(result).isNotNull();
+        // Even if setJobRetries fails, the method should continue gracefully
+        verify(camundaRuntimeApi).setJobRetries(any(), any(), any());
     }
 }
