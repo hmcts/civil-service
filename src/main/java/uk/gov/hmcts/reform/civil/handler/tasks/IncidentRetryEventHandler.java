@@ -98,6 +98,9 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
                                                         );
                                                         if (success) {
                                                             successRetries.incrementAndGet();
+                                                            log.info("Successfully retried incident {}: {}",
+                                                                     incident.getId(),
+                                                                     incident.getProcessInstanceId());
                                                         } else {
                                                             failedRetries.incrementAndGet();
                                                         }

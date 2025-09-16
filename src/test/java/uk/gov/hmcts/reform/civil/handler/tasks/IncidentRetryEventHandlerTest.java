@@ -71,7 +71,6 @@ class IncidentRetryEventHandlerTest {
         when(externalTask.getVariable("incidentEndTime")).thenReturn("2025-12-31T23:59:59Z");
 
         int pageSize = 50;
-        int batchSize = 10;
 
         // 1️⃣ Stub pages of process instances
         List<ProcessInstanceDto> firstPage = IntStream.rangeClosed(1, pageSize)
@@ -99,6 +98,7 @@ class IncidentRetryEventHandlerTest {
             when(camundaRuntimeApi.getProcessVariables("proc" + i, "serviceAuth")).thenReturn(vars);
         }
 
+        int batchSize = 10;
         // 3️⃣ Stub incidents per batch
         for (int batchStart = 0; batchStart < pageSize; batchStart += batchSize) {
             int end = Math.min(batchStart + batchSize, pageSize);
