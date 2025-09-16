@@ -159,7 +159,7 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
                 caseData
             ).name())
             .applicant1ResponseDeadline(applicantDeadline)
-            .nextDeadline(applicantDeadline.toLocalDate());
+            .nextDeadline(applicantDeadline != null ? applicantDeadline.toLocalDate() : null);
 
         if (featureToggleService.isWelshEnabledForMainCase()) {
             Optional<Language> optionalLanguage = Optional.ofNullable(caseData.getRespondent1DQ())
