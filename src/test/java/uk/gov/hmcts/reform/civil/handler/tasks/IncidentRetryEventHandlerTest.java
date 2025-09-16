@@ -23,6 +23,7 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyBoolean;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -44,9 +45,9 @@ class IncidentRetryEventHandlerTest {
 
     @BeforeEach
     void setUp() {
-        when(authTokenGenerator.generate()).thenReturn("serviceAuth");
-        when(externalTask.getVariable("incidentStartTime")).thenReturn("2025-01-01T00:00:00Z");
-        when(externalTask.getVariable("incidentEndTime")).thenReturn("2025-12-31T23:59:59Z");
+        lenient().when(authTokenGenerator.generate()).thenReturn("serviceAuth");
+        lenient().when(externalTask.getVariable("incidentStartTime")).thenReturn("2025-01-01T00:00:00Z");
+        lenient().when(externalTask.getVariable("incidentEndTime")).thenReturn("2025-12-31T23:59:59Z");
     }
 
     @Test
@@ -130,7 +131,6 @@ class IncidentRetryEventHandlerTest {
         )).thenReturn(List.of(pi));
 
         when(camundaRuntimeApi.getOpenIncidents(any(), anyBoolean(), any())).thenReturn(List.of(incident));
-        when(camundaRuntimeApi.getProcessVariables("proc1", "serviceAuth")).thenThrow(new RuntimeException("fail"));
 
         ExternalTaskData result = handler.handleTask(externalTask);
 
