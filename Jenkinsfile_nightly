@@ -29,6 +29,8 @@ properties([
       description: 'The URL of ccd data store'),
     choice(name: 'CIVIL_SERVICE_URL', choices: ['http://civil-service-aat.service.core-compute-aat.internal', 'http://civil-service-demo.service.core-compute-demo.internal'],
       description: 'The URL of civil service'),
+    choice(name: 'AAC_API_URL', choices: ['http://aac-manage-case-assignment-aat.service.core-compute-aat.internal', 'http://aac-manage-case-assignment-demo.service.core-compute-demo.internal'],
+      description: 'The URL of case assignment service'),
     string(name: 'WAIT_FOR_TIMEOUT_MS',
       defaultValue: '120000',
       description: 'Functional tests waitForTimeout value'),
