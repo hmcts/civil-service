@@ -132,19 +132,24 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
 
     private List<ProcessInstanceDto> fetchProcessInstances(String serviceAuthorization, List<String> caseIdList,
                                                            String incidentStartTime, String incidentEndTime) {
-        if (!caseIdList.isEmpty()) {
-            return caseIdList.stream()
-                .flatMap(id -> camundaRuntimeApi.getProcessInstancesByCaseId(
-                    serviceAuthorization,
-                    CASE_ID_VARIABLE + "_eq_" + id,
-                    true,
-                    true
-                ).stream())
-                .toList(); // Java 16+ unmodifiable
-        } else {
-            return camundaRuntimeApi.getUnfinishedProcessInstancesWithIncidents(
-                serviceAuthorization, true, true, incidentStartTime, incidentEndTime
-            );
+        try {
+            if (!caseIdList.isEmpty()) {
+                return caseIdList.stream()
+                    .flatMap(id -> camundaRuntimeApi.getProcessInstancesByCaseId(
+                        serviceAuthorization,
+                        CASE_ID_VARIABLE + "_eq_" + id,
+                        true,
+                        true
+                    ).stream())
+                    .toList(); // Java 16+ unmodifiable
+            } else {
+                return camundaRuntimeApi.getUnfinishedProcessInstancesWithIncidents(
+                    serviceAuthorization, true, true, incidentStartTime, incidentEndTime
+                );
+            }
+        } catch (Exception e) {
+            log.error("Error fetching unfinished process instances", e);
+            return Collections.emptyList();
         }
     }
 
@@ -186,7 +191,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
     }
 
     private List<IncidentDto> getOpenIncidentsBatched(String serviceAuthorization, List<String> processInstanceIds) {
-        int batchSize = 50; // safe for URL length
+        int batchSize = 10; // safe for URL length
 
         return IntStream.range(0, (processInstanceIds.size() + batchSize - 1) / batchSize) // number of batches
             .mapToObj(batchIndex -> {
