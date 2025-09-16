@@ -46,7 +46,11 @@ public interface CamundaRuntimeApi {
         @RequestParam("unfinished") boolean unfinished,
         @RequestParam("withIncident") boolean withIncident,
         @RequestParam("startedAfter") String startedAfter,   // e.g. 2025-09-10T12:00:00Z
-        @RequestParam("startedBefore") String startedBefore  // e.g. 2025-09-10T23:59:59Z
+        @RequestParam("startedBefore") String startedBefore, // e.g. 2025-09-10T23:59:59Z
+        @RequestParam(value = "firstResult", required = false) Integer firstResult,  // pagination offset
+        @RequestParam(value = "maxResults", required = false) Integer maxResults,    // pagination limit
+        @RequestParam(value = "sortBy", required = false) String sortBy,             // e.g. "startTime"
+        @RequestParam(value = "sortOrder", required = false) String sortOrder        // "asc" or "desc"
     );
 
     @GetMapping("/incident")

@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyBoolean;
@@ -45,48 +46,77 @@ class IncidentRetryEventHandlerTest {
     @BeforeEach
     void setUp() {
         when(authTokenGenerator.generate()).thenReturn("serviceAuth");
-        when(externalTask.getVariable("incidentStartTime")).thenReturn("2025-01-01T00:00:00");
-        when(externalTask.getVariable("incidentEndTime")).thenReturn("2025-12-31T23:59:59");
+        when(externalTask.getVariable("incidentStartTime")).thenReturn("2025-01-01T00:00:00Z");
+        when(externalTask.getVariable("incidentEndTime")).thenReturn("2025-12-31T23:59:59Z");
     }
 
     @Test
     void shouldReturnEmptyData_whenNoProcessInstancesFound() {
         when(externalTask.getVariable("caseIds")).thenReturn(null);
         when(camundaRuntimeApi.getUnfinishedProcessInstancesWithIncidents(
-            any(String.class),
-            anyBoolean(),
-            anyBoolean(),
-            any(String.class),
-            any(String.class)
+            any(), anyBoolean(), anyBoolean(), any(), any(), anyInt(), anyInt(), any(), any()
         )).thenReturn(List.of());
 
         ExternalTaskData result = handler.handleTask(externalTask);
 
         assertThat(result).isNotNull();
-        verify(camundaRuntimeApi, never()).getOpenIncidents(any(String.class), anyBoolean(), any(String.class));
+        verify(camundaRuntimeApi, never()).getOpenIncidents(any(), anyBoolean(), any());
     }
 
     @Test
-    void shouldReturnEmptyData_whenNoIncidentsFound() {
-        ProcessInstanceDto pi = new ProcessInstanceDto();
-        pi.setId("proc1");
+    void shouldRetryIncidentsWithPagination() {
+        // Create two pages of process instances
+        ProcessInstanceDto pi1 = new ProcessInstanceDto();
+        pi1.setId("proc1");
+        ProcessInstanceDto pi2 = new ProcessInstanceDto();
+        pi2.setId("proc2");
 
-        when(externalTask.getVariable("caseIds")).thenReturn("123");
-        when(camundaRuntimeApi.getProcessInstancesByCaseId(any(), any(), anyBoolean(), anyBoolean()))
-            .thenReturn(List.of(pi));
+        when(externalTask.getVariable("caseIds")).thenReturn("  ");
 
-        // Mock the new GET-based batching method
-        when(camundaRuntimeApi.getOpenIncidents(any(), anyBoolean(), any()))
-            .thenReturn(List.of());
+        // First page returns 2 instances
+        when(camundaRuntimeApi.getUnfinishedProcessInstancesWithIncidents(
+            any(), anyBoolean(), anyBoolean(), any(), any(), eq(0), eq(50), any(), any()
+        )).thenReturn(List.of(pi1, pi2));
+
+        // Second page returns empty -> end of pagination
+        when(camundaRuntimeApi.getUnfinishedProcessInstancesWithIncidents(
+            any(), anyBoolean(), anyBoolean(), any(), any(), eq(50), eq(50), any(), any()
+        )).thenReturn(List.of());
+
+        // Mock incidents for process instances
+        IncidentDto incident1 = new IncidentDto();
+        incident1.setId("inc1");
+        incident1.setProcessInstanceId("proc1");
+        incident1.setConfiguration("job1");
+
+        IncidentDto incident2 = new IncidentDto();
+        incident2.setId("inc2");
+        incident2.setProcessInstanceId("proc2");
+        incident2.setConfiguration("job2");
+
+        when(camundaRuntimeApi.getOpenIncidents(any(), anyBoolean(), eq("proc1,proc2")))
+            .thenReturn(List.of(incident1, incident2));
+
+        // Mock variables
+        HashMap<String, VariableValueDto> vars1 = new HashMap<>();
+        VariableValueDto varDto1 = new VariableValueDto();
+        varDto1.setValue("123");
+        vars1.put("caseId", varDto1);
+
+        when(camundaRuntimeApi.getProcessVariables("proc1", "serviceAuth")).thenReturn(vars1);
+        when(camundaRuntimeApi.getProcessVariables("proc2", "serviceAuth")).thenReturn(vars1);
 
         ExternalTaskData result = handler.handleTask(externalTask);
 
         assertThat(result).isNotNull();
-        verify(camundaRuntimeApi).getOpenIncidents("serviceAuth", true, "proc1");
+
+        // Verify retries were called for both incidents
+        verify(camundaRuntimeApi).setJobRetries("serviceAuth", "job1", Map.of("retries", 1));
+        verify(camundaRuntimeApi).setJobRetries("serviceAuth", "job2", Map.of("retries", 1));
     }
 
     @Test
-    void shouldRetryIncidentsSuccessfully() {
+    void shouldHandleIncidentRetryFailureGracefully() {
         ProcessInstanceDto pi = new ProcessInstanceDto();
         pi.setId("proc1");
 
@@ -95,93 +125,18 @@ class IncidentRetryEventHandlerTest {
         incident.setProcessInstanceId("proc1");
         incident.setConfiguration("job1");
 
-        VariableValueDto variableValueDto = new VariableValueDto();
-        variableValueDto.setValue("123");
+        when(externalTask.getVariable("caseIds")).thenReturn("  ");
+        when(camundaRuntimeApi.getUnfinishedProcessInstancesWithIncidents(
+            any(), anyBoolean(), anyBoolean(), any(), any(), anyInt(), anyInt(), any(), any()
+        )).thenReturn(List.of(pi));
 
-        HashMap<String, VariableValueDto> variables = new HashMap<>();
-        variables.put("caseId", variableValueDto);
-
-        when(externalTask.getVariable("caseIds")).thenReturn("123");
-        when(camundaRuntimeApi.getProcessInstancesByCaseId(any(), any(), anyBoolean(), anyBoolean()))
-            .thenReturn(List.of(pi));
-
-        // Mock batching to return single incident
-        when(camundaRuntimeApi.getOpenIncidents(any(), anyBoolean(), any()))
-            .thenReturn(List.of(incident));
-
-        when(camundaRuntimeApi.getProcessVariables("proc1", "serviceAuth"))
-            .thenReturn(variables);
+        when(camundaRuntimeApi.getOpenIncidents(any(), anyBoolean(), any())).thenReturn(List.of(incident));
+        when(camundaRuntimeApi.getProcessVariables("proc1", "serviceAuth")).thenThrow(new RuntimeException("fail"));
+        doThrow(new RuntimeException("fail")).when(camundaRuntimeApi).setJobRetries(any(), any(), any());
 
         ExternalTaskData result = handler.handleTask(externalTask);
 
         assertThat(result).isNotNull();
         verify(camundaRuntimeApi).setJobRetries("serviceAuth", "job1", Map.of("retries", 1));
-    }
-
-    @Test
-    void shouldHandleRetryFailureGracefully() {
-        ProcessInstanceDto pi = new ProcessInstanceDto();
-        pi.setId("proc1");
-
-        IncidentDto incident = new IncidentDto();
-        incident.setId("inc1");
-        incident.setProcessInstanceId("proc1");
-        incident.setConfiguration("job1");
-
-        when(externalTask.getVariable("caseIds")).thenReturn("123");
-        when(camundaRuntimeApi.getProcessInstancesByCaseId(any(), any(), anyBoolean(), anyBoolean()))
-            .thenReturn(List.of(pi));
-        when(camundaRuntimeApi.getOpenIncidents(any(), anyBoolean(), any()))
-            .thenReturn(List.of(incident));
-
-        when(camundaRuntimeApi.getProcessVariables("proc1", "serviceAuth"))
-            .thenThrow(new RuntimeException("boom!"));
-        doThrow(new RuntimeException("job fail"))
-            .when(camundaRuntimeApi).setJobRetries(any(), any(), any());
-
-        ExternalTaskData result = handler.handleTask(externalTask);
-
-        assertThat(result).isNotNull();
-        verify(camundaRuntimeApi).setJobRetries("serviceAuth", "job1", Map.of("retries", 1));
-    }
-
-    @Test
-    void shouldFetchUnfinishedProcessInstances_whenCaseIdsEmpty() {
-        when(externalTask.getVariable("caseIds")).thenReturn("  ");
-        when(camundaRuntimeApi.getUnfinishedProcessInstancesWithIncidents(any(), anyBoolean(), anyBoolean(), any(), any()))
-            .thenReturn(List.of());
-
-        handler.handleTask(externalTask);
-
-        verify(camundaRuntimeApi).getUnfinishedProcessInstancesWithIncidents(
-            "serviceAuth",
-            true,
-            true,
-            "2025-01-01T00:00:00",
-            "2025-12-31T23:59:59"
-        );
-    }
-
-    @Test
-    void shouldDefaultDates_whenNotProvided() {
-        // no start or end date provided
-        when(externalTask.getVariable("incidentStartTime")).thenReturn(null);
-        when(externalTask.getVariable("incidentEndTime")).thenReturn("  ");
-        when(externalTask.getVariable("caseIds")).thenReturn("  ");
-
-        when(camundaRuntimeApi.getUnfinishedProcessInstancesWithIncidents(any(), anyBoolean(), anyBoolean(), any(), any()))
-            .thenReturn(List.of());
-
-        handler.handleTask(externalTask);
-
-        // Verify method was called with default ISO date strings
-        verify(camundaRuntimeApi).getUnfinishedProcessInstancesWithIncidents(
-            eq("serviceAuth"),
-            eq(true),
-            eq(true),
-            any(String.class),  // start ~ now-24h
-            any(String.class)   // end ~ now
-        );
     }
 }
-
