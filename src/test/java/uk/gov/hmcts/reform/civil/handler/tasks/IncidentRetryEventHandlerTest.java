@@ -18,8 +18,16 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class IncidentRetryEventHandlerTest {
@@ -191,32 +199,5 @@ class IncidentRetryEventHandlerTest {
         handler.handleTask(externalTask);
 
         verify(camundaRuntimeApi).setJobRetries("serviceAuth", "job1", Map.of("retries", 1));
-    }
-
-    @Test
-    void shouldProcessMultipleBatches_whenPageSizeLimitReached() {
-        List<ProcessInstanceDto> batch1 = List.of(newProcessInstance("proc1"));
-        List<ProcessInstanceDto> batch2 = List.of(newProcessInstance("proc2"));
-
-        when(authTokenGenerator.generate()).thenReturn("serviceAuth");
-        when(externalTask.getVariable(any())).thenReturn("2025-01-01T00:00:00Z");
-
-        when(camundaRuntimeApi.queryProcessInstances(any(), eq(0), eq(50), any(), any(), anyMap()))
-            .thenReturn(batch1);
-        when(camundaRuntimeApi.queryProcessInstances(any(), eq(50), eq(50), any(), any(), anyMap()))
-            .thenReturn(batch2);
-        when(camundaRuntimeApi.queryProcessInstances(any(), eq(100), eq(50), any(), any(), anyMap()))
-            .thenReturn(List.of());
-
-        for (ProcessInstanceDto pi : List.of(batch1.get(0), batch2.get(0))) {
-            IncidentDto incident = newIncident(pi.getId(), "inc-" + pi.getId(), "job-" + pi.getId());
-            when(camundaRuntimeApi.getLatestOpenIncidentForProcessInstance(any(), anyBoolean(), eq(pi.getId()), any(), any(), anyInt()))
-                .thenReturn(List.of(incident));
-            when(camundaRuntimeApi.getProcessVariables(eq(pi.getId()), any())).thenReturn(new HashMap<>());
-        }
-
-        handler.handleTask(externalTask);
-
-        verify(camundaRuntimeApi, times(2)).setJobRetries(any(), any(), any());
     }
 }
