@@ -183,7 +183,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
             filters.put("unfinished", true);
             filters.put("executedActivityAfter", incidentStartTime);
             filters.put("executedActivityBefore", incidentEndTime); //"executedActivityBefore": "2025-09-17T16:20:05.471+0000",
-            filters.put("tenantIdIn", List.of("Civil"));
+            filters.put("tenantIdIn", List.of("civil"));
             if (StringUtils.isNotEmpty(incidentMessageLike)) {
                 filters.put("incidentMessageLike", incidentMessageLike);
             }
