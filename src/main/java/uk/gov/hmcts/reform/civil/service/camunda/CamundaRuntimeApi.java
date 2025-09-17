@@ -46,7 +46,7 @@ public interface CamundaRuntimeApi {
         @RequestParam(value = "incidentStatus", defaultValue = "open") String incidentStatus
     );
 
-    @PostMapping("/process-instance")
+    @PostMapping("/history/process-instance")
     List<ProcessInstanceDto> queryProcessInstances(
         @RequestHeader("ServiceAuthorization") String serviceAuthorization,
         @RequestParam(value = "firstResult", required = false) Integer firstResult,

@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.tasks;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.community.rest.client.model.IncidentDto;
 import org.camunda.community.rest.client.model.ProcessInstanceDto;
@@ -14,11 +15,7 @@ import uk.gov.hmcts.reform.civil.service.camunda.CamundaRuntimeApi;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -178,11 +175,14 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
                                                            int firstResult) {
         try {
             Map<String, Object> filters = new HashMap<>();
-            filters.put("incidentMessageLike", incidentMessageLike);
             filters.put("withIncidents", true);
             filters.put("unfinished", true);
-            filters.put("incidentStartTime", incidentStartTime);
-            filters.put("incidentEndTime", incidentEndTime);
+            filters.put("executedActivityAfter", incidentStartTime);
+            filters.put("executedActivityBefore", incidentEndTime); //"executedActivityBefore": "2025-09-17T16:20:05.471+0000",
+            filters.put("tenantIdIn", List.of("Civil"));
+            if (StringUtils.isNotEmpty(incidentMessageLike)) {
+                filters.put("incidentMessageLike", incidentMessageLike);
+            }
             return camundaRuntimeApi.queryProcessInstances(
                 serviceAuthorization,
                 firstResult,
