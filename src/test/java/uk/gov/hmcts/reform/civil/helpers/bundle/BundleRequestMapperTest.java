@@ -521,8 +521,6 @@ class BundleRequestMapperTest {
             .documentCaseSummaryRes(setupOtherEvidenceDocs(null))
             .documentCaseSummaryRes2(setupOtherEvidenceDocs(null))
             .documentForDisclosure(setupOtherEvidenceDocs(null))
-            .defendantResponseDocuments(getDefendantResponseDocs())
-            .claimantResponseDocuments(getClaimantResponseDocs())
             .dismissalOrderDocStaff(getOrderDoc(DocumentType.DISMISSAL_ORDER))
             .generalOrderDocStaff(getOrderDoc(DocumentType.GENERAL_ORDER))
             .documentCosts(setupOtherEvidenceDocs(null))
@@ -901,6 +899,22 @@ class BundleRequestMapperTest {
                 .createdDatetime(LocalDateTime.of(2023, 2, 10, 2,
                                                   2, 2)).build();
         systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDJ));
+        CaseDocument caseDocumentCd =
+            CaseDocument.builder()
+                .documentType(DocumentType.CLAIMANT_DEFENCE)
+                .createdBy("Claimant")
+                .documentLink(Document.builder().documentUrl(TEST_URL).documentFileName(TEST_FILE_NAME).categoryID("").build())
+                .createdDatetime(LocalDateTime.of(2023, 2, 10, 2,
+                                                  2, 2)).build();
+        systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentCd));
+        CaseDocument caseDocumentDd =
+            CaseDocument.builder()
+                .documentType(DocumentType.DEFENDANT_DEFENCE)
+                .createdBy("Defendant")
+                .documentLink(Document.builder().documentUrl(TEST_URL).documentFileName(TEST_FILE_NAME).categoryID("").build())
+                .createdDatetime(LocalDateTime.of(2023, 2, 10, 2,
+                                                  2, 2)).build();
+        systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDd));
         return systemGeneratedCaseDocuments;
     }
 
