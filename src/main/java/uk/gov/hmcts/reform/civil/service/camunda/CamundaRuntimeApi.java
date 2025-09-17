@@ -37,7 +37,6 @@ public interface CamundaRuntimeApi {
         @RequestHeader("ServiceAuthorization") String serviceAuthorization,
         @RequestParam("unfinished") boolean unfinished,
         @RequestParam("withIncident") boolean withIncident,
-        @RequestParam(value = "incidentMessageLike", required = false) String incidentMessageLike, // e.g. "%502%"
         @RequestParam("startedAfter") String startedAfter,   // e.g. 2025-09-10T12:00:00Z
         @RequestParam("startedBefore") String startedBefore, // e.g. 2025-09-10T23:59:59Z
         @RequestParam(value = "firstResult", required = false) Integer firstResult,  // pagination offset
@@ -45,6 +44,16 @@ public interface CamundaRuntimeApi {
         @RequestParam(value = "sortBy", required = false) String sortBy,             // e.g. "startTime"
         @RequestParam(value = "sortOrder", required = false) String sortOrder,        // "asc" or "desc"
         @RequestParam(value = "incidentStatus", defaultValue = "open") String incidentStatus
+    );
+
+    @PostMapping("/process-instance")
+    List<ProcessInstanceDto> queryProcessInstances(
+        @RequestHeader("ServiceAuthorization") String serviceAuthorization,
+        @RequestParam(value = "firstResult", required = false) Integer firstResult,
+        @RequestParam(value = "maxResults", required = false) Integer maxResults,
+        @RequestParam(value = "sortBy", required = false) String sortBy,
+        @RequestParam(value = "sortOrder", required = false) String sortOrder,
+        @RequestBody Map<String, Object> filters
     );
 
     @GetMapping("/incident")

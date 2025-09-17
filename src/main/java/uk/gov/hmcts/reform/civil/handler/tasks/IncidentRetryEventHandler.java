@@ -15,6 +15,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -176,18 +177,19 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
                                                            String incidentMessageLike,
                                                            int firstResult) {
         try {
-            return camundaRuntimeApi.getUnfinishedProcessInstancesWithIncidents(
+            Map<String, Object> filters = new HashMap<>();
+            filters.put("incidentMessageLike", incidentMessageLike);
+            filters.put("withIncidents", true);
+            filters.put("unfinished", true);
+            filters.put("incidentStartTime", incidentStartTime);
+            filters.put("incidentEndTime", incidentEndTime);
+            return camundaRuntimeApi.queryProcessInstances(
                 serviceAuthorization,
-                true,       // unfinished
-                true,       // withIncident
-                incidentMessageLike,
-                incidentStartTime,
-                incidentEndTime,
                 firstResult,
                 IncidentRetryEventHandler.PAGE_SIZE,
                 "instanceId",
                 "desc",
-                "open"
+                filters
             );
         } catch (Exception e) {
             log.error("Error fetching unfinished process instances", e);
