@@ -186,7 +186,8 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
                 firstResult,
                 IncidentRetryEventHandler.PAGE_SIZE,
                 "instanceId",
-                "desc"
+                "desc",
+                "open"
             );
         } catch (Exception e) {
             log.error("Error fetching unfinished process instances", e);

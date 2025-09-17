@@ -46,7 +46,7 @@ class IncidentRetryEventHandlerTest {
     @Test
     void shouldReturnEmptyData_whenNoProcessInstancesFound() {
         when(camundaRuntimeApi.getUnfinishedProcessInstancesWithIncidents(
-            any(), anyBoolean(), anyBoolean(), any(), any(), any(), anyInt(), anyInt(), any(), any()
+            any(), anyBoolean(), anyBoolean(), any(), any(), any(), anyInt(), anyInt(), any(), any(), any()
         )).thenReturn(List.of());
 
         when(authTokenGenerator.generate()).thenReturn("serviceAuth");
@@ -71,7 +71,7 @@ class IncidentRetryEventHandlerTest {
         );
 
         when(camundaRuntimeApi.getUnfinishedProcessInstancesWithIncidents(
-            any(), anyBoolean(), anyBoolean(), any(), any(), any(), eq(0), eq(50), any(), any()
+            any(), anyBoolean(), anyBoolean(), any(), any(), any(), eq(0), eq(50), any(), any(), any()
         )).thenReturn(processInstances);
 
         // Mock incidents and process variables for each instance
@@ -106,7 +106,7 @@ class IncidentRetryEventHandlerTest {
         when(externalTask.getVariable("incidentEndTime")).thenReturn("2025-12-31T23:59:59Z");
 
         when(camundaRuntimeApi.getUnfinishedProcessInstancesWithIncidents(
-            any(), anyBoolean(), anyBoolean(), any(), any(), any(), anyInt(), anyInt(), any(), any()
+            any(), anyBoolean(), anyBoolean(), any(), any(), any(), anyInt(), anyInt(), any(), any(), any()
         )).thenReturn(List.of(pi));
 
         when(camundaRuntimeApi.getLatestOpenIncidentForProcessInstance(
@@ -130,7 +130,7 @@ class IncidentRetryEventHandlerTest {
         when(externalTask.getVariable("incidentEndTime")).thenReturn("2025-12-31T23:59:59Z");
 
         when(camundaRuntimeApi.getUnfinishedProcessInstancesWithIncidents(
-            any(), anyBoolean(), anyBoolean(), any(), any(), any(), anyInt(), anyInt(), any(), any()
+            any(), anyBoolean(), anyBoolean(), any(), any(), any(), anyInt(), anyInt(), any(), any(), any()
         )).thenReturn(List.of(pi));
 
         when(camundaRuntimeApi.getLatestOpenIncidentForProcessInstance(any(), anyBoolean(), anyString(), any(), any(), anyInt()))

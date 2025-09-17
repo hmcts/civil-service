@@ -43,7 +43,8 @@ public interface CamundaRuntimeApi {
         @RequestParam(value = "firstResult", required = false) Integer firstResult,  // pagination offset
         @RequestParam(value = "maxResults", defaultValue = "50") Integer maxResults,    // pagination limit
         @RequestParam(value = "sortBy", required = false) String sortBy,             // e.g. "startTime"
-        @RequestParam(value = "sortOrder", required = false) String sortOrder        // "asc" or "desc"
+        @RequestParam(value = "sortOrder", required = false) String sortOrder,        // "asc" or "desc"
+        @RequestParam(value = "incidentStatus", defaultValue = "open") String incidentStatus
     );
 
     @GetMapping("/incident")
