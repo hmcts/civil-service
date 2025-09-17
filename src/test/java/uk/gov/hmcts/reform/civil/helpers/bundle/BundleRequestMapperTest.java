@@ -452,8 +452,6 @@ class BundleRequestMapperTest {
             .documentCaseSummaryRes(setupOtherEvidenceDocs(null))
             .documentCaseSummaryRes2(setupOtherEvidenceDocs(null))
             .documentForDisclosure(setupOtherEvidenceDocs(null))
-            .defendantResponseDocuments(getDefendantResponseDocs())
-            .claimantResponseDocuments(getClaimantResponseDocs())
             .dismissalOrderDocStaff(getOrderDoc(DocumentType.DISMISSAL_ORDER))
             .generalOrderDocStaff(getOrderDoc(DocumentType.GENERAL_ORDER))
             .documentCosts(setupOtherEvidenceDocs(null))
@@ -605,32 +603,6 @@ class BundleRequestMapperTest {
                                                         .expertOptionName("Other expert").build()));
 
         return  expertEvidenceDocs;
-    }
-
-    private List<Element<CaseDocument>> getClaimantResponseDocs() {
-        List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
-        CaseDocument caseDocumentDC =
-            CaseDocument.builder()
-                .documentType(DocumentType.CLAIMANT_DEFENCE)
-                .createdBy("Claimant")
-                .documentLink(Document.builder().documentUrl(TEST_URL).documentFileName(TEST_FILE_NAME).categoryID("").build())
-                .createdDatetime(LocalDateTime.of(2023, 2, 10, 2,
-                                                  2, 2)).build();
-        systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDC));
-        return systemGeneratedCaseDocuments;
-    }
-
-    private List<Element<CaseDocument>> getDefendantResponseDocs() {
-        List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
-        CaseDocument caseDocumentDC =
-            CaseDocument.builder()
-                .documentType(DocumentType.DEFENDANT_DEFENCE)
-                .createdBy("Defendant")
-                .documentLink(Document.builder().documentUrl(TEST_URL).documentFileName(TEST_FILE_NAME).categoryID("").build())
-                .createdDatetime(LocalDateTime.of(2023, 2, 10, 2,
-                                                  2, 2)).build();
-        systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDC));
-        return systemGeneratedCaseDocuments;
     }
 
     private List<Element<CaseDocument>> getOrderDoc(DocumentType docType) {
