@@ -32,6 +32,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_AVAILABLE_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_COSC_GEN_FOR_DEFENDANT;
@@ -84,6 +85,7 @@ class CoscCertificateGeneratedDefendantNotificationHandlerTest extends BaseCallb
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
+            when(toggleService.isCoSCEnabled()).thenReturn(true);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_COSC_GEN_FOR_DEFENDANT.name()).build()
@@ -93,6 +95,12 @@ class CoscCertificateGeneratedDefendantNotificationHandlerTest extends BaseCallb
             verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_PROOF_OF_DEBT_PAYMENT_APPLICATION_PROCESSED_DEFENDANT.getScenario(),
+                caseData.getCcdCaseReference().toString(),
+                ScenarioRequestParams.builder().params(scenarioParams).build()
+            );
+            verify(dashboardScenariosService).recordScenarios(
+                "BEARER_TOKEN",
+                SCENARIO_AAA6_GENERAL_APPLICATION_AVAILABLE_DEFENDANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
@@ -113,6 +121,7 @@ class CoscCertificateGeneratedDefendantNotificationHandlerTest extends BaseCallb
                 .build();;
 
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
+            when(toggleService.isCoSCEnabled()).thenReturn(true);
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
@@ -133,6 +142,12 @@ class CoscCertificateGeneratedDefendantNotificationHandlerTest extends BaseCallb
             verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_PROOF_OF_DEBT_PAYMENT_APPLICATION_PROCESSED_DEFENDANT.getScenario(),
+                caseData.getCcdCaseReference().toString(),
+                ScenarioRequestParams.builder().params(scenarioParams).build()
+            );
+            verify(dashboardScenariosService).recordScenarios(
+                "BEARER_TOKEN",
+                SCENARIO_AAA6_GENERAL_APPLICATION_AVAILABLE_DEFENDANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
