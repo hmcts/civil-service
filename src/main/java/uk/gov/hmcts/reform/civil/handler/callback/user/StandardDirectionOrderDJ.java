@@ -716,6 +716,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                       document -> document.getValue().getDocumentLink(), "caseManagementOrders");
         caseDataBuilder.businessProcess(BusinessProcess.ready(STANDARD_DIRECTION_ORDER_DJ));
         caseDataBuilder.hearingNotes(getHearingNotes(caseData));
+
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             boolean isLipCase = caseData.isApplicantLiP() || caseData.isRespondent1LiP() || caseData.isRespondent2LiP();
             if (featureToggleService.isWelshEnabledForMainCase()) {
