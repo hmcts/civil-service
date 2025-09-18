@@ -29,6 +29,7 @@ public class DeadlineExtensionCalculatorService {
     }
 
     public LocalDate calculateExtendedDeadline(LocalDateTime responseDate, int plusDays) {
+        requireNonNull(responseDate);
         if (is4pmOrAfter(responseDate)) {
             responseDate = responseDate.plusDays(1);
         }
