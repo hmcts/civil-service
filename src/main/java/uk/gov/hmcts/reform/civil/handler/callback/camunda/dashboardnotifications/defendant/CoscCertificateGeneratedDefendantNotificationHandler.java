@@ -13,7 +13,9 @@ import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_AVAILABLE_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_PROOF_OF_DEBT_PAYMENT_APPLICATION_PROCESSED_DEFENDANT;
 
 @Service
@@ -44,6 +46,14 @@ public class CoscCertificateGeneratedDefendantNotificationHandler extends Dashbo
     @Override
     protected String getScenario(CaseData caseData) {
         return SCENARIO_AAA6_PROOF_OF_DEBT_PAYMENT_APPLICATION_PROCESSED_DEFENDANT.getScenario();
+    }
+
+    @Override
+    public Map<String, Boolean> getScenarios(CaseData caseData) {
+        return Map.of(
+            SCENARIO_AAA6_GENERAL_APPLICATION_AVAILABLE_DEFENDANT.getScenario(),
+            featureToggleService.isCoSCEnabled()
+        );
     }
 
     @Override
