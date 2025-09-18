@@ -70,6 +70,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.ACKNOWLEDGEMENT_OF_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -908,7 +909,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                                                      .build(), ABOUT_TO_SUBMIT);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
-        if (!UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             assertEquals(eaCourtLocation, responseCaseData.getEaCourtLocation());
         } else {
             assertNull(responseCaseData.getEaCourtLocation());
@@ -955,7 +956,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
 
-        if (!UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             assertEquals(eaCourtLocation, responseCaseData.getEaCourtLocation());
         } else {
             assertNull(responseCaseData.getEaCourtLocation());
