@@ -91,6 +91,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STANDARD_DIRECTION_ORDER_DJ;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -716,7 +717,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                       document -> document.getValue().getDocumentLink(), "caseManagementOrders");
         caseDataBuilder.businessProcess(BusinessProcess.ready(STANDARD_DIRECTION_ORDER_DJ));
         caseDataBuilder.hearingNotes(getHearingNotes(caseData));
-        if (!UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             boolean isLipCase = caseData.isApplicantLiP() || caseData.isRespondent1LiP() || caseData.isRespondent2LiP();
             if (featureToggleService.isWelshEnabledForMainCase()) {
                 caseDataBuilder.eaCourtLocation(YES);
