@@ -172,6 +172,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
     ) {
         totalRetries.incrementAndGet();
         try {
+            log.info("HandleIncidentRetry: calling retryIncidentSafely {}", incident.getId());
             if (retryIncidentSafely(incident, serviceAuthorization, caseIds)) {
                 successRetries.incrementAndGet();
                 log.info("Successfully retried incident {}: {}", incident.getId(), incident.getProcessInstanceId());
@@ -291,7 +292,13 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
                         "desc",                  // use default sortOrder
                         1                        // use default maxResults
                     );
-                    return incidents.isEmpty() ? null : incidents.get(0);
+                    IncidentDto incidentDto = incidents.isEmpty() ? null : incidents.get(0);
+                    if (incidentDto != null) {
+                        log.info("Fetched incident {} for process instance {}", incidentDto.getId(), processInstanceId);
+                    } else {
+                        log.info("No incidents found for process instance {}", processInstanceId);
+                    }
+                    return incidentDto;
                 } catch (Exception e) {
                     log.error("Error fetching latest incident for process instance {}", processInstanceId, e);
                     return null;
