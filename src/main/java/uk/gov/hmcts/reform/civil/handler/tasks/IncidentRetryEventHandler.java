@@ -13,13 +13,11 @@ import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.service.camunda.CamundaRuntimeApi;
 
 import java.time.Instant;
+import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -37,6 +35,9 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
     private static final String RETRIES_FIELD = "retries";
     private static final int RETRIES_COUNT = 1;
     private static final int PAGE_SIZE = 50;
+    private static final DateTimeFormatter INCIDENT_FORMATTER =
+        DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+            .withZone(ZoneOffset.UTC);
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
@@ -50,6 +51,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
         AtomicInteger totalRetries = new AtomicInteger();
         AtomicInteger successRetries = new AtomicInteger();
         AtomicInteger failedRetries = new AtomicInteger();
+        Set<String> caseIds = ConcurrentHashMap.newKeySet();
 
         processAllIncidents(
             serviceAuthorization,
@@ -58,12 +60,20 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
             incidentMessageLike,
             totalRetries,
             successRetries,
-            failedRetries
+            failedRetries,
+            caseIds
         );
 
         log.info(
             "Incident retry completed. Total={}, Success={}, Failed={}",
             totalRetries.get(), successRetries.get(), failedRetries.get()
+        );
+
+        log.info(
+            "All caseIds retried between incidents startTime={} and endTime={}: {}",
+            incidentStartTime,
+            incidentEndTime,
+            caseIds
         );
 
         return ExternalTaskData.builder().build();
@@ -76,7 +86,8 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
         String incidentMessageLike,
         AtomicInteger totalRetries,
         AtomicInteger successRetries,
-        AtomicInteger failedRetries
+        AtomicInteger failedRetries,
+        Set<String> caseIds
     ) {
         int firstResult = 0;
         List<ProcessInstanceDto> processInstancesBatch;
@@ -106,7 +117,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
             log.info("Extracted {} incidents with firstResult {}", incidents.size(), firstResult);
 
             if (!incidents.isEmpty()) {
-                retryIncidents(incidents, serviceAuthorization, totalRetries, successRetries, failedRetries);
+                retryIncidents(incidents, serviceAuthorization, totalRetries, successRetries, failedRetries, caseIds);
             }
 
             firstResult += PAGE_SIZE;
@@ -118,7 +129,9 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
         String serviceAuthorization,
         AtomicInteger totalRetries,
         AtomicInteger successRetries,
-        AtomicInteger failedRetries
+        AtomicInteger failedRetries,
+        Set<String> caseIds
+
     ) {
         log.info("Retrying {} incidents across process instances", incidents.size());
         int poolSize = Math.min(MAX_THREADS, incidents.size());
@@ -127,7 +140,12 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
         try {
             customThreadPool.submit(() ->
                                         incidents.parallelStream().forEach(incident ->
-                                                                               handleIncidentRetry(incident, serviceAuthorization, totalRetries, successRetries, failedRetries))
+                                                                               handleIncidentRetry(incident,
+                                                                                                   serviceAuthorization,
+                                                                                                   totalRetries,
+                                                                                                   successRetries,
+                                                                                                   failedRetries,
+                                                                                                   caseIds))
             ).get();
         } catch (InterruptedException ie) {
             Thread.currentThread().interrupt();
@@ -144,11 +162,12 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
         String serviceAuthorization,
         AtomicInteger totalRetries,
         AtomicInteger successRetries,
-        AtomicInteger failedRetries
+        AtomicInteger failedRetries,
+        Set<String> caseIds
     ) {
         totalRetries.incrementAndGet();
         try {
-            if (retryIncidentSafely(incident, serviceAuthorization)) {
+            if (retryIncidentSafely(incident, serviceAuthorization, caseIds)) {
                 successRetries.incrementAndGet();
                 log.info("Successfully retried incident {}: {}", incident.getId(), incident.getProcessInstanceId());
             } else {
@@ -162,13 +181,13 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
 
     private String resolveStartTime(String incidentStartTime) {
         return (incidentStartTime == null || incidentStartTime.isBlank())
-            ? DateTimeFormatter.ISO_INSTANT.format(Instant.now().minus(1, ChronoUnit.HOURS))
+            ? INCIDENT_FORMATTER.format(Instant.now().minus(24, ChronoUnit.HOURS))
             : incidentStartTime;
     }
 
     private String resolveEndTime(String incidentEndTime) {
         return (incidentEndTime == null || incidentEndTime.isBlank())
-            ? DateTimeFormatter.ISO_INSTANT.format(Instant.now())
+            ? INCIDENT_FORMATTER.format(Instant.now())
             : incidentEndTime;
     }
 
@@ -201,11 +220,13 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
         }
     }
 
-    private boolean retryIncidentSafely(IncidentDto incident, String serviceAuthorization) {
+    private boolean retryIncidentSafely(IncidentDto incident, String serviceAuthorization, Set<String> caseIds) {
         try {
-            String jobId = incident.getConfiguration();
             String processInstanceId = incident.getProcessInstanceId();
             String incidentCaseId = fetchCaseId(processInstanceId, serviceAuthorization);
+            caseIds.add(incidentCaseId);
+
+            String jobId = incident.getConfiguration();
 
             log.info(
                 "Retrying incident {} for processInstanceId={} (jobId={}, caseId={}, activityId={})",
