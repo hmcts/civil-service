@@ -60,7 +60,7 @@ public interface CamundaRuntimeApi {
     List<IncidentDto> getLatestOpenIncidentForProcessInstance(
         @RequestHeader("ServiceAuthorization") String serviceAuthorization,
         @RequestParam("open") boolean open,
-        @RequestParam("processInstanceIdIn") String processInstanceIdIn, // single process instance ID
+        @RequestParam("processInstanceId") String processInstanceId, // single process instance ID
         @RequestParam(value = "sortBy", defaultValue = "incidentTimestamp") String sortBy,
         @RequestParam(value = "sortOrder", defaultValue = "desc") String sortOrder,
         @RequestParam(value = "maxResults", defaultValue = "1") int maxResults
