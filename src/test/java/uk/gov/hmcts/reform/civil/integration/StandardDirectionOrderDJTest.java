@@ -57,6 +57,7 @@ import java.util.Optional;
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -907,8 +908,11 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                                                      .build(), ABOUT_TO_SUBMIT);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
-
-        assertEquals(eaCourtLocation, responseCaseData.getEaCourtLocation());
+        if (!UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            assertEquals(eaCourtLocation, responseCaseData.getEaCourtLocation());
+        } else {
+            assertNull(responseCaseData.getEaCourtLocation());
+        }
     }
 
     @ParameterizedTest
@@ -951,7 +955,11 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
 
-        assertEquals(eaCourtLocation, responseCaseData.getEaCourtLocation());
+        if (!UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            assertEquals(eaCourtLocation, responseCaseData.getEaCourtLocation());
+        } else {
+            assertNull(responseCaseData.getEaCourtLocation());
+        }
     }
 
     @Test
