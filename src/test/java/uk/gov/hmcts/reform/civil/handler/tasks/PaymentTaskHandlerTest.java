@@ -178,7 +178,6 @@ class PaymentTaskHandlerTest {
     private Map<String, Boolean> getVariableMap() {
         return Map.ofEntries(
             Map.entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-            Map.entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
             Map.entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
             Map.entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
             Map.entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
