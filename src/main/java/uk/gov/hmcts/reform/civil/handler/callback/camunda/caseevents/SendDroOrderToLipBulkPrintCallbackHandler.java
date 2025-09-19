@@ -55,10 +55,10 @@ public class SendDroOrderToLipBulkPrintCallbackHandler extends CallbackHandler {
 
         CaseData caseData = callbackParams.getCaseData();
         String taskId = camundaActivityId(callbackParams);
-            sendDroBulkPrintService.sendDecisionReconsiderationToLip(
+        sendDroBulkPrintService.sendDecisionReconsiderationToLip(
                 callbackParams.getParams().get(BEARER_TOKEN).toString(), caseData, taskId);
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .build();
+                .build();
     }
 
 }

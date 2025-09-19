@@ -24,36 +24,36 @@ public class TakeCaseOfflineSearchService extends ElasticSearchService {
 
     private final FeatureToggleService featureToggleService;
 
-    public TakeCaseOfflineSearchService(CoreCaseDataService coreCaseDataService, FeatureToggleService featureToggleService) {
+    public TakeCaseOfflineSearchService(CoreCaseDataService coreCaseDataService,
+            FeatureToggleService featureToggleService) {
         super(coreCaseDataService);
         this.featureToggleService = featureToggleService;
     }
 
     public Query query(int startIndex) {
-            Query query = new Query(
+        Query query = new Query(
                 boolQuery()
-                    .minimumShouldMatch(1)
-                    .should(boolQuery()
+                        .minimumShouldMatch(1)
+                        .should(boolQuery()
                                 .must(rangeQuery("data.applicant1ResponseDeadline").lt("now"))
                                 .must(beState(AWAITING_APPLICANT_INTENTION))
                                 .mustNot(matchQuery("data.isMintiLipCase", "Yes"))
                                 .mustNot(existsQuery("data.applicant1ResponseDate")))
-                    .should(boolQuery()
+                        .should(boolQuery()
                                 .must(rangeQuery("data.addLegalRepDeadlineRes1").lt("now"))
                                 .must(beState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT)))
-                    .should(boolQuery()
+                        .should(boolQuery()
                                 .must(rangeQuery("data.addLegalRepDeadlineRes2").lt("now"))
                                 .must(beState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT))),
                 List.of("reference"),
-                startIndex
-            );
-            log.info("Take Case Offline query: {}", query);
-            return query;
+                startIndex);
+        log.info("Take Case Offline query: {}", query);
+        return query;
 
     }
 
     private QueryBuilder beState(CaseState caseState) {
         return boolQuery()
-            .must(matchQuery("state", caseState.toString()));
+                .must(matchQuery("state", caseState.toString()));
     }
 }

@@ -14,7 +14,6 @@ import static org.elasticsearch.index.query.QueryBuilders.existsQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 class TakeCaseOfflineSearchServiceTest extends ElasticSearchServiceTest {
 

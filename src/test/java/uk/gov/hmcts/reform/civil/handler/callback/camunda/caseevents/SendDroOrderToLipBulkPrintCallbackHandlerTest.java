@@ -18,9 +18,7 @@ import uk.gov.hmcts.reform.civil.service.SendHearingBulkPrintService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_DRO_ORDER_TO_LIP_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_DRO_ORDER_TO_LIP_DEFENDANT;
@@ -44,16 +42,16 @@ public class SendDroOrderToLipBulkPrintCallbackHandlerTest extends BaseCallbackH
     public static final String TASK_ID_DEFENDANT = "SendToDefendantLIP";
     public static final String TASK_ID_CLAIMANT = "SendDORToClaimantLIP";
 
-//    @Test
-//    void shouldNotCallRecordScenario_whenWelshFlagIsDisabled() {
-//
-//        CallbackParams callbackParams = CallbackParamsBuilder.builder()
-//            .of(ABOUT_TO_SUBMIT, CaseData.builder().build())
-//            .build();
-//
-//        handler.handle(callbackParams);
-//        verifyNoInteractions(sendDROBulkPrintService);
-//    }
+    // @Test
+    // void shouldNotCallRecordScenario_whenWelshFlagIsDisabled() {
+    //
+    // CallbackParams callbackParams = CallbackParamsBuilder.builder()
+    // .of(ABOUT_TO_SUBMIT, CaseData.builder().build())
+    // .build();
+    //
+    // handler.handle(callbackParams);
+    // verifyNoInteractions(sendDROBulkPrintService);
+    // }
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {

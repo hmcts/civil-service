@@ -403,18 +403,18 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             }
         }
 
-//        @Test
-//        void shouldNotSetDefendantResponseLanguageDisplayIfWelshNotEnabled() {
-//            CaseData caseData = CaseDataBuilder.builder()
-//                .totalClaimAmount(BigDecimal.valueOf(1000))
-//                .build();
-//
-//            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-//            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-//            CaseData updatedCaseData = getCaseData(response);
-//
-//            assertThat(updatedCaseData.getDefendantLanguagePreferenceDisplay()).isNull();
-//        }
+        // @Test
+        // void shouldNotSetDefendantResponseLanguageDisplayIfWelshNotEnabled() {
+        // CaseData caseData = CaseDataBuilder.builder()
+        // .totalClaimAmount(BigDecimal.valueOf(1000))
+        // .build();
+        //
+        // CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        // var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        // CaseData updatedCaseData = getCaseData(response);
+        //
+        // assertThat(updatedCaseData.getDefendantLanguagePreferenceDisplay()).isNull();
+        // }
 
         @Test
         void shouldSetDefendantResponseLanguageDisplayToEnglishIfNotSpecified() {

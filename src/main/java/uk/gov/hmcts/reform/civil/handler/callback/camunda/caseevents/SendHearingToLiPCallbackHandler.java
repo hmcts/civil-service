@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SendHearingBulkPrintService;
-import uk.gov.hmcts.reform.civil.utils.HmcDataUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -66,12 +65,12 @@ public class SendHearingToLiPCallbackHandler extends CallbackHandler {
 
         CaseData caseData = callbackParams.getCaseData();
         String task = camundaActivityId(callbackParams);
-            sendHearingBulkPrintService.sendHearingToLIP(
+        sendHearingBulkPrintService.sendHearingToLIP(
                 callbackParams.getParams().get(BEARER_TOKEN).toString(), caseData, task,
                 false);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .build();
+                .build();
     }
 
 

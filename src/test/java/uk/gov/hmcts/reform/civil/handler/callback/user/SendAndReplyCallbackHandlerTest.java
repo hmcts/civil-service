@@ -101,8 +101,6 @@ class SendAndReplyCallbackHandlerTest {
             CaseData caseData = CaseData.builder()
                 .sendAndReplyOption(SEND)
                 .build();
-
-
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -119,7 +117,6 @@ class SendAndReplyCallbackHandlerTest {
                 .sendAndReplyOption(SEND)
                 .claimantBilingualLanguagePreference("BOTH")
                 .build();
-
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
 
@@ -140,7 +137,6 @@ class SendAndReplyCallbackHandlerTest {
                                  .respondent1LiPResponse(RespondentLiPResponse.builder()
                                                              .respondent1ResponseLanguage("BOTH").build()).build())
                 .build();
-
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
 

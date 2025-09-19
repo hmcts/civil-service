@@ -888,10 +888,10 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                                                              YesOrNo eaCourtLocation) {
 
         if (NO.equals(respondent1Represented)) {
-//            when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(isCPAndWhitelisted);
-//            if (!isCPAndWhitelisted) {
-//                when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
-//            }
+            // when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(isCPAndWhitelisted);
+            // if (!isCPAndWhitelisted) {
+            // when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
+            // }
         }
         CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
             .caseManagementLocation(CaseLocationCivil.builder()
@@ -932,10 +932,10 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                                                              YesOrNo respondent1Represented,
                                                              YesOrNo eaCourtLocation, boolean isWelshEnabled) {
 
-//        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(isWelshEnabled);
-//        if (!isWelshEnabled && NO.equals(respondent1Represented)) {
-//            when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(isCPAndWhitelisted);
-//        }
+        // when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(isWelshEnabled);
+        // if (!isWelshEnabled && NO.equals(respondent1Represented)) {
+        // when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(isCPAndWhitelisted);
+        // }
         CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
             .caseManagementLocation(CaseLocationCivil.builder()
                                         .region("2")
