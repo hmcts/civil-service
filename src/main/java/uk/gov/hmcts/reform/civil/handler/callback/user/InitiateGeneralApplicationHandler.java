@@ -115,7 +115,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     private CallbackResponse aboutToStartValidationAndSetup(CallbackParams callbackParams) {
         List<String> errors = new ArrayList<>();
         CaseData caseData = callbackParams.getCaseData();
-
+        log.info("initiating general application callback for caseId {}", caseData.getCcdCaseReference());
         if (settleDiscontinueStates.contains(caseData.getCcdState())
             && caseData.getPreviousCCDState() == null) {
             return AboutToStartOrSubmitCallbackResponse.builder()
@@ -124,6 +124,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         }
 
         if (!initiateGeneralApplicationService.respondentAssigned(caseData)) {
+            log.info("initiating general application now allowed for caseId {}", caseData.getCcdCaseReference());
             errors.add(RESP_NOT_ASSIGNED_ERROR);
         }
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
