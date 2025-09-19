@@ -68,14 +68,13 @@ public class PartialAdmitSetDateConfirmationText implements RespondToClaimConfir
                 .append(formatLocalDateTime(caseData.getApplicant1ResponseDeadline(), DATE))
                 .append(" to respond to your claim. <br>We will let you know when they respond.");
         }
-            sb.append(String
-                        .format(
+        sb.append(String
+                      .format(
                             "%n%n<a href=\"%s\" target=\"_blank\">Download questionnaire (opens in a new tab)</a>",
                             format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference())
                         ));
 
         sb.append("<h2 class=\"govuk-heading-m\">What happens next</h2>")
-
             .append(headingThreeText)
             .append(applicantName);
         if (caseData.getApplicant2() != null) {
