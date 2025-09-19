@@ -58,6 +58,7 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
     private final FeatureToggleService featureToggleService;
 
     public static final String INVALID_CASE_STATE_ERROR = "If your case is offline, you cannot raise a query.";
+    public static final String QM_NOT_ALLOWED_ERROR = "The raise a query function is not available on this case. If you have a query, contact the court handling this case.";
     public static final String FOLLOW_UPS_ERROR = "Consecutive follow up messages are not allowed for query management.";
     public static final String PUBLIC_QUERIES_PARTY_NAME = "All queries";
 
@@ -77,9 +78,16 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
 
     private CallbackResponse aboutToStart(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        boolean publicQmEnabled = featureToggleService.isPublicQueryManagementEnabled(caseData);
 
-        List<CaseState> invalidStates = Arrays.asList(PENDING_CASE_ISSUED, CASE_DISMISSED,
-                                                      PROCEEDS_IN_HERITAGE_SYSTEM, CLOSED);
+        if (!publicQmEnabled) {
+            List<String> errors = List.of(QM_NOT_ALLOWED_ERROR);
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(errors).build();
+        }
+
+        List<CaseState> invalidStates = Arrays.asList(
+            PENDING_CASE_ISSUED, CASE_DISMISSED, PROCEEDS_IN_HERITAGE_SYSTEM, CLOSED);
         if (invalidStates.contains(caseData.getCcdState())) {
             List<String> errors = List.of(INVALID_CASE_STATE_ERROR);
 
@@ -88,7 +96,7 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
         }
 
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
-        if (featureToggleService.isPublicQueryManagementEnabled(caseData)) {
+        if (publicQmEnabled) {
             migrateAllQueries(caseDataBuilder);
         }
 
