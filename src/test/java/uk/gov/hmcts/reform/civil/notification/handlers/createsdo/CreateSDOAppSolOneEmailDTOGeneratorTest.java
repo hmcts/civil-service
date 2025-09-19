@@ -31,26 +31,29 @@ public class CreateSDOAppSolOneEmailDTOGeneratorTest {
         MockitoAnnotations.openMocks(this);
     }
 
-//    @Test
-//    void shouldReturnCorrectEmailTemplateIdWhenSpec() {
-//        String baseLocation = "base location";
-//        CaseLocationCivil caseLocation = CaseLocationCivil.builder().baseLocation(baseLocation).build();
-//        CaseData caseData = CaseData.builder().caseAccessCategory(SPEC_CLAIM).caseManagementLocation(caseLocation).build();
-//
-//        String expectedTemplateId = "template-id";
-//        when(notificationsProperties.getSdoOrderedSpec()).thenReturn(expectedTemplateId);
-//        when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(baseLocation)).thenReturn(false);
-//
-//        String actualTemplateId = emailDTOGenerator.getEmailTemplateId(caseData);
-//
-//        assertThat(actualTemplateId).isEqualTo(expectedTemplateId);
-//    }
+    // @Test
+    // void shouldReturnCorrectEmailTemplateIdWhenSpec() {
+    // String baseLocation = "base location";
+    // CaseLocationCivil caseLocation =
+    // CaseLocationCivil.builder().baseLocation(baseLocation).build();
+    // CaseData caseData =
+    // CaseData.builder().caseAccessCategory(SPEC_CLAIM).caseManagementLocation(caseLocation).build();
+    //
+    // String expectedTemplateId = "template-id";
+    // when(notificationsProperties.getSdoOrderedSpec()).thenReturn(expectedTemplateId);
+    // when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(baseLocation)).thenReturn(false);
+    //
+    // String actualTemplateId = emailDTOGenerator.getEmailTemplateId(caseData);
+    //
+    // assertThat(actualTemplateId).isEqualTo(expectedTemplateId);
+    // }
 
     @Test
     void shouldReturnCorrectEmailTemplateIdWhenSpecAndEA() {
         String baseLocation = "base location";
         CaseLocationCivil caseLocation = CaseLocationCivil.builder().baseLocation(baseLocation).build();
-        CaseData caseData = CaseData.builder().caseAccessCategory(SPEC_CLAIM).caseManagementLocation(caseLocation).build();
+        CaseData caseData = CaseData.builder().caseAccessCategory(SPEC_CLAIM).caseManagementLocation(caseLocation)
+                .build();
 
         String expectedTemplateId = "template-id";
         when(notificationsProperties.getSdoOrderedSpecEa()).thenReturn(expectedTemplateId);

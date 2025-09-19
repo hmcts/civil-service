@@ -73,10 +73,9 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_START), this::populateCaseData,
-            callbackKey(ABOUT_TO_SUBMIT), this::aboutToSubmit,
-            callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
-        );
+                callbackKey(ABOUT_TO_START), this::populateCaseData,
+                callbackKey(ABOUT_TO_SUBMIT), this::aboutToSubmit,
+                callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse);
     }
 
     @Override
@@ -90,14 +89,14 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
         updatedCaseData.showResponseOneVOneFlag(responseOneVOneService.setUpOneVOneFlow(caseData));
 
         Optional<BigDecimal> howMuchWasPaid = Optional.ofNullable(caseData.getRespondToAdmittedClaim())
-            .map(RespondToClaim::getHowMuchWasPaid);
+                .map(RespondToClaim::getHowMuchWasPaid);
 
         howMuchWasPaid.ifPresent(howMuchWasPaidValue -> updatedCaseData.partAdmitPaidValuePounds(
-            MonetaryConversions.penniesToPounds(howMuchWasPaidValue)));
+                MonetaryConversions.penniesToPounds(howMuchWasPaidValue)));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseData.build().toMap(objectMapper))
-            .build();
+                .data(updatedCaseData.build().toMap(objectMapper))
+                .build();
     }
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
@@ -105,21 +104,21 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
         LocalDateTime applicant1ResponseDate = LocalDateTime.now();
 
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
-            .applicant1ResponseDate(applicant1ResponseDate)
-            .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE_CUI))
-            .respondent1RespondToSettlementAgreementDeadline(caseData.isClaimantBilingual()
-                                                                 || caseData.isRespondentResponseBilingual()
-                                                                 ? null
-                                                                 : getRespondToSettlementAgreementDeadline(caseData, applicant1ResponseDate))
-            .nextDeadline(null);
+                .applicant1ResponseDate(applicant1ResponseDate)
+                .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE_CUI))
+                .respondent1RespondToSettlementAgreementDeadline(caseData.isClaimantBilingual()
+                        || caseData.isRespondentResponseBilingual()
+                                ? null
+                                : getRespondToSettlementAgreementDeadline(caseData, applicant1ResponseDate))
+                .nextDeadline(null);
 
         updateCaseManagementLocationDetailsService.updateCaseManagementDetails(builder, callbackParams);
 
         if (caseData.hasClaimantAgreedToFreeMediation() && caseData.hasDefendantAgreedToFreeMediation()
-            || (featureToggleService.isCarmEnabledForCase(caseData)
-            && SMALL_CLAIM.name().equals(caseData.getResponseClaimTrack())
-            && (YES.equals(caseData.getApplicant1ProceedWithClaim())
-            || NO.equals(caseData.getCaseDataLiP().getApplicant1SettleClaim())))) {
+                || (featureToggleService.isCarmEnabledForCase(caseData)
+                        && SMALL_CLAIM.name().equals(caseData.getResponseClaimTrack())
+                        && (YES.equals(caseData.getApplicant1ProceedWithClaim())
+                                || NO.equals(caseData.getCaseDataLiP().getApplicant1SettleClaim())))) {
             builder.claimMovedToMediationOn(LocalDate.now());
         }
         updateCcjRequestPaymentDetails(builder, caseData);
@@ -134,27 +133,28 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
 
         if (featureToggleService.isJudgmentOnlineLive() && JudgmentAdmissionUtils.getLIPJudgmentAdmission(caseData)) {
             CaseData updatedCaseData = builder.build();
-            JudgmentDetails activeJudgmentDetails = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(updatedCaseData);
+            JudgmentDetails activeJudgmentDetails = judgmentByAdmissionOnlineMapper
+                    .addUpdateActiveJudgment(updatedCaseData);
             builder
-                .activeJudgment(activeJudgmentDetails)
-                .joIsLiveJudgmentExists(YES)
-                .joJudgementByAdmissionIssueDate(time.now())
-                .joRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummaryWithoutClaimInterest(
-                    activeJudgmentDetails,
-                    true
-                ));
+                    .activeJudgment(activeJudgmentDetails)
+                    .joIsLiveJudgmentExists(YES)
+                    .joJudgementByAdmissionIssueDate(time.now())
+                    .joRepaymentSummaryObject(
+                            JudgmentsOnlineHelper.calculateRepaymentBreakdownSummaryWithoutClaimInterest(
+                                    activeJudgmentDetails,
+                                    true));
         }
         requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabApplicant(callbackParams, builder);
 
         if ((AllocatedTrack.MULTI_CLAIM.name().equals(caseData.getResponseClaimTrack())
-            || AllocatedTrack.INTERMEDIATE_CLAIM.name().equals(caseData.getResponseClaimTrack()))
-            && featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
+                || AllocatedTrack.INTERMEDIATE_CLAIM.name().equals(caseData.getResponseClaimTrack()))
+                && featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
             builder.isMintiLipCase(YES);
         }
 
         CaseData updatedData = builder.build();
-        AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response =
-            AboutToStartOrSubmitCallbackResponse.builder()
+        AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response = AboutToStartOrSubmitCallbackResponse
+                .builder()
                 .data(updatedData.toMap(objectMapper));
 
         return response.build();
@@ -177,14 +177,14 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
     }
 
     private void updateLanguagePreference(CaseData.CaseDataBuilder<?, ?> builder, CaseData caseData) {
-            Optional.ofNullable(caseData.getApplicant1DQ())
+        Optional.ofNullable(caseData.getApplicant1DQ())
                 .map(Applicant1DQ::getApplicant1DQLanguage).map(WelshLanguageRequirements::getDocuments)
                 .ifPresent(documentLanguage -> builder.claimantBilingualLanguagePreference(documentLanguage.name()));
-        
+
     }
 
     private boolean hasCcjRequest(CaseData caseData) {
         return (caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()
-            && caseData.hasApplicant1AcceptedCcj() && caseData.isCcjRequestJudgmentByAdmission());
+                && caseData.hasApplicant1AcceptedCcj() && caseData.isCcjRequestJudgmentByAdmission());
     }
 }

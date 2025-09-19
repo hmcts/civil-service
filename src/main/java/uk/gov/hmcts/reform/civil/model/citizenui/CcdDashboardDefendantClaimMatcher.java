@@ -396,9 +396,9 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
     @Override
     public boolean pausedForTranslationAfterResponse() {
 
-        return (caseData.isClaimUnderTranslationAfterDefResponse() ||
-            caseData.isClaimUnderTranslationAfterClaimantResponse()) &&
-            (caseData.isRespondentResponseBilingual() || caseData.isClaimantBilingual());
+        return (caseData.isClaimUnderTranslationAfterDefResponse()
+            || caseData.isClaimUnderTranslationAfterClaimantResponse())
+            && (caseData.isRespondentResponseBilingual() || caseData.isClaimantBilingual());
 
     }
 

@@ -74,23 +74,23 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
     @Mock
     private UserService userService;
 
-    private static LocationRefData locationRefData =   LocationRefData.builder().siteName("A nice Site Name")
-        .courtAddress("1").postcode("1")
-        .courtName("Court Name example").region("Region").regionId("2").courtVenueId("666")
-        .courtTypeId("10").courtLocationCode("121")
-        .epimmsId("000000").build();
+    private static LocationRefData locationRefData = LocationRefData.builder().siteName("A nice Site Name")
+            .courtAddress("1").postcode("1")
+            .courtName("Court Name example").region("Region").regionId("2").courtVenueId("666")
+            .courtTypeId("10").courtLocationCode("121")
+            .epimmsId("000000").build();
     public static final CaseDocument courtOfficerOrder = CaseDocument.builder()
-        .createdBy("Test")
-        .documentName("Court Officer Order test name")
-        .documentSize(0L)
-        .documentType(COURT_OFFICER_ORDER)
-        .createdDatetime(LocalDateTime.now())
-        .documentLink(Document.builder()
-                          .documentUrl("fake-url")
-                          .documentFileName("file-name.pdf")
-                          .documentBinaryUrl("binary-url")
-                          .build())
-        .build();
+            .createdBy("Test")
+            .documentName("Court Officer Order test name")
+            .documentSize(0L)
+            .documentType(COURT_OFFICER_ORDER)
+            .createdDatetime(LocalDateTime.now())
+            .documentLink(Document.builder()
+                    .documentUrl("fake-url")
+                    .documentFileName("file-name.pdf")
+                    .documentBinaryUrl("binary-url")
+                    .build())
+            .build();
 
     @BeforeEach
     void setup() {
@@ -112,17 +112,17 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
         void shouldPopulateValues_whenInvoked() {
             when(workingDayIndicator.getNextWorkingDay(any(LocalDate.class))).thenReturn(LocalDate.now().plusDays(7));
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .build();
+                    .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData().get("courtOfficerFurtherHearingComplex"))
-                .extracting("datesToAvoidDateDropdown")
-                .extracting("datesToAvoidDates").isEqualTo(LocalDate.now().plusDays(7).toString());
+                    .extracting("datesToAvoidDateDropdown")
+                    .extracting("datesToAvoidDates").isEqualTo(LocalDate.now().plusDays(7).toString());
             assertThat(response.getData().get("courtOfficerFurtherHearingComplex"))
-                .extracting("hearingLocationList").asString().contains("A nice Site Name");
+                    .extracting("hearingLocationList").asString().contains("A nice Site Name");
             assertThat(response.getData().get("courtOfficerFurtherHearingComplex"))
-                .extracting("alternativeHearingList").asString().contains("A nice Site Name");
+                    .extracting("alternativeHearingList").asString().contains("A nice Site Name");
 
         }
 
@@ -136,9 +136,9 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
         @BeforeEach
         void setUp() {
             when(userService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
-                                                                        .forename("Court")
-                                                                        .surname("OfficerName")
-                                                                        .roles(Collections.emptyList()).build());
+                    .forename("Court")
+                    .surname("OfficerName")
+                    .roles(Collections.emptyList()).build());
             when(courtOfficerOrderGenerator.generate(any(), any())).thenReturn(courtOfficerOrder);
         }
 
@@ -146,37 +146,38 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
         void shouldAssignCategoryId_whenInvoked() {
             String fileName = LocalDate.now() + "_Court OfficerName.pdf";
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .courtOfficerFurtherHearingComplex(FinalOrderFurtherHearing.builder()
-                                                       .listFromDate(null).build())
-                .build();
+                    .courtOfficerFurtherHearingComplex(FinalOrderFurtherHearing.builder()
+                            .listFromDate(null).build())
+                    .build();
 
             when(courtOfficerOrderGenerator.generate(any(), any())).thenReturn(CaseDocument.builder().documentLink(
-                Document.builder()
-                    .documentFileName(fileName)
-                    .categoryID("caseManagementOrders")
-                    .build()).createdDatetime(LocalDateTime.now()).build());
+                    Document.builder()
+                            .documentFileName(fileName)
+                            .categoryID("caseManagementOrders")
+                            .build())
+                    .createdDatetime(LocalDateTime.now()).build());
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData())
-                .extracting("previewCourtOfficerOrder")
-                .extracting("documentLink")
-                .extracting("documentFileName")
-                .isEqualTo(fileName);
+                    .extracting("previewCourtOfficerOrder")
+                    .extracting("documentLink")
+                    .extracting("documentFileName")
+                    .isEqualTo(fileName);
             assertThat(response.getData())
-                .extracting("previewCourtOfficerOrder")
-                .extracting("documentLink")
-                .extracting("categoryID")
-                .isEqualTo("caseManagementOrders");
+                    .extracting("previewCourtOfficerOrder")
+                    .extracting("documentLink")
+                    .extracting("categoryID")
+                    .isEqualTo("caseManagementOrders");
         }
 
         @Test
         void shouldNotReturnError_whenNoDate() {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .courtOfficerFurtherHearingComplex(FinalOrderFurtherHearing.builder()
-                                                       .listFromDate(null).build())
-                .build();
+                    .courtOfficerFurtherHearingComplex(FinalOrderFurtherHearing.builder()
+                            .listFromDate(null).build())
+                    .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -186,9 +187,9 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldNoError_whenDateInFuture() {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .courtOfficerFurtherHearingComplex(FinalOrderFurtherHearing.builder()
-                                                       .listFromDate(LocalDate.now().plusDays(7)).build())
-                .build();
+                    .courtOfficerFurtherHearingComplex(FinalOrderFurtherHearing.builder()
+                            .listFromDate(LocalDate.now().plusDays(7)).build())
+                    .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -198,9 +199,9 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldError_whenDateInPast() {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .courtOfficerFurtherHearingComplex(FinalOrderFurtherHearing.builder()
-                                                       .listFromDate(LocalDate.now().minusDays(7)).build())
-                .build();
+                    .courtOfficerFurtherHearingComplex(FinalOrderFurtherHearing.builder()
+                            .listFromDate(LocalDate.now().minusDays(7)).build())
+                    .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -216,14 +217,14 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
             // Given
             String confirmationHeader = format(HEADER, 1234567);
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .ccdCaseReference(1234567L).build();
+                    .ccdCaseReference(1234567L).build();
             // When
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
             var response = (SubmittedCallbackResponse) handler.handle(params);
             // Then
             assertThat(response).usingRecursiveComparison().isEqualTo(SubmittedCallbackResponse.builder()
-                                                                          .confirmationHeader(confirmationHeader)
-                                                                          .build());
+                    .confirmationHeader(confirmationHeader)
+                    .build());
         }
     }
 
@@ -250,18 +251,18 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
         void shouldSubmitted_whenInvoked() {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData()).extracting("businessProcess")
-                .extracting("camundaEvent", "status")
-                .containsOnly(COURT_OFFICER_ORDER.name(), "READY");
+                    .extracting("camundaEvent", "status")
+                    .containsOnly(COURT_OFFICER_ORDER.name(), "READY");
         }
 
         @Test
         void shouldHideDocumentIfClaimantWelsh_onAboutToSubmit() {
             // Given
             caseData = caseData.toBuilder()
-                .previewCourtOfficerOrder(courtOfficerOrder)
-                .preTranslationDocuments(new ArrayList<>())
-                .claimantBilingualLanguagePreference("BOTH")
-                .build();
+                    .previewCourtOfficerOrder(courtOfficerOrder)
+                    .preTranslationDocuments(new ArrayList<>())
+                    .claimantBilingualLanguagePreference("BOTH")
+                    .build();
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -276,10 +277,10 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
         void shouldAddADocumentInCollectionWhenWelshFTisOn_onAboutToSubmit() {
             // Given
             caseData = caseData.toBuilder()
-                .previewCourtOfficerOrder(courtOfficerOrder)
-                .courtOfficersOrders(new ArrayList<>())
-                .claimantBilingualLanguagePreference("ENGLISH")
-                .build();
+                    .previewCourtOfficerOrder(courtOfficerOrder)
+                    .courtOfficersOrders(new ArrayList<>())
+                    .claimantBilingualLanguagePreference("ENGLISH")
+                    .build();
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -290,34 +291,36 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
             assertThat(updatedData.getCurrentCamundaBusinessProcessName()).isEqualTo("COURT_OFFICER_ORDER");
         }
 
-//        @Test
-//        void shouldNotHideDocumentIfWelshDisabled_onAboutToSubmit() {
-//            // Given
-//            caseData = caseData.toBuilder()
-//                .previewCourtOfficerOrder(courtOfficerOrder)
-//                .preTranslationDocuments(new ArrayList<>())
-//                .claimantBilingualLanguagePreference("BOTH")
-//                .build();
-//            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-//            // When
-//            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-//            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
-//            // Then
-//            assertThat(updatedData.getPreTranslationDocuments()).hasSize(0);
-//            assertThat(updatedData.getPreviewCourtOfficerOrder()).isNotNull();
-//            assertThat(updatedData.getCurrentCamundaBusinessProcessName()).isNotNull();
-//        }
+        // @Test
+        // void shouldNotHideDocumentIfWelshDisabled_onAboutToSubmit() {
+        // // Given
+        // caseData = caseData.toBuilder()
+        // .previewCourtOfficerOrder(courtOfficerOrder)
+        // .preTranslationDocuments(new ArrayList<>())
+        // .claimantBilingualLanguagePreference("BOTH")
+        // .build();
+        // params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        // // When
+        // var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        // CaseData updatedData = objectMapper.convertValue(response.getData(),
+        // CaseData.class);
+        // // Then
+        // assertThat(updatedData.getPreTranslationDocuments()).hasSize(0);
+        // assertThat(updatedData.getPreviewCourtOfficerOrder()).isNotNull();
+        // assertThat(updatedData.getCurrentCamundaBusinessProcessName()).isNotNull();
+        // }
 
         @Test
         void shouldHideDocumentIfDefendantWelsh_onAboutToSubmit() {
             // Given
             caseData = caseData.toBuilder()
-                .previewCourtOfficerOrder(courtOfficerOrder)
-                .preTranslationDocuments(new ArrayList<>())
-                .caseDataLiP(CaseDataLiP.builder()
-                                 .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                                             .respondent1ResponseLanguage("WELSH").build()).build())
-                .build();
+                    .previewCourtOfficerOrder(courtOfficerOrder)
+                    .preTranslationDocuments(new ArrayList<>())
+                    .caseDataLiP(CaseDataLiP.builder()
+                            .respondent1LiPResponse(RespondentLiPResponse.builder()
+                                    .respondent1ResponseLanguage("WELSH").build())
+                            .build())
+                    .build();
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
