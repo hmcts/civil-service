@@ -29,7 +29,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_LIP_SIGN_SETTLEMENT_AGREEMENT_FORM;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SETTLEMENT_AGREEMENT;
@@ -95,22 +94,27 @@ class GenerateSettlementAgreementFormCallbackHandlerTest extends BaseCallbackHan
         assertThat(handler.camundaActivityId(params)).isEqualTo("GenerateSignSettlementAgreement");
     }
 
-//    @Test
-//    void shouldNotHideSettlementAgreementDocWhenClaimantHasWelshPreferenceAndWelshToggleDisabled() {
-//        //Given
-//        given(formGenerator.generate(
-//            any(CaseData.class),
-//            anyString()
-//        )).willReturn(caseDocument);
-//        CaseData caseData = CaseData.builder()
-//            .claimantBilingualLanguagePreference("WELSH")
-//            .build();
-//
-//        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
-//        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-//        assertThat(updatedData.getPreTranslationDocuments()).hasSize(0);
-//        verify(formGenerator).generate(caseData, BEARER_TOKEN);
-//    }
+    // @Test
+    // void
+    // shouldNotHideSettlementAgreementDocWhenClaimantHasWelshPreferenceAndWelshToggleDisabled()
+    // {
+    // //Given
+    // given(formGenerator.generate(
+    // any(CaseData.class),
+    // anyString()
+    // )).willReturn(caseDocument);
+    // CaseData caseData = CaseData.builder()
+    // .claimantBilingualLanguagePreference("WELSH")
+    // .build();
+    //
+    // AboutToStartOrSubmitCallbackResponse response =
+    // (AboutToStartOrSubmitCallbackResponse)
+    // handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
+    // CaseData updatedData = mapper.convertValue(response.getData(),
+    // CaseData.class);
+    // assertThat(updatedData.getPreTranslationDocuments()).hasSize(0);
+    // verify(formGenerator).generate(caseData, BEARER_TOKEN);
+    // }
 
     @Test
     void shouldHideSettlementAgreementDocWhenClaimantHasWelshPreference() {

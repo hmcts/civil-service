@@ -92,8 +92,8 @@ public class JudgeDecisionOnReconsiderationRequestCallbackHandler extends Callba
             Comparator.reverseOrder()
         )).findFirst();
 
-        if ((callbackParams.getCaseData().isClaimantBilingual() ||
-            callbackParams.getCaseData().isRespondentResponseBilingual())) {
+        if ((callbackParams.getCaseData().isClaimantBilingual()
+            || callbackParams.getCaseData().isRespondentResponseBilingual())) {
             caseDataBuilder.bilingualHint(YesOrNo.YES);
         }
 

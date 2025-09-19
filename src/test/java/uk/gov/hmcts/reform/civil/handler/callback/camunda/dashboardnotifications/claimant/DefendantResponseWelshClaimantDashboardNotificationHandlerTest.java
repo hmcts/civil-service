@@ -58,8 +58,10 @@ class DefendantResponseWelshClaimantDashboardNotificationHandlerTest extends Bas
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
             caseData = caseData.toBuilder().applicant1Represented(NO).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_RESPONSE_WELSH.name()).build()
-            ).build();
+                    CallbackRequest.builder()
+                            .eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_RESPONSE_WELSH.name())
+                            .build())
+                    .build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
 
@@ -68,20 +70,22 @@ class DefendantResponseWelshClaimantDashboardNotificationHandlerTest extends Bas
             handler.handle(params);
 
             verify(dashboardScenariosService).recordScenarios(
-                "BEARER_TOKEN",
-                "Scenario.AAA6.EnglishDefResponse.BilingualFlagSet.Claimant",
-                caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
-            );
+                    "BEARER_TOKEN",
+                    "Scenario.AAA6.EnglishDefResponse.BilingualFlagSet.Claimant",
+                    caseData.getCcdCaseReference().toString(),
+                    ScenarioRequestParams.builder().params(scenarioParams).build());
         }
 
         @Test
         void shouldDeleteClaimantDJNotification_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
-            caseData = caseData.toBuilder().applicant1Represented(NO).respondent1ResponseDeadline(LocalDateTime.MIN).build();
+            caseData = caseData.toBuilder().applicant1Represented(NO).respondent1ResponseDeadline(LocalDateTime.MIN)
+                    .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_RESPONSE_WELSH.name()).build()
-            ).build();
+                    CallbackRequest.builder()
+                            .eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_RESPONSE_WELSH.name())
+                            .build())
+                    .build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
 
@@ -90,53 +94,59 @@ class DefendantResponseWelshClaimantDashboardNotificationHandlerTest extends Bas
             handler.handle(params);
 
             verify(dashboardNotificationService).deleteByNameAndReferenceAndCitizenRole(
-                "Notice.AAA6.DefResponse.ResponseTimeElapsed.Claimant",
-                caseData.getCcdCaseReference().toString(),
-                "CLAIMANT");
+                    "Notice.AAA6.DefResponse.ResponseTimeElapsed.Claimant",
+                    caseData.getCcdCaseReference().toString(),
+                    "CLAIMANT");
 
             verify(dashboardScenariosService).recordScenarios(
-                "BEARER_TOKEN",
-                "Scenario.AAA6.EnglishDefResponse.BilingualFlagSet.Claimant",
-                caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
-            );
+                    "BEARER_TOKEN",
+                    "Scenario.AAA6.EnglishDefResponse.BilingualFlagSet.Claimant",
+                    caseData.getCcdCaseReference().toString(),
+                    ScenarioRequestParams.builder().params(scenarioParams).build());
         }
 
-//        @Test
-//        void shouldRecordScenarioWhenDefendantHasWelshLanguagePreference_whenInvoked() {
-//            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
-//            caseData = caseData.toBuilder().applicant1Represented(NO)
-//                .caseDataLiP(CaseDataLiP.builder()
-//                .respondent1LiPResponse(RespondentLiPResponse.builder()
-//                .respondent1ResponseLanguage("WELSH").build()).build()).build();
-//            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-//                CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_RESPONSE_WELSH.name()).build()
-//            ).build();
-//
-//            HashMap<String, Object> scenarioParams = new HashMap<>();
-//
-//            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-//
-//            handler.handle(params);
-//
-//            verify(dashboardScenariosService).recordScenarios(
-//                "BEARER_TOKEN",
-//                "Scenario.AAA6.DefResponse.BilingualFlagSet.Claimant",
-//                caseData.getCcdCaseReference().toString(),
-//                ScenarioRequestParams.builder().params(scenarioParams).build()
-//            );
-//        }
+        // @Test
+        // void
+        // shouldRecordScenarioWhenDefendantHasWelshLanguagePreference_whenInvoked() {
+        // CaseData caseData =
+        // CaseDataBuilder.builder().atStateTrialReadyCheck().build();
+        // caseData = caseData.toBuilder().applicant1Represented(NO)
+        // .caseDataLiP(CaseDataLiP.builder()
+        // .respondent1LiPResponse(RespondentLiPResponse.builder()
+        // .respondent1ResponseLanguage("WELSH").build()).build()).build();
+        // CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT,
+        // caseData).request(
+        // CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_RESPONSE_WELSH.name()).build()
+        // ).build();
+        //
+        // HashMap<String, Object> scenarioParams = new HashMap<>();
+        //
+        // when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
+        //
+        // handler.handle(params);
+        //
+        // verify(dashboardScenariosService).recordScenarios(
+        // "BEARER_TOKEN",
+        // "Scenario.AAA6.DefResponse.BilingualFlagSet.Claimant",
+        // caseData.getCcdCaseReference().toString(),
+        // ScenarioRequestParams.builder().params(scenarioParams).build()
+        // );
+        // }
 
         @Test
         void shouldRecordScenarioWhenDefendantHasWelshLanguagePreferenceAndWelshToggleEnabled_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
             caseData = caseData.toBuilder().applicant1Represented(NO)
-                .caseDataLiP(CaseDataLiP.builder()
-                                 .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                                             .respondent1ResponseLanguage("WELSH").build()).build()).build();
+                    .caseDataLiP(CaseDataLiP.builder()
+                            .respondent1LiPResponse(RespondentLiPResponse.builder()
+                                    .respondent1ResponseLanguage("WELSH").build())
+                            .build())
+                    .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_RESPONSE_WELSH.name()).build()
-            ).build();
+                    CallbackRequest.builder()
+                            .eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_RESPONSE_WELSH.name())
+                            .build())
+                    .build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
 
@@ -145,19 +155,20 @@ class DefendantResponseWelshClaimantDashboardNotificationHandlerTest extends Bas
             handler.handle(params);
 
             verify(dashboardScenariosService).recordScenarios(
-                "BEARER_TOKEN",
-                "Scenario.AAA6.DefResponse.BilingualFlagSet.WelshEnabled.Claimant",
-                caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
-            );
+                    "BEARER_TOKEN",
+                    "Scenario.AAA6.DefResponse.BilingualFlagSet.WelshEnabled.Claimant",
+                    caseData.getCcdCaseReference().toString(),
+                    ScenarioRequestParams.builder().params(scenarioParams).build());
         }
 
         @Test
         void shouldNotRecordScenarioWhenClaimantNotLiP_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_RESPONSE_WELSH.name()).build()
-            ).build();
+                    CallbackRequest.builder()
+                            .eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_RESPONSE_WELSH.name())
+                            .build())
+                    .build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
 

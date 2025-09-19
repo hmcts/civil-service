@@ -34,29 +34,30 @@ public class CreateSDORespSolTwoEmailDTOGeneratorTest {
         MockitoAnnotations.openMocks(this);
     }
 
-//    @Test
-//    void shouldReturnCorrectEmailTemplateIdWhenSpecNotEANotBilingual() {
-//        String baseLocation = "base location";
-//        CaseData caseData = CaseData.builder()
-//            .caseAccessCategory(SPEC_CLAIM)
-//            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(baseLocation).build())
-//            .build();
-//
-//        String expectedTemplateId = "template-id";
-//        when(notificationsProperties.getSdoOrderedSpec()).thenReturn(expectedTemplateId);
-//        // when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(baseLocation)).thenReturn(false);
-//
-//        String actualTemplateId = emailDTOGenerator.getEmailTemplateId(caseData);
-//
-//        assertThat(actualTemplateId).isEqualTo(expectedTemplateId);
-//    }
+    // @Test
+    // void shouldReturnCorrectEmailTemplateIdWhenSpecNotEANotBilingual() {
+    // String baseLocation = "base location";
+    // CaseData caseData = CaseData.builder()
+    // .caseAccessCategory(SPEC_CLAIM)
+    // .caseManagementLocation(CaseLocationCivil.builder().baseLocation(baseLocation).build())
+    // .build();
+    //
+    // String expectedTemplateId = "template-id";
+    // when(notificationsProperties.getSdoOrderedSpec()).thenReturn(expectedTemplateId);
+    // //
+    // when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(baseLocation)).thenReturn(false);
+    //
+    // String actualTemplateId = emailDTOGenerator.getEmailTemplateId(caseData);
+    //
+    // assertThat(actualTemplateId).isEqualTo(expectedTemplateId);
+    // }
 
     @Test
     void shouldReturnCorrectEmailTemplateIdWhenSpecBilingual() {
         CaseDataLiP caseDataLiP = CaseDataLiP.builder()
-            .respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage(BOTH.toString())
-                                        .build())
-            .build();
+                .respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage(BOTH.toString())
+                        .build())
+                .build();
         CaseData caseData = CaseData.builder().caseAccessCategory(SPEC_CLAIM).caseDataLiP(caseDataLiP).build();
 
         String expectedTemplateId = "template-id";
@@ -71,9 +72,9 @@ public class CreateSDORespSolTwoEmailDTOGeneratorTest {
     void shouldReturnCorrectEmailTemplateIdWhenSpecEA() {
         String baseLocation = "base location";
         CaseData caseData = CaseData.builder()
-            .caseAccessCategory(SPEC_CLAIM)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(baseLocation).build())
-            .build();
+                .caseAccessCategory(SPEC_CLAIM)
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation(baseLocation).build())
+                .build();
 
         String expectedTemplateId = "template-id";
         when(notificationsProperties.getSdoOrderedSpecEa()).thenReturn(expectedTemplateId);

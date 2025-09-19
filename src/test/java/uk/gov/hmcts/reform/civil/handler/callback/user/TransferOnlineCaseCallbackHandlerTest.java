@@ -237,10 +237,10 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                                  YesOrNo eaCourtLocation) {
 
             if (NO.equals(respondent1Represented)) {
-//                when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(isCPAndWhitelisted);
-//                if (!isCPAndWhitelisted) {
-//                    when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
-//                }
+                // when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(isCPAndWhitelisted);
+                // if (!isCPAndWhitelisted) {
+                // when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
+                // }
             }
 
             when(courtLocationUtils.findPreferredLocationData(any(), any()))
@@ -288,9 +288,9 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                                  YesOrNo respondent1Represented,
                                                                  YesOrNo eaCourtLocation, boolean isWelshEnabled) {
 
-//            if (!isWelshEnabled && NO.equals(respondent1Represented)) {
-//                when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(isCPAndWhitelisted);
-//            }
+            // if (!isWelshEnabled && NO.equals(respondent1Represented)) {
+            // when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(isCPAndWhitelisted);
+            // }
 
             when(courtLocationUtils.findPreferredLocationData(any(), any()))
                 .thenReturn(LocationRefData.builder().siteName("")
