@@ -45,6 +45,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.RaiseQueryCallbackHandler.INVALID_CASE_STATE_ERROR;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.RaiseQueryCallbackHandler.QM_NOT_ALLOWED_ERROR;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
@@ -93,6 +94,8 @@ class RaiseQueryCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         public void shouldNotReturnError_whenClaimIssued() {
+            when(featureToggleService.isPublicQueryManagementEnabled(any(CaseData.class))).thenReturn(true);
+
             CaseData caseData = CaseData.builder()
                 .ccdCaseReference(CASE_ID)
                 .ccdState(CaseState.CASE_ISSUED)
@@ -107,6 +110,8 @@ class RaiseQueryCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         public void shouldReturnError_whenClaimPendingIssued() {
+            when(featureToggleService.isPublicQueryManagementEnabled(any(CaseData.class))).thenReturn(true);
+
             CaseData caseData = CaseData.builder()
                 .ccdCaseReference(CASE_ID)
                 .ccdState(CaseState.PENDING_CASE_ISSUED)
@@ -122,6 +127,8 @@ class RaiseQueryCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         public void shouldReturnError_whenCaseDismissedState() {
+            when(featureToggleService.isPublicQueryManagementEnabled(any(CaseData.class))).thenReturn(true);
+
             CaseData caseData = CaseData.builder()
                 .ccdCaseReference(CASE_ID)
                 .ccdState(CaseState.CASE_DISMISSED)
@@ -137,6 +144,8 @@ class RaiseQueryCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         public void shouldReturnError_whenCaseOffline() {
+            when(featureToggleService.isPublicQueryManagementEnabled(any(CaseData.class))).thenReturn(true);
+
             CaseData caseData = CaseData.builder()
                 .ccdCaseReference(CASE_ID)
                 .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
@@ -152,6 +161,8 @@ class RaiseQueryCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         public void shouldReturnError_whenCaseClosed() {
+            when(featureToggleService.isPublicQueryManagementEnabled(any(CaseData.class))).thenReturn(true);
+
             CaseData caseData = CaseData.builder()
                 .ccdCaseReference(CASE_ID)
                 .ccdState(CaseState.CLOSED)
@@ -163,6 +174,22 @@ class RaiseQueryCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getErrors()).isNotNull();
             assertThat(response.getErrors()).containsOnly(INVALID_CASE_STATE_ERROR);
+        }
+
+        @Test
+        public void shouldReturnError_whenQmNotEnabled() {
+            when(featureToggleService.isPublicQueryManagementEnabled(any(CaseData.class))).thenReturn(false);
+
+            CaseData caseData = CaseData.builder()
+                .ccdCaseReference(CASE_ID)
+                .ccdState(CaseState.AWAITING_APPLICANT_INTENTION)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNotNull();
+            assertThat(response.getErrors()).containsOnly(QM_NOT_ALLOWED_ERROR);
         }
 
         @Test
@@ -200,35 +227,6 @@ class RaiseQueryCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                               .partyName("All queries")
                                                               .caseMessages(expectedMessages)
                                                               .build());
-        }
-
-        @Test
-        void shouldNotMigrateAllQueries_whenFeatureToggleIsDisabled() {
-            when(featureToggleService.isPublicQueryManagementEnabled(any(CaseData.class))).thenReturn(false);
-
-            CaseData caseData = CaseData.builder()
-                .ccdCaseReference(CASE_ID)
-                .ccdState(CaseState.CASE_PROGRESSION)
-                .qmApplicantSolicitorQueries(mockQueriesCollection("app-query-id", NOW))
-                .qmRespondentSolicitor1Queries(mockQueriesCollection(
-                    "res-1-query-id",
-                    NOW.plusDays(1)
-                ))
-                .qmRespondentSolicitor2Queries(mockQueriesCollection(
-                    "res-2--query-id",
-                    NOW.plusDays(2)
-                ))
-                .build();
-
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            CaseData actualData = objectMapper.convertValue(response.getData(), CaseData.class);
-
-            assertThat(actualData.getQueries()).isEqualTo(null);
-            assertThat(actualData.getQmApplicantSolicitorQueries()).isEqualTo(caseData.getQmApplicantSolicitorQueries());
-            assertThat(actualData.getQmRespondentSolicitor1Queries()).isEqualTo(caseData.getQmRespondentSolicitor1Queries());
-            assertThat(actualData.getQmRespondentSolicitor2Queries()).isEqualTo(caseData.getQmRespondentSolicitor2Queries());
         }
     }
 
