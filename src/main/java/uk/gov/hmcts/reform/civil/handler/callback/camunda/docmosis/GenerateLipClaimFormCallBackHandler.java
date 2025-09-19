@@ -82,7 +82,7 @@ public class GenerateLipClaimFormCallBackHandler extends CallbackHandler {
     private CaseData buildClaimFormData(CaseData caseData, CaseDocument caseDocument, CaseEvent event) {
         List<Element<CaseDocument>> translatedDocuments = null;
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = null;
-        if (featureToggleService.isWelshEnabledForMainCase() && caseData.isClaimantBilingual()
+        if (caseData.isClaimantBilingual()
             && event == GENERATE_LIP_DEFENDANT_CLAIM_FORM_SPEC) {
             translatedDocuments = caseData.getPreTranslationDocuments();
             translatedDocuments.add(element(caseDocument));

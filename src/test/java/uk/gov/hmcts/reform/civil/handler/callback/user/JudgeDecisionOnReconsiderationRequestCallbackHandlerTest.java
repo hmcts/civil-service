@@ -54,16 +54,6 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 @ExtendWith(MockitoExtension.class)
 class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-    private JudgeDecisionOnReconsiderationRequestCallbackHandler handler;
-
-    private ObjectMapper mapper;
-
-    @Mock
-    private RequestReconsiderationGeneratorService requestReconsiderationGeneratorService;
-
-    @Mock
-    private FeatureToggleService featureToggleService;
-
     private static final String CONFIRMATION_HEADER = "# Response has been submitted";
     private static final String CONFIRMATION_BODY_YES = "### Upholding previous order \n" +
         "A notification will be sent to the party applying for the request for reconsideration.";
@@ -80,11 +70,10 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
         " \n" +
         "To make a bespoke order in this claim, select 'Make an order' from the dropdown menu on the right of the " +
         "screen on your dashboard.";
-    private static final String UPHOLDING_PREVIOUS_ORDER_REASON = "Having read the application for reconsideration of " +
-        "the Legal Advisor's order dated %s and the court file \n 1.The application for reconsideration of the order " +
-        "is dismissed.";
-
-    private List<Element<CaseDocument>> sdoDocList;
+    private static final String UPHOLDING_PREVIOUS_ORDER_REASON =
+        "Having read the application for reconsideration of " +
+            "the Legal Advisor's order dated %s and the court file \n 1.The application for reconsideration of the order " +
+            "is dismissed.";
     private static final CaseDocument document = CaseDocument.builder()
         .createdBy("John")
         .documentName("document name")
@@ -97,6 +86,13 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
                           .documentBinaryUrl("binary-url")
                           .build())
         .build();
+    private JudgeDecisionOnReconsiderationRequestCallbackHandler handler;
+    private ObjectMapper mapper;
+    @Mock
+    private RequestReconsiderationGeneratorService requestReconsiderationGeneratorService;
+    @Mock
+    private FeatureToggleService featureToggleService;
+    private List<Element<CaseDocument>> sdoDocList;
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvents() {
@@ -108,9 +104,10 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
         mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
         AssignCategoryId assignCategoryId = new AssignCategoryId();
-        handler = new JudgeDecisionOnReconsiderationRequestCallbackHandler(mapper, requestReconsiderationGeneratorService,
-                                                                           assignCategoryId, featureToggleService
-        );
+        handler =
+            new JudgeDecisionOnReconsiderationRequestCallbackHandler(mapper, requestReconsiderationGeneratorService,
+                                                                     assignCategoryId, featureToggleService
+            );
         sdoDocList = new ArrayList<>();
         CaseDocument sdoDoc =
             CaseDocument.builder().documentType(DocumentType.SDO_ORDER).documentLink(Document.builder().documentUrl(
@@ -130,12 +127,12 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .build().toBuilder().systemGeneratedCaseDocuments(sdoDocList).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
 
             //When: handler is called with ABOUT_TO_SUBMIT event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            String reason = String.format(UPHOLDING_PREVIOUS_ORDER_REASON, formatLocalDateTime(LocalDateTime.now(), DATE));
+            String reason =
+                String.format(UPHOLDING_PREVIOUS_ORDER_REASON, formatLocalDateTime(LocalDateTime.now(), DATE));
             //Then: upholding reason should be set correctly
             assertThat(response.getData()).extracting("upholdingPreviousOrderReason")
                 .extracting("reasonForReconsiderationTxtYes")
@@ -145,15 +142,16 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
         @Test
         void shouldPopulateUpholdingPreviousOrderReasonWithWelshFlagEnabledWithClaimant() {
             //Given : Casedata
-            CaseData caseData = CaseDataBuilder.builder().claimantBilingualLanguagePreference("BOTH").atStateClaimDetailsNotified()
-                .build().toBuilder().systemGeneratedCaseDocuments(sdoDocList).build();
+            CaseData caseData =
+                CaseDataBuilder.builder().claimantBilingualLanguagePreference("BOTH").atStateClaimDetailsNotified()
+                    .build().toBuilder().systemGeneratedCaseDocuments(sdoDocList).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
 
             //When: handler is called with ABOUT_TO_SUBMIT event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            String reason = String.format(UPHOLDING_PREVIOUS_ORDER_REASON, formatLocalDateTime(LocalDateTime.now(), DATE));
+            String reason =
+                String.format(UPHOLDING_PREVIOUS_ORDER_REASON, formatLocalDateTime(LocalDateTime.now(), DATE));
             //Then: upholding reason should be set correctly
             assertThat(response.getData()).extracting("upholdingPreviousOrderReason")
                 .extracting("reasonForReconsiderationTxtYes")
@@ -171,12 +169,12 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
                                  .build()).atStateClaimDetailsNotified()
                 .build().toBuilder().systemGeneratedCaseDocuments(sdoDocList).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
 
             //When: handler is called with ABOUT_TO_SUBMIT event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            String reason = String.format(UPHOLDING_PREVIOUS_ORDER_REASON, formatLocalDateTime(LocalDateTime.now(), DATE));
+            String reason =
+                String.format(UPHOLDING_PREVIOUS_ORDER_REASON, formatLocalDateTime(LocalDateTime.now(), DATE));
             //Then: upholding reason should be set correctly
             assertThat(response.getData()).extracting("upholdingPreviousOrderReason")
                 .extracting("reasonForReconsiderationTxtYes")
@@ -194,12 +192,12 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
                                  .build()).atStateClaimDetailsNotified()
                 .build().toBuilder().systemGeneratedCaseDocuments(sdoDocList).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
 
             //When: handler is called with ABOUT_TO_SUBMIT event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            String reason = String.format(UPHOLDING_PREVIOUS_ORDER_REASON, formatLocalDateTime(LocalDateTime.now(), DATE));
+            String reason =
+                String.format(UPHOLDING_PREVIOUS_ORDER_REASON, formatLocalDateTime(LocalDateTime.now(), DATE));
             //Then: upholding reason should be set correctly
             assertThat(response.getData()).extracting("upholdingPreviousOrderReason")
                 .extracting("reasonForReconsiderationTxtYes")
@@ -217,12 +215,12 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
                                  .build()).atStateClaimDetailsNotified()
                 .build().toBuilder().systemGeneratedCaseDocuments(sdoDocList).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
 
             //When: handler is called with ABOUT_TO_SUBMIT event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            String reason = String.format(UPHOLDING_PREVIOUS_ORDER_REASON, formatLocalDateTime(LocalDateTime.now(), DATE));
+            String reason =
+                String.format(UPHOLDING_PREVIOUS_ORDER_REASON, formatLocalDateTime(LocalDateTime.now(), DATE));
             //Then: upholding reason should be set correctly
             assertThat(response.getData()).extracting("upholdingPreviousOrderReason")
                 .extracting("reasonForReconsiderationTxtYes")
@@ -239,11 +237,15 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
             String pageId = "generate-judge-decision-order";
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .build().toBuilder().upholdingPreviousOrderReason(UpholdingPreviousOrderReason.builder()
-                                                                      .reasonForReconsiderationTxtYes("Reason1").build()).decisionOnRequestReconsiderationOptions(
+                                                                      .reasonForReconsiderationTxtYes("Reason1")
+                                                                      .build()).decisionOnRequestReconsiderationOptions(
                     DecisionOnRequestReconsiderationOptions.YES).build();
             CallbackParams params = callbackParamsOf(caseData, MID, pageId);
 
-            when(requestReconsiderationGeneratorService.generate(any(CaseData.class), anyString())).thenReturn(document);
+            when(requestReconsiderationGeneratorService.generate(
+                any(CaseData.class),
+                anyString()
+            )).thenReturn(document);
             //When: handler is called with ABOUT_TO_SUBMIT event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -259,8 +261,10 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
         void shouldPopulateDecisionOnReconsiderationDetails() {
             //Given : Casedata
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .build().toBuilder().systemGeneratedCaseDocuments(sdoDocList).upholdingPreviousOrderReason(UpholdingPreviousOrderReason.builder()
-                                                                      .reasonForReconsiderationTxtYes("Reason1").build()).decisionOnRequestReconsiderationOptions(
+                .build().toBuilder().systemGeneratedCaseDocuments(sdoDocList)
+                .upholdingPreviousOrderReason(UpholdingPreviousOrderReason.builder()
+                                                  .reasonForReconsiderationTxtYes("Reason1").build())
+                .decisionOnRequestReconsiderationOptions(
                     DecisionOnRequestReconsiderationOptions.YES).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -279,11 +283,12 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
         void shouldGenerateDocAndCallBusinessProcessIfDecisionUpheld() {
             //Given : Casedata
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .build().toBuilder().systemGeneratedCaseDocuments(new ArrayList<>()).decisionOnReconsiderationDocument(document)
+                .build().toBuilder().systemGeneratedCaseDocuments(new ArrayList<>())
+                .decisionOnReconsiderationDocument(document)
                 .upholdingPreviousOrderReason(UpholdingPreviousOrderReason.builder()
                                                   .reasonForReconsiderationTxtYes("Reason1").build())
                 .decisionOnRequestReconsiderationOptions(DecisionOnRequestReconsiderationOptions.YES).build();
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
+
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             //When: handler is called with ABOUT_TO_SUBMIT event
@@ -306,10 +311,11 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
 
         @ParameterizedTest
         @CsvSource({"ENGLISH, ENGLISH, ENGLISH, ENGLISH"})
-        void shouldGenerateDocAndCallBusinessProcessIfDecisionUpheldWhenWelshlanguageNotSelected(String claimantLang, String respondentLang,
-            Language claimantDocLang, Language respondentDocLang) {
+        void shouldGenerateDocAndCallBusinessProcessIfDecisionUpheldWhenWelshlanguageNotSelected(String claimantLang,
+                                                                                                 String respondentLang,
+                                                                                                 Language claimantDocLang,
+                                                                                                 Language respondentDocLang) {
 
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
             //Given : Casedata
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .build().toBuilder()
@@ -317,12 +323,17 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
                 .systemGeneratedCaseDocuments(new ArrayList<>()).decisionOnReconsiderationDocument(document)
                 .upholdingPreviousOrderReason(UpholdingPreviousOrderReason.builder()
                                                   .reasonForReconsiderationTxtYes("Reason1").build())
-                .caseDataLiP(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage(respondentLang).build())
+                .caseDataLiP(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder()
+                                                                              .respondent1ResponseLanguage(
+                                                                                  respondentLang).build())
 
                                  .build())
-                .respondent1DQ(Respondent1DQ.builder().respondent1DQLanguage(WelshLanguageRequirements.builder().documents(
-                    respondentDocLang).build()).build())
-                .applicant1DQ(Applicant1DQ.builder().applicant1DQLanguage(WelshLanguageRequirements.builder().documents(claimantDocLang).build()).build())
+                .respondent1DQ(Respondent1DQ.builder()
+                                   .respondent1DQLanguage(WelshLanguageRequirements.builder().documents(
+                                       respondentDocLang).build()).build())
+                .applicant1DQ(Applicant1DQ.builder()
+                                  .applicant1DQLanguage(WelshLanguageRequirements.builder().documents(claimantDocLang)
+                                                            .build()).build())
                 .claimantBilingualLanguagePreference(claimantLang)
                 .decisionOnRequestReconsiderationOptions(DecisionOnRequestReconsiderationOptions.YES).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -347,23 +358,27 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
 
         @ParameterizedTest
         @CsvSource({"WELSH, ENGLISH, ENGLISH, ENGLISH"})
-        void shouldGenerateDocAndCallBusinessProcessIfDecisionUpheldWhenWelshlanguageSelectedClaimantLang(String claimantLang, String respondentLang,
-                                                                                                 Language claimantDocLang, Language respondentDocLang) {
+        void shouldGenerateDocAndCallBusinessProcessIfDecisionUpheldWhenWelshlanguageSelectedClaimantLang(
+            String claimantLang, String respondentLang,
+            Language claimantDocLang, Language respondentDocLang) {
 
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
             //Given : Casedata
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .build().toBuilder()
-
                 .systemGeneratedCaseDocuments(new ArrayList<>()).decisionOnReconsiderationDocument(document)
                 .upholdingPreviousOrderReason(UpholdingPreviousOrderReason.builder()
                                                   .reasonForReconsiderationTxtYes("Reason1").build())
-                .caseDataLiP(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage(respondentLang).build())
+                .caseDataLiP(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder()
+                                                                              .respondent1ResponseLanguage(
+                                                                                  respondentLang).build())
 
                                  .build())
-                .respondent1DQ(Respondent1DQ.builder().respondent1DQLanguage(WelshLanguageRequirements.builder().documents(
-                    respondentDocLang).build()).build())
-                .applicant1DQ(Applicant1DQ.builder().applicant1DQLanguage(WelshLanguageRequirements.builder().documents(claimantDocLang).build()).build())
+                .respondent1DQ(Respondent1DQ.builder()
+                                   .respondent1DQLanguage(WelshLanguageRequirements.builder().documents(
+                                       respondentDocLang).build()).build())
+                .applicant1DQ(Applicant1DQ.builder()
+                                  .applicant1DQLanguage(WelshLanguageRequirements.builder().documents(claimantDocLang)
+                                                            .build()).build())
                 .claimantBilingualLanguagePreference(claimantLang)
                 .decisionOnRequestReconsiderationOptions(DecisionOnRequestReconsiderationOptions.YES).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -387,23 +402,27 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
 
         @ParameterizedTest
         @CsvSource({"ENGLISH, WELSH, ENGLISH, ENGLISH"})
-        void shouldGenerateDocAndCallBusinessProcessIfDecisionUpheldWhenWelshlanguageSelectedRespondentLang(String claimantLang, String respondentLang,
-                                                                                                          Language claimantDocLang, Language respondentDocLang) {
+        void shouldGenerateDocAndCallBusinessProcessIfDecisionUpheldWhenWelshlanguageSelectedRespondentLang(
+            String claimantLang, String respondentLang,
+            Language claimantDocLang, Language respondentDocLang) {
 
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
             //Given : Casedata
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .build().toBuilder()
-
                 .systemGeneratedCaseDocuments(new ArrayList<>()).decisionOnReconsiderationDocument(document)
                 .upholdingPreviousOrderReason(UpholdingPreviousOrderReason.builder()
                                                   .reasonForReconsiderationTxtYes("Reason1").build())
-                .caseDataLiP(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage(respondentLang).build())
+                .caseDataLiP(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder()
+                                                                              .respondent1ResponseLanguage(
+                                                                                  respondentLang).build())
 
                                  .build())
-                .respondent1DQ(Respondent1DQ.builder().respondent1DQLanguage(WelshLanguageRequirements.builder().documents(
-                    respondentDocLang).build()).build())
-                .applicant1DQ(Applicant1DQ.builder().applicant1DQLanguage(WelshLanguageRequirements.builder().documents(claimantDocLang).build()).build())
+                .respondent1DQ(Respondent1DQ.builder()
+                                   .respondent1DQLanguage(WelshLanguageRequirements.builder().documents(
+                                       respondentDocLang).build()).build())
+                .applicant1DQ(Applicant1DQ.builder()
+                                  .applicant1DQLanguage(WelshLanguageRequirements.builder().documents(claimantDocLang)
+                                                            .build()).build())
                 .claimantBilingualLanguagePreference(claimantLang)
                 .decisionOnRequestReconsiderationOptions(DecisionOnRequestReconsiderationOptions.YES).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -432,7 +451,8 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
                 .build().toBuilder().systemGeneratedCaseDocuments(null).decisionOnReconsiderationDocument(null)
                 .upholdingPreviousOrderReason(UpholdingPreviousOrderReason.builder()
                                                   .reasonForReconsiderationTxtYes("Reason1").build())
-                .decisionOnRequestReconsiderationOptions(DecisionOnRequestReconsiderationOptions.CREATE_GENERAL_ORDER).build();
+                .decisionOnRequestReconsiderationOptions(DecisionOnRequestReconsiderationOptions.CREATE_GENERAL_ORDER)
+                .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             //When: handler is called with ABOUT_TO_SUBMIT event
@@ -451,8 +471,10 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
         @Test
         void whenSubmittedWithYes_thenIncludeHeader() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .build().toBuilder().systemGeneratedCaseDocuments(sdoDocList).upholdingPreviousOrderReason(UpholdingPreviousOrderReason.builder()
-                                                                      .reasonForReconsiderationTxtYes("Reason1").build()).decisionOnRequestReconsiderationOptions(
+                .build().toBuilder().systemGeneratedCaseDocuments(sdoDocList)
+                .upholdingPreviousOrderReason(UpholdingPreviousOrderReason.builder()
+                                                  .reasonForReconsiderationTxtYes("Reason1").build())
+                .decisionOnRequestReconsiderationOptions(
                     DecisionOnRequestReconsiderationOptions.YES).build();
             CallbackParams params = CallbackParams.builder()
                 .caseData(caseData)
@@ -467,8 +489,10 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
         @Test
         void whenSubmittedWithCreateSDO_thenIncludeHeader() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .build().toBuilder().systemGeneratedCaseDocuments(sdoDocList).upholdingPreviousOrderReason(UpholdingPreviousOrderReason.builder()
-                                                                      .reasonForReconsiderationTxtYes("Reason1").build()).decisionOnRequestReconsiderationOptions(
+                .build().toBuilder().systemGeneratedCaseDocuments(sdoDocList)
+                .upholdingPreviousOrderReason(UpholdingPreviousOrderReason.builder()
+                                                  .reasonForReconsiderationTxtYes("Reason1").build())
+                .decisionOnRequestReconsiderationOptions(
                     DecisionOnRequestReconsiderationOptions.CREATE_SDO).build();
             CallbackParams params = CallbackParams.builder()
                 .caseData(caseData)

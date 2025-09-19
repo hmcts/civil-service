@@ -408,8 +408,7 @@ public class DQGeneratorFormBuilder {
     }
 
     private boolean isLipClaimantBilingualRequiresTranslation(CaseData caseData) {
-        return featureToggleService.isWelshEnabledForMainCase()
-            && caseData.getCcdState() == CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT && caseData.isLipvLROneVOne()
+        return caseData.getCcdState() == CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT && caseData.isLipvLROneVOne()
             && caseData.isClaimantBilingual();
     }
 }

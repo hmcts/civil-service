@@ -7,7 +7,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseEventDetail;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -454,9 +453,8 @@ class CcdClaimStatusDashboardFactoryTest {
     }
 
     @ParameterizedTest
-    @ValueSource(booleans = {true, false})
+    @ValueSource(booleans = {true})
     void given_SDOBeenDrawn_whenGetStatus_sdoOrderCreatedRequired(boolean caseProgressionEnabled) {
-        Mockito.when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(caseProgressionEnabled);
         Element<CaseDocument> document = new Element<>(
             UUID.fromString("5fc03087-d265-11e7-b8c6-83e29cd24f4c"),
             CaseDocument.builder()
@@ -850,7 +848,6 @@ class CcdClaimStatusDashboardFactoryTest {
 
     @Test
     void given_sdoIsDrawn_anyPartyBilingual_showStatusDocumentsTranslated() {
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         CaseData claim = CaseData.builder().preTranslationDocuments(List.of(Element.<CaseDocument>builder()
                                                                                 .value(CaseDocument.builder()
                                                                                            .documentType(SDO_ORDER)
@@ -866,7 +863,6 @@ class CcdClaimStatusDashboardFactoryTest {
 
     @Test
     void given_decisionMadeIsDrawn_anyPartyBilingual_showStatusDocumentsTranslated() {
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         CaseData claim = CaseData.builder().preTranslationDocuments(List.of(Element.<CaseDocument>builder()
                                                                                 .value(CaseDocument.builder()
                                                                                            .documentType(

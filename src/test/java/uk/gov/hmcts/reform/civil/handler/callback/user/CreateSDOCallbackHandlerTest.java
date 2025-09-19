@@ -260,7 +260,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .thenReturn(LocalDate.now().plusDays(5));
             when(deadlinesCalculator.getOrderSetAsideOrVariedApplicationDeadline(ArgumentMatchers.any(LocalDateTime.class)))
                 .thenReturn(LocalDate.now().plusDays(7));
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
         }
 
         @Test
@@ -327,7 +326,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
                 categorySearchResult));
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .atStateClaimIssuedDisposalHearingSDOInPersonHearing()
                 .claimantBilingualLanguagePreference("BOTH")
@@ -376,7 +374,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
                 categorySearchResult));
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                 .caseDataLip(CaseDataLiP.builder()
                                  .respondent1LiPResponse(RespondentLiPResponse.builder()
@@ -429,7 +426,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
                 categorySearchResult));
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                 .caseDataLip(CaseDataLiP.builder()
                                  .respondent1LiPResponse(RespondentLiPResponse.builder()
@@ -482,7 +478,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
                 categorySearchResult));
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                 .caseDataLip(CaseDataLiP.builder()
                                  .respondent1LiPResponse(RespondentLiPResponse.builder()
@@ -1184,7 +1179,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             userId = UUID.randomUUID().toString();
 
             given(time.now()).willReturn(submittedDate);
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         }
 
         @Test
@@ -1267,7 +1261,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
 
-        assertThat(responseCaseData.getEaCourtLocation()).isEqualTo(NO);
+        assertThat(responseCaseData.getEaCourtLocation()).isEqualTo(YES);
     }
 
     @ParameterizedTest
@@ -1276,15 +1270,15 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         "true, YES, YES, true, YES",
         "false, YES, YES, true, YES",
         // LiP vs LR - ignore HMC court
-        "true,  NO, YES, false, NO",
+        "true,  NO, YES, false, YES",
         "true,  NO, YES, TRUE, YES",
-        "false,  NO, YES, true, NO",
+        "false,  NO, YES, true, YES",
         //LR vs LiP - ignore HMC court
         "true, YES, NO, true, YES",
-        "false, YES, NO, true, NO",
+        "false, YES, NO, true, YES",
         //LiP vs LiP - ignore HMC court
         "true, NO, NO, true, YES",
-        "false, NO, NO, true, NO"
+        "false, NO, NO, true, YES"
     })
     void shouldPopulateHmcLipEnabled_whenLiPAndHmcLipEnabled(boolean isCPAndWhitelisted, YesOrNo applicantRepresented,
                                                              YesOrNo respondent1Represented, boolean defendantNocOnline,

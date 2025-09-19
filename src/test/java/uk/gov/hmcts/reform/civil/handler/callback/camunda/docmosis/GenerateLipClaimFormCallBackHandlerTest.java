@@ -32,7 +32,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_LIP_DEFENDANT_CLAIM_FORM_SPEC;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DRAFT_CLAIM_FORM;
@@ -105,7 +104,6 @@ class GenerateLipClaimFormCallBackHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void shouldGenerateDefendantClaimForm() {
         //Given
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
         given(claimFormGenerator.generate(
             any(CaseData.class),
             anyString(),
@@ -127,7 +125,6 @@ class GenerateLipClaimFormCallBackHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void shouldAddDefendantClaimFormInTempCollection_whenWelshFlagIsOn() {
         //Given
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         given(claimFormGenerator.generate(
             any(CaseData.class),
             anyString(),

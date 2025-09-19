@@ -310,7 +310,6 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
             any(CaseData.class),
             anyString()
         )).thenReturn(SEALED_FORM);
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         CaseData localCaseData = CaseDataBuilder.builder()
             .atStatePendingClaimIssued().build().toBuilder()
             .respondent1OriginalDqDoc(CaseDocument.builder().documentType(SEALED_CLAIM).build())
@@ -358,7 +357,6 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
             any(CaseData.class),
             anyString()
         )).thenReturn(SEALED_FORM);
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         CaseData localCaseData = CaseDataBuilder.builder()
             .atStatePendingClaimIssued().build().toBuilder()
             .respondent1OriginalDqDoc(CaseDocument.builder().documentType(SEALED_CLAIM).build())

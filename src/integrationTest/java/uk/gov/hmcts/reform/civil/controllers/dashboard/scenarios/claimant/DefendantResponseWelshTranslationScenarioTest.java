@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.dashboard.data.TaskStatus;
 
 import java.time.LocalDateTime;
 
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -68,7 +67,6 @@ public class DefendantResponseWelshTranslationScenarioTest extends DashboardBase
 
     @Test
     void should_create_defendant_response_claimant_dashboard_welsh_scenario_welsh_toggle_on() throws Exception {
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         String caseId = "123452";
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build()
             .toBuilder()

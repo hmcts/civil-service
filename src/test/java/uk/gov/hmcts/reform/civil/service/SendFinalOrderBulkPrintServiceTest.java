@@ -29,7 +29,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.FINAL_ORDER_TRANSLATED_DOCUMENT;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.JUDGE_FINAL_ORDER;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SEALED_CLAIM;
@@ -38,30 +37,28 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 @ExtendWith(MockitoExtension.class)
 class SendFinalOrderBulkPrintServiceTest {
 
+    public static final String TASK_ID_DEFENDANT = "SendFinalOrderToDefendantLIP";
+    public static final String TASK_ID_CLAIMANT = "SendFinalOrderToClaimantLIP";
+    private static final String FINAL_ORDER_PACK_LETTER_TYPE = "final-order-document-pack";
+    private static final String TRANSLATED_ORDER_PACK_LETTER_TYPE = "translated-order-document-pack";
+    private static final String TEST = "test";
+    private static final String UPLOAD_TIMESTAMP = "14 Apr 2024 00:00:00";
+    private static final Document DOCUMENT_LINK =
+        new Document("document/url", TEST, TEST, TEST, TEST, UPLOAD_TIMESTAMP);
+    private static final byte[] LETTER_CONTENT = new byte[] {37, 80, 68, 70, 45, 49, 46, 53, 10, 37, -61, -92};
+    private static final String BEARER_TOKEN = "BEARER_TOKEN";
     @Mock
     private CoverLetterAppendService coverLetterAppendService;
-
     @Mock
     private BulkPrintService bulkPrintService;
-
     @Mock
     private FeatureToggleService featureToggleService;
-
     @InjectMocks
     private SendFinalOrderBulkPrintService sendFinalOrderBulkPrintService;
 
-    private static final String FINAL_ORDER_PACK_LETTER_TYPE = "final-order-document-pack";
-    private static final String TRANSLATED_ORDER_PACK_LETTER_TYPE = "translated-order-document-pack";
-    public static final String TASK_ID_DEFENDANT = "SendFinalOrderToDefendantLIP";
-    public static final String TASK_ID_CLAIMANT = "SendFinalOrderToClaimantLIP";
-    private static final String TEST = "test";
-    private static final String UPLOAD_TIMESTAMP = "14 Apr 2024 00:00:00";
-    private static final Document DOCUMENT_LINK = new Document("document/url", TEST, TEST, TEST, TEST, UPLOAD_TIMESTAMP);
-    private static final byte[] LETTER_CONTENT = new byte[]{37, 80, 68, 70, 45, 49, 46, 53, 10, 37, -61, -92};
-    private static final String BEARER_TOKEN = "BEARER_TOKEN";
-
     private CaseData buildCaseData(Party party, DocumentType documentType, boolean addFinalOrder) {
-        CaseDocument caseDocument = CaseDocument.builder().documentType(documentType).documentLink(DOCUMENT_LINK).build();
+        CaseDocument caseDocument =
+            CaseDocument.builder().documentType(documentType).documentLink(DOCUMENT_LINK).build();
         CaseDataBuilder caseDataBuilder = CaseDataBuilder.builder()
             .systemGeneratedCaseDocuments(wrapElements(caseDocument))
             .respondent1(party)
@@ -74,9 +71,12 @@ class SendFinalOrderBulkPrintServiceTest {
         return caseDataBuilder.build();
     }
 
-    private CaseData buildCaseData(Party party, DocumentType documentType1, DocumentType documentType2, boolean addFinalOrder) {
-        CaseDocument caseDocument1 = CaseDocument.builder().documentType(documentType1).documentLink(DOCUMENT_LINK).build();
-        CaseDocument caseDocument2 = CaseDocument.builder().documentType(documentType2).documentLink(DOCUMENT_LINK).build();
+    private CaseData buildCaseData(Party party, DocumentType documentType1, DocumentType documentType2,
+                                   boolean addFinalOrder) {
+        CaseDocument caseDocument1 =
+            CaseDocument.builder().documentType(documentType1).documentLink(DOCUMENT_LINK).build();
+        CaseDocument caseDocument2 =
+            CaseDocument.builder().documentType(documentType2).documentLink(DOCUMENT_LINK).build();
 
         CaseDataBuilder caseDataBuilder = CaseDataBuilder.builder()
             .systemGeneratedCaseDocuments(wrapElements(caseDocument1, caseDocument2))
@@ -84,7 +84,8 @@ class SendFinalOrderBulkPrintServiceTest {
             .applicant1(party);
 
         if (addFinalOrder) {
-            return caseDataBuilder.build().toBuilder().finalOrderDocumentCollection(wrapElements(caseDocument1, caseDocument2)).build();
+            return caseDataBuilder.build().toBuilder()
+                .finalOrderDocumentCollection(wrapElements(caseDocument1, caseDocument2)).build();
         }
 
         return caseDataBuilder.build();
@@ -95,15 +96,15 @@ class SendFinalOrderBulkPrintServiceTest {
             .documentType(DocumentType.ORDER_NOTICE_TRANSLATED_DOCUMENT).documentLink(DOCUMENT_LINK).build();
         CaseDataBuilder caseDataBuilder =
             CaseDataBuilder.builder().caseDataLip(
-                CaseDataLiP.builder()
-                    .respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH").build())
-                    .build())
-            .respondent1(party)
+                    CaseDataLiP.builder()
+                        .respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH").build())
+                        .build())
+                .respondent1(party)
                 .systemGeneratedCaseDocuments(wrapElements(translatedDocument))
                 .claimantBilingualLanguagePreference(Language.BOTH.toString())
                 .respondent1Represented(YesOrNo.NO)
                 .applicant1Represented(YesOrNo.NO)
-            .applicant1(party);
+                .applicant1(party);
         return caseDataBuilder.build();
     }
 
@@ -298,7 +299,6 @@ class SendFinalOrderBulkPrintServiceTest {
     @Test
     void shouldDownloadDocumentAndPrintLetterToClaimantLiPInWelshSuccessfully() {
         // given
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         Party claimant = PartyBuilder.builder().soleTrader().build();
         CaseData caseData = buildCaseData(claimant, FINAL_ORDER_TRANSLATED_DOCUMENT, true);
         caseData = caseData.toBuilder().claimantBilingualLanguagePreference("WELSH").build();
@@ -311,7 +311,13 @@ class SendFinalOrderBulkPrintServiceTest {
         // then
         verifyPrintLetter(caseData, claimant);
         ArgumentCaptor<CaseDocument[]> documentCaptor = ArgumentCaptor.forClass(CaseDocument[].class);
-        verify(coverLetterAppendService).makeDocumentMailable(any(), any(), any(), any(DocumentType.class), documentCaptor.capture());
+        verify(coverLetterAppendService).makeDocumentMailable(
+            any(),
+            any(),
+            any(),
+            any(DocumentType.class),
+            documentCaptor.capture()
+        );
         assertThat(documentCaptor.getValue()).hasSize(1);
         assertThat(documentCaptor.getValue()[0].getDocumentType()).isEqualTo(FINAL_ORDER_TRANSLATED_DOCUMENT);
     }
@@ -319,7 +325,6 @@ class SendFinalOrderBulkPrintServiceTest {
     @Test
     void shouldDownloadDocumentAndPrintLetterToClaimantLiPInBothLanguagesSuccessfully() {
         // given
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         Party claimant = PartyBuilder.builder().soleTrader().build();
         CaseData caseData = buildCaseData(claimant, JUDGE_FINAL_ORDER, FINAL_ORDER_TRANSLATED_DOCUMENT, true);
         caseData = caseData.toBuilder().claimantBilingualLanguagePreference("BOTH").build();
@@ -332,7 +337,13 @@ class SendFinalOrderBulkPrintServiceTest {
         // then
         verifyPrintLetter(caseData, claimant);
         ArgumentCaptor<CaseDocument[]> documentCaptor = ArgumentCaptor.forClass(CaseDocument[].class);
-        verify(coverLetterAppendService).makeDocumentMailable(any(), any(), any(), any(DocumentType.class), documentCaptor.capture());
+        verify(coverLetterAppendService).makeDocumentMailable(
+            any(),
+            any(),
+            any(),
+            any(DocumentType.class),
+            documentCaptor.capture()
+        );
         assertThat(documentCaptor.getValue()).hasSize(2);
         assertThat(documentCaptor.getValue()[0].getDocumentType()).isEqualTo(JUDGE_FINAL_ORDER);
         assertThat(documentCaptor.getValue()[1].getDocumentType()).isEqualTo(FINAL_ORDER_TRANSLATED_DOCUMENT);

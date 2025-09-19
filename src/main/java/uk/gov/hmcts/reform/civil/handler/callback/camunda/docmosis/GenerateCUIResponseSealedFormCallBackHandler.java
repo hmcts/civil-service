@@ -100,7 +100,7 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
     }
 
     private void addToSystemGeneratedDocuments(CaseData.CaseDataBuilder<?, ?> caseDataBuilder, CaseDocument document, CaseData caseData) {
-        if (featureToggleService.isWelshEnabledForMainCase() && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
+        if (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual()) {
             caseDataBuilder
                 .bilingualHint(YesOrNo.YES)
                 .preTranslationDocuments(List.of(ElementUtils.element(document)));
@@ -122,7 +122,7 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
                 "Sealed Claim form",
                 LocalDate.now().toString()
         ));
-        if (featureToggleService.isWelshEnabledForMainCase() && caseData.getRespondent1OriginalDqDoc() != null) {
+        if (caseData.getRespondent1OriginalDqDoc() != null) {
             documents.add(
                 new DocumentMetaData(
                     caseData.getRespondent1OriginalDqDoc().getDocumentLink(),
