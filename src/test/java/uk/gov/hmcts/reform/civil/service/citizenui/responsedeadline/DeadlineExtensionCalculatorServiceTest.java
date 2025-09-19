@@ -28,11 +28,10 @@ public class DeadlineExtensionCalculatorServiceTest {
     private DeadlineExtensionCalculatorService deadlineExtensionCalculatorService;
 
     @Test
-    void shouldReturnNextWorkingDayWhenDateIsHoliday() {
-        LocalDate proposedExtensionDeadline = LocalDate.of(2022, 6, 3);
-        LocalDate calculatedNextWorkingDay = LocalDate.of(2022, 6, 4);
-        given(deadlineExtensionDateTimeHelper.createDateTimeWithNowTime(proposedExtensionDeadline))
-            .willReturn(LocalDateTime.of(2022, 6, 3, 15, 0));
+    void shouldReturnNextWorkingDayWhenExtendedDateIsHolidayAndPlusDaysIsZero() {
+        given(workingDayIndicator.isWorkingDay(any())).willReturn(false);
+        LocalDate proposedExtensionDeadline = LocalDate.of(2022, 6, 5);
+        LocalDate calculatedNextWorkingDay = LocalDate.of(2022, 6, 7);
 
         given(workingDayIndicator.getNextWorkingDay(any())).willReturn(calculatedNextWorkingDay);
 
@@ -44,11 +43,10 @@ public class DeadlineExtensionCalculatorServiceTest {
     }
 
     @Test
-    void shouldReturnNextWorkingDayAfter4pm() {
+    void shouldReturnNextWorkingDayWhenExtendedDateIsWorkingDayAndPlusDaysIsZero() {
+        given(workingDayIndicator.isWorkingDay(any())).willReturn(true);
         LocalDate proposedExtensionDeadline = LocalDate.of(2022, 6, 3);
-        LocalDate calculatedNextWorkingDay = LocalDate.of(2022, 6, 5);
-        given(deadlineExtensionDateTimeHelper.createDateTimeWithNowTime(proposedExtensionDeadline))
-            .willReturn(LocalDateTime.of(2022, 6, 3, 16, 1));
+        LocalDate calculatedNextWorkingDay = LocalDate.of(2022, 6, 3);
 
         given(workingDayIndicator.getNextWorkingDay(any())).willReturn(calculatedNextWorkingDay);
 
@@ -117,7 +115,7 @@ public class DeadlineExtensionCalculatorServiceTest {
 
     @Test
     void shouldStartCountFromNextDayAndConsiderNonWorkingDays_WhenAfter4pm() {
-        LocalDateTime dateTime = LocalDateTime.of(2025, 6, 17, 15, 01); // before 4pm
+        LocalDateTime dateTime = LocalDateTime.of(2025, 6, 17, 15, 1); // before 4pm
         given(workingDayIndicator.isWorkingDay(any())).willReturn(true);
         given(workingDayIndicator.isWorkingDay(LocalDate.of(2025, 6, 19))).willReturn(false);
         LocalDate expectedExtensionDeadline = LocalDate.of(2025, 6, 23);
