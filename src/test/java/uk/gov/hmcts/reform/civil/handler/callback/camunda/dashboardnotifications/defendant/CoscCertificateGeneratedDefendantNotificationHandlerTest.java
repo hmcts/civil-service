@@ -114,14 +114,15 @@ class CoscCertificateGeneratedDefendantNotificationHandlerTest extends BaseCallb
                     .caseLink(CaseLink.builder().caseReference("54326781").build())
                     .generalAppType(GAApplicationType.builder().types(singletonList(CONFIRM_CCJ_DEBT_PAID)).build())
                     .build());
+
+            when(toggleService.isLipVLipEnabled()).thenReturn(true);
+            when(toggleService.isCoSCEnabled()).thenReturn(true);
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedSmallClaim()
                 .caseDataLip(CaseDataLiP.builder().applicant1SettleClaim(YesOrNo.YES).build())
                 .respondent1Represented(YesOrNo.NO).build().toBuilder()
                 .generalApplications(gaApplications)
-                .build();;
-
-            when(toggleService.isLipVLipEnabled()).thenReturn(true);
-            when(toggleService.isCoSCEnabled()).thenReturn(true);
+                .build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
