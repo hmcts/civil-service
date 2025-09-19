@@ -111,74 +111,78 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
 
         @Test
         void shouldAllowRequestIfLessThan7DaysElapsedForLatestSDO() {
-            //Given : Casedata containing two SDO order and latest created 6 days ago
+            // Given : Casedata containing two SDO order and latest created 6 days ago
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
-                .totalClaimAmount(BigDecimal.valueOf(800))
-                .systemGeneratedCaseDocuments(Arrays.asList(
-                    ElementUtils.element(CaseDocument.builder()
-                                             .documentType(DocumentType.SDO_ORDER)
-                                             .createdDatetime(LocalDateTime.now().minusDays(10))
-                                             .build()),
-                    ElementUtils.element(CaseDocument.builder()
-                                             .documentType(DocumentType.SDO_ORDER)
-                                             .createdDatetime(LocalDateTime.now().minusDays(6))
-                                             .build())))
-                .build();
+                    .totalClaimAmount(BigDecimal.valueOf(800))
+                    .systemGeneratedCaseDocuments(Arrays.asList(
+                            ElementUtils.element(CaseDocument.builder()
+                                    .documentType(DocumentType.SDO_ORDER)
+                                    .createdDatetime(LocalDateTime.now().minusDays(10))
+                                    .build()),
+                            ElementUtils.element(CaseDocument.builder()
+                                    .documentType(DocumentType.SDO_ORDER)
+                                    .createdDatetime(LocalDateTime.now().minusDays(6))
+                                    .build())))
+                    .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("APPLICANTSOLICITORONE"));
-            //When: handler is called with ABOUT_TO_START event
+            // When: handler is called with ABOUT_TO_START event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            //Then: No errors should be displayed
+            // Then: No errors should be displayed
             assertThat(response.getErrors()).isNull();
         }
 
-//        @Test
-//        void shouldSendErrorMessageIf7DaysElapsedForLatestSDO() {
-//            //Given : Casedata containing two SDO order and latest created 7 days ago
-//            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
-//                .totalClaimAmount(BigDecimal.valueOf(800))
-//                .systemGeneratedCaseDocuments(Arrays.asList(
-//                    ElementUtils.element(CaseDocument.builder()
-//                                             .documentType(DocumentType.SDO_ORDER)
-//                                             .createdDatetime(LocalDateTime.now().minusDays(10))
-//                                             .build()),
-//                    ElementUtils.element(CaseDocument.builder()
-//                                             .documentType(DocumentType.SDO_ORDER)
-//                                             .createdDatetime(LocalDateTime.now().minusDays(7))
-//                                             .build())))
-//                .build();
-//           // when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-//            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-//
-//            //When: handler is called with ABOUT_TO_START event
-//            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-//
-//            //Then: The error should be displayed
-//            assertThat(response.getErrors().contains(ERROR_MESSAGE_DEADLINE_EXPIRED));
-//        }
+        // @Test
+        // void shouldSendErrorMessageIf7DaysElapsedForLatestSDO() {
+        // //Given : Casedata containing two SDO order and latest created 7 days ago
+        // CaseData caseData =
+        // CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+        // .totalClaimAmount(BigDecimal.valueOf(800))
+        // .systemGeneratedCaseDocuments(Arrays.asList(
+        // ElementUtils.element(CaseDocument.builder()
+        // .documentType(DocumentType.SDO_ORDER)
+        // .createdDatetime(LocalDateTime.now().minusDays(10))
+        // .build()),
+        // ElementUtils.element(CaseDocument.builder()
+        // .documentType(DocumentType.SDO_ORDER)
+        // .createdDatetime(LocalDateTime.now().minusDays(7))
+        // .build())))
+        // .build();
+        // //
+        // when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+        // CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        //
+        // //When: handler is called with ABOUT_TO_START event
+        // var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        //
+        // //Then: The error should be displayed
+        // assertThat(response.getErrors().contains(ERROR_MESSAGE_DEADLINE_EXPIRED));
+        // }
 
-//        @Test
-//        void shouldSendErrorMessageIf7DaysElapsed() {
-//            //Given : Casedata containing an SDO order created 7 days ago
-//            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
-//                .totalClaimAmount(BigDecimal.valueOf(800))
-//                .systemGeneratedCaseDocuments(List.of(ElementUtils
-//                                                          .element(CaseDocument.builder()
-//                                                                       .documentType(DocumentType.SDO_ORDER)
-//                                                                       .createdDatetime(LocalDateTime.now().minusDays(7))
-//                                                                       .build())))
-//                .build();
-//            //  when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-//            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-//
-//            //When: handler is called with ABOUT_TO_START event
-//            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-//
-//            //Then: The error should be displayed
-//            assertThat(response.getErrors().contains(ERROR_MESSAGE_DEADLINE_EXPIRED));
-//        }
+        // @Test
+        // void shouldSendErrorMessageIf7DaysElapsed() {
+        // //Given : Casedata containing an SDO order created 7 days ago
+        // CaseData caseData =
+        // CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+        // .totalClaimAmount(BigDecimal.valueOf(800))
+        // .systemGeneratedCaseDocuments(List.of(ElementUtils
+        // .element(CaseDocument.builder()
+        // .documentType(DocumentType.SDO_ORDER)
+        // .createdDatetime(LocalDateTime.now().minusDays(7))
+        // .build())))
+        // .build();
+        // //
+        // when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+        // CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        //
+        // //When: handler is called with ABOUT_TO_START event
+        // var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        //
+        // //Then: The error should be displayed
+        // assertThat(response.getErrors().contains(ERROR_MESSAGE_DEADLINE_EXPIRED));
+        // }
 
         @ParameterizedTest
         @ValueSource(strings = {"APPLICANTSOLICITORONE", "RESPONDENTSOLICITORONE", "RESPONDENTSOLICITORTWO"})

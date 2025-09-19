@@ -73,7 +73,6 @@ public class SendHearingToLiPCallbackHandler extends CallbackHandler {
                 .build();
     }
 
-
     private boolean isClaimantHMC(String task) {
         return TASK_ID_CLAIMANT_HMC.equals(task);
     }
