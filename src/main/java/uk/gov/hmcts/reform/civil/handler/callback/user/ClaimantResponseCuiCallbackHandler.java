@@ -177,11 +177,10 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
     }
 
     private void updateLanguagePreference(CaseData.CaseDataBuilder<?, ?> builder, CaseData caseData) {
-        if (featureToggleService.isWelshEnabledForMainCase()) {
             Optional.ofNullable(caseData.getApplicant1DQ())
                 .map(Applicant1DQ::getApplicant1DQLanguage).map(WelshLanguageRequirements::getDocuments)
                 .ifPresent(documentLanguage -> builder.claimantBilingualLanguagePreference(documentLanguage.name()));
-        }
+        
     }
 
     private boolean hasCcjRequest(CaseData caseData) {

@@ -101,7 +101,7 @@ class SendAndReplyCallbackHandlerTest {
             CaseData caseData = CaseData.builder()
                 .sendAndReplyOption(SEND)
                 .build();
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
+
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
 
@@ -119,7 +119,7 @@ class SendAndReplyCallbackHandlerTest {
                 .sendAndReplyOption(SEND)
                 .claimantBilingualLanguagePreference("BOTH")
                 .build();
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
+
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
 
@@ -140,7 +140,7 @@ class SendAndReplyCallbackHandlerTest {
                                  .respondent1LiPResponse(RespondentLiPResponse.builder()
                                                              .respondent1ResponseLanguage("BOTH").build()).build())
                 .build();
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
+
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
 
@@ -159,7 +159,7 @@ class SendAndReplyCallbackHandlerTest {
                 .messages(messages)
                 .build();
             DynamicList expectedMessages = DynamicList.fromList(List.of("mock"));
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
+
             when(messageService.createMessageSelectionList(messages)).thenReturn(expectedMessages);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
@@ -177,7 +177,7 @@ class SendAndReplyCallbackHandlerTest {
         void shouldNotInteractWithMessagesService_whenNoMessagesExist() {
             CaseData caseData = CaseData.builder().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
+
             handler.handle(params);
 
             verifyNoInteractions(messageService);

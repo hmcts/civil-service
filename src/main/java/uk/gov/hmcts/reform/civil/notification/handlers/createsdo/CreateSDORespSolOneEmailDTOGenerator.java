@@ -29,11 +29,8 @@ public class CreateSDORespSolOneEmailDTOGenerator extends RespSolOneEmailDTOGene
         if (caseData.getCaseAccessCategory() == CaseCategory.SPEC_CLAIM) {
             if (caseData.isRespondentResponseBilingual()) {
                 return notificationsProperties.getSdoOrderedSpecBilingual();
-            } else if (featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation())
-                || featureToggleService.isWelshEnabledForMainCase()) {
-                return notificationsProperties.getSdoOrderedSpecEa();
             }
-            return notificationsProperties.getSdoOrderedSpec();
+            return notificationsProperties.getSdoOrderedSpecEa();
         }
         return notificationsProperties.getSdoOrdered();
     }

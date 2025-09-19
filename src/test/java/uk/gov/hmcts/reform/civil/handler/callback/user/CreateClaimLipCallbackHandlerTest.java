@@ -66,38 +66,27 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_LIP_CLAIM;
     properties = {"reference.database.enabled=false"})
 class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-    @MockBean
-    private DeadlinesCalculator deadlinesCalculator;
-
-    @MockBean
-    private FeatureToggleService toggleService;
-
-    @MockBean
-    private SpecReferenceNumberRepository specReferenceNumberRepository;
-
-    @MockBean
-    private CaseFlagsInitialiser caseFlagInitialiser;
-
-    @MockBean
-    private Time time;
-
-    @MockBean
-    private DefendantPinToPostLRspecService defendantPinToPostLRspecService;
-
-    @MockBean
-    private HelpWithFeesForTabService hwfForTabService;
-
+    public static final String REFERENCE_NUMBER = "000MC001";
     @MockBean
     CoreCaseEventDataService coreCaseEventDataService;
-
+    @MockBean
+    private DeadlinesCalculator deadlinesCalculator;
+    @MockBean
+    private FeatureToggleService toggleService;
+    @MockBean
+    private SpecReferenceNumberRepository specReferenceNumberRepository;
+    @MockBean
+    private CaseFlagsInitialiser caseFlagInitialiser;
+    @MockBean
+    private Time time;
+    @MockBean
+    private DefendantPinToPostLRspecService defendantPinToPostLRspecService;
+    @MockBean
+    private HelpWithFeesForTabService hwfForTabService;
     @Autowired
     private CreateClaimLipCallBackHandler handler;
-
     @MockBean
     private LocationReferenceDataService locationReferenceDataService;
-
-    public static final String REFERENCE_NUMBER = "000MC001";
-
     @Autowired
     private ObjectMapper mapper;
 
@@ -120,13 +109,12 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class AboutToSubmitCallback {
 
-        private CallbackParams params;
-        private CaseData caseData;
         private static final String DEFENDANT_EMAIL_ADDRESS = "defendantmail@hmcts.net";
         private static final String DEFENDANT_PARTY_NAME = "ABC ABC";
         private static final String CLAIMANT_PARTY_NAME = "Clay Mint";
-
         private final LocalDateTime submittedDate = LocalDateTime.now();
+        private CallbackParams params;
+        private CaseData caseData;
 
         @BeforeEach
         void setup() {
@@ -141,13 +129,13 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldInitializePartyID_whenInvoked() {
             caseData = CaseDataBuilder.builder()
                 .respondent1(Party.builder()
-                    .type(Party.Type.INDIVIDUAL)
-                    .partyName(DEFENDANT_PARTY_NAME)
-                    .partyEmail(DEFENDANT_EMAIL_ADDRESS).build())
+                                 .type(Party.Type.INDIVIDUAL)
+                                 .partyName(DEFENDANT_PARTY_NAME)
+                                 .partyEmail(DEFENDANT_EMAIL_ADDRESS).build())
                 .applicant1(Party.builder()
-                    .type(Party.Type.ORGANISATION)
-                    .partyName("Test Inc")
-                    .partyEmail("claimant@email.com").build())
+                                .type(Party.Type.ORGANISATION)
+                                .partyName("Test Inc")
+                                .partyEmail("claimant@email.com").build())
                 .build();
 
             CallbackParams localParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -170,11 +158,11 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 .individualLastName("Mint")
                                 .build())
                 .respondent1(Party.builder()
-                    .type(Party.Type.INDIVIDUAL)
-                    .partyName(DEFENDANT_PARTY_NAME)
-                    .individualFirstName("Dave")
-                    .individualLastName("Indent")
-                    .partyEmail(DEFENDANT_EMAIL_ADDRESS).build())
+                                 .type(Party.Type.INDIVIDUAL)
+                                 .partyName(DEFENDANT_PARTY_NAME)
+                                 .individualFirstName("Dave")
+                                 .individualLastName("Indent")
+                                 .partyEmail(DEFENDANT_EMAIL_ADDRESS).build())
                 .build();
 
             CallbackParams localParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -187,7 +175,8 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .containsEntry("submittedDate", submittedDate.format(DateTimeFormatter.ISO_DATE_TIME));
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-            assertThat(updatedData.getRespondent1DetailsForClaimDetailsTab().getPartyName().equals(DEFENDANT_PARTY_NAME));
+            assertThat(updatedData.getRespondent1DetailsForClaimDetailsTab().getPartyName()
+                           .equals(DEFENDANT_PARTY_NAME));
             assertThat(updatedData.getRespondent1DetailsForClaimDetailsTab().getType().equals(Party.Type.INDIVIDUAL));
             assertThat(updatedData.getAllPartyNames()).isEqualTo("Clay Mint V Dave Indent");
         }
@@ -210,8 +199,10 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldSetCaseManagementLocation() {
             List<LocationRefData> locations = new ArrayList<>();
-            locations.add(LocationRefData.builder().courtName("Court Name").regionId("2").epimmsId("420219").siteName("Civil National Business Centre").build());
-            when(locationReferenceDataService.getCourtLocationsByEpimmsIdAndCourtType(any(), any())).thenReturn(locations);
+            locations.add(LocationRefData.builder().courtName("Court Name").regionId("2").epimmsId("420219")
+                              .siteName("Civil National Business Centre").build());
+            when(locationReferenceDataService.getCourtLocationsByEpimmsIdAndCourtType(any(), any())).thenReturn(
+                locations);
             CallbackParams localParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId(CREATE_LIP_CLAIM.name()).build())
                 .build();
@@ -251,19 +242,18 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData().get("anyRepresented")).isEqualTo("No");
         }
 
-        @Test
-        void shouldNotSetLanguageDisplayIfWelshDisabled() {
-            CallbackParams localParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                    CallbackRequest.builder().eventId(CREATE_LIP_CLAIM.name()).build())
-                .build();
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
-
-            assertThat(response.getData().get("claimantLanguagePreferenceDisplay")).isNull();
-        }
+//        @Test
+//        void shouldNotSetLanguageDisplayIfWelshDisabled() {
+//            CallbackParams localParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+//                    CallbackRequest.builder().eventId(CREATE_LIP_CLAIM.name()).build())
+//                .build();
+//            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
+//
+//            assertThat(response.getData().get("claimantLanguagePreferenceDisplay")).isNull();
+//        }
 
         @Test
         void shouldSetLanguageDisplayToEnglishIfNotSpecified() {
-            when(toggleService.isWelshEnabledForMainCase()).thenReturn(true);
             CallbackParams localParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId(CREATE_LIP_CLAIM.name()).build())
                 .build();
@@ -274,7 +264,6 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSetLanguageDisplayToEnglishAndWelshIfSpecified() {
-            when(toggleService.isWelshEnabledForMainCase()).thenReturn(true);
             caseData = caseData.toBuilder().claimantBilingualLanguagePreference("BOTH").build();
             CallbackParams localParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId(CREATE_LIP_CLAIM.name()).build())

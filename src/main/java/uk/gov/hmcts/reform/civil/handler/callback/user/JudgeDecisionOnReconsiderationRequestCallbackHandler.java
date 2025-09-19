@@ -92,8 +92,8 @@ public class JudgeDecisionOnReconsiderationRequestCallbackHandler extends Callba
             Comparator.reverseOrder()
         )).findFirst();
 
-        if (featureToggleService.isWelshEnabledForMainCase()
-            && (callbackParams.getCaseData().isClaimantBilingual() || callbackParams.getCaseData().isRespondentResponseBilingual())) {
+        if ((callbackParams.getCaseData().isClaimantBilingual() ||
+            callbackParams.getCaseData().isRespondentResponseBilingual())) {
             caseDataBuilder.bilingualHint(YesOrNo.YES);
         }
 
@@ -134,7 +134,7 @@ public class JudgeDecisionOnReconsiderationRequestCallbackHandler extends Callba
                     callbackParams.getCaseData().getDecisionOnReconsiderationDocument();
                 List<Element<CaseDocument>> systemGeneratedCaseDocuments =
                     callbackParams.getCaseData().getSystemGeneratedCaseDocuments();
-                if (featureToggleService.isWelshEnabledForMainCase() && (callbackParams.getCaseData().isClaimantBilingual()
+                if ((callbackParams.getCaseData().isClaimantBilingual()
                     || callbackParams.getCaseData().isRespondentResponseBilingual())) {
                     caseDataBuilder.preTranslationDocuments(List.of(ElementUtils.element(requestForReconsiderationDocument)));
                     caseDataBuilder.bilingualHint(YesOrNo.YES);

@@ -51,10 +51,7 @@ public class NoticeOfDiscontinuanceFormGenerator implements TemplateDataGenerato
     }
 
     private String getFileName(CaseData caseData, DocmosisTemplates docmosisTemplate, String partyType) {
-        String partyTypeAndCaseRef =
-            featureToggleService.isWelshEnabledForMainCase()
-                ? partyType + "_" + caseData.getLegacyCaseReference()
-                : caseData.getLegacyCaseReference();
+        String partyTypeAndCaseRef = partyType + "_" + caseData.getLegacyCaseReference();
         return String.format(docmosisTemplate.getDocumentTitle(), partyTypeAndCaseRef);
     }
 

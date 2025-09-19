@@ -96,8 +96,7 @@ public class ValidateDiscontinueClaimClaimantCallbackHandler extends CallbackHan
             }
         }
 
-        if (featureToggleService.isWelshEnabledForMainCase()
-            && caseData.isRespondent1LiP()
+        if (caseData.isRespondent1LiP()
             && caseData.getTypeOfDiscontinuance().equals(DiscontinuanceTypeList.PART_DISCONTINUANCE)
             && caseData.isRespondentResponseBilingual()
             && ConfirmOrderGivesPermission.YES.equals(caseData.getConfirmOrderGivesPermission())

@@ -65,8 +65,7 @@ public class GenerateClaimantLipManualDeterminationCallBackHandler extends Callb
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         CaseDocument claimantResponseForm = claimantLipManualDeterminationFormGenerator.generate(callbackParams.getCaseData(),
                 callbackParams.getParams().get(BEARER_TOKEN).toString());
-        if (featureToggleService.isWelshEnabledForMainCase()
-            && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
+        if (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual()) {
             List<Element<CaseDocument>> translatedDocuments = callbackParams.getCaseData()
                 .getPreTranslationDocuments();
             translatedDocuments.add(element(claimantResponseForm));

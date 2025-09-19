@@ -1687,7 +1687,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 .build();
         }
         assembleResponseDocumentsSpec(caseData, updatedData);
-        if (featureToggleService.isWelshEnabledForMainCase() && caseData.isLipvLROneVOne()
+        if ( caseData.isLipvLROneVOne()
             && caseData.isClaimantBilingual()) {
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(updatedData.build().toMap(objectMapper))

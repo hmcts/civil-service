@@ -29,7 +29,7 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.when;
+
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.never;
 
@@ -69,7 +69,7 @@ class NoticeOfDiscontinuanceLiPLetterGeneratorTest {
 
     @Test
     void shouldDownloadDocumentAndPrintLetterSuccessfully() {
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
+
         Party respondent1 = PartyBuilder.builder().soleTrader().build();
         CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
             .respondent1Represented(YesOrNo.NO)
@@ -96,7 +96,6 @@ class NoticeOfDiscontinuanceLiPLetterGeneratorTest {
 
     @Test
     void shouldDownloadDocumentAndPrintLetterSuccessfullyWhenWelshParty() {
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         Party respondent1 = PartyBuilder.builder().soleTrader().build();
         CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
             .respondent1Represented(YesOrNo.NO)
@@ -123,7 +122,6 @@ class NoticeOfDiscontinuanceLiPLetterGeneratorTest {
 
     @Test
     void shouldDownloadDocumentAndPrintLetterSuccessfullyWhenMainCaseHasBilingualParty() {
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         Party respondent1 = PartyBuilder.builder().soleTrader().build();
         CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
             .respondent1Represented(YesOrNo.NO)

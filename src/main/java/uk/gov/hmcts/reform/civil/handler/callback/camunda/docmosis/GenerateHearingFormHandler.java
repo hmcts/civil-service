@@ -74,8 +74,7 @@ public class GenerateHearingFormHandler extends CallbackHandler {
         if (!isEmpty(caseData.getHearingDocuments())) {
             systemGeneratedCaseDocuments.addAll(caseData.getHearingDocuments());
         }
-        if (featureToggleService.isWelshEnabledForMainCase()
-            && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
+        if ((caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
             List<Element<CaseDocument>> translatedDocuments = callbackParams.getCaseData().getPreTranslationDocuments();
             translatedDocuments.add(element(caseDocuments.get(0)));
             caseDataBuilder.preTranslationDocuments(translatedDocuments);

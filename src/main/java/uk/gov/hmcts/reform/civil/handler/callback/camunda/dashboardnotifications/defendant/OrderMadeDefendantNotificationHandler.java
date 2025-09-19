@@ -121,9 +121,6 @@ public class OrderMadeDefendantNotificationHandler extends OrderCallbackHandler 
                 return SCENARIO_AAA6_MEDIATION_UNSUCCESSFUL_TRACK_CHANGE_DEFENDANT_WITHOUT_UPLOAD_FILES_CARM.getScenario();
             }
         }
-        if (isSDODrawnPreCPRelease(caseData)) {
-            return SCENARIO_AAA6_DEFENDANT_SDO_DRAWN_PRE_CASE_PROGRESSION.getScenario();
-        }
 
         if (isFinalOrderIssued(callbackParams)) {
             deleteNotificationAndInactiveTasks(caseData);
@@ -160,13 +157,7 @@ public class OrderMadeDefendantNotificationHandler extends OrderCallbackHandler 
         return CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT
             .equals(CaseEvent.valueOf(callbackParams.getRequest().getEventId()));
     }
-
-    private boolean isSDODrawnPreCPRelease(CaseData caseData) {
-        return !(getFeatureToggleService()
-            .isCaseProgressionEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation())
-            || getFeatureToggleService().isWelshEnabledForMainCase());
-    }
-
+    
     private boolean isOrderMadeFastTrackTrialNotResponded(CaseData caseData) {
         return SdoHelper.isFastTrack(caseData) && isNull(caseData.getTrialReadyRespondent1());
     }

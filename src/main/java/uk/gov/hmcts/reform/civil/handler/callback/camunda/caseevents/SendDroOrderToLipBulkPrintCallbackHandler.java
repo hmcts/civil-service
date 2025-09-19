@@ -33,9 +33,7 @@ public class SendDroOrderToLipBulkPrintCallbackHandler extends CallbackHandler {
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return featureToggleService.isWelshEnabledForMainCase()
-            ? Map.of(callbackKey(ABOUT_TO_SUBMIT), this::sendDroDocument)
-            : Map.of(callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse);
+        return Map.of(callbackKey(ABOUT_TO_SUBMIT), this::sendDroDocument);
     }
 
     @Override
@@ -57,11 +55,8 @@ public class SendDroOrderToLipBulkPrintCallbackHandler extends CallbackHandler {
 
         CaseData caseData = callbackParams.getCaseData();
         String taskId = camundaActivityId(callbackParams);
-        if (featureToggleService.isWelshEnabledForMainCase()) {
             sendDroBulkPrintService.sendDecisionReconsiderationToLip(
                 callbackParams.getParams().get(BEARER_TOKEN).toString(), caseData, taskId);
-
-        }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .build();
     }

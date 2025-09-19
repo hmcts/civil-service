@@ -120,7 +120,6 @@ public class SubmitClaimTask {
             .respondent1DetailsForClaimDetailsTab(caseData.getRespondent1().toBuilder().flags(null).build())
             .caseAccessCategory(CaseCategory.SPEC_CLAIM);
 
-        if (featureToggleService.isWelshEnabledForMainCase()) {
             //    added this to show location name  on location column in my tasks tab
             List<LocationRefData> locations = (locationRefDataService
                 .getCourtLocationsByEpimmsIdAndCourtType(authorisationToken, epimmsId));
@@ -128,9 +127,7 @@ public class SubmitClaimTask {
                 LocationRefData locationRefData = locations.get(0);
                 dataBuilder.locationName(locationRefData.getSiteName());
             }
-
-        }
-
+            
         if (ofNullable(caseData.getRespondent2()).isPresent()) {
             dataBuilder.respondent2DetailsForClaimDetailsTab(caseData.getRespondent2().toBuilder().flags(null).build());
         }

@@ -150,7 +150,7 @@ public class HearingValuesService {
     private void isLrVLr(CaseData caseData) throws IncludesLitigantInPersonException {
         if (caseData.isApplicantLiP() || caseData.isRespondent1LiP() || caseData.isRespondent2LiP()) {
             if (featuretoggleService.isHmcForLipEnabled()) {
-                if (!featuretoggleService.isWelshEnabledForMainCase()) {
+                if (false) {
                     isEarlyAdopter(caseData);
                 }
             } else {

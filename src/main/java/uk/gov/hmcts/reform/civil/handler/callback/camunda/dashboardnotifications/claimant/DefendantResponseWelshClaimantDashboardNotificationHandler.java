@@ -49,10 +49,7 @@ public class DefendantResponseWelshClaimantDashboardNotificationHandler extends 
     @Override
     public String getScenario(CaseData caseData) {
         if (caseData.isRespondentResponseBilingual()) {
-            if (featureToggleService.isWelshEnabledForMainCase()) {
                 return SCENARIO_AAA6_DEFENDANT_RESPONSE_BILINGUAL_WELSH_ENABLED_CLAIMANT.getScenario();
-            }
-            return SCENARIO_AAA6_DEFENDANT_RESPONSE_BILINGUAL_CLAIMANT.getScenario();
         } else {
             return SCENARIO_AAA6_ENGLISH_DEFENDANT_RESPONSE_BILINGUAL_CLAIMANT.getScenario();
         }
@@ -65,7 +62,7 @@ public class DefendantResponseWelshClaimantDashboardNotificationHandler extends 
 
     @Override
     protected void beforeRecordScenario(CaseData caseData, String authToken) {
-        if (featureToggleService.isWelshEnabledForMainCase() && caseData.getRespondent1ResponseDeadline().isBefore(LocalDateTime.now())) {
+        if (caseData.getRespondent1ResponseDeadline().isBefore(LocalDateTime.now())) {
             dashboardNotificationService.deleteByNameAndReferenceAndCitizenRole(DJ_NOTIFICATION, caseData.getCcdCaseReference().toString(), "CLAIMANT");
         }
     }

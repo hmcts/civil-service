@@ -366,9 +366,9 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             "ENGLISH, WELSH, WELSH, true, false",
             "WELSH, WELSH, WELSH, true, false",
             "WELSH, WELSH, ENGLISH, true, false",
-            "WELSH, ENGLISH, ENGLISH, false, true",
+            "WELSH, ENGLISH, ENGLISH, false, false",
             "WELSH, WELSH, ENGLISH, false, false",
-            "ENGLISH, WELSH, ENGLISH, false, false",
+            "ENGLISH, WELSH, ENGLISH, false, true",
             "WELSH, WELSH, WELSH, false, false"
         })
             void shouldMoveToAwaitingApplicantResponse_whenNoTranslations(String claimantBilingualPreference,
@@ -376,7 +376,6 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                                           String defendantDocumentLanguage,
                                                                           boolean toggleEnabled,
                                                                           boolean changeState) {
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(toggleEnabled);
             CaseData caseData = CaseDataBuilder.builder()
                 .totalClaimAmount(BigDecimal.valueOf(1000))
                 .claimantBilingualLanguagePreference(claimantBilingualPreference)
@@ -404,22 +403,22 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             }
         }
 
-        @Test
-        void shouldNotSetDefendantResponseLanguageDisplayIfWelshNotEnabled() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .totalClaimAmount(BigDecimal.valueOf(1000))
-                .build();
-
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            CaseData updatedCaseData = getCaseData(response);
-
-            assertThat(updatedCaseData.getDefendantLanguagePreferenceDisplay()).isNull();
-        }
+//        @Test
+//        void shouldNotSetDefendantResponseLanguageDisplayIfWelshNotEnabled() {
+//            CaseData caseData = CaseDataBuilder.builder()
+//                .totalClaimAmount(BigDecimal.valueOf(1000))
+//                .build();
+//
+//            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+//            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+//            CaseData updatedCaseData = getCaseData(response);
+//
+//            assertThat(updatedCaseData.getDefendantLanguagePreferenceDisplay()).isNull();
+//        }
 
         @Test
         void shouldSetDefendantResponseLanguageDisplayToEnglishIfNotSpecified() {
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
+
             CaseData caseData = CaseDataBuilder.builder()
                 .totalClaimAmount(BigDecimal.valueOf(1000))
                 .build();
@@ -433,7 +432,7 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSetDefendantResponseLanguageDisplayToWelshIfSpecified() {
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
+
             CaseData caseData = CaseDataBuilder.builder()
                 .totalClaimAmount(BigDecimal.valueOf(1000))
                 .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("WELSH").build()).build())
@@ -448,7 +447,6 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldUpdateLanguagePreferenceIfWelshDocsSpecified() {
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                 .totalClaimAmount(BigDecimal.valueOf(1000))
                 .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("ENGLISH").build()).build())

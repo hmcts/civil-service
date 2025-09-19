@@ -138,9 +138,6 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
             }
 
         }
-        if (isSDODrawnPreCPRelease(caseData)) {
-            return SCENARIO_AAA6_CLAIMANT_SDO_DRAWN_PRE_CASE_PROGRESSION.getScenario();
-        }
         if (isFinalOrderIssued(callbackParams)) {
             deleteNotificationAndInactiveTasks(caseData);
             if (isOrderMadeFastTrackTrialNotResponded(caseData)) {
@@ -162,12 +159,6 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
     @Override
     public boolean shouldRecordScenario(CaseData caseData) {
         return caseData.isApplicant1NotRepresented();
-    }
-
-    private boolean isSDODrawnPreCPRelease(CaseData caseData) {
-        return !(getFeatureToggleService()
-            .isCaseProgressionEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation())
-            || getFeatureToggleService().isWelshEnabledForMainCase());
     }
 
     private boolean isMediationUnsuccessfulReasonEqualToNotContactableClaimantOne(CaseData caseData) {

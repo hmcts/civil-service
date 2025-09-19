@@ -32,8 +32,8 @@ public class SendSDOBulkPrintService {
         if (caseData.getSystemGeneratedCaseDocuments() != null && !caseData.getSystemGeneratedCaseDocuments().isEmpty()) {
             Language language = LanguageUtils.determineLanguageForBulkPrint(
                 caseData,
-                TASK_ID_CLAIMANT.equals(taskId),
-                featureToggleService.isWelshEnabledForMainCase());
+                TASK_ID_CLAIMANT.equals(taskId)
+            );
             List<CaseDocument> caseDocuments = new ArrayList<>();
             switch (language) {
                 case ENGLISH -> caseData.getSDODocument().map(Element::getValue).ifPresent(caseDocuments::add);

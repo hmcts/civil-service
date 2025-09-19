@@ -44,17 +44,16 @@ public class SendDroOrderToLipBulkPrintCallbackHandlerTest extends BaseCallbackH
     public static final String TASK_ID_DEFENDANT = "SendToDefendantLIP";
     public static final String TASK_ID_CLAIMANT = "SendDORToClaimantLIP";
 
-    @Test
-    void shouldNotCallRecordScenario_whenWelshFlagIsDisabled() {
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
-
-        CallbackParams callbackParams = CallbackParamsBuilder.builder()
-            .of(ABOUT_TO_SUBMIT, CaseData.builder().build())
-            .build();
-
-        handler.handle(callbackParams);
-        verifyNoInteractions(sendDROBulkPrintService);
-    }
+//    @Test
+//    void shouldNotCallRecordScenario_whenWelshFlagIsDisabled() {
+//
+//        CallbackParams callbackParams = CallbackParamsBuilder.builder()
+//            .of(ABOUT_TO_SUBMIT, CaseData.builder().build())
+//            .build();
+//
+//        handler.handle(callbackParams);
+//        verifyNoInteractions(sendDROBulkPrintService);
+//    }
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
@@ -75,7 +74,6 @@ public class SendDroOrderToLipBulkPrintCallbackHandlerTest extends BaseCallbackH
     @Test
     void shouldDownloadDocumentAndPrintLetterSuccessfullyForDefendantLiP() {
 
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         // given
         CaseData caseData = CaseDataBuilder.builder()
             .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(DECISION_MADE_ON_APPLICATIONS).build())).build();
@@ -93,7 +91,6 @@ public class SendDroOrderToLipBulkPrintCallbackHandlerTest extends BaseCallbackH
     @Test
     void shouldDownloadDocumentAndPrintLetterSuccessfullyForClaimantLiP() {
 
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         // given
         CaseData caseData = CaseDataBuilder.builder()
             .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(DECISION_MADE_ON_APPLICATIONS).build())).build();

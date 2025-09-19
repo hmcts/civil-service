@@ -54,9 +54,8 @@ class NoticeOfDiscontinuanceFormGeneratorTest {
 
     @Test
     void shouldGenerateRespondent1NoticeOfDiscontinuanceDoc_whenValidDataIsProvided() {
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
         String fileName = String.format(
-                NOTICE_OF_DISCONTINUANCE_PDF.getDocumentTitle(), REFERENCE_NUMBER);
+            NOTICE_OF_DISCONTINUANCE_PDF.getDocumentTitle(), "party_type_" + REFERENCE_NUMBER);
 
         CaseDocument caseDocument = CaseDocumentBuilder.builder()
                 .documentName(fileName)
@@ -85,10 +84,8 @@ class NoticeOfDiscontinuanceFormGeneratorTest {
 
     @Test
     void shouldGenerateWelshDiscontinuanceDoc_whenValidDataIsProvided() {
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
         String fileName = String.format(
-            NOTICE_OF_DISCONTINUANCE_BILINGUAL_PDF.getDocumentTitle(), REFERENCE_NUMBER);
-
+            NOTICE_OF_DISCONTINUANCE_PDF.getDocumentTitle(), "party_type_" + REFERENCE_NUMBER);
         CaseDocument caseDocument = CaseDocumentBuilder.builder()
                 .documentName(fileName)
                 .documentType(NOTICE_OF_DISCONTINUANCE)
@@ -120,10 +117,8 @@ class NoticeOfDiscontinuanceFormGeneratorTest {
 
     @Test
     void shouldGenerateApplicant1NoticeOfDiscontinuanceDoc_whenValidDataIsProvided() {
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
         String fileName = String.format(
-                NOTICE_OF_DISCONTINUANCE_PDF.getDocumentTitle(), REFERENCE_NUMBER);
-
+            NOTICE_OF_DISCONTINUANCE_PDF.getDocumentTitle(), "party_type_" + REFERENCE_NUMBER);
         CaseDocument caseDocument = CaseDocumentBuilder.builder()
                 .documentName(fileName)
                 .documentType(NOTICE_OF_DISCONTINUANCE)
@@ -151,10 +146,9 @@ class NoticeOfDiscontinuanceFormGeneratorTest {
 
     @Test
     void shouldGenerateRespondent2NoticeOfDiscontinuanceDoc_whenValidDataIsProvided() {
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
-        String fileName = String.format(
-                NOTICE_OF_DISCONTINUANCE_PDF.getDocumentTitle(), REFERENCE_NUMBER);
 
+        String fileName = String.format(
+            NOTICE_OF_DISCONTINUANCE_PDF.getDocumentTitle(), "party_type_" + REFERENCE_NUMBER);
         CaseDocument caseDocument = CaseDocumentBuilder.builder()
                 .documentName(fileName)
                 .documentType(NOTICE_OF_DISCONTINUANCE)
@@ -182,7 +176,6 @@ class NoticeOfDiscontinuanceFormGeneratorTest {
 
     @Test
     void shouldIncludePartyTypeInFilename_whenValidDataIsProvided() {
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         String fileName = String.format(
             NOTICE_OF_DISCONTINUANCE_PDF.getDocumentTitle(), "party_type_" + REFERENCE_NUMBER);
 
@@ -214,7 +207,6 @@ class NoticeOfDiscontinuanceFormGeneratorTest {
     @Test
     void shouldIncludeQMPublicInformation_whenValidWithQMPublicIsOnAndWelsh() {
         when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         String fileName = String.format(
             NOTICE_OF_DISCONTINUANCE_PDF.getDocumentTitle(), "party_type_" + REFERENCE_NUMBER);
 
@@ -245,11 +237,9 @@ class NoticeOfDiscontinuanceFormGeneratorTest {
 
     @Test
     void shouldIncludeQMPublicInformation_whenWhenIsNotLipAndWelshIsOff() {
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
         when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
         String fileName = String.format(
-            NOTICE_OF_DISCONTINUANCE_PDF.getDocumentTitle(), REFERENCE_NUMBER);
-
+            NOTICE_OF_DISCONTINUANCE_PDF.getDocumentTitle(), "party_type_" + REFERENCE_NUMBER);
         CaseDocument caseDocument = CaseDocumentBuilder.builder()
             .documentName(fileName)
             .documentType(NOTICE_OF_DISCONTINUANCE)
@@ -277,10 +267,9 @@ class NoticeOfDiscontinuanceFormGeneratorTest {
 
     @Test
     void shouldIncludeQMPublicInformation_whenWhenIsLipAndWelshIsOff() {
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
         when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
         String fileName = String.format(
-            NOTICE_OF_DISCONTINUANCE_PDF.getDocumentTitle(), REFERENCE_NUMBER);
+            NOTICE_OF_DISCONTINUANCE_PDF.getDocumentTitle(), "party_type_" + REFERENCE_NUMBER);
 
         CaseDocument caseDocument = CaseDocumentBuilder.builder()
             .documentName(fileName)

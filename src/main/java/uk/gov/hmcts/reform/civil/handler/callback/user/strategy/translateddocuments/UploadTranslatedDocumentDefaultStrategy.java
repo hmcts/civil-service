@@ -260,8 +260,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                             DocCategory.APP1_DQ.getValue()
                         );
                     } else if ((originalDocument.getValue().getDocumentType() != DocumentType.SEALED_CLAIM)
-                        || (featureToggleService.isWelshEnabledForMainCase()
-                        && originalDocument.getValue().getDocumentType() == DocumentType.SEALED_CLAIM)) {
+                        || (originalDocument.getValue().getDocumentType() == DocumentType.SEALED_CLAIM)) {
                         if (originalDocument.getValue().getDocumentType().equals((DocumentType.DEFENDANT_DEFENCE))) {
                             caseDataBuilder.respondent1ClaimResponseDocumentSpec(originalDocument.getValue());
                         }
@@ -275,7 +274,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
             caseDataBuilder.courtOfficersOrders(courtOfficerOrderDocuments);
         }
 
-        if (featureToggleService.isWelshEnabledForMainCase() && caseData.getRespondent1OriginalDqDoc() != null
+        if (caseData.getRespondent1OriginalDqDoc() != null
             && isContainsSpecifiedDocType(translatedDocuments, DEFENDANT_RESPONSE)) {
             systemGeneratedDocuments.add(element(caseData.getRespondent1OriginalDqDoc()));
             caseDataBuilder.respondent1OriginalDqDoc(null);
@@ -395,8 +394,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                 return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_HEARING_NOTICE;
             } else if (Objects.nonNull(translatedDocuments)
                 && isContainsSpecifiedDocType(translatedDocuments, DEFENDANT_RESPONSE)
-                && caseData.isLipvLROneVOne()
-                && featureToggleService.isWelshEnabledForMainCase()) {
+                && caseData.isLipvLROneVOne()) {
                 return CaseEvent.UPLOAD_TRANSLATED_DEFENDANT_SEALED_FORM;
             }
         }
@@ -410,7 +408,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
             }
         }
 
-        if (caseData.isLRvLipOneVOne() && featureToggleService.isWelshEnabledForMainCase()) {
+        if (caseData.isLRvLipOneVOne()) {
             if (caseData.getCcdState() == CaseState.AWAITING_APPLICANT_INTENTION) {
                 return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_CLAIMANT_LR_INTENTION;
             }
@@ -442,14 +440,14 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
     private boolean isTranslationForLipVsLRDefendantSealedForm(Element<TranslatedDocument> document,
                                                                CaseData caseData) {
         return DEFENDANT_RESPONSE.equals(document.getValue().getDocumentType())
-            && caseData.isLipvLROneVOne() && featureToggleService.isWelshEnabledForMainCase()
+            && caseData.isLipvLROneVOne()
             && CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT.equals(caseData.getCcdState());
     }
 
     private boolean isTranslationForLrVsLipApplicantDq(Element<TranslatedDocument> document,
                                                                CaseData caseData) {
         return CLAIMANT_INTENTION.equals(document.getValue().getDocumentType())
-            && caseData.isLRvLipOneVOne() && featureToggleService.isWelshEnabledForMainCase()
+            && caseData.isLRvLipOneVOne()
             && CaseState.AWAITING_APPLICANT_INTENTION.equals(caseData.getCcdState());
     }
 

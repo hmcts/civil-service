@@ -189,7 +189,6 @@ class SubmitClaimTaskTest {
         locations.add(LocationRefData.builder().courtName("Court Name").regionId("2").epimmsId("420219")
                           .siteName("Civil National Business Centre").build());
         when(locationRefDataService.getCourtLocationsByEpimmsIdAndCourtType(any(), any())).thenReturn(locations);
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         CaseData caseData = CaseData.builder()
             .applicant1(Party.builder()
                             .individualFirstName("Clay")

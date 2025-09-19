@@ -35,7 +35,6 @@ class DefendantResponseDeadlineCheckSearchServiceTest {
 
     @Test
     void shouldReturnQuery_whenWelshFeatureDisabled() {
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
 
         Query query = searchService.query(0, "now");
 
@@ -47,7 +46,6 @@ class DefendantResponseDeadlineCheckSearchServiceTest {
 
     @Test
     void shouldReturnQuery_whenWelshFeatureEnabled() {
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
 
         Query query = searchService.query(0, MOCK_TIMESTAMP);
 
@@ -95,7 +93,6 @@ class DefendantResponseDeadlineCheckSearchServiceTest {
 
     @Test
     void shouldReturnQuery_whenCallingQueryWithSingleParameter() {
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
 
         Query query = searchService.query(0);
 

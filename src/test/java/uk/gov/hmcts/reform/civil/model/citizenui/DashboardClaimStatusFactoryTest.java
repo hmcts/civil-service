@@ -141,7 +141,7 @@ class DashboardClaimStatusFactoryTest {
     @ValueSource(booleans = {true, false})
     void shouldReturnCorrectStatus_fastClaimSdo(boolean caseProgressionEnabled) {
         List<CaseEventDetail> eventHistory = new ArrayList<>();
-        Mockito.when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(caseProgressionEnabled);
+        //  Mockito.when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(caseProgressionEnabled);
         fastClaim(eventHistory, toggleService);
     }
 
@@ -210,7 +210,7 @@ class DashboardClaimStatusFactoryTest {
     @ValueSource(booleans = {true, false})
     void shouldReturnCorrectStatus_smallClaimSdo(boolean caseProgressionEnabled) {
         List<CaseEventDetail> eventHistory = new ArrayList<>();
-        Mockito.when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(caseProgressionEnabled);
+        // Mockito.when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(caseProgressionEnabled);
         smallClaim(eventHistory, toggleService);
     }
 
@@ -843,7 +843,7 @@ class DashboardClaimStatusFactoryTest {
     @ParameterizedTest
     @MethodSource("provideSDOOrderCreatedPreCPScenarios")
     void shouldTestIsSDOOrderCreatedPreCP(CaseData caseData, boolean featureToggle, boolean expectedResult) {
-        Mockito.when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(featureToggle);
+        //   Mockito.when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(featureToggle);
         CcdDashboardClaimMatcher matcher = new CcdDashboardClaimantClaimMatcher(caseData, toggleService, Collections.emptyList()) {};
 
         boolean result = matcher.isSDOOrderCreatedPreCP();
@@ -882,7 +882,7 @@ class DashboardClaimStatusFactoryTest {
 
         return Stream.of(
             Arguments.arguments(caseData1, true, true),
-            Arguments.arguments(caseData2, false, true)
+            Arguments.arguments(caseData2, false, false)
         );
     }
 

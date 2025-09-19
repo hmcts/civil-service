@@ -68,7 +68,6 @@ public class DefendantResponseWelshTranslationScenarioTest extends DashboardBase
 
     @Test
     void should_create_defendant_response_claimant_dashboard_welsh_scenario_welsh_toggle_on() throws Exception {
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         String caseId = "123452";
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build()
             .toBuilder()
