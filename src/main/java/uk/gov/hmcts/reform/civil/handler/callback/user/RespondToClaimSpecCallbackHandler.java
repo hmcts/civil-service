@@ -1971,7 +1971,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             );
         } else if (caseData.isClaimantBilingual()) {
             return format(
-                "<h2 class=\"govuk-heading-m\">What happens next FDFD</h2>"
+                "<h2 class=\"govuk-heading-m\">What happens next</h2>"
                     + "%n%nWe will let you know when the claimant responds."
                     + "%n%n<a href=\"%s\" target=\"_blank\">Download questionnaire (opens in a new tab)</a>",
                 format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference())
