@@ -1969,6 +1969,13 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 + "We will let you know when they respond.%n%n",
                 formatLocalDateTime(responseDeadline, DATE)
             );
+        } else if (caseData.isClaimantBilingual()) {
+            return format(
+                "<h2 class=\"govuk-heading-m\">What happens next FDFD</h2>"
+                    + "%n%nWe will let you know when the claimant responds."
+                    + "%n%n<a href=\"%s\" target=\"_blank\">Download questionnaire (opens in a new tab)</a>",
+                format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference())
+            );
         } else {
             return format(
                 "<h2 class=\"govuk-heading-m\">What happens next</h2>"

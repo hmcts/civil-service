@@ -61,10 +61,14 @@ public class PartialAdmitSetDateConfirmationText implements RespondToClaimConfir
             sb.append(" and your explanation of why you do not owe the full amount.");
         }
 
-        sb.append("<br><br>").append("The claimant has until 4pm on ")
-            .append(formatLocalDateTime(caseData.getApplicant1ResponseDeadline(), DATE))
-            .append(" to respond to your claim. <br>We will let you know when they respond.")
-            .append(String
+        if (caseData.isClaimantBilingual()) {
+            sb.append("<br><br>").append("We will let you know when the claimant responds.");
+        } else {
+            sb.append("<br><br>").append("The claimant has until 4pm on ")
+                .append(formatLocalDateTime(caseData.getApplicant1ResponseDeadline(), DATE))
+                .append(" to respond to your claim. <br>We will let you know when they respond.");
+        }
+            sb.append(String
                         .format(
                             "%n%n<a href=\"%s\" target=\"_blank\">Download questionnaire (opens in a new tab)</a>",
                             format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference())
