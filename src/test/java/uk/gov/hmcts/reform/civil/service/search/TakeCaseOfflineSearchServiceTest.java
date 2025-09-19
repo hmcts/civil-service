@@ -10,6 +10,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
+import static org.elasticsearch.index.query.QueryBuilders.existsQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 import static org.mockito.Mockito.mock;
@@ -27,13 +28,13 @@ class TakeCaseOfflineSearchServiceTest extends ElasticSearchServiceTest {
 
     @Override
     protected Query buildQuery(int fromValue) {
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
         BoolQueryBuilder query = boolQuery()
             .minimumShouldMatch(1)
             .should(boolQuery()
                         .must(rangeQuery("data.applicant1ResponseDeadline").lt("now"))
                         .must(boolQuery().must(matchQuery("state", "AWAITING_APPLICANT_INTENTION")))
-                        .mustNot(matchQuery("data.isMintiLipCase", "Yes")))
+                        .mustNot(matchQuery("data.isMintiLipCase", "Yes"))
+                        .mustNot(existsQuery("data.applicant1ResponseDate")))
             .should(boolQuery()
                         .must(rangeQuery("data.addLegalRepDeadlineRes1").lt("now"))
                         .must(boolQuery().must(matchQuery("state", "AWAITING_RESPONDENT_ACKNOWLEDGEMENT"))))
@@ -45,20 +46,7 @@ class TakeCaseOfflineSearchServiceTest extends ElasticSearchServiceTest {
     }
 
     @Test
-    void shouldReturnQuery_whenWelshFeatureDisabled() {
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
-
-        Query query = searchService.query(0);
-
-        assertThat(query).isNotNull();
-        assertThat(query.toString()).contains("\"from\": 0");
-        assertThat(query.toString()).contains("\"_source\": [\"reference\"]");
-        assertThat(query.toString()).contains("\"query\"");
-    }
-
-    @Test
     void shouldReturnQuery_whenWelshFeatureEnabled() {
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
 
         Query query = searchService.query(0);
 

@@ -30,7 +30,6 @@ public class TakeCaseOfflineSearchService extends ElasticSearchService {
     }
 
     public Query query(int startIndex) {
-        if (featureToggleService.isWelshEnabledForMainCase()) {
             Query query = new Query(
                 boolQuery()
                     .minimumShouldMatch(1)
@@ -50,26 +49,7 @@ public class TakeCaseOfflineSearchService extends ElasticSearchService {
             );
             log.info("Take Case Offline query: {}", query);
             return query;
-        } else {
-            Query query = new Query(
-                boolQuery()
-                    .minimumShouldMatch(1)
-                    .should(boolQuery()
-                                .must(rangeQuery("data.applicant1ResponseDeadline").lt("now"))
-                                .must(beState(AWAITING_APPLICANT_INTENTION))
-                                .mustNot(matchQuery("data.isMintiLipCase", "Yes")))
-                    .should(boolQuery()
-                                .must(rangeQuery("data.addLegalRepDeadlineRes1").lt("now"))
-                                .must(beState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT)))
-                    .should(boolQuery()
-                                .must(rangeQuery("data.addLegalRepDeadlineRes2").lt("now"))
-                                .must(beState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT))),
-                List.of("reference"),
-                startIndex
-            );
-            log.info("Take Case Offline query: {}", query);
-            return query;
-        }
+
     }
 
     private QueryBuilder beState(CaseState caseState) {
