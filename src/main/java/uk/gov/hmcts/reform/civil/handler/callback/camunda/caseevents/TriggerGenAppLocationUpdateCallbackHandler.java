@@ -59,7 +59,8 @@ public class TriggerGenAppLocationUpdateCallbackHandler extends CallbackHandler 
             if (!(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(
                 caseData.getCaseManagementLocation().getBaseLocation()))
                 && caseData.isLipCase()
-                && (Objects.nonNull(caseData.getGeneralApplications()) && !caseData.getGeneralApplications().isEmpty())) {
+                && (Objects.nonNull(caseData.getGeneralApplications()) && !caseData.getGeneralApplications().isEmpty())
+                && !featureToggleService.isCuiGaNroEnabled()) {
                 caseDataBuilder.gaEaCourtLocation(YesOrNo.YES);
             }
             if (caseData.getGeneralApplications() != null && !caseData.getGeneralApplications().isEmpty()) {
