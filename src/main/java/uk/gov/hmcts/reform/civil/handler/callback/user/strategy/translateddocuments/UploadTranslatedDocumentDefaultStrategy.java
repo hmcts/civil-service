@@ -18,10 +18,12 @@ import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocument;
 import uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -52,7 +54,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
     private final ObjectMapper objectMapper;
     private final AssignCategoryId assignCategoryId;
     private final FeatureToggleService featureToggleService;
-
+    private final DeadlinesCalculator deadlinesCalculator;
     private static final String CATEGORY_ID = "caseManagementOrders";
 
     @Override
@@ -274,13 +276,18 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
         if (!courtOfficerOrderDocuments.isEmpty()) {
             caseDataBuilder.courtOfficersOrders(courtOfficerOrderDocuments);
         }
-
+        boolean isDefendantResponse = isContainsSpecifiedDocType(translatedDocuments, DEFENDANT_RESPONSE);
         if (featureToggleService.isWelshEnabledForMainCase() && caseData.getRespondent1OriginalDqDoc() != null
-            && isContainsSpecifiedDocType(translatedDocuments, DEFENDANT_RESPONSE)) {
+            && isDefendantResponse) {
             systemGeneratedDocuments.add(element(caseData.getRespondent1OriginalDqDoc()));
             caseDataBuilder.respondent1OriginalDqDoc(null);
         }
-
+        if (isDefendantResponse) {
+            LocalDateTime applicant1ResponseDeadline =
+                deadlinesCalculator.calculateApplicantResponseDeadlineSpec(LocalDateTime.now());
+            caseDataBuilder.applicant1ResponseDeadline(applicant1ResponseDeadline)
+                .nextDeadline(applicant1ResponseDeadline.toLocalDate());
+        }
     }
 
     private void updateNoticeOfDiscontinuanceTranslatedDoc(CallbackParams callbackParams,
