@@ -207,6 +207,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                                 )
                             );
                         });
+                        caseDataBuilder.urgentFlag(null);
                         preTranslationCourtOfficerOrder.ifPresent(preTranslationDocuments::remove);
                         preTranslationCourtOfficerOrder.ifPresent(courtOfficerOrderDocuments::add);
                     }
