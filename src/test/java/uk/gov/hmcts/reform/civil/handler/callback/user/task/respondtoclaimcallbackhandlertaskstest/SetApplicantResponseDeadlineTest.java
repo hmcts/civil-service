@@ -247,8 +247,8 @@ class SetApplicantResponseDeadlineTest {
 
         when(time.now()).thenReturn(responseDate);
         when(deadlinesCalculator.calculateApplicantResponseDeadline(any(LocalDateTime.class))).thenReturn(deadline);
-        when(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(24, LocalDate.now()))
-            .thenReturn(LocalDateTime.now().plusMonths(24));
+        when(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(36, LocalDate.now()))
+            .thenReturn(LocalDateTime.now().plusMonths(36));
         when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
         when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
         when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
@@ -280,7 +280,7 @@ class SetApplicantResponseDeadlineTest {
         Object deadlineValue = response.getData().get("claimDismissedDeadline");
 
         LocalDateTime actual = LocalDateTime.parse(deadlineValue.toString());
-        LocalDateTime expected = LocalDateTime.now().plusMonths(24);
+        LocalDateTime expected = LocalDateTime.now().plusMonths(36);
 
         assertThat(actual.toLocalDate()).isEqualTo(expected.toLocalDate());
     }

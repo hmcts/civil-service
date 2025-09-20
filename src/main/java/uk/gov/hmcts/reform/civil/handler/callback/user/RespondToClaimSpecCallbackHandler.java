@@ -159,7 +159,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     private static final List<CaseEvent> EVENTS = Collections.singletonList(DEFENDANT_RESPONSE_SPEC);
     private static final String DEF2 = "Defendant 2";
     public static final String ERROR_DEFENDANT_RESPONSE_SPEC_SUBMITTED = "There is a problem \n You have already submitted the defendant's response";
-    private static final int RESPONSE_CLAIM_SPEC_DEADLINE_EXTENSION_MONTHS = 24;
+    private static final int RESPONSE_CLAIM_SPEC_DEADLINE_EXTENSION_MONTHS = 36;
     public static final String ERROR_RESPONSE_TO_CLAIM_OWING_AMOUNT = "This amount equals or exceeds the claim amount plus interest.";
     private final DateOfBirthValidator dateOfBirthValidator;
     private final UnavailableDateValidator unavailableDateValidator;
