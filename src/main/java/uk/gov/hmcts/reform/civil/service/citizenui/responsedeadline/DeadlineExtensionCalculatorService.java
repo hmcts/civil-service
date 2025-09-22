@@ -17,6 +17,14 @@ public class DeadlineExtensionCalculatorService {
     private final DeadlineExtensionDateTimeHelper deadlineExtensionDateTimeHelper;
 
     public LocalDate calculateExtendedDeadline(LocalDate responseDate, int plusDays) {
+        requireNonNull(responseDate);
+
+        /* .In CUI user provide the exact extended deadline
+         *  so we do not make any other changes except setting it to next working day
+         */
+        if (plusDays == 0) {
+            return workingDayIndicator.getNextWorkingDay(responseDate);
+        }
         return calculateExtendedDeadline(deadlineExtensionDateTimeHelper.createDateTimeWithNowTime(responseDate), plusDays);
     }
 
