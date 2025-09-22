@@ -155,8 +155,8 @@ public class InitiateGeneralApplicationService {
 
     private boolean isLipCase(CaseData caseData, CaseAssignmentUserRolesResource userRoles) {
         log.info("Checking isLipCase for case: {}", caseData.getCcdCaseReference());
-        if ((caseData.isRespondent1LiP() || caseData.isRespondent2LiP()
-            || caseData.isApplicantNotRepresented())) {
+        if (caseData.isRespondent1LiP() || caseData.isRespondent2LiP()
+            || caseData.isApplicantNotRepresented()) {
 
             for (String lipRole : lipCaseRole) {
                 if (userRoles.getCaseAssignmentUserRoles() != null && userRoles.getCaseAssignmentUserRoles().size() > 1
