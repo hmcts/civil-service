@@ -37,6 +37,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import static java.lang.Long.parseLong;
 import static java.util.Objects.isNull;
 import static java.util.Optional.ofNullable;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @RequiredArgsConstructor
@@ -120,10 +121,13 @@ public class UpdateFromGACaseEventTaskHandler extends BaseExternalTaskHandler {
             updateDocCollection(output, generalAppCaseData, "gaRespondDoc", civilCaseData, "gaRespondDoc");
             generalAppCaseData = mergeBundle(generalAppCaseData);
             updateDocCollectionField(output, civilCaseData, generalAppCaseData, "gaAddl");
-            String toCivilApplicantList = generalAppCaseData.getParentClaimantIsApplicant() == YES ? "gaAddlDocClaimant" : "gaAddlDocRespondentSol";
-            String toCivilRespondentList = generalAppCaseData.getParentClaimantIsApplicant() == YES ? "gaAddlDocRespondentSol" : "gaAddlDocClaimant";
-            updateDocCollection(output, generalAppCaseData, "preTranslationGaDocsApplicant", civilCaseData, toCivilApplicantList);
-            updateDocCollection(output, generalAppCaseData, "preTranslationGaDocsRespondent", civilCaseData, toCivilRespondentList);
+            if (featureToggleService.isGaForWelshEnabled() && (civilCaseData.isClaimantBilingual() || civilCaseData.isRespondentResponseBilingual())) {
+                if (generalAppCaseData.getParentClaimantIsApplicant() == YES) {
+                    updateDocCollection(output, generalAppCaseData, "preTranslationGaDocsApplicant", civilCaseData, "gaAddlDocClaimant");
+                } else {
+                    updateDocCollection(output, generalAppCaseData, "preTranslationGaDocsRespondent", civilCaseData, "gaAddlDocRespondentSol");
+                }
+            }
         } catch (Exception e) {
             log.error(e.getMessage());
         }
@@ -297,7 +301,7 @@ public class UpdateFromGACaseEventTaskHandler extends BaseExternalTaskHandler {
         }
         List<Element<GeneralApplicationsDetails>> gaAppDetails = civilCaseData.getClaimantGaAppDetails();
 
-        if (generalAppCaseData.getParentClaimantIsApplicant() == YesOrNo.NO
+        if (generalAppCaseData.getParentClaimantIsApplicant() == NO
             && ((generalAppCaseData.getGeneralAppInformOtherParty()) != null && YES.equals(generalAppCaseData.getGeneralAppInformOtherParty().getIsWithNotice())
                 || (generalAppCaseData.getGeneralAppRespondentAgreement() != null && generalAppCaseData.getGeneralAppRespondentAgreement().getHasAgreed().equals(YES)))) {
             return true;
