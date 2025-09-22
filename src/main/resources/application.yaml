@@ -83,6 +83,11 @@ serviceRequestClaimIssued:
 wa:
   feature-toggle: ${WA_TOGGLE:Prod}
 
+task-management:
+  enabled: true
+  api:
+    url: http://fake-task-management-api
+
 send-letter:
   url: ${SEND_LETTER_URL:http://localhost:8765}
 
@@ -223,6 +228,13 @@ rtl:
 dashboard:
   api:
     url: http://localhost:4000
+
+migration:
+  batchsize: 100
+  wait-time-mins: 5
+  csvFile:
+    decrypt:
+      key: DUMMY_KEY
 
 notifications:
   govNotifyApiKey: ${GOV_NOTIFY_API_KEY:}
@@ -398,6 +410,7 @@ notifications:
   notifyLiPClaimantClaimSubmittedAndPayClaimFeeTemplate: "2c4be8ac-4c19-4204-a02c-8e5229efdf61"
   notifyLiPClaimantClaimSubmittedAndHelpWithFeeTemplate: "d0965148-3e75-4b94-8f10-f0111d12124f"
   notifyLiPClaimantDefendantResponded: "b8438371-b070-453e-934c-41219e4cba15"
+  notifyLiPClaimantDefendantRespondedWelshLip: "4073eab6-dffd-4904-8508-fd497ef28f1e"
   notifyLiPClaimantDefendantChangedContactDetails: "7cf18066-c3c1-46b0-bc45-435edb38aa1b"
 
   notifyApplicant1EnteredBreathingSpaceLip: "7e34af74-ec20-476b-aea5-6a6508d3acaf"
@@ -478,6 +491,7 @@ notifications:
   notifyLiPOrderTranslatedTemplate: "d1eb5d79-6d1f-4b05-bbdf-a18fda06cf01"
   notifyClaimDiscontinuedLRTemplate: "445e95e4-4d15-4757-9cb2-a75a47b73ac9"
   notifyClaimDiscontinuedLipTemplate: "68342b9f-f9ad-4efc-a465-fb84fb60e3ce"
+  notifyClaimDiscontinuedWelshLipTemplate: "21d87aec-4344-4c07-a90c-0e9579f80b89"
 
   notifyClaimantLrValidationDiscontinuanceFailureTemplate: "f7f08517-0284-4602-916a-af6819c06477"
 

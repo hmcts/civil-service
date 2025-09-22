@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.callback.OrderCallbackHandler;
 import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
+import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
@@ -105,7 +106,8 @@ public class OrderMadeDefendantNotificationHandler extends OrderCallbackHandler 
     @Override
     protected String getScenario(CaseData caseData, CallbackParams callbackParams) {
         if (isSDOEvent(callbackParams)
-            && isEligibleForReconsideration(caseData)) {
+            && isEligibleForReconsideration(caseData)
+            && Objects.isNull(caseData.getIsReferToJudgeClaim())) {
             return SCENARIO_AAA6_CP_SDO_MADE_BY_LA_DEFENDANT.getScenario();
         }
         if (isCarmApplicableCase(caseData)
@@ -160,8 +162,9 @@ public class OrderMadeDefendantNotificationHandler extends OrderCallbackHandler 
     }
 
     private boolean isSDODrawnPreCPRelease(CaseData caseData) {
-        return !getFeatureToggleService()
-            .isCaseProgressionEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation());
+        return !(getFeatureToggleService()
+            .isCaseProgressionEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation())
+            || getFeatureToggleService().isWelshEnabledForMainCase());
     }
 
     private boolean isOrderMadeFastTrackTrialNotResponded(CaseData caseData) {

@@ -23,11 +23,11 @@ import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
+import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -56,6 +56,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
     private final FeatureToggleService featureToggleService;
     private final JudgmentByAdmissionOnlineMapper judgmentByAdmissionOnlineMapper;
     private final InterestCalculator interestCalculator;
+    private final Time time;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -154,11 +155,14 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
             JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseDataBuilder.build());
 
             BigDecimal interest = interestCalculator.calculateInterest(data);
+
+            String joSummaryObject = data.isLipvLipOneVOne() ? JudgmentsOnlineHelper.calculateRepaymentBreakdownSummaryWithoutClaimInterest(
+                activeJudgment, true) : getJudgmentRepaymentSummaryObject(data, interest, activeJudgment);
             caseDataBuilder
                 .activeJudgment(activeJudgment)
                 .joIsLiveJudgmentExists(YesOrNo.YES)
-                .joRepaymentSummaryObject(getJudgmentRepaymentSummaryObject(data, interest, activeJudgment))
-                .joJudgementByAdmissionIssueDate(LocalDateTime.now());
+                .joRepaymentSummaryObject(joSummaryObject)
+                .joJudgementByAdmissionIssueDate(time.now());
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -169,7 +173,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
 
     private String getJudgmentRepaymentSummaryObject(CaseData caseData, BigDecimal interest, JudgmentDetails activeJudgment) {
         return judgementService.isLrPayImmediatelyPlan(caseData)
-            ? JudgmentsOnlineHelper.calculateRepaymentBreakdownSummaryForLRImmediatePlan(activeJudgment)
+            ? JudgmentsOnlineHelper.calculateRepaymentBreakdownSummaryWithoutClaimInterest(activeJudgment, false)
             : JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(activeJudgment, interest);
     }
 

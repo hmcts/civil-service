@@ -228,15 +228,9 @@ public class LocationHelper {
     }
 
     private boolean matches(LocationRefData locationRefData, RequestedCourt preferredCourt) {
-        return (StringUtils.isNotBlank(preferredCourt.getResponseCourtCode())
-            && preferredCourt.getResponseCourtCode().equals(locationRefData.getCourtLocationCode()))
-            ||
-            (preferredCourt.getCaseLocation() != null
-                && StringUtils.equals(preferredCourt.getCaseLocation().getRegion(), locationRefData.getRegionId())
-                && StringUtils.equals(
-                preferredCourt.getCaseLocation().getBaseLocation(),
-                locationRefData.getEpimmsId()
-            ));
+        return preferredCourt.getCaseLocation() != null
+            && preferredCourt.getCaseLocation().getBaseLocation() != null
+            && preferredCourt.getCaseLocation().getBaseLocation().equals(locationRefData.getEpimmsId());
     }
 
     /**
@@ -280,7 +274,12 @@ public class LocationHelper {
         Optional<LocationRefData> matchingLocation = getMatching(getLocations.get(), requestedCourt);
         Long reference = updatedData.build().getCcdCaseReference();
         if (log.isInfoEnabled()) {
-            log.info("Case {}, requested court is {}", reference, requestedCourt != null ? "defined" : "undefined");
+            Optional.ofNullable(requestedCourt)
+                .map(RequestedCourt::getCaseLocation)
+                .map(CaseLocationCivil::getBaseLocation)
+                .ifPresentOrElse(baseLocation -> log.info("Case {}, requested court is {}", reference, baseLocation),
+                            () -> log.info("Case {}, requested court or location is missing", reference)
+                );
             log.info(
                 "Case {}, there {} a location matching to requested court",
                 reference,

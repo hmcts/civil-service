@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.utils;
 
 import lombok.extern.slf4j.Slf4j;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -12,6 +13,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Optional.ofNullable;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
@@ -73,8 +76,10 @@ public class QueryNotificationUtils {
                 getLegalOrganizationNameForRespondent(caseData, true, organisationService)
             );
         } else if (isRespondentSolicitorTwo(roles)) {
-            properties.put(CLAIM_LEGAL_ORG_NAME_SPEC,
-                           getLegalOrganizationNameForRespondent(caseData, false, organisationService));
+            properties.put(
+                CLAIM_LEGAL_ORG_NAME_SPEC,
+                getLegalOrganizationNameForRespondent(caseData, false, organisationService)
+            );
         } else if (isLIPClaimant(roles)) {
             properties.put(PARTY_NAME, caseData.getApplicant1().getPartyName());
         } else if (isLIPDefendant(roles)) {
@@ -141,7 +146,10 @@ public class QueryNotificationUtils {
                 emailDetailsList.add(createLipOnCaseEmailDetails(email, lipName, lipOtherPartyWelsh));
                 break;
             case "lipRespondent":
-                email = caseData.getDefendantUserDetails().getEmail();
+                if (ofNullable(caseData.getRespondent1().getPartyEmail()).isEmpty()) {
+                    break;
+                }
+                email = caseData.getRespondent1().getPartyEmail();
                 lipName = caseData.getRespondent1().getPartyName();
                 lipOtherPartyWelsh = caseData.isRespondentResponseBilingual() ? "WELSH" : "NON_WELSH";
                 emailDetailsList.add(createLipOnCaseEmailDetails(email, lipName, lipOtherPartyWelsh));
@@ -153,15 +161,24 @@ public class QueryNotificationUtils {
                 break;
             case "lrDefendant":
                 if (getMultiPartyScenario(caseData).equals(ONE_V_TWO_TWO_LEGAL_REP)) {
+                    if (ofNullable(caseData.getRespondentSolicitor1EmailAddress()).isEmpty()) {
+                        break;
+                    }
                     emailDetailsList.add(createEmailDetails(
                         caseData.getRespondentSolicitor1EmailAddress(),
                         getLegalOrganizationNameForRespondent(caseData, true, organisationService)
                     ));
+                    if (ofNullable(caseData.getRespondentSolicitor2EmailAddress()).isEmpty()) {
+                        break;
+                    }
                     emailDetailsList.add(createEmailDetails(
                         caseData.getRespondentSolicitor2EmailAddress(),
                         getLegalOrganizationNameForRespondent(caseData, false, organisationService)
                     ));
                 } else {
+                    if (ofNullable(caseData.getRespondentSolicitor1EmailAddress()).isEmpty()) {
+                        break;
+                    }
                     email = caseData.getRespondentSolicitor1EmailAddress();
                     legalOrgName = getLegalOrganizationNameForRespondent(caseData, true, organisationService);
                     emailDetailsList.add(createEmailDetails(email, legalOrgName));
@@ -234,7 +251,7 @@ public class QueryNotificationUtils {
         return details;
     }
 
-    private static  Map<String, String> createLipOnCaseEmailDetails(String email, String lipName, String lipOtherPartyWelsh) {
+    private static Map<String, String> createLipOnCaseEmailDetails(String email, String lipName, String lipOtherPartyWelsh) {
         Map<String, String> details = new HashMap<>();
         details.put(EMAIL, email);
         details.put(LIP_NAME, lipName);
@@ -243,4 +260,12 @@ public class QueryNotificationUtils {
         return details;
     }
 
+    public static boolean isUnspecClaimNotReadyForNotification(CaseData caseData, CoreCaseUserService coreCaseUserService, String queryId) {
+        List<String> roles = getUserRoleForQuery(caseData, coreCaseUserService, queryId);
+
+        return UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+            && !isOtherPartyApplicant(roles)
+            && (CaseState.CASE_ISSUED == caseData.getCcdState()
+            || CaseState.AWAITING_CASE_DETAILS_NOTIFICATION == caseData.getCcdState());
+    }
 }

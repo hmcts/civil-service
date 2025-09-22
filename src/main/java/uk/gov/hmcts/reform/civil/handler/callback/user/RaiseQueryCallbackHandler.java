@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -57,6 +58,8 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
     private final FeatureToggleService featureToggleService;
 
     public static final String INVALID_CASE_STATE_ERROR = "If your case is offline, you cannot raise a query.";
+    public static final String QM_NOT_ALLOWED_ERROR = "The raise a query function is not available on this case. If you have a query, contact the court handling this case.";
+    public static final String FOLLOW_UPS_ERROR = "Consecutive follow up messages are not allowed for query management.";
     public static final String PUBLIC_QUERIES_PARTY_NAME = "All queries";
 
     @Override
@@ -75,9 +78,16 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
 
     private CallbackResponse aboutToStart(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        boolean publicQmEnabled = featureToggleService.isPublicQueryManagementEnabled(caseData);
 
-        List<CaseState> invalidStates = Arrays.asList(PENDING_CASE_ISSUED, CASE_DISMISSED,
-                                                      PROCEEDS_IN_HERITAGE_SYSTEM, CLOSED);
+        if (!publicQmEnabled) {
+            List<String> errors = List.of(QM_NOT_ALLOWED_ERROR);
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(errors).build();
+        }
+
+        List<CaseState> invalidStates = Arrays.asList(
+            PENDING_CASE_ISSUED, CASE_DISMISSED, PROCEEDS_IN_HERITAGE_SYSTEM, CLOSED);
         if (invalidStates.contains(caseData.getCcdState())) {
             List<String> errors = List.of(INVALID_CASE_STATE_ERROR);
 
@@ -86,7 +96,7 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
         }
 
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
-        if (featureToggleService.isPublicQueryManagementEnabled(caseData)) {
+        if (publicQmEnabled) {
             migrateAllQueries(caseDataBuilder);
         }
 
@@ -102,17 +112,24 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
 
-        CaseMessage latestCaseMessage = featureToggleService.isPublicQueryManagementEnabled(caseData)
+        boolean isPublicQmEnabled =  featureToggleService.isPublicQueryManagementEnabled(caseData);
+        CaseMessage latestCaseMessage = isPublicQmEnabled
             ? getLatestQuery(caseData) : getUserQueriesByRole(caseData, roles).latest();
 
+        if (nonNull(caseData.getQueries()) && caseData.getQueries().messageThread(latestCaseMessage).size() % 2 == 0) {
+            return AboutToStartOrSubmitCallbackResponse.builder().errors(List.of(FOLLOW_UPS_ERROR)).build();
+        }
+
         assignCategoryIdToAttachments(latestCaseMessage, assignCategoryId, roles);
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder().qmLatestQuery(
-            buildLatestQuery(latestCaseMessage));
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
 
         if (featureToggleService.isPublicQueryManagementEnabled(caseData)) {
-            caseDataBuilder.queries(caseData.getQueries().toBuilder().partyName(PUBLIC_QUERIES_PARTY_NAME).build());
+            caseDataBuilder
+                .queries(caseData.getQueries().toBuilder().partyName(PUBLIC_QUERIES_PARTY_NAME).build())
+                .qmLatestQuery(buildLatestQuery(latestCaseMessage, caseData, roles));;
             clearOldQueryCollections(caseDataBuilder);
         } else if (!isLIPClaimant(roles) && !isLIPDefendant(roles)) {
+            caseDataBuilder.qmLatestQuery(buildLatestQuery(latestCaseMessage));
             updateQueryCollectionPartyName(roles, MultiPartyScenario.getMultiPartyScenario(caseData), caseDataBuilder);
         }
 

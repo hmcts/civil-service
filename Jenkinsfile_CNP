@@ -11,7 +11,6 @@ import uk.gov.hmcts.contino.GithubAPI
 def type = "java"
 def product = "civil"
 def component = "service"
-def ccdBranch = "master"
 def camundaBranch = "master"
 def dmnBranch = "master"
 def yarnBuilder = new uk.gov.hmcts.contino.YarnBuilder(this)
@@ -130,7 +129,7 @@ withPipeline(type, product, component) {
   }
 
   before('smoketest:preview') {
-    env.URL = "https://xui-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+    env.URL = "https://civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.CIVIL_SERVICE_URL = "https://civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.WIREMOCK_URL = "https://wiremock-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
 
@@ -183,7 +182,7 @@ withPipeline(type, product, component) {
       ./bin/import-ccd-definition.sh "-e *-nonprod.json,*COS-nonprod.json,AuthorisationCaseType-shuttered.json"
       ./bin/import-bpmn-diagram.sh .
     """
-    env.URL = "https://civil-service-xui-staging.aat.platform.hmcts.net"
+    env.URL = "https://civil-service-staging.aat.platform.hmcts.net"
     env.CIVIL_SERVICE_URL = "https://civil-service-staging.aat.platform.hmcts.net"
     env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
     env.IDAM_API_URL = "https://idam-api.aat.platform.hmcts.net"

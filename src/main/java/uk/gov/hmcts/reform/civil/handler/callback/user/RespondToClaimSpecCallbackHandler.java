@@ -80,6 +80,8 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -157,7 +159,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     private static final List<CaseEvent> EVENTS = Collections.singletonList(DEFENDANT_RESPONSE_SPEC);
     private static final String DEF2 = "Defendant 2";
     public static final String ERROR_DEFENDANT_RESPONSE_SPEC_SUBMITTED = "There is a problem \n You have already submitted the defendant's response";
-    private static final int RESPONSE_CLAIM_SPEC_DEADLINE_EXTENSION_MONTHS = 24;
+    private static final int RESPONSE_CLAIM_SPEC_DEADLINE_EXTENSION_MONTHS = 36;
     public static final String ERROR_RESPONSE_TO_CLAIM_OWING_AMOUNT = "This amount equals or exceeds the claim amount plus interest.";
     private final DateOfBirthValidator dateOfBirthValidator;
     private final UnavailableDateValidator unavailableDateValidator;
@@ -1484,7 +1486,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             && caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == IMMEDIATELY
             && ifResponseTypeIsPartOrFullAdmission(caseData)) {
             LocalDate whenBePaid = deadlineCalculatorService.calculateExtendedDeadline(
-                LocalDate.now(),
+                ZonedDateTime.now(ZoneId.of("Europe/London")).toLocalDateTime(),
                 RespondentResponsePartAdmissionPaymentTimeLRspec.DAYS_TO_PAY_IMMEDIATELY);
             updatedData.respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
                                                           .whenWillThisAmountBePaid(whenBePaid).build());

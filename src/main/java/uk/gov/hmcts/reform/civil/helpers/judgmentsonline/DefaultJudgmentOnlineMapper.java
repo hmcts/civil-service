@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.helpers.judgmentsonline;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
@@ -15,6 +14,7 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
+import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
@@ -25,18 +25,24 @@ import java.time.LocalDateTime;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class DefaultJudgmentOnlineMapper extends JudgmentOnlineMapper {
 
     boolean isNonDivergent =  false;
     private final InterestCalculator interestCalculator;
     private final RoboticsAddressMapper addressMapper;
 
+    public DefaultJudgmentOnlineMapper(Time time, InterestCalculator interestCalculator, RoboticsAddressMapper addressMapper) {
+        super(time);
+        this.interestCalculator = interestCalculator;
+        this.addressMapper = addressMapper;
+    }
+
     @Override
     public JudgmentDetails addUpdateActiveJudgment(CaseData caseData) {
 
         BigInteger orderAmount = MonetaryConversions.poundsToPennies(JudgmentsOnlineHelper.getDebtAmount(caseData, interestCalculator));
-        BigInteger costs = MonetaryConversions.poundsToPennies(JudgmentsOnlineHelper.getCostOfJudgmentForDJ(caseData));
+        BigInteger costs = MonetaryConversions.poundsToPennies(JudgmentsOnlineHelper.getFixedCostsOfJudgmentForDJ(caseData));
+        BigInteger claimFee = MonetaryConversions.poundsToPennies(JudgmentsOnlineHelper.getClaimFeeOfJudgmentForDJ(caseData));
         isNonDivergent =  JudgmentsOnlineHelper.isNonDivergentForDJ(caseData);
         JudgmentDetails activeJudgment = super.addUpdateActiveJudgment(caseData);
         activeJudgment = super.updateDefendantDetails(activeJudgment, caseData, addressMapper);
@@ -51,8 +57,9 @@ public class DefaultJudgmentOnlineMapper extends JudgmentOnlineMapper {
             .rtlState(isNonDivergent ? JudgmentRTLStatus.ISSUED.getRtlState() : null)
             .issueDate(LocalDate.now())
             .orderedAmount(orderAmount.toString())
+            .claimFeeAmount(claimFee.toString())
             .costs(costs.toString())
-            .totalAmount(orderAmount.add(costs).toString())
+            .totalAmount(orderAmount.add(costs).add(claimFee).toString())
             .build();
         super.updateJudgmentTabDataWithActiveJudgment(judgmentDetails, caseData);
 

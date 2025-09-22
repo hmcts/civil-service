@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.helpers.judgmentsonline;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
@@ -19,6 +18,7 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
+import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
@@ -32,13 +32,19 @@ import static java.util.Objects.nonNull;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
 
     boolean isNonDivergent = false;
     private final RoboticsAddressMapper addressMapper;
     private final JudgementService judgementService;
     private final InterestCalculator interestCalculator;
+
+    public JudgmentByAdmissionOnlineMapper(Time time, RoboticsAddressMapper addressMapper, JudgementService judgementService, InterestCalculator interestCalculator) {
+        super(time);
+        this.addressMapper = addressMapper;
+        this.judgementService = judgementService;
+        this.interestCalculator = interestCalculator;
+    }
 
     @Override
     public JudgmentDetails addUpdateActiveJudgment(CaseData caseData) {
@@ -222,7 +228,8 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
     private String addInterest(BigInteger orderAmount, BigInteger totalInterest, CaseData caseData) {
         if (judgementService.isLrFullAdmitRepaymentPlan(caseData)
             || judgementService.isLRPartAdmitRepaymentPlan(caseData)
-            || judgementService.isLrPayImmediatelyPlan(caseData)) {
+            || judgementService.isLrPayImmediatelyPlan(caseData)
+            || judgementService.isLipvLipPartAdmit(caseData)) {
             return orderAmount.toString();
         } else {
             return orderAmount.add(totalInterest).toString();
@@ -233,7 +240,8 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
                                        BigInteger claimFeeAmount, BigInteger costs, CaseData caseData) {
         if (judgementService.isLrFullAdmitRepaymentPlan(caseData)
             || judgementService.isLRPartAdmitRepaymentPlan(caseData)
-            || judgementService.isLrPayImmediatelyPlan(caseData)) {
+            || judgementService.isLrPayImmediatelyPlan(caseData)
+            || judgementService.isLipvLipPartAdmit(caseData)) {
             return orderAmount.add(claimFeeAmount).add(costs).toString();
         } else {
             return orderAmount.add(totalInterest).add(claimFeeAmount).add(costs).toString();

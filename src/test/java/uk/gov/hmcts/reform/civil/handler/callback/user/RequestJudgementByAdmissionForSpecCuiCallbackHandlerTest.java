@@ -38,6 +38,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
+import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
@@ -73,7 +74,8 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
     JudgementService.class,
     JudgmentByAdmissionOnlineMapper.class,
     RoboticsAddressMapper.class,
-    AddressLinesMapper.class
+    AddressLinesMapper.class,
+    Time.class
 })
 public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -100,6 +102,9 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
 
     @MockBean
     private InterestCalculator interestCalculator;
+
+    @MockBean
+    private Time time;
 
     @Nested
     class AboutToStartCallback {
@@ -719,6 +724,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(caseData);
             when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+            when(time.now()).thenReturn(now);
 
             AboutToStartOrSubmitCallbackResponse response;
             try (MockedStatic<LocalDateTime> mock = mockStatic(LocalDateTime.class, CALLS_REAL_METHODS)) {
@@ -833,7 +839,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
             CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                 .ccjPaymentPaidSomeOption(YesOrNo.YES)
                 .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(500.0))
-                .ccjJudgmentLipInterest(BigDecimal.valueOf(300))
+                .ccjJudgmentLipInterest(BigDecimal.valueOf(300.00))
                 .ccjJudgmentAmountClaimFee(BigDecimal.valueOf(0))
                 .build();
             CaseData caseData = CaseData.builder()
@@ -842,6 +848,9 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
                 .applicant1Represented(YesOrNo.NO)
                 .totalClaimAmount(BigDecimal.valueOf(1000))
                 .ccjPaymentDetails(ccjPaymentDetails)
+                .claimFee(Fee.builder()
+                    .calculatedAmountInPence(BigDecimal.valueOf(0))
+                    .build())
                 .defendantDetailsSpec(DynamicList.builder()
                                           .value(DynamicListElement.builder()
                                                      .label("John Doe")
@@ -907,6 +916,42 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
                 .extracting("businessProcess")
                 .extracting("camundaEvent")
                 .isEqualTo(JUDGEMENT_BY_ADMISSION_NON_DIVERGENT_SPEC.name());
+        }
+
+        @Test
+        void shouldUpdateJudgmentTabDetailsForLipvLip() {
+            CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
+                .ccjPaymentPaidSomeOption(YesOrNo.YES)
+                .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(500.0))
+                .ccjJudgmentLipInterest(BigDecimal.valueOf(300.00))
+                .ccjJudgmentAmountClaimFee(BigDecimal.valueOf(0))
+                .build();
+            CaseData caseData = CaseData.builder()
+                .respondent1Represented(YesOrNo.NO)
+                .specRespondent1Represented(YesOrNo.NO)
+                .applicant1Represented(YesOrNo.NO)
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .ccjPaymentDetails(ccjPaymentDetails)
+                .respondent1(PartyBuilder.builder().individual().build())
+                .activeJudgment(activeJudgment)
+                .claimFee(Fee.builder()
+                              .calculatedAmountInPence(BigDecimal.valueOf(0))
+                              .build())
+                .defendantDetailsSpec(DynamicList.builder()
+                                          .value(DynamicListElement.builder()
+                                                     .label("John Doe")
+                                                     .build())
+                                          .build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(caseData);
+            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            CaseData data = getCaseData(response);
+            assertThat(data.getActiveJudgment()).isNotNull();
+            assertThat(data.getJoRepaymentSummaryObject()).isNotNull();
         }
 
     }
