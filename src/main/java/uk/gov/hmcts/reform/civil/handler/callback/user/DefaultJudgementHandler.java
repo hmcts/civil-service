@@ -57,7 +57,7 @@ public class DefaultJudgementHandler extends CallbackHandler {
     public static final String JUDGMENT_REQUESTED = "# Judgment for damages to be decided requested ";
     public static final String JUDGMENT_GRANTED_HEADER = "# Judgment for damages to be decided Granted ";
     private static final List<CaseEvent> EVENTS = List.of(DEFAULT_JUDGEMENT);
-    private static final int DEFAULT_JUDGEMENT_DEADLINE_EXTENSION_MONTHS = 24;
+    private static final int DEFAULT_JUDGEMENT_DEADLINE_EXTENSION_MONTHS = 36;
     private final ObjectMapper objectMapper;
     private final LocationReferenceDataService locationRefDataService;
     private final DeadlinesCalculator deadlinesCalculator;
