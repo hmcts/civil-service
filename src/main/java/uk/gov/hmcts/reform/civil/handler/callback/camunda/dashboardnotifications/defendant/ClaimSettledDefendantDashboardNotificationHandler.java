@@ -4,10 +4,12 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.callback.DashboardCallbackHandler;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
+import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
+import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
 import java.util.List;
 
@@ -20,11 +22,17 @@ public class ClaimSettledDefendantDashboardNotificationHandler extends Dashboard
     private static final List<CaseEvent> EVENTS =
         List.of(CREATE_DASHBOARD_NOTIFICATION_FOR_CLAIM_SETTLED_FOR_DEFENDANT1);
     public static final String TASK_ID = "CreateClaimSettledDashboardNotificationsForDefendant1";
+    private final DashboardNotificationService dashboardNotificationService;
+    private final TaskListService taskListService;
 
-    public ClaimSettledDefendantDashboardNotificationHandler(DashboardApiClient dashboardApiClient,
-                                          DashboardNotificationsParamsMapper mapper,
-                                          FeatureToggleService featureToggleService) {
-        super(dashboardApiClient, mapper, featureToggleService);
+    public ClaimSettledDefendantDashboardNotificationHandler(DashboardScenariosService dashboardScenariosService,
+                                                             DashboardNotificationsParamsMapper mapper,
+                                                             FeatureToggleService featureToggleService,
+                                                             DashboardNotificationService dashboardNotificationService,
+                                                             TaskListService taskListService) {
+        super(dashboardScenariosService, mapper, featureToggleService);
+        this.dashboardNotificationService = dashboardNotificationService;
+        this.taskListService = taskListService;
     }
 
     @Override
@@ -40,5 +48,28 @@ public class ClaimSettledDefendantDashboardNotificationHandler extends Dashboard
     @Override
     public String getScenario(CaseData caseData) {
         return SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLE_EVENT_DEFENDANT.getScenario();
+    }
+
+    @Override
+    protected void beforeRecordScenario(CaseData caseData, String authToken) {
+        final String caseId = String.valueOf(caseData.getCcdCaseReference());
+
+        if (!featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation())) {
+            inactiveGAItems(caseId);
+        }
+
+    }
+
+    private void inactiveGAItems(String caseId) {
+        dashboardNotificationService.deleteByReferenceAndCitizenRole(
+            caseId,
+            "DEFENDANT"
+        );
+
+        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate(
+            caseId,
+            "DEFENDANT",
+            "Application.View"
+        );
     }
 }

@@ -4,21 +4,23 @@ import com.google.common.base.Strings;
 import lombok.RequiredArgsConstructor;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
+import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
+import java.util.HashMap;
 import java.util.Map;
 
+import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 @RequiredArgsConstructor
 public abstract class DashboardCallbackHandler extends CallbackHandler {
 
-    protected final DashboardApiClient dashboardApiClient;
+    protected final DashboardScenariosService dashboardScenariosService;
     protected final DashboardNotificationsParamsMapper mapper;
     protected final FeatureToggleService featureToggleService;
 
@@ -33,6 +35,11 @@ public abstract class DashboardCallbackHandler extends CallbackHandler {
 
     protected String getExtraScenario() {
         return null;
+    }
+
+    @SuppressWarnings("unused")
+    protected Map<String, Boolean> getScenarios(CaseData caseData) {
+        return new HashMap<>();
     }
 
     /**
@@ -69,23 +76,32 @@ public abstract class DashboardCallbackHandler extends CallbackHandler {
         if (!Strings.isNullOrEmpty(scenario) && shouldRecordScenario(caseData)) {
             beforeRecordScenario(caseData, authToken);
 
-            dashboardApiClient.recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                scenario,
+            dashboardScenariosService.recordScenarios(
                 authToken,
+                scenario,
+                caseData.getCcdCaseReference().toString(),
                 scenarioParams
             );
         }
 
         scenario = getExtraScenario();
         if (!Strings.isNullOrEmpty(scenario) && shouldRecordExtraScenario(caseData)) {
-            dashboardApiClient.recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                scenario,
+            dashboardScenariosService.recordScenarios(
                 authToken,
+                scenario,
+                caseData.getCcdCaseReference().toString(),
                 scenarioParams
             );
         }
+
+        ofNullable(getScenarios(caseData)).orElse(new HashMap<>())
+            .entrySet().stream()
+            .filter(scenarioEntry -> !Strings.isNullOrEmpty(scenarioEntry.getKey()) && scenarioEntry.getValue())
+            .forEach(scenarioEntry -> dashboardScenariosService.recordScenarios(
+                authToken,
+                scenarioEntry.getKey(),
+                caseData.getCcdCaseReference().toString(),
+                scenarioParams));
 
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }

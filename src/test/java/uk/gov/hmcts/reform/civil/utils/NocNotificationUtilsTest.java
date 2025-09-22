@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.model.Party;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static uk.gov.hmcts.reform.civil.utils.NocNotificationUtils.getOtherSolicitor1Email;
 
 public class NocNotificationUtilsTest {
 
@@ -50,7 +51,7 @@ public class NocNotificationUtilsTest {
             .applicant1OrganisationPolicy(organisationPolicy)
             .build();
 
-        assertEquals(TEST_EMAIL, NocNotificationUtils.getOtherSolicitor1Email(caseData));
+        assertEquals(TEST_EMAIL, getOtherSolicitor1Email(caseData));
         assertEquals(TEST_ORG, NocNotificationUtils.getOtherSolicitor1Name(caseData));
     }
 
@@ -66,7 +67,7 @@ public class NocNotificationUtilsTest {
             .respondent1OrganisationPolicy(organisationPolicy)
             .build();
 
-        assertEquals(TEST_EMAIL, NocNotificationUtils.getOtherSolicitor1Email(caseData));
+        assertEquals(TEST_EMAIL, getOtherSolicitor1Email(caseData));
         assertEquals(TEST_ORG, NocNotificationUtils.getOtherSolicitor1Name(caseData));
     }
 
@@ -83,7 +84,7 @@ public class NocNotificationUtilsTest {
             .applicant1OrganisationPolicy(organisationPolicy)
             .build();
 
-        assertEquals(TEST_EMAIL, NocNotificationUtils.getOtherSolicitor1Email(caseData));
+        assertEquals(TEST_EMAIL, getOtherSolicitor1Email(caseData));
         assertEquals(TEST_ORG, NocNotificationUtils.getOtherSolicitor1Name(caseData));
     }
 
@@ -256,5 +257,31 @@ public class NocNotificationUtilsTest {
         CaseData actual = NocNotificationUtils.getCaseDataWithoutFormerSolicitorEmail(caseData);
 
         assertEquals(expected, actual);
+    }
+
+    @Test
+    void testIsAppliantLipForRespondentSolicitorChange_trueCondition() {
+        // Arrange
+        CaseData caseData = CaseData.builder().applicant1Represented(YesOrNo.NO)
+            .changeOfRepresentation(ChangeOfRepresentation.builder()
+                                        .caseRole(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())
+                                        .build()).build();
+
+        // Act
+        boolean result = NocNotificationUtils.isAppliantLipForRespondentSolicitorChange(caseData);
+
+        // Assert
+        assertTrue(result, "The result should be true when both conditions are true");
+    }
+
+    @Test
+    void testApplicantLipEmailForRespondentSolicitorChange() {
+        // Arrange
+        CaseData caseData = CaseData.builder().applicant1Represented(YesOrNo.NO)
+            .changeOfRepresentation(ChangeOfRepresentation.builder()
+                                        .caseRole(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())
+                                        .build()).applicant1(Party.builder().partyEmail(TEST_EMAIL).build()).build();
+
+        assertEquals(TEST_EMAIL, getOtherSolicitor1Email(caseData));
     }
 }

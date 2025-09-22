@@ -62,7 +62,7 @@ public class PartAdmitPayByInstalmentsScenarioTest extends DashboardBaseIntegrat
                 jsonPath("$[0].titleEn").value("Response to the claim"),
                 jsonPath("$[0].descriptionEn").value(
                     "<p class=\"govuk-body\">James John has offered to pay you "
-                        + "£" + totalAmount + " in "
+                        + "£" + totalAmount + " plus the claim fee in "
                         + "instalments of £"
                         + MonetaryConversions.penniesToPounds(installmentAmount).toPlainString().replace(
                         ".00", "")
@@ -75,11 +75,11 @@ public class PartAdmitPayByInstalmentsScenarioTest extends DashboardBaseIntegrat
                 jsonPath("$[0].titleCy").value("Ymateb i’r hawliad"),
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Mae James John wedi cynnig talu "
-                        + "£" + totalAmount + " i chi mewn rhandaliadau o £"
+                        + "£" + totalAmount + " ynghyd â ffi’r hawliad i chi mewn rhandaliadau o £"
                         + MonetaryConversions.penniesToPounds(installmentAmount).toPlainString().replace(
                         ".00", "")
                         + " " + frequency.getDashboardLabelWelsh() + ". Maent yn cynnig gwneud hyn o "
-                        + DateUtils.formatDateInWelsh(firstPaymentDate)
+                        + DateUtils.formatDateInWelsh(firstPaymentDate, false)
                         + " ymlaen.</p>"
                         + "<p class=\"govuk-body\"><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Gweld ac ymateb"
                         + "</a></p>"

@@ -8,11 +8,15 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -21,6 +25,9 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLI
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 
 @Service
@@ -34,6 +41,9 @@ public class TrialReadyApplicantNotificationHandler extends CallbackHandler impl
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
+    private final OrganisationService organisationService;
+    private final NotificationsSignatureConfiguration configuration;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -80,18 +90,16 @@ public class TrialReadyApplicantNotificationHandler extends CallbackHandler impl
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-        String claimRefNumber;
-        if (caseData.getSolicitorReferences() == null
-            || caseData.getSolicitorReferences().getApplicantSolicitor1Reference() == null) {
-            claimRefNumber = "";
-        } else {
-            claimRefNumber = caseData.getSolicitorReferences().getApplicantSolicitor1Reference();
-        }
-
-        return Map.of(
+        HashMap<String, String> properties = new HashMap<>(Map.of(
             HEARING_DATE, formatLocalDate(caseData.getHearingDate(), DATE),
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
-        );
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData, organisationService),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
+        ));
+        addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
+        return properties;
     }
 
     public String addTrialOrHearing(CaseData caseData) {
@@ -104,12 +112,15 @@ public class TrialReadyApplicantNotificationHandler extends CallbackHandler impl
     }
 
     private Map<String, String> addPropertiesLip(CaseData caseData) {
-
-        return Map.of(
+        HashMap<String, String> properties = new HashMap<>(Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             PARTY_NAME, caseData.getApplicant1().getPartyName(),
-            CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData)
-        );
+            CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
+        ));
+        addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
+        return properties;
     }
 
     private boolean isLipApplicant(CallbackParams callbackParams) {

@@ -14,12 +14,15 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.UpholdingPreviousOrderReason;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.sdo.RequestReconsiderationGeneratorService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
+import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -35,6 +38,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DECISION_ON_RECONSIDERATION_REQUEST;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
+import static uk.gov.hmcts.reform.civil.model.welshenhancements.PreTranslationDocumentType.DECISION_MADE_ON_APPLICATIONS;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
@@ -45,6 +49,7 @@ public class JudgeDecisionOnReconsiderationRequestCallbackHandler extends Callba
     protected final ObjectMapper objectMapper;
     private final RequestReconsiderationGeneratorService requestReconsiderationGeneratorService;
     private final AssignCategoryId assignCategoryId;
+    private final FeatureToggleService featureToggleService;
     private static final String CONFIRMATION_HEADER = "# Response has been submitted";
     private static final String CONFIRMATION_BODY_YES = "### Upholding previous order \n" +
         "A notification will be sent to the party applying for the request for reconsideration.";
@@ -55,6 +60,12 @@ public class JudgeDecisionOnReconsiderationRequestCallbackHandler extends Callba
         "general order" +
         " \n" +
         "To make a bespoke order in this claim, select 'General order' from the dropdown menu on the right of the " +
+        "screen on your dashboard.";
+
+    private static final String CONFIRMATION_BODY_CREATE_MAKE_AN_ORDER = "### Amend previous order and create a " +
+        "general order" +
+        " \n" +
+        "To make a bespoke order in this claim, select 'Make an order' from the dropdown menu on the right of the " +
         "screen on your dashboard.";
     private static final String UPHOLDING_PREVIOUS_ORDER_REASON = "Having read the application for reconsideration of" +
         " " +
@@ -80,6 +91,11 @@ public class JudgeDecisionOnReconsiderationRequestCallbackHandler extends Callba
                     caseDocumentElement -> caseDocumentElement.getValue().getCreatedDatetime(),
             Comparator.reverseOrder()
         )).findFirst();
+
+        if (featureToggleService.isWelshEnabledForMainCase()
+            && (callbackParams.getCaseData().isClaimantBilingual() || callbackParams.getCaseData().isRespondentResponseBilingual())) {
+            caseDataBuilder.bilingualHint(YesOrNo.YES);
+        }
 
         if (sdoDocLatest.isPresent()) {
             String sdoDate = formatLocalDateTime(sdoDocLatest.get().getValue().getCreatedDatetime(), DATE);
@@ -118,12 +134,19 @@ public class JudgeDecisionOnReconsiderationRequestCallbackHandler extends Callba
                     callbackParams.getCaseData().getDecisionOnReconsiderationDocument();
                 List<Element<CaseDocument>> systemGeneratedCaseDocuments =
                     callbackParams.getCaseData().getSystemGeneratedCaseDocuments();
-                systemGeneratedCaseDocuments.add(element(requestForReconsiderationDocument));
-                caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
+                if (featureToggleService.isWelshEnabledForMainCase() && (callbackParams.getCaseData().isClaimantBilingual()
+                    || callbackParams.getCaseData().isRespondentResponseBilingual())) {
+                    caseDataBuilder.preTranslationDocuments(List.of(ElementUtils.element(requestForReconsiderationDocument)));
+                    caseDataBuilder.bilingualHint(YesOrNo.YES);
+                    caseDataBuilder.preTranslationDocumentType(DECISION_MADE_ON_APPLICATIONS);
+                } else {
+                    systemGeneratedCaseDocuments.add(element(requestForReconsiderationDocument));
+                    caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
+                    caseDataBuilder.businessProcess(BusinessProcess.ready(DECISION_ON_RECONSIDERATION_REQUEST));
+                }
                 //delete temp so it will not show up twice in case file view
                 caseDataBuilder.decisionOnReconsiderationDocument(null);
             }
-            caseDataBuilder.businessProcess(BusinessProcess.ready(DECISION_ON_RECONSIDERATION_REQUEST));
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -149,12 +172,15 @@ public class JudgeDecisionOnReconsiderationRequestCallbackHandler extends Callba
     }
 
     private String getBody(DecisionOnRequestReconsiderationOptions decisionOnRequestReconsiderationOptions) {
-        if (decisionOnRequestReconsiderationOptions.equals(DecisionOnRequestReconsiderationOptions.YES)) {
-            return CONFIRMATION_BODY_YES;
-        } else if (decisionOnRequestReconsiderationOptions.equals(DecisionOnRequestReconsiderationOptions.CREATE_SDO)) {
-            return CONFIRMATION_BODY_CREATE_SDO;
-        } else {
-            return CONFIRMATION_BODY_CREATE_GENERAL_ORDER;
+        switch (decisionOnRequestReconsiderationOptions) {
+            case YES:
+                return CONFIRMATION_BODY_YES;
+            case CREATE_SDO:
+                return CONFIRMATION_BODY_CREATE_SDO;
+            default:
+                return featureToggleService.isCaseProgressionEnabled()
+                    ? CONFIRMATION_BODY_CREATE_MAKE_AN_ORDER
+                    : CONFIRMATION_BODY_CREATE_GENERAL_ORDER;
         }
     }
 

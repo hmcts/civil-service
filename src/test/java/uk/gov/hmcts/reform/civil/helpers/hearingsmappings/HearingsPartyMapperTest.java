@@ -92,14 +92,14 @@ public class HearingsPartyMapperTest {
 
     private CaseData rollUpUnavailableDateRespondent(CaseData caseData) {
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
-        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent(builder, true);
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent(builder);
         caseData = builder.build();
         return caseData;
     }
 
     private CaseData rollUpUnavailableDateApplicant(CaseData caseData) {
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
-        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(builder, true);
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(builder);
         caseData = builder.build();
         return caseData;
     }

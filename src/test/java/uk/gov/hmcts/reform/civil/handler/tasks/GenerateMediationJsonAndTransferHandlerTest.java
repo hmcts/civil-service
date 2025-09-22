@@ -20,16 +20,13 @@ import uk.gov.hmcts.reform.civil.service.search.MediationCasesSearchService;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -39,7 +36,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.IN_MEDIATION;
 class GenerateMediationJsonAndTransferHandlerTest {
 
     @InjectMocks
-    private GenerateMediationJsonAndTransferTaskHandler mediationJsonHandler;
+    private GenerateJsonAndTransferTaskHandler mediationJsonHandler;
 
     @Mock
     private ExternalTask externalTask;
@@ -54,13 +51,13 @@ class GenerateMediationJsonAndTransferHandlerTest {
     private CaseDetailsConverter caseDetailsConverter;
 
     @Mock
-    private  SendGridClient sendGridClient;
+    private SendGridClient sendGridClient;
 
     @Mock
     private MediationJsonService mediationJsonService;
 
     @Mock
-    private  MediationCSVEmailConfiguration mediationCSVEmailConfiguration;
+    private MediationCSVEmailConfiguration mediationCSVEmailConfiguration;
 
     @Mock
     private FeatureToggleService featureToggleService;
@@ -70,7 +67,7 @@ class GenerateMediationJsonAndTransferHandlerTest {
     private CaseData caseDataInMediation;
     private CaseData caseDataInMediationNotToProcess;
     private static final String RECIPIENT = "recipient@gmail.com";
-    private final LocalDate claimToBeProcessed = LocalDate.now().minusDays(1);
+    private final LocalDate claimToBeProcessed = LocalDate.now().minusDays(7);
     private final LocalDate claimNotToBeProcessed = LocalDate.now();
 
     @BeforeEach
@@ -79,17 +76,16 @@ class GenerateMediationJsonAndTransferHandlerTest {
         caseDetailsWithInMediationStateNotToProcess = getCaseDetails(2L, claimNotToBeProcessed);
         caseDataInMediation = getCaseData(1L, claimToBeProcessed);
         caseDataInMediationNotToProcess = getCaseData(2L, claimNotToBeProcessed);
-        when(featureToggleService.isFeatureEnabled("carm")).thenReturn(true);
     }
 
     @Test
     void shouldGenerateJsonAndSendEmailSuccessfully() {
-        when(searchService.getInMediationCases(claimToBeProcessed, true)).thenReturn(List.of(caseDetailsWithInMediationState));
+        when(searchService.getInMediationCases(true)).thenReturn(List.of(caseDetailsWithInMediationState));
         when(caseDetailsConverter.toCaseData(caseDetailsWithInMediationState)).thenReturn(caseDataInMediation);
         when(mediationCSVEmailConfiguration.getSender()).thenReturn(RECIPIENT);
 
         mediationJsonHandler.execute(externalTask, externalTaskService);
-        verify(searchService).getInMediationCases(claimToBeProcessed, true);
+        verify(searchService).getInMediationCases(true);
         verify(sendGridClient).sendEmail(anyString(), any());
         verify(sendGridClient, times(1)).sendEmail(anyString(), any());
         verify(externalTaskService).complete(externalTask, null);
@@ -98,50 +94,22 @@ class GenerateMediationJsonAndTransferHandlerTest {
     @Test
     void shouldNotGenerateJsonAndSendEmail() {
         List<CaseDetails> cases = new ArrayList<>();
-        String date = (claimNotToBeProcessed.format(DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.UK)));
-        when(externalTask.getVariable(any())).thenReturn(date);
-        when(searchService.getInMediationCases(any(), anyBoolean())).thenReturn(cases);
+        when(searchService.getInMediationCases(anyBoolean())).thenReturn(cases);
 
         mediationJsonHandler.execute(externalTask, externalTaskService);
-        verify(searchService).getInMediationCases(claimNotToBeProcessed, true);
+        verify(searchService).getInMediationCases(true);
         verify(sendGridClient, times(0)).sendEmail(anyString(), any());
-        verify(externalTaskService).complete(externalTask, null);
-    }
-
-    @Test
-    void shouldNotGenerateJsonAndSendEmailCarmToggleOff() {
-        when(featureToggleService.isFeatureEnabled("carm")).thenReturn(false);
-
-        mediationJsonHandler.execute(externalTask, externalTaskService);
-        verify(searchService, times(0)).getInMediationCases(eq(claimNotToBeProcessed), anyBoolean());
-        verify(sendGridClient, times(0)).sendEmail(anyString(), any());
-        verify(externalTaskService).complete(externalTask, null);
-    }
-
-    @Test
-    void should_handle_task_from_external_variable() {
-        String date = (claimNotToBeProcessed.format(DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.UK)));
-        when(externalTask.getVariable(any())).thenReturn(date);
-        when(searchService.getInMediationCases(any(), anyBoolean())).thenReturn(List.of(caseDetailsWithInMediationState, caseDetailsWithInMediationStateNotToProcess));
-        when(caseDetailsConverter.toCaseData(caseDetailsWithInMediationState)).thenReturn(caseDataInMediation);
-        when(caseDetailsConverter.toCaseData(caseDetailsWithInMediationStateNotToProcess)).thenReturn(caseDataInMediationNotToProcess);
-        when(mediationCSVEmailConfiguration.getSender()).thenReturn(RECIPIENT);
-
-        mediationJsonHandler.execute(externalTask, externalTaskService);
-        verify(searchService).getInMediationCases(claimNotToBeProcessed, true);
-        verify(sendGridClient).sendEmail(anyString(), any());
-        verify(sendGridClient, times(1)).sendEmail(anyString(), any());
         verify(externalTaskService).complete(externalTask, null);
     }
 
     @Test
     void shouldGenerateCsvAndSendEmailSuccessfully_R2LipVLipFlagEnabled() {
-        when(searchService.getInMediationCases(claimToBeProcessed, true)).thenReturn(List.of(caseDetailsWithInMediationState));
+        when(searchService.getInMediationCases(true)).thenReturn(List.of(caseDetailsWithInMediationState));
         when(caseDetailsConverter.toCaseData(caseDetailsWithInMediationState)).thenReturn(caseDataInMediation);
         when(mediationCSVEmailConfiguration.getSender()).thenReturn(RECIPIENT);
 
         mediationJsonHandler.execute(externalTask, externalTaskService);
-        verify(searchService).getInMediationCases(claimToBeProcessed, true);
+        verify(searchService).getInMediationCases(true);
         verify(sendGridClient, times(1)).sendEmail(anyString(), any());
         verify(externalTaskService).complete(externalTask, null);
     }

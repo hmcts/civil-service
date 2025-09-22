@@ -83,15 +83,18 @@ public class HearingValuesService {
     private final FeatureToggleService featuretoggleService;
 
     public ServiceHearingValuesModel getValues(Long caseId, String authToken) throws Exception {
+        log.info("Getting hearing values for case id: " + caseId);
         CaseData caseData = retrieveCaseData(caseId);
         populateMissingFields(caseId, caseData);
-        isEarlyAdopter(caseData);
+
+        log.info("Checking LR v LR for case id: " + caseId);
         isLrVLr(caseData);
+        log.info("Completed LR v LR check for case id: " + caseId);
 
         String baseUrl = manageCaseBaseUrlConfiguration.getManageCaseBaseUrl();
         String hmctsServiceID = getHmctsServiceID(caseData, paymentsConfiguration);
 
-        return ServiceHearingValuesModel.builder()
+        ServiceHearingValuesModel hearingValuesModel = ServiceHearingValuesModel.builder()
             .hmctsServiceID(hmctsServiceID)
             .hmctsInternalCaseName(getHmctsInternalCaseName(caseData))
             .publicCaseName(getPublicCaseName(caseData))
@@ -125,6 +128,8 @@ public class HearingValuesService {
             .hearingChannels(getHearingChannels(authToken, hmctsServiceID, caseData, categoryService))
             .caseFlags(getCaseFlags(caseData))
             .build();
+        log.info("Returning hearing values for case id: " + caseId);
+        return hearingValuesModel;
     }
 
     private CaseData retrieveCaseData(long caseId) {
@@ -137,22 +142,27 @@ public class HearingValuesService {
     }
 
     private void isEarlyAdopter(CaseData caseData) throws NotEarlyAdopterCourtException {
-        if (!earlyAdoptersService.isPartOfHmcEarlyAdoptersRollout(caseData)) {
+        if (!earlyAdoptersService.isPartOfHmcLipEarlyAdoptersRollout(caseData)) {
             throw new NotEarlyAdopterCourtException();
         }
     }
 
     private void isLrVLr(CaseData caseData) throws IncludesLitigantInPersonException {
         if (caseData.isApplicantLiP() || caseData.isRespondent1LiP() || caseData.isRespondent2LiP()) {
-            throw new IncludesLitigantInPersonException();
+            if (featuretoggleService.isHmcForLipEnabled()) {
+                if (!featuretoggleService.isWelshEnabledForMainCase()) {
+                    isEarlyAdopter(caseData);
+                }
+            } else {
+                throw new IncludesLitigantInPersonException();
+            }
         }
     }
 
     private void populateMissingFields(Long caseId, CaseData caseData) throws Exception {
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
         boolean partyIdsUpdated = populateMissingPartyIds(builder, caseData);
-        boolean unavailableDatesUpdated = featuretoggleService.isUpdateContactDetailsEnabled()
-            ? populateMissingUnavailableDatesFields(builder) : false;
+        boolean unavailableDatesUpdated = populateMissingUnavailableDatesFields(builder);
         boolean caseFlagsUpdated = initialiseMissingCaseFlags(builder);
 
         if (partyIdsUpdated || unavailableDatesUpdated || caseFlagsUpdated) {
@@ -208,8 +218,8 @@ public class HearingValuesService {
             || shouldUpdateApplicant2UnavailableDates(caseData)
             || shouldUpdateRespondent1UnavailableDates(caseData)
             || shouldUpdateRespondent2UnavailableDates(caseData)) {
-            updateMissingUnavailableDatesForApplicants(caseData, builder, true);
-            rollUpUnavailabilityDatesForRespondent(builder, true);
+            updateMissingUnavailableDatesForApplicants(caseData, builder);
+            rollUpUnavailabilityDatesForRespondent(builder);
             copyDatesIntoListingTabFields(builder.build(), builder);
             return true;
         }

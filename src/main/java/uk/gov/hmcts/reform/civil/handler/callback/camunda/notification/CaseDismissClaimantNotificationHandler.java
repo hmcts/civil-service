@@ -6,6 +6,8 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.List;
 
@@ -17,8 +19,10 @@ public class CaseDismissClaimantNotificationHandler extends AbstractCaseDismissN
     );
 
     public CaseDismissClaimantNotificationHandler(NotificationService notificationService,
-                                                  NotificationsProperties notificationsProperties) {
-        super(notificationService, notificationsProperties);
+                                                  NotificationsProperties notificationsProperties,
+                                                  FeatureToggleService featureToggleService,
+                                                  NotificationsSignatureConfiguration configuration) {
+        super(notificationService, notificationsProperties, configuration, featureToggleService);
     }
 
     @Override
@@ -27,7 +31,7 @@ public class CaseDismissClaimantNotificationHandler extends AbstractCaseDismissN
     }
 
     @Override
-    protected String getPartyName(CaseData caseData) {
+    protected String getPartyName(CaseData caseData, CallbackParams callbackParams) {
         return caseData.getApplicant1().getPartyName();
     }
 

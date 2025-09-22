@@ -60,6 +60,7 @@ public class ReferenceNumberAndCourtDetailsPopulatorTest {
                             .build())
             .respondent1DQ(respondent1DQ)
             .legacyCaseReference("12345")
+            .ccdCaseReference(1234567890123456L)
             .detailsOfWhyDoesYouDisputeTheClaim("Dispute details")
             .build();
 
@@ -70,6 +71,7 @@ public class ReferenceNumberAndCourtDetailsPopulatorTest {
 
         SealedClaimResponseFormForSpec form = builder.build();
         assertEquals("12345", form.getReferenceNumber());
+        assertEquals("1234567890123456", form.getCcdCaseReference());
         assertEquals("Dispute details", form.getWhyDisputeTheClaim());
         assertEquals("Court Name", form.getHearingCourtLocation());
     }

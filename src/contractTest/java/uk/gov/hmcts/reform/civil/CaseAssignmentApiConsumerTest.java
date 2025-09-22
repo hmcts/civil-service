@@ -36,13 +36,13 @@ public class CaseAssignmentApiConsumerTest extends BaseContractTest {
     @Autowired
     private CaseAssignmentApi caseAssignmentApi;
 
-    @Pact(consumer = "civil-service")
+    @Pact(consumer = "civil_service")
     public RequestResponsePact getUserRoles(PactDslWithProvider builder)
         throws JSONException, IOException {
         return buildGetUserRolesResponsePact(builder);
     }
 
-    @Pact(consumer = "civil-service")
+    @Pact(consumer = "civil_service")
     public RequestResponsePact removeCaseUserRoles(PactDslWithProvider builder)
         throws JSONException, IOException {
         return buildRemoveUserRolesResponsePact(builder);
@@ -95,7 +95,7 @@ public class CaseAssignmentApiConsumerTest extends BaseContractTest {
             .path(ENDPOINT)
             .headers(SERVICE_AUTHORIZATION_HEADER, SERVICE_AUTH_TOKEN, AUTHORIZATION_HEADER, AUTHORIZATION_TOKEN)
             .method(HttpMethod.DELETE.toString())
-            .body(objectMapper.writeValueAsString(getRequestEntity()))
+            .body(createJsonObject(getRequestEntity()))
             .willRespondWith()
             .matchHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .body(buildRemoveUserRolesResponseBody())

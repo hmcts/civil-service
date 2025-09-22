@@ -1,18 +1,24 @@
 package uk.gov.hmcts.reform.civil.service;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleApi;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -38,38 +44,11 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenAutomatedHearingNoticeEnabledInvoked(Boolean toggleStat) {
-        var hearingAndListingKey = "ahn";
-        givenToggle(hearingAndListingKey, toggleStat);
-
-        assertThat(featureToggleService.isAutomatedHearingNoticeEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsCaseFlagsEnabledInvoked(Boolean toggleStat) {
-        var caseFlagsKey = "case-flags";
-        givenToggle(caseFlagsKey, toggleStat);
-
-        assertThat(featureToggleService.isCaseFlagsEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsGAForLipInvoked(Boolean toggleStat) {
         var caseFlagsKey = "GaForLips";
         givenToggle(caseFlagsKey, toggleStat);
 
         assertThat(featureToggleService.isGaForLipsEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsCaseEventsEnabledInvoked(Boolean toggleStat) {
-        var caseFlagsKey = "cui-case-events-enabled";
-        givenToggle(caseFlagsKey, toggleStat);
-
-        assertThat(featureToggleService.isCaseEventsEnabled()).isEqualTo(toggleStat);
     }
 
     @ParameterizedTest
@@ -119,15 +98,6 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenHmcIsEnabled(Boolean toggleStat) {
-        var hmcKey = "hmc";
-        givenToggle(hmcKey, toggleStat);
-
-        assertThat(featureToggleService.isHmcEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenEnableRPAEmailsInvoked(Boolean toggleStat) {
         var enableRPAEmailsKey = "enable-rpa-emails";
         givenToggle(enableRPAEmailsKey, toggleStat);
@@ -146,15 +116,6 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenUpdateContactDetailsEnabled(Boolean toggleStat) {
-        var caseFileKey = "update-contact-details";
-        givenToggle(caseFileKey, toggleStat);
-
-        assertThat(featureToggleService.isUpdateContactDetailsEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenLocationWhiteListed(Boolean toggleStat) {
         final String feature = "case-progression-location-whitelist";
         String location = "000000";
@@ -162,6 +123,29 @@ class FeatureToggleServiceTest {
             .thenReturn(toggleStat);
 
         assertThat(featureToggleService.isLocationWhiteListedForCaseProgression(location)).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "someLocation, true, true",
+        "someLocation, false, false",
+        ", true, false",
+        ", false, false"
+    })
+    void shouldReturnCorrectValueBasedOnLocationAndFeatureToggleForGaLips(String location, boolean isFeatureEnabled, boolean expected) {
+
+        if (isFeatureEnabled && location != null) {
+            when(featureToggleApi.isFeatureEnabledForLocation(
+                "ea-courts-whitelisted-for-ga-lips",
+                location,
+                false
+            )).thenReturn(isFeatureEnabled);
+            when(featureToggleService.isGaForLipsEnabled()).thenReturn(isFeatureEnabled);
+        }
+
+        boolean result = featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(location);
+
+        assertEquals(expected, result);
     }
 
     @ParameterizedTest
@@ -184,38 +168,11 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenEarlyAdopterEnabled(Boolean toggleStat) {
-        var caseFileKey = "early-adopters";
-        givenToggle(caseFileKey, toggleStat);
-
-        assertThat(featureToggleService.isEarlyAdoptersEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsSdoR2Enabled(Boolean toggleStat) {
-        var sdoR2Key = "isSdoR2Enabled";
-        givenToggle(sdoR2Key, toggleStat);
-
-        assertThat(featureToggleService.isSdoR2Enabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsJudgmentOnlineLive(Boolean toggleStat) {
         var isJudgmentOnlineLiveKey = "isJudgmentOnlineLive";
         givenToggle(isJudgmentOnlineLiveKey, toggleStat);
 
         assertThat(featureToggleService.isJudgmentOnlineLive()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsMintiEnabled(Boolean toggleStat) {
-        var mintiKey = "minti";
-        givenToggle(mintiKey, toggleStat);
-
-        assertThat(featureToggleService.isMintiEnabled()).isEqualTo(toggleStat);
     }
 
     @ParameterizedTest
@@ -230,9 +187,7 @@ class FeatureToggleServiceTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsCarmEnabled(Boolean toggleStat) {
-        var carmKey = "carm";
         var carmDateKey = "cam-enabled-for-case";
-        givenToggle(carmKey, toggleStat);
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
             .setClaimTypeToSpecClaim()
@@ -249,9 +204,7 @@ class FeatureToggleServiceTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenMultiOrIntermediateTrackEnabled(Boolean toggleStat) {
-        var mintiKey = "minti";
         var caseFileKey = "multi-or-intermediate-track";
-        givenToggle(mintiKey, toggleStat);
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
             .build();
@@ -262,20 +215,21 @@ class FeatureToggleServiceTest {
         assertThat(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).isEqualTo(toggleStat);
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsPartOfNationalRollout(Boolean toggleStat) {
-        final String feature = "national-rollout-whitelist";
-        String location = "000000";
-        when(featureToggleApi.isFeatureEnabledForLocation(eq(feature), eq(location), eq(false)))
-            .thenReturn(toggleStat);
-
-        assertThat(featureToggleService.isPartOfNationalRollout(location)).isEqualTo(toggleStat);
-    }
-
     private void givenToggle(String feature, boolean state) {
         when(featureToggleApi.isFeatureEnabled(eq(feature)))
             .thenReturn(state);
+    }
+
+    @Test
+    void shouldReturnFalse_whenCaseIsNotSpecClaim() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimIssued()
+            .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+            .build();
+
+        assertThat(featureToggleService.isDashboardEnabledForCase(caseData)).isFalse();
+
+        verifyNoInteractions(featureToggleApi);
     }
 
     @ParameterizedTest
@@ -304,5 +258,112 @@ class FeatureToggleServiceTest {
         givenToggle(isCoSCEnabledKey, toggleStat);
 
         assertThat(featureToggleService.isCoSCEnabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "someLocation, true, true",
+        "someLocation, false, false",
+        ", true, false",
+        ", false, false"
+    })
+    void shouldReturnCorrectValueBasedOnLocationAndFeatureToggle(String location, boolean isFeatureEnabled, boolean expected) {
+
+        if (isFeatureEnabled && location != null) {
+            when(featureToggleApi.isFeatureEnabledForLocation(
+                "case-progression-location-whitelist",
+                location,
+                true
+            )).thenReturn(isFeatureEnabled);
+            when(featureToggleService.isCaseProgressionEnabled()).thenReturn(isFeatureEnabled);
+        }
+
+        boolean result = featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(location);
+
+        assertEquals(expected, result);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenisJOLiveFeedActive(Boolean toggleStat) {
+        when(featureToggleService.isJudgmentOnlineLive())
+            .thenReturn(toggleStat);
+        when(featureToggleService.isJOLiveFeedActive())
+            .thenReturn(toggleStat);
+        assertThat(featureToggleService.isJOLiveFeedActive()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenIsDefendantNoCOnlineForCase(Boolean toggleStat) {
+        var nocOnlineKey = "is-defendant-noc-online-for-case";
+
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
+            .setClaimTypeToSpecClaim()
+            .build();
+
+        when(featureToggleApi.isFeatureEnabledForDate(eq(nocOnlineKey), anyLong(), eq(false)))
+            .thenReturn(toggleStat);
+
+        assertThat(featureToggleService.isDefendantNoCOnlineForCase(caseData)).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenIsHmcForLipEnabled(Boolean toggleStat) {
+        var hmcCui = "hmc-cui-enabled";
+        givenToggle(hmcCui, toggleStat);
+
+        assertThat(featureToggleService.isHmcForLipEnabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenIsLrAdmissionBulkEnabled(Boolean toggleStat) {
+        var lrAdmission = "lr-admission-bulk";
+        givenToggle(lrAdmission, toggleStat);
+
+        assertThat(featureToggleService.isLrAdmissionBulkEnabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenPublicQueryEnabledLr(Boolean toggleStat) {
+        var lrPublicQuery = "public-query-management";
+        givenToggle(lrPublicQuery, toggleStat);
+
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
+            .build();
+
+        assertThat(featureToggleService.isPublicQueryManagementEnabled(caseData)).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenPublicQueryEnabledLip(Boolean toggleStat) {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
+            .applicant1Represented(YesOrNo.NO)
+            .build();
+
+        when(featureToggleService.isLipQueryManagementEnabled(caseData)).thenReturn(toggleStat);
+
+        assertThat(featureToggleService.isPublicQueryManagementEnabled(caseData)).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenPublicQueryEnabled(Boolean toggleStat) {
+        when(featureToggleService.isQMPdfGeneratorDisabled()).thenReturn(toggleStat);
+
+        assertThat(featureToggleService.isQMPdfGeneratorDisabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldCallBoolVariation_whenGaForLipNro(Boolean toggleStat) {
+        var gaCuiNroKey = "cui-ga-nro";
+        givenToggle(gaCuiNroKey, toggleStat);
+
+        assertThat(featureToggleService.isCuiGaNroEnabled()).isEqualTo(toggleStat);
     }
 }

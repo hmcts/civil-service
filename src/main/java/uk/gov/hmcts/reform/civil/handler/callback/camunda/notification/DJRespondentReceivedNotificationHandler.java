@@ -8,14 +8,16 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
-import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -24,6 +26,8 @@ import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR_DJ_RECEIVED;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
@@ -38,6 +42,7 @@ public class DJRespondentReceivedNotificationHandler extends CallbackHandler imp
     private final NotificationsProperties notificationsProperties;
     private final OrganisationService organisationService;
     private final FeatureToggleService toggleService;
+    private final NotificationsSignatureConfiguration configuration;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -83,7 +88,10 @@ public class DJRespondentReceivedNotificationHandler extends CallbackHandler imp
             emailTemplate.template = notificationsProperties.getRespondentSolicitor1DefaultJudgmentRequested();
             emailTemplate.templateReference = REFERENCE_TEMPLATE_REQUESTED;
         }
-        if (ofNullable(caseData.getRespondent2()).isEmpty()) {
+        if (caseData.isApplicantLipOneVOne()) {
+            emailTemplate.template = notificationsProperties.getRespondentSolicitor1DefaultJudgmentReceivedForLipVSLR();
+            emailTemplate.templateReference = REFERENCE_TEMPLATE_RECEIVED;
+        } else if (ofNullable(caseData.getRespondent2()).isEmpty()) {
             emailTemplate.template = notificationsProperties.getRespondentSolicitor1DefaultJudgmentReceived();
             emailTemplate.templateReference = REFERENCE_TEMPLATE_RECEIVED;
         }
@@ -147,60 +155,86 @@ public class DJRespondentReceivedNotificationHandler extends CallbackHandler imp
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-        return Map.of(
+        HashMap<String, String> properties = new HashMap<>(Map.of(
             DEFENDANT_EMAIL, getLegalOrganizationName(caseData.getRespondent1OrganisationPolicy()
                                                           .getOrganisation()
                                                           .getOrganisationID(), caseData),
-            CLAIM_NUMBER, caseData.getLegacyCaseReference(),
-            DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
-        );
+            CLAIM_NUMBER, caseData.getCcdCaseReference().toString(),
+            DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference(),
+            CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1())
+        ));
+        addAllFooterItems(caseData, properties, configuration,
+                          toggleService.isPublicQueryManagementEnabled(caseData));
+        return properties;
     }
 
     public Map<String, String> addProperties2(CaseData caseData) {
-        return Map.of(
+        HashMap<String, String> properties = new HashMap<>(Map.of(
             DEFENDANT_EMAIL, getLegalOrganizationName(caseData.getRespondent1OrganisationPolicy()
                                                           .getOrganisation()
                                                           .getOrganisationID(), caseData),
-            CLAIM_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_NUMBER, caseData.getCcdCaseReference().toString(),
             DEFENDANT_NAME, caseData.getDefendantDetailsSpec().getValue().getLabel(),
             CLAIMANT_EMAIL, getLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
                                                          .getOrganisation()
-                                                         .getOrganisationID(), caseData)
-        );
+                                                         .getOrganisationID(), caseData),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
+        ));
+        addAllFooterItems(caseData, properties, configuration,
+                          toggleService.isPublicQueryManagementEnabled(caseData));
+        return properties;
     }
 
     public Map<String, String> addProperties1v2FirstDefendant(CaseData caseData) {
-        return Map.of(
+        HashMap<String, String> properties = new HashMap<>(Map.of(
             DEFENDANT_EMAIL, getLegalOrganizationName(caseData.getRespondent1OrganisationPolicy()
                                                           .getOrganisation()
                                                           .getOrganisationID(), caseData),
-            CLAIM_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_NUMBER, caseData.getCcdCaseReference().toString(),
             DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
             CLAIMANT_EMAIL, getLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
                                                           .getOrganisation()
-                                                          .getOrganisationID(), caseData)
-        );
+                                                          .getOrganisationID(), caseData),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
+        ));
+        addAllFooterItems(caseData, properties, configuration,
+                          toggleService.isPublicQueryManagementEnabled(caseData));
+        return properties;
     }
 
     public Map<String, String> addProperties1v2SecondDefendant(CaseData caseData) {
-        return Map.of(
+        HashMap<String, String> properties = new HashMap<>(Map.of(
             DEFENDANT_EMAIL, getLegalOrganizationName(caseData.getRespondent1OrganisationPolicy()
                                                               .getOrganisation()
                                                               .getOrganisationID(), caseData),
-            CLAIM_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_NUMBER, caseData.getCcdCaseReference().toString(),
             DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent2()),
             CLAIMANT_EMAIL, getLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
                                                           .getOrganisation()
-                                                          .getOrganisationID(), caseData)
-        );
+                                                          .getOrganisationID(), caseData),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
+        ));
+        addAllFooterItems(caseData, properties, configuration,
+                          toggleService.isPublicQueryManagementEnabled(caseData));
+        return properties;
     }
 
     public Map<String, String> addProperties1v1LRvLip(CaseData caseData) {
-        return Map.of(
-            CLAIM_NUMBER_INTERIM, caseData.getLegacyCaseReference(),
+        HashMap<String, String> properties = new HashMap<>(Map.of(
+            CLAIM_NUMBER_INTERIM, caseData.getCcdCaseReference().toString(),
             DEFENDANT_NAME_INTERIM, getPartyNameBasedOnType(caseData.getRespondent1()),
-            APPLICANT_ONE_NAME, getPartyNameBasedOnType(caseData.getApplicant1())
-        );
+            APPLICANT_ONE_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
+        ));
+        addAllFooterItems(caseData, properties, configuration,
+                          toggleService.isPublicQueryManagementEnabled(caseData));
+        return properties;
     }
 
     public String getLegalOrganizationName(String id, CaseData caseData) {

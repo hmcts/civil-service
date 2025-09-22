@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.model.FlightDelayDetails;
 import uk.gov.hmcts.reform.civil.model.TimelineOfEvents;
 import uk.gov.hmcts.reform.civil.model.citizenui.AdditionalLipPartyDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.docmosis.common.EvidenceTemplateData;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.Timeline;
 import uk.gov.hmcts.reform.civil.model.docmosis.lip.LipFormParty;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
@@ -27,7 +28,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE;
-import static uk.gov.hmcts.reform.civil.utils.DateUtils.getRequiredDateBeforeFourPm;
+import static uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils.formatCcdCaseReference;
 
 @Component
 @RequiredArgsConstructor
@@ -36,7 +37,7 @@ public class ClaimFormMapper {
     private static final String STANDARD_INTEREST_RATE = "8";
     public static final String EXPLANATION_OF_INTEREST_RATE = "The claimant reserves the right to claim interest under "
         + "Section 69 of the County Courts Act 1984";
-    public static final String INTEREST_START_FROM_CLAIM_ISSUED_DATE = "From the date the claim was issued";
+    public static final String INTEREST_START_FROM_CLAIM_SUBMITTED_DATE = "From the date the claim was submitted";
     private final InterestCalculator interestCalculator;
 
     public ClaimForm toClaimForm(CaseData caseData) {
@@ -47,7 +48,7 @@ public class ClaimFormMapper {
         Optional<AdditionalLipPartyDetails> defendantDetails =
             caseDataLip.map(CaseDataLiP::getRespondent1AdditionalLipPartyDetails);
         caseData.getApplicant1().setPartyEmail(caseData.getClaimantUserDetails() != null
-                                                   ? caseData.getClaimantUserDetails().getEmail() : null);
+            ? caseData.getClaimantUserDetails().getEmail() : null);
         LipFormParty claimant = LipFormParty.toLipFormParty(
             caseData.getApplicant1(),
             getCorrespondenceAddress(applicantDetails),
@@ -66,6 +67,7 @@ public class ClaimFormMapper {
             .interestFromDate(interest != null && interest.compareTo(BigDecimal.ZERO) > 0 ? getInterestFromDate(caseData) : null)
             .interestEndDate(interest != null && interest.compareTo(BigDecimal.ZERO) > 0 ? getInterestEndDate(caseData) : null)
             .interestEndDateDescription(interest != null ? caseData.getBreakDownInterestDescription() : null)
+            .interestPerDayBreakdown(interestCalculator.getInterestPerDayBreakdown(caseData))
             .whenAreYouClaimingInterestFrom(interest != null ? generateWhenAreYouPlanningInterestFrom(
                 caseData) : null)
             .timelineEvents(getTimeLine(caseData.getTimelineOfEvents()))
@@ -83,15 +85,23 @@ public class ClaimFormMapper {
             ))
             .generationDate(LocalDateTime.now())
             .claimIssuedDate(caseData.getIssueDate())
+            .ccdCaseReference(formatCcdCaseReference(caseData))
             .claimNumber(caseData.getLegacyCaseReference())
             .flightDelayDetails(getFlightDelayDetails(caseData))
+            .evidenceList(Optional.ofNullable(caseData.getSpeclistYourEvidenceList())
+                              .map(Collection::stream)
+                              .map(evidenceStream -> evidenceStream
+                                  .map(EvidenceTemplateData::toEvidenceTemplateData)
+                                  .toList())
+                              .orElse(Collections.emptyList()))
+            .uiStatementOfTruth(caseData.getUiStatementOfTruth())
             .build();
     }
 
     @Nullable
     private static LocalDate getInterestEndDate(CaseData caseData) {
         return StringUtils.isBlank(caseData.getBreakDownInterestDescription())
-            ? getRequiredDateBeforeFourPm(LocalDateTime.now())
+            ? LocalDate.now()
             : null;
     }
 
@@ -129,7 +139,7 @@ public class ClaimFormMapper {
         return Optional.ofNullable(caseData.getInterestClaimFrom())
             .map(interestClaimFromType -> {
                 if (interestClaimFromType.equals(FROM_CLAIM_SUBMIT_DATE)) {
-                    return INTEREST_START_FROM_CLAIM_ISSUED_DATE;
+                    return INTEREST_START_FROM_CLAIM_SUBMITTED_DATE;
                 }
                 return caseData.getInterestFromSpecificDateDescription();
             }).orElse(null);
@@ -172,7 +182,8 @@ public class ClaimFormMapper {
     private FlightDelayDetails getFlightDelayDetails(CaseData caseData) {
         return Objects.nonNull(caseData.getFlightDelayDetails()) && caseData.getRespondent1().isCompany()
             ? FlightDelayDetails.builder().flightNumber(caseData.getFlightDelayDetails().getFlightNumber())
-            .nameOfAirline(caseData.getFlightDelayDetails().getNameOfAirline()).scheduledDate(caseData.getFlightDelayDetails().getScheduledDate()).build()
+            .nameOfAirline(caseData.getFlightDelayDetails().getNameOfAirline()).scheduledDate(caseData.getFlightDelayDetails().getScheduledDate())
+            .build()
             : null;
     }
 }

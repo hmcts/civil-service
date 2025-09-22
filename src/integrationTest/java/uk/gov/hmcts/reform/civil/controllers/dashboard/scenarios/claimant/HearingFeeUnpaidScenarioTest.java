@@ -62,7 +62,7 @@ public class HearingFeeUnpaidScenarioTest extends DashboardBaseIntegrationTest {
                 jsonPath("$[0].titleCy").value("Mae'r hawliad wedi cael ei ddileu"),
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Y rheswm am hyn yw na thalwyd ffi'r gwrandawiad erbyn "
-                        + DateUtils.formatDateInWelsh(hearingDueDate)
+                        + DateUtils.formatDateInWelsh(hearingDueDate, false)
                         + " fel y nodir yn yr <a href=\"{VIEW_HEARING_NOTICE}\" rel=\"noopener noreferrer\" target=\"_blank\" class=\"govuk-link\">hysbysiad o wrandawiad</a>.</p>")
             );
 
@@ -107,7 +107,7 @@ public class HearingFeeUnpaidScenarioTest extends DashboardBaseIntegrationTest {
                 jsonPath("$[0].titleCy").value("Mae'r hawliad wedi cael ei ddileu"),
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Y rheswm am hyn yw na thalwyd ffi'r gwrandawiad erbyn "
-                        + DateUtils.formatDateInWelsh(hearingDueDate)
+                        + DateUtils.formatDateInWelsh(hearingDueDate, false)
                         + " fel y nodir yn yr <a href=\"{VIEW_HEARING_NOTICE}\" rel=\"noopener noreferrer\" target=\"_blank\" class=\"govuk-link\">hysbysiad o wrandawiad</a>.</p>")
             );
 
@@ -150,7 +150,7 @@ public class HearingFeeUnpaidScenarioTest extends DashboardBaseIntegrationTest {
                 jsonPath("$[0].titleCy").value("Mae'r hawliad wedi cael ei ddileu"),
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Y rheswm am hyn yw na thalwyd ffi'r gwrandawiad erbyn "
-                        + DateUtils.formatDateInWelsh(hearingDueDate)
+                        + DateUtils.formatDateInWelsh(hearingDueDate, false)
                         + " fel y nodir yn yr <a href=\"{VIEW_HEARING_NOTICE}\" rel=\"noopener noreferrer\" target=\"_blank\" class=\"govuk-link\">hysbysiad o wrandawiad</a>.</p>")
             );
 

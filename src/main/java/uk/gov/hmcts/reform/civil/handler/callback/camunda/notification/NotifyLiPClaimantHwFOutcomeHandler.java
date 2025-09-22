@@ -13,8 +13,11 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesMoreInformation;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -24,6 +27,7 @@ import java.util.stream.Stream;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
@@ -38,6 +42,8 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
     private final Map<String, Callback> callBackMap = Map.of(
         callbackKey(ABOUT_TO_SUBMIT), this::notifyApplicantForHwFOutcome
     );
+    private final NotificationsSignatureConfiguration configuration;
+    private final FeatureToggleService featureToggleService;
     private Map<CaseEvent, String> emailTemplates;
     private Map<CaseEvent, String> emailTemplatesBilingual;
 
@@ -54,10 +60,15 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
     private CallbackResponse notifyApplicantForHwFOutcome(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseEvent hwfEvent = caseData.getHwFEvent();
+
+        String recipientEmail = caseData.isApplicantLiP()
+            ? caseData.getApplicant1Email()
+            : caseData.getApplicantSolicitor1UserDetails().getEmail();
+
         //CIV-12798: bypassing sendMail for Full Remission Granted event.
-        if (Objects.nonNull(caseData.getApplicant1Email()) && CaseEvent.FULL_REMISSION_HWF != hwfEvent) {
+        if (Objects.nonNull(recipientEmail) && CaseEvent.FULL_REMISSION_HWF != hwfEvent) {
             notificationService.sendMail(
-                caseData.getApplicant1Email(),
+                recipientEmail,
                 caseData.isClaimantBilingual() ? getTemplateBilingual(hwfEvent) : getTemplate(hwfEvent),
                 addProperties(caseData),
                 String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
@@ -187,13 +198,16 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
     }
 
     private Map<String, String> getCommonProperties(CaseData caseData) {
-        return Map.of(
+        HashMap<String, String> properties = new HashMap<>(Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
             TYPE_OF_FEE, caseData.getHwfFeeType().getLabel(),
             TYPE_OF_FEE_WELSH, caseData.getHwfFeeType().getLabelInWelsh(),
             HWF_REFERENCE_NUMBER, caseData.getHwFReferenceNumber()
-        );
+        ));
+        addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
+        return properties;
     }
 
     private String getHwFNoRemissionReason(CaseData caseData) {

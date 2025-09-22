@@ -37,9 +37,4 @@ public class CaseHearingDateSearchService extends ElasticSearchService {
             startIndex
         );
     }
-
-    @Override
-    Query queryInMediationCases(int startIndex, LocalDate claimMovedDate, boolean carmEnabled) {
-        return null;
-    }
 }

@@ -4,6 +4,8 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +14,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
-import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.PrdAdminUserConfiguration;
 import uk.gov.hmcts.reform.civil.config.properties.robotics.RoboticsEmailConfiguration;
 import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
@@ -511,8 +512,9 @@ class RoboticsNotificationServiceTest {
         assertThat(capturedEmailData.getTo()).isEqualTo(emailConfiguration.getLipJRecipient());
     }
 
-    @Test
-    void shouldNotifyDefaultJudgementLiP_whenLipvsLiPEnabled() {
+    @ParameterizedTest
+    @CsvSource({"DEFAULT_JUDGEMENT_SPEC", "DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC"})
+    void shouldNotifyDefaultJudgementLiP_whenLipvsLiPEnabled(String camundaEvent) {
         //Given
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
             .toBuilder()
@@ -521,11 +523,13 @@ class RoboticsNotificationServiceTest {
             .caseAccessCategory(SPEC_CLAIM).paymentTypeSelection(
                 DJPaymentTypeSelection.SET_DATE)
             .businessProcess(BusinessProcess.builder()
-                .camundaEvent(CaseEvent.DEFAULT_JUDGEMENT_SPEC.name())
+                .camundaEvent(camundaEvent)
                 .build())
             .build();
         when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+        when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
         String lastEventText = "event text";
         RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder()
             .events(EventHistory.builder()
@@ -620,6 +624,50 @@ class RoboticsNotificationServiceTest {
         String fileName = format("CaseData_%s.json", reference);
         String message = format("Robotics case data JSON is attached for %s", reference);
         String subject = format("LIP v LR Case Data for %s", reference);
+
+        // Then
+        assertThat(capturedEmailData.getSubject()).isEqualTo(subject);
+        assertThat(capturedEmailData.getMessage()).isEqualTo(message);
+        assertThat(capturedEmailData.getTo()).isEqualTo(emailConfiguration.getRecipient());
+        assertThat(capturedEmailData.getAttachments()).hasSize(1);
+        assertThat(capturedEmailData.getAttachments())
+            .extracting("filename", "contentType")
+            .containsExactlyInAnyOrder(tuple(fileName, "application/json"));
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldSendNotificationEmailWithLipVLrDefaultJudgementSubjectLine() {
+        // Given
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+
+        caseData = caseData.toBuilder()
+            .applicant1Represented(NO)
+            .respondent1Represented(YES)
+            .caseAccessCategory(SPEC_CLAIM)
+            .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
+            .build();
+        String lastEventText = "event text";
+        RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder()
+            .events(EventHistory.builder()
+                        .miscellaneous(Event.builder()
+                                           .eventDetailsText(lastEventText)
+                                           .dateReceived(LocalDateTime.now())
+                                           .build())
+                        .build())
+            .build();
+        when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData, BEARER_TOKEN)).thenReturn(build);
+
+        // When
+        service.notifyRobotics(caseData, false, BEARER_TOKEN);
+
+        verify(sendGridClient).sendEmail(eq(emailConfiguration.getSender()), emailDataArgumentCaptor.capture());
+
+        EmailData capturedEmailData = emailDataArgumentCaptor.getValue();
+        String reference = caseData.getLegacyCaseReference();
+        String fileName = format("CaseData_%s.json", reference);
+        String message = format("Robotics case data JSON is attached for %s", reference);
+        String subject = format("LIP v LR Default Judgment Case Data for %s", reference);
 
         // Then
         assertThat(capturedEmailData.getSubject()).isEqualTo(subject);

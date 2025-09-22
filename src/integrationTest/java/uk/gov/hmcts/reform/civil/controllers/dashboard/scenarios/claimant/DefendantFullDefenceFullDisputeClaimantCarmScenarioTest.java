@@ -64,7 +64,7 @@ public class DefendantFullDefenceFullDisputeClaimantCarmScenarioTest extends Das
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Mae John Doe wedi gwrthod yr hawliad. " +
                         "Mae angen i chi ymateb erbyn " +
-                        DateUtils.formatDateInWelsh(applicantResponseDeadline) + ".</p>" +
+                        DateUtils.formatDateInWelsh(applicantResponseDeadline, false) + ".</p>" +
                         "<a href=\"{VIEW_AND_RESPOND}\" class=\"govuk-link\">Gweld ac ymateb</a>"
                 )
             );

@@ -76,7 +76,7 @@ public class JudgmentOnlineUtils {
                            .build());
         if (applicant2 != null) {
             applicants.add(Party.builder()
-                               .name(applicant2.getPartyName())
+                               .name(" and " + applicant2.getPartyName())
                                .primaryAddress(applicant2.getPrimaryAddress())
                                .build());
         }
@@ -85,8 +85,8 @@ public class JudgmentOnlineUtils {
 
     public static Address getAddress(ContactInformation address) {
         return Address.builder().addressLine1(address.getAddressLine1())
-            .addressLine2(address.getAddressLine1())
-            .addressLine3(address.getAddressLine1())
+            .addressLine2(address.getAddressLine2())
+            .addressLine3(address.getAddressLine3())
             .country(address.getCountry())
             .county(address.getCounty())
             .postCode(address.getPostCode())

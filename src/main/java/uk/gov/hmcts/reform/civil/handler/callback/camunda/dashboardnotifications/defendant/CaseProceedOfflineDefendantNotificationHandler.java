@@ -4,17 +4,26 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.callback.DashboardCallbackHandler;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
+import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
+import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
 import java.util.List;
+import java.util.Map;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DEFENDANT_DASHBOARD_NOTIFICATION_FOR_CASE_PROCEED_OFFLINE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_LIP_QM_CASE_OFFLINE_OPEN_QUERIES_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_AVAILABLE_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT_FAST_TRACK;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT_WITHOUT_TASK_CHANGES;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_UPDATE_CASE_PROCEED_IN_CASE_MAN_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_UPDATE_CASE_PROCEED_IN_CASE_MAN_DEFENDANT_FAST_TRACK;
 
 @Service
 public class CaseProceedOfflineDefendantNotificationHandler extends DashboardCallbackHandler {
@@ -30,11 +39,18 @@ public class CaseProceedOfflineDefendantNotificationHandler extends DashboardCal
                 CaseState.DECISION_OUTCOME,
                 CaseState.All_FINAL_ORDERS_ISSUED);
     public static final String TASK_ID = "GenerateDefendantDashboardNotificationCaseProceedOffline";
+    public static final String GA = "Applications";
+    private final DashboardNotificationService dashboardNotificationService;
+    private final TaskListService taskListService;
 
-    public CaseProceedOfflineDefendantNotificationHandler(DashboardApiClient dashboardApiClient,
+    public CaseProceedOfflineDefendantNotificationHandler(DashboardScenariosService dashboardScenariosService,
                                                           DashboardNotificationsParamsMapper mapper,
-                                                          FeatureToggleService featureToggleService) {
-        super(dashboardApiClient, mapper, featureToggleService);
+                                                          FeatureToggleService featureToggleService,
+                                                          DashboardNotificationService dashboardNotificationService,
+                                                          TaskListService taskListService) {
+        super(dashboardScenariosService, mapper, featureToggleService);
+        this.dashboardNotificationService = dashboardNotificationService;
+        this.taskListService = taskListService;
     }
 
     @Override
@@ -43,16 +59,34 @@ public class CaseProceedOfflineDefendantNotificationHandler extends DashboardCal
     }
 
     @Override
-    public List<CaseEvent> handledEvents() {
-        return EVENTS;
+    public String getScenario(CaseData caseData) {
+        if (featureToggleService.isCoSCEnabled() && caseData.getActiveJudgment() != null) {
+            if (caseData.isFastTrackClaim()) {
+                return SCENARIO_AAA6_UPDATE_CASE_PROCEED_IN_CASE_MAN_DEFENDANT_FAST_TRACK.getScenario();
+            }
+            return SCENARIO_AAA6_UPDATE_CASE_PROCEED_IN_CASE_MAN_DEFENDANT.getScenario();
+        }
+        if (featureToggleService.isCaseProgressionEnabled()) {
+            return SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT_WITHOUT_TASK_CHANGES.getScenario();
+        }
+        return SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT.getScenario();
     }
 
     @Override
-    public String getScenario(CaseData caseData) {
-        if (featureToggleService.isCaseProgressionEnabled() && caseData.isFastTrackClaim()) {
-            return SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT_FAST_TRACK.getScenario();
-        }
-        return SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT.getScenario();
+    public Map<String, Boolean> getScenarios(CaseData caseData) {
+
+        return Map.of(
+            SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_DEFENDANT.getScenario(),
+            featureToggleService.isGaForLipsEnabled(),
+            SCENARIO_AAA6_GENERAL_APPLICATION_AVAILABLE_DEFENDANT.getScenario(),
+            featureToggleService.isGaForLipsEnabled() && caseData.getGeneralApplications().size() > 0,
+            SCENARIO_AAA6_LIP_QM_CASE_OFFLINE_OPEN_QUERIES_DEFENDANT.getScenario(), defendantQueryAwaitingResponse(caseData)
+        );
+    }
+
+    @Override
+    public List<CaseEvent> handledEvents() {
+        return EVENTS;
     }
 
     @Override
@@ -60,6 +94,11 @@ public class CaseProceedOfflineDefendantNotificationHandler extends DashboardCal
         boolean isLipvLipOrLRvLip = caseData.isLipvLipOneVOne() || caseData.isLRvLipOneVOne();
         return (caseData.getPreviousCCDState() != null && caseProceedInCaseManStates.contains(caseData.getPreviousCCDState()) && isLipvLipOrLRvLip)
             || (shouldRecordScenarioInCaseProgression(caseData, isLipvLipOrLRvLip));
+    }
+
+    private boolean defendantQueryAwaitingResponse(CaseData caseData) {
+        return featureToggleService.isPublicQueryManagementEnabled(caseData)
+            && nonNull(caseData.getQueries()) && caseData.getQueries().hasAQueryAwaitingResponse();
     }
 
     public boolean shouldRecordScenarioInCaseProgression(CaseData caseData, boolean isLipvLipOrLRvLip) {
@@ -70,16 +109,16 @@ public class CaseProceedOfflineDefendantNotificationHandler extends DashboardCal
 
     @Override
     protected void beforeRecordScenario(CaseData caseData, String authToken) {
-        dashboardApiClient.deleteNotificationsForCaseIdentifierAndRole(
-            caseData.getCcdCaseReference().toString(),
-            "DEFENDANT",
-            authToken
+        final String caseId = String.valueOf(caseData.getCcdCaseReference());
+        dashboardNotificationService.deleteByReferenceAndCitizenRole(
+            caseId,
+            "DEFENDANT"
         );
 
-        dashboardApiClient.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
-            caseData.getCcdCaseReference().toString(),
+        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(
+            caseId,
             "DEFENDANT",
-            authToken
+            GA
         );
     }
 }

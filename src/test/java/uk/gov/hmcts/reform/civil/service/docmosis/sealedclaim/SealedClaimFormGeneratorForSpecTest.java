@@ -6,10 +6,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.model.FixedCosts;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.TimelineOfEventDetails;
 import uk.gov.hmcts.reform.civil.model.TimelineOfEvents;
@@ -17,22 +21,19 @@ import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.Representative;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.SealedClaimFormForSpec;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
-import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
-import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,18 +48,19 @@ import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SE
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_1V2_DIFFERENT_SOL;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_1V2_DIFFERENT_SOL_LIP;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_1V2_SAME_SOL;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_2V1;
 
 @ExtendWith(SpringExtension.class)
-public class SealedClaimFormGeneratorForSpecTest {
+class  SealedClaimFormGeneratorForSpecTest {
 
     private static final String BEARER_TOKEN = "Bearer Token";
     private static final String REFERENCE_NUMBER = "000DC001";
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
-    private static final String fileName = format(N1.getDocumentTitle(), REFERENCE_NUMBER);
+    private static final String FILE_NAME  = format(N1.getDocumentTitle(), REFERENCE_NUMBER);
     private static final CaseDocument CASE_DOCUMENT = CaseDocumentBuilder.builder()
-        .documentName(fileName)
+        .documentName(FILE_NAME)
         .documentType(SEALED_CLAIM)
         .build();
 
@@ -77,8 +79,6 @@ public class SealedClaimFormGeneratorForSpecTest {
     @Mock
     private InterestCalculator interestCalculator;
     @Mock
-    private DeadlinesCalculator deadlinesCalculator;
-    @Mock
     private FeatureToggleService featureToggleService;
 
     @BeforeEach
@@ -87,6 +87,7 @@ public class SealedClaimFormGeneratorForSpecTest {
         when(representativeService.getRespondent2Representative(any())).thenReturn(representative2);
         when(representativeService.getApplicantRepresentative(any())).thenReturn(getRepresentative());
         when(interestCalculator.calculateInterest(any(CaseData.class))).thenReturn(BigDecimal.ZERO);
+        when(interestCalculator.getInterestPerDayBreakdown(any(CaseData.class))).thenReturn("Interest will accrue at the daily rate of £0.50 up to the date of claim issue");
     }
 
     private Representative getRepresentative() {
@@ -110,22 +111,17 @@ public class SealedClaimFormGeneratorForSpecTest {
         CaseData caseData = caseBuilder
             .build();
 
-        when(deadlinesCalculator.calculateFirstWorkingDay(caseData.getIssueDate().plusDays(28)))
-            .thenReturn(caseData.getIssueDate().plusDays(17));
-        when(deadlinesCalculator.calculateFirstWorkingDay(caseData.getIssueDate().plusDays(29)))
-            .thenReturn(caseData.getIssueDate().plusDays(17));
-
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N2)))
             .thenReturn(new DocmosisDocument(N2.getDocumentTitle(), bytes));
 
-        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM)))
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, SEALED_CLAIM)))
             .thenReturn(CASE_DOCUMENT);
 
         CaseDocument caseDocument = sealedClaimFormGenerator.generate(caseData, BEARER_TOKEN);
         assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT);
 
         verify(representativeService).getRespondent1Representative(caseData);
-        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM));
+        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, SEALED_CLAIM));
         verify(documentGeneratorService).generateDocmosisDocument(any(SealedClaimFormForSpec.class), eq(N2));
     }
 
@@ -138,23 +134,21 @@ public class SealedClaimFormGeneratorForSpecTest {
                              .partyName("name")
                              .build())
             .respondent2SameLegalRepresentative(YesOrNo.YES)
+            .submittedDate(LocalDateTime.now().minusDays(30))
+            .interestClaimFrom(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE)
             .build();
 
-        when(deadlinesCalculator.calculateFirstWorkingDay(caseData.getIssueDate().plusDays(28)))
-            .thenReturn(caseData.getIssueDate().plusDays(28));
-        when(deadlinesCalculator.calculateFirstWorkingDay(caseData.getIssueDate().plusDays(29)))
-            .thenReturn(caseData.getIssueDate().plusDays(29));
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N2_1V2_SAME_SOL)))
             .thenReturn(new DocmosisDocument(N2_1V2_SAME_SOL.getDocumentTitle(), bytes));
 
-        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM)))
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, SEALED_CLAIM)))
             .thenReturn(CASE_DOCUMENT);
 
         CaseDocument caseDocument = sealedClaimFormGenerator.generate(caseData, BEARER_TOKEN);
         assertThat(caseDocument).isNotNull();
 
         verify(representativeService, times(2)).getRespondent1Representative(caseData);
-        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM));
+        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, SEALED_CLAIM));
         verify(documentGeneratorService).generateDocmosisDocument(
             any(SealedClaimFormForSpec.class),
             eq(N2_1V2_SAME_SOL)
@@ -171,14 +165,10 @@ public class SealedClaimFormGeneratorForSpecTest {
                              .build())
             .build();
 
-        when(deadlinesCalculator.calculateFirstWorkingDay(caseData.getIssueDate().plusDays(28)))
-            .thenReturn(caseData.getIssueDate().plusDays(28));
-        when(deadlinesCalculator.calculateFirstWorkingDay(caseData.getIssueDate().plusDays(29)))
-            .thenReturn(caseData.getIssueDate().plusDays(29));
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N2_1V2_DIFFERENT_SOL)))
             .thenReturn(new DocmosisDocument(N2_1V2_DIFFERENT_SOL.getDocumentTitle(), bytes));
 
-        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM)))
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, SEALED_CLAIM)))
             .thenReturn(CASE_DOCUMENT);
 
         CaseDocument caseDocument = sealedClaimFormGenerator.generate(caseData, BEARER_TOKEN);
@@ -186,10 +176,68 @@ public class SealedClaimFormGeneratorForSpecTest {
 
         verify(representativeService).getRespondent1Representative(caseData);
         verify(representativeService).getRespondent2Representative(caseData);
-        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM));
+        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, SEALED_CLAIM));
         verify(documentGeneratorService).generateDocmosisDocument(
             any(SealedClaimFormForSpec.class),
             eq(N2_1V2_DIFFERENT_SOL)
+        );
+    }
+
+    @Test
+    void generateSealedClaimForm1v2Respondent1LIP() {
+        CaseData.CaseDataBuilder caseBuilder = getBaseCaseDataBuilder();
+        CaseData caseData = caseBuilder
+            .respondent2(Party.builder()
+                             .type(Party.Type.COMPANY)
+                             .partyName("name")
+                             .build())
+            .specRespondent1Represented(YesOrNo.NO)
+            .build();
+
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N2_1V2_DIFFERENT_SOL_LIP)))
+            .thenReturn(new DocmosisDocument(N2_1V2_DIFFERENT_SOL_LIP.getDocumentTitle(), bytes));
+
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, SEALED_CLAIM)))
+            .thenReturn(CASE_DOCUMENT);
+
+        CaseDocument caseDocument = sealedClaimFormGenerator.generate(caseData, BEARER_TOKEN);
+        assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT);
+
+        verify(representativeService).getRespondent1Representative(caseData);
+        verify(representativeService).getRespondent2Representative(caseData);
+        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, SEALED_CLAIM));
+        verify(documentGeneratorService).generateDocmosisDocument(
+            any(SealedClaimFormForSpec.class),
+            eq(N2_1V2_DIFFERENT_SOL_LIP)
+        );
+    }
+
+    @Test
+    void generateSealedClaimForm1v2Respondent2LIP() {
+        CaseData.CaseDataBuilder caseBuilder = getBaseCaseDataBuilder();
+        CaseData caseData = caseBuilder
+            .respondent2(Party.builder()
+                             .type(Party.Type.COMPANY)
+                             .partyName("name")
+                             .build())
+            .specRespondent2Represented(YesOrNo.NO)
+            .build();
+
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N2_1V2_DIFFERENT_SOL_LIP)))
+            .thenReturn(new DocmosisDocument(N2_1V2_DIFFERENT_SOL_LIP.getDocumentTitle(), bytes));
+
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, SEALED_CLAIM)))
+            .thenReturn(CASE_DOCUMENT);
+
+        CaseDocument caseDocument = sealedClaimFormGenerator.generate(caseData, BEARER_TOKEN);
+        assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT);
+
+        verify(representativeService).getRespondent1Representative(caseData);
+        verify(representativeService).getRespondent2Representative(caseData);
+        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, SEALED_CLAIM));
+        verify(documentGeneratorService).generateDocmosisDocument(
+            any(SealedClaimFormForSpec.class),
+            eq(N2_1V2_DIFFERENT_SOL_LIP)
         );
     }
 
@@ -203,22 +251,17 @@ public class SealedClaimFormGeneratorForSpecTest {
                             .build())
             .build();
 
-        when(deadlinesCalculator.calculateFirstWorkingDay(caseData.getIssueDate().plusDays(28)))
-            .thenReturn(caseData.getIssueDate().plusDays(28));
-        when(deadlinesCalculator.calculateFirstWorkingDay(caseData.getIssueDate().plusDays(29)))
-            .thenReturn(caseData.getIssueDate().plusDays(29));
-
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N2_2V1)))
             .thenReturn(new DocmosisDocument(N2_2V1.getDocumentTitle(), bytes));
 
-        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM)))
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, SEALED_CLAIM)))
             .thenReturn(CASE_DOCUMENT);
 
         CaseDocument caseDocument = sealedClaimFormGenerator.generate(caseData, BEARER_TOKEN);
         assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT);
 
         verify(representativeService).getRespondent1Representative(caseData);
-        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM));
+        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, SEALED_CLAIM));
         verify(documentGeneratorService).generateDocmosisDocument(any(SealedClaimFormForSpec.class), eq(N2_2V1));
     }
 
@@ -249,6 +292,10 @@ public class SealedClaimFormGeneratorForSpecTest {
                                            .differentRate(new BigDecimal(100)).differentRateReason("test").build())
             .interestFromSpecificDate(LocalDate.now())
             .interestClaimFrom(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE)
+            .fixedCosts(FixedCosts.builder()
+                            .claimFixedCosts(YesOrNo.YES)
+                            .fixedCostAmount("2000")
+                            .build())
             .breakDownInterestDescription("test breakdown desc");
     }
 
@@ -259,21 +306,16 @@ public class SealedClaimFormGeneratorForSpecTest {
         CaseData caseData = caseBuilder
             .build();
 
-        when(deadlinesCalculator.calculateFirstWorkingDay(caseData.getIssueDate().plusDays(28)))
-            .thenReturn(caseData.getIssueDate().plusDays(17));
-        when(deadlinesCalculator.calculateFirstWorkingDay(caseData.getIssueDate().plusDays(29)))
-            .thenReturn(caseData.getIssueDate().plusDays(17));
-
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N2)))
             .thenReturn(new DocmosisDocument(N2.getDocumentTitle(), bytes));
 
-        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM)))
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, SEALED_CLAIM)))
             .thenReturn(CASE_DOCUMENT);
 
-        CaseDocument caseDocument = sealedClaimFormGenerator.generate(caseData, BEARER_TOKEN);
+        sealedClaimFormGenerator.generate(caseData, BEARER_TOKEN);
 
         verify(representativeService).getRespondent1Representative(caseData);
-        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM));
+        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, SEALED_CLAIM));
         verify(documentGeneratorService).generateDocmosisDocument(any(SealedClaimFormForSpec.class), eq(N2));
     }
 
@@ -288,12 +330,12 @@ public class SealedClaimFormGeneratorForSpecTest {
 
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N2)))
             .thenReturn(new DocmosisDocument(N2.getDocumentTitle(), bytes));
-        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM)))
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, SEALED_CLAIM)))
             .thenReturn(CASE_DOCUMENT);
         CaseDocument caseDocument = sealedClaimFormGenerator.generate(caseData, BEARER_TOKEN);
 
         assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT);
-        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM));
+        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, SEALED_CLAIM));
         verify(documentGeneratorService).generateDocmosisDocument(any(SealedClaimFormForSpec.class), eq(N2));
     }
 
@@ -313,12 +355,12 @@ public class SealedClaimFormGeneratorForSpecTest {
         when(interestCalculator.calculateBulkInterest(any(CaseData.class))).thenReturn(BigDecimal.valueOf(5));
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N2)))
             .thenReturn(new DocmosisDocument(N2.getDocumentTitle(), bytes));
-        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM)))
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, SEALED_CLAIM)))
             .thenReturn(CASE_DOCUMENT);
         CaseDocument caseDocument = sealedClaimFormGenerator.generate(caseData, BEARER_TOKEN);
 
         assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT);
-        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM));
+        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, SEALED_CLAIM));
         verify(documentGeneratorService).generateDocmosisDocument(any(SealedClaimFormForSpec.class), eq(N2));
     }
 

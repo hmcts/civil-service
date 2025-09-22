@@ -56,9 +56,9 @@ public abstract class AbstractCreateSDORespondentNotificationHandler extends Cal
     protected CallbackResponse notifyRespondentSolicitorSDOTriggered(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         if (isRespondentLiP(caseData)) {
-            lipNotificationSender.notifyRespondentPartySDOTriggered(caseData);
+            lipNotificationSender.notifyRespondentPartySDOTriggered(callbackParams);
         } else {
-            lrNotificationSender.notifyRespondentPartySDOTriggered(caseData);
+            lrNotificationSender.notifyRespondentPartySDOTriggered(callbackParams);
         }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }

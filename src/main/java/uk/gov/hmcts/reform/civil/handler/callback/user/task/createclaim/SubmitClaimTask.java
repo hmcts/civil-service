@@ -1,9 +1,11 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaim;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CallbackException;
@@ -18,15 +20,15 @@ import uk.gov.hmcts.reform.civil.model.CaseManagementCategoryElement;
 import uk.gov.hmcts.reform.civil.model.CorrectEmail;
 import uk.gov.hmcts.reform.civil.model.FlightDelayDetails;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
-import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
+import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
+import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.repositories.SpecReferenceNumberRepository;
@@ -57,8 +59,10 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_L
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllDefendantSolicitorReferencesSpec;
 import static uk.gov.hmcts.reform.civil.utils.CaseNameUtils.buildCaseName;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateWithPartyIds;
 
 @Component
@@ -116,6 +120,17 @@ public class SubmitClaimTask {
             .respondent1DetailsForClaimDetailsTab(caseData.getRespondent1().toBuilder().flags(null).build())
             .caseAccessCategory(CaseCategory.SPEC_CLAIM);
 
+        if (featureToggleService.isWelshEnabledForMainCase()) {
+            //    added this to show location name  on location column in my tasks tab
+            List<LocationRefData> locations = (locationRefDataService
+                .getCourtLocationsByEpimmsIdAndCourtType(authorisationToken, epimmsId));
+            if (!locations.isEmpty()) {
+                LocationRefData locationRefData = locations.get(0);
+                dataBuilder.locationName(locationRefData.getSiteName());
+            }
+
+        }
+
         if (ofNullable(caseData.getRespondent2()).isPresent()) {
             dataBuilder.respondent2DetailsForClaimDetailsTab(caseData.getRespondent2().toBuilder().flags(null).build());
         }
@@ -137,6 +152,8 @@ public class SubmitClaimTask {
         OrgPolicyUtils.addMissingOrgPolicies(dataBuilder);
 
         caseFlagInitialiser.initialiseCaseFlags(CREATE_CLAIM_SPEC, dataBuilder);
+
+        defaultInterestClaimUntil(caseData, dataBuilder);
 
         CaseData temporaryCaseData = dataBuilder.build();
 
@@ -180,14 +197,13 @@ public class SubmitClaimTask {
             dataBuilder.respondentSolicitor2ServiceAddress(caseData.getRespondentSolicitor1ServiceAddress());
             dataBuilder.respondentSolicitor2OrganisationDetails(caseData.getRespondentSolicitor1OrganisationDetails());
         }
+        dataBuilder
+            .allPartyNames(getAllPartyNames(caseData))
+            .caseListDisplayDefendantSolicitorReferences(getAllDefendantSolicitorReferencesSpec(caseData));
 
-        if (featureToggleService.isHmcEnabled()) {
-            populateWithPartyIds(dataBuilder);
-        }
+        populateWithPartyIds(dataBuilder);
 
-        if (featureToggleService.isCaseEventsEnabled()) {
-            dataBuilder.anyRepresented(YES);
-        }
+        dataBuilder.anyRepresented(YES);
 
         if (caseData.getSdtRequestIdFromSdt() != null) {
             // assign StdRequestId, to ensure duplicate requests from SDT/bulk claims are not processed
@@ -202,9 +218,9 @@ public class SubmitClaimTask {
             //PBA manual selection
             List<String> pbaNumbers = getPbaAccounts(authorisationToken);
             dataBuilder.applicantSolicitor1PbaAccounts(DynamicList.builder()
-                                                           .value(DynamicListElement.builder()
-                                                                      .label(pbaNumbers.get(0))
-                                                                      .build()).build());
+                .value(DynamicListElement.builder()
+                    .label(pbaNumbers.get(0))
+                    .build()).build());
         }
 
         List<String> errors = new ArrayList<>();
@@ -218,22 +234,29 @@ public class SubmitClaimTask {
                     caseData.getSpecRespondentCorrespondenceAddressdetails());
         }
 
-        if (featureToggleService.isSdoR2Enabled() && isFlightDelayClaim != null && isFlightDelayClaim.equals(YES)) {
+        if (isFlightDelayClaim != null && isFlightDelayClaim.equals(YES)) {
             String selectedAirlineCode = flightDelayDetails.getAirlineList().getValue().getCode();
             dataBuilder.claimType(ClaimType.FLIGHT_DELAY)
                 .flightDelayDetails(FlightDelayDetails.builder()
-                                        .airlineList(DynamicList.builder().value(flightDelayDetails.getAirlineList().getValue()).build())
-                                        .nameOfAirline(flightDelayDetails.getNameOfAirline())
-                                        .flightNumber(flightDelayDetails.getFlightNumber())
-                                        .scheduledDate(flightDelayDetails.getScheduledDate())
-                                        .flightCourtLocation(getAirlineCaseLocation(selectedAirlineCode, authorisationToken))
-                                        .build());
+                    .airlineList(DynamicList.builder().value(flightDelayDetails.getAirlineList().getValue()).build())
+                    .nameOfAirline(flightDelayDetails.getNameOfAirline())
+                    .flightNumber(flightDelayDetails.getFlightNumber())
+                    .scheduledDate(flightDelayDetails.getScheduledDate())
+                    .flightCourtLocation(getAirlineCaseLocation(selectedAirlineCode, authorisationToken))
+                    .build());
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .data(dataBuilder.build().toMap(objectMapper))
             .build();
+    }
+
+    private void defaultInterestClaimUntil(CaseData caseData, CaseData.CaseDataBuilder<?, ?> dataBuilder) {
+        if (caseData.getInterestClaimFrom() != null && caseData.getInterestClaimFrom().equals(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE)) {
+            dataBuilder.interestClaimUntil(InterestClaimUntilType.UNTIL_SETTLED_OR_JUDGEMENT_MADE)
+                .build();
+        }
     }
 
     private CaseData.CaseDataBuilder getSharedData(CaseData caseData, String authToken, String eventId) {
@@ -279,8 +302,8 @@ public class SubmitClaimTask {
 
     private boolean isPinInPostCaseMatched(CaseData caseData) {
         log.info("Respondent1Represented =={}== AddRespondent2 =={}== AddApplicant2 =={}== and isPinInPostEnabled {} for caseId ={}=",
-                 caseData.getRespondent1Represented(), caseData.getAddRespondent2(), caseData.getAddApplicant2(),
-                 featureToggleService.isPinInPostEnabled(), caseData.getCcdCaseReference());
+            caseData.getRespondent1Represented(), caseData.getAddRespondent2(), caseData.getAddApplicant2(),
+            featureToggleService.isPinInPostEnabled(), caseData.getCcdCaseReference());
         return (caseData.getRespondent1Represented() == NO
             && caseData.getAddRespondent2() == NO
             && caseData.getAddApplicant2() == NO
@@ -299,7 +322,7 @@ public class SubmitClaimTask {
         }
         String locationEpimmsId = airlineEpimsService.getEpimsIdForAirline(airline);
         List<LocationRefData> locations = fetchLocationData(authToken);
-        var matchedLocations =  locations.stream().filter(loc -> loc.getEpimmsId().equals(locationEpimmsId)).toList();
+        var matchedLocations = locations.stream().filter(loc -> loc.getEpimmsId().equals(locationEpimmsId)).toList();
         if (matchedLocations.isEmpty()) {
             throw new CallbackException(String.format(LOCATION_NOT_FOUND_MESSAGE, locationEpimmsId));
         } else {

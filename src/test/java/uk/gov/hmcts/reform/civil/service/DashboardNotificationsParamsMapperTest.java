@@ -3,11 +3,11 @@ package uk.gov.hmcts.reform.civil.service;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
+import uk.gov.hmcts.reform.civil.enums.settlediscontinue.MarkPaidConsentList;
 import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
@@ -39,6 +40,8 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardMapperTestConfiguration;
+import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.utils.ClaimantResponseUtils;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
 
@@ -53,6 +56,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.JUDGE_FINAL_ORDER;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SDO_ORDER;
@@ -66,22 +70,22 @@ import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.RESPONSE_DEAD
 import static uk.gov.hmcts.reform.civil.service.DeadlinesCalculator.END_OF_DAY;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest(classes = {DashboardMapperTestConfiguration.class})
 public class DashboardNotificationsParamsMapperTest {
-
-    private DashboardNotificationsParamsMapper mapper;
 
     private CaseData caseData;
 
-    @Mock
+    @MockBean
     private FeatureToggleService featureToggleService;
 
-    @Mock
+    @MockBean
     private ClaimantResponseUtils claimantResponseUtils;
+
+    @Autowired
+    private DashboardNotificationsParamsMapper mapper;
 
     @BeforeEach
     void setup() {
-        mapper = new DashboardNotificationsParamsMapper(featureToggleService, claimantResponseUtils);
         caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
     }
 
@@ -110,7 +114,7 @@ public class DashboardNotificationsParamsMapperTest {
             new IdValue<>("2", Bundle.builder().createdOn(Optional.of(now)).build()),
             new IdValue<>("3", Bundle.builder().createdOn(Optional.of(now.minusDays(2))).build())
         );
-        when(claimantResponseUtils.getDefendantAdmittedAmount(any())).thenReturn(BigDecimal.valueOf(100));
+        when(claimantResponseUtils.getDefendantAdmittedAmount(any(), anyBoolean())).thenReturn(BigDecimal.valueOf(100));
 
         LocalDateTime applicant1ResponseDeadline = LocalDateTime.of(2024, 3, 21, 16, 0);
         caseData = caseData.toBuilder()
@@ -152,20 +156,20 @@ public class DashboardNotificationsParamsMapperTest {
             .isEqualTo(DateUtils.formatDate(date));
 
         assertThat(result).extracting("respondent1AdmittedAmountPaymentDeadlineCy")
-            .isEqualTo(DateUtils.formatDateInWelsh(date));
+            .isEqualTo(DateUtils.formatDateInWelsh(date, false));
 
         assertThat(result).extracting("applicant1ResponseDeadline")
             .isEqualTo(applicant1ResponseDeadline);
         assertThat(result).extracting("applicant1ResponseDeadlineEn")
             .isEqualTo(DateUtils.formatDate(applicant1ResponseDeadline.toLocalDate()));
         assertThat(result).extracting("applicant1ResponseDeadlineCy")
-            .isEqualTo(DateUtils.formatDateInWelsh(applicant1ResponseDeadline.toLocalDate()));
+            .isEqualTo(DateUtils.formatDateInWelsh(applicant1ResponseDeadline.toLocalDate(), false));
         assertThat(result).extracting("respondent1ResponseDeadline")
             .isEqualTo(RESPONSE_DEADLINE);
         assertThat(result).extracting("respondent1ResponseDeadlineEn")
             .isEqualTo(DateUtils.formatDate(LocalDate.now().plusDays(14L)));
         assertThat(result).extracting("respondent1ResponseDeadlineCy")
-            .isEqualTo(DateUtils.formatDateInWelsh(LocalDate.now().plusDays(14L)));
+            .isEqualTo(DateUtils.formatDateInWelsh(LocalDate.now().plusDays(14L), false));
         assertThat(result).extracting("respondent1PartyName")
             .isEqualTo(caseData.getRespondent1().getPartyName());
 
@@ -176,7 +180,7 @@ public class DashboardNotificationsParamsMapperTest {
             .isEqualTo(DateUtils.formatDate(LocalDateTime.now()));
 
         assertThat(result).extracting("respondent1SettlementAgreementDeadlineCy")
-            .isEqualTo(DateUtils.formatDateInWelsh(LocalDate.now()));
+            .isEqualTo(DateUtils.formatDateInWelsh(LocalDate.now(), false));
 
         assertThat(result).extracting("claimantSettlementAgreementEn").isEqualTo("accepted");
         assertThat(result).extracting("claimantSettlementAgreementCy").isEqualTo("derbyn");
@@ -186,7 +190,7 @@ public class DashboardNotificationsParamsMapperTest {
             .isEqualTo(DateUtils.formatDate(LocalDateTime.now()));
 
         assertThat(result).extracting("applicant1ClaimSettledDateCy")
-            .isEqualTo(DateUtils.formatDateInWelsh(LocalDate.now()));
+            .isEqualTo(DateUtils.formatDateInWelsh(LocalDate.now(), false));
 
         assertThat(result).extracting("applicant1ResponseDeadlineEn")
             .isEqualTo("21 March 2024");
@@ -224,7 +228,7 @@ public class DashboardNotificationsParamsMapperTest {
         assertThat(result).extracting("bundleRestitchedDateEn")
             .isEqualTo(DateUtils.formatDate(LocalDate.now()));
         assertThat(result).extracting("bundleRestitchedDateCy")
-            .isEqualTo(DateUtils.formatDateInWelsh(LocalDate.now()));
+            .isEqualTo(DateUtils.formatDateInWelsh(LocalDate.now(), false));
 
     }
 
@@ -502,7 +506,7 @@ public class DashboardNotificationsParamsMapperTest {
         assertThat(result).extracting("paymentFrequency").isEqualTo("every week");
         assertThat(result).extracting("paymentFrequencyWelsh").isEqualTo("bob wythnos");
         assertThat(result).extracting("instalmentStartDateEn").isEqualTo(DateUtils.formatDate(date));
-        assertThat(result).extracting("instalmentStartDateCy").isEqualTo(DateUtils.formatDateInWelsh(date));
+        assertThat(result).extracting("instalmentStartDateCy").isEqualTo(DateUtils.formatDateInWelsh(date, false));
     }
 
     @Test
@@ -546,19 +550,51 @@ public class DashboardNotificationsParamsMapperTest {
         assertThat(result).extracting("hearingFeeOutStandingAmount").isEqualTo("£100");
     }
 
-    @Test
-    void shouldMapOrderParameters_whenEventIsFinalOrder() {
+    @ParameterizedTest
+    @EnumSource(value = CaseEvent.class, names = {
+        "CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT",
+        "CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT",
+        "UPDATE_TASK_LIST_CONFIRM_ORDER_REVIEW_CLAIMANT",
+        "UPDATE_TASK_LIST_CONFIRM_ORDER_REVIEW_DEFENDANT"
+    })
+    void shouldMapOrderParameters(CaseEvent caseEvent) {
         List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
         finalCaseDocuments.add(element(generateOrder(JUDGE_FINAL_ORDER)));
         caseData = caseData.toBuilder().finalOrderDocumentCollection(finalCaseDocuments).build();
 
-        Map<String, Object> resultClaimant =
-            mapper.mapCaseDataToParams(caseData, CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT);
-        Map<String, Object> resultDefendant =
-            mapper.mapCaseDataToParams(caseData, CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT);
+        Map<String, Object> result = mapper.mapCaseDataToParams(caseData, caseEvent);
 
-        assertThat(resultClaimant).extracting("orderDocument").isEqualTo("binary-url");
-        assertThat(resultDefendant).extracting("orderDocument").isEqualTo("binary-url");
+        assertThat(result).extracting("orderDocument").isEqualTo("binary-url");
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = CaseEvent.class, names = {
+        "CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT",
+        "CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT",
+        "UPDATE_TASK_LIST_CONFIRM_ORDER_REVIEW_CLAIMANT",
+        "UPDATE_TASK_LIST_CONFIRM_ORDER_REVIEW_DEFENDANT"
+    })
+    void shouldNotThrowExceptionWhenNoFinalOrders(CaseEvent caseEvent) {
+        caseData = caseData.toBuilder().finalOrderDocumentCollection(new ArrayList<>()).build();
+
+        Map<String, Object> result = mapper.mapCaseDataToParams(caseData, caseEvent);
+
+        assertThat(result).doesNotContainKey("orderDocument");
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = CaseEvent.class, names = {
+        "CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT",
+        "CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT",
+        "UPDATE_TASK_LIST_CONFIRM_ORDER_REVIEW_CLAIMANT",
+        "UPDATE_TASK_LIST_CONFIRM_ORDER_REVIEW_DEFENDANT"
+    })
+    void shouldNotThrowExceptionWhenFinalOrdersNull(CaseEvent caseEvent) {
+        caseData = caseData.toBuilder().finalOrderDocumentCollection(null).build();
+
+        Map<String, Object> result = mapper.mapCaseDataToParams(caseData, caseEvent);
+
+        assertThat(result).doesNotContainKey("orderDocument");
     }
 
     @Test
@@ -580,7 +616,11 @@ public class DashboardNotificationsParamsMapperTest {
     void shouldMapOrderParameters_whenEventIsSdo() {
         List<Element<CaseDocument>> systemGeneratedDocuments = new ArrayList<>();
         systemGeneratedDocuments.add(element(generateOrder(SDO_ORDER)));
-        caseData = caseData.toBuilder().systemGeneratedCaseDocuments(systemGeneratedDocuments).build();
+        List<Element<CaseDocument>> preTranslationDocuments = new ArrayList<>();
+        preTranslationDocuments.add(element(generateOrder(SDO_ORDER)));
+        caseData = caseData.toBuilder()
+            .systemGeneratedCaseDocuments(systemGeneratedDocuments)
+            .preTranslationDocuments(preTranslationDocuments).build();
 
         Map<String, Object> resultClaimant =
             mapper.mapCaseDataToParams(caseData, CaseEvent.CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT);
@@ -589,6 +629,8 @@ public class DashboardNotificationsParamsMapperTest {
 
         assertThat(resultClaimant).extracting("orderDocument").isEqualTo("binary-url");
         assertThat(resultDefendant).extracting("orderDocument").isEqualTo("binary-url");
+        assertThat(resultClaimant).extracting("hiddenOrderDocument").isEqualTo("binary-url");
+        assertThat(resultDefendant).extracting("hiddenOrderDocument").isEqualTo("binary-url");
     }
 
     @Test
@@ -635,7 +677,7 @@ public class DashboardNotificationsParamsMapperTest {
         assertThat(result).extracting("sdoDocumentUploadRequestedDateEn")
                 .isEqualTo(DateUtils.formatDate(date));
         assertThat(result).extracting("sdoDocumentUploadRequestedDateCy")
-                .isEqualTo(DateUtils.formatDateInWelsh(date));
+                .isEqualTo(DateUtils.formatDateInWelsh(date, false));
     }
 
     @Test
@@ -661,11 +703,24 @@ public class DashboardNotificationsParamsMapperTest {
         assertThat(result).extracting("coscFullPaymentDateEn")
             .isEqualTo(DateUtils.formatDate(fullPaymentDate));
         assertThat(result).extracting("coscFullPaymentDateCy")
-            .isEqualTo(DateUtils.formatDateInWelsh(fullPaymentDate));
+            .isEqualTo(DateUtils.formatDateInWelsh(fullPaymentDate, false));
         assertThat(result).extracting("coscNotificationDateEn")
             .isEqualTo(DateUtils.formatDate(fullPaymentDate));
         assertThat(result).extracting("coscNotificationDateCy")
-            .isEqualTo(DateUtils.formatDateInWelsh(fullPaymentDate));
+            .isEqualTo(DateUtils.formatDateInWelsh(fullPaymentDate, false));
+    }
+
+    @Test
+    void shouldMapParameters_whenClaimantMarkedPaidInFull() {
+        LocalDate markedPaidInFullDate = LocalDate.now();
+        caseData = caseData.toBuilder().legacyCaseReference("reference")
+            .ccdCaseReference(1234L).respondent1Represented(YesOrNo.NO)
+            .markPaidConsent(MarkPaidConsentList.YES).build();
+
+        Map<String, Object> result = mapper.mapCaseDataToParams(caseData, null);
+        assertThat(result).extracting("settleClaimPaidInFullDateEn").isEqualTo(DateUtils.formatDate(markedPaidInFullDate));
+        assertThat(result).extracting("settleClaimPaidInFullDateCy").isEqualTo(DateUtils.formatDateInWelsh(
+            markedPaidInFullDate, false));
     }
 }
 

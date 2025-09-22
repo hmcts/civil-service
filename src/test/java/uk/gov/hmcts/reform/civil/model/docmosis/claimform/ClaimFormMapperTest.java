@@ -6,12 +6,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Evidence;
+import uk.gov.hmcts.reform.civil.model.EvidenceDetails;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.FlightDelayDetails;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.model.TimelineOfEvents;
+import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.TimelineOfEventDetails;
+import uk.gov.hmcts.reform.civil.model.TimelineOfEvents;
 import uk.gov.hmcts.reform.civil.model.citizenui.AdditionalLipPartyDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
@@ -58,6 +61,18 @@ class ClaimFormMapperTest {
     @Test
     void should_displayIndividualName_whenPartiesIndividual() {
         //Given
+        List<Evidence> evidenceList = List.of(
+            Evidence.builder().id("0").value(EvidenceDetails.builder()
+                                                 .evidenceType("EXPERT_WITNESS")
+                                                 .expertWitnessEvidence("This is an expert")
+                                                 .build())
+                .build(),
+            Evidence.builder().id("0").value(EvidenceDetails.builder()
+                                                 .evidenceType("LETTERS_EMAILS_AND_OTHER_CORRESPONDENCE")
+                                                 .lettersEmailsAndOtherCorrespondenceEvidence("This is Letter")
+                                                 .build())
+                .build()
+        );
         CaseData caseData = CaseData.builder()
             .applicant1(Party.builder()
                             .individualLastName(INDIVIDUAL_LAST_NAME)
@@ -80,12 +95,20 @@ class ClaimFormMapperTest {
                              .partyEmail(EMAIL)
                              .type(Party.Type.INDIVIDUAL)
                              .build())
+            .speclistYourEvidenceList(evidenceList)
             .build();
         //When
         ClaimForm form = claimFormMapper.toClaimForm(caseData);
         //Then
         assertThat(form.getClaimant().name()).isEqualTo(caseData.getApplicant1().getPartyName());
         assertThat(form.getDefendant().name()).isEqualTo(caseData.getRespondent1().getPartyName());
+        assertThat(form.getEvidenceList()).hasSize(2);
+        assertThat(form.getEvidenceList().get(0).getType()).isEqualTo("EXPERT_WITNESS");
+        assertThat(form.getEvidenceList().get(0).getDisplayTypeValue()).isEqualTo("Expert witness");
+        assertThat(form.getEvidenceList().get(0).getExplanation()).isEqualTo("This is an expert");
+        assertThat(form.getEvidenceList().get(1).getType()).isEqualTo("LETTERS_EMAILS_AND_OTHER_CORRESPONDENCE");
+        assertThat(form.getEvidenceList().get(1).getDisplayTypeValue()).isEqualTo("Letters, emails and other correspondence");
+        assertThat(form.getEvidenceList().get(1).getExplanation()).isEqualTo("This is Letter");
     }
 
     @Test
@@ -135,12 +158,16 @@ class ClaimFormMapperTest {
                              .partyEmail(EMAIL)
                              .type(Party.Type.COMPANY)
                              .build())
+            .uiStatementOfTruth(StatementOfTruth.builder().name("Test").role("Test").build())
             .build();
         //When
         ClaimForm form = claimFormMapper.toClaimForm(caseData);
         //Then
         assertThat(form.getClaimant().name()).isEqualTo(COMPANY);
         assertThat(form.getDefendant().name()).isEqualTo(COMPANY);
+        assertThat(form.getUiStatementOfTruth().getName()).isEqualTo(caseData.getUiStatementOfTruth().getName());
+        assertThat(form.getUiStatementOfTruth().getRole()).isEqualTo(caseData.getUiStatementOfTruth().getRole());
+
     }
 
     @Test
@@ -336,7 +363,7 @@ class ClaimFormMapperTest {
         ClaimForm form = claimFormMapper.toClaimForm(caseData);
         //Then
         assertThat(form.getWhenAreYouClaimingInterestFrom())
-            .isEqualTo(ClaimFormMapper.INTEREST_START_FROM_CLAIM_ISSUED_DATE);
+            .isEqualTo(ClaimFormMapper.INTEREST_START_FROM_CLAIM_SUBMITTED_DATE);
     }
 
     @Test
@@ -454,6 +481,7 @@ class ClaimFormMapperTest {
         ClaimForm form = claimFormMapper.toClaimForm(CASE_DATA);
         //Then
         assertThat(form.getClaimNumber()).isEqualTo("000MC038");
+        assertThat(form.getCcdCaseReference()).isEqualTo("1234-5678-9012-3456");
     }
 
     @Test
@@ -485,8 +513,9 @@ class ClaimFormMapperTest {
     }
 
     private static CaseData getCaseData() {
-        CaseData caseData = CaseData.builder()
+        return CaseData.builder()
             .legacyCaseReference("000MC038")
+            .ccdCaseReference(1234567890123456L)
             .applicant1(Party.builder()
                             .companyName(ORGANISATION)
                             .partyEmail(EMAIL)
@@ -508,6 +537,5 @@ class ClaimFormMapperTest {
                              .build())
             .issueDate(LocalDate.now())
             .build();
-        return caseData;
     }
 }

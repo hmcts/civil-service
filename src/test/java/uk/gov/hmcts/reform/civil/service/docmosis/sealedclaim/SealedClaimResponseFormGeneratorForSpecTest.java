@@ -123,6 +123,7 @@ public class SealedClaimResponseFormGeneratorForSpecTest {
     public void contentCheckRespondent2() {
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("case reference")
+            .ccdCaseReference(1234567890123456L)
             .detailsOfWhyDoesYouDisputeTheClaim("why dispute the claim")
             .respondent1DQ(Respondent1DQ.builder().respondent1DQStatementOfTruth(
                 StatementOfTruth.builder()
@@ -165,6 +166,7 @@ public class SealedClaimResponseFormGeneratorForSpecTest {
             caseData, BEARER_TOKEN);
 
         Assertions.assertEquals(caseData.getLegacyCaseReference(), templateData.getReferenceNumber());
+        Assertions.assertEquals(caseData.getCcdCaseReference().toString(), templateData.getCcdCaseReference());
         Assertions.assertEquals(caseData.getDetailsOfWhyDoesYouDisputeTheClaim2(),
                                 templateData.getWhyDisputeTheClaim());
         Assertions.assertEquals(caseData.getRespondent2DQ().getRespondent2DQStatementOfTruth().getName(),
@@ -494,4 +496,40 @@ public class SealedClaimResponseFormGeneratorForSpecTest {
                                 templateData.getMediation()
         );
     }
+
+    @Test
+    void shouldSelectTemplateWithoutRepaymentPlan_whenLrAdmissionBulkEnabled() {
+        //Given
+        DocmosisDocument docmosisDocument = DocmosisDocument.builder().build();
+        given(featureToggleService.isLrAdmissionBulkEnabled()).willReturn(true);
+        given(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), any()))
+            .willReturn(docmosisDocument);
+        //When
+        generator.generate(CASE_DATA_WITH_RESPONDENT1, BEARER_TOKEN);
+        //Then
+        verify(documentGeneratorService).generateDocmosisDocument(templateDataCaptor.capture(), docmosisTemplatesArgumentCaptor.capture());
+        assertThat(docmosisTemplatesArgumentCaptor.getValue()).isEqualTo(DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_SEALED_1V1_INSTALLMENTS_LR_ADMISSION_BULK);
+    }
+
+    @Test
+    void shouldSelectMultipartyTemplate_whenMultipartyCaseWithLrAdmissionBulkEnabled() {
+        //Given
+        DocmosisDocument docmosisDocument = DocmosisDocument.builder().build();
+        given(featureToggleService.isLrAdmissionBulkEnabled()).willReturn(true);
+        given(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), any()))
+            .willReturn(docmosisDocument);
+        CaseData multipartyCaseData = CASE_DATA_WITH_RESPONDENT1.toBuilder()
+            .respondent2(Party.builder()
+                             .type(Party.Type.COMPANY)
+                             .companyName("defendant2 name")
+                             .build())
+            .respondentResponseIsSame(YesOrNo.YES)
+            .build();
+        //When
+        generator.generate(multipartyCaseData, BEARER_TOKEN);
+        //Then
+        verify(documentGeneratorService).generateDocmosisDocument(templateDataCaptor.capture(), docmosisTemplatesArgumentCaptor.capture());
+        assertThat(docmosisTemplatesArgumentCaptor.getValue()).isEqualTo(DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_SEALED_1V2_LR_ADMISSION_BULK);
+    }
+
 }

@@ -13,9 +13,9 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
+import static java.time.LocalDateTime.now;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -45,15 +45,16 @@ public class NotificationAcknowledgedTransitionBuilderTest {
 
     @Test
     void shouldSetUpTransitions() {
-        assertThat(result).hasSize(7); // Adjusted for the correct number of transitions
+        assertThat(result).hasSize(8); // Adjusted for the correct number of transitions
 
         assertTransition(result.get(0), "MAIN.NOTIFICATION_ACKNOWLEDGED", "MAIN.NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION");
         assertTransition(result.get(1), "MAIN.NOTIFICATION_ACKNOWLEDGED", "MAIN.ALL_RESPONSES_RECEIVED");
         assertTransition(result.get(2), "MAIN.NOTIFICATION_ACKNOWLEDGED", "MAIN.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED");
-        assertTransition(result.get(3), "MAIN.NOTIFICATION_ACKNOWLEDGED", "MAIN.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED");
-        assertTransition(result.get(4), "MAIN.NOTIFICATION_ACKNOWLEDGED", "MAIN.TAKEN_OFFLINE_BY_STAFF");
-        assertTransition(result.get(5), "MAIN.NOTIFICATION_ACKNOWLEDGED", "MAIN.PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA");
-        assertTransition(result.get(6), "MAIN.NOTIFICATION_ACKNOWLEDGED", "MAIN.TAKEN_OFFLINE_SDO_NOT_DRAWN");
+        assertTransition(result.get(3), "MAIN.NOTIFICATION_ACKNOWLEDGED", "MAIN.AWAITING_RESPONSES_FULL_ADMIT_RECEIVED");
+        assertTransition(result.get(4), "MAIN.NOTIFICATION_ACKNOWLEDGED", "MAIN.AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED");
+        assertTransition(result.get(5), "MAIN.NOTIFICATION_ACKNOWLEDGED", "MAIN.TAKEN_OFFLINE_BY_STAFF");
+        assertTransition(result.get(6), "MAIN.NOTIFICATION_ACKNOWLEDGED", "MAIN.PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA");
+        assertTransition(result.get(7), "MAIN.NOTIFICATION_ACKNOWLEDGED", "MAIN.TAKEN_OFFLINE_SDO_NOT_DRAWN");
     }
 
     @Test
@@ -119,7 +120,7 @@ public class NotificationAcknowledgedTransitionBuilderTest {
             .atStateTakenOfflineByStaffAfterNotificationAcknowledged()
             .respondent2(Party.builder().partyName("Respondent 2").build())
             .respondent2SameLegalRepresentative(YES)
-            .respondent2AcknowledgeNotificationDate(LocalDateTime.now().minusDays(1))
+            .respondent2AcknowledgeNotificationDate(now().minusDays(1))
             .build();
         assertTrue(takenOfflineByStaffAfterNotificationAcknowledged.test(caseData));
     }
@@ -138,20 +139,32 @@ public class NotificationAcknowledgedTransitionBuilderTest {
     void shouldReturnTrue_whenCaseDataAtStateClaimDismissedAfterNotificationAcknowledged_1v2DS() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateNotificationAcknowledged_1v2_BothDefendants()
-            .claimDismissedDeadline(LocalDateTime.now().minusDays(5))
+            .claimDismissedDeadline(now().minusDays(5))
             .respondent1ResponseDate(null)
-            .respondent2ResponseDate(LocalDateTime.now())
+            .respondent2ResponseDate(now())
             .build();
         assertTrue(caseDismissedAfterClaimAcknowledged.test(caseData));
+    }
+
+    @Test
+    void shouldReturnFalseWhenOffline1v2DS() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateNotificationAcknowledged_1v2_BothDefendants()
+            .claimDismissedDeadline(now().minusDays(5))
+            .respondent1ResponseDate(null)
+            .respondent2ResponseDate(now())
+            .takenOfflineByStaffDate(now())
+            .build();
+        assertFalse(caseDismissedAfterClaimAcknowledged.test(caseData));
     }
 
     @Test
     void shouldReturnFalse_whenCaseDataAtStateClaimDismissedAfterNotificationAcknowledged_1v2DS() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateNotificationAcknowledged_1v2_BothDefendants()
-            .claimDismissedDeadline(LocalDateTime.now().minusDays(5))
-            .respondent1ResponseDate(LocalDateTime.now())
-            .respondent2ResponseDate(LocalDateTime.now())
+            .claimDismissedDeadline(now().minusDays(5))
+            .respondent1ResponseDate(now())
+            .respondent2ResponseDate(now())
             .build();
         assertFalse(caseDismissedAfterClaimAcknowledged.test(caseData));
     }
@@ -160,18 +173,29 @@ public class NotificationAcknowledgedTransitionBuilderTest {
     void shouldReturnTrue_whenCaseDataAtStateClaimDismissedAfterNotificationAcknowledged_1v1() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateNotificationAcknowledged()
-            .claimDismissedDeadline(LocalDateTime.now().minusDays(5))
+            .claimDismissedDeadline(now().minusDays(5))
             .respondent1ResponseDate(null)
             .build();
         assertTrue(caseDismissedAfterClaimAcknowledged.test(caseData));
     }
 
     @Test
+    void shouldReturnFalseWhenOffline_1v1() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateNotificationAcknowledged()
+            .claimDismissedDeadline(now().minusDays(5))
+            .respondent1ResponseDate(null)
+            .takenOfflineByStaffDate(now())
+            .build();
+        assertFalse(caseDismissedAfterClaimAcknowledged.test(caseData));
+    }
+
+    @Test
     void shouldReturnFalse_whenCaseDataAtStateClaimDismissedAfterNotificationAcknowledged_1v1() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateNotificationAcknowledged()
-            .claimDismissedDeadline(LocalDateTime.now().minusDays(5))
-            .respondent1ResponseDate(LocalDateTime.now())
+            .claimDismissedDeadline(now().minusDays(5))
+            .respondent1ResponseDate(now())
             .build();
         assertFalse(caseDismissedAfterClaimAcknowledged.test(caseData));
     }

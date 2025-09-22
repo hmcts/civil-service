@@ -55,7 +55,7 @@ public class PostNoticeOfDiscontinuanceLetterLiPDefendant1HandlerTest extends Ba
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent1Represented(YesOrNo.NO)
                 .courtPermissionNeeded(SettleDiscontinueYesOrNoList.NO)
-                .noticeOfDiscontinueAllParitiesDoc(caseDocument).build();
+                .respondent1NoticeOfDiscontinueAllPartyViewDoc(caseDocument).build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(SEND_DISCONTINUANCE_LETTER_LIP_DEFENDANT1.name());

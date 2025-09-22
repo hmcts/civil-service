@@ -50,11 +50,17 @@ public abstract class CallbackHandler {
     }
 
     public boolean isEventAlreadyProcessed(CallbackParams callbackParams, BusinessProcess businessProcess) {
-        if (camundaActivityIds(callbackParams).contains(DEFAULT)) {
+        List<String> currentActivityId = camundaActivityIds(callbackParams);
+        if (currentActivityId.contains(DEFAULT)) {
             return false;
         }
 
-        return businessProcess != null && camundaActivityIds(callbackParams).contains(businessProcess.getActivityId());
+        String lastExecutedActivityId = businessProcess.getActivityId();
+        log.info("Last executed activity id was: {} and current activity id for this request is: {}",
+                 lastExecutedActivityId, currentActivityId
+        );
+
+        return businessProcess != null && currentActivityId.contains(lastExecutedActivityId);
     }
 
     public void register(Map<String, CallbackHandler> handlers) {
@@ -105,5 +111,9 @@ public abstract class CallbackHandler {
      */
     protected CallbackResponse emptySubmittedCallbackResponse(CallbackParams callbackParams) {
         return SubmittedCallbackResponse.builder().build();
+    }
+
+    public String generateDocumentName(String formName, final String caseReference) {
+        return String.format(formName, caseReference);
     }
 }

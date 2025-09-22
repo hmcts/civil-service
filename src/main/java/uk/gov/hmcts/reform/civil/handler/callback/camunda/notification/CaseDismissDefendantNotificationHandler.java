@@ -7,6 +7,8 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.List;
 
@@ -14,11 +16,14 @@ import java.util.List;
 public class CaseDismissDefendantNotificationHandler extends AbstractCaseDismissNotificationHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(
-        CaseEvent.NOTIFY_DEFENDANT_DISMISS_CASE
+        CaseEvent.NOTIFY_DEFENDANT_DISMISS_CASE,
+        CaseEvent.NOTIFY_DEFENDANT_TWO_DISMISS_CASE
     );
 
-    public CaseDismissDefendantNotificationHandler(NotificationService notificationService, NotificationsProperties notificationsProperties) {
-        super(notificationService, notificationsProperties);
+    public CaseDismissDefendantNotificationHandler(NotificationService notificationService, NotificationsProperties notificationsProperties,
+                                                   FeatureToggleService featureToggleService,
+                                                   NotificationsSignatureConfiguration configuration) {
+        super(notificationService, notificationsProperties, configuration, featureToggleService);
     }
 
     @Override
@@ -27,8 +32,8 @@ public class CaseDismissDefendantNotificationHandler extends AbstractCaseDismiss
     }
 
     @Override
-    protected String getPartyName(CaseData caseData) {
-        return caseData.getRespondent1().getPartyName();
+    protected String getPartyName(CaseData caseData, CallbackParams callbackParams) {
+        return isForRespondent1(callbackParams) ? caseData.getRespondent1().getPartyName() : caseData.getRespondent2().getPartyName();
     }
 
     protected String getReferenceTemplate() {
@@ -40,7 +45,7 @@ public class CaseDismissDefendantNotificationHandler extends AbstractCaseDismiss
         if (caseData.isRespondent1LiP() && StringUtils.isNotBlank(caseData.getRespondent1().getPartyEmail())) {
             return caseData.getRespondent1().getPartyEmail();
         } else {
-            return caseData.getRespondentSolicitor1EmailAddress();
+            return isForRespondent1(params) ? caseData.getRespondentSolicitor1EmailAddress() : caseData.getRespondentSolicitor2EmailAddress();
         }
     }
 
@@ -50,5 +55,10 @@ public class CaseDismissDefendantNotificationHandler extends AbstractCaseDismiss
 
     protected boolean isLiP(CallbackParams params) {
         return params.getCaseData().isRespondent1LiP();
+    }
+
+    private boolean isForRespondent1(CallbackParams callbackParams) {
+        return callbackParams.getRequest().getEventId()
+            .equals(CaseEvent.NOTIFY_DEFENDANT_DISMISS_CASE.name());
     }
 }

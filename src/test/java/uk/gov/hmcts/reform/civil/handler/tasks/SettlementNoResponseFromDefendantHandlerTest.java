@@ -12,8 +12,8 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.event.SettlementNoResponseFromDefendantEvent;
 import uk.gov.hmcts.reform.civil.service.search.SettlementNoResponseFromDefendantSearchService;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
@@ -39,7 +39,7 @@ public class SettlementNoResponseFromDefendantHandlerTest {
         // Given: one case found from search service
         long caseId = 1L;
         Map<String, Object> data = Map.of("data", "some data");
-        List<CaseDetails> caseDetails = List.of(CaseDetails.builder().id(caseId).data(data).build());
+        Set<CaseDetails> caseDetails = Set.of(CaseDetails.builder().id(caseId).data(data).build());
 
         given(caseSearchService.getCases()).willReturn(caseDetails);
 
@@ -54,7 +54,7 @@ public class SettlementNoResponseFromDefendantHandlerTest {
     @Test
     void shouldNotEmitSettlementNoResponseFromDefendantEvent_WhenNoCasesFound() {
         // Given: no case found from search service
-        when(caseSearchService.getCases()).thenReturn(List.of());
+        when(caseSearchService.getCases()).thenReturn(Set.of());
 
         // When: handler is called
         handler.execute(mockTask, externalTaskService);

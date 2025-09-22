@@ -1,8 +1,10 @@
 package uk.gov.hmcts.reform.civil.helpers.judgmentsonline;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
@@ -19,6 +21,8 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.JudgementService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
@@ -32,16 +36,33 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
 public class EditJudgmentsOnlineMapperTest {
 
-    private RoboticsAddressMapper addressMapper = new RoboticsAddressMapper(new AddressLinesMapper());
-    private EditJudgmentOnlineMapper editJudgmentOnlineMapper = new EditJudgmentOnlineMapper();
-    private RecordJudgmentOnlineMapper recordJudgmentMapper = new RecordJudgmentOnlineMapper(addressMapper);
-    private JudgmentByAdmissionOnlineMapper judgmentByAdmissionMapper = new JudgmentByAdmissionOnlineMapper(addressMapper);
+    @Mock
+    private FeatureToggleService featureToggleService;
+
+    private InterestCalculator interestCalculator;
+    private JudgementService judgementService;
+    private RoboticsAddressMapper addressMapper;
+    private EditJudgmentOnlineMapper editJudgmentOnlineMapper;
+    private RecordJudgmentOnlineMapper recordJudgmentMapper;
+    private JudgmentByAdmissionOnlineMapper judgmentByAdmissionMapper;
+    private DefaultJudgmentOnlineMapper defaultJudgmentMapper;
+
+    @Mock
     private Time time;
-    private InterestCalculator interestCalculator = new InterestCalculator(time);
-    private DefaultJudgmentOnlineMapper defaultJudgmentMapper = new DefaultJudgmentOnlineMapper(interestCalculator, addressMapper);
+
+    @BeforeEach
+    public void setUp() {
+        interestCalculator = new InterestCalculator();
+        judgementService = new JudgementService(featureToggleService, interestCalculator);
+        addressMapper = new RoboticsAddressMapper(new AddressLinesMapper());
+        editJudgmentOnlineMapper = new EditJudgmentOnlineMapper(time);
+        recordJudgmentMapper = new RecordJudgmentOnlineMapper(time, addressMapper);
+        judgmentByAdmissionMapper = new JudgmentByAdmissionOnlineMapper(time, addressMapper, judgementService, interestCalculator);
+        defaultJudgmentMapper = new DefaultJudgmentOnlineMapper(time, interestCalculator, addressMapper);
+    }
 
     @Test
     void testIfActiveJudgmentIsnullIfnotSet() {
@@ -218,13 +239,13 @@ public class EditJudgmentsOnlineMapperTest {
             .specRespondent1Represented(YES)
             .applicant1Represented(YES)
             .defendantDetailsSpec(DynamicList.builder()
-                                      .value(DynamicListElement.builder()
-                                                 .label("John Doe")
-                                                 .build())
-                                      .build())
+                .value(DynamicListElement.builder()
+                    .label("John Doe")
+                    .build())
+                .build())
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
             .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
-                                               .whenWillThisAmountBePaid(LocalDate.now().plusDays(5)).build())
+                .whenWillThisAmountBePaid(LocalDate.now().plusDays(5)).build())
             .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
             .ccjPaymentDetails(ccjPaymentDetails)
             .respondent1(PartyBuilder.builder().organisation().build())

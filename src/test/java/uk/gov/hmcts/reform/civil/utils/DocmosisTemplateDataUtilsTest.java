@@ -2,12 +2,16 @@ package uk.gov.hmcts.reform.civil.utils;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 
 import java.io.IOException;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -15,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils.fetchApplicantName;
 import static uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils.fetchSolicitorReferences;
+import static uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils.formatCcdCaseReference;
 import static uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils.toCaseName;
 
 class DocmosisTemplateDataUtilsTest {
@@ -493,5 +498,34 @@ class DocmosisTemplateDataUtilsTest {
                 () -> assertEquals("Not Provided", result.getRespondentSolicitor2Reference())
             );
         }
+    }
+
+    @Test
+    void shouldReturnEmptyForMissingCaseReference() {
+        CaseData caseData = CaseData.builder()
+            .build();
+        String formattedCaseReference = formatCcdCaseReference(caseData);
+        assertThat(formattedCaseReference).isEmpty();
+    }
+
+    private static Stream<Arguments> testCaseReferenceData() {
+        return Stream.of(
+            Arguments.of(1111111111111111L, "1111-1111-1111-1111"),
+            Arguments.of(11111111111111L, "1111-1111-1111-11"),
+            Arguments.of(1111L, "1111"),
+            Arguments.of(1L, "1")
+
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("testCaseReferenceData")
+    void shouldReturnFormattedReference(Long inputCaseReference, String expectedCaseReference) {
+        CaseData caseData = CaseData.builder()
+            .ccdCaseReference(inputCaseReference)
+            .build();
+        String formattedCaseReference = formatCcdCaseReference(caseData);
+        assertThat(formattedCaseReference).isNotEmpty();
+        assertThat(formattedCaseReference).isEqualTo(expectedCaseReference);
     }
 }

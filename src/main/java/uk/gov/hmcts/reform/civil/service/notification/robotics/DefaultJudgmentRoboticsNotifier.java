@@ -9,6 +9,8 @@ import uk.gov.hmcts.reform.civil.service.robotics.RoboticsNotificationService;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSpec;
 
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+
 @Slf4j
 @Component
 public class DefaultJudgmentRoboticsNotifier extends RoboticsNotifier {
@@ -25,7 +27,8 @@ public class DefaultJudgmentRoboticsNotifier extends RoboticsNotifier {
 
     @Override
     public void sendNotifications(CaseData caseData, boolean multiPartyScenario, String authToken) {
-        if (toggleService.isPinInPostEnabled() && caseData.isRespondent1NotRepresented()) {
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory()) && caseData.isRespondent1NotRepresented()
+            && toggleService.isPinInPostEnabled()) {
             roboticsNotificationService.notifyJudgementLip(caseData, authToken);
         } else {
             super.sendNotifications(caseData, multiPartyScenario,

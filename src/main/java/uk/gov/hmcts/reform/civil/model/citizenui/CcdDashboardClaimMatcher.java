@@ -2,10 +2,12 @@ package uk.gov.hmcts.reform.civil.model.citizenui;
 
 import uk.gov.hmcts.reform.ccd.client.model.CaseEventDetail;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
+import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.math.BigDecimal;
@@ -123,20 +125,57 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
         return caseData.getHearingDate() != null;
     }
 
-    @Override
     public boolean isSDOOrderCreatedPreCP() {
-        Optional<LocalDateTime> lastNonSdoOrderTime = getTimeOfLastNonSDOOrder();
+        String baseLocation = Optional.ofNullable(caseData.getCaseManagementLocation())
+            .map(location -> location.getBaseLocation())
+            .orElse(null);
+
+        boolean isCaseProgression = CaseState.CASE_PROGRESSION.equals(caseData.getCcdState());
+        boolean isBaseLocationValid = baseLocation != null;
+        boolean isFeatureToggleEnabled = (featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(
+            baseLocation) || featureToggleService.isWelshEnabledForMainCase());
         Optional<LocalDateTime> sdoTime = getSDOTime();
-        return !featureToggleService.isCaseProgressionEnabled()
-            && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState());
+        boolean isSDOTimeBeforeCPRelease = sdoTime.isPresent()
+            && sdoTime.get().isBefore(LocalDateTime.of(2024, 12, 5, 0, 0));
+        Optional<LocalDateTime> lastNonSdoOrderTime = getTimeOfLastNonSDOOrder();
+
+        boolean isSDOTimeAfterLastNonSdoOrder = lastNonSdoOrderTime.isEmpty()
+            || (sdoTime.isPresent() && sdoTime.get().isAfter(lastNonSdoOrderTime.get()));
+
+        return isCaseProgression && isBaseLocationValid && (!isFeatureToggleEnabled
+            || (isSDOTimeBeforeCPRelease && isSDOTimeAfterLastNonSdoOrder));
+    }
+
+    @Override
+    public boolean decisionMadeDocumentsAreInTranslation() {
+        return (featureToggleService.isWelshEnabledForMainCase() && caseData.getPreTranslationDocuments() != null
+            && caseData.getPreTranslationDocuments().stream().map(
+                    Element::getValue)
+                .map(CaseDocument::getDocumentType)
+            .anyMatch(type -> DocumentType.DECISION_MADE_ON_APPLICATIONS.equals(type))) && !isSettled()
+            && !CaseState.CASE_DISCONTINUED.equals(caseData.getCcdState());
+    }
+
+    @Override
+    public boolean sdoDocumentsAreInTranslation() {
+        return (featureToggleService.isWelshEnabledForMainCase() && caseData.getPreTranslationDocuments() != null
+            && caseData.getPreTranslationDocuments().stream().map(
+                    Element::getValue)
+            .map(CaseDocument::getDocumentType).anyMatch(type -> DocumentType.SDO_ORDER.equals(type))
+            && !isSettled() && !CaseState.CASE_DISCONTINUED.equals(caseData.getCcdState()));
     }
 
     @Override
     public boolean isSDOOrderCreatedCP() {
+        String baseLocation = Optional.ofNullable(caseData.getCaseManagementLocation())
+            .map(location -> location.getBaseLocation())
+            .orElse(null);
         Optional<LocalDateTime> lastNonSdoOrderTime = getTimeOfLastNonSDOOrder();
         Optional<LocalDateTime> sdoTime = getSDOTime();
-        return featureToggleService.isCaseProgressionEnabled()
-            && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
+        return CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
+            && baseLocation != null
+            && (featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation())
+            || featureToggleService.isWelshEnabledForMainCase())
             && !isSDOOrderLegalAdviserCreated()
             && !isSDOOrderInReview()
             && !isSDOOrderInReviewOtherParty()
@@ -157,8 +196,20 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
             && !isSDOOrderInReviewOtherParty()
             && !isDecisionForReconsiderationMade()
             && sdoTime.isPresent()
+            && !isSDODoneAfterDecisionForReconsiderationMade()
+            && !isGeneralOrderAfterDecisionForReconsiderationMade()
             && (lastNonSdoOrderTime.isEmpty()
             || sdoTime.get().isAfter(lastNonSdoOrderTime.get()));
+    }
+
+    protected boolean isSDODoneAfterDecisionForReconsiderationMade() {
+        return caseData.getDecisionOnRequestReconsiderationOptions() == DecisionOnRequestReconsiderationOptions.CREATE_SDO
+            && caseData.getDocumentListByType(caseData.getSystemGeneratedCaseDocuments(), DocumentType.SDO_ORDER).map(List::size).orElse(0) == 2;
+    }
+
+    protected boolean isGeneralOrderAfterDecisionForReconsiderationMade() {
+        return caseData.getDecisionOnRequestReconsiderationOptions() == DecisionOnRequestReconsiderationOptions.CREATE_GENERAL_ORDER
+            && caseData.getDocumentListByType(caseData.getFinalOrderDocumentCollection(), DocumentType.JUDGE_FINAL_ORDER).isPresent();
     }
 
     @Override
@@ -187,7 +238,7 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
 
     @Override
     public Optional<LocalDateTime> getWhenWasHearingScheduled() {
-        return getMostRecentEventOfType(EnumSet.of(CaseEvent.HEARING_SCHEDULED))
+        return getMostRecentEventOfType(EnumSet.of(CaseEvent.HEARING_SCHEDULED, CaseEvent.GENERATE_HEARING_NOTICE_HMC))
             .map(CaseEventDetail::getCreatedDate);
     }
 
@@ -210,6 +261,7 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
         return CaseState.HEARING_READINESS.equals(caseData.getCcdState())
             && (hearingScheduledDate.isPresent())
             && !isTrialArrangementStatusActive()
+            && !isBundleCreatedStatusActive()
             && (orderDate.isEmpty()
             || orderDate.get().isBefore(hearingScheduledDate.get()));
     }
@@ -227,33 +279,44 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
     }
 
     @Override
-    public boolean isTrialArrangementStatusActive() {
-        Optional<LocalDate> hearingDate = getHearingDate();
-        if (caseData.isFastTrackClaim()
-            && (CaseState.HEARING_READINESS.equals(caseData.getCcdState()) || CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING.equals(caseData.getCcdState()))
-            && !ListingOrRelisting.RELISTING.equals(caseData.getListingOrRelisting())
-            && hearingDate.isPresent()
-            && YesOrNo.YES.equals(caseData.getTrialReadyNotified())
-            && isHearingLessThanDaysAway(DAY_LIMIT)
-            && !isBundleCreatedStatusActive()) {
-            Optional<LocalDateTime> lastOrder = getTimeOfLastNonSDOOrder();
-            return lastOrder.isEmpty()
-                || hearingDate.get().minusDays(DAY_LIMIT)
-                .isAfter(lastOrder.get().toLocalDate());
-        } else {
-            return false;
-        }
-    }
-
-    @Override
     public boolean isBundleCreatedStatusActive() {
         Optional<LocalDateTime> bundleDate = getBundleCreationDate();
         Optional<LocalDateTime> lastOrderDate = getTimeOfLastNonSDOOrder();
         return isHearingScheduled()
-            && caseData.getCcdState() == CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING
+            && (CaseState.HEARING_READINESS.equals(caseData.getCcdState())
+                || caseData.getCcdState() == CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING)
             && isHearingLessThanDaysAway(3 * 7)
             && bundleDate.isPresent()
             && (lastOrderDate.isEmpty()
-            || lastOrderDate.get().isBefore(bundleDate.get()));
+                || lastOrderDate.get().isBefore(bundleDate.get()));
+    }
+
+    @Override
+    public boolean isWaitingForClaimantIntentDocUploadPreDefendantNocOnline() {
+        return isWaitingForClaimantIntentDocUpload()
+            && !featureToggleService.isDefendantNoCOnlineForCase(caseData);
+    }
+
+    @Override
+    public boolean isWaitingForClaimantIntentDocUploadPostDefendantNocOnline() {
+        return isWaitingForClaimantIntentDocUpload()
+            && featureToggleService.isDefendantNoCOnlineForCase(caseData);
+    }
+
+    private boolean isWaitingForClaimantIntentDocUpload() {
+        return caseData.isRespondentResponseFullDefence() && caseData.getApplicant1ResponseDate() != null
+            && caseData.getCcdState() == CaseState.AWAITING_APPLICANT_INTENTION && caseData.isClaimantBilingual();
+    }
+
+    @Override
+    public boolean awaitingHearingNoticeTranslationNotSettledOrDiscontinued() {
+        return awaitingHearingNoticeTranslation() && !isSettled() && !isCasedDiscontinued();
+    }
+
+    private boolean awaitingHearingNoticeTranslation() {
+        return caseData.getPreTranslationDocuments() != null
+            && caseData.getPreTranslationDocuments().stream().anyMatch(
+                element -> element.getValue().getDocumentType() == DocumentType.HEARING_FORM
+        );
     }
 }

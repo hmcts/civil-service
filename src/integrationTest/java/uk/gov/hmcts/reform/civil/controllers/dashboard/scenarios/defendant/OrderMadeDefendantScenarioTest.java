@@ -15,6 +15,8 @@ import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant.OrderMadeDefendantNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Mediation;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
@@ -39,6 +41,9 @@ public class OrderMadeDefendantScenarioTest extends DashboardBaseIntegrationTest
     @Autowired
     private OrderMadeDefendantNotificationHandler handler;
 
+    DynamicListElement selectedCourt = DynamicListElement.builder()
+        .code("00002").label("court 2 - 2 address - Y02 7RB").build();
+
     @Test
     void should_create_order_made_defendant_scenario() throws Exception {
 
@@ -49,11 +54,12 @@ public class OrderMadeDefendantScenarioTest extends DashboardBaseIntegrationTest
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .respondent1Represented(YesOrNo.NO)
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
             .finalOrderDocumentCollection(List.of(ElementUtils.element(
                 CaseDocument.builder().documentLink(Document.builder().documentBinaryUrl("url").build()).build())))
             .build();
 
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
+        when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
         handler.handle(callbackParamsTest(caseData));
 
         //Verify Notification is created
@@ -88,6 +94,7 @@ public class OrderMadeDefendantScenarioTest extends DashboardBaseIntegrationTest
                 CaseDocument.builder().documentLink(Document.builder().documentBinaryUrl("url").build()).build())))
             .responseClaimTrack(FAST_CLAIM.name())
             .totalClaimAmount(BigDecimal.valueOf(999))
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
             .mediation(Mediation.builder()
                            .mediationUnsuccessfulReasonsMultiSelect(List.of(NOT_CONTACTABLE_CLAIMANT_ONE, NOT_CONTACTABLE_DEFENDANT_ONE))
                            .build())
@@ -122,11 +129,12 @@ public class OrderMadeDefendantScenarioTest extends DashboardBaseIntegrationTest
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .respondent1Represented(YesOrNo.NO)
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
             .finalOrderDocumentCollection(List.of(ElementUtils.element(
                 CaseDocument.builder().documentLink(Document.builder().documentBinaryUrl("url").build()).build())))
             .build();
 
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(false);
+        when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(false);
         handler.handle(callbackParamsTest(caseData));
 
         //Verify Notification is created
@@ -157,11 +165,12 @@ public class OrderMadeDefendantScenarioTest extends DashboardBaseIntegrationTest
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .respondent1Represented(YesOrNo.NO)
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
             .finalOrderDocumentCollection(List.of(ElementUtils.element(
                 CaseDocument.builder().documentLink(Document.builder().documentBinaryUrl("url").build()).build())))
             .build();
 
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
+        when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
         handler.handle(callbackParamsTestFinalOrders(caseData));
 
         //Verify Notification is created
@@ -202,11 +211,12 @@ public class OrderMadeDefendantScenarioTest extends DashboardBaseIntegrationTest
             .respondent1Represented(YesOrNo.NO)
             .claimsTrack(ClaimsTrack.fastTrack)
             .drawDirectionsOrderRequired(YesOrNo.NO)
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
             .finalOrderDocumentCollection(List.of(ElementUtils.element(
                 CaseDocument.builder().documentLink(Document.builder().documentBinaryUrl("url").build()).build())))
             .build();
 
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
+        when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
         handler.handle(callbackParamsTestFinalOrders(caseData));
 
         //Verify Notification is created

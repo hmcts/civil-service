@@ -15,14 +15,15 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimLipResponseFormGenerator;
-import uk.gov.hmcts.reform.civil.service.stitching.CivilDocumentStitchingService;
+import uk.gov.hmcts.reform.civil.stitch.service.CivilStitchService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -30,9 +31,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_RESPONSE_CUI_SEALED;
-import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DEFENDANT_DEFENCE;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DIRECTIONS_QUESTIONNAIRE;
 
 @Slf4j
 @Service
@@ -45,7 +45,7 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
     private final SealedClaimLipResponseFormGenerator formGenerator;
     private final SystemGeneratedDocumentService systemGeneratedDocumentService;
     private final AssignCategoryId assignCategoryId;
-    private final CivilDocumentStitchingService civilDocumentStitchingService;
+    private final CivilStitchService civilStitchService;
     private final FeatureToggleService featureToggleService;
     @Value("${stitching.enabled}")
     private boolean stitchEnabled;
@@ -66,55 +66,52 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
 
     private CallbackResponse prepareSealedForm(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        log.info("GENERATE_RESPONSE_CUI_SEALED for case {}", caseData.getCcdCaseReference());
-        CaseDocument sealedForm = formGenerator.generate(
-            caseData,
-            callbackParams.getParams().get(BEARER_TOKEN).toString()
-        );
-        log.info("sealedForm {} for case {}", sealedForm, caseData.getCcdCaseReference());
+        Long caseId = caseData.getCcdCaseReference();
+
+        log.info("Generating response cui sealed form for case {}", caseId);
+        String authToken = callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString();
+        CaseDocument sealedForm = formGenerator.generate(caseData, authToken);
+
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        log.info("isLipvLipOneVOne {} isLipVLipEnabled {} for case {}", caseData.isLipvLipOneVOne(),
-                 featureToggleService.isLipVLipEnabled(), caseData.getCcdCaseReference());
+
         if (stitchEnabled && caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()) {
-            log.info("if condition for case {}", caseData.getCcdCaseReference());
             List<DocumentMetaData> documentMetaDataList = fetchDocumentsToStitch(caseData, sealedForm);
+            log.info("no of document sending for stitch {} for caseId {}", documentMetaDataList.size(), caseId);
             if (documentMetaDataList.size() > 1) {
-                log.info("documentMetaDataList {} for case {}", documentMetaDataList.size(), caseData.getCcdCaseReference());
-                CaseDocument stitchedDocument = civilDocumentStitchingService.bundle(
-                        documentMetaDataList,
-                        callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
-                        sealedForm.getDocumentName(),
-                        sealedForm.getDocumentName(),
-                        caseData
-                );
-                log.info("stitchedDocument {} for case {}", stitchedDocument, caseData.getCcdCaseReference());
-                CaseDocument updatedStitchedDoc = stitchedDocument.toBuilder().documentType(DEFENDANT_DEFENCE).build();
-                caseDataBuilder.respondent1ClaimResponseDocumentSpec(updatedStitchedDoc)
-                        .systemGeneratedCaseDocuments(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
-                                updatedStitchedDoc,
-                                caseData
-                        ));
-                assignCategoryId.assignCategoryIdToCaseDocument(stitchedDocument, DocCategory.DEF1_DEFENSE_DQ.getValue());
+                log.info("Calling civil stitch service from response cui sealed form for caseId {}", caseId);
+                CaseDocument stitchedDocument =
+                    civilStitchService.generateStitchedCaseDocument(documentMetaDataList,
+                                                                    sealedForm.getDocumentName(),
+                                                                    caseId,
+                                                                    DocumentType.DEFENDANT_DEFENCE,
+                                                                    authToken);
+                log.info("Civil stitch service for response cui sealed form {} for caseId {}", stitchedDocument, caseId);
+                addToSystemGeneratedDocuments(caseDataBuilder, stitchedDocument, caseData);
             } else {
-                log.info("Inner Else sealedForm {} condition for case {}", sealedForm, caseData.getCcdCaseReference());
-                addToSystemGeneratedDocments(caseDataBuilder, sealedForm, caseData);
+                addToSystemGeneratedDocuments(caseDataBuilder, sealedForm, caseData);
             }
         } else {
-            log.info("Else sealedForm {} condition for case {}", sealedForm, caseData.getCcdCaseReference());
-            addToSystemGeneratedDocments(caseDataBuilder, sealedForm, caseData);
+            addToSystemGeneratedDocuments(caseDataBuilder, sealedForm, caseData);
         }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
 
-    private void addToSystemGeneratedDocments(CaseData.CaseDataBuilder<?, ?> caseDataBuilder, CaseDocument sealedForm, CaseData caseData) {
-        caseDataBuilder.respondent1ClaimResponseDocumentSpec(sealedForm)
-            .systemGeneratedCaseDocuments(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
-                sealedForm,
-                caseData
-            ));
-        assignCategoryId.assignCategoryIdToCaseDocument(sealedForm, DocCategory.DEF1_DEFENSE_DQ.getValue());
+    private void addToSystemGeneratedDocuments(CaseData.CaseDataBuilder<?, ?> caseDataBuilder, CaseDocument document, CaseData caseData) {
+        if (featureToggleService.isWelshEnabledForMainCase() && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
+            caseDataBuilder
+                .bilingualHint(YesOrNo.YES)
+                .preTranslationDocuments(List.of(ElementUtils.element(document)));
+        } else {
+            caseDataBuilder.respondent1ClaimResponseDocumentSpec(document)
+                .systemGeneratedCaseDocuments(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
+                    document,
+                    caseData
+                ));
+        }
+        assignCategoryId.assignCategoryIdToCaseDocument(document, DocCategory.DEF1_DEFENSE_DQ.getValue());
     }
 
     private List<DocumentMetaData> fetchDocumentsToStitch(CaseData caseData, CaseDocument sealedForm) {
@@ -125,16 +122,25 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
                 "Sealed Claim form",
                 LocalDate.now().toString()
         ));
-        ElementUtils.unwrapElements(caseData.getSystemGeneratedCaseDocuments()).stream()
-                .filter(cd -> DocumentType.DIRECTIONS_QUESTIONNAIRE.equals(cd.getDocumentType()))
+        if (featureToggleService.isWelshEnabledForMainCase() && caseData.getRespondent1OriginalDqDoc() != null) {
+            documents.add(
+                new DocumentMetaData(
+                    caseData.getRespondent1OriginalDqDoc().getDocumentLink(),
+                    "Directions Questionnaire",
+                    LocalDate.now().toString()
+                )
+            );
+        } else {
+            ElementUtils.unwrapElements(caseData.getSystemGeneratedCaseDocuments()).stream()
+                .filter(cd -> DIRECTIONS_QUESTIONNAIRE.equals(cd.getDocumentType()))
                 .map(cd ->
-                        new DocumentMetaData(
-                                cd.getDocumentLink(),
-                                "Directions Questionnaire",
-                                LocalDate.now().toString()
-                        )
+                         new DocumentMetaData(
+                             cd.getDocumentLink(),
+                             "Directions Questionnaire",
+                             LocalDate.now().toString()
+                         )
                 ).forEach(documents::add);
-
+        }
         return documents;
     }
 }

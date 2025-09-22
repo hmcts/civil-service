@@ -19,8 +19,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimIssuedTransitionBuilder.awaitingResponsesFullAdmitReceivedSpec;
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimIssuedTransitionBuilder.awaitingResponsesFullDefenceReceivedSpec;
-import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimIssuedTransitionBuilder.awaitingResponsesNonFullDefenceReceivedSpec;
+import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimIssuedTransitionBuilder.awaitingResponsesNonFullDefenceOrFullAdmitReceivedSpec;
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimIssuedTransitionBuilder.claimNotified;
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimIssuedTransitionBuilder.contactDetailsChange;
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimIssuedTransitionBuilder.pastClaimNotificationDeadline;
@@ -45,7 +46,7 @@ public class ClaimIssuedTransitionBuilderTest {
 
     @Test
     void shouldSetUpTransitions_withExpectedSizeAndStates() {
-        assertThat(result).hasSize(14);
+        assertThat(result).hasSize(15);
 
         assertTransition(result.get(0), "MAIN.CLAIM_ISSUED", "MAIN.CLAIM_NOTIFIED");
         assertTransition(result.get(1), "MAIN.CLAIM_ISSUED", "MAIN.TAKEN_OFFLINE_BY_STAFF");
@@ -58,9 +59,10 @@ public class ClaimIssuedTransitionBuilderTest {
         assertTransition(result.get(8), "MAIN.CLAIM_ISSUED", "MAIN.FULL_ADMISSION");
         assertTransition(result.get(9), "MAIN.CLAIM_ISSUED", "MAIN.COUNTER_CLAIM");
         assertTransition(result.get(10), "MAIN.CLAIM_ISSUED", "MAIN.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED");
-        assertTransition(result.get(11), "MAIN.CLAIM_ISSUED", "MAIN.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED");
-        assertTransition(result.get(12), "MAIN.CLAIM_ISSUED", "MAIN.DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE");
-        assertTransition(result.get(13), "MAIN.CLAIM_ISSUED", "MAIN.DIVERGENT_RESPOND_GO_OFFLINE");
+        assertTransition(result.get(11), "MAIN.CLAIM_ISSUED", "MAIN.AWAITING_RESPONSES_FULL_ADMIT_RECEIVED");
+        assertTransition(result.get(12), "MAIN.CLAIM_ISSUED", "MAIN.AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED");
+        assertTransition(result.get(13), "MAIN.CLAIM_ISSUED", "MAIN.DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE");
+        assertTransition(result.get(14), "MAIN.CLAIM_ISSUED", "MAIN.DIVERGENT_RESPOND_GO_OFFLINE");
     }
 
     @Test
@@ -157,31 +159,60 @@ public class ClaimIssuedTransitionBuilderTest {
     }
 
     @Test
+    void shouldReturnTrueWhenAwaitingResponsesFullAdmitReceivedForRespondent1() {
+        CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoDefendantSolicitors()
+            .setClaimTypeToSpecClaim().respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION).build();
+        assertTrue(awaitingResponsesFullAdmitReceivedSpec.test(caseData));
+    }
+
+    @Test
+    void shouldReturnTrueWhenAwaitingResponsesFullAdmitReceivedForRespondent2() {
+        CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoDefendantSolicitors()
+            .setClaimTypeToSpecClaim().respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION).build();
+        assertTrue(awaitingResponsesFullAdmitReceivedSpec.test(caseData));
+    }
+
+    @Test
+    void shouldReturnFalseWhenBothRespondentsFullAdmitReceived() {
+        CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoDefendantSolicitors()
+            .setClaimTypeToSpecClaim().respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+            .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION).build();
+        assertFalse(awaitingResponsesFullAdmitReceivedSpec.test(caseData));
+    }
+
+    @Test
+    void shouldReturnFalseWhenSingleDefendantFullAdmitReceived() {
+        CaseData caseData = CaseDataBuilder.builder().multiPartyClaimOneDefendantSolicitor()
+            .setClaimTypeToSpecClaim().build();
+        assertFalse(awaitingResponsesFullAdmitReceivedSpec.test(caseData));
+    }
+
+    @Test
     void shouldReturnTrueWhenAwaitingFirstDefendantNonFullDefenceReceived() {
         CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoDefendantSolicitors()
             .setClaimTypeToSpecClaim().respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION).build();
-        assertTrue(awaitingResponsesNonFullDefenceReceivedSpec.test(caseData));
+        assertTrue(awaitingResponsesNonFullDefenceOrFullAdmitReceivedSpec.test(caseData));
     }
 
     @Test
     void shouldReturnTrueWhenAwaitingSecondDefendantNonFullDefenceReceived() {
         CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoDefendantSolicitors()
             .setClaimTypeToSpecClaim().respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION).build();
-        assertTrue(awaitingResponsesNonFullDefenceReceivedSpec.test(caseData));
+        assertTrue(awaitingResponsesNonFullDefenceOrFullAdmitReceivedSpec.test(caseData));
     }
 
     @Test
     void shouldReturnFalseWhenNoDefendantNonFullDefenceReceived() {
         CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoDefendantSolicitors()
             .setClaimTypeToSpecClaim().build();
-        assertFalse(awaitingResponsesNonFullDefenceReceivedSpec.test(caseData));
+        assertFalse(awaitingResponsesNonFullDefenceOrFullAdmitReceivedSpec.test(caseData));
     }
 
     @Test
     void shouldReturnFalseWhenSingleDefendantNonFullDefenceReceived() {
         CaseData caseData = CaseDataBuilder.builder().multiPartyClaimOneDefendantSolicitor()
             .setClaimTypeToSpecClaim().build();
-        assertFalse(awaitingResponsesNonFullDefenceReceivedSpec.test(caseData));
+        assertFalse(awaitingResponsesNonFullDefenceOrFullAdmitReceivedSpec.test(caseData));
     }
 
     @Test

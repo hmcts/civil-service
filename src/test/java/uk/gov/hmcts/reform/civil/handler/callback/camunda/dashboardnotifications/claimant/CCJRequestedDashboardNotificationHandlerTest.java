@@ -10,7 +10,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
@@ -23,9 +22,10 @@ import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
-import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
+import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -50,7 +50,7 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
     private CCJRequestedDashboardNotificationHandler handler;
 
     @Mock
-    private DashboardApiClient dashboardApiClient;
+    private DashboardScenariosService dashboardScenariosService;
 
     @Mock
     private DashboardNotificationsParamsMapper dashboardNotificationsParamsMapper;
@@ -106,10 +106,43 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
             .build();
 
         handler.handle(callbackParams);
-        verify(dashboardApiClient).recordScenario(
-            caseData.getCcdCaseReference().toString(),
-            SCENARIO_AAA6_CLAIMANT_INTENT_CCJ_REQUESTED_CLAIMANT.getScenario(),
+        verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
+            SCENARIO_AAA6_CLAIMANT_INTENT_CCJ_REQUESTED_CLAIMANT.getScenario(),
+            caseData.getCcdCaseReference().toString(),
+            ScenarioRequestParams.builder().params(params).build()
+        );
+    }
+
+    @Test
+    void createDashboardNotificationsWhenDJSubmittedForLipvLR() {
+
+        params.put("ccdCaseReference", "123");
+        params.put("defaultRespondTime", "4pm");
+        params.put("responseDeadline", "11 March 2024");
+
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+        when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+
+        LocalDateTime dateTime = LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay();
+
+        CaseData caseData = CaseData.builder()
+            .legacyCaseReference("reference")
+            .ccdCaseReference(1234L)
+            .applicant1Represented(YesOrNo.NO)
+            .respondent1ResponseDeadline(dateTime)
+            .repaymentSummaryObject("Test String")
+            .build();
+
+        CallbackParams callbackParams = CallbackParamsBuilder.builder()
+            .of(ABOUT_TO_SUBMIT, caseData)
+            .build();
+
+        handler.handle(callbackParams);
+        verify(dashboardScenariosService).recordScenarios(
+            "BEARER_TOKEN",
+            SCENARIO_AAA6_CLAIMANT_INTENT_CCJ_REQUESTED_CLAIMANT.getScenario(),
+            caseData.getCcdCaseReference().toString(),
             ScenarioRequestParams.builder().params(params).build()
         );
     }
@@ -140,10 +173,10 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
             .build();
 
         handler.handle(callbackParams);
-        verify(dashboardApiClient).recordScenario(
-            caseData.getCcdCaseReference().toString(),
-            SCENARIO_AAA6_CLAIMANT_INTENT_CCJ_REQUESTED_CLAIMANT.getScenario(),
+        verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
+            SCENARIO_AAA6_CLAIMANT_INTENT_CCJ_REQUESTED_CLAIMANT.getScenario(),
+            caseData.getCcdCaseReference().toString(),
             ScenarioRequestParams.builder().params(params).build()
         );
     }
@@ -164,10 +197,10 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
             .build();
 
         handler.handle(callbackParams);
-        verify(dashboardApiClient).recordScenario(
-            caseData.getCcdCaseReference().toString(),
-            SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT.getScenario(),
+        verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
+            SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT.getScenario(),
+            caseData.getCcdCaseReference().toString(),
             ScenarioRequestParams.builder().params(params).build()
         );
     }

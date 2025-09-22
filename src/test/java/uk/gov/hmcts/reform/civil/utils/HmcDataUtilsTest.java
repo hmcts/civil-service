@@ -5,10 +5,18 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
+import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.WelshLanguageRequirements;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.HearingIndividual;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
@@ -19,6 +27,8 @@ import uk.gov.hmcts.reform.hmc.model.hearing.HearingDetails;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingGetResponse;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingRequestDetails;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingResponse;
+import uk.gov.hmcts.reform.hmc.model.hearing.OrganisationDetailsModel;
+import uk.gov.hmcts.reform.hmc.model.hearing.PartyDetailsModel;
 import uk.gov.hmcts.reform.hmc.model.hearings.CaseHearing;
 import uk.gov.hmcts.reform.hmc.model.hearings.HearingsResponse;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.HearingDay;
@@ -96,13 +106,13 @@ class HmcDataUtilsTest {
             .serviceData(PartiesNotifiedServiceData.builder()
                              .days(List.of(
                                  HearingDay.builder()
-                                               .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 10, 0))
-                                               .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 11, 0))
-                                               .build(),
+                                     .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 10, 0))
+                                     .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 11, 0))
+                                     .build(),
                                  HearingDay.builder()
-                                               .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 10, 0))
-                                               .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 11, 0))
-                                               .build()))
+                                     .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 10, 0))
+                                     .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 11, 0))
+                                     .build()))
                              .hearingLocation("Venue A")
                              .build()).build();
 
@@ -199,8 +209,9 @@ class HmcDataUtilsTest {
             .partyDetails(List.of());
     }
 
-    @Test
-    void getHearingDaysText() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void getHearingDaysText(Boolean isWelsh) {
         var hearingDay1 = HearingDaySchedule.builder()
             .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 10, 0))
             .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 13, 0))
@@ -221,11 +232,14 @@ class HmcDataUtilsTest {
                 List.of(hearingDay1, hearingDay2, hearingDay3)).build())
             .build();
 
-        var result = HmcDataUtils.getHearingDaysText(hearing);
+        var result = HmcDataUtils.getHearingDaysText(hearing, isWelsh);
 
-        assertEquals(result, "23 December 2023 at 10:00 for 3 hours\n" +
+        assertEquals(result, isWelsh ? "23 Rhagfyr 2023 am 10:00 am 3 awr\n" +
+            "24 Rhagfyr 2023 am 14:00 am 2 awr\n" +
+            "25 Rhagfyr 2023 am 10:00 am 6 awr"
+            : "23 December 2023 at 10:00 for 3 hours\n" +
             "24 December 2023 at 14:00 for 2 hours\n" +
-            "25 December 2023 at 10:00 for 5 hours");
+            "25 December 2023 at 10:00 for 6 hours");
     }
 
     @Test
@@ -329,8 +343,9 @@ class HmcDataUtilsTest {
         }
     }
 
-    @Test
-    void getHearingDaysText_shouldReturnExpectedText_1Day_FullDay_BstHearingDay() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void getHearingDaysText_shouldReturnExpectedText_1Day_FullDay_BstHearingDay(Boolean isWelsh) {
         var hearingDay = HearingDaySchedule.builder()
             .hearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0))
             .hearingEndDateTime(LocalDateTime.of(2023, 5, 23, 16, 0))
@@ -340,13 +355,14 @@ class HmcDataUtilsTest {
             .hearingResponse(HearingResponse.builder().hearingDaySchedule(List.of(hearingDay)).build())
             .build();
 
-        var result = HmcDataUtils.getHearingDaysTextList(hearing);
+        var result = HmcDataUtils.getHearingDaysTextList(hearing, isWelsh);
 
-        assertEquals(result, List.of("23 May 2023 at 11:00 for 5 hours"));
+        assertEquals(result, List.of(isWelsh ? "23 Mai 2023 am 11:00 am 6 awr" : "23 May 2023 at 11:00 for 6 hours"));
     }
 
-    @Test
-    void getHearingDaysText_shouldReturnExpectedText_1Day_FullDay() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void getHearingDaysText_shouldReturnExpectedText_1Day_FullDay(Boolean isWelsh) {
         var hearingDay = HearingDaySchedule.builder()
             .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 10, 0))
             .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 16, 0))
@@ -356,13 +372,14 @@ class HmcDataUtilsTest {
             .hearingResponse(HearingResponse.builder().hearingDaySchedule(List.of(hearingDay)).build())
             .build();
 
-        var result = HmcDataUtils.getHearingDaysTextList(hearing);
+        var result = HmcDataUtils.getHearingDaysTextList(hearing, isWelsh);
 
-        assertEquals(result, List.of("23 December 2023 at 10:00 for 5 hours"));
+        assertEquals(result, List.of(isWelsh ? "23 Rhagfyr 2023 am 10:00 am 6 awr" : "23 December 2023 at 10:00 for 6 hours"));
     }
 
-    @Test
-    void getHearingDaysText_shouldReturnExpectedText_1Day_Morning() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void getHearingDaysText_shouldReturnExpectedText_1Day_Morning(Boolean isWelsh) {
         var hearingDay = HearingDaySchedule.builder()
             .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 10, 0))
             .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 13, 0))
@@ -372,13 +389,14 @@ class HmcDataUtilsTest {
             .hearingResponse(HearingResponse.builder().hearingDaySchedule(List.of(hearingDay)).build())
             .build();
 
-        var result = HmcDataUtils.getHearingDaysTextList(hearing);
+        var result = HmcDataUtils.getHearingDaysTextList(hearing, isWelsh);
 
-        assertEquals(result, List.of("23 December 2023 at 10:00 for 3 hours"));
+        assertEquals(result, List.of(isWelsh ? "23 Rhagfyr 2023 am 10:00 am 3 awr" : "23 December 2023 at 10:00 for 3 hours"));
     }
 
-    @Test
-    void getHearingDaysText_shouldReturnExpectedText_1Day_Afternoon() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void getHearingDaysText_shouldReturnExpectedText_1Day_Afternoon(Boolean isWelsh) {
         var hearingDay = HearingDaySchedule.builder()
             .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 14, 0))
             .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 16, 0))
@@ -388,13 +406,14 @@ class HmcDataUtilsTest {
             .hearingResponse(HearingResponse.builder().hearingDaySchedule(List.of(hearingDay)).build())
             .build();
 
-        var result = HmcDataUtils.getHearingDaysTextList(hearing);
+        var result = HmcDataUtils.getHearingDaysTextList(hearing, isWelsh);
 
-        assertEquals(result, List.of("23 December 2023 at 14:00 for 2 hours"));
+        assertEquals(result, List.of(isWelsh ? "23 Rhagfyr 2023 am 14:00 am 2 awr" : "23 December 2023 at 14:00 for 2 hours"));
     }
 
-    @Test
-    void getHearingDaysText_shouldReturnExpectedText_2Days_MorningAndAfternoon_BST() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void getHearingDaysText_shouldReturnExpectedText_2Days_MorningAndAfternoon_BST(Boolean isWelsh) {
         var hearingDay1 = HearingDaySchedule.builder()
             .hearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0))
             .hearingEndDateTime(LocalDateTime.of(2023, 5, 23, 13, 0))
@@ -410,15 +429,22 @@ class HmcDataUtilsTest {
                 List.of(hearingDay1, hearingDay2)).build())
             .build();
 
-        var result = HmcDataUtils.getHearingDaysTextList(hearing);
+        var result = HmcDataUtils.getHearingDaysTextList(hearing, isWelsh);
 
-        assertEquals(result, List.of(
+        List<String> expectedList = isWelsh
+            ? List.of(
+            "23 Mai 2023 am 11:00 am 3 awr",
+            "24 Mai 2023 am 15:00 am 2 awr")
+            : List.of(
             "23 May 2023 at 11:00 for 3 hours",
-            "24 May 2023 at 15:00 for 2 hours"));
+            "24 May 2023 at 15:00 for 2 hours");
+
+        assertEquals(result, expectedList);
     }
 
-    @Test
-    void getHearingDaysText_shouldReturnExpectedText_2Days_MorningAndAfternoon() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void getHearingDaysText_shouldReturnExpectedText_2Days_MorningAndAfternoon(Boolean isWelsh) {
         var hearingDay1 = HearingDaySchedule.builder()
             .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 10, 0))
             .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 13, 0))
@@ -434,15 +460,22 @@ class HmcDataUtilsTest {
                 List.of(hearingDay1, hearingDay2)).build())
             .build();
 
-        var result = HmcDataUtils.getHearingDaysTextList(hearing);
+        var result = HmcDataUtils.getHearingDaysTextList(hearing, isWelsh);
 
-        assertEquals(result, List.of(
+        List<String> expectedList = isWelsh
+            ? List.of(
+            "23 Rhagfyr 2023 am 10:00 am 3 awr",
+            "24 Rhagfyr 2023 am 14:00 am 2 awr")
+            : List.of(
             "23 December 2023 at 10:00 for 3 hours",
-            "24 December 2023 at 14:00 for 2 hours"));
+            "24 December 2023 at 14:00 for 2 hours");
+
+        assertEquals(result, expectedList);
     }
 
-    @Test
-    void getHearingDaysText_shouldReturnExpectedText_2Days_FullDayAndAfternoon() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void getHearingDaysText_shouldReturnExpectedText_2Days_FullDayAndAfternoon(Boolean isWelsh) {
         var hearingDay1 = HearingDaySchedule.builder()
             .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 10, 0))
             .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 16, 0))
@@ -458,15 +491,22 @@ class HmcDataUtilsTest {
                 List.of(hearingDay1, hearingDay2)).build())
             .build();
 
-        var result = HmcDataUtils.getHearingDaysTextList(hearing);
+        var result = HmcDataUtils.getHearingDaysTextList(hearing, isWelsh);
 
-        assertEquals(result, List.of(
-            "23 December 2023 at 10:00 for 5 hours",
-            "24 December 2023 at 14:00 for 2 hours"));
+        List<String> expectedResult = isWelsh
+            ? List.of(
+            "23 Rhagfyr 2023 am 10:00 am 6 awr",
+            "24 Rhagfyr 2023 am 14:00 am 2 awr")
+            : List.of(
+            "23 December 2023 at 10:00 for 6 hours",
+            "24 December 2023 at 14:00 for 2 hours");
+
+        assertEquals(result, expectedResult);
     }
 
-    @Test
-    void getHearingDaysText_shouldReturnExpectedText_2Days_FullDayAndMorning() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void getHearingDaysText_shouldReturnExpectedText_2Days_FullDayAndMorning(Boolean isWelsh) {
         var hearingDay1 = HearingDaySchedule.builder()
             .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 10, 0))
             .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 16, 0))
@@ -482,15 +522,22 @@ class HmcDataUtilsTest {
                 List.of(hearingDay1, hearingDay2)).build())
             .build();
 
-        var result = HmcDataUtils.getHearingDaysTextList(hearing);
+        var result = HmcDataUtils.getHearingDaysTextList(hearing, isWelsh);
 
-        assertEquals(result, List.of(
-            "23 December 2023 at 10:00 for 5 hours",
-            "24 December 2023 at 10:00 for 3 hours"));
+        List<String> expectedResult = isWelsh
+            ? List.of(
+            "23 Rhagfyr 2023 am 10:00 am 6 awr",
+            "24 Rhagfyr 2023 am 10:00 am 3 awr")
+            : List.of(
+            "23 December 2023 at 10:00 for 6 hours",
+            "24 December 2023 at 10:00 for 3 hours");
+
+        assertEquals(result, expectedResult);
     }
 
-    @Test
-    void getHearingDaysText_shouldReturnExpectedText_2Days_Morning() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void getHearingDaysText_shouldReturnExpectedText_2Days_Morning(Boolean isWelsh) {
         var hearingDay1 = HearingDaySchedule.builder()
             .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 10, 0))
             .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 13, 0))
@@ -506,15 +553,22 @@ class HmcDataUtilsTest {
                 List.of(hearingDay1, hearingDay2)).build())
             .build();
 
-        var result = HmcDataUtils.getHearingDaysTextList(hearing);
+        var result = HmcDataUtils.getHearingDaysTextList(hearing, isWelsh);
 
-        assertEquals(result, List.of(
+        List<String> expectedResult = isWelsh
+            ? List.of(
+            "23 Rhagfyr 2023 am 10:00 am 3 awr",
+            "24 Rhagfyr 2023 am 10:00 am 3 awr")
+            : List.of(
             "23 December 2023 at 10:00 for 3 hours",
-            "24 December 2023 at 10:00 for 3 hours"));
+            "24 December 2023 at 10:00 for 3 hours");
+
+        assertEquals(result, expectedResult);
     }
 
-    @Test
-    void getHearingDaysText_shouldReturnExpectedText_2Days_Afternoon() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void getHearingDaysText_shouldReturnExpectedText_2Days_Afternoon(Boolean isWelsh) {
         var hearingDay1 = HearingDaySchedule.builder()
             .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 14, 0))
             .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 16, 0))
@@ -530,15 +584,22 @@ class HmcDataUtilsTest {
                 List.of(hearingDay1, hearingDay2)).build())
             .build();
 
-        var result = HmcDataUtils.getHearingDaysTextList(hearing);
+        var result = HmcDataUtils.getHearingDaysTextList(hearing, isWelsh);
 
-        assertEquals(result, List.of(
+        List<String> expectedResult = isWelsh
+            ? List.of(
+            "23 Rhagfyr 2023 am 14:00 am 2 awr",
+            "24 Rhagfyr 2023 am 14:00 am 2 awr")
+            : List.of(
             "23 December 2023 at 14:00 for 2 hours",
-            "24 December 2023 at 14:00 for 2 hours"));
+            "24 December 2023 at 14:00 for 2 hours");
+
+        assertEquals(result, expectedResult);
     }
 
-    @Test
-    void getHearingDaysText_shouldReturnExpectedText_3Days_FullDays() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void getHearingDaysText_shouldReturnExpectedText_3Days_FullDays(Boolean isWelsh) {
         var hearingDay1 = HearingDaySchedule.builder()
             .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 10, 0))
             .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 16, 0))
@@ -559,16 +620,24 @@ class HmcDataUtilsTest {
                 List.of(hearingDay1, hearingDay2, hearingDay3)).build())
             .build();
 
-        var result = HmcDataUtils.getHearingDaysTextList(hearing);
+        var result = HmcDataUtils.getHearingDaysTextList(hearing, isWelsh);
 
-        assertEquals(result, List.of(
-            "23 December 2023 at 10:00 for 5 hours",
-            "24 December 2023 at 10:00 for 5 hours",
-            "25 December 2023 at 10:00 for 5 hours"));
+        List<String> expectedResult = isWelsh
+            ? List.of(
+            "23 Rhagfyr 2023 am 10:00 am 6 awr",
+            "24 Rhagfyr 2023 am 10:00 am 6 awr",
+            "25 Rhagfyr 2023 am 10:00 am 6 awr")
+            : List.of(
+            "23 December 2023 at 10:00 for 6 hours",
+            "24 December 2023 at 10:00 for 6 hours",
+            "25 December 2023 at 10:00 for 6 hours");
+
+        assertEquals(result, expectedResult);
     }
 
-    @Test
-    void getHearingDaysText_shouldReturnExpectedText_3Days_FullDayMorningAndAfternoon() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void getHearingDaysText_shouldReturnExpectedText_3Days_FullDayMorningAndAfternoon(Boolean isWelsh) {
         var hearingDay1 = HearingDaySchedule.builder()
             .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 10, 0))
             .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 16, 0))
@@ -589,16 +658,24 @@ class HmcDataUtilsTest {
                 List.of(hearingDay1, hearingDay2, hearingDay3)).build())
             .build();
 
-        var result = HmcDataUtils.getHearingDaysTextList(hearing);
+        var result = HmcDataUtils.getHearingDaysTextList(hearing, isWelsh);
 
-        assertEquals(result, List.of(
-            "23 December 2023 at 10:00 for 5 hours",
+        List<String> expectedResult = isWelsh
+            ? List.of(
+            "23 Rhagfyr 2023 am 10:00 am 6 awr",
+            "24 Rhagfyr 2023 am 10:00 am 3 awr",
+            "25 Rhagfyr 2023 am 14:00 am 2 awr")
+            : List.of(
+            "23 December 2023 at 10:00 for 6 hours",
             "24 December 2023 at 10:00 for 3 hours",
-            "25 December 2023 at 14:00 for 2 hours"));
+            "25 December 2023 at 14:00 for 2 hours");
+
+        assertEquals(result, expectedResult);
     }
 
-    @Test
-    void getHearingDaysText_shouldReturnExpectedText_3Days_Afternoon() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void getHearingDaysText_shouldReturnExpectedText_3Days_Afternoon(Boolean isWelsh) {
         var hearingDay1 = HearingDaySchedule.builder()
             .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 14, 0))
             .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 16, 0))
@@ -619,16 +696,24 @@ class HmcDataUtilsTest {
                 List.of(hearingDay1, hearingDay2, hearingDay3)).build())
             .build();
 
-        var result = HmcDataUtils.getHearingDaysTextList(hearing);
+        var result = HmcDataUtils.getHearingDaysTextList(hearing, isWelsh);
 
-        assertEquals(result, List.of(
+        List<String> expectedResult = isWelsh
+            ? List.of(
+            "23 Rhagfyr 2023 am 14:00 am 2 awr",
+            "24 Rhagfyr 2023 am 14:00 am 2 awr",
+            "25 Rhagfyr 2023 am 14:00 am 2 awr")
+            : List.of(
             "23 December 2023 at 14:00 for 2 hours",
             "24 December 2023 at 14:00 for 2 hours",
-            "25 December 2023 at 14:00 for 2 hours"));
+            "25 December 2023 at 14:00 for 2 hours");
+
+        assertEquals(result, expectedResult);
     }
 
-    @Test
-    void getHearingDaysText_shouldReturnExpectedText_1Hour30minutes() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void getHearingDaysText_shouldReturnExpectedText_1Hour30minutes(Boolean isWelsh) {
         var hearingDay1 = HearingDaySchedule.builder()
             .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 14, 30))
             .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 16, 0))
@@ -639,14 +724,18 @@ class HmcDataUtilsTest {
                 List.of(hearingDay1)).build())
             .build();
 
-        var result = HmcDataUtils.getHearingDaysTextList(hearing);
+        var result = HmcDataUtils.getHearingDaysTextList(hearing, isWelsh);
 
-        assertEquals(result, List.of(
-            "23 December 2023 at 14:30 for 1 hour and 30 minutes"));
+        List<String> expectedResult = isWelsh
+            ?  List.of("23 Rhagfyr 2023 am 14:30 am 1 awr a 30 munud")
+            : List.of("23 December 2023 at 14:30 for 1 hour and 30 minutes");
+
+        assertEquals(result, expectedResult);
     }
 
-    @Test
-    void getHearingDaysText_shouldReturnExpectedText_30minutes() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void getHearingDaysText_shouldReturnExpectedText_30minutes(Boolean isWelsh) {
         var hearingDay1 = HearingDaySchedule.builder()
             .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 14, 0))
             .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 14, 30))
@@ -657,14 +746,19 @@ class HmcDataUtilsTest {
                 List.of(hearingDay1)).build())
             .build();
 
-        var result = HmcDataUtils.getHearingDaysTextList(hearing);
+        var result = HmcDataUtils.getHearingDaysTextList(hearing, isWelsh);
 
-        assertEquals(result, List.of(
-            "23 December 2023 at 14:00 for 30 minutes"));
+        List<String> expectedList = isWelsh
+            ? List.of(
+            "23 Rhagfyr 2023 am 14:00 am 30 munud")
+            : List.of(
+            "23 December 2023 at 14:00 for 30 minutes");
+        assertEquals(result, expectedList);
     }
 
-    @Test
-    void getHearingDaysText_shouldReturnExpectedText_1Hour15minutes() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void getHearingDaysText_shouldReturnExpectedText_1Hour15minutes(Boolean isWelsh) {
         var hearingDay1 = HearingDaySchedule.builder()
             .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 14, 45))
             .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 16, 0))
@@ -675,14 +769,20 @@ class HmcDataUtilsTest {
                 List.of(hearingDay1)).build())
             .build();
 
-        var result = HmcDataUtils.getHearingDaysTextList(hearing);
+        var result = HmcDataUtils.getHearingDaysTextList(hearing, isWelsh);
 
-        assertEquals(result, List.of(
-            "23 December 2023 at 14:45 for 1 hour and 15 minutes"));
+        List<String> expectedResult = isWelsh
+            ? List.of(
+            "23 Rhagfyr 2023 am 14:45 am 1 awr a 15 munud")
+            : List.of(
+            "23 December 2023 at 14:45 for 1 hour and 15 minutes");
+
+        assertEquals(result, expectedResult);
     }
 
-    @Test
-    void getHearingDaysText_shouldReturnExpectedText_1Hour45minutes() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void getHearingDaysText_shouldReturnExpectedText_1Hour45minutes(Boolean isWelsh) {
         var hearingDay1 = HearingDaySchedule.builder()
             .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 14, 15))
             .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 16, 0))
@@ -693,14 +793,20 @@ class HmcDataUtilsTest {
                 List.of(hearingDay1)).build())
             .build();
 
-        var result = HmcDataUtils.getHearingDaysTextList(hearing);
+        var result = HmcDataUtils.getHearingDaysTextList(hearing, isWelsh);
 
-        assertEquals(result, List.of(
-            "23 December 2023 at 14:15 for 1 hour and 45 minutes"));
+        List<String> expectedResult = isWelsh
+            ? List.of(
+            "23 Rhagfyr 2023 am 14:15 am 1 awr a 45 munud")
+            : List.of(
+            "23 December 2023 at 14:15 for 1 hour and 45 minutes");
+
+        assertEquals(result, expectedResult);
     }
 
-    @Test
-    void getTotalHearingDurationText_1Day_3Hours_30minutes() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void getTotalHearingDurationText_1Day_3Hours_30minutes(Boolean isWelsh) {
         var hearingDay1 = HearingDaySchedule.builder()
             .hearingStartDateTime(LocalDateTime.of(2023, 10, 23, 10, 00))
             .hearingEndDateTime(LocalDateTime.of(2023, 10, 23, 16, 0))
@@ -716,13 +822,37 @@ class HmcDataUtilsTest {
                 List.of(hearingDay1, hearingDay2)).build())
             .build();
 
-        var result = HmcDataUtils.getTotalHearingDurationText(hearing);
+        var result = HmcDataUtils.getTotalHearingDurationText(hearing, isWelsh);
 
-        assertEquals(result, "1 day and 3 hours and 30 minutes");
+        assertEquals(result, isWelsh ? "1 diwrnod a 3 awr a 30 munud" : "1 day and 3 hours and 30 minutes");
     }
 
-    @Test
-    void getTotalHearingDurationText_whenDurationLessThan1Hour() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void getTotalHearingDurationText_1Day_1Hours_30minutes(Boolean isWelsh) {
+        var hearingDay1 = HearingDaySchedule.builder()
+            .hearingStartDateTime(LocalDateTime.of(2023, 10, 23, 10, 00))
+            .hearingEndDateTime(LocalDateTime.of(2023, 10, 23, 14, 0))
+            .build();
+
+        var hearingDay2 = HearingDaySchedule.builder()
+            .hearingStartDateTime(LocalDateTime.of(2023, 10, 24, 10, 0))
+            .hearingEndDateTime(LocalDateTime.of(2023, 10, 24, 13, 30))
+            .build();
+
+        HearingGetResponse hearing = hearingResponse()
+            .hearingResponse(HearingResponse.builder().hearingDaySchedule(
+                List.of(hearingDay1, hearingDay2)).build())
+            .build();
+
+        var result = HmcDataUtils.getTotalHearingDurationText(hearing, isWelsh);
+
+        assertEquals(result, isWelsh ? "1 diwrnod ac 1 awr a 30 munud" : "1 day and 1 hour and 30 minutes");
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void getTotalHearingDurationText_whenDurationLessThan1Hour(Boolean isWelsh) {
         var hearingDay1 = HearingDaySchedule.builder()
             .hearingStartDateTime(LocalDateTime.of(2023, 10, 23, 10, 0))
             .hearingEndDateTime(LocalDateTime.of(2023, 10, 23, 10, 30))
@@ -733,13 +863,14 @@ class HmcDataUtilsTest {
                 List.of(hearingDay1)).build())
             .build();
 
-        var result = HmcDataUtils.getTotalHearingDurationText(hearing);
+        var result = HmcDataUtils.getTotalHearingDurationText(hearing, isWelsh);
 
-        assertEquals(result, "30 minutes");
+        assertEquals(result, isWelsh ? "30 munud" : "30 minutes");
     }
 
-    @Test
-    void getTotalHearingDurationText_whenDuration5Hours() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void getTotalHearingDurationText_whenDuration5Hours(Boolean isWelsh) {
         var hearingDay1 = HearingDaySchedule.builder()
             .hearingStartDateTime(LocalDateTime.of(2023, 10, 23, 10, 0))
             .hearingEndDateTime(LocalDateTime.of(2023, 10, 23, 15, 0))
@@ -750,13 +881,14 @@ class HmcDataUtilsTest {
                 List.of(hearingDay1)).build())
             .build();
 
-        var result = HmcDataUtils.getTotalHearingDurationText(hearing);
+        var result = HmcDataUtils.getTotalHearingDurationText(hearing, isWelsh);
 
-        assertEquals(result, "5 hours");
+        assertEquals(result, isWelsh ? "5 awr" : "5 hours");
     }
 
-    @Test
-    void getTotalHearingDurationText_whenDuration5Hours30Minutes() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void getTotalHearingDurationText_whenDuration5Hours30Minutes(Boolean isWelsh) {
         var hearingDay1 = HearingDaySchedule.builder()
             .hearingStartDateTime(LocalDateTime.of(2023, 10, 23, 10, 0))
             .hearingEndDateTime(LocalDateTime.of(2023, 10, 23, 15, 30))
@@ -767,13 +899,32 @@ class HmcDataUtilsTest {
                 List.of(hearingDay1)).build())
             .build();
 
-        var result = HmcDataUtils.getTotalHearingDurationText(hearing);
+        var result = HmcDataUtils.getTotalHearingDurationText(hearing, isWelsh);
 
-        assertEquals(result, "5 hours and 30 minutes");
+        assertEquals(result, isWelsh ? "5 awr a 30 munud" : "5 hours and 30 minutes");
     }
 
-    @Test
-    void getTotalHearingDurationText_whenDuration1Day5Hours() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void getTotalHearingDurationText_whenDuration5Hours20Minutes(Boolean isWelsh) {
+        var hearingDay1 = HearingDaySchedule.builder()
+            .hearingStartDateTime(LocalDateTime.of(2023, 10, 23, 10, 0))
+            .hearingEndDateTime(LocalDateTime.of(2023, 10, 23, 15, 20))
+            .build();
+
+        HearingGetResponse hearing = hearingResponse()
+            .hearingResponse(HearingResponse.builder().hearingDaySchedule(
+                List.of(hearingDay1)).build())
+            .build();
+
+        var result = HmcDataUtils.getTotalHearingDurationText(hearing, isWelsh);
+
+        assertEquals(result, isWelsh ? "5 awr ac 20 munud" : "5 hours and 20 minutes");
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void getTotalHearingDurationText_whenDuration1Day5Hours(Boolean isWelsh) {
         var hearingDay1 = HearingDaySchedule.builder()
             .hearingStartDateTime(LocalDateTime.of(2023, 10, 23, 10, 0))
             .hearingEndDateTime(LocalDateTime.of(2023, 10, 23, 15, 0))
@@ -784,13 +935,14 @@ class HmcDataUtilsTest {
                 List.of(hearingDay1)).build())
             .build();
 
-        var result = HmcDataUtils.getTotalHearingDurationText(hearing);
+        var result = HmcDataUtils.getTotalHearingDurationText(hearing, isWelsh);
 
-        assertEquals(result, "5 hours");
+        assertEquals(result, isWelsh ? "5 awr" : "5 hours");
     }
 
-    @Test
-    void getTotalHearingDurationText_whenDuration1day30Minutes() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void getTotalHearingDurationText_whenDuration1day30Minutes(Boolean isWelsh) {
         var hearingDay1 = HearingDaySchedule.builder()
             .hearingStartDateTime(LocalDateTime.of(2023, 10, 23, 10, 0))
             .hearingEndDateTime(LocalDateTime.of(2023, 10, 23, 16, 0))
@@ -806,13 +958,14 @@ class HmcDataUtilsTest {
                 List.of(hearingDay1, hearingDay2)).build())
             .build();
 
-        var result = HmcDataUtils.getTotalHearingDurationText(hearing);
+        var result = HmcDataUtils.getTotalHearingDurationText(hearing, isWelsh);
 
-        assertEquals(result, "1 day and 30 minutes");
+        assertEquals(result, isWelsh ? "1 diwrnod a 30 munud" : "1 day and 30 minutes");
     }
 
-    @Test
-    void getTotalHearingDurationText_whenDuration1Day5Hours30Minutes() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void getTotalHearingDurationText_whenDuration1Day5Hours30Minutes(Boolean isWelsh) {
         var hearingDay1 = HearingDaySchedule.builder()
             .hearingStartDateTime(LocalDateTime.of(2023, 10, 23, 10, 0))
             .hearingEndDateTime(LocalDateTime.of(2023, 10, 23, 16, 0))
@@ -828,13 +981,14 @@ class HmcDataUtilsTest {
                 List.of(hearingDay1, hearingDay2)).build())
             .build();
 
-        var result = HmcDataUtils.getTotalHearingDurationText(hearing);
+        var result = HmcDataUtils.getTotalHearingDurationText(hearing, isWelsh);
 
-        assertEquals(result, "1 day and 5 hours and 30 minutes");
+        assertEquals(result, isWelsh ? "1 diwrnod a 5 awr a 30 munud" : "1 day and 5 hours and 30 minutes");
     }
 
-    @Test
-    void getTotalHearingDurationText_1Day_FullDay() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void getTotalHearingDurationText_1Day_FullDay(Boolean isWelsh) {
         var hearingDay1 = HearingDaySchedule.builder()
             .hearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0))
             .hearingEndDateTime(LocalDateTime.of(2023, 5, 23, 16, 0))
@@ -845,13 +999,14 @@ class HmcDataUtilsTest {
                 List.of(hearingDay1)).build())
             .build();
 
-        var result = HmcDataUtils.getTotalHearingDurationText(hearing);
+        var result = HmcDataUtils.getTotalHearingDurationText(hearing, isWelsh);
 
-        assertEquals(result, "1 day");
+        assertEquals(result, isWelsh ? "1 diwrnod" : "1 day");
     }
 
-    @Test
-    void getTotalHearingDurationText_1Day_Morning() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void getTotalHearingDurationText_1Day_Morning(Boolean isWelsh) {
         var hearingDay1 = HearingDaySchedule.builder()
             .hearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0))
             .hearingEndDateTime(LocalDateTime.of(2023, 5, 23, 13, 0))
@@ -862,13 +1017,14 @@ class HmcDataUtilsTest {
                 List.of(hearingDay1)).build())
             .build();
 
-        var result = HmcDataUtils.getTotalHearingDurationText(hearing);
+        var result = HmcDataUtils.getTotalHearingDurationText(hearing, isWelsh);
 
-        assertEquals(result, "3 hours");
+        assertEquals(result, isWelsh ? "3 awr" : "3 hours");
     }
 
-    @Test
-    void getTotalHearingDurationText_1Day_Afternoon() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void getTotalHearingDurationText_1Day_Afternoon(Boolean isWelsh) {
         var hearingDay1 = HearingDaySchedule.builder()
             .hearingStartDateTime(LocalDateTime.of(2023, 5, 23, 14, 0))
             .hearingEndDateTime(LocalDateTime.of(2023, 5, 23, 16, 0))
@@ -879,13 +1035,14 @@ class HmcDataUtilsTest {
                 List.of(hearingDay1)).build())
             .build();
 
-        var result = HmcDataUtils.getTotalHearingDurationText(hearing);
+        var result = HmcDataUtils.getTotalHearingDurationText(hearing, isWelsh);
 
-        assertEquals(result, "2 hours");
+        assertEquals(result, isWelsh ? "2 awr" : "2 hours");
     }
 
-    @Test
-    void getTotalHearingDurationText_2Days_MorningAndAfternoon() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void getTotalHearingDurationText_2Days_MorningAndAfternoon(Boolean isWelsh) {
         var hearingDay1 = HearingDaySchedule.builder()
             .hearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0))
             .hearingEndDateTime(LocalDateTime.of(2023, 5, 23, 13, 0))
@@ -901,13 +1058,14 @@ class HmcDataUtilsTest {
                 List.of(hearingDay1, hearingDay2)).build())
             .build();
 
-        var result = HmcDataUtils.getTotalHearingDurationText(hearing);
+        var result = HmcDataUtils.getTotalHearingDurationText(hearing, isWelsh);
 
-        assertEquals(result, "5 hours");
+        assertEquals(result, isWelsh ? "5 awr" : "5 hours");
     }
 
-    @Test
-    void getTotalHearingDurationText_2Days_FullDayAndAfternoon() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void getTotalHearingDurationText_2Days_FullDayAndAfternoon(Boolean isWelsh) {
         var hearingDay1 = HearingDaySchedule.builder()
             .hearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0))
             .hearingEndDateTime(LocalDateTime.of(2023, 5, 23, 16, 0))
@@ -923,13 +1081,14 @@ class HmcDataUtilsTest {
                 List.of(hearingDay1, hearingDay2)).build())
             .build();
 
-        var result = HmcDataUtils.getTotalHearingDurationText(hearing);
+        var result = HmcDataUtils.getTotalHearingDurationText(hearing, isWelsh);
 
-        assertEquals(result, "1 day and 2 hours");
+        assertEquals(result, isWelsh ? "1 diwrnod a 2 awr" : "1 day and 2 hours");
     }
 
-    @Test
-    void getTotalHearingDurationText_2Days_FullDayAndMorning() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void getTotalHearingDurationText_2Days_FullDayAndMorning(Boolean isWelsh) {
         var hearingDay1 = HearingDaySchedule.builder()
             .hearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0))
             .hearingEndDateTime(LocalDateTime.of(2023, 5, 23, 16, 0))
@@ -945,13 +1104,14 @@ class HmcDataUtilsTest {
                 List.of(hearingDay1, hearingDay2)).build())
             .build();
 
-        var result = HmcDataUtils.getTotalHearingDurationText(hearing);
+        var result = HmcDataUtils.getTotalHearingDurationText(hearing, isWelsh);
 
-        assertEquals(result, "1 day and 3 hours");
+        assertEquals(result, isWelsh ? "1 diwrnod a 3 awr" : "1 day and 3 hours");
     }
 
-    @Test
-    void getTotalHearingDurationText_2Days_Morning() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void getTotalHearingDurationText_2Days_Morning(Boolean isWelsh) {
         var hearingDay1 = HearingDaySchedule.builder()
             .hearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0))
             .hearingEndDateTime(LocalDateTime.of(2023, 5, 23, 13, 0))
@@ -967,13 +1127,47 @@ class HmcDataUtilsTest {
                 List.of(hearingDay1, hearingDay2)).build())
             .build();
 
-        var result = HmcDataUtils.getTotalHearingDurationText(hearing);
+        var result = HmcDataUtils.getTotalHearingDurationText(hearing, isWelsh);
 
-        assertEquals(result, "1 day");
+        assertEquals(result, isWelsh ? "1 diwrnod" : "1 day");
     }
 
-    @Test
-    void getTotalHearingDurationText_2Days_Afternoon() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void getTotalHearingDurationText_2Days_48Hours(Boolean isWelsh) {
+        var hearingDay1 = HearingDaySchedule.builder()
+            .hearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0))
+            .hearingEndDateTime(LocalDateTime.of(2023, 5, 23, 13, 0))
+            .build();
+
+        var hearingDay2 = HearingDaySchedule.builder()
+            .hearingStartDateTime(LocalDateTime.of(2023, 5, 24, 10, 0))
+            .hearingEndDateTime(LocalDateTime.of(2023, 5, 24, 13, 0))
+            .build();
+
+        var hearingDay3 = HearingDaySchedule.builder()
+            .hearingStartDateTime(LocalDateTime.of(2023, 5, 25, 10, 0))
+            .hearingEndDateTime(LocalDateTime.of(2023, 5, 25, 13, 0))
+            .build();
+
+        var hearingDay4 = HearingDaySchedule.builder()
+            .hearingStartDateTime(LocalDateTime.of(2023, 5, 26, 10, 0))
+            .hearingEndDateTime(LocalDateTime.of(2023, 5, 26, 13, 0))
+            .build();
+
+        HearingGetResponse hearing = hearingResponse()
+            .hearingResponse(HearingResponse.builder().hearingDaySchedule(
+                List.of(hearingDay1, hearingDay2, hearingDay3, hearingDay4)).build())
+            .build();
+
+        var result = HmcDataUtils.getTotalHearingDurationText(hearing, isWelsh);
+
+        assertEquals(result, isWelsh ? "2 ddiwrnod" : "2 days");
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void getTotalHearingDurationText_2Days_Afternoon(Boolean isWelsh) {
         var hearingDay1 = HearingDaySchedule.builder()
             .hearingStartDateTime(LocalDateTime.of(2023, 5, 23, 14, 0))
             .hearingEndDateTime(LocalDateTime.of(2023, 5, 23, 16, 0))
@@ -989,13 +1183,14 @@ class HmcDataUtilsTest {
                 List.of(hearingDay1, hearingDay2)).build())
             .build();
 
-        var result = HmcDataUtils.getTotalHearingDurationText(hearing);
+        var result = HmcDataUtils.getTotalHearingDurationText(hearing, isWelsh);
 
-        assertEquals(result, "4 hours");
+        assertEquals(result, isWelsh ? "4 awr" : "4 hours");
     }
 
-    @Test
-    void getTotalHearingDurationText_3Days_FullDays() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void getTotalHearingDurationText_3Days_FullDays(Boolean isWelsh) {
         var hearingDay1 = HearingDaySchedule.builder()
             .hearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0))
             .hearingEndDateTime(LocalDateTime.of(2023, 5, 23, 16, 0))
@@ -1016,13 +1211,14 @@ class HmcDataUtilsTest {
                 List.of(hearingDay1, hearingDay2, hearingDay3)).build())
             .build();
 
-        var result = HmcDataUtils.getTotalHearingDurationText(hearing);
+        var result = HmcDataUtils.getTotalHearingDurationText(hearing, isWelsh);
 
-        assertEquals(result, "3 days");
+        assertEquals(result, isWelsh ? "3 diwrnod" : "3 days");
     }
 
-    @Test
-    void getTotalHearingDurationText_3Days_FullDayMorningAndAfternoon() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void getTotalHearingDurationText_3Days_FullDayMorningAndAfternoon(Boolean isWelsh) {
         var hearingDay1 = HearingDaySchedule.builder()
             .hearingStartDateTime(LocalDateTime.of(2023, 5, 23, 10, 0))
             .hearingEndDateTime(LocalDateTime.of(2023, 5, 23, 16, 0))
@@ -1043,13 +1239,14 @@ class HmcDataUtilsTest {
                 List.of(hearingDay1, hearingDay2, hearingDay3)).build())
             .build();
 
-        var result = HmcDataUtils.getTotalHearingDurationText(hearing);
+        var result = HmcDataUtils.getTotalHearingDurationText(hearing, isWelsh);
 
-        assertEquals(result, "1 day and 5 hours");
+        assertEquals(result, isWelsh ? "1 diwrnod a 5 awr" : "1 day and 5 hours");
     }
 
-    @Test
-    void getTotalHearingDurationText_3Days_Afternoon() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void getTotalHearingDurationText_3Days_Afternoon(Boolean isWelsh) {
         var hearingDay1 = HearingDaySchedule.builder()
             .hearingStartDateTime(LocalDateTime.of(2023, 5, 23, 14, 0))
             .hearingEndDateTime(LocalDateTime.of(2023, 5, 23, 16, 0))
@@ -1070,9 +1267,9 @@ class HmcDataUtilsTest {
                 List.of(hearingDay1, hearingDay2, hearingDay3)).build())
             .build();
 
-        var result = HmcDataUtils.getTotalHearingDurationText(hearing);
+        var result = HmcDataUtils.getTotalHearingDurationText(hearing, isWelsh);
 
-        assertEquals(result, "1 day");
+        assertEquals(result, isWelsh ? "1 diwrnod" : "1 day");
     }
 
     @Nested
@@ -1246,7 +1443,7 @@ class HmcDataUtilsTest {
             HearingGetResponse hearing = buildHearing(hearingType);
             CaseData caseData = CaseData.builder().allocatedTrack(allocatedTrack).build();
 
-            String actual = HmcDataUtils.getHearingTypeTitleText(caseData, hearing);
+            String actual = HmcDataUtils.getHearingTypeTitleText(caseData, hearing, false);
 
             assertEquals(expected, actual);
         }
@@ -1262,7 +1459,23 @@ class HmcDataUtilsTest {
             HearingGetResponse hearing = buildHearing(hearingType);
             CaseData caseData = CaseData.builder().responseClaimTrack(allocatedTrack.name()).build();
 
-            String actual = HmcDataUtils.getHearingTypeTitleText(caseData, hearing);
+            String actual = HmcDataUtils.getHearingTypeTitleText(caseData, hearing, false);
+
+            assertEquals(expected, actual);
+        }
+
+        @ParameterizedTest
+        @CsvSource({
+            "TRI, SMALL_CLAIM, wrandawiad",
+            "TRI, FAST_CLAIM, dreial",
+            "DRH, SMALL_CLAIM, wrandawiad datrys anghydfod",
+            "DIS, SMALL_CLAIM, wrandawiad gwaredu"
+        })
+        void shouldReturnExpectedTitleWelsh_specClaim(String hearingType, AllocatedTrack allocatedTrack, String expected) {
+            HearingGetResponse hearing = buildHearing(hearingType);
+            CaseData caseData = CaseData.builder().responseClaimTrack(allocatedTrack.name()).build();
+
+            String actual = HmcDataUtils.getHearingTypeTitleText(caseData, hearing, true);
 
             assertEquals(expected, actual);
         }
@@ -1282,7 +1495,7 @@ class HmcDataUtilsTest {
             HearingGetResponse hearing = buildHearing(hearingType);
             CaseData caseData = CaseData.builder().allocatedTrack(allocatedTrack).build();
 
-            String actual = HmcDataUtils.getHearingTypeContentText(caseData, hearing);
+            String actual = HmcDataUtils.getHearingTypeContentText(caseData, hearing, false);
 
             assertEquals(expected, actual);
         }
@@ -1298,7 +1511,39 @@ class HmcDataUtilsTest {
             HearingGetResponse hearing = buildHearing(hearingType);
             CaseData caseData = CaseData.builder().responseClaimTrack(allocatedTrack.name()).build();
 
-            String actual = HmcDataUtils.getHearingTypeContentText(caseData, hearing);
+            String actual = HmcDataUtils.getHearingTypeContentText(caseData, hearing, false);
+
+            assertEquals(expected, actual);
+        }
+
+        @ParameterizedTest
+        @CsvSource({
+            "TRI, SMALL_CLAIM, gwrandawiad",
+            "TRI, FAST_CLAIM, treial",
+            "DRH, SMALL_CLAIM, gwrandawiad",
+            "DIS, FAST_CLAIM, gwrandawiad",
+        })
+        void shouldReturnExpectedTextWelsh_specClaim(String hearingType, AllocatedTrack allocatedTrack, String expected) {
+            HearingGetResponse hearing = buildHearing(hearingType);
+            CaseData caseData = CaseData.builder().responseClaimTrack(allocatedTrack.name()).build();
+
+            String actual = HmcDataUtils.getHearingTypeContentText(caseData, hearing, true);
+
+            assertEquals(expected, actual);
+        }
+
+        @ParameterizedTest
+        @CsvSource({
+            "TRI, SMALL_CLAIM, wrandawiadau",
+            "TRI, FAST_CLAIM, dreialon",
+            "DRH, SMALL_CLAIM, wrandawiadau",
+            "DIS, SMALL_CLAIM, wrandawiadau",
+        })
+        void shouldReturnExpectedPluralTextWelsh_specClaim(String hearingType, AllocatedTrack allocatedTrack, String expected) {
+            HearingGetResponse hearing = buildHearing(hearingType);
+            CaseData caseData = CaseData.builder().responseClaimTrack(allocatedTrack.name()).build();
+
+            String actual = HmcDataUtils.getPluralHearingTypeTextWelsh(caseData, hearing);
 
             assertEquals(expected, actual);
         }
@@ -1310,9 +1555,9 @@ class HmcDataUtilsTest {
         @Test
         void shouldReturnOneAttendee() {
             HearingGetResponse hearing = buildHearing(
-                    List.of(HearingIndividual.attendingHearingInPerson("Jason", "Wells"),
-                            HearingIndividual.attendingHearingByPhone("Chloe", "Landale"),
-                            HearingIndividual.attendingHearingByVideo("Jenny", "Harper")));
+                List.of(HearingIndividual.attendingHearingInPerson("Jason", "Wells"),
+                        HearingIndividual.attendingHearingByPhone("Chloe", "Landale"),
+                        HearingIndividual.attendingHearingByVideo("Jenny", "Harper")));
 
             String actual = HmcDataUtils.getInPersonAttendeeNames(hearing);
 
@@ -1322,12 +1567,12 @@ class HmcDataUtilsTest {
         @Test
         void shouldReturnMultipleAttendees() {
             HearingGetResponse hearing = buildHearing(
-                    List.of(HearingIndividual.attendingHearingInPerson("Jason", "Wells"),
-                            HearingIndividual.attendingHearingByPhone("Chloe", "Landale"),
-                            HearingIndividual.attendingHearingInPerson("Michael", "Carver"),
-                            HearingIndividual.attendingHearingByVideo("Jenny", "Harper"),
-                            HearingIndividual.attendingHearingInPerson("Jack", "Crawley")
-                    ));
+                List.of(HearingIndividual.attendingHearingInPerson("Jason", "Wells"),
+                        HearingIndividual.attendingHearingByPhone("Chloe", "Landale"),
+                        HearingIndividual.attendingHearingInPerson("Michael", "Carver"),
+                        HearingIndividual.attendingHearingByVideo("Jenny", "Harper"),
+                        HearingIndividual.attendingHearingInPerson("Jack", "Crawley")
+                ));
 
             String actual = HmcDataUtils.getInPersonAttendeeNames(hearing);
 
@@ -1337,13 +1582,34 @@ class HmcDataUtilsTest {
         @Test
         void shouldReturnNullForZeroAttendees() {
             HearingGetResponse hearing = buildHearing(
-                    List.of(HearingIndividual.attendingHearingByPhone("Chloe", "Landale"),
-                            HearingIndividual.attendingHearingByVideo("Jenny", "Harper")
-                    ));
+                List.of(HearingIndividual.attendingHearingByPhone("Chloe", "Landale"),
+                        HearingIndividual.attendingHearingByVideo("Jenny", "Harper")
+                ));
 
             String actual = HmcDataUtils.getInPersonAttendeeNames(hearing);
 
             assertNull(actual);
+        }
+
+        @Test
+        void shouldNotThrowNpeWhenAttendeesContainsOrgNotIndividualFromListAssistMisuse() {
+            HearingGetResponse hearing = buildHearingWithOrganisation(
+                List.of(HearingIndividual.attendingHearingInPerson("Jason", "Wells"),
+                        HearingIndividual.attendingHearingByPhone("Chloe", "Landale"),
+                        HearingIndividual.attendingHearingInPerson("Michael", "Carver"),
+                        HearingIndividual.attendingHearingByVideo("Jenny", "Harper"),
+                        HearingIndividual.attendingHearingInPerson("Jack", "Crawley")
+                ),
+                PartyDetailsModel.builder().hearingSubChannel(INTER.name()).partyID("PARTYID")
+                    .organisationDetails(OrganisationDetailsModel.builder()
+                                             .cftOrganisationID("ID")
+                                             .name("Misplaced Org")
+                                             .build()).build()
+            );
+
+            String actual = HmcDataUtils.getInPersonAttendeeNames(hearing);
+
+            assertEquals("Jason Wells\nMichael Carver\nJack Crawley", actual);
         }
 
     }
@@ -1354,9 +1620,9 @@ class HmcDataUtilsTest {
         @Test
         void shouldReturnOneAttendee() {
             HearingGetResponse hearing = buildHearing(
-                    List.of(HearingIndividual.attendingHearingByPhone("Jason", "Wells"),
-                            HearingIndividual.attendingHearingInPerson("Chloe", "Landale"),
-                            HearingIndividual.attendingHearingByVideo("Jenny", "Harper")));
+                List.of(HearingIndividual.attendingHearingByPhone("Jason", "Wells"),
+                        HearingIndividual.attendingHearingInPerson("Chloe", "Landale"),
+                        HearingIndividual.attendingHearingByVideo("Jenny", "Harper")));
 
             String actual = HmcDataUtils.getPhoneAttendeeNames(hearing);
 
@@ -1366,12 +1632,12 @@ class HmcDataUtilsTest {
         @Test
         void shouldReturnMultipleAttendees() {
             HearingGetResponse hearing = buildHearing(
-                    List.of(HearingIndividual.attendingHearingByPhone("Jason", "Wells"),
-                            HearingIndividual.attendingHearingInPerson("Chloe", "Landale"),
-                            HearingIndividual.attendingHearingByPhone("Michael", "Carver"),
-                            HearingIndividual.attendingHearingByVideo("Jenny", "Harper"),
-                            HearingIndividual.attendingHearingByPhone("Jack", "Crawley")
-                    ));
+                List.of(HearingIndividual.attendingHearingByPhone("Jason", "Wells"),
+                        HearingIndividual.attendingHearingInPerson("Chloe", "Landale"),
+                        HearingIndividual.attendingHearingByPhone("Michael", "Carver"),
+                        HearingIndividual.attendingHearingByVideo("Jenny", "Harper"),
+                        HearingIndividual.attendingHearingByPhone("Jack", "Crawley")
+                ));
 
             String actual = HmcDataUtils.getPhoneAttendeeNames(hearing);
 
@@ -1381,9 +1647,9 @@ class HmcDataUtilsTest {
         @Test
         void shouldReturnNull() {
             HearingGetResponse hearing = buildHearing(
-                    List.of(HearingIndividual.attendingHearingInPerson("Chloe", "Landale"),
-                            HearingIndividual.attendingHearingByVideo("Jenny", "Harper")
-                    ));
+                List.of(HearingIndividual.attendingHearingInPerson("Chloe", "Landale"),
+                        HearingIndividual.attendingHearingByVideo("Jenny", "Harper")
+                ));
 
             String actual = HmcDataUtils.getPhoneAttendeeNames(hearing);
 
@@ -1398,9 +1664,9 @@ class HmcDataUtilsTest {
         @Test
         void shouldReturnOneAttendee() {
             HearingGetResponse hearing = buildHearing(
-                    List.of(HearingIndividual.attendingHearingByVideo("Jason", "Wells"),
-                            HearingIndividual.attendingHearingInPerson("Chloe", "Landale"),
-                            HearingIndividual.attendingHearingByPhone("Jenny", "Harper")));
+                List.of(HearingIndividual.attendingHearingByVideo("Jason", "Wells"),
+                        HearingIndividual.attendingHearingInPerson("Chloe", "Landale"),
+                        HearingIndividual.attendingHearingByPhone("Jenny", "Harper")));
 
             String actual = HmcDataUtils.getVideoAttendeesNames(hearing);
 
@@ -1410,12 +1676,12 @@ class HmcDataUtilsTest {
         @Test
         void shouldReturnMultipleAttendees() {
             HearingGetResponse hearing = buildHearing(
-                    List.of(HearingIndividual.attendingHearingByVideo("Jason", "Wells"),
-                            HearingIndividual.attendingHearingInPerson("Chloe", "Landale"),
-                            HearingIndividual.attendingHearingByVideo("Michael", "Carver"),
-                            HearingIndividual.attendingHearingByPhone("Jenny", "Harper"),
-                            HearingIndividual.attendingHearingByVideo("Jack", "Crawley")
-                    ));
+                List.of(HearingIndividual.attendingHearingByVideo("Jason", "Wells"),
+                        HearingIndividual.attendingHearingInPerson("Chloe", "Landale"),
+                        HearingIndividual.attendingHearingByVideo("Michael", "Carver"),
+                        HearingIndividual.attendingHearingByPhone("Jenny", "Harper"),
+                        HearingIndividual.attendingHearingByVideo("Jack", "Crawley")
+                ));
 
             String actual = HmcDataUtils.getVideoAttendeesNames(hearing);
 
@@ -1425,9 +1691,9 @@ class HmcDataUtilsTest {
         @Test
         void shouldReturnNullForZeroAttendees() {
             HearingGetResponse hearing = buildHearing(
-                    List.of(HearingIndividual.attendingHearingInPerson("Chloe", "Landale"),
-                            HearingIndividual.attendingHearingByPhone("Jenny", "Harper")
-                    ));
+                List.of(HearingIndividual.attendingHearingInPerson("Chloe", "Landale"),
+                        HearingIndividual.attendingHearingByPhone("Jenny", "Harper")
+                ));
 
             String actual = HmcDataUtils.getVideoAttendeesNames(hearing);
 
@@ -1438,17 +1704,33 @@ class HmcDataUtilsTest {
 
     private HearingGetResponse buildHearing(List<HearingIndividual> testIndividuals) {
         return HearingGetResponse.builder()
-                .partyDetails(testIndividuals.stream().map(HearingIndividual::buildPartyDetails).toList())
-                .hearingResponse(HearingResponse.builder().hearingDaySchedule(List.of(
-                        HearingDaySchedule.builder()
-                                .attendees(testIndividuals.stream().map(HearingIndividual::buildAttendee).toList())
-                                .build())).build())
-                .build();
+            .partyDetails(testIndividuals.stream().map(HearingIndividual::buildPartyDetails).toList())
+            .hearingResponse(HearingResponse.builder().hearingDaySchedule(List.of(
+                HearingDaySchedule.builder()
+                    .attendees(testIndividuals.stream().map(HearingIndividual::buildAttendee).toList())
+                    .build())).build())
+            .build();
     }
 
     private HearingGetResponse buildHearing(String hearingType) {
         return HearingGetResponse.builder()
             .hearingDetails(HearingDetails.builder().hearingType(hearingType).build())
+            .build();
+    }
+
+    private HearingGetResponse buildHearingWithOrganisation(List<HearingIndividual> testIndividuals,
+                                                            PartyDetailsModel org) {
+        List<PartyDetailsModel> partyDetails = new ArrayList<>(testIndividuals.stream()
+                                                                   .map(HearingIndividual::buildPartyDetails).toList());
+
+        partyDetails.add(org);
+
+        return HearingGetResponse.builder()
+            .partyDetails(partyDetails)
+            .hearingResponse(HearingResponse.builder().hearingDaySchedule(List.of(
+                HearingDaySchedule.builder()
+                    .attendees(testIndividuals.stream().map(HearingIndividual::buildAttendee).toList())
+                    .build())).build())
             .build();
     }
 
@@ -1460,5 +1742,333 @@ class HmcDataUtilsTest {
                 startTime).build()).collect(
                 Collectors.toList()))
             .build();
+    }
+
+    @Nested
+    class IsClaimantDQDocumentsWelshTests {
+
+        @Test
+        void shouldReturnFalse_whenApplicant1DQIsNull() {
+            // Given
+            CaseData caseData = CaseData.builder()
+                .applicant1DQ(null)
+                .build();
+
+            // When
+            boolean result = HmcDataUtils.isClaimantDQDocumentsWelsh(caseData);
+
+            // Then
+            assertThat(result).isFalse();
+        }
+
+        @Test
+        void shouldReturnFalse_whenApplicant1DQLanguageIsNull() {
+            // Given
+            Applicant1DQ applicant1DQ = Applicant1DQ.builder()
+                .applicant1DQLanguage(null)
+                .build();
+            CaseData caseData = CaseData.builder()
+                .applicant1DQ(applicant1DQ)
+                .build();
+
+            // When
+            boolean result = HmcDataUtils.isClaimantDQDocumentsWelsh(caseData);
+
+            // Then
+            assertThat(result).isFalse();
+        }
+
+        @Test
+        void shouldReturnFalse_whenDocumentsIsEnglish() {
+            // Given
+            WelshLanguageRequirements req = WelshLanguageRequirements.builder()
+                .documents(Language.ENGLISH)
+                .build();
+            Applicant1DQ applicant1DQ = Applicant1DQ.builder()
+                .applicant1DQLanguage(req)
+                .build();
+            CaseData caseData = CaseData.builder()
+                .applicant1DQ(applicant1DQ)
+                .build();
+
+            // When
+            boolean result = HmcDataUtils.isClaimantDQDocumentsWelsh(caseData);
+
+            // Then
+            assertThat(result).isFalse();
+        }
+
+        @Test
+        void shouldReturnTrue_whenDocumentsIsWelsh() {
+            // Given
+            WelshLanguageRequirements req = WelshLanguageRequirements.builder()
+                .documents(Language.WELSH)
+                .build();
+            Applicant1DQ applicant1DQ = Applicant1DQ.builder()
+                .applicant1DQLanguage(req)
+                .build();
+            CaseData caseData = CaseData.builder()
+                .applicant1DQ(applicant1DQ)
+                .build();
+
+            // When
+            boolean result = HmcDataUtils.isClaimantDQDocumentsWelsh(caseData);
+
+            // Then
+            assertThat(result).isTrue();
+        }
+
+        @Test
+        void shouldReturnTrue_whenDocumentsIsBoth() {
+            // Given
+            WelshLanguageRequirements req = WelshLanguageRequirements.builder()
+                .documents(Language.BOTH)
+                .build();
+            Applicant1DQ applicant1DQ = Applicant1DQ.builder()
+                .applicant1DQLanguage(req)
+                .build();
+            CaseData caseData = CaseData.builder()
+                .applicant1DQ(applicant1DQ)
+                .build();
+
+            // When
+            boolean result = HmcDataUtils.isClaimantDQDocumentsWelsh(caseData);
+
+            // Then
+            assertThat(result).isTrue();
+        }
+    }
+
+    @Nested
+    class IsDefendantDQDocumentsWelshTests {
+
+        @Test
+        void shouldReturnFalse_whenRespondent1DQIsNull() {
+            // Given
+            CaseData caseData = CaseData.builder()
+                .respondent1DQ(null)
+                .build();
+
+            // When
+            boolean result = HmcDataUtils.isDefendantDQDocumentsWelsh(caseData);
+
+            // Then
+            assertThat(result).isFalse();
+        }
+
+        @Test
+        void shouldReturnFalse_whenRespondent1DQLanguageIsNull() {
+            // Given
+            Respondent1DQ respondent1DQ = Respondent1DQ.builder()
+                .respondent1DQLanguage(null)
+                .build();
+            CaseData caseData = CaseData.builder()
+                .respondent1DQ(respondent1DQ)
+                .build();
+
+            // When
+            boolean result = HmcDataUtils.isDefendantDQDocumentsWelsh(caseData);
+
+            // Then
+            assertThat(result).isFalse();
+        }
+
+        @Test
+        void shouldReturnFalse_whenDocumentsIsEnglish() {
+            // Given
+            WelshLanguageRequirements req = WelshLanguageRequirements.builder()
+                .documents(Language.ENGLISH)
+                .build();
+            Respondent1DQ respondent1DQ = Respondent1DQ.builder()
+                .respondent1DQLanguage(req)
+                .build();
+            CaseData caseData = CaseData.builder()
+                .respondent1DQ(respondent1DQ)
+                .build();
+
+            // When
+            boolean result = HmcDataUtils.isDefendantDQDocumentsWelsh(caseData);
+
+            // Then
+            assertThat(result).isFalse();
+        }
+
+        @Test
+        void shouldReturnTrue_whenDocumentsIsWelsh() {
+            // Given
+            WelshLanguageRequirements req = WelshLanguageRequirements.builder()
+                .documents(Language.WELSH)
+                .build();
+            Respondent1DQ respondent1DQ = Respondent1DQ.builder()
+                .respondent1DQLanguage(req)
+                .build();
+            CaseData caseData = CaseData.builder()
+                .respondent1DQ(respondent1DQ)
+                .build();
+
+            // When
+            boolean result = HmcDataUtils.isDefendantDQDocumentsWelsh(caseData);
+
+            // Then
+            assertThat(result).isTrue();
+        }
+
+        @Test
+        void shouldReturnTrue_whenDocumentsIsBoth() {
+            // Given
+            WelshLanguageRequirements req = WelshLanguageRequirements.builder()
+                .documents(Language.BOTH)
+                .build();
+            Respondent1DQ respondent1DQ = Respondent1DQ.builder()
+                .respondent1DQLanguage(req)
+                .build();
+            CaseData caseData = CaseData.builder()
+                .respondent1DQ(respondent1DQ)
+                .build();
+
+            // When
+            boolean result = HmcDataUtils.isDefendantDQDocumentsWelsh(caseData);
+
+            // Then
+            assertThat(result).isTrue();
+        }
+    }
+
+    @Nested
+    class IsWelshHearingTemplateTests {
+
+        @Test
+        void shouldReturnTrue_whenApplicantNoRepAndClaimantBilingual() {
+            // Given
+            CaseData caseData = CaseData.builder()
+                .applicant1Represented(YesOrNo.NO)
+                // -> isClaimantBilingual() = true
+                .claimantBilingualLanguagePreference(Language.WELSH.toString())
+                .respondent1Represented(YesOrNo.YES)
+                .build();
+
+            // When
+            boolean result = HmcDataUtils.isWelshHearingTemplate(caseData);
+
+            // Then
+            assertThat(result).isTrue();
+        }
+
+        @Test
+        void shouldReturnTrue_whenApplicantNoRepAndClaimantDQDocumentsWelsh() {
+            // Given
+            WelshLanguageRequirements req = WelshLanguageRequirements.builder()
+                .documents(Language.BOTH)
+                .build();
+            Applicant1DQ dq = Applicant1DQ.builder()
+                .applicant1DQLanguage(req)
+                .build();
+
+            CaseData caseData = CaseData.builder()
+                .applicant1Represented(YesOrNo.NO)
+                // -> isClaimantBilingual() = false (ej: ENGLISH)
+                .claimantBilingualLanguagePreference(Language.ENGLISH.toString())
+                .applicant1DQ(dq)
+                .respondent1Represented(YesOrNo.YES)
+                .build();
+
+            // When
+            boolean result = HmcDataUtils.isWelshHearingTemplate(caseData);
+
+            // Then
+            assertThat(result).isTrue();
+        }
+
+        @Test
+        void shouldReturnTrue_whenRespondentNoRepAndRespondentResponseBilingual() {
+            // Given
+            // -> isRespondentResponseBilingual() = true si "BOTH" o "WELSH"
+            CaseDataLiP caseDataLiP = CaseDataLiP.builder()
+                .respondent1LiPResponse(RespondentLiPResponse.builder()
+                                            .respondent1ResponseLanguage("BOTH") // => true
+                                            .build())
+                .build();
+
+            CaseData caseData = CaseData.builder()
+                .applicant1Represented(YesOrNo.YES)
+                .respondent1Represented(YesOrNo.NO)
+                .caseDataLiP(caseDataLiP)
+                .build();
+
+            // When
+            boolean result = HmcDataUtils.isWelshHearingTemplate(caseData);
+
+            // Then
+            assertThat(result).isTrue();
+        }
+
+        @Test
+        void shouldReturnTrue_whenRespondentNoRepAndDefendantDQDocumentsWelsh() {
+            // Given
+            WelshLanguageRequirements req = WelshLanguageRequirements.builder()
+                .documents(Language.WELSH)
+                .build();
+            Respondent1DQ respondent1DQ = Respondent1DQ.builder()
+                .respondent1DQLanguage(req)
+                .build();
+
+            // -> isRespondentResponseBilingual() = false (ej: "ENGLISH")
+            CaseDataLiP caseDataLiP = CaseDataLiP.builder()
+                .respondent1LiPResponse(RespondentLiPResponse.builder()
+                                            .respondent1ResponseLanguage("ENGLISH").build())
+                .build();
+
+            CaseData caseData = CaseData.builder()
+                .applicant1Represented(YesOrNo.YES)
+                .respondent1Represented(YesOrNo.NO)
+                .respondent1DQ(respondent1DQ)
+                .caseDataLiP(caseDataLiP)
+                .build();
+
+            // When
+            boolean result = HmcDataUtils.isWelshHearingTemplate(caseData);
+
+            // Then
+            assertThat(result).isTrue();
+        }
+
+        @Test
+        void shouldReturnFalse_whenApplicantYesRepAndRespondentYesRep() {
+            // Given
+            // Ninguno es NO => toda la expresión OR se evalúa a false
+            CaseData caseData = CaseData.builder()
+                .applicant1Represented(YesOrNo.YES)
+                .respondent1Represented(YesOrNo.YES)
+                .build();
+
+            // When
+            boolean result = HmcDataUtils.isWelshHearingTemplate(caseData);
+
+            // Then
+            assertThat(result).isFalse();
+        }
+
+        @Test
+        void shouldReturnFalse_whenApplicantNoRepButNotBilingualNotDQ_andRespondentNoRepButNotBilingualNotDQ() {
+            // Given
+            CaseDataLiP caseDataLiP = CaseDataLiP.builder()
+                .respondent1LiPResponse(RespondentLiPResponse.builder()
+                                            .respondent1ResponseLanguage("ENGLISH").build())
+                .build();
+
+            CaseData caseData = CaseData.builder()
+                .applicant1Represented(YesOrNo.NO)
+                .claimantBilingualLanguagePreference(Language.ENGLISH.toString()) // => false
+                .respondent1Represented(YesOrNo.NO)
+                .caseDataLiP(caseDataLiP)
+                // Sin Applicant1DQ ni Respondent1DQ que establezcan WELSH o BOTH
+                .build();
+
+            // When
+            boolean result = HmcDataUtils.isWelshHearingTemplate(caseData);
+
+            // Then
+            assertThat(result).isFalse();
+        }
     }
 }

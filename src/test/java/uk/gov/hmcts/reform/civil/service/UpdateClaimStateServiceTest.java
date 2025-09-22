@@ -3,10 +3,13 @@ package uk.gov.hmcts.reform.civil.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MediationDecision;
 import uk.gov.hmcts.reform.civil.enums.PaymentType;
@@ -30,6 +33,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.INTERMEDIATE_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -46,7 +51,85 @@ class UpdateClaimStateServiceTest {
 
     @BeforeEach
     void before() {
-        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(false);
+    }
+
+    @Test
+    void shouldNotUpdateCaseState_WhenMultiClaimClaimantLiP() {
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+
+        CaseData caseData =
+            CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .applicant1ProceedWithClaim(YES)
+                .applicant1PartAdmitIntentionToSettleClaimSpec(NO)
+                .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                .build().toBuilder()
+                .applicant1Represented(NO)
+                .responseClaimTrack(MULTI_CLAIM.name())
+                .build();
+        String actualState = service.setUpCaseState(caseData);
+
+        assertEquals(CaseState.AWAITING_APPLICANT_INTENTION.name(), actualState);
+    }
+
+    @Test
+    void shouldNotUpdateCaseState_WhenMultiClaimRespondentLiP() {
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+
+        CaseData caseData =
+            CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .applicant1ProceedWithClaim(YES)
+                .applicant1PartAdmitIntentionToSettleClaimSpec(NO)
+                .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                .build().toBuilder()
+                .respondent1Represented(NO)
+                .specRespondent1Represented(NO)
+                .responseClaimTrack(MULTI_CLAIM.name())
+                .build();
+        String actualState = service.setUpCaseState(caseData);
+
+        assertEquals(CaseState.AWAITING_APPLICANT_INTENTION.name(), actualState);
+    }
+
+    @Test
+    void shouldNotUpdateCaseState_WhenIntermediateClaimClaimantLiP() {
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+
+        CaseData caseData =
+            CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .applicant1ProceedWithClaim(YES)
+                .applicant1PartAdmitIntentionToSettleClaimSpec(NO)
+                .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                .build().toBuilder()
+                .applicant1Represented(NO)
+                .responseClaimTrack(INTERMEDIATE_CLAIM.name())
+                .build();
+        String actualState = service.setUpCaseState(caseData);
+
+        assertEquals(CaseState.AWAITING_APPLICANT_INTENTION.name(), actualState);
+    }
+
+    @Test
+    void shouldNotUpdateCaseState_WhenIntermediateClaimRespondentLiP() {
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+
+        CaseData caseData =
+            CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .applicant1ProceedWithClaim(YES)
+                .applicant1PartAdmitIntentionToSettleClaimSpec(NO)
+                .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                .build().toBuilder()
+                .specRespondent1Represented(NO)
+                .respondent1Represented(NO)
+                .responseClaimTrack(INTERMEDIATE_CLAIM.name())
+                .build();
+        String actualState = service.setUpCaseState(caseData);
+
+        assertEquals(CaseState.AWAITING_APPLICANT_INTENTION.name(), actualState);
     }
 
     @Test
@@ -92,6 +175,7 @@ class UpdateClaimStateServiceTest {
 
     @Test
     void shouldUpdateCaseStateToJudicialReferral_WhenPartAdmitNoSettle_NoMediation() {
+        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
         //Given
         CaseDataLiP caseDataLiP = CaseDataLiP.builder()
             .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
@@ -112,6 +196,7 @@ class UpdateClaimStateServiceTest {
 
     @Test
     void shouldUpdateCaseStateToJudicialReferral_WhenNotReceivedPayment_NoMediation_ForPartAdmit() {
+        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
         //Given
         CaseDataLiP caseDataLiP = CaseDataLiP.builder()
             .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
@@ -132,6 +217,7 @@ class UpdateClaimStateServiceTest {
 
     @Test
     void shouldUpdateCaseStateToJudicialReferral_WhenFullDefence_NotPaid_NoMediation() {
+        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
         //Given
         CaseDataLiP caseDataLiP = CaseDataLiP.builder()
             .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
@@ -152,6 +238,7 @@ class UpdateClaimStateServiceTest {
 
     @Test
     void shouldUpdateCaseStateToJudicialReferral_WhenFullDefence_NotPaid_FastTrack() {
+        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
         //Given
         CaseData caseData =
             CaseDataBuilder.builder().applicant1PartAdmitIntentionToSettleClaimSpec(NO)
@@ -167,6 +254,7 @@ class UpdateClaimStateServiceTest {
 
     @Test
     void shouldUpdateCaseStateToJudicialReferral_WhenFullDefence() {
+        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
         //Given
         CaseDataLiP caseDataLiP = CaseDataLiP.builder()
             .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
@@ -184,6 +272,7 @@ class UpdateClaimStateServiceTest {
 
     @Test
     void shouldUpdateCaseStateToCaseDismissed_WhenFullDefence_FastTrack() {
+        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
         //Given
         CaseData caseData =
             CaseDataBuilder.builder().applicant1ProceedWithClaim(NO)
@@ -198,6 +287,7 @@ class UpdateClaimStateServiceTest {
 
     @Test
     void shouldChangeCaseState_whenApplicantRejectClaimSettlementAndAgreeToMediation() {
+        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
         //Given
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued()
@@ -215,7 +305,27 @@ class UpdateClaimStateServiceTest {
     }
 
     @Test
-    void shouldChangeCaseState_whenApplicantAgreeClaimSettlement() {
+    void shouldNotChangeCaseState_whenHaveFullAdmissionFromRespondent() {
+        //Given
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimIssued()
+            .atStateRespondentRespondToClaimSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+            .applicant1PartAdmitConfirmAmountPaidSpec(NO)
+            .caseDataLip(CaseDataLiP.builder().applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder().hasAgreedFreeMediation(
+                    MediationDecision.Yes).build())
+                             .build())
+            .build().toBuilder()
+            .responseClaimMediationSpecRequired(YES).build();
+        //When
+        var response = service.setUpCaseState(caseData);
+        //Then
+        assertThat(response).isNotEqualTo(CaseState.IN_MEDIATION.name());
+    }
+
+    @ParameterizedTest
+    @CsvSource({"true", "false"})
+    void shouldChangeCaseState_whenApplicantAgreeClaimSettlement(boolean carmEnabled) {
+        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(carmEnabled);
         //Given
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued()
@@ -232,6 +342,7 @@ class UpdateClaimStateServiceTest {
 
     @Test
     void shouldChangeCaseState_whenApplicantRejectRepaymentPlanAndIsCompany_toAllFinalOrdersIssued() {
+        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
         //Given
         CaseData caseData = CaseDataBuilder.builder()
             .applicant1AcceptPartAdmitPaymentPlanSpec(NO)
@@ -253,6 +364,7 @@ class UpdateClaimStateServiceTest {
 
     @Test
     void shouldChangeCaseState_whenApplicantAcceptedPartAdmitImmediatePayment() {
+        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
         //Given
         CaseData caseData = CaseDataBuilder.builder()
             .build().toBuilder()
@@ -276,6 +388,7 @@ class UpdateClaimStateServiceTest {
 
     @Test
     void shouldChangeCaseState_whenApplicantRejectedRepaymentPlanAndRequestCCJ_CourtAcceptsClaimantDecision_ForPartAmit() {
+        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
         //Given
         CaseData caseData = CaseDataBuilder.builder()
             .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
@@ -299,6 +412,7 @@ class UpdateClaimStateServiceTest {
 
     @Test
     void shouldChangeCaseState_whenApplicantRejectedRepaymentPlanAndRequestCCJ_RejectedManualDetermination_ForPartAmit_PayBySetDate() {
+        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
         //Given
         CaseData caseData = CaseDataBuilder.builder()
             .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
@@ -323,6 +437,7 @@ class UpdateClaimStateServiceTest {
 
     @Test
     void shouldChangeCaseState_whenApplicantRejectedRepaymentPlanAndRequestCCJ_AcceptManualDetermination_ForPartAmit_ForPayByInstalments() {
+        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
         //Given
         CaseData caseData = CaseDataBuilder.builder()
             .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
@@ -348,6 +463,7 @@ class UpdateClaimStateServiceTest {
 
     @Test
     void shouldChangeCaseState_whenApplicantRejectedRepaymentPlanAndRequestCCJ_AcceptManualDetermination_ForPartAmit_ForPayBySetDate() {
+        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
         //Given
         CaseData caseData = CaseDataBuilder.builder()
             .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
@@ -373,6 +489,7 @@ class UpdateClaimStateServiceTest {
 
     @Test
     void shouldUpdateCaseStateToAllFinalOrderIssued_whenApplicantAcceptOrRejectedRepaymentPlanAndRequestCCJ_JudgementOnlineLiveEnabled() {
+        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder()
             .applicant1ResponseDate(LocalDateTime.now())

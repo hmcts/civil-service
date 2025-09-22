@@ -17,6 +17,7 @@ public class CallbackParams {
     private CallbackVersion version;
     private String pageId;
     private CaseData caseData;
+    private CaseData caseDataBefore;
 
     public enum Params {
         BEARER_TOKEN

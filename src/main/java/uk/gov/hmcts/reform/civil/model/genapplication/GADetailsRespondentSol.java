@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 
 import java.time.LocalDateTime;
@@ -16,16 +17,19 @@ public class GADetailsRespondentSol implements MappableObject {
     private final LocalDateTime generalAppSubmittedDateGAspec;
     private CaseLink caseLink;
     private String caseState;
+    private YesOrNo parentClaimantIsApplicant;
 
     @JsonCreator
     GADetailsRespondentSol(@JsonProperty("generalApplicationType") String generalApplicationType,
                                @JsonProperty("generalAppSubmittedDateGAspec")
                                    LocalDateTime generalAppSubmittedDateGAspec,
                                @JsonProperty("caseLink") CaseLink caseLink,
-                               @JsonProperty("caseState") String caseState) {
+                               @JsonProperty("caseState") String caseState,
+                               @JsonProperty("parentClaimantIsApplicant") YesOrNo parentClaimantIsApplicant) {
         this.generalApplicationType = generalApplicationType;
         this.generalAppSubmittedDateGAspec = generalAppSubmittedDateGAspec;
         this.caseLink = caseLink;
         this.caseState = caseState;
+        this.parentClaimantIsApplicant = parentClaimantIsApplicant;
     }
 }

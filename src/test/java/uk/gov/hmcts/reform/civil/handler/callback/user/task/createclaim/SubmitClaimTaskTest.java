@@ -2,16 +2,22 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaim;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.config.ToggleConfiguration;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.FlightDelayDetails;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
+import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.AirlineEpimsService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.FeesService;
@@ -23,14 +29,16 @@ import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.repositories.SpecReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
-import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.FlightDelayDetails;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @ExtendWith(MockitoExtension.class)
@@ -82,21 +90,31 @@ class SubmitClaimTaskTest {
                                               organisationService, airlineEpimsService, locationRefDataService);
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldSubmitClaimSuccessfully(boolean caseEventsEnabled) {
-        when(featureToggleService.isCaseEventsEnabled()).thenReturn(caseEventsEnabled);
+    @Test
+    void shouldSubmitClaimSuccessfully() {
 
         CaseData caseData = CaseData.builder()
+            .applicant1(Party.builder()
+                            .individualFirstName("Clay")
+                            .individualLastName("Mint")
+                            .partyName("Clay Mint")
+                            .type(Party.Type.INDIVIDUAL)
+                            .build())
             .totalClaimAmount(new BigDecimal("1000"))
             .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("test@gmail.com").build())
-            .respondent1(Party.builder().type(Party.Type.COMPANY).build())
+            .interestClaimFrom(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE)
+            .respondent1(Party.builder().companyName("Defendant Inc.").type(Party.Type.COMPANY).build())
+            .solicitorReferences(SolicitorReferences.builder().respondentSolicitor1Reference("1234").build())
             .build();
 
         when(userService.getUserDetails("authToken")).thenReturn(UserDetails.builder().id("userId").build());
         when(specReferenceNumberRepository.getSpecReferenceNumber()).thenReturn("12345");
 
-        FlightDelayDetails flightDelayDetails = FlightDelayDetails.builder().build();
+        FlightDelayDetails flightDelayDetails = FlightDelayDetails.builder()
+            .airlineList(
+                DynamicList.builder()
+                    .value(DynamicListElement.builder().code("OTHER").label("OTHER")
+                               .build()).build()).build();
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) submitClaimTask.submitClaim(
             caseData,
@@ -108,11 +126,102 @@ class SubmitClaimTaskTest {
 
         assertThat(response.getData()).isNotNull();
         assertThat(response.getErrors()).isEmpty();
-        if (caseEventsEnabled) {
-            assertThat(response.getData().get("anyRepresented")).isEqualTo("Yes");
-        } else {
-            assertThat(response.getData().get("anyRepresented")).isNull();
-        }
+        assertThat(response.getData()).containsEntry("interestClaimUntil", "UNTIL_SETTLED_OR_JUDGEMENT_MADE");
+        assertThat(response.getData().get("anyRepresented")).isEqualTo("Yes");
+        assertThat(response.getData().get("allPartyNames")).isEqualTo("Clay Mint V Defendant Inc.");
+        assertThat(response.getData().get("caseListDisplayDefendantSolicitorReferences"))
+            .isEqualTo("1234");
+    }
+
+    @Test
+    void shouldSubmitClaimSuccessfully1Vs2DS() {
+
+        CaseData caseData = CaseData.builder()
+            .applicant1(Party.builder()
+                            .individualFirstName("Clay")
+                            .individualLastName("Mint")
+                            .partyName("Clay Mint")
+                            .type(Party.Type.INDIVIDUAL)
+                            .build())
+            .totalClaimAmount(new BigDecimal("1000"))
+            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("test@gmail.com").build())
+            .interestClaimFrom(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE)
+            .respondent1(Party.builder().companyName("Defendant Inc.").type(Party.Type.COMPANY).build())
+            .respondent2(Party.builder().individualFirstName("Dave").individualLastName("Indentoo").type(Party.Type.INDIVIDUAL).build())
+            .respondent2Represented(YES)
+            .addRespondent2(YES)
+            .respondent2SameLegalRepresentative(NO)
+            .solicitorReferences(SolicitorReferences.builder()
+                                     .respondentSolicitor1Reference("1234")
+                                     .respondentSolicitor2Reference("5678")
+                                     .build())
+            .build();
+
+        when(userService.getUserDetails("authToken")).thenReturn(UserDetails.builder().id("userId").build());
+        when(specReferenceNumberRepository.getSpecReferenceNumber()).thenReturn("12345");
+
+        FlightDelayDetails flightDelayDetails = FlightDelayDetails.builder()
+            .airlineList(
+                DynamicList.builder()
+                    .value(DynamicListElement.builder().code("OTHER").label("OTHER")
+                               .build()).build()).build();
+
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) submitClaimTask.submitClaim(
+            caseData,
+            "eventId",
+            "authToken",
+            YES,
+            flightDelayDetails
+        );
+
+        assertThat(response.getData()).isNotNull();
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData()).containsEntry("interestClaimUntil", "UNTIL_SETTLED_OR_JUDGEMENT_MADE");
+        assertThat(response.getData().get("anyRepresented")).isEqualTo("Yes");
+        assertThat(response.getData().get("allPartyNames")).isEqualTo("Clay Mint V Defendant Inc., Dave Indentoo");
+        assertThat(response.getData().get("caseListDisplayDefendantSolicitorReferences"))
+            .isEqualTo("1234, 5678");
+    }
+
+    @Test
+    void shouldSetTheCourtLocationName() {
+        List<LocationRefData> locations = new ArrayList<>();
+        locations.add(LocationRefData.builder().courtName("Court Name").regionId("2").epimmsId("420219")
+                          .siteName("Civil National Business Centre").build());
+        when(locationRefDataService.getCourtLocationsByEpimmsIdAndCourtType(any(), any())).thenReturn(locations);
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
+        CaseData caseData = CaseData.builder()
+            .applicant1(Party.builder()
+                            .individualFirstName("Clay")
+                            .individualLastName("Mint")
+                            .partyName("Clay Mint")
+                            .type(Party.Type.INDIVIDUAL)
+                            .build())
+            .totalClaimAmount(new BigDecimal("1000"))
+            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("test@gmail.com").build())
+            .interestClaimFrom(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE)
+            .respondent1(Party.builder().companyName("Defendant Inc.").type(Party.Type.COMPANY).build())
+            .solicitorReferences(SolicitorReferences.builder().respondentSolicitor1Reference("1234").build())
+            .build();
+
+        when(userService.getUserDetails("authToken")).thenReturn(UserDetails.builder().id("userId").build());
+        when(specReferenceNumberRepository.getSpecReferenceNumber()).thenReturn("12345");
+
+        FlightDelayDetails flightDelayDetails = FlightDelayDetails.builder()
+            .airlineList(
+                DynamicList.builder()
+                    .value(DynamicListElement.builder().code("OTHER").label("OTHER")
+                               .build()).build()).build();
+
+        AboutToStartOrSubmitCallbackResponse response =
+            (AboutToStartOrSubmitCallbackResponse) submitClaimTask.submitClaim(
+                caseData,
+                "eventId",
+                "authToken",
+                NO,
+                flightDelayDetails
+            );
+        assertThat(response.getData()).containsEntry("locationName", "Civil National Business Centre");
     }
 }
 

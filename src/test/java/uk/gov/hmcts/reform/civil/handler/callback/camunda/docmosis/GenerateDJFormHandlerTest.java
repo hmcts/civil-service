@@ -177,6 +177,26 @@ class GenerateDJFormHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldNotGenerateOneForm_whenLipvLRSpecified() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+                .specClaim1v1LipvLr().build().toBuilder()
+                .addRespondent2(NO)
+                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                .defendantDetailsSpec(DynamicList.builder()
+                                          .value(DynamicListElement.builder()
+                                                     .label("One")
+                                                     .build()).build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            params.getRequest().setEventId(GENERATE_DJ_FORM_SPEC.name());
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getDefaultJudgmentDocuments()).isEmpty();
+        }
+
+        @Test
         void shouldGenerateTwoForm_when1v2Specified() {
             List<CaseDocument> documents = new ArrayList<>();
             documents.add(document);

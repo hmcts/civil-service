@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.model.citizenui;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.ccd.client.model.CaseEventDetail;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
@@ -79,7 +80,7 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
 
     @Override
     public boolean defendantRespondedWithFullAdmitAndPayImmediately() {
-        if (isClaimProceedInCaseMan()) {
+        if (isClaimProceedInCaseMan() || isPaperResponse()) {
             return false;
         }
         return hasResponseFullAdmit() && isPayImmediately();
@@ -87,7 +88,7 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
 
     @Override
     public boolean defendantRespondedWithFullAdmitAndPayBySetDate() {
-        if (isClaimProceedInCaseMan()) {
+        if (isClaimProceedInCaseMan() || isPaperResponse()) {
             return false;
         }
         return hasResponseFullAdmit() && caseData.isPayBySetDate()
@@ -96,7 +97,7 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
 
     @Override
     public boolean defendantRespondedWithFullAdmitAndPayByInstallments() {
-        if (isClaimProceedInCaseMan()) {
+        if (isClaimProceedInCaseMan() || isPaperResponse()) {
             return false;
         }
         return hasResponseFullAdmit() && caseData.isPayByInstallment()
@@ -199,7 +200,7 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
 
     @Override
     public boolean defendantRespondedWithPartAdmit() {
-        if (isClaimProceedInCaseMan()) {
+        if (isClaimProceedInCaseMan() || isPaperResponse()) {
             return false;
         }
         return RespondentResponseTypeSpec.PART_ADMISSION == caseData.getRespondent1ClaimResponseTypeForSpec()
@@ -240,7 +241,21 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
     public boolean isCourtReviewing() {
         return (!hasSdoBeenDrawn() && (caseData.isRespondentResponseFullDefence() || caseData.isPartAdmitClaimSpec())
             && CaseState.JUDICIAL_REFERRAL.equals(caseData.getCcdState()))
-            || (caseData.hasApplicantRejectedRepaymentPlan());
+            || (caseData.hasApplicantRejectedRepaymentPlan())
+            || (CaseState.AWAITING_APPLICANT_INTENTION.equals(caseData.getCcdState())
+            && isMintiClaim(caseData) && isClaimantProceeding(caseData));
+    }
+
+    private boolean isMintiClaim(CaseData caseData) {
+        return featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)
+            && (AllocatedTrack.INTERMEDIATE_CLAIM.name().equals(caseData.getResponseClaimTrack())
+            || AllocatedTrack.MULTI_CLAIM.name().equals(caseData.getResponseClaimTrack()));
+    }
+
+    private boolean isClaimantProceeding(CaseData caseData) {
+        return (caseData.getCaseDataLiP() != null
+            && NO.equals(caseData.getCaseDataLiP().getApplicant1SettleClaim()))
+            || YES.equals(caseData.getApplicant1ProceedWithClaim());
     }
 
     @Override
@@ -275,7 +290,9 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
     public boolean isSDOOrderInReview() {
         return featureToggleService.isCaseProgressionEnabled() && isSDOMadeByLegalAdviser()
             && nonNull(caseData.getOrderRequestedForReviewClaimant())
-            && caseData.getOrderRequestedForReviewClaimant().equals(YES) && !isDecisionForReconsiderationMade();
+            && caseData.getOrderRequestedForReviewClaimant().equals(YES) && !isDecisionForReconsiderationMade()
+            && !isSDODoneAfterDecisionForReconsiderationMade()
+            && !isGeneralOrderAfterDecisionForReconsiderationMade();
     }
 
     @Override
@@ -283,12 +300,16 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
         return featureToggleService.isCaseProgressionEnabled() && isSDOMadeByLegalAdviser()
             && nonNull(caseData.getOrderRequestedForReviewDefendant())
             && caseData.getOrderRequestedForReviewDefendant().equals(YES)
-            && !isSDOOrderInReview() && !isDecisionForReconsiderationMade();
+            && !isSDOOrderInReview() && !isDecisionForReconsiderationMade()
+            && !isSDODoneAfterDecisionForReconsiderationMade()
+            && !isGeneralOrderAfterDecisionForReconsiderationMade();
     }
 
     @Override
     public boolean isDecisionForReconsiderationMade() {
-        return caseData.getHearingDate() == null && caseData.getDecisionOnReconsiderationDocumentFromList().isPresent();
+        return caseData.getHearingDate() == null && caseData.getDecisionOnReconsiderationDocumentFromList().isPresent()
+            && !isSDODoneAfterDecisionForReconsiderationMade()
+            && !isGeneralOrderAfterDecisionForReconsiderationMade();
     }
 
     @Override
@@ -394,14 +415,15 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
     }
 
     @Override
-    public boolean defendantRespondedWithPreferredLanguageWelsh() {
-        return caseData.isRespondentResponseBilingual()
-            && caseData.getCcdState() == CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
-    }
-
-    public boolean isWaitingForClaimantIntentDocUpload() {
-        return caseData.isRespondentResponseFullDefence() && caseData.getApplicant1ResponseDate() != null
-            && caseData.getCcdState() == CaseState.AWAITING_APPLICANT_INTENTION && caseData.isClaimantBilingual();
+    public boolean pausedForTranslationAfterResponse() {
+        if (!featureToggleService.isWelshEnabledForMainCase() && (caseData.isClaimUnderTranslationAfterDefResponse() && caseData.isRespondentResponseBilingual())
+            || (caseData.isClaimUnderTranslationAfterClaimantResponse() && caseData.isClaimantBilingual())) {
+            return true;
+        } else {
+            return featureToggleService.isWelshEnabledForMainCase()
+                && (caseData.isClaimUnderTranslationAfterDefResponse() || caseData.isClaimUnderTranslationAfterClaimantResponse())
+                && (caseData.isRespondentResponseBilingual() || caseData.isClaimantBilingual());
+        }
     }
 
     public boolean isNocForDefendant() {
@@ -434,14 +456,25 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
         Optional<LocalDateTime> eventTime = getTimeOfMostRecentEventOfType(
             EnumSet.of(CaseEvent.GENERATE_TRIAL_READY_FORM_APPLICANT));
         Optional<LocalDateTime> orderTime = getTimeOfLastNonSDOOrder();
+
         return caseData.isFastTrackClaim()
             && caseData.getTrialReadyApplicant() != null
-            && !ListingOrRelisting.RELISTING.equals(caseData.getListingOrRelisting())
+            && ((nonNull(caseData.getListingOrRelisting()) && !ListingOrRelisting.RELISTING.equals(
+                caseData.getListingOrRelisting())) || isAutomaticHearingNotModifiedAfterTrialNotified())
             && (CaseState.HEARING_READINESS.equals(caseData.getCcdState()) || CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING.equals(caseData.getCcdState()))
             && !isBundleCreatedStatusActive()
             && isHearingLessThanDaysAway(DAY_LIMIT)
             && (eventTime.isPresent())
             && (orderTime.isEmpty() || eventTime.get().isAfter(orderTime.get()));
+    }
+
+    private boolean isAutomaticHearingNotModifiedAfterTrialNotified() {
+        Optional<LocalDateTime> automaticHearingRequested = this.getWhenWasHearingScheduled();
+        Optional<LocalDateTime> trialReadyDocumentCreated = Optional.ofNullable(caseData.getClaimantTrialReadyDocumentCreated());
+
+        return isNull(caseData.getListingOrRelisting())
+            && automaticHearingRequested.isPresent()
+            && (trialReadyDocumentCreated.isEmpty() || trialReadyDocumentCreated.get().isAfter(automaticHearingRequested.get()));
     }
 
     @Override
@@ -452,5 +485,30 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
         return caseData.isHWFTypeHearing() && caseData.getHwFEvent() == null
             && (eventTime.isPresent())
             && (orderTime.isEmpty() || eventTime.get().isAfter(orderTime.get()));
+    }
+
+    @Override
+    public boolean isTrialArrangementStatusActive() {
+        Optional<LocalDate> hearingDate = getHearingDate();
+        if (caseData.isFastTrackClaim()
+            && (CaseState.HEARING_READINESS.equals(caseData.getCcdState()) || CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING.equals(caseData.getCcdState()))
+            && hearingDate.isPresent()
+            && YesOrNo.YES.equals(caseData.getTrialReadyNotified())
+            && isHearingLessThanDaysAway(DAY_LIMIT)
+            && !isBundleCreatedStatusActive()
+            && Objects.isNull(caseData.getTrialReadyChecked())
+            && caseData.getTrialReadyApplicant() == null) {
+            Optional<LocalDateTime> lastOrder = getTimeOfLastNonSDOOrder();
+            return lastOrder.isEmpty()
+                || hearingDate.get().minusDays(DAY_LIMIT)
+                .isAfter(lastOrder.get().toLocalDate());
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean isCasedDiscontinued() {
+        return false;
     }
 }

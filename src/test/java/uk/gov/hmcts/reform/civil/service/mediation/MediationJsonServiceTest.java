@@ -20,6 +20,9 @@ import uk.gov.hmcts.reform.civil.model.dq.WelshLanguageRequirements;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.service.mediation.helpers.PartyDetailsPopulator;
+import uk.gov.hmcts.reform.civil.service.mediation.helpers.RepresentedLitigantPopulator;
+import uk.gov.hmcts.reform.civil.service.mediation.helpers.UnrepresentedLitigantPopulator;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -38,7 +41,10 @@ import static uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.SOLE_TRADER;
 
 @SpringBootTest(classes = {
-    MediationJsonService.class
+    MediationJsonService.class,
+    RepresentedLitigantPopulator.class,
+    UnrepresentedLitigantPopulator.class,
+    PartyDetailsPopulator.class
 })
 public class MediationJsonServiceTest {
 

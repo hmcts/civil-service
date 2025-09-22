@@ -1,14 +1,16 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
@@ -18,9 +20,13 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderFurtherHearing;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.CourtOfficerOrderGenerator;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
@@ -32,6 +38,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,31 +46,33 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.COURT_OFFICER_ORDER;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CourtOfficerOrderHandler.HEADER;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    CourtOfficerOrderHandler.class,
-    JacksonAutoConfiguration.class,
-    AssignCategoryId.class,
-})
+@ExtendWith(MockitoExtension.class)
 public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
 
-    @Autowired
+    @InjectMocks
     private CourtOfficerOrderHandler handler;
-    @MockBean
+    @Mock
     private DocumentHearingLocationHelper locationHelper;
-    @MockBean
+    @Mock
     private WorkingDayIndicator workingDayIndicator;
-    @MockBean
+    @Mock
     private LocationReferenceDataService locationRefDataService;
-    @Autowired
+    @Spy
     private AssignCategoryId assignCategoryId;
-    @MockBean
+    @Spy
+    private ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+    @Mock
     private CourtOfficerOrderGenerator courtOfficerOrderGenerator;
+    @Mock
+    private FeatureToggleService featureToggleService;
+    @Mock
+    private UserService userService;
 
     private static LocationRefData locationRefData =   LocationRefData.builder().siteName("A nice Site Name")
         .courtAddress("1").postcode("1")
@@ -85,14 +94,19 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
 
     @BeforeEach
     void setup() {
-        when(locationHelper.getHearingLocation(any(), any(), any())).thenReturn(locationRefData);
-        List<LocationRefData> locationRefDataList = new ArrayList<>();
-        locationRefDataList.add(locationRefData);
-        when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(locationRefDataList);
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     }
 
     @Nested
     class AboutToStartCallback {
+
+        @BeforeEach
+        void setup() {
+            when(locationHelper.getHearingLocation(any(), any(), any())).thenReturn(locationRefData);
+            List<LocationRefData> locationRefDataList = new ArrayList<>();
+            locationRefDataList.add(locationRefData);
+            when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(locationRefDataList);
+        }
 
         @Test
         void shouldPopulateValues_whenInvoked() {
@@ -136,18 +150,24 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
                                                        .listFromDate(null).build())
                 .build();
 
+            when(courtOfficerOrderGenerator.generate(any(), any())).thenReturn(CaseDocument.builder().documentLink(
+                Document.builder()
+                    .documentFileName(fileName)
+                    .categoryID("caseManagementOrders")
+                    .build()).createdDatetime(LocalDateTime.now()).build());
+
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData())
                 .extracting("previewCourtOfficerOrder")
                 .extracting("documentLink")
-                .extracting("document_filename")
+                .extracting("documentFileName")
                 .isEqualTo(fileName);
             assertThat(response.getData())
                 .extracting("previewCourtOfficerOrder")
                 .extracting("documentLink")
-                .extracting("category_id")
+                .extracting("categoryID")
                 .isEqualTo("caseManagementOrders");
         }
 
@@ -204,6 +224,112 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response).usingRecursiveComparison().isEqualTo(SubmittedCallbackResponse.builder()
                                                                           .confirmationHeader(confirmationHeader)
                                                                           .build());
+        }
+    }
+
+    @Nested
+    class AboutToSubmitCallback {
+
+        public static final String REFERENCE_NUMBER = "000DC001";
+        private CallbackParams params;
+        private CaseData caseData;
+        private String userId;
+
+        private ObjectMapper objectMapper;
+
+        @BeforeEach
+        void setup() {
+            caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            userId = UUID.randomUUID().toString();
+            objectMapper = new ObjectMapper();
+            objectMapper.findAndRegisterModules();
+        }
+
+        @Test
+        void shouldSubmitted_whenInvoked() {
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData()).extracting("businessProcess")
+                .extracting("camundaEvent", "status")
+                .containsOnly(COURT_OFFICER_ORDER.name(), "READY");
+        }
+
+        @Test
+        void shouldHideDocumentIfClaimantWelsh_onAboutToSubmit() {
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
+            // Given
+            caseData = caseData.toBuilder()
+                .previewCourtOfficerOrder(courtOfficerOrder)
+                .preTranslationDocuments(new ArrayList<>())
+                .claimantBilingualLanguagePreference("BOTH")
+                .build();
+            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
+            // Then
+            assertThat(updatedData.getPreTranslationDocuments()).hasSize(1);
+            assertThat(updatedData.getPreviewCourtOfficerOrder()).isNull();
+            assertThat(updatedData.getCurrentCamundaBusinessProcessName()).isNull();
+        }
+
+        @Test
+        void shouldAddADocumentInCollectionWhenWelshFTisOn_onAboutToSubmit() {
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
+            // Given
+            caseData = caseData.toBuilder()
+                .previewCourtOfficerOrder(courtOfficerOrder)
+                .courtOfficersOrders(new ArrayList<>())
+                .claimantBilingualLanguagePreference("ENGLISH")
+                .build();
+            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
+            // Then
+            assertThat(updatedData.getCourtOfficersOrders()).hasSize(1);
+            assertThat(updatedData.getPreviewCourtOfficerOrder()).isNull();
+            assertThat(updatedData.getCurrentCamundaBusinessProcessName()).isEqualTo("COURT_OFFICER_ORDER");
+        }
+
+        @Test
+        void shouldNotHideDocumentIfWelshDisabled_onAboutToSubmit() {
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
+            // Given
+            caseData = caseData.toBuilder()
+                .previewCourtOfficerOrder(courtOfficerOrder)
+                .preTranslationDocuments(new ArrayList<>())
+                .claimantBilingualLanguagePreference("BOTH")
+                .build();
+            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
+            // Then
+            assertThat(updatedData.getPreTranslationDocuments()).hasSize(0);
+            assertThat(updatedData.getPreviewCourtOfficerOrder()).isNotNull();
+            assertThat(updatedData.getCurrentCamundaBusinessProcessName()).isNotNull();
+        }
+
+        @Test
+        void shouldHideDocumentIfDefendantWelsh_onAboutToSubmit() {
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
+            // Given
+            caseData = caseData.toBuilder()
+                .previewCourtOfficerOrder(courtOfficerOrder)
+                .preTranslationDocuments(new ArrayList<>())
+                .caseDataLiP(CaseDataLiP.builder()
+                                 .respondent1LiPResponse(RespondentLiPResponse.builder()
+                                                             .respondent1ResponseLanguage("WELSH").build()).build())
+                .build();
+            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
+            // Then
+            assertThat(updatedData.getPreTranslationDocuments()).hasSize(1);
+            assertThat(updatedData.getPreviewCourtOfficerOrder()).isNull();
+            assertThat(updatedData.getCurrentCamundaBusinessProcessName()).isNull();
         }
     }
 

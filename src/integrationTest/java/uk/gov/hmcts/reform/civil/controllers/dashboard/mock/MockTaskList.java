@@ -138,7 +138,7 @@ public class MockTaskList {
                 .build(),
             TaskList.builder()
                 .reference(reference)
-                .taskNameCy("<a>Gweld y cais i gyd</a>")
+                .taskNameCy("<a>Gweld ceisiadau</a>")
                 .taskNameEn("<a>View applications</a>")
                 .categoryCy("Ceisiadau")
                 .categoryEn("Applications")
@@ -275,7 +275,7 @@ public class MockTaskList {
                 .build(),
             TaskList.builder()
                 .reference(reference)
-                .taskNameCy("<a>Gweld y cais i gyd</a>")
+                .taskNameCy("<a>Gweld ceisiadau</a>")
                 .taskNameEn("<a>View applications</a>")
                 .categoryCy("Ceisiadau")
                 .categoryEn("Applications")

@@ -17,7 +17,9 @@ import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.RecordJudgmentOnlineMap
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRecordedReason;
+import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +38,7 @@ public class RecordJudgmentCallbackHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = Collections.singletonList(RECORD_JUDGMENT);
     protected final ObjectMapper objectMapper;
     private final RecordJudgmentOnlineMapper recordJudgmentOnlineMapper;
+    private final InterestCalculator interestCalculator;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -88,6 +91,7 @@ public class RecordJudgmentCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         caseData.setJoIsLiveJudgmentExists(YesOrNo.YES);
         caseData.setJoSetAsideOrderDate(null);
+        caseData.setJoSetAsideApplicationDate(null);
         caseData.setJoSetAsideDefenceReceivedDate(null);
         caseData.setJoSetAsideOrderType(null);
         caseData.setJoSetAsideReason(null);
@@ -97,7 +101,8 @@ public class RecordJudgmentCallbackHandler extends CallbackHandler {
             caseData.setJoIssuedDate(caseData.getJoOrderMadeDate());
         }
         caseData.setActiveJudgment(recordJudgmentOnlineMapper.addUpdateActiveJudgment(caseData));
-        caseData.setJoRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(caseData.getActiveJudgment()));
+        BigDecimal interest = interestCalculator.calculateInterest(caseData);
+        caseData.setJoRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(caseData.getActiveJudgment(), interest));
 
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         if (caseData.getJoJudgmentRecordReason() == JudgmentRecordedReason.DETERMINATION_OF_MEANS) {

@@ -10,14 +10,19 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.ConfirmOrderGivesPermission;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.DiscontinuanceTypeList;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.SettleDiscontinueYesOrNoList;
 import uk.gov.hmcts.reform.civil.helpers.settlediscontinue.DiscontinueClaimHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.welshenhancements.PreTranslationDocumentType;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.List;
 import java.util.Map;
@@ -27,6 +32,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.VALIDATE_DISCONTINUE_CLAIM_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.NOTICE_OF_DISCONTINUANCE_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
 @RequiredArgsConstructor
@@ -42,6 +49,7 @@ public class ValidateDiscontinueClaimClaimantCallbackHandler extends CallbackHan
 
     private final ObjectMapper objectMapper;
     private static final String BOTH = "Both";
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -88,7 +96,23 @@ public class ValidateDiscontinueClaimClaimantCallbackHandler extends CallbackHan
             }
         }
 
-        caseDataBuilder.businessProcess(BusinessProcess.ready(VALIDATE_DISCONTINUE_CLAIM_CLAIMANT));
+        if (featureToggleService.isWelshEnabledForMainCase()
+            && caseData.isRespondent1LiP()
+            && caseData.getTypeOfDiscontinuance().equals(DiscontinuanceTypeList.PART_DISCONTINUANCE)
+            && caseData.isRespondentResponseBilingual()
+            && ConfirmOrderGivesPermission.YES.equals(caseData.getConfirmOrderGivesPermission())
+        ) {
+            List<Element<CaseDocument>> translatedDocuments = callbackParams.getCaseData()
+                .getPreTranslationDocuments();
+            caseData.getRespondent1NoticeOfDiscontinueCWViewDoc().setDocumentType(NOTICE_OF_DISCONTINUANCE_DEFENDANT);
+            translatedDocuments.add(element(caseData.getRespondent1NoticeOfDiscontinueCWViewDoc()));
+            caseDataBuilder.bilingualHint(YesOrNo.YES);
+            caseDataBuilder.preTranslationDocuments(translatedDocuments);
+            caseDataBuilder.preTranslationDocumentType(PreTranslationDocumentType.NOTICE_OF_DISCONTINUANCE);
+            caseDataBuilder.respondent1NoticeOfDiscontinueCWViewDoc(null);
+        } else {
+            caseDataBuilder.businessProcess(BusinessProcess.ready(VALIDATE_DISCONTINUE_CLAIM_CLAIMANT));
+        }
 
         return aboutToStartOrSubmitCallbackResponseBuilder.data(caseDataBuilder.build().toMap(objectMapper)).build();
     }

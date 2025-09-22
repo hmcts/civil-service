@@ -111,6 +111,24 @@ public interface NotificationData {
     String CLAIM_NUMBER_CASE = "ClaimNumber";
     String CLAIM_NAME = "ClaimName";
 
+    String CASEMAN_REF = "casemanRef";
+    String LEGAL_REP_NAME_WITH_SPACE = "legal rep name";
+    String REFERENCE = "reference";
+
+    String QUERY_DATE = "queryDate";
+
+    //footer
+    String HMCTS_SIGNATURE = "hmctsSignature";
+    String PHONE_CONTACT = "phoneContact";
+    String OPENING_HOURS = "openingHours";
+    String WELSH_HMCTS_SIGNATURE = "welshHmctsSignature";
+    String WELSH_PHONE_CONTACT = "welshPhoneContact";
+    String WELSH_OPENING_HOURS = "welshOpeningHours";
+    String SPEC_UNSPEC_CONTACT = "specAndUnspecContact";
+    String CNBC_CONTACT = "cnbcContact";
+    String LIP_CONTACT = "specContact";
+    String LIP_CONTACT_WELSH = "welshContact";
+
     Map<String, String> addProperties(CaseData caseData);
 
 }

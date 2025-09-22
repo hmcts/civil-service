@@ -21,9 +21,11 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.service.http.HttpResponseHeadersService;
 
 import java.util.Objects;
 import java.util.Optional;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotNull;
 
 @Tag(name = "Callback Controller")
@@ -39,6 +41,7 @@ public class CallbackController {
 
     private final CallbackHandlerFactory callbackHandlerFactory;
     private final CaseDetailsConverter caseDetailsConverter;
+    private final HttpResponseHeadersService responseHeadersService;
 
     @PostMapping(path = {
         "/{callback-type}",
@@ -48,6 +51,7 @@ public class CallbackController {
     })
     @Operation(summary = "Handles all callbacks from CCD")
     public CallbackResponse callback(
+        HttpServletResponse response,
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
         @PathVariable("callback-type") String callbackType,
         @NotNull @RequestBody CallbackRequest callback,
@@ -55,9 +59,12 @@ public class CallbackController {
         @PathVariable("page-id") Optional<String> pageId
     ) {
         final CaseDetails caseDetails = callback.getCaseDetails();
-        MDC.put("caseId", Objects.toString(caseDetails.getId(), ""));
-        log.info("Received callback from CCD, eventId: {}, callback type: {}, page id: {}, version: {}",
-                 callback.getEventId(), callbackType, pageId, version
+        final CaseDetails caseDetailsBefore = callback.getCaseDetailsBefore();
+        final Long caseId = caseDetails.getId();
+
+        MDC.put("caseId", Objects.toString(caseId, ""));
+        log.info("Received callback from CCD, caseId: {}, caseIdBefore: {}, eventId: {}, callback type: {}, page id: {}, version: {}",
+                 caseId,  caseDetailsBefore == null ? null : caseDetailsBefore.getId(), callback.getEventId(), callbackType, pageId, version
         );
 
         CallbackParams callbackParams = CallbackParams.builder()
@@ -67,8 +74,12 @@ public class CallbackController {
             .version(version.orElse(null))
             .pageId(pageId.orElse(null))
             .caseData(caseDetailsConverter.toCaseData(caseDetails))
+            .caseDataBefore(caseDetailsBefore != null ? caseDetailsConverter.toCaseData(caseDetailsBefore) : null)
             .build();
 
-        return callbackHandlerFactory.dispatch(callbackParams);
+        CallbackResponse callbackResponse = callbackHandlerFactory.dispatch(callbackParams);
+        responseHeadersService.addClientContextHeader(callbackResponse, response);
+        return callbackResponse;
     }
+
 }

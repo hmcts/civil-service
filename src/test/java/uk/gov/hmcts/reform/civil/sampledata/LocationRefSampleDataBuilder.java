@@ -35,9 +35,7 @@ public class LocationRefSampleDataBuilder {
     protected static final String STRING_CONSTANT = "this is a string";
     protected static final String CASE_MANAGEMENT_CATEGORY = "Civil";
     protected static final String STRING_NUM_CONSTANT = "123456789";
-    protected static final DynamicList PBA_ACCOUNTS = DynamicList.builder().build();
     protected static final LocalDate APP_DATE_EPOCH = EPOCH;
-    protected static final DynamicList PBALIST = DynamicList.builder().build();
 
     protected CaseData getTestCaseData(CaseData caseData) {
         return caseData.toBuilder()
@@ -302,7 +300,10 @@ public class LocationRefSampleDataBuilder {
                 .courtLocationCode("court2").build(),
             LocationRefData.builder()
                 .epimmsId("333").siteName("Site 3").courtAddress("Adr 3").postcode("CCC 333")
-                .courtLocationCode("court3").build()
+                .courtLocationCode("court3").build(),
+            LocationRefData.builder()
+                .epimmsId("00000").siteName("Site 5").courtAddress("Adr 5").postcode("YYY 111")
+                .courtLocationCode("court5").build()
         ));
     }
 
@@ -319,7 +320,10 @@ public class LocationRefSampleDataBuilder {
                 .courtLocationCode("court3").build(),
             LocationRefData.builder()
                 .epimmsId("444").siteName("A Site 3").courtAddress("Adr 3").postcode("AAA 111")
-                .courtLocationCode("court4").build()
+                .courtLocationCode("court4").build(),
+            LocationRefData.builder()
+                .epimmsId("00000").siteName("Site 5").courtAddress("Adr 5").postcode("YYY 111")
+                .courtLocationCode("court5").build()
         ));
     }
 }

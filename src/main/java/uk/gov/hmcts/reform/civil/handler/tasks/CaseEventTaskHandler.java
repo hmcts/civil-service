@@ -18,10 +18,10 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.exceptions.InvalidCaseDataException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.data.ExternalTaskInput;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
@@ -61,8 +61,7 @@ public class CaseEventTaskHandler extends BaseExternalTaskHandler {
             BusinessProcess businessProcess = startEventData.getBusinessProcess()
                 .updateActivityId(externalTask.getActivityId());
 
-            if (featureToggleService.isAutomatedHearingNoticeEnabled()
-                && !businessProcess.hasSameProcessInstanceId(externalTask.getProcessInstanceId())) {
+            if (!businessProcess.hasSameProcessInstanceId(externalTask.getProcessInstanceId())) {
                 businessProcess.updateProcessInstanceId(externalTask.getProcessInstanceId());
             }
 
@@ -84,7 +83,7 @@ public class CaseEventTaskHandler extends BaseExternalTaskHandler {
     public VariableMap getVariableMap(ExternalTaskData externalTaskData) {
         var data = externalTaskData.caseData().orElseThrow();
         VariableMap variables = Variables.createVariables();
-        var stateFlow = stateFlowEngine.evaluate(data);
+        var stateFlow = stateFlowEngine.getStateFlow(data);
         variables.putValue(FLOW_STATE, stateFlow.getState().getName());
         variables.putValue(FLOW_FLAGS, stateFlow.getFlags());
         return variables;
@@ -100,21 +99,34 @@ public class CaseEventTaskHandler extends BaseExternalTaskHandler {
         return CaseDataContent.builder()
             .eventToken(startEventResponse.getToken())
             .event(Event.builder().id(startEventResponse.getEventId())
-                       .summary(getSummary(startEventResponse.getEventId(), flowState))
+                       .summary(getSummary(startEventResponse.getEventId(), flowState, caseData))
                        .description(getDescription(startEventResponse.getEventId(), data, flowState, caseData))
                        .build())
             .data(data)
             .build();
     }
 
-    private String getSummary(String eventId, String state) {
+    private String getFullOrPartAdmission(CaseData caseData, String state) {
+        FlowState.Main flowState = (FlowState.Main) FlowState.fromFullName(state);
+        if (caseData.isLipvLROneVOne()) {
+            return "RPA Reason: LiP vs LR - full/part admission received.";
+        } else {
+            if (flowState.equals(FlowState.Main.FULL_ADMISSION)) {
+                return "RPA Reason: Defendant fully admits.";
+            } else {
+                return "RPA Reason: Defendant partial admission.";
+            }
+        }
+    }
+
+    private String getSummary(String eventId, String state, CaseData caseData) {
         if (Objects.equals(eventId, CaseEvent.PROCEEDS_IN_HERITAGE_SYSTEM.name())) {
             FlowState.Main flowState = (FlowState.Main) FlowState.fromFullName(state);
             return switch (flowState) {
                 case DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE, DIVERGENT_RESPOND_GO_OFFLINE ->
                     "RPA Reason: Divergent respond.";
-                case FULL_ADMISSION -> "RPA Reason: Defendant fully admits.";
-                case PART_ADMISSION -> "RPA Reason: Defendant partial admission.";
+                case FULL_ADMISSION -> getFullOrPartAdmission(caseData, state);
+                case PART_ADMISSION -> getFullOrPartAdmission(caseData, state);
                 case COUNTER_CLAIM -> "RPA Reason: Defendant rejects and counter claims.";
                 case PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC, PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT ->
                     "RPA Reason: Unrepresented defendant(s).";

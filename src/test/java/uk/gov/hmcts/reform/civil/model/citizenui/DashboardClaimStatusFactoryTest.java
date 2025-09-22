@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.model.citizenui;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -21,7 +22,9 @@ import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.math.BigDecimal;
@@ -33,7 +36,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 class DashboardClaimStatusFactoryTest {
 
@@ -71,6 +77,7 @@ class DashboardClaimStatusFactoryTest {
     @BeforeEach
     void prepare() {
         Mockito.when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
+        Mockito.when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
     }
 
     @ParameterizedTest
@@ -134,7 +141,7 @@ class DashboardClaimStatusFactoryTest {
     @ValueSource(booleans = {true, false})
     void shouldReturnCorrectStatus_fastClaimSdo(boolean caseProgressionEnabled) {
         List<CaseEventDetail> eventHistory = new ArrayList<>();
-        Mockito.when(toggleService.isCaseProgressionEnabled()).thenReturn(caseProgressionEnabled);
+        Mockito.when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(caseProgressionEnabled);
         fastClaim(eventHistory, toggleService);
     }
 
@@ -203,7 +210,7 @@ class DashboardClaimStatusFactoryTest {
     @ValueSource(booleans = {true, false})
     void shouldReturnCorrectStatus_smallClaimSdo(boolean caseProgressionEnabled) {
         List<CaseEventDetail> eventHistory = new ArrayList<>();
-        Mockito.when(toggleService.isCaseProgressionEnabled()).thenReturn(caseProgressionEnabled);
+        Mockito.when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(caseProgressionEnabled);
         smallClaim(eventHistory, toggleService);
     }
 
@@ -312,16 +319,20 @@ class DashboardClaimStatusFactoryTest {
             .documentType(DocumentType.SDO_ORDER)
             .createdDatetime(LocalDateTime.now())
             .build();
+        DynamicListElement selectedCourt = DynamicListElement.builder()
+            .code("00002").label("court 2 - 2 address - Y02 7RB").build();
+
         CaseData caseData = CaseData.builder()
             .ccdState(CaseState.CASE_PROGRESSION)
             .responseClaimTrack(AllocatedTrack.FAST_CLAIM.name())
             .totalClaimAmount(BigDecimal.valueOf(1000))
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
             .systemGeneratedCaseDocuments(List.of(Element.<CaseDocument>builder()
                                                       .value(sdoDocument).build()))
             .drawDirectionsOrderRequired(YesOrNo.NO)
             .claimsTrack(ClaimsTrack.fastTrack)
             .build();
-        if (toggleService.isCaseProgressionEnabled()) {
+        if (toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())) {
             checkStatus(caseData, eventHistory,
                         DashboardClaimStatus.SDO_ORDER_CREATED_CP,
                         DashboardClaimStatus.SDO_ORDER_CREATED_CP
@@ -540,14 +551,17 @@ class DashboardClaimStatusFactoryTest {
             .documentType(DocumentType.SDO_ORDER)
             .createdDatetime(LocalDateTime.now())
             .build();
+        DynamicListElement selectedCourt = DynamicListElement.builder()
+            .code("00002").label("court 2 - 2 address - Y02 7RB").build();
         CaseData caseData = CaseData.builder()
             .ccdState(CaseState.CASE_PROGRESSION)
             .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
             .totalClaimAmount(BigDecimal.valueOf(999))
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
             .systemGeneratedCaseDocuments(List.of(Element.<CaseDocument>builder()
                                                       .value(sdoDocument).build()))
             .build();
-        if (toggleService.isCaseProgressionEnabled()) {
+        if (toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())) {
             checkStatus(caseData, eventHistory,
                         DashboardClaimStatus.SDO_ORDER_LEGAL_ADVISER_CREATED,
                         DashboardClaimStatus.SDO_ORDER_LEGAL_ADVISER_CREATED
@@ -824,5 +838,67 @@ class DashboardClaimStatusFactoryTest {
 
         argumentList.add(Arguments.arguments(defendant, DashboardClaimStatus.CASE_DISMISSED));
         argumentList.add(Arguments.arguments(claimant, DashboardClaimStatus.CASE_DISMISSED));
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideSDOOrderCreatedPreCPScenarios")
+    void shouldTestIsSDOOrderCreatedPreCP(CaseData caseData, boolean featureToggle, boolean expectedResult) {
+        Mockito.when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(featureToggle);
+        CcdDashboardClaimMatcher matcher = new CcdDashboardClaimantClaimMatcher(caseData, toggleService, Collections.emptyList()) {};
+
+        boolean result = matcher.isSDOOrderCreatedPreCP();
+
+        assertEquals(expectedResult, result);
+    }
+
+    private static Stream<Arguments> provideSDOOrderCreatedPreCPScenarios() {
+        LocalDateTime beforeTargetDate = LocalDateTime.of(2024, 12, 4, 23, 59);
+        LocalDateTime afterTargetDate = LocalDateTime.of(2024, 12, 5, 0, 1);
+        CaseDocument sdoDocumentBefore = CaseDocument.builder()
+            .documentType(DocumentType.SDO_ORDER)
+            .createdDatetime(beforeTargetDate)
+            .build();
+        CaseDocument sdoDocumentAfter = CaseDocument.builder()
+            .documentType(DocumentType.SDO_ORDER)
+            .createdDatetime(afterTargetDate)
+            .build();
+
+        DynamicListElement selectedCourt = DynamicListElement.builder()
+            .code("00002").label("court 2 - 2 address - Y02 7RB").build();
+
+        CaseData caseData1 = CaseData.builder()
+            .ccdState(CaseState.CASE_PROGRESSION)
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
+            .systemGeneratedCaseDocuments(List.of(Element.<CaseDocument>builder()
+                                                 .value(sdoDocumentBefore).build()))
+            .build();
+
+        CaseData caseData2 = CaseData.builder()
+            .ccdState(CaseState.CASE_PROGRESSION)
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
+            .systemGeneratedCaseDocuments(List.of(Element.<CaseDocument>builder()
+                                                      .value(sdoDocumentAfter).build()))
+            .build();
+
+        return Stream.of(
+            Arguments.arguments(caseData1, true, true),
+            Arguments.arguments(caseData2, false, true)
+        );
+    }
+
+    @Test
+    void shouldOverrideStatus_fromOverrideList() {
+        List<CaseEventDetail> eventHistory = new ArrayList<>();
+        eventHistory.add(CaseEventDetail.builder().id("GENERATE_DIRECTIONS_ORDER").createdDate(LocalDateTime.now()).build());
+        CaseData caseData = CaseData.builder()
+            .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+            .preTranslationDocuments(List.of(element(CaseDocument.builder().documentType(DocumentType.HEARING_FORM).build())))
+
+            .build();
+
+        DashboardClaimStatus claimantStatus = claimStatusFactory.getDashboardClaimStatus(
+            new CcdDashboardClaimantClaimMatcher(caseData, toggleService, eventHistory)
+        );
+        assertThat(claimantStatus).isEqualTo(DashboardClaimStatus.ORDER_MADE);
     }
 }

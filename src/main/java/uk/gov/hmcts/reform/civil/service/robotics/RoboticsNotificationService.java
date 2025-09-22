@@ -54,7 +54,11 @@ public class RoboticsNotificationService {
         log.info(String.format("Start notifyRobotics and case data is not null %s", caseData.getLegacyCaseReference()));
         Optional<EmailData> emailData = prepareEmailData(RoboticsEmailParams.builder().caseData(caseData).authToken(
             authToken).isMultiParty(isMultiParty).build());
-        emailData.ifPresent(data -> sendGridClient.sendEmail(roboticsEmailConfiguration.getSender(), data));
+
+        emailData.ifPresent(data -> {
+            log.info(String.format("Sending email via client to %s", data.getTo()));
+            sendGridClient.sendEmail(roboticsEmailConfiguration.getSender(), data);
+        });
     }
 
     public void notifyJudgementLip(@NotNull CaseData caseData, String authToken) {
@@ -82,7 +86,6 @@ public class RoboticsNotificationService {
                 triggerEvent = findLatestEventTriggerReasonSpec(roboticsCaseDataDTO.getEvents());
             } else {
                 triggerEvent = findLatestEventTriggerReason(roboticsCaseDataDTO.getEvents());
-                log.info(String.format("triggerEvent %s", triggerEvent));
             }
             return Optional.of(EmailData.builder()
                                    .message(getMessage(params.getCaseData(), params.isMultiParty()))
@@ -154,7 +157,8 @@ public class RoboticsNotificationService {
         if (caseData.isRespondent1NotRepresented()) {
             if (caseData.isLipvLipOneVOne() && toggleService.isLipVLipEnabled()) {
                 if (nonNull(caseData.getPaymentTypeSelection())
-                    && caseData.getBusinessProcess().getCamundaEvent().equals(CaseEvent.DEFAULT_JUDGEMENT_SPEC.name())) {
+                    && (caseData.getBusinessProcess().getCamundaEvent().equals(CaseEvent.DEFAULT_JUDGEMENT_SPEC.name())
+                    || isNonDivergentSpecDJ(caseData))) {
                     subject = String.format(
                         "LiP v LiP Default Judgement Case Data for %s",
                         caseData.getLegacyCaseReference()
@@ -193,6 +197,11 @@ public class RoboticsNotificationService {
             subject = String.format("Multiparty LR v LR Case Data for %s - %s - %s",
                                     caseData.getLegacyCaseReference(),
                                     caseData.getCcdState(), triggerEvent
+            );
+        } else if (nonNull(caseData.getPaymentTypeSelection()) && caseData.isLipvLROneVOne()) {
+            subject = String.format(
+                "LIP v LR Default Judgment Case Data for %s",
+                caseData.getLegacyCaseReference()
             );
         } else if (caseData.isLipvLROneVOne()) {
             subject = String.format(
@@ -308,5 +317,10 @@ public class RoboticsNotificationService {
 
     private static String updateTriggerReason(List<Event> event, String triggerReason) {
         return getLastDetailsText(event).orElse(triggerReason);
+    }
+
+    private boolean isNonDivergentSpecDJ(CaseData caseData) {
+        return toggleService.isJOLiveFeedActive()
+            && caseData.getBusinessProcess().getCamundaEvent().equals(CaseEvent.DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC.name());
     }
 }

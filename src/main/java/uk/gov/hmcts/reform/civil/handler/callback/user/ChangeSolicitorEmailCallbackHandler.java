@@ -40,6 +40,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CHANGE_SOLICITOR_EMAIL;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
@@ -235,7 +236,12 @@ public class ChangeSolicitorEmailCallbackHandler extends CallbackHandler {
                 .respondentSolicitor2ServiceAddressRequired(temp.getRespondentSolicitor1ServiceAddressRequired())
                 .respondentSolicitor2ServiceAddress(temp.getRespondentSolicitor1ServiceAddress())
                 .respondentSolicitor2EmailAddress(temp.getRespondentSolicitor1EmailAddress())
-                .respondent2OrganisationPolicy(temp.getRespondent1OrganisationPolicy());
+                .respondent2OrganisationPolicy(OrganisationPolicy.builder()
+                        .organisation(temp.getRespondent1OrganisationPolicy().getOrganisation())
+                        .orgPolicyReference(temp.getRespondent1OrganisationPolicy().getOrgPolicyReference())
+                        .orgPolicyCaseAssignedRole(RESPONDENTSOLICITORTWO.getFormattedName())
+                        .build());
+
         }
         return caseBuilder;
     }

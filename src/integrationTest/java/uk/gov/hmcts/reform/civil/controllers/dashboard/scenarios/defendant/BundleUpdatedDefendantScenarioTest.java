@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
-import uk.gov.hmcts.reform.dashboard.data.TaskStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -97,7 +96,7 @@ public class BundleUpdatedDefendantScenarioTest extends CaseProgressionDashboard
                 jsonPath("$[0].titleCy").value("Mae bwndel yr achos wedi'i ddiweddaru"),
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Cafodd bwndel yr achos ei newid a'i ail-uwchlwytho ar " +
-                        DateUtils.formatDateInWelsh(LocalDateTime.of(2024, 4, 1, 0, 0).toLocalDate()) +
+                        DateUtils.formatDateInWelsh(LocalDateTime.of(2024, 4, 1, 0, 0).toLocalDate(), false) +
                         ". <a href=\"{VIEW_BUNDLE_REDIRECT}\" class=\"govuk-link\">Adolygu’r bwndel newydd</a></p>")
             );
         } else {
@@ -107,10 +106,8 @@ public class BundleUpdatedDefendantScenarioTest extends CaseProgressionDashboard
         if (isFastTrack) {
             taskListResultActions.andExpectAll(
                 status().is(HttpStatus.OK.value()),
-                jsonPath("$[0].taskNameEn").value("<a>Add the trial arrangements</a>"),
-                jsonPath("$[0].currentStatusEn").value(TaskStatus.INACTIVE.getName()),
-                jsonPath("$[1].reference").value(caseId.toString()),
-                jsonPath("$[1].taskNameEn").value(
+                jsonPath("$[0].reference").value(caseId.toString()),
+                jsonPath("$[0].taskNameEn").value(
                     "<a href={VIEW_BUNDLE} class=\"govuk-link\">View the bundle</a>")
             );
         }

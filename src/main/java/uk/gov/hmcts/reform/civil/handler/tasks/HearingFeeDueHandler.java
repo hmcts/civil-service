@@ -19,7 +19,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.HearingFeeDueSearchService;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -34,7 +34,7 @@ public class HearingFeeDueHandler extends BaseExternalTaskHandler {
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
-        List<CaseDetails> cases = caseSearchService.getCases();
+        Set<CaseDetails> cases = caseSearchService.getCases();
         log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
 
         cases.forEach(caseDetails -> {
@@ -43,27 +43,23 @@ public class HearingFeeDueHandler extends BaseExternalTaskHandler {
                 CaseData caseData = caseDetailsConverter.toCaseData(detailsWithData);
                 PaymentDetails hearingFeePaymentDetails = caseData.getHearingFeePaymentDetails();
 
-                if (featureToggleService.isMintiEnabled()) {
-                    if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
-                        if (caseData.getHearingDueDate() == null) {
-                            log.info("Current case status '{}'", caseDetails.getState());
-                            applicationEventPublisher.publishEvent(new NoHearingFeeDueEvent(caseDetails.getId()));
-                        } else {
-                            if ((hearingFeePaymentDetails != null
-                                && hearingFeePaymentDetails.getStatus() == PaymentStatus.SUCCESS)
-                                && caseData.getHearingDueDate().isBefore(LocalDate.now())
-                                || caseData.hearingFeePaymentDoneWithHWF()) {
-                                log.info("Current case status '{}'", caseDetails.getState());
-                                applicationEventPublisher.publishEvent(new HearingFeePaidEvent(caseDetails.getId()));
-                            } else if ((hearingFeePaymentDetails == null
-                                || hearingFeePaymentDetails.getStatus() == PaymentStatus.FAILED)
-                                && caseData.getHearingDueDate().isBefore(LocalDate.now())) {
-                                log.info("Current case status '{}'", caseDetails.getState());
-                                applicationEventPublisher.publishEvent(new HearingFeeUnpaidEvent(caseDetails.getId()));
-                            }
-                        }
+                if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
+                    if (caseData.getHearingDueDate() == null) {
+                        log.info("Current case status '{}'", caseDetails.getState());
+                        applicationEventPublisher.publishEvent(new NoHearingFeeDueEvent(caseDetails.getId()));
                     } else {
-                        preMultiIntermediateClaimLogic(caseDetails, hearingFeePaymentDetails, caseData);
+                        if ((hearingFeePaymentDetails != null
+                            && hearingFeePaymentDetails.getStatus() == PaymentStatus.SUCCESS)
+                            && caseData.getHearingDueDate().isBefore(LocalDate.now())
+                            || caseData.hearingFeePaymentDoneWithHWF()) {
+                            log.info("Current case status '{}'", caseDetails.getState());
+                            applicationEventPublisher.publishEvent(new HearingFeePaidEvent(caseDetails.getId()));
+                        } else if ((hearingFeePaymentDetails == null
+                            || hearingFeePaymentDetails.getStatus() == PaymentStatus.FAILED)
+                            && caseData.getHearingDueDate().isBefore(LocalDate.now())) {
+                            log.info("Current case status '{}'", caseDetails.getState());
+                            applicationEventPublisher.publishEvent(new HearingFeeUnpaidEvent(caseDetails.getId()));
+                        }
                     }
                 } else {
                     preMultiIntermediateClaimLogic(caseDetails, hearingFeePaymentDetails, caseData);

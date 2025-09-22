@@ -11,11 +11,11 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.properties.defaultjudgments.DefaultJudgmentSpecEmailConfiguration;
-import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
@@ -28,6 +28,7 @@ import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CASEWORKER_DJ_RECEIVED;
 import static uk.gov.hmcts.reform.civil.utils.DefaultJudgmentUtils.calculateFixedCosts;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @Slf4j
 @Service
@@ -89,13 +90,15 @@ public class DJCaseworkerReceivedNotificationHandler extends CallbackHandler imp
         final BigDecimal partialPayment = getPartialPayment(caseData);
         final BigDecimal total = amountClaimed.add(amountOfCosts).subtract(partialPayment);
         return new HashMap<>(Map.of(
-            CLAIM_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_NUMBER, caseData.getCcdCaseReference().toString(),
             PAYMENT_TYPE, getPaymentTypeField(caseData, total),
             AMOUNT_CLAIMED, amountClaimed.toString(),
             RESPONDENT, caseData.getDefendantDetailsSpec().getValue().getLabel(),
             AMOUNT_OF_COSTS, amountOfCosts.toString(),
             AMOUNT_PAID, partialPayment.toString(),
-            AMOUNT_OF_JUDGMENT, total.toString()
+            AMOUNT_OF_JUDGMENT, total.toString(),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
     }
 

@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.BundleCreationClaimantNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.dashboard.data.TaskStatus;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -53,10 +52,8 @@ public class BundleCreationClaimantScenarioTest extends CaseProgressionDashboard
         doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "CLAIMANT")
             .andExpectAll(
                 status().is(HttpStatus.OK.value()),
-                jsonPath("$[0].taskNameEn").value("<a>Add the trial arrangements</a>"),
-                jsonPath("$[0].currentStatusEn").value(TaskStatus.INACTIVE.getName()),
-                jsonPath("$[1].reference").value(caseId.toString()),
-                jsonPath("$[1].taskNameEn").value(
+                jsonPath("$[0].reference").value(caseId.toString()),
+                jsonPath("$[0].taskNameEn").value(
                     "<a href={VIEW_BUNDLE} class=\"govuk-link\">View the bundle</a>")
             );
     }

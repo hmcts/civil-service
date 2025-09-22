@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.utils;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
@@ -24,13 +23,9 @@ import static uk.gov.hmcts.reform.civil.utils.CaseFlagUtils.createOrUpdateFlags;
 @AllArgsConstructor
 public class CaseFlagsInitialiser {
 
-    private final FeatureToggleService featureToggleService;
     private final OrganisationService organisationService;
 
     public void initialiseCaseFlags(CaseEvent caseEvent, CaseData.CaseDataBuilder dataBuilder) {
-        if (!featureToggleService.isCaseFlagsEnabled()) {
-            return;
-        }
 
         CaseData caseData = dataBuilder.build();
         switch (caseEvent) {

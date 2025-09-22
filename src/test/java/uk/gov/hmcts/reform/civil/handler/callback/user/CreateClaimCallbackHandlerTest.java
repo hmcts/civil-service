@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
@@ -46,6 +45,7 @@ import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.service.CoreCaseEventDataService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -71,7 +71,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -168,6 +167,9 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private CaseFlagsInitialiser caseFlagInitialiser;
+
+    @MockBean
+    CoreCaseEventDataService coreCaseEventDataService;
 
     @Autowired
     private AssignCategoryId assignCategoryId;
@@ -1507,8 +1509,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldAddPartyIdsToPartyFields_whenInvoked() {
-            when(featureToggleService.isHmcEnabled()).thenReturn(true);
-
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData()).extracting("applicant1").hasFieldOrProperty("partyID");
@@ -1516,30 +1516,11 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldNotAddPartyIdsToPartyFields_whenInvokedWithHMCToggleOff() {
-            when(featureToggleService.isHmcEnabled()).thenReturn(false);
+        void shouldAddAnyRepresentedAsYes_whenCaseEventsEnabledOnly() {
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertThat(response.getData()).extracting("applicant1")
-                .isEqualTo(objMapper.convertValue(caseData.getApplicant1(), HashMap.class));
-            assertThat(response.getData()).extracting("respondent1")
-                .isEqualTo(objMapper.convertValue(caseData.getRespondent1(), HashMap.class));
-        }
-
-        @ParameterizedTest
-        @ValueSource(booleans = {true, false})
-        void shouldAddAnyRepresentedAsYes_whenCaseEventsEnabledOnly(boolean caseEventsEnabled) {
-            when(featureToggleService.isCaseEventsEnabled()).thenReturn(caseEventsEnabled);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            if (caseEventsEnabled) {
-                assertThat(response.getData().get("anyRepresented"))
-                    .isEqualTo("Yes");
-            } else {
-                assertThat(response.getData().get("anyRepresented")).isNull();
-            }
+            assertThat(response.getData().get("anyRepresented")).isEqualTo("Yes");
         }
 
         @Test
@@ -1583,7 +1564,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldAddCaseNamePublic_whenInvoked() {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertThat(response.getData()).containsEntry("caseNamePublic", "'John Rambo' v 'Sole Trader'");
+            assertThat(response.getData()).containsEntry("caseNamePublic", "John Rambo v Sole Trader");
         }
 
         @Test
@@ -1703,7 +1684,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT));
 
             assertThat(response.getData().get("caseNameHmctsInternal"))
-                .isEqualTo("'John Rambo' v 'Sole Trader', 'John Rambo'");
+                .isEqualTo("John Rambo v Sole Trader, John Rambo");
             assertThat(response.getData().get("caseManagementCategory")).extracting("value")
                 .extracting("code").isEqualTo("Civil");
         }
@@ -1716,7 +1697,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT));
 
             assertThat(response.getData().get("caseNameHmctsInternal"))
-                .isEqualTo("'John Rambo', 'Jason Rambo' v 'Sole Trader'");
+                .isEqualTo("John Rambo, Jason Rambo v Sole Trader");
             assertThat(response.getData().get("caseManagementCategory")).extracting("value")
                 .extracting("code").isEqualTo("Civil");
         }
@@ -1729,7 +1710,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT));
 
             assertThat(response.getData().get("caseNameHmctsInternal"))
-                .isEqualTo("'John Rambo' v 'Sole Trader'");
+                .isEqualTo("John Rambo v Sole Trader");
             assertThat(response.getData().get("caseManagementCategory")).extracting("value")
                 .extracting("code").isEqualTo("Civil");
         }
@@ -1746,21 +1727,10 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldsetClaimTypeFromClaimTypeUnspec_when_sdoR2Enabled() {
 
             CaseData localCaseData = CaseDataBuilder.builder().atStateClaimDraft().build();
-            when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
                 callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT));
             assertThat(response.getData())
                 .containsEntry("claimType", ClaimType.CLINICAL_NEGLIGENCE.name());
-        }
-
-        @Test
-        void shouldNotsetClaimTypeFromClaimTypeUnspec_when_sdoR2Disabled() {
-
-            when(featureToggleService.isSdoR2Enabled()).thenReturn(false);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
-                callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
-            assertThat(response.getData())
-                .containsEntry("claimType", ClaimType.PERSONAL_INJURY.name());
         }
 
         @Nested
@@ -1987,7 +1957,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 assertThat(response.getData())
                     .extracting("caseManagementLocation")
                     .extracting("region", "baseLocation")
-                    .containsExactly("4", "192280");
+                    .containsExactly("2", "420219");
             }
         }
 

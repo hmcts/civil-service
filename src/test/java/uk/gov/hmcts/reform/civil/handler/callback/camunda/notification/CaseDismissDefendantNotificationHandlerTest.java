@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
+import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -20,15 +22,28 @@ import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CNBC_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT_WELSH;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.OPENING_HOURS;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PHONE_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.SPEC_UNSPEC_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_HMCTS_SIGNATURE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_OPENING_HOURS;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_PHONE_CONTACT;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @ExtendWith(MockitoExtension.class)
 class CaseDismissDefendantNotificationHandlerTest {
@@ -39,8 +54,27 @@ class CaseDismissDefendantNotificationHandlerTest {
     @Mock
     private NotificationsProperties notificationsProperties;
 
+    @Mock
+    private FeatureToggleService featureToggleService;
+
+    @Mock
+    private NotificationsSignatureConfiguration configuration;
+
     @InjectMocks
     private CaseDismissDefendantNotificationHandler handler;
+
+    @BeforeEach
+    void setup() {
+        Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+        when(configuration.getHmctsSignature()).thenReturn((String) configMap.get("hmctsSignature"));
+        when(configuration.getPhoneContact()).thenReturn((String) configMap.get("phoneContact"));
+        when(configuration.getOpeningHours()).thenReturn((String) configMap.get("openingHours"));
+        when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("welshHmctsSignature"));
+        when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("welshPhoneContact"));
+        when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
+        when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
+        when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
+    }
 
     private CaseDataBuilder commonCaseData() {
         return CaseDataBuilder.builder().atStateClaimDetailsNotified()
@@ -53,7 +87,7 @@ class CaseDismissDefendantNotificationHandlerTest {
             .respondentSolicitor1EmailAddress("solicitor@example.com");
     }
 
-    private CaseData getCaseData(boolean isRespondentLiP, boolean isRespondentBilingual) {
+    private CaseData getCaseData(boolean isRespondentLiP, boolean isRespondentBilingual, boolean isRespondent1) {
         RespondentLiPResponse respondentLip = RespondentLiPResponse.builder()
             .respondent1ResponseLanguage(isRespondentBilingual ? Language.BOTH.toString()
                                              : Language.ENGLISH.toString()).build();
@@ -63,25 +97,34 @@ class CaseDismissDefendantNotificationHandlerTest {
             .build().toBuilder()
             .caseDataLiP(CaseDataLiP.builder()
                              .respondent1LiPResponse(respondentLip).build())
+            .respondent2(!isRespondent1 ? Party.builder().individualFirstName("John").individualLastName("Johnson")
+                             .partyEmail("defendant2@hmcts.net")
+                             .type(Party.Type.INDIVIDUAL).build() : null)
+            .respondentSolicitor2EmailAddress(!isRespondent1 ? "solicitor2@example.com" : null)
+            .addRespondent2(!isRespondent1 ? YesOrNo.YES : YesOrNo.NO)
+            .respondent2SameLegalRepresentative(!isRespondent1 ? YesOrNo.NO : null)
             .build();
     }
 
     static Stream<Arguments> provideCaseData() {
         return Stream.of(
-            Arguments.of(true, true, "bilingual-template"),
-            Arguments.of(true, false, "default-template"),
-            Arguments.of(false, false, "solicitor-template")
+            Arguments.of(true, true, true, "bilingual-template"),
+            Arguments.of(true, false, true, "default-template"),
+            Arguments.of(false, false, true, "solicitor-template"),
+            Arguments.of(false, false, false, "solicitor-template")
         );
     }
 
     @ParameterizedTest
     @MethodSource("provideCaseData")
-    void sendNotificationShouldSendEmail(boolean isRespondentLiP, boolean isRespondentBilingual, String template) {
-        CaseData caseData = getCaseData(isRespondentLiP, isRespondentBilingual);
+    void sendNotificationShouldSendEmail(boolean isRespondentLiP, boolean isRespondentBilingual, boolean isRespondent1, String template) {
+        CaseData caseData = getCaseData(isRespondentLiP, isRespondentBilingual, isRespondent1);
 
         CallbackRequest callbackRequest = CallbackRequest
             .builder()
-            .eventId(CaseEvent.NOTIFY_DEFENDANT_DISMISS_CASE.name())
+            .eventId(isRespondent1
+                         ? CaseEvent.NOTIFY_DEFENDANT_DISMISS_CASE.name()
+                         : CaseEvent.NOTIFY_DEFENDANT_TWO_DISMISS_CASE.name())
             .build();
         CallbackParams params = CallbackParams.builder()
             .request(callbackRequest)
@@ -89,26 +132,68 @@ class CaseDismissDefendantNotificationHandlerTest {
             .type(ABOUT_TO_SUBMIT)
             .build();
 
+        Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
         if (isRespondentLiP && isRespondentBilingual) {
             when(notificationsProperties.getNotifyLipUpdateTemplateBilingual()).thenReturn("bilingual-template");
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
         } else if (isRespondentLiP) {
             when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn("default-template");
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
         } else {
             when(notificationsProperties.getNotifyLRCaseDismissed()).thenReturn("solicitor-template");
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
         }
 
         CallbackResponse response = handler.sendNotification(params);
 
+        String email;
+        if (isRespondentLiP) {
+            email = "defendant@hmcts.net";
+        } else if (isRespondent1) {
+            email = "solicitor@example.com";
+        } else {
+            email = "solicitor2@example.com";
+        }
+
+        Map<String, String> commonProps = addCommonProperties(isRespondentLiP);
+
+        Map<String, String> notificationData = new HashMap<>(commonProps);
+        notificationData.put("claimReferenceNumber", "1594901956117591");
+        notificationData.put("name", isRespondent1 ? "Jack Jackson" : "John Johnson");
+        notificationData.put("claimantvdefendant", isRespondent1
+            ? "John Doe V Jack Jackson"
+            : "John Doe V Jack Jackson, John Johnson");
+        notificationData.put("partyReferences", buildPartiesReferencesEmailSubject(caseData));
+        notificationData.put("casemanRef", caseData.getLegacyCaseReference());
+
         verify(notificationService).sendMail(
-            isRespondentLiP ? "defendant@hmcts.net" : "solicitor@example.com",
+            email,
             template,
-            Map.of(
-                "claimReferenceNumber", "1594901956117591",
-                "name", "Jack Jackson",
-                "claimantvdefendant", "John Doe V Jack Jackson"
-            ),
+            notificationData,
             "dismiss-case-defendant-notification-1594901956117591"
         );
-        assertNotNull(response);
+    }
+
+    @NotNull
+    public Map<String, String> addCommonProperties(boolean isLipCase) {
+        Map<String, String> expectedProperties = new HashMap<>();
+        expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
+        expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
+        expectedProperties.put(HMCTS_SIGNATURE, configuration.getHmctsSignature());
+        expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
+        expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
+        expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
+        expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
+        expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+        if (isLipCase) {
+            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+            expectedProperties.put(CNBC_CONTACT, configuration.getCnbcContact());
+        } else {
+            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getRaiseQueryLr());
+            expectedProperties.put(CNBC_CONTACT, configuration.getRaiseQueryLr());
+        }
+        return expectedProperties;
     }
 }

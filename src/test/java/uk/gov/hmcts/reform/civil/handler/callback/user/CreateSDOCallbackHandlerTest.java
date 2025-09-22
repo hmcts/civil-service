@@ -10,6 +10,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentMatchers;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
@@ -32,18 +33,15 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.enums.sdo.AddOrRemoveToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrack;
-import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.HearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.HearingOnRadioOptions;
 import uk.gov.hmcts.reform.civil.enums.sdo.IncludeInOrderToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
 import uk.gov.hmcts.reform.civil.enums.sdo.PhysicalTrialBundleOptions;
-import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2PhysicalTrialBundleOptions;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2TimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallTrack;
@@ -54,6 +52,8 @@ import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.SDOHearingNotes;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -97,6 +97,7 @@ import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.camunda.UpdateWaCourtLocationsService;
 import uk.gov.hmcts.reform.civil.service.docmosis.sdo.SdoGeneratorService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
@@ -115,11 +116,13 @@ import java.util.stream.Stream;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -171,6 +174,7 @@ import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantFastTrack.WRITT
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate.FIVE_HOURS;
@@ -181,6 +185,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackH
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.CONFIRMATION_SUMMARY_2v1;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.ERROR_MESSAGE_DATE_MUST_BE_IN_THE_FUTURE;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.ERROR_MESSAGE_NUMBER_CANNOT_BE_LESS_THAN_ZERO;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.ERROR_MINTI_DISPOSAL_NOT_ALLOWED;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.FEEDBACK_LINK;
 
 @SpringBootTest(classes = {
@@ -238,6 +243,12 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     @MockBean
     private CategoryService categoryService;
 
+    @Mock
+    private LocationHelper locationHelper;
+
+    @MockBean
+    private UpdateWaCourtLocationsService updateWaCourtLocationsService;
+
     @Nested
     class AboutToStartCallback extends LocationRefSampleDataBuilder {
         @BeforeEach
@@ -249,6 +260,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .thenReturn(LocalDate.now().plusDays(5));
             when(deadlinesCalculator.getOrderSetAsideOrVariedApplicationDeadline(ArgumentMatchers.any(LocalDateTime.class)))
                 .thenReturn(LocalDate.now().plusDays(7));
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
         }
 
         @Test
@@ -299,6 +311,214 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldPopulateLocationListsWithPreselectedCourtAndEnableWelshFlagWithClaimantLanguagePreference() {
+            Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag(
+                "Y").build();
+            CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
+            String preSelectedCourt = "214320";
+            List<LocationRefData> locations = List.of(
+                LocationRefData.builder().epimmsId("00001").courtLocationCode("00001")
+                    .siteName("court 1").courtAddress("1 address").postcode("Y01 7RB").build(),
+                LocationRefData.builder().epimmsId(preSelectedCourt).courtLocationCode(preSelectedCourt)
+                    .siteName("court 2").courtAddress("2 address").postcode("Y02 7RB").build(),
+                LocationRefData.builder().epimmsId("00003").courtLocationCode("00003")
+                    .siteName("court 3").courtAddress("3 address").postcode("Y03 7RB").build()
+            );
+            when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
+            when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
+                categorySearchResult));
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .atStateClaimIssuedDisposalHearingSDOInPersonHearing()
+                .claimantBilingualLanguagePreference("BOTH")
+                .caseAccessCategory(UNSPEC_CLAIM)
+                .build();
+
+            CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_START);
+            CaseDocument order = CaseDocument.builder().documentLink(
+                    Document.builder().documentUrl("url").build())
+                .build();
+            when(sdoGeneratorService.generate(any(), any())).thenReturn(order);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+
+            DynamicList expected = DynamicList.builder()
+                .listItems(List.of(
+                               DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
+                               DynamicListElement.builder().code(preSelectedCourt).label("court 2 - 2 address - Y02 7RB").build(),
+                               DynamicListElement.builder().code("00003").label("court 3 - 3 address - Y03 7RB").build()
+                           )
+                )
+                .value(DynamicListElement.builder().code(preSelectedCourt).label("court 2 - 2 address - Y02 7RB").build())
+                .build();
+
+            assertThat(responseCaseData.getDisposalHearingMethodInPerson()).isEqualTo(expected);
+            assertThat(responseCaseData.getFastTrackMethodInPerson()).isEqualTo(expected);
+            assertThat(responseCaseData.getSmallClaimsMethodInPerson()).isEqualTo(expected);
+            assertThat(responseCaseData.getBilingualHint()).isEqualTo(YES);
+        }
+
+        @Test
+        void shouldPopulateLocationListsWithPreselectedCourtAndEnableWelshFlagWithRespondentLanguagePreference() {
+            Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag(
+                "Y").build();
+            CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
+            String preSelectedCourt = "214320";
+            List<LocationRefData> locations = List.of(
+                LocationRefData.builder().epimmsId("00001").courtLocationCode("00001")
+                    .siteName("court 1").courtAddress("1 address").postcode("Y01 7RB").build(),
+                LocationRefData.builder().epimmsId(preSelectedCourt).courtLocationCode(preSelectedCourt)
+                    .siteName("court 2").courtAddress("2 address").postcode("Y02 7RB").build(),
+                LocationRefData.builder().epimmsId("00003").courtLocationCode("00003")
+                    .siteName("court 3").courtAddress("3 address").postcode("Y03 7RB").build()
+            );
+            when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
+            when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
+                categorySearchResult));
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder()
+                .caseDataLip(CaseDataLiP.builder()
+                                 .respondent1LiPResponse(RespondentLiPResponse.builder()
+                                                             .respondent1ResponseLanguage("BOTH").build()).build())
+                .atStateClaimDraft()
+                .atStateClaimIssuedDisposalHearingSDOInPersonHearing()
+                .claimantBilingualLanguagePreference("ENGLISH")
+                .caseAccessCategory(UNSPEC_CLAIM)
+                .build();
+
+            CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_START);
+            CaseDocument order = CaseDocument.builder().documentLink(
+                    Document.builder().documentUrl("url").build())
+                .build();
+            when(sdoGeneratorService.generate(any(), any())).thenReturn(order);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+
+            DynamicList expected = DynamicList.builder()
+                .listItems(List.of(
+                               DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
+                               DynamicListElement.builder().code(preSelectedCourt).label("court 2 - 2 address - Y02 7RB").build(),
+                               DynamicListElement.builder().code("00003").label("court 3 - 3 address - Y03 7RB").build()
+                           )
+                )
+                .value(DynamicListElement.builder().code(preSelectedCourt).label("court 2 - 2 address - Y02 7RB").build())
+                .build();
+
+            assertThat(responseCaseData.getDisposalHearingMethodInPerson()).isEqualTo(expected);
+            assertThat(responseCaseData.getFastTrackMethodInPerson()).isEqualTo(expected);
+            assertThat(responseCaseData.getSmallClaimsMethodInPerson()).isEqualTo(expected);
+            assertThat(responseCaseData.getBilingualHint()).isEqualTo(YES);
+        }
+
+        @Test
+        void shouldPopulateLocationListsWithPreselectedCourtAndEnableWelshFlagWithNoClaimantAndRespondentLanguagePreference() {
+            Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag(
+                "Y").build();
+            CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
+            String preSelectedCourt = "214320";
+            List<LocationRefData> locations = List.of(
+                LocationRefData.builder().epimmsId("00001").courtLocationCode("00001")
+                    .siteName("court 1").courtAddress("1 address").postcode("Y01 7RB").build(),
+                LocationRefData.builder().epimmsId(preSelectedCourt).courtLocationCode(preSelectedCourt)
+                    .siteName("court 2").courtAddress("2 address").postcode("Y02 7RB").build(),
+                LocationRefData.builder().epimmsId("00003").courtLocationCode("00003")
+                    .siteName("court 3").courtAddress("3 address").postcode("Y03 7RB").build()
+            );
+            when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
+            when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
+                categorySearchResult));
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder()
+                .caseDataLip(CaseDataLiP.builder()
+                                 .respondent1LiPResponse(RespondentLiPResponse.builder()
+                                                             .respondent1ResponseLanguage("BOTH").build()).build())
+                .atStateClaimDraft()
+                .atStateClaimIssuedDisposalHearingSDOInPersonHearing()
+                .claimantBilingualLanguagePreference("BOTH")
+                .caseAccessCategory(UNSPEC_CLAIM)
+                .build();
+
+            CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_START);
+            CaseDocument order = CaseDocument.builder().documentLink(
+                    Document.builder().documentUrl("url").build())
+                .build();
+            when(sdoGeneratorService.generate(any(), any())).thenReturn(order);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+
+            DynamicList expected = DynamicList.builder()
+                .listItems(List.of(
+                               DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
+                               DynamicListElement.builder().code(preSelectedCourt).label("court 2 - 2 address - Y02 7RB").build(),
+                               DynamicListElement.builder().code("00003").label("court 3 - 3 address - Y03 7RB").build()
+                           )
+                )
+                .value(DynamicListElement.builder().code(preSelectedCourt).label("court 2 - 2 address - Y02 7RB").build())
+                .build();
+
+            assertThat(responseCaseData.getDisposalHearingMethodInPerson()).isEqualTo(expected);
+            assertThat(responseCaseData.getFastTrackMethodInPerson()).isEqualTo(expected);
+            assertThat(responseCaseData.getSmallClaimsMethodInPerson()).isEqualTo(expected);
+            assertThat(responseCaseData.getBilingualHint()).isEqualTo(YES);
+        }
+
+        @Test
+        void shouldPopulateLocationListsWithPreselectedCourtAndEnableWelshFlagWithClaimantAndRespondentLanguagePreference() {
+            Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag(
+                "Y").build();
+            CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
+            String preSelectedCourt = "214320";
+            List<LocationRefData> locations = List.of(
+                LocationRefData.builder().epimmsId("00001").courtLocationCode("00001")
+                    .siteName("court 1").courtAddress("1 address").postcode("Y01 7RB").build(),
+                LocationRefData.builder().epimmsId(preSelectedCourt).courtLocationCode(preSelectedCourt)
+                    .siteName("court 2").courtAddress("2 address").postcode("Y02 7RB").build(),
+                LocationRefData.builder().epimmsId("00003").courtLocationCode("00003")
+                    .siteName("court 3").courtAddress("3 address").postcode("Y03 7RB").build()
+            );
+            when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
+            when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
+                categorySearchResult));
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder()
+                .caseDataLip(CaseDataLiP.builder()
+                                 .respondent1LiPResponse(RespondentLiPResponse.builder()
+                                                             .respondent1ResponseLanguage("ENGLISH").build()).build())
+                .atStateClaimDraft()
+                .atStateClaimIssuedDisposalHearingSDOInPersonHearing()
+                .claimantBilingualLanguagePreference("ENGLISH")
+                .caseAccessCategory(UNSPEC_CLAIM)
+                .build();
+
+            CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_START);
+            CaseDocument order = CaseDocument.builder().documentLink(
+                    Document.builder().documentUrl("url").build())
+                .build();
+            when(sdoGeneratorService.generate(any(), any())).thenReturn(order);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+
+            DynamicList expected = DynamicList.builder()
+                .listItems(List.of(
+                               DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
+                               DynamicListElement.builder().code(preSelectedCourt).label("court 2 - 2 address - Y02 7RB").build(),
+                               DynamicListElement.builder().code("00003").label("court 3 - 3 address - Y03 7RB").build()
+                           )
+                )
+                .value(DynamicListElement.builder().code(preSelectedCourt).label("court 2 - 2 address - Y02 7RB").build())
+                .build();
+
+            assertThat(responseCaseData.getDisposalHearingMethodInPerson()).isEqualTo(expected);
+            assertThat(responseCaseData.getFastTrackMethodInPerson()).isEqualTo(expected);
+            assertThat(responseCaseData.getSmallClaimsMethodInPerson()).isEqualTo(expected);
+            assertThat(responseCaseData.getBilingualHint()).isNull();
+        }
+
+        @Test
         void shouldGenerateDynamicListsCorrectly() {
             Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag(
                 "Y").build();
@@ -341,7 +561,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldClearDataIfStateIsCaseProgression() {
-            when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
             List<FastTrack> directions = List.of(FastTrack.fastClaimBuildingDispute);
             List<SmallTrack> smallDirections = List.of(SmallTrack.smallClaimCreditHire);
             DisposalHearingAddNewDirections disposalHearingAddNewDirections = DisposalHearingAddNewDirections.builder()
@@ -413,8 +632,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPopulateHearingCourtLocationForNihl() {
-            when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
-
             String preSelectedCourt = "214320";
             List<LocationRefData> locations = List.of(
                 LocationRefData.builder().epimmsId("00001").courtLocationCode("00001")
@@ -465,8 +682,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPopulateDefaultFieldsForNihl() {
-            when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
-
             List<FastTrack> fastTrackList = new ArrayList<FastTrack>();
             fastTrackList.add(FastTrack.fastClaimNoiseInducedHearingLoss);
 
@@ -703,7 +918,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .atStateClaimIssuedDisposalHearingSDOInPersonHearing().build();
 
-            when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -752,9 +966,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 SdoR2UiConstantFastTrack.DEADLINE_EVIDENCE);
         }
 
-        @ParameterizedTest
-        @ValueSource(booleans = {true, false})
-        void shouldPopulateWelshSectionForSDOR2(boolean valid) {
+        @Test
+        void shouldPopulateWelshSectionForSDOR2() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .build()
@@ -762,29 +975,21 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .claimsTrack(ClaimsTrack.smallClaimsTrack)
                 .drawDirectionsOrderRequired(NO).build();
 
-            when(featureToggleService.isSdoR2Enabled()).thenReturn(valid);
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_START);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
-            if (valid) {
-                assertThat(response.getData()).extracting("sdoR2FastTrackUseOfWelshLanguage")
-                    .extracting("description").isEqualTo(WELSH_LANG_DESCRIPTION);
-                assertThat(response.getData()).extracting("sdoR2SmallClaimsUseOfWelshLanguage")
-                    .extracting("description").isEqualTo(WELSH_LANG_DESCRIPTION);
-                assertThat(response.getData()).extracting("sdoR2DisposalHearingUseOfWelshLanguage")
-                    .extracting("description").isEqualTo(WELSH_LANG_DESCRIPTION);
-                assertThat(response.getData()).extracting("sdoR2DrhUseOfWelshLanguage")
-                    .extracting("description").isEqualTo(WELSH_LANG_DESCRIPTION);
-                assertThat(response.getData()).extracting("sdoR2NihlUseOfWelshLanguage")
-                    .extracting("description").isEqualTo(WELSH_LANG_DESCRIPTION);
-            } else {
-                assertThat(responseCaseData.getSdoR2FastTrackUseOfWelshLanguage()).isNull();
-                assertThat(responseCaseData.getSdoR2SmallClaimsUseOfWelshLanguage()).isNull();
-                assertThat(responseCaseData.getSdoR2DisposalHearingUseOfWelshLanguage()).isNull();
-                assertThat(responseCaseData.getSdoR2DrhUseOfWelshLanguage()).isNull();
-                assertThat(responseCaseData.getSdoR2NihlUseOfWelshLanguage()).isNull();
-            }
+
+            assertThat(response.getData()).extracting("sdoR2FastTrackUseOfWelshLanguage")
+                .extracting("description").isEqualTo(WELSH_LANG_DESCRIPTION);
+            assertThat(response.getData()).extracting("sdoR2SmallClaimsUseOfWelshLanguage")
+                .extracting("description").isEqualTo(WELSH_LANG_DESCRIPTION);
+            assertThat(response.getData()).extracting("sdoR2DisposalHearingUseOfWelshLanguage")
+                .extracting("description").isEqualTo(WELSH_LANG_DESCRIPTION);
+            assertThat(response.getData()).extracting("sdoR2DrhUseOfWelshLanguage")
+                .extracting("description").isEqualTo(WELSH_LANG_DESCRIPTION);
+            assertThat(response.getData()).extracting("sdoR2NihlUseOfWelshLanguage")
+                .extracting("description").isEqualTo(WELSH_LANG_DESCRIPTION);
+
         }
 
         @Test
@@ -904,8 +1109,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             given(time.now()).willReturn(submittedDate);
 
             given(featureToggleService.isLocationWhiteListedForCaseProgression(anyString())).willReturn(true);
-
-            given(featureToggleService.isEarlyAdoptersEnabled()).willReturn(true);
+            given(featureToggleService.isHmcForLipEnabled()).willReturn(false);
         }
 
         @Test
@@ -939,6 +1143,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             userId = UUID.randomUUID().toString();
 
             given(time.now()).willReturn(submittedDate);
+            when(featureToggleService.isHmcForLipEnabled()).thenReturn(false);
         }
 
         @Test
@@ -966,50 +1171,59 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
     }
 
-    @ParameterizedTest
-    @CsvSource({"true", "false"})
-    void shouldSetEarlyAdoptersFlag_whenDisposal(Boolean isLocationWhiteListed) {
-        DynamicList localOptions = DynamicList.builder()
-            .listItems(List.of(
-                           DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
-                           DynamicListElement.builder().code("00002").label("court 2 - 2 address - Y02 7RB").build(),
-                           DynamicListElement.builder().code("00003").label("court 3 - 3 address - Y03 7RB").build()
-                       )
-            )
-            .build();
+    @Nested
+    class AboutToSubmitCallbackWelshParty {
 
-        DynamicListElement selectedCourt = DynamicListElement.builder()
-            .code("00002").label("court 2 - 2 address - Y02 7RB").build();
+        private String userId;
 
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
-            .disposalHearingMethod(DisposalHearingMethod.disposalHearingMethodInPerson)
-            .disposalHearingMethodInPerson(localOptions.toBuilder().value(selectedCourt).build())
-            .fastTrackMethodInPerson(localOptions)
-            .smallClaimsMethodInPerson(localOptions)
-            .disposalHearingMethodInPerson(localOptions.toBuilder().value(selectedCourt).build())
-            .disposalHearingMethodToggle(Collections.singletonList(OrderDetailsPagesSectionsToggle.SHOW))
-            .orderType(OrderType.DISPOSAL)
-            .build();
+        private static final String EMAIL = "example@email.com";
+        private final LocalDateTime submittedDate = LocalDateTime.now();
 
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
-        when(featureToggleService.isLocationWhiteListedForCaseProgression(selectedCourt.getCode())).thenReturn(
-            isLocationWhiteListed);
-        when(featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())).thenReturn(
-            isLocationWhiteListed);
-        when(locationRefDataService.getLocationMatchingLabel(selectedCourt.getCode(), params.getParams().get(
-            CallbackParams.Params.BEARER_TOKEN).toString()))
-            .thenReturn(Optional.of(LocationRefData.builder()
-                                        .regionId("region id")
-                                        .epimmsId("epimms id")
-                                        .siteName("site name")
-                                        .build()));
+        @BeforeEach
+        void setup() {
+            userId = UUID.randomUUID().toString();
 
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+            given(time.now()).willReturn(submittedDate);
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
+        }
 
-        assertThat(responseCaseData.getEaCourtLocation()).isEqualTo(isLocationWhiteListed ? YES : NO);
+        @Test
+        void shouldSaveDocumentToTempList_whenClaimantIsWelsh() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+                .sdoOrderDocument(CaseDocument.builder().documentLink(
+                        Document.builder().documentUrl("url").build())
+                                      .build())
+                .claimantBilingualLanguagePreference("WELSH")
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
+                .build().toBuilder()
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).doesNotContainKey("sdoOrderDocument");
+            assertThat(response.getData()).doesNotContainKey("systemGeneratedCaseDocuments");
+            assertThat(response.getData()).containsKey("preTranslationDocuments");
+        }
+
+        @Test
+        void shouldSaveDocumentToTempList_whenDefendantIsWelsh() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+                .sdoOrderDocument(CaseDocument.builder().documentLink(
+                        Document.builder().documentUrl("url").build())
+                                      .build())
+                .caseDataLiP(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH").build()).build())
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
+                .build().toBuilder()
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).doesNotContainKey("sdoOrderDocument");
+            assertThat(response.getData()).doesNotContainKey("systemGeneratedCaseDocuments");
+            assertThat(response.getData()).containsKey("preTranslationDocuments");
+        }
     }
 
     @ParameterizedTest
@@ -1040,7 +1254,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             .build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
         when(featureToggleService.isLocationWhiteListedForCaseProgression(selectedCourt.getCode()))
             .thenReturn(isLocationWhiteListed);
         when(locationRefDataService.getLocationMatchingLabel(selectedCourt.getCode(), params.getParams().get(
@@ -1058,471 +1271,82 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @ParameterizedTest
-    @CsvSource({"true", "false"})
-    void shouldSetEarlyAdoptersFlag_whenSmallClaims(Boolean isLocationWhiteListed) {
-        DynamicList localOptions = DynamicList.builder()
-            .listItems(List.of(
-                           DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
-                           DynamicListElement.builder().code("00002").label("court 2 - 2 address - Y02 7RB").build(),
-                           DynamicListElement.builder().code("00003").label("court 3 - 3 address - Y03 7RB").build()
-                       )
-            )
-            .build();
+    @CsvSource({
+        //LR scenarios trigger and ignore hmcLipEnabled
+        "true, YES, YES, true, YES",
+        "false, YES, YES, true, YES",
+        // LiP vs LR - ignore HMC court
+        "true,  NO, YES, false, NO",
+        "true,  NO, YES, TRUE, YES",
+        "false,  NO, YES, true, NO",
+        //LR vs LiP - ignore HMC court
+        "true, YES, NO, true, YES",
+        "false, YES, NO, true, NO",
+        //LiP vs LiP - ignore HMC court
+        "true, NO, NO, true, YES",
+        "false, NO, NO, true, NO"
+    })
+    void shouldPopulateHmcLipEnabled_whenLiPAndHmcLipEnabled(boolean isCPAndWhitelisted, YesOrNo applicantRepresented,
+                                                             YesOrNo respondent1Represented, boolean defendantNocOnline,
+                                                             YesOrNo eaCourtLocation) {
 
-        DynamicListElement selectedCourt = DynamicListElement.builder()
-            .code("00002").label("court 2 - 2 address - Y02 7RB").build();
+        if (NO.equals(respondent1Represented) || NO.equals(applicantRepresented)) {
+            when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(isCPAndWhitelisted);
+        } else {
+            when(featureToggleService.isLocationWhiteListedForCaseProgression(any())).thenReturn(isCPAndWhitelisted);
+        }
+        when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(defendantNocOnline);
+        CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                        .region("2")
+                                        .baseLocation("111")
+                                        .build())
+            .transferCourtLocationList(DynamicList.builder().value(DynamicListElement.builder()
+                                                                       .label("Site 1 - Adr 1 - AAA 111").build()).build()).build();
 
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
-            .smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodInPerson)
-            .disposalHearingMethodInPerson(localOptions)
-            .fastTrackMethodInPerson(localOptions)
-            .smallClaimsMethodInPerson(localOptions.toBuilder().value(selectedCourt).build())
-            .claimsTrack(ClaimsTrack.smallClaimsTrack)
-            .setSmallClaimsFlag(YES)
-            .drawDirectionsOrderRequired(NO)
-            .build();
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
-        when(featureToggleService.isLocationWhiteListedForCaseProgression(selectedCourt.getCode()))
-            .thenReturn(isLocationWhiteListed);
-        when(featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation()))
-            .thenReturn(isLocationWhiteListed);
-        when(locationRefDataService.getLocationMatchingLabel("label 1", params.getParams().get(
-            CallbackParams.Params.BEARER_TOKEN).toString())).thenReturn(
-            Optional.of(LocationRefData.builder()
-                            .regionId("region id")
-                            .epimmsId("epimms id")
-                            .siteName("location name")
-                            .build()));
-
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CallbackParams params = callbackParamsOf(caseData.toBuilder()
+                                                     .applicant1Represented(applicantRepresented)
+                                                     .respondent1Represented(respondent1Represented)
+                                                     .build(), ABOUT_TO_SUBMIT);
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
 
-        assertThat(responseCaseData.getEaCourtLocation()).isEqualTo(isLocationWhiteListed ? YES : NO);
-    }
-
-    @ParameterizedTest
-    @CsvSource({"true", "false"})
-    void shouldSetEarlyAdoptersFlag_whenFastTrack(Boolean isLocationWhiteListed) {
-        DynamicList localOptions = DynamicList.builder()
-            .listItems(List.of(
-                           DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
-                           DynamicListElement.builder().code("00002").label("court 2 - 2 address - Y02 7RB").build(),
-                           DynamicListElement.builder().code("00003").label("court 3 - 3 address - Y03 7RB").build()
-                       )
-            )
-            .build();
-
-        DynamicListElement selectedCourt = DynamicListElement.builder()
-            .code("00002").label("court 2 - 2 address - Y02 7RB").build();
-
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
-            .fastTrackMethod(FastTrackMethod.fastTrackMethodInPerson)
-            .smallClaimsMethodInPerson(localOptions)
-            .isSdoR2NewScreen(NO)
-            .fastTrackMethodInPerson(localOptions.toBuilder().value(selectedCourt).build())
-            .disposalHearingMethodInPerson(localOptions)
-            .claimsTrack(ClaimsTrack.fastTrack)
-            .setFastTrackFlag(YES)
-            .drawDirectionsOrderRequired(NO)
-            .build();
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
-        when(featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation()))
-            .thenReturn(isLocationWhiteListed);
-        when(featureToggleService.isLocationWhiteListedForCaseProgression((selectedCourt.getCode()))).thenReturn(
-            isLocationWhiteListed);
-        when(locationRefDataService.getLocationMatchingLabel("label 1", params.getParams().get(
-            CallbackParams.Params.BEARER_TOKEN).toString())).thenReturn(
-            Optional.of(LocationRefData.builder()
-                            .regionId("region id")
-                            .epimmsId("epimms id")
-                            .siteName("location name")
-                            .build()));
-
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
-
-        assertThat(responseCaseData.getEaCourtLocation()).isEqualTo(isLocationWhiteListed ? YES : NO);
-    }
-
-    @ParameterizedTest
-    @CsvSource({"true", "false"})
-    void shouldSetEarlyAdoptersFlag_whenFastTrackNihl(Boolean isLocationWhiteListed) {
-        DynamicList localOptions = DynamicList.builder()
-            .listItems(List.of(
-                           DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
-                           DynamicListElement.builder().code("00002").label("court 2 - 2 address - Y02 7RB").build(),
-                           DynamicListElement.builder().code("00003").label("court 3 - 3 address - Y03 7RB").build()
-                       )
-            )
-            .build();
-
-        DynamicListElement selectedCourt = DynamicListElement.builder()
-            .code("00002").label("court 2 - 2 address - Y02 7RB").build();
-
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
-            .fastTrackMethod(FastTrackMethod.fastTrackMethodInPerson)
-            .fastClaims(List.of(FastTrack.fastClaimNoiseInducedHearingLoss))
-            .isSdoR2NewScreen(YES)
-            .disposalHearingMethodInPerson(localOptions)
-            .claimsTrack(ClaimsTrack.fastTrack)
-            .setFastTrackFlag(YES)
-            .drawDirectionsOrderRequired(NO)
-            .sdoR2Trial(SdoR2Trial.builder().hearingCourtLocationList(localOptions.toBuilder().value(selectedCourt).build()).build())
-            .build();
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
-        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
-        when(featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())).thenReturn(
-            isLocationWhiteListed);
-        when(featureToggleService.isLocationWhiteListedForCaseProgression((selectedCourt.getCode()))).thenReturn(
-            isLocationWhiteListed);
-        when(locationRefDataService.getLocationMatchingLabel("label 1", params.getParams().get(
-            CallbackParams.Params.BEARER_TOKEN).toString())).thenReturn(
-            Optional.of(LocationRefData.builder()
-                            .regionId("region id")
-                            .epimmsId("epimms id")
-                            .siteName("location name")
-                            .build()));
-
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
-
-        assertThat(responseCaseData.getEaCourtLocation()).isEqualTo(isLocationWhiteListed ? YES : NO);
-    }
-
-    @ParameterizedTest
-    @CsvSource({"true", "false"})
-    void shouldSetEarlyAdoptersFlag_whenFastTrackNihlAltLocation(Boolean isLocationWhiteListed) {
-        DynamicList localOptions = DynamicList.builder()
-            .listItems(List.of(
-                           DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
-                           DynamicListElement.builder().code("00002").label("court 2 - 2 address - Y02 7RB").build(),
-                           DynamicListElement.builder().code("00003").label("court 3 - 3 address - Y03 7RB").build()
-                       )
-            )
-            .build();
-
-        DynamicListElement selectedCourt = DynamicListElement.builder()
-            .code("00002").label("court 2 - 2 address - Y02 7RB").build();
-
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
-            .fastTrackMethod(FastTrackMethod.fastTrackMethodInPerson)
-            .fastClaims(List.of(FastTrack.fastClaimNoiseInducedHearingLoss))
-            .isSdoR2NewScreen(YES)
-            .disposalHearingMethodInPerson(localOptions)
-            .claimsTrack(ClaimsTrack.fastTrack)
-            .setFastTrackFlag(YES)
-            .drawDirectionsOrderRequired(NO)
-            .sdoR2Trial(SdoR2Trial.builder().altHearingCourtLocationList(localOptions.toBuilder().value(selectedCourt).build()).build())
-            .build();
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
-        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
-        when(featureToggleService.isLocationWhiteListedForCaseProgression(selectedCourt.getCode()))
-            .thenReturn(isLocationWhiteListed);
-        when(featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())).thenReturn(
-            isLocationWhiteListed);
-        when(locationRefDataService.getLocationMatchingLabel("label 1", params.getParams().get(
-            CallbackParams.Params.BEARER_TOKEN).toString())).thenReturn(
-            Optional.of(LocationRefData.builder()
-                            .regionId("region id")
-                            .epimmsId("epimms id")
-                            .siteName("location name")
-                            .build()));
-
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
-
-        assertThat(responseCaseData.getEaCourtLocation()).isEqualTo(isLocationWhiteListed ? YES : NO);
-    }
-
-    @ParameterizedTest
-    @CsvSource({"true", "false"})
-    void shouldSetEarlyAdoptersFlag_whenSmallClaimsDRH(Boolean isLocationWhiteListed) {
-        DynamicList localOptions = DynamicList.builder()
-            .listItems(List.of(
-                           DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
-                           DynamicListElement.builder().code("00002").label("court 2 - 2 address - Y02 7RB").build(),
-                           DynamicListElement.builder().code("00003").label("court 3 - 3 address - Y03 7RB").build()
-                       )
-            )
-            .build();
-
-        DynamicListElement selectedCourt = DynamicListElement.builder()
-            .code("00002").label("court 2 - 2 address - Y02 7RB").build();
-
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
-            .smallClaimsMethodInPerson(localOptions)
-            .isSdoR2NewScreen(YES)
-            .claimsTrack(ClaimsTrack.smallClaimsTrack)
-            .setSmallClaimsFlag(YES)
-            .drawDirectionsOrderRequired(NO)
-            .smallClaims(List.of(SmallTrack.smallClaimDisputeResolutionHearing))
-            .sdoR2SmallClaimsHearing(SdoR2SmallClaimsHearing.builder().hearingCourtLocationList(localOptions.toBuilder().value(
-                selectedCourt).build()).build())
-            .build();
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
-        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
-        when(featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())).thenReturn(
-            isLocationWhiteListed);
-        when(featureToggleService.isLocationWhiteListedForCaseProgression((selectedCourt.getCode()))).thenReturn(
-            isLocationWhiteListed);
-        when(locationRefDataService.getLocationMatchingLabel("label 1", params.getParams().get(
-            CallbackParams.Params.BEARER_TOKEN).toString())).thenReturn(
-            Optional.of(LocationRefData.builder()
-                            .regionId("region id")
-                            .epimmsId("epimms id")
-                            .siteName("location name")
-                            .build()));
-
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
-
-        assertThat(responseCaseData.getEaCourtLocation()).isEqualTo(isLocationWhiteListed ? YES : NO);
-        assertThat(responseCaseData.getSdoR2SmallClaimsHearing().getHearingCourtLocationList().getListItems()).isNull();
-    }
-
-    @ParameterizedTest
-    @CsvSource({"true", "false"})
-    void shouldSetEarlyAdoptersFlag_whenSmallClaimsAndNotDRH(Boolean isLocationWhiteListed) {
-        DynamicList localOptions = DynamicList.builder()
-            .listItems(List.of(
-                           DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
-                           DynamicListElement.builder().code("00002").label("court 2 - 2 address - Y02 7RB").build(),
-                           DynamicListElement.builder().code("00003").label("court 3 - 3 address - Y03 7RB").build()
-                       )
-            )
-            .build();
-
-        DynamicListElement selectedCourt = DynamicListElement.builder()
-            .code("00002").label("court 2 - 2 address - Y02 7RB").build();
-
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
-            .smallClaimsMethodInPerson(localOptions.toBuilder().value(selectedCourt).build())
-            .claimsTrack(ClaimsTrack.smallClaimsTrack)
-            .setSmallClaimsFlag(YES)
-            .smallClaims(List.of(SmallTrack.smallClaimCreditHire))
-            .isSdoR2NewScreen(NO)
-            .drawDirectionsOrderRequired(NO)
-            .build();
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
-        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
-        when(featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())).thenReturn(
-            isLocationWhiteListed);
-        when(featureToggleService.isLocationWhiteListedForCaseProgression((selectedCourt.getCode()))).thenReturn(
-            isLocationWhiteListed);
-        when(locationRefDataService.getLocationMatchingLabel("label 1", params.getParams().get(
-            CallbackParams.Params.BEARER_TOKEN).toString())).thenReturn(
-            Optional.of(LocationRefData.builder()
-                            .regionId("region id")
-                            .epimmsId("epimms id")
-                            .siteName("location name")
-                            .build()));
-
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
-
-        assertThat(responseCaseData.getEaCourtLocation()).isEqualTo(isLocationWhiteListed ? YES : NO);
-    }
-
-    @ParameterizedTest
-    @CsvSource({"true", "false"})
-    void shouldSetEarlyAdoptersFlag_whenSmallClaimDRHAltLocation(Boolean isLocationWhiteListed) {
-        DynamicList localOptions = DynamicList.builder()
-            .listItems(List.of(
-                           DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
-                           DynamicListElement.builder().code("00002").label("court 2 - 2 address - Y02 7RB").build(),
-                           DynamicListElement.builder().code("00003").label("court 3 - 3 address - Y03 7RB").build()
-                       )
-            )
-            .build();
-
-        DynamicListElement selectedCourt = DynamicListElement.builder()
-            .code("00002").label("court 2 - 2 address - Y02 7RB").build();
-
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
-            .smallClaimsMethodInPerson(localOptions)
-            .isSdoR2NewScreen(YES)
-            .disposalHearingMethodInPerson(localOptions)
-            .claimsTrack(ClaimsTrack.smallClaimsTrack)
-            .setSmallClaimsFlag(YES)
-            .smallClaims(List.of(SmallTrack.smallClaimDisputeResolutionHearing))
-            .drawDirectionsOrderRequired(NO)
-            .sdoR2SmallClaimsHearing(SdoR2SmallClaimsHearing.builder().altHearingCourtLocationList(localOptions.toBuilder().value(
-                selectedCourt).build()).build())
-            .build();
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
-        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
-        when(featureToggleService.isLocationWhiteListedForCaseProgression((selectedCourt.getCode()))).thenReturn(
-            isLocationWhiteListed);
-        when(featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())).thenReturn(
-            isLocationWhiteListed);
-        when(locationRefDataService.getLocationMatchingLabel("label 1", params.getParams().get(
-            CallbackParams.Params.BEARER_TOKEN).toString())).thenReturn(
-            Optional.of(LocationRefData.builder()
-                            .regionId("region id")
-                            .epimmsId("epimms id")
-                            .siteName("location name")
-                            .build()));
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
-        assertThat(responseCaseData.getEaCourtLocation()).isEqualTo(isLocationWhiteListed ? YES : NO);
-    }
-
-    @ParameterizedTest
-    @CsvSource({"true", "false"})
-    void shouldSetEarlyAdoptersFlag_whenPartOfNationalRolloutAndNationalRolloutEnabled(Boolean isLocationWhiteListed) {
-        DynamicList options = DynamicList.builder()
-            .listItems(List.of(
-                           DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
-                           DynamicListElement.builder().code("00002").label("court 2 - 2 address - Y02 7RB").build(),
-                           DynamicListElement.builder().code("00003").label("court 3 - 3 address - Y03 7RB").build()
-                       )
-            )
-            .build();
-
-        DynamicListElement selectedCourt = DynamicListElement.builder()
-            .code("00002").label("court 2 - 2 address - Y02 7RB").build();
-
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
-            .disposalHearingMethod(DisposalHearingMethod.disposalHearingMethodInPerson)
-            .disposalHearingMethodInPerson(options.toBuilder().value(selectedCourt).build())
-            .fastTrackMethodInPerson(options)
-            .smallClaimsMethodInPerson(options)
-            .disposalHearingMethodInPerson(options.toBuilder().value(selectedCourt).build())
-            .disposalHearingMethodToggle(Collections.singletonList(OrderDetailsPagesSectionsToggle.SHOW))
-            .orderType(OrderType.DISPOSAL)
-            .build();
-
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        when(featureToggleService.isPartOfNationalRollout(eq(selectedCourt.getCode()))).thenReturn(
-            isLocationWhiteListed);
-        when(locationRefDataService.getLocationMatchingLabel(selectedCourt.getCode(), params.getParams().get(
-            CallbackParams.Params.BEARER_TOKEN).toString()))
-            .thenReturn(Optional.of(LocationRefData.builder()
-                                        .regionId("region id")
-                                        .epimmsId("epimms id")
-                                        .siteName("site name")
-                                        .build()));
-
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
-
-        assertThat(responseCaseData.getEaCourtLocation()).isEqualTo(isLocationWhiteListed ? YES : NO);
-    }
-
-    @ParameterizedTest
-    @CsvSource({"true", "false"})
-    void shouldPopulateHmcEarlyAdoptersFlag_whenHmcIsEnabled(Boolean isLocationWhiteListed) {
-        DynamicList options = DynamicList.builder()
-            .listItems(List.of(
-                           DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
-                           DynamicListElement.builder().code("00002").label("court 2 - 2 address - Y02 7RB").build(),
-                           DynamicListElement.builder().code("00003").label("court 3 - 3 address - Y03 7RB").build()
-                       )
-            )
-            .build();
-
-        DynamicListElement selectedCourt = DynamicListElement.builder()
-            .code("00002").label("court 2 - 2 address - Y02 7RB").build();
-
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
-            .disposalHearingMethod(DisposalHearingMethod.disposalHearingMethodInPerson)
-            .disposalHearingMethodInPerson(options.toBuilder().value(selectedCourt).build())
-            .fastTrackMethodInPerson(options)
-            .smallClaimsMethodInPerson(options)
-            .disposalHearingMethodInPerson(options.toBuilder().value(selectedCourt).build())
-            .disposalHearingMethodToggle(Collections.singletonList(OrderDetailsPagesSectionsToggle.SHOW))
-            .orderType(OrderType.DISPOSAL)
-            .build();
-
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        when(featureToggleService.isPartOfNationalRollout(eq(selectedCourt.getCode()))).thenReturn(
-            isLocationWhiteListed);
-        when(featureToggleService.isHmcEnabled()).thenReturn(true);
-        when(featureToggleService.isLocationWhiteListedForCaseProgression(eq(selectedCourt.getCode()))).thenReturn(
-            isLocationWhiteListed);
-        when(locationRefDataService.getLocationMatchingLabel(selectedCourt.getCode(), params.getParams().get(
-            CallbackParams.Params.BEARER_TOKEN).toString()))
-            .thenReturn(Optional.of(LocationRefData.builder()
-                                        .regionId("region id")
-                                        .epimmsId("epimms id")
-                                        .siteName("site name")
-                                        .build()));
-
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
-
-        assertThat(responseCaseData.getEaCourtLocation()).isEqualTo(isLocationWhiteListed ? YES : NO);
+        assertEquals(eaCourtLocation, responseCaseData.getEaCourtLocation());
     }
 
     @Test
-    void shouldNotPopulateHmcEarlyAdoptersFlag_whenLiP() {
-        DynamicList options = DynamicList.builder()
-            .listItems(List.of(
-                           DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
-                           DynamicListElement.builder().code("00002").label("court 2 - 2 address - Y02 7RB").build(),
-                           DynamicListElement.builder().code("00003").label("court 3 - 3 address - Y03 7RB").build()
-                       )
-            )
-            .build();
+    void shouldNotCallUpdateWaCourtLocationsServiceWhenNotPresent_AndMintiEnabled() {
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
 
-        DynamicListElement selectedCourt = DynamicListElement.builder()
-            .code("00002").label("court 2 - 2 address - Y02 7RB").build();
+        handler = new CreateSDOCallbackHandler(objectMapper, locationRefDataService, workingDayIndicator,
+                                               deadlinesCalculator, sdoGeneratorService, featureToggleService, locationHelper,
+                                                        assignCategoryId, categoryService,
+                                                        Optional.empty());
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
-            .disposalHearingMethod(DisposalHearingMethod.disposalHearingMethodInPerson)
-            .disposalHearingMethodInPerson(options.toBuilder().value(selectedCourt).build())
-            .fastTrackMethodInPerson(options)
-            .smallClaimsMethodInPerson(options)
-            .disposalHearingMethodInPerson(options.toBuilder().value(selectedCourt).build())
-            .disposalHearingMethodToggle(Collections.singletonList(OrderDetailsPagesSectionsToggle.SHOW))
-            .orderType(OrderType.DISPOSAL)
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("123456").build())
             .build();
-        when(featureToggleService.isPartOfNationalRollout(eq(selectedCourt.getCode()))).thenReturn(
-            true);
-        when(featureToggleService.isHmcEnabled()).thenReturn(true);
-        when(featureToggleService.isLocationWhiteListedForCaseProgression(eq(selectedCourt.getCode()))).thenReturn(true);
-
-        CallbackParams params = callbackParamsOf(caseData.toBuilder()
-                                                     .applicant1Represented(YesOrNo.NO)
-                                                     .build(), ABOUT_TO_SUBMIT);
-        when(locationRefDataService.getLocationMatchingLabel(selectedCourt.getCode(), params.getParams().get(
-            CallbackParams.Params.BEARER_TOKEN).toString()))
-            .thenReturn(Optional.of(LocationRefData.builder()
-                                        .regionId("region id")
-                                        .epimmsId("epimms id")
-                                        .siteName("site name")
-                                        .build()));
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
 
-        assertThat(responseCaseData.getHmcEaCourtLocation()).isNull();
+        verifyNoInteractions(updateWaCourtLocationsService);
+    }
 
-        params = callbackParamsOf(caseData.toBuilder()
-                                      .respondent1Represented(YesOrNo.NO)
-                                      .build(), ABOUT_TO_SUBMIT);
+    @Test
+    void shouldCallUpdateWaCourtLocationsServiceWhenPresent_AndMintiEnabled() {
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
 
-        response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("123456").build())
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
-        assertThat(responseCaseData.getHmcEaCourtLocation()).isNull();
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+
+        verify(updateWaCourtLocationsService).updateCourtListingWALocations(any(), any());
     }
 
     @Nested
@@ -1550,7 +1374,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(locationsFromDynamicList(dynamicList)).containsExactly(
                 "Site 1 - Adr 1 - AAA 111",
                 "Site 2 - Adr 2 - BBB 222",
-                "Site 3 - Adr 3 - CCC 333"
+                "Site 3 - Adr 3 - CCC 333",
+                "Site 5 - Adr 5 - YYY 111"
             );
         }
 
@@ -1583,7 +1408,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(locationsFromDynamicList(dynamicList)).containsExactly(
                 "Site 1 - Adr 1 - AAA 111",
                 "Site 2 - Adr 2 - BBB 222",
-                "Site 3 - Adr 3 - CCC 333"
+                "Site 3 - Adr 3 - CCC 333",
+                "Site 5 - Adr 5 - YYY 111"
             );
         }
 
@@ -1622,7 +1448,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(locationsFromDynamicList(dynamicList)).containsExactly(
                 "Site 1 - Adr 1 - AAA 111",
                 "Site 2 - Adr 2 - BBB 222",
-                "Site 3 - Adr 3 - CCC 333"
+                "Site 3 - Adr 3 - CCC 333",
+                "Site 5 - Adr 5 - YYY 111"
             );
         }
 
@@ -1641,7 +1468,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                                           .responseCourtCode("court3")
                                           .caseLocation(
                                               CaseLocationCivil.builder()
-                                                  .baseLocation("dummy base")
+                                                  .baseLocation("00000")
                                                   .region("dummy region")
                                                   .build()
                                           ).build()
@@ -1667,9 +1494,10 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(locationsFromDynamicList(dynamicList)).containsExactly(
                 "Site 1 - Adr 1 - AAA 111",
                 "Site 2 - Adr 2 - BBB 222",
-                "Site 3 - Adr 3 - CCC 333"
+                "Site 3 - Adr 3 - CCC 333",
+                "Site 5 - Adr 5 - YYY 111"
             );
-            assertThat(dynamicList.getValue().getLabel()).isEqualTo("Site 3 - Adr 3 - CCC 333");
+            assertThat(dynamicList.getValue().getLabel()).isEqualTo("Site 5 - Adr 5 - YYY 111");
         }
     }
 
@@ -1678,7 +1506,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     void whenClaimUnspecAndJudgeSelects_changeTrackOrMaintainAllocatedTrack(CaseData caseData, AllocatedTrack expectedAllocatedTrack) {
         // When judge selects a different track to which the claim is currently on, update allocatedTrack to match selection
         // or maintain allocatedTrack if selection already corresponds with selection made.
-        when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -1767,7 +1594,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     void whenClaimSpecAndJudgeSelects_changeTrackOrMaintainClaimResponseTrack(CaseData caseData, String expectedClaimResponseTrack) {
         // When judge selects a different track to which the claim is currently on, update ClaimResponseTrack to match selection
         // or maintain ClaimResponseTrack if selection already corresponds with selection made.
-        when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -1934,11 +1760,12 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 "A Site 3 - Adr 3 - AAA 111",
                 "Site 1 - Adr 1 - VVV 111",
                 "Site 2 - Adr 2 - BBB 222",
-                "Site 3 - Adr 3 - CCC 333"
+                "Site 3 - Adr 3 - CCC 333",
+                "Site 5 - Adr 5 - YYY 111"
             );
             Optional<LocationRefData> shouldBeSelected = getSampleCourLocationsRefObjectToSort().stream()
-                .filter(locationRefData -> locationRefData.getCourtLocationCode().equals(
-                    caseData.getApplicant1DQ().getApplicant1DQRequestedCourt().getResponseCourtCode()))
+                .filter(locationRefData -> locationRefData.getEpimmsId().equals(
+                    caseData.getApplicant1DQ().getApplicant1DQRequestedCourt().getCaseLocation().getBaseLocation()))
                 .findFirst();
             assertThat(shouldBeSelected).isPresent();
             assertThat(dynamicList.getValue()).isNotNull()
@@ -2076,32 +1903,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("fastTrackDisclosureOfDocuments").extracting("date3")
                 .isEqualTo(nextWorkingDayDate.toString());
 
-            assertThat(response.getData()).extracting("fastTrackWitnessOfFact").extracting("input1")
-                .isEqualTo("Each party must upload to the Digital Portal copies of the statements of all witnesses of "
-                               + "fact on whom they intend to rely.");
-            assertThat(response.getData()).extracting("fastTrackWitnessOfFact").extracting("input2")
-                .isEqualTo("3");
-            assertThat(response.getData()).extracting("fastTrackWitnessOfFact").extracting("input3")
-                .isEqualTo("3");
-            assertThat(response.getData()).extracting("fastTrackWitnessOfFact").extracting("input4")
-                .isEqualTo("For this limitation, a party is counted as a witness.");
-            assertThat(response.getData()).extracting("fastTrackWitnessOfFact").extracting("input5")
-                .isEqualTo("Each witness statement should be no more than");
-            assertThat(response.getData()).extracting("fastTrackWitnessOfFact").extracting("input6")
-                .isEqualTo("10");
-            assertThat(response.getData()).extracting("fastTrackWitnessOfFact").extracting("input7")
-                .isEqualTo("A4 pages. Statements should be double spaced using a font size of 12.");
-            assertThat(response.getData()).extracting("fastTrackWitnessOfFact").extracting("input8")
-                .isEqualTo("Witness statements shall be uploaded to the Digital Portal by 4pm on");
-            assertThat(response.getData()).extracting("fastTrackWitnessOfFact").extracting("date")
-                .isEqualTo(nextWorkingDayDate.toString());
-            assertThat(response.getData()).extracting("fastTrackWitnessOfFact").extracting("input9")
-                .isEqualTo("Evidence will not be permitted at trial from a witness"
-                               + " whose statement has not been uploaded in accordance with"
-                               + " this Order. "
-                               + "Evidence not uploaded, or uploaded late, "
-                               + "will not be permitted except with permission from the Court.");
-
             assertThat(response.getData()).extracting("fastTrackSchedulesOfLoss").extracting("input1")
                 .isEqualTo("The claimant must upload to the Digital Portal an up-to-date schedule of loss by 4pm on");
             assertThat(response.getData()).extracting("fastTrackSchedulesOfLoss").extracting("date1")
@@ -2172,108 +1973,59 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                                + "in a separate paginated bundle by the claimant's solicitors and kept up to date. "
                                + "All references to medical notes are to be made by reference "
                                + "to the pages in that bundle.");
-            if (featureToggleService.isSdoR2Enabled()) {
-                assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting("input1")
-                    .isEqualTo("If impecuniosity is alleged by the claimant and not admitted by the defendant, the "
-                                   + "claimant's disclosure as ordered earlier in this Order must include:\n"
-                                   + "a) Evidence of all income from all sources for a period of 3 months prior to the "
-                                   + "commencement of hire until the earlier of:\n "
-                                   + "     i) 3 months after cessation of hire\n"
-                                   + "     ii) the repair or replacement of the claimant's vehicle\n"
-                                   + "b) Copies of all bank, credit card, and saving account statements for a period of 3"
-                                   + " months prior to the commencement of hire until the earlier of:\n"
-                                   + "     i) 3 months after cessation of hire\n"
-                                   + "     ii) the repair or replacement of the claimant's vehicle\n"
-                                   + "c) Evidence of any loan, overdraft or other credit facilities available to the "
-                                   + "claimant.");
-                assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting(
-                        "sdoR2FastTrackCreditHireDetails").extracting("input2")
-                    .isEqualTo("The claimant must upload to the Digital Portal a witness statement addressing\n"
-                                   + "a) the need to hire a replacement vehicle; and\n"
-                                   + "b) impecuniosity");
-                assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting(
-                        "sdoR2FastTrackCreditHireDetails").extracting("date1")
-                    .isEqualTo(nextWorkingDayDate.toString());
-                assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting(
-                        "sdoR2FastTrackCreditHireDetails").extracting("input3")
-                    .isEqualTo(
-                        "A failure to comply with the paragraph above will result in the claimant being debarred "
-                            + "from asserting need or relying on impecuniosity as the case may be at the final "
-                            + "hearing, save with permission of the Trial Judge.");
-                assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting(
-                        "sdoR2FastTrackCreditHireDetails").extracting("input4")
-                    .isEqualTo(
-                        "The parties are to liaise and use reasonable endeavours to agree the basic hire rate no "
-                            + "later than 4pm on");
-                assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting(
-                        "sdoR2FastTrackCreditHireDetails").extracting("date2")
-                    .isEqualTo(nextWorkingDayDate.toString());
-                assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting("input5")
-                    .isEqualTo("If the parties fail to agree rates subject to liability and/or other issues pursuant to"
-                                   + " the paragraph above, each party may rely upon written evidence by way of witness"
-                                   + " statement of one witness to provide evidence of basic hire rates available within"
-                                   + " the claimant's geographical location, from a mainstream supplier, or a local"
-                                   + " reputable supplier if none is available.");
-                assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting("input6")
-                    .isEqualTo("The defendant's evidence is to be uploaded to the Digital Portal by 4pm on");
-                assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting("date3")
-                    .isEqualTo(nextWorkingDayDate.toString());
-                assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting("input7")
-                    .isEqualTo("and the claimant's evidence in reply if so advised to be uploaded by 4pm on");
-                assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting("date4")
-                    .isEqualTo(nextWorkingDayDate.toString());
-                assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting("input8")
-                    .isEqualTo("This witness statement is limited to 10 pages per party, including any appendices.");
-                assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting("detailsShowToggle")
-                    .isEqualTo(List.of(AddOrRemoveToggle.ADD));
-            } else {
-                assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("input1")
-                    .isEqualTo("If impecuniosity is alleged by the claimant and not admitted by the defendant, the "
-                                   + "claimant's disclosure as ordered earlier in this Order must include:\n"
-                                   + "a) Evidence of all income from all sources for a period of 3 months prior to the "
-                                   + "commencement of hire until the earlier of:\n "
-                                   + "     i) 3 months after cessation of hire\n"
-                                   + "     ii) the repair or replacement of the claimant's vehicle\n"
-                                   + "b) Copies of all bank, credit card, and saving account statements for a period of 3"
-                                   + " months prior to the commencement of hire until the earlier of:\n"
-                                   + "     i) 3 months after cessation of hire\n"
-                                   + "     ii) the repair or replacement of the claimant's vehicle\n"
-                                   + "c) Evidence of any loan, overdraft or other credit facilities available to the "
-                                   + "claimant.");
-                assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("input2")
-                    .isEqualTo("The claimant must upload to the Digital Portal a witness statement addressing\n"
-                                   + "a) the need to hire a replacement vehicle; and\n"
-                                   + "b) impecuniosity");
-                assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("date1")
-                    .isEqualTo(nextWorkingDayDate.toString());
-                assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("input3")
-                    .isEqualTo(
-                        "A failure to comply with the paragraph above will result in the claimant being debarred "
-                            + "from asserting need or relying on impecuniosity as the case may be at the final "
-                            + "hearing, save with permission of the Trial Judge.");
-                assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("input4")
-                    .isEqualTo(
-                        "The parties are to liaise and use reasonable endeavours to agree the basic hire rate no "
-                            + "later than 4pm on");
-                assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("date2")
-                    .isEqualTo(nextWorkingDayDate.toString());
-                assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("input5")
-                    .isEqualTo("If the parties fail to agree rates subject to liability and/or other issues pursuant to"
-                                   + " the paragraph above, each party may rely upon written evidence by way of witness"
-                                   + " statement of one witness to provide evidence of basic hire rates available within"
-                                   + " the claimant's geographical location, from a mainstream supplier, or a local"
-                                   + " reputable supplier if none is available.");
-                assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("input6")
-                    .isEqualTo("The defendant's evidence is to be uploaded to the Digital Portal by 4pm on");
-                assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("date3")
-                    .isEqualTo(nextWorkingDayDate.toString());
-                assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("input7")
-                    .isEqualTo("and the claimant's evidence in reply if so advised to be uploaded by 4pm on");
-                assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("date4")
-                    .isEqualTo(nextWorkingDayDate.toString());
-                assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("input8")
-                    .isEqualTo("This witness statement is limited to 10 pages per party, including any appendices.");
-            }
+
+            assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting("input1")
+                .isEqualTo("If impecuniosity is alleged by the claimant and not admitted by the defendant, the "
+                               + "claimant's disclosure as ordered earlier in this Order must include:\n"
+                               + "a) Evidence of all income from all sources for a period of 3 months prior to the "
+                               + "commencement of hire until the earlier of:\n "
+                               + "     i) 3 months after cessation of hire\n"
+                               + "     ii) the repair or replacement of the claimant's vehicle\n"
+                               + "b) Copies of all bank, credit card, and saving account statements for a period of 3"
+                               + " months prior to the commencement of hire until the earlier of:\n"
+                               + "     i) 3 months after cessation of hire\n"
+                               + "     ii) the repair or replacement of the claimant's vehicle\n"
+                               + "c) Evidence of any loan, overdraft or other credit facilities available to the "
+                               + "claimant.");
+            assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting(
+                    "sdoR2FastTrackCreditHireDetails").extracting("input2")
+                .isEqualTo("The claimant must upload to the Digital Portal a witness statement addressing\n"
+                               + "a) the need to hire a replacement vehicle; and\n"
+                               + "b) impecuniosity");
+            assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting(
+                    "sdoR2FastTrackCreditHireDetails").extracting("date1")
+                .isEqualTo(nextWorkingDayDate.toString());
+            assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting(
+                    "sdoR2FastTrackCreditHireDetails").extracting("input3")
+                .isEqualTo(
+                    "A failure to comply with the paragraph above will result in the claimant being debarred "
+                        + "from asserting need or relying on impecuniosity as the case may be at the final "
+                        + "hearing, save with permission of the Trial Judge.");
+            assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting(
+                    "sdoR2FastTrackCreditHireDetails").extracting("input4")
+                .isEqualTo(
+                    "The parties are to liaise and use reasonable endeavours to agree the basic hire rate no "
+                        + "later than 4pm on");
+            assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting(
+                    "sdoR2FastTrackCreditHireDetails").extracting("date2")
+                .isEqualTo(nextWorkingDayDate.toString());
+            assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting("input5")
+                .isEqualTo("If the parties fail to agree rates subject to liability and/or other issues pursuant to"
+                               + " the paragraph above, each party may rely upon written evidence by way of witness"
+                               + " statement of one witness to provide evidence of basic hire rates available within"
+                               + " the claimant's geographical location, from a mainstream supplier, or a local"
+                               + " reputable supplier if none is available.");
+            assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting("input6")
+                .isEqualTo("The defendant's evidence is to be uploaded to the Digital Portal by 4pm on");
+            assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting("date3")
+                .isEqualTo(nextWorkingDayDate.toString());
+            assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting("input7")
+                .isEqualTo("and the claimant's evidence in reply if so advised to be uploaded by 4pm on");
+            assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting("date4")
+                .isEqualTo(nextWorkingDayDate.toString());
+            assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting("input8")
+                .isEqualTo("This witness statement is limited to 10 pages per party, including any appendices.");
+
             assertThat(response.getData()).extracting("fastTrackHousingDisrepair").extracting("input1")
                 .isEqualTo("The claimant must prepare a Scott Schedule of the items in disrepair.");
             assertThat(response.getData()).extracting("fastTrackHousingDisrepair").extracting("input2")
@@ -2294,15 +2046,13 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo(nextWorkingDayDate.toString());
 
             assertThat(response.getData()).extracting("fastTrackPersonalInjury").extracting("input1")
-                .isEqualTo("The claimant has permission to rely upon the written expert evidence already uploaded to"
-                               + " the Digital Portal with the particulars of claim and in addition has permission to"
-                               + " rely upon any associated correspondence or updating report which is uploaded to the"
-                               + " Digital Portal by 4pm on");
-            assertThat(response.getData()).extracting("fastTrackPersonalInjury").extracting("date1")
-                .isEqualTo(nextWorkingDayDate.toString());
+                .isEqualTo(
+                    "The Claimant has permission to rely upon the written expert evidence already uploaded to the"
+                        + " Digital Portal with the particulars of claim");
+            assertThat(response.getData()).extracting("fastTrackPersonalInjury").doesNotHaveToString("date1");
             assertThat(response.getData()).extracting("fastTrackPersonalInjury").extracting("input2")
-                .isEqualTo("Any questions which are to be addressed to an expert must be sent to the expert directly "
-                               + "and uploaded to the Digital Portal by 4pm on");
+                .isEqualTo("The Defendant(s) may ask questions of the Claimant's " +
+                               "expert which must be sent to the expert directly and uploaded to the Digital Portal by 4pm on");
             assertThat(response.getData()).extracting("fastTrackPersonalInjury").extracting("date2")
                 .isEqualTo(nextWorkingDayDate.toString());
             assertThat(response.getData()).extracting("fastTrackPersonalInjury").extracting("input3")
@@ -2310,7 +2060,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("fastTrackPersonalInjury").extracting("date3")
                 .isEqualTo(nextWorkingDayDate.toString());
             assertThat(response.getData()).extracting("fastTrackPersonalInjury").extracting("input4")
-                .isEqualTo("and uploaded to the Digital Portal by");
+                .isEqualTo("and uploaded to the Digital Portal by the party who has asked the question by");
             assertThat(response.getData()).extracting("fastTrackPersonalInjury").extracting("date4")
                 .isEqualTo(nextWorkingDayDate.toString());
 
@@ -2346,34 +2096,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                                + "Any such application must be received by the Court "
                                + "(together with the appropriate fee) by 4pm on "
                                + DateFormatHelper.formatLocalDate(newDate, DateFormatHelper.DATE));
-
-            assertThat(response.getData()).extracting("smallClaimsWitnessStatement").extracting("input1")
-                .isEqualTo("Each party must upload to the Digital Portal copies of all witness statements of the"
-                               + " witnesses upon whose evidence they intend to rely at the hearing not less than 21"
-                               + " days before the hearing.");
-            assertThat(response.getData()).extracting("smallClaimsWitnessStatement").doesNotHaveToString("input2");
-            assertThat(response.getData()).extracting("smallClaimsWitnessStatement").doesNotHaveToString("input3");
-            assertThat(response.getData()).extracting("smallClaimsWitnessStatement").extracting("input4")
-                .isEqualTo("For this limitation, a party is counted as a witness.");
-            assertThat(response.getData()).extracting("smallClaimsWitnessStatement").extracting("text")
-                .isEqualTo("A witness statement must: \na) Start with the name of the case and the claim number;"
-                               + "\nb) State the full name and address of the witness; "
-                               + "\nc) Set out the witness's evidence clearly in numbered paragraphs on numbered pages;"
-                               + "\nd) End with this paragraph: 'I believe that the facts stated in this witness "
-                               + "statement are true. I understand that proceedings for contempt of court may be "
-                               + "brought against anyone who makes, or causes to be made, a false statement in a "
-                               + "document verified by a statement of truth without an honest belief in its truth'."
-                               + "\ne) be signed by the witness and dated."
-                               + "\nf) If a witness is unable to read the statement there must be a certificate that "
-                               + "it has been read or interpreted to the witness by a suitably qualified person and "
-                               + "at the final hearing there must be an independent interpreter who will not be "
-                               + "provided by the Court."
-                               + "\n\nThe judge may refuse to allow a witness to give evidence or consider any "
-                               + "statement of any witness whose statement has not been uploaded to the Digital Portal"
-                               + " in accordance with the paragraphs above."
-                               + "\n\nA witness whose statement has been uploaded in accordance with the above must"
-                               + " attend the hearing. If they do not attend, it will be for the court to decide how"
-                               + " much reliance, if any, to place on their evidence.");
 
             assertThat(response.getData()).extracting("smallClaimsMediationSectionStatement").extracting("input")
                 .isEqualTo("If you failed to attend a mediation appointment,"
@@ -2457,13 +2179,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo(LocalDate.now().plusWeeks(22).toString());
             assertThat(response.getData()).extracting("fastTrackHearingTime").extracting("dateTo")
                 .isEqualTo(LocalDate.now().plusWeeks(30).toString());
-            assertThat(response.getData()).extracting("fastTrackHearingTime").extracting("helpText2")
-                .isEqualTo("Not more than seven nor less than three clear days before the trial, "
-                               + "the claimant must file at court and serve an indexed and paginated bundle of "
-                               + "documents which complies with the requirements of Rule 39.5 Civil Procedure Rules "
-                               + "and which complies with requirements of PD32. The parties must endeavour to agree "
-                               + "the contents of the bundle before it is filed. The bundle will include a case "
-                               + "summary and a chronology.");
             assertThat(response.getData()).extracting("fastTrackOrderWithoutJudgement").extracting("input")
                 .isEqualTo(String.format(
                     "This order has been made without hearing. "
@@ -2517,8 +2232,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
                 categorySearchResult));
 
-            when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
-
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -2553,8 +2266,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
                 categorySearchResult));
-
-            when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
@@ -2601,7 +2312,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
                 categorySearchResult));
-            when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
             given(featureToggleService.isCarmEnabledForCase(any())).willReturn(true);
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
@@ -2674,7 +2384,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
                 categorySearchResult));
-            when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
             given(featureToggleService.isCarmEnabledForCase(any())).willReturn(false);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
@@ -2699,8 +2408,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
                 categorySearchResult));
-
-            when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
@@ -2746,7 +2453,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
                 categorySearchResult));
-            when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
             given(featureToggleService.isCarmEnabledForCase(any())).willReturn(true);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
@@ -2789,7 +2495,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 "A Site 3 - Adr 3 - AAA 111",
                 "Site 1 - Adr 1 - VVV 111",
                 "Site 2 - Adr 2 - BBB 222",
-                "Site 3 - Adr 3 - CCC 333"
+                "Site 3 - Adr 3 - CCC 333",
+                "Site 5 - Adr 5 - YYY 111"
             );
         }
 
@@ -2822,7 +2529,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 "A Site 3 - Adr 3 - AAA 111",
                 "Site 1 - Adr 1 - VVV 111",
                 "Site 2 - Adr 2 - BBB 222",
-                "Site 3 - Adr 3 - CCC 333"
+                "Site 3 - Adr 3 - CCC 333",
+                "Site 5 - Adr 5 - YYY 111"
             );
         }
 
@@ -2857,6 +2565,88 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class MidEventSetOrderDetailsFlags {
         private static final String PAGE_ID = "order-details-navigation";
+
+        @Test
+        void showReturnError_whenUnspecIntermediateTrack() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build().toBuilder()
+                .allocatedTrack(AllocatedTrack.INTERMEDIATE_CLAIM)
+                .orderType(OrderType.DISPOSAL)
+                .ccdState(JUDICIAL_REFERRAL)
+                .build();
+
+            when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(true);
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).hasSize(1);
+            assertThat(response.getErrors()).containsOnly(ERROR_MINTI_DISPOSAL_NOT_ALLOWED);
+        }
+
+        @Test
+        void showReturnError_whenUnspecMultiTrack() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build().toBuilder()
+                .allocatedTrack(AllocatedTrack.MULTI_CLAIM)
+                .orderType(OrderType.DISPOSAL)
+                .ccdState(JUDICIAL_REFERRAL)
+                .build();
+
+            when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(true);
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).hasSize(1);
+            assertThat(response.getErrors()).containsOnly(ERROR_MINTI_DISPOSAL_NOT_ALLOWED);
+        }
+
+        @Test
+        void showReturnError_whenSpecIntermediateTrack() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .setClaimTypeToSpecClaim()
+                .build().toBuilder()
+                .responseClaimTrack(AllocatedTrack.INTERMEDIATE_CLAIM.name())
+                .orderType(OrderType.DISPOSAL)
+                .ccdState(JUDICIAL_REFERRAL)
+                .build();
+
+            when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(true);
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).hasSize(1);
+            assertThat(response.getErrors()).containsOnly(ERROR_MINTI_DISPOSAL_NOT_ALLOWED);
+        }
+
+        @Test
+        void showReturnError_whenSpecMultiTrack() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .setClaimTypeToSpecClaim()
+                .build().toBuilder()
+                .responseClaimTrack(AllocatedTrack.MULTI_CLAIM.name())
+                .orderType(OrderType.DISPOSAL)
+                .ccdState(JUDICIAL_REFERRAL)
+                .build();
+
+            when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(true);
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).hasSize(1);
+            assertThat(response.getErrors()).containsOnly(ERROR_MINTI_DISPOSAL_NOT_ALLOWED);
+        }
 
         @Test
         void smallClaimsFlagAndFastTrackFlagSetToNo() {
@@ -2950,7 +2740,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void fastTRackSdoR2NihlPathTwo() {
-            when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
 
             List<FastTrack> fastTrackList = new ArrayList<FastTrack>();
             fastTrackList.add(FastTrack.fastClaimBuildingDispute);
@@ -2978,9 +2767,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void fastTrackFlagSetToYesNihlPathOne() {
-
-            when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
-
             List<FastTrack> fastTrackList = new ArrayList<FastTrack>();
             fastTrackList.add(FastTrack.fastClaimBuildingDispute);
             fastTrackList.add(FastTrack.fastClaimNoiseInducedHearingLoss);
@@ -3005,7 +2791,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void smallClaimsSdoR2FlagSetToYesPathOne() {
-            when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .build()
@@ -3026,7 +2811,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void smallClaimsSdoR2FlagSetToYesPathTwo() {
-            when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .build()
@@ -3193,7 +2977,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldGenerateAndSaveSdoOrder_whenNihl() {
-            when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
             List<FastTrack> fastTrackList = new ArrayList<FastTrack>();
             fastTrackList.add(FastTrack.fastClaimNoiseInducedHearingLoss);
             CaseData caseData = CaseDataBuilder.builder()
@@ -3220,9 +3003,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         @ParameterizedTest
         @ValueSource(booleans = {true, false})
         void shouldValidateFieldsForNihl(boolean valid) {
-
-            when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
-
             List<FastTrack> fastTrackList = new ArrayList<FastTrack>();
             fastTrackList.add(FastTrack.fastClaimNoiseInducedHearingLoss);
 
@@ -3282,7 +3062,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldGenerateAndSaveSdoOrder_whenDrhIsSelected() {
-            when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .atStateClaimIssued()
                 .build()
@@ -3489,7 +3268,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 .build();
 
-            when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -3512,7 +3290,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .sdoR2SmallClaimsImpNotes(SdoR2SmallClaimsImpNotes.builder().date(LocalDate.now().plusDays(2)).build())
                 .build();
 
-            when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -3536,7 +3313,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                      .dateTo(testDate).build()).build())
                 .build();
 
-            when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);

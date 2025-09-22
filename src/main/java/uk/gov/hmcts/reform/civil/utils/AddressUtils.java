@@ -2,6 +2,9 @@ package uk.gov.hmcts.reform.civil.utils;
 
 import camundajar.impl.scala.collection.mutable.StringBuilder;
 import uk.gov.hmcts.reform.civil.model.Address;
+import uk.gov.hmcts.reform.civil.prd.model.ContactInformation;
+
+import java.util.Objects;
 
 public class AddressUtils {
 
@@ -26,4 +29,14 @@ public class AddressUtils {
         return line != null ? line + ", " : "";
     }
 
+    public static Address getAddress(ContactInformation address) {
+        return Address.builder().addressLine1(address.getAddressLine1())
+            .addressLine2(Objects.toString(address.getAddressLine2(), ""))
+            .addressLine3(Objects.toString(address.getAddressLine3(), ""))
+            .country(address.getCountry())
+            .county(address.getCounty())
+            .postCode(address.getPostCode())
+            .postTown(address.getTownCity())
+            .build();
+    }
 }

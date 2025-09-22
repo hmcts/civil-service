@@ -10,18 +10,22 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackException;
+import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -37,13 +41,28 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLI
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.AGREED_EXTENSION_DATE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CNBC_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.FRONTEND_URL;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT_WELSH;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.OPENING_HOURS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PHONE_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONSE_DEADLINE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.SPEC_UNSPEC_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_HMCTS_SIGNATURE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_OPENING_HOURS;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_PHONE_CONTACT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.fetchDefendantName;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @ExtendWith(MockitoExtension.class)
 class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandlerTest {
@@ -60,17 +79,39 @@ class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandler
     @Mock
     private OrganisationService organisationService;
 
+    @Mock
+    private PinInPostConfiguration pinInPostConfiguration;
+
+    @Mock
+    private FeatureToggleService featureToggleService;
+
+    @Mock
+    private NotificationsSignatureConfiguration configuration;
+
     @Nested
     class AboutToSubmitCallback {
 
         final String templateId = "template-id";
-
         final String templateIdRespondent = "template-id-respondent";
+        final String templateIdWelsh = "template-id-welsh";
         final String reference = "agreed-extension-date-applicant-notification-spec-000DC001";
         Map<String, String> expectedNotificationData;
-
         Map<String, String> expectedNotificationDataRespondent;
+        Map<String, String> expectedNotificationDataClaimantLiP;
         CaseData caseData;
+
+        @BeforeEach
+        void setup() {
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getHmctsSignature()).thenReturn((String) configMap.get("hmctsSignature"));
+            when(configuration.getPhoneContact()).thenReturn((String) configMap.get("phoneContact"));
+            when(configuration.getOpeningHours()).thenReturn((String) configMap.get("openingHours"));
+            when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("welshHmctsSignature"));
+            when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("welshPhoneContact"));
+            when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
+            when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
+            when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
+        }
 
         @Nested
         class WhenRespondent1SubmitsTimeExtension {
@@ -78,34 +119,80 @@ class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandler
             @BeforeEach
             void setup() {
                 caseData = CaseDataBuilder.builder().atStateNotificationAcknowledgedRespondent1TimeExtension().build();
-                expectedNotificationData = getNotificationDataMap(
-                    caseData.getRespondentSolicitor1AgreedDeadlineExtension());
-                expectedNotificationDataRespondent = getNotificationDataMapRespondent1v2(
-                    caseData.getRespondentSolicitor1AgreedDeadlineExtension());
-
-                when(organisationService.findOrganisationById(anyString()))
-                    .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
             }
 
             @Test
             void shouldNotifyApplicantSolicitor_whenInvoked() {
+                when(organisationService.findOrganisationById(anyString()))
+                    .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
                 when(notificationsProperties.getClaimantSolicitorAgreedExtensionDateForSpec())
                     .thenReturn("template-id");
+                Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+                when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
 
                 invokeAboutToSubmitWithEvent("NOTIFY_APPLICANT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE_FOR_SPEC");
 
                 verify(notificationService).sendMail(
                     "applicantsolicitor@example.com",
                     templateId,
-                    expectedNotificationData,
+                    getNotificationDataMap(
+                        caseData.getRespondentSolicitor1AgreedDeadlineExtension()),
+                    reference
+                );
+            }
+
+            @Test
+            void shouldNotifyApplicantLiP_whenInvoked() {
+                caseData = caseData.toBuilder()
+                    .applicant1Represented(NO).build();
+                when(pinInPostConfiguration.getCuiFrontEndUrl()).thenReturn("http://localhost:3001/");
+                when(notificationsProperties.getClaimantLipDeadlineExtension())
+                    .thenReturn("template-id");
+                Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+                when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+                when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
+
+                invokeAboutToSubmitWithEvent("NOTIFY_LIP_APPLICANT_FOR_AGREED_EXTENSION_DATE_FOR_SPEC");
+
+                verify(notificationService).sendMail(
+                    "rambo@email.com",
+                    templateId,
+                    getNotificationDataMapClaimantLiP(
+                        caseData.getRespondent1ResponseDeadline().toLocalDate()),
+                    reference
+                );
+            }
+
+            @Test
+            void shouldNotifyApplicantLiPInWelsh_whenInvoked() {
+                caseData = caseData.toBuilder()
+                    .applicant1Represented(NO)
+                    .claimantBilingualLanguagePreference("BOTH").build();
+                when(pinInPostConfiguration.getCuiFrontEndUrl()).thenReturn("http://localhost:3001/");
+                when(notificationsProperties.getClaimantLipDeadlineExtensionWelsh())
+                    .thenReturn("template-id-welsh");
+                Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+                when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+                when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
+                invokeAboutToSubmitWithEvent("NOTIFY_LIP_APPLICANT_FOR_AGREED_EXTENSION_DATE_FOR_SPEC");
+
+                verify(notificationService).sendMail(
+                    "rambo@email.com",
+                    templateIdWelsh,
+                    getNotificationDataMapClaimantLiP(
+                        caseData.getRespondent1ResponseDeadline().toLocalDate()),
                     reference
                 );
             }
 
             @Test
             void shouldNotifyRespondentSolicitor1_whenInvoked() {
+                when(organisationService.findOrganisationById(anyString()))
+                    .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
                 when(notificationsProperties.getRespondentSolicitorAgreedExtensionDateForSpec())
                     .thenReturn("template-id-respondent");
+                Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+                when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
 
                 invokeAboutToSubmitWithEvent("NOTIFY_APPLICANT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE_FOR_SPEC_CC");
 
@@ -120,8 +207,12 @@ class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandler
 
             @Test
             void shouldNotifyRespondentSolicitor2_whenInvoked() {
+                when(organisationService.findOrganisationById(anyString()))
+                    .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
                 when(notificationsProperties.getRespondentSolicitorAgreedExtensionDateForSpec())
                     .thenReturn("template-id-respondent");
+                Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+                when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
 
                 invokeAboutToSubmitWithEvent("NOTIFY_APPLICANT_RESPONDENT2_FOR_AGREED_EXTENSION_DATE_FOR_SPEC_CC");
 
@@ -302,6 +393,7 @@ class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandler
                     .thenReturn("template-id-respondent");
                 when(organisationService.findOrganisationById(anyString()))
                     .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
+
                 caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledgedRespondent2TimeExtension()
                     .atStateNotificationAcknowledgedRespondent1TimeExtension()
@@ -345,6 +437,7 @@ class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandler
                     .thenReturn("template-id-respondent");
                 when(organisationService.findOrganisationById(anyString()))
                     .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
+
                 caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledgedRespondent2TimeExtension()
                     .respondent2TimeExtensionDate(LocalDateTime.now().minusDays(1))
@@ -392,33 +485,68 @@ class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandler
 
         @NotNull
         private Map<String, String> getNotificationDataMap(LocalDate extensionDate) {
-            return Map.of(
-                CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
-                CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
-                AGREED_EXTENSION_DATE, formatLocalDate(extensionDate, DATE),
-                DEFENDANT_NAME, fetchDefendantName(caseData),
-                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789"
-            );
+            Map<String, String> properties = new HashMap<>(addCommonProperties(false));
+            properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name");
+            properties.put(CLAIM_REFERENCE_NUMBER, CASE_ID.toString());
+            properties.put(AGREED_EXTENSION_DATE, formatLocalDate(extensionDate, DATE));
+            properties.put(DEFENDANT_NAME, fetchDefendantName(caseData));
+            properties.put(PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789");
+            properties.put(CASEMAN_REF, "000DC001");
+            return properties;
         }
 
         @NotNull
         private Map<String, String> getNotificationDataMapRespondent1v2(LocalDate extensionDate) {
-            return Map.of(
-                CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
-                CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
-                AGREED_EXTENSION_DATE, formatLocalDate(extensionDate, DATE),
-                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant 1 reference: 6789 - Defendant 2 reference: Not provided"
-            );
+            Map<String, String> properties = new HashMap<>(addCommonProperties(false));
+            properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name");
+            properties.put(CLAIM_REFERENCE_NUMBER, CASE_ID.toString());
+            properties.put(AGREED_EXTENSION_DATE, formatLocalDate(extensionDate, DATE));
+            properties.put(PARTY_REFERENCES, "Claimant reference: 12345 - Defendant 1 reference: 6789 - Defendant 2 reference: Not provided");
+            properties.put(CASEMAN_REF, "000DC001");
+            return properties;
         }
 
         @NotNull
         private Map<String, String> getNotificationDataMapRespondent1v1(LocalDate extensionDate) {
-            return Map.of(
-                CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
-                CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
-                AGREED_EXTENSION_DATE, formatLocalDate(extensionDate, DATE),
-                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789"
-            );
+            Map<String, String> properties = new HashMap<>(addCommonProperties(false));
+            properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name");
+            properties.put(CLAIM_REFERENCE_NUMBER, CASE_ID.toString());
+            properties.put(AGREED_EXTENSION_DATE, formatLocalDate(extensionDate, DATE));
+            properties.put(PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789");
+            properties.put(CASEMAN_REF, "000DC001");
+            return properties;
+        }
+
+        @NotNull
+        private Map<String, String> getNotificationDataMapClaimantLiP(LocalDate extensionDate) {
+            Map<String, String> properties = new HashMap<>(addCommonProperties(true));
+            properties.put(CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString());
+            properties.put(CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()));
+            properties.put(DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
+            properties.put(FRONTEND_URL, "http://localhost:3001/");
+            properties.put(RESPONSE_DEADLINE, formatLocalDate(extensionDate, DATE));
+            return properties;
+        }
+
+        @NotNull
+        public Map<String, String> addCommonProperties(boolean isLipCase) {
+            Map<String, String> expectedProperties = new HashMap<>();
+            expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
+            expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
+            expectedProperties.put(HMCTS_SIGNATURE, configuration.getHmctsSignature());
+            expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
+            expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
+            expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
+            expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
+            expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+            if (isLipCase) {
+                expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+                expectedProperties.put(CNBC_CONTACT, configuration.getCnbcContact());
+            } else {
+                expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getRaiseQueryLr());
+                expectedProperties.put(CNBC_CONTACT, configuration.getRaiseQueryLr());
+            }
+            return expectedProperties;
         }
 
         private void invokeAboutToSubmitWithEvent(String eventId) {

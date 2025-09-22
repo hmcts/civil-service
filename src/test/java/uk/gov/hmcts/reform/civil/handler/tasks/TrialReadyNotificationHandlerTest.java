@@ -14,8 +14,8 @@ import uk.gov.hmcts.reform.civil.event.TakeCaseOfflineEvent;
 import uk.gov.hmcts.reform.civil.event.TrialReadyNotificationEvent;
 import uk.gov.hmcts.reform.civil.service.search.TrialReadyNotificationSearchService;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -57,7 +57,7 @@ class TrialReadyNotificationHandlerTest {
     void shouldEmitTrialReadyCheckEvent_whenCasesFound() {
         long caseId = 1L;
         Map<String, Object> data = Map.of("data", "some data");
-        List<CaseDetails> caseDetails = List.of(CaseDetails.builder().id(caseId).data(data).build());
+        Set<CaseDetails> caseDetails = Set.of(CaseDetails.builder().id(caseId).data(data).build());
 
         when(searchService.getCases()).thenReturn(caseDetails);
 
@@ -69,7 +69,7 @@ class TrialReadyNotificationHandlerTest {
 
     @Test
     void shouldNotEmitTrialReadyCheckEvent_WhenNoCasesFound() {
-        when(searchService.getCases()).thenReturn(List.of());
+        when(searchService.getCases()).thenReturn(Set.of());
 
         handler.execute(mockTask, externalTaskService);
 
@@ -116,7 +116,7 @@ class TrialReadyNotificationHandlerTest {
         long caseId = 1L;
         long otherId = 2L;
         Map<String, Object> data = Map.of("data", "some data");
-        List<CaseDetails> caseDetails = List.of(
+        Set<CaseDetails> caseDetails = Set.of(
             CaseDetails.builder().id(caseId).data(data).build(),
             CaseDetails.builder().id(otherId).data(data).build());
 

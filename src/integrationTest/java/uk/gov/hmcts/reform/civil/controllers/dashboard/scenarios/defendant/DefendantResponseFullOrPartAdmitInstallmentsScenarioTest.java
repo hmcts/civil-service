@@ -59,7 +59,7 @@ public class DefendantResponseFullOrPartAdmitInstallmentsScenarioTest extends Da
                 jsonPath("$[0].titleEn").value("Response to the claim"),
                 jsonPath("$[0].descriptionEn").value(
                     "<p class=\"govuk-body\">You have offered to pay £" + totalAmount
-                        + " in instalments of £"
+                        + " plus the claim fee and any fixed costs claimed in instalments of £"
                         + MonetaryConversions.penniesToPounds(installmentAmount).toPlainString().replace(
                         ".00", "")
                         + " " + frequency.getDashboardLabel() + ". You have offered to do this starting from " + DateUtils.formatDate(firstPaymentDate)
@@ -69,10 +69,10 @@ public class DefendantResponseFullOrPartAdmitInstallmentsScenarioTest extends Da
                 jsonPath("$[0].titleCy").value("Ymateb i’r hawliad"),
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Rydych wedi cynnig talu £" + totalAmount
-                        + " mewn rhandaliadau o £"
+                        + " ynghyd â ffi’r hawliad ac unrhyw gostau sefydlog a hawlir mewn rhandaliadau o £"
                         + MonetaryConversions.penniesToPounds(installmentAmount).toPlainString().replace(
                         ".00", "")
-                        + " " + frequency.getDashboardLabelWelsh() + ". Rydych wedi cynnig gwneud hyn o " + DateUtils.formatDateInWelsh(firstPaymentDate)
+                        + " " + frequency.getDashboardLabelWelsh() + ". Rydych wedi cynnig gwneud hyn o " + DateUtils.formatDateInWelsh(firstPaymentDate, false)
                         + " ymlaen. Byddwn yn cysylltu â chi pan fydd yr hawlydd yn ymateb i’ch cynnig.</p><p class=\"govuk-body\"><a "
                         + "href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">Gweld eich ymateb</a></p>"
                 )

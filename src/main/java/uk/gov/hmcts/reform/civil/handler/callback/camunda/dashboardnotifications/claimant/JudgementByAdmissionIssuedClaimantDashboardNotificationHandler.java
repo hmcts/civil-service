@@ -4,17 +4,17 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.callback.DashboardJudgementOnlineCallbackHandler;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
-import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
+import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_JUDGEMENT_BY_ADMISSION_CLAIMANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_JUDGEMENTS_ONLINE_ISSUED_CCJ_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_UPDATE_JUDGEMENTS_ONLINE_ISSUED_CCJ_CLAIMANT;
 
 @Service
 public class JudgementByAdmissionIssuedClaimantDashboardNotificationHandler extends DashboardJudgementOnlineCallbackHandler {
@@ -23,10 +23,10 @@ public class JudgementByAdmissionIssuedClaimantDashboardNotificationHandler exte
         List.of(CREATE_DASHBOARD_NOTIFICATION_JUDGEMENT_BY_ADMISSION_CLAIMANT);
     public static final String TASK_ID = "GenerateDashboardNotificationJudgementByAdmissionClaimant";
 
-    public JudgementByAdmissionIssuedClaimantDashboardNotificationHandler(DashboardApiClient dashboardApiClient,
+    public JudgementByAdmissionIssuedClaimantDashboardNotificationHandler(DashboardScenariosService dashboardScenariosService,
                                                                           DashboardNotificationsParamsMapper mapper,
                                                                           FeatureToggleService featureToggleService) {
-        super(dashboardApiClient, mapper, featureToggleService);
+        super(dashboardScenariosService, mapper, featureToggleService);
     }
 
     @Override
@@ -43,7 +43,7 @@ public class JudgementByAdmissionIssuedClaimantDashboardNotificationHandler exte
     public String getScenario(CaseData caseData) {
         if (isJudgmentOrderIssued(caseData)) {
             return
-                SCENARIO_AAA6_JUDGEMENTS_ONLINE_ISSUED_CCJ_CLAIMANT.getScenario();
+                SCENARIO_AAA6_UPDATE_JUDGEMENTS_ONLINE_ISSUED_CCJ_CLAIMANT.getScenario();
         }
         return null;
     }

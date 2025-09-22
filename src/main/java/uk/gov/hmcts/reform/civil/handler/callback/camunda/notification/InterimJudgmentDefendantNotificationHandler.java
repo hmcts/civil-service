@@ -10,13 +10,16 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
-import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -24,6 +27,8 @@ import java.util.Optional;
 import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_INTERIM_JUDGMENT_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +38,8 @@ public class InterimJudgmentDefendantNotificationHandler extends CallbackHandler
     private final NotificationsProperties notificationsProperties;
     private final ObjectMapper objectMapper;
     private final OrganisationService organisationService;
+    private final NotificationsSignatureConfiguration configuration;
+    private final FeatureToggleService featureToggleService;
     private static final List<CaseEvent> EVENTS = List.of(NOTIFY_INTERIM_JUDGMENT_DEFENDANT);
     private static final String REFERENCE_TEMPLATE_APPROVAL_DEF = "interim-judgment-approval-notification-def-%s";
     private static final String REFERENCE_TEMPLATE_REQUEST_DEF = "interim-judgment-requested-notification-def-%s";
@@ -52,33 +59,78 @@ public class InterimJudgmentDefendantNotificationHandler extends CallbackHandler
 
     private CallbackResponse notifyAllPartiesInterimJudgmentApprovedDefendant(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        var state = "JUDICIAL_REFERRAL";
+
+        if (caseData.isRespondent1LiP() && !YesOrNo.YES.equals(caseData.getAddRespondent2())) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .state(state)
+                .data(caseData.toMap(objectMapper))
+                .build();
+        }
+
+        if (caseData.isRespondent1LiP() && YesOrNo.YES.equals(caseData.getAddRespondent2())) {
+            if (caseData.isRespondent2LiP()) {
+                return AboutToStartOrSubmitCallbackResponse.builder()
+                    .state(state)
+                    .data(caseData.toMap(objectMapper))
+                    .build();
+            }
+
+            notificationService.sendMail(
+                caseData.getRespondentSolicitor2EmailAddress() != null
+                    ? caseData.getRespondentSolicitor2EmailAddress() :
+                    caseData.getRespondentSolicitor1EmailAddress(),
+                checkIfBothDefendants(caseData)
+                    ? notificationsProperties.getInterimJudgmentApprovalDefendant()
+                    : notificationsProperties.getInterimJudgmentRequestedDefendant(),
+                addPropertiesDefendant2(caseData),
+                String.format(
+                    checkIfBothDefendants(caseData)
+                        ? REFERENCE_TEMPLATE_APPROVAL_DEF
+                        : REFERENCE_TEMPLATE_REQUEST_DEF,
+                    caseData.getLegacyCaseReference()
+                )
+            );
+
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .state(state)
+                .data(caseData.toMap(objectMapper))
+                .build();
+        }
 
         if (caseData.getAddRespondent2() != null && caseData.getAddRespondent2().equals(YesOrNo.YES)) {
             if (checkDefendantRequested(caseData, caseData.getRespondent1().getPartyName())
                 || checkIfBothDefendants(caseData)) {
-                notificationService.sendMail(caseData.getRespondentSolicitor1EmailAddress(),
-                                             checkIfBothDefendants(caseData)
-                                                 ? notificationsProperties.getInterimJudgmentApprovalDefendant()
-                                                 : notificationsProperties.getInterimJudgmentRequestedDefendant(),
-                                             addProperties(caseData),
-                                             String.format(checkIfBothDefendants(caseData)
-                                                               ? REFERENCE_TEMPLATE_APPROVAL_DEF
-                                                               : REFERENCE_TEMPLATE_REQUEST_DEF,
-                                                           caseData.getLegacyCaseReference()));
+                notificationService.sendMail(
+                    caseData.getRespondentSolicitor1EmailAddress(),
+                    checkIfBothDefendants(caseData)
+                        ? notificationsProperties.getInterimJudgmentApprovalDefendant()
+                        : notificationsProperties.getInterimJudgmentRequestedDefendant(),
+                    addProperties(caseData),
+                    String.format(
+                        checkIfBothDefendants(caseData)
+                            ? REFERENCE_TEMPLATE_APPROVAL_DEF
+                            : REFERENCE_TEMPLATE_REQUEST_DEF,
+                        caseData.getLegacyCaseReference()
+                    )
+                );
             }
             if (checkDefendantRequested(caseData, caseData.getRespondent2().getPartyName())
                 || checkIfBothDefendants(caseData)) {
-                notificationService.sendMail(caseData.getRespondentSolicitor2EmailAddress() != null
-                                                 ? caseData.getRespondentSolicitor2EmailAddress() :
-                                                 caseData.getRespondentSolicitor1EmailAddress(),
-                                             checkIfBothDefendants(caseData)
-                                                 ? notificationsProperties.getInterimJudgmentApprovalDefendant()
-                                                 : notificationsProperties.getInterimJudgmentRequestedDefendant(),
-                                             addPropertiesDefendant2(caseData),
-                                             String.format(checkIfBothDefendants(caseData)
-                                                               ? REFERENCE_TEMPLATE_APPROVAL_DEF
-                                                               : REFERENCE_TEMPLATE_REQUEST_DEF,
-                                                           caseData.getLegacyCaseReference())
+                notificationService.sendMail(
+                    caseData.getRespondentSolicitor2EmailAddress() != null
+                        ? caseData.getRespondentSolicitor2EmailAddress() :
+                        caseData.getRespondentSolicitor1EmailAddress(),
+                    checkIfBothDefendants(caseData)
+                        ? notificationsProperties.getInterimJudgmentApprovalDefendant()
+                        : notificationsProperties.getInterimJudgmentRequestedDefendant(),
+                    addPropertiesDefendant2(caseData),
+                    String.format(
+                        checkIfBothDefendants(caseData)
+                            ? REFERENCE_TEMPLATE_APPROVAL_DEF
+                            : REFERENCE_TEMPLATE_REQUEST_DEF,
+                        caseData.getLegacyCaseReference()
+                    )
                 );
             }
         } else {
@@ -89,7 +141,6 @@ public class InterimJudgmentDefendantNotificationHandler extends CallbackHandler
                                                        caseData.getLegacyCaseReference()));
         }
 
-        var state = "JUDICIAL_REFERRAL";
         return AboutToStartOrSubmitCallbackResponse.builder()
             .state(state)
             .data(caseData.toMap(objectMapper))
@@ -103,19 +154,31 @@ public class InterimJudgmentDefendantNotificationHandler extends CallbackHandler
 
     @Override
     public Map<String, String> addProperties(final CaseData caseData) {
-        return Map.of(
+        HashMap<String, String> properties = new HashMap<>(Map.of(
             LEGAL_ORG_DEF, getLegalOrganizationName(caseData),
-            CLAIM_NUMBER_INTERIM, caseData.getLegacyCaseReference(),
-            DEFENDANT_NAME_INTERIM, caseData.getRespondent1().getPartyName()
-        );
+            CLAIM_NUMBER_INTERIM, caseData.getCcdCaseReference().toString(),
+            DEFENDANT_NAME_INTERIM, caseData.getRespondent1().getPartyName(),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
+        ));
+        addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
+
+        return properties;
     }
 
     public Map<String, String> addPropertiesDefendant2(final CaseData caseData) {
-        return Map.of(
+        HashMap<String, String> properties = new HashMap<>(Map.of(
             LEGAL_ORG_DEF, getLegalOrganizationNameDefendant2(caseData),
-            CLAIM_NUMBER_INTERIM, caseData.getLegacyCaseReference(),
-            DEFENDANT_NAME_INTERIM, caseData.getRespondent2().getPartyName()
-        );
+            CLAIM_NUMBER_INTERIM, caseData.getCcdCaseReference().toString(),
+            DEFENDANT_NAME_INTERIM, caseData.getRespondent2().getPartyName(),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
+        ));
+        addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
+
+        return properties;
     }
 
     private boolean checkDefendantRequested(final CaseData caseData, String defendantName) {

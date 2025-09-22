@@ -3,10 +3,12 @@ package uk.gov.hmcts.reform.civil.service.robotics.mapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
@@ -15,15 +17,20 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
+import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCaseman;
 import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCasemanLR;
 import uk.gov.hmcts.reform.civil.model.ClaimantResponseDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PartyData;
+import uk.gov.hmcts.reform.civil.model.PaymentBySetDate;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
+import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceType;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.DQ;
 import uk.gov.hmcts.reform.civil.model.dq.FileDirectionsQuestionnaire;
@@ -32,6 +39,10 @@ import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideOrderType;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideReason;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.SetAsideApplicantTypeForRPA;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.SetAsideResultTypeForRPA;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
@@ -51,9 +62,11 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.IntStream;
 
 import static java.lang.String.format;
@@ -64,6 +77,9 @@ import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.left;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISCONTINUED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISMISSED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
@@ -80,6 +96,7 @@ import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.STRIKE_
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.ACKNOWLEDGEMENT_OF_SERVICE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.BREATHING_SPACE_ENTERED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.BREATHING_SPACE_LIFTED;
+import static uk.gov.hmcts.reform.civil.model.robotics.EventType.CERTIFICATE_OF_SATISFACTION_OR_CANCELLATION;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.CONSENT_EXTENSION_FILING_DEFENCE;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFAULT_JUDGMENT_GRANTED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFENCE_FILED;
@@ -93,8 +110,8 @@ import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MENTAL_HEALTH_B
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MISCELLANEOUS;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.RECEIPT_OF_ADMISSION;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.RECEIPT_OF_PART_ADMISSION;
+import static uk.gov.hmcts.reform.civil.model.robotics.EventType.SET_ASIDE_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.STATES_PAID;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_SPEC_DEFENDANT_NOC;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.APPLICANT2_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.APPLICANT_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT2_ID;
@@ -126,9 +143,13 @@ public class EventHistoryMapper {
     public static final String BS_END_DATE = "actual end date";
     public static final String RPA_REASON_MANUAL_DETERMINATION = "RPA Reason: Manual Determination Required.";
     public static final String RPA_REASON_JUDGMENT_BY_ADMISSION = "RPA Reason: Judgment by Admission requested and claim moved offline.";
+    public static final String RECORD_JUDGMENT = "Judgment recorded.";
+    public static final String RPA_RECORD_JUDGMENT_REASON = "RPA Reason: Judgment recorded.";
     public static final String RPA_IN_MEDIATION = "IN MEDIATION";
+    public static final String QUERIES_ON_CASE = "There has been a query on this case";
     static final String ENTER = "Enter";
     static final String LIFTED = "Lifted";
+    static final Set<CaseState> OFFLINE_STATES = EnumSet.of(CASE_DISMISSED, PROCEEDS_IN_HERITAGE_SYSTEM, CASE_DISCONTINUED);
 
     public EventHistory buildEvents(CaseData caseData) {
         return buildEvents(caseData, null);
@@ -186,7 +207,7 @@ public class EventHistoryMapper {
                     // It can share the same RPA builder as DIVERGENT_RESPOND state because it builds events according
                     // to defendant response
                     // DIVERGENT_RESPOND states would only happen in 1v2 diff sol after both defendant responds.
-                    case AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED, AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED:
+                    case AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED, AWAITING_RESPONSES_FULL_ADMIT_RECEIVED, AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED:
                         buildRespondentDivergentResponse(builder, caseData, false);
                         break;
                     case DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE, DIVERGENT_RESPOND_GO_OFFLINE:
@@ -244,7 +265,7 @@ public class EventHistoryMapper {
                     case IN_MEDIATION:
                         buildClaimInMediation(builder, caseData);
                         break;
-                    case TAKEN_OFFLINE_SPEC_DEFENDANT_NOC:
+                    case TAKEN_OFFLINE_SPEC_DEFENDANT_NOC, TAKEN_OFFLINE_SPEC_DEFENDANT_NOC_AFTER_JBA:
                         buildTakenOfflineDueToDefendantNoc(builder, caseData);
                         break;
                     default:
@@ -284,7 +305,44 @@ public class EventHistoryMapper {
         buildInformAgreedExtensionDateForSpec(builder, caseData);
         buildClaimTakenOfflineAfterDJ(builder, caseData);
         buildCcjEvent(builder, caseData);
-        return eventHistorySequencer.sortEvents(builder.build());
+        buildSetAsideJudgment(builder, caseData);
+        buildCoscEvent(builder, caseData);
+        buildTakenOfflineAfterDefendantNoCDeadlinePassed(builder, caseData);
+        buildQueriesEvent(builder, caseData);
+        EventHistory eventHistory = eventHistorySequencer.sortEvents(builder.build());
+        log.info("Event history: {}", eventHistory);
+        return eventHistory;
+    }
+
+    private void buildTakenOfflineAfterDefendantNoCDeadlinePassed(EventHistory.EventHistoryBuilder builder,
+                                                                  CaseData caseData) {
+        boolean nocDeadlinePassed = false;
+        LocalDateTime takenOfflineDate = caseData.getTakenOfflineDate();
+        if (takenOfflineDate != null) {
+            if (caseData.getAddLegalRepDeadlineRes1() != null
+                && takenOfflineDate.isAfter(caseData.getAddLegalRepDeadlineRes1())
+                && YesOrNo.NO.equals(caseData.getRespondent1Represented())) {
+                nocDeadlinePassed = true;
+            }
+            if (caseData.getAddLegalRepDeadlineRes2() != null
+                && takenOfflineDate.isAfter(caseData.getAddLegalRepDeadlineRes2())
+                && YesOrNo.NO.equals(caseData.getRespondent2Represented())) {
+                nocDeadlinePassed = true;
+            }
+            if (nocDeadlinePassed) {
+                String miscText = "RPA Reason: Claim moved offline after defendant NoC deadline has passed";
+                builder.miscellaneous(
+                    Event.builder()
+                        .eventSequence(prepareEventSequence(builder.build()))
+                        .eventCode(MISCELLANEOUS.getCode())
+                        .dateReceived(takenOfflineDate)
+                        .eventDetailsText(miscText)
+                        .eventDetails(EventDetails.builder()
+                                          .miscText(miscText)
+                                          .build())
+                        .build());
+            }
+        }
     }
 
     private void buildInterlocutoryJudgment(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
@@ -333,51 +391,99 @@ public class EventHistoryMapper {
         }
     }
 
-    private Event prepareDefaultJudgment(EventHistory.EventHistoryBuilder builder, CaseData caseData,
+    private boolean hasCourtDecisionInFavourOfClaimant(CaseData caseData) {
+        ClaimantLiPResponse applicant1Response = Optional.ofNullable(caseData.getCaseDataLiP())
+            .map(CaseDataLiP::getApplicant1LiPResponse).orElse(null);
+        return applicant1Response != null && applicant1Response.hasCourtDecisionInFavourOfClaimant();
+    }
+
+    private Event prepareDefaultJudgment(EventHistory.EventHistoryBuilder eventHistoryBuilder, CaseData caseData,
                                          String litigiousPartyID) {
 
-        BigDecimal claimInterest = caseData.getTotalInterest() != null
-            ? caseData.getTotalInterest() : ZERO;
-        BigDecimal amountClaimedWithInterest = caseData.getTotalClaimAmount().add(claimInterest);
-        var partialPaymentPennies = isNotEmpty(caseData.getPartialPaymentAmount())
-            ? new BigDecimal(caseData.getPartialPaymentAmount()) : null;
-        var partialPaymentPounds = isNotEmpty(partialPaymentPennies)
-            ? MonetaryConversions.penniesToPounds(partialPaymentPennies) : null;
+        // Monetary amounts
+        BigDecimal totalInterest = caseData.getTotalInterest() != null ? caseData.getTotalInterest() : ZERO;
+        BigDecimal amountClaimedWithInterest = caseData.getTotalClaimAmount().add(totalInterest);
 
-        LocalDateTime paymentInFullDate;
-        if (caseData.getPaymentTypeSelection().equals(DJPaymentTypeSelection.IMMEDIATELY)) {
-            paymentInFullDate = LocalDateTime.now();
-        } else if (caseData.getPaymentTypeSelection().equals(DJPaymentTypeSelection.SET_DATE)) {
-            paymentInFullDate = caseData.getPaymentSetDate().atStartOfDay();
-        } else {
-            paymentInFullDate = null;
-        }
+        // Partial payment handling
+        BigDecimal partialPaymentAmountInPennies = isNotEmpty(caseData.getPartialPaymentAmount())
+            ? new BigDecimal(caseData.getPartialPaymentAmount())
+            : null;
+        BigDecimal partialPaymentAmountInPounds = isNotEmpty(partialPaymentAmountInPennies)
+            ? MonetaryConversions.penniesToPounds(partialPaymentAmountInPennies)
+            : null;
+
+        // Common flags and dates
+        boolean isImmediate = DJPaymentTypeSelection.IMMEDIATELY.equals(caseData.getPaymentTypeSelection());
+        boolean isRepaymentPlan = DJPaymentTypeSelection.REPAYMENT_PLAN.equals(caseData.getPaymentTypeSelection());
+        LocalDateTime dateOfDjCreated = getDateOfDjCreated(caseData);
+        LocalDateTime paymentInFullDate = computePaymentInFullDate(caseData);
+
+        // Costs and installments
+        BigDecimal amountOfCosts = (caseData.isApplicantLipOneVOne() && featureToggleService.isLipVLipEnabled())
+            ? MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence())
+            : JudgmentsOnlineHelper.getFixedCostsOfJudgmentForDJ(caseData).add(
+            JudgmentsOnlineHelper.getClaimFeeOfJudgmentForDJ(caseData));
+
+        BigDecimal installmentAmount = isRepaymentPlan
+            ? getInstallmentAmount(caseData.getRepaymentSuggestion()).setScale(2)
+            : ZERO;
+
+        BigDecimal amountPaidBeforeJudgment = (caseData.getPartialPayment() == YesOrNo.YES) ? partialPaymentAmountInPounds : ZERO;
+
+        boolean isJointJudgment = caseData.getRespondent2() != null;
 
         return Event.builder()
-            .eventSequence(prepareEventSequence(builder.build()))
+            .eventSequence(prepareEventSequence(eventHistoryBuilder.build()))
             .eventCode(DEFAULT_JUDGMENT_GRANTED.getCode())
-            .dateReceived(LocalDateTime.now())
+            .dateReceived(dateOfDjCreated)
             .litigiousPartyID(litigiousPartyID)
             .eventDetailsText("")
             .eventDetails(EventDetails.builder()
                               .miscText("")
                               .amountOfJudgment(amountClaimedWithInterest.setScale(2))
-                              .amountOfCosts((caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled())
-                                                 ? MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence())
-                                                 : JudgmentsOnlineHelper.getCostOfJudgmentForDJ(caseData))
-                              .amountPaidBeforeJudgment((caseData.getPartialPayment() == YesOrNo.YES) ? partialPaymentPounds : ZERO)
-                              .isJudgmentForthwith(caseData.getPaymentTypeSelection().equals(DJPaymentTypeSelection.IMMEDIATELY))
+                              .amountOfCosts(amountOfCosts)
+                              .amountPaidBeforeJudgment(amountPaidBeforeJudgment)
+                              .isJudgmentForthwith(isImmediate)
                               .paymentInFullDate(paymentInFullDate)
-                              .installmentAmount(caseData.getPaymentTypeSelection().equals(DJPaymentTypeSelection.REPAYMENT_PLAN)
-                                                     ? getInstallmentAmount(caseData.getRepaymentSuggestion()).setScale(2)
-                                                     : ZERO)
+                              .installmentAmount(installmentAmount)
                               .installmentPeriod(getInstallmentPeriod(caseData))
                               .firstInstallmentDate(caseData.getRepaymentDate())
-                              .dateOfJudgment(LocalDateTime.now())
-                              .jointJudgment(caseData.getRespondent2() != null)
+                              .dateOfJudgment(dateOfDjCreated)
+                              .jointJudgment(isJointJudgment)
                               .judgmentToBeRegistered(false)
                               .build())
             .build();
+    }
+
+    private LocalDateTime computePaymentInFullDate(CaseData caseData) {
+        DJPaymentTypeSelection paymentTypeSelection = caseData.getPaymentTypeSelection();
+        boolean claimantFavouredImmediate = hasCourtDecisionInFavourOfClaimant(caseData)
+            && caseData.applicant1SuggestedPayImmediately();
+
+        if (paymentTypeSelection == DJPaymentTypeSelection.IMMEDIATELY) {
+            return claimantFavouredImmediate
+                ? Optional.ofNullable(caseData.getApplicant1SuggestPayImmediatelyPaymentDateForDefendantSpec())
+                .map(LocalDate::atStartOfDay)
+                .orElse(null)
+                : LocalDateTime.now();
+        }
+
+        if (paymentTypeSelection == DJPaymentTypeSelection.SET_DATE) {
+            return claimantFavouredImmediate
+                ? Optional.ofNullable(caseData.getApplicant1RequestedPaymentDateForDefendantSpec())
+                .map(PaymentBySetDate::getPaymentSetDate)
+                .map(LocalDate::atStartOfDay)
+                .orElse(null)
+                : caseData.getPaymentSetDate().atStartOfDay();
+        }
+
+        return null;
+    }
+
+    private LocalDateTime getDateOfDjCreated(CaseData caseData) {
+        return featureToggleService.isJOLiveFeedActive() && Objects.nonNull(caseData.getJoDJCreatedDate())
+            ? caseData.getJoDJCreatedDate()
+            : LocalDateTime.now();
     }
 
     private BigDecimal getInstallmentAmount(String amount) {
@@ -386,19 +492,25 @@ public class EventHistoryMapper {
     }
 
     @Nullable
-    private BigDecimal getInstallmentAmount(boolean isResponsePayByInstallment, Optional<RepaymentPlanLRspec> repaymentPlan) {
-        return isResponsePayByInstallment
+    private BigDecimal getInstallmentAmount(CaseData caseData) {
+        boolean payByInstallment = hasCourtDecisionInFavourOfClaimant(caseData) ? caseData.applicant1SuggestedPayByInstalments() : caseData.isPayByInstallment();
+        Optional<RepaymentPlanLRspec> repaymentPlan = Optional.ofNullable(caseData.getRespondent1RepaymentPlan());
+        BigDecimal repaymentAmount = hasCourtDecisionInFavourOfClaimant(caseData)
+            ? caseData.getApplicant1SuggestInstalmentsPaymentAmountForDefendantSpec()
+            : repaymentPlan.map(RepaymentPlanLRspec::getPaymentAmount).orElse(ZERO);
+        return payByInstallment
             ? MonetaryConversions.penniesToPounds(
-            repaymentPlan.map(RepaymentPlanLRspec::getPaymentAmount).map(amount -> amount.setScale(2)).orElse(ZERO))
+            Optional.ofNullable(repaymentAmount).map(amount -> amount.setScale(2)).orElse(ZERO))
             : null;
     }
 
     @Nullable
-    private LocalDate getFirstInstallmentDate(boolean isResponsePayByInstallment, Optional<RepaymentPlanLRspec> repaymentPlan) {
-        return isResponsePayByInstallment
-            ? repaymentPlan.map(RepaymentPlanLRspec::getFirstRepaymentDate)
-            .orElse(null)
-            : null;
+    private LocalDate getFirstInstallmentDate(CaseData caseData) {
+        if (hasCourtDecisionInFavourOfClaimant(caseData)) {
+            return caseData.applicant1SuggestedPayByInstalments() ? caseData.getApplicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec() : null;
+        } else {
+            return caseData.isPayByInstallment() ? ofNullable(caseData.getRespondent1RepaymentPlan()).map(RepaymentPlanLRspec::getFirstRepaymentDate).orElse(null) : null;
+        }
     }
 
     private void buildBreathingSpaceEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData,
@@ -495,57 +607,165 @@ public class EventHistoryMapper {
         }
     }
 
+    private void buildCoscEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
+        boolean joMarkedPaidInFullDateExists = caseData.getJoMarkedPaidInFullIssueDate() != null;
+
+        if (featureToggleService.isJOLiveFeedActive()
+            && ((joMarkedPaidInFullDateExists && caseData.getJoDefendantMarkedPaidInFullIssueDate() == null)
+                || caseData.hasCoscCert())
+        ) {
+            // date received when mark paid in full by claimant is issued or when the scheduler runs at the cosc deadline at 4pm
+            LocalDateTime dateReceived = joMarkedPaidInFullDateExists
+                ? caseData.getJoMarkedPaidInFullIssueDate() : caseData.getJoDefendantMarkedPaidInFullIssueDate();
+
+            builder.certificateOfSatisfactionOrCancellation((Event.builder()
+                .eventSequence(prepareEventSequence(builder.build()))
+                .litigiousPartyID(joMarkedPaidInFullDateExists ? APPLICANT_ID : RESPONDENT_ID)
+                .eventCode(CERTIFICATE_OF_SATISFACTION_OR_CANCELLATION.getCode())
+                .dateReceived(dateReceived)
+                .eventDetails(EventDetails.builder()
+                                  .status(caseData.getJoCoscRpaStatus().toString())
+                                  .datePaidInFull(getCoscDate(caseData))
+                                  .notificationReceiptDate(joMarkedPaidInFullDateExists
+                                                               ? caseData.getJoMarkedPaidInFullIssueDate().toLocalDate()
+                                                               : caseData.getJoDefendantMarkedPaidInFullIssueDate().toLocalDate())
+                                  .build())
+                .eventDetailsText("")
+                .build()));
+        }
+    }
+
     private void buildCcjEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         if (caseData.isCcjRequestJudgmentByAdmission()) {
             buildJudgmentByAdmissionEventDetails(builder, caseData);
+
+            String miscTextRequested = RPA_REASON_JUDGMENT_BY_ADMISSION;
+            String detailsTextRequested = RPA_REASON_JUDGMENT_BY_ADMISSION;
+            if (featureToggleService.isJOLiveFeedActive()) {
+                miscTextRequested = RECORD_JUDGMENT;
+                detailsTextRequested = RPA_RECORD_JUDGMENT_REASON;
+            }
+
             builder.miscellaneous((Event.builder()
                 .eventSequence(prepareEventSequence(builder.build()))
                 .eventCode(MISCELLANEOUS.getCode())
-                .dateReceived(setApplicant1ResponseDate(caseData))
-                .eventDetailsText(RPA_REASON_JUDGMENT_BY_ADMISSION)
+                .dateReceived(getJbADate(caseData))
+                .eventDetailsText(detailsTextRequested)
                 .eventDetails(EventDetails.builder()
-                                  .miscText(RPA_REASON_JUDGMENT_BY_ADMISSION)
+                                  .miscText(miscTextRequested)
                                   .build())
                 .build()));
         }
     }
 
+    private void buildSetAsideJudgment(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
+        if (featureToggleService.isJOLiveFeedActive() && caseData.getJoSetAsideReason() != null) {
+            List<Event> events = new ArrayList<>();
+            events.add(buildSetAsideJudgmentEvent(builder, caseData, RESPONDENT_ID));
+            if (null != caseData.getRespondent2()) {
+                events.add(buildSetAsideJudgmentEvent(builder, caseData, RESPONDENT2_ID));
+            }
+            builder.setAsideJudgment(events);
+        }
+    }
+
+    private Event buildSetAsideJudgmentEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData, String litigiousPartyID) {
+        return Event.builder()
+            .eventSequence(prepareEventSequence(builder.build()))
+            .litigiousPartyID(litigiousPartyID)
+            .eventCode(SET_ASIDE_JUDGMENT.getCode())
+            .dateReceived(caseData.getJoSetAsideCreatedDate())
+            .eventDetails(getSetAsideEventDetails(caseData))
+            .eventDetailsText("")
+            .build();
+    }
+
+    private EventDetails getSetAsideEventDetails(CaseData caseData) {
+        String applicant = null;
+        LocalDate appDate = null;
+        LocalDate resultDate = null;
+        if (JudgmentSetAsideReason.JUDGE_ORDER.equals(caseData.getJoSetAsideReason())) {
+            if (JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION.equals(caseData.getJoSetAsideOrderType())) {
+                appDate = caseData.getJoSetAsideApplicationDate();
+            } else if (JudgmentSetAsideOrderType.ORDER_AFTER_DEFENCE.equals(caseData.getJoSetAsideOrderType())) {
+                appDate = caseData.getJoSetAsideDefenceReceivedDate();
+            }
+            applicant = SetAsideApplicantTypeForRPA.PARTY_AGAINST.getValue();
+            resultDate = caseData.getJoSetAsideOrderDate();
+
+        } else if (JudgmentSetAsideReason.JUDGMENT_ERROR.equals(caseData.getJoSetAsideReason())) {
+            applicant = SetAsideApplicantTypeForRPA.PROPER_OFFICER.getValue();
+        }
+        return EventDetails.builder()
+            .result(SetAsideResultTypeForRPA.GRANTED.name())
+            .applicant(applicant)
+            .applicationDate(appDate)
+            .resultDate(resultDate)
+            .build();
+    }
+
     private void buildJudgmentByAdmissionEventDetails(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        boolean isResponsePayByInstallment = caseData.isPayByInstallment();
-        Optional<RepaymentPlanLRspec> repaymentPlan = Optional.ofNullable(caseData.getRespondent1RepaymentPlan());
+
+        Optional<CCJPaymentDetails> ccjPaymentDetails = ofNullable(caseData.getCcjPaymentDetails());
         EventDetails judgmentByAdmissionEvent = EventDetails.builder()
-            .amountOfJudgment(caseData.getCcjPaymentDetails().getCcjJudgmentAmountClaimAmount()
-                                  .add(caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()
-                                           ? caseData.getCcjPaymentDetails().getCcjJudgmentLipInterest() :
-                                           Optional.ofNullable(caseData.getTotalInterest()).orElse(ZERO))
-                                  .setScale(2))
-            .amountOfCosts(caseData.getCcjPaymentDetails().getCcjJudgmentFixedCostAmount()
-                               .add(caseData.getCcjPaymentDetails().getCcjJudgmentAmountClaimFee()).setScale(2))
-            .amountPaidBeforeJudgment(caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeAmountInPounds().setScale(2))
-            .isJudgmentForthwith(caseData.isPayImmediately())
-            .paymentInFullDate(caseData.isPayBySetDate()
-                                   ? caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid().atStartOfDay()
-                                   : null)
-            .installmentAmount(getInstallmentAmount(isResponsePayByInstallment, repaymentPlan))
-            .installmentPeriod(isResponsePayByInstallment
-                                   ? getInstallmentPeriodForRequestJudgmentByAdmission(repaymentPlan)
-                                   : null)
-            .firstInstallmentDate(getFirstInstallmentDate(isResponsePayByInstallment, repaymentPlan))
-            .dateOfJudgment(setApplicant1ResponseDate(caseData))
+            .amountOfJudgment(getAmountOfJudgmentForAdmission(caseData))
+            .amountOfCosts(
+                ccjPaymentDetails.map(CCJPaymentDetails::getCcjJudgmentFixedCostAmount).orElse(BigDecimal.ZERO)
+                               .add(ccjPaymentDetails.map(CCJPaymentDetails::getCcjJudgmentAmountClaimFee)
+                                        .map(amount -> amount.setScale(2)).orElse(ZERO)))
+            .amountPaidBeforeJudgment(ccjPaymentDetails.map(CCJPaymentDetails::getCcjPaymentPaidSomeAmountInPounds).map(amountPaid -> amountPaid.setScale(2)).orElse(ZERO))
+            .isJudgmentForthwith(hasCourtDecisionInFavourOfClaimant(caseData) ? caseData.applicant1SuggestedPayImmediately() : caseData.isPayImmediately())
+            .paymentInFullDate(getPaymentInFullDate(caseData))
+            .installmentAmount(getInstallmentAmount(caseData))
+            .installmentPeriod(getJBAInstallmentPeriod(caseData))
+            .firstInstallmentDate(getFirstInstallmentDate(caseData))
+            .dateOfJudgment(getJbADate(caseData))
             .jointJudgment(false)
             .judgmentToBeRegistered(true)
             .miscText("")
             .build();
 
+        log.info("judgmentByAdmissionEvent: {}", judgmentByAdmissionEvent);
+
         builder.judgmentByAdmission((Event.builder()
             .eventSequence(prepareEventSequence(builder.build()))
             .eventCode(JUDGEMENT_BY_ADMISSION.getCode())
-            .litigiousPartyID(APPLICANT_ID)
-            .dateReceived(setApplicant1ResponseDate(caseData))
+            .litigiousPartyID(featureToggleService.isJOLiveFeedActive() ? RESPONDENT_ID : APPLICANT_ID)
+            .dateReceived(getJbADate(caseData))
             .eventDetails(judgmentByAdmissionEvent)
             .eventDetailsText("")
             .build()));
+    }
 
+    @Nullable
+    private LocalDateTime getPaymentInFullDate(CaseData caseData) {
+        RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec = caseData.getRespondToClaimAdmitPartLRspec();
+        if (hasCourtDecisionInFavourOfClaimant(caseData)) {
+            if (caseData.applicant1SuggestedPayBySetDate()) {
+                return Optional.ofNullable(caseData.getApplicant1RequestedPaymentDateForDefendantSpec())
+                    .map(PaymentBySetDate::getPaymentSetDate).map(LocalDate::atStartOfDay).orElse(null);
+            } else {
+                return null;
+            }
+        }
+        return caseData.isPayBySetDate()
+            ? Optional.ofNullable(respondToClaimAdmitPartLRspec)
+            .map(RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid)
+            .map(LocalDate::atStartOfDay).orElse(null)
+            : null;
+    }
+
+    @NotNull
+    protected BigDecimal getAmountOfJudgmentForAdmission(CaseData caseData) {
+        Optional<CCJPaymentDetails> ccjPaymentDetails = ofNullable(caseData.getCcjPaymentDetails());
+        return ccjPaymentDetails.map(CCJPaymentDetails::getCcjJudgmentAmountClaimAmount).orElse(ZERO)
+            .add(caseData.isLipvLipOneVOne() && !caseData.isPartAdmitClaimSpec()
+                ? ccjPaymentDetails.map(CCJPaymentDetails::getCcjJudgmentLipInterest).orElse(ZERO) : totalInterestForLrClaim(caseData)).setScale(2);
+    }
+
+    private BigDecimal totalInterestForLrClaim(CaseData caseData) {
+        return featureToggleService.isLrAdmissionBulkEnabled() ? ZERO : Optional.ofNullable(caseData.getTotalInterest()).orElse(
+            ZERO);
     }
 
     private void buildRespondentDivergentResponse(EventHistory.EventHistoryBuilder builder, CaseData caseData,
@@ -559,7 +779,6 @@ public class EventHistoryMapper {
             respondent2ResponseDate = caseData.getRespondent2ResponseDate();
         }
         String miscText;
-
         if (defendant1ResponseExists.test(caseData)) {
             if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
                 RespondentResponseTypeSpec respondent1SpecResponseType =
@@ -982,6 +1201,43 @@ public class EventHistoryMapper {
                                   .miscText(prepareTakenOfflineEventDetails(caseData))
                                   .build())
                 .build());
+    }
+
+    private void buildQueriesEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
+        if (!isCaseOffline(caseData)) {
+            return;
+        }
+        if (!hasActiveQueries(caseData)) {
+            return;
+        }
+
+        LocalDateTime dateReceived = Optional.ofNullable(caseData.getTakenOfflineDate())
+            .orElseGet(time::now);
+
+        builder.miscellaneous(
+            Event.builder()
+                .eventSequence(prepareEventSequence(builder.build()))
+                .eventCode(MISCELLANEOUS.getCode())
+                .dateReceived(dateReceived)
+                .eventDetailsText(QUERIES_ON_CASE)
+                .eventDetails(EventDetails.builder()
+                                  .miscText(QUERIES_ON_CASE)
+                                  .build())
+                .build());
+    }
+
+    private boolean hasActiveQueries(CaseData caseData) {
+        if (featureToggleService.isPublicQueryManagementEnabled(caseData)) {
+            return caseData.getQueries() != null;
+        } else {
+            return caseData.getQmApplicantSolicitorQueries() != null
+                || caseData.getQmRespondentSolicitor1Queries() != null
+                || caseData.getQmRespondentSolicitor2Queries() != null;
+        }
+    }
+
+    private boolean isCaseOffline(CaseData caseData) {
+        return OFFLINE_STATES.contains(caseData.getCcdState()) || caseData.getTakenOfflineDate() != null;
     }
 
     private void buildGeneralFormApplicationEventsStrikeOutOrder(EventHistory.EventHistoryBuilder builder,
@@ -1491,13 +1747,13 @@ public class EventHistoryMapper {
     }
 
     public boolean isStayClaim(DQ dq) {
-        return ofNullable(dq.getFileDirectionQuestionnaire())
+        return ofNullable(dq).map(DQ::getFileDirectionQuestionnaire)
             .map(FileDirectionsQuestionnaire::getOneMonthStayRequested)
             .orElse(NO) == YES;
     }
 
     public String getPreferredCourtCode(DQ dq) {
-        return ofNullable(dq.getRequestedCourt())
+        return ofNullable(dq).map(DQ::getRequestedCourt)
             .map(RequestedCourt::getResponseCourtCode)
             .orElse("");
     }
@@ -1967,7 +2223,7 @@ public class EventHistoryMapper {
                                            .build()
             );
             buildRespondentResponseText(builder, caseData, miscText, caseData.getRespondent1ResponseDate());
-
+            buildMiscellaneousForRespondentResponseLipVSLr(builder, caseData);
             if (defendant1v2SameSolicitorSameResponse.test(caseData)) {
                 LocalDateTime respondent2ResponseDate = null != caseData.getRespondent2ResponseDate()
                     ? caseData.getRespondent2ResponseDate() : caseData.getRespondent1ResponseDate();
@@ -2001,9 +2257,9 @@ public class EventHistoryMapper {
         if (defendant1ResponseExists.test(caseData)) {
             final Party respondent1 = caseData.getRespondent1();
             miscText = prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
-            Respondent1DQ respondent1DQ = caseData.getRespondent1DQ();
             LocalDateTime respondent1ResponseDate = caseData.getRespondent1ResponseDate();
-
+            buildMiscellaneousForRespondentResponseLipVSLr(builder, caseData);
+            Respondent1DQ respondent1DQ = caseData.getRespondent1DQ();
             if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                 && Objects.nonNull(caseData.getSpecDefenceAdmittedRequired())
                 && caseData.getSpecDefenceAdmittedRequired().equals(YES)) {
@@ -2187,7 +2443,6 @@ public class EventHistoryMapper {
 
     private void buildSDONotDrawn(EventHistory.EventHistoryBuilder builder,
                                   CaseData caseData) {
-
         String miscText = left(format(
             "RPA Reason: Case proceeds offline. "
                 + "Judge / Legal Advisor did not draw a Direction's Order: %s",
@@ -2195,12 +2450,16 @@ public class EventHistoryMapper {
         ), 250);
 
         LocalDateTime eventDate = caseData.getUnsuitableSDODate();
-
-        List<String> miscTextList = new ArrayList<>();
-        miscTextList.add(miscText);
-
-        List<Event> miscTextEvent = prepareMiscEventList(builder, caseData, miscTextList, eventDate);
-        builder.miscellaneous(miscTextEvent);
+        builder.miscellaneous(
+            Event.builder()
+                .eventSequence(prepareEventSequence(builder.build()))
+                .eventCode(MISCELLANEOUS.getCode())
+                .dateReceived(eventDate)
+                .eventDetailsText(miscText)
+                .eventDetails(EventDetails.builder()
+                                  .miscText(miscText)
+                                  .build())
+                .build());
     }
 
     private void buildClaimTakenOfflineAfterSDO(EventHistory.EventHistoryBuilder builder,
@@ -2245,14 +2504,19 @@ public class EventHistoryMapper {
             && caseData.getDefendantDetailsSpec() != null
             && !caseData.getDefendantDetailsSpec().getValue()
             .getLabel().startsWith("Both");
-        String miscTextRequested = "RPA Reason: Default Judgment requested and claim moved offline.";
+        String miscTextRequested =  "RPA Reason: Default Judgment requested and claim moved offline.";
         String miscTextGranted = "RPA Reason: Default Judgment granted and claim moved offline.";
+
+        if (featureToggleService.isJOLiveFeedActive()) {
+            miscTextGranted = RECORD_JUDGMENT;
+        }
+
         if (caseData.getDefendantDetailsSpec() != null) {
             builder.miscellaneous(
                 Event.builder()
                     .eventSequence(prepareEventSequence(builder.build()))
                     .eventCode(MISCELLANEOUS.getCode())
-                    .dateReceived(LocalDateTime.now())
+                    .dateReceived(getDateOfDjCreated(caseData))
                     .eventDetailsText(grantedFlag ? miscTextRequested : miscTextGranted)
                     .eventDetails(EventDetails.builder()
                                       .miscText(grantedFlag ? miscTextRequested : miscTextGranted)
@@ -2264,7 +2528,6 @@ public class EventHistoryMapper {
     private String getInstallmentPeriod(CaseData data) {
         if (data.getPaymentTypeSelection().equals(DJPaymentTypeSelection.REPAYMENT_PLAN)) {
             if (data.getRepaymentFrequency().equals(RepaymentFrequencyDJ.ONCE_ONE_WEEK)) {
-
                 return "WK";
             } else if (data.getRepaymentFrequency().equals(RepaymentFrequencyDJ.ONCE_TWO_WEEKS)) {
                 return "FOR";
@@ -2279,19 +2542,43 @@ public class EventHistoryMapper {
         return "FUL";
     }
 
-    private String getInstallmentPeriodForRequestJudgmentByAdmission(Optional<RepaymentPlanLRspec> repaymentPlanLRspec) {
-        return repaymentPlanLRspec.map(RepaymentPlanLRspec::getRepaymentFrequency).map(repaymentFrequency -> {
-            switch (repaymentFrequency) {
-                case ONCE_ONE_WEEK:
-                    return "WK";
-                case ONCE_TWO_WEEKS:
-                    return "FOR";
-                case ONCE_ONE_MONTH:
-                    return "MTH";
-                default:
-                    return null;
+    private String getInstallmentPeriodForRequestJudgmentByAdmission(boolean payByInstallment, CaseData caseData) {
+        if (payByInstallment) {
+            if (hasCourtDecisionInFavourOfClaimant(caseData)) {
+                return mapToRepaymentPlanFrequency(Optional.ofNullable(caseData.getApplicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec()).map(Enum::name).orElse(""));
+            } else {
+                return mapToRepaymentPlanFrequency(ofNullable(caseData.getRespondent1RepaymentPlan()).map(RepaymentPlanLRspec::getRepaymentFrequency).map(
+                    Enum::name).orElse(""));
             }
-        }).orElse(null);
+        } else {
+            return null;
+        }
+    }
+
+    private String mapToRepaymentPlanFrequency(String frequency) {
+        return switch (frequency) {
+            case "ONCE_ONE_WEEK" -> "WK";
+            case "ONCE_TWO_WEEKS" -> "FOR";
+            case "ONCE_ONE_MONTH" -> "MTH";
+            default -> null;
+        };
+    }
+
+    private String getJBAInstallmentPeriod(CaseData caseData) {
+        boolean joLiveFeedActive = featureToggleService.isJOLiveFeedActive();
+        boolean payByInstallment = hasCourtDecisionInFavourOfClaimant(caseData) ? caseData.applicant1SuggestedPayByInstalments() : caseData.isPayByInstallment();
+        if (payByInstallment) {
+            return getInstallmentPeriodForRequestJudgmentByAdmission(payByInstallment, caseData);
+        }
+        boolean payBySetDate = hasCourtDecisionInFavourOfClaimant(caseData) ? caseData.applicant1SuggestedPayBySetDate() : caseData.isPayBySetDate();
+        boolean payImmediately = hasCourtDecisionInFavourOfClaimant(caseData) ? caseData.applicant1SuggestedPayImmediately() : caseData.isPayImmediately();
+        if (joLiveFeedActive && payBySetDate) {
+            return "FUL";
+        } else if (joLiveFeedActive && payImmediately) {
+            return "FW";
+        } else {
+            return null;
+        }
     }
 
     private void buildClaimTakenOfflineAfterDJ(EventHistory.EventHistoryBuilder builder,
@@ -2410,5 +2697,36 @@ public class EventHistoryMapper {
             applicant1ResponseDate = LocalDateTime.now();
         }
         return applicant1ResponseDate;
+    }
+
+    private void buildMiscellaneousForRespondentResponseLipVSLr(EventHistory.EventHistoryBuilder builder,
+                                                                CaseData caseData) {
+        if (caseData.isLipvLROneVOne()) {
+            builder.miscellaneous(
+                Event.builder()
+                    .eventSequence(prepareEventSequence(builder.build()))
+                    .eventCode(MISCELLANEOUS.getCode())
+                    .dateReceived(LocalDateTime.now())
+                    .eventDetailsText("RPA Reason: LiP vs LR - full/part admission received.")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("RPA Reason: LiP vs LR - full/part admission received.")
+                                      .build())
+                    .build());
+        }
+    }
+
+    private LocalDate getCoscDate(CaseData caseData) {
+        if (caseData.getJoFullyPaymentMadeDate() != null) {
+            return caseData.getJoFullyPaymentMadeDate();
+        } else if (caseData.getCertOfSC() != null && caseData.getCertOfSC().getDefendantFinalPaymentDate() != null) {
+            return caseData.getCertOfSC().getDefendantFinalPaymentDate();
+        }
+        throw new IllegalArgumentException("Payment date cannot be null");
+    }
+
+    private LocalDateTime getJbADate(CaseData caseData) {
+        return featureToggleService.isJOLiveFeedActive()
+            ? caseData.getJoJudgementByAdmissionIssueDate()
+            : setApplicant1ResponseDate(caseData);
     }
 }

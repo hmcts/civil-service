@@ -8,9 +8,11 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 
@@ -22,7 +24,11 @@ import java.util.Optional;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_PROCEEDS_IN_CASEMAN;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_CASE_PROCEEDS_IN_CASEMAN;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_NOTIFIED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_BY_STAFF;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getRespondentLegalOrganizationName;
 
@@ -43,6 +49,8 @@ public class CaseProceedsInCasemanRespondentNotificationHandler extends Callback
     private final NotificationsProperties notificationsProperties;
     private final IStateFlowEngine stateFlowEngine;
     private final OrganisationService organisationService;
+    private final NotificationsSignatureConfiguration configuration;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -69,7 +77,16 @@ public class CaseProceedsInCasemanRespondentNotificationHandler extends Callback
     private CallbackResponse notifyRespondentSolicitorForCaseProceedsInCaseman(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        if (stateFlowEngine.hasTransitionedTo(callbackParams.getRequest().getCaseDetails(), CLAIM_NOTIFIED)) {
+        var multiPartyScenario = getMultiPartyScenario(caseData);
+
+        if (NOTIFY_RESPONDENT_SOLICITOR2_FOR_CASE_PROCEEDS_IN_CASEMAN.name().equals(callbackParams.getRequest().getEventId())
+            && ONE_V_TWO_TWO_LEGAL_REP != multiPartyScenario) {
+            return AboutToStartOrSubmitCallbackResponse.builder().build();
+        }
+
+        if (stateFlowEngine.hasTransitionedTo(callbackParams.getRequest().getCaseDetails(), CLAIM_NOTIFIED)
+            || (stateFlowEngine.hasTransitionedTo(callbackParams.getRequest().getCaseDetails(), TAKEN_OFFLINE_BY_STAFF)
+            && caseData.isLipvLROneVOne())) {
 
             String emailAddress;
             if (NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_PROCEEDS_IN_CASEMAN.name()
@@ -84,7 +101,8 @@ public class CaseProceedsInCasemanRespondentNotificationHandler extends Callback
             Optional.ofNullable(emailAddress).ifPresent(
                 email -> notificationService.sendMail(
                     email,
-                    notificationsProperties.getSolicitorCaseTakenOffline(),
+                    caseData.isLipvLROneVOne() ? notificationsProperties.getSolicitorCaseTakenOfflineForSpec() :
+                        notificationsProperties.getSolicitorCaseTakenOffline(),
                     notificationProperties,
                     String.format(
                         REFERENCE_TEMPLATE,
@@ -104,9 +122,14 @@ public class CaseProceedsInCasemanRespondentNotificationHandler extends Callback
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-        return new HashMap<>(Map.of(
+        HashMap<String, String> properties = new HashMap<>(Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
-            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
+        addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
+
+        return properties;
     }
 }

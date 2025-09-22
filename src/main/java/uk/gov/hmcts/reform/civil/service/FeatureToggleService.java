@@ -10,6 +10,8 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseContainsLiP;
+import static uk.gov.hmcts.reform.civil.utils.JudgeReallocatedClaimTrack.judgeReallocatedTrackOrAlreadyMinti;
 
 @Slf4j
 @Service
@@ -30,10 +32,6 @@ public class FeatureToggleService {
         return this.featureToggleApi.isFeatureEnabled("bulk_claim_enabled");
     }
 
-    public boolean isCaseFlagsEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("case-flags");
-    }
-
     public boolean isPinInPostEnabled() {
         return this.featureToggleApi.isFeatureEnabled("pin-in-post");
     }
@@ -42,20 +40,8 @@ public class FeatureToggleService {
         return this.featureToggleApi.isFeatureEnabled("enable-rpa-emails");
     }
 
-    public boolean isHmcEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("hmc");
-    }
-
-    public boolean isAutomatedHearingNoticeEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("ahn");
-    }
-
     public boolean isFastTrackUpliftsEnabled() {
         return this.featureToggleApi.isFeatureEnabled("fast-track-uplifts");
-    }
-
-    public boolean isUpdateContactDetailsEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("update-contact-details");
     }
 
     public boolean isLipVLipEnabled() {
@@ -82,20 +68,8 @@ public class FeatureToggleService {
         return featureToggleApi.isFeatureEnabled("cui-case-progression");
     }
 
-    public boolean isEarlyAdoptersEnabled() {
-        return featureToggleApi.isFeatureEnabled("early-adopters");
-    }
-
-    public boolean isSdoR2Enabled() {
-        return featureToggleApi.isFeatureEnabled("isSdoR2Enabled");
-    }
-
     public boolean isJudgmentOnlineLive() {
         return featureToggleApi.isFeatureEnabled("isJudgmentOnlineLive");
-    }
-
-    public boolean isMintiEnabled() {
-        return featureToggleApi.isFeatureEnabled("minti");
     }
 
     public boolean isCjesServiceAvailable() {
@@ -106,7 +80,7 @@ public class FeatureToggleService {
         ZoneId zoneId = ZoneId.systemDefault();
         long epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
         boolean isSpecClaim = SPEC_CLAIM.equals(caseData.getCaseAccessCategory());
-        return isSpecClaim && featureToggleApi.isFeatureEnabled("carm")
+        return isSpecClaim
             && featureToggleApi.isFeatureEnabledForDate("cam-enabled-for-case",
                                                         epoch, false);
     }
@@ -123,11 +97,16 @@ public class FeatureToggleService {
         } else {
             epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
         }
-        return featureToggleApi.isFeatureEnabled("minti")
-            && featureToggleApi.isFeatureEnabledForDate("multi-or-intermediate-track", epoch, false);
+        boolean multiOrIntermediateTrackEnabled = featureToggleApi.isFeatureEnabledForDate("multi-or-intermediate-track", epoch, false);
+        boolean judgeReallocatedTrackOrAlreadyMinti = judgeReallocatedTrackOrAlreadyMinti(caseData, multiOrIntermediateTrackEnabled);
+        return multiOrIntermediateTrackEnabled || judgeReallocatedTrackOrAlreadyMinti;
     }
 
     public boolean isDashboardEnabledForCase(CaseData caseData) {
+        if (!SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            return false;
+        }
+
         ZoneId zoneId = ZoneId.systemDefault();
         long epoch;
         if (caseData.getSubmittedDate() == null) {
@@ -139,24 +118,78 @@ public class FeatureToggleService {
             && featureToggleApi.isFeatureEnabledForDate("is-dashboard-enabled-for-case", epoch, false);
     }
 
-    public boolean isPartOfNationalRollout(String locationEpimms) {
-        return locationEpimms != null && featureToggleApi
-            .isFeatureEnabledForLocation("national-rollout-whitelist", locationEpimms, false);
-    }
-
-    public boolean isCaseEventsEnabled() {
-        return featureToggleApi.isFeatureEnabled("cui-case-events-enabled");
-    }
-
     public boolean isAmendBundleEnabled() {
         return featureToggleApi.isFeatureEnabled("amend-bundle-enabled");
     }
 
-    public boolean isGenAppsAllowedPreSdo() {
-        return featureToggleApi.isFeatureEnabled("ga-allowed-pre-sdo");
-    }
-
     public boolean isCoSCEnabled() {
         return featureToggleApi.isFeatureEnabled("isCoSCEnabled");
+    }
+
+    public boolean isCaseProgressionEnabledAndLocationWhiteListed(String location) {
+        return location != null
+            && featureToggleApi.isFeatureEnabledForLocation("case-progression-location-whitelist", location, true)
+            && isCaseProgressionEnabled();
+    }
+
+    public boolean isGaForLipsEnabledAndLocationWhiteListed(String location) {
+        return location != null
+            && featureToggleApi.isFeatureEnabledForLocation("ea-courts-whitelisted-for-ga-lips", location, false)
+            && isGaForLipsEnabled();
+    }
+
+    public boolean isJOLiveFeedActive() {
+        return isJudgmentOnlineLive()
+            && featureToggleApi.isFeatureEnabled("isJOLiveFeedActive");
+    }
+
+    public boolean isDefendantNoCOnlineForCase(CaseData caseData)  {
+        ZoneId zoneId = ZoneId.systemDefault();
+        long epoch;
+        if (caseData.getSubmittedDate() == null) {
+            epoch = LocalDateTime.now().atZone(zoneId).toEpochSecond();
+        } else {
+            epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
+        }
+        return featureToggleApi.isFeatureEnabledForDate("is-defendant-noc-online-for-case", epoch, false);
+    }
+
+    public boolean isHmcForLipEnabled() {
+        return featureToggleApi.isFeatureEnabled("hmc-cui-enabled");
+    }
+
+    // if deleting this, also handle isQMPdfGeneratorEnabled() below
+    public boolean isPublicQueryManagementEnabled(CaseData caseData) {
+        if (caseContainsLiP.test(caseData)) {
+            return isLipQueryManagementEnabled(caseData);
+        }
+        return featureToggleApi.isFeatureEnabled("public-query-management");
+    }
+
+    public boolean isQMPdfGeneratorDisabled() {
+        // only generate pdf if flag is off
+        return featureToggleApi.isFeatureEnabled("public-query-management");
+    }
+
+    public boolean isGaForWelshEnabled() {
+        return featureToggleApi.isFeatureEnabled("generalApplicationsForWelshParty");
+    }
+
+    public boolean isWelshEnabledForMainCase() {
+        return featureToggleApi.isFeatureEnabled("enableWelshForMainCase");
+    }
+
+    public boolean isLipQueryManagementEnabled(CaseData caseData) {
+        ZoneId zoneId = ZoneId.systemDefault();
+        long epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
+        return featureToggleApi.isFeatureEnabledForDate("cui-query-management", epoch, false);
+    }
+
+    public boolean isLrAdmissionBulkEnabled() {
+        return featureToggleApi.isFeatureEnabled("lr-admission-bulk");
+    }
+
+    public boolean isCuiGaNroEnabled() {
+        return featureToggleApi.isFeatureEnabled("cui-ga-nro");
     }
 }

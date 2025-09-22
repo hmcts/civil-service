@@ -8,132 +8,131 @@ import au.com.dius.pact.core.model.RequestResponsePact;
 import au.com.dius.pact.core.model.annotations.Pact;
 import org.apache.http.HttpStatus;
 import org.json.JSONException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
-import uk.gov.hmcts.reform.payments.client.PaymentsApi;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
+import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.prd.model.ContactInformation;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.service.PaymentsService;
 import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
-import uk.gov.hmcts.reform.payments.request.CardPaymentServiceRequestDTO;
-import uk.gov.hmcts.reform.payments.response.CardPaymentServiceRequestResponse;
 
 import java.io.IOException;
-import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import static au.com.dius.pact.consumer.dsl.LambdaDsl.newJsonBody;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
-@PactTestFor(providerName = "payment_api")
+@PactTestFor(providerName = "payment_creditAccountPayment")
 @MockServerConfig(hostInterface = "localhost", port = "6670")
 @TestPropertySource(properties = "payments.api.url=http://localhost:6670")
 public class PaymentsApiConsumerTest extends BaseContractTest {
 
-    public static final String PAYMENT_REQUEST_ENDPOINT_PREFIX = "/service-request/";
-    public static final String PAYMENT_REQUEST_ENDPOINT_SUFFIX = "/card-payments";
-    private static final String SERVICE_REQUEST_ID_SUFFIX = "${service-request-reference}";
-
-    public static final String STATUS_ENDPOINT_PREFIX = "/card-payments/";
-    public static final String STATUS_ENDPOINT_SUFFIX = "/statuses";
-    private static final String PAYMENT_REFERENCE_ID_SUFFIX = "${paymentReference}";
-    private static final String REFERENCE = "123456789";
+    private static final String SERVICE = "CIVIL";
+    private static final String SITE_ID = "site_id";
+    private static final String SPEC_SITE_ID = "spec_site_id";
+    private static final Organisation ORGANISATION = Organisation.builder()
+        .name("test org")
+        .contactInformation(List.of(ContactInformation.builder().build()))
+        .build();
+    protected static final String ACCOUNT_NUMBER = "PBA0077597";
 
     @Autowired
-    private PaymentsApi paymentsApi;
+    private PaymentsService paymentsService;
 
-    @Pact(consumer = "civil-service")
-    public RequestResponsePact getStatusOfPayment(PactDslWithProvider builder)
-        throws JSONException, IOException {
-        return buildStatusOfPaymentPact(builder);
-    }
+    @MockBean
+    AuthTokenGenerator authTokenGenerator;
 
-    @Test
-    @PactTestFor(pactMethod = "getStatusOfPayment")
-    public void verifyPaymentSuccess() {
-        PaymentDto response = paymentsApi.retrieveCardPaymentStatus(REFERENCE, AUTHORIZATION_TOKEN, SERVICE_AUTH_TOKEN);
-        assertThat(response.getStatus(), is("Success"));
-    }
+    @MockBean
+    private OrganisationService organisationService;
 
-    public RequestResponsePact buildStatusOfPaymentPact(PactDslWithProvider builder) throws IOException {
-        return builder
-            .given("The status of a payment request needs to be checked")
-            .uponReceiving("a request for status for a payment reference")
-            .pathFromProviderState(
-                STATUS_ENDPOINT_PREFIX + PAYMENT_REFERENCE_ID_SUFFIX + STATUS_ENDPOINT_SUFFIX,
-                STATUS_ENDPOINT_PREFIX + REFERENCE + STATUS_ENDPOINT_SUFFIX
-            )
-            .headers(AUTHORIZATION_HEADER, AUTHORIZATION_TOKEN, SERVICE_AUTHORIZATION_HEADER, SERVICE_AUTH_TOKEN)
-            .method(HttpMethod.GET.toString())
-            .willRespondWith()
-            .matchHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-            .body(buildPaymentStatusResponseDsl())
-            .status(HttpStatus.SC_OK)
-            .toPact();
-    }
+    @MockBean
+    private PaymentsConfiguration paymentsConfiguration;
 
-    public static DslPart buildPaymentStatusResponseDsl() {
-        return newJsonBody(response ->
-                               response
-                                   .stringValue("external_reference", "DUMMY-EXT-REF")
-                                   .stringValue("payment_reference", "DUMMY-PAYMENT-REF")
-                                   .stringValue("status", "Success")
-                                   .stringValue("date_created", "2020-02-20T20:20:20.222+0000")
-        ).build();
-    }
+    private CaseData caseData = CaseDataBuilder.builder().buildClaimIssuedPaymentCaseDataWithPba(ACCOUNT_NUMBER);
 
-    @Pact(consumer = "civil-service")
+    @Pact(consumer = "civil_service")
     public RequestResponsePact doCardPaymentRequest(PactDslWithProvider builder)
         throws JSONException, IOException {
         return buildCardPaymentRequestPact(builder);
     }
 
+    @BeforeEach
+    void setUp() {
+        when(paymentsConfiguration.getService()).thenReturn(SERVICE);
+        when(paymentsConfiguration.getSiteId()).thenReturn(SITE_ID);
+        when(paymentsConfiguration.getSpecSiteId()).thenReturn(SPEC_SITE_ID);
+        when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(ORGANISATION));
+        when(authTokenGenerator.generate()).thenReturn(SERVICE_AUTH_TOKEN);
+    }
+
     @Test
     @PactTestFor(pactMethod = "doCardPaymentRequest")
-    public void verifyPostOfPaymentRequest() {
-        CardPaymentServiceRequestResponse response = paymentsApi.createGovPayCardPaymentRequest(REFERENCE, AUTHORIZATION_TOKEN, SERVICE_AUTH_TOKEN, buildPaymentRequest());
-        assertThat(response.getExternalReference(), is("DUMMY-EXT-REF"));
-        assertThat(response.getStatus(), is("Initiated"));
-        assertThat(response.getNextUrl(), is("cui-page.hmcts.platform.net"));
+    public void verifyCreditCardPaymentRequest() {
+        PaymentDto response = paymentsService.createCreditAccountPayment(caseData, AUTHORIZATION_TOKEN);
+        assertThat(response.getStatus(), is("Success"));
+
     }
 
     private RequestResponsePact buildCardPaymentRequestPact(PactDslWithProvider builder) throws IOException {
+
+        Map<String, Object> paymentMap = new HashMap<>();
+        paymentMap.put("accountNumber", ACCOUNT_NUMBER);
+        paymentMap.put("availableBalance", "1000.00");
+        paymentMap.put("accountName", "test.account.name");
+
         return builder
-            .given("Post a payment request to pay service request")
-            .uponReceiving("a request payment")
-            .pathFromProviderState(
-                PAYMENT_REQUEST_ENDPOINT_PREFIX + SERVICE_REQUEST_ID_SUFFIX + PAYMENT_REQUEST_ENDPOINT_SUFFIX,
-                PAYMENT_REQUEST_ENDPOINT_PREFIX + REFERENCE + PAYMENT_REQUEST_ENDPOINT_SUFFIX
-            )
-            .headers(AUTHORIZATION_HEADER, AUTHORIZATION_TOKEN, SERVICE_AUTHORIZATION_HEADER, SERVICE_AUTH_TOKEN)
+            .given("An active account has sufficient funds for a payment", paymentMap)
+            .uponReceiving("a request to create a payment in payments api with valid authorization")
+            .path("/credit-account-payments")
+            .headers(AUTHORIZATION_HEADER, AUTHORIZATION_TOKEN)
             .method(HttpMethod.POST.toString())
+            .body(createJsonObject(paymentsService.buildRequest(caseData)))
             .willRespondWith()
             .matchHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-            .body(buildDoPaymentResponseDsl())
-            .status(HttpStatus.SC_OK)
+            .body(buildPBAPaymentResponseDsl("Success", "success", null, "Payment by account successful"))
+            .status(HttpStatus.SC_CREATED)
             .toPact();
     }
 
-    public CardPaymentServiceRequestDTO buildPaymentRequest() {
-        return CardPaymentServiceRequestDTO.builder()
-            .language("En")
-            .currency("GBP")
-            .amount(new BigDecimal(5000))
-            .returnUrl("cui-page.hmcts.platform.net")
-            .build();
-
+    private DslPart buildPBAPaymentResponseDsl(String status, String paymentStatus, String errorCode, String errorMessage) {
+        return getDslPart(status, paymentStatus, errorCode, errorMessage);
     }
 
-    public static DslPart buildDoPaymentResponseDsl() {
-        return newJsonBody(response ->
-                               response
-                                   .stringValue("external_reference", "DUMMY-EXT-REF")
-                                   .stringValue("payment_reference", "DUMMY-PAYMENT-REF")
-                                   .stringValue("status", "Initiated")
-                                   .stringValue("next_url", "cui-page.hmcts.platform.net")
-                                   .stringValue("date_created", "2020-02-20T20:20:20.222+0000")
-        ).build();
+    static DslPart getDslPart(String status, String paymentStatus, String errorCode, String errorMessage) {
+        return newJsonBody((o) -> {
+            o.stringType("reference", "reference")
+                .stringType("status", status)
+                .minArrayLike("status_histories", 1, 1,
+                    (sh) -> {
+                        sh.stringMatcher("date_updated",
+                                "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{3}\\+\\d{4})$",
+                                "2020-10-06T18:54:48.785+0000")
+                            .stringMatcher("date_created",
+                                "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{3}\\+\\d{4})$",
+                                "2020-10-06T18:54:48.785+0000")
+                            .stringValue("status", paymentStatus);
+                        if (errorCode != null) {
+                            sh.stringValue("error_code", errorCode);
+                            sh.stringType("error_message",
+                                errorMessage);
+                        }
+                    });
+        }).build();
     }
-
 }

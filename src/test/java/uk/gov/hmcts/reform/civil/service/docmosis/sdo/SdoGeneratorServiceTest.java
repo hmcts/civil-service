@@ -94,13 +94,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SDO_ORDER;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_DISPOSAL;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_FAST;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_FAST_FAST_TRACK_INT_R2;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_FAST_R2;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_FAST_TRACK_NIHL;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_R2_DISPOSAL;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_SMALL;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_SMALL_DRH;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_SMALL_R2;
 
@@ -173,8 +170,8 @@ public class SdoGeneratorServiceTest {
 
     @Test
     public void sdoSmall() {
-        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(SDO_SMALL)))
-            .thenReturn(new DocmosisDocument(SDO_SMALL.getDocumentTitle(), bytes));
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(SDO_SMALL_R2)))
+            .thenReturn(new DocmosisDocument(SDO_SMALL_R2.getDocumentTitle(), bytes));
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameSmall, bytes, SDO_ORDER)))
             .thenReturn(CASE_DOCUMENT_SMALL);
 
@@ -196,8 +193,8 @@ public class SdoGeneratorServiceTest {
 
     @Test
     public void sdoSmallInPerson() {
-        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(SDO_SMALL)))
-            .thenReturn(new DocmosisDocument(SDO_SMALL.getDocumentTitle(), bytes));
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(SDO_SMALL_R2)))
+            .thenReturn(new DocmosisDocument(SDO_SMALL_R2.getDocumentTitle(), bytes));
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameSmall, bytes, SDO_ORDER)))
             .thenReturn(CASE_DOCUMENT_SMALL);
 
@@ -241,7 +238,6 @@ public class SdoGeneratorServiceTest {
             .thenReturn(new DocmosisDocument(SDO_SMALL_R2.getDocumentTitle(), bytes));
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameSmall, bytes, SDO_ORDER)))
             .thenReturn(CASE_DOCUMENT_SMALL);
-        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
 
         LocationRefData locationRefData = LocationRefData.builder().build();
         String locationLabel = "String 1";
@@ -282,8 +278,8 @@ public class SdoGeneratorServiceTest {
 
     @Test
     public void sdoSmallInPersonCarm() {
-        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(SDO_SMALL)))
-            .thenReturn(new DocmosisDocument(SDO_SMALL.getDocumentTitle(), bytes));
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(SDO_SMALL_R2)))
+            .thenReturn(new DocmosisDocument(SDO_SMALL_R2.getDocumentTitle(), bytes));
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameSmall, bytes, SDO_ORDER)))
             .thenReturn(CASE_DOCUMENT_SMALL);
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
@@ -329,8 +325,8 @@ public class SdoGeneratorServiceTest {
 
     @Test
     public void shouldGenerateSdoFastTrackDocument() {
-        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(SDO_FAST)))
-            .thenReturn(new DocmosisDocument(SDO_FAST.getDocumentTitle(), bytes));
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(SDO_FAST_R2)))
+            .thenReturn(new DocmosisDocument(SDO_FAST_R2.getDocumentTitle(), bytes));
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameFast, bytes, SDO_ORDER)))
             .thenReturn(CASE_DOCUMENT_FAST);
 
@@ -353,8 +349,8 @@ public class SdoGeneratorServiceTest {
 
     @Test
     public void shouldGenerateSdoFastTrackDocumentInPerson() {
-        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(SDO_FAST)))
-            .thenReturn(new DocmosisDocument(SDO_FAST.getDocumentTitle(), bytes));
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(SDO_FAST_R2)))
+            .thenReturn(new DocmosisDocument(SDO_FAST_R2.getDocumentTitle(), bytes));
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameFast, bytes, SDO_ORDER)))
             .thenReturn(CASE_DOCUMENT_FAST);
 
@@ -394,39 +390,7 @@ public class SdoGeneratorServiceTest {
     }
 
     @Test
-    public void shouldGenerateSdoFastTrackDocumentWithR2Template() {
-        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
-
-        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(SDO_FAST_R2)))
-            .thenReturn(new DocmosisDocument(SDO_FAST_R2.getDocumentTitle(), bytes));
-        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameFast, bytes, SDO_ORDER)))
-            .thenReturn(CASE_DOCUMENT_FAST);
-
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateNotificationAcknowledged()
-            .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
-            .atStateSdoFastTrackTrial()
-            .build()
-            .toBuilder()
-            .drawDirectionsOrderRequired(YesOrNo.NO)
-            .claimsTrack(ClaimsTrack.fastTrack)
-            .build();
-
-        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
-
-        assertThat(caseDocument).isNotNull();
-        verify(documentManagementService)
-            .uploadDocument(BEARER_TOKEN, new PDF(fileNameFast, bytes, SDO_ORDER));
-        verify(documentGeneratorService).generateDocmosisDocument(
-            argThat((MappableObject templateData) ->
-                        templateData instanceof SdoDocumentFormFast),
-            eq(SDO_FAST_R2)
-        );
-    }
-
-    @Test
     public void shouldGenerateSdoFastTrackDocumentWithR2TemplateAndFastTrackUpLiftsEnabled() {
-        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
         when(featureToggleService.isFastTrackUpliftsEnabled()).thenReturn(true);
 
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(SDO_FAST_FAST_TRACK_INT_R2)))
@@ -440,41 +404,6 @@ public class SdoGeneratorServiceTest {
             .atStateSdoFastTrackTrial()
             .build()
             .toBuilder()
-            .drawDirectionsOrderRequired(YesOrNo.NO)
-            .claimsTrack(ClaimsTrack.fastTrack)
-            .build();
-
-        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
-
-        assertThat(caseDocument).isNotNull();
-        verify(documentManagementService)
-            .uploadDocument(BEARER_TOKEN, new PDF(fileNameFast, bytes, SDO_ORDER));
-        verify(documentGeneratorService).generateDocmosisDocument(
-            argThat((MappableObject templateData) ->
-                        templateData instanceof SdoDocumentFormFast),
-            eq(SDO_FAST_FAST_TRACK_INT_R2)
-        );
-    }
-
-    @Test
-    public void shouldGenerateSdoR2FastTrackDocumentWithR2TemplateAndFastTrackUpLiftsEnabled() {
-        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
-        when(featureToggleService.isFastTrackUpliftsEnabled()).thenReturn(true);
-
-        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(SDO_FAST_FAST_TRACK_INT_R2)))
-            .thenReturn(new DocmosisDocument(SDO_FAST_FAST_TRACK_INT_R2.getDocumentTitle(), bytes));
-        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameFast, bytes, SDO_ORDER)))
-            .thenReturn(CASE_DOCUMENT_FAST);
-        List<FastTrack> fastTrackList = new ArrayList<FastTrack>();
-        fastTrackList.add(FastTrack.fastClaimCreditHire);
-
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateNotificationAcknowledged()
-            .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
-            .atStateSdoFastTrackCreditHire()
-            .build()
-            .toBuilder()
-            .trialAdditionalDirectionsForFastTrack(fastTrackList)
             .drawDirectionsOrderRequired(YesOrNo.NO)
             .claimsTrack(ClaimsTrack.fastTrack)
             .build();
@@ -493,8 +422,8 @@ public class SdoGeneratorServiceTest {
 
     @Test
     public void shouldGenerateSdoDisposalDocument() {
-        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(SDO_DISPOSAL)))
-            .thenReturn(new DocmosisDocument(SDO_DISPOSAL.getDocumentTitle(), bytes));
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(SDO_R2_DISPOSAL)))
+            .thenReturn(new DocmosisDocument(SDO_R2_DISPOSAL.getDocumentTitle(), bytes));
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameDisposal, bytes, SDO_ORDER)))
             .thenReturn(CASE_DOCUMENT_DISPOSAL);
 
@@ -531,8 +460,8 @@ public class SdoGeneratorServiceTest {
 
     @Test
     public void shouldGenerateSdoDisposalDocumentInPerson() {
-        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(SDO_DISPOSAL)))
-            .thenReturn(new DocmosisDocument(SDO_DISPOSAL.getDocumentTitle(), bytes));
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(SDO_R2_DISPOSAL)))
+            .thenReturn(new DocmosisDocument(SDO_R2_DISPOSAL.getDocumentTitle(), bytes));
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameDisposal, bytes, SDO_ORDER)))
             .thenReturn(CASE_DOCUMENT_DISPOSAL);
 
@@ -575,43 +504,7 @@ public class SdoGeneratorServiceTest {
     }
 
     @Test
-    public void shouldGenerateSdoDisposalDocumentWithR2Template() {
-        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
-
-        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(SDO_R2_DISPOSAL)))
-            .thenReturn(new DocmosisDocument(SDO_R2_DISPOSAL.getDocumentTitle(), bytes));
-        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameDisposal, bytes, SDO_ORDER)))
-            .thenReturn(CASE_DOCUMENT_FAST);
-
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateNotificationAcknowledged()
-            .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
-            .atStateSdoDisposal()
-            .build()
-            .toBuilder()
-            .drawDirectionsOrderRequired(YesOrNo.YES)
-            .drawDirectionsOrderSmallClaims(YesOrNo.NO)
-            .orderType(OrderType.DISPOSAL)
-            .claimsTrack(ClaimsTrack.fastTrack)
-            .disposalHearingMethod(DisposalHearingMethod.disposalHearingMethodInPerson)
-            .build();
-
-        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
-
-        assertThat(caseDocument).isNotNull();
-        verify(documentManagementService)
-            .uploadDocument(BEARER_TOKEN, new PDF(fileNameDisposal, bytes, SDO_ORDER));
-        verify(documentGeneratorService).generateDocmosisDocument(
-            argThat((MappableObject templateData) ->
-                        templateData instanceof SdoDocumentFormDisposal),
-            eq(SDO_R2_DISPOSAL)
-        );
-    }
-
-    @Test
     public void shouldGenerateSdoFastTrackNihlDocument_pathone() {
-        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
-
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(SDO_FAST_TRACK_NIHL)))
             .thenReturn(new DocmosisDocument(SDO_FAST_TRACK_NIHL.getDocumentTitle(), bytes));
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameFast, bytes, SDO_ORDER)))
@@ -637,8 +530,6 @@ public class SdoGeneratorServiceTest {
 
     @Test
     public void shouldGenerateSdoFastTrackNihlDocument_pathtwo() {
-        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
-
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(SDO_FAST_TRACK_NIHL)))
             .thenReturn(new DocmosisDocument(SDO_FAST_TRACK_NIHL.getDocumentTitle(), bytes));
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameFast, bytes, SDO_ORDER)))
@@ -822,7 +713,6 @@ public class SdoGeneratorServiceTest {
 
     @Test
     public void shouldGenerateSdoSmallDrhDocument() {
-        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(SDO_SMALL_DRH)))
             .thenReturn(new DocmosisDocument(SDO_SMALL_DRH.getDocumentTitle(), bytes));
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameSmallDrh, bytes, SDO_ORDER)))
@@ -847,7 +737,6 @@ public class SdoGeneratorServiceTest {
 
     @Test
     public void shouldGenerateSdoSmallDrhDocumentCarmEnabled() {
-        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(SDO_SMALL_DRH)))
             .thenReturn(new DocmosisDocument(SDO_SMALL_DRH.getDocumentTitle(), bytes));

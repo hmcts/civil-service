@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
+
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 
@@ -53,7 +54,8 @@ class UpdateVisibilityNoticeOfDiscontinuanceHandlerTest extends BaseCallbackHand
                 .businessProcess(BusinessProcess.builder().processInstanceId(processId).build()).build();
             caseData.setConfirmOrderGivesPermission(
                 toggleState ? ConfirmOrderGivesPermission.YES : ConfirmOrderGivesPermission.NO);
-            caseData.setNoticeOfDiscontinueCWDoc(caseDocument);
+            caseData.setRespondent1NoticeOfDiscontinueCWViewDoc(caseDocument);
+            caseData.setApplicant1NoticeOfDiscontinueCWViewDoc(caseDocument);
 
             CallbackParams params = CallbackParams.builder()
                 .caseData(caseData)
@@ -67,6 +69,6 @@ class UpdateVisibilityNoticeOfDiscontinuanceHandlerTest extends BaseCallbackHand
             //Then
             verify(runTimeService).setVariable(processId, "discontinuanceValidationSuccess", toggleState);
         }
-    }
 
+    }
 }

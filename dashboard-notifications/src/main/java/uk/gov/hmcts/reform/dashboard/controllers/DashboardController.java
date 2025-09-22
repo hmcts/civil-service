@@ -199,6 +199,24 @@ public class DashboardController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @DeleteMapping(path = {
+        "notifications/{ccd-case-identifier}/role/{role-type}/{template-name}"
+    }, consumes = MediaType.ALL_VALUE)
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "OK"),
+        @ApiResponse(responseCode = "401", description = "Not Authorized"),
+        @ApiResponse(responseCode = "400", description = "Bad Request")})
+    public ResponseEntity<Void> deleteTemplateNotificationsForCaseIdentifierAndRole(
+        @PathVariable("ccd-case-identifier") String ccdCaseIdentifier,
+        @PathVariable("role-type") String roleType,
+        @PathVariable("template-name") String templateName,
+        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
+    ) {
+        log.info("Received UUID for deleting notification : {} for case: {} and role {}", templateName, ccdCaseIdentifier, roleType);
+        dashboardNotificationService.deleteByNameAndReferenceAndCitizenRole(templateName, ccdCaseIdentifier, roleType);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
     @PostMapping(path = "/scenarios/{scenario_ref}/{unique_case_identifier}")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK"),
@@ -214,6 +232,25 @@ public class DashboardController {
         dashboardScenariosService.recordScenarios(authorisation, scenarioReference,
                                                   uniqueCaseIdentifier, scenarioRequestParams
         );
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PutMapping(path = {
+        "taskList/{ccd-case-identifier}/role/{role-type}/status/{category}"
+    })
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "OK"),
+        @ApiResponse(responseCode = "401", description = "Not Authorized"),
+        @ApiResponse(responseCode = "400", description = "Bad Request")})
+    public ResponseEntity<Void> makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(
+        @PathVariable("ccd-case-identifier") String ccdCaseIdentifier,
+        @PathVariable("role-type") String roleType,
+        @PathVariable("category") String category,
+        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
+    ) {
+        log.info("Received UUID for making progress-able tasks inactive for case: {} and role {} and category {}",
+                 ccdCaseIdentifier, roleType, category);
+        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(ccdCaseIdentifier, roleType, category);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

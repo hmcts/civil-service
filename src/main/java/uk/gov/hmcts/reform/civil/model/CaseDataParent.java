@@ -449,6 +449,7 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     private List<Element<UnavailableDate>> respondent1UnavailableDatesForTab;
     private List<Element<UnavailableDate>> respondent2UnavailableDatesForTab;
     private String pcqId;
+    private String respondentResponsePcqId;
 
     // Transfer a Case Online
     private String reasonForTransfer;
@@ -480,6 +481,14 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     private List<Element<MediationDocumentsReferredInStatement>> res2MediationDocumentsReferred;
 
     private SmallClaimsMediation smallClaimsMediationSectionStatement;
+
+    private FixedCosts fixedCosts;
+    private YesOrNo showDJFixedCostsScreen;
+    private YesOrNo showOldDJFixedCostsScreen;
+    private YesOrNo claimFixedCostsOnEntryDJ;
+
+    private YesOrNo mediationFileSentToMmt;
+    private YesOrNo evidenceUploadNotificationSent;
 
     @JsonIgnore
     public boolean isResponseAcceptedByClaimant() {
@@ -515,15 +524,40 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
         return Optional.ofNullable(getCaseDataLiP())
             .map(CaseDataLiP::getRespondent1LiPResponse)
             .map(RespondentLiPResponse::getRespondent1ResponseLanguage)
-            .filter(Language.BOTH.toString()::equals)
+            .filter(language -> language.equals(Language.BOTH.toString())
+                || language.equals(Language.WELSH.toString()))
             .isPresent();
     }
 
     @JsonIgnore
-    public boolean hasClaimantAgreedToFreeMediation() {
+    public String getDefendantBilingualLanguagePreference() {
         return Optional.ofNullable(getCaseDataLiP())
-            .map(CaseDataLiP::getApplicant1ClaimMediationSpecRequiredLip)
-            .filter(ClaimantMediationLip::hasClaimantAgreedToFreeMediation).isPresent();
+            .map(CaseDataLiP::getRespondent1LiPResponse)
+            .map(RespondentLiPResponse::getRespondent1ResponseLanguage)
+            .orElse(null);
+    }
+
+    @JsonIgnore
+    public boolean hasClaimantAgreedToFreeMediation() {
+        Optional<CaseDataLiP> caseDataLiP1 = Optional.ofNullable(getCaseDataLiP());
+        return caseDataLiP1.map(CaseDataLiP::getApplicant1ClaimMediationSpecRequiredLip)
+            .filter(ClaimantMediationLip::hasClaimantAgreedToFreeMediation).isPresent()
+            || isCorrectEmailPresent(caseDataLiP1)
+            || isCorrectPhonePresent(caseDataLiP1);
+    }
+
+    private static boolean isCorrectPhonePresent(Optional<CaseDataLiP> caseDataLiP1) {
+        return (caseDataLiP1.map(CaseDataLiP::getApplicant1LiPResponseCarm)
+            .filter(carm -> carm.getIsMediationPhoneCorrect() == YES).isPresent()
+            || caseDataLiP1.map(CaseDataLiP::getApplicant1LiPResponseCarm)
+            .filter(carm -> carm.getAlternativeMediationTelephone() != null).isPresent());
+    }
+
+    private static boolean isCorrectEmailPresent(Optional<CaseDataLiP> caseDataLiP1) {
+        return (caseDataLiP1.map(CaseDataLiP::getApplicant1LiPResponseCarm)
+            .filter(carm -> carm.getIsMediationEmailCorrect() == YES).isPresent()
+            || caseDataLiP1.map(CaseDataLiP::getApplicant1LiPResponseCarm)
+            .filter(carm -> carm.getAlternativeMediationEmail() != null).isPresent());
     }
 
     @JsonIgnore
@@ -559,6 +593,11 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     @JsonIgnore
     public boolean applicant1SuggestedPayBySetDate() {
         return applicant1RepaymentOptionForDefendantSpec == PaymentType.SET_DATE;
+    }
+
+    @JsonIgnore
+    public boolean applicant1SuggestedPayByInstalments() {
+        return applicant1RepaymentOptionForDefendantSpec == PaymentType.REPAYMENT_PLAN;
     }
 
     @JsonIgnore

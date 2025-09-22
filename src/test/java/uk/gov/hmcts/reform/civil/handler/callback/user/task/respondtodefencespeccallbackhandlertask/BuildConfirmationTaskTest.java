@@ -8,10 +8,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationHeaderGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationTextGenerator;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.List;
 import java.util.Map;
@@ -33,6 +36,9 @@ class BuildConfirmationTaskTest {
     @Mock
     private List<RespondToResponseConfirmationTextGenerator> confirmationTextGenerators;
 
+    @Mock
+    private FeatureToggleService featureToggleService;
+
     @InjectMocks
     private BuildConfirmationTask buildConfirmationTask;
 
@@ -44,7 +50,7 @@ class BuildConfirmationTaskTest {
             .setIntermediateTrackClaim()
             .build();
 
-        SubmittedCallbackResponse response = buildConfirmationTask.execute(callbackParams(caseData));
+        SubmittedCallbackResponse response = buildConfirmationTask.execute(callbackParams(caseData), featureToggleService);
 
         String expectedConfirmationText = "<h2 class=\"govuk-heading-m\">What happens next</h2>"
             + "You've decided not to proceed and the case will end.<br>"
@@ -70,7 +76,7 @@ class BuildConfirmationTaskTest {
             .applicant1ProceedWithClaim(YES)
             .build();
 
-        SubmittedCallbackResponse response = buildConfirmationTask.execute(callbackParams(caseData));
+        SubmittedCallbackResponse response = buildConfirmationTask.execute(callbackParams(caseData), featureToggleService);
 
         String expectedConfirmationText = "<h2 class=\"govuk-heading-m\">What happens next</h2>"
             + "We'll review the case and contact you about what to do next.<br>"
@@ -91,9 +97,11 @@ class BuildConfirmationTaskTest {
     void shouldGenerateConfirmationTextAndHeaderWhenAllFinalOrderIssued() {
         CaseData caseData = CaseDataBuilder.builder()
             .buildJudmentOnlineCaseDataWithPaymentByInstalment().toBuilder()
+            .applicant1ProceedWithClaim(YesOrNo.NO)
+            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
             .build();
 
-        SubmittedCallbackResponse response = buildConfirmationTask.execute(callbackParams(caseData));
+        SubmittedCallbackResponse response = buildConfirmationTask.execute(callbackParams(caseData), featureToggleService);
 
         String expectedConfirmationText = format(
             "<br />%n%n<a href=\"%s\" target=\"_blank\">Download county court judgment</a>"
@@ -115,7 +123,7 @@ class BuildConfirmationTaskTest {
             .atStateMediationSuccessful(MultiPartyScenario.ONE_V_ONE)
             .build();
 
-        SubmittedCallbackResponse response = buildConfirmationTask.execute(callbackParams(caseData));
+        SubmittedCallbackResponse response = buildConfirmationTask.execute(callbackParams(caseData), featureToggleService);
 
         String expectedConfirmationHeader =  format(
             "# You have rejected their response %n## Your Claim Number : %s",

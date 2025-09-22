@@ -48,10 +48,4 @@ class CaseHearingDateSearchServiceTest extends ElasticSearchServiceTest {
                         .must(matchQuery("data.hearingDate", targetDate)));
         return new Query(query, List.of("reference"), fromValue);
     }
-
-    @Override
-    protected Query buildQueryInMediation(int fromValue, LocalDate date, boolean carmEnabled) {
-        return null;
-    }
-
 }

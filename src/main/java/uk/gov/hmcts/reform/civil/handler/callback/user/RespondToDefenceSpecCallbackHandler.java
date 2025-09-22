@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
 import uk.gov.hmcts.reform.civil.service.citizenui.RespondentMediationService;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
@@ -63,6 +64,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(CLAIMANT_RESPONSE_SPEC);
     public static final String DOWNLOAD_URL_CLAIM_DOCUMENTS = "/cases/case-details/%s#Claim documents";
+    public static final String PARTIAL_PAYMENT_OFFLINE = "This feature is currently not available, please see guidance below";
     private final ObjectMapper objectMapper;
     private final UnavailableDateValidator unavailableDateValidator;
     private final JudgementService judgementService;
@@ -70,6 +72,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private final AboutToSubmitRespondToDefenceTask aboutToSubmitRespondToDefenceTask;
     private final PopulateCaseDataTask populateCaseDataTask;
     private final BuildConfirmationTask buildConfirmationTask;
+    private final FeatureToggleService featureToggleService;
 
     @Value("${court-location.specified-claim.epimms-id}") String cnbcEpimsId;
 
@@ -157,6 +160,11 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             && YES.equals(caseData.getApplicant1ProceedWithClaimSpec2v1())) {
             caseDataBuilder.applicant1ProceedWithClaim(YES);
         }
+        if (NO.equals(caseData.getApplicant1AcceptAdmitAmountPaidSpec())
+            || NO.equals(caseData.getApplicant1PartAdmitConfirmAmountPaidSpec())
+            || NO.equals(caseData.getApplicant1PartAdmitIntentionToSettleClaimSpec())) {
+            caseDataBuilder.applicant1ProceedWithClaim(YES);
+        }
     }
 
     private CallbackResponse validateMediationUnavailableDates(CallbackParams callbackParams) {
@@ -210,6 +218,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
 
         setMediationConditionFlag(caseData, caseDataBuilder);
+        setApplicant1ProceedFlagToYes(caseData, caseDataBuilder);
         setApplicantDefenceResponseDocFlag(caseData, caseDataBuilder);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -227,7 +236,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
      */
     private boolean shouldVulnerabilityAppear(CaseData caseData) {
         return (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE
-            && caseData.getApplicant1ProceedWithClaim() == YES)
+            && caseData.getApplicant1ProceedWithClaim() == YES || YES == caseData.getApplicant1ProceedWithClaimSpec2v1())
             || caseData.getApplicant1AcceptAdmitAmountPaidSpec() == NO;
     }
 
@@ -255,7 +264,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
-        return buildConfirmationTask.execute(callbackParams);
+        return buildConfirmationTask.execute(callbackParams, featureToggleService);
     }
 
     private CallbackResponse validatePaymentDate(CallbackParams callbackParams) {
@@ -321,10 +330,32 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
     private CallbackResponse validateAmountPaid(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder();
+
+        if (caseData.getCcjPaymentDetails() != null
+            && YES.equals(caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeOption())) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(List.of(PARTIAL_PAYMENT_OFFLINE))
+                .build();
+        } else if (featureToggleService.isLrAdmissionBulkEnabled()
+                   && caseData.getFixedCosts() != null
+                   && NO.equals(caseData.getFixedCosts().getClaimFixedCosts())) {
+            updatedCaseData.ccjPaymentDetails(judgementService.buildJudgmentAmountSummaryDetails(caseData));
+        }
+
+        if (judgementService.isLrFullAdmitRepaymentPlan(caseData)
+            || judgementService.isLRPartAdmitRepaymentPlan(caseData)) {
+            updatedCaseData.ccjJudgmentAmountShowInterest(NO);
+            if (caseData.getFixedCosts() != null
+                && YES.equals(caseData.getFixedCosts().getClaimFixedCosts())) {
+                updatedCaseData.claimFixedCostsExist(YES);
+            }
+        }
+
         List<String> errors = judgementService.validateAmountPaid(caseData);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
-            .data(errors.isEmpty() ? caseData.toMap(objectMapper) : null)
+            .data(errors.isEmpty() ? updatedCaseData.build().toMap(objectMapper) : null)
             .build();
     }
 

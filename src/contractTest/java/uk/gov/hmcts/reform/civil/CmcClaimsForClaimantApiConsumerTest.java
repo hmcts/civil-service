@@ -37,7 +37,7 @@ public class CmcClaimsForClaimantApiConsumerTest extends BaseContractTest {
     @Autowired
     private ClaimStoreApi claimStoreApi;
 
-    @Pact(consumer = "civil-service")
+    @Pact(consumer = "civil_service")
     public RequestResponsePact getClaimsForClaimant(PactDslWithProvider builder)
         throws JSONException, IOException {
         return buildClaimsForClaimantPact(builder);

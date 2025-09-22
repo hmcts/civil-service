@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
@@ -16,6 +17,7 @@ import uk.gov.hmcts.reform.civil.model.CourtLocation;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -339,7 +341,7 @@ public class GeneralApplicationDetailsBuilder {
         return caseDataBuilder.build();
     }
 
-    public CaseData getTestCaseDataWithLocationDetails(CaseData caseData,
+    public CaseData getTestCaseDataWithLocationDetailsLip(CaseData caseData,
                                                boolean withGADetails,
                                                boolean withGADetailsResp,
                                                boolean withGADetailsResp2, boolean withGADetailsMaster,
@@ -348,6 +350,7 @@ public class GeneralApplicationDetailsBuilder {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.caseManagementLocation(CaseLocationCivil.builder().baseLocation("000000")
                                                    .region("2").build());
+        caseDataBuilder.respondent1Represented(NO);
         caseDataBuilder.ccdCaseReference(1L);
         if (!Collections.isEmpty(applicationIdStatus)) {
             List<GeneralApplication> genApps = new ArrayList<>();
@@ -483,6 +486,10 @@ public class GeneralApplicationDetailsBuilder {
         CaseLocationCivil caseManagementLoc = CaseLocationCivil.builder().region("1").baseLocation("22222").build();
         return caseData.toBuilder()
             .ccdCaseReference(1234L)
+            .caseAccessCategory(SPEC_CLAIM)
+            .claimDismissedDeadline(LocalDateTime.now().plusMonths(6))
+            .solicitorReferences(SolicitorReferences.builder().applicantSolicitor1Reference("AppSol1Ref").respondentSolicitor1Reference("RespSol1ref").build())
+            .responseClaimTrack("MULTI_CLAIM")
             .respondent2OrganisationPolicy(OrganisationPolicy.builder()
                                                .organisation(Organisation.builder()
                                                                  .organisationID(STRING_CONSTANT).build())
@@ -586,6 +593,7 @@ public class GeneralApplicationDetailsBuilder {
     public CaseData getTestCaseDataForConsentUnconsentCheck(GARespondentOrderAgreement respondentOrderAgreement) {
         return CaseData.builder()
             .caseAccessCategory(UNSPEC_CLAIM)
+            .allocatedTrack(AllocatedTrack.FAST_CLAIM)
             .ccdState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT)
             .ccdCaseReference(1234L)
             .respondent2OrganisationPolicy(OrganisationPolicy.builder()
@@ -799,6 +807,7 @@ public class GeneralApplicationDetailsBuilder {
     public CaseData getTestCaseDataForStatementOfTruthCheck(GARespondentOrderAgreement respondentOrderAgreement) {
         return CaseData.builder()
             .caseAccessCategory(UNSPEC_CLAIM)
+            .allocatedTrack(AllocatedTrack.INTERMEDIATE_CLAIM)
             .ccdState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT)
             .ccdCaseReference(1234L)
             .respondent2OrganisationPolicy(OrganisationPolicy.builder()
@@ -902,6 +911,7 @@ public class GeneralApplicationDetailsBuilder {
         return CaseData.builder()
             .ccdCaseReference(1234L)
             .caseAccessCategory(claimType)
+            .submittedDate(LocalDateTime.of(2025, 5, 5, 0, 0, 0))
             .courtLocation(CourtLocation.builder()
                                .caseLocation(CaseLocationCivil.builder()
                                                  .region("2")
@@ -1778,6 +1788,8 @@ public class GeneralApplicationDetailsBuilder {
         return CaseData
                 .builder()
                 .ccdCaseReference(1L)
+                .caseAccessCategory(SPEC_CLAIM)
+                .responseClaimTrack("SMALL_CLAIM")
                 .applicant1(Party.builder().type(Party.Type.COMPANY).companyName("Applicant1").build())
                 .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("Respondent1").build())
                 .addRespondent2(NO)

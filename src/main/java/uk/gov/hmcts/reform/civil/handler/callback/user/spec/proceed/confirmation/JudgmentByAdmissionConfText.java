@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationTextGenerator;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.Optional;
 
@@ -14,8 +15,9 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.RespondToDefenceSp
 public class JudgmentByAdmissionConfText implements RespondToResponseConfirmationTextGenerator {
 
     @Override
-    public Optional<String> generateTextFor(CaseData caseData) {
-        if (CaseState.All_FINAL_ORDERS_ISSUED == caseData.getCcdState()) {
+    public Optional<String> generateTextFor(CaseData caseData, FeatureToggleService featureToggleService) {
+        if (CaseState.All_FINAL_ORDERS_ISSUED == caseData.getCcdState()
+            && (caseData.isPayBySetDate() || caseData.isPayByInstallment())) {
             return Optional.of(format(
                 "<br />%n%n<a href=\"%s\" target=\"_blank\">Download county court judgment</a>"
                     + "<br><br>The defendant will be served the county court judgment<br><br>",

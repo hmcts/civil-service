@@ -14,10 +14,8 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 @ExtendWith(MockitoExtension.class)
@@ -27,15 +25,12 @@ public class DefendantResponseDeadlineCheckCallbackHandlerTest extends BaseCallb
     private DefendantResponseDeadlineCheckCallbackHandler handler;
 
     @Mock
-    private FeatureToggleService featureToggleService;
-
-    @Mock
     private ObjectMapper objectMapper;
 
     @BeforeEach
     void setUp() {
         objectMapper = new ObjectMapper();
-        handler = new DefendantResponseDeadlineCheckCallbackHandler(objectMapper, featureToggleService);
+        handler = new DefendantResponseDeadlineCheckCallbackHandler(objectMapper);
         objectMapper.registerModule(new JavaTimeModule());
     }
 
@@ -46,13 +41,11 @@ public class DefendantResponseDeadlineCheckCallbackHandlerTest extends BaseCallb
         void shouldReturnRespondent1ResponseDeadlineChecked_WhenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData())
                 .containsEntry("respondent1ResponseDeadlineChecked", "Yes");
-
         }
     }
 }

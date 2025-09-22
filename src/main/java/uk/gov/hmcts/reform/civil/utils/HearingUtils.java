@@ -51,61 +51,40 @@ public class HearingUtils {
     }
 
     public static String getHearingType(CaseData caseData) {
-        switch (caseData.getChannel()) {
-            case IN_PERSON:
-                return "in person";
-            case VIDEO:
-                return "by video conference";
-            case TELEPHONE:
-                return "by telephone";
-            default:
-                return "not defined";
-        }
+        return switch (caseData.getChannel()) {
+            case IN_PERSON -> "in person";
+            case VIDEO -> "by video conference";
+            case TELEPHONE -> "by telephone";
+            default -> "not defined";
+        };
     }
 
     public static String formatHearingDuration(HearingDuration hearingDuration) {
-        switch (hearingDuration) {
-            case MINUTES_05:
-                return "5 minutes";
-            case MINUTES_10:
-                return "10 minutes";
-            case MINUTES_15:
-                return "15 minutes";
-            case MINUTES_20:
-                return "20 minutes";
-            case MINUTES_25:
-                return "25 minutes";
-            case MINUTES_30:
-                return "30 minutes";
-            case MINUTES_35:
-                return "35 minutes";
-            case MINUTES_40:
-                return "40 minutes";
-            case MINUTES_45:
-                return "45 minutes";
-            case MINUTES_50:
-                return "50 minutes";
-            case MINUTES_55:
-                return "55 minutes";
-            case MINUTES_60:
-                return "1 hour";
-            case MINUTES_90:
-                return "1 and half hours";
-            case MINUTES_120:
-                return "2 hours";
-            case MINUTES_150:
-                return "2 and half hours";
-            case MINUTES_180:
-                return "3 hours";
-            case MINUTES_240:
-                return "4 hours";
-            case DAY_1:
-                return "1 day";
-            case DAY_2:
-                return "2 days";
-            default:
-                return null;
+        if (hearingDuration == null) {
+            return null;
         }
+        return switch (hearingDuration) {
+            case MINUTES_05 -> "5 minutes";
+            case MINUTES_10 -> "10 minutes";
+            case MINUTES_15 -> "15 minutes";
+            case MINUTES_20 -> "20 minutes";
+            case MINUTES_25 -> "25 minutes";
+            case MINUTES_30 -> "30 minutes";
+            case MINUTES_35 -> "35 minutes";
+            case MINUTES_40 -> "40 minutes";
+            case MINUTES_45 -> "45 minutes";
+            case MINUTES_50 -> "50 minutes";
+            case MINUTES_55 -> "55 minutes";
+            case MINUTES_60 -> "1 hour";
+            case MINUTES_90 -> "1 and half hours";
+            case MINUTES_120 -> "2 hours";
+            case MINUTES_150 -> "2 and half hours";
+            case MINUTES_180 -> "3 hours";
+            case MINUTES_240 -> "4 hours";
+            case DAY_1 -> "1 day";
+            case DAY_2 -> "2 days";
+            default -> null;
+        };
     }
 
     public static String formatHearingFee(Fee hearingFee) {

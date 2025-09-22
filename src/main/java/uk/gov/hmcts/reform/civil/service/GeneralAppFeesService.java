@@ -35,13 +35,6 @@ public class GeneralAppFeesService {
 
     private final FeesApiClient feesApiClient;
     private final GeneralAppFeesConfiguration feesConfiguration;
-
-    private static final String CHANNEL = "channel";
-    private static final String EVENT = "event";
-    private static final String JURISDICTION1 = "jurisdiction1";
-    private static final String JURISDICTION2 = "jurisdiction2";
-    private static final String SERVICE = "service";
-    private static final String KEYWORD = "keyword";
     public static final String FREE_REF = "FREE";
     private static final Fee FREE_FEE = Fee.builder()
         .calculatedAmountInPence(BigDecimal.ZERO).code(FREE_REF).version("1").build();
@@ -50,8 +43,7 @@ public class GeneralAppFeesService {
 
     protected static final List<GeneralApplicationTypes> VARY_TYPES
         = Arrays.asList(
-        GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT,
-        GeneralApplicationTypes.VARY_ORDER
+        GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT
     );
     protected static final List<GeneralApplicationTypes> SET_ASIDE
         = List.of(GeneralApplicationTypes.SET_ASIDE_JUDGEMENT);
@@ -112,9 +104,15 @@ public class GeneralAppFeesService {
             }
         }
         if (typeSize > 0
-            && CollectionUtils.containsAny(types, SET_ASIDE)) {
+            && CollectionUtils.containsAny(types, SET_ASIDE) && Boolean.FALSE.equals(respondentAgreed)) {
+            String feeKeyword;
+            if (Boolean.FALSE.equals(informOtherParty)) {
+                feeKeyword = feesConfiguration.getConsentedOrWithoutNoticeKeyword();
+            } else {
+                feeKeyword = feesConfiguration.getWithNoticeKeyword();
+            }
             typeSize--;
-            Fee setAsideFeeForGA = getFeeForGA(feesConfiguration.getWithNoticeKeyword(), null, null);
+            Fee setAsideFeeForGA = getFeeForGA(feeKeyword, null, null);
             if (setAsideFeeForGA.getCalculatedAmountInPence()
                 .compareTo(result.getCalculatedAmountInPence()) < 0) {
                 result = setAsideFeeForGA;

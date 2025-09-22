@@ -4,7 +4,8 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.callback.DashboardCallbackHandler;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MediationDecision;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -12,8 +13,12 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
-import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
+import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
+import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
+import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
 import java.util.List;
 import java.util.Objects;
@@ -22,6 +27,7 @@ import java.util.Optional;
 import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DEFENDANT_DASHBOARD_NOTIFICATION_FOR_CLAIMANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_SETTLED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_STAYED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.IN_MEDIATION;
@@ -43,17 +49,25 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT_CLAIMANT_ACCEPTS_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT_CLAIMANT_REJECTS_COURT_AGREES_WITH_CLAIMANT_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_REJECTED_NOT_PAID_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_MULTI_INT_CLAIMANT_INTENT_DEFENDANT;
 
 @Service
 public class ClaimantResponseDefendantNotificationHandler extends DashboardCallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(CREATE_DEFENDANT_DASHBOARD_NOTIFICATION_FOR_CLAIMANT_RESPONSE);
     public static final String TASK_ID = "GenerateDefendantDashboardNotificationClaimantResponse";
+    private final DashboardNotificationService dashboardNotificationService;
+    private final TaskListService taskListService;
 
-    public ClaimantResponseDefendantNotificationHandler(DashboardApiClient dashboardApiClient,
+    public ClaimantResponseDefendantNotificationHandler(DashboardScenariosService dashboardScenariosService,
                                                         DashboardNotificationsParamsMapper mapper,
-                                                        FeatureToggleService featureToggleService) {
-        super(dashboardApiClient, mapper, featureToggleService);
+                                                        FeatureToggleService featureToggleService,
+                                                        DashboardNotificationService dashboardNotificationService,
+                                                        TaskListService taskListService) {
+        super(dashboardScenariosService, mapper, featureToggleService);
+        this.dashboardNotificationService = dashboardNotificationService;
+        this.taskListService = taskListService;
     }
 
     @Override
@@ -73,9 +87,11 @@ public class ClaimantResponseDefendantNotificationHandler extends DashboardCallb
 
     @Override
     public String getScenario(CaseData caseData) {
-        if (isCaseStateSettled(caseData)) {
+        if (isMintiApplicable(caseData) && isCaseStateAwaitingApplicantIntention(caseData)) {
+            return SCENARIO_AAA6_MULTI_INT_CLAIMANT_INTENT_DEFENDANT.getScenario();
+        } else if (isCaseStateSettled(caseData)) {
             return getCaseSettledScenarios(caseData);
-        } else if (caseData.isPartAdmitImmediatePaymentClaimSettled()) {
+        } else if (caseData.isPartAdmitImmediatePaymentClaimSettled() || isLrvLipFullAdmitImmediatePayClaimSettled(caseData)) {
             return SCENARIO_AAA6_CLAIMANT_INTENT_PART_ADMIT_DEFENDANT.getScenario();
         } else if (isCourtDecisionRejected(caseData)) {
             return SCENARIO_AAA6_CLAIMANT_INTENT_REQUEST_CCJ_CLAIMANT_REJECTS_DEF_PLAN_CLAIMANT_DISAGREES_COURT_PLAN_DEFENDANT.getScenario();
@@ -103,6 +119,30 @@ public class ClaimantResponseDefendantNotificationHandler extends DashboardCallb
             return SCENARIO_AAA6_CLAIMANT_INTENT_CLAIMANT_ENDS_CLAIM_DEFENDANT.getScenario();
         }
         return null;
+    }
+
+    @Override
+    protected void beforeRecordScenario(CaseData caseData, String authToken) {
+        final String caseId = String.valueOf(caseData.getCcdCaseReference());
+        if (isCaseStateSettled(caseData)) {
+            dashboardNotificationService.deleteByReferenceAndCitizenRole(
+                caseId,
+                "DEFENDANT"
+            );
+
+            taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+                caseId,
+                "DEFENDANT"
+            );
+        }
+        if (caseData.getCcdState() == CaseState.PROCEEDS_IN_HERITAGE_SYSTEM) {
+            ScenarioRequestParams notificationParams = ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build();
+            dashboardScenariosService.recordScenarios(
+                authToken,
+                SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_DEFENDANT.getScenario(),
+                caseData.getCcdCaseReference().toString(),
+                notificationParams);
+        }
     }
 
     private String getCaseSettledScenarios(CaseData caseData) {
@@ -160,6 +200,10 @@ public class ClaimantResponseDefendantNotificationHandler extends DashboardCallb
         return caseData.getCcdState() == IN_MEDIATION;
     }
 
+    private static boolean isCaseStateAwaitingApplicantIntention(CaseData caseData) {
+        return caseData.getCcdState() == AWAITING_APPLICANT_INTENTION;
+    }
+
     private RespondToClaim getRespondToClaim(CaseData caseData) {
         RespondToClaim respondToClaim = null;
         if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE) {
@@ -197,6 +241,12 @@ public class ClaimantResponseDefendantNotificationHandler extends DashboardCallb
         return getFeatureToggleService().isCarmEnabledForCase(caseData);
     }
 
+    private boolean isMintiApplicable(CaseData caseData) {
+        return getFeatureToggleService().isMultiOrIntermediateTrackEnabled(caseData)
+            && (AllocatedTrack.INTERMEDIATE_CLAIM.name().equals(caseData.getResponseClaimTrack())
+            || AllocatedTrack.MULTI_CLAIM.name().equals(caseData.getResponseClaimTrack()));
+    }
+
     private boolean isLrvLipPartFullAdmitAndPayByPlan(CaseData caseData) {
         return !featureToggleService.isJudgmentOnlineLive()
             && !caseData.isApplicantLiP()
@@ -209,5 +259,12 @@ public class ClaimantResponseDefendantNotificationHandler extends DashboardCallb
             && caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE
             && NO.equals(caseData.getApplicant1ProceedWithClaim())
             && HAS_PAID_THE_AMOUNT_CLAIMED.equals(caseData.getDefenceRouteRequired());
+    }
+
+    private boolean isLrvLipFullAdmitImmediatePayClaimSettled(CaseData caseData) {
+        return featureToggleService.isJudgmentOnlineLive()
+            && !caseData.isApplicantLiP()
+            && caseData.isFullAdmitPayImmediatelyClaimSpec()
+            && caseData.getApplicant1ProceedWithClaim() == null;
     }
 }

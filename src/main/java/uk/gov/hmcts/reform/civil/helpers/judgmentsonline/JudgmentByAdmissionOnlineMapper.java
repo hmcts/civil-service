@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.helpers.judgmentsonline;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
@@ -18,7 +17,10 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
+import uk.gov.hmcts.reform.civil.service.JudgementService;
+import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
+import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
@@ -26,13 +28,23 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import static java.util.Objects.nonNull;
+
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
 
     boolean isNonDivergent = false;
     private final RoboticsAddressMapper addressMapper;
+    private final JudgementService judgementService;
+    private final InterestCalculator interestCalculator;
+
+    public JudgmentByAdmissionOnlineMapper(Time time, RoboticsAddressMapper addressMapper, JudgementService judgementService, InterestCalculator interestCalculator) {
+        super(time);
+        this.addressMapper = addressMapper;
+        this.judgementService = judgementService;
+        this.interestCalculator = interestCalculator;
+    }
 
     @Override
     public JudgmentDetails addUpdateActiveJudgment(CaseData caseData) {
@@ -43,6 +55,8 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
         BigInteger claimFeeAmount = MonetaryConversions.poundsToPennies(getClaimFeeAmount(caseData));
         BigInteger totalStillOwed = MonetaryConversions.poundsToPennies(getTotalStillOwed(caseData));
         BigInteger amountAlreadyPaid = MonetaryConversions.poundsToPennies(getAmountAlreadyPaid(caseData));
+        BigInteger totalInterest = nonNull(judgementService.ccjJudgmentInterest(caseData))
+            ? MonetaryConversions.poundsToPennies(judgementService.ccjJudgmentInterest(caseData)) : BigInteger.ZERO;
         isNonDivergent = JudgmentsOnlineHelper.isNonDivergentForJBA(caseData);
         PaymentPlanSelection paymentPlan = getPaymentPlan(caseData);
 
@@ -61,16 +75,33 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
             .isRegisterWithRTL(isNonDivergent ? YesOrNo.YES : YesOrNo.NO)
             .rtlState(isNonDivergent ? JudgmentRTLStatus.ISSUED.getRtlState() : null)
             .issueDate(LocalDate.now())
-            .orderedAmount(orderAmount.toString())
+            .orderedAmount(addInterest(orderAmount, totalInterest, caseData))
             .costs(costs.toString())
             .claimFeeAmount(claimFeeAmount.toString())
             .amountAlreadyPaid(amountAlreadyPaid.toString())
-            .totalAmount(orderAmount.add(costs).add(claimFeeAmount).toString())
+            .totalAmount(generateTotalAmount(orderAmount, totalInterest, claimFeeAmount, costs, caseData))
             .build();
 
         super.updateJudgmentTabDataWithActiveJudgment(activeJudgmentDetails, caseData);
 
         return activeJudgmentDetails;
+    }
+
+    public CaseData.CaseDataBuilder addUpdateActiveJudgment(CaseData caseData, CaseData.CaseDataBuilder builder) {
+        JudgmentDetails activeJudgmentDetails = addUpdateActiveJudgment(caseData);
+        builder.activeJudgment(activeJudgmentDetails);
+        CaseData data = builder.build();
+        boolean isLrAdmissionRepaymentPlan = judgementService.isLRAdmissionRepaymentPlan(data);
+        BigDecimal interest = (!isLrAdmissionRepaymentPlan) ? interestCalculator.calculateInterest(data) : null;
+        super.updateJudgmentTabDataWithActiveJudgment(activeJudgmentDetails, builder, interest);
+
+        if (isLrAdmissionRepaymentPlan) {
+            builder.joRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummaryForLRAdmission(
+                activeJudgmentDetails,
+                interest
+            ));
+        }
+        return builder;
     }
 
     @NotNull
@@ -192,5 +223,28 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
             return PaymentPlanSelection.PAY_BY_DATE;
         }
         return PaymentPlanSelection.PAY_IMMEDIATELY;
+    }
+
+    private String addInterest(BigInteger orderAmount, BigInteger totalInterest, CaseData caseData) {
+        if (judgementService.isLrFullAdmitRepaymentPlan(caseData)
+            || judgementService.isLRPartAdmitRepaymentPlan(caseData)
+            || judgementService.isLrPayImmediatelyPlan(caseData)
+            || judgementService.isLipvLipPartAdmit(caseData)) {
+            return orderAmount.toString();
+        } else {
+            return orderAmount.add(totalInterest).toString();
+        }
+    }
+
+    private String generateTotalAmount(BigInteger orderAmount, BigInteger totalInterest,
+                                       BigInteger claimFeeAmount, BigInteger costs, CaseData caseData) {
+        if (judgementService.isLrFullAdmitRepaymentPlan(caseData)
+            || judgementService.isLRPartAdmitRepaymentPlan(caseData)
+            || judgementService.isLrPayImmediatelyPlan(caseData)
+            || judgementService.isLipvLipPartAdmit(caseData)) {
+            return orderAmount.add(claimFeeAmount).add(costs).toString();
+        } else {
+            return orderAmount.add(totalInterest).add(claimFeeAmount).add(costs).toString();
+        }
     }
 }

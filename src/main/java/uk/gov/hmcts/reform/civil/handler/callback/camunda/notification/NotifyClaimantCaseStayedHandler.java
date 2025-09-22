@@ -7,6 +7,8 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.List;
 import java.util.Map;
@@ -21,8 +23,10 @@ public class NotifyClaimantCaseStayedHandler extends AbstractNotifyCaseStayedHan
     private static final String REFERENCE_TEMPLATE = "case-stayed-claimant-notification-%s";
     private static final List<CaseEvent> EVENTS = List.of(NOTIFY_CLAIMANT_STAY_CASE);
 
-    public NotifyClaimantCaseStayedHandler(NotificationService notificationService, NotificationsProperties notificationsProperties) {
-        super(notificationService, notificationsProperties);
+    public NotifyClaimantCaseStayedHandler(NotificationService notificationService, NotificationsProperties notificationsProperties,
+                                           FeatureToggleService featureToggleService,
+                                           NotificationsSignatureConfiguration configuration) {
+        super(notificationService, notificationsProperties, configuration, featureToggleService);
     }
 
     @Override
@@ -31,7 +35,8 @@ public class NotifyClaimantCaseStayedHandler extends AbstractNotifyCaseStayedHan
     }
 
     @Override
-    protected String getRecipient(CaseData caseData) {
+    protected String getRecipient(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
         return caseData.isApplicantLiP()
             ? caseData.getClaimantUserDetails().getEmail()
             : caseData.getApplicantSolicitor1UserDetails().getEmail();
@@ -48,7 +53,8 @@ public class NotifyClaimantCaseStayedHandler extends AbstractNotifyCaseStayedHan
     }
 
     @Override
-    protected String getPartyName(CaseData caseData) {
+    protected String getPartyName(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
         return caseData.getApplicant1().getPartyName();
     }
 

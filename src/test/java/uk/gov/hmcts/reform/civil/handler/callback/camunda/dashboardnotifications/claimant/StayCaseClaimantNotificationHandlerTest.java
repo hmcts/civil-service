@@ -7,21 +7,22 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
+import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
+import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
+import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
 import java.util.HashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -29,13 +30,17 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTI
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_CASE_STAYED_CLAIMANT;
 
 @ExtendWith(MockitoExtension.class)
-public class StayCaseClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
+class StayCaseClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @InjectMocks
     private StayCaseClaimantNotificationHandler handler;
 
     @Mock
-    private DashboardApiClient dashboardApiClient;
+    private DashboardScenariosService dashboardScenariosService;
+    @Mock
+    private DashboardNotificationService dashboardNotificationService;
+    @Mock
+    private TaskListService taskListService;
 
     @Mock
     private DashboardNotificationsParamsMapper dashboardNotificationsParamsMapper;
@@ -66,8 +71,8 @@ public class StayCaseClaimantNotificationHandlerTest extends BaseCallbackHandler
 
         HashMap<String, Object> params = new HashMap<>();
 
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
             .toBuilder().applicant1Represented(YesOrNo.NO)
@@ -79,18 +84,22 @@ public class StayCaseClaimantNotificationHandlerTest extends BaseCallbackHandler
 
         handler.handle(callbackParams);
 
-        verify(dashboardApiClient).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+        dashboardNotificationService.deleteByReferenceAndCitizenRole(
             caseData.getCcdCaseReference().toString(),
-            "CLAIMANT",
-            "BEARER_TOKEN"
+            "CLAIMANT"
         );
 
-        verify(dashboardApiClient, times(1)).recordScenario(
+        verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(
             caseData.getCcdCaseReference().toString(),
-            SCENARIO_AAA6_CP_CASE_STAYED_CLAIMANT.getScenario(),
+            "CLAIMANT",
+            "Applications"
+        );
+
+        verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
+            SCENARIO_AAA6_CP_CASE_STAYED_CLAIMANT.getScenario(),
+            caseData.getCcdCaseReference().toString(),
             ScenarioRequestParams.builder().params(params).build()
         );
     }
-
 }

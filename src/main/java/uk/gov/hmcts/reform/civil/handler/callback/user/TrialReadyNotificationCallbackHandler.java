@@ -49,6 +49,7 @@ public class TrialReadyNotificationCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData().toBuilder()
             .businessProcess(BusinessProcess.ready(TRIAL_READY_NOTIFICATION))
             .trialReadyNotified(YesOrNo.YES)
+            .trialReadyChecked(null)
             .build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()

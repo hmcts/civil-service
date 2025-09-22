@@ -13,10 +13,14 @@ import java.util.Map;
 
 import static java.util.Collections.emptyList;
 import static java.util.Map.entry;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CHANGE_LANGUAGE_PREFERENCE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CITIZEN_CLAIM_ISSUE_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_SIGN_SETTLEMENT_AGREEMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISPATCH_BUSINESS_PROCESS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.FEE_PAYMENT_OUTCOME;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NO_REMISSION_HWF;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_AND_REPLY;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REMOVE_DOCUMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SETTLE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SETTLE_CLAIM_MARK_PAID_FULL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISCONTINUE_CLAIM_CLAIMANT;
@@ -49,6 +53,8 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC_AFTER_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_LIP_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SDO;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CONFIRM_ORDER_REVIEW;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ORDER_REVIEW_OBLIGATION_CHECK;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DECISION_ON_RECONSIDERATION_REQUEST;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_SPEC;
@@ -68,12 +74,14 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.COURT_OFFICER_ORDER;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_FEE_PAID;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_FEE_UNPAID;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_SCHEDULED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_SCHEDULED_RETRIGGER;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INVALID_HWF_REFERENCE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.JUDGMENT_PAID_IN_FULL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REFER_JUDGE_DEFENCE_RECEIVED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION_COSC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIFT_BREATHING_SPACE_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIP_CLAIM_SETTLED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MANAGE_CONTACT_INFORMATION;
@@ -112,8 +120,10 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPLOAD_TRANSLATED_DOC
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.WITHDRAW_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.migrateCase;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CONFIRM_LISTING_COMPLETED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_ADMIT_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CASE_STAYED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION;
@@ -159,6 +169,8 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CL
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PREPARE_FOR_HEARING_CONDUCT_HEARING;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.queryManagementRaiseQuery;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.queryManagementRespondQuery;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.SIGN_SETTLEMENT_AGREEMENT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.SPEC_DRAFT;
@@ -186,7 +198,12 @@ public class FlowStateAllowedEventService {
         CASE_PROCEEDS_IN_CASEMAN,
         UpdateNextHearingInfo,
         UPDATE_NEXT_HEARING_DETAILS,
-        DISPATCH_BUSINESS_PROCESS
+        DISPATCH_BUSINESS_PROCESS,
+        SEND_AND_REPLY,
+        queryManagementRaiseQuery,
+        queryManagementRespondQuery,
+        ADD_CASE_NOTE,
+        REMOVE_DOCUMENT
     );
 
     private static final Map<String, List<CaseEvent>> ALLOWED_EVENTS_ON_FLOW_STATE = Map.ofEntries(
@@ -201,7 +218,6 @@ public class FlowStateAllowedEventService {
         entry(
             CLAIM_SUBMITTED.fullName(),
             List.of(
-                ADD_CASE_NOTE,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 NotSuitable_SDO,
@@ -226,7 +242,6 @@ public class FlowStateAllowedEventService {
                 WITHDRAW_CLAIM,
                 DISCONTINUE_CLAIM,
                 AMEND_PARTY_DETAILS,
-                ADD_CASE_NOTE,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 NotSuitable_SDO,
@@ -249,7 +264,6 @@ public class FlowStateAllowedEventService {
             List.of(
                 NOC_REQUEST,
                 APPLY_NOC_DECISION,
-                ADD_CASE_NOTE,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 NotSuitable_SDO,
@@ -283,7 +297,6 @@ public class FlowStateAllowedEventService {
                 DISMISS_CLAIM,
                 DISCONTINUE_CLAIM,
                 WITHDRAW_CLAIM,
-                ADD_CASE_NOTE,
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
@@ -304,7 +317,9 @@ public class FlowStateAllowedEventService {
                 RECORD_JUDGMENT,
                 EDIT_JUDGMENT,
                 JUDGMENT_PAID_IN_FULL,
-                SET_ASIDE_JUDGMENT
+                SET_ASIDE_JUDGMENT,
+                CONFIRM_ORDER_REVIEW,
+                ORDER_REVIEW_OBLIGATION_CHECK
             )
         ),
 
@@ -321,7 +336,6 @@ public class FlowStateAllowedEventService {
                 DISMISS_CLAIM,
                 DISCONTINUE_CLAIM,
                 WITHDRAW_CLAIM,
-                ADD_CASE_NOTE,
                 DEFAULT_JUDGEMENT,
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
@@ -336,7 +350,9 @@ public class FlowStateAllowedEventService {
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
                 DISCONTINUE_CLAIM_CLAIMANT,
-                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                CONFIRM_ORDER_REVIEW,
+                ORDER_REVIEW_OBLIGATION_CHECK
             )
         ),
 
@@ -354,7 +370,6 @@ public class FlowStateAllowedEventService {
                 AMEND_PARTY_DETAILS,
                 CASE_PROCEEDS_IN_CASEMAN,
                 DISMISS_CLAIM,
-                ADD_CASE_NOTE,
                 DEFAULT_JUDGEMENT,
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
@@ -367,6 +382,8 @@ public class FlowStateAllowedEventService {
                 HEARING_FEE_UNPAID,
                 HEARING_FEE_PAID,
                 HEARING_SCHEDULED,
+                HEARING_SCHEDULED_RETRIGGER,
+                CONFIRM_LISTING_COMPLETED,
                 TRIAL_READY_CHECK,
                 TRIAL_READY_NOTIFICATION,
                 MOVE_TO_DECISION_OUTCOME,
@@ -386,7 +403,9 @@ public class FlowStateAllowedEventService {
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
                 DISMISS_CASE,
-                MANAGE_STAY
+                MANAGE_STAY,
+                CONFIRM_ORDER_REVIEW,
+                ORDER_REVIEW_OBLIGATION_CHECK
             )
         ),
 
@@ -403,7 +422,6 @@ public class FlowStateAllowedEventService {
                 CASE_PROCEEDS_IN_CASEMAN,
                 AMEND_PARTY_DETAILS,
                 DISMISS_CLAIM,
-                ADD_CASE_NOTE,
                 DEFAULT_JUDGEMENT,
                 STANDARD_DIRECTION_ORDER_DJ,
                 INFORM_AGREED_EXTENSION_DATE,
@@ -416,6 +434,8 @@ public class FlowStateAllowedEventService {
                 TAKE_CASE_OFFLINE,
                 EVIDENCE_UPLOAD_JUDGE,
                 HEARING_SCHEDULED,
+                HEARING_SCHEDULED_RETRIGGER,
+                CONFIRM_LISTING_COMPLETED,
                 GENERATE_DIRECTIONS_ORDER,
                 TRANSFER_ONLINE_CASE,
                 COURT_OFFICER_ORDER,
@@ -425,7 +445,9 @@ public class FlowStateAllowedEventService {
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
                 DISMISS_CASE,
-                MANAGE_STAY
+                MANAGE_STAY,
+                CONFIRM_ORDER_REVIEW,
+                ORDER_REVIEW_OBLIGATION_CHECK
             )
         ),
 
@@ -443,7 +465,6 @@ public class FlowStateAllowedEventService {
                 INFORM_AGREED_EXTENSION_DATE,
                 AMEND_PARTY_DETAILS,
                 DISMISS_CLAIM,
-                ADD_CASE_NOTE,
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
@@ -455,6 +476,8 @@ public class FlowStateAllowedEventService {
                 TAKE_CASE_OFFLINE,
                 EVIDENCE_UPLOAD_JUDGE,
                 HEARING_SCHEDULED,
+                HEARING_SCHEDULED_RETRIGGER,
+                CONFIRM_LISTING_COMPLETED,
                 GENERATE_DIRECTIONS_ORDER,
                 TRANSFER_ONLINE_CASE,
                 COURT_OFFICER_ORDER,
@@ -464,7 +487,10 @@ public class FlowStateAllowedEventService {
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
                 DISMISS_CASE,
-                MANAGE_STAY
+                MANAGE_STAY,
+                CONFIRM_ORDER_REVIEW,
+                ORDER_REVIEW_OBLIGATION_CHECK,
+                EVIDENCE_UPLOAD_APPLICANT
             )
         ),
 
@@ -481,7 +507,6 @@ public class FlowStateAllowedEventService {
                 CASE_PROCEEDS_IN_CASEMAN,
                 AMEND_PARTY_DETAILS,
                 DISMISS_CLAIM,
-                ADD_CASE_NOTE,
                 INFORM_AGREED_EXTENSION_DATE,
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
@@ -499,6 +524,8 @@ public class FlowStateAllowedEventService {
                 EVIDENCE_UPLOAD_JUDGE,
                 TRIAL_READINESS,
                 HEARING_SCHEDULED,
+                HEARING_SCHEDULED_RETRIGGER,
+                CONFIRM_LISTING_COMPLETED,
                 TRIAL_READY_CHECK,
                 TRIAL_READY_NOTIFICATION,
                 MOVE_TO_DECISION_OUTCOME,
@@ -512,7 +539,9 @@ public class FlowStateAllowedEventService {
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
                 DISMISS_CASE,
-                MANAGE_STAY
+                MANAGE_STAY,
+                CONFIRM_ORDER_REVIEW,
+                ORDER_REVIEW_OBLIGATION_CHECK
             )
         ),
 
@@ -530,7 +559,6 @@ public class FlowStateAllowedEventService {
                 AMEND_PARTY_DETAILS,
                 CASE_PROCEEDS_IN_CASEMAN,
                 DISMISS_CLAIM,
-                ADD_CASE_NOTE,
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
@@ -544,12 +572,14 @@ public class FlowStateAllowedEventService {
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
                 DISMISS_CASE,
-                MANAGE_STAY
+                MANAGE_STAY,
+                CONFIRM_ORDER_REVIEW,
+                ORDER_REVIEW_OBLIGATION_CHECK
             )
         ),
 
         entry(
-            AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED.fullName(),
+            AWAITING_RESPONSES_FULL_ADMIT_RECEIVED.fullName(),
             List.of(
                 NOC_REQUEST,
                 APPLY_NOC_DECISION,
@@ -562,7 +592,6 @@ public class FlowStateAllowedEventService {
                 AMEND_PARTY_DETAILS,
                 CASE_PROCEEDS_IN_CASEMAN,
                 DISMISS_CLAIM,
-                ADD_CASE_NOTE,
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
@@ -576,7 +605,42 @@ public class FlowStateAllowedEventService {
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
                 DISMISS_CASE,
-                MANAGE_STAY
+                MANAGE_STAY,
+                CONFIRM_ORDER_REVIEW,
+                ORDER_REVIEW_OBLIGATION_CHECK
+            )
+        ),
+
+        entry(
+            AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED.fullName(),
+            List.of(
+                NOC_REQUEST,
+                APPLY_NOC_DECISION,
+                DEFENDANT_RESPONSE,
+                ACKNOWLEDGE_CLAIM,
+                INFORM_AGREED_EXTENSION_DATE,
+                ADD_DEFENDANT_LITIGATION_FRIEND,
+                WITHDRAW_CLAIM,
+                DISCONTINUE_CLAIM,
+                AMEND_PARTY_DETAILS,
+                CASE_PROCEEDS_IN_CASEMAN,
+                DISMISS_CLAIM,
+                CHANGE_SOLICITOR_EMAIL,
+                INITIATE_GENERAL_APPLICATION,
+                CREATE_SDO,
+                NotSuitable_SDO,
+                REQUEST_FOR_RECONSIDERATION,
+                migrateCase,
+                TRANSFER_ONLINE_CASE,
+                SETTLE_CLAIM,
+                SETTLE_CLAIM_MARK_PAID_FULL,
+                DISCONTINUE_CLAIM_CLAIMANT,
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                STAY_CASE,
+                DISMISS_CASE,
+                MANAGE_STAY,
+                CONFIRM_ORDER_REVIEW,
+                ORDER_REVIEW_OBLIGATION_CHECK
             )
         ),
 
@@ -593,7 +657,6 @@ public class FlowStateAllowedEventService {
                 AMEND_PARTY_DETAILS,
                 TAKE_CASE_OFFLINE,
                 APPLICATION_OFFLINE_UPDATE_CLAIM,
-                ADD_CASE_NOTE,
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
@@ -608,7 +671,9 @@ public class FlowStateAllowedEventService {
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
                 DISMISS_CASE,
-                MANAGE_STAY
+                MANAGE_STAY,
+                CONFIRM_ORDER_REVIEW,
+                ORDER_REVIEW_OBLIGATION_CHECK
             )
         ),
 
@@ -620,7 +685,6 @@ public class FlowStateAllowedEventService {
                 DISCONTINUE_CLAIM,
                 CASE_PROCEEDS_IN_CASEMAN,
                 AMEND_PARTY_DETAILS,
-                ADD_CASE_NOTE,
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
@@ -637,7 +701,9 @@ public class FlowStateAllowedEventService {
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
                 DISMISS_CASE,
-                MANAGE_STAY
+                MANAGE_STAY,
+                CONFIRM_ORDER_REVIEW,
+                ORDER_REVIEW_OBLIGATION_CHECK
             )
         ),
 
@@ -650,7 +716,6 @@ public class FlowStateAllowedEventService {
                 DISCONTINUE_CLAIM,
                 CASE_PROCEEDS_IN_CASEMAN,
                 AMEND_PARTY_DETAILS,
-                ADD_CASE_NOTE,
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
                 NotSuitable_SDO,
@@ -666,7 +731,9 @@ public class FlowStateAllowedEventService {
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
                 DISMISS_CASE,
-                MANAGE_STAY
+                MANAGE_STAY,
+                CONFIRM_ORDER_REVIEW,
+                ORDER_REVIEW_OBLIGATION_CHECK
             )
         ),
 
@@ -678,7 +745,6 @@ public class FlowStateAllowedEventService {
                 DISCONTINUE_CLAIM,
                 CASE_PROCEEDS_IN_CASEMAN,
                 AMEND_PARTY_DETAILS,
-                ADD_CASE_NOTE,
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
@@ -690,7 +756,9 @@ public class FlowStateAllowedEventService {
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
                 DISCONTINUE_CLAIM_CLAIMANT,
-                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                CONFIRM_ORDER_REVIEW,
+                ORDER_REVIEW_OBLIGATION_CHECK
             )
         ),
 
@@ -712,13 +780,14 @@ public class FlowStateAllowedEventService {
                 DISCONTINUE_CLAIM,
                 CASE_PROCEEDS_IN_CASEMAN,
                 AMEND_PARTY_DETAILS,
-                ADD_CASE_NOTE,
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 NotSuitable_SDO,
                 REQUEST_FOR_RECONSIDERATION,
                 HEARING_SCHEDULED,
+                HEARING_SCHEDULED_RETRIGGER,
+                CONFIRM_LISTING_COMPLETED,
                 HEARING_FEE_PAID,
                 HEARING_FEE_UNPAID,
                 TRIAL_READY_CHECK,
@@ -752,7 +821,9 @@ public class FlowStateAllowedEventService {
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
                 DISMISS_CASE,
-                MANAGE_STAY
+                MANAGE_STAY,
+                CONFIRM_ORDER_REVIEW,
+                ORDER_REVIEW_OBLIGATION_CHECK
             )
         ),
 
@@ -764,7 +835,6 @@ public class FlowStateAllowedEventService {
                 DISCONTINUE_CLAIM,
                 CASE_PROCEEDS_IN_CASEMAN,
                 AMEND_PARTY_DETAILS,
-                ADD_CASE_NOTE,
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
@@ -779,14 +849,15 @@ public class FlowStateAllowedEventService {
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
                 DISMISS_CASE,
-                MANAGE_STAY
+                MANAGE_STAY,
+                CONFIRM_ORDER_REVIEW,
+                ORDER_REVIEW_OBLIGATION_CHECK
             )
         ),
         entry(
             CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE.fullName(),
             List.of(
                 CASE_PROCEEDS_IN_CASEMAN,
-                ADD_CASE_NOTE,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 NotSuitable_SDO,
@@ -805,7 +876,6 @@ public class FlowStateAllowedEventService {
             CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE.fullName(),
             List.of(
                 CASE_PROCEEDS_IN_CASEMAN,
-                ADD_CASE_NOTE,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 NotSuitable_SDO,
@@ -823,8 +893,7 @@ public class FlowStateAllowedEventService {
         entry(
             CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE.fullName(),
             List.of(
-                CASE_PROCEEDS_IN_CASEMAN,
-                ADD_CASE_NOTE
+                CASE_PROCEEDS_IN_CASEMAN
             )
         ),
         entry(
@@ -858,7 +927,6 @@ public class FlowStateAllowedEventService {
             PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA.fullName(),
             List.of(
                 DISMISS_CLAIM,
-                ADD_CASE_NOTE,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 NotSuitable_SDO,
@@ -876,7 +944,6 @@ public class FlowStateAllowedEventService {
             PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA.fullName(),
             List.of(
                 DISMISS_CLAIM,
-                ADD_CASE_NOTE,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 NotSuitable_SDO,
@@ -899,7 +966,6 @@ public class FlowStateAllowedEventService {
                 NotSuitable_SDO,
                 REQUEST_FOR_RECONSIDERATION,
                 TRANSFER_ONLINE_CASE,
-                ADD_CASE_NOTE,
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
                 DISCONTINUE_CLAIM_CLAIMANT,
@@ -911,7 +977,6 @@ public class FlowStateAllowedEventService {
         entry(
             TAKEN_OFFLINE_BY_STAFF.fullName(),
             List.of(
-                ADD_CASE_NOTE,
                 APPLICATION_OFFLINE_UPDATE_CLAIM,
                 migrateCase
             )
@@ -919,7 +984,6 @@ public class FlowStateAllowedEventService {
         entry(
             TAKEN_OFFLINE_UNREGISTERED_DEFENDANT.fullName(),
             List.of(
-                ADD_CASE_NOTE,
                 APPLICATION_OFFLINE_UPDATE_CLAIM,
                 migrateCase
             )
@@ -927,7 +991,6 @@ public class FlowStateAllowedEventService {
         entry(
             TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT.fullName(),
             List.of(
-                ADD_CASE_NOTE,
                 APPLICATION_OFFLINE_UPDATE_CLAIM,
                 migrateCase
             )
@@ -935,7 +998,6 @@ public class FlowStateAllowedEventService {
         entry(
             TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT.fullName(),
             List.of(
-                ADD_CASE_NOTE,
                 APPLICATION_OFFLINE_UPDATE_CLAIM,
                 migrateCase
             )
@@ -943,7 +1005,6 @@ public class FlowStateAllowedEventService {
         entry(
             TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE.fullName(),
             List.of(
-                ADD_CASE_NOTE,
                 APPLICATION_OFFLINE_UPDATE_CLAIM,
                 migrateCase
             )
@@ -951,7 +1012,6 @@ public class FlowStateAllowedEventService {
         entry(
             TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED.fullName(),
             List.of(
-                ADD_CASE_NOTE,
                 APPLICATION_OFFLINE_UPDATE_CLAIM,
                 migrateCase
             )
@@ -959,24 +1019,17 @@ public class FlowStateAllowedEventService {
         entry(
             TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED.fullName(),
             List.of(
-                ADD_CASE_NOTE,
                 APPLICATION_OFFLINE_UPDATE_CLAIM,
                 migrateCase
             )
         ),
         entry(
             TAKEN_OFFLINE_SDO_NOT_DRAWN.fullName(),
-            List.of(
-                ADD_CASE_NOTE,
-                migrateCase
-            )
+            List.of(migrateCase)
         ),
         entry(
             TAKEN_OFFLINE_AFTER_SDO.fullName(),
-            List.of(
-                ADD_CASE_NOTE,
-                AMEND_PARTY_DETAILS
-            )
+            List.of(AMEND_PARTY_DETAILS)
         ),
         entry(
             CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE.fullName(),
@@ -999,7 +1052,9 @@ public class FlowStateAllowedEventService {
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
                 DISMISS_CASE,
-                MANAGE_STAY
+                MANAGE_STAY,
+                CONFIRM_ORDER_REVIEW,
+                ORDER_REVIEW_OBLIGATION_CHECK
             )
         ),
         entry(
@@ -1014,7 +1069,6 @@ public class FlowStateAllowedEventService {
                 AMEND_PARTY_DETAILS,
                 CASE_PROCEEDS_IN_CASEMAN,
                 DISMISS_CLAIM,
-                ADD_CASE_NOTE,
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
                 NotSuitable_SDO,
@@ -1023,6 +1077,8 @@ public class FlowStateAllowedEventService {
                 HEARING_FEE_UNPAID,
                 HEARING_FEE_PAID,
                 HEARING_SCHEDULED,
+                HEARING_SCHEDULED_RETRIGGER,
+                CONFIRM_LISTING_COMPLETED,
                 TRIAL_READY_CHECK,
                 TRIAL_READY_NOTIFICATION,
                 MOVE_TO_DECISION_OUTCOME,
@@ -1045,7 +1101,9 @@ public class FlowStateAllowedEventService {
                 AMEND_RESTITCH_BUNDLE,
                 STAY_CASE,
                 DISMISS_CASE,
-                MANAGE_STAY
+                MANAGE_STAY,
+                CONFIRM_ORDER_REVIEW,
+                ORDER_REVIEW_OBLIGATION_CHECK
             )
         ),
         entry(
@@ -1053,7 +1111,8 @@ public class FlowStateAllowedEventService {
             List.of(
                 INITIATE_GENERAL_APPLICATION,
                 ADD_UNAVAILABLE_DATES,
-                CHANGE_SOLICITOR_EMAIL
+                CHANGE_SOLICITOR_EMAIL,
+                ORDER_REVIEW_OBLIGATION_CHECK
             )
         )
     );
@@ -1082,7 +1141,6 @@ public class FlowStateAllowedEventService {
             List.of(
                 NOC_REQUEST,
                 APPLY_NOC_DECISION,
-                ADD_CASE_NOTE,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 NotSuitable_SDO,
@@ -1098,7 +1156,9 @@ public class FlowStateAllowedEventService {
                 RECORD_JUDGMENT,
                 EDIT_JUDGMENT,
                 JUDGMENT_PAID_IN_FULL,
-                SET_ASIDE_JUDGMENT
+                SET_ASIDE_JUDGMENT,
+                INITIATE_GENERAL_APPLICATION_COSC,
+                CHANGE_LANGUAGE_PREFERENCE
             )
         ),
 
@@ -1124,7 +1184,9 @@ public class FlowStateAllowedEventService {
                 RECORD_JUDGMENT,
                 EDIT_JUDGMENT,
                 JUDGMENT_PAID_IN_FULL,
-                SET_ASIDE_JUDGMENT
+                SET_ASIDE_JUDGMENT,
+                INITIATE_GENERAL_APPLICATION_COSC,
+                CHANGE_LANGUAGE_PREFERENCE
             )
         ),
 
@@ -1137,7 +1199,6 @@ public class FlowStateAllowedEventService {
                 ADD_DEFENDANT_LITIGATION_FRIEND,
                 CASE_PROCEEDS_IN_CASEMAN,
                 ADD_OR_AMEND_CLAIM_DOCUMENTS,
-                ADD_CASE_NOTE,
                 AMEND_PARTY_DETAILS,
                 ACKNOWLEDGEMENT_OF_SERVICE,
                 INFORM_AGREED_EXTENSION_DATE,
@@ -1155,6 +1216,8 @@ public class FlowStateAllowedEventService {
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 HEARING_SCHEDULED,
+                HEARING_SCHEDULED_RETRIGGER,
+                CONFIRM_LISTING_COMPLETED,
                 NotSuitable_SDO,
                 REQUEST_FOR_RECONSIDERATION,
                 EVIDENCE_UPLOAD_JUDGE,
@@ -1182,7 +1245,13 @@ public class FlowStateAllowedEventService {
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
                 DISMISS_CASE,
-                MANAGE_STAY
+                MANAGE_STAY,
+                CONFIRM_ORDER_REVIEW,
+                ORDER_REVIEW_OBLIGATION_CHECK,
+                REFER_JUDGE_DEFENCE_RECEIVED,
+                GENERATE_DIRECTIONS_ORDER,
+                INITIATE_GENERAL_APPLICATION_COSC,
+                CHANGE_LANGUAGE_PREFERENCE
             )
         ),
         entry(
@@ -1211,6 +1280,8 @@ public class FlowStateAllowedEventService {
                 NotSuitable_SDO,
                 REQUEST_FOR_RECONSIDERATION,
                 HEARING_SCHEDULED,
+                HEARING_SCHEDULED_RETRIGGER,
+                CONFIRM_LISTING_COMPLETED,
                 TRIAL_READY_CHECK,
                 TRIAL_READY_NOTIFICATION,
                 MOVE_TO_DECISION_OUTCOME,
@@ -1229,7 +1300,11 @@ public class FlowStateAllowedEventService {
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
                 DISMISS_CASE,
-                MANAGE_STAY
+                MANAGE_STAY,
+                CONFIRM_ORDER_REVIEW,
+                ORDER_REVIEW_OBLIGATION_CHECK,
+                INITIATE_GENERAL_APPLICATION_COSC,
+                CHANGE_LANGUAGE_PREFERENCE
             )
         ),
         entry(
@@ -1259,7 +1334,12 @@ public class FlowStateAllowedEventService {
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
                 DISMISS_CASE,
-                MANAGE_STAY
+                MANAGE_STAY,
+                CONFIRM_ORDER_REVIEW,
+                ORDER_REVIEW_OBLIGATION_CHECK,
+                INITIATE_GENERAL_APPLICATION_COSC,
+                CHANGE_LANGUAGE_PREFERENCE,
+                EVIDENCE_UPLOAD_APPLICANT
             )
         ),
 
@@ -1290,6 +1370,8 @@ public class FlowStateAllowedEventService {
                 EVIDENCE_UPLOAD_JUDGE,
                 TRIAL_READINESS,
                 HEARING_SCHEDULED,
+                HEARING_SCHEDULED_RETRIGGER,
+                CONFIRM_LISTING_COMPLETED,
                 TRIAL_READY_CHECK,
                 TRIAL_READY_NOTIFICATION,
                 MOVE_TO_DECISION_OUTCOME,
@@ -1303,7 +1385,11 @@ public class FlowStateAllowedEventService {
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
                 DISMISS_CASE,
-                MANAGE_STAY
+                MANAGE_STAY,
+                CONFIRM_ORDER_REVIEW,
+                ORDER_REVIEW_OBLIGATION_CHECK,
+                INITIATE_GENERAL_APPLICATION_COSC,
+                CHANGE_LANGUAGE_PREFERENCE
             )
         ),
 
@@ -1338,7 +1424,10 @@ public class FlowStateAllowedEventService {
                 STAY_CASE,
                 DISMISS_CASE,
                 MANAGE_STAY,
-                ADD_CASE_NOTE
+                CONFIRM_ORDER_REVIEW,
+                ORDER_REVIEW_OBLIGATION_CHECK,
+                INITIATE_GENERAL_APPLICATION_COSC,
+                CHANGE_LANGUAGE_PREFERENCE
             )
         ),
 
@@ -1373,7 +1462,12 @@ public class FlowStateAllowedEventService {
                 STAY_CASE,
                 DISMISS_CASE,
                 MANAGE_STAY,
-                ADD_CASE_NOTE
+                CONFIRM_ORDER_REVIEW,
+                NOC_REQUEST,
+                APPLY_NOC_DECISION,
+                ORDER_REVIEW_OBLIGATION_CHECK,
+                INITIATE_GENERAL_APPLICATION_COSC,
+                CHANGE_LANGUAGE_PREFERENCE
             )
         ),
         entry(
@@ -1415,7 +1509,12 @@ public class FlowStateAllowedEventService {
                 FULL_REMISSION_HWF,
                 UPDATE_HELP_WITH_FEE_NUMBER,
                 INVALID_HWF_REFERENCE,
-                ADD_CASE_NOTE
+                CONFIRM_ORDER_REVIEW,
+                NOC_REQUEST,
+                APPLY_NOC_DECISION,
+                ORDER_REVIEW_OBLIGATION_CHECK,
+                INITIATE_GENERAL_APPLICATION_COSC,
+                CHANGE_LANGUAGE_PREFERENCE
             )
         ),
 
@@ -1448,7 +1547,13 @@ public class FlowStateAllowedEventService {
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
                 DISCONTINUE_CLAIM_CLAIMANT,
-                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                CONFIRM_ORDER_REVIEW,
+                NOC_REQUEST,
+                APPLY_NOC_DECISION,
+                ORDER_REVIEW_OBLIGATION_CHECK,
+                INITIATE_GENERAL_APPLICATION_COSC,
+                CHANGE_LANGUAGE_PREFERENCE
             )
         ),
         entry(
@@ -1456,18 +1561,24 @@ public class FlowStateAllowedEventService {
             List.of(
                 DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
                 REQUEST_JUDGEMENT_ADMISSION_SPEC,
-                ADD_CASE_NOTE
+                NOC_REQUEST,
+                APPLY_NOC_DECISION,
+                CHANGE_LANGUAGE_PREFERENCE
             )
         ),
         entry(
             PART_ADMIT_PROCEED.fullName(),
             List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
-                    ADD_CASE_NOTE)
+                    NOC_REQUEST,
+                    APPLY_NOC_DECISION,
+                    CHANGE_LANGUAGE_PREFERENCE)
         ),
         entry(
             PART_ADMIT_NOT_PROCEED.fullName(),
             List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
-                    ADD_CASE_NOTE)
+                    NOC_REQUEST,
+                    APPLY_NOC_DECISION,
+                    CHANGE_LANGUAGE_PREFERENCE)
         ),
         entry(
             PART_ADMIT_PAY_IMMEDIATELY.fullName(),
@@ -1478,28 +1589,49 @@ public class FlowStateAllowedEventService {
                 STAY_CASE,
                 DISMISS_CASE,
                 MANAGE_STAY,
-                ADD_CASE_NOTE
+                CONFIRM_ORDER_REVIEW,
+                NOC_REQUEST,
+                APPLY_NOC_DECISION,
+                ORDER_REVIEW_OBLIGATION_CHECK,
+                REQUEST_JUDGEMENT_ADMISSION_SPEC,
+                JUDGMENT_PAID_IN_FULL,
+                INITIATE_GENERAL_APPLICATION,
+                REFER_JUDGE_DEFENCE_RECEIVED,
+                GENERATE_DIRECTIONS_ORDER,
+                INITIATE_GENERAL_APPLICATION_COSC,
+                CHANGE_LANGUAGE_PREFERENCE
             )
         ),
         entry(
             PART_ADMIT_AGREE_SETTLE.fullName(),
             List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
-                    ADD_CASE_NOTE)
+                    NOC_REQUEST,
+                    APPLY_NOC_DECISION,
+                    CHANGE_LANGUAGE_PREFERENCE)
         ),
         entry(
             FULL_ADMIT_PAY_IMMEDIATELY.fullName(),
             List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
-                    ADD_CASE_NOTE)
+                    NOC_REQUEST,
+                    APPLY_NOC_DECISION,
+                    REQUEST_JUDGEMENT_ADMISSION_SPEC,
+                    REFER_JUDGE_DEFENCE_RECEIVED,
+                    GENERATE_DIRECTIONS_ORDER,
+                    CHANGE_LANGUAGE_PREFERENCE)
         ),
         entry(
             FULL_ADMIT_PROCEED.fullName(),
             List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
-                    ADD_CASE_NOTE)
+                    NOC_REQUEST,
+                    APPLY_NOC_DECISION,
+                    CHANGE_LANGUAGE_PREFERENCE)
         ),
         entry(
             FULL_ADMIT_NOT_PROCEED.fullName(),
             List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
-                    ADD_CASE_NOTE)
+                    NOC_REQUEST,
+                    APPLY_NOC_DECISION,
+                    CHANGE_LANGUAGE_PREFERENCE)
         ),
         entry(
             FULL_ADMIT_JUDGMENT_ADMISSION.fullName(),
@@ -1508,7 +1640,13 @@ public class FlowStateAllowedEventService {
                 EDIT_JUDGMENT,
                 JUDGMENT_PAID_IN_FULL,
                 SET_ASIDE_JUDGMENT,
-                ADD_CASE_NOTE
+                NOC_REQUEST,
+                APPLY_NOC_DECISION,
+                INITIATE_GENERAL_APPLICATION,
+                REFER_JUDGE_DEFENCE_RECEIVED,
+                GENERATE_DIRECTIONS_ORDER,
+                INITIATE_GENERAL_APPLICATION_COSC,
+                CHANGE_LANGUAGE_PREFERENCE
             )
         ),
         entry(
@@ -1526,6 +1664,8 @@ public class FlowStateAllowedEventService {
                 NotSuitable_SDO,
                 REQUEST_FOR_RECONSIDERATION,
                 HEARING_SCHEDULED,
+                HEARING_SCHEDULED_RETRIGGER,
+                CONFIRM_LISTING_COMPLETED,
                 TRIAL_READY_CHECK,
                 TRIAL_READY_NOTIFICATION,
                 MOVE_TO_DECISION_OUTCOME,
@@ -1541,7 +1681,6 @@ public class FlowStateAllowedEventService {
                 EVIDENCE_UPLOAD_JUDGE,
                 TRIAL_READINESS,
                 BUNDLE_CREATION_NOTIFICATION,
-                ADD_CASE_NOTE,
                 CHANGE_SOLICITOR_EMAIL,
                 ADD_UNAVAILABLE_DATES,
                 SET_ASIDE_JUDGMENT,
@@ -1572,7 +1711,14 @@ public class FlowStateAllowedEventService {
                 FULL_REMISSION_HWF,
                 UPDATE_HELP_WITH_FEE_NUMBER,
                 INVALID_HWF_REFERENCE,
-                ADD_CASE_NOTE
+                CONFIRM_ORDER_REVIEW,
+                NOC_REQUEST,
+                APPLY_NOC_DECISION,
+                MEDIATION_SUCCESSFUL,
+                MEDIATION_UNSUCCESSFUL,
+                ORDER_REVIEW_OBLIGATION_CHECK,
+                INITIATE_GENERAL_APPLICATION_COSC,
+                CHANGE_LANGUAGE_PREFERENCE
             )
         ),
 
@@ -1599,7 +1745,12 @@ public class FlowStateAllowedEventService {
                 SETTLE_CLAIM_MARK_PAID_FULL,
                 DISCONTINUE_CLAIM_CLAIMANT,
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
-                ADD_CASE_NOTE
+                CONFIRM_ORDER_REVIEW,
+                NOC_REQUEST,
+                APPLY_NOC_DECISION,
+                ORDER_REVIEW_OBLIGATION_CHECK,
+                INITIATE_GENERAL_APPLICATION_COSC,
+                CHANGE_LANGUAGE_PREFERENCE
             )
         ),
         entry(
@@ -1658,7 +1809,6 @@ public class FlowStateAllowedEventService {
             List.of(
                 DISMISS_CLAIM,
                 migrateCase,
-                ADD_CASE_NOTE,
                 AMEND_RESTITCH_BUNDLE,
                 asyncStitchingComplete
             )
@@ -1679,7 +1829,6 @@ public class FlowStateAllowedEventService {
                 AMEND_PARTY_DETAILS,
                 CASE_PROCEEDS_IN_CASEMAN,
                 DISMISS_CLAIM,
-                ADD_CASE_NOTE,
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
@@ -1693,11 +1842,14 @@ public class FlowStateAllowedEventService {
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
                 DISMISS_CASE,
-                MANAGE_STAY
+                MANAGE_STAY,
+                CONFIRM_ORDER_REVIEW,
+                ORDER_REVIEW_OBLIGATION_CHECK,
+                INITIATE_GENERAL_APPLICATION_COSC
             )
         ),
         entry(
-            AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED.fullName(),
+            AWAITING_RESPONSES_FULL_ADMIT_RECEIVED.fullName(),
             List.of(
                 DEFENDANT_RESPONSE_SPEC,
                 DEFENDANT_RESPONSE_CUI,
@@ -1711,7 +1863,27 @@ public class FlowStateAllowedEventService {
                 STAY_CASE,
                 DISMISS_CASE,
                 MANAGE_STAY,
-                ADD_CASE_NOTE
+                CONFIRM_ORDER_REVIEW,
+                ORDER_REVIEW_OBLIGATION_CHECK
+            )
+        ),
+        entry(
+            AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED.fullName(),
+            List.of(
+                DEFENDANT_RESPONSE_SPEC,
+                DEFENDANT_RESPONSE_CUI,
+                RESET_PIN,
+                migrateCase,
+                TRANSFER_ONLINE_CASE,
+                SETTLE_CLAIM,
+                SETTLE_CLAIM_MARK_PAID_FULL,
+                DISCONTINUE_CLAIM_CLAIMANT,
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                STAY_CASE,
+                DISMISS_CASE,
+                MANAGE_STAY,
+                CONFIRM_ORDER_REVIEW,
+                ORDER_REVIEW_OBLIGATION_CHECK
             )
         ),
         entry(
@@ -1731,7 +1903,13 @@ public class FlowStateAllowedEventService {
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
                 DISMISS_CASE,
-                MANAGE_STAY
+                MANAGE_STAY,
+                CONFIRM_ORDER_REVIEW,
+                NOC_REQUEST,
+                APPLY_NOC_DECISION,
+                ORDER_REVIEW_OBLIGATION_CHECK,
+                INITIATE_GENERAL_APPLICATION_COSC,
+                CHANGE_LANGUAGE_PREFERENCE
             )
         ),
         entry(
@@ -1744,12 +1922,13 @@ public class FlowStateAllowedEventService {
                 DISCONTINUE_CLAIM,
                 CASE_PROCEEDS_IN_CASEMAN,
                 AMEND_PARTY_DETAILS,
-                ADD_CASE_NOTE,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 NotSuitable_SDO,
                 REQUEST_FOR_RECONSIDERATION,
                 HEARING_SCHEDULED,
+                HEARING_SCHEDULED_RETRIGGER,
+                CONFIRM_LISTING_COMPLETED,
                 TRIAL_READY_CHECK,
                 TRIAL_READY_NOTIFICATION,
                 MOVE_TO_DECISION_OUTCOME,
@@ -1787,7 +1966,13 @@ public class FlowStateAllowedEventService {
                 AMEND_RESTITCH_BUNDLE,
                 STAY_CASE,
                 DISMISS_CASE,
-                MANAGE_STAY
+                MANAGE_STAY,
+                CONFIRM_ORDER_REVIEW,
+                NOC_REQUEST,
+                APPLY_NOC_DECISION,
+                ORDER_REVIEW_OBLIGATION_CHECK,
+                INITIATE_GENERAL_APPLICATION_COSC,
+                CHANGE_LANGUAGE_PREFERENCE
             )
         ),
         entry(
@@ -1805,6 +1990,8 @@ public class FlowStateAllowedEventService {
                 NotSuitable_SDO,
                 REQUEST_FOR_RECONSIDERATION,
                 HEARING_SCHEDULED,
+                HEARING_SCHEDULED_RETRIGGER,
+                CONFIRM_LISTING_COMPLETED,
                 TRIAL_READY_CHECK,
                 TRIAL_READY_NOTIFICATION,
                 MOVE_TO_DECISION_OUTCOME,
@@ -1820,7 +2007,6 @@ public class FlowStateAllowedEventService {
                 EVIDENCE_UPLOAD_JUDGE,
                 TRIAL_READINESS,
                 BUNDLE_CREATION_NOTIFICATION,
-                ADD_CASE_NOTE,
                 CHANGE_SOLICITOR_EMAIL,
                 ADD_UNAVAILABLE_DATES,
                 LIP_CLAIM_SETTLED,
@@ -1843,7 +2029,13 @@ public class FlowStateAllowedEventService {
                 FULL_REMISSION_HWF,
                 UPDATE_HELP_WITH_FEE_NUMBER,
                 INVALID_HWF_REFERENCE,
-                AMEND_RESTITCH_BUNDLE
+                AMEND_RESTITCH_BUNDLE,
+                CONFIRM_ORDER_REVIEW,
+                NOC_REQUEST,
+                APPLY_NOC_DECISION,
+                ORDER_REVIEW_OBLIGATION_CHECK,
+                INITIATE_GENERAL_APPLICATION_COSC,
+                CHANGE_LANGUAGE_PREFERENCE
             )
         ),
         entry(
@@ -1860,8 +2052,13 @@ public class FlowStateAllowedEventService {
                 STAY_CASE,
                 DISMISS_CASE,
                 MANAGE_STAY,
-                ADD_CASE_NOTE,
-                INITIATE_GENERAL_APPLICATION
+                INITIATE_GENERAL_APPLICATION,
+                CONFIRM_ORDER_REVIEW,
+                COURT_OFFICER_ORDER,
+                ORDER_REVIEW_OBLIGATION_CHECK,
+                INITIATE_GENERAL_APPLICATION_COSC,
+                JUDGMENT_PAID_IN_FULL,
+                CHANGE_LANGUAGE_PREFERENCE
             )
         ),
         entry(
@@ -1878,7 +2075,11 @@ public class FlowStateAllowedEventService {
                 CREATE_SDO,
                 NotSuitable_SDO,
                 REQUEST_FOR_RECONSIDERATION,
+                DECISION_ON_RECONSIDERATION_REQUEST,
+                AMEND_RESTITCH_BUNDLE,
                 HEARING_SCHEDULED,
+                HEARING_SCHEDULED_RETRIGGER,
+                CONFIRM_LISTING_COMPLETED,
                 TRIAL_READY_CHECK,
                 TRIAL_READY_NOTIFICATION,
                 MOVE_TO_DECISION_OUTCOME,
@@ -1901,7 +2102,6 @@ public class FlowStateAllowedEventService {
                 CUI_UPLOAD_MEDIATION_DOCUMENTS,
                 TRANSFER_ONLINE_CASE,
                 COURT_OFFICER_ORDER,
-                ADD_CASE_NOTE,
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
                 DISCONTINUE_CLAIM_CLAIMANT,
@@ -1909,7 +2109,18 @@ public class FlowStateAllowedEventService {
                 LIP_CLAIM_SETTLED,
                 STAY_CASE,
                 DISMISS_CASE,
-                MANAGE_STAY
+                MANAGE_STAY,
+                CONFIRM_ORDER_REVIEW,
+                ORDER_REVIEW_OBLIGATION_CHECK,
+                INITIATE_GENERAL_APPLICATION_COSC,
+                CHANGE_LANGUAGE_PREFERENCE,
+                MORE_INFORMATION_HWF,
+                FEE_PAYMENT_OUTCOME,
+                NO_REMISSION_HWF,
+                PARTIAL_REMISSION_HWF_GRANTED,
+                FULL_REMISSION_HWF,
+                UPDATE_HELP_WITH_FEE_NUMBER,
+                INVALID_HWF_REFERENCE
             )
         ),
         entry(
@@ -1927,13 +2138,17 @@ public class FlowStateAllowedEventService {
                 AMEND_RESTITCH_BUNDLE,
                 STAY_CASE,
                 DISMISS_CASE,
-                MANAGE_STAY
+                MANAGE_STAY,
+                CONFIRM_ORDER_REVIEW,
+                NOC_REQUEST,
+                APPLY_NOC_DECISION,
+                ORDER_REVIEW_OBLIGATION_CHECK,
+                CHANGE_LANGUAGE_PREFERENCE
             )
         ),
         entry(
             TAKEN_OFFLINE_BY_STAFF.fullName(),
             List.of(
-                ADD_CASE_NOTE,
                 APPLICATION_OFFLINE_UPDATE_CLAIM,
                 migrateCase
             )
@@ -1941,7 +2156,6 @@ public class FlowStateAllowedEventService {
         entry(
             TAKEN_OFFLINE_UNREGISTERED_DEFENDANT.fullName(),
             List.of(
-                ADD_CASE_NOTE,
                 APPLICATION_OFFLINE_UPDATE_CLAIM,
                 migrateCase
             )
@@ -1949,7 +2163,6 @@ public class FlowStateAllowedEventService {
         entry(
             TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT.fullName(),
             List.of(
-                ADD_CASE_NOTE,
                 APPLICATION_OFFLINE_UPDATE_CLAIM,
                 migrateCase
             )
@@ -1957,7 +2170,6 @@ public class FlowStateAllowedEventService {
         entry(
             TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT.fullName(),
             List.of(
-                ADD_CASE_NOTE,
                 APPLICATION_OFFLINE_UPDATE_CLAIM,
                 migrateCase
             )
@@ -1965,7 +2177,6 @@ public class FlowStateAllowedEventService {
         entry(
             TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE.fullName(),
             List.of(
-                ADD_CASE_NOTE,
                 APPLICATION_OFFLINE_UPDATE_CLAIM,
                 migrateCase
             )
@@ -1973,7 +2184,6 @@ public class FlowStateAllowedEventService {
         entry(
             TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED.fullName(),
             List.of(
-                ADD_CASE_NOTE,
                 APPLICATION_OFFLINE_UPDATE_CLAIM,
                 migrateCase
             )
@@ -1981,7 +2191,6 @@ public class FlowStateAllowedEventService {
         entry(
             TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED.fullName(),
             List.of(
-                ADD_CASE_NOTE,
                 APPLICATION_OFFLINE_UPDATE_CLAIM,
                 migrateCase
             )
@@ -1989,14 +2198,12 @@ public class FlowStateAllowedEventService {
         entry(
             TAKEN_OFFLINE_SDO_NOT_DRAWN.fullName(),
             List.of(
-                ADD_CASE_NOTE,
                 migrateCase
             )
         ),
         entry(
             TAKEN_OFFLINE_AFTER_SDO.fullName(),
             List.of(
-                ADD_CASE_NOTE,
                 AMEND_PARTY_DETAILS
             )
         ),
@@ -2011,7 +2218,14 @@ public class FlowStateAllowedEventService {
                 LIP_CLAIM_SETTLED,
                 DISCONTINUE_CLAIM_CLAIMANT,
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
-                ADD_CASE_NOTE
+                NOC_REQUEST,
+                APPLY_NOC_DECISION,
+                JUDGMENT_PAID_IN_FULL,
+                INITIATE_GENERAL_APPLICATION,
+                REFER_JUDGE_DEFENCE_RECEIVED,
+                GENERATE_DIRECTIONS_ORDER,
+                INITIATE_GENERAL_APPLICATION_COSC,
+                CHANGE_LANGUAGE_PREFERENCE
             )
         ),
         entry(
@@ -2020,7 +2234,9 @@ public class FlowStateAllowedEventService {
                 DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
                 REQUEST_JUDGEMENT_ADMISSION_SPEC,
                 LIP_CLAIM_SETTLED,
-                ADD_CASE_NOTE
+                NOC_REQUEST,
+                APPLY_NOC_DECISION,
+                CHANGE_LANGUAGE_PREFERENCE
             )
         ),
         entry(
@@ -2040,7 +2256,16 @@ public class FlowStateAllowedEventService {
                 STAY_CASE,
                 DISMISS_CASE,
                 MANAGE_STAY,
-                ADD_CASE_NOTE
+                CONFIRM_ORDER_REVIEW,
+                NOC_REQUEST,
+                APPLY_NOC_DECISION,
+                ORDER_REVIEW_OBLIGATION_CHECK,
+                INITIATE_GENERAL_APPLICATION,
+                REFER_JUDGE_DEFENCE_RECEIVED,
+                GENERATE_DIRECTIONS_ORDER,
+                INITIATE_GENERAL_APPLICATION_COSC,
+                EVIDENCE_UPLOAD_RESPONDENT,
+                CHANGE_LANGUAGE_PREFERENCE
             )
         ),
         entry(
@@ -2055,7 +2280,8 @@ public class FlowStateAllowedEventService {
                 INVALID_HWF_REFERENCE,
                 NO_REMISSION_HWF,
                 LIP_CLAIM_SETTLED,
-                ADD_CASE_NOTE
+                CITIZEN_CLAIM_ISSUE_PAYMENT,
+                CHANGE_LANGUAGE_PREFERENCE
             )
         ),
         entry(
@@ -2064,7 +2290,10 @@ public class FlowStateAllowedEventService {
                 INITIATE_GENERAL_APPLICATION,
                 ADD_UNAVAILABLE_DATES,
                 CHANGE_SOLICITOR_EMAIL,
-                ADD_CASE_NOTE
+                NOC_REQUEST,
+                APPLY_NOC_DECISION,
+                ORDER_REVIEW_OBLIGATION_CHECK,
+                CHANGE_LANGUAGE_PREFERENCE
             )
         ),
         entry(
@@ -2072,14 +2301,13 @@ public class FlowStateAllowedEventService {
             List.of(
                 REQUEST_JUDGEMENT_ADMISSION_SPEC,
                 LIP_CLAIM_SETTLED,
-                ADD_CASE_NOTE
+                CHANGE_LANGUAGE_PREFERENCE
             )
         ),
         entry(
             CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE.fullName(),
             List.of(
-                CASE_PROCEEDS_IN_CASEMAN,
-                ADD_CASE_NOTE
+                CASE_PROCEEDS_IN_CASEMAN
             )
         )
     );

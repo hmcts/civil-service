@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.model.DeterWithoutHearing;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.account.AccountSimple;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -53,6 +54,13 @@ public class Respondent2DQ implements DQ {
     private FutureApplications respondent2DQFutureApplications;
     private Hearing respondent2DQHearingFastClaim;
     private RequestedCourt respondToCourtLocation2;
+    private DeterWithoutHearing deterWithoutHearingRespondent2;
+
+    @Override
+    @JsonProperty("deterWithoutHearingRespondent2")
+    public DeterWithoutHearing getDeterWithoutHearing() {
+        return deterWithoutHearingRespondent2;
+    }
 
     @Override
     @JsonProperty("respondent2DQFileDirectionsQuestionnaire")

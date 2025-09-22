@@ -3,8 +3,10 @@ package uk.gov.hmcts.reform.civil.helpers.judgmentsonline;
 import camundajar.impl.scala.collection.mutable.StringBuilder;
 import org.jetbrains.annotations.NotNull;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentAddress;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
@@ -81,29 +83,38 @@ public class JudgmentsOnlineHelper {
             || caseData.isLRvLipOneVOne();
     }
 
-    public static BigDecimal getCostOfJudgmentForDJ(CaseData data) {
+    public static BigDecimal getClaimFeeOfJudgmentForDJ(CaseData data) {
 
         if (data.getOutstandingFeeInPounds() != null) {
             return data.getOutstandingFeeInPounds();
         }
 
         String repaymentSummary = data.getRepaymentSummaryObject();
-        BigDecimal fixedCost = null;
         BigDecimal claimCost = null;
         if (null != repaymentSummary) {
-            fixedCost = repaymentSummary.contains("Fixed")
-                ? new BigDecimal(repaymentSummary.substring(
-                repaymentSummary.indexOf("Fixed cost amount \n£") + 20,
-                repaymentSummary.indexOf("\n### Claim fee amount ")
-            )) : null;
             claimCost = new BigDecimal(repaymentSummary.substring(
                 repaymentSummary.indexOf("Claim fee amount \n £") + 20,
                 repaymentSummary.indexOf("\n ## Subtotal")
             ));
         }
 
-        return fixedCost != null && claimCost != null ? fixedCost.add(claimCost)
-            : claimCost != null ? claimCost : ZERO;
+        return claimCost != null ? claimCost : ZERO;
+
+    }
+
+    public static BigDecimal getFixedCostsOfJudgmentForDJ(CaseData data) {
+
+        String repaymentSummary = data.getRepaymentSummaryObject();
+        BigDecimal fixedCost = null;
+        if (null != repaymentSummary) {
+            fixedCost = repaymentSummary.contains("Fixed")
+                ? new BigDecimal(repaymentSummary.substring(
+                repaymentSummary.indexOf("Fixed cost amount \n£") + 20,
+                repaymentSummary.indexOf("\n### Claim fee amount ")
+            )) : null;
+        }
+
+        return fixedCost != null ? fixedCost : ZERO;
 
     }
 
@@ -114,6 +125,44 @@ public class JudgmentsOnlineHelper {
         subTotal = subTotal.subtract(getPartialPayment(caseData));
 
         return subTotal;
+    }
+
+    @NotNull
+    public static BigDecimal getJudgmentAmount(CaseData caseData, InterestCalculator interestCalculator) {
+        BigDecimal judgmentAmount = calculateJudgmentAmountForFixedCosts(caseData, interestCalculator)
+            .add(JudgmentsOnlineHelper.getFixedCostsOnCommencement(caseData)).add(getClaimFeePounds(caseData, caseData.getClaimFee()));
+        return judgmentAmount;
+    }
+
+    public static BigDecimal getClaimFeePounds(CaseData caseData, Fee claimfee) {
+        BigDecimal claimFeePounds;
+        if (caseData.getOutstandingFeeInPounds() != null) {
+            claimFeePounds = caseData.getOutstandingFeeInPounds();
+        } else {
+            claimFeePounds = MonetaryConversions.penniesToPounds(claimfee.getCalculatedAmountInPence());
+        }
+        return claimFeePounds;
+    }
+
+    private static BigDecimal calculateJudgmentAmountForFixedCosts(CaseData caseData, InterestCalculator interestCalculator) {
+        BigDecimal interest = interestCalculator.calculateInterest(caseData);
+
+        BigDecimal subTotal = caseData.getTotalClaimAmount().add(interest);
+        BigDecimal partialPaymentPounds = getPartialPayment(caseData);
+        return calculateOverallTotal(partialPaymentPounds, subTotal);
+    }
+
+    private static BigDecimal calculateOverallTotal(BigDecimal partialPaymentPounds, BigDecimal subTotal) {
+        return subTotal.subtract(partialPaymentPounds);
+    }
+
+    public static BigDecimal getFixedCostsOnCommencement(CaseData caseData) {
+        BigDecimal fixedCostsCommencement = BigDecimal.valueOf(0);
+        if (caseData.getFixedCosts() != null && YesOrNo.YES.equals(caseData.getFixedCosts().getClaimFixedCosts())) {
+            fixedCostsCommencement = MonetaryConversions.penniesToPounds(BigDecimal.valueOf(Integer.parseInt(
+                caseData.getFixedCosts().getFixedCostAmount())));
+        }
+        return fixedCostsCommencement;
     }
 
     public static BigDecimal getPartialPayment(CaseData caseData) {
@@ -132,27 +181,73 @@ public class JudgmentsOnlineHelper {
     }
 
     @NotNull
-    public static String calculateRepaymentBreakdownSummary(JudgmentDetails activeJudgment) {
-
+    public static String calculateRepaymentBreakdownSummary(JudgmentDetails activeJudgment, BigDecimal interest) {
         BigDecimal totalAmount = MonetaryConversions.penniesToPounds(new BigDecimal(activeJudgment.getTotalAmount()));
-
-        //creates  the text on the page, based on calculated values
         StringBuilder repaymentBreakdown = new StringBuilder();
-        repaymentBreakdown.append("The judgment will order the defendants to pay £").append(totalAmount);
-        repaymentBreakdown.append(", including the claim fee and interest, if applicable, as shown:");
+        //creates  the text on the page, based on calculated values
+        getJudgmentSummaryText(totalAmount, repaymentBreakdown);
+        getClaimAmountBreakdownSummary(activeJudgment, totalAmount, repaymentBreakdown);
+        getClaimInterestBreakdownSummary(interest, repaymentBreakdown);
+        repaymentJoBreakdownSummary(activeJudgment, totalAmount, repaymentBreakdown);
+        return repaymentBreakdown.toString();
+    }
 
+    @NotNull
+    public static String calculateRepaymentBreakdownSummaryForLRAdmission(JudgmentDetails activeJudgment, BigDecimal interest) {
+        BigDecimal totalAmount = MonetaryConversions.penniesToPounds(new BigDecimal(activeJudgment.getTotalAmount()));
+        StringBuilder repaymentBreakdown = new StringBuilder();
+
+        getJudgmentSummaryTextForLRAdmission(totalAmount, repaymentBreakdown);
+        getClaimAmountBreakdownSummary(activeJudgment, totalAmount, repaymentBreakdown);
+        getClaimInterestBreakdownSummary(interest, repaymentBreakdown);
+        repaymentJoBreakdownSummary(activeJudgment, totalAmount, repaymentBreakdown);
+        return repaymentBreakdown.toString();
+    }
+
+    @NotNull
+    public static String calculateRepaymentBreakdownSummaryWithoutClaimInterest(JudgmentDetails activeJudgment, boolean isSameJudgmentText) {
+        BigDecimal totalAmount = MonetaryConversions.penniesToPounds(new BigDecimal(activeJudgment.getTotalAmount()));
+        StringBuilder repaymentBreakdown = new StringBuilder();
+        if (isSameJudgmentText) {
+            getJudgmentSummaryText(totalAmount, repaymentBreakdown);
+        } else {
+            getJudgmentSummaryTextForLRAdmission(totalAmount, repaymentBreakdown);
+        }
+        getClaimAmountBreakdownSummary(activeJudgment, totalAmount, repaymentBreakdown);
+        repaymentJoBreakdownSummary(activeJudgment, totalAmount, repaymentBreakdown);
+        return repaymentBreakdown.toString();
+    }
+
+    private static void getJudgmentSummaryTextForLRAdmission(BigDecimal totalAmount, StringBuilder repaymentBreakdown) {
+        repaymentBreakdown.append("The judgment will order the defendant to pay £").append(totalAmount);
+        repaymentBreakdown.append(", including the claim fee, any fixed costs if claimed and interest if applicable, as shown:");
+    }
+
+    private static void getJudgmentSummaryText(BigDecimal totalAmount, StringBuilder repaymentBreakdown) {
+        repaymentBreakdown.append("The judgment will order the defendant to pay £").append(totalAmount);
+        repaymentBreakdown.append(", including the claim fee and interest, if applicable, as shown:");
+    }
+
+    private static void getClaimAmountBreakdownSummary(JudgmentDetails activeJudgment, BigDecimal totalAmount, StringBuilder repaymentBreakdown) {
         BigDecimal orderedAmount = MonetaryConversions.penniesToPounds(new BigDecimal(activeJudgment.getOrderedAmount()));
         if (null != orderedAmount) {
             repaymentBreakdown.append("\n").append("### Claim amount \n £").append(orderedAmount.setScale(2));
         }
+    }
 
+    private static void getClaimInterestBreakdownSummary(BigDecimal interest, StringBuilder repaymentBreakdown) {
+        if (interest != null && interest.compareTo(BigDecimal.ZERO) != 0) {
+            repaymentBreakdown.append("\n ### Claim interest amount \n").append("£").append(interest.setScale(2));
+        }
+    }
+
+    private static void repaymentJoBreakdownSummary(JudgmentDetails activeJudgment, BigDecimal totalAmount, StringBuilder repaymentBreakdown) {
         if (null != activeJudgment.getCosts()) {
             BigDecimal costs = MonetaryConversions.penniesToPounds(new BigDecimal(activeJudgment.getCosts()));
             if (costs.compareTo(BigDecimal.ZERO) != 0) {
                 repaymentBreakdown.append("\n ### Fixed cost amount \n").append("£").append(costs.setScale(2));
             }
         }
-
         if (null != activeJudgment.getClaimFeeAmount()) {
             BigDecimal claimFeeAmount = MonetaryConversions.penniesToPounds(new BigDecimal(activeJudgment.getClaimFeeAmount()));
             if (claimFeeAmount.compareTo(BigDecimal.ZERO) != 0) {
@@ -176,8 +271,6 @@ public class JudgmentsOnlineHelper {
             ? totalAmount.subtract(amountAlreadyPaid)
             : totalAmount;
         repaymentBreakdown.append("\n ## Total still owed \n £").append(totalStillOwed.setScale(2));
-
-        return repaymentBreakdown.toString();
     }
 
     public static JudgmentAddress getJudgmentAddress(Address address, RoboticsAddressMapper addressMapper) {

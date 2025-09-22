@@ -4,23 +4,38 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationException;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.UPLOADED_DOCUMENTS;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
+
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getRespondentLegalOrganizationName;
 
 @Service
 @RequiredArgsConstructor
-public class EvidenceUploadRespondentNotificationHandler implements NotificationData {
+public class EvidenceUploadRespondentNotificationHandler  {
 
     private static final String REFERENCE_TEMPLATE = "evidence-upload-notification-%s";
     private final NotificationService notificationService;
+    private final OrganisationService organisationService;
     private final NotificationsProperties notificationsProperties;
+    private final NotificationsSignatureConfiguration configuration;
+    private final FeatureToggleService featureToggleService;
 
     public void notifyRespondentEvidenceUpload(CaseData caseData, boolean isForRespondentSolicitor1) throws NotificationException {
 
@@ -43,10 +58,13 @@ public class EvidenceUploadRespondentNotificationHandler implements Notification
         }
 
         if (null != email && nonNull(caseData.getNotificationText()) && !caseData.getNotificationText().equals("NULLED")) {
+            Map<String, String> properties = addProperties(caseData, isRespondentLip);
+            properties.put(CLAIM_REFERENCE_NUMBER, getCaseRef(caseData, isRespondentLip));
+            properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getOrgName(caseData, isForRespondentSolicitor1, isRespondentLip));
             notificationService.sendMail(
                 email,
                 getTemplate(caseData, isRespondentLip),
-                addProperties(caseData),
+                properties,
                 String.format(
                     REFERENCE_TEMPLATE,
                     caseData.getLegacyCaseReference()
@@ -65,11 +83,24 @@ public class EvidenceUploadRespondentNotificationHandler implements Notification
         }
     }
 
-    @Override
-    public Map<String, String> addProperties(CaseData caseData) {
-        return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            UPLOADED_DOCUMENTS, caseData.getNotificationText()
-        );
+    public Map<String, String> addProperties(CaseData caseData, boolean isRespondentLip) {
+        HashMap<String, String> properties = new HashMap<>(Map.of(
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            UPLOADED_DOCUMENTS, caseData.getNotificationText(),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
+        ));
+        addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
+        return properties;
+    }
+
+    private String getCaseRef(CaseData caseData, boolean isLip) {
+        return isLip ? caseData.getLegacyCaseReference() : caseData.getCcdCaseReference().toString();
+    }
+
+    private String getOrgName(CaseData caseData, boolean isForRespondentSolicitor1, boolean isLip) {
+        return isLip && isForRespondentSolicitor1 ? caseData.getRespondent1().getPartyName() : isForRespondentSolicitor1
+            ? getRespondentLegalOrganizationName(caseData.getRespondent1OrganisationPolicy(), organisationService)
+            : getRespondentLegalOrganizationName(caseData.getRespondent2OrganisationPolicy(), organisationService);
     }
 }

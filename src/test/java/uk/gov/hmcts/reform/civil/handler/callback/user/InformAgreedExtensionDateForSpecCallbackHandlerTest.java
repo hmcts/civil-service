@@ -38,6 +38,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static java.time.LocalDate.now;
+import static java.time.format.DateTimeFormatter.ISO_DATE;
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -163,11 +164,11 @@ class InformAgreedExtensionDateForSpecCallbackHandlerTest extends BaseCallbackHa
         }
 
         @Test
-        void shouldReturnError_whenIssueDateIsBeforeOf28Days() {
+        void shouldReturnError_whenRespDeadlineIsBeforeOf28Days() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
                 .addRespondent2(NO)
-                .issueDate(LocalDate.now().minusDays(35))
+                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(35))
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
@@ -185,11 +186,11 @@ class InformAgreedExtensionDateForSpecCallbackHandlerTest extends BaseCallbackHa
         }
 
         @Test
-        void shouldNotReturnError_whenIssueDateIsBeforeOf28DaysForCaseworker() {
+        void shouldNotReturnError_whenDeadlineIsBeforeOf28DaysForCaseworker() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
                 .addRespondent2(NO)
-                .issueDate(LocalDate.now().minusDays(35))
+                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(35))
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
@@ -345,7 +346,6 @@ class InformAgreedExtensionDateForSpecCallbackHandlerTest extends BaseCallbackHa
             assertThat(response.getErrors().get(0))
                 .isEqualTo("Date must be from claim issue date plus a maximum of between 29 and 56 days.");
         }
-
     }
 
     @Nested
@@ -391,6 +391,8 @@ class InformAgreedExtensionDateForSpecCallbackHandlerTest extends BaseCallbackHa
             extensionDateRespondent2 = now().plusDays(16);
             when(deadlinesCalculator.calculateFirstWorkingDay(any())).thenReturn(
                 extensionDateRespondent1);
+            when(deadlinesCalculator.nextDeadline(any())).thenReturn(
+                extensionDateRespondent1.atStartOfDay());
             when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
         }
@@ -416,7 +418,8 @@ class InformAgreedExtensionDateForSpecCallbackHandlerTest extends BaseCallbackHa
                 .containsEntry("respondent1ResponseDeadline", newDeadline.format(ISO_DATE_TIME))
                 .containsEntry("respondent1TimeExtensionDate", timeExtensionDate.format(ISO_DATE_TIME))
                 .containsEntry("respondent2ResponseDeadline", newDeadline.format(ISO_DATE_TIME))
-                .containsEntry("respondent2TimeExtensionDate", timeExtensionDate.format(ISO_DATE_TIME));
+                .containsEntry("respondent2TimeExtensionDate", timeExtensionDate.format(ISO_DATE_TIME))
+                .containsEntry("nextDeadline", nextDeadline.toLocalDate().format(ISO_DATE));
 
             assertThat(response.getData())
                 .extracting("businessProcess")
@@ -445,7 +448,8 @@ class InformAgreedExtensionDateForSpecCallbackHandlerTest extends BaseCallbackHa
 
             assertThat(response.getData())
                 .containsEntry("respondent2ResponseDeadline", newDeadline.format(ISO_DATE_TIME))
-                .containsEntry("respondent2TimeExtensionDate", timeExtensionDate.format(ISO_DATE_TIME));
+                .containsEntry("respondent2TimeExtensionDate", timeExtensionDate.format(ISO_DATE_TIME))
+                .containsEntry("nextDeadline", nextDeadline.toLocalDate().format(ISO_DATE));
         }
 
         @Test
@@ -466,7 +470,8 @@ class InformAgreedExtensionDateForSpecCallbackHandlerTest extends BaseCallbackHa
             LocalDateTime newDeadline = extensionDateRespondent1.atTime(END_OF_BUSINESS_DAY);
 
             assertThat(response.getData())
-                .containsEntry("respondent1ResponseDeadline", newDeadline.format(ISO_DATE_TIME));
+                .containsEntry("respondent1ResponseDeadline", newDeadline.format(ISO_DATE_TIME))
+                .containsEntry("nextDeadline", nextDeadline.toLocalDate().format(ISO_DATE));
 
             assertThat(response.getData())
                 .extracting("businessProcess")

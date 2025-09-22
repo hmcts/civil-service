@@ -14,12 +14,15 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.finalorders.DatesFinalOrders;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderFurtherHearing;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.CourtOfficerOrderGenerator;
@@ -42,6 +45,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.COURT_OFFICER_ORDER;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
 @RequiredArgsConstructor
@@ -56,6 +60,7 @@ public class CourtOfficerOrderHandler extends CallbackHandler {
     private final CourtOfficerOrderGenerator courtOfficerOrderGenerator;
     private final UserService userService;
     private final AssignCategoryId assignCategoryId;
+    private final FeatureToggleService featureToggleService;
     private String ext = "";
 
     public static final String HEADER = "## Your order has been issued \n ### Case number \n ### #%s";
@@ -65,7 +70,7 @@ public class CourtOfficerOrderHandler extends CallbackHandler {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::prePopulateValues,
             callbackKey(MID, "validateValues"), this::validateFormValuesAndGenerateDocument,
-            callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse,
+            callbackKey(ABOUT_TO_SUBMIT), this::handleAboutToSubmit,
             callbackKey(SUBMITTED), this::buildConfirmation
         );
     }
@@ -73,6 +78,28 @@ public class CourtOfficerOrderHandler extends CallbackHandler {
     @Override
     public List<CaseEvent> handledEvents() {
         return EVENTS;
+    }
+
+    private CallbackResponse handleAboutToSubmit(CallbackParams callbackParams) {
+        var caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        if (featureToggleService.isWelshEnabledForMainCase()
+            && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
+            List<Element<CaseDocument>> preTranslationDocuments = caseData.getPreTranslationDocuments();
+            preTranslationDocuments.add(element(caseData.getPreviewCourtOfficerOrder()));
+            caseDataBuilder.bilingualHint(YesOrNo.YES);
+            caseDataBuilder.previewCourtOfficerOrder(null);
+            caseDataBuilder.preTranslationDocuments(preTranslationDocuments);
+        } else {
+            if (featureToggleService.isWelshEnabledForMainCase() && caseData.getPreviewCourtOfficerOrder() != null) {
+                caseDataBuilder.build().getCourtOfficersOrders().add(element(caseData.getPreviewCourtOfficerOrder()));
+                caseDataBuilder.previewCourtOfficerOrder(null);
+            }
+            caseDataBuilder.businessProcess(BusinessProcess.ready(COURT_OFFICER_ORDER));
+        }
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
     }
 
     private CallbackResponse prePopulateValues(CallbackParams callbackParams) {

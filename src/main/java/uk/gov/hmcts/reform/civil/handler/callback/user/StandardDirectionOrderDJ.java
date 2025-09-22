@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalAndTrialHearingDJToggle;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
 import uk.gov.hmcts.reform.civil.enums.sdo.AddOrRemoveToggle;
@@ -44,7 +45,6 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.SdoDJR2TrialCreditHire;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.SdoDJR2TrialCreditHireDetails;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialBuildingDispute;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialClinicalNegligence;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialCreditHire;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingNotes;
@@ -65,6 +65,7 @@ import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.civil.service.camunda.UpdateWaCourtLocationsService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
@@ -91,7 +92,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STANDARD_DIRECTION_ORDER_DJ;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getHearingNotes;
@@ -121,6 +121,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
     private final AssignCategoryId assignCategoryId;
     private final CategoryService categoryService;
     private final LocationHelper locationHelper;
+    private final Optional<UpdateWaCourtLocationsService> updateWaCourtLocationsService;
 
     @Autowired
     private final DeadlinesCalculator deadlinesCalculator;
@@ -532,122 +533,68 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                                 + "to medical notes are to be made by reference to"
                                                                 + " the pages in that bundle")
                                                     .build());
-        if (featureToggleService.isSdoR2Enabled()) {
-            List<AddOrRemoveToggle> addOrRemoveToggleList = List.of(AddOrRemoveToggle.ADD);
-            SdoDJR2TrialCreditHireDetails tempSdoDJR2TrialCreditHireDetails = SdoDJR2TrialCreditHireDetails.builder()
-                .input2("The claimant must upload to the Digital Portal a witness "
-                            + "statement addressing \na) the need to hire a replacement "
-                            + "vehicle; and \nb) impecuniosity")
-                .input3("This statement must be uploaded to the Digital Portal by 4pm on")
-                .date1(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)))
-                .input4("A failure to comply will result in the claimant being "
-                            + "debarred from asserting need or relying on impecuniosity "
-                            + "as the case may be at the final hearing, unless they "
-                            + "have the permission of the trial Judge.")
-                .date2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(10)))
-                .input5("The parties are to liaise and use reasonable endeavours to"
-                            + " agree the basic hire rate no "
-                            + "later than 4pm on")
-                .build();
 
-            caseDataBuilder.sdoDJR2TrialCreditHire(SdoDJR2TrialCreditHire
-                                                       .builder()
-                                                       .input1(
-                                                           "If impecuniosity is alleged by the claimant and not admitted "
-                                                               + "by the defendant, the claimant's "
-                                                               + "disclosure as ordered earlier in this order must "
-                                                               + "include:\n"
-                                                               + "a. Evidence of all income from all sources for a period "
-                                                               + "of 3 months prior to the "
-                                                               + "commencement of hire until the earlier of \n    i) 3 months "
-                                                               + "after cessation of hire or \n    ii) "
-                                                               + "the repair or replacement of the claimant's vehicle;\n"
-                                                               + "b. Copy statements of all bank, credit card and savings "
-                                                               + "account statements for a period of 3 months "
-                                                               + "prior to the commencement of hire until"
-                                                               + " the earlier of \n    i)"
-                                                               + " 3 months after cessation of hire "
-                                                               + "or \n    ii) the repair or replacement of the "
-                                                               + "claimant's vehicle;\n"
-                                                               + "c. Evidence of any loan, overdraft or other credit "
-                                                               + "facilities available to the claimant")
-                                                       .input6(
-                                                           "If the parties fail to agree rates subject to liability "
-                                                               + "and/or other issues pursuant to the paragraph above, "
-                                                               + "each party may rely upon the written evidence by way of"
-                                                               + " witness statement of one witness to provide evidence of "
-                                                               + "basic hire rates available within the claimant’s "
-                                                               + "geographical"
-                                                               + " location from a mainstream supplier, or a local reputable "
-                                                               + "supplier if none is available. The defendant’s evidence is "
-                                                               + "to be uploaded to the Digital Portal by 4pm on")
-                                                       .date3(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(
-                                                           12)))
-                                                       .input7("and the claimant’s evidence in reply if "
-                                                                   + "so advised is to be uploaded by 4pm on")
-                                                       .date4(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(
-                                                           14)))
-                                                       .input8(
-                                                           "This witness statement is limited to 10 pages per party "
-                                                               + "(to include any appendices).")
-                                                       .detailsShowToggle(addOrRemoveToggleList)
-                                                       .sdoDJR2TrialCreditHireDetails(tempSdoDJR2TrialCreditHireDetails)
-                                                       .build());
-        } else {
-            caseDataBuilder.trialCreditHire(TrialCreditHire
-                                                .builder()
-                                                .input1("If impecuniosity is alleged by the claimant and not admitted "
-                                                            + "by the defendant, the claimant's "
-                                                            + "disclosure as ordered earlier in this order must "
-                                                            + "include:\n"
-                                                            + "a. Evidence of all income from all sources for a period "
-                                                            + "of 3 months prior to the "
-                                                            + "commencement of hire until the earlier of \n    i) 3 months "
-                                                            + "after cessation of hire or \n    ii) "
-                                                            + "the repair or replacement of the claimant's vehicle;\n"
-                                                            + "b. Copy statements of all bank, credit card and savings "
-                                                            + "account statements for a period of 3 months "
-                                                            + "prior to the commencement of hire until"
-                                                            + " the earlier of \n    i)"
-                                                            + " 3 months after cessation of hire "
-                                                            + "or \n    ii) the repair or replacement of the "
-                                                            + "claimant's vehicle;\n"
-                                                            + "c. Evidence of any loan, overdraft or other credit "
-                                                            + "facilities available to the claimant")
-                                                .input2("The claimant must upload to the Digital Portal a witness "
-                                                            + "statement addressing \na) the need to hire a replacement "
-                                                            + "vehicle; and \nb) impecuniosity")
-                                                .input3(
-                                                    "This statement must be uploaded to the Digital Portal by 4pm on")
-                                                .date1(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)))
-                                                .input4("A failure to comply will result in the claimant being "
-                                                            + "debarred from asserting need or relying on impecuniosity "
-                                                            + "as the case may be at the final hearing, unless they "
-                                                            + "have the permission of the trial Judge.")
-                                                .input5("The parties are to liaise and use reasonable endeavours to"
-                                                            + " agree the basic hire rate no "
-                                                            + "later than 4pm on")
-                                                .date2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(
-                                                    10)))
-                                                .input6("If the parties fail to agree rates subject to liability "
-                                                            + "and/or other issues pursuant to the paragraph above, "
-                                                            + "each party may rely upon the written evidence by way of"
-                                                            + " witness statement of one witness to provide evidence of "
-                                                            + "basic hire rates available within the claimant’s "
-                                                            + "geographical"
-                                                            + " location from a mainstream supplier, or a local reputable "
-                                                            + "supplier if none is available. The defendant’s evidence is "
-                                                            + "to be uploaded to the Digital Portal by 4pm on")
-                                                .date3(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(
-                                                    12)))
-                                                .input7("and the claimant’s evidence in reply if "
-                                                            + "so advised is to be uploaded by 4pm on")
-                                                .date4(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(
-                                                    14)))
-                                                .input8("This witness statement is limited to 10 pages per party "
-                                                            + "(to include any appendices).")
-                                                .build());
-        }
+        List<AddOrRemoveToggle> addOrRemoveToggleList = List.of(AddOrRemoveToggle.ADD);
+        SdoDJR2TrialCreditHireDetails tempSdoDJR2TrialCreditHireDetails = SdoDJR2TrialCreditHireDetails.builder()
+            .input2("The claimant must upload to the Digital Portal a witness "
+                        + "statement addressing \na) the need to hire a replacement "
+                        + "vehicle; and \nb) impecuniosity")
+            .input3("This statement must be uploaded to the Digital Portal by 4pm on")
+            .date1(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)))
+            .input4("A failure to comply will result in the claimant being "
+                        + "debarred from asserting need or relying on impecuniosity "
+                        + "as the case may be at the final hearing, unless they "
+                        + "have the permission of the trial Judge.")
+            .date2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(10)))
+            .input5("The parties are to liaise and use reasonable endeavours to"
+                        + " agree the basic hire rate no "
+                        + "later than 4pm on")
+            .build();
+
+        caseDataBuilder.sdoDJR2TrialCreditHire(SdoDJR2TrialCreditHire
+                                                   .builder()
+                                                   .input1(
+                                                       "If impecuniosity is alleged by the claimant and not admitted "
+                                                           + "by the defendant, the claimant's "
+                                                           + "disclosure as ordered earlier in this order must "
+                                                           + "include:\n"
+                                                           + "a. Evidence of all income from all sources for a period "
+                                                           + "of 3 months prior to the "
+                                                           + "commencement of hire until the earlier of \n    i) 3 months "
+                                                           + "after cessation of hire or \n    ii) "
+                                                           + "the repair or replacement of the claimant's vehicle;\n"
+                                                           + "b. Copy statements of all bank, credit card and savings "
+                                                           + "account statements for a period of 3 months "
+                                                           + "prior to the commencement of hire until"
+                                                           + " the earlier of \n    i)"
+                                                           + " 3 months after cessation of hire "
+                                                           + "or \n    ii) the repair or replacement of the "
+                                                           + "claimant's vehicle;\n"
+                                                           + "c. Evidence of any loan, overdraft or other credit "
+                                                           + "facilities available to the claimant")
+                                                   .input6(
+                                                       "If the parties fail to agree rates subject to liability "
+                                                           + "and/or other issues pursuant to the paragraph above, "
+                                                           + "each party may rely upon the written evidence by way of"
+                                                           + " witness statement of one witness to provide evidence of "
+                                                           + "basic hire rates available within the claimant’s "
+                                                           + "geographical"
+                                                           + " location from a mainstream supplier, or a local reputable "
+                                                           + "supplier if none is available. The defendant’s evidence is "
+                                                           + "to be uploaded to the Digital Portal by 4pm on")
+                                                   .date3(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(
+                                                       12)))
+                                                   .input7("and the claimant’s evidence in reply if "
+                                                               + "so advised is to be uploaded by 4pm on")
+                                                   .date4(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(
+                                                       14)))
+                                                   .input8(
+                                                       "This witness statement is limited to 10 pages per party "
+                                                           + "(to include any appendices).")
+                                                   .detailsShowToggle(addOrRemoveToggleList)
+                                                   .sdoDJR2TrialCreditHireDetails(tempSdoDJR2TrialCreditHireDetails)
+                                                   .build());
+
         caseDataBuilder.trialPersonalInjury(TrialPersonalInjury
                                                 .builder()
                                                 .input1("The claimant has permission to rely upon the written "
@@ -694,18 +641,15 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                               + "in response completed by 4pm on")
                                                   .date2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(12)))
                                                   .build());
-        if (featureToggleService.isSdoR2Enabled()) {
-            caseDataBuilder.sdoR2DisposalHearingWelshLanguageDJ(
-                SdoR2WelshLanguageUsage.builder()
-                    .description(SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION).build());
-            caseDataBuilder.sdoR2TrialWelshLanguageDJ(
-                SdoR2WelshLanguageUsage.builder()
-                    .description(SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION).build());
-        }
 
-        if (featureToggleService.isSdoR2Enabled()) {
-            updateDisclosureOfDocumentFields(caseDataBuilder);
-        }
+        caseDataBuilder.sdoR2DisposalHearingWelshLanguageDJ(
+            SdoR2WelshLanguageUsage.builder()
+                .description(SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION).build());
+        caseDataBuilder.sdoR2TrialWelshLanguageDJ(
+            SdoR2WelshLanguageUsage.builder()
+                .description(SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION).build());
+
+        updateDisclosureOfDocumentFields(caseDataBuilder);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -763,37 +707,45 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
-        // Casefileview will show any document uploaded even without an categoryID under uncategorized section,
-        //  we only use orderSDODocumentDJ as a preview and do not want it shown on case file view, so to prevent it
+        // Case File View will show any document uploaded even without an categoryID under uncategorized section,
+        // we only use orderSDODocumentDJ as a preview and do not want it shown on case file view, so to prevent it
         // showing, we remove.
         caseDataBuilder.orderSDODocumentDJ(null);
         assignCategoryId.assignCategoryIdToCollection(caseData.getOrderSDODocumentDJCollection(),
                                                       document -> document.getValue().getDocumentLink(), "caseManagementOrders");
         caseDataBuilder.businessProcess(BusinessProcess.ready(STANDARD_DIRECTION_ORDER_DJ));
-
-        var state = "CASE_PROGRESSION";
         caseDataBuilder.hearingNotes(getHearingNotes(caseData));
 
-        if (featureToggleService.isPartOfNationalRollout(caseData.getCaseManagementLocation().getBaseLocation())) {
-            log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
+        boolean isLipCase = caseData.isApplicantLiP() || caseData.isRespondent1LiP() || caseData.isRespondent2LiP();
+        if (featureToggleService.isWelshEnabledForMainCase()) {
             caseDataBuilder.eaCourtLocation(YES);
-
-            if (featureToggleService.isHmcEnabled()
-                && !caseData.isApplicantLiP()
-                && !caseData.isRespondent1LiP()
-                && !caseData.isRespondent2LiP()) {
-                caseDataBuilder.hmcEaCourtLocation(featureToggleService.isLocationWhiteListedForCaseProgression(
-                    caseData.getCaseManagementLocation().getBaseLocation()) ? YES : NO);
-            }
         } else {
-            log.info("Case {} is NOT whitelisted for case progression.", caseData.getCcdCaseReference());
-            caseDataBuilder.eaCourtLocation(NO);
+            if (!isLipCase) {
+                log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
+                caseDataBuilder.eaCourtLocation(YES);
+            } else {
+                boolean isLipCaseEaCourt = isLipCaseWithProgressionEnabledAndCourtWhiteListed(caseData);
+                caseDataBuilder.eaCourtLocation(isLipCaseEaCourt ? YesOrNo.YES : YesOrNo.NO);
+            }
         }
 
+        if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
+            updateWaCourtLocationsService.ifPresent(service -> service.updateCourtListingWALocations(
+                callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
+                caseDataBuilder
+            ));
+        }
+
+        var state = "CASE_PROGRESSION";
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .state(state)
             .build();
+    }
+
+    private boolean isLipCaseWithProgressionEnabledAndCourtWhiteListed(CaseData caseData) {
+        return (caseData.isLipvLipOneVOne() || caseData.isLRvLipOneVOne())
+            && featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation());
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {

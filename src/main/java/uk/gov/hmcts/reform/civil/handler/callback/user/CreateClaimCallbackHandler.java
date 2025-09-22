@@ -565,13 +565,9 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
         dataBuilder.ccdState(CaseState.PENDING_CASE_ISSUED);
 
-        if (toggleService.isCaseEventsEnabled()) {
-            dataBuilder.anyRepresented(YES);
-        }
+        dataBuilder.anyRepresented(YES);
 
-        if (toggleService.isHmcEnabled()) {
-            populateWithPartyIds(dataBuilder);
-        }
+        populateWithPartyIds(dataBuilder);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
@@ -597,16 +593,11 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         dataBuilder.businessProcess(BusinessProcess.ready(CREATE_SERVICE_REQUEST_CLAIM));
         dataBuilder.legacyCaseReference(referenceNumberRepository.getReferenceNumber());
 
-        //Copy Unspec Claim Type into Spec claim Type if SDO R" feature toggle is on
-        if (toggleService.isSdoR2Enabled()) {
-            ClaimType claimType = ClaimTypeHelper.getClaimTypeFromClaimTypeUnspec(caseData.getClaimTypeUnSpec());
-            dataBuilder.claimType(claimType);
-            dataBuilder.allocatedTrack(getAllocatedTrack(caseData.getClaimValue().toPounds(), claimType, caseData.getPersonalInjuryType(),
-                                                         toggleService, caseData));
-        } else {
-            dataBuilder.allocatedTrack(getAllocatedTrack(caseData.getClaimValue().toPounds(), caseData.getClaimType(), caseData.getPersonalInjuryType(),
-                                                         toggleService, caseData));
-        }
+        ClaimType claimType = ClaimTypeHelper.getClaimTypeFromClaimTypeUnspec(caseData.getClaimTypeUnSpec());
+        dataBuilder.claimType(claimType);
+        dataBuilder.allocatedTrack(getAllocatedTrack(caseData.getClaimValue().toPounds(), claimType, caseData.getPersonalInjuryType(),
+                                                     toggleService, caseData));
+
         dataBuilder.submittedDate(time.now());
 
         //set check email field to null for GDPR

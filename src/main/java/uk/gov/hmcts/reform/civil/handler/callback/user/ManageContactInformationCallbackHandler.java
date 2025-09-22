@@ -21,13 +21,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.UpdateDetailsForm;
 import uk.gov.hmcts.reform.civil.model.UpdatePartyDetailsForm;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
-import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
-import uk.gov.hmcts.reform.civil.utils.PartyDetailsChangedUtil;
-import uk.gov.hmcts.reform.civil.validation.PartyValidator;
-import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 
 import java.util.Collections;
 import java.util.List;
@@ -69,15 +63,9 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
         MANAGE_CONTACT_INFORMATION
     );
 
-    private final CoreCaseUserService coreCaseUserService;
     private final UserService userService;
     private final ObjectMapper objectMapper;
     private final CaseDetailsConverter caseDetailsConverter;
-    private final CaseFlagsInitialiser caseFlagsInitialiser;
-    private final PostcodeValidator postcodeValidator;
-    private final PartyDetailsChangedUtil partyDetailsChangedUtil;
-    private final FeatureToggleService featureToggleService;
-    private final PartyValidator partyValidator;
     private final ValidateExpertsTask validateExpertsTask;
     private final ValidateWitnessesTask validateWitnessesTask;
     private final PrepareEventTask prepareEventTask;

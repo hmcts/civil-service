@@ -33,7 +33,7 @@ public class NocNotificationUtils {
     private static RecipientData getOtherSolicitor1(CaseData caseData) {
         if (isRespondent2NewSolicitor(caseData)) {
             return RecipientData.builder()
-                .email(caseData.getApplicantSolicitor1UserDetails().getEmail())
+                .email(caseData.getApplicantSolicitor1UserDetailsEmail())
                 .orgId(caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID())
                 .build();
         } else if (isApplicant1NewSolicitor(caseData)) {
@@ -46,7 +46,7 @@ public class NocNotificationUtils {
                     .orgId(respondent1OrgID)
                     .build();
             }
-        } else if (isRespondent1NewSolicitor(caseData)) {
+        } else if (isRespondent1NewSolicitor(caseData) && !caseData.isApplicantLipOneVOne()) {
             return RecipientData.builder()
                 .email(caseData.getApplicantSolicitor1UserDetails().getEmail())
                 .orgId(caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID())
@@ -98,6 +98,16 @@ public class NocNotificationUtils {
         if (otherSolicitor1 != null) {
             return otherSolicitor1.getEmail();
         }
+        if (caseData.isApplicantLipOneVOne() && isRespondent1NewSolicitor(caseData)) {
+            return caseData.getApplicant1Email();
+        }
+        return null;
+    }
+
+    public static String getClaimantLipEmail(CaseData caseData) {
+        if (caseData.isApplicantLipOneVOne()) {
+            return caseData.getApplicant1Email();
+        }
         return null;
     }
 
@@ -123,6 +133,10 @@ public class NocNotificationUtils {
             return otherSolicitor2.getOrgId();
         }
         return null;
+    }
+
+    public static boolean isAppliantLipForRespondentSolicitorChange(CaseData caseData) {
+        return caseData.isApplicantLipOneVOne() && isRespondent1NewSolicitor(caseData);
     }
 
     private static boolean isRespondent2NewSolicitor(CaseData caseData) {

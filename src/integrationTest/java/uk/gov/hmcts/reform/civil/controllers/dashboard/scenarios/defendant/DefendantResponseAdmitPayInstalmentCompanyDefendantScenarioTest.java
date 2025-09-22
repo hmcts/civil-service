@@ -64,7 +64,8 @@ public class DefendantResponseAdmitPayInstalmentCompanyDefendantScenarioTest ext
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Response to the claim"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">You have offered to pay Claimant John £1000 in instalments of £10 " +
+                    "<p class=\"govuk-body\">You have offered to pay Claimant John £1000 plus the claim fee and any fixed costs claimed " +
+                        "in instalments of £10 " +
                         frequency.getDashboardLabel() + "." +
                         " You have offered to do this starting from " + DateUtils.formatDate(firstRepaymentDate) + "." +
                         " You need to send the claimant your financial details. The court will contact you when they respond.</p>" +
@@ -72,9 +73,10 @@ public class DefendantResponseAdmitPayInstalmentCompanyDefendantScenarioTest ext
                 ),
                 jsonPath("$[0].titleCy").value("Ymateb i’r hawliad"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">Rydych wedi cynnig talu £1000 mewn rhandaliadau o £10 i Claimant John " +
+                    "<p class=\"govuk-body\">Rydych wedi cynnig talu £1000 ynghyd â ffi’r hawliad ac unrhyw gostau sefydlog a hawlir " +
+                        "mewn rhandaliadau o £10 i Claimant John " +
                         frequency.getDashboardLabelWelsh() + "." +
-                        " Rydych wedi cynnig gwneud hyn o " + DateUtils.formatDateInWelsh(firstRepaymentDate) + " ymlaen." +
+                        " Rydych wedi cynnig gwneud hyn o " + DateUtils.formatDateInWelsh(firstRepaymentDate, false) + " ymlaen." +
                         " Mae angen i chi anfon eich manylion ariannol at yr hawlydd. Bydd y llys yn cysylltu â chi pan fyddant yn ymateb.</p>" +
                         "<p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">Gweld eich ymateb</a></p>"
                 )
@@ -125,7 +127,9 @@ public class DefendantResponseAdmitPayInstalmentCompanyDefendantScenarioTest ext
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Response to the claim"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">You have offered to pay Claimant John £1001 in instalments of £10 " +
+                    "<p class=\"govuk-body\">You have offered to pay Claimant John £1001 (this amount includes interest if it has been" +
+                        " claimed which may continue to accrue to the date of Judgment, settlement agreement or earlier payment) in instalments" +
+                        " of £10 " +
                         frequency.getDashboardLabel() + "." +
                         " You have offered to do this starting from " + DateUtils.formatDate(firstRepaymentDate) + "." +
                         " You need to send the claimant your financial details. The court will contact you when they respond.</p>" +
@@ -133,9 +137,10 @@ public class DefendantResponseAdmitPayInstalmentCompanyDefendantScenarioTest ext
                 ),
                 jsonPath("$[0].titleCy").value("Ymateb i’r hawliad"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">Rydych wedi cynnig talu £1001 mewn rhandaliadau o £10 i Claimant John " +
+                    "<p class=\"govuk-body\">Rydych wedi cynnig talu £1001 (mae’r swm hwn yn cynnwys llog os yw wedi’i hawlio a gall" +
+                        " barhau i gronni hyd dyddiad y Dyfarniad, y cytundeb setlo neu daliad cynharach) mewn rhandaliadau o £10 i Claimant John " +
                         frequency.getDashboardLabelWelsh() + "." +
-                        " Rydych wedi cynnig gwneud hyn o " + DateUtils.formatDateInWelsh(firstRepaymentDate) + " ymlaen." +
+                        " Rydych wedi cynnig gwneud hyn o " + DateUtils.formatDateInWelsh(firstRepaymentDate, false) + " ymlaen." +
                         " Mae angen i chi anfon eich manylion ariannol at yr hawlydd. Bydd y llys yn cysylltu â chi pan fyddant yn ymateb.</p>" +
                         "<p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">Gweld eich ymateb</a></p>"
                 )
