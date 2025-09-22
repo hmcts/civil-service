@@ -86,9 +86,6 @@ class SetApplicantResponseDeadlineSpecTest {
     private DeadlinesCalculator deadlinesCalculator;
 
     @Mock
-    private FeatureToggleService featureToggleService;
-
-    @Mock
     private CaseFlagsInitialiser caseFlagsInitialiser;
 
     @Mock
@@ -124,8 +121,7 @@ class SetApplicantResponseDeadlineSpecTest {
                 respondToClaimSpecUtils,
                 setApplicantResponseDeadlineCaseDataUpdaters,
                 expertsAndWitnessesCaseDataUpdaters,
-                requestedCourtForClaimDetailsTab,
-                featureToggleService
+                requestedCourtForClaimDetailsTab
         );
         when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
         when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
