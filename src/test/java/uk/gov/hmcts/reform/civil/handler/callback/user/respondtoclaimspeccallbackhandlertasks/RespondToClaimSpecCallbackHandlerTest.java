@@ -816,7 +816,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Test
-    void shouldSetClaimDismissedDeadlineTo24MonthsInFuture() {
+    void shouldSetClaimDismissedDeadlineTo36MonthsInFuture() {
         // Given
         LocalDateTime localDateTime = LocalDateTime.now();
         when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
@@ -824,8 +824,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(true);
         given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(false);
         when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any())).thenReturn(localDateTime);
-        when(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(24, LocalDate.now()))
-                .thenReturn(LocalDateTime.now().plusMonths(24));
+        when(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(36, LocalDate.now()))
+                .thenReturn(LocalDateTime.now().plusMonths(36));
 
         CaseData caseData = CaseDataBuilder.builder()
                 .claimDismissedDeadline(LocalDateTime.now().plusMonths(6))
@@ -846,7 +846,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         Object deadlineValue = response.getData().get("claimDismissedDeadline");
         assertThat(deadlineValue).isNotNull();
 
-        LocalDate expectedDate = LocalDate.now().plusMonths(24);
+        LocalDate expectedDate = LocalDate.now().plusMonths(36);
         LocalDate actualDate = LocalDateTime.parse(deadlineValue.toString()).toLocalDate();
 
         assertThat(actualDate).isEqualTo(expectedDate);

@@ -16,7 +16,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 @Slf4j
 public class Respondent1CaseDataUpdater implements SetApplicantResponseDeadlineCaseDataUpdater {
 
-    private static final int RESPONSE_CLAIM_SPEC_DEADLINE_EXTENSION_MONTHS = 24;
+    private static final int RESPONSE_CLAIM_SPEC_DEADLINE_EXTENSION_MONTHS = 36;
     private final DeadlinesCalculator deadlinesCalculator;
 
     @Override
