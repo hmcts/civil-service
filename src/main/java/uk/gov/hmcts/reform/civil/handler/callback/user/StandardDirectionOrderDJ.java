@@ -782,12 +782,6 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
             .build();
     }
 
-    private boolean isLipCaseWithProgressionEnabledAndCourtWhiteListed(CaseData caseData) {
-        return (caseData.isLipvLipOneVOne() || caseData.isLRvLipOneVOne())
-            && featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation()
-                                                                                       .getBaseLocation());
-    }
-
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         return SubmittedCallbackResponse.builder()
