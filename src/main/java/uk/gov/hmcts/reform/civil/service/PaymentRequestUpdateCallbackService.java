@@ -41,8 +41,8 @@ public class PaymentRequestUpdateCallbackService {
 
     public void processCallback(ServiceRequestUpdateDto dto, String feeTypeStr) {
         log.info("Processing callback for caseId {} with status {}",
-                 dto.getCcdCaseNumber(),
-                 dto.getServiceRequestStatus());
+                dto.getCcdCaseNumber(),
+                dto.getServiceRequestStatus());
 
         if (!isPaid(dto)) {
             log.info("Service request status is not 'Paid'. No action required for case {}", dto.getCcdCaseNumber());
@@ -91,7 +91,7 @@ public class PaymentRequestUpdateCallbackService {
 
     private boolean isPaymentUpdateValid(FeeType feeType, CaseData caseData) {
         return (feeType == FeeType.HEARING && isHearingPaymentUnpaidOrFailed(caseData))
-            || (feeType == FeeType.CLAIMISSUED && isClaimIssuePaymentUnpaidOrFailed(caseData));
+                || (feeType == FeeType.CLAIMISSUED && isClaimIssuePaymentUnpaidOrFailed(caseData));
     }
 
     private boolean isHearingPaymentUnpaidOrFailed(CaseData caseData) {
@@ -132,9 +132,9 @@ public class PaymentRequestUpdateCallbackService {
 
     private CardPaymentStatusResponse buildPaymentStatusResponse(ServiceRequestUpdateDto dto) {
         return CardPaymentStatusResponse.builder()
-            .paymentReference(dto.getPayment().getPaymentReference())
-            .status(PaymentStatus.SUCCESS.name())
-            .build();
+                .paymentReference(dto.getPayment().getPaymentReference())
+                .status(PaymentStatus.SUCCESS.name())
+                .build();
     }
 
     private void submitUpdatePaymentEvent(CaseData caseData, Long caseId, FeeType feeType) {
@@ -144,15 +144,15 @@ public class PaymentRequestUpdateCallbackService {
 
     private void submitEvent(CaseData caseData, Long caseId, CaseEvent event) {
         StartEventResponse startEvent = coreCaseDataService.startUpdate(
-            String.valueOf(caseId),
-            event
+                String.valueOf(caseId),
+                event
         );
 
         CaseDataContent caseDataContent = CaseDataContent.builder()
-            .eventToken(startEvent.getToken())
-            .event(Event.builder().id(startEvent.getEventId()).build())
-            .data(caseData.toMap(objectMapper))
-            .build();
+                .eventToken(startEvent.getToken())
+                .event(Event.builder().id(startEvent.getEventId()).build())
+                .data(caseData.toMap(objectMapper))
+                .build();
 
         coreCaseDataService.submitUpdate(String.valueOf(caseId), caseDataContent);
     }
@@ -167,28 +167,28 @@ public class PaymentRequestUpdateCallbackService {
             return switch (feeType) {
                 case HEARING -> SERVICE_REQUEST_RECEIVED;
                 case CLAIMISSUED -> caseData.getCaseAccessCategory() == CaseCategory.SPEC_CLAIM
-                    ? CREATE_CLAIM_SPEC_AFTER_PAYMENT
-                    : CREATE_CLAIM_AFTER_PAYMENT;
+                        ? CREATE_CLAIM_SPEC_AFTER_PAYMENT
+                        : CREATE_CLAIM_AFTER_PAYMENT;
             };
         }
     }
 
     private CaseData updateCaseDataWithPaymentDetails(CardPaymentStatusResponse response, CaseData caseData, FeeType feeType) {
         PaymentDetails updatedPayment = PaymentDetails.builder()
-            .status(PaymentStatus.valueOf(response.getStatus()))
-            .reference(response.getPaymentReference())
-            .errorCode(response.getErrorCode())
-            .errorMessage(response.getErrorDescription())
-            .build();
+                .status(PaymentStatus.valueOf(response.getStatus()))
+                .reference(response.getPaymentReference())
+                .errorCode(response.getErrorCode())
+                .errorMessage(response.getErrorDescription())
+                .build();
 
         PaymentDetails mergedPayment = Optional.ofNullable(getPaymentDetails(feeType, caseData))
-            .map(existingPayment -> existingPayment.toBuilder()
-                .status(updatedPayment.getStatus())
-                .reference(updatedPayment.getReference())
-                .errorCode(updatedPayment.getErrorCode())
-                .errorMessage(updatedPayment.getErrorMessage())
-                .build())
-            .orElse(updatedPayment);
+                .map(existingPayment -> existingPayment.toBuilder()
+                        .status(updatedPayment.getStatus())
+                        .reference(updatedPayment.getReference())
+                        .errorCode(updatedPayment.getErrorCode())
+                        .errorMessage(updatedPayment.getErrorMessage())
+                        .build())
+                .orElse(updatedPayment);
 
         return applyPaymentDetails(caseData, feeType, mergedPayment);
     }

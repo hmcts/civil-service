@@ -60,42 +60,42 @@ class PaymentRequestUpdateCallbackServiceTest {
 
     private CaseData buildCaseData(CaseState state, BusinessProcessStatus businessProcessStatus, String camundaEvent, PaymentDetails paymentDetails) {
         return CaseDataBuilder.builder().receiveUpdatePaymentRequest().build().toBuilder()
-            .ccdState(state)
-            .businessProcess(BusinessProcess.builder()
-                                 .status(businessProcessStatus)
-                                 .camundaEvent(camundaEvent)
-                                 .build())
-            .hearingFeePaymentDetails(paymentDetails)
-            .build();
+                .ccdState(state)
+                .businessProcess(BusinessProcess.builder()
+                        .status(businessProcessStatus)
+                        .camundaEvent(camundaEvent)
+                        .build())
+                .hearingFeePaymentDetails(paymentDetails)
+                .build();
     }
 
     private CaseDetails buildCaseDetails(CaseData caseData) {
         return CaseDetails.builder()
-            .data(objectMapper.convertValue(caseData, new TypeReference<>() {
-            }))
-            .id(CASE_ID)
-            .build();
+                .data(objectMapper.convertValue(caseData, new TypeReference<>() {
+                }))
+                .id(CASE_ID)
+                .build();
     }
 
     private ServiceRequestUpdateDto buildServiceDto(String status) {
         return ServiceRequestUpdateDto.builder()
-            .ccdCaseNumber(CASE_ID.toString())
-            .serviceRequestStatus(status)
-            .payment(PaymentDto.builder()
-                         .amount(new BigDecimal(167))
-                         .paymentReference(REFERENCE)
-                         .caseReference(REFERENCE)
-                         .accountNumber(ACCOUNT_NUMBER)
-                         .build())
-            .build();
+                .ccdCaseNumber(CASE_ID.toString())
+                .serviceRequestStatus(status)
+                .payment(PaymentDto.builder()
+                        .amount(new BigDecimal(167))
+                        .paymentReference(REFERENCE)
+                        .caseReference(REFERENCE)
+                        .accountNumber(ACCOUNT_NUMBER)
+                        .build())
+                .build();
     }
 
     private StartEventResponse startEventResponse(CaseDetails caseDetails, CaseEvent event) {
         return StartEventResponse.builder()
-            .token(TOKEN)
-            .eventId(event.name())
-            .caseDetails(caseDetails)
-            .build();
+                .token(TOKEN)
+                .eventId(event.name())
+                .caseDetails(caseDetails)
+                .build();
     }
 
     @Test
@@ -106,8 +106,8 @@ class PaymentRequestUpdateCallbackServiceTest {
         when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
         when(coreCaseDataService.startUpdate(any(), any())).thenReturn(startEventResponse(
-            caseDetails,
-            CaseEvent.SERVICE_REQUEST_RECEIVED
+                caseDetails,
+                CaseEvent.SERVICE_REQUEST_RECEIVED
         ));
         when(coreCaseDataService.submitUpdate(any(), any())).thenReturn(caseData);
 
@@ -121,16 +121,16 @@ class PaymentRequestUpdateCallbackServiceTest {
     @Test
     void shouldStartAndSubmitEventWithCaseDetailsForHearingAndPreviousFail() {
         CaseData caseData = buildCaseData(CaseState.PENDING_CASE_ISSUED, null, null, null).toBuilder()
-            .claimIssuedPaymentDetails(PaymentDetails.builder().status(PaymentStatus.FAILED).build())
-            .caseAccessCategory(SPEC_CLAIM)
-            .build();
+                .claimIssuedPaymentDetails(PaymentDetails.builder().status(PaymentStatus.FAILED).build())
+                .caseAccessCategory(SPEC_CLAIM)
+                .build();
         CaseDetails caseDetails = buildCaseDetails(caseData);
 
         when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
         when(coreCaseDataService.startUpdate(any(), any())).thenReturn(startEventResponse(
-            caseDetails,
-            CaseEvent.CREATE_CLAIM_SPEC_AFTER_PAYMENT
+                caseDetails,
+                CaseEvent.CREATE_CLAIM_SPEC_AFTER_PAYMENT
         ));
         when(coreCaseDataService.submitUpdate(any(), any())).thenReturn(caseData);
 
@@ -144,15 +144,15 @@ class PaymentRequestUpdateCallbackServiceTest {
     @Test
     void shouldStartAndSubmitEventWithCaseDetailsForClaimIssued() {
         CaseData caseData = buildCaseData(CaseState.PENDING_CASE_ISSUED, null, null, null).toBuilder()
-            .caseAccessCategory(SPEC_CLAIM)
-            .build();
+                .caseAccessCategory(SPEC_CLAIM)
+                .build();
         CaseDetails caseDetails = buildCaseDetails(caseData);
 
         when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
         when(coreCaseDataService.startUpdate(any(), any())).thenReturn(startEventResponse(
-            caseDetails,
-            CaseEvent.CREATE_CLAIM_SPEC_AFTER_PAYMENT
+                caseDetails,
+                CaseEvent.CREATE_CLAIM_SPEC_AFTER_PAYMENT
         ));
         when(coreCaseDataService.submitUpdate(any(), any())).thenReturn(caseData);
 
@@ -166,20 +166,20 @@ class PaymentRequestUpdateCallbackServiceTest {
     @Test
     void shouldProceed_WhenAdditionalPaymentExist_WithPaymentFailForClaimIssued() {
         PaymentDetails paymentDetails = PaymentDetails.builder()
-            .status(PaymentStatus.FAILED)
-            .reference(REFERENCE)
-            .build();
+                .status(PaymentStatus.FAILED)
+                .reference(REFERENCE)
+                .build();
         CaseData caseData = buildCaseData(CaseState.PENDING_CASE_ISSUED, null, null, paymentDetails)
-            .toBuilder()
-            .caseAccessCategory(SPEC_CLAIM)
-            .build();
+                .toBuilder()
+                .caseAccessCategory(SPEC_CLAIM)
+                .build();
         CaseDetails caseDetails = buildCaseDetails(caseData);
 
         when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
         when(coreCaseDataService.startUpdate(any(), any())).thenReturn(startEventResponse(
-            caseDetails,
-            CaseEvent.CREATE_CLAIM_SPEC_AFTER_PAYMENT
+                caseDetails,
+                CaseEvent.CREATE_CLAIM_SPEC_AFTER_PAYMENT
         ));
         when(coreCaseDataService.submitUpdate(any(), any())).thenReturn(caseData);
 
@@ -193,17 +193,17 @@ class PaymentRequestUpdateCallbackServiceTest {
     @Test
     void shouldNotCallUpdatePaymentStatus_WhenLRvLR() {
         CaseData caseData = buildCaseData(CaseState.CASE_PROGRESSION, BusinessProcessStatus.READY, BUSINESS_PROCESS, null)
-            .toBuilder()
-            .applicant1Represented(YesOrNo.YES)
-            .respondent1Represented(YesOrNo.YES)
-            .build();
+                .toBuilder()
+                .applicant1Represented(YesOrNo.YES)
+                .respondent1Represented(YesOrNo.YES)
+                .build();
         CaseDetails caseDetails = buildCaseDetails(caseData);
 
         when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
         when(coreCaseDataService.startUpdate(any(), any())).thenReturn(startEventResponse(
-            caseDetails,
-            CaseEvent.SERVICE_REQUEST_RECEIVED
+                caseDetails,
+                CaseEvent.SERVICE_REQUEST_RECEIVED
         ));
         when(coreCaseDataService.submitUpdate(any(), any())).thenReturn(caseData);
 
@@ -236,22 +236,22 @@ class PaymentRequestUpdateCallbackServiceTest {
     void shouldSubmitCitizenHearingFeePaymentEventIfFeeTypeIsHearing() {
         CaseData caseData = CaseDataBuilder.builder().receiveUpdatePaymentRequest().build();
         caseData = caseData.toBuilder()
-            .ccdState(CaseState.CASE_PROGRESSION)
-            .businessProcess(BusinessProcess.builder()
-                                 .status(BusinessProcessStatus.READY)
-                                 .camundaEvent(BUSINESS_PROCESS)
-                                 .build())
-            .applicant1Represented(YesOrNo.NO)
-            .respondent1Represented(YesOrNo.NO)
-            .hearingFeePaymentDetails(null)
-            .build();
+                .ccdState(CaseState.CASE_PROGRESSION)
+                .businessProcess(BusinessProcess.builder()
+                        .status(BusinessProcessStatus.READY)
+                        .camundaEvent(BUSINESS_PROCESS)
+                        .build())
+                .applicant1Represented(YesOrNo.NO)
+                .respondent1Represented(YesOrNo.NO)
+                .hearingFeePaymentDetails(null)
+                .build();
         CaseDetails caseDetails = buildCaseDetails(caseData);
 
         when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
         when(coreCaseDataService.startUpdate(any(), any())).thenReturn(startEventResponse(
-            caseDetails,
-            CITIZEN_HEARING_FEE_PAYMENT
+                caseDetails,
+                CITIZEN_HEARING_FEE_PAYMENT
         ));
         when(coreCaseDataService.submitUpdate(any(), any())).thenReturn(caseData);
 
@@ -266,22 +266,22 @@ class PaymentRequestUpdateCallbackServiceTest {
     void shouldSubmitCitizenClaimIssuedFeePaymentEventIfFeeTypeIsClaimIssued() {
         CaseData caseData = CaseDataBuilder.builder().receiveUpdatePaymentRequest().build();
         caseData = caseData.toBuilder()
-            .ccdState(CaseState.CASE_PROGRESSION)
-            .businessProcess(BusinessProcess.builder()
-                                 .status(BusinessProcessStatus.READY)
-                                 .camundaEvent(BUSINESS_PROCESS)
-                                 .build())
-            .applicant1Represented(YesOrNo.NO)
-            .respondent1Represented(YesOrNo.NO)
-            .hearingFeePaymentDetails(null)
-            .build();
+                .ccdState(CaseState.CASE_PROGRESSION)
+                .businessProcess(BusinessProcess.builder()
+                        .status(BusinessProcessStatus.READY)
+                        .camundaEvent(BUSINESS_PROCESS)
+                        .build())
+                .applicant1Represented(YesOrNo.NO)
+                .respondent1Represented(YesOrNo.NO)
+                .hearingFeePaymentDetails(null)
+                .build();
         CaseDetails caseDetails = buildCaseDetails(caseData);
 
         when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
         when(coreCaseDataService.startUpdate(any(), any())).thenReturn(startEventResponse(
-            caseDetails,
-            CITIZEN_CLAIM_ISSUE_PAYMENT
+                caseDetails,
+                CITIZEN_CLAIM_ISSUE_PAYMENT
         ));
         when(coreCaseDataService.submitUpdate(any(), any())).thenReturn(caseData);
 
@@ -306,8 +306,8 @@ class PaymentRequestUpdateCallbackServiceTest {
 
     private CardPaymentStatusResponse getCardPaymentStatusResponse() {
         return CardPaymentStatusResponse.builder()
-            .paymentReference("1234")
-            .status(PaymentStatus.SUCCESS.name())
-            .build();
+                .paymentReference("1234")
+                .status(PaymentStatus.SUCCESS.name())
+                .build();
     }
 }

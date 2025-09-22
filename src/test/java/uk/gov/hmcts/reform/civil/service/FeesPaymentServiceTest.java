@@ -38,6 +38,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
@@ -77,13 +78,8 @@ class FeesPaymentServiceTest {
     private PaymentsClient paymentsClient;
     @MockBean
     private CoreCaseDataService coreCaseDataService;
-    @Autowired
-    private CaseDetailsConverter caseDetailsConverter;
-    private ObjectMapper objectMapper = new ObjectMapper();
     @MockBean
     private PinInPostConfiguration pinInPostConfiguration;
-    @MockBean
-    private UpdatePaymentStatusService updatePaymentStatusService;
     @MockBean
     private FeatureToggleService featureToggleService;
     @MockBean
@@ -291,16 +287,19 @@ class FeesPaymentServiceTest {
     void shouldReturnResponseWhenExceptionOccurs() {
         PaymentDto response = buildGovPayCardPaymentStatusResponse("Success");
         when(paymentsClient.getGovPayCardPaymentStatus("RC-1701-0909-0602-0418", BEARER_TOKEN))
-            .thenReturn(response);
+                .thenReturn(response);
 
-        doThrow(new CaseDataUpdateException()).when(updatePaymentStatusService).updatePaymentStatus(any(), any(), any());
+        doThrow(new CaseDataUpdateException())
+                .when(paymentRequestUpdateCallbackService)
+                .updatePaymentStatus(any(), any(), any(CardPaymentStatusResponse.class));
 
         CardPaymentStatusResponse result =
-            feesPaymentService.getGovPaymentRequestStatus(HEARING, "123", "RC-1701-0909-0602-0418", BEARER_TOKEN);
+                feesPaymentService.getGovPaymentRequestStatus(HEARING, "123", "RC-1701-0909-0602-0418", BEARER_TOKEN);
 
-        verify(updatePaymentStatusService).updatePaymentStatus(HEARING, "123", result);
+        verify(paymentRequestUpdateCallbackService)
+                .updatePaymentStatus(eq(HEARING), eq("123"), any(CardPaymentStatusResponse.class));
+
         assertThat(result).isEqualTo(expectedResponse("Success"));
-
     }
 
     private PaymentDto buildGovPayCardPaymentStatusResponse(String status) {

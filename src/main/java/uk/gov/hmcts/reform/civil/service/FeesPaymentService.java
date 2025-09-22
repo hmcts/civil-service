@@ -31,65 +31,64 @@ public class FeesPaymentService {
     private final PinInPostConfiguration pinInPostConfiguration;
     private final PaymentStatusService paymentStatusService;
     private final PaymentRequestUpdateCallbackService paymentRequestUpdateCallbackService;
-    private final UpdatePaymentStatusService updatePaymentStatusService;
     private final FeatureToggleService featureToggleService;
 
     public CardPaymentStatusResponse createGovPaymentRequest(
-        FeeType feeType, String caseReference, String authorization) {
+            FeeType feeType, String caseReference, String authorization) {
 
         log.info("Creating gov Payment request url for caseId {} for fee type {}", caseReference, feeType);
         CaseDetails caseDetails = coreCaseDataService.getCase(Long.valueOf(caseReference));
         CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
 
         SRPbaDetails feePaymentDetails = feeType.equals(FeeType.HEARING)
-            ? caseData.getHearingFeePBADetails()
-            : caseData.getClaimIssuedPBADetails();
+                ? caseData.getHearingFeePBADetails()
+                : caseData.getClaimIssuedPBADetails();
 
         requireNonNull(feePaymentDetails, "Fee Payment details cannot be null");
         requireNonNull(feePaymentDetails.getServiceReqReference(), "Fee Payment service request cannot be null");
 
         String returnUrlSubPath = feeType.equals(FeeType.HEARING)
-            ? "/hearing-payment-confirmation/" : "/claim-issued-payment-confirmation/";
+                ? "/hearing-payment-confirmation/" : "/claim-issued-payment-confirmation/";
 
         CardPaymentServiceRequestDTO requestDto = CardPaymentServiceRequestDTO.builder()
-            .amount(feePaymentDetails.getFee().getCalculatedAmountInPence()
-                .divide(BigDecimal.valueOf(100), 2, RoundingMode.UNNECESSARY))
-            .currency("GBP")
-            .language(getClaimantSelectedLanguage(caseData))
-            .returnUrl(pinInPostConfiguration.getCuiFrontEndUrl() + returnUrlSubPath + caseReference)
-            .build();
+                .amount(feePaymentDetails.getFee().getCalculatedAmountInPence()
+                        .divide(BigDecimal.valueOf(100), 2, RoundingMode.UNNECESSARY))
+                .currency("GBP")
+                .language(getClaimantSelectedLanguage(caseData))
+                .returnUrl(pinInPostConfiguration.getCuiFrontEndUrl() + returnUrlSubPath + caseReference)
+                .build();
 
         CardPaymentServiceRequestResponse govPayCardPaymentRequest = paymentStatusService
-            .createGovPayCardPaymentRequest(
-                feePaymentDetails.getServiceReqReference(),
-                authorization,
-                requestDto
-            );
+                .createGovPayCardPaymentRequest(
+                        feePaymentDetails.getServiceReqReference(),
+                        authorization,
+                        requestDto
+                );
         return CardPaymentStatusResponse.from(govPayCardPaymentRequest);
     }
 
     private String getClaimantSelectedLanguage(CaseData caseData) {
         return Objects.equals(caseData.getClaimantBilingualLanguagePreference(), "WELSH")
-            || (!featureToggleService.isWelshEnabledForMainCase() && Objects.equals(caseData.getClaimantBilingualLanguagePreference(), "BOTH")) ? "cy" : "en";
+                || (!featureToggleService.isWelshEnabledForMainCase() && Objects.equals(caseData.getClaimantBilingualLanguagePreference(), "BOTH")) ? "cy" : "en";
     }
 
     public CardPaymentStatusResponse getGovPaymentRequestStatus(
-        FeeType feeType, String caseReference, String paymentReference, String authorization) {
+            FeeType feeType, String caseReference, String paymentReference, String authorization) {
         log.info("Checking payment status for {} of fee type {}", paymentReference, feeType);
         PaymentDto cardPaymentDetails = paymentStatusService.getCardPaymentDetails(paymentReference, authorization);
         String paymentStatus = cardPaymentDetails.getStatus();
         CardPaymentStatusResponse.CardPaymentStatusResponseBuilder response = CardPaymentStatusResponse.builder()
-            .status(paymentStatus)
-            .paymentReference(cardPaymentDetails.getReference())
-            .externalReference(cardPaymentDetails.getPaymentGroupReference())
-            .paymentFor(feeType.name().toLowerCase())
-            .paymentAmount(cardPaymentDetails.getAmount());
+                .status(paymentStatus)
+                .paymentReference(cardPaymentDetails.getReference())
+                .externalReference(cardPaymentDetails.getPaymentGroupReference())
+                .paymentFor(feeType.name().toLowerCase())
+                .paymentAmount(cardPaymentDetails.getAmount());
 
         if (paymentStatus.equals("Failed")) {
-            Arrays.asList(cardPaymentDetails.getStatusHistories()).stream()
-                .filter(h -> h.getStatus().equals(paymentStatus))
-                .findFirst()
-                .ifPresent(h -> response.errorCode(h.getErrorCode()).errorDescription(h.getErrorMessage()));
+            Arrays.stream(cardPaymentDetails.getStatusHistories())
+                    .filter(h -> h.getStatus().equals(paymentStatus))
+                    .findFirst()
+                    .ifPresent(h -> response.errorCode(h.getErrorCode()).errorDescription(h.getErrorMessage()));
         }
 
         try {
@@ -97,11 +96,11 @@ public class FeesPaymentService {
 
         } catch (Exception e) {
             log.error(
-                "Update payment status failed for claim [{}] with fee type [{}]. Error: {}",
-                caseReference,
-                feeType,
-                e.getMessage(),
-                e
+                    "Update payment status failed for claim [{}] with fee type [{}]. Error: {}",
+                    caseReference,
+                    feeType,
+                    e.getMessage(),
+                    e
             );
         }
 

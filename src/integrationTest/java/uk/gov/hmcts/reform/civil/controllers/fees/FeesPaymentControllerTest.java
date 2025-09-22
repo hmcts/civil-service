@@ -38,10 +38,10 @@ import static uk.gov.hmcts.reform.civil.enums.FeeType.HEARING;
 public class FeesPaymentControllerTest extends BaseIntegrationTest {
 
     private static final CardPaymentServiceRequestDTO CARD_PAYMENT_SERVICE_REQUEST
-        = CardPaymentServiceRequestDTO.builder()
-        .returnUrl("http://localhost:3001/hearing-payment-confirmation/1701090368574910")
-        .language("en")
-        .amount(new BigDecimal("232.00")).currency("GBP").build();
+            = CardPaymentServiceRequestDTO.builder()
+            .returnUrl("http://localhost:3001/hearing-payment-confirmation/1701090368574910")
+            .language("en")
+            .amount(new BigDecimal("232.00")).currency("GBP").build();
 
     @MockBean
     private PaymentsClient paymentsClient;
@@ -53,14 +53,14 @@ public class FeesPaymentControllerTest extends BaseIntegrationTest {
     @BeforeEach
     void before() {
         CaseDetails expectedCaseDetails = CaseDetails.builder().id(1701090368574910L)
-            .data(Map.of(
-                "hearingFeePBADetails",
-                SRPbaDetails.builder().serviceReqReference("2023-1701090705688")
-                    .fee(Fee.builder().calculatedAmountInPence(new BigDecimal("23200")).build())
-                    .build(),
-                "hearingFee",
-                Fee.builder().calculatedAmountInPence(new BigDecimal("23200")).build()
-            )).build();
+                .data(Map.of(
+                        "hearingFeePBADetails",
+                        SRPbaDetails.builder().serviceReqReference("2023-1701090705688")
+                                .fee(Fee.builder().calculatedAmountInPence(new BigDecimal("23200")).build())
+                                .build(),
+                        "hearingFee",
+                        Fee.builder().calculatedAmountInPence(new BigDecimal("23200")).build()
+                )).build();
 
         when(coreCaseDataService.getCase(1701090368574910L)).thenReturn(expectedCaseDetails);
     }
@@ -71,14 +71,14 @@ public class FeesPaymentControllerTest extends BaseIntegrationTest {
         CardPaymentServiceRequestResponse response = buildServiceRequestResponse();
 
         when(paymentsClient.createGovPayCardPaymentRequest(
-            "2023-1701090705688",
-            BEARER_TOKEN,
-            CARD_PAYMENT_SERVICE_REQUEST
+                "2023-1701090705688",
+                BEARER_TOKEN,
+                CARD_PAYMENT_SERVICE_REQUEST
         )).thenReturn(response);
 
         doPost(BEARER_TOKEN, "", FEES_PAYMENT_REQUEST_URL, HEARING.name(), "1701090368574910")
-            .andExpect(content().json(toJson(CardPaymentStatusResponse.from(response))))
-            .andExpect(status().isOk());
+                .andExpect(content().json(toJson(CardPaymentStatusResponse.from(response))))
+                .andExpect(status().isOk());
     }
 
     @ParameterizedTest
@@ -87,10 +87,10 @@ public class FeesPaymentControllerTest extends BaseIntegrationTest {
     void shouldReturnServiceRequestPaymentStatus(String status) {
         PaymentDto response = buildGovPayCardPaymentStatusResponse(status);
         when(paymentsClient.getGovPayCardPaymentStatus("RC-1701-0909-0602-0418", BEARER_TOKEN))
-            .thenReturn(response);
+                .thenReturn(response);
         doGet(BEARER_TOKEN, FEES_PAYMENT_STATUS_URL, HEARING.name(), "123", "RC-1701-0909-0602-0418")
-            .andExpect(content().json(toJson(expectedResponse(status))))
-            .andExpect(status().isOk());
+                .andExpect(content().json(toJson(expectedResponse(status))))
+                .andExpect(status().isOk());
     }
 
     @ParameterizedTest
@@ -99,31 +99,31 @@ public class FeesPaymentControllerTest extends BaseIntegrationTest {
     void shouldReturnServiceRequestPaymentStatusWhenExceptionInCaseDataUpdate(String status) {
         PaymentDto response = buildGovPayCardPaymentStatusResponse(status);
         when(paymentsClient.getGovPayCardPaymentStatus("RC-1701-0909-0602-0418", BEARER_TOKEN))
-            .thenReturn(response);
+                .thenReturn(response);
         doThrow(new CaseDataUpdateException()).when(paymentRequestUpdateCallbackService).updatePaymentStatus(any(), any(), any(CardPaymentStatusResponse.class));
         doGet(BEARER_TOKEN, FEES_PAYMENT_STATUS_URL, HEARING.name(), "123", "RC-1701-0909-0602-0418")
-            .andExpect(content().json(toJson(expectedResponse(status))))
-            .andExpect(status().isOk());
+                .andExpect(content().json(toJson(expectedResponse(status))))
+                .andExpect(status().isOk());
     }
 
     private PaymentDto buildGovPayCardPaymentStatusResponse(String status) {
         return PaymentDto.builder()
-            .externalReference("lbh2ogknloh9p3b4lchngdfg63")
-            .reference("RC-1701-0909-0602-0418")
-            .status(status)
-            .currency("GBP")
-            .amount(new BigDecimal(200))
-            .statusHistories(getStatusHistories(status))
-            .build();
+                .externalReference("lbh2ogknloh9p3b4lchngdfg63")
+                .reference("RC-1701-0909-0602-0418")
+                .status(status)
+                .currency("GBP")
+                .amount(new BigDecimal(200))
+                .statusHistories(getStatusHistories(status))
+                .build();
     }
 
     private CardPaymentStatusResponse expectedResponse(String status) {
         CardPaymentStatusResponse.CardPaymentStatusResponseBuilder payment
-            = CardPaymentStatusResponse.builder()
-            .paymentReference("RC-1701-0909-0602-0418")
-            .status(status)
-            .paymentAmount(new BigDecimal(200))
-            .paymentFor("hearing");
+                = CardPaymentStatusResponse.builder()
+                .paymentReference("RC-1701-0909-0602-0418")
+                .status(status)
+                .paymentAmount(new BigDecimal(200))
+                .paymentFor("hearing");
 
         if (status.equals("Failed")) {
             payment.errorCode("P0030").errorDescription("Payment was cancelled by the user");
@@ -135,8 +135,8 @@ public class FeesPaymentControllerTest extends BaseIntegrationTest {
 
         StatusHistoryDto initiatedHistory = StatusHistoryDto.builder().status("Initiated").build();
         StatusHistoryDto failedHistory = StatusHistoryDto.builder().status("Failed")
-            .errorCode("P0030")
-            .errorMessage("Payment was cancelled by the user").build();
+                .errorCode("P0030")
+                .errorMessage("Payment was cancelled by the user").build();
         List<StatusHistoryDto> histories = new ArrayList<>();
         histories.add(initiatedHistory);
         if (status.equals("Failed")) {
@@ -150,11 +150,11 @@ public class FeesPaymentControllerTest extends BaseIntegrationTest {
 
     private CardPaymentServiceRequestResponse buildServiceRequestResponse() {
         return new CardPaymentServiceRequestResponse(
-            "lbh2ogknloh9p3b4lchngdfg63",
-            "RC-1701-0909-0602-0418",
-            "Initiated",
-            "https://card.payments.service.gov.uk/secure/7b0716b2-40c4-413e-b62e-72c599c91960",
-            OffsetDateTime.parse("2023-11-27T13:15:06.313+00:00")
+                "lbh2ogknloh9p3b4lchngdfg63",
+                "RC-1701-0909-0602-0418",
+                "Initiated",
+                "https://card.payments.service.gov.uk/secure/7b0716b2-40c4-413e-b62e-72c599c91960",
+                OffsetDateTime.parse("2023-11-27T13:15:06.313+00:00")
         );
     }
 
