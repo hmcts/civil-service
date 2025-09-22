@@ -146,12 +146,6 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
             .build();
     }
 
-    private boolean isLipCaseWithProgressionEnabledAndCourtWhiteListed(CaseData caseData, String newCourtLocation) {
-        return (caseData.isLipvLipOneVOne() || caseData.isLRvLipOneVOne()
-            || (caseData.isLipvLROneVOne() && featureToggleService.isDefendantNoCOnlineForCase(caseData)))
-            && featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(newCourtLocation);
-    }
-
     private boolean ifSameCourtSelected(CallbackParams callbackParams) {
         LocationRefData newCourtLocation = courtLocationUtils.findPreferredLocationData(
             fetchLocationData(callbackParams),

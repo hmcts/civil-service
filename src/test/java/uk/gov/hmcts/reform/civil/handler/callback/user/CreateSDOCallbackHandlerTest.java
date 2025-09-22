@@ -1284,11 +1284,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                              YesOrNo respondent1Represented, boolean defendantNocOnline,
                                                              YesOrNo eaCourtLocation) {
 
-        if (NO.equals(respondent1Represented) || NO.equals(applicantRepresented)) {
-            when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(isCPAndWhitelisted);
-        } else {
-            when(featureToggleService.isLocationWhiteListedForCaseProgression(any())).thenReturn(isCPAndWhitelisted);
-        }
         when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(defendantNocOnline);
         CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
             .caseManagementLocation(CaseLocationCivil.builder()

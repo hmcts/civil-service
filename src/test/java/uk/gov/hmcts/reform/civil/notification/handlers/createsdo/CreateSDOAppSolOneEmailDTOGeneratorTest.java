@@ -40,7 +40,6 @@ public class CreateSDOAppSolOneEmailDTOGeneratorTest {
 
         String expectedTemplateId = "template-id";
         when(notificationsProperties.getSdoOrderedSpecEa()).thenReturn(expectedTemplateId);
-        when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(baseLocation)).thenReturn(true);
 
         String actualTemplateId = emailDTOGenerator.getEmailTemplateId(caseData);
 

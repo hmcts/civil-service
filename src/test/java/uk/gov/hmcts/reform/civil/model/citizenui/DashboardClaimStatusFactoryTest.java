@@ -77,7 +77,6 @@ class DashboardClaimStatusFactoryTest {
     @BeforeEach
     void prepare() {
         Mockito.when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
-        Mockito.when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
     }
 
     @ParameterizedTest
@@ -330,17 +329,11 @@ class DashboardClaimStatusFactoryTest {
             .drawDirectionsOrderRequired(YesOrNo.NO)
             .claimsTrack(ClaimsTrack.fastTrack)
             .build();
-        if (toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())) {
             checkStatus(caseData, eventHistory,
                         DashboardClaimStatus.SDO_ORDER_CREATED_CP,
                         DashboardClaimStatus.SDO_ORDER_CREATED_CP
             );
-        } else {
-            checkStatus(caseData, eventHistory,
-                        DashboardClaimStatus.SDO_ORDER_CREATED_PRE_CP,
-                        DashboardClaimStatus.SDO_ORDER_CREATED_PRE_CP
-            );
-        }
+
 
         return caseData;
     }
@@ -559,17 +552,10 @@ class DashboardClaimStatusFactoryTest {
             .systemGeneratedCaseDocuments(List.of(Element.<CaseDocument>builder()
                                                       .value(sdoDocument).build()))
             .build();
-        if (toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())) {
             checkStatus(caseData, eventHistory,
                         DashboardClaimStatus.SDO_ORDER_LEGAL_ADVISER_CREATED,
                         DashboardClaimStatus.SDO_ORDER_LEGAL_ADVISER_CREATED
             );
-        } else {
-            checkStatus(caseData, eventHistory,
-                        DashboardClaimStatus.SDO_ORDER_CREATED_PRE_CP,
-                        DashboardClaimStatus.SDO_ORDER_CREATED_PRE_CP
-            );
-        }
 
         return caseData;
     }

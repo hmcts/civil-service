@@ -261,29 +261,6 @@ class FeatureToggleServiceTest {
     }
 
     @ParameterizedTest
-    @CsvSource({
-        "someLocation, true, true",
-        "someLocation, false, false",
-        ", true, false",
-        ", false, false"
-    })
-    void shouldReturnCorrectValueBasedOnLocationAndFeatureToggle(String location, boolean isFeatureEnabled, boolean expected) {
-
-        if (isFeatureEnabled && location != null) {
-            when(featureToggleApi.isFeatureEnabledForLocation(
-                "case-progression-location-whitelist",
-                location,
-                true
-            )).thenReturn(isFeatureEnabled);
-            when(featureToggleService.isCaseProgressionEnabled()).thenReturn(isFeatureEnabled);
-        }
-
-        boolean result = featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(location);
-
-        assertEquals(expected, result);
-    }
-
-    @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenisJOLiveFeedActive(Boolean toggleStat) {
         when(featureToggleService.isJudgmentOnlineLive())
