@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.dq;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
@@ -31,6 +32,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_RE
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_RESPONSE_1V2_DS;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_RESPONSE_1V2_DS_FAST_TRACK_INT;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWithAuth<DirectionsQuestionnaireForm> {
@@ -42,6 +44,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
     private final RespondentTemplateForDQGenerator respondentTemplateForDQGenerator;
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
+        log.info("Starting generation of directions questionnaire for caseId {}", caseData.getCcdCaseReference());
+
         DocmosisTemplates templateId;
         DocmosisDocument docmosisDocument;
         DirectionsQuestionnaireForm templateData;
@@ -50,12 +54,14 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
         templateData = getTemplateData(caseData, authorisation);
         docmosisDocument = documentGeneratorService.generateDocmosisDocument(templateData, templateId);
 
-        return documentManagementService.uploadDocument(
-            authorisation,
-            new PDF(getFileName(caseData, templateId), docmosisDocument.getBytes(),
-                    DocumentType.DIRECTIONS_QUESTIONNAIRE
-            )
-        );
+        CaseDocument uploadedDocument = documentManagementService.uploadDocument(
+                authorisation,
+                new PDF(getFileName(caseData, templateId), docmosisDocument.getBytes(),
+                        DocumentType.DIRECTIONS_QUESTIONNAIRE
+                ));
+
+        log.info("Completed upload of directions questionnaire for caseId {}", caseData.getCcdCaseReference());
+        return uploadedDocument;
     }
 
     protected DocmosisTemplates getTemplateId(CaseData caseData) {
@@ -107,6 +113,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
     public CaseDocument generateDQFor1v2SingleSolDiffResponse(CaseData caseData,
                                                               String authorisation,
                                                               String respondent) {
+        log.info("Starting 1v2 single-solicitor different-response DQ for caseId {} respondent {}", caseData.getCcdCaseReference(), respondent);
+
         boolean isFastTrackOrMinti = featureToggleService.isFastTrackUpliftsEnabled() || featureToggleService.isMultiOrIntermediateTrackEnabled(caseData);
         DocmosisTemplates templateId = isFastTrackOrMinti ? DQ_RESPONSE_1V1_FAST_TRACK_INT : DQ_RESPONSE_1V1;
         DirectionsQuestionnaireForm templateData;
@@ -121,6 +129,9 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
 
         DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
             templateData, templateId);
+
+        log.info("Completed upload of 1v2 single-solicitor DQ for caseId {} respondent {}", caseData.getCcdCaseReference(), respondent);
+
         return documentManagementService.uploadDocument(
             authorisation,
             new PDF(getFileName(caseData, templateId), docmosisDocument.getBytes(),
@@ -136,12 +147,13 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
         boolean isFastTrackOrMinti = featureToggleService.isFastTrackUpliftsEnabled() || featureToggleService.isMultiOrIntermediateTrackEnabled(caseData);
         DocmosisTemplates templateId = isFastTrackOrMinti ? DQ_RESPONSE_1V1_FAST_TRACK_INT : DQ_RESPONSE_1V1;
 
+        log.info("Starting 1v2 different-solicitor DQ check for caseId {} respondent {}", caseData.getCcdCaseReference(), respondent);
         String fileName = getFileName(caseData, templateId);
         LocalDateTime responseDate = getResponseDate(caseData, respondent);
 
         // Check if the DQ is already generated for this response date and file name
         if (isDQAlreadyGenerated(caseData, responseDate, fileName)) {
-            // DQ is already generated, return empty optional
+            log.info("DQ already exists for caseId {} respondent {} responseDate {}", caseData.getCcdCaseReference(), respondent, responseDate);
             return Optional.empty();
         }
 
@@ -158,7 +170,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
             )
         );
 
-        // set the create date time equal to the response date time, so we can check it afterwards
+        log.info("Uploaded new 1v2 different-solicitor DQ for caseId {} respondent {} responseDate {}", caseData.getCcdCaseReference(), respondent, responseDate);
         return Optional.of(document.toBuilder().createdDatetime(responseDate).build());
     }
 
