@@ -62,7 +62,8 @@ public class DefendantResponseWelshClaimantDashboardNotificationHandler extends 
 
     @Override
     protected void beforeRecordScenario(CaseData caseData, String authToken) {
-        if (caseData.getRespondent1ResponseDeadline().isBefore(LocalDateTime.now())) {
+        if (caseData.getRespondent1ResponseDeadline() != null
+            && caseData.getRespondent1ResponseDeadline().isBefore(LocalDateTime.now())) {
             dashboardNotificationService.deleteByNameAndReferenceAndCitizenRole(DJ_NOTIFICATION,
                     caseData.getCcdCaseReference().toString(), "CLAIMANT");
         }
