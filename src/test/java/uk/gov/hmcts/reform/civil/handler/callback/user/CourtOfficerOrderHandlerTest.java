@@ -291,25 +291,6 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
             assertThat(updatedData.getCurrentCamundaBusinessProcessName()).isEqualTo("COURT_OFFICER_ORDER");
         }
 
-        // @Test
-        // void shouldNotHideDocumentIfWelshDisabled_onAboutToSubmit() {
-        // // Given
-        // caseData = caseData.toBuilder()
-        // .previewCourtOfficerOrder(courtOfficerOrder)
-        // .preTranslationDocuments(new ArrayList<>())
-        // .claimantBilingualLanguagePreference("BOTH")
-        // .build();
-        // params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        // // When
-        // var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        // CaseData updatedData = objectMapper.convertValue(response.getData(),
-        // CaseData.class);
-        // // Then
-        // assertThat(updatedData.getPreTranslationDocuments()).hasSize(0);
-        // assertThat(updatedData.getPreviewCourtOfficerOrder()).isNotNull();
-        // assertThat(updatedData.getCurrentCamundaBusinessProcessName()).isNotNull();
-        // }
-
         @Test
         void shouldHideDocumentIfDefendantWelsh_onAboutToSubmit() {
             // Given

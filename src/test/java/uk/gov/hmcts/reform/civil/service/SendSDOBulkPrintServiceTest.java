@@ -75,28 +75,6 @@ class SendSDOBulkPrintServiceTest {
         verifyPrintLetter(caseData, applicant1);
     }
 
-    // @Test
-    // void shouldPrintLetterSuccessfullyForDefendantLIPInEnglishIfWelshNotEnabled()
-    // {
-    // Party applicant1 = createSoleTraderParty();
-    // CaseData caseData = createCaseDataWithSDOOrder(applicant1);
-    // caseData = caseData.toBuilder().caseDataLiP(
-    // CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("WELSH").build()).build()).build();
-    // given(sdoCoverLetterAppendService.makeSdoDocumentMailable(any(), any(),
-    // any(), any(DocumentType.class), any()))
-    // .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
-    //
-    // sendSDOBulkPrintService.sendSDOOrderToLIP(BEARER_TOKEN, caseData,
-    // TASK_ID_DEFENDANT);
-    //
-    // verifyPrintLetter(caseData, applicant1);
-    // ArgumentCaptor<CaseDocument[]> captor =
-    // ArgumentCaptor.forClass(CaseDocument[].class);
-    // verify(sdoCoverLetterAppendService).makeSdoDocumentMailable(any(), any(),
-    // any(), any(), captor.capture());
-    // assertThat(captor.getValue()).hasSize(1);
-    // }
-
     @Test
     void shouldPrintLetterSuccessfullyForDefendantLIPInWelsh() {
         Party applicant1 = createSoleTraderParty();
@@ -134,28 +112,6 @@ class SendSDOBulkPrintServiceTest {
         verify(sdoCoverLetterAppendService).makeSdoDocumentMailable(any(), any(), any(), any(), captor.capture());
         assertThat(captor.getValue()).hasSize(2);
     }
-
-    // @Test
-    // void shouldPrintLetterSuccessfullyForClaimantLIPInEnglishIfWelshNotEnabled()
-    // {
-    // Party applicant1 = createSoleTraderParty();
-    // CaseData caseData = createCaseDataWithSDOOrder(applicant1);
-    // caseData =
-    // caseData.toBuilder().claimantBilingualLanguagePreference("WELSH").build();
-    // given(sdoCoverLetterAppendService.makeSdoDocumentMailable(any(), any(),
-    // any(), any(DocumentType.class), any()))
-    // .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
-    //
-    // sendSDOBulkPrintService.sendSDOOrderToLIP(BEARER_TOKEN, caseData,
-    // TASK_ID_CLAIMANT);
-    //
-    // verifyPrintLetter(caseData, applicant1);
-    // ArgumentCaptor<CaseDocument[]> captor =
-    // ArgumentCaptor.forClass(CaseDocument[].class);
-    // verify(sdoCoverLetterAppendService).makeSdoDocumentMailable(any(), any(),
-    // any(), any(), captor.capture());
-    // assertThat(captor.getValue()).hasSize(1);
-    // }
 
     @Test
     void shouldPrintLetterSuccessfullyForClaimantLIPInWelsh() {

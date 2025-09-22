@@ -70,7 +70,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.ACKNOWLEDGEMENT_OF_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
@@ -886,13 +885,6 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
     void shouldPopulateHmcLipEnabled_whenLiPAndHmcLipEnabled(boolean isCPAndWhitelisted, YesOrNo applicantRepresented,
                                                              YesOrNo respondent1Represented,
                                                              YesOrNo eaCourtLocation) {
-
-        if (NO.equals(respondent1Represented)) {
-            // when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(isCPAndWhitelisted);
-            // if (!isCPAndWhitelisted) {
-            // when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
-            // }
-        }
         CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
             .caseManagementLocation(CaseLocationCivil.builder()
                                         .region("2")
@@ -931,11 +923,6 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
     void shouldPopulateHmcLipEnabled_whenLiPAndHmcLipEnabledAndWelshConsidered(boolean isCPAndWhitelisted, YesOrNo applicantRepresented,
                                                              YesOrNo respondent1Represented,
                                                              YesOrNo eaCourtLocation, boolean isWelshEnabled) {
-
-        // when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(isWelshEnabled);
-        // if (!isWelshEnabled && NO.equals(respondent1Represented)) {
-        // when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(isCPAndWhitelisted);
-        // }
         CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
             .caseManagementLocation(CaseLocationCivil.builder()
                                         .region("2")

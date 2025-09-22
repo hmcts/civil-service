@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
 import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
 import uk.gov.hmcts.reform.civil.exceptions.MissingFieldsUpdatedException;
 import uk.gov.hmcts.reform.civil.exceptions.NotEarlyAdopterCourtException;
-import uk.gov.hmcts.reform.civil.exceptions.IncludesLitigantInPersonException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.ServiceHearingValuesModel;
@@ -88,7 +87,6 @@ public class HearingValuesService {
         populateMissingFields(caseId, caseData);
 
         log.info("Checking LR v LR for case id: " + caseId);
-        isLrVLr(caseData);
         log.info("Completed LR v LR check for case id: " + caseId);
 
         String baseUrl = manageCaseBaseUrlConfiguration.getManageCaseBaseUrl();
@@ -138,24 +136,6 @@ public class HearingValuesService {
         } catch (Exception ex) {
             log.error(String.format("No case found for %d", caseId));
             throw new CaseNotFoundException();
-        }
-    }
-
-    private void isEarlyAdopter(CaseData caseData) throws NotEarlyAdopterCourtException {
-        if (!earlyAdoptersService.isPartOfHmcLipEarlyAdoptersRollout(caseData)) {
-            throw new NotEarlyAdopterCourtException();
-        }
-    }
-
-    private void isLrVLr(CaseData caseData) throws IncludesLitigantInPersonException {
-        if (caseData.isApplicantLiP() || caseData.isRespondent1LiP() || caseData.isRespondent2LiP()) {
-            if (featuretoggleService.isHmcForLipEnabled()) {
-                if (false) {
-                    isEarlyAdopter(caseData);
-                }
-            } else {
-                throw new IncludesLitigantInPersonException();
-            }
         }
     }
 

@@ -115,27 +115,6 @@ class GenerateClaimantLipManualDeterminationCallBackHandlerTest extends BaseCall
         assertThat(handler.handledEvents()).contains(GENERATE_LIP_CLAIMANT_MANUAL_DETERMINATION);
     }
 
-    // @Test
-    // void shouldNotHideTheDocumentWhenFTisOff() {
-    // //Given
-    // given(formGenerator.generate(
-    // any(CaseData.class),
-    // anyString()
-    // )).willReturn(FORM);
-    // CaseData caseData = CaseData.builder()
-    // .respondent1(Party.builder().type(Party.Type.COMPANY).build())
-    // .claimantBilingualLanguagePreference("WELSH")
-    // .build();
-    //
-    // AboutToStartOrSubmitCallbackResponse response =
-    // (AboutToStartOrSubmitCallbackResponse)
-    // handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
-    // CaseData updatedData = mapper.convertValue(response.getData(),
-    // CaseData.class);
-    // assertThat(updatedData.getPreTranslationDocuments()).hasSize(0);
-    // verify(formGenerator).generate(caseData, BEARER_TOKEN);
-    // }
-
     @Test
     void shouldHideTheDocumentWhenFTisONAndWelshClaimant() {
         //Given

@@ -119,58 +119,6 @@ public class SealedClaimResponseFormGeneratorForSpecTest {
         );
     }
 
-    // @Test
-    // public void contentCheckRespondent2() {
-    // CaseData caseData = CaseData.builder()
-    // .legacyCaseReference("case reference")
-    // .ccdCaseReference(1234567890123456L)
-    // .detailsOfWhyDoesYouDisputeTheClaim("why dispute the claim")
-    // .respondent1DQ(Respondent1DQ.builder().respondent1DQStatementOfTruth(
-    // StatementOfTruth.builder()
-    // .name("sot1 name")
-    // .role("sot1 role")
-    // .build()).build())
-    // .respondent2DQ(Respondent2DQ.builder()
-    // .respondent2DQStatementOfTruth(
-    // StatementOfTruth.builder()
-    // .name("sot2 name")
-    // .role("sot2 role")
-    // .build()
-    // )
-    // .respondent2DQRequestedCourt(
-    // RequestedCourt.builder()
-    // .responseCourtCode("121")
-    // .caseLocation(CaseLocationCivil.builder()
-    // .region("2")
-    // .baseLocation("000000")
-    // .build())
-    // .build())
-    // .build())
-    // .applicant1(Party.builder()
-    // .type(Party.Type.COMPANY)
-    // .companyName("applicant name")
-    // .build())
-    // .respondent1(Party.builder()
-    // .type(Party.Type.COMPANY)
-    // .companyName("defendant name")
-    // .build())
-    // .respondent1ResponseDate(LocalDateTime.now())
-    // .respondent2(Party.builder()
-    // .type(Party.Type.COMPANY)
-    // .companyName("defendant2 name")
-    // .build())
-    // .respondent2ResponseDate(LocalDateTime.now())
-    // .build();
-    //
-    // SealedClaimResponseFormForSpec templateData = generator.getTemplateData(
-    // caseData, BEARER_TOKEN);
-    //
-    // Assertions.assertEquals(caseData.getLegacyCaseReference(),
-    // templateData.getReferenceNumber());
-    // Assertions.assertEquals(caseData.getCcdCaseReference().toString(),
-    // templateData.getCcdCaseReference());
-    // }
-
     @Test
     public void contentCheckMultipartyRespondent2Answering() {
         SealedClaimResponseFormForSpec templateData = generator.getTemplateData(

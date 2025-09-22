@@ -42,17 +42,6 @@ public class SendDroOrderToLipBulkPrintCallbackHandlerTest extends BaseCallbackH
     public static final String TASK_ID_DEFENDANT = "SendToDefendantLIP";
     public static final String TASK_ID_CLAIMANT = "SendDORToClaimantLIP";
 
-    // @Test
-    // void shouldNotCallRecordScenario_whenWelshFlagIsDisabled() {
-    //
-    // CallbackParams callbackParams = CallbackParamsBuilder.builder()
-    // .of(ABOUT_TO_SUBMIT, CaseData.builder().build())
-    // .build();
-    //
-    // handler.handle(callbackParams);
-    // verifyNoInteractions(sendDROBulkPrintService);
-    // }
-
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
         assertThat(handler.handledEvents()).contains(SEND_DRO_ORDER_TO_LIP_CLAIMANT);

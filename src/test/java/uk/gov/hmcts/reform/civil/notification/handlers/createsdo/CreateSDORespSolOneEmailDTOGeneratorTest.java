@@ -34,23 +34,6 @@ public class CreateSDORespSolOneEmailDTOGeneratorTest {
         MockitoAnnotations.openMocks(this);
     }
 
-    // @Test
-    // void shouldReturnCorrectEmailTemplateIdWhenSpecNotEANotBilingual() {
-    // String baseLocation = "base location";
-    // CaseData caseData = CaseData.builder()
-    // .caseAccessCategory(SPEC_CLAIM)
-    // .caseManagementLocation(CaseLocationCivil.builder().baseLocation(baseLocation).build())
-    // .build();
-    //
-    // String expectedTemplateId = "template-id";
-    // when(notificationsProperties.getSdoOrderedSpec()).thenReturn(expectedTemplateId);
-    // when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(baseLocation)).thenReturn(false);
-    //
-    // String actualTemplateId = emailDTOGenerator.getEmailTemplateId(caseData);
-    //
-    // assertThat(actualTemplateId).isEqualTo(expectedTemplateId);
-    // }
-
     @Test
     void shouldReturnCorrectEmailTemplateIdWhenSpecBilingual() {
         CaseDataLiP caseDataLiP = CaseDataLiP.builder()
