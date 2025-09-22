@@ -37,7 +37,6 @@ import static uk.gov.hmcts.reform.civil.utils.QueryNotificationUtils.IS_LIP_OTHE
 import static uk.gov.hmcts.reform.civil.utils.QueryNotificationUtils.IS_LIP_OTHER_PARTY_WELSH;
 import static uk.gov.hmcts.reform.civil.utils.QueryNotificationUtils.LEGAL_ORG;
 import static uk.gov.hmcts.reform.civil.utils.QueryNotificationUtils.LIP_NAME;
-import static uk.gov.hmcts.reform.civil.utils.QueryNotificationUtils.getOtherPartyEmailDetails;
 import static uk.gov.hmcts.reform.civil.utils.QueryNotificationUtils.getOtherPartyEmailDetailsPublicQuery;
 import static uk.gov.hmcts.reform.civil.utils.QueryNotificationUtils.isUnspecClaimNotReadyForNotification;
 
@@ -72,60 +71,46 @@ public class NotifyOtherPartyQueryRaisedNotificationHandler extends CallbackHand
 
     private CallbackResponse notifyOtherPartyQueryHasBeenRaised(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (featureToggleService.isPublicQueryManagementEnabled(caseData)) {
-            String processInstanceId = caseData.getBusinessProcess().getProcessInstanceId();
-            QueryManagementVariables processVariables = runtimeService.getProcessVariables(processInstanceId);
-            String queryId = processVariables.getQueryId();
-            List<Map<String, String>> emailDetailsList = getOtherPartyEmailDetailsPublicQuery(caseData, organisationService, coreCaseUserService, queryId);
-            boolean isLipOtherParty = emailDetailsList.stream().anyMatch(map -> "TRUE".equalsIgnoreCase(map.get(IS_LIP_OTHER_PARTY)));
+        String processInstanceId = caseData.getBusinessProcess().getProcessInstanceId();
+        QueryManagementVariables processVariables = runtimeService.getProcessVariables(processInstanceId);
+        String queryId = processVariables.getQueryId();
+        List<Map<String, String>> emailDetailsList = getOtherPartyEmailDetailsPublicQuery(
+            caseData,
+            organisationService,
+            coreCaseUserService,
+            queryId
+        );
+        boolean isLipOtherParty = emailDetailsList.stream().anyMatch(map -> "TRUE".equalsIgnoreCase(map.get(
+            IS_LIP_OTHER_PARTY)));
 
-            if (isLipOtherParty) {
-                emailDetailsList.forEach(otherPartyEmailDetails -> {
-                    boolean isWelsh = "WELSH".equalsIgnoreCase(otherPartyEmailDetails.get(IS_LIP_OTHER_PARTY_WELSH));
-                    String templateId = isWelsh
-                        ? notificationsProperties.getNotifyOtherLipPartyWelshPublicQueryRaised()
-                        : notificationsProperties.getNotifyOtherLipPartyPublicQueryRaised();
+        if (isLipOtherParty) {
+            emailDetailsList.forEach(otherPartyEmailDetails -> {
+                boolean isWelsh = "WELSH".equalsIgnoreCase(otherPartyEmailDetails.get(IS_LIP_OTHER_PARTY_WELSH));
+                String templateId = isWelsh
+                    ? notificationsProperties.getNotifyOtherLipPartyWelshPublicQueryRaised()
+                    : notificationsProperties.getNotifyOtherLipPartyPublicQueryRaised();
 
-                    notificationService.sendMail(
-                        otherPartyEmailDetails.get(EMAIL),
-                        templateId,
-                        addProperties(caseData, otherPartyEmailDetails.get(LIP_NAME), isLipOtherParty),
-                        String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
-                    );
-                });
-            } else {
-                emailDetailsList.forEach(otherPartyEmailDetails -> {
-                    if (isUnspecClaimNotReadyForNotification(caseData, coreCaseUserService, queryId)) {
-                        return;
-                    }
-                    notificationService.sendMail(
-                        otherPartyEmailDetails.get(EMAIL),
-                        notificationsProperties.getNotifyOtherPartyPublicQueryRaised(),
-                        addProperties(caseData, otherPartyEmailDetails.get(LEGAL_ORG), false),
-                        String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
-                    );
-                });
-            }
-            return AboutToStartOrSubmitCallbackResponse.builder().build();
+                notificationService.sendMail(
+                    otherPartyEmailDetails.get(EMAIL),
+                    templateId,
+                    addProperties(caseData, otherPartyEmailDetails.get(LIP_NAME), isLipOtherParty),
+                    String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+                );
+            });
         } else {
-            String processInstanceId = caseData.getBusinessProcess().getProcessInstanceId();
-            QueryManagementVariables processVariables = runtimeService.getProcessVariables(processInstanceId);
-            String queryId = processVariables.getQueryId();
-            List<Map<String, String>> emailDetailsList = getOtherPartyEmailDetails(caseData, organisationService, coreCaseUserService, queryId);
-
             emailDetailsList.forEach(otherPartyEmailDetails -> {
                 if (isUnspecClaimNotReadyForNotification(caseData, coreCaseUserService, queryId)) {
                     return;
                 }
                 notificationService.sendMail(
                     otherPartyEmailDetails.get(EMAIL),
-                    notificationsProperties.getNotifyOtherPartyQueryRaised(),
+                    notificationsProperties.getNotifyOtherPartyPublicQueryRaised(),
                     addProperties(caseData, otherPartyEmailDetails.get(LEGAL_ORG), false),
                     String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
                 );
             });
-            return AboutToStartOrSubmitCallbackResponse.builder().build();
         }
+        return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
     public Map<String, String> addProperties(CaseData caseData, String legalOrgNameOrPartyName, boolean isLipOtherParty) {
@@ -140,8 +125,7 @@ public class NotifyOtherPartyQueryRaisedNotificationHandler extends CallbackHand
             properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, legalOrgNameOrPartyName);
             properties.put(CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString());
         }
-        addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isPublicQueryManagementEnabled(caseData));
+        addAllFooterItems(caseData, properties, configuration, featureToggleService.isPublicQueryManagementEnabled(caseData));
 
         return properties;
     }

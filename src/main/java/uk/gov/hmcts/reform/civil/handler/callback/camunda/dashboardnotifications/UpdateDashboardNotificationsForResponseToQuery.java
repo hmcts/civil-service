@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
@@ -37,7 +36,6 @@ public class UpdateDashboardNotificationsForResponseToQuery extends CallbackHand
     public static final String TASK_ID = "UpdateDashboardNotificationsResponseToQuery";
     private final DashboardScenariosService dashboardScenariosService;
     private final DashboardNotificationsParamsMapper mapper;
-    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -58,9 +56,6 @@ public class UpdateDashboardNotificationsForResponseToQuery extends CallbackHand
 
     private CallbackResponse createDashboardNotification(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (!featureToggleService.isPublicQueryManagementEnabled(caseData)) {
-            return AboutToStartOrSubmitCallbackResponse.builder().build();
-        }
         ScenarioRequestParams
             notificationParams = ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();

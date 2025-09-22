@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.querymanagement.QueryManagementCamundaService;
 import uk.gov.hmcts.reform.civil.service.querymanagement.QueryManagementVariables;
@@ -48,7 +47,6 @@ public class RaiseQuerySolicitorNotificationHandler extends CallbackHandler impl
     private final CoreCaseUserService coreCaseUserService;
     private final QueryManagementCamundaService runtimeService;
     private final NotificationsSignatureConfiguration configuration;
-    private final FeatureToggleService featureToggleService;
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
@@ -103,8 +101,7 @@ public class RaiseQuerySolicitorNotificationHandler extends CallbackHandler impl
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
-        addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isPublicQueryManagementEnabled(caseData));
+        addAllFooterItems(caseData, properties, configuration, true);
 
         return properties;
     }

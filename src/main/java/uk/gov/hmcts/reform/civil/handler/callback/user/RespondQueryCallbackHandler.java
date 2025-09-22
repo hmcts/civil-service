@@ -42,8 +42,8 @@ public class RespondQueryCallbackHandler extends CallbackHandler {
     protected Map<String, Callback> callbacks() {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::aboutToStart,
-            callbackKey(ABOUT_TO_SUBMIT), this::setManagementQuery,
-            callbackKey(SUBMITTED), this::aboutToSubmit
+            callbackKey(ABOUT_TO_SUBMIT), this::aboutToSubmit,
+            callbackKey(SUBMITTED), this::submitted
         );
     }
 
@@ -55,16 +55,13 @@ public class RespondQueryCallbackHandler extends CallbackHandler {
     private CallbackResponse aboutToStart(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
-
-        if (featureToggleService.isPublicQueryManagementEnabled(caseData)) {
-            migrateAllQueries(caseDataBuilder);
-        }
+        migrateAllQueries(caseDataBuilder);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(mapper)).build();
     }
 
-    private CallbackResponse setManagementQuery(CallbackParams callbackParams) {
+    private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         CaseMessage latestCaseMessage = getLatestQuery(caseData);
@@ -83,11 +80,8 @@ public class RespondQueryCallbackHandler extends CallbackHandler {
             .build();
     }
 
-    private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
-        CaseData caseDataBefore = callbackParams.getCaseDataBefore();
-        if (featureToggleService.isPublicQueryManagementEnabled(caseDataBefore)) {
-            logMigrationSuccess(callbackParams.getCaseDataBefore());
-        }
+    private CallbackResponse submitted(CallbackParams callbackParams) {
+        logMigrationSuccess(callbackParams.getCaseDataBefore());
         return emptySubmittedCallbackResponse(callbackParams);
     }
 

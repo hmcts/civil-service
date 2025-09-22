@@ -158,12 +158,11 @@ public class FeatureToggleService {
         return featureToggleApi.isFeatureEnabled("hmc-cui-enabled");
     }
 
-    // if deleting this, also handle isQMPdfGeneratorEnabled() below
     public boolean isPublicQueryManagementEnabled(CaseData caseData) {
         if (caseContainsLiP.test(caseData)) {
             return isLipQueryManagementEnabled(caseData);
         }
-        return featureToggleApi.isFeatureEnabled("public-query-management");
+        return true;
     }
 
     public boolean isQMPdfGeneratorDisabled() {

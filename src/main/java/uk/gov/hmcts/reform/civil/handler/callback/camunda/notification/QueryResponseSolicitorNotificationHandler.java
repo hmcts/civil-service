@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.querymanagement.QueryManagementCamundaService;
 import uk.gov.hmcts.reform.civil.service.querymanagement.QueryManagementVariables;
@@ -59,7 +58,6 @@ public class QueryResponseSolicitorNotificationHandler extends CallbackHandler i
     private final NotificationsProperties notificationsProperties;
     private final CoreCaseUserService coreCaseUserService;
     private final NotificationsSignatureConfiguration configuration;
-    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -96,8 +94,8 @@ public class QueryResponseSolicitorNotificationHandler extends CallbackHandler i
         if (queryDate != null) {
             properties.put(QUERY_DATE, formatLocalDate(queryDate, DATE));
         }
-        boolean publicQueryEnabled = featureToggleService.isPublicQueryManagementEnabled(caseData);
-        String template = publicQueryEnabled ? getPublicQueryTemplates(caseData, roles) : getTemplates(caseData, roles);
+
+        String template = getPublicQueryTemplates(caseData, roles);
         notificationService.sendMail(
             email,
             template,
@@ -163,8 +161,7 @@ public class QueryResponseSolicitorNotificationHandler extends CallbackHandler i
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
-        addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isPublicQueryManagementEnabled(caseData));
+        addAllFooterItems(caseData, properties, configuration, true);
 
         return properties;
     }
