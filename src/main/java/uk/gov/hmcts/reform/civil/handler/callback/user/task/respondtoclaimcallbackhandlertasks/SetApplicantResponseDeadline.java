@@ -46,7 +46,7 @@ import static uk.gov.hmcts.reform.civil.utils.WitnessUtils.addEventAndDateAddedT
 @Slf4j
 public class SetApplicantResponseDeadline implements CaseTask {
 
-    private static final int RESPONSE_CLAIM_DEADLINE_EXTENSION_MONTHS = 24;
+    private static final int RESPONSE_CLAIM_DEADLINE_EXTENSION_MONTHS = 36;
     private final Time time;
     private final DeadlinesCalculator deadlinesCalculator;
     private final FrcDocumentsUtils frcDocumentsUtils;
