@@ -347,4 +347,13 @@ class FeatureToggleServiceTest {
 
         assertThat(featureToggleService.isQMPdfGeneratorDisabled()).isEqualTo(toggleStat);
     }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldCallBoolVariation_whenGaForLipNro(Boolean toggleStat) {
+        var gaCuiNroKey = "cui-ga-nro";
+        givenToggle(gaCuiNroKey, toggleStat);
+
+        assertThat(featureToggleService.isCuiGaNroEnabled()).isEqualTo(toggleStat);
+    }
 }
