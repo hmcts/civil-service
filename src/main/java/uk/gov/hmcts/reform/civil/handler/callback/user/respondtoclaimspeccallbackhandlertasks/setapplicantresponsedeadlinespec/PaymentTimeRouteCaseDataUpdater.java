@@ -14,7 +14,6 @@ import java.time.ZonedDateTime;
 
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_ADMISSION;
-import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
 
 @Component
 @RequiredArgsConstructor
@@ -28,8 +27,8 @@ public class PaymentTimeRouteCaseDataUpdater implements SetApplicantResponseDead
         log.info("Updating PaymentTimeRouteCaseData for caseId: {}", caseData.getCcdCaseReference());
 
         if (IMMEDIATELY.equals(caseData.getDefenceAdmitPartPaymentTimeRouteRequired())
-                && ifResponseTypeIsPartOrFullAdmission(caseData)) {
-            log.debug("Defence admit part payment time route is IMMEDIATELY and response type is part or full admission for caseId: {}", caseData.getCcdCaseReference());
+                && isFullAdmission(caseData)) {
+            log.debug("Defence admit part payment time route is IMMEDIATELY and response type is full admission for caseId: {}", caseData.getCcdCaseReference());
             LocalDate whenBePaid = deadlineCalculatorService.calculateExtendedDeadline(
                     ZonedDateTime.now(ZoneId.of("Europe/London")).toLocalDateTime(),
                     RespondentResponsePartAdmissionPaymentTimeLRspec.DAYS_TO_PAY_IMMEDIATELY);
@@ -40,11 +39,10 @@ public class PaymentTimeRouteCaseDataUpdater implements SetApplicantResponseDead
         }
     }
 
-    private boolean ifResponseTypeIsPartOrFullAdmission(CaseData caseData) {
-        log.debug("Checking if response type is part or full admission for caseId: {}", caseData.getCcdCaseReference());
-        return PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-                || PART_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec())
-                || FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-                || FULL_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec());
+    private boolean isFullAdmission(CaseData caseData) {
+        log.debug("Checking if response type is full admission for caseId: {}", caseData.getCcdCaseReference());
+        return FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+            || FULL_ADMISSION.equals(
+            caseData.getRespondent2ClaimResponseTypeForSpec());
     }
 }
