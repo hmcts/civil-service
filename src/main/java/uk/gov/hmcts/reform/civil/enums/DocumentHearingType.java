@@ -34,13 +34,26 @@ public enum DocumentHearingType {
     }
 
     private static String getTypeText(DocumentHearingType documentHearingType, AllocatedTrack allocatedTrack, DocumentContext context, boolean isWelsh) {
-        String labelText = isWelsh ? documentHearingType.getLabelWelsh() : documentHearingType.getLabel();
-        String hearingText = isWelsh ? "wrandawiad" : "hearing";
+        String labelText;
+        String hearingText;
 
-        if (documentHearingType.equals(TRI)) {
+        if (documentHearingType.equals(TRI) && !isWelsh) {
+            labelText = documentHearingType.getLabel();
+            hearingText = "hearing";
             return allocatedTrack.equals(FAST_CLAIM) ? labelText : hearingText;
+        } else if (documentHearingType.equals(TRI) && context.equals(TITLE)) {
+            labelText = documentHearingType.getLabelWelsh();
+            hearingText = "wrandawiad";
+            return allocatedTrack.equals(FAST_CLAIM) ? labelText : hearingText;
+        } else if (documentHearingType.equals(TRI)) {
+            labelText = "treial";
+            hearingText = "gwrandawiad";
+            return allocatedTrack.equals(FAST_CLAIM) ? labelText : hearingText;
+        } else {
+            labelText = isWelsh ? documentHearingType.getLabelWelsh() : documentHearingType.getLabel();
+            hearingText = isWelsh ? "gwrandawiad" : "hearing";
+            return context.equals(TITLE) ? labelText : hearingText;
         }
-        return context.equals(TITLE) ? labelText : hearingText;
     }
 
     public static String getTitleText(DocumentHearingType hearingType, AllocatedTrack allocatedTrack, boolean isWelsh) {
@@ -51,4 +64,7 @@ public enum DocumentHearingType {
         return getTypeText(hearingType, allocatedTrack, CONTENT, isWelsh);
     }
 
+    public static String getPluralTypeTextWelsh(DocumentHearingType documentHearingType, AllocatedTrack allocatedTrack) {
+        return documentHearingType.equals(DocumentHearingType.TRI) && allocatedTrack.equals(FAST_CLAIM) ? "dreialon" : "wrandawiadau";
+    }
 }

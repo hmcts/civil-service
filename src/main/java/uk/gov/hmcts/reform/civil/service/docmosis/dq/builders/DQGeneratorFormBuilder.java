@@ -34,6 +34,7 @@ import java.util.Optional;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.INTERMEDIATE_CLAIM;
@@ -48,16 +49,27 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.ALL_RES
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_ADMIT_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMISSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMISSION;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 
 @Component
 @RequiredArgsConstructor
 public class DQGeneratorFormBuilder {
 
+    public static final String ERROR_FLOW_STATE_PAST_DEADLINE =
+        "Error evaluating state flow when checking which DQ file name to be used";
     private final IStateFlowEngine stateFlowEngine;
     private final RepresentativeService representativeService;
     private final FeatureToggleService featureToggleService;
@@ -107,14 +119,25 @@ public class DQGeneratorFormBuilder {
         }
 
         builder.fileDirectionsQuestionnaire(dq.getFileDirectionQuestionnaire())
-            .fixedRecoverableCosts(FixedRecoverableCostsSection.from(INTERMEDIATE_CLAIM.toString().equals(getClaimTrack(caseData))
+            .fixedRecoverableCosts(FixedRecoverableCostsSection.from(INTERMEDIATE_CLAIM.toString().equals(getClaimTrack(
+                caseData))
                                                                          ? dq.getFixedRecoverableCostsIntermediate()
                                                                          : dq.getFixedRecoverableCosts()))
             .disclosureOfElectronicDocuments(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                                                  ? dq.getDisclosureOfElectronicDocuments() : dq.getSpecDisclosureOfElectronicDocuments())
             .disclosureOfNonElectronicDocuments(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                                                     ? dq.getDisclosureOfNonElectronicDocuments() : dq.getSpecDisclosureOfNonElectronicDocuments())
-            .experts(!specAndSmallClaim ? respondentTemplateForDQGenerator.getExperts(dq) : respondentTemplateForDQGenerator.getSmallClaimExperts(dq, caseData, null))
+            .deterWithoutHearingYesNo(getDeterWithoutHearing(caseData, dq))
+            .deterWithoutHearingWhyNot(getDeterWithoutHearing(
+                caseData,
+                dq
+            ) != null && dq.getDeterWithoutHearing().getDeterWithoutHearingYesNo().equals(NO)
+                                           ? dq.getDeterWithoutHearing().getDeterWithoutHearingWhyNot() : null)
+            .experts(!specAndSmallClaim ? respondentTemplateForDQGenerator.getExperts(dq) : respondentTemplateForDQGenerator.getSmallClaimExperts(
+                dq,
+                caseData,
+                null
+            ))
             .witnesses(witnesses)
             .witnessesIncludingDefendants(witnessesIncludingDefendants)
             .hearing(getHearing(dq))
@@ -147,30 +170,32 @@ public class DQGeneratorFormBuilder {
         var litigationFriend = caseData.getRespondent1LitigationFriend();
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
             && TWO_V_ONE.equals(getMultiPartyScenario(caseData))) {
-            return List.of(Party.builder()
-                               .name(applicant.getPartyName())
-                               .emailAddress(caseData.getApplicant1().getPartyEmail())
-                               .phoneNumber(caseData.getApplicant1().getPartyPhone())
-                               .primaryAddress(applicant.getPrimaryAddress())
-                               .representative(respondentRepresentative)
-                               .litigationFriendName(
-                                   ofNullable(litigationFriend)
-                                       .map(LitigationFriend::getFullName)
-                                       .orElse(""))
-                               .legalRepHeading(legalRepHeading)
-                               .build(),
-                           Party.builder()
-                               .name(applicant2.getPartyName())
-                               .emailAddress(caseData.getApplicant2().getPartyEmail())
-                               .phoneNumber(caseData.getApplicant2().getPartyPhone())
-                               .primaryAddress(applicant2.getPrimaryAddress())
-                               .representative(respondentRepresentative)
-                               .litigationFriendName(
-                                   ofNullable(litigationFriend)
-                                       .map(LitigationFriend::getFullName)
-                                       .orElse(""))
-                               .legalRepHeading(legalRepHeading)
-                               .build());
+            return List.of(
+                Party.builder()
+                    .name(applicant.getPartyName())
+                    .emailAddress(caseData.getApplicant1().getPartyEmail())
+                    .phoneNumber(caseData.getApplicant1().getPartyPhone())
+                    .primaryAddress(applicant.getPrimaryAddress())
+                    .representative(respondentRepresentative)
+                    .litigationFriendName(
+                        ofNullable(litigationFriend)
+                            .map(LitigationFriend::getFullName)
+                            .orElse(""))
+                    .legalRepHeading(legalRepHeading)
+                    .build(),
+                Party.builder()
+                    .name(applicant2.getPartyName())
+                    .emailAddress(caseData.getApplicant2().getPartyEmail())
+                    .phoneNumber(caseData.getApplicant2().getPartyPhone())
+                    .primaryAddress(applicant2.getPrimaryAddress())
+                    .representative(respondentRepresentative)
+                    .litigationFriendName(
+                        ofNullable(litigationFriend)
+                            .map(LitigationFriend::getFullName)
+                            .orElse(""))
+                    .legalRepHeading(legalRepHeading)
+                    .build()
+            );
         }
         return List.of(Party.builder()
                            .name(applicant.getPartyName())
@@ -193,35 +218,56 @@ public class DQGeneratorFormBuilder {
             ? caseData.getAllocatedTrack().name() : caseData.getResponseClaimTrack();
     }
 
-    private String createStatementOfTruthText(Boolean respondentState) {
-        String role = Boolean.TRUE.equals(respondentState) ? DEFENDANT : "claimant";
+    private String createStatementOfTruthText(boolean respondentState) {
+        String role = respondentState ? DEFENDANT : "claimant";
         String statementOfTruth = role.equals(DEFENDANT)
             ? "The defendant believes that the facts stated in the response are true."
             : "The claimant believes that the facts in this claim are true.";
-        statementOfTruth += String.format("\n\n\nI am duly authorised by the %s to sign this statement.\n\n"
-                                              + "The %s understands that the proceedings for contempt of court "
-                                              + "may be brought against anyone who makes, or causes to be made, "
-                                              + "a false statement in a document verified by a statement of truth "
-                                              + "without an honest belief in its truth.",
-                                          IntStream.range(0, 2).mapToObj(i -> role).toArray());
+        statementOfTruth += String.format(
+            "\n\n\nI am duly authorised by the %s to sign this statement.\n\n"
+                + "The %s understands that the proceedings for contempt of court "
+                + "may be brought against anyone who makes, or causes to be made, "
+                + "a false statement in a document verified by a statement of truth "
+                + "without an honest belief in its truth.",
+            IntStream.range(0, 2).mapToObj(i -> role).toArray()
+        );
         return statementOfTruth;
     }
 
-    public Boolean isRespondentState(CaseData caseData) {
+    public boolean isRespondentState(CaseData caseData) {
         if (isClaimantResponse(caseData)) {
             return false;
         }
         String state = stateFlowEngine.evaluate(caseData).getState().getName();
+        if (isPastDeadlineState(state)) {
+            throw new IllegalStateException(ERROR_FLOW_STATE_PAST_DEADLINE);
+        }
+
+        if (isLipClaimantBilingualRequiresTranslation(caseData)) {
+            return true;
+        }
 
         return SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
             && caseData.getCcdState() == CaseState.AWAITING_APPLICANT_INTENTION
             || state.equals(FULL_DEFENCE.fullName())
+            || state.equals(PART_ADMISSION.fullName())
             || state.equals(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName())
             || state.equals(ALL_RESPONSES_RECEIVED.fullName())
             || state.equals(DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE.fullName())
             || state.equals(AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED.fullName())
             || state.equals(AWAITING_RESPONSES_FULL_ADMIT_RECEIVED.fullName())
             || state.equals(RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.fullName());
+    }
+
+    private boolean isPastDeadlineState(String state) {
+        return TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE.fullName().equals(state)
+            || PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA.fullName().equals(state)
+            || CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE.fullName().equals(state)
+            || PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA.fullName().equals(state)
+            || CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE.fullName().equals(state)
+            || PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA.fullName().equals(state)
+            || CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE.fullName().equals(state)
+            || PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA.fullName().equals(state);
     }
 
     private DQ getDQAndSetSubmittedOn(DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder builder,
@@ -347,5 +393,23 @@ public class DQGeneratorFormBuilder {
     private boolean onlyApplicant2IsProceeding(CaseData caseData) {
         return !YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
             && YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1());
+    }
+
+    private static YesOrNo getDeterWithoutHearing(CaseData caseData, DQ dq) {
+        if (isSmallClaim(caseData) && nonNull(dq.getDeterWithoutHearing())) {
+            return dq.getDeterWithoutHearing().getDeterWithoutHearingYesNo();
+        }
+        return null;
+    }
+
+    private static boolean isSmallClaim(CaseData caseData) {
+        return AllocatedTrack.SMALL_CLAIM.equals(caseData.getAllocatedTrack())
+            || SMALL_CLAIM.equals(caseData.getResponseClaimTrack());
+    }
+
+    private boolean isLipClaimantBilingualRequiresTranslation(CaseData caseData) {
+        return featureToggleService.isWelshEnabledForMainCase()
+            && caseData.getCcdState() == CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT && caseData.isLipvLROneVOne()
+            && caseData.isClaimantBilingual();
     }
 }

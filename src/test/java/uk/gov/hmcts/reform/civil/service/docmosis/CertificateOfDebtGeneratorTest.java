@@ -9,7 +9,10 @@ import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.cosc.CertificateOfDebtForm;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -23,6 +26,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.CERTIFICATE_OF_DEBT_PAYMENT;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.CERTIFICATE_OF_DEBT_PAYMENT_WELSH;
 
 @ExtendWith(MockitoExtension.class)
 class CertificateOfDebtGeneratorTest {
@@ -50,7 +54,7 @@ class CertificateOfDebtGeneratorTest {
     void setup() {
         certificateOfDebtGenerator = new CertificateOfDebtGenerator(documentManagementService, documentGeneratorService, locationRefDataService);
     }
-    
+
     @Test
     void shouldGenerateCoscDocument() {
 
@@ -66,7 +70,7 @@ class CertificateOfDebtGeneratorTest {
             .buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31DaysForCosc().toBuilder()
             .build();
 
-        CaseDocument caseDoc = certificateOfDebtGenerator.generateDoc(caseData, BEARER_TOKEN);
+        CaseDocument caseDoc = certificateOfDebtGenerator.generateDoc(caseData, BEARER_TOKEN, CERTIFICATE_OF_DEBT_PAYMENT);
         assertThat(caseDoc).isNotNull();
 
         verify(documentManagementService)
@@ -88,7 +92,33 @@ class CertificateOfDebtGeneratorTest {
             .buildJudgmentOnlineCaseWithMarkJudgementPaidWithin31DaysForCosc().toBuilder()
             .build();
 
-        CaseDocument caseDoc = certificateOfDebtGenerator.generateDoc(caseData, BEARER_TOKEN);
+        CaseDocument caseDoc = certificateOfDebtGenerator.generateDoc(caseData, BEARER_TOKEN, CERTIFICATE_OF_DEBT_PAYMENT);
+        assertThat(caseDoc).isNotNull();
+
+        verify(documentManagementService)
+            .uploadDocument(BEARER_TOKEN, new PDF(fileName, LETTER_CONTENT, DocumentType.CERTIFICATE_OF_DEBT_PAYMENT));
+    }
+
+    @Test
+    void shouldGenerateCoscWelshDocument() {
+
+        //Given
+        when(documentGeneratorService.generateDocmosisDocument(any(CertificateOfDebtForm.class), eq(CERTIFICATE_OF_DEBT_PAYMENT_WELSH)))
+            .thenReturn(new DocmosisDocument(CERTIFICATE_OF_DEBT_PAYMENT_WELSH.getDocumentTitle(), LETTER_CONTENT));
+
+        when(documentManagementService
+                 .uploadDocument(BEARER_TOKEN, new PDF(fileName, LETTER_CONTENT, DocumentType.CERTIFICATE_OF_DEBT_PAYMENT)))
+            .thenReturn(COSC_DOCUMENT);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31DaysForCosc().toBuilder()
+            .caseDataLiP(CaseDataLiP.builder()
+                             .respondent1LiPResponse(RespondentLiPResponse.builder()
+                                                         .respondent1ResponseLanguage(Language.BOTH.toString())
+                                                         .build()).build())
+            .build();
+
+        CaseDocument caseDoc = certificateOfDebtGenerator.generateDoc(caseData, BEARER_TOKEN, CERTIFICATE_OF_DEBT_PAYMENT_WELSH);
         assertThat(caseDoc).isNotNull();
 
         verify(documentManagementService)

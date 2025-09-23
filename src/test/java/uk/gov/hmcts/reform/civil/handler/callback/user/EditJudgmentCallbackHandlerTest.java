@@ -32,6 +32,7 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRecordedReason;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsAddress;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
@@ -61,14 +62,17 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Mock
     private RoboticsAddressMapper addressMapper;
 
+    @Mock
+    Time time;
+
     @BeforeEach
     void setUp() {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        defaultJudgmentOnlineMapper = new DefaultJudgmentOnlineMapper(interestCalculator, addressMapper);
-        EditJudgmentOnlineMapper editJudgmentOnlineMapper = new EditJudgmentOnlineMapper();
-        handler = new EditJudgmentCallbackHandler(objectMapper, editJudgmentOnlineMapper);
+        defaultJudgmentOnlineMapper = new DefaultJudgmentOnlineMapper(time, interestCalculator, addressMapper);
+        EditJudgmentOnlineMapper editJudgmentOnlineMapper = new EditJudgmentOnlineMapper(time);
+        handler = new EditJudgmentCallbackHandler(objectMapper, editJudgmentOnlineMapper, interestCalculator);
     }
 
     @Test
@@ -86,7 +90,7 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(addressMapper.toRoboticsAddress(any())).thenReturn(RoboticsAddress.builder().build());
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
             caseData.setJoIsRegisteredWithRTL(value);
-            RecordJudgmentOnlineMapper recordMapper = new RecordJudgmentOnlineMapper(addressMapper);
+            RecordJudgmentOnlineMapper recordMapper = new RecordJudgmentOnlineMapper(time, addressMapper);
             caseData.setActiveJudgment(recordMapper.addUpdateActiveJudgment(caseData));
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
@@ -144,7 +148,7 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(addressMapper.toRoboticsAddress(any())).thenReturn(RoboticsAddress.builder().build());
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
             caseData.setJoShowRegisteredWithRTLOption(YesOrNo.NO);
-            RecordJudgmentOnlineMapper recordMapper = new RecordJudgmentOnlineMapper(addressMapper);
+            RecordJudgmentOnlineMapper recordMapper = new RecordJudgmentOnlineMapper(time, addressMapper);
             caseData.setActiveJudgment(recordMapper.addUpdateActiveJudgment(caseData));
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -198,7 +202,7 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentImmediately();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             caseData.setJoShowRegisteredWithRTLOption(YesOrNo.YES);
-            RecordJudgmentOnlineMapper recordMapper = new RecordJudgmentOnlineMapper(addressMapper);
+            RecordJudgmentOnlineMapper recordMapper = new RecordJudgmentOnlineMapper(time, addressMapper);
             caseData.setActiveJudgment(recordMapper.addUpdateActiveJudgment(caseData));
 
             //When: handler is called with ABOUT_TO_SUBMIT event
@@ -238,7 +242,7 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithPaymentByDate();
             caseData.setJoIsRegisteredWithRTL(YesOrNo.NO);
             caseData.setJoShowRegisteredWithRTLOption(YesOrNo.YES);
-            RecordJudgmentOnlineMapper recordMapper = new RecordJudgmentOnlineMapper(addressMapper);
+            RecordJudgmentOnlineMapper recordMapper = new RecordJudgmentOnlineMapper(time, addressMapper);
             caseData.setActiveJudgment(recordMapper.addUpdateActiveJudgment(caseData));
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);

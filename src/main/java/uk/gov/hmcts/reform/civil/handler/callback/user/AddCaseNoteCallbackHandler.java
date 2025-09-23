@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -34,6 +35,9 @@ public class AddCaseNoteCallbackHandler extends CallbackHandler {
     private final CaseNoteService caseNoteService;
     private final ObjectMapper objectMapper;
 
+    @Value("${azure.service-bus.ccd-events-topic.enabled:false}")
+    private boolean ccdEventsServiceBusEnabled;
+
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
@@ -58,14 +62,16 @@ public class AddCaseNoteCallbackHandler extends CallbackHandler {
 
         List<Element<CaseNote>> caseNotes = caseNoteService.addNoteToListStart(caseNote, caseData.getCaseNotes());
 
-        CaseData updatedCaseData = caseData.toBuilder()
+        CaseData.CaseDataBuilder updatedCaseDataBuilder = caseData.toBuilder()
             .caseNotes(caseNotes)
-            .caseNote(null)
-            .businessProcess(BusinessProcess.ready(ADD_CASE_NOTE))
-            .build();
+            .caseNote(null);
+
+        if (!ccdEventsServiceBusEnabled) {
+            updatedCaseDataBuilder.businessProcess(BusinessProcess.ready(ADD_CASE_NOTE));
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseData.toMap(objectMapper))
+            .data(updatedCaseDataBuilder.build().toMap(objectMapper))
             .build();
     }
 }

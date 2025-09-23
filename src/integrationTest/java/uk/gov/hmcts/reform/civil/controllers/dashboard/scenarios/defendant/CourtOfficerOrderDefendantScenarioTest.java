@@ -22,8 +22,6 @@ public class CourtOfficerOrderDefendantScenarioTest extends DashboardBaseIntegra
     @Test
     void should_create_court_officer_order_defendant_scenario() throws Exception {
 
-        when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
-
         String caseId = "72016577145";
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
@@ -69,7 +67,6 @@ public class CourtOfficerOrderDefendantScenarioTest extends DashboardBaseIntegra
             .build();
 
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
         handler.handle(callbackParams(caseData));
 
         //Verify Notification is created

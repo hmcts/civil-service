@@ -514,6 +514,36 @@ class LocationReferenceDataServiceTest {
         }
 
         @Test
+        void shouldReturnLocations_whenLRDReturnsCourtLocationByEpimmsIdCMLYesAndCourtType() {
+            LocationRefData ccmccLocation = LocationRefData.builder().courtVenueId("9263").epimmsId("192280")
+                .siteName("site_name").regionId("4").region("North West").courtType("County Court")
+                .courtTypeId("10").locationType("COURT").courtName("COUNTY COURT MONEY CLAIMS CENTRE")
+                .venueName("CCMCC").courtLocationCode("121").build();
+            List<LocationRefData> mockedResponse = List.of(ccmccLocation);
+            when(authTokenGenerator.generate()).thenReturn("service_token");
+            when(locationReferenceDataApiClient.getCourtVenueByEpimmsIdWithCMLAndCourtType(
+                anyString(),
+                anyString(),
+                anyString(),
+                anyString(),
+                anyString(),
+                anyString()
+            ))
+                .thenReturn(mockedResponse);
+
+            List<LocationRefData> result = refDataService.getCourtLocationsByEpimmsIdWithCML(
+                "user_token",
+                "192280"
+            );
+            String prefferedCourtCode = result.stream()
+                .filter(id -> id.getCourtTypeId().equals(CIVIL_COURT_TYPE_ID))
+                .toList().get(0).getCourtLocationCode();
+
+            assertThat(result).isNotNull();
+            assertThat(prefferedCourtCode).isEqualTo("121");
+        }
+
+        @Test
         void shouldReturnEmptyList_whenEpimmsIdThrowsException() {
             when(authTokenGenerator.generate()).thenReturn("service_token");
             when(locationReferenceDataApiClient.getCourtVenueByEpimmsIdAndType(
@@ -584,6 +614,48 @@ class LocationReferenceDataServiceTest {
             assertEquals(el1.getCourtAddress(), opt.get().getCourtAddress());
             assertEquals(el1.getPostcode(), opt.get().getPostcode());
         }
+
+        @Test
+        void whenDisplayEntry_match_english() {
+            LocationRefData el1 = LocationRefData.builder()
+                .siteName("site name")
+                .welshSiteName("welsh site name")
+                .courtAddress("court address")
+                .postcode("postcode")
+                .build();
+
+            String actualDisplayEntry = LocationReferenceDataService.getDisplayEntry(el1);
+
+            assertEquals(el1.getSiteName() + " - " + el1.getCourtAddress() + " - " + el1.getPostcode(), actualDisplayEntry);
+        }
+
+        @Test
+        void whenDisplayEntry_match_welsh() {
+            LocationRefData el1 = LocationRefData.builder()
+                .siteName("site name")
+                .welshSiteName("welsh site name")
+                .courtAddress("court address")
+                .postcode("postcode")
+                .build();
+
+            String actualDisplayEntry = LocationReferenceDataService.getDisplayEntryWelsh(el1);
+
+            assertEquals(el1.getWelshSiteName() + " - " + el1.getCourtAddress() + " - " + el1.getPostcode(), actualDisplayEntry);
+        }
+
+        @Test
+        void whenDisplayEntry_match_english_ifWelshBlank() {
+            LocationRefData el1 = LocationRefData.builder()
+                .siteName("site name")
+                .welshSiteName("")
+                .courtAddress("court address")
+                .postcode("postcode")
+                .build();
+
+            String actualDisplayEntry = LocationReferenceDataService.getDisplayEntryWelsh(el1);
+
+            assertEquals(el1.getSiteName() + " - " + el1.getCourtAddress() + " - " + el1.getPostcode(), actualDisplayEntry);
+        }
     }
 
     @Nested
@@ -643,4 +715,64 @@ class LocationReferenceDataServiceTest {
         }
     }
 
+    @Nested
+    class AdditionalCoverageTests {
+
+        @Test
+        void shouldReturnEmptyList_whenGetHearingCourtLocationsThrowsException() {
+            when(authTokenGenerator.generate()).thenReturn("service_token");
+            when(locationReferenceDataApiClient.getHearingVenue(
+                anyString(), anyString(), anyString(), anyString(), anyString()
+            )).thenThrow(new RuntimeException("boom"));
+
+            List<LocationRefData> result = refDataService.getHearingCourtLocations("user_token");
+
+            assertThat(result).isEmpty();
+        }
+
+        @Test
+        void shouldReturnEmptyLocation_whenCourtVenueByLocationCodeReturnsNullOrEmpty() {
+            when(authTokenGenerator.generate()).thenReturn("service_token");
+
+            // Null case
+            when(locationReferenceDataApiClient.getCourtVenueByLocationCode(
+                anyString(), anyString(), anyString(), anyString(), anyString(), anyString()
+            )).thenReturn(null);
+
+            LocationRefData resultNull = refDataService.getCourtLocation("user_token", "123");
+            assertThat(resultNull).isEqualTo(LocationRefData.builder().build());
+
+            // Empty case
+            when(locationReferenceDataApiClient.getCourtVenueByLocationCode(
+                anyString(), anyString(), anyString(), anyString(), anyString(), anyString()
+            )).thenReturn(Collections.emptyList());
+
+            LocationRefData resultEmpty = refDataService.getCourtLocation("user_token", "123");
+            assertThat(resultEmpty).isEqualTo(LocationRefData.builder().build());
+        }
+
+        @Test
+        void shouldThrowException_whenGetCourtLocationFails() {
+            when(authTokenGenerator.generate()).thenReturn("service_token");
+            when(locationReferenceDataApiClient.getCourtVenueByLocationCode(
+                anyString(), anyString(), anyString(), anyString(), anyString(), anyString()
+            )).thenThrow(new RuntimeException("API failure"));
+
+            assertThrows(RuntimeException.class,
+                         () -> refDataService.getCourtLocation("user_token", "123"));
+        }
+
+        @Test
+        void shouldReturnEmptyList_whenGetCourtLocationsByEpimmsIdWithCMLThrowsException() {
+            when(authTokenGenerator.generate()).thenReturn("service_token");
+            when(locationReferenceDataApiClient.getCourtVenueByEpimmsIdWithCMLAndCourtType(
+                anyString(), anyString(), anyString(), anyString(), anyString(), anyString()
+            )).thenThrow(new RuntimeException("error"));
+
+            List<LocationRefData> result =
+                refDataService.getCourtLocationsByEpimmsIdWithCML("user_token", "epimms123");
+
+            assertThat(result).isEmpty();
+        }
+    }
 }

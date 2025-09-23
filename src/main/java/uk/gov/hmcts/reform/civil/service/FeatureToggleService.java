@@ -10,6 +10,8 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseContainsLiP;
+import static uk.gov.hmcts.reform.civil.utils.JudgeReallocatedClaimTrack.judgeReallocatedTrackOrAlreadyMinti;
 
 @Slf4j
 @Service
@@ -66,16 +68,8 @@ public class FeatureToggleService {
         return featureToggleApi.isFeatureEnabled("cui-case-progression");
     }
 
-    public boolean isSdoR2Enabled() {
-        return featureToggleApi.isFeatureEnabled("isSdoR2Enabled");
-    }
-
     public boolean isJudgmentOnlineLive() {
         return featureToggleApi.isFeatureEnabled("isJudgmentOnlineLive");
-    }
-
-    public boolean isMintiEnabled() {
-        return featureToggleApi.isFeatureEnabled("minti");
     }
 
     public boolean isCjesServiceAvailable() {
@@ -103,11 +97,16 @@ public class FeatureToggleService {
         } else {
             epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
         }
-        return featureToggleApi.isFeatureEnabled("minti")
-            && featureToggleApi.isFeatureEnabledForDate("multi-or-intermediate-track", epoch, false);
+        boolean multiOrIntermediateTrackEnabled = featureToggleApi.isFeatureEnabledForDate("multi-or-intermediate-track", epoch, false);
+        boolean judgeReallocatedTrackOrAlreadyMinti = judgeReallocatedTrackOrAlreadyMinti(caseData, multiOrIntermediateTrackEnabled);
+        return multiOrIntermediateTrackEnabled || judgeReallocatedTrackOrAlreadyMinti;
     }
 
     public boolean isDashboardEnabledForCase(CaseData caseData) {
+        if (!SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            return false;
+        }
+
         ZoneId zoneId = ZoneId.systemDefault();
         long epoch;
         if (caseData.getSubmittedDate() == null) {
@@ -117,10 +116,6 @@ public class FeatureToggleService {
         }
         return featureToggleApi.isFeatureEnabled("cuiReleaseTwoEnabled")
             && featureToggleApi.isFeatureEnabledForDate("is-dashboard-enabled-for-case", epoch, false);
-    }
-
-    public boolean isCaseEventsEnabled() {
-        return featureToggleApi.isFeatureEnabled("cui-case-events-enabled");
     }
 
     public boolean isAmendBundleEnabled() {
@@ -143,11 +138,6 @@ public class FeatureToggleService {
             && isGaForLipsEnabled();
     }
 
-    public boolean isHmcNroEnabled() {
-        return featureToggleApi.isFeatureEnabled("hmc-nro");
-
-    }
-
     public boolean isJOLiveFeedActive() {
         return isJudgmentOnlineLive()
             && featureToggleApi.isFeatureEnabled("isJOLiveFeedActive");
@@ -166,5 +156,40 @@ public class FeatureToggleService {
 
     public boolean isHmcForLipEnabled() {
         return featureToggleApi.isFeatureEnabled("hmc-cui-enabled");
+    }
+
+    // if deleting this, also handle isQMPdfGeneratorEnabled() below
+    public boolean isPublicQueryManagementEnabled(CaseData caseData) {
+        if (caseContainsLiP.test(caseData)) {
+            return isLipQueryManagementEnabled(caseData);
+        }
+        return featureToggleApi.isFeatureEnabled("public-query-management");
+    }
+
+    public boolean isQMPdfGeneratorDisabled() {
+        // only generate pdf if flag is off
+        return featureToggleApi.isFeatureEnabled("public-query-management");
+    }
+
+    public boolean isGaForWelshEnabled() {
+        return featureToggleApi.isFeatureEnabled("generalApplicationsForWelshParty");
+    }
+
+    public boolean isWelshEnabledForMainCase() {
+        return featureToggleApi.isFeatureEnabled("enableWelshForMainCase");
+    }
+
+    public boolean isLipQueryManagementEnabled(CaseData caseData) {
+        ZoneId zoneId = ZoneId.systemDefault();
+        long epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
+        return featureToggleApi.isFeatureEnabledForDate("cui-query-management", epoch, false);
+    }
+
+    public boolean isLrAdmissionBulkEnabled() {
+        return featureToggleApi.isFeatureEnabled("lr-admission-bulk");
+    }
+
+    public boolean isCuiGaNroEnabled() {
+        return featureToggleApi.isFeatureEnabled("cui-ga-nro");
     }
 }

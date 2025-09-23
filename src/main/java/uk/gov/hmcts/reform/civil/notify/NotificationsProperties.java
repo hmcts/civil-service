@@ -386,6 +386,9 @@ public class NotificationsProperties {
     private String notifyDefendantLIPClaimantSettleTheClaimTemplate;
 
     @NotEmpty
+    private String notifyDefendantLRClaimantSettleTheClaimTemplate;
+
+    @NotEmpty
     private String  evidenceUploadLipTemplate;
 
     @NotEmpty
@@ -408,6 +411,9 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String notifyLiPClaimantDefendantResponded;
+
+    @NotEmpty
+    private String notifyLiPClaimantDefendantRespondedWelshLip;
 
     @NotEmpty
     private String notifyLiPClaimantDefendantChangedContactDetails;
@@ -641,6 +647,9 @@ public class NotificationsProperties {
     private String notifyClaimDiscontinuedLipTemplate;
 
     @NotEmpty
+    private String notifyClaimDiscontinuedWelshLipTemplate;
+
+    @NotEmpty
     private String notifyLRCaseStayed;
 
     @NotEmpty
@@ -666,4 +675,56 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String queryRaised;
+
+    @NotEmpty
+    private String queryRaisedLip;
+
+    @NotEmpty
+    private String queryRaisedLipBilingual;
+
+    @NotEmpty
+    private String queryResponseReceived;
+
+    @NotEmpty
+    private String notifyOtherPartyQueryRaised;
+
+    @NotEmpty
+    private String notifyOtherPartyQueryResponseReceived;
+
+    @NotEmpty
+    private String queryLipResponseReceivedEnglish;
+
+    @NotEmpty
+    private String queryLipResponseReceivedWelsh;
+
+    @NotEmpty
+    private String partAdmitPayImmediatelyAgreedClaimant;
+
+    @NotEmpty
+    private String partAdmitPayImmediatelyAgreedDefendant;
+
+    @NotEmpty
+    private String claimantSolicitorImmediatelyDefendantResponseForSpecJBA;
+
+    @NotEmpty
+    private String notifyOtherPartyPublicQueryRaised;
+
+    @NotEmpty
+    private String notifyOtherLipPartyPublicQueryRaised;
+
+    @NotEmpty
+    private String notifyOtherLipPartyWelshPublicQueryRaised;
+
+    @NotEmpty
+    private String queryLrPublicResponseReceived;
+
+    @NotEmpty
+    private String queryLipPublicResponseReceived;
+
+    @NotEmpty
+    private String queryLipWelshPublicResponseReceived;
+
+    @NotEmpty
+    private String notifyClaimantLipTemplateManualDeterminationForWelsh;
+
 }

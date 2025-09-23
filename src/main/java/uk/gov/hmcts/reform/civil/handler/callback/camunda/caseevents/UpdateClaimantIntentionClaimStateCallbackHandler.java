@@ -13,11 +13,13 @@ import uk.gov.hmcts.reform.civil.config.ToggleConfiguration;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.UpdateClaimStateService;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PROCEEDS_IN_HERITAGE_SYSTEM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CLAIMANT_INTENTION_CLAIM_STATE;
 
 @Service
@@ -52,17 +54,22 @@ public class UpdateClaimantIntentionClaimStateCallbackHandler extends CallbackHa
 
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.featureToggleWA(toggleConfiguration.getFeatureToggle());
+        caseDataBuilder.previousCCDState(caseData.getCcdState());
         CaseData updatedData = caseDataBuilder.build();
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response =
-            AboutToStartOrSubmitCallbackResponse.builder()
-                .data(updatedData.toMap(objectMapper));
-        if (isClaimantNotBilingualAndNotSignedSettlementAgreement(updatedData)) {
-            response.state(updateClaimStateService.setUpCaseState(updatedData));
+            AboutToStartOrSubmitCallbackResponse.builder();
+        if (hasClaimantSignedSettlementAgreement(updatedData)) {
+            String newState = updateClaimStateService.setUpCaseState(updatedData);
+            response.state(newState);
+            if (PROCEEDS_IN_HERITAGE_SYSTEM.name().equals(newState)) {
+                updatedData = updatedData.toBuilder().takenOfflineDate(LocalDateTime.now()).build();
+            }
         }
+        response.data(updatedData.toMap(objectMapper));
         return response.build();
     }
 
-    private boolean isClaimantNotBilingualAndNotSignedSettlementAgreement(CaseData caseData) {
-        return !caseData.isClaimantBilingual() && !caseData.hasApplicant1SignedSettlementAgreement();
+    private boolean hasClaimantSignedSettlementAgreement(CaseData caseData) {
+        return !caseData.hasApplicant1SignedSettlementAgreement();
     }
 }

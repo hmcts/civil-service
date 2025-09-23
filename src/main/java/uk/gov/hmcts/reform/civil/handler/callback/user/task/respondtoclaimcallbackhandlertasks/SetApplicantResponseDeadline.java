@@ -19,9 +19,11 @@ import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.FrcDocumentsUtils;
+import uk.gov.hmcts.reform.civil.utils.RequestedCourtForClaimDetailsTab;
 import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -44,6 +46,7 @@ import static uk.gov.hmcts.reform.civil.utils.WitnessUtils.addEventAndDateAddedT
 @Slf4j
 public class SetApplicantResponseDeadline implements CaseTask {
 
+    private static final int RESPONSE_CLAIM_DEADLINE_EXTENSION_MONTHS = 36;
     private final Time time;
     private final DeadlinesCalculator deadlinesCalculator;
     private final FrcDocumentsUtils frcDocumentsUtils;
@@ -55,6 +58,7 @@ public class SetApplicantResponseDeadline implements CaseTask {
     private final UserService userService;
     private final UpdateDataRespondentDeadlineResponse updateDataRespondentDeadlineResponse;
     private final AssembleDocumentsForDeadlineResponse assembleDocumentsForDeadlineResponse;
+    private final RequestedCourtForClaimDetailsTab requestedCourtForClaimDetailsTab;
 
     public SetApplicantResponseDeadline(Time time,
                                         DeadlinesCalculator deadlinesCalculator,
@@ -66,7 +70,8 @@ public class SetApplicantResponseDeadline implements CaseTask {
                                         CoreCaseUserService coreCaseUserService,
                                         UserService userService,
                                         UpdateDataRespondentDeadlineResponse updateDataRespondentDeadlineResponse,
-                                        AssembleDocumentsForDeadlineResponse assembleDocumentsForDeadlineResponse) {
+                                        AssembleDocumentsForDeadlineResponse assembleDocumentsForDeadlineResponse,
+                                        RequestedCourtForClaimDetailsTab requestedCourtForClaimDetailsTab) {
         this.time = time;
         this.deadlinesCalculator = deadlinesCalculator;
         this.frcDocumentsUtils = frcDocumentsUtils;
@@ -78,12 +83,17 @@ public class SetApplicantResponseDeadline implements CaseTask {
         this.userService = userService;
         this.updateDataRespondentDeadlineResponse = updateDataRespondentDeadlineResponse;
         this.assembleDocumentsForDeadlineResponse = assembleDocumentsForDeadlineResponse;
+        this.requestedCourtForClaimDetailsTab = requestedCourtForClaimDetailsTab;
     }
 
     public CallbackResponse execute(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
         CaseData.CaseDataBuilder<?, ?> updatedData = updateRespondentAddresses(caseData);
+        updatedData.claimDismissedDeadline(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(
+            RESPONSE_CLAIM_DEADLINE_EXTENSION_MONTHS,
+            LocalDate.now()
+        ));
 
         LocalDateTime responseDate = time.now();
         LocalDateTime applicant1Deadline = getApplicant1ResponseDeadline(responseDate);
@@ -129,6 +139,13 @@ public class SetApplicantResponseDeadline implements CaseTask {
 
         caseFlagsInitialiser.initialiseCaseFlags(DEFENDANT_RESPONSE, updatedData);
         updateDocumentGenerationRespondent2(callbackParams, updatedData, caseData);
+
+        UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
+        if (coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference().toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO)) {
+            requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabRespondent2(callbackParams, updatedData);
+        } else {
+            requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabRespondent1(callbackParams, updatedData);
+        }
 
         if (isMultipartyScenario1v2With2LegalRep(caseData)) {
 

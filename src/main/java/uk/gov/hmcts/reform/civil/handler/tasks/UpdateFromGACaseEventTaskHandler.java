@@ -12,6 +12,7 @@ import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.exceptions.InvalidCaseDataException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -36,6 +37,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import static java.lang.Long.parseLong;
 import static java.util.Objects.isNull;
 import static java.util.Optional.ofNullable;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @RequiredArgsConstructor
@@ -48,6 +50,8 @@ public class UpdateFromGACaseEventTaskHandler extends BaseExternalTaskHandler {
     private static final String CIVIL_DOC_CLAIMANT_SUFFIX = "DocClaimant";
     private static final String CIVIL_DOC_RESPONDENT_SOL_SUFFIX = "DocRespondentSol";
     private static final String CIVIL_DOC_RESPONDENT_SOL_TWO_SUFFIX = "DocRespondentSolTwo";
+    private static final List<String> GA_RESPONDENT_VIEW_DOC_TYPES = List.of("generalOrder", "dismissalOrder", "directionOrder",
+                                                                          "hearingNotice", "hearingOrder", "requestForInfo");
     private static final String GA_DRAFT = "gaDraft";
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
@@ -117,7 +121,13 @@ public class UpdateFromGACaseEventTaskHandler extends BaseExternalTaskHandler {
             updateDocCollection(output, generalAppCaseData, "gaRespondDoc", civilCaseData, "gaRespondDoc");
             generalAppCaseData = mergeBundle(generalAppCaseData);
             updateDocCollectionField(output, civilCaseData, generalAppCaseData, "gaAddl");
-
+            if (featureToggleService.isGaForWelshEnabled() && (civilCaseData.isClaimantBilingual() || civilCaseData.isRespondentResponseBilingual())) {
+                if (generalAppCaseData.getParentClaimantIsApplicant() == YES) {
+                    updateDocCollection(output, generalAppCaseData, "preTranslationGaDocsApplicant", civilCaseData, "gaAddlDocClaimant");
+                } else {
+                    updateDocCollection(output, generalAppCaseData, "preTranslationGaDocsRespondent", civilCaseData, "gaAddlDocRespondentSol");
+                }
+            }
         } catch (Exception e) {
             log.error(e.getMessage());
         }
@@ -195,19 +205,19 @@ public class UpdateFromGACaseEventTaskHandler extends BaseExternalTaskHandler {
             civilCaseData, toCivilStaffList);
         //Claimant collection will hold ga doc accessible for Claimant
         String toCivilClaimantList = civilDocPrefix + CIVIL_DOC_CLAIMANT_SUFFIX;
-        if (canViewClaimant(civilCaseData, generalAppCaseData)) {
+        if (canViewClaimant(civilCaseData, generalAppCaseData, civilDocPrefix)) {
             updateDocCollection(output, generalAppCaseData, fromGaList,
                 civilCaseData, toCivilClaimantList);
         }
         //RespondentSol collection will hold ga doc accessible for RespondentSol1
         String toCivilRespondentSol1List = civilDocPrefix + CIVIL_DOC_RESPONDENT_SOL_SUFFIX;
-        if (canViewResp(civilCaseData, generalAppCaseData, "1")) {
+        if (canViewResp(civilCaseData, generalAppCaseData, civilDocPrefix, "1")) {
             updateDocCollection(output, generalAppCaseData, fromGaList,
                 civilCaseData, toCivilRespondentSol1List);
         }
         //Respondent2Sol collection will hold ga doc accessible for RespondentSol2
         String toCivilRespondentSol2List = civilDocPrefix + CIVIL_DOC_RESPONDENT_SOL_TWO_SUFFIX;
-        if (canViewResp(civilCaseData, generalAppCaseData, "2")) {
+        if (canViewResp(civilCaseData, generalAppCaseData, civilDocPrefix, "2")) {
             updateDocCollection(output, generalAppCaseData, fromGaList,
                 civilCaseData, toCivilRespondentSol2List);
         }
@@ -242,7 +252,10 @@ public class UpdateFromGACaseEventTaskHandler extends BaseExternalTaskHandler {
         if (gaDocs != null && !(fromGaList.equals("gaDraftDocument"))) {
             List<UUID> ids = civilDocs.stream().map(Element::getId).toList();
             for (Element<?> gaDoc : gaDocs) {
-                if (!ids.contains(gaDoc.getId())) {
+                CaseDocument caseDocument = gaDoc.getValue() instanceof CaseDocument ? (CaseDocument) gaDoc.getValue() : null;
+                String gaRespondentMainClaimUser = generalAppCaseData.getParentClaimantIsApplicant() == YES ? "Respondent" : "Claimant";
+                if (!ids.contains(gaDoc.getId())
+                    && (!toCivilList.contains(gaRespondentMainClaimUser) || caseDocument == null || caseDocument.getDocumentType() != DocumentType.SEND_APP_TO_OTHER_PARTY)) {
                     civilDocs.add(gaDoc);
                 }
             }
@@ -282,10 +295,13 @@ public class UpdateFromGACaseEventTaskHandler extends BaseExternalTaskHandler {
         return civilDocs;
     }
 
-    protected boolean canViewClaimant(CaseData civilCaseData, CaseData generalAppCaseData) {
+    protected boolean canViewClaimant(CaseData civilCaseData, CaseData generalAppCaseData, String civilDocPrefix) {
+        if (GA_RESPONDENT_VIEW_DOC_TYPES.contains(civilDocPrefix)) {
+            return true;
+        }
         List<Element<GeneralApplicationsDetails>> gaAppDetails = civilCaseData.getClaimantGaAppDetails();
 
-        if (generalAppCaseData.getParentClaimantIsApplicant() == YesOrNo.NO
+        if (generalAppCaseData.getParentClaimantIsApplicant() == NO
             && ((generalAppCaseData.getGeneralAppInformOtherParty()) != null && YES.equals(generalAppCaseData.getGeneralAppInformOtherParty().getIsWithNotice())
                 || (generalAppCaseData.getGeneralAppRespondentAgreement() != null && generalAppCaseData.getGeneralAppRespondentAgreement().getHasAgreed().equals(YES)))) {
             return true;
@@ -300,7 +316,10 @@ public class UpdateFromGACaseEventTaskHandler extends BaseExternalTaskHandler {
                 .equals(parseLong(civilGaData.getValue().getCaseLink().getCaseReference())));
     }
 
-    protected boolean canViewResp(CaseData civilCaseData, CaseData generalAppCaseData, String respondent) {
+    protected boolean canViewResp(CaseData civilCaseData, CaseData generalAppCaseData, String civilDocPrefix, String respondent) {
+        if (GA_RESPONDENT_VIEW_DOC_TYPES.contains(civilDocPrefix)) {
+            return true;
+        }
         List<Element<GADetailsRespondentSol>> gaAppDetails;
         if (respondent.equals("2")) {
             gaAppDetails = civilCaseData.getRespondentSolTwoGaAppDetails();

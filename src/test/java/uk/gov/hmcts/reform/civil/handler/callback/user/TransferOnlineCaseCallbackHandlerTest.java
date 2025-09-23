@@ -87,7 +87,7 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData())
                 .extracting("transferCourtLocationList")
                 .extracting("list_items")
-                .asList().hasSize(3);
+                .asList().hasSize(4);
         }
     }
 
@@ -217,52 +217,30 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @ParameterizedTest
-        @CsvSource({"true", "false"})
-        void shouldPopulateHmcEaCourtLocation_whenLocationIsWhiteListed(Boolean isLocationWhiteListed) {
-            when(featureToggleService.isLocationWhiteListedForCaseProgression(any())).thenReturn(isLocationWhiteListed);
-            when(courtLocationUtils.findPreferredLocationData(any(), any()))
-                .thenReturn(LocationRefData.builder().siteName("")
-                                .epimmsId("222")
-                                .siteName("Site 2").courtAddress("Adr 2").postcode("BBB 222")
-                                .courtLocationCode("other code").build());
-            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
-                .caseManagementLocation(CaseLocationCivil.builder()
-                                            .region("2")
-                                            .baseLocation("111")
-                                            .build())
-                .transferCourtLocationList(DynamicList.builder().value(DynamicListElement.builder()
-                                                                           .label("Site 1 - Adr 1 - AAA 111").build()).build()).build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
-
-            assertThat(responseCaseData.getHmcEaCourtLocation()).isEqualTo(isLocationWhiteListed ? YES : NO);
-        }
-
-        @ParameterizedTest
         @CsvSource({
-            //LR scenarios trigger hmcEaCourt and ignore hmcLipEnabled
-            "true, YES, YES, YES, YES",
-            "false, YES, YES, YES, NO",
+            //LR scenarios trigger and ignore hmcLipEnabled
+            "true, YES, YES, YES",
+            "false, YES, YES, YES",
             // LiP vs LR - ignore HMC court
-            "true,  NO, YES, NO,",
-            "false,  NO, YES, NO,",
+            "true,  NO, YES, NO",
+            "false,  NO, YES, NO",
             //LR vs LiP - ignore HMC court
-            "true, YES, NO, YES,",
-            "false, YES, NO, NO,",
+            "true, YES, NO, YES",
+            "false, YES, NO, NO",
             //LiP vs LiP - ignore HMC court
-            "true, NO, NO, YES,",
-            "false, NO, NO, NO,"
+            "true, NO, NO, YES",
+            "false, NO, NO, NO"
         })
         void shouldPopulateHmcLipEnabled_whenLiPAndHmcLipEnabled(boolean isCPAndWhitelisted,
                                                                  YesOrNo applicantRepresented,
                                                                  YesOrNo respondent1Represented,
-                                                                 YesOrNo eaCourtLocation, YesOrNo hmcEaCourtLocation) {
+                                                                 YesOrNo eaCourtLocation) {
 
             if (NO.equals(respondent1Represented)) {
                 when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(isCPAndWhitelisted);
-            } else {
-                when(featureToggleService.isLocationWhiteListedForCaseProgression(any())).thenReturn(isCPAndWhitelisted);
+                if (!isCPAndWhitelisted) {
+                    when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
+                }
             }
 
             when(courtLocationUtils.findPreferredLocationData(any(), any()))
@@ -284,9 +262,58 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                          .build(), ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
-            
+
             assertEquals(eaCourtLocation, responseCaseData.getEaCourtLocation());
-            assertEquals(hmcEaCourtLocation, responseCaseData.getHmcEaCourtLocation());
+        }
+
+        @ParameterizedTest
+        @CsvSource({
+            //LR scenarios trigger and ignore hmcLipEnabled
+            "true, YES, YES, YES, true",
+            "false, YES, YES, YES, true",
+            // LiP vs LR - ignore HMC court
+            "true,  NO, YES, NO, false",
+            "false,  NO, YES, NO, false",
+            //LR vs LiP - ignore HMC court
+            "true, YES, NO, YES, true",
+            "false, YES, NO, YES, true",
+            //LiP vs LiP - ignore HMC court
+            "true, NO, NO, YES, true",
+            "false, NO, NO, YES, true",
+            "false, NO, NO, NO, false",
+            "true, NO, NO, YES, false"
+        })
+        void shouldPopulateHmcLipEnabled_whenLiPAndHmcLipEnabledAnsWelshFlagConsidered(boolean isCPAndWhitelisted,
+                                                                 YesOrNo applicantRepresented,
+                                                                 YesOrNo respondent1Represented,
+                                                                 YesOrNo eaCourtLocation, boolean isWelshEnabled) {
+
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(isWelshEnabled);
+            if (!isWelshEnabled && NO.equals(respondent1Represented)) {
+                when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(isCPAndWhitelisted);
+            }
+
+            when(courtLocationUtils.findPreferredLocationData(any(), any()))
+                .thenReturn(LocationRefData.builder().siteName("")
+                                .epimmsId("222")
+                                .siteName("Site 2").courtAddress("Adr 2").postcode("BBB 222")
+                                .courtLocationCode("other code").build());
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+                .caseManagementLocation(CaseLocationCivil.builder()
+                                            .region("2")
+                                            .baseLocation("111")
+                                            .build())
+                .transferCourtLocationList(DynamicList.builder().value(DynamicListElement.builder()
+                                                                           .label("Site 1 - Adr 1 - AAA 111").build()).build()).build();
+
+            CallbackParams params = callbackParamsOf(caseData.toBuilder()
+                                                         .applicant1Represented(applicantRepresented)
+                                                         .respondent1Represented(respondent1Represented)
+                                                         .build(), ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+
+            assertEquals(eaCourtLocation, responseCaseData.getEaCourtLocation());
         }
 
         @Test

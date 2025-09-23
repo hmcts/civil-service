@@ -22,6 +22,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import uk.gov.hmcts.reform.auth.checker.core.RequestAuthorizer;
+import uk.gov.hmcts.reform.auth.checker.core.user.User;
 import uk.gov.hmcts.reform.authorisation.ServiceAuthorisationApi;
 import uk.gov.hmcts.reform.civil.Application;
 import uk.gov.hmcts.reform.civil.TestIdamConfiguration;
@@ -37,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -90,6 +93,9 @@ public abstract class BaseIntegrationTest {
     @MockBean
     public IdamApi idamApi;
 
+    @MockBean
+    public RequestAuthorizer<User> userRequestAuthorizerMock;
+
     @Autowired
     protected ObjectMapper objectMapper;
 
@@ -108,6 +114,7 @@ public abstract class BaseIntegrationTest {
         when(jwtDecoder.decode(anyString())).thenReturn(getJwt());
         when(idamApi.retrieveUserDetails(anyString()))
             .thenReturn(UserDetails.builder().forename("Claimant").surname("test").build());
+        when(userRequestAuthorizerMock.authorise(any())).thenReturn(new User("1", Set.of("caseworker-civil-solicitor")));
     }
 
     protected void setSecurityAuthorities(Authentication authenticationMock, String... authorities) {

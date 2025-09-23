@@ -415,14 +415,15 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
     }
 
     @Override
-    public boolean defendantRespondedWithPreferredLanguageWelsh() {
-        return caseData.isRespondentResponseBilingual()
-            && caseData.getCcdState() == CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
-    }
-
-    public boolean isWaitingForClaimantIntentDocUpload() {
-        return caseData.isRespondentResponseFullDefence() && caseData.getApplicant1ResponseDate() != null
-            && caseData.getCcdState() == CaseState.AWAITING_APPLICANT_INTENTION && caseData.isClaimantBilingual();
+    public boolean pausedForTranslationAfterResponse() {
+        if (!featureToggleService.isWelshEnabledForMainCase() && (caseData.isClaimUnderTranslationAfterDefResponse() && caseData.isRespondentResponseBilingual())
+            || (caseData.isClaimUnderTranslationAfterClaimantResponse() && caseData.isClaimantBilingual())) {
+            return true;
+        } else {
+            return featureToggleService.isWelshEnabledForMainCase()
+                && (caseData.isClaimUnderTranslationAfterDefResponse() || caseData.isClaimUnderTranslationAfterClaimantResponse())
+                && (caseData.isRespondentResponseBilingual() || caseData.isClaimantBilingual());
+        }
     }
 
     public boolean isNocForDefendant() {
@@ -504,5 +505,10 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
         } else {
             return false;
         }
+    }
+
+    @Override
+    public boolean isCasedDiscontinued() {
+        return false;
     }
 }

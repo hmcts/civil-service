@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.DocumentHearingType.getContentText;
+import static uk.gov.hmcts.reform.civil.enums.DocumentHearingType.getPluralTypeTextWelsh;
 import static uk.gov.hmcts.reform.civil.enums.DocumentHearingType.getTitleText;
 import static uk.gov.hmcts.reform.civil.enums.DocumentHearingType.getType;
 import static uk.gov.hmcts.reform.civil.utils.DateUtils.convertFromUTC;
@@ -129,17 +130,6 @@ public class HmcDataUtils {
     }
 
     /**
-     * If a hearing is listed for 6 hours which is classed as a full day hearing,
-     *      one hour is removed from the hearingDuration to account for lunch break.
-     * hearingDayHours is the amount of hours the hearing is listed for on a single day
-     * @return hearingDayHours
-     */
-    private static int actualHours(int hearingDayHours) {
-
-        return hearingDayHours == HOURS_PER_DAY ? 5 : hearingDayHours;
-    }
-
-    /**
      * Returns and formats information for each individual day of the hearing.
      * Returns the date of hearing, time of hearing and total duration of hearing.
      * @return e.g. "30 June 2023 at 10:00 for 3 hours"
@@ -153,7 +143,7 @@ public class HmcDataUtils {
         int hours = (int)Math.floor((double)hearingDayDurationInMinutes / MINUTES_PER_HOUR);
         int minutes = hearingDayDurationInMinutes - (hours * MINUTES_PER_HOUR);
 
-        return String.format("%s at %s for %s", dateString, timeString, hoursMinutesFormat(actualHours(hours), minutes));
+        return String.format("%s at %s for %s", dateString, timeString, hoursMinutesFormat(hours, minutes));
     }
 
     /**
@@ -170,7 +160,7 @@ public class HmcDataUtils {
         int hours = (int)Math.floor((double)hearingDayDurationInMinutes / MINUTES_PER_HOUR);
         int minutes = hearingDayDurationInMinutes - (hours * MINUTES_PER_HOUR);
 
-        return String.format("%s am %s am %s", dateString, timeString, hoursMinutesFormatWelsh(actualHours(hours), minutes));
+        return String.format("%s am %s am %s", dateString, timeString, hoursMinutesFormatWelsh(hours, minutes));
     }
 
     /**
@@ -295,11 +285,11 @@ public class HmcDataUtils {
      * @return the concatenated string
      */
     private static String hoursMinutesFormatWelsh(int hours, int minutes) {
-        String hoursFullText = timeFormatWelsh(hours, "awr", "oriau");
-        String minutesFullText = timeFormatWelsh(minutes, "munud", "munudau");
+        String hoursFullText = timeFormatWelsh(hours, "awr");
+        String minutesFullText = timeFormatWelsh(minutes, "munud");
 
         //The 'and' for minutes cannot be one as it is done in increments of 5. So minute number never starts with vowel.
-        return concatWithWelshAnd(List.of(hoursFullText, minutesFullText), false);
+        return concatWithWelshAnd(List.of(hoursFullText, minutesFullText), numberStartsWithVowel(minutes));
     }
 
     /**
@@ -311,16 +301,20 @@ public class HmcDataUtils {
      * @return the concatenated string
      */
     private static String daysHoursMinutesFormatWelsh(int days, int hours, int minutes) {
-        String daysFullText = timeFormatWelsh(days, "dydd", "dyddiau");
-        //Number of hours could be one, which would mean we need to use the Welsh And for vowels.
-        Boolean vowelStart = hours == 1;
+        String daysFullText = timeFormatWelsh(days, days == 2 ? "ddiwrnod" : "diwrnod");
+        //Word for 'Number of hours' could start with vowel, which would mean we need to use the Welsh 'And' for vowels.
+        Boolean vowelStart = numberStartsWithVowel(hours);
         return concatWithWelshAnd(List.of(daysFullText, hoursMinutesFormatWelsh(hours, minutes)), vowelStart);
     }
 
-    private static String timeFormatWelsh(int time, String textSingular, String textPlural) {
+    private static boolean numberStartsWithVowel(int number) {
+        //Only including numbers relevant for time (24 hours or any 5 minute increment up to 60)
+        return number == 1 || number == 11 || number == 16 || number == 20 || number == 21;
+    }
+
+    private static String timeFormatWelsh(int time, String text) {
         if (time > 0) {
-            String timeWelshText = time > 1 ? textPlural : textSingular;
-            return String.format("%s %s", time, timeWelshText);
+            return String.format("%s %s", time, text);
         } else {
             return "";
         }
@@ -403,6 +397,10 @@ public class HmcDataUtils {
         return getContentText(getType(hearing.getHearingDetails().getHearingType()), caseData.getAssignedTrackType(), isWelsh);
     }
 
+    public static String getPluralHearingTypeTextWelsh(CaseData caseData, HearingGetResponse hearing) {
+        return getPluralTypeTextWelsh(getType(hearing.getHearingDetails().getHearingType()), caseData.getAssignedTrackType());
+    }
+
     @Nullable
     public static LocationRefData getLocationRefData(String hearingId, String venueId,
                                                      String bearerToken, LocationReferenceDataService locationRefDataService) {
@@ -411,7 +409,7 @@ public class HmcDataUtils {
         if (!matchedLocations.isEmpty()) {
             return matchedLocations.get(0);
         } else {
-            throw new IllegalArgumentException("Hearing location data not available for hearing " + hearingId);
+            throw new IllegalArgumentException("Hearing location data not available for hearing " + hearingId + " venueId " + venueId);
         }
     }
 

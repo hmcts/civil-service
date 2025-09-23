@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.sendandreply.RecipientOption;
 import uk.gov.hmcts.reform.civil.enums.sendandreply.RolePool;
+import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -22,9 +23,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Stream;
 
-import static java.util.Map.entry;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
@@ -37,39 +38,48 @@ public class SendAndReplyMessageService {
 
     // Order is important here as we only use the first matching role when mapping against a users role assignments.
     // Senior roles should always be before their non-senior counterpart.
-    private static final Map<String, RolePool> SUPPORTED_ROLES_MAP = Map.ofEntries(
-        entry("ctsc-team-leader", RolePool.ADMIN),
-        entry("ctsc", RolePool.ADMIN),
-        entry("hearing-centre-team-leader", RolePool.ADMIN),
-        entry("hearing-centre-admin", RolePool.ADMIN),
-        entry("senior-tribunal-caseworker", RolePool.LEGAL_OPERATIONS),
-        entry("tribunal-caseworker", RolePool.LEGAL_OPERATIONS),
-        entry("nbc-team-leader", RolePool.ADMIN),
-        entry("national-business-centre", RolePool.ADMIN),
-        entry("circuit-judge", RolePool.JUDICIAL_CIRCUIT),
-        entry("district-judge", RolePool.JUDICIAL_DISTRICT),
-        entry("judge", RolePool.JUDICIAL)
-    );
+    Map<String, RolePool> buildSupportedRolesMap() {
+        Map<String, RolePool> supportedRolesMap = new LinkedHashMap<>();
+        supportedRolesMap.put("wlu-team-leader", RolePool.WLU_ADMIN);
+        supportedRolesMap.put("wlu-admin", RolePool.WLU_ADMIN);
+        supportedRolesMap.put("ctsc-team-leader", RolePool.ADMIN);
+        supportedRolesMap.put("ctsc", RolePool.ADMIN);
+        supportedRolesMap.put("hearing-centre-team-leader", RolePool.ADMIN);
+        supportedRolesMap.put("hearing-centre-admin", RolePool.ADMIN);
+        supportedRolesMap.put("senior-tribunal-caseworker", RolePool.LEGAL_OPERATIONS);
+        supportedRolesMap.put("tribunal-caseworker", RolePool.LEGAL_OPERATIONS);
+        supportedRolesMap.put("nbc-team-leader", RolePool.ADMIN);
+        supportedRolesMap.put("national-business-centre", RolePool.ADMIN);
+        supportedRolesMap.put("circuit-judge", RolePool.JUDICIAL_CIRCUIT);
+        supportedRolesMap.put("district-judge", RolePool.JUDICIAL_DISTRICT);
+        supportedRolesMap.put("judge", RolePool.JUDICIAL);
+        return supportedRolesMap;
+    }
 
-    private static final List<String> SUPPORTED_ROLES = List.of(
-        "ctsc-team-leader",
-        "ctsc",
-        "hearing-centre-team-leader",
-        "hearing-centre-admin",
-        "senior-tribunal-caseworker",
-        "tribunal-caseworker",
-        "nbc-team-leader",
-        "national-business-centre",
-        "circuit-judge",
-        "district-judge",
-        "judge"
-    );
+    List<String> buildSupportedRolesList() {
+        List<String> supportedRolesList = new ArrayList<>();
+        supportedRolesList.add("wlu-team-leader");
+        supportedRolesList.add("wlu-admin");
+        supportedRolesList.add("ctsc-team-leader");
+        supportedRolesList.add("ctsc");
+        supportedRolesList.add("hearing-centre-team-leader");
+        supportedRolesList.add("hearing-centre-admin");
+        supportedRolesList.add("senior-tribunal-caseworker");
+        supportedRolesList.add("tribunal-caseworker");
+        supportedRolesList.add("nbc-team-leader");
+        supportedRolesList.add("national-business-centre");
+        supportedRolesList.add("circuit-judge");
+        supportedRolesList.add("district-judge");
+        supportedRolesList.add("judge");
+        return supportedRolesList;
+    }
 
     private static final Map<RecipientOption, RolePool> ROLE_SELECTION_TO_POOL = Map.of(
         RecipientOption.COURT_STAFF, RolePool.ADMIN,
         RecipientOption.LEGAL_ADVISOR, RolePool.LEGAL_OPERATIONS,
         RecipientOption.DISTRICT_JUDGE, RolePool.JUDICIAL_DISTRICT,
-        RecipientOption.CIRCUIT_JUDGE, RolePool.JUDICIAL_CIRCUIT
+        RecipientOption.CIRCUIT_JUDGE, RolePool.JUDICIAL_CIRCUIT,
+        RecipientOption.WELSH_LANGUAGE_UNIT, RolePool.WLU_ADMIN
     );
 
     private final RoleAssignmentsService roleAssignmentsService;
@@ -93,6 +103,7 @@ public class SendAndReplyMessageService {
                 .subjectType(messageMetaData.getSubjectType())
                 .subject(messageMetaData.getSubject())
                 .messageContent(messageContent)
+                .messageId(UUID.randomUUID().toString())
                 .build())
         );
         return messageList;
@@ -102,14 +113,16 @@ public class SendAndReplyMessageService {
         UserDetails details = userService.getUserDetails(userAuth);
         RoleAssignmentResponse role = getFirstSupportedRole(userAuth, details.getId());
         String senderName = String.format("%s, %s", details.getFullName(), role.getRoleLabel());
+        Map<String, RolePool> supportRoleMap = buildSupportedRolesMap();
 
         return Message.builder()
             .senderName(senderName)
-            .senderRoleType(SUPPORTED_ROLES_MAP.get(role.getRoleName()))
+            .senderRoleType(supportRoleMap.get(role.getRoleName()))
             .build();
     }
 
-    public List<Element<Message>> addReplyToMessage(List<Element<Message>> messages, String messageId, MessageReply messageReply, String userAuth) {
+    public List<Element<Message>> addReplyToMessage(List<Element<Message>> messages, String messageId, MessageReply messageReply,
+                                                    String userAuth, CaseData caseData) {
         Element<Message> messageToReplace = getMessageById(messages, messageId);
         Message baseMessageDetails = createBaseMessageWithSenderDetails(userAuth);
 
@@ -130,11 +143,12 @@ public class SendAndReplyMessageService {
     }
 
     private RoleAssignmentResponse getFirstSupportedRole(String auth, String userId) {
-        var roleAssignments = roleAssignmentsService.getRoleAssignmentsWithLabels(userId, auth);
+        List<String> supportedRolesList = buildSupportedRolesList();
+        var roleAssignments = roleAssignmentsService.getRoleAssignmentsWithLabels(userId, auth, supportedRolesList);
 
         RoleAssignmentResponse roleAssignment = roleAssignments.getRoleAssignmentResponse().stream()
-            .filter(userRole -> SUPPORTED_ROLES.contains(userRole.getRoleName()))
-            .min(Comparator.comparingInt(userRole -> SUPPORTED_ROLES.indexOf(userRole.getRoleName())))
+            .filter(userRole -> supportedRolesList.contains(userRole.getRoleName()))
+            .min(Comparator.comparingInt(userRole -> supportedRolesList.indexOf(userRole.getRoleName())))
             .orElse(RoleAssignmentResponse.builder().roleLabel("").roleCategory("").build());
         return roleAssignment;
     }

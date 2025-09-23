@@ -94,12 +94,17 @@ public class GenerateHearingNoticeHmcHandler extends CallbackHandler {
         var hearingStartDay = HmcDataUtils.getHearingStartDay(hearing);
         var hearingStartDate = convertFromUTC(hearingStartDay.getHearingStartDateTime());
         String hearingLocation = getHearingLocation(camundaVars.getHearingId(), hearing,
-                                                    bearerToken, locationRefDataService);
+                                                    bearerToken, locationRefDataService, false);
 
         buildDocument(callbackParams, caseDataBuilder, hearing, hearingLocation, camundaVars.getHearingId(), HEARING_NOTICE_HMC);
 
-        if (featureToggleService.isHmcForLipEnabled() && isWelshHearingTemplate(caseData)) {
-            buildDocument(callbackParams, caseDataBuilder, hearing, hearingLocation, camundaVars.getHearingId(), HEARING_NOTICE_HMC_WELSH);
+        if (featureToggleService.isHmcForLipEnabled()
+            // Check DQ document language if Welsh not enabled, only check main language flag if enabled
+            && ((!featureToggleService.isWelshEnabledForMainCase() && isWelshHearingTemplate(caseData))
+                || (featureToggleService.isWelshEnabledForMainCase() && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())))) {
+            String hearingLocationWelsh = getHearingLocation(camundaVars.getHearingId(), hearing,
+                                                        bearerToken, locationRefDataService, true);
+            buildDocument(callbackParams, caseDataBuilder, hearing, hearingLocationWelsh, camundaVars.getHearingId(), HEARING_NOTICE_HMC_WELSH);
         }
 
         camundaService.setProcessVariables(
@@ -162,14 +167,17 @@ public class GenerateHearingNoticeHmcHandler extends CallbackHandler {
     }
 
     private String getHearingLocation(String hearingId, HearingGetResponse hearing,
-                                      String bearerToken, LocationReferenceDataService locationRefDataService) {
+                                      String bearerToken, LocationReferenceDataService locationRefDataService,
+                                      boolean isWelsh) {
         LocationRefData hearingLocation = getLocationRefData(
             hearingId,
             HmcDataUtils.getHearingStartDay(hearing).getHearingVenueId(),
             bearerToken,
             locationRefDataService);
         if (hearingLocation != null) {
-            return LocationReferenceDataService.getDisplayEntry(hearingLocation);
+            return isWelsh
+                ? LocationReferenceDataService.getDisplayEntryWelsh(hearingLocation)
+                : LocationReferenceDataService.getDisplayEntry(hearingLocation);
         }
         return null;
     }

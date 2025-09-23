@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
@@ -16,10 +17,13 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.SetAsideJudgmentOnlineMapper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaymentPlan;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideOrderType;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideReason;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.Time;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -34,6 +38,9 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SET_ASIDE_JUDGMENT;
 @ExtendWith(MockitoExtension.class)
 class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
 
+    @Mock
+    Time time;
+
     private SetAsideJudgmentCallbackHandler handler;
 
     private SetAsideJudgmentOnlineMapper setAsideJudgmentOnlineMapper;
@@ -46,7 +53,7 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
     @BeforeEach
     void setup() {
         ObjectMapper objectMapper = new ObjectMapper().registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
-        setAsideJudgmentOnlineMapper = new SetAsideJudgmentOnlineMapper();
+        setAsideJudgmentOnlineMapper = new SetAsideJudgmentOnlineMapper(time);
         handler = new SetAsideJudgmentCallbackHandler(objectMapper, setAsideJudgmentOnlineMapper);
     }
 
@@ -76,7 +83,10 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGE_ORDER);
             caseData.setJoSetAsideOrderType(JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION);
             caseData.setJoSetAsideOrderDate(LocalDate.of(2022, 12, 12));
-            caseData.setActiveJudgment(JudgmentDetails.builder().state(JudgmentState.SET_ASIDE).build());
+            caseData.setActiveJudgment(JudgmentDetails.builder()
+                                           .state(JudgmentState.SET_ASIDE_ERROR)
+                                           .paymentPlan(JudgmentPaymentPlan.builder().type(PaymentPlanSelection.PAY_BY_DATE).build())
+                                           .build());
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -102,7 +112,11 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGE_ORDER);
             caseData.setJoSetAsideOrderType(JudgmentSetAsideOrderType.ORDER_AFTER_DEFENCE);
             caseData.setJoSetAsideDefenceReceivedDate(LocalDate.of(2022, 12, 12));
-            caseData.setActiveJudgment(JudgmentDetails.builder().state(JudgmentState.SET_ASIDE).build());
+            caseData.setActiveJudgment(JudgmentDetails.builder()
+                                           .state(JudgmentState.SET_ASIDE)
+                                           .paymentPlan(JudgmentPaymentPlan.builder().type(PaymentPlanSelection.PAY_BY_DATE).build())
+                                           .build());
+
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             //When: handler is called with ABOUT_TO_SUBMIT event
@@ -123,10 +137,13 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPopulateSetAsideJudgmentErrorText() {
             //Given : Casedata in All_FINAL_ORDERS_ISSUED State
-            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithPaymentByDate();
             caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGMENT_ERROR);
             caseData.setJoSetAsideJudgmentErrorText("Some text");
-            caseData.setActiveJudgment(JudgmentDetails.builder().state(JudgmentState.SET_ASIDE_ERROR).build());
+            caseData.setActiveJudgment(JudgmentDetails.builder()
+                                           .state(JudgmentState.SET_ASIDE_ERROR)
+                                           .paymentPlan(JudgmentPaymentPlan.builder().type(PaymentPlanSelection.PAY_BY_DATE).build())
+                                           .build());
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             //When: handler is called with ABOUT_TO_SUBMIT event
@@ -153,7 +170,11 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseData.setJoSetAsideOrderType(JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION);
             caseData.setActiveJudgment(JudgmentDetails.builder().build());
             caseData.setJoSetAsideOrderDate(now());
-            caseData.setActiveJudgment(JudgmentDetails.builder().state(JudgmentState.SET_ASIDE).build());
+            caseData.setActiveJudgment(JudgmentDetails.builder()
+                                           .state(JudgmentState.SET_ASIDE)
+                                           .paymentPlan(JudgmentPaymentPlan.builder().type(PaymentPlanSelection.PAY_BY_DATE).build())
+                                           .build());
+
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             //When: handler is called with ABOUT_TO_SUBMIT event
@@ -173,7 +194,10 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGE_ORDER);
             caseData.setJoSetAsideOrderType(JudgmentSetAsideOrderType.ORDER_AFTER_DEFENCE);
             caseData.setJoSetAsideDefenceReceivedDate(LocalDate.of(2022, 12, 12));
-            caseData.setActiveJudgment(JudgmentDetails.builder().state(JudgmentState.SET_ASIDE).build());
+            caseData.setActiveJudgment(JudgmentDetails.builder()
+                                           .state(JudgmentState.SET_ASIDE)
+                                           .paymentPlan(JudgmentPaymentPlan.builder().type(PaymentPlanSelection.PAY_BY_DATE).build())
+                                           .build());
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             //When: handler is called with ABOUT_TO_SUBMIT event
@@ -200,7 +224,10 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .joSetAsideOrderType(JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION)
                 .joSetAsideOrderDate(LocalDate.of(2024, 11, 12))
                 .joSetAsideApplicationDate(LocalDate.of(2024, 11, 11))
-                .activeJudgment(JudgmentDetails.builder().state(JudgmentState.SET_ASIDE).build()).build();
+                .activeJudgment(JudgmentDetails.builder()
+                                    .state(JudgmentState.SET_ASIDE)
+                                    .paymentPlan(JudgmentPaymentPlan.builder().type(
+                    PaymentPlanSelection.PAY_BY_DATE).build()).build()).build();
 
             CallbackParams params = callbackParamsOf(updatedCaseData, ABOUT_TO_SUBMIT);
 

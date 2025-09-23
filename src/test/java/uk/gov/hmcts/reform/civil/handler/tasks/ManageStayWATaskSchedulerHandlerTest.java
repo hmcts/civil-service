@@ -57,17 +57,6 @@ class ManageStayWATaskSchedulerHandlerTest {
     void init() {
         when(mockTask.getTopicName()).thenReturn("test");
         when(mockTask.getWorkerId()).thenReturn("worker");
-        when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
-    }
-
-    @Test
-    void shouldNotInteractWithSearchServiceOrApplicationEventPublisher_whenCaseEventsToggleIsOff() {
-        when(featureToggleService.isCaseEventsEnabled()).thenReturn(false);
-
-        handler.execute(mockTask, externalTaskService);
-
-        verifyNoInteractions(searchService);
-        verifyNoInteractions(applicationEventPublisher);
     }
 
     @Test

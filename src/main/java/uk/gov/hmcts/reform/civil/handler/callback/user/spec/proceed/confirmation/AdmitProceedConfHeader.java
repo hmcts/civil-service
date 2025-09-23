@@ -5,6 +5,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationHeaderGenerator;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.EnumSet;
 import java.util.Optional;
@@ -21,7 +22,7 @@ public class AdmitProceedConfHeader implements RespondToResponseConfirmationHead
     );
 
     @Override
-    public Optional<String> generateTextFor(CaseData caseData) {
+    public Optional<String> generateTextFor(CaseData caseData, FeatureToggleService featureToggleService) {
         String claimNumber = caseData.getLegacyCaseReference();
         if (caseData.getApplicant1ProceedsWithClaimSpec() == null
             || YesOrNo.NO.equals(caseData.getApplicant1ProceedsWithClaimSpec())

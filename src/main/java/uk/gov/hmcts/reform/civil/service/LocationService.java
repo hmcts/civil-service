@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.civil.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseEventDetail;
@@ -13,14 +15,16 @@ import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataServ
 
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRANSFER_ONLINE_CASE;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_CASE_DETAILS_NOTIFICATION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISCONTINUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.IN_MEDIATION;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_SETTLED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
 
 @Service
@@ -30,17 +34,22 @@ public class LocationService {
 
     private final LocationReferenceDataService locationRefDataService;
     private final CoreCaseEventDataService coreCaseEventDataService;
+    private final FeatureToggleService featureToggleService;
 
     public static final Set<CaseState> statesBeforeSDO = EnumSet.of(PENDING_CASE_ISSUED, CASE_ISSUED,
                                                                     AWAITING_CASE_DETAILS_NOTIFICATION,
                                                                     AWAITING_RESPONDENT_ACKNOWLEDGEMENT,
-                                                                    IN_MEDIATION,
                                                                     AWAITING_APPLICANT_INTENTION);
 
+    public static final Set<CaseState> settleDiscontinueStates = EnumSet.of(CASE_SETTLED,
+                                                                            CASE_DISCONTINUED);
+
     public Pair<CaseLocationCivil, Boolean> getWorkAllocationLocation(CaseData caseData, String authToken) {
-        if (hasSDOBeenMade(caseData.getCcdState())) {
+        if (hasSDOBeenMade(caseData)) {
+            log.info("WorkAllocation Location If for caseId {}", caseData.getCcdCaseReference());
             return Pair.of(assignCaseManagementLocationToMainCaseLocation(caseData, authToken), false);
         } else {
+            log.info("WorkAllocation Location Else for caseId {}", caseData.getCcdCaseReference());
             return getWorkAllocationLocationBeforeSdo(caseData, authToken);
         }
     }
@@ -65,8 +74,13 @@ public class LocationService {
         return Pair.of(courtLocation, true);
     }
 
-    private boolean hasSDOBeenMade(CaseState state) {
-        return !statesBeforeSDO.contains(state);
+    private boolean hasSDOBeenMade(CaseData caseData) {
+        log.info("hasSDOBeenMade If for caseId {}", caseData.getCcdCaseReference());
+        return (!statesBeforeSDO.contains(caseData.getCcdState())
+            && !settleDiscontinueStates.contains(caseData.getCcdState()))
+            || (!statesBeforeSDO.contains(caseData.getPreviousCCDState())
+            && settleDiscontinueStates.contains(caseData.getCcdState()));
+
     }
 
     public LocationRefData getWorkAllocationLocationDetails(String baseLocation, String authToken) {
@@ -79,23 +93,46 @@ public class LocationService {
     }
 
     private CaseLocationCivil assignCaseManagementLocationToMainCaseLocation(CaseData caseData, String authToken) {
-        LocationRefData caseManagementLocationDetails;
-        List<LocationRefData>  locationRefDataList = locationRefDataService.getHearingCourtLocations(authToken);
-        var foundLocations = locationRefDataList.stream()
-            .filter(location -> location.getEpimmsId().equals(caseData.getCaseManagementLocation().getBaseLocation())).toList();
-        if (!foundLocations.isEmpty()) {
-            caseManagementLocationDetails = foundLocations.get(0);
-        } else {
-            throw new IllegalArgumentException("Base Court Location for General applications not found, in location data");
+        String epimmsId = Optional.ofNullable(caseData)
+            .map(CaseData::getCaseManagementLocation)
+            .map(uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil::getBaseLocation)
+            .orElse(null);
+
+        String caseRef = (caseData != null) ? String.valueOf(caseData.getCcdCaseReference()) : "unknown";
+        if (StringUtils.isEmpty(epimmsId)) {
+            throw new IllegalArgumentException(String.format(
+                "Base Court Location for main applications not found, in case data for caseId %s", caseRef
+            ));
         }
-        CaseLocationCivil courtLocation;
-        courtLocation = CaseLocationCivil.builder()
+
+        String region = Optional.of(caseData)
+            .map(CaseData::getCaseManagementLocation)
+            .map(uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil::getRegion)
+            .orElse("unknown");
+
+        log.info("Case managementLocation region {} and base Location {} caseId {}", region, epimmsId, caseRef);
+
+        List<LocationRefData> locationRefDataList =
+            locationRefDataService.getCourtLocationsByEpimmsIdWithCML(authToken, epimmsId);
+
+        log.info("CML court locations found : {} for caseId {}",
+                 locationRefDataList, caseData.getCcdCaseReference());
+
+        if (CollectionUtils.isEmpty(locationRefDataList)) {
+            throw new IllegalArgumentException(String.format(
+                "Base Court Location for General applications not found, in location data for caseId %s",
+                caseData.getCcdCaseReference()
+            ));
+        }
+
+        LocationRefData caseManagementLocationDetails = locationRefDataList.get(0);
+
+        return CaseLocationCivil.builder()
             .region(caseManagementLocationDetails.getRegionId())
             .baseLocation(caseManagementLocationDetails.getEpimmsId())
             .siteName(caseManagementLocationDetails.getSiteName())
             .address(caseManagementLocationDetails.getCourtAddress())
             .postcode(caseManagementLocationDetails.getPostcode())
             .build();
-        return courtLocation;
     }
 }

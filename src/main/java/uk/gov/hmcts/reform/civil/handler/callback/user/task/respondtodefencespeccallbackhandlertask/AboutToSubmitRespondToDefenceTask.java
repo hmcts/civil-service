@@ -32,6 +32,7 @@ import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.utils.DQResponseDocumentUtils;
 import uk.gov.hmcts.reform.civil.utils.FrcDocumentsUtils;
 import uk.gov.hmcts.reform.civil.utils.JudicialReferralUtils;
+import uk.gov.hmcts.reform.civil.utils.RequestedCourtForClaimDetailsTab;
 import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
 
 import java.time.LocalDate;
@@ -73,6 +74,7 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
     private final DQResponseDocumentUtils dqResponseDocumentUtils;
     private final DetermineNextState determineNextState;
     private final Optional<UpdateWaCourtLocationsService> updateWaCourtLocationsService;
+    private final RequestedCourtForClaimDetailsTab requestedCourtForClaimDetailsTab;
     @Value("${court-location.specified-claim.epimms-id}") String cnbcEpimsId;
     @Value("${court-location.specified-claim.region-id}") String cnbcRegionId;
 
@@ -112,11 +114,21 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
         clearTempDocuments(builder);
 
         if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
+            if ((AllocatedTrack.MULTI_CLAIM.name().equals(caseData.getResponseClaimTrack())
+                || AllocatedTrack.INTERMEDIATE_CLAIM.name().equals(caseData.getResponseClaimTrack())
+                && caseData.isLipCase())) {
+                builder.isMintiLipCase(YES);
+            }
+
             updateWaCourtLocationsService.ifPresent(service -> service.updateCourtListingWALocations(
                 callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
                 builder
             ));
         }
+
+        requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabApplicantSpec(callbackParams, builder);
+        builder.nextDeadline(null);
+        builder.previousCCDState(caseData.getCcdState());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(builder.build().toMap(objectMapper))
@@ -131,8 +143,7 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
             && caseData.hasClaimantAgreedToFreeMediation())
             || (featureToggleService.isCarmEnabledForCase(caseData)
             && SMALL_CLAIM.name().equals(caseData.getResponseClaimTrack())
-            && (YES.equals(caseData.getApplicant1ProceedWithClaim())
-            || YES.equals(caseData.getApplicant1ProceedWithClaimSpec2v1())))) {
+            && caseData.hasApplicantProceededWithClaim())) {
             builder.claimMovedToMediationOn(LocalDate.now());
             log.info("Moved Claim to mediation for Case : {}", caseData.getCcdCaseReference());
         }
@@ -261,7 +272,7 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
     }
 
     private boolean isFlightDelayAndSmallClaim(CaseData caseData) {
-        return (featureToggleService.isSdoR2Enabled() && caseData.getIsFlightDelayClaim() != null
+        return (caseData.getIsFlightDelayClaim() != null
             && caseData.getIsFlightDelayClaim().equals(YES)
             &&  SMALL_CLAIM.name().equals(caseData.getResponseClaimTrack()));
     }

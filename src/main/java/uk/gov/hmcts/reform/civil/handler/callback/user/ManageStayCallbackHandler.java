@@ -61,11 +61,11 @@ public class ManageStayCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse handleAboutToSubmit(CallbackParams params) {
-        return featureToggleService.isCaseEventsEnabled() ? manageStay(params) : emptyCallbackResponse(params);
+        return manageStay(params);
     }
 
     private CallbackResponse handleSubmitted(CallbackParams params) {
-        return featureToggleService.isCaseEventsEnabled() ? addConfirmationScreen(params) : emptyCallbackResponse(params);
+        return addConfirmationScreen(params);
     }
 
     private CallbackResponse handleAboutToStart(CallbackParams callbackParams) {

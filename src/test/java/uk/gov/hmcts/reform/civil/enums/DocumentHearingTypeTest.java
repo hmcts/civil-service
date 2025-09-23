@@ -100,12 +100,12 @@ public class DocumentHearingTypeTest {
 
     @ParameterizedTest
     @CsvSource({
-        "TRI, SMALL_CLAIM, wrandawiad",
-        "TRI, FAST_CLAIM, dreial",
-        "DRH, SMALL_CLAIM, wrandawiad",
-        "DRH, FAST_CLAIM, wrandawiad",
-        "DIS, SMALL_CLAIM, wrandawiad",
-        "DIS, FAST_CLAIM, wrandawiad"
+        "TRI, SMALL_CLAIM, gwrandawiad",
+        "TRI, FAST_CLAIM, treial",
+        "DRH, SMALL_CLAIM, gwrandawiad",
+        "DRH, FAST_CLAIM, gwrandawiad",
+        "DIS, SMALL_CLAIM, gwrandawiad",
+        "DIS, FAST_CLAIM, gwrandawiad"
     })
     void shouldReturnExpectedContentTextWelsh(DocumentHearingType hearingType, AllocatedTrack allocatedTrack, String expected) {
         assertEquals(expected, getContentText(hearingType, allocatedTrack, true));

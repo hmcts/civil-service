@@ -39,6 +39,7 @@ import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getHearingTypeTitleTe
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getInPersonAttendeeNames;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getLocationRefData;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getPhoneAttendeeNames;
+import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getPluralHearingTypeTextWelsh;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getTotalHearingDurationText;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getVideoAttendeesNames;
 
@@ -88,15 +89,23 @@ public class HearingNoticeHmcGenerator implements TemplateDataGenerator<HearingN
         LocationRefData caseManagementLocation =
             getLocationRefData(hearingId, caseData.getCaseManagementLocation().getBaseLocation(), bearerToken, locationRefDataService);
 
+        String caseManagementLocationText = "";
+        if (nonNull(caseManagementLocation) && isWelsh) {
+            caseManagementLocationText = LocationReferenceDataService.getDisplayEntryWelsh(caseManagementLocation);
+        } else if (nonNull(caseManagementLocation)) {
+            caseManagementLocationText = LocationReferenceDataService.getDisplayEntry(caseManagementLocation);
+        }
+
         return HearingNoticeHmc.builder()
             .title(getHearingTypeTitleText(caseData, hearing, isWelsh ? true : false))
-            .hearingSiteName(getExternalShortName(template, caseManagementLocation))
-            .caseManagementLocation(nonNull(caseManagementLocation) ? LocationReferenceDataService.getDisplayEntry(caseManagementLocation) : null)
+            .hearingSiteName(nonNull(caseManagementLocation) ? getExternalShortName(template, caseManagementLocation) : null)
+            .caseManagementLocation(caseManagementLocationText)
             .hearingLocation(hearingLocation)
             .caseNumber(caseData.getCcdCaseReference())
             .creationDate(creationDate)
             .creationDateWelshText(isWelsh ? formatDateInWelsh(creationDate, true) : null)
-            .hearingType(getHearingTypeContentText(caseData, hearing, isWelsh ? true : false))
+            .hearingType(getHearingTypeContentText(caseData, hearing, isWelsh))
+            .hearingTypePluralWelsh(isWelsh ? getPluralHearingTypeTextWelsh(caseData, hearing) : null)
             .claimant(caseData.getApplicant1().getPartyName())
             .claimantReference(nonNull(caseData.getSolicitorReferences())
                                    ? caseData.getSolicitorReferences().getApplicantSolicitor1Reference() : null)

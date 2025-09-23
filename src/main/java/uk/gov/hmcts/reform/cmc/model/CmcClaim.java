@@ -507,12 +507,17 @@ public class CmcClaim implements Claim {
     }
 
     @Override
-    public boolean defendantRespondedWithPreferredLanguageWelsh() {
+    public boolean pausedForTranslationAfterResponse() {
         return false;
     }
 
     @Override
-    public boolean isWaitingForClaimantIntentDocUpload() {
+    public boolean isWaitingForClaimantIntentDocUploadPreDefendantNocOnline() {
+        return false;
+    }
+
+    @Override
+    public boolean isWaitingForClaimantIntentDocUploadPostDefendantNocOnline() {
         return false;
     }
 
@@ -555,6 +560,11 @@ public class CmcClaim implements Claim {
 
     @Override
     public boolean isDefaultJudgementIssued() {
+        return false;
+    }
+
+    @Override
+    public boolean decisionMadeDocumentsAreInTranslation() {
         return false;
     }
 
@@ -624,7 +634,22 @@ public class CmcClaim implements Claim {
     }
 
     @Override
+    public boolean sdoDocumentsAreInTranslation() {
+        return false;
+    }
+
+    @Override
     public boolean isBundleCreatedStatusActive() {
+        return false;
+    }
+
+    @Override
+    public boolean isCasedDiscontinued() {
+        return false;
+    }
+
+    @Override
+    public boolean awaitingHearingNoticeTranslationNotSettledOrDiscontinued() {
         return false;
     }
 }

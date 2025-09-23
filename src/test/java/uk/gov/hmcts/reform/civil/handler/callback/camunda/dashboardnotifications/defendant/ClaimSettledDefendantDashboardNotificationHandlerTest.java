@@ -13,9 +13,10 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
+import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
@@ -27,6 +28,7 @@ import java.util.HashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -76,12 +78,14 @@ class ClaimSettledDefendantDashboardNotificationHandlerTest extends BaseCallback
         }
 
         @Test
-        void shouldRecordScenario_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedSmallClaim()
+        void shouldRecordScenarioWhenQmLrIsOnAndIsNonOnEACourt_whenInvoked() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimSubmittedSmallClaim()
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("test").region(
+                    "test").build())
                 .caseDataLip(CaseDataLiP.builder().applicant1SettleClaim(YesOrNo.YES)
                                  .applicant1ClaimSettledDate(
                                      LocalDate.now()).build()).build();
-
             HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("applicant1ClaimSettledDateEn", caseData.getApplicant1ClaimSettleDate());
             scenarioParams.put("applicant1ClaimSettledDateCy", caseData.getApplicant1ClaimSettleDate());
@@ -97,10 +101,10 @@ class ClaimSettledDefendantDashboardNotificationHandlerTest extends BaseCallback
             verify(dashboardNotificationService).deleteByReferenceAndCitizenRole(
                 caseData.getCcdCaseReference().toString(),
                 "DEFENDANT");
-            verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+            verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate(
                 caseData.getCcdCaseReference().toString(),
                 "DEFENDANT",
-                null);
+                "Application.View");
 
             verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
@@ -109,5 +113,44 @@ class ClaimSettledDefendantDashboardNotificationHandlerTest extends BaseCallback
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }
+
+        @Test
+        void shouldRecordScenarioWhenQmLrIsOnEaCourt_whenInvoked() {
+            when(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimSubmittedSmallClaim()
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("test").region(
+                    "test").build())
+                .caseDataLip(CaseDataLiP.builder().applicant1SettleClaim(YesOrNo.YES)
+                                 .applicant1ClaimSettledDate(
+                                     LocalDate.now()).build()).build();
+            HashMap<String, Object> scenarioParams = new HashMap<>();
+            scenarioParams.put("applicant1ClaimSettledDateEn", caseData.getApplicant1ClaimSettleDate());
+            scenarioParams.put("applicant1ClaimSettledDateCy", caseData.getApplicant1ClaimSettleDate());
+
+            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FOR_CLAIM_SETTLED_FOR_DEFENDANT1.name())
+                    .build()
+            ).build();
+
+            handler.handle(params);
+            verify(dashboardNotificationService, never()).deleteByReferenceAndCitizenRole(
+                caseData.getCcdCaseReference().toString(),
+                "DEFENDANT");
+            verify(taskListService, never()).makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate(
+                caseData.getCcdCaseReference().toString(),
+                "DEFENDANT",
+                "Application.View");
+
+            verify(dashboardScenariosService).recordScenarios(
+                "BEARER_TOKEN",
+                SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLE_EVENT_DEFENDANT.getScenario(),
+                caseData.getCcdCaseReference().toString(),
+                ScenarioRequestParams.builder().params(scenarioParams).build()
+            );
+        }
+
     }
 }

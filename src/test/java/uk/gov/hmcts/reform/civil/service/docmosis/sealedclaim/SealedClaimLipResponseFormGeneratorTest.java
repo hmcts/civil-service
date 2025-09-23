@@ -40,6 +40,7 @@ import uk.gov.hmcts.reform.civil.model.Respondent1DebtLRspec;
 import uk.gov.hmcts.reform.civil.model.Respondent1EmployerDetailsLRspec;
 import uk.gov.hmcts.reform.civil.model.Respondent1SelfEmploymentLRspec;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
+import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.TimelineOfEventDetails;
 import uk.gov.hmcts.reform.civil.model.TimelineOfEvents;
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
@@ -59,6 +60,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
+import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
@@ -100,14 +102,15 @@ class SealedClaimLipResponseFormGeneratorTest {
 
     @MockBean
     private FeatureToggleService featureToggleService;
+    @MockBean
+    private InterestCalculator interestCalculator;
     @Captor
     ArgumentCaptor<PDF> uploadDocumentArgumentCaptor;
 
     @Test
     void shouldGenerateDocumentSuccessfully() {
-
+        when(interestCalculator.claimAmountPlusInterestToDate(any())).thenReturn(new BigDecimal(2000));
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
-        LocalDate whenWillPay = LocalDate.now().plusDays(5);
         //Given
         CaseData caseData = commonData().build();
 
@@ -136,11 +139,10 @@ class SealedClaimLipResponseFormGeneratorTest {
 
     @Test
     void shouldGenerateDocumentSuccessfully_AfterCarmEnabled() {
-
+        when(interestCalculator.claimAmountPlusInterestToDate(any())).thenReturn(new BigDecimal(2000));
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
         LocalDate whenWillPay = LocalDate.now().plusDays(5);
         //Given
-        CaseData caseData = commonData().build();
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(company("B"))
             .respondent2(individual("C"))
@@ -176,6 +178,7 @@ class SealedClaimLipResponseFormGeneratorTest {
 
     @Test
     void admitPayImmediate() {
+        when(interestCalculator.claimAmountPlusInterestToDate(any())).thenReturn(new BigDecimal(2000));
         LocalDate whenWillPay = LocalDate.now().plusDays(5);
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(company("B"))
@@ -195,6 +198,7 @@ class SealedClaimLipResponseFormGeneratorTest {
 
     @Test
     void admitPayInstalments() {
+        when(interestCalculator.claimAmountPlusInterestToDate(any())).thenReturn(new BigDecimal(2000));
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(individual("B"))
             .respondent2(company("C"))
@@ -217,6 +221,7 @@ class SealedClaimLipResponseFormGeneratorTest {
 
     @Test
     void admitPayByDate() {
+        when(interestCalculator.claimAmountPlusInterestToDate(any())).thenReturn(new BigDecimal(2000));
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(individual("B"))
             .respondent2(individual("C"))
@@ -236,7 +241,25 @@ class SealedClaimLipResponseFormGeneratorTest {
     }
 
     @Test
+    void admitPayByDate_Lip() {
+        when(interestCalculator.claimAmountPlusInterestToDate(any())).thenReturn(new BigDecimal(2000));
+        CaseData.CaseDataBuilder<?, ?> builder = commonData()
+            .respondent1(individual("B"))
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+            .defenceAdmitPartPaymentTimeRouteRequired(
+                RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
+            .responseToClaimAdmitPartWhyNotPayLRspec("Reason not to pay immediately");
+
+        CaseData caseData = financialDetails(builder).build();
+
+        SealedClaimLipResponseForm templateData = generator
+            .getTemplateData(caseData);
+        Assertions.assertEquals(LocalDate.now(), templateData.getGenerationDate());
+    }
+
+    @Test
     void partAdmitPayImmediate() {
+        when(interestCalculator.claimAmountPlusInterestToDate(any())).thenReturn(new BigDecimal(2000));
         LocalDate whenWillPay = LocalDate.now().plusDays(5);
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(company("B"))
@@ -263,6 +286,7 @@ class SealedClaimLipResponseFormGeneratorTest {
 
     @Test
     void shouldNotBuildRepaymentPlan_whenRespondent1RepaymentPlanisNull() {
+        when(interestCalculator.claimAmountPlusInterestToDate(any())).thenReturn(new BigDecimal(2000));
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(individual("B"))
@@ -284,6 +308,7 @@ class SealedClaimLipResponseFormGeneratorTest {
 
     @Test
     void partAdmitPayInstalments() {
+        when(interestCalculator.claimAmountPlusInterestToDate(any())).thenReturn(new BigDecimal(2000));
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(individual("B"))
             .respondent1ResponseDate(now())
@@ -312,7 +337,8 @@ class SealedClaimLipResponseFormGeneratorTest {
     }
 
     @Test
-    public void partAdmitPayByDate() {
+    void partAdmitPayByDate() {
+        when(interestCalculator.claimAmountPlusInterestToDate(any())).thenReturn(new BigDecimal(2000));
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(individual("B"))
             .respondent1ResponseDate(now())
@@ -338,6 +364,7 @@ class SealedClaimLipResponseFormGeneratorTest {
 
     @Test
     void partAdmitAlreadyPaid() {
+        when(interestCalculator.claimAmountPlusInterestToDate(any())).thenReturn(new BigDecimal(2000));
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(individual("B"))
             .respondent2(individual("C"))
@@ -360,6 +387,7 @@ class SealedClaimLipResponseFormGeneratorTest {
 
     @Test
     void fullDefenseAlreadyPaid() {
+        when(interestCalculator.claimAmountPlusInterestToDate(any())).thenReturn(new BigDecimal(2000));
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(individual("B"))
             .respondent2(individual("C"))
@@ -382,6 +410,7 @@ class SealedClaimLipResponseFormGeneratorTest {
 
     @Test
     void fullDefenseDispute() {
+        when(interestCalculator.claimAmountPlusInterestToDate(any())).thenReturn(new BigDecimal(2000));
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(individual("B"))
             .respondent2(individual("C"))
@@ -399,6 +428,7 @@ class SealedClaimLipResponseFormGeneratorTest {
 
     @Test
     void counterClaim() {
+        when(interestCalculator.claimAmountPlusInterestToDate(any())).thenReturn(new BigDecimal(2000));
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(individual("B"))
             .respondent2(individual("C"))
@@ -415,6 +445,15 @@ class SealedClaimLipResponseFormGeneratorTest {
     @Test
     void shouldGenerateDocumentSuccessfullyForFullAdmit() {
         //Given
+        when(interestCalculator.claimAmountPlusInterestToDate(any())).thenReturn(new BigDecimal(2000));
+        String fileName = "someName";
+        DocmosisDocument docmosisDocument = mock(DocmosisDocument.class);
+        byte[] bytes = {};
+        given(docmosisDocument.getBytes()).willReturn(bytes);
+        CaseDocument caseDocument = CaseDocument.builder().documentName(fileName).build();
+        given(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), any())).willReturn(
+            docmosisDocument);
+        given(documentManagementService.uploadDocument(anyString(), any(PDF.class))).willReturn(caseDocument);
         LocalDate whenWillPay = LocalDate.now().plusDays(5);
         CaseData caseData = commonData()
             .respondent1(company("B"))
@@ -427,16 +466,7 @@ class SealedClaimLipResponseFormGeneratorTest {
                     .build()
             )
             .build();
-        String fileName = "someName";
-        DocmosisDocument docmosisDocument = mock(DocmosisDocument.class);
-        byte[] bytes = {};
-        given(docmosisDocument.getBytes()).willReturn(bytes);
-        CaseDocument caseDocument = CaseDocument.builder().documentName(fileName).build();
-        given(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), any())).willReturn(
-            docmosisDocument);
-        given(documentManagementService.uploadDocument(anyString(), any(PDF.class))).willReturn(caseDocument);
-        SealedClaimLipResponseForm templateData = generator
-            .getTemplateData(caseData);
+        generator.getTemplateData(caseData);
         //When
         CaseDocument result = generator.generate(caseData, AUTHORIZATION);
         //Then
@@ -446,6 +476,15 @@ class SealedClaimLipResponseFormGeneratorTest {
     @Test
     void shouldGenerateDocumentSuccessfullyForPartAdmit() {
         //Given
+        when(interestCalculator.claimAmountPlusInterestToDate(any())).thenReturn(new BigDecimal(2000));
+        String fileName = "someName";
+        DocmosisDocument docmosisDocument = mock(DocmosisDocument.class);
+        byte[] bytes = {};
+        given(docmosisDocument.getBytes()).willReturn(bytes);
+        CaseDocument caseDocument = CaseDocument.builder().documentName(fileName).build();
+        given(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), any())).willReturn(
+            docmosisDocument);
+        given(documentManagementService.uploadDocument(anyString(), any(PDF.class))).willReturn(caseDocument);
         LocalDate whenWillPay = LocalDate.now().plusDays(5);
         CaseData caseData = commonData()
             .respondent1(company("B"))
@@ -461,16 +500,7 @@ class SealedClaimLipResponseFormGeneratorTest {
                     .whenWillThisAmountBePaid(whenWillPay)
                     .build()
             ).build();
-        String fileName = "someName";
-        DocmosisDocument docmosisDocument = mock(DocmosisDocument.class);
-        byte[] bytes = {};
-        given(docmosisDocument.getBytes()).willReturn(bytes);
-        CaseDocument caseDocument = CaseDocument.builder().documentName(fileName).build();
-        given(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), any())).willReturn(
-            docmosisDocument);
-        given(documentManagementService.uploadDocument(anyString(), any(PDF.class))).willReturn(caseDocument);
-        SealedClaimLipResponseForm templateData = generator
-            .getTemplateData(caseData);
+        generator.getTemplateData(caseData);
         //When
         CaseDocument result = generator.generate(caseData, AUTHORIZATION);
         //Then
@@ -653,6 +683,7 @@ class SealedClaimLipResponseFormGeneratorTest {
 
     @Test
     void checkMediationDefaultFields() {
+        when(interestCalculator.claimAmountPlusInterestToDate(any())).thenReturn(new BigDecimal(2000));
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
         LocalDate whenWillPay = LocalDate.now().plusDays(5);
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
@@ -681,6 +712,7 @@ class SealedClaimLipResponseFormGeneratorTest {
 
     @Test
     void checkMediationAlternativeFields() {
+        when(interestCalculator.claimAmountPlusInterestToDate(any())).thenReturn(new BigDecimal(2000));
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
         LocalDate whenWillPay = LocalDate.now().plusDays(5);
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
@@ -712,6 +744,7 @@ class SealedClaimLipResponseFormGeneratorTest {
 
     @Test
     void checkMediationUnAvailabilityDateRangeFields() {
+        when(interestCalculator.claimAmountPlusInterestToDate(any())).thenReturn(new BigDecimal(2000));
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
         LocalDate whenWillPay = LocalDate.now().plusDays(5);
         List<Element<UnavailableDate>> def1UnavailabilityDates = new ArrayList<>();
@@ -751,6 +784,7 @@ class SealedClaimLipResponseFormGeneratorTest {
 
     @Test
     void checkMediationUnAvailabilitySingleDateFields() {
+        when(interestCalculator.claimAmountPlusInterestToDate(any())).thenReturn(new BigDecimal(2000));
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
         LocalDate whenWillPay = LocalDate.now().plusDays(5);
         List<Element<UnavailableDate>> def1UnavailabilityDates = new ArrayList<>();
@@ -790,6 +824,7 @@ class SealedClaimLipResponseFormGeneratorTest {
 
     @Test
     void checkMediationRespondent1LipResponseFieldsAreNull() {
+        when(interestCalculator.claimAmountPlusInterestToDate(any())).thenReturn(new BigDecimal(2000));
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
         LocalDate whenWillPay = LocalDate.now().plusDays(5);
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
@@ -813,6 +848,7 @@ class SealedClaimLipResponseFormGeneratorTest {
 
     @Test
     void checkMediationCaseDataLipResponsesAreNull() {
+        when(interestCalculator.claimAmountPlusInterestToDate(any())).thenReturn(new BigDecimal(2000));
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
         LocalDate whenWillPay = LocalDate.now().plusDays(5);
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
@@ -834,6 +870,7 @@ class SealedClaimLipResponseFormGeneratorTest {
 
     @Test
     void checkMediationNullFieldsOfRespondent1MediationLipResponseFields() {
+        when(interestCalculator.claimAmountPlusInterestToDate(any())).thenReturn(new BigDecimal(2000));
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
         LocalDate whenWillPay = LocalDate.now().plusDays(5);
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
@@ -857,6 +894,7 @@ class SealedClaimLipResponseFormGeneratorTest {
 
     @Test
     void checkMediationIndividualNameField() {
+        when(interestCalculator.claimAmountPlusInterestToDate(any())).thenReturn(new BigDecimal(2000));
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
         LocalDate whenWillPay = LocalDate.now().plusDays(5);
         List<Element<UnavailableDate>> def1UnavailabilityDates = new ArrayList<>();
@@ -894,5 +932,36 @@ class SealedClaimLipResponseFormGeneratorTest {
         Assertions.assertEquals("test@gmail.com", templateData.getDefendant1MediationEmail());
         Assertions.assertEquals("23454656", templateData.getDefendant1MediationContactNumber());
         Assertions.assertEquals(2, templateData.getDefendant1UnavailableDatesList().size());
+    }
+
+    @Test
+    void shouldGenerateDocumentWithStatementOfTruthSuccessfully_DefendantLipTypeCompanyOROrg() {
+        //Given
+        when(interestCalculator.claimAmountPlusInterestToDate(any())).thenReturn(new BigDecimal(2000));
+        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+        LocalDate whenWillPay = LocalDate.now().plusDays(5);
+        //When
+        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder()
+            .applicant1(company("A"))
+            .applicant1Represented(YesOrNo.NO)
+            .respondent1Represented(YesOrNo.NO)
+            .respondent1(company("B"))
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+            .caseDataLiP(CaseDataLiP.builder().respondent1MediationLiPResponseCarm(MediationLiPCarm.builder().build())
+                             .build())
+            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+            .respondent1LiPStatementOfTruth(StatementOfTruth.builder().name("Test").role("Test").build())
+            .respondToClaimAdmitPartLRspec(
+                RespondToClaimAdmitPartLRspec.builder()
+                    .whenWillThisAmountBePaid(whenWillPay)
+                    .build())
+            .totalClaimAmount(BigDecimal.valueOf(10_000))
+            .uiStatementOfTruth(StatementOfTruth.builder().name("Test").role("Test").build());
+
+        //Then
+        SealedClaimLipResponseForm templateData = generator
+            .getTemplateData(builder.build());
+        assertThat(templateData.getUiStatementOfTruth().getName()).isEqualTo("Test");
+        assertThat(templateData.getUiStatementOfTruth().getRole()).isEqualTo("Test");
     }
 }

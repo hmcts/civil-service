@@ -38,7 +38,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRANSFER_ONLINE_CASE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIGGER_TASK_RECONFIG_GA;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 
@@ -137,15 +136,16 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
 
         if (nonNull(newCourtLocation)) {
             boolean isLipCase = caseData.isApplicantLiP() || caseData.isRespondent1LiP() || caseData.isRespondent2LiP();
-            boolean isLocationWhiteListed = featureToggleService.isLocationWhiteListedForCaseProgression(newCourtLocation.getEpimmsId());
-
-            if (!isLipCase) {
-                log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
+            if (featureToggleService.isWelshEnabledForMainCase()) {
                 caseDataBuilder.eaCourtLocation(YES);
-                caseDataBuilder.hmcEaCourtLocation(isLocationWhiteListed ? YES : NO);
             } else {
-                boolean isLipCaseEaCourt = isLipCaseWithProgressionEnabledAndCourtWhiteListed(caseData, newCourtLocation.getEpimmsId());
-                caseDataBuilder.eaCourtLocation(isLipCaseEaCourt ? YesOrNo.YES : YesOrNo.NO);
+                if (!isLipCase) {
+                    log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
+                    caseDataBuilder.eaCourtLocation(YES);
+                } else {
+                    boolean isLipCaseEaCourt = isLipCaseWithProgressionEnabledAndCourtWhiteListed(caseData, newCourtLocation.getEpimmsId());
+                    caseDataBuilder.eaCourtLocation(isLipCaseEaCourt ? YesOrNo.YES : YesOrNo.NO);
+                }
             }
         }
 
@@ -159,7 +159,8 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
     }
 
     private boolean isLipCaseWithProgressionEnabledAndCourtWhiteListed(CaseData caseData, String newCourtLocation) {
-        return (caseData.isLipvLipOneVOne() || caseData.isLRvLipOneVOne())
+        return (caseData.isLipvLipOneVOne() || caseData.isLRvLipOneVOne()
+            || (caseData.isLipvLROneVOne() && featureToggleService.isDefendantNoCOnlineForCase(caseData)))
             && featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(newCourtLocation);
     }
 

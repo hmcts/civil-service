@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -243,27 +244,36 @@ public class PartyUtils {
         }
     }
 
+    public static boolean isAcknowledgeUserRespondentTwo(CaseData caseData) {
+        boolean isAcknowledgeUserRespondentTwo;
+        final LocalDateTime resp1AcknowledgedDate =  caseData.getRespondent1AcknowledgeNotificationDate();
+        final LocalDateTime resp2AcknowledgedDate =  caseData.getRespondent2AcknowledgeNotificationDate();
+        if (resp1AcknowledgedDate == null &&  resp2AcknowledgedDate != null) {
+            //case where respondent 2 acknowledges first
+            isAcknowledgeUserRespondentTwo = true;
+        } else if (resp1AcknowledgedDate != null && resp2AcknowledgedDate != null) {
+            if (resp2AcknowledgedDate.isAfter(resp1AcknowledgedDate)) {
+                //case where respondent 2 acknowledges 2nd
+                isAcknowledgeUserRespondentTwo = true;
+            } else {
+                //case where respondent 1 acknowledges 2nd
+                isAcknowledgeUserRespondentTwo = false;
+            }
+        } else {
+            //case where respondent 1 acknowledges first
+            isAcknowledgeUserRespondentTwo = false;
+        }
+        return isAcknowledgeUserRespondentTwo;
+    }
+
     public static String getResponseIntentionForEmail(CaseData caseData) {
         StringBuilder responseIntentions = new StringBuilder();
         responseIntentions.append("The acknowledgement response selected: ");
         switch (getMultiPartyScenario(caseData)) {
             case ONE_V_TWO_TWO_LEGAL_REP:
-                if ((caseData.getRespondent1AcknowledgeNotificationDate() == null)
-                    && (caseData.getRespondent2AcknowledgeNotificationDate() != null)) {
-                    //case where respondent 2 acknowledges first
+                if (isAcknowledgeUserRespondentTwo(caseData)) {
                     responseIntentions.append(caseData.getRespondent2ClaimResponseIntentionType().getLabel());
-                } else if ((caseData.getRespondent1AcknowledgeNotificationDate() != null)
-                    && (caseData.getRespondent2AcknowledgeNotificationDate() != null)) {
-                    if (caseData.getRespondent2AcknowledgeNotificationDate()
-                        .isAfter(caseData.getRespondent1AcknowledgeNotificationDate())) {
-                        //case where respondent 2 acknowledges 2nd
-                        responseIntentions.append(caseData.getRespondent2ClaimResponseIntentionType().getLabel());
-                    } else {
-                        //case where respondent 1 acknowledges 2nd
-                        responseIntentions.append(caseData.getRespondent1ClaimResponseIntentionType().getLabel());
-                    }
                 } else {
-                    //case where respondent 1 acknowledges first
                     responseIntentions.append(caseData.getRespondent1ClaimResponseIntentionType().getLabel());
                 }
                 break;
