@@ -117,6 +117,11 @@ public class SendHearingBulkPrintService {
                                     || TASK_ID_CLAIMANT_DRO.equals(taskId))
             ? caseData.getClaimantBilingualLanguagePreference()
             : caseData.getDefendantBilingualLanguagePreference();
+
+        if (languagePreference == null) {
+            return Language.ENGLISH;
+        }
+
         return switch (languagePreference) {
             case "WELSH" -> WELSH;
             case "BOTH" -> BOTH;
