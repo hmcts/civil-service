@@ -4,7 +4,7 @@
 update
 	dbs.scenario
 set
-	notifications_to_delete = '{"Notice.AAA6.DefResponse.PartAdmit.PayImmediately.Claimant",
+	notifications_to_delete = '{"Notice.AAA6.DefResponse.ResponseTimeElapsed.Claimant",
 								"Notice.AAA6.DefResponse.FullOrPartAdmit.PayBySetDate.Claimant",
 								"Notice.AAA6.DefResponse.FullOrPartAdmit.PayByInstalments.Claimant",
 								"Notice.AAA6.DefResponse.OrgOrLtdCompany.FullOrPartAdmit.PayBySetDate.Claimant",
