@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadServ
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DECISION_MADE_ON_APPLICATIONS;
@@ -117,6 +118,11 @@ public class SendHearingBulkPrintService {
                                     || TASK_ID_CLAIMANT_DRO.equals(taskId))
             ? caseData.getClaimantBilingualLanguagePreference()
             : caseData.getDefendantBilingualLanguagePreference();
+
+        if (Objects.isNull(languagePreference)) {
+            return Language.ENGLISH;
+        }
+
         return switch (languagePreference) {
             case "WELSH" -> WELSH;
             case "BOTH" -> BOTH;
