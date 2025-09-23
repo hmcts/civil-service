@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.utils;
 
 import lombok.extern.slf4j.Slf4j;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import static java.util.Optional.ofNullable;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
@@ -74,8 +76,10 @@ public class QueryNotificationUtils {
                 getLegalOrganizationNameForRespondent(caseData, true, organisationService)
             );
         } else if (isRespondentSolicitorTwo(roles)) {
-            properties.put(CLAIM_LEGAL_ORG_NAME_SPEC,
-                           getLegalOrganizationNameForRespondent(caseData, false, organisationService));
+            properties.put(
+                CLAIM_LEGAL_ORG_NAME_SPEC,
+                getLegalOrganizationNameForRespondent(caseData, false, organisationService)
+            );
         } else if (isLIPClaimant(roles)) {
             properties.put(PARTY_NAME, caseData.getApplicant1().getPartyName());
         } else if (isLIPDefendant(roles)) {
@@ -247,7 +251,7 @@ public class QueryNotificationUtils {
         return details;
     }
 
-    private static  Map<String, String> createLipOnCaseEmailDetails(String email, String lipName, String lipOtherPartyWelsh) {
+    private static Map<String, String> createLipOnCaseEmailDetails(String email, String lipName, String lipOtherPartyWelsh) {
         Map<String, String> details = new HashMap<>();
         details.put(EMAIL, email);
         details.put(LIP_NAME, lipName);
@@ -256,4 +260,12 @@ public class QueryNotificationUtils {
         return details;
     }
 
+    public static boolean isUnspecClaimNotReadyForNotification(CaseData caseData, CoreCaseUserService coreCaseUserService, String queryId) {
+        List<String> roles = getUserRoleForQuery(caseData, coreCaseUserService, queryId);
+
+        return UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+            && !isOtherPartyApplicant(roles)
+            && (CaseState.CASE_ISSUED == caseData.getCcdState()
+            || CaseState.AWAITING_CASE_DETAILS_NOTIFICATION == caseData.getCcdState());
+    }
 }
