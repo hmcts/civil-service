@@ -65,7 +65,7 @@ import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesRefe
 @Slf4j
 public class InitiateGeneralApplicationService {
 
-    public static final int GA_CLAIM_DEADLINE_EXTENSION_MONTHS = 24;
+    public static final int GA_CLAIM_DEADLINE_EXTENSION_MONTHS = 36;
     private final InitiateGeneralApplicationServiceHelper helper;
     private final GeneralAppsDeadlinesCalculator deadlinesCalculator;
     private final FeatureToggleService featureToggleService;
@@ -154,6 +154,7 @@ public class InitiateGeneralApplicationService {
     }
 
     private boolean isLipCase(CaseData caseData, CaseAssignmentUserRolesResource userRoles) {
+        log.info("Checking isLipCase for case: {} and application feature is enabled {}", caseData.getCcdCaseReference(), featureToggleService.isGaForLipsEnabled());
         if (featureToggleService.isGaForLipsEnabled() && (caseData.isRespondent1LiP() || caseData.isRespondent2LiP()
             || caseData.isApplicantNotRepresented())) {
 
