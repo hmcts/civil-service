@@ -121,15 +121,6 @@ public class InitiateGeneralApplicationServiceHelperTest {
         );
     }
 
-    public List<CaseAssignmentUserRole> getCaseUsersWithEmptyRole() {
-        return List.of(
-                CaseAssignmentUserRole.builder().caseDataId("1").userId(STRING_NUM_CONSTANT)
-                        .build(),
-                CaseAssignmentUserRole.builder().caseDataId("1").userId("2")
-                        .build()
-        );
-    }
-
     public List<CaseAssignmentUserRole> getCaseUsers() {
         return List.of(
                 CaseAssignmentUserRole.builder().caseDataId("1").userId(STRING_NUM_CONSTANT)
@@ -240,13 +231,17 @@ public class InitiateGeneralApplicationServiceHelperTest {
     }
 
     @Test
-    void shouldReturnsFourRespondentsWithEmptyDetails() {
+    void shouldReturnsNoRespondents() {
 
         when(caseAssignmentApi.getUserRoles(any(), any(), any()))
                 .thenReturn(CaseAssignmentUserRolesResource.builder()
-                        .caseAssignmentUserRoles(getCaseUsersWithEmptyRole()).build());
+                        .caseAssignmentUserRoles(List.of(CaseAssignmentUserRole.builder()
+                                                             .caseDataId("1")
+                                                             .userId(STRING_NUM_CONSTANT)
+                                                             .caseRole(APPLICANTSOLICITORONE.getFormattedName()).build())
+                        ).build());
 
-        assertThrows(IllegalArgumentException.class, () -> helper
+        assertDoesNotThrow(() -> helper
                 .setRespondentDetailsIfPresent(
                         GeneralApplication.builder().build(),
                         getTestCaseData(CaseData.builder().build(), true, null),
