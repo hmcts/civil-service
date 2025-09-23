@@ -52,7 +52,7 @@ import static uk.gov.hmcts.reform.civil.utils.WitnessUtils.addEventAndDateAddedT
 public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(DEFENDANT_RESPONSE_CUI);
-    private static final int DEFENDANT_RESPONSE_CUI_DEADLINE_EXTENSION_MONTHS = 24;
+    private static final int DEFENDANT_RESPONSE_CUI_DEADLINE_EXTENSION_MONTHS = 36;
 
     private final ObjectMapper objectMapper;
     private final DeadlinesCalculator deadlinesCalculator;
