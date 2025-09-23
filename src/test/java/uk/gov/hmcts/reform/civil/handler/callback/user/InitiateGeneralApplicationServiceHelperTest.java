@@ -86,6 +86,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
 
     @Mock
     protected IdamClient idamClient;
+
     @Mock
     private GeneralAppFeesService feesService;
 
@@ -112,7 +113,11 @@ public class InitiateGeneralApplicationServiceHelperTest {
                 CaseAssignmentUserRole.builder().caseDataId("1").userId("4")
                         .caseRole(RESPONDENTSOLICITORONE.getFormattedName()).build(),
                 CaseAssignmentUserRole.builder().caseDataId("1").userId("5")
-                        .caseRole(APPLICANTSOLICITORONE.getFormattedName()).build()
+                        .caseRole(APPLICANTSOLICITORONE.getFormattedName()).build(),
+                CaseAssignmentUserRole.builder().caseDataId("6").userId("6")
+                    .caseRole(APPLICANTSOLICITORONE.getFormattedName()).build(),
+                CaseAssignmentUserRole.builder().caseDataId("7").userId("7")
+                    .caseRole(APPLICANTSOLICITORONE.getFormattedName()).build()
         );
     }
 
@@ -205,7 +210,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
     }
 
     @Test
-    void shouldReturnsFourRespondents() {
+    void shouldReturnsTwoRespondents() {
         when(caseAssignmentApi.getUserRoles(any(), any(), any()))
                 .thenReturn(CaseAssignmentUserRolesResource.builder()
                         .caseAssignmentUserRoles(getCaseAssignmentApplicantUserRoles()).build());
@@ -220,9 +225,9 @@ public class InitiateGeneralApplicationServiceHelperTest {
 
         assertThat(result).isNotNull();
         assertThat(result.getGeneralAppRespondentSolicitors()).isNotNull();
-        assertThat(result.getGeneralAppRespondentSolicitors().size()).isEqualTo(4);
+        assertThat(result.getGeneralAppRespondentSolicitors().size()).isEqualTo(2);
 
-        ArrayList<String> userID = new ArrayList<>(Arrays.asList("2", "3", "4", "5"));
+        ArrayList<String> userID = new ArrayList<>(Arrays.asList("3", "4"));
 
         userID.forEach(uid -> assertThat(result.getGeneralAppRespondentSolicitors()
                 .stream().filter(e -> uid.equals(e.getValue().getId()))
@@ -870,7 +875,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
         @Test
         void should_Non_Urgency_Lip_Vs_Lip_At_25th() {
             LocalDate hearingDate = LocalDate.now().plusDays(25);
-            CaseData.CaseDataBuilder caseDataBuilder =
+            CaseData.CaseDataBuilder<?, ?> caseDataBuilder =
                 getTestCaseData(CaseData.builder().build(), false, 25).toBuilder();
             caseDataBuilder.addRespondent2(YesOrNo.NO)
                 .addApplicant2(YesOrNo.NO)

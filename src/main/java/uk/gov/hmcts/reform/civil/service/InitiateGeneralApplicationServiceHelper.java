@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
@@ -27,6 +28,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -41,7 +43,6 @@ import static uk.gov.hmcts.reform.civil.utils.OrgPolicyUtils.getRespondent2Solic
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@SuppressWarnings("unchecked")
 public class InitiateGeneralApplicationServiceHelper {
 
     private final CaseAssignmentApi caseAssignmentApi;
@@ -73,9 +74,30 @@ public class InitiateGeneralApplicationServiceHelper {
 
         CaseAssignmentUserRolesResource userRoles = getUserRoles(parentCaseId);
 
-        /*Filter the case users to collect solicitors whose ID doesn't match with GA Applicant Solicitor's ID*/
-        List<CaseAssignmentUserRole> respondentSolicitors = userRoles.getCaseAssignmentUserRoles().stream()
-            .filter(caseAssigned -> !caseAssigned.getUserId().equals(userDetails.getId()))
+        /*
+        * Filter the case users to collect solicitors whose ID doesn't match with GA Applicant Solicitor's ID
+        * There can be multiple applicant solicitors
+        * */
+        List<CaseAssignmentUserRole> caseAssignments = userRoles.getCaseAssignmentUserRoles();
+
+        String gaApplicantRoleOnMainCase = Optional.ofNullable(caseAssignments)
+            .orElse(Collections.emptyList())
+            .stream()
+            .filter(caseAssigned -> Objects.equals(caseAssigned.getUserId(),
+                                                   userDetails != null ? userDetails.getId() : null))
+            .map(CaseAssignmentUserRole::getCaseRole)
+            .findFirst()
+            .orElse(null);
+
+        List<CaseAssignmentUserRole> respondentSolicitors = Optional.ofNullable(caseAssignments)
+            .orElse(Collections.emptyList())
+            .stream()
+            .filter(caseAssigned -> !Objects.equals(caseAssigned.getUserId(),
+                                                    userDetails != null ? userDetails.getId() : null))
+            .filter(caseAssigned -> !StringUtils.equalsAnyIgnoreCase(
+                gaApplicantRoleOnMainCase,
+                caseAssigned.getCaseRole()
+            ))
             .toList();
 
         /*
