@@ -20,12 +20,13 @@ public class RetriggerUpdateLocationDataHandler extends BaseExternalTaskHandler 
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
-        if (externalTask.getVariable("caseIds") == null) {
-            throw new AssertionError("caseIds is null");
+        String caseIds = externalTask.getVariable("caseIds");
+        if (caseIds == null) {
+            throw new IllegalArgumentException("caseIds is null");
         }
         String epimsId = externalTask.getVariable("ePimId");
         if (epimsId == null) {
-            throw new AssertionError("ePimId is null");
+            throw new IllegalArgumentException("ePimId is null");
         }
 
         String caseManagementLocation = externalTask.getVariable("caseManagementLocation");
@@ -34,7 +35,6 @@ public class RetriggerUpdateLocationDataHandler extends BaseExternalTaskHandler 
         String respondent1DQRequestedCourt = externalTask.getVariable("respondent1DQRequestedCourt");
         String region = externalTask.getVariable("region");
 
-        String caseIds = externalTask.getVariable("caseIds");
         String eventSummary = "Update locations epimId by " + epimsId;
         String eventDescription = "Process ID: %s".formatted(externalTask.getProcessInstanceId());
 
