@@ -49,6 +49,7 @@ class CaseHearingDateSearchServiceTest extends ElasticSearchServiceTest {
             LocalDate.now(), 3).format(DateTimeFormatter.ISO_DATE);
         BoolQueryBuilder query = boolQuery()
             .mustNot(matchQuery("state", "PREPARE_FOR_HEARING_CONDUCT_HEARING"))
+            .mustNot(matchQuery("data.cvpLinkSchedulerProcessed", "Yes"))
             .must(boolQuery()
                       .minimumShouldMatch(1)
                       .should(rangeQuery("data.hearingDate").lte(targetMaxDateString).gte(

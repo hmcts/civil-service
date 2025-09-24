@@ -35,6 +35,7 @@ public class CaseHearingDateSearchService extends ElasticSearchService {
         return new Query(
             boolQuery()
                 .mustNot(matchQuery("state", "PREPARE_FOR_HEARING_CONDUCT_HEARING"))
+                .mustNot(matchQuery("data.cvpLinkSchedulerProcessed", "Yes"))
                 .must(boolQuery()
                           .minimumShouldMatch(1)
                           .should(rangeQuery("data.hearingDate").lte(targetMaxDateString).gte(
