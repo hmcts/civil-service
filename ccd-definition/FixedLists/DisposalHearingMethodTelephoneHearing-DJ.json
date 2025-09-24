@@ -1,0 +1,20 @@
+[
+  {
+    "ID": "DisposalHearingMethodTelephoneHearingDJ",
+    "ListElementCode": "telephoneTheClaimant",
+    "ListElement": "The claimant",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "DisposalHearingMethodTelephoneHearingDJ",
+    "ListElementCode": "telephoneTheDefendant",
+    "ListElement": "The defendant",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "DisposalHearingMethodTelephoneHearingDJ",
+    "ListElementCode": "telephoneTheCourt",
+    "ListElement": "The court",
+    "DisplayOrder": 3
+  }
+]

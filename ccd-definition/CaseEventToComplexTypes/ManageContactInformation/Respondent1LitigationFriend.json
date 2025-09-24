@@ -1,0 +1,151 @@
+[
+  {
+    "ID": "DefendantLitigationFriend",
+    "CaseEventID": "MANAGE_CONTACT_INFORMATION",
+    "CaseFieldID": "respondent1LitigationFriend",
+    "ListElementCode": "firstName",
+    "EventHintText": "You can only update this information if you have a signed order from a judge",
+    "FieldDisplayOrder": 1,
+    "FieldShowCondition": "partyChosenType=\"DEFENDANT_1_LITIGATION_FRIEND_ADMIN\"",
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "DefendantLitigationFriend",
+    "CaseEventID": "MANAGE_CONTACT_INFORMATION",
+    "CaseFieldID": "respondent1LitigationFriend",
+    "ListElementCode": "lastName",
+    "EventHintText": "You can only update this information if you have a signed order from a judge",
+    "FieldDisplayOrder": 2,
+    "FieldShowCondition": "partyChosenType=\"DEFENDANT_1_LITIGATION_FRIEND_ADMIN\"",
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "DefendantLitigationFriend",
+    "CaseEventID": "MANAGE_CONTACT_INFORMATION",
+    "CaseFieldID": "respondent1LitigationFriend",
+    "ListElementCode": "emailAddress",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "DefendantLitigationFriend",
+    "CaseEventID": "MANAGE_CONTACT_INFORMATION",
+    "CaseFieldID": "respondent1LitigationFriend",
+    "ListElementCode": "phoneNumber",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "DefendantLitigationFriend",
+    "CaseEventID": "MANAGE_CONTACT_INFORMATION",
+    "CaseFieldID": "respondent1LitigationFriend",
+    "ListElementCode": "hasSameAddressAsLitigant",
+    "EventElementLabel": "Is the address of the Defendant’s litigation friend the same as the address of the Defendant?",
+    "FieldDisplayOrder": 5,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "RespondentSolicitor1Organisation",
+    "CaseEventID": "MANAGE_CONTACT_INFORMATION",
+    "CaseFieldID": "respondent1LitigationFriend",
+    "ListElementCode": "primaryAddress",
+    "FieldDisplayOrder": 6,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "RespondentSolicitor1Organisation",
+    "CaseEventID": "MANAGE_CONTACT_INFORMATION",
+    "CaseFieldID": "respondent1LitigationFriend",
+    "ListElementCode": "primaryAddress.AddressLine1",
+    "FieldDisplayOrder": 7,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "RespondentSolicitor1Organisation",
+    "CaseEventID": "MANAGE_CONTACT_INFORMATION",
+    "CaseFieldID": "respondent1LitigationFriend",
+    "ListElementCode": "primaryAddress.AddressLine2",
+    "FieldDisplayOrder": 8,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "RespondentSolicitor1Organisation",
+    "CaseEventID": "MANAGE_CONTACT_INFORMATION",
+    "CaseFieldID": "respondent1LitigationFriend",
+    "ListElementCode": "primaryAddress.AddressLine3",
+    "FieldDisplayOrder": 9,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "RespondentSolicitor1Organisation",
+    "CaseEventID": "MANAGE_CONTACT_INFORMATION",
+    "CaseFieldID": "respondent1LitigationFriend",
+    "ListElementCode": "primaryAddress.PostTown",
+    "FieldDisplayOrder": 10,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "RespondentSolicitor1Organisation",
+    "CaseEventID": "MANAGE_CONTACT_INFORMATION",
+    "CaseFieldID": "respondent1LitigationFriend",
+    "ListElementCode": "primaryAddress.County",
+    "FieldDisplayOrder": 11,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "RespondentSolicitor1Organisation",
+    "CaseEventID": "MANAGE_CONTACT_INFORMATION",
+    "CaseFieldID": "respondent1LitigationFriend",
+    "ListElementCode": "primaryAddress.Country",
+    "FieldDisplayOrder": 12,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "RespondentSolicitor1Organisation",
+    "CaseEventID": "MANAGE_CONTACT_INFORMATION",
+    "CaseFieldID": "respondent1LitigationFriend",
+    "ListElementCode": "primaryAddress.PostCode",
+    "FieldDisplayOrder": 13,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+   "ID": "LitigationFriend",
+   "CaseEventID": "MANAGE_CONTACT_INFORMATION",
+   "CaseFieldID": "respondent1LitigationFriend",
+   "ListElementCode": "certificateOfSuitability",
+   "FieldDisplayOrder": 14,
+   "DisplayContext": "READONLY",
+   "FieldShowCondition": "respondent1LitigationFriend=\"DO_NOT_SHOW_IN_UI\"",
+   "RetainHiddenValue": "Y"
+  },
+  {
+    "ID": "LitigationFriend",
+    "CaseEventID": "MANAGE_CONTACT_INFORMATION",
+    "CaseFieldID": "respondent1LitigationFriend",
+    "ListElementCode": "flags",
+    "FieldDisplayOrder": 15,
+    "DisplayContext": "OPTIONAL",
+    "RetainHiddenValue": "Y",
+    "FieldShowCondition": "respondent1LitigationFriend = \"DO_NOT_SHOW_IN_UI\""
+  },
+  {
+    "ID": "LitigationFriend",
+    "CaseEventID": "MANAGE_CONTACT_INFORMATION",
+    "CaseFieldID": "respondent1LitigationFriend",
+    "ListElementCode": "flags.roleOnCase",
+    "FieldDisplayOrder": 16,
+    "DisplayContext": "OPTIONAL",
+    "RetainHiddenValue": "Y",
+    "FieldShowCondition": "respondent1LitigationFriend = \"DO_NOT_SHOW_IN_UI\""
+  },
+  {
+    "ID": "LitigationFriend",
+    "CaseEventID": "MANAGE_CONTACT_INFORMATION",
+    "CaseFieldID": "respondent1LitigationFriend",
+    "ListElementCode": "flags.partyName",
+    "FieldDisplayOrder": 17,
+    "DisplayContext": "OPTIONAL",
+    "RetainHiddenValue": "Y",
+    "FieldShowCondition": "respondent1LitigationFriend = \"DO_NOT_SHOW_IN_UI\""
+  }
+]

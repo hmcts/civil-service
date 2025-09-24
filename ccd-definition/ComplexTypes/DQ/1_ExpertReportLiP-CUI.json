@@ -1,0 +1,18 @@
+[
+  {
+    "ID": "ExpertReportLiP",
+    "ListElementCode": "expertName",
+    "ElementLabel": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "ExpertReportLiP",
+    "ListElementCode": "reportDate",
+    "ElementLabel": " ",
+    "FieldType": "Date",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

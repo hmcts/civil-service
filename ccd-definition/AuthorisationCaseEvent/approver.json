@@ -1,0 +1,8 @@
+[
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "CaseEventID": "APPLY_NOC_DECISION",
+    "UserRole": "caseworker-approver",
+    "CRUD": "CRUD"
+  }
+]

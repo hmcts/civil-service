@@ -1,0 +1,46 @@
+[
+  {
+    "ID": "RevisedHearingRequirements",
+    "ListElementCode": "startLabel",
+    "FieldType": "Label",
+    "ElementLabel": "### Hearing Requirements",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "RevisedHearingRequirements",
+    "ListElementCode": "revisedHearingRequirements",
+    "ElementLabel": "Has anything changed to the support or adjustments you wish the court and the judge to consider for you, or a witness who will give evidence on your behalf?",
+    "HintText": "Check your previous answers in 'Directions questionnaire form' under 'Claim documents'",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "RevisedHearingRequirements",
+    "ListElementCode": "revisedHearingComments",
+    "ElementLabel": "What support do you, your clients, experts or witnesses need?",
+    "HintText": "For Example, client requires a courtroom with step free access.",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "revisedHearingRequirements = \"Yes\""
+  },
+  {
+    "ID": "RevisedHearingRequirements",
+    "ListElementCode": "endLabel",
+    "FieldType": "Label",
+    "ElementLabel": "You are reminded that this information will be shared with all other parties.",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "revisedHearingRequirements = \"Yes\""
+  },
+  {
+    "ID": "RevisedHearingRequirements",
+    "ListElementCode": "endLine",
+    "FieldType": "Label",
+    "ElementLabel": "****",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

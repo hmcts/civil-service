@@ -1,0 +1,86 @@
+[
+  {
+    "ID": "SmallClaimsHearing",
+    "ListElementCode": "label",
+    "FieldType": "Label",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SmallClaimsHearing",
+    "ListElementCode": "input1",
+    "FieldType": "TextArea",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SmallClaimsHearing",
+    "ListElementCode": "time",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "SmallClaimsTimeEstimate",
+    "ElementLabel": "The time estimate is",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SmallClaimsHearing",
+    "ListElementCode": "otherHours",
+    "ElementLabel": "Hour(s)",
+    "FieldType": "Number",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "time = \"OTHER\""
+  },
+  {
+    "ID": "SmallClaimsHearing",
+    "ListElementCode": "otherMinutes",
+    "ElementLabel": "Minute(s)",
+    "FieldType": "Number",
+    "Max": 59,
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "time = \"OTHER\""
+  },
+  {
+    "ID": "SmallClaimsHearing",
+    "ListElementCode": "input2",
+    "FieldType": "TextArea",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SmallClaimsHearing",
+    "ListElementCode": "dateToLabel",
+    "ElementLabel": "Date to",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SmallClaimsHearing",
+    "ListElementCode": "dateTo",
+    "ElementLabel": " ",
+    "FieldType": "Date",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SmallClaimsHearing",
+    "ListElementCode": "dateFromLabel",
+    "ElementLabel": "Date from",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SmallClaimsHearing",
+    "ListElementCode": "dateFrom",
+    "ElementLabel": " ",
+    "FieldType": "Date",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

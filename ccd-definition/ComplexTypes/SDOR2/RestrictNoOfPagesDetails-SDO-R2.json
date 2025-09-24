@@ -1,0 +1,28 @@
+[
+  {
+    "ID": "SdoR2RestrictNoOfPagesDetails",
+    "ListElementCode": "witnessShouldNotMoreThanTxt",
+    "FieldType": "Text",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2RestrictNoOfPagesDetails",
+    "ListElementCode": "noOfPages",
+    "FieldType": "Number",
+    "HintText":"For example,4",
+    "ElementLabel": "Number of pages",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2RestrictNoOfPagesDetails",
+    "ListElementCode": "fontDetails",
+    "FieldType": "TextArea",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+
+]

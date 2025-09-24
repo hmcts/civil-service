@@ -1,0 +1,67 @@
+[
+  {
+    "ID": "SdoR2ScheduleOfLoss",
+    "ListElementCode": "sdoR2ScheduleOfLossClaimantLabel",
+    "FieldType": "Label",
+    "ElementLabel": "### Claimant",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2ScheduleOfLoss",
+    "ListElementCode": "sdoR2ScheduleOfLossClaimantText",
+    "FieldType": "TextArea",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2ScheduleOfLoss",
+    "ListElementCode": "sdoR2ScheduleOfLossClaimantDate",
+    "FieldType": "Date",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2ScheduleOfLoss",
+    "ListElementCode": "sdoR2ScheduleOfLossDefendantLabel",
+    "FieldType": "Label",
+    "ElementLabel": "### Defendant(s)",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2ScheduleOfLoss",
+    "ListElementCode": "sdoR2ScheduleOfLossDefendantText",
+    "FieldType": "TextArea",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2ScheduleOfLoss",
+    "ListElementCode": "sdoR2ScheduleOfLossDefendantDate",
+    "FieldType": "Date",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2ScheduleOfLoss",
+    "ListElementCode": "isClaimForPecuniaryLoss",
+    "FieldType": "YesOrNo",
+    "ElementLabel": "Claim for future pecuniary loss",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2ScheduleOfLoss",
+    "ListElementCode": "sdoR2ScheduleOfLossPecuniaryLossTxt",
+    "FieldType": "TextArea",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "isClaimForPecuniaryLoss = \"Yes\""
+  }
+]

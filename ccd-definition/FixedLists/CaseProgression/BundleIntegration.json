@@ -1,0 +1,47 @@
+[
+  {
+    "ID": "pageNumberFormat",
+    "ListElementCode": "pageRange",
+    "ListElement": "Page Range"
+  },
+  {
+    "ID": "pageNumberFormat",
+    "ListElementCode": "numberOfPages",
+    "ListElement": "Number Of Pages"
+  },
+  {
+    "ID": "paginationStyle",
+    "ListElementCode": "off",
+    "ListElement": "Off"
+  },
+  {
+    "ID": "paginationStyle",
+    "ListElementCode": "topLeft",
+    "ListElement": "Top Left"
+  },
+  {
+    "ID": "paginationStyle",
+    "ListElementCode": "topCenter",
+    "ListElement": "Top Center"
+  },
+  {
+    "ID": "paginationStyle",
+    "ListElementCode": "topRight",
+    "ListElement": "Top Right"
+  },
+  {
+    "ID": "paginationStyle",
+    "ListElementCode": "bottomLeft",
+    "ListElement": "Bottom Left"
+  },
+  {
+    "ID": "paginationStyle",
+    "ListElementCode": "bottomCenter",
+    "ListElement": "Bottom Center"
+  },
+  {
+    "ID": "paginationStyle",
+    "ListElementCode": "bottomRight",
+    "ListElement": "Bottom Right"
+  }
+]

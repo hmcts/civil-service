@@ -1,0 +1,14 @@
+[
+  {
+    "ID": "HearingOnRadioOptions",
+    "ListElementCode": "OPEN_DATE",
+    "ListElement": "First open date after",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "HearingOnRadioOptions",
+    "ListElementCode": "HEARING_WINDOW",
+    "ListElement": "Hearing window",
+    "DisplayOrder": 2
+  }
+]

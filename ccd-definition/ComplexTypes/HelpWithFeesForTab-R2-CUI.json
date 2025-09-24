@@ -1,0 +1,50 @@
+[
+  {
+    "ID": "HelpWithFeesForTab",
+    "ListElementCode": "hwfType",
+    "ElementLabel": "Type:",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "HelpWithFeesForTab",
+    "ListElementCode": "feeCode",
+    "ElementLabel": "Fee code:",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "HelpWithFeesForTab",
+    "ListElementCode": "claimFee",
+    "ElementLabel": "Fee amount:",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "HelpWithFeesForTab",
+    "ListElementCode": "remissionAmount",
+    "ElementLabel": "Remission amount:",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "HelpWithFeesForTab",
+    "ListElementCode": "applicantMustPay",
+    "ElementLabel": "Applicant must pay:",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "HelpWithFeesForTab",
+    "ListElementCode": "hwfReferenceNumber",
+    "ElementLabel": "HWF reference number:",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

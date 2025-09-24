@@ -1,0 +1,10 @@
+[
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "TabID": "PaymentHistory",
+    "TabLabel": "Payment History",
+    "TabDisplayOrder": 6,
+    "CaseFieldID": "casePaymentHistoryViewer",
+    "TabFieldDisplayOrder": 1
+  }
+]

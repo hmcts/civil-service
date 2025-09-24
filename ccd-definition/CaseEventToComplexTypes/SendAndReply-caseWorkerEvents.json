@@ -1,0 +1,58 @@
+[
+  {
+    "ID": "SendMessageMetadata",
+    "CaseEventID": "SEND_AND_REPLY",
+    "CaseFieldID": "sendMessageMetadata",
+    "ListElementCode": "recipientRoleType",
+    "EventElementLabel": "Who are you sending the message to?",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "SendMessageMetadata",
+    "CaseEventID": "SEND_AND_REPLY",
+    "CaseFieldID": "sendMessageMetadata",
+    "ListElementCode": "isUrgent",
+    "EventElementLabel": "Is this urgent?",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "SendMessageMetadata",
+    "CaseEventID": "SEND_AND_REPLY",
+    "CaseFieldID": "sendMessageMetadata",
+    "ListElementCode": "subjectType",
+    "EventElementLabel": "What is this message about?",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "SendMessageMetadata",
+    "CaseEventID": "SEND_AND_REPLY",
+    "CaseFieldID": "sendMessageMetadata",
+    "ListElementCode": "subject",
+    "EventElementLabel": "Enter the subject",
+    "FieldShowCondition": "sendMessageMetadata.subjectType = \"*\"",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "SendMessageMetadata",
+    "CaseEventID": "SEND_AND_REPLY",
+    "CaseFieldID": "messageReplyMetadata",
+    "ListElementCode": "isUrgent",
+    "EventElementLabel": "Is this urgent?",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "SendMessageMetadata",
+    "CaseEventID": "SEND_AND_REPLY",
+    "CaseFieldID": "messageReplyMetadata",
+    "ListElementCode": "messageContent",
+    "EventElementLabel": "Enter your message",
+    "EventHintText": "Explain what you're requesting and why. Include any answers and decision you need.",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "MANDATORY"
+  }
+]

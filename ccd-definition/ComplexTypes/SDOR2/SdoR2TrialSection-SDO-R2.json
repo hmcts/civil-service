@@ -1,0 +1,173 @@
+[
+  {
+    "ID": "SdoR2Trial",
+    "ListElementCode": "sdoR2TrialLabel",
+    "FieldType": "Label",
+    "ElementLabel": "### A trial will take place on",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2Trial",
+    "ListElementCode": "trialOnOptions",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "TrialOnRadioOptions",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2Trial",
+    "ListElementCode": "sdoR2TrialFirstOpenDateAfter",
+    "FieldType": "SdoR2FirstOpenDateAfter",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "trialOnOptions = \"OPEN_DATE\""
+  },
+  {
+    "ID": "SdoR2Trial",
+    "ListElementCode": "sdoR2TrialWindow",
+    "FieldType": "SdoR2TrialFromTo",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "trialOnOptions = \"TRIAL_WINDOW\""
+  },
+  {
+    "ID": "SdoR2Trial",
+    "ListElementCode": "lengthListLabel",
+    "FieldType": "Label",
+    "ElementLabel": "### Length of trial",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2Trial",
+    "ListElementCode": "lengthList",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "FastTrackTimeEstimate",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2Trial",
+    "ListElementCode": "lengthListOther",
+    "FieldType": "SdoR2TrialHearingLengthOther",
+    "ElementLabel": "Length of hearing",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "lengthList = \"OTHER\""
+  },
+  {
+    "ID": "SdoR2Trial",
+    "ListElementCode": "label",
+    "FieldType": "Label",
+    "ElementLabel": "If either party considers that the time estimate is insufficient, they must inform the court within 7 days of the date of this order.",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2Trial",
+    "ListElementCode": "hearingCourtLocationListLabel",
+    "FieldType": "Label",
+    "ElementLabel": "### Hearing location",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2Trial",
+    "ListElementCode": "hearingCourtLocationList",
+    "FieldType": "DynamicRadioList",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2Trial",
+    "ListElementCode": "altHearingCourtLocationListLabel",
+    "FieldType": "Label",
+    "ElementLabel": "### Alternative hearing location",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "hearingCourtLocationList=\"OTHER_LOCATION\""
+  },
+  {
+    "ID": "SdoR2Trial",
+    "ListElementCode": "altHearingCourtLocationList",
+    "FieldType": "DynamicList",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "hearingCourtLocationList=\"OTHER_LOCATION\""
+  },
+  {
+    "ID": "SdoR2Trial",
+    "ListElementCode": "methodOfHearingLabel",
+    "FieldType": "Label",
+    "ElementLabel": "### Method of hearing",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2Trial",
+    "ListElementCode": "methodOfHearing",
+    "FieldType": "DynamicRadioList",
+    "ElementLabel": " ",
+    "HintText": "If you want to include any extra information or want to request a certain hearing platform, please include this in the Hearing notes section below",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2Trial",
+    "ListElementCode": "physicalBundleOptionsLabel",
+    "FieldType": "Label",
+    "ElementLabel": "### Physical trial bundle",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2Trial",
+    "ListElementCode": "physicalBundleOptions",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "PhysicalTrialBundleOptions",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2Trial",
+    "ListElementCode": "physicalBundlePartyTxtLabel",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "ElementLabel": "### Bundle of documents",
+    "FieldShowCondition": "physicalBundleOptions = \"PARTY\""
+  },
+  {
+    "ID": "SdoR2Trial",
+    "ListElementCode": "physicalBundlePartyTxt",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "ElementLabel": " ",
+    "FieldShowCondition": "physicalBundleOptions = \"PARTY\""
+  },
+  {
+    "ID": "SdoR2Trial",
+    "ListElementCode": "hearingNotesLbl",
+    "FieldType": "Label",
+    "ElementLabel": "### Hearing notes",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2Trial",
+    "ListElementCode": "hearingNotesTxt",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "ElementLabel": "This is only seen by the listing officer"
+  }
+]

@@ -1,0 +1,24 @@
+[
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "CaseEventID": "TRIGGER_UPDATE_GA_LOCATION",
+    "CaseFieldID": "gaEaCourtLocation",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "READONLY",
+    "PageID": "WorkAllocation",
+    "PageShowCondition": "gaDraftDocRespondentSolTwo=\"DO NOT SHOW IN UI\"",
+    "ShowSummaryChangeOption": "N",
+    "Publish": "Y"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "CaseEventID": "TRIGGER_UPDATE_GA_LOCATION",
+    "CaseFieldID": "gaDraftDocRespondentSolTwo",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "READONLY",
+    "PageID": "WorkAllocation",
+    "ShowSummaryChangeOption": "N"
+  }
+]

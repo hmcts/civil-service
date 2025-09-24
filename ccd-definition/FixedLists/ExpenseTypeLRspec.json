@@ -1,0 +1,86 @@
+[
+  {
+    "ID": "ExpenseType",
+    "ListElementCode": "MORTGAGE",
+    "ListElement": "Mortgage",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "ExpenseType",
+    "ListElementCode": "RENT",
+    "ListElement": "Rent",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "ExpenseType",
+    "ListElementCode": "COUNCIL_TAX",
+    "ListElement": "Council tax",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "ExpenseType",
+    "ListElementCode": "GAS",
+    "ListElement": "Gas",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "ExpenseType",
+    "ListElementCode": "ELECTRICITY",
+    "ListElement": "Electricity",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "ExpenseType",
+    "ListElementCode": "WATER",
+    "ListElement": "Water",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "ExpenseType",
+    "ListElementCode": "TRAVEL",
+    "ListElement": "Travel (Work or school)",
+    "DisplayOrder": 7
+  },
+  {
+    "ID": "ExpenseType",
+    "ListElementCode": "SCHOOL",
+    "ListElement": "School costs (include clothing)",
+    "DisplayOrder": 8
+  },
+  {
+    "ID": "ExpenseType",
+    "ListElementCode": "FOOD",
+    "ListElement": "Food and housekeeping",
+    "DisplayOrder": 9
+  },
+  {
+    "ID": "ExpenseType",
+    "ListElementCode": "TV",
+    "ListElement": "TV and broadband",
+    "DisplayOrder": 10
+  },
+  {
+    "ID": "ExpenseType",
+    "ListElementCode": "HIRE_PURCHASE",
+    "ListElement": "Hire purchase",
+    "DisplayOrder": 11
+  },
+  {
+    "ID": "ExpenseType",
+    "ListElementCode": "MOBILE_PHONE",
+    "ListElement": "Mobile phone",
+    "DisplayOrder": 12
+  },
+  {
+    "ID": "ExpenseType",
+    "ListElementCode": "MAINTENANCE",
+    "ListElement": "Maintenance payments",
+    "DisplayOrder": 13
+  },
+  {
+    "ID": "ExpenseType",
+    "ListElementCode": "OTHER",
+    "ListElement": "Other",
+    "DisplayOrder": 14
+  }
+]

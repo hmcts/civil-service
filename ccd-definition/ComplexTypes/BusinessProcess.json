@@ -1,0 +1,44 @@
+[
+  {
+    "ID": "BusinessProcess",
+    "ListElementCode": "processInstanceId",
+    "FieldType": "Text",
+    "ElementLabel": "Camunda process instance Id",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "BusinessProcess",
+    "ListElementCode": "status",
+    "FieldType": "FixedList",
+    "FieldTypeParameter": "BusinessProcessStatus",
+    "ElementLabel": "Camunda business process status",
+    "SecurityClassification": "Public",
+    "Searchable": "Y"
+  },
+  {
+    "ID": "BusinessProcess",
+    "ListElementCode": "activityId",
+    "FieldType": "Text",
+    "ElementLabel": "Last successfully processed task activity id",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "BusinessProcess",
+    "ListElementCode": "camundaEvent",
+    "FieldType": "Text",
+    "ElementLabel": "Camunda event name used to trigger business process by sending message",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "BusinessProcess",
+    "ListElementCode": "readyOn",
+    "FieldType": "DateTime",
+    "ElementLabel": "Date Business process Ready",
+    "SecurityClassification": "Public",
+    "Searchable": "Y",
+    "FieldShowCondition": "camundaEvent = \"DO_NOT_SHOW\""
+  }
+]

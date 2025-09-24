@@ -1,0 +1,14 @@
+[
+  {
+    "ID": "EvidenceUploadDisclosure",
+    "ListElementCode": "DISCLOSURE_LIST",
+    "ListElement": "Disclosure list",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "EvidenceUploadDisclosure",
+    "ListElementCode": "DOCUMENTS_FOR_DISCLOSURE",
+    "ListElement": "Documents for disclosure",
+    "DisplayOrder": 2
+  }
+]

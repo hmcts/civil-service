@@ -1,0 +1,32 @@
+[
+  {
+    "ID": "ReasonForProceedingOnPaperLR",
+    "ListElementCode": "APPLICATION",
+    "ListElement": "Application",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "ReasonForProceedingOnPaperLR",
+    "ListElementCode": "JUDGEMENT_REQUEST",
+    "ListElement": "Judgment request",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "ReasonForProceedingOnPaperLR",
+    "ListElementCode": "DEFENDANT_DOES_NOT_CONSENT",
+    "ListElement": "Defendant solicitor does not consent to accept service through MyHMCTS",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "ReasonForProceedingOnPaperLR",
+    "ListElementCode": "CASE_SETTLED",
+    "ListElement": "Case settled",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "ReasonForProceedingOnPaperLR",
+    "ListElementCode": "OTHER",
+    "ListElement": "Other",
+    "DisplayOrder": 5
+  }
+]

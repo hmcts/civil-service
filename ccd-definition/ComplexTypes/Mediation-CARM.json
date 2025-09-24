@@ -1,0 +1,67 @@
+[
+  {
+    "ID": "MediationLiPCarm",
+    "ListElementCode": "isMediationContactNameCorrect",
+    "ElementLabel": "Is the mediation contact name correct?",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "MediationLiPCarm",
+    "ListElementCode": "alternativeMediationContactPerson",
+    "ElementLabel": "Alternative mediation contact name",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "MediationLiPCarm",
+    "ListElementCode": "isMediationEmailCorrect",
+    "ElementLabel": "Is the mediation email correct?",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "MediationLiPCarm",
+    "ListElementCode": "alternativeMediationEmail",
+    "ElementLabel": "Alternative mediation email",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "MediationLiPCarm",
+    "ListElementCode": "isMediationPhoneCorrect",
+    "ElementLabel": "Is the mediation phone number correct?",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "MediationLiPCarm",
+    "ListElementCode": "alternativeMediationTelephone",
+    "ElementLabel": "Alternative mediation phone number",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "MediationLiPCarm",
+    "ListElementCode": "hasUnavailabilityNextThreeMonths",
+    "ElementLabel": "Are there any unavailable dates for mediation in the next three months?",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "MediationLiPCarm",
+    "ListElementCode": "unavailableDatesForMediation",
+    "ElementLabel": "Unavailable dates for mediation",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "UnavailableDate",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

@@ -1,0 +1,20 @@
+[
+  {
+    "ID": "RepaymentFrequencyDJ",
+    "ListElementCode": "ONCE_ONE_WEEK",
+    "ListElement": "Every week",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "RepaymentFrequencyDJ",
+    "ListElementCode": "ONCE_TWO_WEEKS",
+    "ListElement": "Every 2 weeks",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "RepaymentFrequencyDJ",
+    "ListElementCode": "ONCE_ONE_MONTH",
+    "ListElement": "Every month",
+    "DisplayOrder": 3
+  }
+]

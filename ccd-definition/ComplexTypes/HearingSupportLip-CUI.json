@@ -1,0 +1,19 @@
+[
+  {
+    "ID": "HearingSupportLip",
+    "ListElementCode": "supportRequirementLip",
+    "ElementLabel": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "HearingSupportLip",
+    "ListElementCode": "requirementsLip",
+    "ElementLabel": " ",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "RequirementsLip",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+  ]

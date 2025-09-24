@@ -1,0 +1,43 @@
+[
+  {
+    "ID": "OrderAfterHearingDate",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "orderAfterHearingDate",
+    "ListElementCode": "dateType",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY",
+    "EventElementLabel": "Enter date(s) of hearing"
+  },
+  {
+    "ID": "OrderAfterHearingDate",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "orderAfterHearingDate",
+    "ListElementCode": "date",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "OrderAfterHearingDate",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "orderAfterHearingDate",
+    "ListElementCode": "fromDate",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "OrderAfterHearingDate",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "orderAfterHearingDate",
+    "ListElementCode": "toDate",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "OrderAfterHearingDate",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "orderAfterHearingDate",
+    "ListElementCode": "bespokeDates",
+    "FieldDisplayOrder": 5,
+    "DisplayContext": "MANDATORY"
+  }
+]

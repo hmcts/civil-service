@@ -1,0 +1,10 @@
+[
+  {
+    "ID": "LatestQuery",
+    "ListElementCode": "isWelsh",
+    "FieldType": "YesOrNo",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

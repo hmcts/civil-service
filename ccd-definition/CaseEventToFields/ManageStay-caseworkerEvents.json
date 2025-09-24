@@ -1,0 +1,109 @@
+[
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "CaseEventID": "MANAGE_STAY",
+    "CaseFieldID": "manageStayOptionsLabel",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "READONLY",
+    "PageID": "manageStayOptions",
+    "PageDisplayOrder": 1,
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "CaseEventID": "MANAGE_STAY",
+    "CaseFieldID": "manageStayOption",
+    "PageFieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY",
+    "PageID": "manageStayOptions",
+    "PageDisplayOrder": 1,
+    "PageColumnNumber": 1,
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "CaseEventID": "MANAGE_STAY",
+    "CaseFieldID": "preStayState",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "READONLY",
+    "PageID": "manageStayOptions",
+    "PageDisplayOrder": 1,
+    "ShowSummaryChangeOption": "N",
+    "FieldShowCondition": "manageStayOption = \"DO_NOT_SHOW_IN_UI\""
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "CaseEventID": "MANAGE_STAY",
+    "CaseFieldID": "manageStayRequestUpdateHintText",
+    "PageFieldDisplayOrder": 3,
+    "DisplayContext": "READONLY",
+    "PageID": "manageStayOptions",
+    "PageDisplayOrder": 1,
+    "ShowSummaryChangeOption": "N",
+    "FieldShowCondition": "manageStayOption = \"REQUEST_UPDATE\""
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "CaseEventID": "MANAGE_STAY",
+    "CaseFieldID": "manageStayDummyField",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "READONLY",
+    "PageID": "manageStayDummyPage",
+    "PageDisplayOrder": 2,
+    "ShowSummaryChangeOption": "N",
+    "PageShowCondition": "manageStayOption = \"\""
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "CaseEventID": "MANAGE_STAY",
+    "CaseFieldID": "manageStayJudicialReferralInMediationText",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "READONLY",
+    "PageID": "manageStayJudicialReferralInMediation",
+    "PageDisplayOrder": 2,
+    "ShowSummaryChangeOption": "N",
+    "PageShowCondition": "preStayState != \"CASE_PROGRESSION\" AND preStayState != \"HEARING_READINESS\" AND preStayState != \"PREPARE_FOR_HEARING_CONDUCT_HEARING\" AND manageStayOption = \"LIFT_STAY\""
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "CaseEventID": "MANAGE_STAY",
+    "CaseFieldID": "manageStayCaseProgressedHearingReadyPrepareForHearingText",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "READONLY",
+    "PageID": "manageStayCaseProgressedHearingReadyPrepareForHearing",
+    "PageDisplayOrder": 2,
+    "ShowSummaryChangeOption": "N",
+    "PageShowCondition": "preStayState != \"JUDICIAL_REFERRAL\" AND preStayState != \"IN_MEDIATION\" AND manageStayOption = \"LIFT_STAY\""
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "CaseEventID": "MANAGE_STAY",
+    "CaseFieldID": "manageStayRequestUpdateText",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "READONLY",
+    "PageID": "manageStayRequestUpdate",
+    "PageDisplayOrder": 2,
+    "ShowSummaryChangeOption": "N",
+    "PageShowCondition": "manageStayOption = \"REQUEST_UPDATE\""
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "CaseEventID": "MANAGE_STAY",
+    "CaseFieldID": "applicant1Represented",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "READONLY",
+    "PageID": "WorkAllocationIntegrationFields",
+    "PageDisplayOrder": 99,
+    "Publish": "Y"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "CaseEventID": "MANAGE_STAY",
+    "CaseFieldID": "respondent1Represented",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "READONLY",
+    "PageID": "WorkAllocationIntegrationFields",
+    "PageDisplayOrder": 99,
+    "Publish": "Y"
+  }
+]

@@ -1,0 +1,27 @@
+[
+  {
+    "ID": "SdoR2RestrictPages",
+    "ListElementCode": "sdoR2RestrictPagesLabel",
+    "FieldType": "Label",
+    "ElementLabel": "### Restrict number of pages",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2RestrictPages",
+    "ListElementCode": "isRestrictPages",
+    "FieldType": "YesOrNo",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2RestrictPages",
+    "ListElementCode": "restrictNoOfPagesDetails",
+    "FieldType": "SdoR2RestrictNoOfPagesDetails",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "isRestrictPages = \"Yes\""
+  }
+]

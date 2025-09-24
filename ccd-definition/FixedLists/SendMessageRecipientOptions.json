@@ -1,0 +1,26 @@
+[
+  {
+    "ID": "SendMessageRecipientOptionsList",
+    "ListElementCode": "COURT_STAFF",
+    "ListElement": "Court staff",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "SendMessageRecipientOptionsList",
+    "ListElementCode": "DISTRICT_JUDGE",
+    "ListElement": "District judge",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "SendMessageRecipientOptionsList",
+    "ListElementCode": "CIRCUIT_JUDGE",
+    "ListElement": "Circuit judge",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "SendMessageRecipientOptionsList",
+    "ListElementCode": "LEGAL_ADVISOR",
+    "ListElement": "Legal advisor",
+    "DisplayOrder": 4
+  }
+]

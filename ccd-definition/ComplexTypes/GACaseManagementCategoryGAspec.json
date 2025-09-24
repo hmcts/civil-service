@@ -1,0 +1,21 @@
+[
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "GACaseManagementCategory",
+    "ListElementCode": "value",
+    "ElementLabel": " ",
+    "FieldType": "CaseManagementCategoryElement",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "GACaseManagementCategory",
+    "ListElementCode": "list_items",
+    "ElementLabel": " ",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "CaseManagementCategoryElement",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

@@ -1,0 +1,38 @@
+[
+  {
+    "ID": "SmallClaimsTimeEstimate",
+    "ListElementCode": "THIRTY_MINUTES",
+    "ListElement": "30 minutes",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "SmallClaimsTimeEstimate",
+    "ListElementCode": "ONE_HOUR",
+    "ListElement": "1 hour",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "SmallClaimsTimeEstimate",
+    "ListElementCode": "ONE_AND_HALF_HOUR",
+    "ListElement": "1.5 hours",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "SmallClaimsTimeEstimate",
+    "ListElementCode": "TWO_HOURS",
+    "ListElement": "2 hours",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "SmallClaimsTimeEstimate",
+    "ListElementCode": "TWO_AND_HALF_HOURS",
+    "ListElement": "2.5 hours",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "SmallClaimsTimeEstimate",
+    "ListElementCode": "OTHER",
+    "ListElement": "Other",
+    "DisplayOrder": 6
+  }
+]

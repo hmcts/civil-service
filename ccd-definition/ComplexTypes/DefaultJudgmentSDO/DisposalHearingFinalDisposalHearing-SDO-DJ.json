@@ -1,0 +1,35 @@
+[
+  {
+    "ID": "DisposalHearingFinalDisposalHearingDJ",
+    "ListElementCode": "label",
+    "FieldType": "Label",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DisposalHearingFinalDisposalHearingDJ",
+    "ListElementCode": "input",
+    "FieldType": "TextArea",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DisposalHearingFinalDisposalHearingDJ",
+    "ListElementCode": "date",
+    "FieldType": "Date",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DisposalHearingFinalDisposalHearingDJ",
+    "ListElementCode": "time",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "DisposalHearingFinalDisposalHearingTimeEstimate",
+    "ElementLabel": "The time estimate ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

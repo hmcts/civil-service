@@ -1,0 +1,14 @@
+[
+  {
+    "ID": "OrderType",
+    "ListElementCode": "DISPOSAL",
+    "ListElement": "Disposal hearing",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "OrderType",
+    "ListElementCode": "DECIDE_DAMAGES",
+    "ListElement": "A trial to decide the amount of damages",
+    "DisplayOrder": 2
+  }
+]

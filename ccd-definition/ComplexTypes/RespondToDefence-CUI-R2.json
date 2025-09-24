@@ -1,0 +1,76 @@
+[
+  {
+    "ID": "ClaimantLiPResponse",
+    "ListElementCode": "applicant1DQExtraDetails",
+    "ElementLabel": " ",
+    "FieldType": "DQExtraDetailsLip",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "ClaimantLiPResponse",
+    "ListElementCode": "applicant1DQHearingSupportLip",
+    "ElementLabel": " ",
+    "FieldType": "HearingSupportLip",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "ClaimantLiPResponse",
+    "ListElementCode": "applicant1ChoosesHowToProceed",
+    "ElementLabel": " ",
+    "FieldType": "FixedList",
+    "FieldTypeParameter": "ChooseHowToProceed",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "ClaimantLiPResponse",
+    "ListElementCode": "applicant1SignedSettlementAgreement",
+    "ElementLabel": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "ClaimantLiPResponse",
+    "ListElementCode": "claimantResponseOnCourtDecision",
+    "ElementLabel": " ",
+    "FieldType": "FixedList",
+    "FieldTypeParameter": "ClaimantResponseOnCourtDecisionType",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "ClaimantLiPResponse",
+    "ListElementCode": "claimantCourtDecision",
+    "ElementLabel": " ",
+    "FieldType": "FixedList",
+    "FieldTypeParameter": "RepaymentDecisionType",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "ClaimantLiPResponse",
+    "ListElementCode": "applicant1RejectedRepaymentReason",
+    "ElementLabel": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "ClaimantLiPResponse",
+    "ListElementCode": "applicant1SuggestedImmediatePaymentDeadLine",
+    "ElementLabel": " ",
+    "FieldType": "Date",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "ClaimantLiPResponse",
+    "ListElementCode": "applicant1DQEvidenceConfirmDetails",
+    "ElementLabel": " ",
+    "FieldType": "EvidenceConfirmYourDetails",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

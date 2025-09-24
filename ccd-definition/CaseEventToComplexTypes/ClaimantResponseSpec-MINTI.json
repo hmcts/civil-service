@@ -1,0 +1,48 @@
+[
+  {
+    "ID": "FixedRecoverableCostsIntermediate",
+    "CaseEventID": "CLAIMANT_RESPONSE_SPEC",
+    "CaseFieldID": "applicant1DQFixedRecoverableCostsIntermediate",
+    "ListElementCode": "isSubjectToFixedRecoverableCostRegime",
+    "ElementLabel": " ",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "FixedRecoverableCostsIntermediate",
+    "CaseEventID": "CLAIMANT_RESPONSE_SPEC",
+    "CaseFieldID": "applicant1DQFixedRecoverableCostsIntermediate",
+    "ListElementCode": "complexityBandingAgreed",
+    "ElementLabel": " ",
+    "FieldDisplayOrder":3,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "FixedRecoverableCostsIntermediate",
+    "CaseEventID": "CLAIMANT_RESPONSE_SPEC",
+    "CaseFieldID": "applicant1DQFixedRecoverableCostsIntermediate",
+    "ListElementCode": "band",
+    "ElementLabel": " ",
+    "FieldTypeParameter": "ComplexityBandIntermediate",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "FixedRecoverableCostsIntermediate",
+    "CaseEventID": "CLAIMANT_RESPONSE_SPEC",
+    "CaseFieldID": "applicant1DQFixedRecoverableCostsIntermediate",
+    "ListElementCode": "reasons",
+    "ElementLabel": " ",
+    "FieldDisplayOrder": 5,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "FixedRecoverableCostsIntermediate",
+    "CaseEventID": "CLAIMANT_RESPONSE_SPEC",
+    "CaseFieldID": "applicant1DQFixedRecoverableCostsIntermediate",
+    "ListElementCode": "frcSupportingDocument",
+    "ElementLabel": " ",
+    "FieldDisplayOrder": 6,
+    "DisplayContext": "OPTIONAL"
+  }
+]

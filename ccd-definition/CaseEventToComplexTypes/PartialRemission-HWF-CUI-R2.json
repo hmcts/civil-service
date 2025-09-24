@@ -1,0 +1,22 @@
+[
+  {
+    "ID": "HelpWithFeesDetails",
+    "CaseEventID": "PARTIAL_REMISSION_HWF_GRANTED",
+    "CaseFieldID": "claimIssuedHwfDetails",
+    "ListElementCode": "remissionAmount",
+    "EventElementLabel": "Remission Amount",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY",
+    "FieldShowCondition": "hwfFeeType = \"CLAIMISSUED\""
+  },
+  {
+    "ID": "HelpWithFeesDetails",
+    "CaseEventID": "PARTIAL_REMISSION_HWF_GRANTED",
+    "CaseFieldID": "hearingHwfDetails",
+    "ListElementCode": "remissionAmount",
+    "EventElementLabel": "Remission Amount",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY",
+    "FieldShowCondition": "hwfFeeType = \"HEARING\""
+  }
+]

@@ -1,0 +1,20 @@
+[
+  {
+    "ID": "HearingLength",
+    "ListElementCode": "LESS_THAN_DAY",
+    "ListElement": "Less than a day",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "HearingLength",
+    "ListElementCode": "ONE_DAY",
+    "ListElement": "One day",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "HearingLength",
+    "ListElementCode": "MORE_THAN_DAY",
+    "ListElement": "More than a day",
+    "DisplayOrder": 3
+  }
+]

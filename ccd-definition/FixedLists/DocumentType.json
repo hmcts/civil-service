@@ -1,0 +1,110 @@
+[
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "SEALED_CLAIM",
+    "ListElement": "Sealed Claim form",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "ACKNOWLEDGEMENT_OF_CLAIM",
+    "ListElement": "Acknowledgement of claim form",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "DIRECTIONS_QUESTIONNAIRE",
+    "ListElement": "Directions questionnaire form",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "DEFENDANT_DEFENCE",
+    "ListElement": "Defendant defence",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "DEFENDANT_DRAFT_DIRECTIONS",
+    "ListElement": "Defendant Draft Directions",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "CLAIMANT_DEFENCE",
+    "ListElement": "Claimant response",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "CLAIMANT_DRAFT_DIRECTIONS",
+    "ListElement": "Claimant Draft Directions",
+    "DisplayOrder": 7
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "DEFAULT_JUDGMENT",
+    "ListElement": "Default Judgment",
+    "DisplayOrder": 8
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "DEFAULT_JUDGMENT_SDO_ORDER",
+    "ListElement": "Default Judgment Order",
+    "DisplayOrder": 9
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "HEARING_FORM",
+    "ListElement": "Hearing Notice",
+    "DisplayOrder": 10
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "HEARING_FORM_WELSH",
+    "ListElement": "Translated Hearing Notice",
+    "DisplayOrder": 11
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "SDO_ORDER",
+    "ListElement": "Standard Directions Order",
+    "DisplayOrder": 12
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "TRIAL_READY_DOCUMENT",
+    "ListElement": "Trial Ready",
+    "DisplayOrder": 13
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "JUDGE_FINAL_ORDER",
+    "ListElement": "Order",
+    "DisplayOrder": 14
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "DEFENCE_TRANSLATED_DOCUMENT",
+    "ListElement": "Defence Translated Document",
+    "DisplayOrder": 15
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "COURT_OFFICER_ORDER",
+    "ListElement": "Court Officer Order",
+    "DisplayOrder": 16
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "DECISION_MADE_ON_APPLICATIONS",
+    "ListElement": "Decision on reconsideration request",
+    "DisplayOrder": 17
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "SEND_APP_TO_OTHER_PARTY",
+    "ListElement": "Send Application to other party",
+    "DisplayOrder": 18
+  }
+]

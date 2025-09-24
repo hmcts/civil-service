@@ -1,0 +1,14 @@
+[
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "CaseEventID": "REFER_JUDGE_DEFENCE_RECEIVED",
+    "CaseFieldID": "featureToggleWA",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 6,
+    "DisplayContext": "READONLY",
+    "PageID": "ReferJudgeDefenceReceived",
+    "ShowSummaryChangeOption": "N",
+    "FieldShowCondition": "confirmReferToJudgeDefenceReceived=\"DO NOT SHOW IN UI\"",
+    "Publish": "Y"
+  }
+]

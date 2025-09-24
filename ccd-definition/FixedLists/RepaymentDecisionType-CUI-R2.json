@@ -1,0 +1,14 @@
+[
+  {
+    "ID": "RepaymentDecisionType",
+    "ListElementCode": "IN_FAVOUR_OF_CLAIMANT",
+    "ListElement": "IN_FAVOUR_OF_CLAIMANT",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "RepaymentDecisionType",
+    "ListElementCode": "IN_FAVOUR_OF_DEFENDANT",
+    "ListElement": "IN_FAVOUR_OF_DEFENDANT",
+    "DisplayOrder": 2
+  }
+]

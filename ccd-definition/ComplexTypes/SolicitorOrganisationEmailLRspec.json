@@ -1,0 +1,10 @@
+[
+    {
+      "ID": "SolicitorOrganisationEmail",
+      "ListElementCode": "email",
+      "FieldType": "Text",
+      "ElementLabel": "Email",
+      "SecurityClassification": "Public",
+      "Searchable": "Y"
+    }
+  ]

@@ -1,0 +1,26 @@
+[
+  {
+    "ID": "ObligationWAFlag",
+    "ListElementCode": "obligationReason",
+    "ElementLabel": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "ObligationWAFlag",
+    "ListElementCode": "obligationReasonDisplayValue",
+    "ElementLabel": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "ObligationWAFlag",
+    "ListElementCode": "currentDate",
+    "ElementLabel": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

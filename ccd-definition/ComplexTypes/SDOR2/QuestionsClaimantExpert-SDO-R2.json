@@ -1,0 +1,74 @@
+[
+  {
+    "ID": "SdoR2QuestionsClaimantExpert",
+    "ListElementCode": "sdoDefendantMayAskLbl",
+    "ElementLabel": "### Defendant(s) may ask questions",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2QuestionsClaimantExpert",
+    "ListElementCode": "sdoDefendantMayAskTxt",
+    "FieldType": "TextArea",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2QuestionsClaimantExpert",
+    "ListElementCode": "sdoDefendantMayAskDate",
+    "FieldType": "Date",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2QuestionsClaimantExpert",
+    "ListElementCode": "sdoQuestionsShallBeAnsweredLbl",
+    "ElementLabel": "### Questions shall be answered by",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2QuestionsClaimantExpert",
+    "ListElementCode": "sdoQuestionsShallBeAnsweredTxt",
+    "FieldType": "Text",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+  "ID": "SdoR2QuestionsClaimantExpert",
+  "ListElementCode": "sdoQuestionsShallBeAnsweredDate",
+  "FieldType": "Date",
+  "ElementLabel": " ",
+  "SecurityClassification": "Public",
+  "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2QuestionsClaimantExpert",
+    "ListElementCode": "sdoUploadedToDigitalPortalLbl",
+    "FieldType": "Label",
+    "ElementLabel": "and uploaded to the Digital Portal",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2QuestionsClaimantExpert",
+    "ListElementCode": "sdoUploadedToDigitalPortalTxt",
+    "FieldType": "Text",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2QuestionsClaimantExpert",
+    "ListElementCode": "sdoApplicationToRelyOnFurther",
+    "FieldType": "SdoR2ApplicationToRelyOnFurther",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

@@ -1,0 +1,9 @@
+[
+  {
+    "ID": "TransferCaseDetails",
+    "ListElementCode": "reasonForTransferCaseTxt",
+    "FieldType": "Text",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public"
+  }
+]

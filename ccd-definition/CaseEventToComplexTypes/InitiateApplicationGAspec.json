@@ -1,0 +1,401 @@
+[
+  {
+    "ID": "GARespondentAgreementPage",
+    "CaseEventID": "INITIATE_GENERAL_APPLICATION",
+    "CaseFieldID": "generalAppRespondentAgreement",
+    "ListElementCode": "hasAgreed",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "GAUrgencyRecordPage",
+    "CaseEventID": "INITIATE_GENERAL_APPLICATION",
+    "CaseFieldID": "generalAppUrgencyRequirement",
+    "ListElementCode": "generalAppUrgency",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "GAUrgencyRecordPage",
+    "CaseEventID": "INITIATE_GENERAL_APPLICATION",
+    "CaseFieldID": "generalAppUrgencyRequirement",
+    "ListElementCode": "urgentAppConsiderationDate",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "GAUrgencyRecordPage",
+    "CaseEventID": "INITIATE_GENERAL_APPLICATION",
+    "CaseFieldID": "generalAppUrgencyRequirement",
+    "ListElementCode": "reasonsForUrgency",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "GAUrgencyRecordPage",
+    "CaseEventID": "INITIATE_GENERAL_APPLICATION",
+    "CaseFieldID": "generalAppUrgencyRequirement",
+    "ListElementCode": "ConsentAgreementCheckBox",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "GAWithOrWithoutNoticePage",
+    "CaseEventID": "INITIATE_GENERAL_APPLICATION",
+    "CaseFieldID": "generalAppInformOtherParty",
+    "ListElementCode": "isWithNotice",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "GAWithOrWithoutNoticePage",
+    "CaseEventID": "INITIATE_GENERAL_APPLICATION",
+    "CaseFieldID": "generalAppInformOtherParty",
+    "ListElementCode": "reasonsForWithoutNotice",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "StatementOfTruth",
+    "CaseEventID": "INITIATE_GENERAL_APPLICATION",
+    "CaseFieldID": "generalAppStatementOfTruth",
+    "ListElementCode": "name",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "StatementOfTruth",
+    "CaseEventID": "INITIATE_GENERAL_APPLICATION",
+    "CaseFieldID": "generalAppStatementOfTruth",
+    "ListElementCode": "role",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "HearingDetails",
+    "CaseEventID": "INITIATE_GENERAL_APPLICATION",
+    "CaseFieldID": "generalAppHearingDetails",
+    "ListElementCode": "hearingYesorNo",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "HearingDetails",
+    "CaseEventID": "INITIATE_GENERAL_APPLICATION",
+    "CaseFieldID": "generalAppHearingDetails",
+    "ListElementCode": "hearingDate",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "HearingDetails",
+    "CaseEventID": "INITIATE_GENERAL_APPLICATION",
+    "CaseFieldID": "generalAppHearingDetails",
+    "ListElementCode": "judgeRequiredYesOrNo",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "HearingDetails",
+    "CaseEventID": "INITIATE_GENERAL_APPLICATION",
+    "CaseFieldID": "generalAppHearingDetails",
+    "ListElementCode": "judgeName",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "HearingDetails",
+    "CaseEventID": "INITIATE_GENERAL_APPLICATION",
+    "CaseFieldID": "generalAppHearingDetails",
+    "ListElementCode": "trialRequiredYesOrNo",
+    "FieldDisplayOrder": 5,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "HearingDetails",
+    "CaseEventID": "INITIATE_GENERAL_APPLICATION",
+    "CaseFieldID": "generalAppHearingDetails",
+    "ListElementCode": "trialRequiredLabel",
+    "FieldDisplayOrder": 6,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "HearingDetails",
+    "CaseEventID": "INITIATE_GENERAL_APPLICATION",
+    "CaseFieldID": "generalAppHearingDetails",
+    "ListElementCode": "trialDateFrom",
+    "FieldDisplayOrder": 7,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "HearingDetails",
+    "CaseEventID": "INITIATE_GENERAL_APPLICATION",
+    "CaseFieldID": "generalAppHearingDetails",
+    "ListElementCode": "trialDateTo",
+    "FieldDisplayOrder": 8,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "HearingDetails",
+    "CaseEventID": "INITIATE_GENERAL_APPLICATION",
+    "CaseFieldID": "generalAppHearingDetails",
+    "ListElementCode": "HearingPreferencesPreferredType",
+    "FieldDisplayOrder": 9,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "HearingDetails",
+    "CaseEventID": "INITIATE_GENERAL_APPLICATION",
+    "CaseFieldID": "generalAppHearingDetails",
+    "ListElementCode": "TelephoneHearingPreferredType",
+    "FieldDisplayOrder": 10,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "HearingDetails",
+    "CaseEventID": "INITIATE_GENERAL_APPLICATION",
+    "CaseFieldID": "generalAppHearingDetails",
+    "ListElementCode": "ReasonForPreferredHearingType",
+    "FieldDisplayOrder": 11,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "HearingDetails",
+    "CaseEventID": "INITIATE_GENERAL_APPLICATION",
+    "CaseFieldID": "generalAppHearingDetails",
+    "ListElementCode": "HearingPreferredLocationLabel",
+    "FieldDisplayOrder": 12,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "HearingDetails",
+    "CaseEventID": "INITIATE_GENERAL_APPLICATION",
+    "CaseFieldID": "generalAppHearingDetails",
+    "ListElementCode": "HearingPreferredLocation",
+    "FieldDisplayOrder": 13,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "HearingDetails",
+    "CaseEventID": "INITIATE_GENERAL_APPLICATION",
+    "CaseFieldID": "generalAppHearingDetails",
+    "ListElementCode": "HearingDetailsTelephoneNumber",
+    "FieldDisplayOrder": 14,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "HearingDetails",
+    "CaseEventID": "INITIATE_GENERAL_APPLICATION",
+    "CaseFieldID": "generalAppHearingDetails",
+    "ListElementCode": "HearingDetailsEmailID",
+    "FieldDisplayOrder": 15,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "HearingDetails",
+    "CaseEventID": "INITIATE_GENERAL_APPLICATION",
+    "CaseFieldID": "generalAppHearingDetails",
+    "ListElementCode": "HearingDuration",
+    "FieldDisplayOrder": 16,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "HearingDetails",
+    "CaseEventID": "INITIATE_GENERAL_APPLICATION",
+    "CaseFieldID": "generalAppHearingDetails",
+    "ListElementCode": "generalAppHearingDays",
+    "FieldDisplayOrder": 17,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "HearingDetails",
+    "CaseEventID": "INITIATE_GENERAL_APPLICATION",
+    "CaseFieldID": "generalAppHearingDetails",
+    "ListElementCode": "generalAppHearingHours",
+    "FieldDisplayOrder": 18,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "HearingDetails",
+    "CaseEventID": "INITIATE_GENERAL_APPLICATION",
+    "CaseFieldID": "generalAppHearingDetails",
+    "ListElementCode": "generalAppHearingMinutes",
+    "FieldDisplayOrder": 19,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "HearingDetails",
+    "CaseEventID": "INITIATE_GENERAL_APPLICATION",
+    "CaseFieldID": "generalAppHearingDetails",
+    "ListElementCode": "unavailableTrialRequiredYesOrNo",
+    "FieldDisplayOrder": 20,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "HearingDetails",
+    "CaseEventID": "INITIATE_GENERAL_APPLICATION",
+    "CaseFieldID": "generalAppHearingDetails",
+    "ListElementCode": "generalAppUnavailableDates",
+    "FieldDisplayOrder": 21,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "HearingDetails",
+    "CaseEventID": "INITIATE_GENERAL_APPLICATION",
+    "CaseFieldID": "generalAppHearingDetails",
+    "ListElementCode": "generalAppUnavailableDates.unavailableTrialDateFrom",
+    "FieldDisplayOrder": 22,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "HearingDetails",
+    "CaseEventID": "INITIATE_GENERAL_APPLICATION",
+    "CaseFieldID": "generalAppHearingDetails",
+    "ListElementCode": "generalAppUnavailableDates.unavailableTrialDateTo",
+    "FieldDisplayOrder": 23,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "HearingDetails",
+    "CaseEventID": "INITIATE_GENERAL_APPLICATION",
+    "CaseFieldID": "generalAppHearingDetails",
+    "ListElementCode": "vulnerabilityQuestionsLabel",
+    "FieldDisplayOrder": 24,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "HearingDetails",
+    "CaseEventID": "INITIATE_GENERAL_APPLICATION",
+    "CaseFieldID": "generalAppHearingDetails",
+    "ListElementCode": "vulnerabilityQuestionsYesOrNo",
+    "FieldDisplayOrder": 25,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "HearingDetails",
+    "CaseEventID": "INITIATE_GENERAL_APPLICATION",
+    "CaseFieldID": "generalAppHearingDetails",
+    "ListElementCode": "vulnerabilityQuestion",
+    "FieldDisplayOrder": 26,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "HearingDetails",
+    "CaseEventID": "INITIATE_GENERAL_APPLICATION",
+    "CaseFieldID": "generalAppHearingDetails",
+    "ListElementCode": "HearingSupportRequirementsLabel",
+    "FieldDisplayOrder": 27,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "HearingDetails",
+    "CaseEventID": "INITIATE_GENERAL_APPLICATION",
+    "CaseFieldID": "generalAppHearingDetails",
+    "ListElementCode": "SupportRequirement",
+    "FieldDisplayOrder": 28,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "HearingDetails",
+    "CaseEventID": "INITIATE_GENERAL_APPLICATION",
+    "CaseFieldID": "generalAppHearingDetails",
+    "ListElementCode": "SupportRequirementSignLanguage",
+    "FieldDisplayOrder": 29,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "HearingDetails",
+    "CaseEventID": "INITIATE_GENERAL_APPLICATION",
+    "CaseFieldID": "generalAppHearingDetails",
+    "ListElementCode": "SupportRequirementLanguageInterpreter",
+    "FieldDisplayOrder": 30,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "HearingDetails",
+    "CaseEventID": "INITIATE_GENERAL_APPLICATION",
+    "CaseFieldID": "generalAppHearingDetails",
+    "ListElementCode": "SupportRequirementOther",
+    "FieldDisplayOrder": 31,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "GAPBADetailsGAspec",
+    "CaseEventID": "INITIATE_GENERAL_APPLICATION",
+    "CaseFieldID": "generalAppPBADetails",
+    "ListElementCode": "generalAppFeeToPayInText",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "READONLY",
+    "ShowSummaryContentOption": "Y"
+  },
+  {
+    "ID": "GAPBADetailsGAspec",
+    "CaseEventID": "INITIATE_GENERAL_APPLICATION",
+    "CaseFieldID": "generalAppPBADetails",
+    "ListElementCode": "generalAppPayInformationText",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "READONLY",
+    "ShowSummaryContentOption": "Y"
+  },
+  {
+    "ID": "GAUploadN245Form",
+    "CaseEventID": "INITIATE_GENERAL_APPLICATION",
+    "CaseFieldID": "gaUploadN245FormUploadLabel",
+    "ListElementCode": "generalAppN245Download",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY",
+    "ShowSummaryContentOption": "N"
+  },
+  {
+    "ID": "GAUploadN245Form",
+    "CaseEventID": "INITIATE_GENERAL_APPLICATION",
+    "CaseFieldID": "gaUploadN245FormUploadLabel",
+    "ListElementCode": "generalAppN245Label",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY",
+    "ShowSummaryContentOption": "N"
+  },
+  {
+    "ID": "GAHearingDate",
+    "CaseEventID": "INITIATE_GENERAL_APPLICATION",
+    "CaseFieldID": "generalAppHearingDate",
+    "ListElementCode": "hearingScheduledPreferenceYesNoLabel",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL",
+    "ShowSummaryContentOption": "Y"
+  },
+  {
+    "ID": "GAHearingDate",
+    "CaseEventID": "INITIATE_GENERAL_APPLICATION",
+    "CaseFieldID": "generalAppHearingDate",
+    "ListElementCode": "hearingScheduledPreferenceYesNo",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "OPTIONAL",
+    "ShowSummaryContentOption": "Y"
+  },
+  {
+    "ID": "GAHearingDate",
+    "CaseEventID": "INITIATE_GENERAL_APPLICATION",
+    "CaseFieldID": "generalAppHearingDate",
+    "ListElementCode": "hearingScheduledDateLabel",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL",
+    "ShowSummaryContentOption": "Y"
+  },
+  {
+    "ID": "GAHearingDate",
+    "CaseEventID": "INITIATE_GENERAL_APPLICATION",
+    "CaseFieldID": "generalAppHearingDate",
+    "ListElementCode": "hearingScheduledDate",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "OPTIONAL",
+    "ShowSummaryContentOption": "Y"
+  }
+]

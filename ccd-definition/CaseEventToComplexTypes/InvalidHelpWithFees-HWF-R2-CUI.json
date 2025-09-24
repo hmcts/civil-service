@@ -1,0 +1,22 @@
+[
+  {
+    "ID": "HelpWithFees",
+    "CaseEventID": "INVALID_HWF_REFERENCE",
+    "CaseFieldID": "helpWithFees",
+    "ListElementCode": "helpWithFeesReferenceNumber",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "READONLY",
+    "EventElementLabel": " ",
+    "FieldShowCondition": "helpWithFeesReferenceNumber != \"\""
+  },
+  {
+    "ID": "HelpWithFees",
+    "CaseEventID": "INVALID_HWF_REFERENCE",
+    "CaseFieldID": "helpWithFees",
+    "ListElementCode": "helpWithFee",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "READONLY",
+    "EventElementLabel": " ",
+    "FieldShowCondition": "invalidHelpWithFee = \"DO_NOT_SHOW_IN_UI\""
+  }
+]

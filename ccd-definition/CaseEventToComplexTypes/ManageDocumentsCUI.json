@@ -1,0 +1,38 @@
+[
+  {
+    "ID": "StaffDocument",
+    "CaseEventID": "MANAGE_DOCUMENTS",
+    "CaseFieldID": "manageDocuments",
+    "ListElementCode": "documentName",
+    "EventElementLabel": "Document Name",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "StaffDocument",
+    "CaseEventID": "MANAGE_DOCUMENTS",
+    "CaseFieldID": "manageDocuments",
+    "ListElementCode": "documentType",
+    "EventElementLabel": "Document Type",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "StaffDocument",
+    "CaseEventID": "MANAGE_DOCUMENTS",
+    "CaseFieldID": "manageDocuments",
+    "ListElementCode": "documentTypeOther",
+    "EventElementLabel": "What type of document is it?",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "StaffDocument",
+    "CaseEventID": "MANAGE_DOCUMENTS",
+    "CaseFieldID": "manageDocuments",
+    "ListElementCode": "documentLink",
+    "EventElementLabel": "Upload essential document",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "MANDATORY"
+  }
+]

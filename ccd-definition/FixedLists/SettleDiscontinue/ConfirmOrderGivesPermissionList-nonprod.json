@@ -1,0 +1,14 @@
+[
+  {
+    "ID": "ConfirmOrderGivesPermission",
+    "ListElementCode": "YES",
+    "ListElement": "Yes - generate a Notice of Discontinuance",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "ConfirmOrderGivesPermission",
+    "ListElementCode": "NO",
+    "ListElement": "No - the claimant will be notified and requested to resubmit",
+    "DisplayOrder": 2
+  }
+]

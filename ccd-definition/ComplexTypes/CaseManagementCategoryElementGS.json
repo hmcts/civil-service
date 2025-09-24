@@ -1,0 +1,22 @@
+[
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ListElementCode": "code",
+    "ID": "CaseManagementCategoryElement",
+    "Label": "Civil",
+    "ElementLabel": "Civil",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ListElementCode": "label",
+    "ID": "CaseManagementCategoryElement",
+    "Label": "Civil",
+    "ElementLabel": "Civil",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

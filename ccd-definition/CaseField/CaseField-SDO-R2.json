@@ -1,0 +1,989 @@
+[
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "reasonForReconsiderationPartiesName",
+    "Label": "**${caseNameHmctsInternal}**",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "reasonForReconsiderationSeparator",
+    "Label": "****",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "reasonForReconsiderationApplicant",
+    "Label": "Reason for reconsideration of directions order by a Legal Advisor",
+    "FieldType": "ReasonForReconsideration",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "reasonForReconsiderationRespondent1",
+    "Label": "Reason for reconsideration of directions order by a Legal Advisor",
+    "FieldType": "ReasonForReconsideration",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "reasonForReconsiderationRespondent2",
+    "Label": "Reason for reconsideration of directions order by a Legal Advisor",
+    "FieldType": "ReasonForReconsideration",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "casePartyRequestForReconsideration",
+    "Label": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "claimTypeUnSpec",
+    "Label": "Type of claim",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "ClaimTypeUnSpec",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "decisionOnRequestReconsiderationOptions",
+    "Label": "Do you wish to uphold the previous order made?",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "DecisionOnRequestReconsiderationOptionList",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+  "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+  "ID": "upholdingPreviousOrderReason",
+  "Label": " ",
+  "FieldType": "JudgeDecisionOnReconsiderationSelect",
+  "SecurityClassification": "Public",
+  "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "judgeResponseToReconsiderationDetailsNo",
+    "Label": " ",
+    "FieldType": "JudgeDecisionOnReconsiderationSelect",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "judgeResponseToReconsiderationDetailsAmending",
+    "Label": " ",
+    "FieldType": "JudgeDecisionOnReconsiderationSelect",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "decisionOnReconsiderationDocument",
+    "Label": "View directions order",
+    "FieldType": "CaseDocument",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "smallClaimsFlightDelayTitle",
+    "Label": "## Flight Delay ",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "smallClaimsFlightDelayStartLine",
+    "Label": "****",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "smallClaimsFlightDelayToggle",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "OrderDetailsPagesSectionsToggle",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "smallClaimsFlightDelay",
+    "Label": " ",
+    "FieldType": "SmallClaimsFlightDelay",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoPartiesName",
+    "Label": "**${caseNameHmctsInternal}**",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoPartiesNameDRH",
+    "Label": "**${caseNameHmctsInternal}**",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoWarningDateFormat",
+    "Label": "****\n<div class=\"govuk-warning-text\"><span class=\"govuk-warning-text__icon\" aria-hidden=\"true\">!</span><strong class=\"govuk-warning-text__text\"><span class=\"govuk-warning-text__assistive\"></span>All dates should be in the format 16 4 2021</strong></div>",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoWarningDateFormatDRH",
+    "Label": "****\n<div class=\"govuk-warning-text\"><span class=\"govuk-warning-text__icon\" aria-hidden=\"true\">!</span><strong class=\"govuk-warning-text__text\"><span class=\"govuk-warning-text__assistive\"></span>All dates should be in the format 16 4 2021</strong></div>",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoWarning",
+    "Label": "****\n ### Warning\nYou must comply with the terms imposed upon you by this Order otherwise your claim or the defence of it is liable to be struck out or some other sanction imposed. If you cannot comply, you are expected to make a formal application to the Court before any deadline imposed upon you expires.\n ****",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoJudgesRecitalLbl",
+    "Label": "### Judge’s recital",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoFastTrackJudgesRecital",
+    "Label": " ",
+    "FieldType": "FastTrackJudgesRecital",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoAllocation",
+    "Label": "****\n ### Allocation\n The claim is allocated to the Fast Track. \n****\n",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoAltDisputeResolutionLbl",
+    "Label": "### Alternative Dispute Resolution",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoAltDisputeResolution",
+    "Label": " ",
+    "FieldType": "SdoR2FastTrackAltDisputeResolution",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoSeparatorVariationOfDirections",
+    "Label": "****\n ### Variation of directions",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoVariationOfDirections",
+    "Label": " ",
+    "FieldType": "SdoR2VariationOfDirections",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoSeparatorSettlement",
+    "Label": "****\n ### Settlement",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2Settlement",
+    "Label": " ",
+    "FieldType": "SdoR2Settlement",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoSeparatorDisclosureOfDocument",
+    "Label": "****\n ### Disclosure of documents",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2DisclosureOfDocumentsToggle",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "IncludeInOrderToggle",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2DisclosureOfDocuments",
+    "Label": " ",
+    "FieldType": "SdoR2DisclosureOfDocuments",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoSeparatorWitnessesOfFact",
+    "Label": "****\n ### Witnesses of Fact",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2SeparatorWitnessesOfFactToggle",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "IncludeInOrderToggle",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2WitnessesOfFact",
+    "Label": " ",
+    "FieldType": "SdoR2WitnessOfFact",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoSeparatorScheduleOfLoss",
+    "Label": "****\n ### Schedule of loss",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2ScheduleOfLossToggle",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "IncludeInOrderToggle",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2ScheduleOfLoss",
+    "Label": " ",
+    "FieldType": "SdoR2ScheduleOfLoss",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoSeparatorAddNewDirection",
+    "Label": "****\n ### Add a new direction",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2AddNewDirection",
+    "Label": "Add a new direction",
+    "FieldTypeParameter": "SdoR2AddNewDirection",
+    "FieldType": "Collection",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoSeparatorTrial",
+    "Label": "****\n ### Trial",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2TrialToggle",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "IncludeInOrderToggle",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2Trial",
+    "Label": " ",
+    "FieldType": "SdoR2Trial",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoSeparatorImportantNotes",
+    "Label": "****\n ### Important notes",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2ImportantNotesTxt",
+    "Label": " ",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2ImportantNotesDate",
+    "Label": " ",
+    "FieldType": "Date",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "isSdoR2NewScreen",
+    "Label": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoSeparatorExpertEvidence",
+    "Label": "****\n ### Expert Evidence",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2SeparatorExpertEvidenceToggle",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "IncludeInOrderToggle",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2ExpertEvidence",
+    "Label": " ",
+    "FieldType": "SdoR2ExpertEvidence",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoSeparatorAddendumReport",
+    "Label": "****\n ### Addendum report",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2SeparatorAddendumReportToggle",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "IncludeInOrderToggle",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2AddendumReport",
+    "Label": " ",
+    "FieldType": "SdoR2AddendumReport",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoSeparatorFurtherAudiogram",
+    "Label": "****\n ### Further audiogram",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2SeparatorFurtherAudiogramToggle",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "IncludeInOrderToggle",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2FurtherAudiogram",
+    "Label": " ",
+    "FieldType": "SdoR2FurtherAudiogram",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoSeparatorQuestionsClaimantExpert",
+    "Label": "****\n ### Questions of the Claimant's expert",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2SeparatorQuestionsClaimantExpertToggle",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "IncludeInOrderToggle",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2QuestionsClaimantExpert",
+    "Label": " ",
+    "FieldType": "SdoR2QuestionsClaimantExpert",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoSeparatorPermissionToRelyOnExpert",
+    "Label": "****\n ### Permission for any Defendant to rely on expert evidence from a consultant ENT surgeon",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2SeparatorPermissionToRelyOnExpertToggle",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "IncludeInOrderToggle",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2PermissionToRelyOnExpert",
+    "Label": " ",
+    "FieldType": "SdoR2PermissionToRelyOnExpert",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoSeparatorEvidenceAcousticEngineer",
+    "Label": "****\n ### Evidence of an expert acoustic engineer",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2SeparatorEvidenceAcousticEngineerToggle",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "IncludeInOrderToggle",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2EvidenceAcousticEngineer",
+    "Label": " ",
+    "FieldType": "SdoR2EvidenceAcousticEngineer",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoSeparatorQuestionsToEntExpert",
+    "Label": "****\n ### Questions to ENT expert(s) after engineering evidence",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2SeparatorQuestionsToEntExpertToggle",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "IncludeInOrderToggle",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2QuestionsToEntExpert",
+    "Label": " ",
+    "FieldType": "SdoR2QuestionsToEntExpert",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoSeparatorUploadOfDocuments",
+    "Label": "****\n ### Upload of documents",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2SeparatorUploadOfDocumentsToggle",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "IncludeInOrderToggle",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2UploadOfDocuments",
+    "Label": " ",
+    "FieldType": "SdoR2UploadOfDocuments",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+  "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+  "ID": "sdoR2SmallClaimsWarning1",
+  "Label": "****\n ### Warning\nYou must comply with the terms imposed upon you by this Order otherwise your claim or the defence of it is liable to be struck out or some other sanction imposed. If you cannot comply, you are expected to make a formal application to the Court before any deadline imposed upon you expires.\n\n",
+  "FieldType": "Label",
+  "SecurityClassification": "Public",
+  "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2SmallClaimsWarning2",
+    "Label": "\n  You are encouraged to try to settle the case with the other side. You may also contact the Small Claims Mediation Service to arrange an appointment. The service is free and can be contacted on 01604 795 511.",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2SmallClaimsJudgesRecitalLbl",
+    "Label": "****\n### Judge’s recital",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2SmallClaimsJudgesRecital",
+    "Label": " ",
+    "FieldType": "SdoR2SmallClaimsJudgesRecital",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2SmallClaimsAllocation",
+    "Label": "****\n ### Allocation\n The claim is allocated to the Small Claims Track.",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2SmallClaimsDisputeResolutionHearing",
+    "Label": "****\n ### Dispute Resolution Hearing\n  The claim is listed for a Dispute Resolution Hearing before a District Judge on the date and at the time indicated on the Notice of Hearing which will follow separately.\n  A Dispute Resolution Hearing is a preliminary hearing for the purposes of Civil Procedure Rule 27.6.",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2SmallClaimsLRForDRH",
+    "Label": "#### Legal representation for DRH\n  If a party is legally represented at the dispute resolution hearing and the party is not also in attendance, they must have provided full instructions including as to settlement and be contactable so that meaningful negotiations can take place. Failure to have done so may result in the hearing being adjourned and a costs order being made against the party at fault.",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2SmallClaimsJudgesPowersDRH",
+    "Label": "#### Judges powers at DRH",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2SmallClaimsJudgesPowersDRH2",
+    "Label": " At the Dispute Resolution Hearing the Judge may:  \n  a) Strike out the claim, the defence, and any counterclaim and/or any defence to counterclaim if the court finds that the statement of case discloses no reasonable grounds for bringing or defending the claim or if it is considered a party has no real prospect of success at a final hearing.  \n  b) If a party fails to provide a contact number for the hearing, fails to attend the hearing, or fails to comply with the directions set out in this Order the court may strike out the claim, defence, and/or counterclaim.  \n  c) Conduct mediation with the parties’ consent, to assist the parties to reach an agreed resolution of the claim so that the dispute can be resolved completely at the Dispute Resolution Hearing and/or identify the real issues in the dispute.  \n  d) List any further hearing including final hearing and/or make an Order requiring the parties to take further steps prior to a further or final hearing and provide that if the same are not carried out, that the Statement of Case of any party in default will be struck out.  \n  e) Make any other Order which the court considers appropriate.",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2SmallClaimsPPILbl",
+    "Label": "****\n ### Payment Protection Insurance (PPI)",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2SmallClaimsPPIToggle",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "IncludeInOrderToggle",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2SmallClaimsPPI",
+    "Label": " ",
+    "FieldType": "SdoR2SmallClaimsPPI",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2SmallClaimsWitnessesOfFactLbl",
+    "Label": "****\n ### Witness statements",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2SmallClaimsWitnessStatementsToggle",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "IncludeInOrderToggle",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2SmallClaimsWitnessStatements",
+    "Label": " ",
+    "FieldType": "SdoR2SmallClaimsWitnessStatements",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2SmallClaimsUploadDocLbl",
+    "Label": "****\n ### Upload of documents",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2SmallClaimsUploadDocToggle",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "IncludeInOrderToggle",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2SmallClaimsUploadDoc",
+    "Label": " ",
+    "FieldType": "SdoR2SmallClaimsUploadDoc",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2SmallClaimsAddNewDirectionLbl",
+    "Label": "****",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2SmallClaimsAddNewDirection",
+    "Label": "Add a new direction",
+    "FieldTypeParameter": "SdoR2SmallClaimsAddNewDirection",
+    "FieldType": "Collection",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2SmallClaimsHearingLbl",
+    "Label": "****\n ### Hearing",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2SmallClaimsHearingToggle",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "IncludeInOrderToggle",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2SmallClaimsHearing",
+    "Label": " ",
+    "FieldType": "SdoR2SmallClaimsHearing",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2SmallClaimsMediationSectionTitle",
+    "Label": "****\n ### Mediation representation",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2SmallClaimsMediationSectionToggle",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "IncludeInOrderToggle",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2SmallClaimsMediationSectionStatement",
+    "Label": " ",
+    "FieldType": "SdoR2SmallClaimsMediation",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2SmallClaimsImpNotesLbl",
+    "Label": "****\n ### Important notes",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2SmallClaimsImpNotes",
+    "Label": " ",
+    "FieldType": "SdoR2SmallClaimsImpNotes",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2NIHLUseOfWelshLanguageTitle",
+    "Label": "****\n ### Use of the Welsh Language",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2NihlUseOfWelshIncludeInOrderToggle",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "IncludeInOrderToggle",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2NihlUseOfWelshLanguage",
+    "Label": " ",
+    "FieldType": "SdoR2WelshLanguageUsage",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2DRHUseOfWelshLanguageTitle",
+    "Label": "****\n ### Use of the Welsh Language",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2DrhUseOfWelshIncludeInOrderToggle",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "IncludeInOrderToggle",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2DrhUseOfWelshLanguage",
+    "Label": " ",
+    "FieldType": "SdoR2WelshLanguageUsage",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2FastTrackUseOfWelshLanguageTitle",
+    "Label": "### Use of the Welsh Language",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2FastTrackUseOfWelshToggle",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "OrderDetailsPagesSectionsToggle",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2FastTrackUseOfWelshLanguage",
+    "Label": " ",
+    "FieldType": "SdoR2WelshLanguageUsage",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2FastTrackWelshLangEndLine",
+    "Label": "****",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2SmallClaimsUseOfWelshLanguageTitle",
+    "Label": "****\n ### Use of the Welsh Language",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2SmallClaimsUseOfWelshToggle",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "OrderDetailsPagesSectionsToggle",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2SmallClaimsUseOfWelshLanguage",
+    "Label": " ",
+    "FieldType": "SdoR2WelshLanguageUsage",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2SmallClaimsWelshLangEndLine",
+    "Label": "****",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2DisposalHearingUseOfWelshLanguageTitle",
+    "Label": "****\n ### Use of the Welsh Language",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2DisposalHearingUseOfWelshToggle",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "OrderDetailsPagesSectionsToggle",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2DisposalHearingUseOfWelshLanguage",
+    "Label": " ",
+    "FieldType": "SdoR2WelshLanguageUsage",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2SmallClaimsWitnessStatementOther",
+    "Label": " ",
+    "FieldType": "SdoR2SmallClaimsWitnessStatements",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2FastTrackWitnessOfFact",
+    "Label": " ",
+    "FieldType": "SdoR2WitnessOfFact",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "sdoR2FastTrackCreditHire",
+    "Label": "Credit hire",
+    "FieldType": "SdoR2FastTrackCreditHire",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

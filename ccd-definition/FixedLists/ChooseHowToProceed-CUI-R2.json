@@ -1,0 +1,14 @@
+[
+  {
+    "ID": "ChooseHowToProceed",
+    "ListElementCode": "SIGN_A_SETTLEMENT_AGREEMENT",
+    "ListElement": "SIGN_A_SETTLEMENT_AGREEMENT",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "ChooseHowToProceed",
+    "ListElementCode": "REQUEST_A_CCJ",
+    "ListElement": "REQUEST_A_CCJ",
+    "DisplayOrder": 2
+  }
+]

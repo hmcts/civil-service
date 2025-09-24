@@ -1,0 +1,50 @@
+[
+  {
+    "ID": "SdoDJR2TrialCreditHireDetails",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "sdoDJR2TrialCreditHire",
+    "ListElementCode": "sdoDJR2TrialCreditHireDetails.input2",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "SdoDJR2TrialCreditHireDetails",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "sdoDJR2TrialCreditHire",
+    "ListElementCode": "sdoDJR2TrialCreditHireDetails.input3",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "SdoDJR2TrialCreditHireDetails",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "sdoDJR2TrialCreditHire",
+    "ListElementCode": "sdoDJR2TrialCreditHireDetails.date1",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "SdoDJR2TrialCreditHireDetails",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "sdoDJR2TrialCreditHire",
+    "ListElementCode": "sdoDJR2TrialCreditHireDetails.input4",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "SdoDJR2TrialCreditHireDetails",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "sdoDJR2TrialCreditHire",
+    "ListElementCode": "sdoDJR2TrialCreditHireDetails.input5",
+    "FieldDisplayOrder": 5,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "SdoDJR2TrialCreditHireDetails",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "sdoDJR2TrialCreditHire",
+    "ListElementCode": "sdoDJR2TrialCreditHireDetails.date2",
+    "FieldDisplayOrder": 6,
+    "DisplayContext": "OPTIONAL"
+  }
+]

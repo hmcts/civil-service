@@ -1,0 +1,35 @@
+2025-07-25 16:58:10.132+01:00 WARN  c.m.a.a.i.c.ConfigurationBuilder - "Sampling overrides" is no longer in preview and it has been GA since 3.5.0 GA,
+2025-07-25 16:58:10.137+01:00 INFO  c.m.a.a.i.c.ConfigurationBuilder - Some telemetry may be sampled out because a default sampling configuration was added in version 3.4.0 to reduce the default billing cost. You can set the sampling configuration explicitly: https://learn.microsoft.com/azure/azure-monitor/app/java-standalone-config#sampling
+2025-07-25 16:58:11.435+01:00 WARN  i.o.s.a.ResourceConfiguration - Found reference to io.opentelemetry.sdk.autoconfigure.internal.EnvironmentResourceProvider in otel.java.enabled.resource.providers. Please update to io.opentelemetry.sdk.autoconfigure.EnvironmentResourceProvider. Support for the old provider name will be removed after 1.49.0.
+2025-07-25 16:58:13.335+01:00 INFO  c.m.applicationinsights.agent - Application Insights Java Agent 3.7.1 started successfully (PID 32523, JVM running for 5.557 s)
+2025-07-25 16:58:13.336+01:00 INFO  c.m.applicationinsights.agent - Java version: 17.0.10, vendor: Oracle Corporation, home: /Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home
+2025-07-25 17:08:02.941+01:00 ERROR c.a.m.o.a.i.p.TelemetryPipeline - 
+*************************
+Failed to connect to https://uksouth-0.in.applicationinsights.azure.com/v2.1/track
+*************************
+
+Description:
+Unable to resolve host in url
+
+Action:
+Please update your network configuration so that the host in this url can be resolved: https://uksouth-0.in.applicationinsights.azure.com/v2.1/track
+Learn more about troubleshooting unknown host exception here: https://go.microsoft.com/fwlink/?linkid=2185830
+
+Note:
+This message is only logged the first time it occurs after startup.
+
+2025-07-25 17:08:03.801+01:00 ERROR c.a.m.o.a.i.q.QuickPulsePingSender - 
+*************************
+Failed to connect to https://uksouth.livediagnostics.monitor.azure.com/
+*************************
+
+Description:
+Unable to resolve host in url
+
+Action:
+Please update your network configuration so that the host in this url can be resolved: https://uksouth.livediagnostics.monitor.azure.com/
+Learn more about troubleshooting unknown host exception here: https://go.microsoft.com/fwlink/?linkid=2185830
+
+Note:
+This message is only logged the first time it occurs after startup.
+

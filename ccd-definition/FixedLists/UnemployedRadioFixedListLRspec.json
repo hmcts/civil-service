@@ -1,0 +1,20 @@
+[
+  {
+    "ID": "UnemployedRadioFixedListLRspec",
+    "ListElementCode": "UNEMPLOYED",
+    "ListElement": "Unemployed",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "UnemployedRadioFixedListLRspec",
+    "ListElementCode": "RETIRED",
+    "ListElement": "Retired",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "UnemployedRadioFixedListLRspec",
+    "ListElementCode": "OTHER",
+    "ListElement": "Other",
+    "DisplayOrder": 3
+  }
+]

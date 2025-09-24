@@ -1,0 +1,32 @@
+[
+  {
+    "ID": "EvidenceUploadTrial",
+    "ListElementCode": "CASE_SUMMARY",
+    "ListElement": "Case Summary",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "EvidenceUploadTrial",
+    "ListElementCode": "SKELETON_ARGUMENT",
+    "ListElement": "Skeleton argument",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "EvidenceUploadTrial",
+    "ListElementCode": "AUTHORITIES",
+    "ListElement": "Authorities",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "EvidenceUploadTrial",
+    "ListElementCode": "COSTS",
+    "ListElement": "Costs",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "EvidenceUploadTrial",
+    "ListElementCode": "DOCUMENTARY",
+    "ListElement": "Documentary evidence for trial",
+    "DisplayOrder": 5
+  }
+]

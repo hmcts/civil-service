@@ -1,0 +1,28 @@
+[
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "bundleLabel",
+    "Label": "## Bundles",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "bundleSelectionEvidence",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "BundleUpload",
+    "Label": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "bundleEvidence",
+    "Label": "Bundle",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "UploadEvidenceBundle",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

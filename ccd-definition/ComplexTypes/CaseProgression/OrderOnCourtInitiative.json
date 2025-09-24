@@ -1,0 +1,35 @@
+[
+  {
+    "ID": "OrderOnCourtInitiative",
+    "ListElementCode": "onInitiativeSelectionLabel",
+    "FieldType": "Label",
+    "ElementLabel": "### Order on court's own initiative",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "OrderOnCourtInitiative",
+    "ListElementCode": "onInitiativeSelectionTextArea",
+    "FieldType": "TextArea",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "OrderOnCourtInitiative",
+    "ListElementCode": "onInitiativeSelectionDateLabel",
+    "FieldType": "Label",
+    "ElementLabel": "### Please enter date",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "OrderOnCourtInitiative",
+    "ListElementCode": "onInitiativeSelectionDate",
+    "FieldType": "Date",
+    "ElementLabel": " ",
+    "HintText": "For example, 16 4 2021",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

@@ -1,0 +1,38 @@
+[
+  {
+    "ID": "RespondentResponseAdmissionType",
+    "ListElementCode": "HAS_PAID_THE_AMOUNT_CLAIMED",
+    "ListElement": "Has paid the amount claimed",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "RespondentResponseAdmissionType",
+    "ListElementCode": "DISPUTES_THE_CLAIM",
+    "ListElement": "Disputes the claim",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "HowWasThisAmountPaid",
+    "ListElementCode": "CREDIT_CARD",
+    "ListElement": "Credit card",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "HowWasThisAmountPaid",
+    "ListElementCode": "CHEQUE",
+    "ListElement": "Cheque",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "HowWasThisAmountPaid",
+    "ListElementCode": "BACS",
+    "ListElement": "BACS",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "HowWasThisAmountPaid",
+    "ListElementCode": "OTHER",
+    "ListElement": "Other",
+    "DisplayOrder": 4
+  }
+]

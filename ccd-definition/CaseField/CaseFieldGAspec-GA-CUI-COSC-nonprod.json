@@ -1,0 +1,18 @@
+[
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "certOfSC",
+    "Label": " ",
+    "FieldType": "CertOfSC",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "generalAppTypeLR",
+    "Label": " ",
+    "FieldType": "GATypeGAspecLR",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

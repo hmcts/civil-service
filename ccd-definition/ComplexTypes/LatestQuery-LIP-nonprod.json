@@ -1,0 +1,10 @@
+[
+  {
+    "ID": "LatestQuery",
+    "ListElementCode": "isAdditionalQuestion",
+    "FieldType": "YesOrNo",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

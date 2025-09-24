@@ -1,0 +1,14 @@
+[
+  {
+    "ID": "ClaimantOrDefendant",
+    "ListElementCode": "CLAIMANT",
+    "ListElement": "Claimant",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "ClaimantOrDefendant",
+    "ListElementCode": "DEFENDANT",
+    "ListElement": "Defendant",
+    "DisplayOrder": 2
+  }
+]

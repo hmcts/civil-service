@@ -1,0 +1,18 @@
+[
+  {
+    "ID": "TransferCaseReason",
+    "ListElementCode": "txtTransferCaseReason",
+    "ElementLabel": "Give details <br> State the court location name where the case will be transferred and the reason as to why the case needs to be transferred to another hearing court centre (i.e. Transfer the case to Leicester County Court. This case is not on our court jurisdiction to draw an order)",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "TransferCaseReason",
+    "ListElementCode": "reasonForCaseTransferJudgeTxt",
+    "ElementLabel": " ",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

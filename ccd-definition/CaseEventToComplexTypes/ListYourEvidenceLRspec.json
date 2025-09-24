@@ -1,0 +1,58 @@
+[
+  {
+    "ID": "EvidenceList",
+    "CaseEventID": "CREATE_CLAIM_SPEC",
+    "CaseFieldID": "speclistYourEvidenceList",
+    "ListElementCode": "evidenceType",
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "EvidenceList",
+    "CaseEventID": "CREATE_CLAIM_SPEC",
+    "CaseFieldID": "speclistYourEvidenceList",
+    "ListElementCode": "contractAndAgreementsEvidence",
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "EvidenceList",
+    "CaseEventID": "CREATE_CLAIM_SPEC",
+    "CaseFieldID": "speclistYourEvidenceList",
+    "ListElementCode": "expertWitnessEvidence",
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "EvidenceList",
+    "CaseEventID": "CREATE_CLAIM_SPEC",
+    "CaseFieldID": "speclistYourEvidenceList",
+    "ListElementCode": "lettersEmailsAndOtherCorrespondenceEvidence",
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "EvidenceList",
+    "CaseEventID": "CREATE_CLAIM_SPEC",
+    "CaseFieldID": "speclistYourEvidenceList",
+    "ListElementCode": "photoEvidence",
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "EvidenceList",
+    "CaseEventID": "CREATE_CLAIM_SPEC",
+    "CaseFieldID": "speclistYourEvidenceList",
+    "ListElementCode": "receiptsEvidence",
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "EvidenceList",
+    "CaseEventID": "CREATE_CLAIM_SPEC",
+    "CaseFieldID": "speclistYourEvidenceList",
+    "ListElementCode": "statementOfTruthEvidence",
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "EvidenceList",
+    "CaseEventID": "CREATE_CLAIM_SPEC",
+    "CaseFieldID": "speclistYourEvidenceList",
+    "ListElementCode": "otherEvidence",
+    "DisplayContext": "OPTIONAL"
+  }
+]

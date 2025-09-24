@@ -1,0 +1,23 @@
+[
+  {
+    "ID": "StaffDocumentType",
+    "ListElementCode": "N9A_PAPER_ADMISSION_FULL_OR_PART",
+    "ListElement": "N9a (Paper Admission - Full or Part)"
+  },
+  {
+    "ID": "StaffDocumentType",
+    "ListElementCode": "N9B_PAPER_DEFENCE_OR_COUNTERCLAIM",
+    "ListElement": "N9b (Paper defence/Counterclaim)"
+  },
+  {
+    "ID": "StaffDocumentType",
+    "ListElementCode": "N9_REQUEST_MORE_TIME",
+    "ListElement": "N9 (Request more time)"
+  },
+  { "ID": "StaffDocumentType", "ListElementCode": "OTHER", "ListElement": "Other" },
+  {
+    "ID": "StaffDocumentType",
+    "ListElementCode": "MEDIATION_AGREEMENT",
+    "ListElement": "Mediation Agreement"
+  }
+]

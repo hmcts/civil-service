@@ -1,0 +1,11 @@
+[
+  {
+    "ID": "Fee",
+    "CaseEventID": "RESUBMIT_CLAIM",
+    "CaseFieldID": "claimFee",
+    "ListElementCode": "calculatedAmountInPence",
+    "EventElementLabel": "Amount to pay",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "READONLY"
+  }
+]

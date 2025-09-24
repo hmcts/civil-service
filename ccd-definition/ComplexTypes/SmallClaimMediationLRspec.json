@@ -1,0 +1,18 @@
+[
+  {
+    "ID": "SmallClaimMediation",
+    "ListElementCode": "claimMediationLabel",
+    "ElementLabel": "<p>Find out more about <a href=\"https://www.gov.uk/guidance/small-claims-mediation-service\" rel=\"noreferrer noopener\" target=\"_blank\">free mediation (opens in a new tab)</a>.</p>",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SmallClaimMediation",
+    "ListElementCode": "hasAgreedFreeMediation",
+    "FieldType": "YesOrNo",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

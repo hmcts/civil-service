@@ -72,4 +72,11 @@ public interface CamundaRuntimeApi {
         @PathVariable("jobId") String jobId,
         @RequestBody Map<String, Object> body
     );
+
+    @PostMapping("/process-instance/{processInstanceId}/modification")
+    void modifyProcessInstance(
+        @RequestHeader("ServiceAuthorization") String serviceAuthorization,
+        @PathVariable("processInstanceId") String processInstanceId,
+        @RequestBody Map<String, Object> modificationRequest
+    );
 }

@@ -1,0 +1,42 @@
+[
+  {
+    "ID": "JudgeDecisionOnReconsideration",
+    "CaseEventID": "DECISION_ON_RECONSIDERATION_REQUEST",
+    "CaseFieldID": "upholdingPreviousOrderReason",
+    "ListElementCode": "reasonForReconsiderationTxtYes",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "JudgeDecisionOnReconsideration",
+    "CaseEventID": "DECISION_ON_RECONSIDERATION_REQUEST",
+    "CaseFieldID": "judgeResponseToReconsiderationDetailsNo",
+    "ListElementCode": "reasonForReconsiderationLblNoTitle",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "JudgeDecisionOnReconsideration",
+    "CaseEventID": "DECISION_ON_RECONSIDERATION_REQUEST",
+    "CaseFieldID": "judgeResponseToReconsiderationDetailsNo",
+    "ListElementCode": "reasonForReconsiderationLblNoTxt",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "JudgeDecisionOnReconsideration",
+    "CaseEventID": "DECISION_ON_RECONSIDERATION_REQUEST",
+    "CaseFieldID": "judgeResponseToReconsiderationDetailsAmending",
+    "ListElementCode": "reasonForReconsiderationLblAmendingTitle",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "JudgeDecisionOnReconsideration",
+    "CaseEventID": "DECISION_ON_RECONSIDERATION_REQUEST",
+    "CaseFieldID": "judgeResponseToReconsiderationDetailsAmending",
+    "ListElementCode": "reasonForReconsiderationLblAmendingTxt",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY"
+  }
+]

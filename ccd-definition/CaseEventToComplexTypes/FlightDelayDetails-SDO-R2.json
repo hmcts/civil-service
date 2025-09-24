@@ -1,0 +1,35 @@
+[
+  {
+    "ID": "FlightDelayDetails",
+    "CaseEventID": "CREATE_CLAIM_SPEC",
+    "CaseFieldID": "flightDelayDetails",
+    "ListElementCode": "airlineList",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "FlightDelayDetails",
+    "CaseEventID": "CREATE_CLAIM_SPEC",
+    "CaseFieldID": "flightDelayDetails",
+    "ListElementCode": "nameOfAirline",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY",
+    "FieldShowCondition": "flightDelayDetails.airlineList=\"OTHER\""
+  },
+  {
+    "ID": "FlightDelayDetails",
+    "CaseEventID": "CREATE_CLAIM_SPEC",
+    "CaseFieldID": "flightDelayDetails",
+    "ListElementCode": "flightNumber",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "FlightDelayDetails",
+    "CaseEventID": "CREATE_CLAIM_SPEC",
+    "CaseFieldID": "flightDelayDetails",
+    "ListElementCode": "scheduledDate",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "MANDATORY"
+  }
+]

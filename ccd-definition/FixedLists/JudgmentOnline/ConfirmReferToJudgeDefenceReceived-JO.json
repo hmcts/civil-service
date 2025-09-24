@@ -1,0 +1,8 @@
+[
+  {
+    "ID": "ConfirmReferToJudgeDefenceReceived",
+    "ListElementCode": "CONFIRM",
+    "ListElement": "I confirm that I want to refer this decision to a judge",
+    "DisplayOrder": 1
+  }
+]

@@ -1,0 +1,53 @@
+[
+  {
+    "ID": "OrderAfterHearingDate",
+    "ListElementCode": "dateType",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "OrderAfterHearingDateType",
+    "ElementLabel": "Enter date(s) of hearing",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "OrderAfterHearingDate",
+    "ListElementCode": "date",
+    "FieldType": "Date",
+    "ElementLabel": "Date",
+    "SecurityClassification": "Public",
+    "HintText": "For example 16 4 2021",
+    "FieldShowCondition": "dateType = \"SINGLE_DATE\"",
+    "Searchable": "N"
+  },
+  {
+    "ID": "OrderAfterHearingDate",
+    "ListElementCode": "fromDate",
+    "FieldType": "Date",
+    "ElementLabel": "Date from",
+    "SecurityClassification": "Public",
+    "HintText": "For example 16 4 2021",
+    "FieldShowCondition": "dateType = \"DATE_RANGE\"",
+    "Searchable": "N"
+  },
+  {
+    "ID": "OrderAfterHearingDate",
+    "ListElementCode": "toDate",
+    "FieldType": "Date",
+    "ElementLabel": "Date to",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "dateType = \"DATE_RANGE\"",
+    "HintText": "For example 16 4 2021",
+    "Searchable": "N"
+  },
+  {
+    "ID": "OrderAfterHearingDate",
+    "ListElementCode": "bespokeDates",
+    "FieldType": "TextArea",
+    "ElementLabel": "Enter a bespoke range of dates for hearing",
+    "HintText": "For example, 16 4 2021, 19-20 4 2021 and 11-12 5 2021",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "dateType = \"BESPOKE_RANGE\"",
+    "Searchable": "N"
+  }
+]
+
+

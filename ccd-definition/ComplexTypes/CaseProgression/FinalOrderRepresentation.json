@@ -1,0 +1,32 @@
+[
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ListElementCode": "typeRepresentationList",
+    "ID": "FinalOrderRepresentation",
+    "ElementLabel": " ",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "FinalOrdersRepresentationList",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ListElementCode": "typeRepresentationComplex",
+    "ID": "FinalOrderRepresentation",
+    "ElementLabel": " ",
+    "FieldType": "ClaimantAndDefendantHeard",
+    "FieldShowCondition": "typeRepresentationList=\"CLAIMANT_AND_DEFENDANT\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ListElementCode": "typeRepresentationOtherComplex",
+    "ID": "FinalOrderRepresentation",
+    "ElementLabel": " ",
+    "FieldType": "ClaimantAndDefendantHeard",
+    "FieldShowCondition": "typeRepresentationList=\"OTHER_REPRESENTATION\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

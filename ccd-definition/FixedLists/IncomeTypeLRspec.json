@@ -1,0 +1,68 @@
+[
+  {
+    "ID": "IncomeType",
+    "ListElementCode": "JOB",
+    "ListElement": "Income from your job",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "IncomeType",
+    "ListElementCode": "UNIVERSAL_CREDIT",
+    "ListElement": "Universal credit",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "IncomeType",
+    "ListElementCode": "JOBSEEKER_ALLOWANCE_INCOME",
+    "ListElement": "Jobseeker's Allowance (income based)",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "IncomeType",
+    "ListElementCode": "JOBSEEKER_ALLOWANCE_CONTRIBUTION",
+    "ListElement": "Jobseeker's Allowance (contribution based)",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "IncomeType",
+    "ListElementCode": "INCOME_SUPPORT",
+    "ListElement": "Income support",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "IncomeType",
+    "ListElementCode": "WORKING_TAX_CREDIT",
+    "ListElement": "Working Tax Credit",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "IncomeType",
+    "ListElementCode": "CHILD_TAX",
+    "ListElement": "Child Tax Credit",
+    "DisplayOrder": 7
+  },
+  {
+    "ID": "IncomeType",
+    "ListElementCode": "CHILD_BENEFIT",
+    "ListElement": "Child benefit",
+    "DisplayOrder": 8
+  },
+  {
+    "ID": "IncomeType",
+    "ListElementCode": "COUNCIL_TAX_SUPPORT",
+    "ListElement": "Council Tax Support",
+    "DisplayOrder": 9
+  },
+  {
+    "ID": "IncomeType",
+    "ListElementCode": "PENSION",
+    "ListElement": "Pension",
+    "DisplayOrder": 10
+  },
+  {
+    "ID": "IncomeType",
+    "ListElementCode": "OTHER",
+    "ListElement": "Other",
+    "DisplayOrder": 11
+  }
+]

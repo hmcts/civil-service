@@ -1,0 +1,37 @@
+[
+  {
+    "ID": "GeneralApplicationDetailsGAspec",
+    "ListElementCode": "generalApplicationType",
+    "FieldType": "Text",
+    "ElementLabel": "Application type",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "GeneralApplicationDetailsGAspec",
+    "ListElementCode": "caseLink",
+    "FieldType": "CaseLink",
+    "Label": "Application ID",
+    "ElementLabel": "Application ID",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "GeneralApplicationDetailsGAspec",
+    "ListElementCode": "caseState",
+    "FieldType": "Text",
+    "Label": "Status",
+    "ElementLabel": "Status",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "GeneralApplicationDetailsGAspec",
+    "ListElementCode": "generalAppSubmittedDateGAspec",
+    "FieldType": "DateTime",
+    "Label": "Submitted on",
+    "ElementLabel": "Submitted on",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

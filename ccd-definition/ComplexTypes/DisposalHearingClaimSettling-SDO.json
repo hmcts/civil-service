@@ -1,0 +1,19 @@
+[
+  {
+    "ID": "DisposalHearingClaimSettling",
+    "ListElementCode": "label",
+    "FieldType": "Label",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DisposalHearingClaimSettling",
+    "ListElementCode": "text",
+    "FieldType": "Label",
+    "ElementLabel": "Each party must inform the court immediately if the case is settled, whether or not it is then possible to file a draft consent order to give effect to their agreement.",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]
+

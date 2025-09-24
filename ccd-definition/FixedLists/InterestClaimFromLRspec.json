@@ -1,0 +1,16 @@
+[
+  {
+    "ID": "InterestClaimFrom",
+    "ListElementCode": "FROM_CLAIM_SUBMIT_DATE",
+    "ListElement": "The date you submit the claim. \n\n\n The interest will then be calculated up until the claim is settled or a judgment has been made.",
+    "HintText": "The interest will then be calculated up until the claim is settled or a judgment has been made.",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "InterestClaimFrom",
+    "ListElementCode": "FROM_A_SPECIFIC_DATE",
+    "ListElement": "A specific date. \n\n\n For example, the date an invoice was overdue, or the date that you told someone they owed you money.",
+    "HintText": "For example, the date an invoice was overdue, or the date that you told someone they owed you money.",
+    "DisplayOrder": 2
+  }
+]

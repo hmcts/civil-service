@@ -1,0 +1,10 @@
+[
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "CIVIL${CCD_DEF_VERSION}",
+    "Name": "Civil${CCD_DEF_VERSION}",
+    "Description": "Civil",
+    "JurisdictionID": "CIVIL",
+    "SecurityClassification": "Public"
+  }
+]

@@ -1,0 +1,20 @@
+[
+  {
+    "ID": "FastTrackMethodTelephoneHearing",
+    "ListElementCode": "telephoneTheClaimant",
+    "ListElement": "The claimant",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "FastTrackMethodTelephoneHearing",
+    "ListElementCode": "telephoneTheDefendant",
+    "ListElement": "The defendant",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "FastTrackMethodTelephoneHearing",
+    "ListElementCode": "telephoneTheCourt",
+    "ListElement": "The court",
+    "DisplayOrder": 3
+  }
+]

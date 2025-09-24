@@ -1,0 +1,34 @@
+[
+    {
+      "ID": "DisposalHearingMedicalEvidence",
+      "ListElementCode": "label",
+      "FieldType": "Label",
+      "ElementLabel": " ",
+      "SecurityClassification": "Public",
+      "Searchable": "N"
+    },
+    {
+      "ID": "DisposalHearingMedicalEvidence",
+      "ListElementCode": "input",
+      "FieldType": "TextArea",
+      "ElementLabel": " ",
+      "SecurityClassification": "Public",
+      "Searchable": "N"
+    },
+    {
+      "ID": "DisposalHearingMedicalEvidence",
+      "ListElementCode": "dateLabel",
+      "FieldType": "Label",
+      "ElementLabel": " ",
+      "SecurityClassification": "Public",
+      "Searchable": "N"
+    },
+    {
+      "ID": "DisposalHearingMedicalEvidence",
+      "ListElementCode": "date",
+      "FieldType": "Date",
+      "ElementLabel": " ",
+      "SecurityClassification": "Public",
+      "Searchable": "N"
+    }
+  ]

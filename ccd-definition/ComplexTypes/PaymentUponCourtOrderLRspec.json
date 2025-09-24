@@ -1,0 +1,20 @@
+[
+  {
+    "ID": "PaymentUponCourtOrderLRspec",
+    "ListElementCode": "payingDetailsRequired",
+    "FieldType": "YesOrNo",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "PaymentUponCourtOrderLRspec",
+    "ListElementCode": "payingMoneyDetails",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "PayingExtraInfo",
+    "ElementLabel": " ",
+    "FieldShowCondition": "payingDetailsRequired = \"Yes\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

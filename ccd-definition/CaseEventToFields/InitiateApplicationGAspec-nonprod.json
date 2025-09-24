@@ -1,0 +1,40 @@
+[
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "CaseEventID": "INITIATE_GENERAL_APPLICATION",
+    "CaseFieldID": "generalAppTypeLR",
+    "DisplayContext": "COMPLEX",
+    "PageID": "GATypePage",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "PageColumnNumber": 1,
+    "ShowSummaryChangeOption": "Y",
+    "CallBackURLMidEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/ga-validate-type"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "CaseEventID": "INITIATE_GENERAL_APPLICATION",
+    "CaseFieldID": "generalAppParentClaimantIsApplicant",
+    "DisplayContext": "READONLY",
+    "PageID": "GAUploadN245Form",
+    "PageDisplayOrder": 3,
+    "PageFieldDisplayOrder": 1,
+    "PageColumnNumber": 1,
+    "ShowSummaryChangeOption": "N",
+    "FieldShowCondition": "generalAppTypeLR.types = \"DO_NOT_SHOW_IN_UI\"",
+    "PageShowCondition": "generalAppVaryJudgementType=\"Yes\" AND generalAppParentClaimantIsApplicant=\"No\""
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "CaseEventID": "INITIATE_GENERAL_APPLICATION",
+    "CaseFieldID": "generalAppVaryJudgementType",
+    "DisplayContext": "READONLY",
+    "PageID": "GAWithOrWithoutNoticePage",
+    "PageDisplayOrder": 6,
+    "PageFieldDisplayOrder": 2,
+    "PageColumnNumber": 1,
+    "FieldShowCondition": "generalAppTypeLR.types = \"DO_NOT_SHOW_IN_UI\"",
+    "ShowSummaryChangeOption": "N",
+    "PageShowCondition": "generalAppRespondentAgreement.hasAgreed=\"No\" AND generalAppVaryJudgementType=\"No\""
+  }
+]

@@ -1,0 +1,79 @@
+[
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "TabID": "ClaimDetails",
+    "TabLabel": "Claim details",
+    "TabDisplayOrder": 2,
+    "CaseFieldID": "totalClaimAmount",
+    "TabFieldDisplayOrder": 1
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "TabID": "ClaimDetails",
+    "CaseFieldID": "enterBreathing",
+    "FieldShowCondition": "totalClaimAmount=\"DO NOT SHOW IN UI\"",
+    "TabFieldDisplayOrder": 2
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "TabID": "ClaimDetails",
+    "CaseFieldID": "liftBreathing",
+    "FieldShowCondition": "totalClaimAmount=\"DO NOT SHOW IN UI\"",
+    "TabFieldDisplayOrder": 2
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "TabID": "ClaimDetails",
+    "CaseFieldID": "breathingSpaceLabel",
+    "FieldShowCondition": "enterBreathing.type=\"*\" AND liftBreathing.expectedEnd!=\"*\"",
+    "TabFieldDisplayOrder": 0
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "TabID": "ClaimDetails",
+    "CaseFieldID": "resp1MediationContactInfo",
+    "TabFieldDisplayOrder": 69
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "TabID": "ClaimDetails",
+    "CaseFieldID": "resp2MediationContactInfo",
+    "TabFieldDisplayOrder": 70
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "TabID": "ClaimDetails",
+    "CaseFieldID": "resp1MediationAvailability",
+    "TabFieldDisplayOrder": 71
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "TabID": "ClaimDetails",
+    "CaseFieldID": "resp2MediationAvailability",
+    "TabFieldDisplayOrder": 72
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "TabID": "ClaimDetails",
+    "CaseFieldID": "respondent1LiPResponseCarm",
+    "TabFieldDisplayOrder": 89
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "TabID": "ClaimDetails",
+    "CaseFieldID": "applicant1LiPResponseCarm",
+    "TabFieldDisplayOrder": 90
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "TabID": "ClaimDetails",
+    "CaseFieldID": "app1MediationContactInfo",
+    "TabFieldDisplayOrder": 95
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "TabID": "ClaimDetails",
+    "CaseFieldID": "app1MediationAvailability",
+    "TabFieldDisplayOrder": 96
+  }
+]

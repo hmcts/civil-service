@@ -1,0 +1,25 @@
+[
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "TabID": "QueryManagement",
+    "TabLabel": "Queries",
+    "TabDisplayOrder": 14,
+    "CaseFieldID": "QueryManagementComponentLauncher",
+    "DisplayContextParameter" : "#ARGUMENT(QueryManagement)",
+    "TabFieldDisplayOrder": 1,
+    "TabShowCondition": "queries.partyName = \"*\" OR qmApplicantSolicitorQueries.partyName = \"*\" OR qmRespondentSolicitor1Queries.partyName = \"*\" OR qmRespondentSolicitor2Queries.partyName = \"*\""
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "Channel": "CaseWorker",
+    "TabID": "QueryManagement",
+    "TabLabel": "Queries",
+    "TabDisplayOrder": 14,
+    "CaseFieldID": "queries",
+    "DisplayContextParameter" : "#ARGUMENT(QueryManagement)",
+    "TabFieldDisplayOrder": 3,
+    "FieldShowCondition": "QueryManagementComponentLauncher!=\"\""
+  }
+]

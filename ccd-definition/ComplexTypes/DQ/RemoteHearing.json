@@ -1,0 +1,20 @@
+[
+  {
+    "ID": "RemoteHearing",
+    "ListElementCode": "remoteHearingRequested",
+    "ElementLabel": "Do you want the hearing to be held remotely?",
+    "HintText": "This will be over telephone or video",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "RemoteHearing",
+    "ListElementCode": "reasonForRemoteHearing",
+    "ElementLabel": "Briefly explain your reasons",
+    "FieldShowCondition": "remoteHearingRequested = \"Yes\"",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

@@ -1,0 +1,14 @@
+[
+  {
+    "ID": "DrawDirectionsOrderSmallClaimsAdditionalDirections",
+    "ListElementCode": "DrawDirectionsOrderSmallClaimsAdditionalDirectionsCreditHire",
+    "ListElement": "Credit Hire",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "DrawDirectionsOrderSmallClaimsAdditionalDirections",
+    "ListElementCode": "DrawDirectionsOrderSmallClaimsAdditionalDirectionsTrafficAccident",
+    "ListElement": "Road Traffic Accident",
+    "DisplayOrder": 2
+  }
+]

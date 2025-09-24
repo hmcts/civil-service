@@ -1,0 +1,14 @@
+[
+  {
+    "ID": "MediationDecision",
+    "ListElementCode": "Yes",
+    "ListElement": " I have read and understood the above",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "MediationDecision",
+    "ListElementCode": "No",
+    "ListElement": "Opt out of mediation",
+    "DisplayOrder": 2
+  }
+]

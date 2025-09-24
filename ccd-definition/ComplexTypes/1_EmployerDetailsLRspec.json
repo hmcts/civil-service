@@ -1,0 +1,18 @@
+[
+  {
+    "ID": "EmployerDetail",
+    "ListElementCode": "employerName",
+    "FieldType": "Text",
+    "ElementLabel": "Employer's name",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "EmployerDetail",
+    "ListElementCode": "jobTitle",
+    "FieldType": "Text",
+    "ElementLabel": "Job title",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

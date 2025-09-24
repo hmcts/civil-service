@@ -1,0 +1,73 @@
+[
+  {
+    "ID": "PartnerAndDependentsLRspec",
+    "ListElementCode": "liveWithPartnerRequired",
+    "FieldType": "YesOrNo",
+    "ElementLabel": "Does your client live with a partner?",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "PartnerAndDependentsLRspec",
+    "ListElementCode": "partnerAgedOver",
+    "FieldType": "YesOrNo",
+    "ElementLabel": "Is the partner aged 18 or over?",
+    "FieldShowCondition": "liveWithPartnerRequired = \"Yes\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "PartnerAndDependentsLRspec",
+    "ListElementCode": "haveAnyChildrenRequired",
+    "FieldType": "YesOrNo",
+    "ElementLabel": "Does your client have any children?",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "PartnerAndDependentsLRspec",
+    "ListElementCode": "howManyChildrenByAgeGroup",
+    "FieldType": "ChildrenByAgeGroupDetails",
+    "ElementLabel": " ",
+    "FieldShowCondition": "haveAnyChildrenRequired = \"Yes\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "PartnerAndDependentsLRspec",
+    "ListElementCode": "receiveDisabilityPayments",
+    "FieldType": "YesOrNo",
+    "ElementLabel": "Do any of the children that live your client receive severe disability premium payments",
+    "FieldShowCondition": "haveAnyChildrenRequired = \"Yes\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "PartnerAndDependentsLRspec",
+    "ListElementCode": "supportedAnyoneFinancialRequired",
+    "FieldType": "YesOrNo",
+    "ElementLabel": "Does your client support anyone else financially",
+    "HintText": "This can include adults and people your client does not live with",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "PartnerAndDependentsLRspec",
+    "ListElementCode": "supportPeopleNumber",
+    "FieldType": "Text",
+    "ElementLabel": "Number of people",
+    "FieldShowCondition": "supportedAnyoneFinancialRequired = \"Yes\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "RegularExpression": "\\d+"
+  },
+  {
+    "ID": "PartnerAndDependentsLRspec",
+    "ListElementCode": "supportPeopleDetails",
+    "FieldType": "TextArea",
+    "ElementLabel": "Provide details",
+    "FieldShowCondition": "supportedAnyoneFinancialRequired = \"Yes\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

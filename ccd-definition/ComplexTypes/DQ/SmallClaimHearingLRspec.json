@@ -1,0 +1,21 @@
+[
+  {
+    "ID": "SmallClaimHearing",
+    "ListElementCode": "unavailableDatesRequired",
+    "FieldType": "YesOrNo",
+    "ElementLabel": "Are there any days in the next 12 months when you, your client, an expert, or a witness, cannot attend a hearing?",
+    "HintText": "Hearings\ntake place Monday to Friday.",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SmallClaimHearing",
+    "ListElementCode": "smallClaimUnavailableDate",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "SmallClaimUnavailableDate",
+    "ElementLabel": "Unavailable date",
+    "FieldShowCondition": "unavailableDatesRequired = \"Yes\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

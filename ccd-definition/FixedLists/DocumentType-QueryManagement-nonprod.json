@@ -1,0 +1,8 @@
+[
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "QUERY_DOCUMENT",
+    "ListElement": "Query Document",
+    "DisplayOrder": 30
+  }
+]

@@ -1,0 +1,44 @@
+[
+  {
+    "ID": "TrialHearingTimeEstimate",
+    "ListElementCode": "ONE_HOUR",
+    "ListElement": "1 hour",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "TrialHearingTimeEstimate",
+    "ListElementCode": "ONE_AND_HALF_HOUR",
+    "ListElement": "1.5 hours",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "TrialHearingTimeEstimate",
+    "ListElementCode": "TWO_HOURS",
+    "ListElement": "2 hours",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "TrialHearingTimeEstimate",
+    "ListElementCode": "THREE_HOURS",
+    "ListElement": "3 hours",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "TrialHearingTimeEstimate",
+    "ListElementCode": "FOUR_HOURS",
+    "ListElement": "4 hours",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "TrialHearingTimeEstimate",
+    "ListElementCode": "FIVE_HOURS",
+    "ListElement": "5 hours",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "TrialHearingTimeEstimate",
+    "ListElementCode": "OTHER",
+    "ListElement": "Other",
+    "DisplayOrder": 7
+  }
+]

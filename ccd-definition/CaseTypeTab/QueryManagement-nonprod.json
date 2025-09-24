@@ -1,0 +1,49 @@
+[
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "TabID": "QueryManagement",
+    "TabLabel": "Queries",
+    "TabDisplayOrder": 14,
+    "CaseFieldID": "QueryManagementComponentLauncher",
+    "DisplayContextParameter" : "#ARGUMENT(QueryManagement)",
+    "TabFieldDisplayOrder": 1,
+    "TabShowCondition": "qmApplicantCitizenQueries.partyName = \"*\" OR qmRespondentCitizenQueries.partyName = \"*\" OR qmApplicantSolicitorQueries.partyName = \"*\" OR qmRespondentSolicitor1Queries.partyName = \"*\" OR qmRespondentSolicitor2Queries.partyName = \"*\""
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "Channel": "CaseWorker",
+    "TabID": "QueryManagement",
+    "TabLabel": "Queries",
+    "TabDisplayOrder": 14,
+    "CaseFieldID": "qmApplicantSolicitorQueries",
+    "DisplayContextParameter" : "#ARGUMENT(QueryManagement)",
+    "TabFieldDisplayOrder": 2,
+    "FieldShowCondition": "QueryManagementComponentLauncher!=\"\""
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "Channel": "CaseWorker",
+    "TabID": "QueryManagement",
+    "TabLabel": "Queries",
+    "TabDisplayOrder": 14,
+    "CaseFieldID": "qmRespondentSolicitor1Queries",
+    "DisplayContextParameter" : "#ARGUMENT(QueryManagement)",
+    "TabFieldDisplayOrder": 5,
+    "FieldShowCondition": "QueryManagementComponentLauncher!=\"\""
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "Channel": "CaseWorker",
+    "TabID": "QueryManagement",
+    "TabLabel": "Queries",
+    "TabDisplayOrder": 14,
+    "CaseFieldID": "qmRespondentSolicitor2Queries",
+    "DisplayContextParameter" : "#ARGUMENT(QueryManagement)",
+    "TabFieldDisplayOrder": 6,
+    "FieldShowCondition": "QueryManagementComponentLauncher!=\"\""
+  }
+]

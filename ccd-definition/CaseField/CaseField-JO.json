@@ -1,0 +1,396 @@
+[
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "joDefendantName1",
+    "Label": "Defendant 1",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "joDefendantName2",
+    "Label": "Defendant 2",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "joIsDisplayInJudgmentTab",
+    "Label": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "joPaymentPlanSelected",
+    "Label": "Payment type",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "joRepaymentSummaryLabel",
+    "Label": "${joRepaymentSummaryObject}",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "joRepaymentSummaryObject",
+    "Label": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "joOrderedAmount",
+    "Label": "Claim amount",
+    "FieldType": "MoneyGBP",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "joCosts",
+    "Label": "Claim fee amount",
+    "FieldType": "MoneyGBP",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "joTotalAmount",
+    "Label": "Total amount owed",
+    "FieldType": "MoneyGBP",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "joRepaymentAmount",
+    "Label": "Regular payments of",
+    "HintText": "For example, £10",
+    "FieldType": "MoneyGBP",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "joRepaymentFrequency",
+    "Label": "How often do you want to receive payments?",
+    "FieldTypeParameter": "PaymentFrequencyList",
+    "FieldType": "FixedRadioList",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "joRepaymentStartDate",
+    "Label": "Date for first instalment",
+    "HintText": "This must be after ${currentDatebox}",
+    "FieldType": "Date",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "joIssueDate",
+    "Label": "Date judgment order is issued",
+    "FieldType": "Date",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "joState",
+    "Label": "Status of active judgment",
+    "FieldType": "FixedList",
+    "FieldTypeParameter": "JudgmentState",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "joFullyPaymentMadeDate",
+    "Label": "Date judgment amount paid in full",
+    "FieldType": "Date",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "joIsLiveJudgmentExists",
+    "Label": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "lblRecordJudgment",
+    "Label": " ",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "joPartiesNames",
+    "Label": "**${caseNameHmctsInternal}** <br> <br>",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "joJudgmentRecordReason",
+    "Label": "Why is this judgment being recorded?",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "JoJudgmentRecordReasonList",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "joOrderMadeDate",
+    "Label": "Enter the date the determination was made or the date the judge made the order",
+    "HintText": "For example, 16 04 2021",
+    "FieldType": "Date",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "joAmountOrdered",
+    "Label": "Enter the amount of the judgment ordered",
+    "HintText": "For example £451.00",
+    "FieldType": "MoneyGBP",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "joAmountCostOrdered",
+    "Label": "Enter the amount of the costs ordered",
+    "HintText": "For example £50.00",
+    "FieldType": "MoneyGBP",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "joPaymentPlan",
+    "Label": "Select how the judgment will be paid",
+    "FieldType": "JoPaymentPlan",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "joInstalmentDetails",
+    "Label": " ",
+    "FieldType": "InstalmentPaymentDetails",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "joIsRegisteredWithRTL",
+    "Label": "Should this judgment be registered with RTL?",
+    "HintText": "This judgment should only be registered with RTL if the judge has ordered the amount should be paid in instalments, or if the claimant has applied to enforce the judgment",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "joConfirmSentToBothDef",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "JoConfirmSentToBothDef",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "lblMarkPaidInFull",
+    "Label": " ",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "joJudgmentPaidInFull",
+    "Label": " ",
+    "FieldType": "MarkJudgmentPaid",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "joSetAsideReason",
+    "Label": "Why is this judgment being set aside?",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "JoSetAsideReasonList",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "joSetAsideJudgmentErrorText",
+    "Label": "Enter any additional information. This will be shown to the parties in the case.",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+  "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+  "ID": "joSetAsideOrderType",
+  "Label": "Which type of order has been made?",
+  "FieldType": "FixedRadioList",
+  "FieldTypeParameter": "JoSetAsideOrderTypeList",
+  "SecurityClassification": "Public",
+  "Searchable": "N"
+   },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "joSetAsideOrderDate",
+    "Label": "Enter the date of the order setting aside the judgment",
+    "HintText": "For example, 16 04 2021",
+    "FieldType": "Date",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "joSetAsideDefenceReceivedDate",
+    "Label": "Enter the date of the defence was received",
+    "HintText": "For example, 16 04 2021",
+    "FieldType": "Date",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "joIssuedDate",
+    "Label": " ",
+    "FieldType": "Date",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "joShowRegisteredWithRTLOption",
+    "Label": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+  "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+  "ID": "confirmReferToJudgeDefenceReceived",
+  "Label": " ",
+  "FieldType": "MultiSelectList",
+  "FieldTypeParameter": "ConfirmReferToJudgeDefenceReceived",
+  "SecurityClassification": "Public",
+  "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "activeJudgment",
+    "Label": " ",
+    "FieldType": "JoJudgment",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "historicJudgment",
+    "Label": " ",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "JoJudgment",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "joSetAsideApplicationDate",
+    "Label": "Enter the date of the application to set aside",
+    "HintText": "For example, 16 04 2021",
+    "FieldType": "Date",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "joDefendantMarkedPaidInFullIssueDate",
+    "Label": " ",
+    "FieldType": "DateTime",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "joMarkedPaidInFullIssueDate",
+    "Label": " ",
+    "FieldType": "DateTime",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "joCoscRpaStatus",
+    "Label": " ",
+    "FieldType": "FixedList",
+    "FieldTypeParameter": "CoscRpaStatus",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "joSetAsideCreatedDate",
+    "Label": "Enter the date set aside is done",
+    "FieldType": "DateTime",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "respondForImmediateOption",
+    "Label": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "joDJCreatedDate",
+    "Label": " ",
+    "FieldType": "DateTime",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "joJudgementByAdmissionIssueDate",
+    "Label": " ",
+    "FieldType": "DateTime",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "respondentPayImmediatelyTextAfterDate",
+    "Label": "Any cheques or transfers should be clear in your account.<p>You need to tell us if you’ve settled the claim, for example because the defendant has paid you.</p><p>You can settle for less than the full claim amount.</p><p><h3>If you haven’t been paid.</h3></p><p>If the defendant has not paid you, you can request a County Court Judgment by selecting 'Request Judgment by Admission' from the 'Next step' drop down list.</p>",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

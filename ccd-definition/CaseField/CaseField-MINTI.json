@@ -1,0 +1,254 @@
+[
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "allowOrderTrackAllocation",
+    "Label": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "finalOrderTrackToggle",
+    "Label": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "eligibilityQuestions",
+    "Label": "## Issue civil court proceedings\n### Who can use this service\n### Please note: You can only use this service if you are a solicitor organisation\nYou must be:\n* bringing a claim for damages\n* issuing a claim to the county court.  Claims cannot be issued to the High Court using this service\n* representing 1 claimant against up to 2 Defendants, or 2 claimants against 1 defendant \n* able to pay the full issue fee using Payment by Account (PBA) or card payment\n\nIf the defendant has legal representation, you'll need:\n* name of the defendant's firm of solicitors \n* email address the firm uses for notifications from MyHMCTS \n\n### About the Claimants\n Claimants must: \n* have an address in England or Wales \n* have a litigation friend who can provide a certificate of suitability if they are under 18 \n* not be a protected party as defined in CPR 21.1(2)(d)\n* not have an all proceedings order, civil proceedings order, or civil restraint order in force against them\n\n### About the Defendants \n Defendants must (as far as the Claimant is aware):\n* have a postal address for service in England or Wales\n* be aged 18 years or older\n* not be a protected party\n\n### About the claim\nA County Court damages claim is only suitable for the pilot if it:\n* would not ordinarily follow the Part 8 procedure\n* meets all the conditions in PD51ZB 1.6(3)\n* is conducted in English \n",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "applicant2DQFixedRecoverableCostsIntermediate",
+    "Label": "Claimant 2 Fixed Recoverable Costs",
+    "FieldType": "FixedRecoverableCostsIntermediate",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "applicantDQFixedRecoverableCostsIntermediateLabel",
+    "Label": "You should discuss the complexity band allocation with the other party. Read <a href='https://www.justice.gov.uk/courts/procedure-rules/civil/rules/part26' rel=\"noreferrer noopener\" target=\"_blank\">CPR26.16 Table 2</a></div><br /> for information on complexity bands.",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "applicant1DQFixedRecoverableCostsIntermediate",
+    "Label": "Claimant 1 Fixed Recoverable Costs",
+    "FieldType": "FixedRecoverableCostsIntermediate",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "respondent1DQFixedRecoverableCostsIntermediate",
+    "Label": "Defendant 1 Fixed Recoverable Costs",
+    "FieldType": "FixedRecoverableCostsIntermediate",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "respondentDQFixedRecoverableCostsIntermediateLabel",
+    "Label": "You should discuss the complexity band allocation with the other party. Read <a href='https://www.justice.gov.uk/courts/procedure-rules/civil/rules/part26' rel=\"noreferrer noopener\" target=\"_blank\">CPR26.16 Table 2</a></div><br /> for information on complexity bands.",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "respondent2DQFixedRecoverableCostsIntermediate",
+    "Label": "Defendant 2 Fixed Recoverable Costs",
+    "FieldType": "FixedRecoverableCostsIntermediate",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "respondent1DQClaimantDocumentsToBeConsidered",
+    "Label": "Defendant 1 claimant documents to be considered",
+    "FieldType": "DocumentsToBeConsidered",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "applicant1DQDefendantDocumentsToBeConsidered",
+    "Label": "Claimant 1 defendant documents to be considered",
+    "FieldType": "DocumentsToBeConsidered",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "finalOrderAllocateToTrack",
+    "Label": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "finalOrderTrackAllocation",
+    "Label": " ",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "FinalOrdersAllocatedTrackList",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "finalOrderIntermediateTrackComplexityBandLabel",
+    "Label": "**** \n ### Allocation \n For information on which complexity band the claim should be in see <a href='https://www.justice.gov.uk/courts/procedure-rules/civil/rules/part26#16' rel=\"noreferrer noopener\" target=\"_blank\">CPR26.16 Table 2</a>. \n\nThe claim is allocated to the Intermediate Track.",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "finalOrderIntermediateTrackComplexityBand",
+    "Label": " ",
+    "FieldType": "FinalOrderIntermediateTrackAllocation",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "selectTemplateLabel",
+    "Label": "**** \n ### Which template do you wish to use?",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "finalOrderDownloadTemplateOptions",
+    "Label": " ",
+    "FieldType": "DynamicList",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "downloadTemplateLabel1",
+    "Label": "**** \n ## You must now download the template \n Open the selected template and download it to your computer to complete the order.",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "finalOrderDownloadTemplateDocument",
+    "Label": " ",
+    "FieldType": "CaseDocument",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "downloadTemplateLabel2",
+    "Label": "\n Once you've completed the order, you can save and upload it on the next screen.",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "uploadOrderDocumentFromTemplateLabel",
+    "Label": "**** \n ## Add document \n Upload your completed order in DOC/DOCX (Word) format.",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "uploadOrderDocumentFromTemplate",
+    "Label": " ",
+    "FieldType": "Document",
+    "RegularExpression": ".doc,.docx",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "hearingListedDynamicListLabel",
+    "Label": "## What type of hearing have you listed?",
+    "FieldType": "Label",
+    "FieldTypeParameter": "ConfirmListingTickBox",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "hearingListedDynamicList",
+    "Label": "Hearing type",
+    "FieldType": "DynamicRadioList",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "confirmListingTickBox",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "ConfirmListingTickBox",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "taskManagementLocations",
+    "Label": "Task management location",
+    "FieldType": "TaskManagementLocationTypes",
+    "SecurityClassification": "Public",
+    "Searchable": "Y"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "taskManagementLocationsTab",
+    "Label": "Task management locations",
+    "FieldType": "TaskManagementLocationTab",
+    "SecurityClassification": "Public",
+    "Searchable": "Y"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "caseManagementLocationTab",
+    "Label": "Case management location",
+    "FieldType": "TaskManagementLocationTab",
+    "SecurityClassification": "Public",
+    "Searchable": "Y"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "orderAfterHearingDate",
+    "Label": " ",
+    "FieldType": "OrderAfterHearingDate",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "showOrderAfterHearingDatePage",
+    "Label": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "hearingDurationMinti",
+    "Label": "Duration",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

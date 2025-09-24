@@ -1,0 +1,38 @@
+[
+  {
+    "ID": "MediationContactInformation",
+    "ListElementCode": "firstName",
+    "ElementLabel": "First name",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "RetainHiddenValue": "Y",
+    "Searchable": "N"
+  },
+  {
+    "ID": "MediationContactInformation",
+    "ListElementCode": "lastName",
+    "ElementLabel": "Last name",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "RetainHiddenValue": "Y",
+    "Searchable": "N"
+  },
+  {
+    "ID": "MediationContactInformation",
+    "ListElementCode": "emailAddress",
+    "ElementLabel": "Email address",
+    "FieldType": "Email",
+    "SecurityClassification": "Public",
+    "RetainHiddenValue": "Y",
+    "Searchable": "N"
+  },
+  {
+    "ID": "MediationContactInformation",
+    "ListElementCode": "telephoneNumber",
+    "ElementLabel": "Telephone number",
+    "FieldType": "PhoneUK",
+    "SecurityClassification": "Public",
+    "RetainHiddenValue": "Y",
+    "Searchable": "N"
+  }
+]

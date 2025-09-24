@@ -1,0 +1,10 @@
+[
+  {
+    "LiveFrom": "05/12/2022",
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "CategoryID": "applications",
+    "CategoryLabel": "Applications",
+    "DisplayOrder": "12",
+    "ParentCategoryID": ""
+  }
+]

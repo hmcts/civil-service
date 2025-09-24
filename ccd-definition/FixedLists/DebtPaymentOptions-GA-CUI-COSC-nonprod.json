@@ -1,0 +1,21 @@
+[
+  {
+    "ID": "DebtPaymentOptions",
+    "ListElementCode": "UPLOAD_EVIDENCE_DEBT_PAID_IN_FULL",
+    "ListElement": "UPLOAD_EVIDENCE_DEBT_PAID_IN_FULL",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "DebtPaymentOptions",
+    "ListElementCode": "MADE_FULL_PAYMENT_TO_COURT",
+    "ListElement": "MADE_FULL_PAYMENT_TO_COURT",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "DebtPaymentOptions",
+    "ListElementCode": "UNABLE_TO_PROVIDE_EVIDENCE_OF_FULL_PAYMENT",
+    "ListElement": "UNABLE_TO_PROVIDE_EVIDENCE_OF_FULL_PAYMENT",
+    "DisplayOrder": 3
+  }
+
+]

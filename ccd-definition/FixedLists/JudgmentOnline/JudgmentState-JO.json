@@ -1,0 +1,44 @@
+[
+  {
+    "ID": "JudgmentState",
+    "ListElementCode": "REQUESTED",
+    "ListElement": "Requested",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "JudgmentState",
+    "ListElementCode": "ISSUED",
+    "ListElement": "Issued",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "JudgmentState",
+    "ListElementCode": "MODIFIED",
+    "ListElement": "Modified",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "JudgmentState",
+    "ListElementCode": "SATISFIED",
+    "ListElement": "Satisfied - Paid in Full",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "JudgmentState",
+    "ListElementCode": "SET_ASIDE",
+    "ListElement": "Cancelled - Set aside",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "JudgmentState",
+    "ListElementCode": "SET_ASIDE_ERROR",
+    "ListElement": "Cancelled - set aside, judgment entered in error",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "JudgmentState",
+    "ListElementCode": "CANCELLED",
+    "ListElement": "Cancelled - Paid in Full",
+    "DisplayOrder": 7
+  }
+]

@@ -1,0 +1,86 @@
+[
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "SDO_TRANSLATED_DOCUMENT",
+    "ListElement": "Translated Standard Direction Order",
+    "DisplayOrder": 28
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "INTERLOC_JUDGMENT_TRANSLATED_DOCUMENT",
+    "ListElement": "Translated Interlocutory Judgment",
+    "DisplayOrder": 29
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "MANUAL_DETERMINATION_TRANSLATED_DOCUMENT",
+    "ListElement": "Translated Manual Determination Document",
+    "DisplayOrder": 30
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "SETTLEMENT_AGREEMENT_TRANSLATED_DOCUMENT",
+    "ListElement": "Translated Settlement Agreement",
+    "DisplayOrder": 31
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "NOTICE_OF_DISCONTINUANCE_DEFENDANT",
+    "ListElement": "Notice of discontinuance defendant",
+    "DisplayOrder": 32
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "NOTICE_OF_DISCONTINUANCE_DEFENDANT_TRANSLATED_DOCUMENT",
+    "ListElement": "Notice of discontinuance defendant translated",
+    "DisplayOrder": 34
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "FINAL_ORDER_TRANSLATED_DOCUMENT",
+    "ListElement": "Translated Judge final order",
+    "DisplayOrder": 32
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "COURT_OFFICER_ORDER_TRANSLATED_DOCUMENT",
+    "ListElement": "Translated Court Officer Order",
+    "DisplayOrder": 33
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "DECISION_MADE_ON_APPLICATIONS_TRANSLATED",
+    "ListElement": "Translated Decision on reconsideration request",
+    "DisplayOrder": 34
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "TRANSLATED_HEARING_NOTICE",
+    "ListElement": "Translated Hearing Notice",
+    "DisplayOrder": 35
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "REQUEST_MORE_INFORMATION_APPLICANT_TRANSLATED",
+    "ListElement": "Request More Info Applicant Translated",
+    "DisplayOrder": 36
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "REQUEST_MORE_INFORMATION_RESPONDENT_TRANSLATED",
+    "ListElement": "Request More Info Respondent Translated",
+    "DisplayOrder": 37
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "WRITTEN_REPRESENTATION_APPLICANT_TRANSLATED",
+    "ListElement": "Written Reps Applicant Translated",
+    "DisplayOrder": 38
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "WRITTEN_REPRESENTATION_RESPONDENT_TRANSLATED",
+    "ListElement": "Written Reps Respondent Translated",
+    "DisplayOrder": 39
+  }
+]

@@ -1,0 +1,8 @@
+[
+  {
+    "ID": "ConfirmJudgmentPaidInFull",
+    "ListElementCode": "CONFIRMED",
+    "ListElement": "I confirm that this judgment can be marked as paid in full",
+    "DisplayOrder": 1
+  }
+]

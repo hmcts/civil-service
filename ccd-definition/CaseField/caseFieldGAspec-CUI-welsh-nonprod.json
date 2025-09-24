@@ -1,0 +1,13 @@
+[ {
+  "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+  "ID": "gaDetailsTranslationCollection",
+  "Label": "Applications in translation ",
+  "ElementLabel": "Application Type",
+  "FieldType": "Collection",
+  "FieldTypeParameter": "GeneralApplicationDetailsGAspec",
+  "SecurityClassification": "Public",
+  "Searchable": "N",
+  "_Definition":  "The details of the child application on the case for wlu",
+  "_Category":  "COMMON"
+}
+]

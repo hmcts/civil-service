@@ -1,0 +1,14 @@
+[
+  {
+    "ID": "SettleReason",
+    "ListElementCode": "JUDGE_ORDER",
+    "ListElement": "Settled following judge's order",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "SettleReason",
+    "ListElementCode": "CONSENT_ORDER",
+    "ListElement": "Consent order approved",
+    "DisplayOrder": 2
+  }
+]

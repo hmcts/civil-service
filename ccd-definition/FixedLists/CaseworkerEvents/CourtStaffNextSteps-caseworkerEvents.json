@@ -1,0 +1,14 @@
+[
+  {
+    "ID": "courtStaffNextSteps",
+    "ListElementCode": "NO_TASKS",
+    "ListElement": "There are no other tasks to complete",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "courtStaffNextSteps",
+    "ListElementCode": "STILL_TASKS",
+    "ListElement": "There are still tasks to do",
+    "DisplayOrder": 2
+   }
+]

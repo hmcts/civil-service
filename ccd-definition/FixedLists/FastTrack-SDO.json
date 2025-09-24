@@ -1,0 +1,45 @@
+[
+  {
+    "ID": "FastTrack",
+    "ListElementCode": "fastClaimBuildingDispute",
+    "ListElement": "Building Dispute",
+    "DisplayOrder": 1
+
+  },
+  {
+    "ID": "FastTrack",
+    "ListElementCode": "fastClaimClinicalNegligence",
+    "ListElement": "Clinical Negligence",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "FastTrack",
+    "ListElementCode": "fastClaimCreditHire",
+    "ListElement": "Credit Hire",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "FastTrack",
+    "ListElementCode": "fastClaimEmployersLiability",
+    "ListElement": "Employers Liability",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "FastTrack",
+    "ListElementCode": "fastClaimHousingDisrepair",
+    "ListElement": "Housing Disrepair",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "FastTrack",
+    "ListElementCode": "fastClaimPersonalInjury",
+    "ListElement": "Personal Injury",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "FastTrack",
+    "ListElementCode": "fastClaimRoadTrafficAccident",
+    "ListElement": "Road Traffic Accident",
+    "DisplayOrder": 7
+  }
+]

@@ -1,0 +1,14 @@
+[
+  {
+    "ID": "FinalOrderSelection",
+    "ListElementCode": "ASSISTED_ORDER",
+    "ListElement": "Assisted order",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "FinalOrderSelection",
+    "ListElementCode": "FREE_FORM_ORDER",
+    "ListElement": "Free form order",
+    "DisplayOrder": 2
+  }
+]

@@ -1,0 +1,16 @@
+[
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "CaseEventID": "SEND_AND_REPLY",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-admin",
+          "judge-profile",
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  }
+]

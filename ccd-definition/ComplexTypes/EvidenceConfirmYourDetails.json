@@ -1,0 +1,42 @@
+[
+  {
+    "ID": "EvidenceConfirmYourDetails",
+    "ListElementCode": "firstName",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "ElementLabel": "First name",
+    "Searchable": "N"
+  },
+  {
+    "ID": "EvidenceConfirmYourDetails",
+    "ListElementCode": "lastName",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "ElementLabel": "Last name",
+    "Searchable": "N"
+  },
+  {
+    "ID": "EvidenceConfirmYourDetails",
+    "ListElementCode": "email",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "ElementLabel": "Email",
+    "Searchable": "N"
+  },
+  {
+    "ID": "EvidenceConfirmYourDetails",
+    "ListElementCode": "phone",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "ElementLabel": "Phone",
+    "Searchable": "N"
+  },
+  {
+    "ID": "EvidenceConfirmYourDetails",
+    "ListElementCode": "jobTitle",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "ElementLabel": "Job title",
+    "Searchable": "N"
+  }
+]

@@ -1,0 +1,8 @@
+[
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "CaseEventID": "DEFAULT_JUDGEMENT",
+    "UserRole": "caseworker-civil-staff",
+    "CRUD": "R"
+  }
+]

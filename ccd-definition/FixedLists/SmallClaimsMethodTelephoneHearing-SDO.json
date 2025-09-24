@@ -1,0 +1,20 @@
+[
+  {
+    "ID": "SmallClaimsMethodTelephoneHearing",
+    "ListElementCode": "telephoneTheClaimant",
+    "ListElement": "The claimant",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "SmallClaimsMethodTelephoneHearing",
+    "ListElementCode": "telephoneTheDefendant",
+    "ListElement": "The defendant",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "SmallClaimsMethodTelephoneHearing",
+    "ListElementCode": "telephoneTheCourt",
+    "ListElement": "The court",
+    "DisplayOrder": 3
+  }
+]

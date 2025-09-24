@@ -1,0 +1,18 @@
+[
+  {
+    "ID": "DisposalHearingJudgementDeductionStatement",
+    "ListElementCode": "line",
+    "FieldType": "Label",
+    "ElementLabel": "****",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DisposalHearingJudgementDeductionStatement",
+    "ListElementCode": "label",
+    "FieldType": "Label",
+    "ElementLabel": "## There is a judgment for the claimant for an amount to be decided by the court ##",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

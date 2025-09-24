@@ -1,0 +1,14 @@
+[
+  {
+    "ID": "JudgmentStatePaidInFull",
+    "ListElementCode": "SATISFIED",
+    "ListElement": "Satisfied - Paid in Full",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "JudgmentStatePaidInFull",
+    "ListElementCode": "CANCELLED",
+    "ListElement": "Cancelled - Paid in Full",
+    "DisplayOrder": 2
+  }
+]

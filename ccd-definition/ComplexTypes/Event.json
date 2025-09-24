@@ -1,0 +1,23 @@
+[
+  {
+    "ID": "ContactDetailsChangedEvent",
+    "ListElementCode": "summary",
+    "FieldType": "Text",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "ContactDetailsChangedEvent",
+    "ListElementCode": "description",
+    "FieldType": "Text",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "ContactDetailsChangedEvent",
+    "ListElementCode": "submittedByCaseworker",
+    "FieldType": "YesOrNo",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public"
+  }
+]

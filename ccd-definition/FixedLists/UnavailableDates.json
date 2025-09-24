@@ -1,0 +1,14 @@
+[
+  {
+    "ID": "UnavailableDateChoice",
+    "ListElementCode": "SINGLE_DATE",
+    "ListElement": "Single date",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "UnavailableDateChoice",
+    "ListElementCode": "DATE_RANGE",
+    "ListElement": "Date range",
+    "DisplayOrder": 2
+  }
+]

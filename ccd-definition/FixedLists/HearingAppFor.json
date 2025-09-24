@@ -1,0 +1,20 @@
+[
+  {
+    "ID": "HearingAppFor",
+    "ListElementCode": "CLAIMANT",
+    "ListElement": "Claimant",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "HearingAppFor",
+    "ListElementCode": "DEFENDANT",
+    "ListElement": "Defendant",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "HearingAppFor",
+    "ListElementCode": "CLAIMANT_AND_DEFENDANT",
+    "ListElement": "Claimant and defendant",
+    "DisplayOrder": 3
+  }
+]

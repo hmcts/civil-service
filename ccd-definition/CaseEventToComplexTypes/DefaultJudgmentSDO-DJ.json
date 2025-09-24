@@ -1,0 +1,878 @@
+[
+  {
+    "ID": "DisposalHearingOrderAndHearingDetailsDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "disposalHearingOrderAndHearingDetailsDJ",
+    "ListElementCode": "text",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "DisposalHearingJudgesRecitalDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "disposalHearingJudgesRecitalDJ",
+    "ListElementCode": "label",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "DisposalHearingJudgesRecitalDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "disposalHearingJudgesRecitalDJ",
+    "ListElementCode": "input",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "DisposalHearingJudgesRecitalDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "disposalHearingJudgesRecitalDJ",
+    "ListElementCode": "line",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "DisposalHearingDisclosureOfDocumentsDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "disposalHearingDisclosureOfDocumentsDJ",
+    "ListElementCode": "label",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "DisposalHearingDisclosureOfDocumentsDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "disposalHearingDisclosureOfDocumentsDJ",
+    "ListElementCode": "input",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "DisposalHearingDisclosureOfDocumentsDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "disposalHearingDisclosureOfDocumentsDJ",
+    "ListElementCode": "date",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "DisposalHearingWitnessOfFactDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "disposalHearingWitnessOfFactDJ",
+    "ListElementCode": "label",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "DisposalHearingWitnessOfFactDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "disposalHearingWitnessOfFactDJ",
+    "ListElementCode": "input1",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "DisposalHearingWitnessOfFactDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "disposalHearingWitnessOfFactDJ",
+    "ListElementCode": "date1",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "DisposalHearingWitnessOfFactDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "disposalHearingWitnessOfFactDJ",
+    "ListElementCode": "input2",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "DisposalHearingWitnessOfFactDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "disposalHearingWitnessOfFactDJ",
+    "ListElementCode": "input3",
+    "FieldDisplayOrder": 5,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "DisposalHearingWitnessOfFactDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "disposalHearingWitnessOfFactDJ",
+    "ListElementCode": "date2",
+    "FieldDisplayOrder": 6,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "DisposalHearingWitnessOfFactDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "disposalHearingWitnessOfFactDJ",
+    "ListElementCode": "input4",
+    "FieldDisplayOrder": 7,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "DisposalHearingWitnessOfFactDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "disposalHearingWitnessOfFactDJ",
+    "ListElementCode": "input5",
+    "FieldDisplayOrder": 8,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "DisposalHearingWitnessOfFactDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "disposalHearingWitnessOfFactDJ",
+    "ListElementCode": "date3",
+    "FieldDisplayOrder": 9,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "DisposalHearingWitnessOfFactDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "disposalHearingWitnessOfFactDJ",
+    "ListElementCode": "input6",
+    "FieldDisplayOrder": 10,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "DisposalHearingMedicalEvidenceDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "disposalHearingMedicalEvidenceDJ",
+    "ListElementCode": "label",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "DisposalHearingMedicalEvidenceDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "disposalHearingMedicalEvidenceDJ",
+    "ListElementCode": "input1",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "DisposalHearingMedicalEvidenceDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "disposalHearingMedicalEvidenceDJ",
+    "ListElementCode": "date1",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "DisposalHearingMedicalEvidenceDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "disposalHearingMedicalEvidenceDJ",
+    "ListElementCode": "input2",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "DisposalHearingMedicalEvidenceDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "disposalHearingMedicalEvidenceDJ",
+    "ListElementCode": "date2",
+    "FieldDisplayOrder": 5,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "DisposalHearingQuestionsToExpertsDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "disposalHearingQuestionsToExpertsDJ",
+    "ListElementCode": "text1",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "DisposalHearingQuestionsToExpertsDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "disposalHearingQuestionsToExpertsDJ",
+    "ListElementCode": "date",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "DisposalHearingQuestionsToExpertsDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "disposalHearingQuestionsToExpertsDJ",
+    "ListElementCode": "text2",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "DisposalHearingSchedulesOfLossDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "disposalHearingSchedulesOfLossDJ",
+    "ListElementCode": "label",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "DisposalHearingSchedulesOfLossDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "disposalHearingSchedulesOfLossDJ",
+    "ListElementCode": "input1",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "DisposalHearingSchedulesOfLossDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "disposalHearingSchedulesOfLossDJ",
+    "ListElementCode": "date1",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "DisposalHearingSchedulesOfLossDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "disposalHearingSchedulesOfLossDJ",
+    "ListElementCode": "input2",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "DisposalHearingSchedulesOfLossDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "disposalHearingSchedulesOfLossDJ",
+    "ListElementCode": "date2",
+    "FieldDisplayOrder": 5,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "DisposalHearingSchedulesOfLossDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "disposalHearingSchedulesOfLossDJ",
+    "ListElementCode": "input3",
+    "FieldDisplayOrder": 6,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "DisposalHearingSchedulesOfLossDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "disposalHearingSchedulesOfLossDJ",
+    "ListElementCode": "date3",
+    "FieldDisplayOrder": 7,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "DisposalHearingSchedulesOfLossDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "disposalHearingSchedulesOfLossDJ",
+    "ListElementCode": "inputText4",
+    "FieldDisplayOrder": 8,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "DisposalHearingFinalDisposalHearingDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "disposalHearingFinalDisposalHearingDJ",
+    "ListElementCode": "label",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "DisposalHearingFinalDisposalHearingDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "disposalHearingFinalDisposalHearingDJ",
+    "ListElementCode": "input",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "DisposalHearingFinalDisposalHearingDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "disposalHearingFinalDisposalHearingDJ",
+    "ListElementCode": "date",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "DisposalHearingFinalDisposalHearingDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "disposalHearingFinalDisposalHearingDJ",
+    "ListElementCode": "time",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "DisposalHearingFinalDisposalHearingTimeDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "disposalHearingFinalDisposalHearingTimeDJ",
+    "ListElementCode": "input",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "DisposalHearingFinalDisposalHearingTimeDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "disposalHearingFinalDisposalHearingTimeDJ",
+    "ListElementCode": "dateLabel",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "DisposalHearingFinalDisposalHearingTimeDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "disposalHearingFinalDisposalHearingTimeDJ",
+    "ListElementCode": "date",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "DisposalHearingFinalDisposalHearingTimeDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "disposalHearingFinalDisposalHearingTimeDJ",
+    "ListElementCode": "time",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "DisposalHearingFinalDisposalHearingTimeDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "disposalHearingFinalDisposalHearingTimeDJ",
+    "ListElementCode": "otherHours",
+    "FieldDisplayOrder": 5,
+    "DisplayContext": "MANDATORY",
+    "FieldShowCondition": "disposalHearingFinalDisposalHearingTimeDJ.time = \"OTHER\""
+  },
+  {
+    "ID": "DisposalHearingFinalDisposalHearingTimeDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "disposalHearingFinalDisposalHearingTimeDJ",
+    "ListElementCode": "otherMinutes",
+    "FieldDisplayOrder": 6,
+    "DisplayContext": "MANDATORY",
+    "FieldShowCondition": "disposalHearingFinalDisposalHearingTimeDJ.time = \"OTHER\""
+  },
+  {
+    "ID": "DisposalHearingBundleDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "disposalHearingBundleDJ",
+    "ListElementCode": "label1",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "DisposalHearingBundleDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "disposalHearingBundleDJ",
+    "ListElementCode": "input",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "DisposalHearingBundleDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "disposalHearingBundleDJ",
+    "ListElementCode": "label2",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "DisposalHearingBundleDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "disposalHearingBundleDJ",
+    "ListElementCode": "type",
+    "FieldDisplayOrder": 5,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "DisposalHearingBundleDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "disposalHearingBundleDJ",
+    "ListElementCode": "text",
+    "FieldDisplayOrder": 6,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "DisposalHearingHearingNotesDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "disposalHearingHearingNotesDJ",
+    "ListElementCode": "label",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "DisposalHearingHearingNotesDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "disposalHearingHearingNotesDJ",
+    "ListElementCode": "input",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "DisposalHearingHearingNotesDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "disposalHearingHearingNotesDJ",
+    "ListElementCode": "line",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "DisposalHearingOrderMadeWithoutHearingDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "disposalHearingOrderMadeWithoutHearingDJ",
+    "ListElementCode": "title",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "DisposalHearingOrderMadeWithoutHearingDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "disposalHearingOrderMadeWithoutHearingDJ",
+    "ListElementCode": "input",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "DisposalHearingOrderMadeWithoutHearingDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "disposalHearingOrderMadeWithoutHearingDJ",
+    "ListElementCode": "line",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "DisposalHearingNotesDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "disposalHearingNotesDJ",
+    "ListElementCode": "label",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "DisposalHearingNotesDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "disposalHearingNotesDJ",
+    "ListElementCode": "input",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "DisposalHearingNotesDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "disposalHearingNotesDJ",
+    "ListElementCode": "date",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID":"DisposalHearingAddNewDirectionsDJ",
+    "CaseEventID":"STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID":"disposalHearingAddNewDirectionsDJ",
+    "ListElementCode":"directionComment",
+    "FieldDisplayOrder":1,
+    "DisplayContext":"OPTIONAL"
+  },
+  {
+    "ID": "DisposalHearingNotesDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "disposalHearingNotesDJ",
+    "ListElementCode": "label",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "DisposalHearingNotesDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "disposalHearingNotesDJ",
+    "ListElementCode": "input",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "DisposalHearingNotesDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "disposalHearingNotesDJ",
+    "ListElementCode": "date",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID":"DisposalHearingAddNewDirectionsDJ",
+    "CaseEventID":"STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID":"disposalHearingAddNewDirectionsDJ",
+    "ListElementCode":"directionComment",
+    "FieldDisplayOrder":1,
+    "DisplayContext":"OPTIONAL"
+  },
+  {
+    "ID":"TrialHearingJudgesRecitalDJ",
+    "CaseEventID":"STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID":"trialHearingJudgesRecitalDJ",
+    "ListElementCode":"label",
+    "FieldDisplayOrder":1,
+    "DisplayContext":"READONLY"
+  },
+  {
+    "ID": "TrialHearingJudgesRecitalDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID":"trialHearingJudgesRecitalDJ",
+    "ListElementCode": "input",
+    "FieldDisplayOrder":2,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID":"TrialHearingTrialDJ",
+    "CaseEventID":"STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID":"trialHearingTrialDJ",
+    "ListElementCode":"input1",
+    "FieldDisplayOrder":1,
+    "DisplayContext":"OPTIONAL"
+  },
+  {
+    "ID":"TrialHearingTrialDJ",
+    "CaseEventID":"STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID":"trialHearingTrialDJ",
+    "ListElementCode":"date1",
+    "FieldDisplayOrder":2,
+    "DisplayContext":"OPTIONAL"
+  },
+  {
+    "ID":"TrialHearingTrialDJ",
+    "CaseEventID":"STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID":"trialHearingTrialDJ",
+    "ListElementCode":"date2",
+    "FieldDisplayOrder":3,
+    "DisplayContext":"OPTIONAL"
+  },
+  {
+    "ID":"TrialHearingTrialDJ",
+    "CaseEventID":"STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID":"trialHearingTrialDJ",
+    "ListElementCode":"input2",
+    "FieldDisplayOrder":4,
+    "DisplayContext":"MANDATORY"
+  },
+  {
+    "ID":"TrialHearingTrialDJ",
+    "CaseEventID":"STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID":"trialHearingTrialDJ",
+    "ListElementCode":"input3",
+    "FieldDisplayOrder":5,
+    "DisplayContext":"MANDATORY"
+  },
+  {
+    "ID":"TrialHearingTrialDJ",
+    "CaseEventID":"STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID":"trialHearingTrialDJ",
+    "ListElementCode":"type",
+    "FieldDisplayOrder":6,
+    "DisplayContext":"MANDATORY"
+  },
+  {
+    "ID":"TrialHearingTimeDJ",
+    "CaseEventID":"STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID":"trialHearingTimeDJ",
+    "ListElementCode":"date1Label",
+    "FieldDisplayOrder":1,
+    "DisplayContext":"OPTIONAL"
+  },
+  {
+    "ID":"TrialHearingTimeDJ",
+    "CaseEventID":"STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID":"trialHearingTimeDJ",
+    "ListElementCode":"date1",
+    "FieldDisplayOrder":2,
+    "DisplayContext":"MANDATORY"
+  },
+  {
+    "ID": "TrialHearingTimeDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "trialHearingTimeDJ",
+    "ListElementCode": "dateToToggle",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID":"TrialHearingTimeDJ",
+    "CaseEventID":"STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID":"trialHearingTimeDJ",
+    "ListElementCode":"date2",
+    "FieldDisplayOrder":4,
+    "DisplayContext":"OPTIONAL"
+  },
+  {
+    "ID":"TrialHearingTimeDJ",
+    "CaseEventID":"STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID":"trialHearingTimeDJ",
+    "ListElementCode":"hearingTimeEstimate",
+    "FieldDisplayOrder":5,
+    "DisplayContext":"MANDATORY"
+  },
+  {
+    "ID":"TrialHearingTimeDJ",
+    "CaseEventID":"STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID":"trialHearingTimeDJ",
+    "ListElementCode":"otherHours",
+    "FieldDisplayOrder":6,
+    "DisplayContext":"MANDATORY",
+    "FieldShowCondition": "trialHearingTimeDJ.hearingTimeEstimate = \"OTHER\""
+  },
+  {
+    "ID":"TrialHearingTimeDJ",
+    "CaseEventID":"STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID":"trialHearingTimeDJ",
+    "ListElementCode":"otherMinutes",
+    "FieldDisplayOrder":7,
+    "DisplayContext":"MANDATORY",
+    "FieldShowCondition": "trialHearingTimeDJ.hearingTimeEstimate = \"OTHER\""
+  },
+  {
+    "ID":"TrialHearingTimeDJ",
+    "CaseEventID":"STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID":"trialHearingTimeDJ",
+    "ListElementCode":"helpText1",
+    "FieldDisplayOrder":8,
+    "DisplayContext":"MANDATORY"
+  },
+  {
+    "ID":"TrialHearingTimeDJ",
+    "CaseEventID":"STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID":"trialHearingTimeDJ",
+    "ListElementCode":"helpText2",
+    "FieldDisplayOrder":9,
+    "DisplayContext":"MANDATORY"
+  },
+  {
+    "ID":"TrialHearingHearingNotesDJ",
+    "CaseEventID":"STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID":"trialHearingHearingNotesDJ",
+    "ListElementCode":"label",
+    "FieldDisplayOrder":1,
+    "DisplayContext":"READONLY"
+  },
+  {
+    "ID":"TrialHearingHearingNotesDJ",
+    "CaseEventID":"STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID":"trialHearingHearingNotesDJ",
+    "ListElementCode":"input",
+    "FieldDisplayOrder":2,
+    "DisplayContext":"OPTIONAL"
+  },
+  {
+    "ID":"TrialHearingHearingNotesDJ",
+    "CaseEventID":"STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID":"trialHearingHearingNotesDJ",
+    "ListElementCode":"line",
+    "FieldDisplayOrder":3,
+    "DisplayContext":"READONLY"
+  },
+  {
+    "ID":"TrialOrderMadeWithoutHearingDJ",
+    "CaseEventID":"STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID":"trialOrderMadeWithoutHearingDJ",
+    "ListElementCode":"title",
+    "FieldDisplayOrder":1,
+    "DisplayContext":"READONLY"
+  },
+  {
+    "ID":"TrialOrderMadeWithoutHearingDJ",
+    "CaseEventID":"STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID":"trialOrderMadeWithoutHearingDJ",
+    "ListElementCode":"input",
+    "FieldDisplayOrder":2,
+    "DisplayContext":"MANDATORY"
+  },
+  {
+    "ID":"TrialOrderMadeWithoutHearingDJ",
+    "CaseEventID":"STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID":"trialOrderMadeWithoutHearingDJ",
+    "ListElementCode":"line",
+    "FieldDisplayOrder":3,
+    "DisplayContext":"READONLY"
+  },
+  {
+    "ID":"TrialHearingAddNewDirectionsDJ",
+    "CaseEventID":"STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID":"trialHearingAddNewDirectionsDJ",
+    "ListElementCode":"directionComment",
+    "FieldDisplayOrder":1,
+    "DisplayContext":"OPTIONAL"
+  },
+  {
+    "ID": "TrialHearingSchedulesOfLossDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "trialHearingSchedulesOfLossDJ",
+    "ListElementCode": "input1",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "TrialHearingSchedulesOfLossDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "trialHearingSchedulesOfLossDJ",
+    "ListElementCode": "date1",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "TrialHearingSchedulesOfLossDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "trialHearingSchedulesOfLossDJ",
+    "ListElementCode": "input2",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "TrialHearingSchedulesOfLossDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "trialHearingSchedulesOfLossDJ",
+    "ListElementCode": "date2",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "TrialHearingSchedulesOfLossDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "trialHearingSchedulesOfLossDJ",
+    "ListElementCode": "input3",
+    "FieldDisplayOrder": 5,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "TrialHearingWitnessOfFactDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "trialHearingWitnessOfFactDJ",
+    "ListElementCode": "input1",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "TrialHearingWitnessOfFactDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "trialHearingWitnessOfFactDJ",
+    "ListElementCode": "input2",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "TrialHearingWitnessOfFactDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "trialHearingWitnessOfFactDJ",
+    "ListElementCode": "input3",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "TrialHearingWitnessOfFactDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "trialHearingWitnessOfFactDJ",
+    "ListElementCode": "input4",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "TrialHearingWitnessOfFactDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "trialHearingWitnessOfFactDJ",
+    "ListElementCode": "input5",
+    "FieldDisplayOrder": 5,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "TrialHearingWitnessOfFactDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "trialHearingWitnessOfFactDJ",
+    "ListElementCode": "input6",
+    "FieldDisplayOrder": 6,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "TrialHearingWitnessOfFactDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "trialHearingWitnessOfFactDJ",
+    "ListElementCode": "input7",
+    "FieldDisplayOrder": 7,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "TrialHearingWitnessOfFactDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "trialHearingWitnessOfFactDJ",
+    "ListElementCode": "input8",
+    "FieldDisplayOrder": 8,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "TrialHearingWitnessOfFactDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "trialHearingWitnessOfFactDJ",
+    "ListElementCode": "date1",
+    "FieldDisplayOrder": 9,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "TrialHearingWitnessOfFactDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "trialHearingWitnessOfFactDJ",
+    "ListElementCode": "input9",
+    "FieldDisplayOrder": 10,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "TrialHearingDisclosureOfDocumentsDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "trialHearingDisclosureOfDocumentsDJ",
+    "ListElementCode": "input1",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "TrialHearingDisclosureOfDocumentsDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "trialHearingDisclosureOfDocumentsDJ",
+    "ListElementCode": "date1",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "TrialHearingDisclosureOfDocumentsDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "trialHearingDisclosureOfDocumentsDJ",
+    "ListElementCode": "input2",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "TrialHearingDisclosureOfDocumentsDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "trialHearingDisclosureOfDocumentsDJ",
+    "ListElementCode": "date2",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "TrialHearingDisclosureOfDocumentsDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "trialHearingDisclosureOfDocumentsDJ",
+    "ListElementCode": "input3",
+    "FieldDisplayOrder": 5,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "TrialHearingDisclosureOfDocumentsDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "trialHearingDisclosureOfDocumentsDJ",
+    "ListElementCode": "input4",
+    "FieldDisplayOrder": 6,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "TrialHearingDisclosureOfDocumentsDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "trialHearingDisclosureOfDocumentsDJ",
+    "ListElementCode": "input5",
+    "FieldDisplayOrder": 7,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "TrialHearingDisclosureOfDocumentsDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "trialHearingDisclosureOfDocumentsDJ",
+    "ListElementCode": "date3",
+    "FieldDisplayOrder": 8,
+    "DisplayContext": "OPTIONAL"
+  }
+]

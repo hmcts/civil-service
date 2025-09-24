@@ -1,0 +1,26 @@
+[
+  {
+    "ID": "BreathingSpaceLiftInfo",
+    "CaseEventID": "LIFT_BREATHING_SPACE_SPEC_LIP",
+    "CaseFieldID": "liftBreathing",
+    "ListElementCode": "expectedEnd",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "BreathingSpaceLiftInfo",
+    "CaseEventID": "LIFT_BREATHING_SPACE_SPEC_LIP",
+    "CaseFieldID": "liftBreathing",
+    "ListElementCode": "event",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "BreathingSpaceLiftInfo",
+    "CaseEventID": "LIFT_BREATHING_SPACE_SPEC_LIP",
+    "CaseFieldID": "liftBreathing",
+    "ListElementCode": "eventDescription",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL"
+  }
+]

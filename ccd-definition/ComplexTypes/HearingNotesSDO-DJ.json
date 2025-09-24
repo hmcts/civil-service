@@ -1,0 +1,18 @@
+[
+  {
+    "ID": "HearingNotes",
+    "ListElementCode": "date",
+    "FieldType": "Date",
+    "ElementLabel": "Order date",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "HearingNotes",
+    "ListElementCode": "notes",
+    "FieldType": "Text",
+    "ElementLabel": "Notes",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

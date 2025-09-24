@@ -1,0 +1,42 @@
+[
+  {
+    "ID": "DisposalHearingQuestionsToExperts",
+    "ListElementCode": "label",
+    "FieldType": "Label",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DisposalHearingQuestionsToExperts",
+    "ListElementCode": "text1",
+    "FieldType": "Label",
+    "ElementLabel": "Any questions which are to be addressed to an expert must be sent to the expert directly and uploaded to the Digital Portal by 4pm on",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DisposalHearingQuestionsToExperts",
+    "ListElementCode": "dateLabel",
+    "FieldType": "Label",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DisposalHearingQuestionsToExperts",
+    "ListElementCode": "date",
+    "FieldType": "Date",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DisposalHearingQuestionsToExperts",
+    "ListElementCode": "text2",
+    "FieldType": "Label",
+    "ElementLabel": "The answers to the questions shall be answered by the Expert within 14 days and uploaded to the Digital Portal within 21 days.",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

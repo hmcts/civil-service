@@ -1,0 +1,152 @@
+[
+  {
+    "ID": "ShowConditionFlags",
+    "ListElementCode": "CAN_ANSWER_RESPONDENT_1",
+    "ListElement": "CAN_ANSWER_RESPONDENT_1",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "ShowConditionFlags",
+    "ListElementCode": "CAN_ANSWER_RESPONDENT_2",
+    "ListElement": "CAN_ANSWER_RESPONDENT_2",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "ShowConditionFlags",
+    "ListElementCode": "ONLY_RESPONDENT_1_DISPUTES",
+    "ListElement": "ONLY_RESPONDENT_1_DISPUTES",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "ShowConditionFlags",
+    "ListElementCode": "ONLY_RESPONDENT_2_DISPUTES",
+    "ListElement": "ONLY_RESPONDENT_2_DISPUTES",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "ShowConditionFlags",
+    "ListElementCode": "BOTH_RESPONDENTS_DISPUTE",
+    "ListElement": "BOTH_RESPONDENTS_DISPUTE",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "ShowConditionFlags",
+    "ListElementCode": "RESPONDENT_1_PAID_LESS",
+    "ListElement": "RESPONDENT_1_PAID_LESS",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "ShowConditionFlags",
+    "ListElementCode": "RESPONDENT_2_PAID_LESS",
+    "ListElement": "RESPONDENT_2_PAID_LESS",
+    "DisplayOrder": 7
+  },
+  {
+    "ID": "ShowConditionFlags",
+    "ListElementCode": "WHEN_WILL_CLAIM_BE_PAID",
+    "ListElement": "WHEN_WILL_CLAIM_BE_PAID",
+    "DisplayOrder": 8
+  },
+  {
+    "ID": "ShowConditionFlags",
+    "ListElementCode": "RESPONDENT_1_ADMITS_PART_OR_FULL",
+    "ListElement": "RESPONDENT_1_ADMITS_PART_OR_FULL",
+    "DisplayOrder": 9
+  },
+  {
+    "ID": "ShowConditionFlags",
+    "ListElementCode": "RESPONDENT_2_ADMITS_PART_OR_FULL",
+    "ListElement": "RESPONDENT_2_ADMITS_PART_OR_FULL",
+    "DisplayOrder": 10
+  },
+  {
+    "ID": "ShowConditionFlags",
+    "ListElementCode": "NEED_FINANCIAL_DETAILS_1",
+    "ListElement": "NEED_FINANCIAL_DETAILS_1",
+    "DisplayOrder": 11
+  },
+  {
+    "ID": "ShowConditionFlags",
+    "ListElementCode": "NEED_FINANCIAL_DETAILS_2",
+    "ListElement": "NEED_FINANCIAL_DETAILS_2",
+    "DisplayOrder": 12
+  },
+  {
+    "ID": "ShowConditionFlags",
+    "ListElementCode": "WHY_2_DOES_NOT_PAY_IMMEDIATELY",
+    "ListElement": "WHY_2_DOES_NOT_PAY_IMMEDIATELY",
+    "DisplayOrder": 13
+  },
+  {
+    "ID": "ShowConditionFlags",
+    "ListElementCode": "REPAYMENT_PLAN_2",
+    "ListElement": "REPAYMENT_PLAN_2",
+    "DisplayOrder": 14
+  },
+  {
+    "ID": "ShowConditionFlags",
+    "ListElementCode": "SOMEONE_DISPUTES",
+    "ListElement": "SOMEONE_DISPUTES",
+    "DisplayOrder": 15
+  },
+  {
+    "ID": "ShowConditionFlags",
+    "ListElementCode": "CURRENT_ADMITS_PART_OR_FULL",
+    "ListElement": "CURRENT_ADMITS_PART_OR_FULL",
+    "DisplayOrder": 16
+  },
+  {
+    "ID": "ShowConditionFlags",
+    "ListElementCode": "WHY_1_DOES_NOT_PAY_IMMEDIATELY",
+    "ListElement": "WHY_1_DOES_NOT_PAY_IMMEDIATELY",
+    "DisplayOrder": 17
+  },
+  {
+    "ID": "ShowConditionFlags",
+    "ListElementCode": "TIMELINE_UPLOAD",
+    "ListElement": "TIMELINE_UPLOAD",
+    "DisplayOrder": 18
+  },
+  {
+    "ID": "ShowConditionFlags",
+    "ListElementCode": "TIMELINE_MANUALLY",
+    "ListElement": "TIMELINE_MANUALLY",
+    "DisplayOrder": 19
+  },
+  {
+    "ID": "ShowConditionFlags",
+    "ListElementCode": "VULNERABILITY",
+    "ListElement": "VULNERABILITY",
+    "DisplayOrder": 20
+  },
+  {
+    "ID": "ShowConditionFlags",
+    "ListElementCode": "CLAIMANT_MEDIATION_ONE_V_ONE",
+    "ListElement": "CLAIMANT_MEDIATION_ONE_V_ONE",
+    "DisplayOrder": 21
+  },
+  {
+    "ID": "ShowConditionFlags",
+    "ListElementCode": "CLAIMANT_MEDIATION_ADMIT_PAID_ONE_V_ONE",
+    "ListElement": "CLAIMANT_MEDIATION_ADMIT_PAID_ONE_V_ONE",
+    "DisplayOrder": 22
+  },
+  {
+    "ID": "ShowConditionFlags",
+    "ListElementCode": "CLAIMANT_MEDIATION_ONE_V_TWO",
+    "ListElement": "CLAIMANT_MEDIATION_ONE_V_TWO",
+    "DisplayOrder": 23
+  },
+  {
+    "ID": "ShowConditionFlags",
+    "ListElementCode": "CLAIMANT_MEDIATION_TWO_V_ONE",
+    "ListElement": "CLAIMANT_MEDIATION_TWO_V_ONE",
+    "DisplayOrder": 24
+  },
+  {
+    "ID": "ShowConditionFlags",
+    "ListElementCode": "SHOW_ADMITTED_AMOUNT_SCREEN",
+    "ListElement": "SHOW_ADMITTED_AMOUNT_SCREEN",
+    "DisplayOrder": 25
+  }
+]

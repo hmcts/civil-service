@@ -1,0 +1,14 @@
+[
+  {
+    "ID": "BreathingSpaceType",
+    "ListElementCode": "STANDARD",
+    "ListElement": "Standard Breathing Space",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "BreathingSpaceType",
+    "ListElementCode": "MENTAL_HEALTH",
+    "ListElement": "Mental Health Crises Moratorium",
+    "DisplayOrder": 2
+  }
+]

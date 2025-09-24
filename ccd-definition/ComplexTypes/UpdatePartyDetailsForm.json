@@ -1,0 +1,51 @@
+[
+  {
+    "ID": "UpdatePartyDetailsForm",
+    "ListElementCode": "firstName",
+    "FieldType": "Text",
+    "ElementLabel": "First name",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "UpdatePartyDetailsForm",
+    "ListElementCode": "lastName",
+    "FieldType": "Text",
+    "ElementLabel": "Last name",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "UpdatePartyDetailsForm",
+    "ListElementCode": "emailAddress",
+    "FieldType": "Email",
+    "ElementLabel": "Email address",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "UpdatePartyDetailsForm",
+    "ListElementCode": "phoneNumber",
+    "FieldType": "PhoneUK",
+    "ElementLabel": "Phone number",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "UpdatePartyDetailsForm",
+    "ListElementCode": "fieldOfExpertise",
+    "FieldType": "Text",
+    "ElementLabel": "Field of expertise",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "UpdatePartyDetailsForm",
+    "ListElementCode": "partyId",
+    "FieldType": "Text",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "firstName = \"DO_NOT_SHOW_ON_UI\""
+  }
+]

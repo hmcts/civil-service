@@ -1,0 +1,38 @@
+[
+  {
+    "ID": "JudgmentStatusTypeList",
+    "ListElementCode": "REQUESTED",
+    "ListElement": "Requested",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "JudgmentStatusTypeList",
+    "ListElementCode": "ISSUED",
+    "ListElement": "Issued",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "JudgmentStatusTypeList",
+    "ListElementCode": "MODIFIED",
+    "ListElement": "Modified",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "JudgmentStatusTypeList",
+    "ListElementCode": "SET_ASIDE",
+    "ListElement": "Set aside",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "JudgmentStatusTypeList",
+    "ListElementCode": "CANCELLED",
+    "ListElement": "Cancelled",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "JudgmentStatusTypeList",
+    "ListElementCode": "SATISFIED",
+    "ListElement": "Satisfied",
+    "DisplayOrder": 6
+  }
+]

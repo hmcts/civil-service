@@ -1,0 +1,32 @@
+[
+  {
+    "ID": "GAHearingSupportRequirementsGAspec",
+    "ListElementCode": "DISABLED_ACCESS",
+    "ListElement": "Disabled access",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "GAHearingSupportRequirementsGAspec",
+    "ListElementCode": "HEARING_LOOPS",
+    "ListElement": "Hearing loop",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "GAHearingSupportRequirementsGAspec",
+    "ListElementCode": "SIGN_INTERPRETER",
+    "ListElement": "Sign language interpreter (you will have to arrange this)",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "GAHearingSupportRequirementsGAspec",
+    "ListElementCode": "LANGUAGE_INTERPRETER",
+    "ListElement": "Language interpreter (you will have to arrange this)",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "GAHearingSupportRequirementsGAspec",
+    "ListElementCode": "OTHER_SUPPORT",
+    "ListElement": "Other support",
+    "DisplayOrder": 5
+  }
+]

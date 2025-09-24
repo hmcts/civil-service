@@ -1,0 +1,50 @@
+[
+  {
+    "ID": "SdoR2FastTrackCreditHireDetails",
+    "CaseEventID": "CREATE_SDO",
+    "CaseFieldID": "sdoR2FastTrackCreditHire",
+    "ListElementCode": "sdoR2FastTrackCreditHireDetails.input2",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "SdoR2FastTrackCreditHireDetails",
+    "CaseEventID": "CREATE_SDO",
+    "CaseFieldID": "sdoR2FastTrackCreditHire",
+    "ListElementCode": "sdoR2FastTrackCreditHireDetails.dateText",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "SdoR2FastTrackCreditHireDetails",
+    "CaseEventID": "CREATE_SDO",
+    "CaseFieldID": "sdoR2FastTrackCreditHire",
+    "ListElementCode": "sdoR2FastTrackCreditHireDetails.date1",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "SdoR2FastTrackCreditHireDetails",
+    "CaseEventID": "CREATE_SDO",
+    "CaseFieldID": "sdoR2FastTrackCreditHire",
+    "ListElementCode": "sdoR2FastTrackCreditHireDetails.input3",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "SdoR2FastTrackCreditHireDetails",
+    "CaseEventID": "CREATE_SDO",
+    "CaseFieldID": "sdoR2FastTrackCreditHire",
+    "ListElementCode": "sdoR2FastTrackCreditHireDetails.input4",
+    "FieldDisplayOrder": 5,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "SdoR2FastTrackCreditHireDetails",
+    "CaseEventID": "CREATE_SDO",
+    "CaseFieldID": "sdoR2FastTrackCreditHire",
+    "ListElementCode": "sdoR2FastTrackCreditHireDetails.date2",
+    "FieldDisplayOrder": 11,
+    "DisplayContext": "OPTIONAL"
+  }
+]

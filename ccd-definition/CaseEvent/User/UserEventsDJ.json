@@ -1,0 +1,23 @@
+[
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "DEFAULT_JUDGEMENT",
+    "Name": "Request Default Judgment",
+    "Description": "Request Default Judgment",
+    "DisplayOrder": 17,
+    "PreConditionState(s)": "AWAITING_RESPONDENT_ACKNOWLEDGEMENT",
+    "PostConditionState": "*",
+    "EventEnablingCondition": "applicantSolicitor1ServiceAddressRequired = \"No\" OR applicantSolicitor1ServiceAddressRequired =  \"Yes\"",
+    "_comment": "above shows the DF event when claim type is damages",
+    "SecurityClassification": "Public",
+    "CallBackURLAboutToStartEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-start",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-submit",
+    "CallBackURLSubmittedEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/submitted",
+    "ShowSummary": "Y",
+    "ShowEventNotes": "N",
+    "RetriesTimeoutAboutToStartEvent": 0,
+    "RetriesTimeoutURLAboutToSubmitEvent": 0,
+    "RetriesTimeoutURLSubmittedEvent": 0,
+    "Publish": "Y"
+  }
+]

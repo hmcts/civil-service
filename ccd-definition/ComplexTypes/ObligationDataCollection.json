@@ -1,0 +1,45 @@
+[
+  {
+    "ID": "ObligationDataCollection",
+    "ListElementCode": "obligationDate",
+    "FieldType": "Date",
+    "ElementLabel": "Review date",
+    "SecurityClassification": "Public",
+    "Searchable": "Y"
+  },
+  {
+    "ID": "ObligationDataCollection",
+    "ListElementCode": "obligationReason",
+    "ElementLabel": "Reason",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "ObligationReason",
+    "SecurityClassification": "Public",
+    "Searchable": "Y"
+  },
+  {
+    "ID": "ObligationDataCollection",
+    "ListElementCode": "otherObligationReason",
+    "FieldType": "Text",
+    "ElementLabel": "Info for other",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "obligationReason = \"OTHER\"",
+    "Searchable": "Y"
+  },
+  {
+    "ID": "ObligationDataCollection",
+    "ListElementCode": "obligationAction",
+    "FieldType": "TextArea",
+    "ElementLabel": "Description of review",
+    "SecurityClassification": "Public",
+    "Searchable": "Y"
+  },
+  {
+    "ID": "ObligationDataCollection",
+    "ListElementCode": "obligationWATaskRaised",
+    "ElementLabel": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "Y",
+    "FieldShowCondition": "obligationWATaskRaised = \"DO_NOT_SHOW_IN_UI\""
+  }
+]

@@ -1,0 +1,88 @@
+[
+  {
+    "ID": "LitigationFriend",
+    "ListElementCode": "fullName",
+    "FieldType": "Text",
+    "ElementLabel": "Litigation friend's full name",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "LitigationFriend",
+    "ListElementCode": "hasSameAddressAsLitigant",
+    "FieldType": "YesOrNo",
+    "ElementLabel": "Is the address of the Claimant’s litigation friend the same as the address of the Claimant?",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "LitigationFriend",
+    "ListElementCode": "primaryAddress",
+    "FieldType": "AddressUK",
+    "FieldShowCondition": "hasSameAddressAsLitigant = \"No\"",
+    "ElementLabel": "Litigation friend's address",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "LitigationFriend",
+    "ListElementCode": "certificateOfSuitability",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "DocumentOrImageWithRegex",
+    "ElementLabel": "Upload the certificate of suitability",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "Min": 1
+  },
+  {
+    "ID": "LitigationFriend",
+    "ListElementCode": "firstName",
+    "FieldType": "Text",
+    "ElementLabel": "First name",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "LitigationFriend",
+    "ListElementCode": "lastName",
+    "FieldType": "Text",
+    "ElementLabel": "Last name",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "LitigationFriend",
+    "ListElementCode": "emailAddress",
+    "FieldType": "Email",
+    "ElementLabel": "Email address",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "LitigationFriend",
+    "ListElementCode": "phoneNumber",
+    "FieldType": "PhoneUK",
+    "ElementLabel": "Phone number",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "LitigationFriend",
+    "ListElementCode": "flags",
+    "FieldType": "Flags",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "RetainHiddenValue": "Y"
+  },
+  {
+    "ID": "LitigationFriend",
+    "ListElementCode": "partyID",
+    "FieldType": "Text",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "hasSameAddressAsLitigant = \"DO NOT SHOW\"",
+    "RetainHiddenValue": "Y"
+  }
+]

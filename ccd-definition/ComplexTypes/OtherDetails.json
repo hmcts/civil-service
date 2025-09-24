@@ -1,0 +1,18 @@
+[
+  {
+    "ID": "OtherDetails",
+    "ListElementCode": "notSuitableForSDO",
+    "FieldType": "YesOrNo",
+    "ElementLabel": "Not suitable for SDO",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "OtherDetails",
+    "ListElementCode": "reasonNotSuitableForSDO",
+    "FieldType": "Text",
+    "ElementLabel": "Reason",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

@@ -1,0 +1,28 @@
+[
+  {
+    "ID": "SdoR2RestrictNoOfWitnessDetails",
+    "ListElementCode": "noOfWitnessClaimant",
+    "FieldType": "Number",
+    "HintText":"For example,4",
+    "ElementLabel": "Number of witnesses (claimant)",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2RestrictNoOfWitnessDetails",
+    "ListElementCode": "noOfWitnessDefendant",
+    "FieldType": "Number",
+    "HintText":"For example,4",
+    "ElementLabel": "Number of witnesses (defendant)",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2RestrictNoOfWitnessDetails",
+    "ListElementCode": "partyIsCountedAsWitnessTxt",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "ElementLabel": " "
+  }
+]

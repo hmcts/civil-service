@@ -1,0 +1,11 @@
+[
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "typeOfDiscontinuance",
+    "Label": " ",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "DiscontinuanceTypeList",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

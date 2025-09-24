@@ -1,0 +1,56 @@
+[
+  {
+    "ID": "PartyFlagStructure",
+    "ListElementCode": "firstName",
+    "FieldType": "Text",
+    "ElementLabel": "First name",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "RetainHiddenValue": "Y"
+  },
+  {
+    "ID": "PartyFlagStructure",
+    "ListElementCode": "lastName",
+    "FieldType": "Text",
+    "ElementLabel": "Last name",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "RetainHiddenValue": "Y"
+  },
+  {
+    "ID": "PartyFlagStructure",
+    "ListElementCode": "email",
+    "FieldType": "Text",
+    "ElementLabel": "Email",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "RetainHiddenValue": "Y"
+  },
+  {
+    "ID": "PartyFlagStructure",
+    "ListElementCode": "phone",
+    "FieldType": "Text",
+    "ElementLabel": "Phone",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "RetainHiddenValue": "Y"
+  },
+  {
+    "ID": "PartyFlagStructure",
+    "ListElementCode": "flags",
+    "FieldType": "Flags",
+    "ElementLabel": "flags",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "RetainHiddenValue": "Y"
+  },
+  {
+    "ID": "PartyFlagStructure",
+    "ListElementCode": "partyID",
+    "FieldType": "Text",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "phone = \"DO NOT SHOW\""
+  }
+]

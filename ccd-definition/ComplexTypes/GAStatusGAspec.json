@@ -1,0 +1,10 @@
+[
+  {
+    "ID": "GAStatusGAspec",
+    "ListElementCode": "status",
+    "FieldType": "Text",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

@@ -1,0 +1,19 @@
+
+[
+  {
+    "ID": "FastTrackCosts",
+    "ListElementCode": "label",
+    "FieldType": "Label",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "FastTrackCosts",
+    "ListElementCode": "text",
+    "FieldType": "Label",
+    "ElementLabel": "Costs in the case",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

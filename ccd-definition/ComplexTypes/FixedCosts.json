@@ -1,0 +1,19 @@
+[
+  {
+    "ID": "FixedCosts",
+    "ListElementCode": "claimFixedCosts",
+    "FieldType": "YesOrNo",
+    "ElementLabel": "Do you want to claim for fixed commencement costs?",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "FixedCosts",
+    "ListElementCode": "fixedCostAmount",
+    "FieldType": "MoneyGBP",
+    "ElementLabel": "Amount",
+    "FieldShowCondition": "claimFixedCosts = \"Yes\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

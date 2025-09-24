@@ -1,0 +1,32 @@
+[
+  {
+    "ID": "RolePool",
+    "ListElementCode": "ADMIN",
+    "ListElement": "Court Staff",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "RolePool",
+    "ListElementCode": "JUDICIAL",
+    "ListElement": "Judge",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "RolePool",
+    "ListElementCode": "JUDICIAL_DISTRICT",
+    "ListElement": "Judge",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "RolePool",
+    "ListElementCode": "JUDICIAL_CIRCUIT",
+    "ListElement": "Judge",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "RolePool",
+    "ListElementCode": "LEGAL_OPERATIONS",
+    "ListElement": "Legal Advisor",
+    "DisplayOrder": 5
+  }
+]

@@ -1,0 +1,19 @@
+[
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "coSCApplicationStatus",
+    "FieldType": "FixedList",
+    "FieldTypeParameter": "CoscApplicationStatus",
+    "Label": "CoSC Application Status",
+    "SecurityClassification": "Public",
+    "Searchable": "Y"
+  },
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "coscSchedulerDeadline",
+    "Label": " ",
+    "FieldType": "Date",
+    "SecurityClassification": "Public",
+    "Searchable": "Y"
+  }
+]

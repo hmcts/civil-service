@@ -1,0 +1,27 @@
+[
+  {
+    "ID": "HelpWithFeesMoreInformation",
+    "ListElementCode": "hwFMoreInfoRequiredDocuments",
+    "ElementLabel": "Proof of the following needed (Select one or more)",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "HwfInformationProofList",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "HelpWithFeesMoreInformation",
+    "ListElementCode": "hwFMoreInfoDetails",
+    "ElementLabel": "Details",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "HelpWithFeesMoreInformation",
+    "ListElementCode": "hwFMoreInfoDocumentDate",
+    "ElementLabel": "Documents to be sent before 4pm",
+    "FieldType": "Date",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

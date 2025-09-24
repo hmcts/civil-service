@@ -1,0 +1,26 @@
+[
+  {
+    "ID": "EvidenceUploadWitness",
+    "ListElementCode": "WITNESS_STATEMENT",
+    "ListElement": "Witness statement",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "EvidenceUploadWitness",
+    "ListElementCode": "WITNESS_SUMMARY",
+    "ListElement": "Witness summary",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "EvidenceUploadWitness",
+    "ListElementCode": "NOTICE_OF_INTENTION",
+    "ListElement": "Notice of the intention to rely on hearsay evidence",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "EvidenceUploadWitness",
+    "ListElementCode": "DOCUMENTS_REFERRED",
+    "ListElement": "Documents referred to in the statement",
+    "DisplayOrder": 4
+  }
+]

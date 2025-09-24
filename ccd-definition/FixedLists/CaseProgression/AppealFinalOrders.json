@@ -1,0 +1,32 @@
+[
+  {
+    "ID": "AppealList",
+    "ListElementCode": "CLAIMANT",
+    "ListElement": "Claimant's",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "AppealList",
+    "ListElementCode": "DEFENDANT",
+    "ListElement": "Defendant's",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "AppealList",
+    "ListElementCode": "OTHER",
+    "ListElement": "Other",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "ApplicationAppealList",
+    "ListElementCode": "GRANTED",
+    "ListElement": "granted",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "ApplicationAppealList",
+    "ListElementCode": "REFUSED",
+    "ListElement": "refused",
+    "DisplayOrder": 2
+  }
+]

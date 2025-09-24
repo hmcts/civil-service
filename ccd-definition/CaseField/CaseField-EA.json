@@ -1,0 +1,11 @@
+[
+  {
+    "CaseTypeID": "CIVIL${CCD_DEF_VERSION}",
+    "ID": "eaCourtLocation",
+    "Label": " ",
+    "FieldType": "YesOrNo",
+    "Searchable": "N",
+    "SecurityClassification": "Public",
+    "Publish": "Y"
+  }
+]

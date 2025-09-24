@@ -1,0 +1,236 @@
+[
+  {
+    "ID": "JoJudgment",
+    "ListElementCode": "judgmentId",
+    "ElementLabel": " ",
+    "FieldType": "Number",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "JoJudgment",
+    "ListElementCode": "defendant1Name",
+    "ElementLabel": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "JoJudgment",
+    "ListElementCode": "defendant2Name",
+    "ElementLabel": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "JoJudgment",
+    "ListElementCode": "defendant1Address",
+    "ElementLabel": " ",
+    "FieldType": "JudgmentAddress",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "JoJudgment",
+    "ListElementCode": "defendant2Address",
+    "ElementLabel": " ",
+    "FieldType": "JudgmentAddress",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "JoJudgment",
+    "ListElementCode": "defendant1Dob",
+    "ElementLabel": " ",
+    "FieldType": "Date",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "JoJudgment",
+    "ListElementCode": "defendant2Dob",
+    "ElementLabel": " ",
+    "FieldType": "Date",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "JoJudgment",
+    "ListElementCode": "createdTimestamp",
+    "ElementLabel": " ",
+    "FieldType": "DateTime",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "JoJudgment",
+    "ListElementCode": "lastUpdateTimeStamp",
+    "ElementLabel": " ",
+    "FieldType": "DateTime",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "JoJudgment",
+    "ListElementCode": "cancelledTimeStamp",
+    "ElementLabel": " ",
+    "FieldType": "DateTime",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "JoJudgment",
+    "ListElementCode": "state",
+    "ElementLabel": " ",
+    "FieldType": "FixedList",
+    "FieldTypeParameter": "JudgmentState",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "JoJudgment",
+    "ListElementCode": "rtlState",
+    "ElementLabel": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "JoJudgment",
+    "ListElementCode": "type",
+    "ElementLabel": " ",
+    "FieldType": "FixedList",
+    "FieldTypeParameter": "JudgmentType",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "JoJudgment",
+    "ListElementCode": "isRegisterWithRTL",
+    "ElementLabel": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "JoJudgment",
+    "ListElementCode": "requestDate",
+    "ElementLabel": " ",
+    "FieldType": "Date",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "JoJudgment",
+    "ListElementCode": "issueDate",
+    "ElementLabel": " ",
+    "FieldType": "Date",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "JoJudgment",
+    "ListElementCode": "setAsideDate",
+    "ElementLabel": " ",
+    "FieldType": "Date",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "JoJudgment",
+    "ListElementCode": "cancelDate",
+    "ElementLabel": " ",
+    "FieldType": "Date",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "JoJudgment",
+    "ListElementCode": "fullyPaymentMadeDate",
+    "ElementLabel": " ",
+    "FieldType": "Date",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "JoJudgment",
+    "ListElementCode": "isJointJudgment",
+    "ElementLabel": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "JoJudgment",
+    "ListElementCode": "orderedAmount",
+    "ElementLabel": " ",
+    "FieldType": "MoneyGBP",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "JoJudgment",
+    "ListElementCode": "costs",
+    "ElementLabel": " ",
+    "FieldType": "MoneyGBP",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "JoJudgment",
+    "ListElementCode": "claimFeeAmount",
+    "ElementLabel": " ",
+    "FieldType": "MoneyGBP",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "JoJudgment",
+    "ListElementCode": "amountAlreadyPaid",
+    "ElementLabel": " ",
+    "FieldType": "MoneyGBP",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "JoJudgment",
+    "ListElementCode": "totalAmount",
+    "ElementLabel": " ",
+    "FieldType": "MoneyGBP",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "JoJudgment",
+    "ListElementCode": "courtLocation",
+    "ElementLabel": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "JoJudgment",
+    "ListElementCode": "paymentPlan",
+    "ElementLabel": " ",
+    "FieldType": "JoPaymentPlan",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "JoJudgment",
+    "ListElementCode": "instalmentDetails",
+    "ElementLabel": " ",
+    "FieldType": "InstalmentPaymentDetails",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "JoJudgment",
+    "ListElementCode": "setAsideApplicationDate",
+    "ElementLabel": " ",
+    "FieldType": "Date",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

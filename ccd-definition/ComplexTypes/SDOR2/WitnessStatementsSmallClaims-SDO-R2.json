@@ -1,0 +1,84 @@
+[
+  {
+    "ID": "SdoR2SmallClaimsWitnessStatements",
+    "ListElementCode": "label",
+    "FieldType": "Label",
+    "ElementLabel": "### Statements of witnesses",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2SmallClaimsWitnessStatements",
+    "ListElementCode": "sdoStatementOfWitness",
+    "FieldType": "TextArea",
+    "ElementLabel": "Statements of witnesses",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2SmallClaimsWitnessStatements",
+    "ListElementCode": "restrictWitnessLbl",
+    "FieldType": "Label",
+    "ElementLabel": "**Restrict number of witnesses**",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2SmallClaimsWitnessStatements",
+    "ListElementCode": "isRestrictWitness",
+    "FieldType": "YesOrNo",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2SmallClaimsWitnessStatements",
+    "ListElementCode": "sdoR2SmallClaimsRestrictWitness",
+    "FieldType": "SdoR2SmallClaimsRestrictWitness",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "isRestrictWitness = \"Yes\""
+  },
+  {
+    "ID": "SdoR2SmallClaimsWitnessStatements",
+    "ListElementCode": "restrictPagesLbl",
+    "FieldType": "Label",
+    "ElementLabel": "**Restrict number of pages**",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2SmallClaimsWitnessStatements",
+    "ListElementCode": "isRestrictPages",
+    "FieldType": "YesOrNo",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2SmallClaimsWitnessStatements",
+    "ListElementCode": "sdoR2SmallClaimsRestrictPages",
+    "FieldType": "SdoR2SmallClaimsRestrictPages",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "isRestrictPages = \"Yes\""
+  },
+  {
+    "ID": "SdoR2SmallClaimsWitnessStatements",
+    "ListElementCode": "label1",
+    "FieldType": "Label",
+    "ElementLabel": "### A witness statement must",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2SmallClaimsWitnessStatements",
+    "ListElementCode": "text",
+    "FieldType": "TextArea",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]
