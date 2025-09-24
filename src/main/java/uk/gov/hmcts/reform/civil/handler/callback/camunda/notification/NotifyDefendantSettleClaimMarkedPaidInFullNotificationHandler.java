@@ -77,13 +77,9 @@ public class NotifyDefendantSettleClaimMarkedPaidInFullNotificationHandler exten
         String recipient = callbackParams.getRequest().getEventId()
                 .equals(NOTIFY_SOLICITOR1_DEFENDANT_SETTLE_CLAIM_MARKED_PAID_IN_FULL.name())
                 ? caseData.getRespondentSolicitor1EmailAddress() : caseData.getRespondentSolicitor2EmailAddress();
-        log.info("caseData.getRespondentSolicitor1EmailAddress(): {}" +
-                     ", caseData.getRespondentSolicitor2EmailAddress(): {}", caseData.getRespondentSolicitor1EmailAddress(),
-                 caseData.getRespondentSolicitor2EmailAddress());
-        log.info("recipient: {}", recipient);
 
         if (nonNull(recipient)) {
-            log.info("Sending notification..");
+            log.info("Sending notification..for caseId {}", caseData.getCcdCaseReference());
             notificationService.sendMail(
                 recipient,
                 getTemplate(),

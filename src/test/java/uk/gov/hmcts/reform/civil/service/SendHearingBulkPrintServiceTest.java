@@ -251,6 +251,22 @@ class SendHearingBulkPrintServiceTest {
     }
 
     @Test
+    void shouldDownloadDocumentAndPrintWelshHearingNoticeLetterToClaimantLiPSuccessfullyWhenLangFieldNotSet() {
+        // given
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
+        Party claimant = PartyBuilder.builder().soleTrader().build();
+        CaseData caseData = buildCaseData(claimant, HEARING_FORM, true, null, null, null, null);
+        given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
+            .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
+
+        // when
+        sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_CLAIMANT, false);
+
+        // then
+        verifyPrintLetter(caseData, claimant);
+    }
+
+    @Test
     void shouldDownloadDocumentAndPrintWelshHearingNoticeLetterToClaimantLiPSuccessfullyWhenBilingual() {
         // given
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
