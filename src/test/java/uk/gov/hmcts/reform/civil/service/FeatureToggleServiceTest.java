@@ -328,18 +328,6 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenPublicQueryEnabledLr(Boolean toggleStat) {
-        var lrPublicQuery = "public-query-management";
-        givenToggle(lrPublicQuery, toggleStat);
-
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
-            .build();
-
-        assertThat(featureToggleService.isPublicQueryManagementEnabled(caseData)).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenPublicQueryEnabledLip(Boolean toggleStat) {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
             .applicant1Represented(YesOrNo.NO)
@@ -348,14 +336,6 @@ class FeatureToggleServiceTest {
         when(featureToggleService.isLipQueryManagementEnabled(caseData)).thenReturn(toggleStat);
 
         assertThat(featureToggleService.isPublicQueryManagementEnabled(caseData)).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenPublicQueryEnabled(Boolean toggleStat) {
-        when(featureToggleService.isQMPdfGeneratorDisabled()).thenReturn(toggleStat);
-
-        assertThat(featureToggleService.isQMPdfGeneratorDisabled()).isEqualTo(toggleStat);
     }
 
     @ParameterizedTest

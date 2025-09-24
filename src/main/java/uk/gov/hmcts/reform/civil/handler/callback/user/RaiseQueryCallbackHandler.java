@@ -36,7 +36,6 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYS
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.assignCategoryIdToAttachments;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.buildLatestQuery;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.clearOldQueryCollections;
-import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getLatestQuery;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.logMigrationSuccess;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.migrateAllQueries;
 
@@ -104,7 +103,7 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
 
-        CaseMessage latestCaseMessage = getLatestQuery(caseData);
+        CaseMessage latestCaseMessage = caseData.getQueries().latest();
         if (nonNull(caseData.getQueries()) && caseData.getQueries().messageThread(latestCaseMessage).size() % 2 == 0) {
             return AboutToStartOrSubmitCallbackResponse.builder().errors(List.of(FOLLOW_UPS_ERROR)).build();
         }

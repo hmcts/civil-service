@@ -53,7 +53,7 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     Map.entry(DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnlineForCase(c)),
                     Map.entry(CLAIM_STATE_DURING_NOC.name(), getMainClaimCcdState(c)),
                     Map.entry(WELSH_ENABLED.name(), featureToggleService.isWelshEnabledForMainCase()),
-                    Map.entry(PUBLIC_QUERIES_ENABLED.name(), featureToggleService.isQMPdfGeneratorDisabled()),
+                    Map.entry(PUBLIC_QUERIES_ENABLED.name(), true),
                     Map.entry(JBA_ISSUED_BEFORE_NOC.name(), isJudgmentByAdmissionIssuedForCase(c)),
                     Map.entry(IS_CJES_SERVICE_ENABLED.name(), featureToggleService.isCjesServiceAvailable())
                 )), transitions)
@@ -76,7 +76,7 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     Map.entry(DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnlineForCase(c)),
                     Map.entry(CLAIM_STATE_DURING_NOC.name(), getMainClaimCcdState(c)),
                     Map.entry(WELSH_ENABLED.name(), featureToggleService.isWelshEnabledForMainCase()),
-                    Map.entry(PUBLIC_QUERIES_ENABLED.name(), featureToggleService.isQMPdfGeneratorDisabled()),
+                    Map.entry(PUBLIC_QUERIES_ENABLED.name(), true),
                     Map.entry(JBA_ISSUED_BEFORE_NOC.name(), isJudgmentByAdmissionIssuedForCase(c)),
                     Map.entry(IS_CJES_SERVICE_ENABLED.name(), featureToggleService.isCjesServiceAvailable())
                 )), transitions)
@@ -95,7 +95,7 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     Map.entry(DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnlineForCase(c)),
                     Map.entry(CLAIM_STATE_DURING_NOC.name(), getMainClaimCcdState(c)),
                     Map.entry(WELSH_ENABLED.name(), featureToggleService.isWelshEnabledForMainCase()),
-                    Map.entry(PUBLIC_QUERIES_ENABLED.name(), featureToggleService.isQMPdfGeneratorDisabled()),
+                    Map.entry(PUBLIC_QUERIES_ENABLED.name(), true),
                     Map.entry(JBA_ISSUED_BEFORE_NOC.name(), isJudgmentByAdmissionIssuedForCase(c)),
                     Map.entry(IS_CJES_SERVICE_ENABLED.name(), featureToggleService.isCjesServiceAvailable())
                 )), transitions)
@@ -117,7 +117,7 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     Map.entry(DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnlineForCase(c)),
                     Map.entry(CLAIM_STATE_DURING_NOC.name(), getMainClaimCcdState(c)),
                     Map.entry(WELSH_ENABLED.name(), featureToggleService.isWelshEnabledForMainCase()),
-                    Map.entry(PUBLIC_QUERIES_ENABLED.name(), featureToggleService.isQMPdfGeneratorDisabled()),
+                    Map.entry(PUBLIC_QUERIES_ENABLED.name(), true),
                     Map.entry(JBA_ISSUED_BEFORE_NOC.name(), isJudgmentByAdmissionIssuedForCase(c)),
                     Map.entry(IS_CJES_SERVICE_ENABLED.name(), featureToggleService.isCjesServiceAvailable())
                 )), transitions)
@@ -138,7 +138,7 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     Map.entry(DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnlineForCase(c)),
                     Map.entry(CLAIM_STATE_DURING_NOC.name(), getMainClaimCcdState(c)),
                     Map.entry(WELSH_ENABLED.name(), featureToggleService.isWelshEnabledForMainCase()),
-                    Map.entry(PUBLIC_QUERIES_ENABLED.name(), featureToggleService.isQMPdfGeneratorDisabled()),
+                    Map.entry(PUBLIC_QUERIES_ENABLED.name(), true),
                     Map.entry(JBA_ISSUED_BEFORE_NOC.name(), isJudgmentByAdmissionIssuedForCase(c)),
                     Map.entry(IS_CJES_SERVICE_ENABLED.name(), featureToggleService.isCjesServiceAvailable())
                 )), transitions)
@@ -159,7 +159,7 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     Map.entry(DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnlineForCase(c)),
                     Map.entry(CLAIM_STATE_DURING_NOC.name(), getMainClaimCcdState(c)),
                     Map.entry(WELSH_ENABLED.name(), featureToggleService.isWelshEnabledForMainCase()),
-                    Map.entry(PUBLIC_QUERIES_ENABLED.name(), featureToggleService.isQMPdfGeneratorDisabled()),
+                    Map.entry(PUBLIC_QUERIES_ENABLED.name(), true),
                     Map.entry(JBA_ISSUED_BEFORE_NOC.name(), isJudgmentByAdmissionIssuedForCase(c)),
                     Map.entry(IS_CJES_SERVICE_ENABLED.name(), featureToggleService.isCjesServiceAvailable())
                 )), transitions);

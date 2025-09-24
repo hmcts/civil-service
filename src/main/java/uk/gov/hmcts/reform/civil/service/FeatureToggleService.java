@@ -165,11 +165,6 @@ public class FeatureToggleService {
         return true;
     }
 
-    public boolean isQMPdfGeneratorDisabled() {
-        // only generate pdf if flag is off
-        return featureToggleApi.isFeatureEnabled("public-query-management");
-    }
-
     public boolean isGaForWelshEnabled() {
         return featureToggleApi.isFeatureEnabled("generalApplicationsForWelshParty");
     }

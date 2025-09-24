@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.querymanagement.QueryManagementCamundaService;
 import uk.gov.hmcts.reform.civil.service.querymanagement.QueryManagementVariables;
@@ -55,7 +54,6 @@ public class NotifyOtherPartyQueryRaisedNotificationHandler extends CallbackHand
     private final OrganisationService organisationService;
     private final QueryManagementCamundaService runtimeService;
     private final NotificationsSignatureConfiguration configuration;
-    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -125,7 +123,7 @@ public class NotifyOtherPartyQueryRaisedNotificationHandler extends CallbackHand
             properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, legalOrgNameOrPartyName);
             properties.put(CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString());
         }
-        addAllFooterItems(caseData, properties, configuration, featureToggleService.isPublicQueryManagementEnabled(caseData));
+        addAllFooterItems(caseData, properties, configuration, true);
 
         return properties;
     }
