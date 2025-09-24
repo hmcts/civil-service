@@ -288,21 +288,21 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
 
     @Override
     public boolean isSDOOrderInReview() {
-        return featureToggleService.isCaseProgressionEnabled() && isSDOMadeByLegalAdviser()
-            && nonNull(caseData.getOrderRequestedForReviewClaimant())
-            && caseData.getOrderRequestedForReviewClaimant().equals(YES) && !isDecisionForReconsiderationMade()
-            && !isSDODoneAfterDecisionForReconsiderationMade()
-            && !isGeneralOrderAfterDecisionForReconsiderationMade();
+        return isSDOMadeByLegalAdviser()
+                && nonNull(caseData.getOrderRequestedForReviewClaimant())
+                && caseData.getOrderRequestedForReviewClaimant().equals(YES) && !isDecisionForReconsiderationMade()
+                && !isSDODoneAfterDecisionForReconsiderationMade()
+                && !isGeneralOrderAfterDecisionForReconsiderationMade();
     }
 
     @Override
     public boolean isSDOOrderInReviewOtherParty() {
-        return featureToggleService.isCaseProgressionEnabled() && isSDOMadeByLegalAdviser()
-            && nonNull(caseData.getOrderRequestedForReviewDefendant())
-            && caseData.getOrderRequestedForReviewDefendant().equals(YES)
-            && !isSDOOrderInReview() && !isDecisionForReconsiderationMade()
-            && !isSDODoneAfterDecisionForReconsiderationMade()
-            && !isGeneralOrderAfterDecisionForReconsiderationMade();
+        return isSDOMadeByLegalAdviser()
+                && nonNull(caseData.getOrderRequestedForReviewDefendant())
+                && caseData.getOrderRequestedForReviewDefendant().equals(YES)
+                && !isSDOOrderInReview() && !isDecisionForReconsiderationMade()
+                && !isSDODoneAfterDecisionForReconsiderationMade()
+                && !isGeneralOrderAfterDecisionForReconsiderationMade();
     }
 
     @Override

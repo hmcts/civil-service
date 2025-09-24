@@ -127,17 +127,15 @@ public class GenerateHearingNoticeHmcHandler extends CallbackHandler {
                 .trialReadyNotified(null);
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder
-                      .hearingDate(hearingStartDate.toLocalDate())
-                      .hearingDueDate(HearingFeeUtils.calculateHearingDueDate(LocalDate.now(), hearingStartDate.toLocalDate()))
-                      .hearingLocation(DynamicList.builder().value(DynamicListElement.builder()
-                                                                       .label(hearingLocation)
-                                                                       .build()).build())
-                      .hearingFee(featureToggleService.isCaseProgressionEnabled()
-                                      ? calculateAndApplyFee(hearingFeesService, caseData, claimTrack)
-                                      : null)
-                      .build().toMap(objectMapper))
-            .build();
+                .data(caseDataBuilder
+                        .hearingDate(hearingStartDate.toLocalDate())
+                        .hearingDueDate(HearingFeeUtils.calculateHearingDueDate(LocalDate.now(), hearingStartDate.toLocalDate()))
+                        .hearingLocation(DynamicList.builder().value(DynamicListElement.builder()
+                                .label(hearingLocation)
+                                .build()).build())
+                        .hearingFee(calculateAndApplyFee(hearingFeesService, caseData, claimTrack))
+                        .build().toMap(objectMapper))
+                .build();
     }
 
     private void buildDocument(CallbackParams callbackParams, CaseData.CaseDataBuilder<?, ?> caseDataBuilder, HearingGetResponse hearing,

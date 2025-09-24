@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.claimant;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,7 +14,6 @@ import uk.gov.hmcts.reform.civil.utils.DateUtils;
 
 import java.time.LocalDate;
 
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -24,12 +22,6 @@ public class HearingFeeUnpaidScenarioTest extends DashboardBaseIntegrationTest {
 
     @Autowired
     private HearingFeeUnpaidClaimantNotificationHandler handler;
-
-    @BeforeEach
-    public void before() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
-    }
 
     @Test
     void should_create_hearing_fee_unpaid_scenario() throws Exception {

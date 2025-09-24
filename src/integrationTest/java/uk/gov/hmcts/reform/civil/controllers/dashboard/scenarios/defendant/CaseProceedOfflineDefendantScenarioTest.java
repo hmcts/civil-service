@@ -51,22 +51,16 @@ public class CaseProceedOfflineDefendantScenarioTest extends DashboardBaseIntegr
                                 "<p class=\"govuk-body\">Ni fydd eich cyfrif ar-lein yn cael ei ddiweddaru mwyach."
                                         + " Os oes unrhyw ddiweddariadau pellach i’ch achos, bydd y rhain yn cael eu hanfon atoch drwy'r post.</p>"));
 
-        //Verify task Item is created
+        //Verify NO task items are created
         doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "DEFENDANT")
-            .andExpectAll(
-                status().is(HttpStatus.OK.value()),
-                jsonPath("$[0].reference").value(caseId.toString()),
-                jsonPath("$[0].taskNameEn").value(
-                    "<a>Upload hearing documents</a>"),
-                jsonPath("$[0].currentStatusEn").value("Inactive")
-
+                .andExpectAll(
+                        status().is(HttpStatus.OK.value()),
+                        jsonPath("$[0]").doesNotExist()
             );
     }
 
     @Test
     void should_create_case_proceed_offline__claimant_scenario_without_tasks() throws Exception {
-
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         String caseId = "72016577183";
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
@@ -115,7 +109,6 @@ public class CaseProceedOfflineDefendantScenarioTest extends DashboardBaseIntegr
             .activeJudgment(JudgmentDetails.builder().state(JudgmentState.ISSUED).build())
             .previousCCDState(CaseState.All_FINAL_ORDERS_ISSUED)
             .build();
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         when(featureToggleService.isCoSCEnabled()).thenReturn(true);
 
         handler.handle(callbackParams(caseData));
