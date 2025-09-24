@@ -49,7 +49,6 @@ public class FullAdmitPayImmediatelyNoPaymentFromDefendantScenarioTest extends D
 
         when(coreCaseDataService.getCase(Long.valueOf(caseId))).thenReturn(caseDetails);
         when(userService.getAccessToken(any(), any())).thenReturn(BEARER_TOKEN);
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(false);
 
         handler.createClaimantDashboardScenario(new FullAdmitPayImmediatelyNoPaymentFromDefendantEvent(Long.valueOf(
             caseId)));
@@ -59,14 +58,16 @@ public class FullAdmitPayImmediatelyNoPaymentFromDefendantScenarioTest extends D
             status().is(HttpStatus.OK.value()),
             jsonPath("$[0].titleEn").value("Immediate payment"),
             jsonPath("$[0].descriptionEn").value(
-                "<p class=\"govuk-body\">You have accepted Dave Indent's offer to pay £{fullAdmitPayImmediatelyPaymentAmount} immediately." +
+                "<p class=\"govuk-body\">You have accepted Dave Indent's offer to pay £{fullAdmitPayImmediatelyPaymentAmount} immediately. " +
+                    "This amount includes interest if it has been claimed which may continue to accrue to the date of Judgment, settlement agreement or earlier payment." +
                     " Funds must be received in your account by " + DateUtils.formatDate(whenWillThisAmountBePaid) + ".</p>" +
                     "<p class=\"govuk-body\">If you don't receive the money by then, <a href=\"{COUNTY_COURT_JUDGEMENT_URL}\"  " +
                     "rel=\"noopener noreferrer\" class=\"govuk-link\">you can request a County Court Judgment(CCJ)</a>.</p>"),
             jsonPath("$[0].titleCy").value("Talu ar unwaith"),
             jsonPath("$[0].descriptionCy").value(
                 "<p class=\"govuk-body\">Rydych wedi derbyn cynnig Dave Indent i dalu £{fullAdmitPayImmediatelyPaymentAmount} " +
-                    "ar unwaith. Rhaid i’r arian gyrraedd eich cyfrif erbyn " + DateUtils.formatDateInWelsh(whenWillThisAmountBePaid, false) + ".</p>" +
+                    "ar unwaith. Mae’r swm hwn yn cynnwys y llog os hawliwyd a all barhau i gronni hyd at ddyddiad Dyfarniad, cytundeb setliad neu daliad cynharach. " +
+                    "Rhaid i’r arian gyrraedd eich cyfrif erbyn " + DateUtils.formatDateInWelsh(whenWillThisAmountBePaid, false) + ".</p>" +
                     "<p class=\"govuk-body\">Os na fyddwch wedi cael yr arian erbyn hynny, <a href=\"{COUNTY_COURT_JUDGEMENT_URL}\"" +
                     "  rel=\"noopener noreferrer\" class=\"govuk-link\">gallwch wneud cais am Ddyfarniad Llys Sifil (CCJ)</a>.</p>")
 

@@ -58,12 +58,9 @@ public class ClaimSettledDashboardNotificationHandler extends DashboardCallbackH
     @Override
     protected void beforeRecordScenario(CaseData caseData, String authToken) {
         final String caseId = String.valueOf(caseData.getCcdCaseReference());
-        boolean isLrQmEnabled = featureToggleService.isQueryManagementLRsEnabled();
 
-        if (!isLrQmEnabled && !featureToggleService.isCuiGaNroEnabled()) {
-            inactiveGAItems(caseId);
-        } else if (!featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation()
-                                                                                                                                                               .getBaseLocation())
+        if (!featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation()
+                                                                               .getBaseLocation())
             && !featureToggleService.isCuiGaNroEnabled()) {
             inactiveGAItems(caseId);
         }

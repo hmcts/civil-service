@@ -35,7 +35,6 @@ import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.SettleDiscontinueYesOrNoList;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
@@ -78,6 +77,7 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationAvailability;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationContactInformation;
 import uk.gov.hmcts.reform.civil.model.sdo.OtherDetails;
+import uk.gov.hmcts.reform.civil.model.taskmanagement.ClientContext;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.ChangeLanguagePreference;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.PreTranslationDocumentType;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.PreferredLanguage;
@@ -108,7 +108,6 @@ import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.FINISHED;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
-import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoTwoLegalRep;
@@ -170,6 +169,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     private final List<Element<GeneralApplicationsDetails>> claimantGaAppDetails;
     private final List<Element<GeneralApplicationsDetails>> gaDetailsMasterCollection;
+    private final List<Element<GeneralApplicationsDetails>> gaDetailsTranslationCollection;
     private final List<Element<GADetailsRespondentSol>> respondentSolGaAppDetails;
     private final List<Element<GADetailsRespondentSol>> respondentSolTwoGaAppDetails;
     private final SolicitorReferences solicitorReferences;
@@ -610,7 +610,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<CaseDocument>> gaDraftDocRespondentSolTwo;
 
     private final List<Element<CaseDocument>> gaRespondDoc;
-
+    private final List<Element<CaseDocument>> preTranslationGaDocsApplicant;
+    private final List<Element<CaseDocument>> preTranslationGaDocsRespondent;
     @Builder.Default
     private final List<Element<CaseDocument>> hearingDocuments = new ArrayList<>();
 
@@ -643,6 +644,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @Builder.Default
     private final List<Element<CaseDocument>> courtOfficersOrders = new ArrayList<>();
+    private final YesOrNo isReferToJudgeClaim;
+
+    private final ClientContext clientContext;
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending
@@ -673,7 +677,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public boolean isRespondent1LiP() {
-        return YesOrNo.NO == getRespondent1Represented();
+        return YesOrNo.NO.equals(getRespondent1Represented());
     }
 
     @JsonIgnore
@@ -918,16 +922,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public boolean isApplicant1NotRepresented() {
         return NO.equals(getApplicant1Represented());
-    }
-
-    @JsonIgnore
-    public boolean isUnSpecClaim() {
-        return UNSPEC_CLAIM.equals(getCaseAccessCategory());
-    }
-
-    @JsonIgnore
-    public boolean isSpecClaim() {
-        return SPEC_CLAIM.equals(getCaseAccessCategory());
     }
 
     @JsonIgnore
@@ -1620,22 +1614,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
-    public boolean isLipClaimantSpecifiedBilingualDocuments() {
-        return isApplicant1NotRepresented()
-            && getApplicant1DQ() != null
-            && getApplicant1DQ().getApplicant1DQLanguage() != null
-            && (getApplicant1DQ().getApplicant1DQLanguage().getDocuments() == Language.BOTH || getApplicant1DQ().getApplicant1DQLanguage().getDocuments() == Language.WELSH);
-    }
-
-    @JsonIgnore
-    public boolean isLipDefendantSpecifiedBilingualDocuments() {
-        return isRespondent1NotRepresented()
-            && getRespondent1DQ() != null
-            && getRespondent1DQ().getRespondent1DQLanguage() != null
-            && (getRespondent1DQ().getRespondent1DQLanguage().getDocuments() == Language.BOTH || getRespondent1DQ().getRespondent1DQLanguage().getDocuments() == Language.WELSH);
-    }
-
-    @JsonIgnore
     public String getApplicantSolicitor1UserDetailsEmail() {
         return applicantSolicitor1UserDetails == null ? null : applicantSolicitor1UserDetails.getEmail();
     }
@@ -1656,5 +1634,17 @@ public class CaseData extends CaseDataParent implements MappableObject {
     public String getRespondent2PartyEmail() {
         final Party party = getRespondent2();
         return party == null ? null : party.getPartyEmail();
+    }
+
+    @JsonIgnore
+    public boolean isClaimUnderTranslationAfterDefResponse() {
+        return this.getRespondent1ClaimResponseTypeForSpec() != null
+            && this.getCcdState() == CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
+    }
+
+    @JsonIgnore
+    public boolean isClaimUnderTranslationAfterClaimantResponse() {
+        return this.getApplicant1ResponseDate() != null
+            && this.getCcdState() == CaseState.AWAITING_APPLICANT_INTENTION;
     }
 }
