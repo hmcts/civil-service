@@ -17,12 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyMap;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -198,5 +193,52 @@ class IncidentRetryEventHandlerTest {
         inc.setConfiguration(jobId);
         inc.setActivityId("activity1");
         return inc;
+    }
+
+    @Test
+    void shouldHandleExceptionWhenFetchingCaseId() {
+        ProcessInstanceDto pi = newProcessInstance("proc1");
+        IncidentDto incident = newIncident(pi.getId(), "inc1", "job1");
+
+        when(authTokenGenerator.generate()).thenReturn("serviceAuth");
+        when(externalTask.getVariable(any())).thenReturn("2025-01-01T00:00:00Z");
+
+        when(camundaRuntimeApi.queryProcessInstances(any(), anyInt(), anyInt(), anyString(), anyString(), anyMap()))
+            .thenReturn(List.of(pi));
+        when(camundaRuntimeApi.getLatestOpenIncidentForProcessInstance(any(), anyBoolean(), eq("proc1"), any(), any(), anyInt()))
+            .thenReturn(List.of(incident));
+
+        // Simulate failure fetching process variables
+        when(camundaRuntimeApi.getProcessVariables(eq("proc1"), any()))
+            .thenThrow(new RuntimeException("DB down"));
+
+        handler.handleTask(externalTask);
+
+        verify(camundaRuntimeApi).modifyProcessInstance(eq("serviceAuth"), eq("proc1"), anyMap());
+    }
+
+    @Test
+    void shouldApplyIncidentMessageLikeFilterWhenProvided() {
+        when(authTokenGenerator.generate()).thenReturn("serviceAuth");
+        when(externalTask.getVariable("incidentStartTime")).thenReturn("2025-01-01T00:00:00Z");
+        when(externalTask.getVariable("incidentEndTime")).thenReturn("2025-12-31T23:59:59Z");
+        when(externalTask.getVariable("incidentMessageLike")).thenReturn("Some error");
+
+        when(camundaRuntimeApi.queryProcessInstances(
+            any(), anyInt(), anyInt(), anyString(), anyString(), anyMap()
+        )).thenReturn(List.of());
+
+        handler.handleTask(externalTask);
+
+        // Verify that queryProcessInstances was invoked with the filter containing incidentMessageLike
+        verify(camundaRuntimeApi).queryProcessInstances(
+            anyString(),
+            anyInt(),
+            anyInt(),
+            anyString(),
+            anyString(),
+            argThat(filters -> filters.containsKey("incidentMessageLike")
+                && "Some error".equals(filters.get("incidentMessageLike")))
+        );
     }
 }
