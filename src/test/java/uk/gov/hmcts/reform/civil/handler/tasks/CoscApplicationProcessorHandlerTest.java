@@ -56,15 +56,6 @@ class CoscApplicationProcessorHandlerTest {
     }
 
     @Test
-    void shouldNotInteractWithSearchService_whenCoscToggleIsOff() {
-
-        handler.execute(mockTask, externalTaskService);
-
-        verify(externalTaskService).complete(mockTask, null);
-        verifyNoInteractions(searchService);
-    }
-
-    @Test
     void shouldInteractWithSearchServiceAndPublishEvent_whenCasesFound() {
         long caseId = 1L;
         Map<String, Object> data = Map.of("data", "some data");
