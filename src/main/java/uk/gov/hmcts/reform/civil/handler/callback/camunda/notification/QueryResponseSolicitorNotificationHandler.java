@@ -166,18 +166,6 @@ public class QueryResponseSolicitorNotificationHandler extends CallbackHandler i
         return properties;
     }
 
-    private String getTemplates(CaseData caseData, List<String> roles) {
-        if ((isLIPClaimant(roles) && caseData.isClaimantBilingual())
-            || (isLIPDefendant(roles) && caseData.isRespondentResponseBilingual())) {
-            return notificationsProperties.getQueryLipResponseReceivedWelsh();
-        }
-        if (isLIPClaimant(roles) || isLIPDefendant(roles)) {
-            return notificationsProperties.getQueryLipResponseReceivedEnglish();
-        }
-
-        return notificationsProperties.getQueryResponseReceived();
-    }
-
     private String getPublicQueryTemplates(CaseData caseData, List<String> roles) {
         if ((isLIPClaimant(roles) && caseData.isClaimantBilingual())
             || (isLIPDefendant(roles) && caseData.isRespondentResponseBilingual())) {

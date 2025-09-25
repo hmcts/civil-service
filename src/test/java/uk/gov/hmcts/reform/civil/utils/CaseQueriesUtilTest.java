@@ -403,37 +403,6 @@ class CaseQueriesUtilTest {
             .build();
     }
 
-    private List<Element<CaseMessage>> buildCaseMessageWithFollowUpQuery() {
-        return wrapElements(
-            CaseMessage.builder()
-                .id("id")
-                .subject("subject")
-                .name("John Doe")
-                .body("Sample body text")
-                .attachments(wrapElements(
-                    Document.builder().documentFileName("a").build(),
-                    Document.builder().documentFileName("b").build()))
-                .isHearingRelated(NO)
-                .hearingDate(LocalDate.now())
-                .createdOn(OffsetDateTime.now())
-                .createdBy("System")
-                .build(),
-            CaseMessage.builder()
-                .id("follow-up-id")
-                .subject("subject")
-                .name("John Doe")
-                .body("Sample body text")
-                .attachments(wrapElements(
-                    Document.builder().documentFileName("c").build(),
-                    Document.builder().documentFileName("d").build()))
-                .isHearingRelated(NO)
-                .hearingDate(LocalDate.now())
-                .createdOn(OffsetDateTime.now())
-                .createdBy("System")
-                .parentId("id")
-                .build());
-    }
-
     @Test
     void shouldMigrateAllQueries_whenOldQueriesExist() {
         List<Element<CaseMessage>> applicantMessages = wrapElements(CaseMessage.builder().id("app1").createdOn(OffsetDateTime.now()).build());

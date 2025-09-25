@@ -11,7 +11,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -260,7 +259,8 @@ class RaiseQueryCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getErrors()).isNotNull();
-            assertThat(response.getErrors()).containsOnly("Consecutive follow up messages are not allowed for query management.");
+            assertThat(response.getErrors()).containsOnly(
+                "Consecutive follow up messages are not allowed for query management.");
             assertThat(response.getData()).isNull();
         }
 
@@ -355,30 +355,5 @@ class RaiseQueryCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     private CaseQueriesCollection mockQueriesCollection(String queryId, OffsetDateTime latestDate) {
         return mockQueriesCollection(queryId, "partyName", latestDate);
-    }
-
-    private CaseQueriesCollection mockQueriesCollectionWithAttachments(String queryId, OffsetDateTime latestDate) {
-        return CaseQueriesCollection.builder()
-            .partyName("partyName")
-            .roleOnCase("roleOnCase")
-            .caseMessages(
-                List.of(
-                    Element.<CaseMessage>builder()
-                        .id(UUID.randomUUID())
-                        .value(
-                            CaseMessage.builder()
-                                .id(queryId)
-                                .isHearingRelated(YES)
-                                .createdOn(latestDate)
-                                .attachments(wrapElements(
-                                    Document.builder()
-                                        .documentFileName("file1")
-                                        .build(),
-                                    Document.builder()
-                                        .documentFileName("file2")
-                                        .build()
-                                ))
-                                .build()).build()))
-            .build();
     }
 }
