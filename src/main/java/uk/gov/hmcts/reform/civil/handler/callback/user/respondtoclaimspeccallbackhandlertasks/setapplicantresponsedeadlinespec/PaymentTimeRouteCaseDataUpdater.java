@@ -36,6 +36,8 @@ public class PaymentTimeRouteCaseDataUpdater implements SetApplicantResponseDead
                     .whenWillThisAmountBePaid(whenBePaid)
                     .build();
             updatedData.respondToClaimAdmitPartLRspec(admitPartLRspec);
+        } else {
+            log.info("Defence admit part payment time route is not IMMEDIATELY for caseId: {}", caseData.getCcdCaseReference());
         }
     }
 

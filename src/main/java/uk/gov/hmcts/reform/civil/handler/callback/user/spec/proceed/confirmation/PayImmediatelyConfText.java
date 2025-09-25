@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.config.ClaimUrlsConfiguration;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
@@ -18,6 +19,7 @@ import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPay
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class PayImmediatelyConfText implements RespondToResponseConfirmationTextGenerator {
 
     private final PaymentDateService paymentDateService;
@@ -26,11 +28,13 @@ public class PayImmediatelyConfText implements RespondToResponseConfirmationText
     @Override
     public Optional<String> generateTextFor(CaseData caseData, FeatureToggleService featureToggleService) {
         if (!isDefendantFullOrPartAdmitPayImmediately(caseData)) {
+            log.info("CaseId: {} is not a defendant full or part admit pay immediately case", caseData.getCcdCaseReference());
             return Optional.empty();
         }
         String formattedWhenBePaid = paymentDateService.getFormattedPaymentDate(caseData);
         if (formattedWhenBePaid == null) {
-            throw new IllegalStateException("Unable to format the payment date.");
+            log.error("Unable to format the payment date for caseId: {}", caseData.getCcdCaseReference());
+            throw new IllegalStateException("Unable to format the payment date for caseId: " + caseData.getCcdCaseReference());
         }
 
         String admitImmediatePayText = caseData.isPartAdmitClaimSpec() && isLrPayImmediatelyPlan(caseData, featureToggleService)
