@@ -135,8 +135,7 @@ public class JudgeDecisionOnReconsiderationRequestCallbackHandler extends Callba
                 List<Element<CaseDocument>> systemGeneratedCaseDocuments =
                     callbackParams.getCaseData().getSystemGeneratedCaseDocuments();
                 if (featureToggleService.isWelshEnabledForMainCase() && (callbackParams.getCaseData().isClaimantBilingual()
-                    || callbackParams.getCaseData().isRespondentResponseBilingual()
-                    || callbackParams.getCaseData().isLipDefendantSpecifiedBilingualDocuments())) {
+                    || callbackParams.getCaseData().isRespondentResponseBilingual())) {
                     caseDataBuilder.preTranslationDocuments(List.of(ElementUtils.element(requestForReconsiderationDocument)));
                     caseDataBuilder.bilingualHint(YesOrNo.YES);
                     caseDataBuilder.preTranslationDocumentType(DECISION_MADE_ON_APPLICATIONS);

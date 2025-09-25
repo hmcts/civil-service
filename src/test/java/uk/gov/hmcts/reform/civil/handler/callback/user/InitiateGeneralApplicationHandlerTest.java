@@ -146,7 +146,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldThrowError_whenDiscontinuedQMOnNoPreviousCcdState() {
-        when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued()
             .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
@@ -166,7 +165,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldThrowError_whenSettledQMOnNoPreviousCcdState() {
-        when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued()
             .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
@@ -186,7 +184,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldNotThrowError_whenSettledQMOnPreviousCcdState() {
-        when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued()
             .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
@@ -206,7 +203,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldNotThrowError_whenDiscontinuedQMOnPreviousCcdState() {
-        when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued()
             .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)

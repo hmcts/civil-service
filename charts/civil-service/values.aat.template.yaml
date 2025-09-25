@@ -30,6 +30,8 @@ java:
     ROLE_INITIALISATION_ENABLED: true
     CASE_FLAGS_LOGGING_ENABLED: true
     COURT_LOCATION_WA_DMN_ENABLED: true
+    TASK_MANAGEMENT_ENABLED: false
+
   keyVaults:
     civil:
       resourceGroup: civil
@@ -271,9 +273,8 @@ ccd:
     java:
       imagePullPolicy: Always
       devcpuRequests: 500m
-      devmemoryRequests: 512Mi
-      devcpuLimits: 2
-      devmemoryLimits: 8Gi
+      devmemoryRequests: 4096Mi
+      devmemoryLimits: 8192Mi
       environment:
         DEFINITION_STORE_DB_HOST: ${SERVICE_NAME}-postgresql
         DEFINITION_STORE_DB_OPTIONS: "?stringtype=unspecified"

@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
@@ -20,6 +21,7 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaymentPlan;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
 import java.time.LocalDate;
@@ -37,12 +39,15 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     private final InterestCalculator interestCalculator = new InterestCalculator();
 
+    @Mock
+    Time time;
+
     @BeforeEach
     void setup() {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        JudgmentPaidInFullOnlineMapper paidInFullJudgmentOnlineMapper = new JudgmentPaidInFullOnlineMapper();
+        JudgmentPaidInFullOnlineMapper paidInFullJudgmentOnlineMapper = new JudgmentPaidInFullOnlineMapper(time);
         handler = new JudgmentPaidInFullCallbackHandler(objectMapper, paidInFullJudgmentOnlineMapper, interestCalculator);
     }
 

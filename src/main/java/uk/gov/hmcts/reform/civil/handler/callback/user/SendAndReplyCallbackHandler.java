@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -15,10 +16,17 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sendandreply.RolePool;
 import uk.gov.hmcts.reform.civil.enums.sendandreply.SendAndReplyOption;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.callback.TaskCompletionSubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.sendandreply.Message;
+import uk.gov.hmcts.reform.civil.model.taskmanagement.ClientContext;
+import uk.gov.hmcts.reform.civil.model.taskmanagement.Task;
+import uk.gov.hmcts.reform.civil.model.taskmanagement.UserTask;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SendAndReplyMessageService;
+import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.civil.service.taskmanagement.WaTaskManagementService;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.util.Comparator;
 import java.util.List;
@@ -33,10 +41,12 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_AND_REPLY;
 import static uk.gov.hmcts.reform.civil.enums.sendandreply.SendAndReplyOption.REPLY;
+import static uk.gov.hmcts.reform.civil.service.taskmanagement.TaskCompletionPredicate.taskToCompleteFilter;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 @SuppressWarnings("unchecked")
 public class SendAndReplyCallbackHandler extends CallbackHandler {
 
@@ -52,7 +62,11 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
 
     private final ObjectMapper objectMapper;
 
+    private final UserService userService;
+
     private final FeatureToggleService featureToggleService;
+
+    private final WaTaskManagementService taskManagementService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -131,6 +145,7 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
                 caseData.getMessageReplyMetadata(),
                 userAuth, caseData
             );
+
             builder.messages(messagesNew)
                 .messagesToReplyTo(null)
                 .messageReplyMetadata(null)
@@ -169,7 +184,8 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(builder.build().toMap(objectMapper)).build();
+            .data(builder.build().toMap(objectMapper))
+            .build();
     }
 
     private CallbackResponse handleSubmitted(CallbackParams params) {
@@ -179,10 +195,43 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
                 .confirmationBody(SEND_MESSAGE_BODY_CONFIRMATION)
                 .build();
         } else {
+            CaseData caseData = params.getCaseData();
+            String userAuth = params.getParams().get(BEARER_TOKEN).toString();
+            ClientContext clientContext = buildTaskCompletionContext(userAuth, caseData);
+
+            if (nonNull(clientContext)) {
+                return TaskCompletionSubmittedCallbackResponse.builder()
+                    .confirmationHeader(REPLY_MESSAGE_CONFIRMATION_HEADER)
+                    .confirmationBody(REPLY_MESSAGE_BODY_CONFIRMATION)
+                    .clientContext(clientContext)
+                    .build();
+            }
             return SubmittedCallbackResponse.builder()
                 .confirmationHeader(REPLY_MESSAGE_CONFIRMATION_HEADER)
                 .confirmationBody(REPLY_MESSAGE_BODY_CONFIRMATION)
                 .build();
         }
+    }
+
+    private ClientContext buildTaskCompletionContext(String userAuth, CaseData caseData) {
+        Task taskToComplete = taskManagementService.getTaskToComplete(
+            caseData.getCcdCaseReference().toString(),
+            userAuth,
+            taskToCompleteFilter(caseData)
+        );
+
+        if (nonNull(taskToComplete)) {
+            if (taskToComplete.getTaskState().equals("unassigned")) {
+                UserDetails userDetails = userService.getUserDetails(userAuth);
+                taskManagementService.claimTask(userAuth, taskToComplete.getId());
+                taskToComplete.toBuilder().assignee(userDetails.getId()).build();
+            }
+
+            return ClientContext.builder()
+                .userTask(UserTask.builder().taskData(taskToComplete).completeTask(true).build())
+                .build();
+        }
+
+        return null;
     }
 }

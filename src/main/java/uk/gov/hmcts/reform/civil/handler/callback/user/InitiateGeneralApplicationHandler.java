@@ -115,19 +115,19 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     private CallbackResponse aboutToStartValidationAndSetup(CallbackParams callbackParams) {
         List<String> errors = new ArrayList<>();
         CaseData caseData = callbackParams.getCaseData();
-
-        if (featureToggleService.isQueryManagementLRsEnabled()) {
-            if (settleDiscontinueStates.contains(caseData.getCcdState())
-                && caseData.getPreviousCCDState() == null) {
-                return AboutToStartOrSubmitCallbackResponse.builder()
-                    .errors(List.of(NOT_ALLOWED_SETTLE_DISCONTINUE))
-                    .build();
-            }
+        log.info("initiating general application callback for caseId {}", caseData.getCcdCaseReference());
+        if (settleDiscontinueStates.contains(caseData.getCcdState())
+            && caseData.getPreviousCCDState() == null) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(List.of(NOT_ALLOWED_SETTLE_DISCONTINUE))
+                .build();
         }
 
         if (!initiateGeneralApplicationService.respondentAssigned(caseData)) {
+            log.info("initiating general application not allowed for caseId {}", caseData.getCcdCaseReference());
             errors.add(RESP_NOT_ASSIGNED_ERROR);
         }
+        log.info("initiating general application allowed for caseId {}", caseData.getCcdCaseReference());
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
 
@@ -142,13 +142,6 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
             } else if (!(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(caseData
                                                               .getCaseManagementLocation().getBaseLocation()))) {
                 errors.add(NOT_IN_EA_REGION);
-            } else {
-                /*
-                 * General Application can only be initiated if Defendant is assigned to the case and QM LR is off
-                 * */
-                if (!featureToggleService.isQueryManagementLRsEnabled() && Objects.isNull(caseData.getDefendantUserDetails()) && !caseData.isLipvLROneVOne()) {
-                    errors.add(RESP_NOT_ASSIGNED_ERROR_LIP);
-                }
             }
         }
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();

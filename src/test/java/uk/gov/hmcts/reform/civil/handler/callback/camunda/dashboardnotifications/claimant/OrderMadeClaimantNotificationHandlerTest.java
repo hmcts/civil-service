@@ -56,6 +56,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.All_FINAL_ORDERS_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING;
 import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.NOT_CONTACTABLE_CLAIMANT_ONE;
 import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.NOT_CONTACTABLE_DEFENDANT_ONE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_NOTICE_OF_CHANGE_CLAIM_REMAINS_ONLINE_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.model.mediation.MediationDocumentsType.NON_ATTENDANCE_STATEMENT;
 
 @ExtendWith(MockitoExtension.class)
@@ -154,6 +155,43 @@ class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
             when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
 
             handler.handle(params);
+            verify(dashboardScenariosService).recordScenarios(
+                "BEARER_TOKEN",
+                "Scenario.AAA6.CP.OrderMade.Claimant",
+                caseData.getCcdCaseReference().toString(),
+                ScenarioRequestParams.builder().params(scenarioParams).build()
+            );
+        }
+
+        @Test
+        void shouldRecordScenarioNoc_whenInvoked() {
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
+                .specRespondent1Represented(YesOrNo.YES)
+                .applicant1Represented(YesOrNo.NO)
+                .orderSDODocumentDJCollection(List.of(
+                    ElementUtils.element(CaseDocument.builder().documentLink(
+                        Document.builder().documentBinaryUrl("urlDirectionsOrder").build()).build())))
+                .applicant1Represented(YesOrNo.NO).build();
+
+            HashMap<String, Object> scenarioParams = new HashMap<>();
+            scenarioParams.put("orderDocument", "urlDirectionsOrder");
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_CLAIMANT.name())
+                    .caseDetails(CaseDetails.builder().state(PREPARE_FOR_HEARING_CONDUCT_HEARING.toString()).build())
+                    .build()).build();
+
+            when(mapper.mapCaseDataToParams(any(), any())).thenReturn(scenarioParams);
+            when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
+
+            handler.handle(params);
+            verify(dashboardScenariosService).recordScenarios(
+                "BEARER_TOKEN",
+
+                SCENARIO_AAA6_DEFENDANT_NOTICE_OF_CHANGE_CLAIM_REMAINS_ONLINE_CLAIMANT.getScenario(),
+                caseData.getCcdCaseReference().toString(),
+                ScenarioRequestParams.builder().params(scenarioParams).build()
+            );
             verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
                 "Scenario.AAA6.CP.OrderMade.Claimant",
@@ -386,12 +424,47 @@ class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
                 .responseClaimTrack("SMALL_CLAIM")
                 .totalClaimAmount(BigDecimal.valueOf(500))
+                .applicant1Represented(YesOrNo.NO)
+                .specRespondent1Represented(YesOrNo.NO)
+                .respondent1Represented(YesOrNo.NO).build();
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT.name()).build()
+            ).build();
+            handler.handle(params);
+            verify(dashboardScenariosService).recordScenarios(
+                "BEARER_TOKEN",
+                "Scenario.AAA6.CP.SDOMadebyLA.Claimant",
+                caseData.getCcdCaseReference().toString(),
+                ScenarioRequestParams.builder().params(scenarioParams).build()
+            );
+        }
+
+        @Test
+        void shouldRecordScenarioInSdoLegalAdviser_whenInvokedForNOC() {
+            HashMap<String, Object> scenarioParams = new HashMap<>();
+            scenarioParams.put("orderDocument", "urlDirectionsOrder");
+
+            when(mapper.mapCaseDataToParams(any(), any())).thenReturn(scenarioParams);
+            when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
+                .responseClaimTrack("SMALL_CLAIM")
+                .specRespondent1Represented(YesOrNo.YES)
+                .totalClaimAmount(BigDecimal.valueOf(500))
                 .applicant1Represented(YesOrNo.NO).build();
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT.name()).build()
             ).build();
             handler.handle(params);
+            verify(dashboardScenariosService).recordScenarios(
+                "BEARER_TOKEN",
+
+                SCENARIO_AAA6_DEFENDANT_NOTICE_OF_CHANGE_CLAIM_REMAINS_ONLINE_CLAIMANT.getScenario(),
+                caseData.getCcdCaseReference().toString(),
+                ScenarioRequestParams.builder().params(scenarioParams).build()
+            );
             verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
                 "Scenario.AAA6.CP.SDOMadebyLA.Claimant",
@@ -443,6 +516,8 @@ class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
                 .responseClaimTrack("SMALL_CLAIM")
                 .totalClaimAmount(totalClaimAmount)
                 .applicant1Represented(YesOrNo.NO)
+                .specRespondent1Represented(YesOrNo.NO)
+                .respondent1Represented(YesOrNo.NO)
                 .decisionOnRequestReconsiderationOptions(decisionOnRequestReconsiderationOptions)
                 .build();
 

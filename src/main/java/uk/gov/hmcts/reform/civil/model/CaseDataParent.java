@@ -596,6 +596,11 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     }
 
     @JsonIgnore
+    public boolean applicant1SuggestedPayByInstalments() {
+        return applicant1RepaymentOptionForDefendantSpec == PaymentType.REPAYMENT_PLAN;
+    }
+
+    @JsonIgnore
     public boolean hasClaimantAgreedClaimSettled() {
         return Optional.ofNullable(getCaseDataLiP())
             .filter(CaseDataLiP::hasClaimantAgreedClaimSettled).isPresent();

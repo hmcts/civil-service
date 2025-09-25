@@ -35,6 +35,7 @@ java:
     CCD_EVENTS_SERVICE_BUS_CONCURRENT_SESSIONS: 1
     CCD_EVENTS_SUBSCRIPTION_ENABLED: true
     CCD_EVENTS_SUBSCRIPTION_RETRY_DURATION: 60
+    TASK_MANAGEMENT_ENABLED: false
   keyVaults:
     civil:
       resourceGroup: civil
@@ -96,7 +97,7 @@ java:
         enabled: false
       resources:
         requests:
-          cpu: 25m
+          cpu: 500m
       initdb:
         scripts:
           init.sql: |
@@ -293,9 +294,8 @@ ccd:
     java:
       imagePullPolicy: Always
       devcpuRequests: 500m
-      devmemoryRequests: 512Mi
-      devcpuLimits: 2
-      devmemoryLimits: 1Gi
+      devmemoryRequests: 4096Mi
+      devmemoryLimits: 8192Mi
       environment:
         DEFINITION_STORE_DB_HOST: ${SERVICE_NAME}-postgresql
         DEFINITION_STORE_DB_OPTIONS: "?stringtype=unspecified"

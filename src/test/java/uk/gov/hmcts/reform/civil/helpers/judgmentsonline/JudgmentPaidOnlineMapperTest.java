@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.helpers.judgmentsonline;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaidInFull;
@@ -10,6 +11,7 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
@@ -26,14 +28,20 @@ public class JudgmentPaidOnlineMapperTest {
 
     private InterestCalculator interestCalculator = new InterestCalculator();
     private RoboticsAddressMapper addressMapper = new RoboticsAddressMapper(new AddressLinesMapper());
-    private JudgmentPaidInFullOnlineMapper judgmentPaidInFullOnlineMapper = new JudgmentPaidInFullOnlineMapper();
-    private RecordJudgmentOnlineMapper recordJudgmentMapper = new RecordJudgmentOnlineMapper(addressMapper);
-    private DefaultJudgmentOnlineMapper defaultJudgmentOnlineMapper = new DefaultJudgmentOnlineMapper(interestCalculator, addressMapper);
+    private JudgmentPaidInFullOnlineMapper judgmentPaidInFullOnlineMapper;
+    private RecordJudgmentOnlineMapper recordJudgmentMapper;
+    private DefaultJudgmentOnlineMapper defaultJudgmentOnlineMapper;
+
+    @Mock
+    private Time time;
 
     @BeforeEach
     public void setUp() {
         interestCalculator = new InterestCalculator();
-        defaultJudgmentOnlineMapper = new DefaultJudgmentOnlineMapper(interestCalculator, addressMapper);
+        judgmentPaidInFullOnlineMapper = new JudgmentPaidInFullOnlineMapper(time);
+        recordJudgmentMapper = new RecordJudgmentOnlineMapper(time, addressMapper);
+        defaultJudgmentOnlineMapper = new DefaultJudgmentOnlineMapper(time, interestCalculator, addressMapper);
+        defaultJudgmentOnlineMapper = new DefaultJudgmentOnlineMapper(time, interestCalculator, addressMapper);
     }
 
     @Test

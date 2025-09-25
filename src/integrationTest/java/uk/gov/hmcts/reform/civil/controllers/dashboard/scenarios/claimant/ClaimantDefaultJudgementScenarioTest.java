@@ -46,8 +46,8 @@ public class ClaimantDefaultJudgementScenarioTest extends DashboardBaseIntegrati
                                "of the judgment. <br> Once they do, you should <a href=\"{CONFIRM_YOU_HAVE_BEEN_PAID_URL}\" class=\"govuk-link\">" +
                                "confirm that they’ve paid you the full amount that you’re owed</a>.<br>If they do not pay you by the date on the judgment, " +
                                "you can <u>ask for enforcement action to be taken against them</u>. <br>If you need to change the terms of payment within the judgment, " +
-                               "such as the instalments you had previously agreed, you can " +
-                               "make an application to vary the judgment.</p>")
+                               "such as the instalments you had previously agreed, you can <a href=\"{GENERAL_APPLICATIONS_INITIATION_PAGE_URL}\" class=\"govuk-link\">" +
+                               "make an application to vary the judgment</a>.</p>")
             );
     }
 
@@ -78,7 +78,7 @@ public class ClaimantDefaultJudgementScenarioTest extends DashboardBaseIntegrati
                         "gadarnhau eu bod wedi talu’r swm llawn sy’n ddyledus i chi</a>.<br>Os na fyddant yn eich talu erbyn y dyddiad ar y dyfarniad, gallwch " +
                         "<u>ofyn am gymryd camau  gorfodi yn eu herbyn</u>." +
                         " <br>Os oes arnoch angen newid y telerau talu o fewn y dyfarniad, fel y rhandaliadau roeddech wedi cytuno arnynt yn flaenorol, gallwch " +
-                        "wneud cais i amrywio’r dyfarniad.</p>")
+                        "<a href=\"{GENERAL_APPLICATIONS_INITIATION_PAGE_URL}\" class=\"govuk-link\">wneud cais i amrywio’r dyfarniad</a>.</p>")
             );
     }
 }

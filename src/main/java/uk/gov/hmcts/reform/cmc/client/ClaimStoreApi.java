@@ -16,12 +16,13 @@ public interface ClaimStoreApi {
 
     @GetMapping("/claims/claimant/{submitterId}")
     List<CmcClaim> getClaimsForClaimant(@RequestHeader(AUTHORIZATION) String authorisation,
-                                        @PathVariable String submitterId);
+                                        @PathVariable("submitterId") String submitterId);
 
     @GetMapping("/claims/defendant/{submitterId}")
     List<CmcClaim> getClaimsForDefendant(@RequestHeader(AUTHORIZATION) String authorisation,
-                                         @PathVariable String submitterId);
+                                         @PathVariable("submitterId") String submitterId);
 
     @GetMapping("/claims/{caseReference}/defendant-link-status")
-    DefendantLinkStatus isDefendantLinked(@PathVariable String caseReference);
+    DefendantLinkStatus isDefendantLinked(@PathVariable("caseReference") String caseReference);
+
 }

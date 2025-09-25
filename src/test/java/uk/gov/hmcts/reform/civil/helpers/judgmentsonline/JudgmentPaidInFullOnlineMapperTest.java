@@ -2,11 +2,13 @@ package uk.gov.hmcts.reform.civil.helpers.judgmentsonline;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaidInFull;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaymentPlan;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
+import uk.gov.hmcts.reform.civil.service.Time;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -18,9 +20,12 @@ class JudgmentPaidInFullOnlineMapperTest {
 
     private JudgmentPaidInFullOnlineMapper judgmentPaidInFullOnlineMapper;
 
+    @Mock
+    Time time;
+
     @BeforeEach
     void setUp() {
-        judgmentPaidInFullOnlineMapper = new JudgmentPaidInFullOnlineMapper();
+        judgmentPaidInFullOnlineMapper = new JudgmentPaidInFullOnlineMapper(time);
     }
 
     @Test
