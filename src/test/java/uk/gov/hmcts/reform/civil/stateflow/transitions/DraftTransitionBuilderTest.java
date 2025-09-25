@@ -216,7 +216,7 @@ public class DraftTransitionBuilderTest {
         assertTrue(claimSubmittedRespondent2Unrepresented.test(caseData));
         assertThat(getCaseFlags(result.get(5), caseData)).hasSize(14).contains(
             entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-            entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
+            entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), true),
             entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), true),
             entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
             entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
@@ -259,7 +259,6 @@ public class DraftTransitionBuilderTest {
     @Test
     void shouldResolve_whenOnlyOneUnrepresentedDefendant() {
         when(mockFeatureToggleService.isDashboardEnabledForCase(any())).thenReturn(true);
-        when(mockFeatureToggleService.isGaForLipsEnabled()).thenReturn(true);
         when(mockFeatureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
         when(mockFeatureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1UnrepresentedDefendant()
@@ -347,7 +346,7 @@ public class DraftTransitionBuilderTest {
 
         assertThat(getCaseFlags(result.get(3), caseData)).hasSize(14).contains(
             entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-            entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
+            entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), true),
             entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), true),
             entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
             entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), true),

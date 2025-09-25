@@ -435,7 +435,7 @@ class SimpleStateFlowEngineTest {
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                     entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), true)
                 );
             }
 
@@ -467,7 +467,7 @@ class SimpleStateFlowEngineTest {
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                     entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), true)
                 );
             }
 
@@ -503,7 +503,7 @@ class SimpleStateFlowEngineTest {
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                     entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), true)
                 );
             }
 
@@ -540,7 +540,7 @@ class SimpleStateFlowEngineTest {
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                     entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), true)
                 );
             }
 
@@ -573,7 +573,7 @@ class SimpleStateFlowEngineTest {
                 assertThat(stateFlow.getFlags()).hasSize(14).contains(
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true),
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
+                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), true),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), true),
                     entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false)
                 );
@@ -608,7 +608,7 @@ class SimpleStateFlowEngineTest {
                 assertThat(stateFlow.getFlags()).hasSize(14).contains(
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true),
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
+                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), true),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), true),
                     entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false)
                 );
@@ -946,7 +946,7 @@ class SimpleStateFlowEngineTest {
                         TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT.fullName()
                     );
                 assertThat(stateFlow.getFlags()).hasSize(14).contains(
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
+                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), true),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), true),
                     entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false)
                 );
