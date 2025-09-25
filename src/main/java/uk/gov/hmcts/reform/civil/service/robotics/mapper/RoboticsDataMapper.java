@@ -64,6 +64,7 @@ public class RoboticsDataMapper {
     private final LocationRefDataUtil locationRefDataUtil;
 
     public RoboticsCaseData toRoboticsCaseData(CaseData caseData, String authToken) {
+        log.info("Preparing Robotics data for unspec caseId {}", caseData.getCcdCaseReference());
         requireNonNull(caseData);
         var roboticsBuilder = RoboticsCaseData.builder()
             .header(buildCaseHeader(caseData, authToken))
@@ -80,9 +81,7 @@ public class RoboticsDataMapper {
             roboticsBuilder.noticeOfChange(RoboticsDataUtil.buildNoticeOfChange(caseData));
         }
 
-        RoboticsCaseData build = roboticsBuilder.build();
-        log.info("Robotics Case Data: {}", build.toString());
-        return build;
+        return roboticsBuilder.build();
     }
 
     private ClaimDetails buildClaimDetails(CaseData caseData) {
