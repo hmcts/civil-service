@@ -16,12 +16,7 @@ import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
@@ -37,8 +32,6 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
 
     private static final int MAX_THREADS = 10;
     private static final String CASE_ID_VARIABLE = "caseId";
-    private static final String RETRIES_FIELD = "retries";
-    private static final int RETRIES_COUNT = 1;
     private static final int PAGE_SIZE = 50;
     private static final DateTimeFormatter INCIDENT_FORMATTER =
         DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
@@ -229,6 +222,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
     private boolean retryIncidentSafely(IncidentDto incident, String serviceAuthorization, Set<String> caseIds) {
         try {
             String processInstanceId = incident.getProcessInstanceId();
+            String failedActivityId = incident.getActivityId();
             String incidentCaseId = fetchCaseId(processInstanceId, serviceAuthorization);
             caseIds.add(incidentCaseId);
 
@@ -236,10 +230,10 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
 
             log.info(
                 "Retrying incident {} for processInstanceId={} (jobId={}, caseId={}, activityId={})",
-                incident.getId(), processInstanceId, jobId, incidentCaseId, incident.getActivityId()
+                incident.getId(), processInstanceId, jobId, incidentCaseId, failedActivityId
             );
 
-            camundaRuntimeApi.setJobRetries(serviceAuthorization, jobId, Map.of(RETRIES_FIELD, RETRIES_COUNT));
+            retryProcessInstance(processInstanceId, serviceAuthorization, failedActivityId);
 
             log.info(
                 "Retries reset for job {} (processInstanceId={}, caseId={})",
@@ -258,6 +252,31 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
                 e
             );
             return false;
+        }
+    }
+
+    private void retryProcessInstance(String processInstanceId, String serviceAuthorization, String failedActivityId) {
+        Map<String, Object> modificationRequest = new HashMap<>();
+        modificationRequest.put("skipCustomListeners", true);
+        modificationRequest.put("skipIoMappings", false);
+
+        List<Map<String, Object>> instructions = new ArrayList<>();
+        Map<String, Object> startBeforeInstruction = new HashMap<>();
+        startBeforeInstruction.put("type", "startBeforeActivity");
+        startBeforeInstruction.put("activityId", failedActivityId);
+        instructions.add(startBeforeInstruction);
+
+        modificationRequest.put("instructions", instructions);
+
+        try {
+            camundaRuntimeApi.modifyProcessInstance(
+                serviceAuthorization,
+                processInstanceId,
+                modificationRequest
+            );
+            log.info("Process instance {} successfully modified to retry activity {}", processInstanceId, failedActivityId);
+        } catch (Exception e) {
+            log.error("Failed to retry activity {} for processInstanceId={}: {}", failedActivityId, processInstanceId, e.getMessage(), e);
         }
     }
 
