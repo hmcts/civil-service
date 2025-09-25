@@ -1507,7 +1507,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
                                                                             .email(APPLICANT_EMAIL_ID_CONSTANT)
                                                                             .build());
-
+            when(theUserService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(initiateGeneralAppService.buildCaseData(any(CaseData.CaseDataBuilder.class),
                     any(CaseData.class), any(UserDetails.class), anyString())).thenAnswer((Answer) invocation -> invocation.getArguments()[1]
             );
