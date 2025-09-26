@@ -59,6 +59,26 @@ public class DocumentHearingTypeTest {
         }
     }
 
+    @Test
+    void shouldThrowWhenNullInput() {
+        IllegalArgumentException ex = assertThrows(
+            IllegalArgumentException.class,
+            () -> DocumentHearingType.getType(null)
+        );
+
+        assertEquals("Hearing type must not be null or blank", ex.getMessage());
+    }
+
+    @Test
+    void shouldThrowWhenEmptyInput() {
+        IllegalArgumentException ex = assertThrows(
+            IllegalArgumentException.class,
+            () -> DocumentHearingType.getType("")
+        );
+
+        assertEquals("Hearing type must not be null or blank", ex.getMessage());
+    }
+
     @ParameterizedTest
     @CsvSource({
         "TRI, SMALL_CLAIM, hearing",
