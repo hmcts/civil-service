@@ -527,7 +527,6 @@ class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
                 .drawDirectionsOrderRequired(YesOrNo.NO)
                 .build();
 
-            when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
             when(toggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).thenReturn(false);
             when(toggleService.isCuiGaNroEnabled()).thenReturn(true);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
