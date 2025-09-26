@@ -21,6 +21,9 @@ import static uk.gov.hmcts.reform.civil.utils.AmountFormatter.formatAmount;
 public class Respondent1AdmittedAmountPaymentDeadlineParamsBuilder extends DashboardNotificationsParamsBuilder {
 
     private final ClaimantResponseUtils claimantResponseUtils;
+
+    private static final String PARAM_AMOUNT_INCLUDES_TEXT_EN = "amountIncludesTextEn";
+    private static final String PARAM_AMOUNT_INCLUDES_TEXT_CY = "amountIncludesTextCy";
     private static final String PARAM_APPLICANT1_PARTY_NAME = "applicant1PartyName";
     private static final String PARAM_DESCRIPTION_EN = "descriptionEn";
     private static final String PARAM_DESCRIPTION_CY = "descriptionCy";
@@ -81,8 +84,8 @@ public class Respondent1AdmittedAmountPaymentDeadlineParamsBuilder extends Dashb
             putDescriptions(params, descriptionEn, descriptionCy);
 
         } else if (nonNull(caseData.getRespondToClaimAdmitPartLRspec())) {
-            final String amountIncludesTextEn = getAmountIncludesTextEn(caseData);
-            final String amountIncludesTextCy = getAmountIncludesTextCy(caseData);
+            final String amountIncludesTextEn = getStringParam(params, PARAM_AMOUNT_INCLUDES_TEXT_EN);
+            final String amountIncludesTextCy = getStringParam(params, PARAM_AMOUNT_INCLUDES_TEXT_CY);
 
             var descriptionEn = String.format("<p class=\"govuk-body\">You have offered to pay %s by %s%s. The payment must be received in %s's account by then, " +
                                                   "if not they can request a county court judgment.</p><p class=\"govuk-body\">" +
@@ -123,26 +126,6 @@ public class Respondent1AdmittedAmountPaymentDeadlineParamsBuilder extends Dashb
         BigDecimal defendantAdmittedAmount = claimantResponseUtils.getDefendantAdmittedAmount(caseData, true);
         if (nonNull(defendantAdmittedAmount)) {
             return "£" + this.removeDoubleZeros(formatAmount(defendantAdmittedAmount));
-        }
-        return "";
-    }
-
-    private String getAmountIncludesTextEn(CaseData caseData) {
-        if (caseData.isFullAdmitClaimSpec()) {
-            return ". This amount includes interest if it has been claimed which may continue to accrue to the date of Judgment,"
-                           + " settlement agreement or earlier payment";
-        } else if (caseData.isPartAdmitClaimSpec()) {
-            return " plus the claim fee and any fixed costs claimed";
-        }
-        return "";
-    }
-
-    private String getAmountIncludesTextCy(CaseData caseData) {
-        if (caseData.isFullAdmitClaimSpec()) {
-
-            return ". Mae’r swm hwn yn cynnwys llog os yw wedi’i hawlio a gall barhau i gronni hyd dyddiad y Dyfarniad, y cytundeb setlo neu daliad cynharach";
-        } else if (caseData.isPartAdmitClaimSpec()) {
-            return " ynghyd â ffi’r hawliad ac unrhyw gostau sefydlog a hawlir";
         }
         return "";
     }
