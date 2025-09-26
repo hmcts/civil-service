@@ -1,19 +1,26 @@
 package uk.gov.hmcts.reform.civil.service.dashboardnotifications;
 
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
+import uk.gov.hmcts.reform.civil.utils.ClaimantResponseUtils;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.civil.utils.AmountFormatter.formatAmount;
 
 @Component
+@AllArgsConstructor
 public class Respondent1AdmittedAmountPaymentDeadlineParamsBuilder extends DashboardNotificationsParamsBuilder {
+
+    private final ClaimantResponseUtils claimantResponseUtils;
 
     private static final String PARAM_AMOUNT_INCLUDES_TEXT_EN = "amountIncludesTextEn";
     private static final String PARAM_AMOUNT_INCLUDES_TEXT_CY = "amountIncludesTextCy";
@@ -51,7 +58,7 @@ public class Respondent1AdmittedAmountPaymentDeadlineParamsBuilder extends Dashb
 
     @Override
     public void addParams(CaseData caseData, HashMap<String, Object> params) {
-        final String defendantAdmittedAmount = getStringParam(params, PARAM_DEFENDANT_ADMITTED_AMOUNT);
+        final String defendantAdmittedAmount = getDefendantAdmittedAmount(caseData);
         final LocalDate paymentDate = getPaymentDate(caseData);
 
         if (paymentDate == null) {
@@ -114,6 +121,14 @@ public class Respondent1AdmittedAmountPaymentDeadlineParamsBuilder extends Dashb
         params.put(RESP1_ADMITTED_AMOUNT_DEADLINE, paymentDate.atTime(END_OF_DAY));
         params.put(RESP1_ADMITTED_AMOUNT_DEADLINE_EN, paymentDateEn);
         params.put(RESP1_ADMITTED_AMOUNT_DEADLINE_CY, paymentDateCy);
+    }
+
+    public String getDefendantAdmittedAmount(CaseData caseData) {
+        BigDecimal defendantAdmittedAmount = claimantResponseUtils.getDefendantAdmittedAmount(caseData, true);
+        if (nonNull(defendantAdmittedAmount)) {
+                return "£" + this.removeDoubleZeros(formatAmount(defendantAdmittedAmount));
+        }
+        return null;
     }
 
 }
