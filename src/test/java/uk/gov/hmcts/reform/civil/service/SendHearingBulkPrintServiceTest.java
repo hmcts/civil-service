@@ -253,7 +253,6 @@ class SendHearingBulkPrintServiceTest {
     @Test
     void shouldDownloadDocumentAndPrintWelshHearingNoticeLetterToClaimantLiPSuccessfullyWhenLangFieldNotSet() {
         // given
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         Party claimant = PartyBuilder.builder().soleTrader().build();
         CaseData caseData = buildCaseData(claimant, HEARING_FORM, true, null, null, null, null);
         given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
