@@ -25,7 +25,6 @@ public class Respondent1AdmittedAmountPaymentDeadlineParamsBuilder extends Dashb
     private static final String PARAM_AMOUNT_INCLUDES_TEXT_EN = "amountIncludesTextEn";
     private static final String PARAM_AMOUNT_INCLUDES_TEXT_CY = "amountIncludesTextCy";
     private static final String PARAM_APPLICANT1_PARTY_NAME = "applicant1PartyName";
-    private static final String PARAM_DEFENDANT_ADMITTED_AMOUNT = "defendantAdmittedAmount";
     private static final String PARAM_DESCRIPTION_EN = "descriptionEn";
     private static final String PARAM_DESCRIPTION_CY = "descriptionCy";
     private static final String RESP1_ADMITTED_AMOUNT_DEADLINE = "respondent1AdmittedAmountPaymentDeadline";
@@ -126,9 +125,9 @@ public class Respondent1AdmittedAmountPaymentDeadlineParamsBuilder extends Dashb
     public String getDefendantAdmittedAmount(CaseData caseData) {
         BigDecimal defendantAdmittedAmount = claimantResponseUtils.getDefendantAdmittedAmount(caseData, true);
         if (nonNull(defendantAdmittedAmount)) {
-                return "£" + this.removeDoubleZeros(formatAmount(defendantAdmittedAmount));
+            return "£" + this.removeDoubleZeros(formatAmount(defendantAdmittedAmount));
         }
-        return null;
+        return "";
     }
 
 }
