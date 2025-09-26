@@ -57,6 +57,7 @@ import java.util.Optional;
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -69,6 +70,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.ACKNOWLEDGEMENT_OF_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -907,8 +909,11 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                                                      .build(), ABOUT_TO_SUBMIT);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
-
-        assertEquals(eaCourtLocation, responseCaseData.getEaCourtLocation());
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            assertEquals(eaCourtLocation, responseCaseData.getEaCourtLocation());
+        } else {
+            assertNull(responseCaseData.getEaCourtLocation());
+        }
     }
 
     @ParameterizedTest
@@ -951,7 +956,11 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
 
-        assertEquals(eaCourtLocation, responseCaseData.getEaCourtLocation());
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            assertEquals(eaCourtLocation, responseCaseData.getEaCourtLocation());
+        } else {
+            assertNull(responseCaseData.getEaCourtLocation());
+        }
     }
 
     @Test
