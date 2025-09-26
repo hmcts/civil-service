@@ -82,7 +82,7 @@ public class Respondent1AdmittedAmountPaymentDeadlineParamsBuilder extends Dashb
 
         } else if (nonNull(caseData.getRespondToClaimAdmitPartLRspec())) {
             final String amountIncludesTextEn = getAmountIncludesTextEn(caseData);
-            final String amountIncludesTextCy = getAmountIncludesTextEn(caseData);
+            final String amountIncludesTextCy = getAmountIncludesTextCy(caseData);
 
             var descriptionEn = String.format("<p class=\"govuk-body\">You have offered to pay %s by %s%s. The payment must be received in %s's account by then, " +
                                                   "if not they can request a county court judgment.</p><p class=\"govuk-body\">" +
