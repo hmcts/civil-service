@@ -324,7 +324,7 @@ class FeatureToggleServiceTest {
     @Test
     void shouldReturnCorrectValue_whenNonLipCase() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
-        assertThat(featureToggleService.isPublicQueryManagementEnabled(caseData)).isEqualTo(true);
+        assertThat(featureToggleService.isPublicQueryManagementEnabled(caseData)).isTrue();
     }
 
     @ParameterizedTest
