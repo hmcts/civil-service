@@ -494,7 +494,6 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
                 .claimsTrack(ClaimsTrack.fastTrack)
                 .drawDirectionsOrderRequired(YesOrNo.NO)
                 .build();
-            when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
             when(toggleService.isCarmEnabledForCase(any())).thenReturn(false);
             when(toggleService.isCuiGaNroEnabled()).thenReturn(true);
             when(toggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).thenReturn(false);
