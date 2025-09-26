@@ -71,7 +71,7 @@ class PopulateCaseDataTaskTest {
         objectMapper.registerModule(new JavaTimeModule());
         task = new PopulateCaseDataTask(locationRefDataService, objectMapper,
                                         courtLocationUtils, featureToggleService,
-                                        paymentDateService, responseOneVOneShowTagService, deadlineCalculatorService);
+                                        paymentDateService, responseOneVOneShowTagService);
     }
 
     @Test
@@ -89,7 +89,7 @@ class PopulateCaseDataTaskTest {
             .build();
 
         when(featureToggleService.isCarmEnabledForCase(any(CaseData.class))).thenReturn(true);
-        when(paymentDateService.getPaymentDateAdmittedClaim(any())).thenReturn(LocalDate.EPOCH);
+        when(paymentDateService.getFormattedPaymentDate(any())).thenReturn(LocalDate.EPOCH.toString());
         when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
 
         CallbackParams params = callbackParams(caseData).toBuilder()
