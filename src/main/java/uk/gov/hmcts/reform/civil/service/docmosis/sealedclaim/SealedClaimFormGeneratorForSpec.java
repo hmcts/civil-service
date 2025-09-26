@@ -101,7 +101,8 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
                 && caseData.getRespondent2SameLegalRepresentative() == YES) {
                 sealedTemplate = N2_1V2_SAME_SOL;
             } else {
-                if (YesOrNo.NO.equals(caseData.getSpecRespondent1Represented())) {
+                if (YesOrNo.NO.equals(caseData.getSpecRespondent1Represented())
+                    || YesOrNo.NO.equals(caseData.getRespondent2Represented())) {
                     sealedTemplate = N2_1V2_DIFFERENT_SOL_LIP;
                 } else {
                     sealedTemplate = N2_1V2_DIFFERENT_SOL;

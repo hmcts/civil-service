@@ -35,12 +35,13 @@ public class EvidenceUploadNotificationSearchService extends ElasticSearchServic
                           .should(beState(DECISION_OUTCOME))
                           .should(beState(All_FINAL_ORDERS_ISSUED))
                           .should(beState(CASE_PROGRESSION)))
+                .mustNot(matchQuery("data.evidenceUploadNotificationSent", "Yes"))
                 .must(boolQuery()
                           .minimumShouldMatch(1)
                           .should(rangeQuery("data.caseDocumentUploadDate").lt("now").gt(
-                              "now-1d"))
+                              "now-7d"))
                           .should(rangeQuery("data.caseDocumentUploadDateRes").lt("now").gt(
-                              "now-1d"))
+                              "now-7d"))
                           ),
             List.of("reference"),
             startIndex

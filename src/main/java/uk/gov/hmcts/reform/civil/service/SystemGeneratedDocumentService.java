@@ -28,6 +28,11 @@ public class SystemGeneratedDocumentService {
         return addToDocumentCollection(systemGeneratedDocument, translatedDocuments);
     }
 
+    public List<Element<CaseDocument>> getCourtOfficerOrdersWithAddedDocument(List<Element<TranslatedDocument>> translatedDocuments, CaseData caseData) {
+        List<Element<CaseDocument>> courtOfficerOrders = caseData.getCourtOfficersOrders();
+        return addToDocumentCollection(courtOfficerOrders, translatedDocuments);
+    }
+
     public List<Element<CaseDocument>> getFinalOrderDocumentsWithAddedDocument(List<Element<TranslatedDocument>> translatedDocuments, CaseData caseData) {
         List<Element<CaseDocument>> finalOrderDocuments = caseData.getFinalOrderDocumentCollection();
         return addToDocumentCollection(finalOrderDocuments, translatedDocuments);

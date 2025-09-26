@@ -80,15 +80,6 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsGeneralApplicationsEnabledInvoked(Boolean toggleStat) {
-        var generalApplicationsKey = "general_applications_enabled";
-        givenToggle(generalApplicationsKey, toggleStat);
-
-        assertThat(featureToggleService.isGeneralApplicationsEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsPinInPostEnabledInvoked(Boolean toggleStat) {
         var pinInPostKey = "pin-in-post";
         givenToggle(pinInPostKey, toggleStat);
@@ -310,15 +301,6 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsQMForLRs(Boolean toggleStat) {
-        var caseFlagsKey = "query-management";
-        givenToggle(caseFlagsKey, toggleStat);
-
-        assertThat(featureToggleService.isQueryManagementLRsEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsLrAdmissionBulkEnabled(Boolean toggleStat) {
         var lrAdmission = "lr-admission-bulk";
         givenToggle(lrAdmission, toggleStat);
@@ -356,5 +338,14 @@ class FeatureToggleServiceTest {
         when(featureToggleService.isQMPdfGeneratorDisabled()).thenReturn(toggleStat);
 
         assertThat(featureToggleService.isQMPdfGeneratorDisabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldCallBoolVariation_whenGaForLipNro(Boolean toggleStat) {
+        var gaCuiNroKey = "cui-ga-nro";
+        givenToggle(gaCuiNroKey, toggleStat);
+
+        assertThat(featureToggleService.isCuiGaNroEnabled()).isEqualTo(toggleStat);
     }
 }

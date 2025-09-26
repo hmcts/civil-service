@@ -153,7 +153,6 @@ class SimpleStateFlowEngineTest {
 
             assertThat(stateFlow.getFlags()).hasSize(12).contains(
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                 entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true)
@@ -183,7 +182,6 @@ class SimpleStateFlowEngineTest {
 
             assertThat(stateFlow.getFlags()).hasSize(12).contains(
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                 entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true)
@@ -220,7 +218,6 @@ class SimpleStateFlowEngineTest {
                 entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                 entry("TWO_RESPONDENT_REPRESENTATIVES", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                 entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false)
             );
@@ -255,8 +252,7 @@ class SimpleStateFlowEngineTest {
                 entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                 entry("TWO_RESPONDENT_REPRESENTATIVES", true),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false));
         }
 
         @Test
@@ -434,8 +430,7 @@ class SimpleStateFlowEngineTest {
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true),
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false)
                 );
             }
 
@@ -466,8 +461,7 @@ class SimpleStateFlowEngineTest {
                 assertThat(stateFlow.getFlags()).hasSize(12).contains(
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false)
                 );
             }
 
@@ -502,8 +496,7 @@ class SimpleStateFlowEngineTest {
                 assertThat(stateFlow.getFlags()).hasSize(12).contains(
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false)
                 );
             }
 
@@ -539,8 +532,7 @@ class SimpleStateFlowEngineTest {
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true),
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false)
                 );
             }
 
@@ -573,7 +565,6 @@ class SimpleStateFlowEngineTest {
                 assertThat(stateFlow.getFlags()).hasSize(13).contains(
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true),
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), true),
                     entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false)
                 );
@@ -608,7 +599,6 @@ class SimpleStateFlowEngineTest {
                 assertThat(stateFlow.getFlags()).hasSize(13).contains(
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true),
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), true),
                     entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false)
                 );
@@ -644,8 +634,7 @@ class SimpleStateFlowEngineTest {
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false),
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false)
                 );
             }
 
@@ -679,8 +668,7 @@ class SimpleStateFlowEngineTest {
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false),
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false));
             }
 
             // 1v2 spec
@@ -715,8 +703,7 @@ class SimpleStateFlowEngineTest {
                 assertThat(stateFlow.getFlags()).hasSize(13).contains(
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false)
                 );
             }
         }
@@ -749,8 +736,7 @@ class SimpleStateFlowEngineTest {
                 assertThat(stateFlow.getFlags()).hasSize(12).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false)
                 );
             }
 
@@ -780,8 +766,7 @@ class SimpleStateFlowEngineTest {
                     );
                 assertThat(stateFlow.getFlags()).hasSize(13).contains(
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false)
                 );
             }
 
@@ -812,8 +797,7 @@ class SimpleStateFlowEngineTest {
                     );
                 assertThat(stateFlow.getFlags()).hasSize(13).contains(
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false)
                 );
             }
 
@@ -844,8 +828,7 @@ class SimpleStateFlowEngineTest {
                 assertThat(stateFlow.getFlags()).hasSize(12).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false)
                 );
             }
 
@@ -882,8 +865,7 @@ class SimpleStateFlowEngineTest {
                 assertThat(stateFlow.getFlags()).hasSize(12).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false)
                 );
             }
 
@@ -913,8 +895,7 @@ class SimpleStateFlowEngineTest {
                 assertThat(stateFlow.getFlags()).hasSize(12).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false)
                 );
             }
         }
@@ -946,7 +927,6 @@ class SimpleStateFlowEngineTest {
                         TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT.fullName()
                     );
                 assertThat(stateFlow.getFlags()).hasSize(13).contains(
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), true),
                     entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false)
                 );
@@ -979,8 +959,7 @@ class SimpleStateFlowEngineTest {
 
                 assertThat(stateFlow.getFlags()).hasSize(13).contains(
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false)
                 );
             }
 
@@ -1015,8 +994,7 @@ class SimpleStateFlowEngineTest {
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false)
             );
         }
 
@@ -1044,8 +1022,7 @@ class SimpleStateFlowEngineTest {
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false));
         }
 
         @Test
@@ -1071,8 +1048,7 @@ class SimpleStateFlowEngineTest {
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false));
         }
 
         @Test
@@ -1106,8 +1082,7 @@ class SimpleStateFlowEngineTest {
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false));
         }
 
         @Test
@@ -1146,8 +1121,7 @@ class SimpleStateFlowEngineTest {
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                 entry("TWO_RESPONDENT_REPRESENTATIVES", true),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false));
         }
 
         @Test
@@ -1186,8 +1160,7 @@ class SimpleStateFlowEngineTest {
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                 entry("TWO_RESPONDENT_REPRESENTATIVES", true),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false));
         }
 
         @Test
@@ -1218,7 +1191,6 @@ class SimpleStateFlowEngineTest {
                 );
 
             assertThat(stateFlow.getFlags()).hasSize(12).contains(
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                 entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
@@ -1248,7 +1220,6 @@ class SimpleStateFlowEngineTest {
                 );
 
             assertThat(stateFlow.getFlags()).hasSize(12).contains(
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                 entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true));
@@ -1288,8 +1259,7 @@ class SimpleStateFlowEngineTest {
                 entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                 entry("TWO_RESPONDENT_REPRESENTATIVES", true),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false));
         }
 
         @Test
@@ -1349,8 +1319,7 @@ class SimpleStateFlowEngineTest {
             assertThat(stateFlow.getFlags()).hasSize(12).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false));
         }
 
         @Test
@@ -1382,8 +1351,7 @@ class SimpleStateFlowEngineTest {
                 );
 
             assertThat(stateFlow.getFlags()).hasSize(12).contains(
-                entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+                entry("ONE_RESPONDENT_REPRESENTATIVE", true));
         }
 
         @Test
@@ -1419,8 +1387,7 @@ class SimpleStateFlowEngineTest {
             assertThat(stateFlow.getFlags()).hasSize(12).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false));
         }
 
         @Test
@@ -1456,8 +1423,7 @@ class SimpleStateFlowEngineTest {
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false));
         }
 
         @Test
@@ -1485,8 +1451,7 @@ class SimpleStateFlowEngineTest {
             assertThat(stateFlow.getFlags()).hasSize(12).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false));
         }
 
         @Nested
@@ -1518,7 +1483,6 @@ class SimpleStateFlowEngineTest {
                     );
 
                 assertThat(stateFlow.getFlags()).hasSize(12).contains(
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                     entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
                     entry("ONE_RESPONDENT_REPRESENTATIVE", true));
@@ -1562,7 +1526,6 @@ class SimpleStateFlowEngineTest {
                     );
 
                 assertThat(stateFlow.getFlags()).hasSize(12).contains(
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                     entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
                     entry("ONE_RESPONDENT_REPRESENTATIVE", true));
@@ -1602,8 +1565,7 @@ class SimpleStateFlowEngineTest {
                 assertThat(stateFlow.getFlags()).hasSize(12).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false));
             }
 
             @Test
@@ -1644,8 +1606,7 @@ class SimpleStateFlowEngineTest {
                 assertThat(stateFlow.getFlags()).hasSize(12).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false));
             }
         }
 
@@ -1689,8 +1650,7 @@ class SimpleStateFlowEngineTest {
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false));
             }
 
             //1v2 Different solicitor scenario-first response FullDefence received
@@ -1730,8 +1690,7 @@ class SimpleStateFlowEngineTest {
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false));
             }
 
             //1v2 Different solicitor scenario-first response FullDefence received
@@ -1771,8 +1730,7 @@ class SimpleStateFlowEngineTest {
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false));
             }
 
             //1v2 Different solicitor scenario-first party acknowledges, not responds
@@ -1811,7 +1769,6 @@ class SimpleStateFlowEngineTest {
 
                 assertThat(stateFlow.getFlags()).hasSize(13).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                     entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true));
@@ -1852,7 +1809,6 @@ class SimpleStateFlowEngineTest {
 
                 assertThat(stateFlow.getFlags()).hasSize(13).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                     entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true));
@@ -1894,7 +1850,6 @@ class SimpleStateFlowEngineTest {
 
                 assertThat(stateFlow.getFlags()).hasSize(13).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                     entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true));
@@ -1937,7 +1892,6 @@ class SimpleStateFlowEngineTest {
 
                 assertThat(stateFlow.getFlags()).hasSize(13).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                     entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true));
@@ -1982,7 +1936,6 @@ class SimpleStateFlowEngineTest {
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                     entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true)
                 );
             }
@@ -2024,7 +1977,6 @@ class SimpleStateFlowEngineTest {
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                     entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true)
                 );
             }
@@ -2066,8 +2018,7 @@ class SimpleStateFlowEngineTest {
                 assertThat(stateFlow.getFlags()).hasSize(12).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false)
                 );
             }
 
@@ -2108,8 +2059,7 @@ class SimpleStateFlowEngineTest {
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+                    entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false)
                 );
             }
 
@@ -2148,7 +2098,6 @@ class SimpleStateFlowEngineTest {
 
                 assertThat(stateFlow.getFlags()).hasSize(13).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                     entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true)
@@ -2183,8 +2132,7 @@ class SimpleStateFlowEngineTest {
             assertThat(stateFlow.getFlags()).hasSize(12).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false)
             );
         }
 
@@ -2247,14 +2195,12 @@ class SimpleStateFlowEngineTest {
             if (flowState == FlowState.Main.FULL_DEFENCE_NOT_PROCEED) {
                 assertThat(stateFlow.getFlags()).hasSize(12).contains(
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                     entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
                     entry("ONE_RESPONDENT_REPRESENTATIVE", true)
                 );
             } else if (flowState == TAKEN_OFFLINE_AFTER_SDO) {
                 assertThat(stateFlow.getFlags()).hasSize(15).contains(
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                     entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
@@ -2340,8 +2286,7 @@ class SimpleStateFlowEngineTest {
                 entry("TWO_RESPONDENT_REPRESENTATIVES", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false)
             );
         }
 
@@ -2392,7 +2337,6 @@ class SimpleStateFlowEngineTest {
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                 entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                 entry("TWO_RESPONDENT_REPRESENTATIVES", true)
             );
         }
@@ -2437,8 +2381,7 @@ class SimpleStateFlowEngineTest {
                 entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                 entry("TWO_RESPONDENT_REPRESENTATIVES", true),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false)
             );
         }
 
@@ -2464,7 +2407,6 @@ class SimpleStateFlowEngineTest {
                 );
 
             assertThat(stateFlow.getFlags()).hasSize(12).contains(
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true)
             );
         }
@@ -2546,7 +2488,6 @@ class SimpleStateFlowEngineTest {
                 );
 
             assertThat(stateFlow.getFlags()).hasSize(12).contains(
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                 entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true)
@@ -2608,7 +2549,6 @@ class SimpleStateFlowEngineTest {
                 );
 
             assertThat(stateFlow.getFlags()).hasSize(15).contains(
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                 entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
@@ -2706,7 +2646,6 @@ class SimpleStateFlowEngineTest {
 
             assertThat(stateFlow.getFlags()).hasSize(12).contains(
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                 entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true)
@@ -2788,7 +2727,6 @@ class SimpleStateFlowEngineTest {
             assertThat(stateFlow.getFlags()).hasSize(17).contains(
                 entry("BULK_CLAIM_ENABLED", false),
                 entry("ONE_RESPONDENT_REPRESENTATIVE", false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                 entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
                 entry("TWO_RESPONDENT_REPRESENTATIVES", true),
@@ -2832,8 +2770,7 @@ class SimpleStateFlowEngineTest {
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false)
             );
         }
 
@@ -2863,8 +2800,7 @@ class SimpleStateFlowEngineTest {
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false)
             );
         }
 
@@ -2893,7 +2829,6 @@ class SimpleStateFlowEngineTest {
             assertThat(stateFlow.getFlags()).hasSize(12).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                 entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false)
             );
@@ -2925,8 +2860,7 @@ class SimpleStateFlowEngineTest {
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false)
             );
         }
 
@@ -2957,7 +2891,6 @@ class SimpleStateFlowEngineTest {
             assertThat(stateFlow.getFlags()).hasSize(12).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                 entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false)
             );
@@ -2991,8 +2924,7 @@ class SimpleStateFlowEngineTest {
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false)
             );
         }
 
@@ -3024,7 +2956,6 @@ class SimpleStateFlowEngineTest {
             assertThat(stateFlow.getFlags()).hasSize(12).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                 entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false)
             );
@@ -3067,7 +2998,6 @@ class SimpleStateFlowEngineTest {
                 entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                 entry("TWO_RESPONDENT_REPRESENTATIVES", true),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                 entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false)
             );
@@ -3100,7 +3030,6 @@ class SimpleStateFlowEngineTest {
             assertThat(stateFlow.getFlags()).hasSize(12).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                 entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false)
             );
@@ -3135,7 +3064,6 @@ class SimpleStateFlowEngineTest {
             assertThat(stateFlow.getFlags()).hasSize(12).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                 entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false)
             );
@@ -3170,7 +3098,6 @@ class SimpleStateFlowEngineTest {
             assertThat(stateFlow.getFlags()).hasSize(12).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                 entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false)
             );
@@ -3296,7 +3223,6 @@ class SimpleStateFlowEngineTest {
             assertThat(stateFlow.getFlags()).hasSize(12).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                 entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false)
             );
@@ -3340,7 +3266,6 @@ class SimpleStateFlowEngineTest {
                 .contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                     entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false)
                 );
@@ -3382,7 +3307,6 @@ class SimpleStateFlowEngineTest {
             assertThat(stateFlow.getFlags()).hasSize(12).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                 entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false)
             );
@@ -3420,7 +3344,6 @@ class SimpleStateFlowEngineTest {
             assertThat(stateFlow.getFlags()).hasSize(12).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                 entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false)
             );
@@ -3522,7 +3445,6 @@ class SimpleStateFlowEngineTest {
             assertThat(stateFlow.getFlags()).hasSize(12).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                 entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false)
             );
@@ -3596,7 +3518,6 @@ class SimpleStateFlowEngineTest {
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true),
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                     entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
                 );
@@ -3639,7 +3560,6 @@ class SimpleStateFlowEngineTest {
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true),
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
                 );
             }
@@ -3682,7 +3602,6 @@ class SimpleStateFlowEngineTest {
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true),
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                     entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
                 );
             }
@@ -3725,7 +3644,6 @@ class SimpleStateFlowEngineTest {
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true),
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
                 );
             }
@@ -3766,7 +3684,6 @@ class SimpleStateFlowEngineTest {
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true),
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                     entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
                 );
@@ -3810,7 +3727,6 @@ class SimpleStateFlowEngineTest {
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true),
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                     entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
                 );
             }
@@ -3854,7 +3770,6 @@ class SimpleStateFlowEngineTest {
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                     entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
                 );
@@ -3899,7 +3814,6 @@ class SimpleStateFlowEngineTest {
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                     entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
                 );
@@ -3943,7 +3857,6 @@ class SimpleStateFlowEngineTest {
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true),
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                     entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
                 );
             }
@@ -3985,7 +3898,6 @@ class SimpleStateFlowEngineTest {
                 assertThat(stateFlow.getFlags()).hasSize(12).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
                 );
             }
@@ -4027,7 +3939,6 @@ class SimpleStateFlowEngineTest {
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true),
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
                 );
             }
@@ -4069,7 +3980,6 @@ class SimpleStateFlowEngineTest {
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                     entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
                 );
@@ -4363,7 +4273,6 @@ class SimpleStateFlowEngineTest {
             assertThat(stateFlow.getFlags()).hasSize(13).contains(
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                 entry(FlowFlag.CONTACT_DETAILS_CHANGE.name(), true),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                 entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
                 entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
@@ -4548,7 +4457,6 @@ class SimpleStateFlowEngineTest {
 
             assertThat(stateFlow.getFlags()).hasSize(12).contains(
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                 entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
                 entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
@@ -4689,7 +4597,6 @@ class SimpleStateFlowEngineTest {
 
             assertThat(stateFlow.getFlags()).hasSize(12).contains(
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true));
         }
 
@@ -4719,8 +4626,7 @@ class SimpleStateFlowEngineTest {
 
             assertThat(stateFlow.getFlags()).hasSize(12).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+                entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false));
         }
 
         @Test
@@ -4757,8 +4663,7 @@ class SimpleStateFlowEngineTest {
             assertThat(stateFlow.getFlags()).hasSize(12).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+                entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false));
         }
 
         @Test
@@ -4796,8 +4701,7 @@ class SimpleStateFlowEngineTest {
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+                entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false));
         }
 
         @Test

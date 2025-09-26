@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.EmployerDetailsLRspec;
 import uk.gov.hmcts.reform.civil.model.PartnerAndDependentsLRspec;
@@ -213,7 +214,9 @@ public class SealedClaimLipResponseForm implements MappableObject {
                 .map(courtOrderDetails -> Respondent1CourtOrderDetails.builder()
                     .claimNumberText(courtOrderDetails.getValue().getClaimNumberText())
                     .amountOwed(MonetaryConversions.penniesToPounds(courtOrderDetails.getValue().getAmountOwed()))
-                    .monthlyInstalmentAmount(MonetaryConversions.penniesToPounds(courtOrderDetails.getValue().getMonthlyInstalmentAmount()))
+                    .monthlyInstalmentAmount(courtOrderDetails.getValue().getMonthlyInstalmentAmount() == null ? null
+                        : MonetaryConversions.penniesToPounds(courtOrderDetails.getValue().getMonthlyInstalmentAmount())
+                    )
                     .build())
                 .toList()
         );

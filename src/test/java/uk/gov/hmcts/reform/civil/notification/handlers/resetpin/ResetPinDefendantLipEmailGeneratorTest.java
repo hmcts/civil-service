@@ -11,7 +11,9 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -39,6 +41,7 @@ class ResetPinDefendantLipEmailGeneratorTest {
             .reference("reset-pin-notification")
             .build();
 
+        when(resetPinDefendantLipEmailDTOGenerator.getShouldNotify(caseData)).thenReturn(true);
         when(resetPinDefendantLipEmailDTOGenerator.buildEmailDTO(caseData, null)).thenReturn(emailDTO);
 
         Set<EmailDTO> partiesToNotify = emailGenerator.getPartiesToNotify(caseData, null);
@@ -46,5 +49,18 @@ class ResetPinDefendantLipEmailGeneratorTest {
         assertThat(partiesToNotify).hasSize(1);
         assertThat(partiesToNotify).contains(emailDTO);
         verify(resetPinDefendantLipEmailDTOGenerator, times(1)).buildEmailDTO(caseData, null);
+    }
+
+    @Test
+    void shouldNotGenerateEmailDTO_whenShouldNotifyIsFalse() {
+        CaseData caseData = mock(CaseData.class);
+
+        when(resetPinDefendantLipEmailDTOGenerator.getShouldNotify(caseData)).thenReturn(false);
+
+        Set<EmailDTO> partiesToNotify = emailGenerator.getPartiesToNotify(caseData, null);
+
+        assertThat(partiesToNotify).isEmpty();
+        verify(resetPinDefendantLipEmailDTOGenerator, times(1)).getShouldNotify(caseData);
+        verify(resetPinDefendantLipEmailDTOGenerator, never()).buildEmailDTO(any(), any());
     }
 }

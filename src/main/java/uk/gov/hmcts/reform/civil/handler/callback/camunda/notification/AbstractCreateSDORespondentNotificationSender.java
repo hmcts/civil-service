@@ -69,7 +69,8 @@ public abstract class AbstractCreateSDORespondentNotificationSender implements N
                 return notificationsProperties.getSdoOrderedSpecBilingual();
             }
 
-            return featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation())
+            return (featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation())
+                || featureToggleService.isWelshEnabledForMainCase())
                 ? notificationsProperties.getSdoOrderedSpecEa() : notificationsProperties.getSdoOrderedSpec();
         }
         return notificationsProperties.getSdoOrdered();

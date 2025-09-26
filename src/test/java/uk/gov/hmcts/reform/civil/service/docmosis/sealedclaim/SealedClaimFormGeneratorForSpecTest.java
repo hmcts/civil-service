@@ -48,6 +48,7 @@ import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SE
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_1V2_DIFFERENT_SOL;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_1V2_DIFFERENT_SOL_LIP;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_1V2_SAME_SOL;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_2V1;
 
@@ -179,6 +180,64 @@ class  SealedClaimFormGeneratorForSpecTest {
         verify(documentGeneratorService).generateDocmosisDocument(
             any(SealedClaimFormForSpec.class),
             eq(N2_1V2_DIFFERENT_SOL)
+        );
+    }
+
+    @Test
+    void generateSealedClaimForm1v2Respondent1LIP() {
+        CaseData.CaseDataBuilder caseBuilder = getBaseCaseDataBuilder();
+        CaseData caseData = caseBuilder
+            .respondent2(Party.builder()
+                             .type(Party.Type.COMPANY)
+                             .partyName("name")
+                             .build())
+            .specRespondent1Represented(YesOrNo.NO)
+            .build();
+
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N2_1V2_DIFFERENT_SOL_LIP)))
+            .thenReturn(new DocmosisDocument(N2_1V2_DIFFERENT_SOL_LIP.getDocumentTitle(), bytes));
+
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, SEALED_CLAIM)))
+            .thenReturn(CASE_DOCUMENT);
+
+        CaseDocument caseDocument = sealedClaimFormGenerator.generate(caseData, BEARER_TOKEN);
+        assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT);
+
+        verify(representativeService).getRespondent1Representative(caseData);
+        verify(representativeService).getRespondent2Representative(caseData);
+        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, SEALED_CLAIM));
+        verify(documentGeneratorService).generateDocmosisDocument(
+            any(SealedClaimFormForSpec.class),
+            eq(N2_1V2_DIFFERENT_SOL_LIP)
+        );
+    }
+
+    @Test
+    void generateSealedClaimForm1v2Respondent2LIP() {
+        CaseData.CaseDataBuilder caseBuilder = getBaseCaseDataBuilder();
+        CaseData caseData = caseBuilder
+            .respondent2(Party.builder()
+                             .type(Party.Type.COMPANY)
+                             .partyName("name")
+                             .build())
+            .specRespondent2Represented(YesOrNo.NO)
+            .build();
+
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N2_1V2_DIFFERENT_SOL_LIP)))
+            .thenReturn(new DocmosisDocument(N2_1V2_DIFFERENT_SOL_LIP.getDocumentTitle(), bytes));
+
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, SEALED_CLAIM)))
+            .thenReturn(CASE_DOCUMENT);
+
+        CaseDocument caseDocument = sealedClaimFormGenerator.generate(caseData, BEARER_TOKEN);
+        assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT);
+
+        verify(representativeService).getRespondent1Representative(caseData);
+        verify(representativeService).getRespondent2Representative(caseData);
+        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, SEALED_CLAIM));
+        verify(documentGeneratorService).generateDocmosisDocument(
+            any(SealedClaimFormForSpec.class),
+            eq(N2_1V2_DIFFERENT_SOL_LIP)
         );
     }
 

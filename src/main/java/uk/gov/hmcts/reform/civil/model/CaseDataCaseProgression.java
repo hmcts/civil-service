@@ -232,7 +232,6 @@ public class CaseDataCaseProgression extends CaseDataCaseSdo implements Mappable
     private String courtOfficerOrdered;
     private YesOrNo courtOfficerGiveReasonsYesNo;
     private CaseDocument previewCourtOfficerOrder;
-    private CaseDocument translatedCourtOfficerOrder;
 
     //Hearing Scheduled
     private DynamicList hearingLocation;
@@ -423,6 +422,7 @@ public class CaseDataCaseProgression extends CaseDataCaseSdo implements Mappable
     private Message lastMessage;
     private String lastMessageAllocatedTrack;
     private String lastMessageJudgeLabel;
+    private String waTaskToCompleteId;
 
     //QueryManagement
     private final CaseQueriesCollection qmApplicantSolicitorQueries;

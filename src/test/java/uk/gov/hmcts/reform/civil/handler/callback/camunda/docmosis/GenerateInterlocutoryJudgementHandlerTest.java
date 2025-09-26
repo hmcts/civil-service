@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ChooseHowToProceed;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
+import uk.gov.hmcts.reform.civil.model.citizenui.dto.ClaimantResponseOnCourtDecisionType;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.RepaymentDecisionType;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.PreTranslationDocumentType;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -84,11 +85,12 @@ class GenerateInterlocutoryJudgementHandlerTest extends BaseCallbackHandlerTest 
             anyString()
         )).willReturn(FORM);
         CaseData caseData = CaseData.builder()
-            .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).build())
+            .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build())
             .caseDataLiP(CaseDataLiP.builder()
 
                              .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                        .applicant1ChoosesHowToProceed(ChooseHowToProceed.REQUEST_A_CCJ)
+                                                        .claimantResponseOnCourtDecision(
+                                                            ClaimantResponseOnCourtDecisionType.JUDGE_REPAYMENT_DATE)
                                                         .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT)
                                                         .build())
                              .build())
@@ -107,10 +109,11 @@ class GenerateInterlocutoryJudgementHandlerTest extends BaseCallbackHandlerTest 
             anyString()
         )).willReturn(FORM);
         CaseData caseData = CaseData.builder()
-            .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).build())
+            .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build())
             .caseDataLiP(CaseDataLiP.builder()
                              .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                        .applicant1ChoosesHowToProceed(ChooseHowToProceed.REQUEST_A_CCJ)
+                                                        .claimantResponseOnCourtDecision(
+                                                            ClaimantResponseOnCourtDecisionType.JUDGE_REPAYMENT_DATE)
                                                         .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT)
                                                         .build())
                              .build())
@@ -132,10 +135,11 @@ class GenerateInterlocutoryJudgementHandlerTest extends BaseCallbackHandlerTest 
             anyString()
         )).willReturn(FORM);
         CaseData caseData = CaseData.builder()
-            .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).build())
+            .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build())
             .caseDataLiP(CaseDataLiP.builder()
                              .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                        .applicant1ChoosesHowToProceed(ChooseHowToProceed.REQUEST_A_CCJ)
+                                                        .claimantResponseOnCourtDecision(
+                                                            ClaimantResponseOnCourtDecisionType.JUDGE_REPAYMENT_DATE)
                                                         .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT)
                                                         .build())
                              .build())
@@ -158,10 +162,11 @@ class GenerateInterlocutoryJudgementHandlerTest extends BaseCallbackHandlerTest 
             anyString()
         )).willReturn(FORM);
         CaseData caseData = CaseData.builder()
-            .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).build())
+            .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build())
             .caseDataLiP(CaseDataLiP.builder()
                              .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                        .applicant1ChoosesHowToProceed(ChooseHowToProceed.REQUEST_A_CCJ)
+                                                        .claimantResponseOnCourtDecision(
+                                                            ClaimantResponseOnCourtDecisionType.JUDGE_REPAYMENT_PLAN)
                                                         .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT)
                                                         .build())
                              .respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("WELSH").build())
@@ -179,7 +184,7 @@ class GenerateInterlocutoryJudgementHandlerTest extends BaseCallbackHandlerTest 
     void shouldNotGenerateDocWhenCourtDecisionInFavourClaimant() {
         //Given
         CaseData caseData = CaseData.builder()
-            .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).build())
+            .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build())
             .caseDataLiP(CaseDataLiP.builder()
                              .applicant1LiPResponse(ClaimantLiPResponse.builder()
                                                         .applicant1ChoosesHowToProceed(ChooseHowToProceed.REQUEST_A_CCJ)
@@ -196,7 +201,7 @@ class GenerateInterlocutoryJudgementHandlerTest extends BaseCallbackHandlerTest 
     void shouldNotGenerateDocWhenChoosesHowToProceedSignSettlementAgreement() {
         //Given
         CaseData caseData = CaseData.builder()
-            .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).build())
+            .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build())
             .caseDataLiP(CaseDataLiP.builder()
                              .applicant1LiPResponse(ClaimantLiPResponse.builder()
                                                         .applicant1ChoosesHowToProceed(ChooseHowToProceed.SIGN_A_SETTLEMENT_AGREEMENT)

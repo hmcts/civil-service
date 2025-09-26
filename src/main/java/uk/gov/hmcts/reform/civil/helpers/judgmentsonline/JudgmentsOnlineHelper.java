@@ -83,29 +83,38 @@ public class JudgmentsOnlineHelper {
             || caseData.isLRvLipOneVOne();
     }
 
-    public static BigDecimal getCostOfJudgmentForDJ(CaseData data) {
+    public static BigDecimal getClaimFeeOfJudgmentForDJ(CaseData data) {
 
         if (data.getOutstandingFeeInPounds() != null) {
             return data.getOutstandingFeeInPounds();
         }
 
         String repaymentSummary = data.getRepaymentSummaryObject();
-        BigDecimal fixedCost = null;
         BigDecimal claimCost = null;
         if (null != repaymentSummary) {
-            fixedCost = repaymentSummary.contains("Fixed")
-                ? new BigDecimal(repaymentSummary.substring(
-                repaymentSummary.indexOf("Fixed cost amount \n£") + 20,
-                repaymentSummary.indexOf("\n### Claim fee amount ")
-            )) : null;
             claimCost = new BigDecimal(repaymentSummary.substring(
                 repaymentSummary.indexOf("Claim fee amount \n £") + 20,
                 repaymentSummary.indexOf("\n ## Subtotal")
             ));
         }
 
-        return fixedCost != null && claimCost != null ? fixedCost.add(claimCost)
-            : claimCost != null ? claimCost : ZERO;
+        return claimCost != null ? claimCost : ZERO;
+
+    }
+
+    public static BigDecimal getFixedCostsOfJudgmentForDJ(CaseData data) {
+
+        String repaymentSummary = data.getRepaymentSummaryObject();
+        BigDecimal fixedCost = null;
+        if (null != repaymentSummary) {
+            fixedCost = repaymentSummary.contains("Fixed")
+                ? new BigDecimal(repaymentSummary.substring(
+                repaymentSummary.indexOf("Fixed cost amount \n£") + 20,
+                repaymentSummary.indexOf("\n### Claim fee amount ")
+            )) : null;
+        }
+
+        return fixedCost != null ? fixedCost : ZERO;
 
     }
 

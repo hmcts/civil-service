@@ -8,7 +8,6 @@ import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
-import uk.gov.hmcts.reform.civil.event.SettlementNoResponseFromDefendantEvent;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -18,7 +17,6 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
-import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import java.util.HashMap;
 
@@ -28,14 +26,14 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
-class SettlementNoResponseFromDefendantEventHandlerTest {
+class SettlementNoResponseFromDefendantEventProcessorTest {
 
     @Mock
     private UserService userService;
     @Mock
     private CoreCaseDataService coreCaseDataService;
     @Mock
-    private DashboardScenariosService dashboardScenariosService;
+    private DashboardScenarioTransactionalService dashboardScenariosService;
     @Mock
     private DashboardNotificationsParamsMapper mapper;
     @Mock
@@ -43,7 +41,7 @@ class SettlementNoResponseFromDefendantEventHandlerTest {
     @Mock
     private CaseDetailsConverter caseDetailsConverter;
     @InjectMocks
-    private SettlementNoResponseFromDefendantEventHandler handler;
+    private SettlementNoResponseFromDefendantEventProcessor handler;
 
     static final Long CASE_ID = 1594901956117591L;
     static final String AUTH_TOKEN = "mock_token";
@@ -66,11 +64,11 @@ class SettlementNoResponseFromDefendantEventHandlerTest {
 
         when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
-        handler.createClaimantDashboardScenario(new SettlementNoResponseFromDefendantEvent(CASE_ID));
+        handler.createClaimantDashboardScenario(CASE_ID);
 
-        verify(dashboardScenariosService).recordScenarios(
+        verify(dashboardScenariosService).createScenario(
             AUTH_TOKEN,
-            DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_SETTLEMENT_NO_RESPONSE_CLAIMANT.getScenario(),
+            DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_SETTLEMENT_NO_RESPONSE_CLAIMANT,
             CASE_ID.toString(),
             ScenarioRequestParams.builder().params(scenarioParams).build()
         );

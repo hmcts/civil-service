@@ -58,10 +58,10 @@ public class EditJudgmentsOnlineMapperTest {
         interestCalculator = new InterestCalculator();
         judgementService = new JudgementService(featureToggleService, interestCalculator);
         addressMapper = new RoboticsAddressMapper(new AddressLinesMapper());
-        editJudgmentOnlineMapper = new EditJudgmentOnlineMapper();
-        recordJudgmentMapper = new RecordJudgmentOnlineMapper(addressMapper);
-        judgmentByAdmissionMapper = new JudgmentByAdmissionOnlineMapper(addressMapper, judgementService, interestCalculator);
-        defaultJudgmentMapper = new DefaultJudgmentOnlineMapper(interestCalculator, addressMapper);
+        editJudgmentOnlineMapper = new EditJudgmentOnlineMapper(time);
+        recordJudgmentMapper = new RecordJudgmentOnlineMapper(time, addressMapper);
+        judgmentByAdmissionMapper = new JudgmentByAdmissionOnlineMapper(time, addressMapper, judgementService, interestCalculator);
+        defaultJudgmentMapper = new DefaultJudgmentOnlineMapper(time, interestCalculator, addressMapper);
     }
 
     @Test

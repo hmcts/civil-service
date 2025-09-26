@@ -21,7 +21,11 @@ public class ResetPinDefendantLipEmailGenerator implements PartiesEmailGenerator
     public Set<EmailDTO> getPartiesToNotify(final CaseData caseData, String taskId) {
         Set<EmailDTO> partiesToEmail = new HashSet<>();
         log.info("Generating reset pin email for Defendant LiP for case id: {}", caseData.getCcdCaseReference());
-        partiesToEmail.add(resetPinDefendantLipEmailDTOGenerator.buildEmailDTO(caseData, taskId));
+        if (resetPinDefendantLipEmailDTOGenerator.getShouldNotify(caseData)) {
+            partiesToEmail.add(resetPinDefendantLipEmailDTOGenerator.buildEmailDTO(caseData, taskId));
+        } else {
+            log.info("Reset pin is not applicable for case id: {}", caseData.getCcdCaseReference());
+        }
         return partiesToEmail;
     }
 }

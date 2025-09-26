@@ -27,12 +27,13 @@ class EvidenceUploadNotificationSearchServiceTest extends ElasticSearchServiceTe
                       .should(boolQuery().must(matchQuery("state", "DECISION_OUTCOME")))
                       .should(boolQuery().must(matchQuery("state", "All_FINAL_ORDERS_ISSUED")))
                       .should(boolQuery().must(matchQuery("state", "CASE_PROGRESSION"))))
+            .mustNot(matchQuery("data.evidenceUploadNotificationSent", "Yes"))
             .must(boolQuery()
                       .minimumShouldMatch(1)
                       .should(rangeQuery("data.caseDocumentUploadDate").lt("now").gt(
-                          "now-1d"))
+                          "now-7d"))
                       .should(rangeQuery("data.caseDocumentUploadDateRes").lt("now").gt(
-                          "now-1d"))
+                          "now-7d"))
                       );
         return new Query(query, List.of("reference"), fromValue);
     }
