@@ -112,6 +112,7 @@ public class SendHearingBulkPrintService {
             ? caseData.getClaimantBilingualLanguagePreference()
             : caseData.getDefendantBilingualLanguagePreference();
         return switch (Objects.requireNonNullElse(languagePreference, ENGLISH.getDisplayedValue())) {
+        return switch (languagePreference) {
             case "WELSH" -> WELSH;
             case "BOTH" -> BOTH;
             default -> ENGLISH;

@@ -80,15 +80,6 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsGeneralApplicationsEnabledInvoked(Boolean toggleStat) {
-        var generalApplicationsKey = "general_applications_enabled";
-        givenToggle(generalApplicationsKey, toggleStat);
-
-        assertThat(featureToggleService.isGeneralApplicationsEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsPinInPostEnabledInvoked(Boolean toggleStat) {
         var pinInPostKey = "pin-in-post";
         givenToggle(pinInPostKey, toggleStat);
