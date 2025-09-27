@@ -67,8 +67,11 @@ public class GenerateQueryDocumentHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder builder = caseData.toBuilder();
 
-        CaseMessage query = getQueryById(caseData,
-                camundaService.getProcessVariables(caseData.getBusinessProcess().getProcessInstanceId()).getQueryId());
+        String queryId = camundaService.getProcessVariables(caseData.getBusinessProcess().getProcessInstanceId()).getQueryId();
+        if (queryId == null) {
+            queryId = caseData.getQmLatestQuery().getQueryId();
+        }
+        CaseMessage query = getQueryById(caseData, queryId);
         CaseQueriesCollection workingCollection = getCollectionByMessage(caseData, query);
         DocCategory queryDocumentCategory = getQueryDocumentCategory(getCollectionType(workingCollection, caseData));
 
