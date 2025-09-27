@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.math.BigDecimal;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -30,7 +29,6 @@ public class UploadHearingDocumentsClaimantScenarioTest extends DashboardBaseInt
 
         String caseId = "12345188432991";
         when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
-        when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
 
         DynamicListElement selectedCourt = DynamicListElement.builder()
             .code("00002").label("court 2 - 2 address - Y02 7RB").build();

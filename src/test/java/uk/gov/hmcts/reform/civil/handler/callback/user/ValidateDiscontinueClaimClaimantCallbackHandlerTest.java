@@ -42,7 +42,6 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
@@ -223,7 +222,6 @@ public class ValidateDiscontinueClaimClaimantCallbackHandlerTest extends BaseCal
         @Test
         void shouldDiscontinueCase_When2v1FullDiscontinuanceAgainstBothClaimantAndAboutToSubmitIsInvoked() {
             //Given
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
             caseData.setTypeOfDiscontinuance(DiscontinuanceTypeList.FULL_DISCONTINUANCE);
             caseData.setSelectedClaimantForDiscontinuance("Both");
@@ -241,7 +239,6 @@ public class ValidateDiscontinueClaimClaimantCallbackHandlerTest extends BaseCal
 
         @Test
         void shouldSetTheValuesInPreTranslationCollectionForWelshTranslation() {
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent1(PartyBuilder.builder().individual().build().toBuilder()
                                  .individualFirstName("John")

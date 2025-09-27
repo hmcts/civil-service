@@ -29,7 +29,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTI
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.All_FINAL_ORDERS_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.NOT_CONTACTABLE_CLAIMANT_ONE;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_SDO_DRAWN_PRE_CASE_PROGRESSION;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_ORDER_MADE_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_SDO_MADE_BY_LA_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_NOTICE_OF_CHANGE_CLAIM_REMAINS_ONLINE_CLAIMANT;
@@ -138,9 +137,6 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
             }
 
         }
-        if (isSDODrawnPreCPRelease(caseData)) {
-            return SCENARIO_AAA6_CLAIMANT_SDO_DRAWN_PRE_CASE_PROGRESSION.getScenario();
-        }
         if (isFinalOrderIssued(callbackParams)) {
             deleteNotificationAndInactiveTasks(caseData);
             if (isOrderMadeFastTrackTrialNotResponded(caseData)) {
@@ -162,12 +158,6 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
     @Override
     public boolean shouldRecordScenario(CaseData caseData) {
         return caseData.isApplicant1NotRepresented();
-    }
-
-    private boolean isSDODrawnPreCPRelease(CaseData caseData) {
-        return !(getFeatureToggleService()
-            .isCaseProgressionEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation())
-            || getFeatureToggleService().isWelshEnabledForMainCase());
     }
 
     private boolean isMediationUnsuccessfulReasonEqualToNotContactableClaimantOne(CaseData caseData) {

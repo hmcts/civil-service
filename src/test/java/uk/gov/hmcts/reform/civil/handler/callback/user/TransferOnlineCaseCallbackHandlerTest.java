@@ -40,7 +40,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @ExtendWith(MockitoExtension.class)
@@ -222,26 +221,19 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
             "true, YES, YES, YES",
             "false, YES, YES, YES",
             // LiP vs LR - ignore HMC court
-            "true,  NO, YES, NO",
-            "false,  NO, YES, NO",
+            "true,  NO, YES, YES",
+            "false,  NO, YES, YES",
             //LR vs LiP - ignore HMC court
             "true, YES, NO, YES",
-            "false, YES, NO, NO",
+            "false, YES, NO, YES",
             //LiP vs LiP - ignore HMC court
             "true, NO, NO, YES",
-            "false, NO, NO, NO"
+            "false, NO, NO, YES"
         })
         void shouldPopulateHmcLipEnabled_whenLiPAndHmcLipEnabled(boolean isCPAndWhitelisted,
                                                                  YesOrNo applicantRepresented,
                                                                  YesOrNo respondent1Represented,
                                                                  YesOrNo eaCourtLocation) {
-
-            if (NO.equals(respondent1Represented)) {
-                when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(isCPAndWhitelisted);
-                if (!isCPAndWhitelisted) {
-                    when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
-                }
-            }
 
             when(courtLocationUtils.findPreferredLocationData(any(), any()))
                 .thenReturn(LocationRefData.builder().siteName("")
@@ -272,26 +264,21 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
             "true, YES, YES, YES, true",
             "false, YES, YES, YES, true",
             // LiP vs LR - ignore HMC court
-            "true,  NO, YES, NO, false",
-            "false,  NO, YES, NO, false",
+            "true,  NO, YES, YES, false",
+            "false,  NO, YES, YES, false",
             //LR vs LiP - ignore HMC court
             "true, YES, NO, YES, true",
             "false, YES, NO, YES, true",
             //LiP vs LiP - ignore HMC court
             "true, NO, NO, YES, true",
             "false, NO, NO, YES, true",
-            "false, NO, NO, NO, false",
+            "false, NO, NO, YES, false",
             "true, NO, NO, YES, false"
         })
         void shouldPopulateHmcLipEnabled_whenLiPAndHmcLipEnabledAnsWelshFlagConsidered(boolean isCPAndWhitelisted,
                                                                  YesOrNo applicantRepresented,
                                                                  YesOrNo respondent1Represented,
                                                                  YesOrNo eaCourtLocation, boolean isWelshEnabled) {
-
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(isWelshEnabled);
-            if (!isWelshEnabled && NO.equals(respondent1Represented)) {
-                when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(isCPAndWhitelisted);
-            }
 
             when(courtLocationUtils.findPreferredLocationData(any(), any()))
                 .thenReturn(LocationRefData.builder().siteName("")
@@ -341,7 +328,7 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
         @ParameterizedTest
         @CsvSource({
             "true, NO, NO, YES",
-            "false, NO, NO, NO",
+            "false, NO, NO, YES",
             "true, YES, NO, YES"
         })
         void shouldSetEaCourtLocationBasedOnConditions(boolean isLocationWhiteListed,
@@ -363,7 +350,6 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 .epimmsId("222")
                                 .siteName("Site 2").courtAddress("Adr 2").postcode("BBB 222")
                                 .courtLocationCode("other code").build());
-            when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(isLocationWhiteListed);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);

@@ -9,10 +9,7 @@ public class LanguageUtils {
         //NO-OP
     }
 
-    public static Language determineLanguageForBulkPrint(CaseData caseData, boolean isClaimant, boolean welshEnabled) {
-        if (!welshEnabled) {
-            return Language.ENGLISH;
-        }
+    public static Language determineLanguageForBulkPrint(CaseData caseData, boolean isClaimant) {
 
         String languageString = isClaimant ? caseData.getClaimantBilingualLanguagePreference() : caseData.getDefendantBilingualLanguagePreference();
 

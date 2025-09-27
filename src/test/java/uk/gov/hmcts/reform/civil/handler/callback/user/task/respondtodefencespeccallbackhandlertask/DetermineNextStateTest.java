@@ -156,7 +156,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
         }
 
         when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         BusinessProcess businessProcess = BusinessProcess.builder().build();
 
         String resultState = determineNextState.determineNextState(caseData, callbackParams(caseData),

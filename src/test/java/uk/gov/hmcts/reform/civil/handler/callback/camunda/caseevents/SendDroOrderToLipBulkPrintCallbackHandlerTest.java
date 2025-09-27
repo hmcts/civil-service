@@ -18,9 +18,7 @@ import uk.gov.hmcts.reform.civil.service.SendHearingBulkPrintService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_DRO_ORDER_TO_LIP_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_DRO_ORDER_TO_LIP_DEFENDANT;
@@ -45,18 +43,6 @@ public class SendDroOrderToLipBulkPrintCallbackHandlerTest extends BaseCallbackH
     public static final String TASK_ID_CLAIMANT = "SendDORToClaimantLIP";
 
     @Test
-    void shouldNotCallRecordScenario_whenWelshFlagIsDisabled() {
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
-
-        CallbackParams callbackParams = CallbackParamsBuilder.builder()
-            .of(ABOUT_TO_SUBMIT, CaseData.builder().build())
-            .build();
-
-        handler.handle(callbackParams);
-        verifyNoInteractions(sendDROBulkPrintService);
-    }
-
-    @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
         assertThat(handler.handledEvents()).contains(SEND_DRO_ORDER_TO_LIP_CLAIMANT);
         assertThat(handler.handledEvents()).contains(SEND_DRO_ORDER_TO_LIP_DEFENDANT);
@@ -75,7 +61,6 @@ public class SendDroOrderToLipBulkPrintCallbackHandlerTest extends BaseCallbackH
     @Test
     void shouldDownloadDocumentAndPrintLetterSuccessfullyForDefendantLiP() {
 
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         // given
         CaseData caseData = CaseDataBuilder.builder()
             .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(DECISION_MADE_ON_APPLICATIONS).build())).build();
@@ -93,7 +78,6 @@ public class SendDroOrderToLipBulkPrintCallbackHandlerTest extends BaseCallbackH
     @Test
     void shouldDownloadDocumentAndPrintLetterSuccessfullyForClaimantLiP() {
 
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         // given
         CaseData caseData = CaseDataBuilder.builder()
             .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(DECISION_MADE_ON_APPLICATIONS).build())).build();

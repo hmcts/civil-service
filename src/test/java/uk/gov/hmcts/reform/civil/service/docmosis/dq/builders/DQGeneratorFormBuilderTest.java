@@ -193,7 +193,6 @@ class DQGeneratorFormBuilderTest {
 
     @Test
     void shouldReturnForTrueForLipClaimantBilingual() {
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         CaseData caseData =
             CaseDataBuilder.builder().respondent1Represented(YesOrNo.YES).applicant1Represented(YesOrNo.NO)
                 .claimantBilingualLanguagePreference("BOTH").build().toBuilder().ccdState(
@@ -204,7 +203,6 @@ class DQGeneratorFormBuilderTest {
 
     @Test
     void shouldReturnForFalseForLipClaimantBilingual_ForOtherStates() {
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         when(state.getName()).thenReturn(FULL_ADMISSION.fullName());
         CaseData caseData =
             CaseDataBuilder.builder().respondent1Represented(YesOrNo.YES).applicant1Represented(YesOrNo.NO)

@@ -51,8 +51,7 @@ public class DashboardNotificationsParamsMapper {
         if (nonNull(caseEvent)) {
             switch (caseEvent) {
                 case CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT, CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT -> {
-                    if (featureToggleService.isWelshEnabledForMainCase()
-                        && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
+                    if (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual()) {
                         return null;
                     } else {
                         return getFirstFinalOrderUrlIfPresent(caseData);

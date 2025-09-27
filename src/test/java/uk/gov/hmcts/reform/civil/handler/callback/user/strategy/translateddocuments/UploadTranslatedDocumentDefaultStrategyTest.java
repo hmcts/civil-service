@@ -259,7 +259,6 @@ class UploadTranslatedDocumentDefaultStrategyTest {
     @Test
     void shouldUpdateBusinessProcess_WhenLrVsLipAndCcdState_InAwaitingClaimantResponse() {
         //Given
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         TranslatedDocument translatedDocument1 = TranslatedDocument
             .builder()
@@ -809,7 +808,6 @@ class UploadTranslatedDocumentDefaultStrategyTest {
             any(CaseData.class)
         )).willReturn(documents);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         TranslatedDocument translatedDocument1 = TranslatedDocument
             .builder()
             .documentType(CLAIM_ISSUE)
@@ -1073,7 +1071,6 @@ class UploadTranslatedDocumentDefaultStrategyTest {
     @Test
     void shouldUpdateBusinessProcess_WhenLipIsBilingual_documentTypeDefendantResponseOfLr() {
         //Given
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         TranslatedDocument translatedDocument1 = TranslatedDocument
             .builder()
             .documentType(DEFENDANT_RESPONSE)
@@ -1127,7 +1124,6 @@ class UploadTranslatedDocumentDefaultStrategyTest {
     @Test
     void shouldUpdateBusinessProcess_WhenLipIsBilingual_documentTypeDefendantResponseOfLrWhenNoTranslatedDOc() {
         //Given
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         TranslatedDocument translatedDocument1 = TranslatedDocument
             .builder()
             .documentType(NOTICE_OF_DISCONTINUANCE_DEFENDANT)

@@ -106,8 +106,7 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
             builder.messagesToReplyTo(messageService.createMessageSelectionList(caseData.getMessages()));
         }
 
-        if (featureToggleService.isWelshEnabledForMainCase()
-            && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
+        if ((caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
             builder.bilingualHint(YesOrNo.YES);
         }
 

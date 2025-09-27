@@ -26,7 +26,6 @@ import java.util.HashMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_UPLOAD_HEARING_DOCUMENTS_CLAIMANT;
@@ -59,12 +58,12 @@ class UploadHearingDocumentsClaimantHandlerTest extends BaseCallbackHandlerTest 
     @Test
     void shouldReturnCorrectCamundaActivityId_whenInvoked() {
         assertThat(handler.camundaActivityId(
-            CallbackParamsBuilder.builder()
-                .request(CallbackRequest.builder()
-                             .eventId(CREATE_DASHBOARD_NOTIFICATION_UPLOAD_HEARING_DOCUMENTS_CLAIMANT.name())
-                             .build())
-                .build()))
-            .isEqualTo(TASK_ID);
+                CallbackParamsBuilder.builder()
+                        .request(CallbackRequest.builder()
+                                .eventId(CREATE_DASHBOARD_NOTIFICATION_UPLOAD_HEARING_DOCUMENTS_CLAIMANT.name())
+                                .build())
+                        .build()))
+                .isEqualTo(TASK_ID);
     }
 
     @Test
@@ -72,33 +71,31 @@ class UploadHearingDocumentsClaimantHandlerTest extends BaseCallbackHandlerTest 
 
         params.put("ccdCaseReference", "1239988");
         when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
-        when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
         DynamicListElement selectedCourt = DynamicListElement.builder()
-            .code("00002").label("court 2 - 2 address - Y02 7RB").build();
+                .code("00002").label("court 2 - 2 address - Y02 7RB").build();
 
         CaseData caseData = CaseData.builder()
-            .legacyCaseReference("reference")
-            .applicant1Represented(YesOrNo.NO)
-            .ccdCaseReference(12349988L)
-            .drawDirectionsOrderRequired(YesOrNo.NO)
-            .claimsTrack(ClaimsTrack.fastTrack)
-            .ccdState(CaseState.CASE_PROGRESSION)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
-            .build();
+                .legacyCaseReference("reference")
+                .applicant1Represented(YesOrNo.NO)
+                .ccdCaseReference(12349988L)
+                .drawDirectionsOrderRequired(YesOrNo.NO)
+                .claimsTrack(ClaimsTrack.fastTrack)
+                .ccdState(CaseState.CASE_PROGRESSION)
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
+                .build();
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
-            .of(ABOUT_TO_SUBMIT, caseData)
-            .build();
+                .of(ABOUT_TO_SUBMIT, caseData)
+                .build();
 
         handler.handle(callbackParams);
         verify(dashboardScenariosService).recordScenarios(
-            "BEARER_TOKEN",
-            SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOAD_CLAIMANT.getScenario(),
-            caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
-        );
+                "BEARER_TOKEN",
+                SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOAD_CLAIMANT.getScenario(),
+                caseData.getCcdCaseReference().toString(),
+                ScenarioRequestParams.builder().params(params).build());
     }
 
     @Test
@@ -106,63 +103,30 @@ class UploadHearingDocumentsClaimantHandlerTest extends BaseCallbackHandlerTest 
 
         params.put("ccdCaseReference", "1239988");
         when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
-        when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(false);
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
         DynamicListElement selectedCourt = DynamicListElement.builder()
-            .code("00002").label("court 2 - 2 address - Y02 7RB").build();
+                .code("00002").label("court 2 - 2 address - Y02 7RB").build();
 
         CaseData caseData = CaseData.builder()
-            .legacyCaseReference("reference")
-            .applicant1Represented(YesOrNo.NO)
-            .ccdCaseReference(12349988L)
-            .drawDirectionsOrderRequired(YesOrNo.NO)
-            .claimsTrack(ClaimsTrack.fastTrack)
-            .ccdState(CaseState.CASE_PROGRESSION)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
-            .build();
+                .legacyCaseReference("reference")
+                .applicant1Represented(YesOrNo.NO)
+                .ccdCaseReference(12349988L)
+                .drawDirectionsOrderRequired(YesOrNo.NO)
+                .claimsTrack(ClaimsTrack.fastTrack)
+                .ccdState(CaseState.CASE_PROGRESSION)
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
+                .build();
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
-            .of(ABOUT_TO_SUBMIT, caseData)
-            .build();
+                .of(ABOUT_TO_SUBMIT, caseData)
+                .build();
 
         handler.handle(callbackParams);
         verify(dashboardScenariosService).recordScenarios(
-            "BEARER_TOKEN",
-            SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOAD_CLAIMANT.getScenario(),
-            caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
-        );
-    }
-
-    @Test
-    void createDashboardNotificationsAfterNroChangesAndWelshNotEnabledForMainCase() {
-
-        params.put("ccdCaseReference", "1239988");
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
-        when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(false);
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
-        when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-
-        DynamicListElement selectedCourt = DynamicListElement.builder()
-            .code("00002").label("court 2 - 2 address - Y02 7RB").build();
-
-        CaseData caseData = CaseData.builder()
-            .legacyCaseReference("reference")
-            .applicant1Represented(YesOrNo.NO)
-            .ccdCaseReference(12349988L)
-            .drawDirectionsOrderRequired(YesOrNo.NO)
-            .claimsTrack(ClaimsTrack.fastTrack)
-            .ccdState(CaseState.CASE_PROGRESSION)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
-            .build();
-
-        CallbackParams callbackParams = CallbackParamsBuilder.builder()
-            .of(ABOUT_TO_SUBMIT, caseData)
-            .build();
-
-        handler.handle(callbackParams);
-        verifyNoInteractions(dashboardScenariosService);
+                "BEARER_TOKEN",
+                SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOAD_CLAIMANT.getScenario(),
+                caseData.getCcdCaseReference().toString(),
+                ScenarioRequestParams.builder().params(params).build());
     }
 }

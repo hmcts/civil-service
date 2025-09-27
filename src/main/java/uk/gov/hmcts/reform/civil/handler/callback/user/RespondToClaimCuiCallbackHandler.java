@@ -59,10 +59,10 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
     private final Time time;
     private final FeatureToggleService featureToggleService;
     private final CaseFlagsInitialiser caseFlagsInitialiser;
-    @Value("${case-flags.logging.enabled:false}")
-    private boolean caseFlagsLoggingEnabled;
     private final UpdateCaseManagementDetailsService updateCaseManagementLocationDetailsService;
     private final RequestedCourtForClaimDetailsTab requestedCourtForClaimDetailsTab;
+    @Value("${case-flags.logging.enabled:false}")
+    private boolean caseFlagsLoggingEnabled;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -109,9 +109,7 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder responseBuilder =
             AboutToStartOrSubmitCallbackResponse.builder().data(updatedData.toMap(objectMapper));
 
-        boolean needsTranslating = featureToggleService.isWelshEnabledForMainCase()
-            ? (caseData.isRespondentResponseBilingual() || caseData.isClaimantBilingual())
-            : caseData.isRespondentResponseBilingual();
+        boolean needsTranslating = (caseData.isRespondentResponseBilingual() || caseData.isClaimantBilingual());
 
         if (!needsTranslating) {
             responseBuilder.state(CaseState.AWAITING_APPLICANT_INTENTION.name());
@@ -159,25 +157,25 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
             .applicant1ResponseDeadline(applicantDeadline)
             .nextDeadline(applicantDeadline.toLocalDate());
 
-        if (featureToggleService.isWelshEnabledForMainCase()) {
-            Optional<Language> optionalLanguage = Optional.ofNullable(caseData.getRespondent1DQ())
-                .map(Respondent1DQ::getRespondent1DQLanguage).map(WelshLanguageRequirements::getDocuments);
-            String respondentLanguageString = optionalLanguage.map(Language::name).orElse(null);
-            optionalLanguage.ifPresent(docLanguage -> {
-                CaseDataLiP caseDataLiP = caseData.getCaseDataLiP();
-                builder.caseDataLiP(caseDataLiP.toBuilder()
-                                        .respondent1LiPResponse(caseDataLiP.getRespondent1LiPResponse().toBuilder()
-                                                                    .respondent1ResponseLanguage(docLanguage.name()).build())
-                                        .build());
-            });
-            if (respondentLanguageString == null) {
-                respondentLanguageString = Optional.ofNullable(caseData.getCaseDataLiP())
-                    .map(CaseDataLiP::getRespondent1LiPResponse)
-                    .map(RespondentLiPResponse::getRespondent1ResponseLanguage)
-                    .orElse(null);
-            }
-            builder.defendantLanguagePreferenceDisplay(PreferredLanguage.fromString(respondentLanguageString));
+        Optional<Language> optionalLanguage = Optional.ofNullable(caseData.getRespondent1DQ())
+            .map(Respondent1DQ::getRespondent1DQLanguage).map(WelshLanguageRequirements::getDocuments);
+        String respondentLanguageString = optionalLanguage.map(Language::name).orElse(null);
+        optionalLanguage.ifPresent(docLanguage -> {
+            CaseDataLiP caseDataLiP = caseData.getCaseDataLiP();
+            builder.caseDataLiP(caseDataLiP.toBuilder()
+                                    .respondent1LiPResponse(caseDataLiP.getRespondent1LiPResponse().toBuilder()
+                                                                .respondent1ResponseLanguage(docLanguage.name())
+                                                                .build())
+                                    .build());
+        });
+        if (respondentLanguageString == null) {
+            respondentLanguageString = Optional.ofNullable(caseData.getCaseDataLiP())
+                .map(CaseDataLiP::getRespondent1LiPResponse)
+                .map(RespondentLiPResponse::getRespondent1ResponseLanguage)
+                .orElse(null);
         }
+        builder.defendantLanguagePreferenceDisplay(PreferredLanguage.fromString(respondentLanguageString));
+
         return builder.build();
     }
 }

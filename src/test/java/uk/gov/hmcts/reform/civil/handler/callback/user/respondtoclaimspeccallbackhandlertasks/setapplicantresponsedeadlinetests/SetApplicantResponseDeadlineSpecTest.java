@@ -31,7 +31,6 @@ import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
@@ -86,9 +85,6 @@ class SetApplicantResponseDeadlineSpecTest {
     private DeadlinesCalculator deadlinesCalculator;
 
     @Mock
-    private FeatureToggleService featureToggleService;
-
-    @Mock
     private CaseFlagsInitialiser caseFlagsInitialiser;
 
     @Mock
@@ -124,8 +120,7 @@ class SetApplicantResponseDeadlineSpecTest {
                 respondToClaimSpecUtils,
                 setApplicantResponseDeadlineCaseDataUpdaters,
                 expertsAndWitnessesCaseDataUpdaters,
-                requestedCourtForClaimDetailsTab,
-                featureToggleService
+                requestedCourtForClaimDetailsTab
         );
         when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
         when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());

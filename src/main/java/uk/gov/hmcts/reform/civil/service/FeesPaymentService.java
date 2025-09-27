@@ -68,8 +68,7 @@ public class FeesPaymentService {
     }
 
     private String getClaimantSelectedLanguage(CaseData caseData) {
-        return Objects.equals(caseData.getClaimantBilingualLanguagePreference(), "WELSH")
-            || (!featureToggleService.isWelshEnabledForMainCase() && Objects.equals(caseData.getClaimantBilingualLanguagePreference(), "BOTH")) ? "cy" : "en";
+        return Objects.equals(caseData.getClaimantBilingualLanguagePreference(), "WELSH") ? "cy" : "en";
     }
 
     public CardPaymentStatusResponse getGovPaymentRequestStatus(

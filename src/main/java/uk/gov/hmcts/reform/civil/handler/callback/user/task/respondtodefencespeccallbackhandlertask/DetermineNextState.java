@@ -234,9 +234,6 @@ public class DetermineNextState extends CallbackHandler {
     }
 
     private boolean claimantIntentionNeedsTranslation(CaseData caseData) {
-        if (!featureToggleService.isWelshEnabledForMainCase()) {
-            return false;
-        }
         boolean bilingualRequested = caseData.isLRvLipOneVOne() && caseData.isRespondentResponseBilingual();
         return bilingualRequested && translationRequiredInFlowState(caseData);
     }

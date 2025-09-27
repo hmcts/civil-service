@@ -28,9 +28,7 @@ public class CreateSDOAppSolOneEmailDTOGenerator extends AppSolOneEmailDTOGenera
     @Override
     protected String getEmailTemplateId(CaseData caseData) {
         if (caseData.getCaseAccessCategory() == SPEC_CLAIM) {
-            return (featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation())
-                || featureToggleService.isWelshEnabledForMainCase())
-                ? notificationsProperties.getSdoOrderedSpecEa() : notificationsProperties.getSdoOrderedSpec();
+            return notificationsProperties.getSdoOrderedSpecEa();
         }
 
         return notificationsProperties.getSdoOrdered();

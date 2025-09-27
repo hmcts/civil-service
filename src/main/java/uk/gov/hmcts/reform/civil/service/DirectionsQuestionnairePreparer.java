@@ -139,7 +139,7 @@ public class DirectionsQuestionnairePreparer {
     private void singleResponseFile(String bearerToken, CaseData caseData,
                                     CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
 
-        if (featureToggleService.isWelshEnabledForMainCase() && caseData.isLRvLipOneVOne()
+        if (caseData.isLRvLipOneVOne()
             && caseData.isRespondentResponseBilingual()
             && CaseState.AWAITING_APPLICANT_INTENTION.equals(caseData.getCcdState())) {
             isClaimantDqPreTranslation(bearerToken, caseData);
@@ -175,7 +175,7 @@ public class DirectionsQuestionnairePreparer {
                     );
                 }
             }
-            if (featureToggleService.isWelshEnabledForMainCase() && caseData.isLipvLROneVOne()
+            if (caseData.isLipvLROneVOne()
                 && caseData.isClaimantBilingual()
                 && CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT.equals(caseData.getCcdState())) {
                 caseDataBuilder.respondent1OriginalDqDoc(directionsQuestionnaire);

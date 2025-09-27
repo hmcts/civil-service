@@ -26,7 +26,6 @@ import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
@@ -78,7 +77,6 @@ public class SetApplicantResponseDeadlineSpec implements CaseTask {
     private final List<SetApplicantResponseDeadlineCaseDataUpdater> setApplicantResponseDeadlineCaseDataUpdaters;
     private final List<ExpertsAndWitnessesCaseDataUpdater> expertsAndWitnessesCaseDataUpdaters;
     private final RequestedCourtForClaimDetailsTab requestedCourtForClaimDetailsTab;
-    private final FeatureToggleService featureToggleService;
 
     public static void getUserInfo(CallbackParams callbackParams, CaseData.CaseDataBuilder<?, ?> updatedData,
                                    CaseData caseData, UserService userService, CoreCaseUserService coreCaseUserService) {
@@ -268,7 +266,7 @@ public class SetApplicantResponseDeadlineSpec implements CaseTask {
         }
         respondToClaimSpecUtils.assembleResponseDocumentsSpec(caseData, updatedData);
 
-        if (featureToggleService.isWelshEnabledForMainCase() && caseData.isLipvLROneVOne()
+        if (caseData.isLipvLROneVOne()
                 && caseData.isClaimantBilingual()) {
             return AboutToStartOrSubmitCallbackResponse.builder()
                     .data(updatedData.build().toMap(objectMapper))

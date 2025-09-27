@@ -147,8 +147,7 @@ public class GenerateDiscontinueClaimCallbackHandler extends CallbackHandler {
             }
             respondent2DiscontinueDoc = generateForm(respondent2Name, respondent2Address, "defendant2", callbackParams, isRespondentLiP);
         }
-        if (featureToggleService.isWelshEnabledForMainCase()
-            && caseData.isRespondent1LiP()
+        if (caseData.isRespondent1LiP()
             && caseData.getTypeOfDiscontinuance().equals(DiscontinuanceTypeList.PART_DISCONTINUANCE)
             && caseData.isRespondentResponseBilingual()
             && SettleDiscontinueYesOrNoList.NO.equals(caseData.getCourtPermissionNeeded())) {
@@ -203,8 +202,7 @@ public class GenerateDiscontinueClaimCallbackHandler extends CallbackHandler {
         runTimeService.setVariable(
             caseData.getBusinessProcess().getProcessInstanceId(),
             "WELSH_ENABLED",
-            featureToggleService.isWelshEnabledForMainCase()
-                && caseData.isRespondent1LiP()
+            caseData.isRespondent1LiP()
                 && caseData.getTypeOfDiscontinuance().equals(DiscontinuanceTypeList.PART_DISCONTINUANCE)
                 && caseData.isRespondentResponseBilingual()
         );
