@@ -72,7 +72,7 @@ public class DraftTransitionBuilderTest {
     void shouldReturnTrue_whenCaseDataAtClaimSubmittedState() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
         assertTrue(claimSubmittedOneRespondentRepresentative.test(caseData));
-        assertThat(getCaseFlags(result.get(0), caseData)).hasSize(12).contains(
+        assertThat(getCaseFlags(result.get(0), caseData)).hasSize(11).contains(
             entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
             entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
             entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
@@ -81,7 +81,6 @@ public class DraftTransitionBuilderTest {
             entry("ONE_RESPONDENT_REPRESENTATIVE", true),
             entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false),
             entry(FlowFlag.WELSH_ENABLED.name(), false),
-            entry(FlowFlag.PUBLIC_QUERIES_ENABLED.name(), false),
             entry(FlowFlag.JBA_ISSUED_BEFORE_NOC.name(), false),
             entry(FlowFlag.IS_CJES_SERVICE_ENABLED.name(), false)
         );
@@ -93,7 +92,7 @@ public class DraftTransitionBuilderTest {
         when(mockFeatureToggleService.isDashboardEnabledForCase(any())).thenReturn(true);
 
         assertTrue(claimSubmittedOneRespondentRepresentative.test(caseData));
-        assertThat(getCaseFlags(result.get(0), caseData)).hasSize(12).contains(
+        assertThat(getCaseFlags(result.get(0), caseData)).hasSize(11).contains(
             entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
             entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
             entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
@@ -102,7 +101,6 @@ public class DraftTransitionBuilderTest {
             entry("ONE_RESPONDENT_REPRESENTATIVE", true),
             entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false),
             entry(FlowFlag.WELSH_ENABLED.name(), false),
-            entry(FlowFlag.PUBLIC_QUERIES_ENABLED.name(), false),
             entry(FlowFlag.JBA_ISSUED_BEFORE_NOC.name(), false),
             entry(FlowFlag.IS_CJES_SERVICE_ENABLED.name(), false)
         );
@@ -171,7 +169,7 @@ public class DraftTransitionBuilderTest {
 
         assertFalse(claimSubmittedTwoRegisteredRespondentRepresentatives.test(caseData));
         assertTrue(claimSubmittedTwoRespondentRepresentativesOneUnregistered.test(caseData));
-        assertThat(getCaseFlags(result.get(1), caseData)).hasSize(13).contains(
+        assertThat(getCaseFlags(result.get(1), caseData)).hasSize(12).contains(
             entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
             entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
             entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
@@ -181,7 +179,6 @@ public class DraftTransitionBuilderTest {
             entry("TWO_RESPONDENT_REPRESENTATIVES", true),
             entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false),
             entry(FlowFlag.WELSH_ENABLED.name(), false),
-            entry(FlowFlag.PUBLIC_QUERIES_ENABLED.name(), false),
             entry(FlowFlag.JBA_ISSUED_BEFORE_NOC.name(), false),
             entry(FlowFlag.IS_CJES_SERVICE_ENABLED.name(), false)
         );
@@ -211,7 +208,7 @@ public class DraftTransitionBuilderTest {
         assertFalse(claimSubmittedTwoRegisteredRespondentRepresentatives.test(caseData));
         assertTrue(claimSubmittedRespondent1Unrepresented.test(caseData));
         assertTrue(claimSubmittedRespondent2Unrepresented.test(caseData));
-        assertThat(getCaseFlags(result.get(5), caseData)).hasSize(13).contains(
+        assertThat(getCaseFlags(result.get(5), caseData)).hasSize(12).contains(
             entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
             entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), true),
             entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
@@ -221,7 +218,6 @@ public class DraftTransitionBuilderTest {
             entry("UNREPRESENTED_DEFENDANT_TWO", true),
             entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), true),
             entry(FlowFlag.WELSH_ENABLED.name(), false),
-            entry(FlowFlag.PUBLIC_QUERIES_ENABLED.name(), false),
             entry(FlowFlag.JBA_ISSUED_BEFORE_NOC.name(), false),
             entry(FlowFlag.IS_CJES_SERVICE_ENABLED.name(), false)
         );
@@ -262,7 +258,7 @@ public class DraftTransitionBuilderTest {
 
         assertTrue(claimSubmittedOneUnrepresentedDefendantOnly.test(caseData));
         assertTrue(claimSubmittedRespondent1Unrepresented.test(caseData));
-        assertThat(getCaseFlags(result.get(2), caseData)).hasSize(12).contains(
+        assertThat(getCaseFlags(result.get(2), caseData)).hasSize(11).contains(
             entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
             entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), true),
             entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
@@ -271,7 +267,6 @@ public class DraftTransitionBuilderTest {
             entry("UNREPRESENTED_DEFENDANT_ONE", true),
             entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), true),
             entry(FlowFlag.WELSH_ENABLED.name(), false),
-            entry(FlowFlag.PUBLIC_QUERIES_ENABLED.name(), false),
             entry(FlowFlag.JBA_ISSUED_BEFORE_NOC.name(), false),
             entry(FlowFlag.IS_CJES_SERVICE_ENABLED.name(), false)
         );
@@ -295,7 +290,7 @@ public class DraftTransitionBuilderTest {
 
         assertFalse(claimSubmittedRespondent1Unrepresented.test(caseData));
         assertTrue(claimSubmittedRespondent2Unrepresented.test(caseData));
-        assertThat(getCaseFlags(result.get(3), caseData)).hasSize(13).contains(
+        assertThat(getCaseFlags(result.get(3), caseData)).hasSize(12).contains(
             entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
             entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), true),
             entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
@@ -305,7 +300,6 @@ public class DraftTransitionBuilderTest {
             entry("UNREPRESENTED_DEFENDANT_TWO", false),
             entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false),
             entry(FlowFlag.WELSH_ENABLED.name(), false),
-            entry(FlowFlag.PUBLIC_QUERIES_ENABLED.name(), false),
             entry(FlowFlag.JBA_ISSUED_BEFORE_NOC.name(), false),
             entry(FlowFlag.IS_CJES_SERVICE_ENABLED.name(), false)
         );
@@ -338,7 +332,7 @@ public class DraftTransitionBuilderTest {
                                 .build())
             .build();
 
-        assertThat(getCaseFlags(result.get(3), caseData)).hasSize(13).contains(
+        assertThat(getCaseFlags(result.get(3), caseData)).hasSize(12).contains(
             entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
             entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), true),
             entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),

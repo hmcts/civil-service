@@ -17,7 +17,6 @@ import uk.gov.hmcts.reform.civil.model.querymanagement.CaseQueriesCollection;
 import uk.gov.hmcts.reform.civil.model.querymanagement.LatestQuery;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.querymanagement.QueryManagementCamundaService;
 import uk.gov.hmcts.reform.civil.service.querymanagement.QueryManagementVariables;
@@ -53,9 +52,6 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
     private DashboardScenariosService dashboardScenariosService;
 
     @Mock
-    private FeatureToggleService featureToggleService;
-
-    @Mock
     private CoreCaseUserService coreCaseUserService;
 
     @Mock
@@ -83,7 +79,6 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
         when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(CLAIMANT.getFormattedName()));
         when(runtimeService.getProcessVariables(any())).thenReturn(QueryManagementVariables.builder().queryId("123456")
                                                                        .build());
@@ -144,7 +139,6 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
         when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(DEFENDANT.getFormattedName()));
         when(runtimeService.getProcessVariables(any())).thenReturn(QueryManagementVariables.builder().queryId("123457")
                                                                        .build());
@@ -205,7 +199,6 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
         when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(DEFENDANT.getFormattedName()));
         when(runtimeService.getProcessVariables(any())).thenReturn(QueryManagementVariables.builder().queryId("123457")
                                                                        .build());
@@ -265,7 +258,6 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
         when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(CLAIMANT.getFormattedName()));
         when(runtimeService.getProcessVariables(any())).thenReturn(QueryManagementVariables.builder().queryId("123457")
                                                                        .build());

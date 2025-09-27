@@ -147,7 +147,7 @@ class EventEmitterServiceTest {
             .ccdCaseReference(caseId);
 
         if (TEST_EVENT_QM.equals(event) || TEST_EVENT_QM_RESPONSE.equals(event)) {
-            caseDataBuilder.qmApplicantSolicitorQueries(CaseQueriesCollection.builder()
+            caseDataBuilder.queries(CaseQueriesCollection.builder()
                                                             .caseMessages(wrapElements(
                                                                 CaseMessage.builder()
                                                                     .id("1")
