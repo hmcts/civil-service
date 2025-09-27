@@ -267,6 +267,11 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
         modificationRequest.put("skipIoMappings", false);
 
         List<Map<String, Object>> instructions = new ArrayList<>();
+        Map<String, Object> cancelInstruction = new HashMap<>();
+        cancelInstruction.put("type", "cancelActivityInstance");
+        cancelInstruction.put("activityId", failedActivityId);
+        instructions.add(cancelInstruction);
+
         Map<String, Object> startBeforeInstruction = new HashMap<>();
         startBeforeInstruction.put("type", "startBeforeActivity");
         startBeforeInstruction.put("activityId", failedActivityId);
