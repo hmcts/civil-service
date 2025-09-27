@@ -861,7 +861,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldNotCauseAnyErrors_whenGaTypeIsNotSettleOrDiscontinueConsentCoscEnabled() {
 
-            when(featureToggleService.isCoSCEnabled()).thenReturn(true);
             when(theUserService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
 
             when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
@@ -892,7 +891,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
             when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
                 .thenReturn(List.of(CaseRole.APPLICANTSOLICITORONE.getFormattedName()));
-            when(featureToggleService.isCoSCEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder
                 .builder()
                 .ccdCaseReference(1234L)
@@ -913,7 +911,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldCauseError_whenGaTypeIsNotSettleOrDiscontinueConsentNoCoscEnabled() {
 
-            when(featureToggleService.isCoSCEnabled()).thenReturn(true);
             when(theUserService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
 
             when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
@@ -1279,7 +1276,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                                 .code(FEE_CODE)
                                 .calculatedAmountInPence(fee275)
                                 .version(FEE_VERSION).build());
-            when(featureToggleService.isCoSCEnabled()).thenReturn(true);
             when(theUserService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
 
             when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
@@ -1334,7 +1330,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                                 .build());
             CaseData caseData = GeneralApplicationDetailsBuilder.builder().getTestCaseDataForApplicationFee(
                 CaseDataBuilder.builder().build(), false, false);
-            when(featureToggleService.isCoSCEnabled()).thenReturn(true);
 
             when(theUserService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
 
@@ -1384,7 +1379,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = GeneralApplicationDetailsBuilder.builder().getTestCaseDataForApplicationFee(
                 CaseDataBuilder.builder().build(), false, false);
 
-            when(featureToggleService.isCoSCEnabled()).thenReturn(true);
             when(theUserService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
                 .thenReturn(List.of(CaseRole.APPLICANTSOLICITORONE.getFormattedName()));
@@ -1563,7 +1557,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
                                                                             .email(APPLICANT_EMAIL_ID_CONSTANT)
                                                                             .build());
-
+            when(theUserService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(initiateGeneralAppService.buildCaseData(any(CaseData.CaseDataBuilder.class),
                     any(CaseData.class), any(UserDetails.class), anyString())).thenAnswer((Answer) invocation -> invocation.getArguments()[1]
             );
