@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -27,8 +28,10 @@ import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -408,5 +411,76 @@ class IncidentRetryEventHandlerTest {
                     && failedActivityId.equals(startInstr.get("activityId"));
             })
         );
+    }
+
+    @Test
+    void shouldRetryIncidentAndCoverChildActivityRecursion() {
+        // Arrange
+        String processInstanceId = "proc1";
+        String failedActivityId = "childActivity";
+        String jobId = "job1";
+        String serviceAuth = "serviceAuth";
+
+        when(authTokenGenerator.generate()).thenReturn(serviceAuth);
+
+        // Mock process instance
+        ProcessInstanceDto processInstanceDto = new ProcessInstanceDto();
+        processInstanceDto.setId(processInstanceId);
+        when(camundaRuntimeApi.queryProcessInstances(anyString(), anyInt(), anyInt(), anyString(), anyString(), anyMap()))
+            .thenReturn(List.of(processInstanceDto));
+
+        // Mock incident
+        IncidentDto incident = new IncidentDto();
+        incident.setId("inc1");
+        incident.setProcessInstanceId(processInstanceId);
+        incident.setActivityId(failedActivityId);
+        incident.setConfiguration(jobId);
+
+        when(camundaRuntimeApi.getLatestOpenIncidentForProcessInstance(
+            anyString(), anyBoolean(), eq(processInstanceId), anyString(), anyString(), anyInt()))
+            .thenReturn(List.of(incident));
+
+        // Mock caseId fetch
+        HashMap<String, VariableValueDto> emptyVariables = new HashMap<>();
+        when(camundaRuntimeApi.getProcessVariables(eq(processInstanceId), eq(serviceAuth)))
+            .thenReturn(emptyVariables);
+
+        // Build activity instance tree with child
+        ActivityInstanceDto childActivity = new ActivityInstanceDto();
+        childActivity.setActivityId(failedActivityId);
+        childActivity.setId("child1");
+        childActivity.setChildActivityInstances(Collections.emptyList());
+
+        ActivityInstanceDto rootActivity = new ActivityInstanceDto();
+        rootActivity.setActivityId("rootActivity");
+        rootActivity.setId("root1");
+        rootActivity.setChildActivityInstances(List.of(childActivity));
+
+        when(camundaRuntimeApi.getActivityInstances(eq(serviceAuth), eq(processInstanceId)))
+            .thenReturn(rootActivity);
+
+        doNothing().when(camundaRuntimeApi).modifyProcessInstance(eq(serviceAuth), eq(processInstanceId), any());
+
+        // Mock external task variables
+        when(externalTask.getVariable("incidentStartTime")).thenReturn(null);
+        when(externalTask.getVariable("incidentEndTime")).thenReturn(null);
+        when(externalTask.getVariable("incidentMessageLike")).thenReturn(null);
+
+        // Act
+        ExternalTaskData result = handler.handleTask(externalTask);
+
+        // Assert
+        assertNotNull(result);
+
+        // Verify that the process instance modification was invoked
+        verify(camundaRuntimeApi, times(1))
+            .modifyProcessInstance(eq(serviceAuth), eq(processInstanceId), argThat(map -> {
+                @SuppressWarnings("unchecked")
+                List<Map<String, Object>> instructions = (List<Map<String, Object>>) map.get("instructions");
+                return instructions.stream().anyMatch(instr ->
+                                                          "startBeforeActivity".equals(instr.get("type")) &&
+                                                              failedActivityId.equals(instr.get("activityId"))
+                );
+            }));
     }
 }
