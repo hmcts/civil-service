@@ -125,7 +125,7 @@ public class StateFlowEngineUnspecTest {
         assertThat(stateFlow.getFlags()).contains(
             entry(FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), true)
         );
-        assertThat(stateFlow.getFlags()).hasSize(12);    // bonus: if this fails, a flag was added/removed but tests were not updated
+        assertThat(stateFlow.getFlags()).hasSize(11);    // bonus: if this fails, a flag was added/removed but tests were not updated
     }
 
     @ParameterizedTest(name = "{index}: The state flow flags ONE_RESPONDENT_REPRESENTATIVE " +
@@ -140,7 +140,7 @@ public class StateFlowEngineUnspecTest {
             entry(FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), false),
             entry(FlowFlag.TWO_RESPONDENT_REPRESENTATIVES.name(), true)
         );
-        assertThat(stateFlow.getFlags()).hasSize(13);    // bonus: if this fails, a flag was added/removed but tests were not updated
+        assertThat(stateFlow.getFlags()).hasSize(12);    // bonus: if this fails, a flag was added/removed but tests were not updated
     }
 }
 
