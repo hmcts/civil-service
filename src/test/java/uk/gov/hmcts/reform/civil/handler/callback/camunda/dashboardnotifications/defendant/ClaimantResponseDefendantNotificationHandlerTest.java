@@ -629,43 +629,6 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
     }
 
     @Test
-    void shouldCreateNotificationForDefendantWhenClaimantLrAcceptPaymentPlan() {
-        HashMap<String, Object> params = new HashMap<>();
-
-        when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-
-        CaseData caseData = CaseData.builder()
-            .legacyCaseReference("reference")
-            .ccdCaseReference(1000001L)
-            .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
-            .respondent1Represented(YesOrNo.NO)
-            .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES)
-            .ccjPaymentDetails(CCJPaymentDetails.builder()
-                                   .ccjPaymentPaidSomeOption(YesOrNo.NO)
-                                   .build())
-            .build();
-
-        CallbackParams callbackParams = CallbackParamsBuilder.builder()
-            .of(ABOUT_TO_SUBMIT, caseData)
-            .build();
-
-        handler.handle(callbackParams);
-        verify(dashboardScenariosService).recordScenarios(
-            "BEARER_TOKEN",
-            SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT_ACCEPTED_DEFENDANT_PLAN_DEFENDANT.getScenario(),
-            caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
-        );
-        verify(dashboardScenariosService).recordScenarios(
-            "BEARER_TOKEN",
-            SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_DEFENDANT.getScenario(),
-            caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
-        );
-    }
-
-    @Test
     void shouldReturnNullWhenNothingIsMatched_Applicant1RejectPaymentPlan() {
         HashMap<String, Object> params = new HashMap<>();
 
