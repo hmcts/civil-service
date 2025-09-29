@@ -20,7 +20,7 @@ ext.libraries = [
 dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-web'
   implementation group: 'org.hibernate', name: 'hibernate-core', version: '7.1.1.Final'
-  implementation group: 'org.hibernate', name: 'hibernate-validator', version: '9.0.1.Final'
+  implementation group: 'org.hibernate', name: 'hibernate-validator', version: '8.0.3.Final'
   implementation group: 'jakarta.persistence', name: 'jakarta.persistence-api', version: '3.2.0'
   implementation 'jakarta.inject:jakarta.inject-api:2.0.1'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: '2.7.18'
