@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -76,12 +75,7 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
         if (isEvent(callbackParams, CREATE_SERVICE_REQUEST_API_HMC)) {
             String processInstanceId = caseData.getBusinessProcess().getProcessInstanceId();
             HearingNoticeVariables camundaVars = camundaService.getProcessVariables(processInstanceId);
-            String hearingType = camundaVars.getHearingType();
-            if (StringUtils.isBlank(hearingType)) {
-                log.error("Hearing type must not be null or blank, hearingType : {}", hearingType);
-                throw new IllegalArgumentException("Hearing type must not be null or blank");
-            }
-            boolean requiresHearingFee = hearingFeeRequired(hearingType);
+            boolean requiresHearingFee = hearingFeeRequired(camundaVars.getHearingType());
 
             CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
             if (isServiceRequestNotRequested(caseData.getHearingFeePBADetails()) && requiresHearingFee) {
