@@ -304,17 +304,14 @@ class IncidentRetryEventHandlerTest {
 
     @Test
     void shouldRetryProcessInstance_whenActivityInstanceExists() {
-        String processInstanceId = "proc1";
-        String failedActivityId = "activity1";
         String serviceAuth = "serviceAuth";
 
         when(authTokenGenerator.generate()).thenReturn(serviceAuth);
         when(externalTask.getVariable("incidentStartTime")).thenReturn("2025-01-01T00:00:00Z");
         when(externalTask.getVariable("incidentEndTime")).thenReturn("2025-12-31T23:59:59Z");
 
-        // Mock process instance
-        ProcessInstanceDto pi = newProcessInstance(processInstanceId);
-
+        String processInstanceId = "proc1";
+        String failedActivityId = "activity1";
         // Mock an incident
         IncidentDto incident = newIncident(processInstanceId, "inc1", "job1");
         incident.setActivityId(failedActivityId);
@@ -325,6 +322,8 @@ class IncidentRetryEventHandlerTest {
         var.setValue("case-1");
         variables.put("caseId", var);
 
+        // Mock process instance
+        ProcessInstanceDto pi = newProcessInstance(processInstanceId);
         when(camundaRuntimeApi.queryProcessInstances(any(), anyInt(), anyInt(), anyString(), anyString(), anyMap()))
             .thenReturn(List.of(pi));
         when(camundaRuntimeApi.getLatestOpenIncidentForProcessInstance(any(), anyBoolean(), eq(processInstanceId), any(), any(), anyInt()))
@@ -363,18 +362,19 @@ class IncidentRetryEventHandlerTest {
 
     @Test
     void shouldLogAndContinue_whenActivityInstanceNotFound() {
-        String processInstanceId = "proc1";
-        String failedActivityId = "missingActivity";
         String serviceAuth = "serviceAuth";
 
         when(authTokenGenerator.generate()).thenReturn(serviceAuth);
         when(externalTask.getVariable("incidentStartTime")).thenReturn("2025-01-01T00:00:00Z");
         when(externalTask.getVariable("incidentEndTime")).thenReturn("2025-12-31T23:59:59Z");
 
-        ProcessInstanceDto pi = newProcessInstance(processInstanceId);
+        String processInstanceId = "proc1";
         IncidentDto incident = newIncident(processInstanceId, "inc1", "job1");
+
+        String failedActivityId = "missingActivity";
         incident.setActivityId(failedActivityId);
 
+        ProcessInstanceDto pi = newProcessInstance(processInstanceId);
         when(camundaRuntimeApi.queryProcessInstances(any(), anyInt(), anyInt(), anyString(), anyString(), anyMap()))
             .thenReturn(List.of(pi));
         when(camundaRuntimeApi.getLatestOpenIncidentForProcessInstance(any(), anyBoolean(), eq(processInstanceId), any(), any(), anyInt()))
