@@ -33,7 +33,6 @@ import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.querymanagement.QueryManagementCamundaService;
 import uk.gov.hmcts.reform.civil.service.querymanagement.QueryManagementVariables;
@@ -90,9 +89,6 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
     private QueryManagementCamundaService runtimeService;
 
     @Mock
-    private FeatureToggleService featureToggleService;
-
-    @Mock
     private NotificationsSignatureConfiguration configuration;
 
     @Captor
@@ -142,13 +138,10 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
 
             @ParameterizedTest
             @CsvSource({
-                "APPLICANTSOLICITORONE, respondent1@email.com, false",
-                "RESPONDENTSOLICITORONE, applicant@email.com, false",
-                "APPLICANTSOLICITORONE, respondent1@email.com, true",
-                "RESPONDENTSOLICITORONE, applicant@email.com, true"
+                "APPLICANTSOLICITORONE, respondent1@email.com",
+                "RESPONDENTSOLICITORONE, applicant@email.com"
             })
-            void shouldNotifyOtherParty_whenQueryRaisedOnCase_OneRespondentRepresentative(String caseRole, String email, String toggle) {
-                when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(Boolean.valueOf(toggle));
+            void shouldNotifyOtherParty_whenQueryRaisedOnCase_OneRespondentRepresentative(String caseRole, String email) {
                 when(runtimeService.getProcessVariables(any()))
                     .thenReturn(QueryManagementVariables.builder()
                                     .queryId("1")
@@ -169,10 +162,9 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
 
             @ParameterizedTest
             @CsvSource({
-                "APPLICANTSOLICITORONE, respondent1@email.com, false",
+                "APPLICANTSOLICITORONE, respondent1@email.com",
             })
-            void shouldNotifyOtherParty_whenQueryRaisedOnCase_OneRespondentRepresentative_atStateClaimIssued(String caseRole, String email, String toggle) {
-                when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(Boolean.valueOf(toggle));
+            void shouldNotifyOtherParty_whenQueryRaisedOnCase_OneRespondentRepresentative_atStateClaimIssued(String caseRole, String email) {
                 when(runtimeService.getProcessVariables(any()))
                     .thenReturn(QueryManagementVariables.builder()
                                     .queryId("1")
@@ -189,13 +181,10 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
 
             @ParameterizedTest
             @CsvSource({
-                "RESPONDENTSOLICITORTWO, applicant@email.com, false",
-                "RESPONDENTSOLICITORONE, applicant@email.com, false",
-                "RESPONDENTSOLICITORTWO, applicant@email.com, true",
-                "RESPONDENTSOLICITORONE, applicant@email.com, true",
+                "RESPONDENTSOLICITORTWO, applicant@email.com",
+                "RESPONDENTSOLICITORONE, applicant@email.com",
             })
-            void shouldNotifyOtherParty_whenQueryRaisedOnCase_OneRespondentRepresentative_applicantIsOtherParty(String caseRole, String email, String toggle) {
-                when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(Boolean.valueOf(toggle));
+            void shouldNotifyOtherParty_whenQueryRaisedOnCase_OneRespondentRepresentative_applicantIsOtherParty(String caseRole, String email) {
                 when(runtimeService.getProcessVariables(any()))
                     .thenReturn(QueryManagementVariables.builder()
                                     .queryId("2")
@@ -216,15 +205,11 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
 
             @ParameterizedTest
             @CsvSource({
-                "RESPONDENTSOLICITORTWO, applicant@email.com, respondent1@email.com, false",
-                "RESPONDENTSOLICITORONE, applicant@email.com, respondent2@email.com, false",
-                "APPLICANTSOLICITORONE, respondent1@email.com, respondent2@email.com, false",
-                "RESPONDENTSOLICITORTWO, applicant@email.com, respondent1@email.com, true",
-                "RESPONDENTSOLICITORONE, applicant@email.com, respondent2@email.com, true",
-                "APPLICANTSOLICITORONE, respondent1@email.com, respondent2@email.com, true"
+                "RESPONDENTSOLICITORTWO, applicant@email.com, respondent1@email.com",
+                "RESPONDENTSOLICITORONE, applicant@email.com, respondent2@email.com",
+                "APPLICANTSOLICITORONE, respondent1@email.com, respondent2@email.com"
             })
-            void shouldNotifyOtherParty_whenQueryRaisedOnCase_TwoRespondentRepresentative(String caseRole, String email, String emailDef2, String toggle) {
-                when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(Boolean.valueOf(toggle));
+            void shouldNotifyOtherParty_whenQueryRaisedOnCase_TwoRespondentRepresentative(String caseRole, String email, String emailDef2) {
                 when(runtimeService.getProcessVariables(any()))
                     .thenReturn(QueryManagementVariables.builder()
                                     .queryId("3")
@@ -292,7 +277,6 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
             @ParameterizedTest
             @ValueSource(booleans = {true, false})
             void shouldNotifyOtherParty_whenQueryRaisedOnLipCase_OtherPartyLipApplicant(boolean isWelsh) {
-                when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
                 CaseQueriesCollection query = CaseQueriesCollection.builder()
                     .roleOnCase(CaseRole.RESPONDENTSOLICITORONE.toString())
                     .caseMessages(wrapElements(CaseMessage.builder()
@@ -341,7 +325,6 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
             @ParameterizedTest
             @ValueSource(booleans = {true, false})
             void shouldNotifyOtherParty_whenQueryRaisedOnLipCase_OtherPartyLipRespondent(boolean isWelsh) {
-                when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
                 CaseQueriesCollection query = CaseQueriesCollection.builder()
                     .roleOnCase(CaseRole.APPLICANTSOLICITORONE.toString())
                     .caseMessages(wrapElements(CaseMessage.builder()
@@ -391,7 +374,6 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
 
             @Test
             void shouldNotifyOtherParty_whenQueryRaisedOnLipCase_OtherPartyLrApplicant() {
-                when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
                 CaseQueriesCollection query = CaseQueriesCollection.builder()
                     .roleOnCase(CaseRole.DEFENDANT.toString())
                     .caseMessages(wrapElements(CaseMessage.builder()
@@ -425,7 +407,6 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
 
             @Test
             void shouldNotifyOtherParty_whenQueryRaisedOnLipCase_OtherPartyLrRespondent() {
-                when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
                 CaseQueriesCollection query = CaseQueriesCollection.builder()
                     .roleOnCase(CaseRole.CLAIMANT.toString())
                     .caseMessages(wrapElements(CaseMessage.builder()
@@ -457,7 +438,6 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
 
             @Test
             void shouldNotifyOtherParty_whenQueryRaisedOnLipCase_OtherPartyLrRespondent_atStateClaimIssued() {
-                when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
                 CaseQueriesCollection query = CaseQueriesCollection.builder()
                     .roleOnCase(CaseRole.CLAIMANT.toString())
                     .caseMessages(wrapElements(CaseMessage.builder()
@@ -485,7 +465,6 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
 
             @Test
             void shouldNotifyOtherParty_whenQueryRaisedOnLipCase_TwoRespondentRepresentative() {
-                when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
                 CaseQueriesCollection query = CaseQueriesCollection.builder()
                     .roleOnCase(CaseRole.CLAIMANT.toString())
                     .caseMessages(wrapElements(CaseMessage.builder()
@@ -529,7 +508,6 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
 
             @Test
             void shouldNotifyOtherParty_whenwhenIsUnpecClaim_and_CaseIssued() {
-                when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
                 CaseQueriesCollection query = CaseQueriesCollection.builder()
                     .roleOnCase(CaseRole.CLAIMANT.toString())
                     .caseMessages(wrapElements(CaseMessage.builder()
@@ -559,7 +537,6 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
 
             @Test
             void shouldNotifyOtherParty_whenIsUnpecClaim_and_awaiting_case_details_notification() {
-                when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
                 CaseQueriesCollection query = CaseQueriesCollection.builder()
                     .roleOnCase(CaseRole.CLAIMANT.toString())
                     .caseMessages(wrapElements(CaseMessage.builder()
@@ -590,28 +567,22 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
         }
 
         private CaseData createCaseDataWithQueries1v1() {
-            CaseQueriesCollection applicantQuery = CaseQueriesCollection.builder()
-                .roleOnCase(CaseRole.APPLICANTSOLICITORONE.toString())
-                .caseMessages(wrapElements(CaseMessage.builder()
-                                               .id("1")
-                                               .build()))
-                .build();
-
-            CaseQueriesCollection respondent1Query = CaseQueriesCollection.builder()
-                .roleOnCase(CaseRole.RESPONDENTSOLICITORONE.toString())
-                .caseMessages(wrapElements(CaseMessage.builder()
-                                               .id("2")
-                                               .build()))
-                .build();
-
             return CaseDataBuilder.builder().atStateAwaitingResponseFullDefenceReceived().build()
                 .toBuilder()
                 .applicantSolicitor1UserDetails(IdamUserDetails.builder()
                                                     .email("applicant@email.com")
                                                     .build())
                 .respondentSolicitor1EmailAddress("respondent1@email.com")
-                .qmApplicantSolicitorQueries(applicantQuery)
-                .qmRespondentSolicitor1Queries(respondent1Query)
+                .queries(CaseQueriesCollection.builder()
+                             .caseMessages(wrapElements(
+                                 CaseMessage.builder()
+                                     .id("1")
+                                     .build(),
+                                 CaseMessage.builder()
+                                     .id("2")
+                                     .build()
+                             ))
+                             .build())
                 .businessProcess(BusinessProcess.builder()
                                      .processInstanceId("123")
                                      .build())
@@ -619,28 +590,22 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
         }
 
         private CaseData createCaseDataWithQueries1v1AtStateClaimIssued() {
-            CaseQueriesCollection applicantQuery = CaseQueriesCollection.builder()
-                .roleOnCase(CaseRole.APPLICANTSOLICITORONE.toString())
-                .caseMessages(wrapElements(CaseMessage.builder()
-                                               .id("1")
-                                               .build()))
-                .build();
-
-            CaseQueriesCollection respondent1Query = CaseQueriesCollection.builder()
-                .roleOnCase(CaseRole.RESPONDENTSOLICITORONE.toString())
-                .caseMessages(wrapElements(CaseMessage.builder()
-                                               .id("2")
-                                               .build()))
-                .build();
-
             return CaseDataBuilder.builder().atStateClaimIssued().build()
                 .toBuilder()
                 .applicantSolicitor1UserDetails(IdamUserDetails.builder()
                                                     .email("applicant@email.com")
                                                     .build())
                 .respondentSolicitor1EmailAddress("respondent1@email.com")
-                .qmApplicantSolicitorQueries(applicantQuery)
-                .qmRespondentSolicitor1Queries(respondent1Query)
+                .queries(CaseQueriesCollection.builder()
+                             .caseMessages(wrapElements(
+                                 CaseMessage.builder()
+                                     .id("1")
+                                     .build(),
+                                 CaseMessage.builder()
+                                     .id("2")
+                                     .build()
+                             ))
+                             .build())
                 .businessProcess(BusinessProcess.builder()
                                      .processInstanceId("123")
                                      .build())
@@ -648,26 +613,6 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
         }
 
         private CaseData createCaseDataWithQueries1v2SameSol() {
-            CaseQueriesCollection applicantQuery = CaseQueriesCollection.builder()
-                .roleOnCase(CaseRole.APPLICANTSOLICITORONE.toString())
-                .caseMessages(wrapElements(CaseMessage.builder()
-                                               .id("1")
-                                               .build()))
-                .build();
-
-            CaseQueriesCollection respondent1Query = CaseQueriesCollection.builder()
-                .roleOnCase(CaseRole.RESPONDENTSOLICITORONE.toString())
-                .caseMessages(wrapElements(CaseMessage.builder()
-                                               .id("2")
-                                               .build()))
-                .build();
-
-            CaseQueriesCollection respondent2Query = CaseQueriesCollection.builder()
-                .roleOnCase(CaseRole.RESPONDENTSOLICITORTWO.toString())
-                .caseMessages(wrapElements(CaseMessage.builder()
-                                               .id("3")
-                                               .build()))
-                .build();
             return CaseDataBuilder.builder().atStateAwaitingResponseFullDefenceReceived().build()
                 .toBuilder()
                 .applicantSolicitor1UserDetails(IdamUserDetails.builder()
@@ -679,9 +624,19 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
                 .respondent2SameLegalRepresentative(YesOrNo.YES)
                 .respondentSolicitor1EmailAddress("respondent1@email.com")
                 .respondentSolicitor2EmailAddress("respondent2@email.com")
-                .qmApplicantSolicitorQueries(applicantQuery)
-                .qmRespondentSolicitor1Queries(respondent1Query)
-                .qmRespondentSolicitor2Queries(respondent2Query)
+                .queries(CaseQueriesCollection.builder()
+                             .caseMessages(wrapElements(
+                                 CaseMessage.builder()
+                                     .id("1")
+                                     .build(),
+                                 CaseMessage.builder()
+                                     .id("2")
+                                     .build(),
+                                 CaseMessage.builder()
+                                     .id("3")
+                                     .build()
+                             ))
+                             .build())
                 .businessProcess(BusinessProcess.builder()
                                      .processInstanceId("123")
                                      .build())
@@ -689,26 +644,6 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
         }
 
         private CaseData createCaseData1v2DifferentSolCaseWithQueries() {
-            CaseQueriesCollection applicantQuery = CaseQueriesCollection.builder()
-                .roleOnCase(CaseRole.APPLICANTSOLICITORONE.toString())
-                .caseMessages(wrapElements(CaseMessage.builder()
-                                               .id("1")
-                                               .build()))
-                .build();
-
-            CaseQueriesCollection respondent1Query = CaseQueriesCollection.builder()
-                .roleOnCase(CaseRole.RESPONDENTSOLICITORONE.toString())
-                .caseMessages(wrapElements(CaseMessage.builder()
-                                               .id("2")
-                                               .build()))
-                .build();
-
-            CaseQueriesCollection respondent2Query = CaseQueriesCollection.builder()
-                .roleOnCase(CaseRole.RESPONDENTSOLICITORTWO.toString())
-                .caseMessages(wrapElements(CaseMessage.builder()
-                                               .id("3")
-                                               .build()))
-                .build();
             return CaseDataBuilder.builder().atStateAwaitingResponseFullDefenceReceived().build()
                 .toBuilder()
                 .respondent1(PartyBuilder.builder().build())
@@ -720,9 +655,19 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
                                                     .build())
                 .respondentSolicitor1EmailAddress("respondent1@email.com")
                 .respondentSolicitor2EmailAddress("respondent2@email.com")
-                .qmApplicantSolicitorQueries(applicantQuery)
-                .qmRespondentSolicitor1Queries(respondent1Query)
-                .qmRespondentSolicitor2Queries(respondent2Query)
+                .queries(CaseQueriesCollection.builder()
+                             .caseMessages(wrapElements(
+                                 CaseMessage.builder()
+                                     .id("1")
+                                     .build(),
+                                 CaseMessage.builder()
+                                     .id("2")
+                                     .build(),
+                                 CaseMessage.builder()
+                                     .id("3")
+                                     .build()
+                             ))
+                             .build())
                 .businessProcess(BusinessProcess.builder()
                                      .processInstanceId("123")
                                      .build())
