@@ -7,8 +7,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.Address;
@@ -66,15 +66,15 @@ class SealedClaimFormGeneratorTest {
     private final Representative representative1 = Representative.builder().organisationName("test org").build();
     private final Representative representative2 = Representative.builder().organisationName("test org2").build();
 
-    @MockBean
+    @MockitoBean
     private SecuredDocumentManagementService documentManagementService;
-    @MockBean
+    @MockitoBean
     private DocumentGeneratorService documentGeneratorService;
     @Autowired
     private SealedClaimFormGenerator sealedClaimFormGenerator;
-    @MockBean
+    @MockitoBean
     private RepresentativeService representativeService;
-    @MockBean
+    @MockitoBean
     LocationRefDataUtil locationRefDataUtil;
 
     @BeforeEach

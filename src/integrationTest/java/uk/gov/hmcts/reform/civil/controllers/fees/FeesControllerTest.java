@@ -3,9 +3,9 @@ package uk.gov.hmcts.reform.civil.controllers.fees;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
@@ -35,13 +35,13 @@ public class FeesControllerTest extends BaseIntegrationTest {
     private static final String FEES_HEARING_URL = "/fees/hearing/{claimAmount}";
     private static final String FEES_GA_URL = "/fees/general-application";
 
-    @MockBean
+    @MockitoBean
     private FeesService feesService;
 
-    @MockBean
+    @MockitoBean
     private InterestCalculator interestCalculator;
 
-    @MockBean
+    @MockitoBean
     private GeneralAppFeesService gaFeesService;
     private ObjectMapper objectMapper = new ObjectMapper();
 

@@ -7,12 +7,12 @@ import org.hibernate.annotations.Type;
 import java.io.Serializable;
 import java.time.OffsetDateTime;
 import java.util.Map;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 
 @lombok.Data
 @lombok.Builder(toBuilder = true)

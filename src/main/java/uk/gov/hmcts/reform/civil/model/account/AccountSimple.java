@@ -8,7 +8,7 @@ import lombok.experimental.SuperBuilder;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 
 import java.math.BigDecimal;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 @Data
 @NoArgsConstructor

@@ -2,8 +2,8 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.claimant;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.event.FullAdmitPayImmediatelyNoPaymentFromDefendantEvent;
@@ -28,7 +28,7 @@ public class FullAdmitPayImmediatelyNoPaymentFromDefendantScenarioTest extends D
 
     @Autowired
     private FullAdmitPayImmediatelyNoPaymentFromDefendantEventHandler handler;
-    @MockBean
+    @MockitoBean
     private CoreCaseDataService coreCaseDataService;
 
     @Test

@@ -72,8 +72,7 @@ public class SecurityConfiguration {
                 .requestMatchers("/cases/callbacks/**", "/case/document/generateAnyDoc", "/dashboard/**")
                 .hasAnyAuthority(AUTHORITIES)
                 .anyRequest().authenticated()
-            )
-            .oauth2Client();
+            );
 
         return http.build();
     }
