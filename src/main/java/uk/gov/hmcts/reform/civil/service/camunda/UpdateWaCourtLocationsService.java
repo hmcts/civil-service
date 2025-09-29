@@ -127,22 +127,12 @@ public class UpdateWaCourtLocationsService {
     private LocationRefData courtLocationDetails(List<LocationRefData> locationRefDataList, String court, String courtType) {
 
         // CNBC will not be returned by ref data call, so populate details manually
-        if (court.equals(cnbcEpimmId)) {
-            LocationRefData cnbcDetails = LocationRefData.builder()
+        if (cnbcEpimmId.equals(court) || ccmccEpimmId.equals(court)) {
+            return LocationRefData.builder()
                 .region("Midlands")
                 .regionId("2")
                 .epimmsId(cnbcEpimmId)
                 .siteName("Civil National Business Centre").build();
-            return cnbcDetails;
-        }
-        // ccmcc no longer exists, temporary solution till usage is removed
-        if (court.equals(ccmccEpimmId)) {
-            LocationRefData ccmccDetails = LocationRefData.builder()
-                .region("-")
-                .regionId("-")
-                .epimmsId("-")
-                .siteName("-").build();
-            return ccmccDetails;
         }
 
         LocationRefData courtTypeLocationDetails;
@@ -151,15 +141,16 @@ public class UpdateWaCourtLocationsService {
         if (!foundLocations.isEmpty()) {
             courtTypeLocationDetails = foundLocations.get(0);
         } else {
-            throw new IllegalArgumentException("Court Location not found, in location data for court type " + courtType);
+            throw new IllegalArgumentException(
+                "Court Location not found, in location data for court type %s epimms_id %s".formatted(courtType, court));
         }
         return courtTypeLocationDetails;
     }
 
     private String getClaimTrack(CaseData caseData) {
-        if (caseData.getCaseAccessCategory().equals(UNSPEC_CLAIM)) {
+        if (UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             return caseData.getAllocatedTrack().name();
-        } else if (caseData.getCaseAccessCategory().equals(SPEC_CLAIM)) {
+        } else if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             return caseData.getResponseClaimTrack();
         }
         return null;

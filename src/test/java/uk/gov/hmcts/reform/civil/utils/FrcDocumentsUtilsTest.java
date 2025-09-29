@@ -3,10 +3,10 @@ package uk.gov.hmcts.reform.civil.utils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -17,19 +17,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    AssignCategoryId.class,
-    FrcDocumentsUtils.class
-})
+@ExtendWith(MockitoExtension.class)
 class FrcDocumentsUtilsTest {
 
-    @Autowired
-    private FrcDocumentsUtils frcDocumentsUtils;
-    @MockBean
+    @Mock
     private FeatureToggleService featureToggleService;
-    @Autowired
-    private AssignCategoryId assignCategoryId;
+    @Spy
+    private AssignCategoryId assignCategoryId = new AssignCategoryId();
+    @InjectMocks
+    private FrcDocumentsUtils frcDocumentsUtils;
 
     @BeforeEach
     void setup() {

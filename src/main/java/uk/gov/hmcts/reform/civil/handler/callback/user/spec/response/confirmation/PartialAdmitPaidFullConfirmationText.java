@@ -5,6 +5,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationTextSpecGenerator;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
@@ -18,7 +19,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 public class PartialAdmitPaidFullConfirmationText implements RespondToClaimConfirmationTextSpecGenerator {
 
     @Override
-    public Optional<String> generateTextFor(CaseData caseData) {
+    public Optional<String> generateTextFor(CaseData caseData, FeatureToggleService featureToggleService) {
         if (!RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
             || NO.equals(caseData.getSpecDefenceAdmittedRequired())) {
             return Optional.empty();

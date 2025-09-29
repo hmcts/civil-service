@@ -62,8 +62,8 @@ public class DefendantResponsePartAdmitPayImmediatelyClaimantScenarioTest extend
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Response to the claim"),
                 jsonPath("$[0].titleCy").value("Ymateb i’r hawliad"),
-                jsonPath("$[0].descriptionEn").value("<p class=\"govuk-body\">James John has offered to pay £300 by 18 March 2024.</p><p class=\"govuk-body\">The payment must be received in your account by then, if not you can request a county court judgment.</p><p class=\"govuk-body\"><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">View and respond</a></p>"),
-                jsonPath("$[0].descriptionCy").value("<p class=\"govuk-body\">Mae James John wedi cynnig talu £300 erbyn 18 Mawrth 2024.</p><p class=\"govuk-body\">Rhaid i’r taliad fod yn eich cyfrif erbyn y dyddiad hwnnw. Os nad yw, yna gallwch wneud cais am ddyfarniad llys sirol.</p><p class=\"govuk-body\"><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">Gweld ac ymateb</a></p>")
+                jsonPath("$[0].descriptionEn").value("<p class=\"govuk-body\">James John has offered to pay £300, plus the claim fee, immediately.</p><p class=\"govuk-body\">If you accept, the payment must be received in your account within 5 working days, if not you can request a County Court Judgment.</p><p class=\"govuk-body\"><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">View and respond</a></p>"),
+                jsonPath("$[0].descriptionCy").value("<p class=\"govuk-body\">Mae James John wedi cynnig talu £300, ynghyd â ffi’r hawliad, ar unwaith.</p><p class=\"govuk-body\">Os ydych yn derbyn, mae’n rhaid derbyn y taliad yn eich cyfrif o fewn 5 diwrnod gwaith, os na, gallwch ofyn am Ddyfarniad Llys Sirol.</p><p class=\"govuk-body\"><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">Gweld ac ymateb</a></p>")
             );
 
         //Verify task Item is created

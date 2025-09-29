@@ -5,6 +5,8 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.Optional;
 
@@ -13,8 +15,10 @@ public class FullDefenceRespondentSolicitorOneCCUnspecNotifier extends FullDefen
 
     @Autowired
     public FullDefenceRespondentSolicitorOneCCUnspecNotifier(NotificationService notificationService,
-                                                             NotificationsProperties notificationsProperties) {
-        super(notificationService, notificationsProperties);
+                                                             NotificationsProperties notificationsProperties,
+                                                             FeatureToggleService featureToggleService,
+                                                             NotificationsSignatureConfiguration configuration) {
+        super(notificationService, notificationsProperties, configuration, featureToggleService);
     }
 
     @Override

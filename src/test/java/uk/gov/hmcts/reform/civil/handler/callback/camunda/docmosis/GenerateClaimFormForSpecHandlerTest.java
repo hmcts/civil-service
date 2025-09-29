@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -127,6 +128,8 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
             // Given
             when(sealedClaimFormGeneratorForSpec.generate(any(CaseData.class), anyString())).thenReturn(CLAIM_FORM);
             when(time.now()).thenReturn(issueDate.atStartOfDay());
+            when(deadlinesCalculator.plus28DaysNextWorkingDayAt4pmDeadline(any()))
+                .thenReturn(LocalDateTime.of(2003, Month.APRIL, 3, 2, 1));
             documents.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
                                                "Sealed Claim form",
                                                LocalDate.now().toString()));
@@ -152,6 +155,7 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
             // Then
             assertThat(updatedData.getSystemGeneratedCaseDocuments().get(0).getValue()).isEqualTo(CLAIM_FORM);
             assertThat(updatedData.getIssueDate()).isEqualTo(issueDate);
+            assertThat(updatedData.getNextDeadline()).isEqualTo(LocalDate.of(2003, Month.APRIL, 3));
 
             verify(sealedClaimFormGeneratorForSpec).generate(any(CaseData.class), eq(BEARER_TOKEN));
             verifyNoInteractions(litigantInPersonFormGenerator);
@@ -162,6 +166,8 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
         void shouldGenerateClaimForm_whenOneVsTwo_andBothPartiesRepresentedSpecClaim() {
             when(sealedClaimFormGeneratorForSpec.generate(any(CaseData.class), anyString())).thenReturn(CLAIM_FORM);
             when(time.now()).thenReturn(issueDate.atStartOfDay());
+            when(deadlinesCalculator.plus28DaysNextWorkingDayAt4pmDeadline(any()))
+                .thenReturn(LocalDateTime.of(2003, Month.APRIL, 3, 2, 1));
             documents.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
                                                "Sealed Claim form",
                                                LocalDate.now().toString()));
@@ -197,6 +203,8 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
             when(civilStitchService.generateStitchedCaseDocument(anyList(), anyString(), anyLong(), eq(SEALED_CLAIM),
                                                                  anyString())).thenReturn(STITCHED_DOC);
             when(time.now()).thenReturn(issueDate.atStartOfDay());
+            when(deadlinesCalculator.plus28DaysNextWorkingDayAt4pmDeadline(any()))
+                .thenReturn(LocalDateTime.of(2003, Month.APRIL, 3, 2, 1));
             specClaimTimelineDocuments.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
                                                "Sealed Claim form",
                                                LocalDate.now().toString()));
@@ -239,6 +247,8 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
         // Given
         when(sealedClaimFormGeneratorForSpec.generate(any(CaseData.class), anyString())).thenReturn(CLAIM_FORM);
         when(time.now()).thenReturn(issueDate.atStartOfDay());
+        when(deadlinesCalculator.plus28DaysNextWorkingDayAt4pmDeadline(any()))
+            .thenReturn(LocalDateTime.of(2003, Month.APRIL, 3, 2, 1));
         documents.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
                                            "Sealed Claim form",
                                            LocalDate.now().toString()));
@@ -271,6 +281,8 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
         when(civilStitchService.generateStitchedCaseDocument(anyList(), anyString(), anyLong(), eq(SEALED_CLAIM),
                                                              anyString())).thenReturn(STITCHED_DOC);
         when(time.now()).thenReturn(issueDate.atStartOfDay());
+        when(deadlinesCalculator.plus28DaysNextWorkingDayAt4pmDeadline(any()))
+            .thenReturn(LocalDateTime.of(2003, Month.APRIL, 3, 2, 1));
         documents.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
                                            "Sealed Claim form",
                                            LocalDate.now().toString()));
@@ -308,6 +320,8 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
         when(civilStitchService.generateStitchedCaseDocument(anyList(), anyString(), anyLong(), eq(SEALED_CLAIM),
                                                              anyString())).thenReturn(STITCHED_DOC);
         when(time.now()).thenReturn(issueDate.atStartOfDay());
+        when(deadlinesCalculator.plus28DaysNextWorkingDayAt4pmDeadline(any()))
+            .thenReturn(LocalDateTime.of(2003, Month.APRIL, 3, 2, 1));
         documents.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
                                            "Sealed Claim form",
                                            LocalDate.now().toString()));
@@ -345,6 +359,8 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
         when(civilStitchService.generateStitchedCaseDocument(anyList(), anyString(), anyLong(), eq(SEALED_CLAIM),
                                                              anyString())).thenReturn(STITCHED_DOC);
         when(time.now()).thenReturn(issueDate.atStartOfDay());
+        when(deadlinesCalculator.plus28DaysNextWorkingDayAt4pmDeadline(any()))
+            .thenReturn(LocalDateTime.of(2003, Month.APRIL, 3, 2, 1));
         documents.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
                                            "Sealed Claim form",
                                            LocalDate.now().toString()));
@@ -386,6 +402,8 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
         when(civilStitchService.generateStitchedCaseDocument(anyList(), anyString(), anyLong(), eq(SEALED_CLAIM),
                                                              anyString())).thenReturn(STITCHED_DOC);
         when(time.now()).thenReturn(issueDate.atStartOfDay());
+        when(deadlinesCalculator.plus28DaysNextWorkingDayAt4pmDeadline(any()))
+            .thenReturn(LocalDateTime.of(2003, Month.APRIL, 3, 2, 1));
         documents.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
                                            "Sealed Claim form",
                                            LocalDate.now().toString()));
@@ -425,6 +443,8 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
         void shouldStitchClaimFormWithLipForm_whenOneVsOne_withLitigantInPersonSpecClaim() {
             when(sealedClaimFormGeneratorForSpec.generate(any(CaseData.class), anyString())).thenReturn(CLAIM_FORM);
             when(time.now()).thenReturn(issueDate.atStartOfDay());
+            when(deadlinesCalculator.plus28DaysNextWorkingDayAt4pmDeadline(any()))
+                .thenReturn(LocalDateTime.of(2003, Month.APRIL, 3, 2, 1));
             documents.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
                                                "Sealed Claim form",
                                                LocalDate.now().toString()));
@@ -456,6 +476,8 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
         void shouldStitchClaimFormWithLipForm_whenOneVsTwo_andDef1LitigantInPersonSpecClaim() {
             when(sealedClaimFormGeneratorForSpec.generate(any(CaseData.class), anyString())).thenReturn(CLAIM_FORM);
             when(time.now()).thenReturn(issueDate.atStartOfDay());
+            when(deadlinesCalculator.plus28DaysNextWorkingDayAt4pmDeadline(any()))
+                .thenReturn(LocalDateTime.of(2003, Month.APRIL, 3, 2, 1));
             documents.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
                                                "Sealed Claim form",
                                                LocalDate.now().toString()));
@@ -488,6 +510,8 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
         void shouldStitchClaimFormWithLipForm_whenOneVsTwo_andDef2LitigantInPersonSpecClaim() {
             when(sealedClaimFormGeneratorForSpec.generate(any(CaseData.class), anyString())).thenReturn(CLAIM_FORM);
             when(time.now()).thenReturn(issueDate.atStartOfDay());
+            when(deadlinesCalculator.plus28DaysNextWorkingDayAt4pmDeadline(any()))
+                .thenReturn(LocalDateTime.of(2003, Month.APRIL, 3, 2, 1));
             documents.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
                                                "Sealed Claim form",
                                                LocalDate.now().toString()));
@@ -520,6 +544,8 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
         void shouldStitchClaimFormWithLipForm_whenOneVsTwo_andBothDefendantsAreLitigantInPersonSpecClaim() {
             when(sealedClaimFormGeneratorForSpec.generate(any(CaseData.class), anyString())).thenReturn(CLAIM_FORM);
             when(time.now()).thenReturn(issueDate.atStartOfDay());
+            when(deadlinesCalculator.plus28DaysNextWorkingDayAt4pmDeadline(any()))
+                .thenReturn(LocalDateTime.of(2003, Month.APRIL, 3, 2, 1));
             documents.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
                                                "Sealed Claim form",
                                                LocalDate.now().toString()));

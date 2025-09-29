@@ -132,6 +132,18 @@ public class LocationReferenceDataService {
         return new ArrayList<>();
     }
 
+    public List<LocationRefData> getCourtLocationsByEpimmsIdWithCML(String authToken, String epimmsId) {
+        try {
+            return locationReferenceDataApiClient.getCourtVenueByEpimmsIdWithCMLAndCourtType(
+                authTokenGenerator.generate(),
+                authToken, epimmsId, IS_CASE_MANAGEMENT_LOCATION, CIVIL_COURT_TYPE_ID, LOCATION_TYPE
+            );
+        } catch (Exception e) {
+            log.error(LOCATION_REFERENCE_DATA_LOOKUP_FAILED, e.getMessage(), e);
+        }
+        return new ArrayList<>();
+    }
+
     /**
      * Returns the list of locations that can then be added in dynamic list on the
      * Judge Assisted order screen, SDO and Hearing Schedule Venue list.

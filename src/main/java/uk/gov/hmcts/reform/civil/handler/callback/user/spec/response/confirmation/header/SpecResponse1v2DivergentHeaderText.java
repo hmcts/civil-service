@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmati
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationHeaderSpecGenerator;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.Optional;
 
@@ -18,7 +19,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartySc
 public class SpecResponse1v2DivergentHeaderText implements RespondToClaimConfirmationHeaderSpecGenerator {
 
     @Override
-    public Optional<String> generateTextFor(CaseData caseData) {
+    public Optional<String> generateTextFor(CaseData caseData, FeatureToggleService featureToggleService) {
         if (!ONE_V_TWO_ONE_LEGAL_REP.equals(getMultiPartyScenario(caseData))) {
             return Optional.empty();
         }

@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -19,12 +20,14 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.PayImmediatelyConfText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.PartialAdmitPayImmediatelyConfirmationText;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.PaymentDateService;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -43,6 +46,12 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
  */
 @ExtendWith(SpringExtension.class)
 class CaseDataToTextGeneratorTest {
+
+    @MockBean
+    private FeatureToggleService featureToggleService;
+
+    @Mock
+    private PaymentDateService paymentDateService;
 
     @SuppressWarnings("rawtypes")
     private final List<CaseDataToTextGeneratorIntentionConfig> intentionConfigs = List.of(
@@ -97,7 +106,7 @@ class CaseDataToTextGeneratorTest {
         for (int i = 0; i < cases.size(); i++) {
             CaseData currentCase = cases.get(i).getLeft();
             List<T> suitable = generators.stream()
-                .filter(generator -> generator.generateTextFor(currentCase).isPresent())
+                .filter(generator -> generator.generateTextFor(currentCase, featureToggleService).isPresent())
                 .toList();
             Assertions.assertEquals(1, suitable.size(),
                                     "There should be exactly 1 suitable generator per case."
@@ -138,7 +147,8 @@ class CaseDataToTextGeneratorTest {
         @Bean
         public PaymentDateService paymentDateService() {
             PaymentDateService mockPaymentDateService = mock(PaymentDateService.class);
-            when(mockPaymentDateService.getPaymentDateAdmittedClaim(any())).thenReturn(LocalDate.EPOCH);
+            when(mockPaymentDateService.getPaymentDate(any())).thenReturn(Optional.of(LocalDate.EPOCH));
+            when(mockPaymentDateService.getFormattedPaymentDate(any())).thenReturn(LocalDate.EPOCH.toString());
             return mockPaymentDateService;
         }
     }
@@ -172,9 +182,6 @@ class CaseDataToTextGeneratorTest {
     @InjectMocks
     private PartialAdmitPayImmediatelyConfirmationText generatorHeader;
 
-    @Mock
-    private PaymentDateService paymentDateService;
-
     private CaseData buildFullAdmitPayImmediatelyWithoutWhenBePaidProceedCaseData() {
         return CaseData.builder()
             .caseAccessCategory(SPEC_CLAIM)
@@ -188,13 +195,13 @@ class CaseDataToTextGeneratorTest {
     void shouldThrowIllegalStateExceptionWhenPaymentDateCannotBeFormattedPayImmediatelyConfText() {
         CaseData caseData = buildFullAdmitPayImmediatelyWithoutWhenBePaidProceedCaseData();
 
-        Assertions.assertThrows(IllegalStateException.class, () -> generatorConf.generateTextFor(caseData));
+        Assertions.assertThrows(IllegalStateException.class, () -> generatorConf.generateTextFor(caseData, featureToggleService));
     }
 
     @Test
     void shouldThrowIllegalStateExceptionWhenPaymentDateCannotBeFormatted() {
         CaseData caseData = buildFullAdmitPayImmediatelyWithoutWhenBePaidProceedCaseData();
 
-        Assertions.assertThrows(IllegalStateException.class, () -> generatorHeader.generateTextFor(caseData));
+        Assertions.assertThrows(IllegalStateException.class, () -> generatorHeader.generateTextFor(caseData, featureToggleService));
     }
 }

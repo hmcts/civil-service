@@ -2,8 +2,8 @@ package uk.gov.hmcts.reform.civil.service.search;
 
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.junit.jupiter.api.BeforeEach;
-import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 
 import java.time.LocalDate;
@@ -32,18 +32,13 @@ class TrialReadyNotificationSearchServiceTest extends ElasticSearchServiceTest {
                           .minimumShouldMatch(1)
                           .should(boolQuery().must(matchQuery("state", "PREPARE_FOR_HEARING_CONDUCT_HEARING")))
                           .should(boolQuery().must(matchQuery("state", "HEARING_READINESS"))))
-                .mustNot(matchQuery("data.allocatedTrack", "SMALL_CLAIM"))
-                .mustNot(matchQuery("data.responseClaimTrack", "SMALL_CLAIM"))
+                .must(boolQuery()
+                          .minimumShouldMatch(1)
+                          .should(matchQuery("data.allocatedTrack", "FAST_CLAIM"))
+                          .should(matchQuery("data.responseClaimTrack", "FAST_CLAIM")))
                 .mustNot(matchQuery("data.listingOrRelisting", ListingOrRelisting.RELISTING))
                 .mustNot(matchQuery("data.trialReadyNotified", YesOrNo.YES)));
 
         return new Query(query, List.of("reference"), fromValue);
-    }
-
-    @Override
-    protected Query buildQueryInMediation(int fromValue, LocalDate date, boolean carmEnabled,
-                                          boolean initialSearch,
-                                          String searchAfterValue) {
-        return null;
     }
 }

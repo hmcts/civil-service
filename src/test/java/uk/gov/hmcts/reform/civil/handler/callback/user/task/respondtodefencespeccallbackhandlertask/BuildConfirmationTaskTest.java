@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseCon
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationTextGenerator;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.List;
 import java.util.Map;
@@ -35,6 +36,9 @@ class BuildConfirmationTaskTest {
     @Mock
     private List<RespondToResponseConfirmationTextGenerator> confirmationTextGenerators;
 
+    @Mock
+    private FeatureToggleService featureToggleService;
+
     @InjectMocks
     private BuildConfirmationTask buildConfirmationTask;
 
@@ -46,7 +50,7 @@ class BuildConfirmationTaskTest {
             .setIntermediateTrackClaim()
             .build();
 
-        SubmittedCallbackResponse response = buildConfirmationTask.execute(callbackParams(caseData));
+        SubmittedCallbackResponse response = buildConfirmationTask.execute(callbackParams(caseData), featureToggleService);
 
         String expectedConfirmationText = "<h2 class=\"govuk-heading-m\">What happens next</h2>"
             + "You've decided not to proceed and the case will end.<br>"
@@ -72,7 +76,7 @@ class BuildConfirmationTaskTest {
             .applicant1ProceedWithClaim(YES)
             .build();
 
-        SubmittedCallbackResponse response = buildConfirmationTask.execute(callbackParams(caseData));
+        SubmittedCallbackResponse response = buildConfirmationTask.execute(callbackParams(caseData), featureToggleService);
 
         String expectedConfirmationText = "<h2 class=\"govuk-heading-m\">What happens next</h2>"
             + "We'll review the case and contact you about what to do next.<br>"
@@ -97,7 +101,7 @@ class BuildConfirmationTaskTest {
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
             .build();
 
-        SubmittedCallbackResponse response = buildConfirmationTask.execute(callbackParams(caseData));
+        SubmittedCallbackResponse response = buildConfirmationTask.execute(callbackParams(caseData), featureToggleService);
 
         String expectedConfirmationText = format(
             "<br />%n%n<a href=\"%s\" target=\"_blank\">Download county court judgment</a>"
@@ -119,7 +123,7 @@ class BuildConfirmationTaskTest {
             .atStateMediationSuccessful(MultiPartyScenario.ONE_V_ONE)
             .build();
 
-        SubmittedCallbackResponse response = buildConfirmationTask.execute(callbackParams(caseData));
+        SubmittedCallbackResponse response = buildConfirmationTask.execute(callbackParams(caseData), featureToggleService);
 
         String expectedConfirmationHeader =  format(
             "# You have rejected their response %n## Your Claim Number : %s",

@@ -4,14 +4,19 @@ import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 class CaseStateUtilsTest {
+
+    FeatureToggleService featureToggleService = mock(FeatureToggleService.class);
 
     @Test
     void shouldReturnTrue_whenCarmEnabledSmallClaim1v1() {
@@ -20,7 +25,8 @@ class CaseStateUtilsTest {
             .applicant1ProceedWithClaim(YES)
             .build();
 
-        boolean actual = CaseStateUtils.shouldMoveToInMediationState(caseData, true);
+        when(featureToggleService.isCarmEnabledForCase(caseData)).thenReturn(true);
+        boolean actual = CaseStateUtils.shouldMoveToInMediationState(caseData, featureToggleService);
 
         assertThat(actual).isTrue();
     }
@@ -34,7 +40,8 @@ class CaseStateUtilsTest {
                              .build())
             .build();
 
-        boolean actual = CaseStateUtils.shouldMoveToInMediationState(caseData, true);
+        when(featureToggleService.isCarmEnabledForCase(caseData)).thenReturn(true);
+        boolean actual = CaseStateUtils.shouldMoveToInMediationState(caseData, featureToggleService);
 
         assertThat(actual).isTrue();
     }
@@ -46,7 +53,8 @@ class CaseStateUtilsTest {
             .applicant1AcceptAdmitAmountPaidSpec(NO)
             .build();
 
-        boolean actual = CaseStateUtils.shouldMoveToInMediationState(caseData, true);
+        when(featureToggleService.isCarmEnabledForCase(caseData)).thenReturn(true);
+        boolean actual = CaseStateUtils.shouldMoveToInMediationState(caseData, featureToggleService);
 
         assertThat(actual).isTrue();
     }
@@ -58,7 +66,8 @@ class CaseStateUtilsTest {
             .applicant1PartAdmitConfirmAmountPaidSpec(NO)
             .build();
 
-        boolean actual = CaseStateUtils.shouldMoveToInMediationState(caseData, true);
+        when(featureToggleService.isCarmEnabledForCase(caseData)).thenReturn(true);
+        boolean actual = CaseStateUtils.shouldMoveToInMediationState(caseData, featureToggleService);
 
         assertThat(actual).isTrue();
     }
@@ -70,7 +79,8 @@ class CaseStateUtilsTest {
             .applicant1PartAdmitIntentionToSettleClaimSpec(NO)
             .build();
 
-        boolean actual = CaseStateUtils.shouldMoveToInMediationState(caseData, true);
+        when(featureToggleService.isCarmEnabledForCase(caseData)).thenReturn(true);
+        boolean actual = CaseStateUtils.shouldMoveToInMediationState(caseData, featureToggleService);
 
         assertThat(actual).isTrue();
     }
@@ -83,7 +93,8 @@ class CaseStateUtilsTest {
             .applicant1ProceedWithClaimSpec2v1(YES)
             .build();
 
-        boolean actual = CaseStateUtils.shouldMoveToInMediationState(caseData, true);
+        when(featureToggleService.isCarmEnabledForCase(caseData)).thenReturn(true);
+        boolean actual = CaseStateUtils.shouldMoveToInMediationState(caseData, featureToggleService);
 
         assertThat(actual).isTrue();
     }
@@ -95,7 +106,8 @@ class CaseStateUtilsTest {
             .applicant1ProceedWithClaim(NO)
             .build();
 
-        boolean actual = CaseStateUtils.shouldMoveToInMediationState(caseData, true);
+        when(featureToggleService.isCarmEnabledForCase(caseData)).thenReturn(true);
+        boolean actual = CaseStateUtils.shouldMoveToInMediationState(caseData, featureToggleService);
 
         assertThat(actual).isFalse();
     }
@@ -108,7 +120,8 @@ class CaseStateUtilsTest {
             .applicant1ProceedWithClaimSpec2v1(NO)
             .build();
 
-        boolean actual = CaseStateUtils.shouldMoveToInMediationState(caseData, true);
+        when(featureToggleService.isCarmEnabledForCase(caseData)).thenReturn(true);
+        boolean actual = CaseStateUtils.shouldMoveToInMediationState(caseData, featureToggleService);
 
         assertThat(actual).isFalse();
     }
@@ -120,7 +133,8 @@ class CaseStateUtilsTest {
             .applicant1ProceedWithClaim(YES)
             .build();
 
-        boolean actual = CaseStateUtils.shouldMoveToInMediationState(caseData, false);
+        when(featureToggleService.isCarmEnabledForCase(caseData)).thenReturn(false);
+        boolean actual = CaseStateUtils.shouldMoveToInMediationState(caseData, featureToggleService);
 
         assertThat(actual).isFalse();
     }
@@ -132,7 +146,8 @@ class CaseStateUtilsTest {
             .applicant1ProceedWithClaim(YES)
             .build();
 
-        boolean actual = CaseStateUtils.shouldMoveToInMediationState(caseData, true);
+        when(featureToggleService.isCarmEnabledForCase(caseData)).thenReturn(true);
+        boolean actual = CaseStateUtils.shouldMoveToInMediationState(caseData, featureToggleService);
 
         assertThat(actual).isFalse();
     }
@@ -145,7 +160,8 @@ class CaseStateUtilsTest {
             .applicant1ProceedWithClaimSpec2v1(YES)
             .build();
 
-        boolean actual = CaseStateUtils.shouldMoveToInMediationState(caseData, true);
+        when(featureToggleService.isCarmEnabledForCase(caseData)).thenReturn(true);
+        boolean actual = CaseStateUtils.shouldMoveToInMediationState(caseData, featureToggleService);
 
         assertThat(actual).isFalse();
     }

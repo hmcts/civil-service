@@ -98,7 +98,10 @@ public class GenerateHearingNoticeHmcHandler extends CallbackHandler {
 
         buildDocument(callbackParams, caseDataBuilder, hearing, hearingLocation, camundaVars.getHearingId(), HEARING_NOTICE_HMC);
 
-        if (featureToggleService.isHmcForLipEnabled() && isWelshHearingTemplate(caseData)) {
+        if (featureToggleService.isHmcForLipEnabled()
+            // Check DQ document language if Welsh not enabled, only check main language flag if enabled
+            && ((!featureToggleService.isWelshEnabledForMainCase() && isWelshHearingTemplate(caseData))
+                || (featureToggleService.isWelshEnabledForMainCase() && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())))) {
             String hearingLocationWelsh = getHearingLocation(camundaVars.getHearingId(), hearing,
                                                         bearerToken, locationRefDataService, true);
             buildDocument(callbackParams, caseDataBuilder, hearing, hearingLocationWelsh, camundaVars.getHearingId(), HEARING_NOTICE_HMC_WELSH);

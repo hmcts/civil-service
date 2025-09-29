@@ -42,7 +42,7 @@ public class ChangeLanguagePreferenceCallbackHandler extends CallbackHandler {
 
     private final ObjectMapper objectMapper;
 
-    private final Map<String, Callback> callbackMap = Map.of(callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
+    private final Map<String, Callback> callbackMap = Map.of(callbackKey(ABOUT_TO_START), this::nullFieldsForNewSubmission,
                                                              callbackKey(MID, VALIDATE_LANGUAGE_PREFERENCE), this::validateChangeLanguagePreference,
                                                              callbackKey(ABOUT_TO_SUBMIT), this::changeLanguagePreference,
                                                              callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse);
@@ -55,6 +55,18 @@ public class ChangeLanguagePreferenceCallbackHandler extends CallbackHandler {
     @Override
     public List<CaseEvent> handledEvents() {
         return EVENTS;
+    }
+
+    private CallbackResponse nullFieldsForNewSubmission(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
+
+        builder.changeLanguagePreference(null);
+        CaseData updatedCaseData = builder.build();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(updatedCaseData.toMap(objectMapper))
+            .build();
     }
 
     private CallbackResponse validateChangeLanguagePreference(CallbackParams callbackParams) {
@@ -88,11 +100,10 @@ public class ChangeLanguagePreferenceCallbackHandler extends CallbackHandler {
             .map(ChangeLanguagePreference::getUserType)
             .orElseThrow(() -> new IllegalArgumentException("User type not found"));
         switch (userType) {
-            case CLAIMANT -> builder.claimantBilingualLanguagePreference(revisedBilingualPreference);
-            case DEFENDANT -> setRespondentResponseBilingualLanguagePreference(caseData, builder, revisedBilingualPreference);
+            case CLAIMANT -> setClaimantBilingualLanguagePreference(builder, preferredLanguage, revisedBilingualPreference);
+            case DEFENDANT -> setRespondentResponseBilingualLanguagePreference(caseData, builder, preferredLanguage, revisedBilingualPreference);
             default -> throw new IllegalArgumentException("Unexpected user type");
         }
-        builder.changeLanguagePreference(null);
         builder.businessProcess(BusinessProcess.ready(CHANGE_LANGUAGE_PREFERENCE)).build();
         CaseData updatedCaseData = builder.build();
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -100,13 +111,22 @@ public class ChangeLanguagePreferenceCallbackHandler extends CallbackHandler {
             .build();
     }
 
+    private void setClaimantBilingualLanguagePreference(CaseData.CaseDataBuilder<?, ?> builder,
+                                                        PreferredLanguage preferredLanguage,
+                                                        String revisedBilingualPreference) {
+        builder.claimantBilingualLanguagePreference(revisedBilingualPreference);
+        builder.claimantLanguagePreferenceDisplay(preferredLanguage);
+    }
+
     private void setRespondentResponseBilingualLanguagePreference(CaseData caseData,
                                                                   CaseData.CaseDataBuilder<?, ?> builder,
+                                                                  PreferredLanguage preferredLanguage,
                                                                   String revisedBilingualPreference) {
         CaseDataLiP caseDataLiP = caseData.getCaseDataLiP();
         builder.caseDataLiP(caseDataLiP.toBuilder()
                                 .respondent1LiPResponse(caseDataLiP.getRespondent1LiPResponse().toBuilder()
                                                             .respondent1ResponseLanguage(revisedBilingualPreference).build())
                                 .build());
+        builder.defendantLanguagePreferenceDisplay(preferredLanguage);
     }
 }

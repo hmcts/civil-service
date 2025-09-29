@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseQueriesCollection;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.querymanagement.QueryManagementCamundaService;
@@ -32,10 +33,13 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getQueryById;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getUserRoleForQuery;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.QueryNotificationUtils.getEmail;
 import static uk.gov.hmcts.reform.civil.utils.QueryNotificationUtils.getProperties;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isApplicantSolicitor;
+import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPClaimant;
+import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPDefendant;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorOne;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorTwo;
 
@@ -43,9 +47,8 @@ import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicito
 @RequiredArgsConstructor
 public class QueryResponseSolicitorNotificationHandler extends CallbackHandler implements NotificationData {
 
-    private static final List<CaseEvent> EVENTS = Collections.singletonList(NOTIFY_RESPONSE_TO_QUERY);
-
     public static final String TASK_ID = "QueryResponseNotify";
+    private static final List<CaseEvent> EVENTS = Collections.singletonList(NOTIFY_RESPONSE_TO_QUERY);
     private static final String REFERENCE_TEMPLATE = "response-to-query-notification-%s";
     private static final String QUERY_NOT_FOUND = "Matching parent query not found.";
 
@@ -54,6 +57,7 @@ public class QueryResponseSolicitorNotificationHandler extends CallbackHandler i
     private final OrganisationService organisationService;
     private final NotificationsProperties notificationsProperties;
     private final CoreCaseUserService coreCaseUserService;
+    private final NotificationsSignatureConfiguration configuration;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -84,13 +88,17 @@ public class QueryResponseSolicitorNotificationHandler extends CallbackHandler i
         List<String> roles = getUserRoleForQuery(caseData, coreCaseUserService, parentQueryId);
         String email = getEmail(caseData, roles);
         Map<String, String> properties = getProperties(caseData, roles, addProperties(caseData),
-                                                       organisationService);
+                                                       organisationService
+        );
         LocalDate queryDate = getOriginalQueryCreatedDate(caseData, responseQuery, roles, parentQuery);
-        properties.put(QUERY_DATE, formatLocalDate(queryDate, DATE));
+        if (queryDate != null) {
+            properties.put(QUERY_DATE, formatLocalDate(queryDate, DATE));
+        }
 
+        String template = getPublicQueryTemplates(caseData, roles);
         notificationService.sendMail(
             email,
-            notificationsProperties.getQueryResponseReceived(),
+            template,
             properties,
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
@@ -98,16 +106,25 @@ public class QueryResponseSolicitorNotificationHandler extends CallbackHandler i
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
-    private LocalDate getOriginalQueryCreatedDate(CaseData caseData, CaseMessage responseQuery, List<String> roles, CaseMessage parentQuery) {
+    private LocalDate getOriginalQueryCreatedDate(CaseData caseData, CaseMessage responseQuery, List<String> roles,
+                                                  CaseMessage parentQuery) {
+        if (caseData.getQueries() != null) {
+            return getLastRelatedQueryRaisedBySolicitorDate(caseData.getQueries(),
+                                                            parentQuery, responseQuery
+            );
+        }
         if (isApplicantSolicitor(roles)) {
             return getLastRelatedQueryRaisedBySolicitorDate(caseData.getQmApplicantSolicitorQueries(),
-                                                            parentQuery, responseQuery);
+                                                            parentQuery, responseQuery
+            );
         } else if (isRespondentSolicitorOne(roles)) {
             return getLastRelatedQueryRaisedBySolicitorDate(caseData.getQmRespondentSolicitor1Queries(),
-                                                            parentQuery, responseQuery);
+                                                            parentQuery, responseQuery
+            );
         } else if (isRespondentSolicitorTwo(roles)) {
             return getLastRelatedQueryRaisedBySolicitorDate(caseData.getQmRespondentSolicitor2Queries(),
-                                                            parentQuery, responseQuery);
+                                                            parentQuery, responseQuery
+            );
         }
         return null;
     }
@@ -118,13 +135,14 @@ public class QueryResponseSolicitorNotificationHandler extends CallbackHandler i
         // check if there was a follow up query
         List<CaseMessage> queriesByUserWithMatchingParentId = caseMessages.stream()
             .filter(m -> responseQuery.getParentId().equals(m.getParentId())
-            && m.getCreatedBy().equals(parentQuery.getCreatedBy())
-            && m.getCreatedOn().isBefore(responseQuery.getCreatedOn())).toList();
+                && m.getCreatedBy().equals(parentQuery.getCreatedBy())
+                && m.getCreatedOn().isBefore(responseQuery.getCreatedOn())).toList();
         CaseMessage latestQuery;
         if (queriesByUserWithMatchingParentId.size() > 0) {
             // if there was a follow up query
-            latestQuery = queriesByUserWithMatchingParentId.stream().max(Comparator.comparing(CaseMessage::getCreatedOn))
-                .orElse(null);
+            latestQuery =
+                queriesByUserWithMatchingParentId.stream().max(Comparator.comparing(CaseMessage::getCreatedOn))
+                    .orElse(null);
         } else {
             // no follow up queries
             latestQuery = parentQuery;
@@ -138,9 +156,25 @@ public class QueryResponseSolicitorNotificationHandler extends CallbackHandler i
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-        return new HashMap<>(Map.of(
+        HashMap<String, String> properties = new HashMap<>(Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
-            CASEMAN_REF, caseData.getLegacyCaseReference()));
+            CASEMAN_REF, caseData.getLegacyCaseReference()
+        ));
+        addAllFooterItems(caseData, properties, configuration, true);
+
+        return properties;
+    }
+
+    private String getPublicQueryTemplates(CaseData caseData, List<String> roles) {
+        if ((isLIPClaimant(roles) && caseData.isClaimantBilingual())
+            || (isLIPDefendant(roles) && caseData.isRespondentResponseBilingual())) {
+            return notificationsProperties.getQueryLipWelshPublicResponseReceived();
+        }
+        if (isLIPClaimant(roles) || isLIPDefendant(roles)) {
+            return notificationsProperties.getQueryLipPublicResponseReceived();
+        }
+
+        return notificationsProperties.getQueryLrPublicResponseReceived();
     }
 }

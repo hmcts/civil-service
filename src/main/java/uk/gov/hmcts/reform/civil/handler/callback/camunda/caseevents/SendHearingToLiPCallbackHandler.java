@@ -66,9 +66,17 @@ public class SendHearingToLiPCallbackHandler extends CallbackHandler {
 
         CaseData caseData = callbackParams.getCaseData();
         String task = camundaActivityId(callbackParams);
-        sendHearingBulkPrintService.sendHearingToLIP(
-            callbackParams.getParams().get(BEARER_TOKEN).toString(), caseData, task,
-            featureToggleService.isHmcForLipEnabled() && sendWelshHearingToLip(task, caseData));
+        if (featureToggleService.isWelshEnabledForMainCase()) {
+            sendHearingBulkPrintService.sendHearingToLIP(
+                callbackParams.getParams().get(BEARER_TOKEN).toString(), caseData, task,
+                false);
+
+        } else {
+            sendHearingBulkPrintService.sendHearingToLIP(
+                callbackParams.getParams().get(BEARER_TOKEN).toString(), caseData, task,
+                featureToggleService.isHmcForLipEnabled() && sendWelshHearingToLip(task, caseData)
+            );
+        }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .build();
     }
@@ -85,4 +93,5 @@ public class SendHearingToLiPCallbackHandler extends CallbackHandler {
     private boolean isDefendantHMC(String task) {
         return TASK_ID_DEFENDANT_HMC.equals(task);
     }
+
 }

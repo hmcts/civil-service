@@ -20,7 +20,6 @@ import java.util.Map;
 import java.util.Objects;
 
 import static java.util.Optional.ofNullable;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.CaseDataContentConverter.caseDataContentFromStartEventResponse;
 
 @RequiredArgsConstructor
@@ -61,11 +60,11 @@ public class CoscApplicationAfterPaymentTaskHandler extends BaseExternalTaskHand
     public VariableMap getVariableMap(ExternalTaskData externalTaskData) {
         var data = externalTaskData.caseData().orElseThrow();
         VariableMap variables = Variables.createVariables();
-        var stateFlow = stateFlowEngine.evaluate(data);
+        var stateFlow = stateFlowEngine.getStateFlow(data);
         variables.putValue(FLOW_STATE, stateFlow.getState().getName());
         variables.putValue(FLOW_FLAGS, stateFlow.getFlags());
         variables.putValue("isJudgmentMarkedPaidInFull", checkMarkPaidInFull(data));
-        variables.putValue("isClaimantLR", isClaimantLR(data));
+        variables.putValue("isClaimantLR", !data.isApplicant1NotRepresented());
         return variables;
     }
 
@@ -73,7 +72,4 @@ public class CoscApplicationAfterPaymentTaskHandler extends BaseExternalTaskHand
         return (Objects.nonNull(data.getActiveJudgment()) && (data.getActiveJudgment().getFullyPaymentMadeDate() != null));
     }
 
-    private boolean isClaimantLR(CaseData caseData) {
-        return YES.equals(caseData.getApplicant1Represented());
-    }
 }

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.spec;
 
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -27,7 +28,7 @@ public interface CaseDataToTextGenerator {
      * @param caseData case data to generate the text for
      * @return empty if case data is not applicable for this generator, the confirmation text if it is
      */
-    Optional<String> generateTextFor(CaseData caseData);
+    Optional<String> generateTextFor(CaseData caseData, FeatureToggleService featureToggleService);
 
     /**
      * When choosing a suitable text generator usually we are going to have the same kind of code. To ease those
@@ -40,9 +41,9 @@ public interface CaseDataToTextGenerator {
      */
     static <T extends CaseDataToTextGenerator> String getTextFor(Stream<T> generators,
                                                                  Supplier<String> defaultText,
-                                                                 CaseData caseData) {
+                                                                 CaseData caseData, FeatureToggleService featureToggleService) {
         return generators
-            .map(generator -> generator.generateTextFor(caseData))
+            .map(generator -> generator.generateTextFor(caseData, featureToggleService))
             .filter(Optional::isPresent)
             .map(Optional::get).findFirst()
             .orElse(defaultText.get());

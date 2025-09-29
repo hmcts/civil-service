@@ -94,6 +94,7 @@ public class ClaimFormMapper {
                                   .map(EvidenceTemplateData::toEvidenceTemplateData)
                                   .toList())
                               .orElse(Collections.emptyList()))
+            .uiStatementOfTruth(caseData.getUiStatementOfTruth())
             .build();
     }
 

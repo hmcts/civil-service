@@ -1,0 +1,16 @@
+package uk.gov.hmcts.reform.civil.notification.handlers.createclaimspecafterpayment.casetakenoffline;
+
+import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.civil.notification.handlers.AllPartiesEmailGenerator;
+
+import java.util.List;
+
+@Component
+public class CaseTakenOfflineForSpecAllPartiesEmailGenerator extends AllPartiesEmailGenerator {
+
+    public CaseTakenOfflineForSpecAllPartiesEmailGenerator(
+            CaseTakenOfflineForSpecAppSolOneEmailDTOGenerator appSolOneGenerator
+    ) {
+        super(List.of(appSolOneGenerator));
+    }
+}

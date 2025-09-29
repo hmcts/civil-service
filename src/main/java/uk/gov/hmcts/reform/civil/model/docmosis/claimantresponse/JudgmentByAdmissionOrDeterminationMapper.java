@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.model.docmosis.claimantresponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyClaimantResponseLRspec;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.PaymentType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
@@ -19,14 +20,16 @@ import uk.gov.hmcts.reform.civil.model.docmosis.lip.LipFormParty;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
+import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Objects;
 import java.util.Optional;
 
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
 import static uk.gov.hmcts.reform.civil.utils.DateUtils.formatDateInWelsh;
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getApplicant;
@@ -89,7 +92,7 @@ public class JudgmentByAdmissionOrDeterminationMapper {
             .repaymentPlan(addRepaymentPlan(caseData))
             .ccjJudgmentAmount(judgementService.ccjJudgmentClaimAmount(caseData).setScale(2).toString())
             .ccjInterestToDate(totalInterest)
-            .claimFee(getClaimFee(caseData))
+            .claimFee(getClaimFee(caseData).toString())
             .ccjSubtotal(judgementService.ccjJudgementSubTotal(caseData).setScale(2).toString())
             .ccjAlreadyPaidAmount(getAlreadyPaidAmount(caseData))
             .ccjFinalTotal(judgementService.ccjJudgmentFinalTotal(caseData).setScale(2).toString())
@@ -99,12 +102,12 @@ public class JudgmentByAdmissionOrDeterminationMapper {
             .build();
     }
 
-    private String getClaimFee(CaseData caseData) {
+    private BigDecimal getClaimFee(CaseData caseData) {
         BigDecimal claimFee = judgementService.ccjJudgmentClaimFee(caseData);
         if (BigDecimal.ZERO.compareTo(claimFee) == 0) {
-            return BigDecimal.ZERO.toString();
+            return BigDecimal.ZERO;
         }
-        return claimFee.setScale(2).toString();
+        return claimFee.setScale(2);
     }
 
     private String getAlreadyPaidAmount(CaseData caseData) {
@@ -208,11 +211,13 @@ public class JudgmentByAdmissionOrDeterminationMapper {
 
         String totalInterest = judgementService.ccjJudgmentInterest(caseData).setScale(2).toString();
 
+        LocalDate payByDate = getPayByDate(caseData);
+
         JudgmentByAdmissionOrDetermination.JudgmentByAdmissionOrDeterminationBuilder builder = new JudgmentByAdmissionOrDetermination.JudgmentByAdmissionOrDeterminationBuilder();
         return builder
             .claimReferenceNumber(caseData.getLegacyCaseReference())
             .respondent1Name(caseData.getRespondent1().getPartyName())
-            .respondent2Name(Objects.isNull(caseData.getRespondent2()) ? null : caseData.getRespondent2().getPartyName())
+            .respondent2Name(isNull(caseData.getRespondent2()) ? null : caseData.getRespondent2().getPartyName())
             .respondent1Ref(getRespondent1SolicitorRef(caseData))
             .respondent2Ref(getRespondent2SolicitorRef(caseData))
             .applicantReference(getApplicantSolicitorRef(caseData))
@@ -222,20 +227,26 @@ public class JudgmentByAdmissionOrDeterminationMapper {
             .totalClaimAmount(totalClaimAmount)
             .totalInterestAmount(totalInterest)
             .paymentPlan(getPaymentTypeForNonDivergent(caseData))
-            .payByDate(caseData.getRespondToClaimAdmitPartLRspec() != null
-                           ? DateFormatHelper.formatLocalDate(caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid(), DateFormatHelper.DATE) : null)
-            .paymentStr(caseData.isPayByInstallment() ? getRepaymentString(caseData.getRespondent1RepaymentPlan().getRepaymentFrequency()) : null)
-            .repaymentFrequency(caseData.isPayByInstallment()
-                                    ? getRepaymentFrequency(caseData.getRespondent1RepaymentPlan().getRepaymentFrequency()) : null)
-            .repaymentDate(caseData.isPayByInstallment()
-                               ? DateFormatHelper.formatLocalDate(caseData.getRespondent1RepaymentPlan().getFirstRepaymentDate(), DateFormatHelper.DATE) : null)
-            .installmentAmount(caseData.isPayByInstallment() ? String.valueOf(caseData.getRespondent1RepaymentPlan().getPaymentAmount().setScale(2)) : null)
-            .ccjJudgmentAmount(judgementService.ccjJudgmentClaimAmount(caseData).setScale(2).toString())
+            .payByDate(payByDate != null
+                           ? DateFormatHelper.formatLocalDate(payByDate, DateFormatHelper.DATE) : null)
+            .paymentStr(getPaymentStr(caseData))
+            .repaymentFrequency(getRepaymentFrequencyStr(caseData))
+            .repaymentDate(getRepaymentDate(caseData))
+            .installmentAmount(getInstalmentAmount(caseData))
+            .ccjJudgmentAmount(getJudgmentAmount(caseData).setScale(2).toString())
             .ccjInterestToDate(totalInterest)
-            .claimFee(getClaimFee(caseData))
+            .claimFee(getClaimCosts(caseData))
             .ccjSubtotal(judgementService.ccjJudgementSubTotal(caseData).setScale(2).toString())
             .ccjFinalTotal(judgementService.ccjJudgmentFinalTotal(caseData).setScale(2).toString())
             .build();
+    }
+
+    private BigDecimal getJudgmentAmount(CaseData caseData) {
+        if (caseData.isLipvLipOneVOne() && caseData.isPayBySetDate() && caseData.isFullAdmitClaimSpec()) {
+            BigDecimal interest = judgementService.getLatestInterest(caseData);
+            return judgementService.ccjJudgmentClaimAmount(caseData).add(interest);
+        }
+        return judgementService.ccjJudgmentClaimAmount(caseData);
     }
 
     public JudgmentByAdmissionOrDetermination toNonDivergentWelshDocs(CaseData caseData, JudgmentByAdmissionOrDetermination builder) {
@@ -275,6 +286,17 @@ public class JudgmentByAdmissionOrDeterminationMapper {
         }
     }
 
+    private String getRepaymentString(PaymentFrequencyClaimantResponseLRspec repaymentFrequency) {
+        if (isNull(repaymentFrequency)) {
+            return null;
+        }
+        return switch (repaymentFrequency) {
+            case ONCE_ONE_WEEK -> "each week";
+            case ONCE_ONE_MONTH -> "each month";
+            case ONCE_TWO_WEEKS -> "every 2 weeks";
+        };
+    }
+
     private String getRepaymentWelshString(PaymentFrequencyLRspec repaymentFrequency) {
         switch (repaymentFrequency) {
             case ONCE_ONE_WEEK : return "pob mis";
@@ -293,6 +315,17 @@ public class JudgmentByAdmissionOrDeterminationMapper {
         }
     }
 
+    private String getRepaymentFrequency(PaymentFrequencyClaimantResponseLRspec repaymentFrequency) {
+        if (isNull(repaymentFrequency)) {
+            return null;
+        }
+        return switch (repaymentFrequency) {
+            case ONCE_ONE_WEEK -> "per week";
+            case ONCE_ONE_MONTH ->  "per month";
+            case ONCE_TWO_WEEKS ->  "every 2 weeks";
+        };
+    }
+
     private String getRepaymentFrequencyInWelsh(PaymentFrequencyLRspec repaymentFrequency) {
         switch (repaymentFrequency) {
             case ONCE_ONE_WEEK : return "yr wythnos";
@@ -303,6 +336,9 @@ public class JudgmentByAdmissionOrDeterminationMapper {
     }
 
     private String getPaymentTypeForNonDivergent(CaseData caseData) {
+        if (caseData.hasApplicant1CourtDecisionInFavourOfClaimant()) {
+            return getPaymentTypeInClaimantFavour(caseData);
+        }
         if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired() != null
             && caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == IMMEDIATELY) {
             return "IMMEDIATELY";
@@ -312,5 +348,85 @@ public class JudgmentByAdmissionOrDeterminationMapper {
             return "SET_DATE";
         }
         return null;
+    }
+
+    private String getClaimCosts(CaseData caseData) {
+        return (judgementService.isLRAdmissionRepaymentPlan(caseData)
+               || judgementService.isLrPayImmediatelyPlan(caseData))
+            ? (getClaimFee(caseData).add(judgementService.ccjJudgmentFixedCost(caseData))).toString()
+            : getClaimFee(caseData).toString();
+    }
+
+    private String getPaymentTypeInClaimantFavour(CaseData caseData) {
+        PaymentType claimantSuggestedPaymentType = caseData.getApplicant1RepaymentOptionForDefendantSpec();
+        if (claimantSuggestedPaymentType == PaymentType.IMMEDIATELY) {
+            return "IMMEDIATELY";
+        } else if (claimantSuggestedPaymentType == PaymentType.REPAYMENT_PLAN) {
+            return "REPAYMENT_PLAN";
+        } else if (claimantSuggestedPaymentType == PaymentType.SET_DATE) {
+            return "SET_DATE";
+        }
+        return null;
+    }
+
+    private LocalDate getPayByDate(CaseData caseData) {
+        if (caseData.hasApplicant1CourtDecisionInFavourOfClaimant()) {
+            return caseData.getApplicant1RequestedPaymentDateForDefendantSpec() != null
+                ? caseData.getApplicant1RequestedPaymentDateForDefendantSpec().getPaymentSetDate() : null;
+        } else if (caseData.getRespondToClaimAdmitPartLRspec() != null) {
+            return caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid();
+        }
+        return null;
+    }
+
+    private String getPaymentStr(CaseData caseData) {
+        if (caseData.hasApplicant1CourtDecisionInFavourOfClaimant()) {
+            return PaymentType.REPAYMENT_PLAN.equals(caseData.getApplicant1RepaymentOptionForDefendantSpec())
+                ? getRepaymentString(caseData.getApplicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec())
+                : null;
+        } else {
+            return caseData.isPayByInstallment()
+                ? getRepaymentString(caseData.getRespondent1RepaymentPlan().getRepaymentFrequency()) : null;
+        }
+    }
+
+    private String getRepaymentFrequencyStr(CaseData caseData) {
+        if (caseData.hasApplicant1CourtDecisionInFavourOfClaimant()) {
+            return PaymentType.REPAYMENT_PLAN.equals(caseData.getApplicant1RepaymentOptionForDefendantSpec())
+                ? getRepaymentFrequency(caseData.getApplicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec())
+                : null;
+        } else {
+            return caseData.isPayByInstallment()
+                ? getRepaymentFrequency(caseData.getRespondent1RepaymentPlan().getRepaymentFrequency()) : null;
+        }
+    }
+
+    private String getRepaymentDate(CaseData caseData) {
+        if (caseData.hasApplicant1CourtDecisionInFavourOfClaimant()) {
+            return PaymentType.REPAYMENT_PLAN.equals(caseData.getApplicant1RepaymentOptionForDefendantSpec())
+                && nonNull(caseData.getApplicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec())
+                ? DateFormatHelper.formatLocalDate(
+                caseData.getApplicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec(), DateFormatHelper.DATE)
+                : null;
+        } else {
+            return caseData.isPayByInstallment()
+                ? DateFormatHelper.formatLocalDate(
+                    caseData.getRespondent1RepaymentPlan().getFirstRepaymentDate(), DateFormatHelper.DATE) : null;
+        }
+    }
+
+    private String getInstalmentAmount(CaseData caseData) {
+        if (caseData.hasApplicant1CourtDecisionInFavourOfClaimant()) {
+            return PaymentType.REPAYMENT_PLAN.equals(caseData.getApplicant1RepaymentOptionForDefendantSpec())
+                && nonNull(caseData.getApplicant1SuggestInstalmentsPaymentAmountForDefendantSpec())
+                ? String.valueOf(MonetaryConversions.penniesToPounds(
+                    caseData.getApplicant1SuggestInstalmentsPaymentAmountForDefendantSpec()))
+                : null;
+        } else {
+            return caseData.isPayByInstallment()
+                ? String.valueOf(MonetaryConversions.penniesToPounds(
+                    caseData.getRespondent1RepaymentPlan().getPaymentAmount()))
+                : null;
+        }
     }
 }

@@ -1,8 +1,11 @@
 package uk.gov.hmcts.reform.civil.controllers;
 
+import com.microsoft.applicationinsights.TelemetryClient;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
+
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 
@@ -25,6 +28,9 @@ public class CallbackControllerTest extends BaseIntegrationTest {
     private static final String INVALID_VERSION = "b2";
 
     private CallbackRequest callbackRequest;
+
+    @MockBean
+    private TelemetryClient telemetryClient;
 
     @BeforeEach
     void setup() {

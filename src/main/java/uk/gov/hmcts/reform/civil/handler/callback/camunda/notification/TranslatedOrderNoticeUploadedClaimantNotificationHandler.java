@@ -11,14 +11,17 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +34,7 @@ public class TranslatedOrderNoticeUploadedClaimantNotificationHandler extends Ca
     final OrganisationService organisationService;
     private static final String REFERENCE_TEMPLATE = "translated-order-notice-uploaded-claimant-notification-%s";
     public static final String TASK_ID = "NotifyClaimantOfUploadedOrderNotice";
+    private final NotificationsSignatureConfiguration configuration;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -46,11 +50,14 @@ public class TranslatedOrderNoticeUploadedClaimantNotificationHandler extends Ca
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-
-        return Map.of(
+        HashMap<String, String> properties = new HashMap<>(Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             PARTY_NAME, caseData.getApplicant1().getPartyName()
-        );
+        ));
+        addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
+
+        return properties;
     }
 
     @Override

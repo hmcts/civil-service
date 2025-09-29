@@ -41,6 +41,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -171,6 +172,7 @@ public class DocumentControllerTest extends BaseIntegrationTest {
             .legacyCaseReference(REFERENCE_NUMBER)
             .totalClaimAmount(BigDecimal.ONE)
             .issueDate(DATE)
+            .respondent1ResponseDeadline(LocalDateTime.now())
             .build();
         when(docmosisApiClient.createDocument(any(DocmosisRequest.class)))
             .thenReturn(bytes);
@@ -194,6 +196,7 @@ public class DocumentControllerTest extends BaseIntegrationTest {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted()
             .legacyCaseReference(REFERENCE_NUMBER)
             .totalClaimAmount(BigDecimal.ONE)
+            .respondent1ResponseDeadline(LocalDateTime.now())
             .issueDate(DATE)
             .build();
 

@@ -54,6 +54,7 @@ class RespondentResponseDeadlineCallbackHandlerTest extends BaseCallbackHandlerT
 
         // Then
         assertThat(updatedData.getRespondent1ResponseDeadline()).isEqualTo(localDateTime);
+        assertThat(updatedData.getNextDeadline()).isEqualTo(localDateTime.toLocalDate());
 
     }
 }

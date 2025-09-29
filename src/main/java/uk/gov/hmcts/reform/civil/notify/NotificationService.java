@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
+
 import java.util.Map;
 
 @Service
@@ -24,7 +25,7 @@ public class NotificationService {
             log.info("NotificationService::sendMail::templateID: {}", emailTemplate);
             notificationClient.sendEmail(emailTemplate, targetEmail, parameters, reference);
         } catch (NotificationClientException e) {
-            log.info("Notification Service error {}", e.getMessage());
+            log.error("Notification Service error {}", e.getMessage());
             throw new NotificationException(e);
         }
     }

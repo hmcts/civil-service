@@ -66,6 +66,7 @@ public class EvidenceUploadNotificationEventHandler {
     private CaseDataContent getCaseContent(StartEventResponse startEventResponse) {
         Map<String, Object> data = startEventResponse.getCaseDetails().getData();
         data.put("notificationText", "NULLED");
+        data.put("evidenceUploadNotificationSent", "Yes");
         return CaseDataContent.builder()
             .eventToken(startEventResponse.getToken())
             .event(Event.builder().id(startEventResponse.getEventId()).build())

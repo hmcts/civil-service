@@ -1,0 +1,18 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/refdata/internal/v1/organisations",
+    "queryParameters": {
+      "id": {
+        "equalTo": "79ZRSOU"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": "{\"name\":\"Civil-Organisation2\",\"organisationIdentifier\":\"79ZRSOU\",\"contactInformation\":[{\"addressLine1\":\"29,SEATONDRIVE\",\"addressLine2\":null,\"addressLine3\":null,\"townCity\":\"NORTHAMPTON\",\"county\":null,\"country\":null,\"postCode\":\"NN39SS\",\"dxAddress\":[]}],\"status\":\"ACTIVE\",\"sraRegulated\":false,\"superUser\":{\"firstName\":\"Civil\",\"lastName\":\"Organisation2\",\"email\":\"hmcts.civil+organisation.2.superuser@gmail.com\"},\"paymentAccount\":[\"PBA1234999\"]}"
+  }
+}

@@ -39,9 +39,9 @@ public class GeneralApplicationTranslatedDocUploadedScenarioTest extends BaseInt
                 jsonPath("$[0].titleEn").value("Translated document for the application is now available"),
                 jsonPath("$[0].titleCy").value("Mae’r ddogfen a gyfieithwyd ar gyfer y cais bellach ar gael"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\"><a href=\"{GA_RESPONSE_VIEW_APPLICATION_URL}\" class=\"govuk-link\">View translated application documents.</a></p>"),
+                    "<p class=\"govuk-body\"><a href=\"{GA_VIEW_APPLICATION_URL}\" class=\"govuk-link\">View translated application documents.</a></p>"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\"><a href=\"{GA_RESPONSE_VIEW_APPLICATION_URL}\" class=\"govuk-link\">Gweld dogfennau’r cais a gyfieithwyd.</a></p>")
+                    "<p class=\"govuk-body\"><a href=\"{GA_VIEW_APPLICATION_URL}\" class=\"govuk-link\">Gweld dogfennau’r cais a gyfieithwyd.</a></p>")
             );
     }
 

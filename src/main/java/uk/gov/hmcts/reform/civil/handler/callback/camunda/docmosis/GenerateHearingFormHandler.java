@@ -9,9 +9,12 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.model.welshenhancements.PreTranslationDocumentType;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.hearing.HearingFormGenerator;
 
 import java.util.ArrayList;
@@ -34,6 +37,7 @@ public class GenerateHearingFormHandler extends CallbackHandler {
 
     private final HearingFormGenerator hearingFormGenerator;
     private final ObjectMapper objectMapper;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -67,11 +71,20 @@ public class GenerateHearingFormHandler extends CallbackHandler {
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
-        systemGeneratedCaseDocuments.add(element(caseDocuments.get(0)));
         if (!isEmpty(caseData.getHearingDocuments())) {
             systemGeneratedCaseDocuments.addAll(caseData.getHearingDocuments());
         }
-        caseDataBuilder.hearingDocuments(systemGeneratedCaseDocuments);
+        if (featureToggleService.isWelshEnabledForMainCase()
+            && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
+            List<Element<CaseDocument>> translatedDocuments = callbackParams.getCaseData().getPreTranslationDocuments();
+            translatedDocuments.add(element(caseDocuments.get(0)));
+            caseDataBuilder.preTranslationDocuments(translatedDocuments);
+            caseDataBuilder.bilingualHint(YesOrNo.YES);
+            caseDataBuilder.preTranslationDocumentType(PreTranslationDocumentType.HEARING_NOTICE);
+        } else {
+            systemGeneratedCaseDocuments.add(element(caseDocuments.get(0)));
+            caseDataBuilder.hearingDocuments(systemGeneratedCaseDocuments);
+        }
     }
 
 }

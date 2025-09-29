@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -24,13 +25,16 @@ import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesMoreInformation;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -47,16 +51,26 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_HELP_WITH_FEE_
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.AMOUNT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CNBC_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HWF_MORE_INFO_DATE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HWF_MORE_INFO_DOCUMENTS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HWF_MORE_INFO_DOCUMENTS_WELSH;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HWF_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT_WELSH;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.OPENING_HOURS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PART_AMOUNT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PHONE_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.REASONS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.REASONS_WELSH;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.REMAINING_AMOUNT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.SPEC_UNSPEC_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.TYPE_OF_FEE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.TYPE_OF_FEE_WELSH;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_HMCTS_SIGNATURE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_OPENING_HOURS;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_PHONE_CONTACT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 
@@ -68,6 +82,10 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
     private NotificationService notificationService;
     @Mock
     private NotificationsProperties notificationsProperties;
+    @Mock
+    private FeatureToggleService featureToggleService;
+    @Mock
+    private NotificationsSignatureConfiguration configuration;
     @InjectMocks
     private NotifyLiPClaimantHwFOutcomeHandler handler;
 
@@ -99,7 +117,7 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
 
         private static final LocalDate NOW = LocalDate.now();
 
-        private static final CaseData CLAIM_ISSUE_CASE_DATA = CaseDataBuilder.builder().atStateClaimSubmitted().build().toBuilder()
+        private static final CaseData CLAIM_ISSUE_CASE_DATA = CaseDataBuilder.builder().atStateClaimIssued().build().toBuilder()
             .applicant1(PartyBuilder.builder().individual().build().toBuilder()
                             .partyEmail(EMAIL)
                             .build())
@@ -112,7 +130,7 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
             .hwfFeeType(FeeType.CLAIMISSUED)
             .build();
 
-        private static final CaseData HEARING_CASE_DATA = CaseDataBuilder.builder().atStateClaimSubmitted().build().toBuilder()
+        private static final CaseData HEARING_CASE_DATA = CaseDataBuilder.builder().atStateClaimIssued().build().toBuilder()
             .applicant1(PartyBuilder.builder().individual().build().toBuilder()
                             .partyEmail(EMAIL)
                             .build())
@@ -150,16 +168,30 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
                 EMAIL_TEMPLATE_FEE_PAYMENT_OUTCOME);
             when(notificationsProperties.getNotifyApplicantForHwfFeePaymentOutcomeInBilingual()).thenReturn(
                 EMAIL_TEMPLATE_BILINGUAL_FEE_PAYMENT_OUTCOME);
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getHmctsSignature()).thenReturn((String) configMap.get("hmctsSignature"));
+            when(configuration.getPhoneContact()).thenReturn((String) configMap.get("phoneContact"));
+            when(configuration.getOpeningHours()).thenReturn((String) configMap.get("openingHours"));
+            when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("welshHmctsSignature"));
+            when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("welshPhoneContact"));
+            when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
+            when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
+            when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
         }
 
         @Test
         void shouldNotifyApplicant_HwfOutcome_NoRemission_ClaimIssued() {
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             // Given
             HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
                 .hwfCaseEvent(NO_REMISSION_HWF)
                 .noRemissionDetails("no remission")
                 .noRemissionDetailsSummary(NoRemissionDetailsSummary.FEES_REQUIREMENT_NOT_MET).build();
-            CaseData caseData = CLAIM_ISSUE_CASE_DATA.toBuilder().claimIssuedHwfDetails(hwfeeDetails).build();
+            CaseData caseData = CLAIM_ISSUE_CASE_DATA.toBuilder()
+                .claimIssuedHwfDetails(hwfeeDetails).build();
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
@@ -170,13 +202,16 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
             verify(notificationService, times(1)).sendMail(
                 EMAIL,
                 EMAIL_TEMPLATE_NO_REMISSION,
-                getNotificationDataMapNoRemissionClaimIssued(),
+                getNotificationDataMapNoRemissionClaimIssued(true),
                 REFERENCE_NUMBER
             );
         }
 
         @Test
         void shouldNotifyApplicantSolicitor_HwfOutcome_NoRemission_ClaimIssued() {
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             // Given
             HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
                 .hwfCaseEvent(NO_REMISSION_HWF)
@@ -197,13 +232,16 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
             verify(notificationService, times(1)).sendMail(
                 EMAIL_SOLICITOR,
                 EMAIL_TEMPLATE_NO_REMISSION,
-                getNotificationDataMapNoRemissionClaimIssued(),
+                getNotificationDataMapNoRemissionClaimIssued(true),
                 REFERENCE_NUMBER
             );
         }
 
         @Test
         void shouldNotifyApplicant_HwfOutcome_NoRemission_ClaimIssuedBilingual() {
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             // Given
             HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
                 .hwfCaseEvent(NO_REMISSION_HWF)
@@ -222,20 +260,24 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
             verify(notificationService, times(1)).sendMail(
                 EMAIL,
                 EMAIL_NO_REMISSION_TEMPLATE_HWF_BILINGUAL,
-                getNotificationDataMapNoRemissionClaimIssued(),
+                getNotificationDataMapNoRemissionClaimIssued(true),
                 REFERENCE_NUMBER
             );
         }
 
         @Test
         void shouldNotifyApplicant_HwfOutcome_NoRemission_Hearing() {
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             // Given
             HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
                 .hwfCaseEvent(NO_REMISSION_HWF)
                 .noRemissionDetails("no remission")
                 .noRemissionDetailsSummary(NoRemissionDetailsSummary.INCORRECT_EVIDENCE).build();
 
-            CaseData caseData = HEARING_CASE_DATA.toBuilder().hearingHwfDetails(hwfeeDetails).build();
+            CaseData caseData = HEARING_CASE_DATA.toBuilder().hearingHwfDetails(hwfeeDetails)
+                .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
             // When
@@ -245,13 +287,16 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
             verify(notificationService, times(1)).sendMail(
                 EMAIL,
                 EMAIL_TEMPLATE_NO_REMISSION,
-                getNotificationDataMapNoRemissionHearing(),
+                getNotificationDataMapNoRemissionHearing(true),
                 REFERENCE_NUMBER
             );
         }
 
         @Test
         void shouldNotifyApplicant_HwfOutcome_MoreInformation_ClaimIssued() {
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             // Given
             HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
                 .hwfCaseEvent(MORE_INFORMATION_HWF).build();
@@ -271,13 +316,16 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
             verify(notificationService, times(1)).sendMail(
                 EMAIL,
                 EMAIL_TEMPLATE_MORE_INFO_HWF,
-                getNotificationDataMapMoreInfoClaimIssued(),
+                getNotificationDataMapMoreInfoClaimIssued(true),
                 REFERENCE_NUMBER
             );
         }
 
         @Test
         void shouldNotifyApplicant_HwfOutcome_MoreInformation_Hearing() {
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             // Given
             HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
                 .hwfCaseEvent(MORE_INFORMATION_HWF).build();
@@ -297,18 +345,22 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
             verify(notificationService, times(1)).sendMail(
                 EMAIL,
                 EMAIL_TEMPLATE_MORE_INFO_HWF,
-                getNotificationDataMapMoreInfoHearing(),
+                getNotificationDataMapMoreInfoHearing(true),
                 REFERENCE_NUMBER
             );
         }
 
         @Test
         void shouldNotifyApplicant_HwfOutcome_InvalidRefNumber_ClaimIssued() {
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             // Given
             HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
                 .hwfCaseEvent(INVALID_HWF_REFERENCE)
                 .build();
-            CaseData caseData = CLAIM_ISSUE_CASE_DATA.toBuilder().claimIssuedHwfDetails(hwfeeDetails).build();
+            CaseData caseData = CLAIM_ISSUE_CASE_DATA.toBuilder()
+                .claimIssuedHwfDetails(hwfeeDetails).build();
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
@@ -319,13 +371,16 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
             verify(notificationService, times(1)).sendMail(
                 EMAIL,
                 EMAIL_TEMPLATE_INVALID_HWF_REFERENCE,
-                getNotificationCommonDataMapForClaimIssued(),
+                getNotificationCommonDataMapForClaimIssued(true),
                 REFERENCE_NUMBER
             );
         }
 
         @Test
         void shouldNotifyApplicant_HwfOutcome_InvalidRefNumber_Hearing() {
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             // Given
             HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
                 .hwfCaseEvent(INVALID_HWF_REFERENCE)
@@ -342,13 +397,16 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
             verify(notificationService, times(1)).sendMail(
                 EMAIL,
                 EMAIL_TEMPLATE_INVALID_HWF_REFERENCE,
-                getNotificationCommonDataMapForHearing(),
+                getNotificationCommonDataMapForHearing(true),
                 REFERENCE_NUMBER
             );
         }
 
         @Test
         void shouldNotifyApplicant_HwfOutcome_PartialRemission_ClaimIssued() {
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             // Given
             HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
                 .hwfCaseEvent(PARTIAL_REMISSION_HWF_GRANTED)
@@ -367,13 +425,16 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
             verify(notificationService, times(1)).sendMail(
                 EMAIL,
                 EMAIL_TEMPLATE_HWF_PARTIAL_REMISSION,
-                getNotificationDataMapPartialRemissionClaimIssued(),
+                getNotificationDataMapPartialRemissionClaimIssued(true),
                 REFERENCE_NUMBER
             );
         }
 
         @Test
         void shouldNotifyApplicant_HwfOutcome_PartialRemission_Hearing() {
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             // Given
             HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
                 .hwfCaseEvent(PARTIAL_REMISSION_HWF_GRANTED)
@@ -392,13 +453,16 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
             verify(notificationService, times(1)).sendMail(
                 EMAIL,
                 EMAIL_TEMPLATE_HWF_PARTIAL_REMISSION,
-                getNotificationDataMapPartialRemissionHearing(),
+                getNotificationDataMapPartialRemissionHearing(true),
                 REFERENCE_NUMBER
             );
         }
 
         @Test
         void shouldNotifyApplicantSolicitor_HwfOutcome_PartialRemission_Hearing() {
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             // Given
             HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
                 .hwfCaseEvent(PARTIAL_REMISSION_HWF_GRANTED)
@@ -421,13 +485,16 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
             verify(notificationService, times(1)).sendMail(
                 EMAIL_SOLICITOR,
                 EMAIL_TEMPLATE_HWF_PARTIAL_REMISSION,
-                getNotificationDataMapPartialRemissionHearing(),
+                getNotificationDataMapPartialRemissionHearing(true),
                 REFERENCE_NUMBER
             );
         }
 
         @Test
         void shouldNotifyApplicant_HwfOutcome_RefNumberUpdated_ClaimIssued() {
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             // Given
             HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
                 .hwfCaseEvent(UPDATE_HELP_WITH_FEE_NUMBER)
@@ -443,13 +510,16 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
             verify(notificationService, times(1)).sendMail(
                 EMAIL,
                 EMAIL_TEMPLATE_UPDATE_REF_NUMBER,
-                getNotificationCommonDataMapForClaimIssued(),
+                getNotificationCommonDataMapForClaimIssued(true),
                 REFERENCE_NUMBER
             );
         }
 
         @Test
         void shouldNotifyApplicant_HwfOutcome_RefNumberUpdated_Hearing() {
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             // Given
             HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
                 .hwfCaseEvent(UPDATE_HELP_WITH_FEE_NUMBER)
@@ -464,13 +534,16 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
             verify(notificationService, times(1)).sendMail(
                 EMAIL,
                 EMAIL_TEMPLATE_UPDATE_REF_NUMBER,
-                getNotificationCommonDataMapForHearing(),
+                getNotificationCommonDataMapForHearing(true),
                 REFERENCE_NUMBER
             );
         }
 
         @Test
         void shouldNotifyApplicant_HwfOutcome_MoreInformationNeeded_Bilingual() {
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             // Given
             HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
                 .hwfCaseEvent(MORE_INFORMATION_HWF).build();
@@ -491,13 +564,16 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
             verify(notificationService, times(1)).sendMail(
                 EMAIL,
                 EMAIL_TEMPLATE_MORE_INFO_HWF_BILINGUAL,
-                getNotificationDataMapMoreInfoClaimIssued(),
+                getNotificationDataMapMoreInfoClaimIssued(true),
                 REFERENCE_NUMBER
             );
         }
 
         @Test
         void shouldNotifyApplicant_HwfOutcome_RefNumberUpdated_Bilingual() {
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             // Given
             HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
                 .hwfCaseEvent(UPDATE_HELP_WITH_FEE_NUMBER)
@@ -516,13 +592,16 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
             verify(notificationService, times(1)).sendMail(
                 EMAIL,
                 EMAIL_TEMPLATE_UPDATE_REF_NUMBER_BILINGUAL,
-                getNotificationCommonDataMapForClaimIssued(),
+                getNotificationCommonDataMapForClaimIssued(true),
                 REFERENCE_NUMBER
             );
         }
 
         @Test
         void shouldNotifyApplicant_HwfOutcome_partRemission_Bilingual() {
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             // Given
             HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
                 .hwfCaseEvent(PARTIAL_REMISSION_HWF_GRANTED)
@@ -543,13 +622,15 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
             verify(notificationService, times(1)).sendMail(
                 EMAIL,
                 EMAIL_TEMPLATE_HWF_PARTIAL_REMISSION_BILINGUAL,
-                getNotificationDataMapPartialRemissionClaimIssued(),
+                getNotificationDataMapPartialRemissionClaimIssued(true),
                 REFERENCE_NUMBER
             );
         }
 
         @Test
         void shouldNotNotify_HwfOutcome_PartialRemission_Hearing_WhenEmailMissing() {
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             // Given
             HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
                 .hwfCaseEvent(PARTIAL_REMISSION_HWF_GRANTED)
@@ -572,13 +653,16 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
             verify(notificationService, never()).sendMail(
                 null,
                 EMAIL_TEMPLATE_HWF_PARTIAL_REMISSION,
-                getNotificationDataMapPartialRemissionHearing(),
+                getNotificationDataMapPartialRemissionHearing(false),
                 REFERENCE_NUMBER
             );
         }
 
         @Test
         void shouldNotifyApplicant_HwfOutcome_InvalidRefNumber_Bilingual() {
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             // Given
             HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
                 .hwfCaseEvent(INVALID_HWF_REFERENCE)
@@ -597,13 +681,14 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
             verify(notificationService, times(1)).sendMail(
                 EMAIL,
                 EMAIL_TEMPLATE_INVALID_HWF_REFERENCE_BILINGUAL,
-                getNotificationCommonDataMapForClaimIssued(),
+                getNotificationCommonDataMapForClaimIssued(true),
                 REFERENCE_NUMBER
             );
         }
 
-        private Map<String, String> getNotificationDataMapNoRemissionClaimIssued() {
-            return Map.of(
+        private Map<String, String> getNotificationDataMapNoRemissionClaimIssued(boolean isLipCase) {
+            Map<String, String> expectedProperties = new HashMap<>(addCommonProperties(isLipCase));
+            expectedProperties.putAll(Map.of(
                 CLAIM_REFERENCE_NUMBER, CLAIM_REFERENCE,
                 CLAIMANT_NAME, CLAIMANT,
                 REASONS, NoRemissionDetailsSummary.FEES_REQUIREMENT_NOT_MET.getLabel(),
@@ -612,11 +697,13 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
                 TYPE_OF_FEE_WELSH, FeeType.CLAIMISSUED.getLabelInWelsh(),
                 HWF_REFERENCE_NUMBER, HWF_REFERENCE,
                 AMOUNT, CLAIM_FEE_AMOUNT
-            );
+            ));
+            return expectedProperties;
         }
 
-        private Map<String, String> getNotificationDataMapNoRemissionHearing() {
-            return Map.of(
+        private Map<String, String> getNotificationDataMapNoRemissionHearing(boolean isLipCase) {
+            Map<String, String> expectedProperties = new HashMap<>(addCommonProperties(isLipCase));
+            expectedProperties.putAll(Map.of(
                 CLAIM_REFERENCE_NUMBER, CLAIM_REFERENCE,
                 CLAIMANT_NAME, CLAIMANT,
                 REASONS, NoRemissionDetailsSummary.INCORRECT_EVIDENCE.getLabel(),
@@ -625,11 +712,13 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
                 TYPE_OF_FEE_WELSH, FeeType.HEARING.getLabelInWelsh(),
                 HWF_REFERENCE_NUMBER, HWF_REFERENCE,
                 AMOUNT, HEARING_FEE_AMOUNT
-            );
+            ));
+            return expectedProperties;
         }
 
-        private Map<String, String> getNotificationDataMapMoreInfoClaimIssued() {
-            return Map.of(
+        private Map<String, String> getNotificationDataMapMoreInfoClaimIssued(boolean isLipCase) {
+            Map<String, String> expectedProperties = new HashMap<>(addCommonProperties(isLipCase));
+            expectedProperties.putAll(Map.of(
                 HWF_MORE_INFO_DATE, formatLocalDate(NOW, DATE),
                 CLAIMANT_NAME, CLAIMANT,
                 CLAIM_REFERENCE_NUMBER, CLAIM_REFERENCE,
@@ -638,11 +727,13 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
                 HWF_MORE_INFO_DOCUMENTS, getMoreInformationDocumentListString(),
                 HWF_MORE_INFO_DOCUMENTS_WELSH, getMoreInformationDocumentListStringWelsh(),
                 HWF_REFERENCE_NUMBER, HWF_REFERENCE
-            );
+            ));
+            return expectedProperties;
         }
 
-        private Map<String, String> getNotificationDataMapMoreInfoHearing() {
-            return Map.of(
+        private Map<String, String> getNotificationDataMapMoreInfoHearing(boolean isLipCase) {
+            Map<String, String> expectedProperties = new HashMap<>(addCommonProperties(isLipCase));
+            expectedProperties.putAll(Map.of(
                 HWF_MORE_INFO_DATE, formatLocalDate(NOW, DATE),
                 CLAIMANT_NAME, CLAIMANT,
                 CLAIM_REFERENCE_NUMBER, CLAIM_REFERENCE,
@@ -651,31 +742,37 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
                 HWF_MORE_INFO_DOCUMENTS, getMoreInformationDocumentListString(),
                 HWF_MORE_INFO_DOCUMENTS_WELSH, getMoreInformationDocumentListStringWelsh(),
                 HWF_REFERENCE_NUMBER, HWF_REFERENCE
-            );
+            ));
+            return expectedProperties;
         }
 
-        private Map<String, String> getNotificationCommonDataMapForClaimIssued() {
-            return Map.of(
+        private Map<String, String> getNotificationCommonDataMapForClaimIssued(boolean isLipCase) {
+            Map<String, String> expectedProperties = new HashMap<>(addCommonProperties(isLipCase));
+            expectedProperties.putAll(Map.of(
                 CLAIM_REFERENCE_NUMBER, CLAIM_REFERENCE,
                 CLAIMANT_NAME, CLAIMANT,
                 TYPE_OF_FEE, FeeType.CLAIMISSUED.getLabel(),
                 TYPE_OF_FEE_WELSH, FeeType.CLAIMISSUED.getLabelInWelsh(),
                 HWF_REFERENCE_NUMBER, HWF_REFERENCE
-            );
+            ));
+            return expectedProperties;
         }
 
-        private Map<String, String> getNotificationCommonDataMapForHearing() {
-            return Map.of(
+        private Map<String, String> getNotificationCommonDataMapForHearing(boolean isLipCase) {
+            Map<String, String> expectedProperties = new HashMap<>(addCommonProperties(isLipCase));
+            expectedProperties.putAll(Map.of(
                 CLAIM_REFERENCE_NUMBER, CLAIM_REFERENCE,
                 CLAIMANT_NAME, CLAIMANT,
                 TYPE_OF_FEE, FeeType.HEARING.getLabel(),
                 TYPE_OF_FEE_WELSH, FeeType.HEARING.getLabelInWelsh(),
                 HWF_REFERENCE_NUMBER, HWF_REFERENCE
-            );
+            ));
+            return expectedProperties;
         }
 
-        private Map<String, String> getNotificationDataMapPartialRemissionClaimIssued() {
-            return Map.of(
+        private Map<String, String> getNotificationDataMapPartialRemissionClaimIssued(boolean isLipCase) {
+            Map<String, String> expectedProperties = new HashMap<>(addCommonProperties(isLipCase));
+            expectedProperties.putAll(Map.of(
                 CLAIM_REFERENCE_NUMBER, CLAIM_REFERENCE,
                 CLAIMANT_NAME, CLAIMANT,
                 TYPE_OF_FEE, FeeType.CLAIMISSUED.getLabel(),
@@ -683,11 +780,13 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
                 HWF_REFERENCE_NUMBER, HWF_REFERENCE,
                 PART_AMOUNT, "1000.00",
                 REMAINING_AMOUNT, OUTSTANDING_AMOUNT_IN_POUNDS
-            );
+            ));
+            return expectedProperties;
         }
 
-        private Map<String, String> getNotificationDataMapPartialRemissionHearing() {
-            return Map.of(
+        private Map<String, String> getNotificationDataMapPartialRemissionHearing(boolean isLipCase) {
+            Map<String, String> expectedProperties = new HashMap<>(addCommonProperties(isLipCase));
+            expectedProperties.putAll(Map.of(
                 CLAIM_REFERENCE_NUMBER, CLAIM_REFERENCE,
                 CLAIMANT_NAME, CLAIMANT,
                 TYPE_OF_FEE, FeeType.HEARING.getLabel(),
@@ -695,7 +794,29 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
                 HWF_REFERENCE_NUMBER, HWF_REFERENCE,
                 PART_AMOUNT, "1000.00",
                 REMAINING_AMOUNT, OUTSTANDING_AMOUNT_IN_POUNDS
-            );
+            ));
+            return expectedProperties;
+        }
+
+        @NotNull
+        public Map<String, String> addCommonProperties(boolean isLipCase) {
+            Map<String, String> expectedProperties = new HashMap<>();
+            expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
+            expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
+            expectedProperties.put(HMCTS_SIGNATURE, configuration.getHmctsSignature());
+            expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
+            expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
+            expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
+            expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
+            expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+            if (isLipCase) {
+                expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+                expectedProperties.put(CNBC_CONTACT, configuration.getCnbcContact());
+            } else {
+                expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getRaiseQueryLr());
+                expectedProperties.put(CNBC_CONTACT, configuration.getRaiseQueryLr());
+            }
+            return expectedProperties;
         }
 
         private List<HwFMoreInfoRequiredDocuments> getMoreInformationDocumentList() {

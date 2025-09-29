@@ -11,8 +11,10 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,6 +22,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT1_FOR_CLAIM_CONTINUING_ONLINE_SPEC;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
@@ -33,6 +36,7 @@ public class ClaimContinuingOnlineApplicantPartyForSpecNotificationHandler exten
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
     private final FeatureToggleService featureToggleService;
+    private final NotificationsSignatureConfiguration configuration;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -61,14 +65,17 @@ public class ClaimContinuingOnlineApplicantPartyForSpecNotificationHandler exten
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-        return Map.of(
+        HashMap<String, String> properties = new HashMap<>(Map.of(
             RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
             CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
             ISSUED_ON, formatLocalDate(caseData.getIssueDate(), DATE),
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             RESPONSE_DEADLINE, formatLocalDate(caseData.getRespondent1ResponseDeadline()
                                                    .toLocalDate(), DATE)
-        );
+        ));
+        addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
+        return properties;
     }
 
     private void generateEmail(CaseData caseData) {

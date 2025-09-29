@@ -4,6 +4,7 @@ import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.connector.ClientAbortException;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +28,7 @@ import static uk.gov.hmcts.reform.civil.utils.ContentCachingRequestWrapperUtil.g
 @Slf4j
 @ControllerAdvice
 @RequiredArgsConstructor
+@Order(2)
 public class ResourceExceptionHandler {
 
     @ExceptionHandler(value = CallbackException.class)
@@ -107,7 +109,7 @@ public class ResourceExceptionHandler {
         return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.FORBIDDEN);
     }
 
-    @ExceptionHandler(value =  FeignException.NotFound.class)
+    @ExceptionHandler(value = FeignException.NotFound.class)
     public ResponseEntity<Object> feignExceptionNotFound(FeignException exception,
                                                          ContentCachingRequestWrapper contentCachingRequestWrapper) {
         log.debug(exception.getMessage(), exception);

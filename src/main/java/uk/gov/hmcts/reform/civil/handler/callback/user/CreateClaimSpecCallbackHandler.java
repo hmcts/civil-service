@@ -102,7 +102,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         + "<li><a href=\"%s\" target=\"_blank\">N9B</a></li></ul><li>and any supporting documents</li></ul>"
         + "to the defendant within 4 months."
         + "%n%nFollowing this, you will need to file a Certificate of Service and supporting documents "
-        + "to : <a href=\"mailto:OCMCNton@justice.gov.uk\">OCMCNton@justice.gov.uk</a>. The Certificate of Service form can be found here:"
+        + "to : <a href=\"mailto:contactocmc@justice.gov.uk\">contactocmc@justice.gov.uk</a>. The Certificate of Service form can be found here:"
         + "%n%n<ul><li><a href=\"%s\" target=\"_blank\">N215</a></li></ul>";
 
     private static final String ERROR_MESSAGE_SCHEDULED_DATE_OF_FLIGHT_MUST_BE_TODAY_OR_IN_THE_PAST =
@@ -454,8 +454,8 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         BigDecimal totalAmountWithInterest = caseData.getTotalClaimAmount().add(interest);
 
         String calculatedInterest = " | Description | Amount | \n |---|---| \n | Claim amount | £ "
-            + caseData.getTotalClaimAmount()
-            + " | \n | Interest amount | £ " + interest + " | \n | Total amount | £ " + totalAmountWithInterest + " |";
+            + caseData.getTotalClaimAmount().setScale(2)
+            + " | \n | Interest amount | £ " + interest.setScale(2) + " | \n | Total amount | £ " + totalAmountWithInterest.setScale(2) + " |";
         caseDataBuilder.calculatedInterest(calculatedInterest);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -468,8 +468,8 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         BigDecimal totalAmountWithInterest = caseData.getTotalClaimAmount();
 
         String calculateInterest = " | Description | Amount | \n |---|---| \n | Claim amount | £ "
-            + caseData.getTotalClaimAmount()
-            + " | \n | Interest amount | £ " + "0" + " | \n | Total amount | £ " + totalAmountWithInterest + " |";
+            + caseData.getTotalClaimAmount().setScale(2)
+            + " | \n | Interest amount | £ " + "0" + " | \n | Total amount | £ " + totalAmountWithInterest.setScale(2) + " |";
         caseDataBuilder.calculatedInterest(calculateInterest);
 
         return AboutToStartOrSubmitCallbackResponse.builder()

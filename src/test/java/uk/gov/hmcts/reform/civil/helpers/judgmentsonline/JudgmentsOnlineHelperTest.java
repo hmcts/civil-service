@@ -17,11 +17,17 @@ import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaymentPlan;
 import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.checkIfDateDifferenceIsGreaterThan31Days;
-import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.getCostOfJudgmentForDJ;
+import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.getFixedCostsOfJudgmentForDJ;
+import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.getClaimFeeOfJudgmentForDJ;
 import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.getMoneyValue;
 import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.getPartialPayment;
 import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.isNonDivergentForDJ;
+import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary;
+import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.calculateRepaymentBreakdownSummaryWithoutClaimInterest;
 
 public class JudgmentsOnlineHelperTest {
 
@@ -89,7 +95,8 @@ public class JudgmentsOnlineHelperTest {
             .repaymentSummaryObject(
                 REPAYMENT_SUMMARY_OBJECT)
             .build();
-        assertThat(getCostOfJudgmentForDJ(caseData)).isEqualTo("172.00");
+        assertThat(getFixedCostsOfJudgmentForDJ(caseData).add(getClaimFeeOfJudgmentForDJ(caseData)))
+            .isEqualTo("172.00");
     }
 
     @Test
@@ -135,5 +142,36 @@ public class JudgmentsOnlineHelperTest {
     @Test
     void testWelshChar() {
         assertThat(JudgmentsOnlineHelper.removeWelshCharacters("TEST Welsh ˆ`´¨")).isEqualTo("TEST Welsh ");
+    }
+
+    @Test
+    void testRepaymentBreakdownSummary() {
+        BigDecimal interest = BigDecimal.TEN;
+        JudgmentDetails activeJudgment = JudgmentDetails.builder().issueDate(LocalDate.now())
+            .paymentPlan(JudgmentPaymentPlan.builder()
+                             .type(PaymentPlanSelection.PAY_IMMEDIATELY).build())
+            .orderedAmount("100")
+            .costs("50")
+            .totalAmount("150")
+            .claimFeeAmount("55")
+            .amountAlreadyPaid("10")
+            .build();
+
+        assertThat(calculateRepaymentBreakdownSummary(activeJudgment, interest)).isNotNull();
+    }
+
+    @Test
+    void testRepaymentBreakdownSummaryForImmediatePlan() {
+        JudgmentDetails activeJudgment = JudgmentDetails.builder().issueDate(LocalDate.now())
+            .paymentPlan(JudgmentPaymentPlan.builder()
+                             .type(PaymentPlanSelection.PAY_IMMEDIATELY).build())
+            .orderedAmount("100")
+            .costs("50")
+            .totalAmount("150")
+            .claimFeeAmount("55")
+            .amountAlreadyPaid("10")
+            .build();
+
+        assertThat(calculateRepaymentBreakdownSummaryWithoutClaimInterest(activeJudgment, false)).isNotNull();
     }
 }

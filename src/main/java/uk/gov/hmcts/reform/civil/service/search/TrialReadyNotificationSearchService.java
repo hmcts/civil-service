@@ -3,8 +3,8 @@ package uk.gov.hmcts.reform.civil.service.search;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
-import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
@@ -37,19 +37,15 @@ public class TrialReadyNotificationSearchService extends ElasticSearchService {
                                       .minimumShouldMatch(1)
                                       .should(beState(PREPARE_FOR_HEARING_CONDUCT_HEARING))
                                       .should(beState(HEARING_READINESS)))
-                            .mustNot(matchQuery("data.allocatedTrack", "SMALL_CLAIM"))
-                            .mustNot(matchQuery("data.responseClaimTrack", "SMALL_CLAIM"))
+                            .must(boolQuery()
+                                      .minimumShouldMatch(1)
+                                      .should(matchQuery("data.allocatedTrack", "FAST_CLAIM"))
+                                      .should(matchQuery("data.responseClaimTrack", "FAST_CLAIM")))
                             .mustNot(matchQuery("data.listingOrRelisting", ListingOrRelisting.RELISTING))
                             .mustNot(matchQuery("data.trialReadyNotified", YesOrNo.YES))),
             List.of("reference"),
             startIndex
         );
-    }
-
-    @Override
-    Query queryInMediationCases(int startIndex, LocalDate claimMovedDate, boolean carmEnabled, boolean initialSearch,
-                                String searchAfterValue) {
-        return null;
     }
 
     private QueryBuilder beState(CaseState caseState) {

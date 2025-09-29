@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.querymanagement.QueryManagementCamundaService;
@@ -24,16 +25,21 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_OTHER_PARTY_QUERY_HAS_RESPONSE;
-
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getQueryById;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.QueryNotificationUtils.EMAIL;
+import static uk.gov.hmcts.reform.civil.utils.QueryNotificationUtils.IS_LIP_OTHER_PARTY;
+import static uk.gov.hmcts.reform.civil.utils.QueryNotificationUtils.IS_LIP_OTHER_PARTY_WELSH;
 import static uk.gov.hmcts.reform.civil.utils.QueryNotificationUtils.LEGAL_ORG;
-import static uk.gov.hmcts.reform.civil.utils.QueryNotificationUtils.getOtherPartyEmailDetails;
+import static uk.gov.hmcts.reform.civil.utils.QueryNotificationUtils.LIP_NAME;
+import static uk.gov.hmcts.reform.civil.utils.QueryNotificationUtils.getOtherPartyEmailDetailsPublicQuery;
+import static uk.gov.hmcts.reform.civil.utils.QueryNotificationUtils.isUnspecClaimNotReadyForNotification;
 
 @Service
 @RequiredArgsConstructor
@@ -49,6 +55,7 @@ public class NotifyOtherPartyQueryHasResponseNotificationHandler extends Callbac
     private final OrganisationService organisationService;
     private final NotificationsProperties notificationsProperties;
     private final CoreCaseUserService coreCaseUserService;
+    private final NotificationsSignatureConfiguration configuration;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -75,25 +82,58 @@ public class NotifyOtherPartyQueryHasResponseNotificationHandler extends Callbac
         CaseMessage responseQuery = getQueryById(caseData, responseQueryId);
         String parentQueryId = responseQuery.getParentId();
 
-        List<Map<String, String>> emailDetailsList = getOtherPartyEmailDetails(caseData, organisationService, coreCaseUserService, parentQueryId);
+        List<Map<String, String>> emailDetailsList = getOtherPartyEmailDetailsPublicQuery(
+            caseData,
+            organisationService,
+            coreCaseUserService,
+            parentQueryId
+        );
+        boolean isLipOtherParty = emailDetailsList.stream().anyMatch(map -> "TRUE".equalsIgnoreCase(map.get(
+            IS_LIP_OTHER_PARTY)));
 
-        emailDetailsList.forEach(otherPartyEmailDetails -> {
-            notificationService.sendMail(
-                otherPartyEmailDetails.get(EMAIL),
-                notificationsProperties.getNotifyOtherPartyQueryResponseReceived(),
-                addProperties(caseData, otherPartyEmailDetails.get(LEGAL_ORG)),
-                String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
-            );
-        });
+        if (isLipOtherParty) {
+            emailDetailsList.forEach(otherPartyEmailDetails -> {
+                boolean isWelsh = "WELSH".equalsIgnoreCase(otherPartyEmailDetails.get(IS_LIP_OTHER_PARTY_WELSH));
+                String templateId = isWelsh
+                    ? notificationsProperties.getQueryLipWelshPublicResponseReceived()
+                    : notificationsProperties.getQueryLipPublicResponseReceived();
 
+                notificationService.sendMail(
+                    otherPartyEmailDetails.get(EMAIL),
+                    templateId,
+                    addProperties(caseData, otherPartyEmailDetails.get(LIP_NAME), isLipOtherParty),
+                    String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+                );
+            });
+        } else {
+            emailDetailsList.forEach(otherPartyEmailDetails -> {
+                if (isUnspecClaimNotReadyForNotification(caseData, coreCaseUserService, parentQueryId)) {
+                    return;
+                }
+                notificationService.sendMail(
+                    otherPartyEmailDetails.get(EMAIL),
+                    notificationsProperties.getQueryLrPublicResponseReceived(),
+                    addProperties(caseData, otherPartyEmailDetails.get(LEGAL_ORG), false),
+                    String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+                );
+            });
+        }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
-    public Map<String, String> addProperties(CaseData caseData, String legalOrgName) {
-        return new HashMap<>(Map.of(
-            CLAIM_LEGAL_ORG_NAME_SPEC, legalOrgName,
-            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
-            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
-            CASEMAN_REF, caseData.getLegacyCaseReference()));
+    public Map<String, String> addProperties(CaseData caseData, String legalOrgNameOrPartyName, boolean isLipOtherParty) {
+        HashMap<String, String> properties = new HashMap<>();
+
+        if (isLipOtherParty) {
+            properties.put(PARTY_NAME, legalOrgNameOrPartyName);
+            properties.put(CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString());
+        } else {
+            properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, legalOrgNameOrPartyName);
+            properties.put(CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString());
+            properties.put(PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData));
+            properties.put(CASEMAN_REF, caseData.getLegacyCaseReference());
+        }
+        addAllFooterItems(caseData, properties, configuration, true);
+        return properties;
     }
 }

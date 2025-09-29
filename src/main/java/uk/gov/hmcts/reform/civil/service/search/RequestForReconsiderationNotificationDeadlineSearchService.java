@@ -37,12 +37,6 @@ public class RequestForReconsiderationNotificationDeadlineSearchService extends 
         );
     }
 
-    @Override
-    Query queryInMediationCases(int startIndex, LocalDate claimMovedDate, boolean carmEnabled, boolean initialSearch,
-                                String searchAfterValue) {
-        return null;
-    }
-
     private QueryBuilder beState(CaseState caseState) {
         return boolQuery()
             .must(matchQuery("state", caseState.toString()));

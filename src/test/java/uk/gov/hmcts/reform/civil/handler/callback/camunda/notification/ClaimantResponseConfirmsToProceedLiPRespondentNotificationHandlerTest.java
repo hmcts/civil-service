@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
+import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -8,6 +10,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -18,17 +22,20 @@ import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -43,12 +50,23 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CNBC_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT_WELSH;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.OPENING_HOURS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PHONE_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.SPEC_UNSPEC_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_HMCTS_SIGNATURE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_OPENING_HOURS;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_PHONE_CONTACT;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @Mock
@@ -63,8 +81,26 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
     @Mock
     private OrganisationService organisationService;
 
+    @Mock
+    private NotificationsSignatureConfiguration configuration;
+
     @InjectMocks
     private ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler handler;
+
+    @BeforeEach
+    void setUp() {
+        Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+        when(configuration.getHmctsSignature()).thenReturn((String) configMap.get("hmctsSignature"));
+        when(configuration.getPhoneContact()).thenReturn((String) configMap.get("phoneContact"));
+        when(configuration.getOpeningHours()).thenReturn((String) configMap.get("openingHours"));
+        when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("welshHmctsSignature"));
+        when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("welshPhoneContact"));
+        when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
+        when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
+        when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
+        when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+        when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
+    }
 
     @Nested
     class AboutToSubmitCallback {
@@ -152,6 +188,8 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
             when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(Organisation.builder()
                                                                                              .name("org name")
                                                                                              .build()));
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .caseDataLip(CaseDataLiP.builder()
@@ -181,6 +219,9 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
             when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(Organisation.builder()
                                                                                              .name("org name")
                                                                                              .build()));
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .responseClaimTrack(claimType)
@@ -197,13 +238,7 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
             verify(notificationService, times(1)).sendMail(
                 "respondentsolicitor@example.com",
                 RESPONDENT_EMAIL_TEMPLATE,
-                Map.of(
-                    CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
-                    CLAIM_LEGAL_ORG_NAME_SPEC, "org name",
-                    "partyReferences", "Claimant reference: 12345 - Defendant reference: 6789",
-                    "Claimant name", "Mr. John Rambo",
-                    CASEMAN_REF, "000DC001"
-                ),
+                getNotificationDataMapLipLr(caseData),
                 REFERENCE_NUMBER
             );
         }
@@ -216,6 +251,9 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
             when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(Organisation.builder()
                                                                                              .name("org name")
                                                                                              .build()));
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .caseDataLip(CaseDataLiP.builder()
@@ -236,13 +274,7 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
             verify(notificationService, times(1)).sendMail(
                 "respondentsolicitor@example.com",
                 RESPONDENT_MEDIATION_EMAIL_TEMPLATE,
-                Map.of(
-                    CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
-                    CLAIM_LEGAL_ORG_NAME_SPEC, "org name",
-                    "partyReferences", "Claimant reference: 12345 - Defendant reference: 6789",
-                    "Claimant name", "Mr. John Rambo",
-                    "casemanRef", "000DC001"
-                ),
+                getNotificationDataMapLipLr(caseData),
                 REFERENCE_NUMBER
             );
         }
@@ -255,6 +287,9 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
             when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(Organisation.builder()
                                                                                              .name("org name")
                                                                                              .build()));
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .caseDataLip(CaseDataLiP.builder()
@@ -274,13 +309,7 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
             verify(notificationService, times(1)).sendMail(
                 "respondentsolicitor@example.com",
                 RESPONDENT_MEDIATION_EMAIL_TEMPLATE,
-                Map.of(
-                    CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
-                    CLAIM_LEGAL_ORG_NAME_SPEC, "org name",
-                    "partyReferences", "Claimant reference: 12345 - Defendant reference: 6789",
-                    "Claimant name", "Mr. John Rambo",
-                    "casemanRef", "000DC001"
-                ),
+                getNotificationDataMapLipLr(caseData),
                 REFERENCE_NUMBER
             );
         }
@@ -294,6 +323,9 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
             when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(Organisation.builder()
                                                                                              .name("org name")
                                                                                              .build()));
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
@@ -318,13 +350,7 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
             verify(notificationService, times(1)).sendMail(
                 "respondentsolicitor@example.com",
                 RESPONDENT_LR_EMAIL_TEMPLATE,
-                Map.of(
-                    "partyReferences", "Claimant reference: 12345 - Defendant reference: 6789",
-                    CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
-                    CLAIM_LEGAL_ORG_NAME_SPEC, "org name",
-                    APPLICANT_ONE_NAME, "Mr. John Rambo",
-                    CASEMAN_REF, caseData.getLegacyCaseReference()
-                ),
+                getNotificationDataMapLipLr(caseData),
                 REFERENCE_NUMBER
             );
         }
@@ -338,6 +364,10 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
             when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(Organisation.builder()
                                                                                              .name("org name")
                                                                                              .build()));
+
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
@@ -360,14 +390,86 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
             verify(notificationService, times(1)).sendMail(
                 "respondentsolicitor@example.com",
                 RESPONDENT_LR_EMAIL_TEMPLATE,
-                Map.of(
-                    "partyReferences", "Claimant reference: 12345 - Defendant reference: 6789",
-                    CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
-                    CLAIM_LEGAL_ORG_NAME_SPEC, "org name",
-                    APPLICANT_ONE_NAME, "Mr. John Rambo",
-                    CASEMAN_REF, caseData.getLegacyCaseReference()
-                ),
+                getNotificationDataMapLipLr(caseData),
                 REFERENCE_NUMBER
+            );
+        }
+
+        @Test
+        void shouldNotifyLRRespondent_whenApplicantNoProceedsForWelsh() {
+            when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+            when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
+            when(notificationsProperties.getRespondentSolicitorNotifyNotToProceedSpec()).thenReturn(
+                RESPONDENT_LR_EMAIL_TEMPLATE);
+            when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(Organisation.builder()
+                                                                                             .name("org name")
+                                                                                             .build()));
+
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
+                .caseDataLip(CaseDataLiP.builder()
+                                 .applicant1SettleClaim(YES)
+                                 .build())
+                .build();
+            caseData = caseData.toBuilder()
+                .applicant1ProceedWithClaim(NO)
+                .applicant1Represented(NO)
+                .respondent1Represented(YES)
+                .claimantBilingualLanguagePreference("BOTH")
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CaseEvent.NOTIFY_LIP_RESPONDENT_CLAIMANT_CONFIRM_TO_PROCEED.name())
+                    .build()).build();
+
+            handler.handle(params);
+
+            verify(notificationService, times(1)).sendMail(
+                "respondentsolicitor@example.com",
+                RESPONDENT_LR_EMAIL_TEMPLATE,
+                getNotificationDataMapLipLr(caseData),
+                REFERENCE_NUMBER
+            );
+        }
+
+        @Test
+        void shouldNotifyLRRespondent_whenApplicantSettlesClaimForWelsh() {
+            when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+            when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
+            when(notificationsProperties.getRespondent1LipClaimUpdatedTemplate()).thenReturn(
+                RESPONDENT_LR_EMAIL_TEMPLATE);
+            when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(Organisation.builder()
+                                                                                             .name("org name")
+                                                                                             .build()));
+
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
+                .build();
+            caseData = caseData.toBuilder()
+                .respondent1Represented(NO)
+                .applicant1PartAdmitIntentionToSettleClaimSpec(YES)
+                .applicant1Represented(NO)
+                .specRespondent1Represented(NO)
+                .claimantBilingualLanguagePreference("BOTH")
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CaseEvent.NOTIFY_LIP_RESPONDENT_CLAIMANT_CONFIRM_TO_PROCEED.name())
+                    .build()).build();
+
+            handler.handle(params);
+
+            verify(notificationService, times(1)).sendMail(
+                eq("sole.trader@email.com"),
+                eq(RESPONDENT_LR_EMAIL_TEMPLATE),
+                any(),
+                eq(REFERENCE_NUMBER)
             );
         }
 
@@ -398,20 +500,51 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
         }
 
         private Map<String, String> getNotificationDataMap() {
-            return Map.of(
-                CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
-                RESPONDENT_NAME, DEFENDANT
-            );
+            Map<String, String> properties = new HashMap<>(addCommonProperties(true));
+            properties.put(CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE);
+            properties.put(RESPONDENT_NAME, DEFENDANT);
+            return properties;
         }
 
         private Map<String, String> getNotificationDataMapCarm(CaseData caseData) {
-            return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
-                CLAIM_LEGAL_ORG_NAME_SPEC, "org name",
-                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
-                CASEMAN_REF, caseData.getLegacyCaseReference(),
-                APPLICANT_ONE_NAME, "Mr. John Rambo"
-            );
+            Map<String, String> properties = new HashMap<>(addCommonProperties(false));
+            properties.put(CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString());
+            properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, "org name");
+            properties.put(PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData));
+            properties.put(CASEMAN_REF, caseData.getLegacyCaseReference());
+            properties.put(APPLICANT_ONE_NAME, "Mr. John Rambo");
+            return properties;
+        }
+
+        private Map<String, String> getNotificationDataMapLipLr(CaseData caseData) {
+            Map<String, String> properties = new HashMap<>(addCommonProperties(true));
+            properties.put(CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString());
+            properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, "org name");
+            properties.put(PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789");
+            properties.put(CASEMAN_REF, caseData.getLegacyCaseReference());
+            properties.put(APPLICANT_ONE_NAME, "Mr. John Rambo");
+            return properties;
+        }
+
+        @NotNull
+        public Map<String, String> addCommonProperties(boolean isLipCase) {
+            Map<String, String> expectedProperties = new HashMap<>();
+            expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
+            expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
+            expectedProperties.put(HMCTS_SIGNATURE, configuration.getHmctsSignature());
+            expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
+            expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
+            expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
+            expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
+            expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+            if (isLipCase) {
+                expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+                expectedProperties.put(CNBC_CONTACT, configuration.getCnbcContact());
+            } else {
+                expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getRaiseQueryLr());
+                expectedProperties.put(CNBC_CONTACT, configuration.getRaiseQueryLr());
+            }
+            return expectedProperties;
         }
 
         @Test

@@ -1,0 +1,72 @@
+package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant;
+
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
+import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
+
+import java.time.LocalDateTime;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REMOVE_CLAIMANT_DJ_DASHBOARD_NOTIFICATION;
+
+@ExtendWith(MockitoExtension.class)
+public class RemoveDefaultJudgmentDashboardNotificationHandlerTest extends BaseCallbackHandlerTest {
+
+    @InjectMocks
+    private RemoveDefaultJudgmentDashboardNotificationHandler handler;
+
+    @Mock
+    private DashboardNotificationService dashboardNotificationService;
+
+    @Test
+    void handleEventsReturnsTheExpectedCallbackEvent() {
+        assertThat(handler.handledEvents()).contains(REMOVE_CLAIMANT_DJ_DASHBOARD_NOTIFICATION);
+    }
+
+    @Nested
+    class AboutToSubmitCallback {
+
+        @Test
+        void shouldRemoveNotification_whenInvoked() {
+            CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build();
+            caseData = caseData.toBuilder().respondent1ResponseDeadline(LocalDateTime.MIN).build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(REMOVE_CLAIMANT_DJ_DASHBOARD_NOTIFICATION.name()).build()
+            ).build();
+
+            handler.handle(params);
+
+            verify(dashboardNotificationService).deleteByNameAndReferenceAndCitizenRole(
+                "Notice.AAA6.DefResponse.ResponseTimeElapsed.Claimant",
+                String.valueOf(caseData.getCcdCaseReference()),
+                "CLAIMANT"
+            );
+        }
+
+        @Test
+        void shouldNotRemoveNotification_IfResponseDeadlineNotPassed() {
+            CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build();
+            caseData = caseData.toBuilder().respondent1ResponseDeadline(LocalDateTime.MAX).build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(REMOVE_CLAIMANT_DJ_DASHBOARD_NOTIFICATION.name()).build()
+            ).build();
+
+            handler.handle(params);
+
+            verifyNoInteractions(dashboardNotificationService);
+        }
+    }
+}

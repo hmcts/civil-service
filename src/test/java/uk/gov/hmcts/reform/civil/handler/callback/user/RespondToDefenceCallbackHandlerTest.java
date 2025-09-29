@@ -60,6 +60,7 @@ import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.FrcDocumentsUtils;
 import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
+import uk.gov.hmcts.reform.civil.utils.RequestedCourtForClaimDetailsTab;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 
 import java.math.BigDecimal;
@@ -151,6 +152,9 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Mock
     private LocationHelper locationHelper;
+
+    @MockBean
+    private RequestedCourtForClaimDetailsTab requestedCourtForClaimDetailsTab;
 
     @Nested
     class AboutToStartCallback {
@@ -1421,7 +1425,8 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
             handler = new RespondToDefenceCallbackHandler(exitSurveyContentService, unavailableDateValidator, mapper,
                                                           time, featureToggleService, locationRefDataService, locationRefDataUtil,
                                                           locationHelper, caseFlagsInitialiser, toggleConfiguration, assignCategoryId,
-                                                          caseDetailsConverter, frcDocumentsUtils, Optional.empty());
+                                                          caseDetailsConverter, frcDocumentsUtils, Optional.empty(),
+                                                          requestedCourtForClaimDetailsTab);
             when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
             var caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.TWO_V_ONE)

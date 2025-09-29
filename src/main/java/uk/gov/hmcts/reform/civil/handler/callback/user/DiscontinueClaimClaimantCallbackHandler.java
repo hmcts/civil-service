@@ -34,7 +34,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISCONTINUE_CLAIM_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISCONTINUED;
 import static uk.gov.hmcts.reform.civil.helpers.settlediscontinue.DiscontinueClaimHelper.is1v2LrVLrCase;
-import static uk.gov.hmcts.reform.civil.utils.PersistDataUtils.persistFlagsForParties;
 
 @Service
 @RequiredArgsConstructor
@@ -57,8 +56,9 @@ public class DiscontinueClaimClaimantCallbackHandler extends CallbackHandler {
             + "Any listed hearings will still proceed as normal.\n\n"
             + "All other parties will be notified.";
     public static final String NO_COURT_PERMISSION_FULL_DISCONTINUE_ANYONE_BODY = "### Next step \n "
-            + "This will now be reviewed and the claim will proceed offline and your online account will not "
-            + "be updated for this claim.Any updates will be sent by post.";
+        + "This will now be reviewed and the claim will proceed offline and your online account will not "
+        + "be updated for this claim.\n\n"
+        + "Any updates will be sent by post.";
     private final ObjectMapper objectMapper;
     private final CaseDetailsConverter caseDetailsConverter;
 
@@ -201,10 +201,6 @@ public class DiscontinueClaimClaimantCallbackHandler extends CallbackHandler {
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        CaseData oldCaseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetailsBefore());
-
-        // persist party flags (ccd issue)
-        persistFlagsForParties(oldCaseData, caseData, caseDataBuilder);
 
         caseDataBuilder.businessProcess(BusinessProcess.ready(DISCONTINUE_CLAIM_CLAIMANT));
         if (MultiPartyScenario.isTwoVOne(caseData)) {

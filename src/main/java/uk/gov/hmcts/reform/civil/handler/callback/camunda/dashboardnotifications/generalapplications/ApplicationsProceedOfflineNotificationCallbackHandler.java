@@ -13,7 +13,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.GADetailsRespondentSol;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails;
-import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
+import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
@@ -55,9 +55,7 @@ public class ApplicationsProceedOfflineNotificationCallbackHandler extends Callb
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return featureToggleService.isGeneralApplicationsEnabled()
-            ? Map.of(callbackKey(ABOUT_TO_SUBMIT), this::configureScenarioForProceedOffline)
-            : Map.of(callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse);
+        return Map.of(callbackKey(ABOUT_TO_SUBMIT), this::configureScenarioForProceedOffline);
     }
 
     @Override

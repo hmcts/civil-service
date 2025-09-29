@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.documentmanagement;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tika.Tika;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +32,6 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.springframework.http.MediaType.ALL_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
 import static uk.gov.hmcts.reform.civil.constants.DocumentManagementConstants.CASE_TYPE_ID;
 import static uk.gov.hmcts.reform.civil.constants.DocumentManagementConstants.CREATED_BY;
@@ -50,6 +50,7 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
     private final UserService userService;
     private final DocumentManagementConfiguration documentManagementConfiguration;
     private final CaseDocumentClientApi caseDocumentClientApi;
+    private final Tika tika;
 
     @Retryable(value = {DocumentUploadException.class}, backoff = @Backoff(delay = 200))
     @Override
@@ -109,7 +110,7 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
 
         try {
             MultipartFile file
-                = new InMemoryMultipartFile(FILES_NAME, originalFileName, ALL_VALUE, uploadedDocument.getFile().getBytes());
+                = new InMemoryMultipartFile(FILES_NAME, originalFileName, tika.detect(originalFileName), uploadedDocument.getFile().getBytes());
 
             DocumentUploadRequest documentUploadRequest = new DocumentUploadRequest(
                 Classification.RESTRICTED.toString(),
@@ -211,7 +212,7 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
             }
 
             return new DownloadedDocumentResponse(responseEntity.getBody(), documentMetadata.originalDocumentName,
-                                                  documentMetadata.mimeType);
+                                                  tika.detect(documentMetadata.originalDocumentName));
         } catch (Exception ex) {
             log.error("Failed downloading document {}", documentPath, ex);
             throw new DocumentDownloadException(documentPath, ex);

@@ -7,7 +7,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseProgressionDashboardCallbackHandle
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
+import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
@@ -45,6 +45,7 @@ public class UploadHearingDocumentsClaimantHandler extends CaseProgressionDashbo
     public boolean shouldRecordScenario(CaseData caseData) {
         return caseData.isApplicantNotRepresented()
             && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
-            && featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation());
+            && (featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation())
+            || featureToggleService.isWelshEnabledForMainCase());
     }
 }

@@ -12,12 +12,16 @@ import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT1_FOR_REQUEST_JUDGEMENT_BY_ADMISSION_LIP_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
@@ -32,6 +36,8 @@ public class ClaimantLipRequestJudgementByAdmissionRespondentNotificationHandler
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
     private final PinInPostConfiguration pipInPostConfiguration;
+    private final NotificationsSignatureConfiguration configuration;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -69,12 +75,15 @@ public class ClaimantLipRequestJudgementByAdmissionRespondentNotificationHandler
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-        return Map.of(
+        HashMap<String, String> properties = new HashMap<>(Map.of(
             CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
             RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             FRONTEND_URL, pipInPostConfiguration.getCuiFrontEndUrl()
-        );
+        ));
+        addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
+        return properties;
     }
 
     private String addEmail(CaseData caseData) {

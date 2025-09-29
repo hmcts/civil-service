@@ -11,16 +11,20 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +36,7 @@ public class TranslatedDocumentUploadedClaimantNotificationHandler extends Callb
     private static final String REFERENCE_TEMPLATE = "translated-document-uploaded-claimant-notification-%s";
     public static final String TASK_ID = "NotifyTranslatedDocumentUploadedToClaimant";
     final  OrganisationService organisationService;
+    private final NotificationsSignatureConfiguration configuration;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -55,15 +60,22 @@ public class TranslatedDocumentUploadedClaimantNotificationHandler extends Callb
         if (caseData.isApplicantNotRepresented()) {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-                CLAIMANT_NAME, caseData.getApplicant1().getPartyName()
-            );
+                CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
+                RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
+            ));
+            addAllFooterItems(caseData, properties, configuration,
+                              featureToggleService.isPublicQueryManagementEnabled(caseData));
+            return properties;
         }
-        return Map.of(
+        HashMap<String, String> properties = new HashMap<>(Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             CASEMAN_REF, caseData.getLegacyCaseReference()
-        );
+        ));
+        addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
+        return properties;
     }
 
     private CallbackResponse notifyClaimant(CallbackParams callbackParams) {
@@ -83,9 +95,9 @@ public class TranslatedDocumentUploadedClaimantNotificationHandler extends Callb
     private String addTemplate(CaseData caseData) {
         if (caseData.isApplicantNotRepresented()) {
             if (caseData.isClaimantBilingual()) {
-                return notificationsProperties.getNotifyClaimantLiPTranslatedDocumentUploadedWhenClaimIssuedInBilingual();
+                return notificationsProperties.getNotifyLiPClaimantDefendantRespondedWelshLip();
             }
-            return notificationsProperties.getNotifyClaimantLiPTranslatedDocumentUploadedWhenClaimIssuedInEnglish();
+            return notificationsProperties.getNotifyLiPClaimantDefendantResponded();
         }
         return notificationsProperties.getNotifyClaimantTranslatedDocumentUploaded();
     }

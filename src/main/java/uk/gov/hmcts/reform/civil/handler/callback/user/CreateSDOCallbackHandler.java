@@ -275,6 +275,11 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             updatedData.showCarmFields(NO);
         }
 
+        if (featureToggleService.isWelshEnabledForMainCase()
+            && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
+            updatedData.bilingualHint(YesOrNo.YES);
+        }
+
         /**
          * Update case management location to preferred logic and return preferred location when legal advisor SDO,
          * otherwise return preferred location only.
@@ -1383,6 +1388,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse generateSdoOrder(CallbackParams callbackParams) {
+        log.info("generateSdoOrder ccdCaseReference: {} legacyCaseReference: {}",
+                 callbackParams.getCaseData().getCcdCaseReference(), callbackParams.getCaseData().getLegacyCaseReference());
         CaseData caseData = V_1.equals(callbackParams.getVersion())
             ? mapHearingMethodFields(callbackParams.getCaseData())
             : callbackParams.getCaseData();
@@ -1518,10 +1525,18 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         CaseDocument document = caseData.getSdoOrderDocument();
         if (document != null) {
-            List<Element<CaseDocument>> generatedDocuments = callbackParams.getCaseData()
-                .getSystemGeneratedCaseDocuments();
-            generatedDocuments.add(element(document));
-            dataBuilder.systemGeneratedCaseDocuments(generatedDocuments);
+            if (featureToggleService.isWelshEnabledForMainCase()
+                && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
+                List<Element<CaseDocument>> sdoDocuments = callbackParams.getCaseData()
+                    .getPreTranslationDocuments();
+                sdoDocuments.add(element(document));
+                dataBuilder.preTranslationDocuments(sdoDocuments);
+            } else {
+                List<Element<CaseDocument>> generatedDocuments = callbackParams.getCaseData()
+                    .getSystemGeneratedCaseDocuments();
+                generatedDocuments.add(element(document));
+                dataBuilder.systemGeneratedCaseDocuments(generatedDocuments);
+            }
         }
         // null/remove preview SDO document, otherwise it will show as duplicate within case file view
         dataBuilder.sdoOrderDocument(null);
@@ -1530,12 +1545,16 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         // LiP check ensures LiP cases will not automatically get whitelisted, and instead will have their own ea court check.
         boolean isLipCase = (caseData.isApplicantLiP() || caseData.isRespondent1LiP() || caseData.isRespondent2LiP());
-        if (!isLipCase) {
-            log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
+        if (featureToggleService.isWelshEnabledForMainCase()) {
             dataBuilder.eaCourtLocation(YES);
         } else {
-            boolean isLipCaseEaCourt = isLipCaseWithProgressionEnabledAndCourtWhiteListed(caseData);
-            dataBuilder.eaCourtLocation(isLipCaseEaCourt ? YesOrNo.YES : YesOrNo.NO);
+            if (!isLipCase) {
+                log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
+                dataBuilder.eaCourtLocation(YES);
+            } else {
+                boolean isLipCaseEaCourt = isLipCaseWithProgressionEnabledAndCourtWhiteListed(caseData);
+                dataBuilder.eaCourtLocation(isLipCaseEaCourt ? YesOrNo.YES : YesOrNo.NO);
+            }
         }
 
         dataBuilder.disposalHearingMethodInPerson(deleteLocationList(

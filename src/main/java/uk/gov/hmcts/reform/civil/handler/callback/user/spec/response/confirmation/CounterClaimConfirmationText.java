@@ -5,6 +5,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationTextSpecGenerator;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.Optional;
 
@@ -17,7 +18,7 @@ public class CounterClaimConfirmationText implements RespondToClaimConfirmationT
         + "<br><br><a href=\"https://www.gov.uk/respond-money-claim\" target=\"_blank\">Download form N9B (opens in a new tab)</a>";
 
     @Override
-    public Optional<String> generateTextFor(CaseData caseData) {
+    public Optional<String> generateTextFor(CaseData caseData, FeatureToggleService featureToggleService) {
         if (!isCounterClaim(caseData)) {
             return Optional.empty();
         }

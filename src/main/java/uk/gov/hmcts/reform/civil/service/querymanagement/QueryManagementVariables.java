@@ -13,4 +13,6 @@ import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 public class QueryManagementVariables implements MappableObject {
 
     public String queryId;
+    public String documentToRemoveId;
+    public boolean removeDocument;
 }

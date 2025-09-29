@@ -49,10 +49,10 @@ public class RespondentResponseDeadlineCallbackHandler extends CallbackHandler {
 
     private CallbackResponse updateRespondentDeadlineDate(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-
+        LocalDateTime respondentDeadline = deadlinesCalculator.plus28DaysAt4pmDeadline(LocalDateTime.now());
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder()
-            .respondent1ResponseDeadline(deadlinesCalculator.plus28DaysAt4pmDeadline(
-                LocalDateTime.now()));
+            .respondent1ResponseDeadline(respondentDeadline)
+            .nextDeadline(respondentDeadline.toLocalDate());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))

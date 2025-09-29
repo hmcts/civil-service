@@ -6,7 +6,6 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
@@ -36,22 +35,17 @@ public class EvidenceUploadNotificationSearchService extends ElasticSearchServic
                           .should(beState(DECISION_OUTCOME))
                           .should(beState(All_FINAL_ORDERS_ISSUED))
                           .should(beState(CASE_PROGRESSION)))
+                .mustNot(matchQuery("data.evidenceUploadNotificationSent", "Yes"))
                 .must(boolQuery()
                           .minimumShouldMatch(1)
                           .should(rangeQuery("data.caseDocumentUploadDate").lt("now").gt(
-                              "now-1d"))
+                              "now-7d"))
                           .should(rangeQuery("data.caseDocumentUploadDateRes").lt("now").gt(
-                              "now-1d"))
+                              "now-7d"))
                           ),
             List.of("reference"),
             startIndex
         );
-    }
-
-    @Override
-    Query queryInMediationCases(int startIndex, LocalDate claimMovedDate, boolean carmEnabled, boolean initialSearch,
-                                String searchAfterValue) {
-        return null;
     }
 
     public BoolQueryBuilder beState(CaseState state) {

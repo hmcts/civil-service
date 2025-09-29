@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
@@ -26,6 +25,7 @@ import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -157,8 +157,9 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse validateDateOfBirth(CallbackParams callbackParams) {
-        Party respondent = callbackParams.getCaseData().getRespondent1();
-        List<String> errors = dateOfBirthValidator.validate(respondent);
+        List<String> errors = new ArrayList<>();
+        ofNullable(callbackParams.getCaseData().getRespondent1())
+            .ifPresent(party -> errors.addAll(dateOfBirthValidator.validate(party)));
         ofNullable(callbackParams.getCaseData().getRespondent2())
             .ifPresent(party -> errors.addAll(dateOfBirthValidator.validate(party)));
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -173,7 +174,6 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
 
         final var updatedRespondent1 = caseData.getRespondent1().toBuilder()
             .primaryAddress(caseData.getRespondent1Copy().getPrimaryAddress())
-            .flags(caseData.getRespondent1Copy().getFlags())
             .build();
 
         CaseData.CaseDataBuilder caseDataUpdated = caseData.toBuilder();
@@ -233,7 +233,6 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
             //1v2 same
             var updatedRespondent2 = caseData.getRespondent2().toBuilder()
                 .primaryAddress(caseData.getRespondent2Copy().getPrimaryAddress())
-                .flags(caseData.getRespondent2Copy().getFlags())
                 .build();
 
             caseDataUpdated.respondent1AcknowledgeNotificationDate(time.now())
@@ -278,7 +277,6 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
             && respondent1Check.equals(NO) && !respondent2HasSameLegalRep(caseData)) {
             var updatedRespondent2 = caseData.getRespondent2Copy().toBuilder()
                 .primaryAddress(caseData.getRespondent2Copy().getPrimaryAddress())
-                .flags(caseData.getRespondent2Copy().getFlags())
                 .build();
             //1v2 diff login 2
             caseDataUpdated

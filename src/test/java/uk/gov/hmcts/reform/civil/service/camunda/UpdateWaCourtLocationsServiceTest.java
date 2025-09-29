@@ -58,7 +58,7 @@ class UpdateWaCourtLocationsServiceTest {
     private FeatureToggleService featureToggleService;
 
     String cnbcEpimmId = "420219";
-    String ccmccEpimmId = "192280";
+    String ccmccEpimmId = "420219";
     private final TaskManagementLocationTypes testTaskManagementLocations = TaskManagementLocationTypes.builder()
         .cmcListingLocation(TaskManagementLocationsModel.builder()
                                 .locationName("london somewhere")
@@ -86,7 +86,7 @@ class UpdateWaCourtLocationsServiceTest {
                                   .build())
         .build();
 
-    private final TaskManagementLocationTypes testCnbcTaskManagementLocations = TaskManagementLocationTypes.builder()
+    private final TaskManagementLocationTypes testCnbcOrCcmcTaskManagementLocations = TaskManagementLocationTypes.builder()
         .cmcListingLocation(TaskManagementLocationsModel.builder()
                                     .locationName("Civil National Business Centre")
                                     .location(cnbcEpimmId)
@@ -111,33 +111,6 @@ class UpdateWaCourtLocationsServiceTest {
                                       .region("2")
                                       .regionName("Midlands")
                                       .build())
-        .build();
-
-    private final TaskManagementLocationTypes testCcmcTaskManagementLocations = TaskManagementLocationTypes.builder()
-        .cmcListingLocation(TaskManagementLocationsModel.builder()
-                                .locationName("-")
-                                .location("-")
-                                .region("-")
-                                .regionName("-")
-                                .build())
-        .ccmcListingLocation(TaskManagementLocationsModel.builder()
-                                 .locationName("-")
-                                 .location("-")
-                                 .region("-")
-                                 .regionName("-")
-                                 .build())
-        .ptrListingLocation(TaskManagementLocationsModel.builder()
-                                .locationName("-")
-                                .location("-")
-                                .region("-")
-                                .regionName("-")
-                                .build())
-        .trialListingLocation(TaskManagementLocationsModel.builder()
-                                  .locationName("-")
-                                  .location("-")
-                                  .region("-")
-                                  .regionName("-")
-                                  .build())
         .build();
 
     @BeforeEach
@@ -218,7 +191,7 @@ class UpdateWaCourtLocationsServiceTest {
         updateWaCourtLocationsService.updateCourtListingWALocations("auth", caseDataBuilder);
         CaseData updatedCaseData = caseDataBuilder.build();
 
-        assertEquals(updatedCaseData.getTaskManagementLocations(), null);
+        assertNull(updatedCaseData.getTaskManagementLocations());
 
     }
 
@@ -323,7 +296,7 @@ class UpdateWaCourtLocationsServiceTest {
         updateWaCourtLocationsService.updateCourtListingWALocations("auth", caseDataBuilder);
         CaseData updatedCaseData = caseDataBuilder.build();
 
-        assertEquals(updatedCaseData.getTaskManagementLocations(), testCnbcTaskManagementLocations);
+        assertEquals(updatedCaseData.getTaskManagementLocations(), testCnbcOrCcmcTaskManagementLocations);
     }
 
     @Test
@@ -374,7 +347,7 @@ class UpdateWaCourtLocationsServiceTest {
         updateWaCourtLocationsService.updateCourtListingWALocations("auth", caseDataBuilder);
         CaseData updatedCaseData = caseDataBuilder.build();
 
-        assertEquals(updatedCaseData.getTaskManagementLocations(), testCcmcTaskManagementLocations);
+        assertEquals(updatedCaseData.getTaskManagementLocations(), testCnbcOrCcmcTaskManagementLocations);
     }
 
 }

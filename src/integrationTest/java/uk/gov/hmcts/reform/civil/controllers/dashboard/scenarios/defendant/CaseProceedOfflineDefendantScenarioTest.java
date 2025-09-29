@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant.CaseProceedOfflineDefendantNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.dashboard.data.TaskStatus;
 
@@ -111,7 +112,7 @@ public class CaseProceedOfflineDefendantScenarioTest extends DashboardBaseIntegr
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .respondent1Represented(YesOrNo.NO)
-            .activeJudgment(JudgmentDetails.builder().build())
+            .activeJudgment(JudgmentDetails.builder().state(JudgmentState.ISSUED).build())
             .previousCCDState(CaseState.All_FINAL_ORDERS_ISSUED)
             .build();
         when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);

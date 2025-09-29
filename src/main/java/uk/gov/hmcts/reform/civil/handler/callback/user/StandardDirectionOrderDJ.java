@@ -717,12 +717,16 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         caseDataBuilder.hearingNotes(getHearingNotes(caseData));
 
         boolean isLipCase = caseData.isApplicantLiP() || caseData.isRespondent1LiP() || caseData.isRespondent2LiP();
-        if (!isLipCase) {
-            log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
+        if (featureToggleService.isWelshEnabledForMainCase()) {
             caseDataBuilder.eaCourtLocation(YES);
         } else {
-            boolean isLipCaseEaCourt = isLipCaseWithProgressionEnabledAndCourtWhiteListed(caseData);
-            caseDataBuilder.eaCourtLocation(isLipCaseEaCourt ? YesOrNo.YES : YesOrNo.NO);
+            if (!isLipCase) {
+                log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
+                caseDataBuilder.eaCourtLocation(YES);
+            } else {
+                boolean isLipCaseEaCourt = isLipCaseWithProgressionEnabledAndCourtWhiteListed(caseData);
+                caseDataBuilder.eaCourtLocation(isLipCaseEaCourt ? YesOrNo.YES : YesOrNo.NO);
+            }
         }
 
         if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {

@@ -8,11 +8,13 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
-import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.HashMap;
 import java.util.List;
@@ -25,6 +27,7 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
@@ -40,6 +43,8 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandler extends Ca
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
     private final OrganisationService organisationService;
+    private final NotificationsSignatureConfiguration configuration;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -83,16 +88,15 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandler extends Ca
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
 
-        Map<String, String> properties = new HashMap<>();
-
-        properties.putAll(Map.of(
+        Map<String, String> properties = new HashMap<>(Map.of(
             CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData),
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             CASEMAN_REF, caseData.getLegacyCaseReference(),
             ISSUED_ON, formatLocalDate(caseData.getIssueDate(), DATE),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             CLAIM_DETAILS_NOTIFICATION_DEADLINE,
-            formatLocalDate(caseData.getRespondent1ResponseDeadline().toLocalDate(), DATE)));
+            formatLocalDate(caseData.getRespondent1ResponseDeadline().toLocalDate(), DATE)
+        ));
 
         if (caseData.getRespondent2() != null) {
             properties.put(RESPONDENT_ONE_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
@@ -102,6 +106,8 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandler extends Ca
             properties.put(RESPONSE_DEADLINE, formatLocalDateTime(
                 caseData.getRespondent1ResponseDeadline(), DATE_TIME_AT));
         }
+        addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
 
         return properties;
     }

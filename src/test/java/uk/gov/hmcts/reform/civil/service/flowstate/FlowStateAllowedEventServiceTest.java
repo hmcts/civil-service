@@ -533,7 +533,8 @@ class FlowStateAllowedEventServiceTest {
                         DISMISS_CASE,
                         MANAGE_STAY,
                         CONFIRM_ORDER_REVIEW,
-                        ORDER_REVIEW_OBLIGATION_CHECK
+                        ORDER_REVIEW_OBLIGATION_CHECK,
+                        EVIDENCE_UPLOAD_APPLICANT
                     }
                 ),
                 of(
@@ -2123,7 +2124,14 @@ class FlowStateAllowedEventServiceTest {
                         CONFIRM_ORDER_REVIEW,
                         ORDER_REVIEW_OBLIGATION_CHECK,
                         INITIATE_GENERAL_APPLICATION_COSC,
-                        CHANGE_LANGUAGE_PREFERENCE
+                        CHANGE_LANGUAGE_PREFERENCE,
+                        MORE_INFORMATION_HWF,
+                        FEE_PAYMENT_OUTCOME,
+                        NO_REMISSION_HWF,
+                        PARTIAL_REMISSION_HWF_GRANTED,
+                        FULL_REMISSION_HWF,
+                        UPDATE_HELP_WITH_FEE_NUMBER,
+                        INVALID_HWF_REFERENCE
                     }
                 ),
                 of(

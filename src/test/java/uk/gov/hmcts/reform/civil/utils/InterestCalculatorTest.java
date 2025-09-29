@@ -285,4 +285,58 @@ class InterestCalculatorTest {
         caseData = caseData.toBuilder().submittedDate(LocalDateTime.of(2024, 10, 28, 15, 59)).build();
         assertThat(interestCalculator.calculateInterest(caseData)).isEqualTo(BigDecimal.valueOf(78.32).setScale(2, RoundingMode.UNNECESSARY));
     }
+
+    @Test
+    void shouldReturnInterestRateWhenSameRateInterestAndSubmitDateIsFurtherInPastForJO() {
+        LocalDateTime dateTime = LocalDateTime.now().minusDays(2);
+        CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
+            .claimInterest(YesOrNo.YES)
+            .caseReference(123456789L)
+            .interestClaimOptions(InterestClaimOptions.SAME_RATE_INTEREST)
+            .sameRateInterestSelection(SameRateInterestSelection.builder()
+                                           .sameRateInterestType(SameRateInterestType.SAME_RATE_INTEREST_8_PC).build())
+            .interestClaimFrom(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE)
+            .interestClaimUntil(InterestClaimUntilType.UNTIL_SETTLED_OR_JUDGEMENT_MADE)
+            .totalClaimAmount(BigDecimal.valueOf(5000))
+            .build();
+        caseData = caseData.toBuilder().submittedDate(dateTime).build();
+        BigDecimal actual = interestCalculator.calculateInterest(caseData);
+        assertThat(actual).isEqualTo(BigDecimal.valueOf(2.20).setScale(2, RoundingMode.UNNECESSARY));
+    }
+
+    @Test
+    void shouldReturnZeroInterestRateWhenSameRateInterestAndSubmitDateIsYesterdayForJO() {
+        LocalDateTime dateTime = LocalDateTime.now().minusDays(1);
+        CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
+            .claimInterest(YesOrNo.YES)
+            .caseReference(123456789L)
+            .interestClaimOptions(InterestClaimOptions.SAME_RATE_INTEREST)
+            .sameRateInterestSelection(SameRateInterestSelection.builder()
+                                           .sameRateInterestType(SameRateInterestType.SAME_RATE_INTEREST_8_PC).build())
+            .interestClaimFrom(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE)
+            .interestClaimUntil(InterestClaimUntilType.UNTIL_SETTLED_OR_JUDGEMENT_MADE)
+            .totalClaimAmount(BigDecimal.valueOf(5000))
+            .build();
+        caseData = caseData.toBuilder().submittedDate(dateTime).build();
+        BigDecimal actual = interestCalculator.calculateInterest(caseData);
+        assertThat(actual).isEqualTo(BigDecimal.valueOf(1.10).setScale(2, RoundingMode.UNNECESSARY));
+    }
+
+    @Test
+    void shouldReturnZeroInterestRateWhenSameRateInterestAndSubmitDateIsTodayForJO() {
+        LocalDateTime dateTime = LocalDateTime.now();
+        CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
+            .claimInterest(YesOrNo.YES)
+            .caseReference(123456789L)
+            .interestClaimOptions(InterestClaimOptions.SAME_RATE_INTEREST)
+            .sameRateInterestSelection(SameRateInterestSelection.builder()
+                                           .sameRateInterestType(SameRateInterestType.SAME_RATE_INTEREST_8_PC).build())
+            .interestClaimFrom(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE)
+            .interestClaimUntil(InterestClaimUntilType.UNTIL_SETTLED_OR_JUDGEMENT_MADE)
+            .totalClaimAmount(BigDecimal.valueOf(5000))
+            .build();
+        caseData = caseData.toBuilder().submittedDate(dateTime).build();
+        BigDecimal actual = interestCalculator.calculateInterest(caseData);
+        assertThat(actual).isEqualTo(BigDecimal.valueOf(0).setScale(2, RoundingMode.UNNECESSARY));
+    }
 }

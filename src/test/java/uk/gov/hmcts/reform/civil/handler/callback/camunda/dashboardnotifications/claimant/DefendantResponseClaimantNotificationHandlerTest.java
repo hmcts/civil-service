@@ -29,7 +29,7 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
+import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
@@ -253,12 +253,10 @@ class DefendantResponseClaimantNotificationHandlerTest extends BaseCallbackHandl
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
             when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
             when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
-            String caseId = "12345673";
-            LocalDate paymentDate = OffsetDateTime.now().toLocalDate().minusDays(5);
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceSpec().build()
                 .toBuilder()
                 .legacyCaseReference("reference")
-                .ccdCaseReference(Long.valueOf(caseId))
+                .ccdCaseReference(Long.valueOf("12345673"))
                 .applicant1Represented(YesOrNo.NO)
                 .respondent1Represented(YesOrNo.YES)
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
@@ -297,12 +295,10 @@ class DefendantResponseClaimantNotificationHandlerTest extends BaseCallbackHandl
         void shouldNotTriggerForDashboardNotificationsForDefendantResponseForFullDefenceCounterClaimantForLrVsLr() {
             //given
             HashMap<String, Object> params = new HashMap<>();
-            String caseId = "12345678";
-            LocalDate paymentDate = OffsetDateTime.now().toLocalDate().minusDays(5);
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceSpec().build()
                 .toBuilder()
                 .legacyCaseReference("reference")
-                .ccdCaseReference(Long.valueOf(caseId))
+                .ccdCaseReference(Long.valueOf("12345678"))
                 .applicant1Represented(YesOrNo.YES)
                 .respondent1Represented(YesOrNo.YES)
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)

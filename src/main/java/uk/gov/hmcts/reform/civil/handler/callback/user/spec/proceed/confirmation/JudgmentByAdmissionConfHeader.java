@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationHeaderGenerator;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.Optional;
 
@@ -13,7 +14,7 @@ import static java.lang.String.format;
 public class JudgmentByAdmissionConfHeader implements RespondToResponseConfirmationHeaderGenerator {
 
     @Override
-    public Optional<String> generateTextFor(CaseData caseData) {
+    public Optional<String> generateTextFor(CaseData caseData, FeatureToggleService featureToggleService) {
         if (CaseState.All_FINAL_ORDERS_ISSUED == caseData.getCcdState()
             && (caseData.isPayBySetDate() || caseData.isPayByInstallment())) {
             String claimNumber = caseData.getLegacyCaseReference();

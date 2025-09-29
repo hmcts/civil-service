@@ -186,7 +186,7 @@ public class HearingValuesServiceTest {
         ServiceHearingValuesModel expected = ServiceHearingValuesModel.builder()
             .hmctsServiceID("AAA7")
             .hmctsInternalCaseName("Mr. John Rambo v Mr. Sole Trader")
-            .publicCaseName("'John Rambo' v 'Sole Trader'")
+            .publicCaseName("John Rambo v Sole Trader")
             .caseAdditionalSecurityFlag(false)
             .caseCategories(expectedCaseCategories)
             .caseDeepLink("http://localhost:3333/cases/case-details/1")
@@ -555,6 +555,36 @@ public class HearingValuesServiceTest {
             when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
             when(featuretoggleService.isHmcForLipEnabled()).thenReturn(true);
             when(earlyAdoptersService.isPartOfHmcLipEarlyAdoptersRollout(any(CaseData.class))).thenReturn(true);
+
+            assertDoesNotThrow(() -> hearingValuesService.getValues(caseId, "auth"));
+        }
+
+        @SneakyThrows
+        @Test
+        void shouldNotThrowErrorIfLocationIsNotWhiteListedButWelshEnabled() {
+            when(featuretoggleService.isWelshEnabledForMainCase()).thenReturn(true);
+            Long caseId = 1L;
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued()
+                .caseAccessCategory(UNSPEC_CLAIM)
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation(BASE_LOCATION_ID)
+                                            .region(WELSH_REGION_ID).build())
+                .applicant1Represented(YesOrNo.NO)
+                .applicant1DQ(applicant1DQ)
+                .respondent1DQ(respondent1DQ)
+                .build();
+            caseData = caseData.toBuilder()
+                .applicant1(caseData.getApplicant1().toBuilder()
+                                .flags(Flags.builder().partyName("party name").build())
+                                .build()).build();
+
+            CaseDetails caseDetails = CaseDetails.builder()
+                .data(caseData.toMap(mapper))
+                .id(caseId).build();
+            when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
+            when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
+            when(featuretoggleService.isHmcForLipEnabled()).thenReturn(true);
+            when(earlyAdoptersService.isPartOfHmcLipEarlyAdoptersRollout(any(CaseData.class))).thenReturn(false);
 
             assertDoesNotThrow(() -> hearingValuesService.getValues(caseId, "auth"));
         }

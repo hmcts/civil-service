@@ -21,7 +21,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
+import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
@@ -67,23 +67,6 @@ class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends BaseCall
 
     @Nested
     class AboutToSubmitCallback {
-
-        @BeforeEach
-        void setup() {
-            when(toggleService.isGeneralApplicationsEnabled()).thenReturn(true);
-        }
-
-        @Test
-        void shouldNotCallRecordScenario_whenGeneralApplicationIsDisabled() {
-            when(toggleService.isGeneralApplicationsEnabled()).thenReturn(false);
-
-            CallbackParams callbackParams = CallbackParamsBuilder.builder()
-                .of(ABOUT_TO_SUBMIT, CaseData.builder().build())
-                .build();
-
-            handler.handle(callbackParams);
-            verifyNoInteractions(dashboardScenariosService);
-        }
 
         @Test
         void shouldReturnCorrectActivityId_whenClaimant() {

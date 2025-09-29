@@ -33,7 +33,7 @@ public class NocNotificationUtils {
     private static RecipientData getOtherSolicitor1(CaseData caseData) {
         if (isRespondent2NewSolicitor(caseData)) {
             return RecipientData.builder()
-                .email(caseData.getApplicantSolicitor1UserDetails().getEmail())
+                .email(caseData.getApplicantSolicitor1UserDetailsEmail())
                 .orgId(caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID())
                 .build();
         } else if (isApplicant1NewSolicitor(caseData)) {
@@ -99,6 +99,13 @@ public class NocNotificationUtils {
             return otherSolicitor1.getEmail();
         }
         if (caseData.isApplicantLipOneVOne() && isRespondent1NewSolicitor(caseData)) {
+            return caseData.getApplicant1Email();
+        }
+        return null;
+    }
+
+    public static String getClaimantLipEmail(CaseData caseData) {
+        if (caseData.isApplicantLipOneVOne()) {
             return caseData.getApplicant1Email();
         }
         return null;

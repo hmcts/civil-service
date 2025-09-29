@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.helpers.judgmentsonline;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -9,6 +8,7 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRTLStatus;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideOrderType;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideReason;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
+import uk.gov.hmcts.reform.civil.service.Time;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -16,8 +16,11 @@ import java.util.Objects;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class SetAsideJudgmentOnlineMapper extends JudgmentOnlineMapper {
+
+    public SetAsideJudgmentOnlineMapper(Time time) {
+        super(time);
+    }
 
     @Override
     public JudgmentDetails addUpdateActiveJudgment(CaseData caseData) {

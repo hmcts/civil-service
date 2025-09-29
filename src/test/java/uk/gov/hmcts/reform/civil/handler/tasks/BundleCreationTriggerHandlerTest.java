@@ -10,6 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.event.BundleCreationTriggerEvent;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -83,6 +84,7 @@ class BundleCreationTriggerHandlerTest {
     @Test
     void shouldEmitBundleCreationEvent_whenCasesFound() {
         long caseId = 1L;
+        ReflectionTestUtils.setField(handler, "waitTime", 0);
         CaseData caseData = CaseDataBuilder.builder().atStateHearingDateScheduled().build();
         Map<String, Object> data = Map.of("data", caseData);
         Set<CaseDetails> caseDetails = Set.of(CaseDetails.builder().id(caseId).data(data).build());

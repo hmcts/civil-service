@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.camunda.bpm.client.exception.ValueMapperException;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
@@ -11,12 +13,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
@@ -25,15 +25,15 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.StateFlowDTO;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
-import uk.gov.hmcts.reform.civil.service.flowstate.TransitionsTestConfiguration;
-import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
+import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
+import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
 import java.util.Map;
 
@@ -52,14 +52,7 @@ import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.FL
 import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.FLOW_STATE;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    StartGeneralApplicationBusinessProcessTaskHandler.class,
-    JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class,
-    SimpleStateFlowEngine.class,
-    SimpleStateFlowBuilder.class,
-    TransitionsTestConfiguration.class})
+@ExtendWith(MockitoExtension.class)
 class StartGeneralApplicationBusinessProcessTaskHandlerTest extends BaseCallbackHandlerTest {
 
     private static final String CASE_ID = "1";
@@ -70,11 +63,17 @@ class StartGeneralApplicationBusinessProcessTaskHandlerTest extends BaseCallback
     private ExternalTask mockTask;
     @Mock
     private ExternalTaskService externalTaskService;
-    @MockBean
+    @Mock
+    private IStateFlowEngine stateFlowEngine;
+    @Mock
     private CoreCaseDataService coreCaseDataService;
-    @MockBean
+    @Mock
     private FeatureToggleService featureToggleService;
-    @Autowired
+    @Spy
+    private ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+    @Spy
+    private CaseDetailsConverter caseDetailsConverter = new CaseDetailsConverter(objectMapper);
+    @InjectMocks
     private StartGeneralApplicationBusinessProcessTaskHandler handler;
 
     private final VariableMap variables = Variables.createVariables();
@@ -147,10 +146,6 @@ class StartGeneralApplicationBusinessProcessTaskHandlerTest extends BaseCallback
     void init() {
         variables.putValue(FLOW_STATE, "MAIN.DRAFT");
         variables.putValue(FLOW_FLAGS, Map.of());
-        when(mockTask.getTopicName()).thenReturn("test");
-        when(mockTask.getWorkerId()).thenReturn("worker");
-        when(mockTask.getActivityId()).thenReturn("activityId");
-        when(mockTask.getProcessInstanceId()).thenReturn(PROCESS_INSTANCE_ID);
 
         when(mockTask.getAllVariables()).thenReturn(Map.of(
             "caseId", CASE_ID,
@@ -168,6 +163,11 @@ class StartGeneralApplicationBusinessProcessTaskHandlerTest extends BaseCallback
 
         when(coreCaseDataService.startUpdate(CASE_ID, START_BUSINESS_PROCESS_GASPEC)).thenReturn(startEventResponse);
         when(coreCaseDataService.submitUpdate(eq(CASE_ID), any(CaseDataContent.class))).thenReturn(caseData);
+        when(stateFlowEngine.getStateFlow(any(CaseData.class))).thenReturn(StateFlowDTO.builder().flags(Map.of()).state(State.from("MAIN.DRAFT")).build());
+
+        when(mockTask.getTopicName()).thenReturn("test");
+        when(mockTask.getProcessInstanceId()).thenReturn(PROCESS_INSTANCE_ID);
+
         handler.execute(mockTask, externalTaskService);
 
         verify(coreCaseDataService).startUpdate(CASE_ID, START_BUSINESS_PROCESS_GASPEC);
@@ -185,6 +185,11 @@ class StartGeneralApplicationBusinessProcessTaskHandlerTest extends BaseCallback
 
         when(coreCaseDataService.startUpdate(CASE_ID, START_BUSINESS_PROCESS_GASPEC)).thenReturn(startEventResponse);
         when(coreCaseDataService.submitUpdate(eq(CASE_ID), any(CaseDataContent.class))).thenReturn(caseData);
+        when(stateFlowEngine.getStateFlow(any(CaseData.class))).thenReturn(StateFlowDTO.builder().flags(Map.of()).state(State.from("MAIN.DRAFT")).build());
+
+        when(mockTask.getTopicName()).thenReturn("test");
+        when(mockTask.getProcessInstanceId()).thenReturn(PROCESS_INSTANCE_ID);
+
         handler.execute(mockTask, externalTaskService);
 
         verify(coreCaseDataService).startUpdate(CASE_ID, START_BUSINESS_PROCESS_GASPEC);
@@ -200,7 +205,10 @@ class StartGeneralApplicationBusinessProcessTaskHandlerTest extends BaseCallback
         StartEventResponse startEventResponse = StartEventResponse.builder().caseDetails(caseDetails).build();
 
         when(coreCaseDataService.startUpdate(CASE_ID, START_BUSINESS_PROCESS_GASPEC)).thenReturn(startEventResponse);
-        when(coreCaseDataService.submitUpdate(eq(CASE_ID), any(CaseDataContent.class))).thenReturn(caseData);
+        when(stateFlowEngine.getStateFlow(any(CaseData.class))).thenReturn(StateFlowDTO.builder().flags(Map.of()).state(State.from("MAIN.DRAFT")).build());
+
+        when(mockTask.getTopicName()).thenReturn("test");
+        when(mockTask.getProcessInstanceId()).thenReturn(PROCESS_INSTANCE_ID);
 
         handler.execute(mockTask, externalTaskService);
 

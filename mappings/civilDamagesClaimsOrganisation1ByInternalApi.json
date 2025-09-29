@@ -1,0 +1,18 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/refdata/internal/v1/organisations",
+    "queryParameters": {
+      "id": {
+        "equalTo": "0FA7S8S"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": "{\"name\":\"CivilDamagesClaims-Organisation1\",\"organisationIdentifier\":\"0FA7S8S\",\"contactInformation\":[{\"addressLine1\":\"26,SEATONDRIVE\",\"addressLine2\":null,\"addressLine3\":null,\"townCity\":\"NORTHAMPTON\",\"county\":null,\"country\":null,\"postCode\":\"NN39SS\",\"dxAddress\":[]}],\"status\":\"ACTIVE\",\"sraRegulated\":false,\"superUser\":{\"firstName\":\"civildamagesclaims\",\"lastName\":\"Organisation1\",\"email\":\"civil.damages.claims+organisation.1.superuser@gmail.com\"},\"paymentAccount\":[\"PBA0088192\",\"PBA0078095\"]}"
+  }
+}

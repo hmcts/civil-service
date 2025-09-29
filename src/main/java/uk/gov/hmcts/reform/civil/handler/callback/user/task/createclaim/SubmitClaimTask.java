@@ -59,8 +59,10 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_L
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllDefendantSolicitorReferencesSpec;
 import static uk.gov.hmcts.reform.civil.utils.CaseNameUtils.buildCaseName;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateWithPartyIds;
 
 @Component
@@ -117,6 +119,17 @@ public class SubmitClaimTask {
             .caseManagementLocation(CaseLocationCivil.builder().region(regionId).baseLocation(epimmsId).build())
             .respondent1DetailsForClaimDetailsTab(caseData.getRespondent1().toBuilder().flags(null).build())
             .caseAccessCategory(CaseCategory.SPEC_CLAIM);
+
+        if (featureToggleService.isWelshEnabledForMainCase()) {
+            //    added this to show location name  on location column in my tasks tab
+            List<LocationRefData> locations = (locationRefDataService
+                .getCourtLocationsByEpimmsIdAndCourtType(authorisationToken, epimmsId));
+            if (!locations.isEmpty()) {
+                LocationRefData locationRefData = locations.get(0);
+                dataBuilder.locationName(locationRefData.getSiteName());
+            }
+
+        }
 
         if (ofNullable(caseData.getRespondent2()).isPresent()) {
             dataBuilder.respondent2DetailsForClaimDetailsTab(caseData.getRespondent2().toBuilder().flags(null).build());
@@ -184,6 +197,9 @@ public class SubmitClaimTask {
             dataBuilder.respondentSolicitor2ServiceAddress(caseData.getRespondentSolicitor1ServiceAddress());
             dataBuilder.respondentSolicitor2OrganisationDetails(caseData.getRespondentSolicitor1OrganisationDetails());
         }
+        dataBuilder
+            .allPartyNames(getAllPartyNames(caseData))
+            .caseListDisplayDefendantSolicitorReferences(getAllDefendantSolicitorReferencesSpec(caseData));
 
         populateWithPartyIds(dataBuilder);
 

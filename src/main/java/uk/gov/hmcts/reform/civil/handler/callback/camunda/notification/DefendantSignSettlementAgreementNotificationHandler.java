@@ -14,7 +14,10 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -22,6 +25,7 @@ import java.util.Optional;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_LIP_RESPONDENT_FOR_SIGN_SETTLEMENT_AGREEMENT;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
 
 @Service
 @RequiredArgsConstructor
@@ -41,6 +45,8 @@ public class DefendantSignSettlementAgreementNotificationHandler extends Callbac
     private final Map<String, Callback> callBackMap = Map.of(
         callbackKey(ABOUT_TO_SUBMIT), this::notifyForSignedSettlement
     );
+    private final NotificationsSignatureConfiguration configuration;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -59,12 +65,15 @@ public class DefendantSignSettlementAgreementNotificationHandler extends Callbac
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-        return Map.of(
+        HashMap<String, String> properties = new HashMap<>(Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             CLAIMANT_NAME, caseData.getApplicant1().getPartyName(),
             RESPONDENT_NAME, caseData.getRespondent1().getPartyName(),
             FRONTEND_URL, pipInPostConfiguration.getCuiFrontEndUrl()
-        );
+        ));
+        addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
+        return properties;
     }
 
     private CallbackResponse notifyForSignedSettlement(CallbackParams callbackParams) {

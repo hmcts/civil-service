@@ -23,16 +23,17 @@ import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
+import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Map;
+import java.util.Objects;
 
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -55,6 +56,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
     private final FeatureToggleService featureToggleService;
     private final JudgmentByAdmissionOnlineMapper judgmentByAdmissionOnlineMapper;
     private final InterestCalculator interestCalculator;
+    private final Time time;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -91,6 +93,10 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
             }
         }
 
+        if (judgementService.isLrPayImmediatelyPlan(caseData)) {
+            caseDataBuilder.ccjJudgmentAmountShowInterest(YesOrNo.NO);
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .data(errors.isEmpty() ? caseDataBuilder.build().toMap(objectMapper) : null)
@@ -100,6 +106,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
     private CallbackResponse buildJudgmentAmountSummaryDetails(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder();
+
         updatedCaseData.ccjPaymentDetails(judgementService.buildJudgmentAmountSummaryDetails(caseData));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -110,9 +117,15 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
     private CallbackResponse validateAmountPaid(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = judgementService.validateAmountPaid(caseData);
+        CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder();
+        if (judgementService.isLrPayImmediatelyPlan(caseData)
+            && Objects.nonNull(caseData.getFixedCosts())
+            && YesOrNo.NO.equals(caseData.getFixedCosts().getClaimFixedCosts())) {
+            updatedCaseData.ccjPaymentDetails(judgementService.buildJudgmentAmountSummaryDetails(caseData));
+        }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
-            .data(errors.isEmpty() ? caseData.toMap(objectMapper) : null)
+            .data(errors.isEmpty() ? updatedCaseData.build().toMap(objectMapper) : null)
             .build();
     }
 
@@ -142,17 +155,26 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
             JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseDataBuilder.build());
 
             BigDecimal interest = interestCalculator.calculateInterest(data);
+
+            String joSummaryObject = data.isLipvLipOneVOne() ? JudgmentsOnlineHelper.calculateRepaymentBreakdownSummaryWithoutClaimInterest(
+                activeJudgment, true) : getJudgmentRepaymentSummaryObject(data, interest, activeJudgment);
             caseDataBuilder
                 .activeJudgment(activeJudgment)
                 .joIsLiveJudgmentExists(YesOrNo.YES)
-                .joRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(activeJudgment, interest))
-                .joJudgementByAdmissionIssueDate(LocalDateTime.now());
+                .joRepaymentSummaryObject(joSummaryObject)
+                .joJudgementByAdmissionIssueDate(time.now());
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .state(nextState)
             .build();
+    }
+
+    private String getJudgmentRepaymentSummaryObject(CaseData caseData, BigDecimal interest, JudgmentDetails activeJudgment) {
+        return judgementService.isLrPayImmediatelyPlan(caseData)
+            ? JudgmentsOnlineHelper.calculateRepaymentBreakdownSummaryWithoutClaimInterest(activeJudgment, false)
+            : JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(activeJudgment, interest);
     }
 
     private CallbackResponse buildConfirmation(CallbackParams callbackParams) {

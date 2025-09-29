@@ -40,3 +40,9 @@ variable "ccd_service_bus_status" {
   type = string
   default = "Active"
 }
+
+variable "ccd_service_bus_filter_rule" {
+  type        = string
+  default     = "jurisdiction_id IN ('CIVIL','civil')"
+  description = "SQL filter rule for CCD Events Service Bus Subscription"
+}

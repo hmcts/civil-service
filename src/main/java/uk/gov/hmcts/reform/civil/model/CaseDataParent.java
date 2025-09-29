@@ -487,6 +487,9 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     private YesOrNo showOldDJFixedCostsScreen;
     private YesOrNo claimFixedCostsOnEntryDJ;
 
+    private YesOrNo mediationFileSentToMmt;
+    private YesOrNo evidenceUploadNotificationSent;
+
     @JsonIgnore
     public boolean isResponseAcceptedByClaimant() {
         return applicant1AcceptAdmitAmountPaidSpec == YesOrNo.YES
@@ -524,6 +527,14 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
             .filter(language -> language.equals(Language.BOTH.toString())
                 || language.equals(Language.WELSH.toString()))
             .isPresent();
+    }
+
+    @JsonIgnore
+    public String getDefendantBilingualLanguagePreference() {
+        return Optional.ofNullable(getCaseDataLiP())
+            .map(CaseDataLiP::getRespondent1LiPResponse)
+            .map(RespondentLiPResponse::getRespondent1ResponseLanguage)
+            .orElse(null);
     }
 
     @JsonIgnore
@@ -582,6 +593,11 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     @JsonIgnore
     public boolean applicant1SuggestedPayBySetDate() {
         return applicant1RepaymentOptionForDefendantSpec == PaymentType.SET_DATE;
+    }
+
+    @JsonIgnore
+    public boolean applicant1SuggestedPayByInstalments() {
+        return applicant1RepaymentOptionForDefendantSpec == PaymentType.REPAYMENT_PLAN;
     }
 
     @JsonIgnore

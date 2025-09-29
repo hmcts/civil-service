@@ -5,6 +5,8 @@ import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.Optional;
@@ -19,8 +21,9 @@ public class FullDefenceRespondentSolicitorOneCCSpecNotifier extends FullDefence
     private final NotificationsProperties notificationsProperties;
 
     public FullDefenceRespondentSolicitorOneCCSpecNotifier(NotificationsProperties notificationsProperties, NotificationService notificationService,
-                                                           OrganisationService organisationService) {
-        super(notificationsProperties, organisationService);
+                                                           OrganisationService organisationService, NotificationsSignatureConfiguration configuration,
+                                                           FeatureToggleService featureToggleService) {
+        super(notificationsProperties, organisationService, configuration, featureToggleService);
         this.notificationsProperties = notificationsProperties;
         this.notificationService = notificationService;
     }

@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CHANGE_LANGUAGE_PREFERENCE;
@@ -44,6 +45,24 @@ public class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHan
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
         assertThat(handler.handledEvents()).contains(CHANGE_LANGUAGE_PREFERENCE);
+    }
+
+    @Test
+    void shouldClearData_WhenAboutToStart() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
+        caseData = caseData.toBuilder()
+            .changeLanguagePreference(ChangeLanguagePreference.builder()
+                                          .userType(CLAIMANT)
+                                          .preferredLanguage(ENGLISH).build())
+            .applicant1Represented(NO)
+            .build();
+        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
+
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+            .handle(params);
+
+        CaseData updatedCaseData = mapper.convertValue(response.getData(), CaseData.class);
+        assertThat(updatedCaseData.getChangeLanguagePreference()).isNull();
     }
 
     @Nested
@@ -173,6 +192,7 @@ public class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHan
 
             CaseData updatedCaseData = mapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedCaseData.getClaimantBilingualLanguagePreference()).isEqualTo("ENGLISH");
+            assertThat(updatedCaseData.getClaimantLanguagePreferenceDisplay()).isEqualTo(ENGLISH);
         }
 
         @Test
@@ -191,6 +211,7 @@ public class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHan
 
             CaseData updatedCaseData = mapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedCaseData.getClaimantBilingualLanguagePreference()).isEqualTo("WELSH");
+            assertThat(updatedCaseData.getClaimantLanguagePreferenceDisplay()).isEqualTo(WELSH);
             assertThat(updatedCaseData.getBusinessProcess().getCamundaEvent()).isEqualTo(CHANGE_LANGUAGE_PREFERENCE.name());
         }
 
@@ -214,6 +235,7 @@ public class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHan
 
             CaseData updatedCaseData = mapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedCaseData.getCaseDataLiP().getRespondent1LiPResponse().getRespondent1ResponseLanguage()).isEqualTo("BOTH");
+            assertThat(updatedCaseData.getDefendantLanguagePreferenceDisplay()).isEqualTo(ENGLISH_AND_WELSH);
         }
     }
 }

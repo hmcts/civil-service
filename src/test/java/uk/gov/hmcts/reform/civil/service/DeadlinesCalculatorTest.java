@@ -42,7 +42,7 @@ import static uk.gov.hmcts.reform.civil.assertion.DayAssert.assertThat;
 import static uk.gov.hmcts.reform.civil.service.DeadlinesCalculator.END_OF_BUSINESS_DAY;
 
 @ExtendWith(SpringExtension.class)
-public class DeadlinesCalculatorTest {
+class DeadlinesCalculatorTest {
 
     @Mock
     private BankHolidaysApi bankHolidaysApi;
@@ -52,7 +52,7 @@ public class DeadlinesCalculatorTest {
     private DeadlinesCalculator calculator;
 
     @BeforeEach
-    public void setUp() throws IOException {
+    void setUp() throws IOException {
         WorkingDayIndicator workingDayIndicator = new WorkingDayIndicator(
             new PublicHolidaysCollection(bankHolidaysApi),
             nonWorkingDaysCollection
@@ -141,6 +141,14 @@ public class DeadlinesCalculatorTest {
 
             assertThat(responseDeadline)
                 .isTheSame(expectedDeadline);
+        }
+
+        @Test
+        void shouldReturnPlus28DaysNextWorkingDayAt4pmDeadline() {
+            LocalDate issueDate = LocalDate.of(2025, 6, 1);
+            LocalDateTime expectedDeadline = LocalDate.of(2025, 6, 30).atTime(END_OF_BUSINESS_DAY);
+            LocalDateTime responseDeadline = calculator.plus28DaysNextWorkingDayAt4pmDeadline(issueDate);
+            assertThat(responseDeadline).isTheSame(expectedDeadline);
         }
     }
 
@@ -334,8 +342,8 @@ public class DeadlinesCalculatorTest {
             List<LocalDateTime> datelines = new ArrayList<>();
             LocalDateTime earliestDeadline = LocalDateTime.of(2019, 03, 28, 14, 33, 48);
             datelines.add(earliestDeadline);
-            datelines.add(LocalDateTime.of(2019, 03, 28, 14, 50, 48));
-            datelines.add(LocalDateTime.of(2019, 05, 28, 14, 33, 48));
+            datelines.add(LocalDateTime.of(2019, 3, 28, 14, 50, 48));
+            datelines.add(LocalDateTime.of(2019, 5, 28, 14, 33, 48));
 
             assertThat(calculator.nextDeadline(datelines)).isTheSame(earliestDeadline);
         }
@@ -343,11 +351,11 @@ public class DeadlinesCalculatorTest {
         @Test
         void shouldReturnEarliestDate_whenOneOfDatesIsNull() {
             List<LocalDateTime> datelines = new ArrayList<>();
-            LocalDateTime earliestDeadline = LocalDateTime.of(2019, 03, 28, 14, 33, 48);
+            LocalDateTime earliestDeadline = LocalDateTime.of(2019, 3, 28, 14, 33, 48);
             datelines.add(earliestDeadline);
-            datelines.add(LocalDateTime.of(2019, 03, 28, 14, 50, 48));
+            datelines.add(LocalDateTime.of(2019, 3, 28, 14, 50, 48));
             datelines.add(null);
-            datelines.add(LocalDateTime.of(2019, 05, 28, 14, 33, 48));
+            datelines.add(LocalDateTime.of(2019, 5, 28, 14, 33, 48));
 
             assertThat(calculator.nextDeadline(datelines)).isTheSame(earliestDeadline);
         }
@@ -355,7 +363,7 @@ public class DeadlinesCalculatorTest {
         @Test
         void shouldReturnEarliestDate_AllDatesAreSame() {
             List<LocalDateTime> datelines = new ArrayList<>();
-            LocalDateTime earliestDeadline = LocalDateTime.of(2019, 03, 28, 14, 33, 48);
+            LocalDateTime earliestDeadline = LocalDateTime.of(2019, 3, 28, 14, 33, 48);
             datelines.add(earliestDeadline);
             datelines.add(earliestDeadline);
             datelines.add(earliestDeadline);

@@ -10,7 +10,8 @@ public enum RolePool {
     JUDICIAL("Judge"),
     JUDICIAL_DISTRICT("District Judge"),
     JUDICIAL_CIRCUIT("Circuit Judge"),
-    LEGAL_OPERATIONS("Legal advisor");
+    LEGAL_OPERATIONS("Legal advisor"),
+    WLU_ADMIN("Welsh language unit");
 
     private final String label;
 }

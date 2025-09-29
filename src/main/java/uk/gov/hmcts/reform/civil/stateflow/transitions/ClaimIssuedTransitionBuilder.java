@@ -24,7 +24,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.divergen
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.divergentRespondWithDQAndGoOfflineSpec;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullAdmissionSpec;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceSpec;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.isRespondentResponseLangIsBilingual;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.onlyInitialRespondentResponseLangIsBilingual;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.partAdmissionSpec;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.specClaim;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_ADMIT_RECEIVED;
@@ -60,16 +60,16 @@ public class ClaimIssuedTransitionBuilder extends MidTransitionBuilder {
             .moveTo(CONTACT_DETAILS_CHANGE, transitions).onlyWhen(contactDetailsChange, transitions)
             .set(flags -> flags.put(FlowFlag.CONTACT_DETAILS_CHANGE.name(), true), transitions)
             .moveTo(RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL, transitions)
-            .onlyWhen(isRespondentResponseLangIsBilingual.and(not(contactDetailsChange)), transitions)
+            .onlyWhen(onlyInitialRespondentResponseLangIsBilingual.and(not(contactDetailsChange)), transitions)
             .set(flags -> flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), true), transitions)
-            .moveTo(FULL_DEFENCE, transitions).onlyWhen(fullDefenceSpec.and(not(contactDetailsChange)).and(not(isRespondentResponseLangIsBilingual))
+            .moveTo(FULL_DEFENCE, transitions).onlyWhen(fullDefenceSpec.and(not(contactDetailsChange)).and(not(onlyInitialRespondentResponseLangIsBilingual))
                 .and(not(pastClaimNotificationDeadline)), transitions)
             .moveTo(PART_ADMISSION, transitions)
-            .onlyWhen(partAdmissionSpec.and(not(contactDetailsChange)).and(not(isRespondentResponseLangIsBilingual)), transitions)
+            .onlyWhen(partAdmissionSpec.and(not(contactDetailsChange)).and(not(onlyInitialRespondentResponseLangIsBilingual)), transitions)
             .moveTo(FULL_ADMISSION, transitions)
-            .onlyWhen(fullAdmissionSpec.and(not(contactDetailsChange)).and(not(isRespondentResponseLangIsBilingual)), transitions)
+            .onlyWhen(fullAdmissionSpec.and(not(contactDetailsChange)).and(not(onlyInitialRespondentResponseLangIsBilingual)), transitions)
             .moveTo(COUNTER_CLAIM, transitions)
-            .onlyWhen(counterClaimSpec.and(not(contactDetailsChange)).and(not(isRespondentResponseLangIsBilingual)), transitions)
+            .onlyWhen(counterClaimSpec.and(not(contactDetailsChange)).and(not(onlyInitialRespondentResponseLangIsBilingual)), transitions)
             .moveTo(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED, transitions)
             .onlyWhen(awaitingResponsesFullDefenceReceivedSpec.and(specClaim), transitions)
             .moveTo(AWAITING_RESPONSES_FULL_ADMIT_RECEIVED, transitions)

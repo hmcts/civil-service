@@ -1,11 +1,14 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
@@ -13,7 +16,6 @@ import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
@@ -21,27 +23,25 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.validation.ValidateEmailService;
 
+import java.util.List;
+
+import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 
-@SpringBootTest(classes = {
-    AmendPartyDetailsCallbackHandler.class,
-    JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class,
-    ValidateEmailService.class
-})
+@ExtendWith(MockitoExtension.class)
 class AmendPartyDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-    @Autowired
-    private AmendPartyDetailsCallbackHandler handler;
-
-    @Autowired
+    @Spy
+    private final ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
+    @Mock
     private ValidateEmailService validateEmailService;
-
-    @Autowired
-    private final ObjectMapper mapper = new ObjectMapper();
+    @InjectMocks
+    private AmendPartyDetailsCallbackHandler handler;
 
     @Nested
     class AboutToStart {
@@ -71,6 +71,7 @@ class AmendPartyDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            when(validateEmailService.validate(any())).thenReturn(emptyList());
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getErrors()).isNull();
@@ -86,10 +87,11 @@ class AmendPartyDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            when(validateEmailService.validate(invalidEmail)).thenReturn(List.of(respondentError()));
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getErrors()).hasSize(2)
-                .contains("Enter an email address in the correct format, for example john.smith@example.com");
+                .contains(respondentError());
         }
 
         @Nested
@@ -121,6 +123,7 @@ class AmendPartyDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .build();
 
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+                when(validateEmailService.validate(any())).thenReturn(emptyList());
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
                 CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
@@ -155,6 +158,7 @@ class AmendPartyDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
                 assertThat(caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID())
                     .isNull();
 
+                when(validateEmailService.validate(any())).thenReturn(emptyList());
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
                 CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
@@ -183,5 +187,9 @@ class AmendPartyDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .confirmationBody("<br />")
                     .build());
         }
+    }
+
+    private static String respondentError() {
+        return "Enter an email address in the correct format, for example john.smith@example.com";
     }
 }
