@@ -415,14 +415,10 @@ class IncidentRetryEventHandlerTest {
 
     @Test
     void shouldRetryIncidentAndCoverChildActivityRecursion() {
-        // Arrange
-        String processInstanceId = "proc1";
-        String failedActivityId = "childActivity";
-        String jobId = "job1";
         String serviceAuth = "serviceAuth";
-
         when(authTokenGenerator.generate()).thenReturn(serviceAuth);
 
+        String processInstanceId = "proc1";
         // Mock process instance
         ProcessInstanceDto processInstanceDto = new ProcessInstanceDto();
         processInstanceDto.setId(processInstanceId);
@@ -433,7 +429,11 @@ class IncidentRetryEventHandlerTest {
         IncidentDto incident = new IncidentDto();
         incident.setId("inc1");
         incident.setProcessInstanceId(processInstanceId);
+
+        String failedActivityId = "childActivity";
         incident.setActivityId(failedActivityId);
+
+        String jobId = "job1";
         incident.setConfiguration(jobId);
 
         when(camundaRuntimeApi.getLatestOpenIncidentForProcessInstance(
@@ -478,8 +478,8 @@ class IncidentRetryEventHandlerTest {
                 @SuppressWarnings("unchecked")
                 List<Map<String, Object>> instructions = (List<Map<String, Object>>) map.get("instructions");
                 return instructions.stream().anyMatch(instr ->
-                                                          "startBeforeActivity".equals(instr.get("type")) &&
-                                                              failedActivityId.equals(instr.get("activityId"))
+                                                          "startBeforeActivity".equals(instr.get("type"))
+                                                              && failedActivityId.equals(instr.get("activityId"))
                 );
             }));
     }
