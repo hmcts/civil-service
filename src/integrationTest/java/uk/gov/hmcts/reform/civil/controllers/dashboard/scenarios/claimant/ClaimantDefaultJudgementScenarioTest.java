@@ -32,7 +32,6 @@ public class ClaimantDefaultJudgementScenarioTest extends DashboardBaseIntegrati
             .build();
 
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
-        when(featureToggleService.isGeneralApplicationsEnabled()).thenReturn(true);
 
         defaultJudgementIssuedClaimantNotificationHandler.handle(callbackParams(caseData));
 
@@ -64,7 +63,6 @@ public class ClaimantDefaultJudgementScenarioTest extends DashboardBaseIntegrati
             .build();
 
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
-        when(featureToggleService.isGeneralApplicationsEnabled()).thenReturn(true);
 
         defaultJudgementIssuedClaimantNotificationHandler.handle(callbackParams(caseData));
 

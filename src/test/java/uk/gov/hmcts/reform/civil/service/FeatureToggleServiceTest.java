@@ -14,6 +14,10 @@ import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleApi;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -76,15 +80,6 @@ class FeatureToggleServiceTest {
         givenToggle(lipVlipKey, toggleStat);
 
         assertThat(featureToggleService.isLipVLipEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsGeneralApplicationsEnabledInvoked(Boolean toggleStat) {
-        var generalApplicationsKey = "general_applications_enabled";
-        givenToggle(generalApplicationsKey, toggleStat);
-
-        assertThat(featureToggleService.isGeneralApplicationsEnabled()).isEqualTo(toggleStat);
     }
 
     @ParameterizedTest
@@ -326,14 +321,29 @@ class FeatureToggleServiceTest {
         assertThat(featureToggleService.isLrAdmissionBulkEnabled()).isEqualTo(toggleStat);
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenPublicQueryEnabledLr(Boolean toggleStat) {
-        var lrPublicQuery = "public-query-management";
-        givenToggle(lrPublicQuery, toggleStat);
+    @Test
+    void shouldReturnCorrectValue_whenNonLipCase() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+        assertThat(featureToggleService.isPublicQueryManagementEnabled(caseData)).isTrue();
+    }
 
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
+    @ParameterizedTest
+    @CsvSource({
+        "true,NO,YES",
+        "true,YES,NO",
+        "true,NO,NO",
+        "false,NO,YES",
+        "false,YES,NO",
+        "false,NO,NO",
+    })
+    void shouldReturnCorrectValue_whenCuiQueryManagementEnabledLip(boolean toggleStat, YesOrNo applicant1Represented,
+                                                                   YesOrNo respondent1Represented) {
+        CaseData caseData = CaseData.builder()
+            .applicant1Represented(applicant1Represented)
+            .respondent1Represented(respondent1Represented)
+            .submittedDate(LocalDateTime.of(LocalDate.now(), LocalTime.NOON))
             .build();
+        when(featureToggleService.isLipQueryManagementEnabled(caseData)).thenReturn(toggleStat);
 
         assertThat(featureToggleService.isPublicQueryManagementEnabled(caseData)).isEqualTo(toggleStat);
     }
@@ -352,9 +362,10 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenPublicQueryEnabled(Boolean toggleStat) {
-        when(featureToggleService.isQMPdfGeneratorDisabled()).thenReturn(toggleStat);
+    void shouldCallBoolVariation_whenGaForLipNro(Boolean toggleStat) {
+        var gaCuiNroKey = "cui-ga-nro";
+        givenToggle(gaCuiNroKey, toggleStat);
 
-        assertThat(featureToggleService.isQMPdfGeneratorDisabled()).isEqualTo(toggleStat);
+        assertThat(featureToggleService.isCuiGaNroEnabled()).isEqualTo(toggleStat);
     }
 }
