@@ -17,7 +17,6 @@ import uk.gov.hmcts.reform.civil.model.querymanagement.CaseQueriesCollection;
 import uk.gov.hmcts.reform.civil.model.querymanagement.LatestQuery;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
@@ -48,9 +47,6 @@ public class UpdateDashboardNotificationsForResponseToQueryTest extends BaseCall
     private DashboardScenariosService dashboardScenariosService;
 
     @Mock
-    private FeatureToggleService featureToggleService;
-
-    @Mock
     private DashboardNotificationsParamsMapper dashboardNotificationsParamsMapper;
 
     public static final String TASK_ID = "UpdateDashboardNotificationsResponseToQuery";
@@ -72,7 +68,6 @@ public class UpdateDashboardNotificationsForResponseToQueryTest extends BaseCall
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
         CaseQueriesCollection claimantQueries = CaseQueriesCollection.builder()
             .caseMessages(wrapElements(List.of(CaseMessage.builder()
                                                    .id("123457")
@@ -125,7 +120,6 @@ public class UpdateDashboardNotificationsForResponseToQueryTest extends BaseCall
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
         CaseQueriesCollection defendantQueries = CaseQueriesCollection.builder()
                 .caseMessages(wrapElements(List.of(CaseMessage.builder()
                                                        .id("123457")
