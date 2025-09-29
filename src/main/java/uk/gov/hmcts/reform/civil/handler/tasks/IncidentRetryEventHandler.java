@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.camunda.bpm.client.task.ExternalTask;
+import org.camunda.community.rest.client.model.ActivityInstanceDto;
 import org.camunda.community.rest.client.model.IncidentDto;
 import org.camunda.community.rest.client.model.ProcessInstanceDto;
 import org.camunda.community.rest.client.model.VariableValueDto;
@@ -186,7 +187,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
 
     private String resolveStartTime(String incidentStartTime) {
         return (incidentStartTime == null || incidentStartTime.isBlank())
-            ? INCIDENT_FORMATTER.format(Instant.now().minus(24, ChronoUnit.HOURS))
+            ? INCIDENT_FORMATTER.format(Instant.now().minus(23, ChronoUnit.HOURS))
             : incidentStartTime;
     }
 
@@ -266,10 +267,18 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
         modificationRequest.put("skipCustomListeners", true);
         modificationRequest.put("skipIoMappings", false);
 
+        ActivityInstanceDto tree = camundaRuntimeApi.getActivityInstances(serviceAuthorization, processInstanceId);
+
+        String activityInstanceId = findActivityInstanceId(tree, failedActivityId);
+
+        if (activityInstanceId == null) {
+            log.info("No running activity instance for activityId=" + failedActivityId);
+        }
+
         List<Map<String, Object>> instructions = new ArrayList<>();
         Map<String, Object> cancelInstruction = new HashMap<>();
         cancelInstruction.put("type", "cancelActivityInstance");
-        cancelInstruction.put("activityId", failedActivityId);
+        cancelInstruction.put("activityInstanceId", activityInstanceId);
         instructions.add(cancelInstruction);
 
         Map<String, Object> startBeforeInstruction = new HashMap<>();
@@ -336,5 +345,21 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
             })
             .filter(Objects::nonNull)
             .toList();
+    }
+
+    private String findActivityInstanceId(ActivityInstanceDto tree, String failedActivityId) {
+        if (failedActivityId.equals(tree.getActivityId())) {
+            return tree.getId();
+        }
+
+        if (tree.getChildActivityInstances() != null) {
+            for (ActivityInstanceDto child : tree.getChildActivityInstances()) {
+                String result = findActivityInstanceId(child, failedActivityId);
+                if (result != null) {
+                    return result;
+                }
+            }
+        }
+        return null;
     }
 }

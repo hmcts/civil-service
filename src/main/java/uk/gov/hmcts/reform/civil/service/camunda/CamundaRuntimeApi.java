@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.camunda;
 
+import org.camunda.community.rest.client.model.ActivityInstanceDto;
 import org.camunda.community.rest.client.model.IncidentDto;
 import org.camunda.community.rest.client.model.ProcessInstanceDto;
 import org.camunda.community.rest.client.model.VariableValueDto;
@@ -78,5 +79,11 @@ public interface CamundaRuntimeApi {
         @RequestHeader("ServiceAuthorization") String serviceAuthorization,
         @PathVariable("processInstanceId") String processInstanceId,
         @RequestBody Map<String, Object> modificationRequest
+    );
+
+    @GetMapping("/process-instance/{processInstanceId}/activity-instances")
+    ActivityInstanceDto getActivityInstances(
+        @RequestHeader("ServiceAuthorization") String serviceAuthorization,
+        @PathVariable("processInstanceId") String processInstanceId
     );
 }
