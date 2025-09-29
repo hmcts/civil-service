@@ -4,7 +4,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
+import uk.gov.hmcts.reform.civil.utils.ClaimantResponseUtils;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
 
@@ -15,10 +17,12 @@ import static org.mockito.Mockito.when;
 class Respondent1AdmittedAmountPaymentDeadlineParamsBuilderTest {
 
     private Respondent1AdmittedAmountPaymentDeadlineParamsBuilder builder;
+    private ClaimantResponseUtils claimantResponseUtils;
 
     @BeforeEach
     void setUp() {
-        builder = new Respondent1AdmittedAmountPaymentDeadlineParamsBuilder();
+        claimantResponseUtils = mock(ClaimantResponseUtils.class);
+        builder = new Respondent1AdmittedAmountPaymentDeadlineParamsBuilder(claimantResponseUtils);
     }
 
     @Test
@@ -30,6 +34,7 @@ class Respondent1AdmittedAmountPaymentDeadlineParamsBuilderTest {
 
         when(caseData.getRespondToClaimAdmitPartLRspec()).thenReturn(admitPartLRspec);
         when(admitPartLRspec.getWhenWillThisAmountBePaid()).thenReturn(paymentDate);
+        when(claimantResponseUtils.getDefendantAdmittedAmount(caseData, true)).thenReturn(new BigDecimal("100.00"));
 
         HashMap<String, Object> params = new HashMap<>();
         params.put("defendantAdmittedAmount", "£100");
@@ -77,6 +82,7 @@ class Respondent1AdmittedAmountPaymentDeadlineParamsBuilderTest {
         when(caseData.isPartAdmitPayImmediatelyClaimSpec()).thenReturn(true);
         when(caseData.getRespondToClaimAdmitPartLRspec()).thenReturn(admitPartLRspec);
         when(admitPartLRspec.getWhenWillThisAmountBePaid()).thenReturn(paymentDate);
+        when(claimantResponseUtils.getDefendantAdmittedAmount(caseData, true)).thenReturn(new BigDecimal("100.00"));
 
         HashMap<String, Object> params = new HashMap<>();
         params.put("defendantAdmittedAmount", "£100");
