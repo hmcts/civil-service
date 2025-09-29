@@ -490,7 +490,6 @@ class UpdateClaimStateServiceTest {
     @Test
     void shouldUpdateCaseStateToAllFinalOrderIssued_whenApplicantAcceptOrRejectedRepaymentPlanAndRequestCCJ_JudgementOnlineLiveEnabled() {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder()
             .applicant1ResponseDate(LocalDateTime.now())
             .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())

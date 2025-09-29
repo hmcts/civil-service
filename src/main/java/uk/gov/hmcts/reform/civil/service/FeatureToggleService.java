@@ -64,10 +64,6 @@ public class FeatureToggleService {
         return featureToggleApi.isFeatureEnabled("cui-case-progression");
     }
 
-    public boolean isJudgmentOnlineLive() {
-        return featureToggleApi.isFeatureEnabled("isJudgmentOnlineLive");
-    }
-
     public boolean isCjesServiceAvailable() {
         return featureToggleApi.isFeatureEnabled("isCjesServiceAvailable");
     }
@@ -132,11 +128,6 @@ public class FeatureToggleService {
         return location != null
             && featureToggleApi.isFeatureEnabledForLocation("ea-courts-whitelisted-for-ga-lips", location, false)
             && isGaForLipsEnabled();
-    }
-
-    public boolean isJOLiveFeedActive() {
-        return isJudgmentOnlineLive()
-            && featureToggleApi.isFeatureEnabled("isJOLiveFeedActive");
     }
 
     public boolean isDefendantNoCOnlineForCase(CaseData caseData)  {

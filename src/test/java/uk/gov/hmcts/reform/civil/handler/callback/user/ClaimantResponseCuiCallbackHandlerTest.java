@@ -613,7 +613,6 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldAddActiveJudgmentWhenClaimantAcceptedRepaymentPlanAndJudgmentOnlineLiveEnabled() {
-            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
             JudgmentDetails activeJudgment = JudgmentDetails.builder()
                 .totalAmount("10100.00")
                 .claimFeeAmount("100.00")

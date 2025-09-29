@@ -634,7 +634,6 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(false);
 
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
@@ -672,7 +671,6 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(false);
 
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
@@ -696,7 +694,6 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(false);
 
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
@@ -721,7 +718,6 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
@@ -980,7 +976,6 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)

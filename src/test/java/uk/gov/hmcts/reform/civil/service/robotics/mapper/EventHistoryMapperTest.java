@@ -90,7 +90,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
@@ -116,7 +115,6 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 import static uk.gov.hmcts.reform.civil.service.robotics.RoboticsNotificationService.findLatestEventTriggerReason;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper.QUERIES_ON_CASE;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper.RPA_IN_MEDIATION;
-import static uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper.RPA_REASON_JUDGMENT_BY_ADMISSION;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper.RECORD_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper.RPA_RECORD_JUDGMENT_REASON;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper.RPA_REASON_MANUAL_DETERMINATION;
@@ -8053,7 +8051,6 @@ class EventHistoryMapperTest {
         @Test
         public void shouldgenerateRPAfeedfor_DJNoDivergent_case_online_999_event() {
 
-            given(featureToggleService.isJOLiveFeedActive()).willReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateNotificationAcknowledged().build().toBuilder()
                 .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
@@ -8094,7 +8091,6 @@ class EventHistoryMapperTest {
         @Test
         public void shouldgenerateRPAfeedfor_DJNoDivergent_case_offline_999_event() {
 
-            given(featureToggleService.isJOLiveFeedActive()).willReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateNotificationAcknowledged().build().toBuilder()
                 .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
@@ -8135,7 +8131,6 @@ class EventHistoryMapperTest {
         @Test
         public void shouldgenerateRPAfeedfor_DJ_event_update_sequenceno() {
 
-            given(featureToggleService.isJOLiveFeedActive()).willReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateNotificationAcknowledged().build().toBuilder()
                 .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
@@ -8190,7 +8185,6 @@ class EventHistoryMapperTest {
             caseData.setJoSetAsideApplicationDate(LocalDate.of(2022, 11, 11));
             caseData.setJoSetAsideCreatedDate(LocalDateTime.of(2022, 11, 11, 10, 10));
             caseData.setActiveJudgment(JudgmentDetails.builder().state(JudgmentState.SET_ASIDE).build());
-            when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
             assertThat(eventHistory).extracting("setAsideJudgment").asList()
                 .extracting("eventCode").asString().contains("[170]");
@@ -8217,7 +8211,6 @@ class EventHistoryMapperTest {
             caseData.setJoSetAsideDefenceReceivedDate(LocalDate.of(2022, 11, 11));
             caseData.setJoSetAsideCreatedDate(LocalDateTime.of(2022, 11, 11, 10, 10));
             caseData.setActiveJudgment(JudgmentDetails.builder().state(JudgmentState.SET_ASIDE).build());
-            when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
             assertThat(eventHistory).extracting("setAsideJudgment").asList()
                 .extracting("eventCode").asString().contains("[170]");
@@ -8241,7 +8234,6 @@ class EventHistoryMapperTest {
             caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGMENT_ERROR);
             caseData.setJoSetAsideCreatedDate(LocalDateTime.of(2022, 11, 11, 10, 10));
             caseData.setActiveJudgment(JudgmentDetails.builder().state(JudgmentState.SET_ASIDE).build());
-            when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
             assertThat(eventHistory).extracting("setAsideJudgment").asList()
                 .extracting("eventCode").asString().contains("[170]");
@@ -8268,7 +8260,6 @@ class EventHistoryMapperTest {
             caseData.setJoSetAsideApplicationDate(LocalDate.of(2022, 11, 11));
             caseData.setJoSetAsideCreatedDate(LocalDateTime.now());
             caseData.setActiveJudgment(JudgmentDetails.builder().state(JudgmentState.SET_ASIDE).build());
-            when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
             assertThat(eventHistory).extracting("setAsideJudgment").asList()
                 .extracting("eventCode").asString().contains("[170, 170]");
@@ -8651,7 +8642,7 @@ class EventHistoryMapperTest {
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .extracting("eventCode").asString().contains("999");
             assertThat(eventHistory).extracting("miscellaneous").asList()
-                .extracting("eventDetailsText").asString().contains(RPA_REASON_JUDGMENT_BY_ADMISSION);
+                .extracting("eventDetailsText").asString().contains(RPA_RECORD_JUDGMENT_REASON);
         }
 
         @Test
@@ -8703,7 +8694,7 @@ class EventHistoryMapperTest {
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .extracting("eventCode").asString().contains("999");
             assertThat(eventHistory).extracting("miscellaneous").asList()
-                .extracting("eventDetailsText").asString().contains(RPA_REASON_JUDGMENT_BY_ADMISSION);
+                .extracting("eventDetailsText").asString().contains(RPA_RECORD_JUDGMENT_REASON);
         }
 
         @Test
@@ -8745,7 +8736,7 @@ class EventHistoryMapperTest {
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .extracting("eventCode").asString().contains("999");
             assertThat(eventHistory).extracting("miscellaneous").asList()
-                .extracting("eventDetailsText").asString().contains(RPA_REASON_JUDGMENT_BY_ADMISSION);
+                .extracting("eventDetailsText").asString().contains(RPA_RECORD_JUDGMENT_REASON);
         }
 
         @Test
@@ -8791,9 +8782,9 @@ class EventHistoryMapperTest {
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .extracting("eventCode").asString().contains("999");
             assertThat(eventHistory).extracting("miscellaneous").asList()
-                .extracting("eventDetailsText").asString().contains(RPA_REASON_JUDGMENT_BY_ADMISSION);
+                .extracting("eventDetailsText").asString().contains(RPA_RECORD_JUDGMENT_REASON);
             assertThat(eventHistory).extracting("judgmentByAdmission").asList()
-                .extracting("litigiousPartyID").asString().contains("001");
+                .extracting("litigiousPartyID").asString().contains("002");
         }
 
         @Test
@@ -8829,7 +8820,7 @@ class EventHistoryMapperTest {
                 .extracting("eventDetails").asList()
                 .extracting("installmentAmount").isNotNull();
             assertThat(eventHistory).extracting("judgmentByAdmission").asList()
-                .extracting("litigiousPartyID").asString().contains("001");
+                .extracting("litigiousPartyID").asString().contains("002");
 
         }
 
@@ -8876,7 +8867,6 @@ class EventHistoryMapperTest {
                 .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
                 .joJudgementByAdmissionIssueDate(now)
                 .build();
-            when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("judgmentByAdmission").isNotNull();
@@ -8918,7 +8908,6 @@ class EventHistoryMapperTest {
                 .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
                 .joJudgementByAdmissionIssueDate(now)
                 .build();
-            when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("judgmentByAdmission").isNotNull();
@@ -8955,7 +8944,6 @@ class EventHistoryMapperTest {
                 .totalInterest(BigDecimal.ZERO)
                 .joJudgementByAdmissionIssueDate(now)
                 .build();
-            given(featureToggleService.isJOLiveFeedActive()).willReturn(true);
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("judgmentByAdmission").isNotNull();
@@ -8976,7 +8964,6 @@ class EventHistoryMapperTest {
 
         @Test
         public void shouldGenerateRPA_ForFullAdmit_WhenLipClaimAgreedRepaymentPlan_JoLiveFeed() {
-            when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
             LocalDate whenWillPay = LocalDate.now().plusDays(5);
             CCJPaymentDetails ccjPaymentDetails = buildCcjPaymentDetails();
             RepaymentPlanLRspec respondent1RepaymentPlan = RepaymentPlanLRspec.builder()
@@ -8994,7 +8981,6 @@ class EventHistoryMapperTest {
                 .totalInterest(BigDecimal.ZERO)
                 .joJudgementByAdmissionIssueDate(now)
                 .build();
-            given(featureToggleService.isJOLiveFeedActive()).willReturn(true);
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("judgmentByAdmission").isNotNull();
@@ -9038,7 +9024,6 @@ class EventHistoryMapperTest {
         @BeforeEach
         void setup() {
             when(featureToggleService.isCoSCEnabled()).thenReturn(true);
-            when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
         }
 
         @Nested
@@ -9253,7 +9238,6 @@ class EventHistoryMapperTest {
                 class CourtFavoursClaimant {
                     @Test
                     void claimantProposesDifferentSetByDate() {
-                        when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
                         PaymentBySetDate claimantSuggestedPayByDate = PaymentBySetDate.builder().paymentSetDate(LocalDate.now().plusDays(1)).build();
@@ -9312,14 +9296,12 @@ class EventHistoryMapperTest {
                         assertThat(eventDetails.getAmountPaidBeforeJudgment()).isEqualByComparingTo(BigDecimal.valueOf(0));
                         assertThat(eventDetails.getAgreedExtensionDate()).isNull();
                         assertThat(eventDetails.getFirstInstallmentDate()).isNull();
-                        assertThat(eventDetails.getInstallmentPeriod()).isNull();
-                        assertThat(eventDetails.getInstallmentAmount()).isNull();
 
                     }
 
                     @Test
                     void claimantProposesPayByInstallment() {
-                        when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
+
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
                         LocalDate climantSuggestedFirstInstallmentDate = LocalDate.now().plusDays(1);
@@ -9385,7 +9367,7 @@ class EventHistoryMapperTest {
 
                     @Test
                     void claimantProposesPayImmediately() {
-                        when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
+
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
                         LocalDate claimantSuggestedDate = LocalDate.now().plusDays(1);
@@ -9444,7 +9426,7 @@ class EventHistoryMapperTest {
                         assertThat(eventDetails.getAmountPaidBeforeJudgment()).isEqualByComparingTo(BigDecimal.valueOf(0));
                         assertThat(eventDetails.getAgreedExtensionDate()).isNull();
                         assertThat(eventDetails.getFirstInstallmentDate()).isNull();
-                        assertThat(eventDetails.getInstallmentPeriod()).isNull();
+                        assertThat(eventDetails.getInstallmentPeriod()).isEqualTo("FW");
                         assertThat(eventDetails.getInstallmentAmount()).isNull();
                     }
 
@@ -9454,7 +9436,7 @@ class EventHistoryMapperTest {
                 class CourtFavoursDefendant {
                     @Test
                     void claimantProposesDifferentSetByDate() {
-                        when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
+
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
                         PaymentBySetDate claimantSuggestedPayByDate = PaymentBySetDate.builder().paymentSetDate(LocalDate.now().plusDays(1)).build();
@@ -9513,14 +9495,14 @@ class EventHistoryMapperTest {
                         assertThat(eventDetails.getAmountPaidBeforeJudgment()).isEqualByComparingTo(BigDecimal.valueOf(0));
                         assertThat(eventDetails.getAgreedExtensionDate()).isNull();
                         assertThat(eventDetails.getFirstInstallmentDate()).isNull();
-                        assertThat(eventDetails.getInstallmentPeriod()).isNull();
+                        assertThat(eventDetails.getInstallmentPeriod()).isEqualTo("FUL");
                         assertThat(eventDetails.getInstallmentAmount()).isNull();
 
                     }
 
                     @Test
                     void claimantProposesPayByInstallment() {
-                        when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
+
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
                         LocalDate climantSuggestedFirstInstallmentDate = LocalDate.now().plusDays(1);
@@ -9580,13 +9562,13 @@ class EventHistoryMapperTest {
                         assertThat(eventDetails.getAmountPaidBeforeJudgment()).isEqualByComparingTo(BigDecimal.valueOf(0));
                         assertThat(eventDetails.getAgreedExtensionDate()).isNull();
                         assertThat(eventDetails.getFirstInstallmentDate()).isNull();
-                        assertThat(eventDetails.getInstallmentPeriod()).isNull();
+                        assertThat(eventDetails.getInstallmentPeriod()).isEqualTo("FUL");
                         assertThat(eventDetails.getInstallmentAmount()).isNull();
                     }
 
                     @Test
                     void claimantProposesPayImmediately() {
-                        when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
+
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
                         LocalDate claimantSuggestedDate = LocalDate.now().plusDays(1);
@@ -9645,7 +9627,7 @@ class EventHistoryMapperTest {
                         assertThat(eventDetails.getAmountPaidBeforeJudgment()).isEqualByComparingTo(BigDecimal.valueOf(0));
                         assertThat(eventDetails.getAgreedExtensionDate()).isNull();
                         assertThat(eventDetails.getFirstInstallmentDate()).isNull();
-                        assertThat(eventDetails.getInstallmentPeriod()).isNull();
+                        assertThat(eventDetails.getInstallmentPeriod()).isEqualTo("FUL");
                         assertThat(eventDetails.getInstallmentAmount()).isNull();
                     }
 
@@ -9660,7 +9642,7 @@ class EventHistoryMapperTest {
                 class CourtFavoursClaimant {
                     @Test
                     void claimantProposesPayBySetDate() {
-                        when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
+
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
                         PaymentBySetDate claimantSuggestedPayByDate = PaymentBySetDate.builder().paymentSetDate(LocalDate.now().plusDays(1)).build();
@@ -9719,13 +9701,13 @@ class EventHistoryMapperTest {
                         assertThat(eventDetails.getAmountPaidBeforeJudgment()).isEqualByComparingTo(BigDecimal.valueOf(0));
                         assertThat(eventDetails.getAgreedExtensionDate()).isNull();
                         assertThat(eventDetails.getFirstInstallmentDate()).isNull();
-                        assertThat(eventDetails.getInstallmentPeriod()).isNull();
+                        assertThat(eventDetails.getInstallmentPeriod()).isEqualTo("FUL");
                         assertThat(eventDetails.getInstallmentAmount()).isNull();
                     }
 
                     @Test
                     void claimantProposesPayByInstallment() {
-                        when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
+
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
                         LocalDate claimantSuggestedDate = LocalDate.now().plusDays(1);
@@ -9792,7 +9774,7 @@ class EventHistoryMapperTest {
 
                     @Test
                     void claimantProposesPayImmediately() {
-                        when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
+
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
                         LocalDate claimantSuggestedDate = LocalDate.now().plusDays(1);
@@ -9851,7 +9833,7 @@ class EventHistoryMapperTest {
                         assertThat(eventDetails.getAmountPaidBeforeJudgment()).isEqualByComparingTo(BigDecimal.valueOf(0));
                         assertThat(eventDetails.getAgreedExtensionDate()).isNull();
                         assertThat(eventDetails.getFirstInstallmentDate()).isNull();
-                        assertThat(eventDetails.getInstallmentPeriod()).isNull();
+                        assertThat(eventDetails.getInstallmentPeriod()).isEqualTo("FW");
                         assertThat(eventDetails.getInstallmentAmount()).isNull();
                     }
                 }
@@ -9860,7 +9842,7 @@ class EventHistoryMapperTest {
                 class CourtFavoursDefendant {
                     @Test
                     void claimantProposesPayBySetDate() {
-                        when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
+
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
                         PaymentBySetDate claimantSuggestedPayByDate = PaymentBySetDate.builder().paymentSetDate(LocalDate.now().plusDays(1)).build();
@@ -9926,7 +9908,7 @@ class EventHistoryMapperTest {
 
                     @Test
                     void claimantProposesPayByInstallment() {
-                        when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
+
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
                         LocalDate claimantSuggestedDate = LocalDate.now().plusDays(1);
@@ -9993,7 +9975,7 @@ class EventHistoryMapperTest {
 
                     @Test
                     void claimantProposesPayImmediately() {
-                        when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
+
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
                         LocalDate claimantSuggestedDate = LocalDate.now().plusDays(1);
@@ -10062,7 +10044,7 @@ class EventHistoryMapperTest {
             class DefendantProposedPayImmediatelyClaimRejectsCourtFavoursDefendant {
                 @Test
                 void claimantProposesPayBySetDate() {
-                    when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
+
                     LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                     LocalDate claimantSuggestedDate = LocalDate.now().plusDays(1);
 
@@ -10114,13 +10096,13 @@ class EventHistoryMapperTest {
                     assertThat(eventDetails.getAmountPaidBeforeJudgment()).isEqualByComparingTo(BigDecimal.valueOf(0));
                     assertThat(eventDetails.getAgreedExtensionDate()).isNull();
                     assertThat(eventDetails.getFirstInstallmentDate()).isNull();
-                    assertThat(eventDetails.getInstallmentPeriod()).isNull();
+                    assertThat(eventDetails.getInstallmentPeriod()).isEqualTo("FUL");
                     assertThat(eventDetails.getInstallmentAmount()).isNull();
                 }
 
                 @Test
                 void claimantProposesPayByInstallment() {
-                    when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
+
                     LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                     LocalDate claimantSuggestedDate = LocalDate.now().plusDays(1);
 
@@ -10190,7 +10172,7 @@ class EventHistoryMapperTest {
                 class CourtFavoursClaimant {
                     @Test
                     void claimantProposesDifferentSetByDate() {
-                        when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
+
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
                         PaymentBySetDate claimantSuggestedPayByDate = PaymentBySetDate.builder().paymentSetDate(LocalDate.now().plusDays(1)).build();
@@ -10249,14 +10231,14 @@ class EventHistoryMapperTest {
                         assertThat(eventDetails.getAmountPaidBeforeJudgment()).isEqualByComparingTo(BigDecimal.valueOf(0));
                         assertThat(eventDetails.getAgreedExtensionDate()).isNull();
                         assertThat(eventDetails.getFirstInstallmentDate()).isNull();
-                        assertThat(eventDetails.getInstallmentPeriod()).isNull();
+                        assertThat(eventDetails.getInstallmentPeriod()).isEqualTo("FUL");
                         assertThat(eventDetails.getInstallmentAmount()).isNull();
 
                     }
 
                     @Test
                     void claimantProposesPayByInstallment() {
-                        when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
+
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
                         LocalDate climantSuggestedFirstInstallmentDate = LocalDate.now().plusDays(1);
@@ -10322,7 +10304,7 @@ class EventHistoryMapperTest {
 
                     @Test
                     void claimantProposesPayImmediately() {
-                        when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
+
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
                         LocalDate claimantSuggestedDate = LocalDate.now().plusDays(1);
@@ -10381,7 +10363,7 @@ class EventHistoryMapperTest {
                         assertThat(eventDetails.getAmountPaidBeforeJudgment()).isEqualByComparingTo(BigDecimal.valueOf(0));
                         assertThat(eventDetails.getAgreedExtensionDate()).isNull();
                         assertThat(eventDetails.getFirstInstallmentDate()).isNull();
-                        assertThat(eventDetails.getInstallmentPeriod()).isNull();
+                        assertThat(eventDetails.getInstallmentPeriod()).isEqualTo("FW");
                         assertThat(eventDetails.getInstallmentAmount()).isNull();
                     }
 
@@ -10391,7 +10373,7 @@ class EventHistoryMapperTest {
                 class CourtFavoursDefendant {
                     @Test
                     void claimantProposesDifferentSetByDate() {
-                        when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
+
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
                         PaymentBySetDate claimantSuggestedPayByDate = PaymentBySetDate.builder().paymentSetDate(LocalDate.now().plusDays(1)).build();
@@ -10450,14 +10432,14 @@ class EventHistoryMapperTest {
                         assertThat(eventDetails.getAmountPaidBeforeJudgment()).isEqualByComparingTo(BigDecimal.valueOf(0));
                         assertThat(eventDetails.getAgreedExtensionDate()).isNull();
                         assertThat(eventDetails.getFirstInstallmentDate()).isNull();
-                        assertThat(eventDetails.getInstallmentPeriod()).isNull();
+                        assertThat(eventDetails.getInstallmentPeriod()).isEqualTo("FUL");
                         assertThat(eventDetails.getInstallmentAmount()).isNull();
 
                     }
 
                     @Test
                     void claimantProposesPayByInstallment() {
-                        when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
+
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
                         LocalDate climantSuggestedFirstInstallmentDate = LocalDate.now().plusDays(1);
@@ -10517,13 +10499,13 @@ class EventHistoryMapperTest {
                         assertThat(eventDetails.getAmountPaidBeforeJudgment()).isEqualByComparingTo(BigDecimal.valueOf(0));
                         assertThat(eventDetails.getAgreedExtensionDate()).isNull();
                         assertThat(eventDetails.getFirstInstallmentDate()).isNull();
-                        assertThat(eventDetails.getInstallmentPeriod()).isNull();
+                        assertThat(eventDetails.getInstallmentPeriod()).isEqualTo("FUL");
                         assertThat(eventDetails.getInstallmentAmount()).isNull();
                     }
 
                     @Test
                     void claimantProposesPayImmediately() {
-                        when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
+
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
                         LocalDate claimantSuggestedDate = LocalDate.now().plusDays(1);
@@ -10582,7 +10564,7 @@ class EventHistoryMapperTest {
                         assertThat(eventDetails.getAmountPaidBeforeJudgment()).isEqualByComparingTo(BigDecimal.valueOf(0));
                         assertThat(eventDetails.getAgreedExtensionDate()).isNull();
                         assertThat(eventDetails.getFirstInstallmentDate()).isNull();
-                        assertThat(eventDetails.getInstallmentPeriod()).isNull();
+                        assertThat(eventDetails.getInstallmentPeriod()).isEqualTo("FUL");
                         assertThat(eventDetails.getInstallmentAmount()).isNull();
                     }
 
@@ -10597,7 +10579,7 @@ class EventHistoryMapperTest {
                 class CourtFavoursClaimant {
                     @Test
                     void claimantProposesPayBySetDate() {
-                        when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
+
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
                         PaymentBySetDate claimantSuggestedPayByDate = PaymentBySetDate.builder().paymentSetDate(LocalDate.now().plusDays(1)).build();
@@ -10656,13 +10638,13 @@ class EventHistoryMapperTest {
                         assertThat(eventDetails.getAmountPaidBeforeJudgment()).isEqualByComparingTo(BigDecimal.valueOf(0));
                         assertThat(eventDetails.getAgreedExtensionDate()).isNull();
                         assertThat(eventDetails.getFirstInstallmentDate()).isNull();
-                        assertThat(eventDetails.getInstallmentPeriod()).isNull();
+                        assertThat(eventDetails.getInstallmentPeriod()).isEqualTo("FUL");
                         assertThat(eventDetails.getInstallmentAmount()).isNull();
                     }
 
                     @Test
                     void claimantProposesPayByInstallment() {
-                        when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
+
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
                         LocalDate claimantSuggestedDate = LocalDate.now().plusDays(1);
@@ -10729,7 +10711,7 @@ class EventHistoryMapperTest {
 
                     @Test
                     void claimantProposesPayImmediately() {
-                        when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
+
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
                         LocalDate claimantSuggestedDate = LocalDate.now().plusDays(1);
@@ -10788,7 +10770,7 @@ class EventHistoryMapperTest {
                         assertThat(eventDetails.getAmountPaidBeforeJudgment()).isEqualByComparingTo(BigDecimal.valueOf(0));
                         assertThat(eventDetails.getAgreedExtensionDate()).isNull();
                         assertThat(eventDetails.getFirstInstallmentDate()).isNull();
-                        assertThat(eventDetails.getInstallmentPeriod()).isNull();
+                        assertThat(eventDetails.getInstallmentPeriod()).isEqualTo("FW");
                         assertThat(eventDetails.getInstallmentAmount()).isNull();
                     }
                 }
@@ -10797,7 +10779,7 @@ class EventHistoryMapperTest {
                 class CourtFavoursDefendant {
                     @Test
                     void claimantProposesPayBySetDate() {
-                        when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
+
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
                         PaymentBySetDate claimantSuggestedPayByDate = PaymentBySetDate.builder().paymentSetDate(LocalDate.now().plusDays(1)).build();
@@ -10862,7 +10844,7 @@ class EventHistoryMapperTest {
 
                     @Test
                     void claimantProposesPayByInstallment() {
-                        when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
+
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
                         LocalDate claimantSuggestedDate = LocalDate.now().plusDays(1);
@@ -10929,7 +10911,7 @@ class EventHistoryMapperTest {
 
                     @Test
                     void claimantProposesPayImmediately() {
-                        when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
+
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
                         LocalDate claimantSuggestedDate = LocalDate.now().plusDays(1);
@@ -11000,7 +10982,7 @@ class EventHistoryMapperTest {
                 class CourtFavoursClaimant {
                     @Test
                     void claimantProposesPayBySetDate() {
-                        when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
+
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate claimantSuggestedDate = LocalDate.now().plusDays(1);
 
@@ -11052,13 +11034,13 @@ class EventHistoryMapperTest {
                         assertThat(eventDetails.getAmountPaidBeforeJudgment()).isEqualByComparingTo(BigDecimal.valueOf(0));
                         assertThat(eventDetails.getAgreedExtensionDate()).isNull();
                         assertThat(eventDetails.getFirstInstallmentDate()).isNull();
-                        assertThat(eventDetails.getInstallmentPeriod()).isNull();
+                        assertThat(eventDetails.getInstallmentPeriod()).isEqualTo("FUL");
                         assertThat(eventDetails.getInstallmentAmount()).isNull();
                     }
 
                     @Test
                     void claimantProposesPayByInstallment() {
-                        when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
+
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate claimantSuggestedDate = LocalDate.now().plusDays(1);
 
@@ -11123,7 +11105,7 @@ class EventHistoryMapperTest {
                 public class CourtFavoursDefendant {
                     @Test
                     void claimantProposesPayBySetDate() {
-                        when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
+
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate claimantSuggestedDate = LocalDate.now().plusDays(1);
 
@@ -11181,13 +11163,13 @@ class EventHistoryMapperTest {
                         assertThat(eventDetails.getAmountPaidBeforeJudgment()).isEqualByComparingTo(BigDecimal.valueOf(0));
                         assertThat(eventDetails.getAgreedExtensionDate()).isNull();
                         assertThat(eventDetails.getFirstInstallmentDate()).isNull();
-                        assertThat(eventDetails.getInstallmentPeriod()).isNull();
+                        assertThat(eventDetails.getInstallmentPeriod()).isEqualTo("FW");
                         assertThat(eventDetails.getInstallmentAmount()).isNull();
                     }
 
                     @Test
                     void claimantProposesPayByInstallment() {
-                        when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
+
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate claimantSuggestedDate = LocalDate.now().plusDays(1);
 
@@ -11244,7 +11226,7 @@ class EventHistoryMapperTest {
                         assertThat(eventDetails.getAmountPaidBeforeJudgment()).isEqualByComparingTo(BigDecimal.valueOf(0));
                         assertThat(eventDetails.getAgreedExtensionDate()).isNull();
                         assertThat(eventDetails.getFirstInstallmentDate()).isNull();
-                        assertThat(eventDetails.getInstallmentPeriod()).isNull();
+                        assertThat(eventDetails.getInstallmentPeriod()).isEqualTo("FW");
                         assertThat(eventDetails.getInstallmentAmount()).isNull();
                     }
                 }

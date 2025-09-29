@@ -49,11 +49,7 @@ public class FullDefenceApplicantSolicitorOneSpecNotifier extends FullDefenceSol
             && (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
             || RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec()))
         ) {
-            if (featureToggleService.isJudgmentOnlineLive()) {
-                emailTemplate = notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpecJBA();
-            } else {
-                emailTemplate = notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpec();
-            }
+            emailTemplate = notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpecJBA();
         } else {
             if (MultiPartyScenario.getMultiPartyScenario(caseData).equals(ONE_V_TWO_TWO_LEGAL_REP)) {
                 emailTemplate = notificationsProperties.getClaimantSolicitorDefendantResponse1v2DSForSpec();

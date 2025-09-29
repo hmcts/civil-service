@@ -248,8 +248,7 @@ public class ClaimantResponseDefendantNotificationHandler extends DashboardCallb
     }
 
     private boolean isLrvLipPartFullAdmitAndPayByPlan(CaseData caseData) {
-        return !featureToggleService.isJudgmentOnlineLive()
-            && !caseData.isApplicantLiP()
+        return !caseData.isApplicantLiP()
             && caseData.hasApplicantAcceptedRepaymentPlan()
             && caseData.isCcjRequestJudgmentByAdmission();
     }
@@ -262,8 +261,7 @@ public class ClaimantResponseDefendantNotificationHandler extends DashboardCallb
     }
 
     private boolean isLrvLipFullAdmitImmediatePayClaimSettled(CaseData caseData) {
-        return featureToggleService.isJudgmentOnlineLive()
-            && !caseData.isApplicantLiP()
+        return !caseData.isApplicantLiP()
             && caseData.isFullAdmitPayImmediatelyClaimSpec()
             && caseData.getApplicant1ProceedWithClaim() == null;
     }

@@ -130,7 +130,7 @@ class FullDefenceApplicantSolicitorOneSpecNotifierTest {
             .build();
         caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM).build();
 
-        when(notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpec()).thenReturn("templateImm-id");
+        when(notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpecJBA()).thenReturn("templateImm-id");
 
         notifier.notifySolicitorForDefendantResponse(caseData);
 
@@ -164,7 +164,7 @@ class FullDefenceApplicantSolicitorOneSpecNotifierTest {
             .build();
         caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM).build();
 
-        when(notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpec()).thenReturn("templateImm-id");
+        when(notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpecJBA()).thenReturn("templateImm-id");
 
         notifier.notifySolicitorForDefendantResponse(caseData);
 
@@ -253,7 +253,7 @@ class FullDefenceApplicantSolicitorOneSpecNotifierTest {
             .build();
         caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM).build();
 
-        when(notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpec()).thenReturn("templateImm-id");
+        when(notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpecJBA()).thenReturn("templateImm-id");
 
         notifier.notifySolicitorForDefendantResponse(caseData);
 
@@ -286,7 +286,6 @@ class FullDefenceApplicantSolicitorOneSpecNotifierTest {
             )
             .build();
         caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM).build();
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         when(notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpecJBA()).thenReturn("templateImm-id-jo");
 
         notifier.notifySolicitorForDefendantResponse(caseData);

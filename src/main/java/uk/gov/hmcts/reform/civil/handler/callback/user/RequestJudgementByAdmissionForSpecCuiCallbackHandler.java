@@ -85,8 +85,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
             LocalDate whenWillThisAmountBePaid =
                 Optional.ofNullable(caseData.getRespondToClaimAdmitPartLRspec()).map(RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid).orElse(
                     null);
-            if (featureToggleService.isJudgmentOnlineLive()
-                && whenWillThisAmountBePaid != null
+            if (whenWillThisAmountBePaid != null
                 && caseData.isDateAfterToday(whenWillThisAmountBePaid)
                 && caseData.isPartAdmitPayImmediatelyClaimSpec()) {
                 errors.add(format(NOT_VALID_DJ_BY_ADMISSION, caseData.getFormattedJudgementPermittedDate(whenWillThisAmountBePaid)));
@@ -137,8 +136,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
             ? judgementService.buildJudgmentAmountSummaryDetails(data) :
             data.getCcjPaymentDetails();
 
-        if (featureToggleService.isJudgmentOnlineLive()
-            && (isOneVOne(data))
+        if ((isOneVOne(data))
             && data.isPayImmediately()) {
             nextState = CaseState.All_FINAL_ORDERS_ISSUED.name();
             businessProcess = BusinessProcess.ready(JUDGEMENT_BY_ADMISSION_NON_DIVERGENT_SPEC);
@@ -151,19 +149,17 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
             .businessProcess(businessProcess)
             .ccjPaymentDetails(ccjPaymentDetails);
 
-        if (featureToggleService.isJudgmentOnlineLive()) {
-            JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseDataBuilder.build());
+        JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseDataBuilder.build());
 
-            BigDecimal interest = interestCalculator.calculateInterest(data);
+        BigDecimal interest = interestCalculator.calculateInterest(data);
 
-            String joSummaryObject = data.isLipvLipOneVOne() ? JudgmentsOnlineHelper.calculateRepaymentBreakdownSummaryWithoutClaimInterest(
-                activeJudgment, true) : getJudgmentRepaymentSummaryObject(data, interest, activeJudgment);
-            caseDataBuilder
-                .activeJudgment(activeJudgment)
-                .joIsLiveJudgmentExists(YesOrNo.YES)
-                .joRepaymentSummaryObject(joSummaryObject)
-                .joJudgementByAdmissionIssueDate(time.now());
-        }
+        String joSummaryObject = data.isLipvLipOneVOne() ? JudgmentsOnlineHelper.calculateRepaymentBreakdownSummaryWithoutClaimInterest(
+            activeJudgment, true) : getJudgmentRepaymentSummaryObject(data, interest, activeJudgment);
+        caseDataBuilder
+            .activeJudgment(activeJudgment)
+            .joIsLiveJudgmentExists(YesOrNo.YES)
+            .joRepaymentSummaryObject(joSummaryObject)
+            .joJudgementByAdmissionIssueDate(time.now());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))

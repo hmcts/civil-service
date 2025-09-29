@@ -49,8 +49,6 @@ public class ClaimantRejectRepaymentPlanOrgLtdCoDefendantScenarioTest extends Da
             .applicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.NO)
             .build();
 
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(false);
-
         handler.handle(callbackParams(caseData));
 
         //Verify Notification is created
@@ -100,8 +98,6 @@ public class ClaimantRejectRepaymentPlanOrgLtdCoDefendantScenarioTest extends Da
             .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.NO)
             .build();
 
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(false);
-
         handler.handle(callbackParams(caseData));
 
         //Verify Notification is created
@@ -144,8 +140,6 @@ public class ClaimantRejectRepaymentPlanOrgLtdCoDefendantScenarioTest extends Da
             .respondToAdmittedClaimOwingAmountPounds(new BigDecimal(1000))
             .applicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.NO)
             .build();
-
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
         handler.handle(callbackParams(caseData));
 

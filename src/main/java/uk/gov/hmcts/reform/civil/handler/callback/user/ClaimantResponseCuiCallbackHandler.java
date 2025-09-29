@@ -132,7 +132,7 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
 
         UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(builder);
 
-        if (featureToggleService.isJudgmentOnlineLive() && JudgmentAdmissionUtils.getLIPJudgmentAdmission(caseData)) {
+        if (JudgmentAdmissionUtils.getLIPJudgmentAdmission(caseData)) {
             CaseData updatedCaseData = builder.build();
             JudgmentDetails activeJudgmentDetails = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(updatedCaseData);
             builder

@@ -270,7 +270,6 @@ class AboutToSubmitRespondToDefenceTaskTest {
 
     @Test
     void shouldSetRespondOptionWhenImmediatePaymentPlanSelected_ApplicantConfirmsNotToProceed1v1() {
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder()
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
@@ -292,7 +291,6 @@ class AboutToSubmitRespondToDefenceTaskTest {
 
     @Test
     void shouldSetRespondOptionWhenImmediatePartPaymentPlanSelected_ApplicantConfirmsNotToProceed1v1() {
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder()
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)

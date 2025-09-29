@@ -75,7 +75,6 @@ class JudgementByAdmissionIssuedClaimantDashboardNotificationHandlerTest extends
     void shouldCreateDashboardNotifications_WhenLipvsLipIndividualOrSoleTraderWithJoIssued() {
         params.put("ccdCaseReference", "123");
 
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
         CaseData caseData = CaseData.builder()
@@ -114,7 +113,6 @@ class JudgementByAdmissionIssuedClaimantDashboardNotificationHandlerTest extends
     void shouldCreateDashboardNotifications_WhenLipvsLipCompanyOrOrganisationWithRepaymentPlanAccepted() {
         params.put("ccdCaseReference", "123");
 
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
         CaseData caseData = CaseData.builder()
@@ -153,7 +151,6 @@ class JudgementByAdmissionIssuedClaimantDashboardNotificationHandlerTest extends
     void shouldNotCreateDashboardNotifications_WhenLRClaimant() {
         params.put("ccdCaseReference", "123");
 
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
         CaseData caseData = CaseData.builder()

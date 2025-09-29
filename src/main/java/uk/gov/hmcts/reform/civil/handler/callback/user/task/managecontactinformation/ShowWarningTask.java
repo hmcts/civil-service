@@ -72,14 +72,12 @@ public class ShowWarningTask {
 
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             errors = postcodeValidator.validate(getPostCode(partyChosen, caseData));
-            if (featureToggleService.isJudgmentOnlineLive()) {
-                Party partyDetails = getPartyDetails(partyChosen, caseData);
-                if (partyDetails != null  && partyDetails.getPrimaryAddress() != null) {
-                    errors = partyValidator.validateAddress(partyDetails.getPrimaryAddress(), errors);
-                }
-                if (partyDetails != null && partyDetails.getPartyName() != null) {
-                    errors = partyValidator.validateName(partyDetails.getPartyName(), errors);
-                }
+            Party partyDetails = getPartyDetails(partyChosen, caseData);
+            if (partyDetails != null  && partyDetails.getPrimaryAddress() != null) {
+                errors = partyValidator.validateAddress(partyDetails.getPrimaryAddress(), errors);
+            }
+            if (partyDetails != null && partyDetails.getPartyName() != null) {
+                errors = partyValidator.validateName(partyDetails.getPartyName(), errors);
             }
         }
 

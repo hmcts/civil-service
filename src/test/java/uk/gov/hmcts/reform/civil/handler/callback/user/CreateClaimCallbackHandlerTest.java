@@ -210,11 +210,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         private static final String PAGE_ID = "applicant";
 
-        @BeforeEach
-        void setup() {
-            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(false);
-        }
-
         @Test
         void shouldReturnError_whenIndividualDateOfBirthIsInTheFuture() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
@@ -273,7 +268,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnError_whenIndividualAddressLengthGreaterThanMaxLimit() {
-            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .applicant1(Party.builder()
                                 .partyName("Party").type(Party.Type.INDIVIDUAL)
@@ -298,7 +292,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_whenOrgNameExceedsMaxLength() {
             // Given
-            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .applicant1(Party.builder()
@@ -317,36 +310,12 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getErrors()).hasSize(1);
         }
 
-        @Test
-        void shouldNotReturnError_whenOrgNameExceedsMaxlength_And_flagOff() {
-            // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                .applicant1(Party.builder()
-                                .type(Party.Type.ORGANISATION)
-                                .organisationName("This is very long name exceeds 70 characters "
-                                                      + " to throw error for max length allowed")
-                                .build())
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-
-            // When
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            // Then
-            assertThat(response.getErrors()).isEmpty();
-        }
-
     }
 
     @Nested
     class MidEventApplicant2Callback {
 
         private static final String PAGE_ID = "applicant2";
-
-        @BeforeEach
-        void setup() {
-            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(false);
-        }
 
         @Test
         void shouldReturnError_whenIndividualDateOfBirthIsInTheFuture() {
@@ -406,7 +375,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnError_whenSoleTraderPostCodeLengthExceedsMaxLimit() {
-            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .applicant2(Party.builder()
                                 .soleTraderTitle("Mr")
@@ -429,7 +397,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnError_whenCompanyAddressExceedsMaxLength() {
-            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .applicant2(Party.builder()
                                 .companyName("MR companyName is very long nam exceeds 70 characters to throw" +
@@ -450,36 +417,12 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getErrors()).isNotEmpty();
             assertThat(response.getErrors()).hasSize(7);
         }
-
-        @Test
-        void shouldNotReturnError_whenOrgNameExceedsMaxlength_And_flagOff() {
-            // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                .applicant2(Party.builder()
-                                .type(Party.Type.ORGANISATION)
-                                .organisationName("This is very long name exceeds 70 characters "
-                                                      + " to throw error for max length allowed")
-                                .build())
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-
-            // When
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            // Then
-            assertThat(response.getErrors()).isEmpty();
-        }
     }
 
     @Nested
     class MidEventDefendant1Callback {
 
         private static final String PAGE_ID = "respondent1";
-
-        @BeforeEach
-        void setUp() {
-            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
-        }
 
         @Test
         void shouldReturnError_whenOrganisationAddressLongerThanMaxLength() {
@@ -582,38 +525,12 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Then
             assertThat(response.getErrors()).isNotEmpty();
         }
-
-        @Test
-        void shouldNotError_when_address_exceeds_max_length_in_org_name_when_flag_in_off() {
-            // Given
-            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(false);
-
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                .respondent1(Party.builder()
-                                 .type(Party.Type.ORGANISATION)
-                                 .organisationName("This is very long name exceeds 70 characters "
-                                                       + " to throw error for max length allowed")
-                                 .build())
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-
-            // When
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            // Then
-            assertThat(response.getErrors()).isEmpty();
-        }
     }
 
     @Nested
     class MidEventDefendant2Callback {
 
         private static final String PAGE_ID = "respondent2";
-
-        @BeforeEach
-        void setUp() {
-            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
-        }
 
         @Test
         void shouldReturnError_whenAddressLongerThanMaxLength() {
@@ -720,7 +637,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldNotError_when_address_exceeds_max_length_in_org_name_when_flag_in_off() {
             // Given
-            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(false);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .respondent1(Party.builder()

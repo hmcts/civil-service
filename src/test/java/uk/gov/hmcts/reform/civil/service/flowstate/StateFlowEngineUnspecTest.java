@@ -1,10 +1,8 @@
 package uk.gov.hmcts.reform.civil.service.flowstate;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.stubbing.OngoingStubbing;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,14 +15,11 @@ import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
 
-import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_SUBMITTED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DRAFT;
 
@@ -41,11 +36,6 @@ public class StateFlowEngineUnspecTest {
 
     @MockBean
     private FeatureToggleService featureToggleService;
-
-    @BeforeEach
-    void setup() {
-        given(featureToggleService.isJOLiveFeedActive()).willReturn(false);
-    }
 
     static Stream<Arguments> caseDataStream() {
         return Stream.of(
@@ -121,7 +111,7 @@ public class StateFlowEngineUnspecTest {
 
         // Then Claim will have IS_JO_LIVE_FEED_ACTIVE and RPA_CONTINUOUS_FEED
         assertThat(stateFlow.getFlags()).contains(
-            entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false)
+            entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), true)
         );
     }
 
@@ -151,29 +141,6 @@ public class StateFlowEngineUnspecTest {
             entry(FlowFlag.TWO_RESPONDENT_REPRESENTATIVES.name(), true)
         );
         assertThat(stateFlow.getFlags()).hasSize(13);    // bonus: if this fails, a flag was added/removed but tests were not updated
-    }
-
-    public interface StubbingFn extends Function<FeatureToggleService, OngoingStubbing<Boolean>> {
-    }
-
-    static Stream<Arguments> commonFlagNames() {
-        return Stream.of(
-            arguments(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(),
-                      (StubbingFn)(featureToggleService) -> when(featureToggleService.isJOLiveFeedActive())));
-    }
-
-    @ParameterizedTest(name = "{index}: The feature flags are carried to the appropriate state flow flags")
-    @MethodSource("commonFlagNames")
-    void shouldUseTrueFeatureFlag_whenCaseDataAtStateClaimSubmitted(String flagName, StubbingFn stubbingFunction) {
-        // Given: some case data (which one shouldn't matter)
-        CaseData caseData = CaseDataBuilderUnspec.builder().atStateClaimSubmitted().build();
-
-        //When: I set a specific feature flag to true
-        stubbingFunction.apply(featureToggleService).thenReturn(true);
-        StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
-
-        // Then: The corresponding flag in the StateFlow must be set to true
-        assertThat(stateFlow.getFlags()).contains(entry(flagName, true));
     }
 }
 

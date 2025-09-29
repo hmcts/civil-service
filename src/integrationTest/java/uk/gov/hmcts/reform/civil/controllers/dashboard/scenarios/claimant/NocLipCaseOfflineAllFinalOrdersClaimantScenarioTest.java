@@ -36,7 +36,6 @@ public class NocLipCaseOfflineAllFinalOrdersClaimantScenarioTest extends Dashboa
         String caseId = "72014544355416";
 
         when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
 
         JudgmentDetails activeJudgment = JudgmentDetails.builder().judgmentId(123).state(JudgmentState.ISSUED).build();

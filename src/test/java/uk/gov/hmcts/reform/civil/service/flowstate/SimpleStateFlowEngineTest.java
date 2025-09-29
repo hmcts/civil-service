@@ -2732,8 +2732,8 @@ class SimpleStateFlowEngineTest {
                 entry("TWO_RESPONDENT_REPRESENTATIVES", true),
                 entry(FlowFlag.IS_MULTI_TRACK.name(), true),
                 entry(FlowFlag.MINTI_ENABLED.name(), false),
-                entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
-                entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
+                entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), true),
+                entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), true),
                 entry(FlowFlag.SDO_ENABLED.name(), false),
                 entry(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), false),
                 entry(FlowFlag.PUBLIC_QUERIES_ENABLED.name(), false)
@@ -3518,7 +3518,7 @@ class SimpleStateFlowEngineTest {
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true),
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                    entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
+                    entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), true),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
                 );
             }
@@ -3601,7 +3601,7 @@ class SimpleStateFlowEngineTest {
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true),
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                    entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
+                    entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), true),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
                 );
             }
@@ -3684,7 +3684,7 @@ class SimpleStateFlowEngineTest {
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true),
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                    entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
+                    entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), true),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
                 );
             }
@@ -3726,7 +3726,7 @@ class SimpleStateFlowEngineTest {
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true),
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                    entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
+                    entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), true),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
                 );
             }
@@ -3770,7 +3770,7 @@ class SimpleStateFlowEngineTest {
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true),
-                    entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
+                    entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), true),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
                 );
             }
@@ -3814,7 +3814,7 @@ class SimpleStateFlowEngineTest {
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true),
-                    entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
+                    entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), true),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
                 );
             }
@@ -3856,7 +3856,7 @@ class SimpleStateFlowEngineTest {
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true),
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                    entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
+                    entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), true),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
                 );
             }
@@ -3980,7 +3980,7 @@ class SimpleStateFlowEngineTest {
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true),
-                    entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
+                    entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), true),
                     entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false)
                 );
             }
@@ -4274,7 +4274,7 @@ class SimpleStateFlowEngineTest {
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                 entry(FlowFlag.CONTACT_DETAILS_CHANGE.name(), true),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
+                entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), true),
                 entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true)
             );
@@ -4459,7 +4459,7 @@ class SimpleStateFlowEngineTest {
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                 entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
+                entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), true),
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true));
         }
 
@@ -4663,7 +4663,7 @@ class SimpleStateFlowEngineTest {
             assertThat(stateFlow.getFlags()).hasSize(12).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false));
+                entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), true));
         }
 
         @Test

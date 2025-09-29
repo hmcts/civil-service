@@ -60,9 +60,7 @@ public class ValidateClaimantDetailsTask {
         List<String> errors = new ArrayList<>();
         errors.addAll(dateOfBirthValidator.validate(applicant));
 
-        if (featureToggleService.isJudgmentOnlineLive()) {
-            validateAddressAndName(applicant, errors);
-        }
+        validateAddressAndName(applicant, errors);
         return errors;
     }
 

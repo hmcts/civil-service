@@ -35,10 +35,7 @@ public class SpecDefRespEmailHelper {
                 || FULL_ADMISSION.equals(respondent2Response));
 
         if (isFullAdmitImmediatePayment) {
-            if (featureToggleService.isJudgmentOnlineLive()) {
-                return notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpecJBA();
-            }
-            return notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpec();
+            return notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpecJBA();
         }
 
         if (ONE_V_TWO_TWO_LEGAL_REP.equals(scenario)) {

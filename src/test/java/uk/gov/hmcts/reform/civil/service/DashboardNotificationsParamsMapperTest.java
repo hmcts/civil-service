@@ -299,7 +299,6 @@ public class DashboardNotificationsParamsMapperTest {
     @ParameterizedTest
     @EnumSource(PaymentFrequency.class)
     public void shouldMapParameters_WhenJudgementByAdmissionInstalmentsIsIssued(PaymentFrequency paymentFrequency) {
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
         caseData = caseData.toBuilder()
             .legacyCaseReference("reference")
@@ -345,7 +344,6 @@ public class DashboardNotificationsParamsMapperTest {
 
     @Test
     public void shouldMapParameters_WhenJudgementByAdmissionIssuedImmediately() {
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
         caseData = caseData.toBuilder()
             .legacyCaseReference("reference")
@@ -371,7 +369,6 @@ public class DashboardNotificationsParamsMapperTest {
 
     @Test
     public void shouldMapParameters_WhenJudgementByAdmissionIssuedPayByDate() {
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
         caseData = caseData.toBuilder()
             .legacyCaseReference("reference")

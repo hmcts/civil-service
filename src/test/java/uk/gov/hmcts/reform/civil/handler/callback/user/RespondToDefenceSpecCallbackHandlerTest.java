@@ -1409,7 +1409,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldChangeCaseState_WhenRespondentRepaymentPlanAndFlagV2WithJudgementLive() {
             given(featureToggleService.isPinInPostEnabled()).willReturn(true);
-            given(featureToggleService.isJudgmentOnlineLive()).willReturn(true);
             CaseData caseData = CaseData.builder()
                 .respondent1Represented(YesOrNo.NO)
                 .applicant1Represented(YesOrNo.YES)
@@ -1432,7 +1431,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldChangeCaseState_WhenRespondentRepaymentPlanAndFlagV2WithJudgementLiveAndLrVLr() {
             given(featureToggleService.isPinInPostEnabled()).willReturn(true);
-            given(featureToggleService.isJudgmentOnlineLive()).willReturn(true);
             CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                 .ccjPaymentPaidSomeOption(YesOrNo.YES)
                 .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(500.0))
@@ -1471,7 +1469,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldChangeCaseState_WhenRespondentRepaymentPlanAndFlagV2WithJudgementLiveAndLrVLrAdmissionBulk() {
             given(featureToggleService.isPinInPostEnabled()).willReturn(true);
-            given(featureToggleService.isJudgmentOnlineLive()).willReturn(true);
             given(featureToggleService.isLrAdmissionBulkEnabled()).willReturn(true);
             CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                 .ccjPaymentPaidSomeOption(YesOrNo.YES)
@@ -1511,7 +1508,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldChangeCaseState_WhenRespondentPaymentSetByDateAndFlagV2WithJudgementLive() {
             given(featureToggleService.isPinInPostEnabled()).willReturn(true);
-            given(featureToggleService.isJudgmentOnlineLive()).willReturn(true);
             CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                 .ccjPaymentPaidSomeOption(YesOrNo.YES)
                 .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(500.0))
@@ -1551,7 +1547,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldChangeCaseState_WhenRespondentPaymentImmediatelyAndFlagV2WithJudgementLive() {
             given(featureToggleService.isPinInPostEnabled()).willReturn(true);
-            given(featureToggleService.isJudgmentOnlineLive()).willReturn(true);
             CaseData caseData = CaseData.builder()
                 .respondent1Represented(YesOrNo.NO)
                 .applicant1Represented(YesOrNo.YES)
@@ -2169,7 +2164,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void summary_when_all_finals_order_issued() {
             given(featureToggleService.isPinInPostEnabled()).willReturn(true);
-            given(featureToggleService.isJudgmentOnlineLive()).willReturn(true);
             CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                 .ccjPaymentPaidSomeOption(YesOrNo.YES)
                 .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(500.0))
@@ -3080,7 +3074,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 + " Court Judgment (CCJ) will be issued, you will receive any further updates by email.";
 
             when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
-            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             Fee fee = Fee.builder().version("1").code("CODE").calculatedAmountInPence(BigDecimal.valueOf(100)).build();
             CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()

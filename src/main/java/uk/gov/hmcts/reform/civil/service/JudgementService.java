@@ -129,8 +129,7 @@ public class JudgementService {
                 && hasPaymentOption) {
                 return String.format(JUDGEMENT_ORDER_V2, ccjJudgementSubTotal(caseData).toString());
             }
-            if (featureToggleService.isJudgmentOnlineLive()
-                && hasPaymentOption) {
+            if (hasPaymentOption) {
                 return JUDGEMENT_BY_COURT_NOT_OFFLINE;
             }
             return JUDGEMENT_BY_COURT;

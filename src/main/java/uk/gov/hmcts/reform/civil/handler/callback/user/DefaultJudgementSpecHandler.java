@@ -122,7 +122,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     }
 
     private String getHeader(CaseData caseData) {
-        if (featureToggleService.isJudgmentOnlineLive() && JudgmentsOnlineHelper.isNonDivergentForDJ(caseData)) {
+        if (JudgmentsOnlineHelper.isNonDivergentForDJ(caseData)) {
             return format(JUDGMENT_GRANTED_HEADER);
         } else if (caseData.isLRvLipOneVOne()
             || (caseData.getRespondent2() != null
@@ -136,7 +136,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     }
 
     private String getBody(CaseData caseData) {
-        if (featureToggleService.isJudgmentOnlineLive() && JudgmentsOnlineHelper.isNonDivergentForDJ(caseData)) {
+        if (JudgmentsOnlineHelper.isNonDivergentForDJ(caseData)) {
             return format(JUDGMENT_GRANTED, format(
                 "/cases/case-details/%s#Claim documents",
                 caseData.getCcdCaseReference()
@@ -395,15 +395,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             repaymentBreakdown.append(", including the claim fee and interest, if applicable, as shown:");
         }
 
-        if (!toggleService.isJudgmentOnlineLive()) {
-            repaymentBreakdown.append("\n").append("### Claim amount \n £").append(caseData.getTotalClaimAmount().setScale(
-                2));
-            if (interest.compareTo(BigDecimal.ZERO) != 0) {
-                repaymentBreakdown.append("\n ### Claim interest amount \n").append("£").append(interest.setScale(2));
-            }
-        } else {
-            repaymentBreakdown.append("\n").append("### Claim amount \n £").append(claimAmountWithInterest.setScale(2));
-        }
+        repaymentBreakdown.append("\n").append("### Claim amount \n £").append(claimAmountWithInterest.setScale(2));
 
         if ((caseData.getFixedCosts() != null
             && YesOrNo.YES.equals(caseData.getFixedCosts().getClaimFixedCosts()))
@@ -507,16 +499,14 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
 
     private CallbackResponse generateClaimForm(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (featureToggleService.isJudgmentOnlineLive()) {
-            JudgmentDetails activeJudgment = djOnlineMapper.addUpdateActiveJudgment(caseData);
-            caseData.setActiveJudgment(activeJudgment);
-            caseData.setJoRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummaryWithoutClaimInterest(
-                activeJudgment,
-                true
-            ));
-            caseData.setJoIsLiveJudgmentExists(YesOrNo.YES);
-            caseData.setJoDJCreatedDate(time.now());
-        }
+        JudgmentDetails activeJudgment = djOnlineMapper.addUpdateActiveJudgment(caseData);
+        caseData.setActiveJudgment(activeJudgment);
+        caseData.setJoRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummaryWithoutClaimInterest(
+            activeJudgment,
+            true
+        ));
+        caseData.setJoIsLiveJudgmentExists(YesOrNo.YES);
+        caseData.setJoDJCreatedDate(time.now());
 
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.totalInterest(interestCalculator.calculateInterest(caseData));
@@ -526,7 +516,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         ));
         String nextState;
 
-        if (featureToggleService.isJudgmentOnlineLive() && JudgmentsOnlineHelper.isNonDivergentForDJ(caseData)) {
+        if (JudgmentsOnlineHelper.isNonDivergentForDJ(caseData)) {
             nextState = CaseState.All_FINAL_ORDERS_ISSUED.name();
             caseDataBuilder.businessProcess(BusinessProcess.ready(DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC));
         } else {

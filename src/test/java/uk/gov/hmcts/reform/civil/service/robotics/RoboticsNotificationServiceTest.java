@@ -528,8 +528,6 @@ class RoboticsNotificationServiceTest {
             .build();
         when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
-        when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
         String lastEventText = "event text";
         RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder()
             .events(EventHistory.builder()

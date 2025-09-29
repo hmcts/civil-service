@@ -196,7 +196,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
         BusinessProcess businessProcess = BusinessProcess.builder().build();
 
         when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
 
@@ -420,7 +419,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
         BusinessProcess businessProcess = BusinessProcess.builder().build();
 
         when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
 
@@ -483,7 +481,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
             .build();
 
         when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
         String resultState;
         if (postTranslation) {
@@ -512,7 +509,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
             .build();
 
         when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         String resultState = determineNextState.determineNextState(caseData, callbackParams(caseData),
                                                                    builder, "", businessProcess);
         assertNotNull(resultState);
