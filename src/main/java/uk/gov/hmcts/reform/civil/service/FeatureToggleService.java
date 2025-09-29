@@ -24,10 +24,6 @@ public class FeatureToggleService {
         return this.featureToggleApi.isFeatureEnabled(feature);
     }
 
-    public boolean isGeneralApplicationsEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("general_applications_enabled");
-    }
-
     public boolean isBulkClaimEnabled() {
         return this.featureToggleApi.isFeatureEnabled("bulk_claim_enabled");
     }
@@ -158,17 +154,11 @@ public class FeatureToggleService {
         return featureToggleApi.isFeatureEnabled("hmc-cui-enabled");
     }
 
-    // if deleting this, also handle isQMPdfGeneratorEnabled() below
     public boolean isPublicQueryManagementEnabled(CaseData caseData) {
         if (caseContainsLiP.test(caseData)) {
             return isLipQueryManagementEnabled(caseData);
         }
-        return featureToggleApi.isFeatureEnabled("public-query-management");
-    }
-
-    public boolean isQMPdfGeneratorDisabled() {
-        // only generate pdf if flag is off
-        return featureToggleApi.isFeatureEnabled("public-query-management");
+        return true;
     }
 
     public boolean isGaForWelshEnabled() {
@@ -187,5 +177,9 @@ public class FeatureToggleService {
 
     public boolean isLrAdmissionBulkEnabled() {
         return featureToggleApi.isFeatureEnabled("lr-admission-bulk");
+    }
+
+    public boolean isCuiGaNroEnabled() {
+        return featureToggleApi.isFeatureEnabled("cui-ga-nro");
     }
 }

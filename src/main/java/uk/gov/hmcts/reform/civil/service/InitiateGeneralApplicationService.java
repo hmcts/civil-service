@@ -65,7 +65,7 @@ import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesRefe
 @Slf4j
 public class InitiateGeneralApplicationService {
 
-    public static final int GA_CLAIM_DEADLINE_EXTENSION_MONTHS = 24;
+    public static final int GA_CLAIM_DEADLINE_EXTENSION_MONTHS = 36;
     private final InitiateGeneralApplicationServiceHelper helper;
     private final GeneralAppsDeadlinesCalculator deadlinesCalculator;
     private final FeatureToggleService featureToggleService;
@@ -147,12 +147,14 @@ public class InitiateGeneralApplicationService {
 
     public boolean respondentAssigned(CaseData caseData) {
         String caseId = caseData.getCcdCaseReference().toString();
+        log.info("Checking if respondent is assigned to case: {}", caseId);
         CaseAssignmentUserRolesResource userRoles = getUserRolesOnCase(caseId);
         List<String> respondentCaseRoles = getRespondentCaseRoles(caseData);
-        return isLipCase(caseData, userRoles) || areRespondentRolesAssigned(userRoles, respondentCaseRoles);
+        return isLipCase(caseData, userRoles) || areRespondentRolesAssigned(userRoles, respondentCaseRoles, caseId);
     }
 
     private boolean isLipCase(CaseData caseData, CaseAssignmentUserRolesResource userRoles) {
+        log.info("Checking isLipCase for case: {} and application feature is enabled {}", caseData.getCcdCaseReference(), featureToggleService.isGaForLipsEnabled());
         if (featureToggleService.isGaForLipsEnabled() && (caseData.isRespondent1LiP() || caseData.isRespondent2LiP()
             || caseData.isApplicantNotRepresented())) {
 
@@ -160,22 +162,28 @@ public class InitiateGeneralApplicationService {
                 if (userRoles.getCaseAssignmentUserRoles() != null && userRoles.getCaseAssignmentUserRoles().size() > 1
                     || userRoles.getCaseAssignmentUserRoles().stream()
                     .anyMatch(role -> role.getCaseRole().equals(lipRole))) {
+                    log.info("Checking isLipCase 111 case: {}", caseData.getCcdCaseReference());
                     return true;
                 }
             }
+            log.info("Checking isLipCase 222 case: {}", caseData.getCcdCaseReference());
             return false;
         }
+        log.info("Checking isLipCase 333 case: {}", caseData.getCcdCaseReference());
         return false;
     }
 
-    private boolean areRespondentRolesAssigned(CaseAssignmentUserRolesResource userRoles, List<String> respondentCaseRoles) {
+    private boolean areRespondentRolesAssigned(CaseAssignmentUserRolesResource userRoles, List<String> respondentCaseRoles, String caseId) {
+        log.info("Checking areRespondentRolesAssigned for case: {}", caseId);
         for (String respondentCaseRole : respondentCaseRoles) {
             if (userRoles.getCaseAssignmentUserRoles() == null
                 || userRoles.getCaseAssignmentUserRoles().stream()
                 .noneMatch(a -> a.getCaseRole() != null && respondentCaseRole.equals(a.getCaseRole()))) {
+                log.info("Checking areRespondentRolesAssigned  11 for case: {}", caseId);
                 return false;
             }
         }
+        log.info("Checking areRespondentRolesAssigned  22 for case: {}", caseId);
         return true;
     }
 

@@ -115,7 +115,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     private CallbackResponse aboutToStartValidationAndSetup(CallbackParams callbackParams) {
         List<String> errors = new ArrayList<>();
         CaseData caseData = callbackParams.getCaseData();
-
+        log.info("initiating general application callback for caseId {}", caseData.getCcdCaseReference());
         if (settleDiscontinueStates.contains(caseData.getCcdState())
             && caseData.getPreviousCCDState() == null) {
             return AboutToStartOrSubmitCallbackResponse.builder()
@@ -124,8 +124,10 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         }
 
         if (!initiateGeneralApplicationService.respondentAssigned(caseData)) {
+            log.info("initiating general application not allowed for caseId {}", caseData.getCcdCaseReference());
             errors.add(RESP_NOT_ASSIGNED_ERROR);
         }
+        log.info("initiating general application allowed for caseId {}", caseData.getCcdCaseReference());
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
 
@@ -137,8 +139,10 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
             } else if (featureToggleService.isDefendantNoCOnlineForCase(caseData) && caseData.isLipvLROneVOne()
                 && caseData.isClaimantBilingual() && !featureToggleService.isGaForWelshEnabled()) {
                 errors.add(LR_VS_LIP);
-            } else if (!(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(caseData
-                                                              .getCaseManagementLocation().getBaseLocation()))) {
+            } else if (
+                !(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation()
+                                                                                    .getBaseLocation()))
+                    && !(featureToggleService.isCuiGaNroEnabled())) {
                 errors.add(NOT_IN_EA_REGION);
             }
         }
