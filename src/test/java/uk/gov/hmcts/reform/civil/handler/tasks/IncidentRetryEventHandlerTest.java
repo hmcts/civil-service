@@ -357,7 +357,7 @@ class IncidentRetryEventHandlerTest {
                 List<Map<String, Object>> instructions = (List<Map<String, Object>>) modificationRequest.get("instructions");
                 // Should contain cancel instruction with runtime activityInstanceId
                 Map<String, Object> cancelInstr = instructions.get(0);
-                return "cancelActivityInstance".equals(cancelInstr.get("type"))
+                return "cancel".equals(cancelInstr.get("type"))
                     && "runtime-activity-1".equals(cancelInstr.get("activityInstanceId"));
             })
         );

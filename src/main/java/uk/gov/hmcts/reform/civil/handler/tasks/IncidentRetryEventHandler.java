@@ -277,7 +277,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
 
         List<Map<String, Object>> instructions = new ArrayList<>();
         Map<String, Object> cancelInstruction = new HashMap<>();
-        cancelInstruction.put("type", "cancelActivityInstance");
+        cancelInstruction.put("type", "cancel");
         cancelInstruction.put("activityInstanceId", activityInstanceId);
         instructions.add(cancelInstruction);
 
