@@ -342,7 +342,6 @@ dependencies {
   implementation group: 'commons-beanutils', name: 'commons-beanutils', version: '1.11.0'
   implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.8.0'
   implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.8'
-  implementation group: 'jakarta.persistence', name: 'jakarta.persistence-api', version: '3.2.0'
   implementation group: 'jakarta.servlet', name: 'jakarta.servlet-api', version: '6.1.0'
 
   implementation group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.49.5'
