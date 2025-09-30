@@ -69,6 +69,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STANDARD_DIRECTION_ORDER_DJ;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.ACKNOWLEDGEMENT_OF_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
@@ -155,6 +156,11 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                 .isEqualTo("Mr. John Rambo v Mr. Sole Trader and Mr. John Rambo");
         }
 
+    }
+
+    @Test
+    void handleEventsReturnsTheExpectedCallbackEvent() {
+        assertThat(handler.handledEvents()).contains(STANDARD_DIRECTION_ORDER_DJ);
     }
 
     @Nested
@@ -910,7 +916,13 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            assertEquals(eaCourtLocation, responseCaseData.getEaCourtLocation());
+            boolean isLipCase = caseData.isApplicantLiP() || caseData.isRespondent1LiP() || caseData.isRespondent2LiP();
+            if (!isLipCase) {
+                assertEquals(YES, eaCourtLocation);
+            } else {
+                boolean isLipCaseEaCourt = handler.isLipCaseWithProgressionEnabledAndCourtWhiteListed(caseData);
+                assertEquals(isLipCaseEaCourt ? YesOrNo.YES : YesOrNo.NO, eaCourtLocation);
+            }
         } else {
             assertNull(responseCaseData.getEaCourtLocation());
         }
@@ -957,7 +969,13 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
         CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
 
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            assertEquals(eaCourtLocation, responseCaseData.getEaCourtLocation());
+            boolean isLipCase = caseData.isApplicantLiP() || caseData.isRespondent1LiP() || caseData.isRespondent2LiP();
+            if (!isLipCase) {
+                assertEquals(YES, eaCourtLocation);
+            } else {
+                boolean isLipCaseEaCourt = handler.isLipCaseWithProgressionEnabledAndCourtWhiteListed(caseData);
+                assertEquals(isLipCaseEaCourt ? YesOrNo.YES : YesOrNo.NO, eaCourtLocation);
+            }
         } else {
             assertNull(responseCaseData.getEaCourtLocation());
         }
