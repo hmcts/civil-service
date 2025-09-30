@@ -1,10 +1,8 @@
 package uk.gov.hmcts.reform.dashboard.entities;
 
-import com.vladmihalcea.hibernate.type.json.JsonType;
+import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
-import org.hibernate.annotations.TypeDefs;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -25,14 +23,6 @@ import java.util.UUID;
 @lombok.NoArgsConstructor
 @lombok.AllArgsConstructor
 @Entity
-@TypeDefs(
-    {
-        @TypeDef(
-            name = "jsonb",
-            typeClass = JsonType.class
-        )
-    }
-)
 @Table(name = "task_list", schema = "dbs")
 public class TaskListEntity implements Serializable {
 
@@ -86,7 +76,7 @@ public class TaskListEntity implements Serializable {
     @Schema(name = "updated_by")
     private String updatedBy;
 
-    @Type(type = "jsonb")
+    @Type(JsonBinaryType.class)
     @Column(columnDefinition = "jsonb")
     @Schema(name = "message_params")
     private HashMap<String, Object> messageParams;

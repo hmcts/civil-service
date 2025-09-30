@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.dashboard.entities;
 
+import com.vladmihalcea.hibernate.type.array.IntArrayType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.Type;
@@ -70,7 +71,7 @@ public class TaskItemTemplateEntity implements Serializable {
     @Schema(name = "created_at")
     private OffsetDateTime createdAt;
 
-    @Type(type = "com.vladmihalcea.hibernate.type.array.IntArrayType")
+    @Type(IntArrayType.class)
     @Schema(name = "task_status_sequence")
     private int[] taskStatusSequence;
 }
