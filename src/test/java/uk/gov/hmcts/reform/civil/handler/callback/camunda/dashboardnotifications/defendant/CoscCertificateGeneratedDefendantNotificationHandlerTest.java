@@ -85,7 +85,6 @@ class CoscCertificateGeneratedDefendantNotificationHandlerTest extends BaseCallb
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
-            when(toggleService.isCoSCEnabled()).thenReturn(true);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_COSC_GEN_FOR_DEFENDANT.name()).build()
@@ -116,7 +115,6 @@ class CoscCertificateGeneratedDefendantNotificationHandlerTest extends BaseCallb
                     .build());
 
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
-            when(toggleService.isCoSCEnabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedSmallClaim()
                 .caseDataLip(CaseDataLiP.builder().applicant1SettleClaim(YesOrNo.YES).build())
