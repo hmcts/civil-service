@@ -721,7 +721,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
             if (featureToggleService.isWelshEnabledForMainCase()) {
                 caseDataBuilder.eaCourtLocation(YES);
             } else {
-                boolean isLipCase = caseData.isApplicantLiP() || caseData.isRespondent1LiP();
+                boolean isLipCase = caseData.isApplicantLiP() || caseData.isRespondent1LiP() || caseData.isRespondent2LiP();
                 if (!isLipCase) {
                     log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
                     caseDataBuilder.eaCourtLocation(YES);
