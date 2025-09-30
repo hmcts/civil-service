@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
 import org.camunda.bpm.client.task.ExternalTask;
+import org.camunda.community.rest.client.model.ActivityInstanceDto;
 import org.camunda.community.rest.client.model.IncidentDto;
 import org.camunda.community.rest.client.model.ProcessInstanceDto;
 import org.camunda.community.rest.client.model.VariableValueDto;
@@ -13,18 +14,24 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.service.camunda.CamundaRuntimeApi;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -77,16 +84,25 @@ class IncidentRetryEventHandlerTest {
         )).thenReturn(processInstances);
 
         for (ProcessInstanceDto pi : processInstances) {
+            // Mock incidents
             IncidentDto incident = newIncident(pi.getId(), "inc-" + pi.getId(), "job-" + pi.getId());
             when(camundaRuntimeApi.getLatestOpenIncidentForProcessInstance(
                 any(), anyBoolean(), eq(pi.getId()), any(), any(), anyInt()
             )).thenReturn(List.of(incident));
 
+            // Mock process variables
             HashMap<String, VariableValueDto> vars = new HashMap<>();
             VariableValueDto var = new VariableValueDto();
             var.setValue("case-" + pi.getId());
             vars.put("caseId", var);
             when(camundaRuntimeApi.getProcessVariables(pi.getId(), "serviceAuth")).thenReturn(vars);
+
+            // Mock activity instances to avoid NullPointerException
+            ActivityInstanceDto tree = new ActivityInstanceDto();
+            tree.setId("root-" + pi.getId());
+            tree.setActivityId("activity1");
+            tree.setChildActivityInstances(Collections.emptyList());
+            when(camundaRuntimeApi.getActivityInstances("serviceAuth", pi.getId())).thenReturn(tree);
         }
 
         ExternalTaskData result = handler.handleTask(externalTask);
@@ -128,6 +144,7 @@ class IncidentRetryEventHandlerTest {
     void shouldHandleModifyProcessInstanceExceptionGracefully() {
         ProcessInstanceDto pi = newProcessInstance("proc1");
         IncidentDto incident = newIncident(pi.getId(), "inc1", "job1");
+        incident.setActivityId("activity1"); // <-- important
 
         when(authTokenGenerator.generate()).thenReturn("serviceAuth");
         when(externalTask.getVariable("incidentStartTime")).thenReturn("2025-01-01T00:00:00Z");
@@ -141,6 +158,21 @@ class IncidentRetryEventHandlerTest {
             any(), anyBoolean(), eq(pi.getId()), any(), any(), anyInt()
         )).thenReturn(List.of(incident));
 
+        // Mock process variables
+        HashMap<String, VariableValueDto> vars = new HashMap<>();
+        VariableValueDto var = new VariableValueDto();
+        var.setValue("case-" + pi.getId());
+        vars.put("caseId", var);
+        when(camundaRuntimeApi.getProcessVariables(pi.getId(), "serviceAuth")).thenReturn(vars);
+
+        // Mock activity instance tree
+        ActivityInstanceDto tree = new ActivityInstanceDto();
+        tree.setId("root-" + pi.getId());
+        tree.setActivityId("activity1"); // should match incident's activityId
+        tree.setChildActivityInstances(Collections.emptyList());
+        when(camundaRuntimeApi.getActivityInstances("serviceAuth", pi.getId())).thenReturn(tree);
+
+        // Simulate failure on modifyProcessInstance
         doThrow(new RuntimeException("Failed to modify process instance"))
             .when(camundaRuntimeApi)
             .modifyProcessInstance(any(), any(), anyMap());
@@ -171,16 +203,30 @@ class IncidentRetryEventHandlerTest {
         IncidentDto incident = newIncident(pi.getId(), "inc1", "job1");
 
         when(authTokenGenerator.generate()).thenReturn("serviceAuth");
-        when(externalTask.getVariable(any())).thenReturn("2025-01-01T00:00:00Z");
+        when(externalTask.getVariable("incidentStartTime")).thenReturn("2025-01-01T00:00:00Z");
+        when(externalTask.getVariable("incidentEndTime")).thenReturn("2025-12-31T23:59:59Z");
 
-        when(camundaRuntimeApi.queryProcessInstances(any(), anyInt(), anyInt(), anyString(), anyString(), anyMap()))
-            .thenReturn(List.of(pi));
-        when(camundaRuntimeApi.getLatestOpenIncidentForProcessInstance(any(), anyBoolean(), eq("proc1"), any(), any(), anyInt()))
-            .thenReturn(List.of(incident));
+        when(camundaRuntimeApi.queryProcessInstances(
+            any(), anyInt(), anyInt(), anyString(), anyString(), anyMap()
+        )).thenReturn(List.of(pi));
+
+        when(camundaRuntimeApi.getLatestOpenIncidentForProcessInstance(
+            any(), anyBoolean(), eq("proc1"), any(), any(), anyInt()
+        )).thenReturn(List.of(incident));
+
+        // Empty variables map to simulate missing caseId
         when(camundaRuntimeApi.getProcessVariables(eq("proc1"), any())).thenReturn(new HashMap<>());
+
+        // Mock activity instance tree
+        ActivityInstanceDto tree = new ActivityInstanceDto();
+        tree.setId("root-proc1");
+        tree.setActivityId("activity1");
+        tree.setChildActivityInstances(Collections.emptyList());
+        when(camundaRuntimeApi.getActivityInstances("serviceAuth", "proc1")).thenReturn(tree);
 
         handler.handleTask(externalTask);
 
+        // Verify modifyProcessInstance was called despite missing caseId
         verify(camundaRuntimeApi).modifyProcessInstance(eq("serviceAuth"), eq("proc1"), anyMap());
     }
 
@@ -198,5 +244,243 @@ class IncidentRetryEventHandlerTest {
         inc.setConfiguration(jobId);
         inc.setActivityId("activity1");
         return inc;
+    }
+
+    @Test
+    void shouldHandleExceptionWhenFetchingCaseId() {
+        ProcessInstanceDto pi = newProcessInstance("proc1");
+        IncidentDto incident = newIncident(pi.getId(), "inc1", "job1");
+
+        when(authTokenGenerator.generate()).thenReturn("serviceAuth");
+        when(externalTask.getVariable("incidentStartTime")).thenReturn("2025-01-01T00:00:00Z");
+        when(externalTask.getVariable("incidentEndTime")).thenReturn("2025-12-31T23:59:59Z");
+
+        when(camundaRuntimeApi.queryProcessInstances(
+            any(), anyInt(), anyInt(), anyString(), anyString(), anyMap()
+        )).thenReturn(List.of(pi));
+
+        when(camundaRuntimeApi.getLatestOpenIncidentForProcessInstance(
+            any(), anyBoolean(), eq("proc1"), any(), any(), anyInt()
+        )).thenReturn(List.of(incident));
+
+        // Simulate failure fetching process variables
+        when(camundaRuntimeApi.getProcessVariables(eq("proc1"), any()))
+            .thenThrow(new RuntimeException("DB down"));
+
+        // Mock activity instance tree to avoid NPE
+        ActivityInstanceDto tree = new ActivityInstanceDto();
+        tree.setId("root-proc1");
+        tree.setActivityId("activity1");
+        tree.setChildActivityInstances(Collections.emptyList());
+        when(camundaRuntimeApi.getActivityInstances("serviceAuth", "proc1")).thenReturn(tree);
+
+        handler.handleTask(externalTask);
+
+        // Verify that modifyProcessInstance is called even when fetching caseId fails
+        verify(camundaRuntimeApi).modifyProcessInstance(eq("serviceAuth"), eq("proc1"), anyMap());
+    }
+
+    @Test
+    void shouldApplyIncidentMessageLikeFilterWhenProvided() {
+        when(authTokenGenerator.generate()).thenReturn("serviceAuth");
+        when(externalTask.getVariable("incidentStartTime")).thenReturn("2025-01-01T00:00:00Z");
+        when(externalTask.getVariable("incidentEndTime")).thenReturn("2025-12-31T23:59:59Z");
+        when(externalTask.getVariable("incidentMessageLike")).thenReturn("Some error");
+
+        when(camundaRuntimeApi.queryProcessInstances(
+            any(), anyInt(), anyInt(), anyString(), anyString(), anyMap()
+        )).thenReturn(List.of());
+
+        handler.handleTask(externalTask);
+
+        // Verify that queryProcessInstances was invoked with the filter containing incidentMessageLike
+        verify(camundaRuntimeApi).queryProcessInstances(
+            anyString(),
+            anyInt(),
+            anyInt(),
+            anyString(),
+            anyString(),
+            argThat(filters -> filters.containsKey("incidentMessageLike")
+                && "Some error".equals(filters.get("incidentMessageLike")))
+        );
+    }
+
+    @Test
+    void shouldRetryProcessInstance_whenActivityInstanceExists() {
+        String serviceAuth = "serviceAuth";
+
+        when(authTokenGenerator.generate()).thenReturn(serviceAuth);
+        when(externalTask.getVariable("incidentStartTime")).thenReturn("2025-01-01T00:00:00Z");
+        when(externalTask.getVariable("incidentEndTime")).thenReturn("2025-12-31T23:59:59Z");
+
+        String processInstanceId = "proc1";
+        String failedActivityId = "activity1";
+        // Mock an incident
+        IncidentDto incident = newIncident(processInstanceId, "inc1", "job1");
+        incident.setActivityId(failedActivityId);
+
+        // Mock process variables
+        HashMap<String, VariableValueDto> variables = new HashMap<>();
+        VariableValueDto var = new VariableValueDto();
+        var.setValue("case-1");
+        variables.put("caseId", var);
+
+        // Mock process instance
+        ProcessInstanceDto pi = newProcessInstance(processInstanceId);
+        when(camundaRuntimeApi.queryProcessInstances(any(), anyInt(), anyInt(), anyString(), anyString(), anyMap()))
+            .thenReturn(List.of(pi));
+        when(camundaRuntimeApi.getLatestOpenIncidentForProcessInstance(any(), anyBoolean(), eq(processInstanceId), any(), any(), anyInt()))
+            .thenReturn(List.of(incident));
+        when(camundaRuntimeApi.getProcessVariables(processInstanceId, serviceAuth))
+            .thenReturn(variables);
+
+        // Mock activity instance tree
+        ActivityInstanceDto activityInstanceDto = new ActivityInstanceDto();
+        activityInstanceDto.setId("runtime-activity-1");
+        activityInstanceDto.setActivityId(failedActivityId);
+        activityInstanceDto.setChildActivityInstances(List.of());
+
+        when(camundaRuntimeApi.getActivityInstances(serviceAuth, processInstanceId))
+            .thenReturn(activityInstanceDto);
+
+        // Execute
+        ExternalTaskData result = handler.handleTask(externalTask);
+
+        assertThat(result).isNotNull();
+
+        // Verify modifyProcessInstance is called with correct runtime activityInstanceId
+        verify(camundaRuntimeApi).modifyProcessInstance(
+            eq(serviceAuth),
+            eq(processInstanceId),
+            argThat(modificationRequest -> {
+                @SuppressWarnings("unchecked")
+                List<Map<String, Object>> instructions = (List<Map<String, Object>>) modificationRequest.get("instructions");
+                // Should contain cancel instruction with runtime activityInstanceId
+                Map<String, Object> cancelInstr = instructions.get(0);
+                return "cancel".equals(cancelInstr.get("type"))
+                    && "runtime-activity-1".equals(cancelInstr.get("activityInstanceId"));
+            })
+        );
+    }
+
+    @Test
+    void shouldLogAndContinue_whenActivityInstanceNotFound() {
+        String serviceAuth = "serviceAuth";
+
+        when(authTokenGenerator.generate()).thenReturn(serviceAuth);
+        when(externalTask.getVariable("incidentStartTime")).thenReturn("2025-01-01T00:00:00Z");
+        when(externalTask.getVariable("incidentEndTime")).thenReturn("2025-12-31T23:59:59Z");
+
+        String processInstanceId = "proc1";
+        IncidentDto incident = newIncident(processInstanceId, "inc1", "job1");
+
+        String failedActivityId = "missingActivity";
+        incident.setActivityId(failedActivityId);
+
+        ProcessInstanceDto pi = newProcessInstance(processInstanceId);
+        when(camundaRuntimeApi.queryProcessInstances(any(), anyInt(), anyInt(), anyString(), anyString(), anyMap()))
+            .thenReturn(List.of(pi));
+        when(camundaRuntimeApi.getLatestOpenIncidentForProcessInstance(any(), anyBoolean(), eq(processInstanceId), any(), any(), anyInt()))
+            .thenReturn(List.of(incident));
+        when(camundaRuntimeApi.getProcessVariables(processInstanceId, serviceAuth))
+            .thenReturn(new HashMap<>());
+
+        // Activity instance tree does NOT contain the failed activity
+        ActivityInstanceDto activityInstanceDto = new ActivityInstanceDto();
+        activityInstanceDto.setId("some-other-id");
+        activityInstanceDto.setActivityId("otherActivity");
+        activityInstanceDto.setChildActivityInstances(List.of());
+
+        when(camundaRuntimeApi.getActivityInstances(serviceAuth, processInstanceId))
+            .thenReturn(activityInstanceDto);
+
+        handler.handleTask(externalTask);
+
+        // Still calls modifyProcessInstance (startBeforeActivity) even if cancel cannot find runtime ID
+        verify(camundaRuntimeApi).modifyProcessInstance(
+            eq(serviceAuth),
+            eq(processInstanceId),
+            argThat(modificationRequest -> {
+                @SuppressWarnings("unchecked")
+                List<Map<String, Object>> instructions = (List<Map<String, Object>>) modificationRequest.get(
+                    "instructions");
+                Map<String, Object> cancelInstr = instructions.get(0);
+                Map<String, Object> startInstr = instructions.get(1);
+                return cancelInstr.get("activityInstanceId") == null
+                    && "startBeforeActivity".equals(startInstr.get("type"))
+                    && failedActivityId.equals(startInstr.get("activityId"));
+            })
+        );
+    }
+
+    @Test
+    void shouldRetryIncidentAndCoverChildActivityRecursion() {
+        String serviceAuth = "serviceAuth";
+        when(authTokenGenerator.generate()).thenReturn(serviceAuth);
+
+        String processInstanceId = "proc1";
+        // Mock process instance
+        ProcessInstanceDto processInstanceDto = new ProcessInstanceDto();
+        processInstanceDto.setId(processInstanceId);
+        when(camundaRuntimeApi.queryProcessInstances(anyString(), anyInt(), anyInt(), anyString(), anyString(), anyMap()))
+            .thenReturn(List.of(processInstanceDto));
+
+        // Mock incident
+        IncidentDto incident = new IncidentDto();
+        incident.setId("inc1");
+        incident.setProcessInstanceId(processInstanceId);
+
+        String failedActivityId = "childActivity";
+        incident.setActivityId(failedActivityId);
+
+        String jobId = "job1";
+        incident.setConfiguration(jobId);
+
+        when(camundaRuntimeApi.getLatestOpenIncidentForProcessInstance(
+            anyString(), anyBoolean(), eq(processInstanceId), anyString(), anyString(), anyInt()))
+            .thenReturn(List.of(incident));
+
+        // Mock caseId fetch
+        HashMap<String, VariableValueDto> emptyVariables = new HashMap<>();
+        when(camundaRuntimeApi.getProcessVariables(eq(processInstanceId), eq(serviceAuth)))
+            .thenReturn(emptyVariables);
+
+        // Build activity instance tree with child
+        ActivityInstanceDto childActivity = new ActivityInstanceDto();
+        childActivity.setActivityId(failedActivityId);
+        childActivity.setId("child1");
+        childActivity.setChildActivityInstances(Collections.emptyList());
+
+        ActivityInstanceDto rootActivity = new ActivityInstanceDto();
+        rootActivity.setActivityId("rootActivity");
+        rootActivity.setId("root1");
+        rootActivity.setChildActivityInstances(List.of(childActivity));
+
+        when(camundaRuntimeApi.getActivityInstances(eq(serviceAuth), eq(processInstanceId)))
+            .thenReturn(rootActivity);
+
+        doNothing().when(camundaRuntimeApi).modifyProcessInstance(eq(serviceAuth), eq(processInstanceId), any());
+
+        // Mock external task variables
+        when(externalTask.getVariable("incidentStartTime")).thenReturn(null);
+        when(externalTask.getVariable("incidentEndTime")).thenReturn(null);
+        when(externalTask.getVariable("incidentMessageLike")).thenReturn(null);
+
+        // Act
+        ExternalTaskData result = handler.handleTask(externalTask);
+
+        // Assert
+        assertNotNull(result);
+
+        // Verify that the process instance modification was invoked
+        verify(camundaRuntimeApi, times(1))
+            .modifyProcessInstance(eq(serviceAuth), eq(processInstanceId), argThat(map -> {
+                @SuppressWarnings("unchecked")
+                List<Map<String, Object>> instructions = (List<Map<String, Object>>) map.get("instructions");
+                return instructions.stream().anyMatch(instr ->
+                                                          "startBeforeActivity".equals(instr.get("type"))
+                                                              && failedActivityId.equals(instr.get("activityId"))
+                );
+            }));
     }
 }
