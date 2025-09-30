@@ -15,7 +15,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.cmc.client.ClaimStoreApi;
-import uk.gov.hmcts.reform.cmc.model.DefendantLinkStatus;
+import uk.gov.hmcts.reform.hmc.model.DefendantLinkStatus;
 
 import java.io.IOException;
 

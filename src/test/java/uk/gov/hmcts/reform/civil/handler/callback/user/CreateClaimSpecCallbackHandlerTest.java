@@ -17,7 +17,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
-import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.ClaimUrlsConfiguration;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
@@ -950,8 +950,8 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_whenOrganisationIdIsNull() {
             // Given
-            uk.gov.hmcts.reform.ccd.model.Organisation organisation
-                = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+            uk.gov.hmcts.reform.civil.model.Organisation organisation
+                = uk.gov.hmcts.reform.civil.model.Organisation.builder()
                 .organisationID(null)
                 .build();
 
@@ -970,8 +970,8 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldBeSuccessful_whenValid() {
             // Given
-            uk.gov.hmcts.reform.ccd.model.Organisation organisation
-                = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+            uk.gov.hmcts.reform.civil.model.Organisation organisation
+                = uk.gov.hmcts.reform.civil.model.Organisation.builder()
                 .organisationID("orgId")
                 .build();
 
@@ -1029,8 +1029,8 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_whenOrganisationIdIsNull() {
             // Given
-            uk.gov.hmcts.reform.ccd.model.Organisation organisation
-                = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+            uk.gov.hmcts.reform.civil.model.Organisation organisation
+                = uk.gov.hmcts.reform.civil.model.Organisation.builder()
                 .organisationID(null)
                 .build();
 
@@ -1050,8 +1050,8 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldBeSuccessful_whenValid() {
             // Given
-            uk.gov.hmcts.reform.ccd.model.Organisation organisation
-                = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+            uk.gov.hmcts.reform.civil.model.Organisation organisation
+                = uk.gov.hmcts.reform.civil.model.Organisation.builder()
                 .organisationID("orgId")
                 .build();
 
@@ -1109,8 +1109,8 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_whenOrganisationIdIsNull() {
             // Given
-            uk.gov.hmcts.reform.ccd.model.Organisation organisation
-                = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+            uk.gov.hmcts.reform.civil.model.Organisation organisation
+                = uk.gov.hmcts.reform.civil.model.Organisation.builder()
                 .organisationID(null)
                 .build();
 
@@ -1130,8 +1130,8 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldBeSuccessful_whenValid() {
             // Given
-            uk.gov.hmcts.reform.ccd.model.Organisation organisation
-                = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+            uk.gov.hmcts.reform.civil.model.Organisation organisation
+                = uk.gov.hmcts.reform.civil.model.Organisation.builder()
                 .organisationID("orgId")
                 .build();
 

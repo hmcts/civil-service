@@ -4,8 +4,8 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
-import uk.gov.hmcts.reform.cmc.model.CmcClaim;
-import uk.gov.hmcts.reform.cmc.model.DefendantLinkStatus;
+import uk.gov.hmcts.reform.hmc.model.CmcClaim;
+import uk.gov.hmcts.reform.hmc.model.DefendantLinkStatus;
 
 import java.util.List;
 

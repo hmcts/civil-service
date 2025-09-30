@@ -14,7 +14,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.cmc.client.ClaimStoreApi;
-import uk.gov.hmcts.reform.cmc.model.CmcClaim;
+import uk.gov.hmcts.reform.hmc.model.CmcClaim;
 
 import java.io.IOException;
 import java.util.List;
@@ -23,7 +23,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static uk.gov.hmcts.reform.civil.CmcConsumerTestUtil.buildBundleCreateResponseDsl;
-import static uk.gov.hmcts.reform.cmc.model.ClaimState.OPEN;
+import static uk.gov.hmcts.reform.hmc.model.ClaimState.OPEN;
 
 @PactTestFor(providerName = "cmc_claimant")
 @TestPropertySource(properties = "cmc-claim-store.api.url=http://localhost:6676")

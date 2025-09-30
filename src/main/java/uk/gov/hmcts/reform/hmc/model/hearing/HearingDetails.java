@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import uk.gov.hmcts.reform.civil.model.hearingvalues.HearingWindowModel;
+import uk.gov.hmcts.reform.civil.model.hearingvalues.PanelRequirementsModel;
 
 import java.util.List;
 

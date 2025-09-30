@@ -9,6 +9,19 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimStatus;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimStatusFactory;
+import uk.gov.hmcts.reform.hmc.model.ClaimData;
+import uk.gov.hmcts.reform.hmc.model.ClaimantResponse;
+import uk.gov.hmcts.reform.hmc.model.ClaimantResponseType;
+import uk.gov.hmcts.reform.hmc.model.CmcClaim;
+import uk.gov.hmcts.reform.hmc.model.CmcParty;
+import uk.gov.hmcts.reform.hmc.model.CourtDetermination;
+import uk.gov.hmcts.reform.hmc.model.FormaliseOption;
+import uk.gov.hmcts.reform.hmc.model.Offer;
+import uk.gov.hmcts.reform.hmc.model.PartyStatement;
+import uk.gov.hmcts.reform.hmc.model.PaymentIntention;
+import uk.gov.hmcts.reform.hmc.model.Response;
+import uk.gov.hmcts.reform.hmc.model.Settlement;
+import uk.gov.hmcts.reform.hmc.model.StatementType;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -29,11 +42,11 @@ public class CmcClaimTest {
     @Test
     void shouldReturnClaimantNameWhenClaimantExists() {
         CmcClaim cmcClaim = CmcClaim.builder()
-            .claimData(ClaimData.builder().claimants(Arrays.asList(CmcParty.builder()
-                                                                       .name(NAME)
-                                                                       .build()))
-                           .build())
-            .build();
+                                    .claimData(ClaimData.builder().claimants(Arrays.asList(CmcParty.builder()
+                                                                                                   .name(NAME)
+                                                                                                   .build()))
+                                                        .build())
+                                    .build();
         String claimantName = cmcClaim.getClaimantName();
         assert (claimantName).equals(NAME);
     }
@@ -73,8 +86,8 @@ public class CmcClaimTest {
         LocalDate now = LocalDate.now();
         CmcClaim cmcClaim = CmcClaim.builder()
             .response(Response.builder().paymentIntention(PaymentIntention.builder()
-                                                              .paymentDate(now).build())
-                          .build()).build();
+                                                                          .paymentDate(now).build())
+                              .build()).build();
         //When
         LocalDate paymentDate = cmcClaim.getBySpecifiedDate();
         //Then
@@ -109,8 +122,8 @@ public class CmcClaimTest {
                           .responseType(RespondentResponseType.FULL_DEFENCE)
                           .build())
             .settlement(Settlement.builder()
-                            .partyStatements(List.of(PartyStatement.builder().build()))
-                            .build())
+                                  .partyStatements(List.of(PartyStatement.builder().build()))
+                                  .build())
             .build();
 
         assertTrue(claim.isClaimRejectedAndOfferSettleOutOfCourt());
@@ -158,8 +171,8 @@ public class CmcClaimTest {
                                 PartyStatement.builder()
                                         .type(StatementType.OFFER)
                                         .offer(Offer.builder()
-                                               .paymentIntention(PaymentIntention.builder().build())
-                                               .build())
+                                                    .paymentIntention(PaymentIntention.builder().build())
+                                                    .build())
                                         .build(),
                                 PartyStatement.builder()
                                         .type(StatementType.ACCEPTATION)

@@ -6,9 +6,9 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimStatusFactory;
 import uk.gov.hmcts.reform.cmc.client.ClaimStoreApi;
-import uk.gov.hmcts.reform.cmc.model.CmcClaim;
-import uk.gov.hmcts.reform.cmc.model.DefendantLinkStatus;
-import uk.gov.hmcts.reform.cmc.model.Response;
+import uk.gov.hmcts.reform.hmc.model.CmcClaim;
+import uk.gov.hmcts.reform.hmc.model.DefendantLinkStatus;
+import uk.gov.hmcts.reform.hmc.model.Response;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

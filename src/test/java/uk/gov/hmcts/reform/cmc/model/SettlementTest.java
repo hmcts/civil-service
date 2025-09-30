@@ -1,6 +1,12 @@
 package uk.gov.hmcts.reform.cmc.model;
 
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.reform.hmc.model.MadeBy;
+import uk.gov.hmcts.reform.hmc.model.Offer;
+import uk.gov.hmcts.reform.hmc.model.PartyStatement;
+import uk.gov.hmcts.reform.hmc.model.PaymentIntention;
+import uk.gov.hmcts.reform.hmc.model.Settlement;
+import uk.gov.hmcts.reform.hmc.model.StatementType;
 
 import java.util.List;
 
@@ -11,12 +17,12 @@ class SettlementTest {
     @Test
     void givenSettelmentRejectedByDefendant_whenIsAcceptedByClaimant_thenReturnFalse() {
         Settlement settlement = getSettlement(List.of(
-            PartyStatement
+                PartyStatement
                 .builder()
                 .type(StatementType.ACCEPTATION)
                 .madeBy(MadeBy.CLAIMANT)
                 .build(),
-            PartyStatement
+                PartyStatement
                 .builder()
                 .type(StatementType.REJECTION)
                 .madeBy(MadeBy.DEFENDANT)

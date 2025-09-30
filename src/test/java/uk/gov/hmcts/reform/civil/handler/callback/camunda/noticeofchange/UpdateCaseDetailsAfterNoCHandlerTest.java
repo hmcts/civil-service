@@ -10,7 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
-import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -680,7 +680,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 .updateOrgPolicyAfterNoC(true, false, NEW_ORG_ID)
                 .anyRepresented(NO)
                 .respondent1OrganisationPolicy(OrganisationPolicy.builder()
-                                                    .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder().organisationID("QWERTY R").build())
+                                                    .organisation(uk.gov.hmcts.reform.civil.model.Organisation.builder().organisationID("QWERTY R").build())
                                                     .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
                                                     .build())
                 .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SEALED_CLAIM).build(),

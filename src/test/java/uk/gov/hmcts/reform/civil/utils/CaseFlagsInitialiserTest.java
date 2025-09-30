@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.civil.utils;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PartyFlagStructure;
@@ -157,7 +157,7 @@ class CaseFlagsInitialiserTest {
     void shouldInitialiseCaseFlagsForManageContactInformationEvent() {
         CaseData caseData = CaseData.builder()
             .applicant1OrganisationPolicy(OrganisationPolicy.builder()
-                                              .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                                              .organisation(uk.gov.hmcts.reform.civil.model.Organisation.builder()
                                                                 .organisationID("id")
                                                                 .build())
                                               .build())

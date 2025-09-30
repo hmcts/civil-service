@@ -5,9 +5,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.ccd.model.Organisation;
-import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.model.Organisation;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationAvailability;
@@ -55,8 +55,8 @@ public class RepresentedLitigantPopulatorTest {
 
         Organisation organisation = Organisation.builder().build();
         OrganisationPolicy organisationPolicy = OrganisationPolicy.builder()
-            .organisation(organisation)
-            .build();
+                                                                  .organisation(organisation)
+                                                                  .build();
 
         MediationAvailability mediationAvailability = MediationAvailability.builder()
             .isMediationUnavailablityExists(YES)

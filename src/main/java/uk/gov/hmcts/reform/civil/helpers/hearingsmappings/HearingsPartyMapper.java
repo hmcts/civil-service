@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.civil.helpers.hearingsmappings;
 
-import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.hearing.PartyRole;
 import uk.gov.hmcts.reform.civil.model.CaseData;

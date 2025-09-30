@@ -17,6 +17,8 @@ import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.WelshLanguageRequirements;
+import uk.gov.hmcts.reform.civil.model.hearingvalues.OrganisationDetailsModel;
+import uk.gov.hmcts.reform.civil.model.hearingvalues.PartyDetailsModel;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.HearingIndividual;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
@@ -27,8 +29,6 @@ import uk.gov.hmcts.reform.hmc.model.hearing.HearingDetails;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingGetResponse;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingRequestDetails;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingResponse;
-import uk.gov.hmcts.reform.hmc.model.hearing.OrganisationDetailsModel;
-import uk.gov.hmcts.reform.hmc.model.hearing.PartyDetailsModel;
 import uk.gov.hmcts.reform.hmc.model.hearings.CaseHearing;
 import uk.gov.hmcts.reform.hmc.model.hearings.HearingsResponse;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.HearingDay;
@@ -1601,10 +1601,10 @@ class HmcDataUtilsTest {
                         HearingIndividual.attendingHearingInPerson("Jack", "Crawley")
                 ),
                 PartyDetailsModel.builder().hearingSubChannel(INTER.name()).partyID("PARTYID")
-                    .organisationDetails(OrganisationDetailsModel.builder()
-                                             .cftOrganisationID("ID")
-                                             .name("Misplaced Org")
-                                             .build()).build()
+                                 .organisationDetails(OrganisationDetailsModel.builder()
+                                                                              .cftOrganisationID("ID")
+                                                                              .name("Misplaced Org")
+                                                                              .build()).build()
             );
 
             String actual = HmcDataUtils.getInPersonAttendeeNames(hearing);

@@ -12,7 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
-import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
@@ -309,7 +309,7 @@ class NotificationForDefendantRepresentedTest extends BaseCallbackHandlerTest {
 
     private OrganisationPolicy setUpOrganisationPolicy() {
         return OrganisationPolicy.builder().organisation(
-            uk.gov.hmcts.reform.ccd.model.Organisation.builder().organisationID("OrgId")
+            uk.gov.hmcts.reform.civil.model.Organisation.builder().organisationID("OrgId")
                 .build()).build();
     }
 

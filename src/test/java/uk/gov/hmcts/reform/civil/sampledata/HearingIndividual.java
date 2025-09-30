@@ -1,10 +1,10 @@
 package uk.gov.hmcts.reform.civil.sampledata;
 
 import lombok.Builder;
+import uk.gov.hmcts.reform.civil.model.hearingvalues.IndividualDetailsModel;
+import uk.gov.hmcts.reform.civil.model.hearingvalues.PartyDetailsModel;
 import uk.gov.hmcts.reform.hmc.model.hearing.Attendees;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingSubChannel;
-import uk.gov.hmcts.reform.hmc.model.hearing.IndividualDetailsModel;
-import uk.gov.hmcts.reform.hmc.model.hearing.PartyDetailsModel;
 
 import java.util.UUID;
 
@@ -25,9 +25,9 @@ public class HearingIndividual {
         return PartyDetailsModel.builder()
                 .partyID(partyId)
                 .individualDetails(IndividualDetailsModel.builder()
-                        .firstName(firstName)
-                        .lastName(lastName)
-                        .build())
+                                                         .firstName(firstName)
+                                                         .lastName(lastName)
+                                                         .build())
                 .build();
     }
 

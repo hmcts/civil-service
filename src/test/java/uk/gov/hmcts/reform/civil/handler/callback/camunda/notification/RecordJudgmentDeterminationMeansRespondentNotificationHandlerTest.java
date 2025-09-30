@@ -9,7 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
-import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -110,7 +110,7 @@ class RecordJudgmentDeterminationMeansRespondentNotificationHandlerTest extends 
                                  .partyName("Test2")
                                  .individualLastName("Test2 Lastname")
                                  .individualFirstName("Test2 Firstname").build())
-                .respondent1OrganisationPolicy(OrganisationPolicy.builder().organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                .respondent1OrganisationPolicy(OrganisationPolicy.builder().organisation(uk.gov.hmcts.reform.civil.model.Organisation.builder()
                                                                                             .organisationID(ORG_NAME_RESPONDENT1).build()).build()).build();
 
             when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(Organisation.builder().name(ORG_NAME_RESPONDENT1).build()));
@@ -148,7 +148,7 @@ class RecordJudgmentDeterminationMeansRespondentNotificationHandlerTest extends 
                                  .partyName("Test2")
                                  .individualLastName("Test2 Lastname")
                                  .individualFirstName("Test2 Firstname").build())
-                .respondent2OrganisationPolicy(OrganisationPolicy.builder().organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                .respondent2OrganisationPolicy(OrganisationPolicy.builder().organisation(uk.gov.hmcts.reform.civil.model.Organisation.builder()
                                                                                              .organisationID(ORG_NAME_RESPONDENT2).build()).build()).build();
             when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(Organisation.builder().name(ORG_NAME_RESPONDENT2).build()));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();

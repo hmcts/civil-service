@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
@@ -69,7 +69,7 @@ public class ClaimContinuingOnlineSpecRespSolTwoEmailDTOGeneratorTest {
                 .respondent2ResponseDeadline(LocalDateTime.now())
                 .respondent2SameLegalRepresentative(YesOrNo.NO)
                 .respondent2OrganisationPolicy(OrganisationPolicy.builder()
-                        .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                        .organisation(uk.gov.hmcts.reform.civil.model.Organisation.builder()
                                 .organisationID("org2")
                                 .build())
                         .build())

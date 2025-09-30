@@ -9,7 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
-import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -120,7 +120,7 @@ class CreateSDOApplicantsNotificationHandlerTest extends BaseCallbackHandlerTest
                 .toBuilder()
                 .applicant1Represented(YesOrNo.YES)
                 .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(
-                    uk.gov.hmcts.reform.ccd.model.Organisation.builder().organisationID("abc1").build()).build())
+                    uk.gov.hmcts.reform.civil.model.Organisation.builder().organisationID("abc1").build()).build())
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                 .applicantSolicitor1ClaimStatementOfTruth(StatementOfTruth.builder().name("test name").build())
                 .build();

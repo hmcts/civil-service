@@ -12,10 +12,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import uk.gov.hmcts.reform.ccd.model.AddCaseAssignedUserRolesRequest;
-import uk.gov.hmcts.reform.ccd.model.AddCaseAssignedUserRolesResponse;
-import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRolesRequest;
-import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRolesResource;
+import uk.gov.hmcts.reform.civil.model.AddCaseAssignedUserRolesRequest;
+import uk.gov.hmcts.reform.civil.model.AddCaseAssignedUserRolesResponse;
+import uk.gov.hmcts.reform.civil.model.CaseAssignedUserRolesRequest;
+import uk.gov.hmcts.reform.civil.model.CaseAssignedUserRolesResource;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;

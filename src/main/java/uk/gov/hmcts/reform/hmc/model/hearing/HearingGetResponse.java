@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.hmc.model.hearing;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import uk.gov.hmcts.reform.civil.model.hearingvalues.PartyDetailsModel;
 
 import java.util.List;
 

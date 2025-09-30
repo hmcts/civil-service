@@ -5,7 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -36,7 +36,7 @@ public class OrganisationDetailsServiceTest {
             .atStateClaimDraft()
             .legacyCaseReference("100MC001")
             .applicant1OrganisationPolicy(OrganisationPolicy.builder()
-                                              .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                                              .organisation(uk.gov.hmcts.reform.civil.model.Organisation.builder()
                                                                 .organisationID("test org")
                                                                 .build())
                                               .build())
@@ -57,7 +57,7 @@ public class OrganisationDetailsServiceTest {
             .atStateClaimDraft()
             .legacyCaseReference("100MC001")
             .applicant1OrganisationPolicy(OrganisationPolicy.builder()
-                                              .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                                              .organisation(uk.gov.hmcts.reform.civil.model.Organisation.builder()
                                                                 .organisationID("test org")
                                                                 .build())
                                               .build())
@@ -78,7 +78,7 @@ public class OrganisationDetailsServiceTest {
         CaseData caseData = CaseDataBuilder.builder()
             .legacyCaseReference("100MC001")
             .applicant1OrganisationPolicy(OrganisationPolicy.builder()
-                                              .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                                              .organisation(uk.gov.hmcts.reform.civil.model.Organisation.builder()
                                                                 .organisationID("test org")
                                                                 .build())
                                               .build())
@@ -96,7 +96,7 @@ public class OrganisationDetailsServiceTest {
         CaseData caseData = CaseDataBuilder.builder()
             .legacyCaseReference("100MC001")
             .applicant1OrganisationPolicy(OrganisationPolicy.builder()
-                                              .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                                              .organisation(uk.gov.hmcts.reform.civil.model.Organisation.builder()
                                                                 .organisationID("test org")
                                                                 .build())
                                               .build())

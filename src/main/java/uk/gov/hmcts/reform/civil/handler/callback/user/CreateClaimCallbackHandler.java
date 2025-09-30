@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
-import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -205,7 +205,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         Optional<Organisation> organisation = organisationService.findOrganisation(authToken);
         organisation.ifPresent(value -> caseDataBuilder.applicant1OrganisationPolicy(
             OrganisationPolicy.builder()
-                 .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                 .organisation(uk.gov.hmcts.reform.civil.model.Organisation.builder()
                  .organisationID(value.getOrganisationIdentifier()).build())
                  .orgPolicyReference(null)
                  .orgPolicyCaseAssignedRole(APPLICANTSOLICITORONE.getFormattedName())
@@ -398,7 +398,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             if (StringUtils.isBlank(caseData.getRespondent1OrganisationIDCopy())) {
                 String id = Optional.ofNullable(caseData.getRespondent1OrganisationPolicy())
                     .map(OrganisationPolicy::getOrganisation)
-                    .map(uk.gov.hmcts.reform.ccd.model.Organisation::getOrganisationID)
+                    .map(uk.gov.hmcts.reform.civil.model.Organisation::getOrganisationID)
                     .orElse(null);
                 if (id != null) {
                     caseDataBuilder.respondent1OrganisationIDCopy(id);
@@ -409,7 +409,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
                 caseData
                     .getRespondent1OrganisationPolicy()
                     .toBuilder()
-                    .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder().build())
+                    .organisation(uk.gov.hmcts.reform.civil.model.Organisation.builder().build())
                     .build()
             );
         }
@@ -418,7 +418,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             if (StringUtils.isBlank(caseData.getRespondent2OrganisationIDCopy())) {
                 String id = Optional.ofNullable(caseData.getRespondent2OrganisationPolicy())
                     .map(OrganisationPolicy::getOrganisation)
-                    .map(uk.gov.hmcts.reform.ccd.model.Organisation::getOrganisationID)
+                    .map(uk.gov.hmcts.reform.civil.model.Organisation::getOrganisationID)
                     .orElse(null);
                 if (id != null) {
                     caseDataBuilder.respondent2OrganisationIDCopy(id);
@@ -429,7 +429,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
                 caseData
                     .getRespondent2OrganisationPolicy()
                     .toBuilder()
-                    .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder().build())
+                    .organisation(uk.gov.hmcts.reform.civil.model.Organisation.builder().build())
                     .build()
             );
         }
@@ -448,7 +448,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
             caseDataBuilder.respondent2OrganisationPolicy(
                 organisationPolicy2Builder
-                    .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder().build())
+                    .organisation(uk.gov.hmcts.reform.civil.model.Organisation.builder().build())
                     .build()
             );
 

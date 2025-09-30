@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -139,7 +139,7 @@ class FullDefenceApplicantSolicitorOneCCSpecNotifierTest {
                              .build())
             .respondent2OrganisationPolicy(
                 OrganisationPolicy.builder()
-                    .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder().organisationID("org-id").build())
+                    .organisation(uk.gov.hmcts.reform.civil.model.Organisation.builder().organisationID("org-id").build())
                     .build())
             .build();
         // When
@@ -161,7 +161,7 @@ class FullDefenceApplicantSolicitorOneCCSpecNotifierTest {
             .respondent1DQ(null)
             .respondent2OrganisationPolicy(
                 OrganisationPolicy.builder()
-                    .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder().organisationID("org-id").build())
+                    .organisation(uk.gov.hmcts.reform.civil.model.Organisation.builder().organisationID("org-id").build())
                     .build())
             .build();
 

@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.civil.notification.handlers.changeofrepresentation.c
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -39,7 +39,7 @@ class NotificationHelperTest {
                             .individualLastName("A")
                             .partyName("Applicant A").build())
             .applicant1OrganisationPolicy(OrganisationPolicy.builder()
-                                              .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder().organisationID("QWERTY A").build())
+                                              .organisation(uk.gov.hmcts.reform.civil.model.Organisation.builder().organisationID("QWERTY A").build())
                                               .build())
             .respondent1(Party.builder()
                              .type(Party.Type.INDIVIDUAL)
@@ -114,7 +114,7 @@ class NotificationHelperTest {
     @Test
     void getOtherSolicitor2_shouldReturnRespondent1SolicitorData_whenRespondent2IsNewSolicitor_andRespondent1IsNotLip() {
         OrganisationPolicy respondent1Policy = OrganisationPolicy.builder()
-            .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+            .organisation(uk.gov.hmcts.reform.civil.model.Organisation.builder()
                               .organisationID("RESP1_ORG_ID").build())
             .build();
 
@@ -139,7 +139,7 @@ class NotificationHelperTest {
     @Test
     void getOtherSolicitor2_shouldReturnApplicantSolicitorData_whenScenarioIsTwoVOne() {
         OrganisationPolicy applicantPolicy = OrganisationPolicy.builder()
-            .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+            .organisation(uk.gov.hmcts.reform.civil.model.Organisation.builder()
                               .organisationID("APP_ORG_ID").build())
             .build();
 
@@ -160,7 +160,7 @@ class NotificationHelperTest {
     @Test
     void getOtherSolicitor2_shouldReturnRespondent2SolicitorData_whenRespondent2NotLipAndNotTwoVOne() {
         OrganisationPolicy respondent2Policy = OrganisationPolicy.builder()
-            .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+            .organisation(uk.gov.hmcts.reform.civil.model.Organisation.builder()
                               .organisationID("RESP2_ORG_ID").build())
             .build();
 
@@ -188,7 +188,7 @@ class NotificationHelperTest {
     @Test
     void getOtherSolicitor1_shouldReturnRespondent1Solicitor_whenApplicant1IsNewSolicitor_andRespondent1IsNotLip() {
         OrganisationPolicy respondent1Policy = OrganisationPolicy.builder()
-            .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+            .organisation(uk.gov.hmcts.reform.civil.model.Organisation.builder()
                               .organisationID("RESP1_ORG_ID").build())
             .build();
 
@@ -213,7 +213,7 @@ class NotificationHelperTest {
     @Test
     void getOtherSolicitor1_shouldReturnApplicantSolicitor_whenRespondent2IsNewSolicitor() {
         OrganisationPolicy applicantPolicy = OrganisationPolicy.builder()
-            .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+            .organisation(uk.gov.hmcts.reform.civil.model.Organisation.builder()
                               .organisationID("APP_ORG_ID").build())
             .build();
 
@@ -239,7 +239,7 @@ class NotificationHelperTest {
     @Test
     void getOtherSolicitor1_shouldReturnApplicantSolicitor_whenRespondent1IsNewSolicitor_andApplicantIsNotLip() {
         OrganisationPolicy applicantPolicy = OrganisationPolicy.builder()
-            .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+            .organisation(uk.gov.hmcts.reform.civil.model.Organisation.builder()
                               .organisationID("APP_ORG_ID").build())
             .build();
 

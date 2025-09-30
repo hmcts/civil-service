@@ -9,8 +9,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import uk.gov.hmcts.reform.ccd.model.ChangeOrganisationApprovalStatus;
-import uk.gov.hmcts.reform.ccd.model.Organisation;
+import uk.gov.hmcts.reform.civil.model.ChangeOrganisationApprovalStatus;
+import uk.gov.hmcts.reform.civil.model.Organisation;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 
 import java.time.LocalDateTime;
