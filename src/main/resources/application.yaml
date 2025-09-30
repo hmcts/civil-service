@@ -251,6 +251,8 @@ notifications:
   lipContactEmail: "Email: contactocmc@justice.gov.uk"
   raiseQueryLipWelsh: "I gysylltu â’r llys, dewiswch ‘contact or apply to the court’ ar eich dangosfwrdd."
   lipContactEmailWelsh: "E-bost: ymholiadaucymraeg@justice.gov.uk"
+  specContact: "Email: contactocmc@justice.gov.uk"
+  welshContact: "E-bost: ymholiadaucymraeg@justice.gov.uk"
   breathingSpaceEnterApplicantEmailTemplate: "bb4bc8ea-273b-4303-bc0a-d3121f78a4d8"
   breathingSpaceEnterDefendantEmailTemplate: "a32f5713-fc3b-4250-972f-84da7bd4e9b0"
   breathingSpaceLiftedApplicantEmailTemplate: "50740783-fc24-49bb-a49f-48fcd3213e06"

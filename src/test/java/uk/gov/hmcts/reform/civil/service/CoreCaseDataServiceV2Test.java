@@ -57,6 +57,9 @@ class CoreCaseDataServiceV2Test {
     @Mock
     private CaseDetailsConverter caseDetailsConverter;
 
+    @Mock
+    private GeneralAppLocationRefDataService locationRefDataService;
+
     private static final String USER_AUTH_TOKEN = "Bearer user-xyz";
     private static final String SERVICE_AUTH_TOKEN = "Bearer service-xyz";
     private static final String CASE_TYPE = "CIVIL";
@@ -70,7 +73,8 @@ class CoreCaseDataServiceV2Test {
                                           caseDetailsConverter,
                                           userService,
                                           featureToggleService,
-                                          locationReferenceDataService);
+                                          locationReferenceDataService,
+                                          locationRefDataService);
         clearInvocations(authTokenGenerator, userService);
         when(authTokenGenerator.generate()).thenReturn(SERVICE_AUTH_TOKEN);
     }

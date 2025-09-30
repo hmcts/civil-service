@@ -86,7 +86,7 @@ public class GeneralAppFeesService {
         );
     }
 
-    private Fee getFeeForGA(List<GeneralApplicationTypes> types, Boolean respondentAgreed, Boolean informOtherParty, LocalDate hearingScheduledDate) {
+    public Fee getFeeForGA(List<GeneralApplicationTypes> types, Boolean respondentAgreed, Boolean informOtherParty, LocalDate hearingScheduledDate) {
         Fee result = Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(Integer.MAX_VALUE)).build();
         int typeSize = types.size();
         if (CollectionUtils.containsAny(types, VARY_TYPES)) {
@@ -133,7 +133,7 @@ public class GeneralAppFeesService {
         return result;
     }
 
-    protected Fee getFeeForGA(String keyword, String event, String service) {
+    public Fee getFeeForGA(String keyword, String event, String service) {
         if (Objects.isNull(event)) {
             event = feesConfiguration.getEvent();
         }
@@ -191,6 +191,20 @@ public class GeneralAppFeesService {
             && hearingScheduledDate.isAfter(LocalDate.now().plusDays(FREE_GA_DAYS));
     }
 
+    public boolean isFreeApplication(final CaseData caseData) {
+        if (caseData.getGeneralAppType().getTypes().size() == 1
+                && caseData.getGeneralAppType().getTypes()
+                .contains(GeneralApplicationTypes.ADJOURN_HEARING)
+                && caseData.getGeneralAppRespondentAgreement() != null
+                && YES.equals(caseData.getGeneralAppRespondentAgreement().getHasAgreed())
+                && caseData.getGeneralAppHearingDate() != null
+                && caseData.getGeneralAppHearingDate().getHearingScheduledDate() != null) {
+            return caseData.getGeneralAppHearingDate().getHearingScheduledDate()
+                    .isAfter(LocalDate.now().plusDays(FREE_GA_DAYS));
+        }
+        return false;
+    }
+
     private Fee buildFeeDto(FeeLookupResponseDto feeLookupResponseDto) {
         BigDecimal calculatedAmount = feeLookupResponseDto.getFeeAmount()
             .multiply(PENCE_PER_POUND)
@@ -246,5 +260,19 @@ public class GeneralAppFeesService {
             return certOfSatisfactionOrCancel;
         }
         return existingResult;
+    }
+
+    public boolean isFreeGa(GeneralApplication application) {
+        if (application.getGeneralAppType().getTypes().size() == 1
+                && application.getGeneralAppType().getTypes()
+                .contains(GeneralApplicationTypes.ADJOURN_HEARING)
+                && application.getGeneralAppRespondentAgreement() != null
+                && YES.equals(application.getGeneralAppRespondentAgreement().getHasAgreed())
+                && application.getGeneralAppHearingDate() != null
+                && application.getGeneralAppHearingDate().getHearingScheduledDate() != null) {
+            return application.getGeneralAppHearingDate().getHearingScheduledDate()
+                    .isAfter(LocalDate.now().plusDays(GeneralAppFeesService.FREE_GA_DAYS));
+        }
+        return false;
     }
 }

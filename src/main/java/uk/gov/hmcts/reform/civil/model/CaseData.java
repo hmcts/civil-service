@@ -9,14 +9,17 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.jackson.Jacksonized;
+import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.ccd.model.SolicitorDetails;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.ClaimType;
 import uk.gov.hmcts.reform.civil.enums.ClaimTypeUnspec;
@@ -35,16 +38,28 @@ import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection;
+import uk.gov.hmcts.reform.civil.enums.dq.AssistedCostTypesList;
+import uk.gov.hmcts.reform.civil.enums.dq.FinalOrderConsideredToggle;
+import uk.gov.hmcts.reform.civil.enums.dq.FinalOrderShowToggle;
+import uk.gov.hmcts.reform.civil.enums.dq.GAByCourtsInitiativeGAspec;
+import uk.gov.hmcts.reform.civil.enums.dq.GAJudgeDecisionOption;
+import uk.gov.hmcts.reform.civil.enums.dq.OrderMadeOnTypes;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.SettleDiscontinueYesOrNoList;
+import uk.gov.hmcts.reform.civil.enums.welshenhancements.PreTranslationGaDocumentType;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
+import uk.gov.hmcts.reform.civil.model.caseprogression.FreeFormOrderValues;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.CertOfSC;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
+import uk.gov.hmcts.reform.civil.model.citizenui.FeePaymentOutcomeDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
+import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesMoreInformation;
 import uk.gov.hmcts.reform.civil.model.citizenui.ManageDocument;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
+import uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocument;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
@@ -57,19 +72,47 @@ import uk.gov.hmcts.reform.civil.model.dq.RecurringExpenseLRspec;
 import uk.gov.hmcts.reform.civil.model.dq.RecurringIncomeLRspec;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
+import uk.gov.hmcts.reform.civil.model.genapplication.CaseLink;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationTypeLR;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAApproveConsentOrder;
+import uk.gov.hmcts.reform.civil.model.genapplication.GACaseLocation;
 import uk.gov.hmcts.reform.civil.model.genapplication.GADetailsRespondentSol;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDateGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingNoticeApplication;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingNoticeDetail;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAJudgesHearingListGAspec;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAJudicialDecision;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAJudicialMakeAnOrder;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAJudicialRequestMoreInfo;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAJudicialWrittenRepresentations;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAMakeApplicationAvailableCheck;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAOrderCourtOwnInitiativeGAspec;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAOrderWithoutNoticeGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAReferToJudgeGAspec;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAReferToLegalAdvisorGAspec;
+import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentDebtorOfferGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement;
+import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentResponse;
 import uk.gov.hmcts.reform.civil.model.genapplication.GASolicitorDetailsGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAStatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails;
+import uk.gov.hmcts.reform.civil.model.genapplication.UploadDocumentByType;
+import uk.gov.hmcts.reform.civil.model.genapplication.finalorder.AssistedOrderAppealDetails;
+import uk.gov.hmcts.reform.civil.model.genapplication.finalorder.AssistedOrderCost;
+import uk.gov.hmcts.reform.civil.model.genapplication.finalorder.AssistedOrderFurtherHearingDetails;
+import uk.gov.hmcts.reform.civil.model.genapplication.finalorder.AssistedOrderGiveReasonsDetails;
+import uk.gov.hmcts.reform.civil.model.genapplication.finalorder.AssistedOrderHeardRepresentation;
+import uk.gov.hmcts.reform.civil.model.genapplication.finalorder.AssistedOrderMadeDateHeardDetails;
+import uk.gov.hmcts.reform.civil.model.genapplication.finalorder.AssistedOrderRecitalRecord;
+import uk.gov.hmcts.reform.civil.model.genapplication.finalorder.BeSpokeCostDetailText;
+import uk.gov.hmcts.reform.civil.model.genapplication.finalorder.DetailText;
+import uk.gov.hmcts.reform.civil.model.genapplication.finalorder.DetailTextWithDate;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
@@ -82,6 +125,7 @@ import uk.gov.hmcts.reform.civil.model.welshenhancements.ChangeLanguagePreferenc
 import uk.gov.hmcts.reform.civil.model.welshenhancements.PreTranslationDocumentType;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.PreferredLanguage;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
+import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import javax.validation.Valid;
@@ -119,6 +163,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.POST_JUDGE_ORDER_LIP_APPLICANT;
 
 @SuperBuilder(toBuilder = true)
 @Jacksonized
@@ -169,6 +214,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     private final List<Element<GeneralApplicationsDetails>> claimantGaAppDetails;
     private final List<Element<GeneralApplicationsDetails>> gaDetailsMasterCollection;
+    private final List<Element<GeneralApplicationsDetails>> gaDetailsMasterCollectionGA;
     private final List<Element<GeneralApplicationsDetails>> gaDetailsTranslationCollection;
     private final List<Element<GADetailsRespondentSol>> respondentSolGaAppDetails;
     private final List<Element<GADetailsRespondentSol>> respondentSolTwoGaAppDetails;
@@ -520,6 +566,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     private final HearingSupportRequirementsDJ hearingSupportRequirementsDJ;
     private final CaseLocationCivil caseManagementLocation;
+    private final GACaseLocation gaCaseManagementLocation;
     private final CaseManagementCategory caseManagementCategory;
     private final String locationName;
     private final DynamicList defendantDetailsSpec;
@@ -579,6 +626,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private List<ConfirmationToggle> confirmReferToJudgeDefenceReceived;
 
     //general application order documents
+    @Builder.Default
+    private final List<Element<CaseDocument>> generalOrderDocumentGA = new ArrayList<>();
     private final List<Element<CaseDocument>> generalOrderDocument;
     private final List<Element<CaseDocument>> generalOrderDocStaff;
     private final List<Element<CaseDocument>> generalOrderDocClaimant;
@@ -609,6 +658,23 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<CaseDocument>> gaDraftDocRespondentSol;
     private final List<Element<CaseDocument>> gaDraftDocRespondentSolTwo;
 
+    @Builder.Default
+    private final List<Element<CaseDocument>> gaDraftDocumentGA = new ArrayList<>();
+
+    @Builder.Default
+    private final List<Element<CaseDocument>> hearingOrderDocumentGA = new ArrayList<>();
+
+    @Builder.Default
+    private final List<Element<CaseDocument>> writtenRepSequentialDocumentGA = new ArrayList<>();
+
+    @Builder.Default
+    private final List<Element<CaseDocument>> directionOrderDocumentGA = new ArrayList<>();
+
+    @Builder.Default
+    private final List<Element<CaseDocument>> writtenRepConcurrentDocumentGA = new ArrayList<>();
+
+    @Builder.Default
+    private final List<Element<CaseDocument>> requestForInformationDocumentGA = new ArrayList<>();
     private final List<Element<CaseDocument>> gaRespondDoc;
     private final List<Element<CaseDocument>> preTranslationGaDocsApplicant;
     private final List<Element<CaseDocument>> preTranslationGaDocsRespondent;
@@ -647,6 +713,188 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final YesOrNo isReferToJudgeClaim;
 
     private final ClientContext clientContext;
+
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private final LocalDateTime createdDate;
+    private final YesOrNo generalAppConsentOrder;
+    private final LocalDateTime notificationDeadline;
+    private final LocalDate submittedOn;
+    private final LocalDateTime generalAppNotificationDeadlineDate;
+    private final GAStatementOfTruth generalAppResponseStatementOfTruth;
+    private final List<Element<GASolicitorDetailsGAspec>> generalAppApplicantAddlSolicitors;
+    private final GAHearingDetails hearingDetailsResp;
+    private final GARespondentRepresentative generalAppRespondent1Representative;
+    private final String generalAppRespondReason;
+    private final String generalAppRespondConsentReason;
+    private List<Element<TranslatedDocument>> translatedDocumentsGA;
+    private List<Element<TranslatedDocument>> translatedDocumentsBulkPrint;
+    private final List<CaseDocument> originalDocumentsBulkPrint;
+    private final List<Element<Document>> generalAppRespondDocument;
+    private final List<Element<Document>> generalAppRespondConsentDocument;
+    private final List<Element<Document>> generalAppRespondDebtorDocument;
+
+    private final LocalDateTime caseDocumentUploadDateRes;
+    private final LocalDateTime caseDocumentUploadDate;
+    private final YesOrNo isDocumentVisible;
+    private final YesOrNo isMultiParty;
+    private final CaseLink caseLink;
+    private GeneralAppParentCaseLink generalAppParentCaseLink;
+    private final IdamUserDetails civilServiceUserRoles;
+    private final GAJudicialDecision judicialDecision;
+    private final List<Element<SolicitorDetails>> applicantSolicitors;
+    private final List<Element<SolicitorDetails>> defendantSolicitors;
+    private final List<Element<GARespondentResponse>> respondentsResponses;
+    private final YesOrNo applicationIsCloaked;
+    private final YesOrNo applicationIsUncloakedOnce;
+    private final GAJudicialMakeAnOrder judicialDecisionMakeOrder;
+    private final Document judicialMakeOrderDocPreview;
+    private final Document judicialListHearingDocPreview;
+    private final Document judicialWrittenRepDocPreview;
+    private final Document judicialRequestMoreInfoDocPreview;
+    private final Document consentOrderDocPreview;
+    private final GAJudicialRequestMoreInfo judicialDecisionRequestMoreInfo;
+    private final GAApproveConsentOrder approveConsentOrder;
+    private final GAJudicialWrittenRepresentations judicialDecisionMakeAnOrderForWrittenRepresentations;
+    private final String judgeRecitalText;
+    private final String directionInRelationToHearingText;
+    private final GAJudgesHearingListGAspec judicialListForHearing;
+    private final String gaApplicantDisplayName;
+    private final String claimant1PartyName;
+    private final String claimant2PartyName;
+    private final String defendant1PartyName;
+    private final String defendant2PartyName;
+    private final YesOrNo isCcmccLocation;
+    private final String judicialGeneralHearingOrderRecital;
+    private final String judicialGOHearingDirections;
+    private final String judicialHearingGeneralOrderHearingText;
+    private final String judicialGeneralOrderHearingEstimationTimeText;
+    private final String judicialHearingGOHearingReqText;
+    private final String judicialSequentialDateText;
+    private final String judicialApplicanSequentialDateText;
+    private final String judicialConcurrentDateText;
+    private final List<Element<Document>> generalAppWrittenRepUpload;
+    @Deprecated
+    private final List<Document> gaWrittenRepDocList;
+    private final List<Document> generalAppDirOrderUpload;
+    private final List<Document> gaDirectionDocList;
+    private final List<Element<Document>> generalAppAddlnInfoUpload;
+
+    private final String gaRespondentDetails;
+    private final String generalAppSuperClaimType;
+    private final GAMakeApplicationAvailableCheck makeAppVisibleToRespondents;
+    private final String respondent1OrganisationIDCopy;
+    private final String respondent2OrganisationIDCopy;
+    private final GAReferToJudgeGAspec referToJudge;
+    private final GAReferToLegalAdvisorGAspec referToLegalAdvisor;
+    private final LocalDateTime applicationClosedDate;
+    private final LocalDateTime applicationTakenOfflineDate;
+    private final GAByCourtsInitiativeGAspec judicialByCourtsInitiativeListForHearing;
+    private final GAByCourtsInitiativeGAspec judicialByCourtsInitiativeForWrittenRep;
+    private final YesOrNo showRequestInfoPreviewDoc;
+    private GAHearingNoticeApplication gaHearingNoticeApplication;
+    private GAHearingNoticeDetail gaHearingNoticeDetail;
+    private String gaHearingNoticeInformation;
+    private final String migrationId;
+    private final String freeFormRecitalText;
+    private final String freeFormOrderedText;
+    private final FreeFormOrderValues orderOnCourtInitiative;
+    private final FreeFormOrderValues orderWithoutNotice;
+    private final Document gaFinalOrderDocPreview;
+    private final LocalDateTime mainCaseSubmittedDate;
+
+    @JsonProperty("CaseAccessCategory")
+    private final CaseCategory caseAccessCategory;
+
+    //PDF Documents
+    private final YesOrNo assistedOrderMadeSelection;
+    private final AssistedOrderMadeDateHeardDetails assistedOrderMadeDateHeardDetails;
+    private final List<FinalOrderShowToggle> assistedOrderJudgeHeardFrom;
+    private final AssistedOrderHeardRepresentation assistedOrderRepresentation;
+    private final List<FinalOrderConsideredToggle> typeRepresentationJudgePapersList;
+    private final List<FinalOrderShowToggle> assistedOrderRecitals;
+    private final AssistedOrderRecitalRecord assistedOrderRecitalsRecorded;
+    private final AssistedCostTypesList assistedCostTypes;
+    private final YesOrNo publicFundingCostsProtection;
+    private final DetailText costReservedDetails;
+    private final String assistedOrderOrderedThatText;
+    private final List<FinalOrderShowToggle> assistedOrderFurtherHearingToggle;
+    private final AssistedOrderFurtherHearingDetails assistedOrderFurtherHearingDetails;
+    private final List<FinalOrderShowToggle> assistedOrderAppealToggle;
+    private final AssistedOrderAppealDetails assistedOrderAppealDetails;
+    private final OrderMadeOnTypes orderMadeOnOption;
+    private final DetailTextWithDate orderMadeOnOwnInitiative;
+    private final DetailTextWithDate orderMadeOnWithOutNotice;
+    private final YesOrNo assistedOrderGiveReasonsYesNo;
+    private final AssistedOrderGiveReasonsDetails assistedOrderGiveReasonsDetails;
+    private final GARespondentDebtorOfferGAspec gaRespondentDebtorOffer;
+    private final YesOrNo gaRespondentConsent;
+    private final String applicationTypes;
+    private final String parentCaseReference;
+    private final String judgeTitle;
+    private final List<Element<UploadDocumentByType>> uploadDocument;
+
+    private final YesOrNo applicant1RepresentedGA;
+
+    // GA for LIP
+    private final YesOrNo isApplicantResponded;
+    private final YesOrNo isRespondentResponded;
+    private final IdamUserDetails claimantUserDetails;
+    private final IdamUserDetails defendantUserDetails;
+    private final HelpWithFees gaAdditionalHelpWithFees;
+    private final uk.gov.hmcts.reform.civil.model.genapplication.HelpWithFeesDetails gaHwfDetails;
+    private final uk.gov.hmcts.reform.civil.model.genapplication.HelpWithFeesDetails additionalHwfDetails;
+    private final HelpWithFeesMoreInformation helpWithFeesMoreInformationGa;
+    private final HelpWithFeesMoreInformation helpWithFeesMoreInformationAdditional;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private final BigDecimal applicationFeeAmountInPence;
+    @JsonUnwrapped
+    private FeePaymentOutcomeDetails feePaymentOutcomeDetails;
+    private String generalAppAddlnInfoText;
+    private String generalAppWrittenRepText;
+    private YesOrNo respondentResponseDeadlineChecked;
+    //Case name for manage case
+    private String caseNameGaInternal;
+    //private String claimantBilingualLanguagePreference;
+    private RespondentLiPResponse respondent1LiPResponseGA;
+    private YesOrNo applicantBilingualLanguagePreferenceGA;
+    private YesOrNo respondentBilingualLanguagePreferenceGA;
+    //WA claim track description
+    private final String emailPartyReference;
+
+    private final GAOrderCourtOwnInitiativeGAspec orderCourtOwnInitiativeListForHearing;
+    private final GAOrderWithoutNoticeGAspec orderWithoutNoticeListForHearing;
+    private final GAOrderCourtOwnInitiativeGAspec orderCourtOwnInitiativeForWrittenRep;
+    private final GAOrderWithoutNoticeGAspec orderWithoutNoticeForWrittenRep;
+    private final AssistedOrderCost assistedOrderMakeAnOrderForCostsGA;
+    private final BeSpokeCostDetailText assistedOrderCostsBespokeGA;
+    private final FinalOrderSelection finalOrderSelectionGA;
+
+    @Builder.Default
+    private final List<Element<CaseDocument>> preTranslationGaDocuments = new ArrayList<>();
+    private final PreTranslationGaDocumentType preTranslationGaDocumentType;
+
+    @Builder.Default
+    private final List<Element<CaseDocument>> hearingNoticeDocumentGA = new ArrayList<>();
+
+    @Builder.Default
+    private final List<Element<CaseDocument>> dismissalOrderDocumentGA = new ArrayList<>();
+
+//    @Builder.Default
+//    private final List<CaseDocument> preTranslationGaDocsApplicant = new ArrayList<>();
+//
+//    @Builder.Default
+//    private final List<CaseDocument> preTranslationGaDocsRespondent = new ArrayList<>();
+
+    @JsonIgnore
+    public boolean isHWFTypeApplication() {
+        return getHwfFeeType() == FeeType.APPLICATION;
+    }
+
+    @JsonIgnore
+    public boolean isHWFTypeAdditional() {
+        return getHwfFeeType() == FeeType.ADDITIONAL;
+    }
+
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending
@@ -1646,5 +1894,171 @@ public class CaseData extends CaseDataParent implements MappableObject {
     public boolean isClaimUnderTranslationAfterClaimantResponse() {
         return this.getApplicant1ResponseDate() != null
             && this.getCcdState() == CaseState.AWAITING_APPLICANT_INTENTION;
+    }
+
+    @JsonIgnore
+    public boolean isUrgent() {
+        return Optional.ofNullable(this.getGeneralAppUrgencyRequirement())
+                .map(GAUrgencyRequirement::getGeneralAppUrgency)
+                .filter(urgency -> urgency == YES)
+                .isPresent();
+    }
+
+    @JsonIgnore
+    public boolean isApplicantBilingual() {
+        return Objects.nonNull(applicantBilingualLanguagePreferenceGA)
+                && applicantBilingualLanguagePreferenceGA.equals(YES);
+    }
+
+    @JsonIgnore
+    public boolean isRespondentBilingual() {
+        return Objects.nonNull(respondentBilingualLanguagePreferenceGA)
+                && respondentBilingualLanguagePreferenceGA.equals(YES);
+    }
+
+    @JsonIgnore
+    public boolean identifyParentClaimantIsApplicant(CaseData caseData) {
+
+        return caseData.getParentClaimantIsApplicant() == null
+                || YES.equals(caseData.getParentClaimantIsApplicant());
+
+    }
+
+    @JsonIgnore
+    public String getPartyName(boolean parentClaimantIsApplicant, FlowFlag userType, CaseData civilCaseData) {
+
+        if (userType.equals(POST_JUDGE_ORDER_LIP_APPLICANT)) {
+            return parentClaimantIsApplicant
+                    ? civilCaseData.getApplicant1().getPartyName()
+                    : civilCaseData.getRespondent1().getPartyName();
+        } else {
+            return parentClaimantIsApplicant
+                    ? civilCaseData.getRespondent1().getPartyName()
+                    : civilCaseData.getApplicant1().getPartyName();
+        }
+    }
+
+    @JsonIgnore
+    public String partyAddressAddressLine1(boolean parentClaimantIsApplicant, FlowFlag userType, CaseData civilCaseData) {
+
+        if (userType.equals(POST_JUDGE_ORDER_LIP_APPLICANT)) {
+            return parentClaimantIsApplicant
+                    ? ofNullable(civilCaseData.getApplicant1().getPrimaryAddress().getAddressLine1())
+                    .orElse(StringUtils.EMPTY)
+                    : ofNullable(civilCaseData.getRespondent1().getPrimaryAddress().getAddressLine1())
+                    .orElse(StringUtils.EMPTY);
+        } else {
+            return parentClaimantIsApplicant
+                    ? ofNullable(civilCaseData.getRespondent1().getPrimaryAddress().getAddressLine1())
+                    .orElse(StringUtils.EMPTY)
+                    : ofNullable(civilCaseData.getApplicant1().getPrimaryAddress().getAddressLine1())
+                    .orElse(StringUtils.EMPTY);
+        }
+    }
+
+    @JsonIgnore
+    public String partyAddressAddressLine2(boolean parentClaimantIsApplicant, FlowFlag userType, CaseData civilCaseData) {
+        if (userType.equals(POST_JUDGE_ORDER_LIP_APPLICANT)) {
+            return parentClaimantIsApplicant
+                    ? ofNullable(civilCaseData.getApplicant1().getPrimaryAddress().getAddressLine2())
+                    .orElse(StringUtils.EMPTY)
+                    : ofNullable(civilCaseData.getRespondent1().getPrimaryAddress().getAddressLine2())
+                    .orElse(StringUtils.EMPTY);
+        } else {
+            return parentClaimantIsApplicant
+                    ? ofNullable(civilCaseData.getRespondent1().getPrimaryAddress().getAddressLine2())
+                    .orElse(StringUtils.EMPTY)
+                    : ofNullable(civilCaseData.getApplicant1().getPrimaryAddress().getAddressLine2())
+                    .orElse(StringUtils.EMPTY);
+        }
+    }
+
+    @JsonIgnore
+    public String partyAddressAddressLine3(boolean parentClaimantIsApplicant, FlowFlag userType, CaseData civilCaseData) {
+        if (userType.equals(POST_JUDGE_ORDER_LIP_APPLICANT)) {
+            return parentClaimantIsApplicant
+                    ? ofNullable(civilCaseData.getApplicant1().getPrimaryAddress().getAddressLine3())
+                    .orElse(StringUtils.EMPTY)
+                    : ofNullable(civilCaseData.getRespondent1().getPrimaryAddress().getAddressLine3())
+                    .orElse(StringUtils.EMPTY);
+        } else {
+            return parentClaimantIsApplicant
+                    ? ofNullable(civilCaseData.getRespondent1().getPrimaryAddress().getAddressLine3())
+                    .orElse(StringUtils.EMPTY)
+                    : ofNullable(civilCaseData.getApplicant1().getPrimaryAddress().getAddressLine3())
+                    .orElse(StringUtils.EMPTY);
+        }
+    }
+
+    @JsonIgnore
+    public String partyAddressPostCode(boolean parentClaimantIsApplicant, FlowFlag userType, CaseData civilCaseData) {
+        if (userType.equals(POST_JUDGE_ORDER_LIP_APPLICANT)) {
+            return parentClaimantIsApplicant
+                    ? ofNullable(civilCaseData.getApplicant1().getPrimaryAddress().getPostCode())
+                    .orElse(StringUtils.EMPTY)
+                    : ofNullable(civilCaseData.getRespondent1().getPrimaryAddress().getPostCode())
+                    .orElse(StringUtils.EMPTY);
+        } else {
+            return parentClaimantIsApplicant
+                    ? ofNullable(civilCaseData.getRespondent1().getPrimaryAddress().getPostCode())
+                    .orElse(StringUtils.EMPTY)
+                    : ofNullable(civilCaseData.getApplicant1().getPrimaryAddress().getPostCode())
+                    .orElse(StringUtils.EMPTY);
+        }
+    }
+
+    @JsonIgnore
+    public String partyAddressPostTown(boolean parentClaimantIsApplicant, FlowFlag userType, CaseData civilCaseData) {
+        if (userType.equals(POST_JUDGE_ORDER_LIP_APPLICANT)) {
+            return parentClaimantIsApplicant
+                    ? ofNullable(civilCaseData.getApplicant1().getPrimaryAddress().getPostTown())
+                    .orElse(StringUtils.EMPTY)
+                    : ofNullable(civilCaseData.getRespondent1().getPrimaryAddress().getPostTown())
+                    .orElse(StringUtils.EMPTY);
+        } else {
+            return parentClaimantIsApplicant
+                    ? ofNullable(civilCaseData.getRespondent1().getPrimaryAddress().getPostTown())
+                    .orElse(StringUtils.EMPTY)
+                    : ofNullable(civilCaseData.getApplicant1().getPrimaryAddress().getPostTown())
+                    .orElse(StringUtils.EMPTY);
+        }
+    }
+
+    @JsonIgnore
+    public boolean judgeHasMadeAnOrder() {
+        return (Objects.nonNull(this.getJudicialDecision()))
+                && (this.getJudicialDecision().getDecision().equals(GAJudgeDecisionOption.MAKE_AN_ORDER)
+                || this.getJudicialDecision().getDecision().equals(GAJudgeDecisionOption.FREE_FORM_ORDER)
+                || this.getJudicialDecision().getDecision().equals(GAJudgeDecisionOption.LIST_FOR_A_HEARING));
+    }
+
+    @JsonIgnore
+    public boolean gaApplicationFeeFullRemissionNotGrantedHWF(CaseData caseData) {
+        return (Objects.nonNull(caseData.getFeePaymentOutcomeDetails())
+                && caseData.getFeePaymentOutcomeDetails().getHwfFullRemissionGrantedForGa() == NO)
+                || (Objects.nonNull(caseData.getGaHwfDetails())
+                && caseData.getGaHwfDetails().getHwfCaseEvent() == CaseEvent.NO_REMISSION_HWF_GA);
+    }
+
+    @JsonIgnore
+    public boolean gaAdditionalFeeFullRemissionNotGrantedHWF(CaseData caseData) {
+        return (Objects.nonNull(caseData.getFeePaymentOutcomeDetails())
+                && caseData.getFeePaymentOutcomeDetails().getHwfFullRemissionGrantedForAdditionalFee() == NO)
+                || (Objects.nonNull(caseData.getAdditionalHwfDetails())
+                && caseData.getAdditionalHwfDetails().getHwfCaseEvent() == CaseEvent.NO_REMISSION_HWF_GA);
+    }
+
+
+    @JsonIgnore
+    public boolean isApplicationBilingual() {
+        return ((this.getIsGaApplicantLip() == YES && this.isApplicantBilingual())
+                || (this.getIsGaRespondentOneLip() == YES && this.isRespondentBilingual()));
+    }
+
+    @JsonIgnore
+    public String getDefendantBilingualLanguagePreferenceGA() {
+        return Optional.ofNullable(getRespondent1LiPResponseGA())
+                .map(RespondentLiPResponse::getRespondent1ResponseLanguage)
+                .orElse(null);
     }
 }

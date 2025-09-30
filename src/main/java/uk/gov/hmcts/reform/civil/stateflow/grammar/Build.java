@@ -5,7 +5,7 @@ import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 /**
  * Represents the BUILD clause.
  */
-public interface Build<S> {
+public interface Build {
 
     StateFlow build();
 }

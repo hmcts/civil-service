@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.utils.MaskHelper;
@@ -58,5 +59,10 @@ public class UserService {
             String maskedError = MaskHelper.maskEmailsInErrorMessages(e.getMessage());
             throw new IllegalArgumentException(maskedError);
         }
+    }
+
+    @CachePut("accessTokenCache")
+    public String refreshAccessToken(String username, String password) {
+        return idamClient.getAccessToken(username, password);
     }
 }

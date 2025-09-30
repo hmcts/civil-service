@@ -6,6 +6,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CaseAccessDataStoreApi;
+import uk.gov.hmcts.reform.ccd.client.CaseAssignmentApi;
+import uk.gov.hmcts.reform.ccd.client.model.CaseAssignmentUserRolesResource;
 import uk.gov.hmcts.reform.ccd.model.AddCaseAssignedUserRolesRequest;
 import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRole;
 import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRoleWithOrganisation;
@@ -26,6 +28,7 @@ public class CoreCaseUserService {
     private final UserService userService;
     private final CrossAccessUserConfiguration crossAccessUserConfiguration;
     private final AuthTokenGenerator authTokenGenerator;
+    private final CaseAssignmentApi caseAssignmentApi;
 
     public List<String> getUserCaseRoles(String caseId, String userId) {
         return caseAccessDataStoreApi.getUserRoles(getCaaAccessToken(), authTokenGenerator.generate(), List.of(caseId))
@@ -130,5 +133,15 @@ public class CoreCaseUserService {
 
         return userRoles.getCaseAssignedUserRoles().stream()
             .anyMatch(c -> c.getCaseRole().equals(caseRole.getFormattedName()));
+    }
+
+    public CaseAssignmentUserRolesResource getUserRoles(String caseId) {
+
+        return caseAssignmentApi.getUserRoles(
+                getCaaAccessToken(),
+                authTokenGenerator.generate(),
+                List.of(caseId)
+        );
+
     }
 }

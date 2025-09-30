@@ -21,6 +21,8 @@ public class NotificationsSignatureConfiguration {
     private final String lipContactEmail;
     private final String raiseQueryLipWelsh;
     private final String lipContactEmailWelsh;
+    private final String specContact;
+    private final String welshContact;
 
     public NotificationsSignatureConfiguration(@Value("${notifications.hmctsSignature}") String hmctsSignature,
                                                @Value("${notifications.phoneContact}") String phoneContact,
@@ -34,7 +36,9 @@ public class NotificationsSignatureConfiguration {
                                                @Value("${notifications.raiseQueryLip}")String raiseQueryLip,
                                                @Value("${notifications.lipContactEmail}")String lipContactEmail,
                                                @Value("${notifications.raiseQueryLipWelsh}")String raiseQueryLipWelsh,
-                                               @Value("${notifications.lipContactEmailWelsh}")String lipContactEmailWelsh) {
+                                               @Value("${notifications.lipContactEmailWelsh}")String lipContactEmailWelsh,
+                                               @Value("${notifications.specContact}")String specContact,
+                                               @Value("${notifications.welshContact}") String welshContact){
 
         this.hmctsSignature = hmctsSignature;
         this.phoneContact = phoneContact;
@@ -49,5 +53,8 @@ public class NotificationsSignatureConfiguration {
         this.lipContactEmail = lipContactEmail;
         this.raiseQueryLipWelsh = raiseQueryLipWelsh;
         this.lipContactEmailWelsh = lipContactEmailWelsh;
+        this.specContact = specContact;
+        this.welshContact = welshContact;
+
     }
 }

@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_APPLICATION_ISSUED;
 
 public abstract class BaseCallbackHandlerTest {
 
@@ -310,5 +311,16 @@ public abstract class BaseCallbackHandlerTest {
             .eventId(eventId)
             .caseDetails(CaseDetails.builder().data(data).id(CASE_ID).state(state).build())
             .build();
+    }
+
+    public CallbackParams callbackParamsOfPendingState(Map<String, Object> data, CallbackType type) {
+        return callbackParamsOf(
+                data,
+                PENDING_APPLICATION_ISSUED,
+                type,
+                null,
+                null,
+                Map.of(Params.BEARER_TOKEN, "BEARER_TOKEN")
+        );
     }
 }

@@ -40,6 +40,11 @@ public class CaseDismissedSearchService extends ElasticSearchService {
         );
     }
 
+    @Override
+    public Query query(int startIndex, CaseState caseState) {
+        return null;
+    }
+
     public BoolQueryBuilder beState(CaseState state) {
         return boolQuery()
             .must(matchQuery("state", state.toString()));

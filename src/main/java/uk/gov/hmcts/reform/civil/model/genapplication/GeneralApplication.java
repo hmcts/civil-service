@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
+import uk.gov.hmcts.reform.civil.model.GeneralAppParentCaseLink;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.CertOfSC;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -41,9 +42,11 @@ public class GeneralApplication implements MappableObject {
     private final GAHearingDetails generalAppHearingDetails;
     private final GASolicitorDetailsGAspec generalAppApplnSolicitor;
     private final List<Element<GASolicitorDetailsGAspec>> generalAppRespondentSolicitors;
+    private List<Element<GASolicitorDetailsGAspec>> generalAppApplicantAddlSolicitors;
     private final List<Element<Document>> generalAppEvidenceDocument;
     private final LocalDateTime generalAppDateDeadline;
     private final YesOrNo isMultiParty;
+    private YesOrNo isDocumentVisibleGA;
     private final YesOrNo parentClaimantIsApplicant;
     private final String gaApplicantDisplayName;
     private final CaseLink caseLink;
@@ -57,6 +60,7 @@ public class GeneralApplication implements MappableObject {
     private final String litigiousPartyID;
     private final String generalAppSuperClaimType;
     private final CaseLocationCivil caseManagementLocation;
+    private final GACaseLocation gAcaseManagementLocation;
     private final YesOrNo isCcmccLocation;
     private final GACaseManagementCategory caseManagementCategory;
     private final CaseCategory caseAccessCategory;
@@ -66,6 +70,8 @@ public class GeneralApplication implements MappableObject {
     private final YesOrNo generalAppVaryJudgementType;
     private final Document generalAppN245FormUpload;
     private final GAHearingDateGAspec generalAppHearingDate;
+    private GeneralAppParentCaseLink generalAppParentCaseLink;
+    private final List<Element<GARespondentResponse>> respondentsResponses;
     // GA for LIP
     private final YesOrNo isGaApplicantLip;
     private final YesOrNo isGaRespondentOneLip;
@@ -101,9 +107,12 @@ public class GeneralApplication implements MappableObject {
                        @JsonProperty("generalAppApplnSolicitor") GASolicitorDetailsGAspec generalAppApplnSolicitor,
                        @JsonProperty("generalAppRespondentSolicitors") List<Element<GASolicitorDetailsGAspec>>
                            generalAppRespondentSolicitors,
+                       @JsonProperty("generalAppApplicantAddlSolicitors") List<Element<GASolicitorDetailsGAspec>>
+                           generalAppApplicantAddlSolicitors,
                        @JsonProperty("generalAppEvidenceDocument") List<Element<Document>> generalAppEvidenceDocument,
                        @JsonProperty("generalAppDateDeadline") LocalDateTime generalAppDateDeadline,
                        @JsonProperty("isMultiParty") YesOrNo isMultiParty,
+                       @JsonProperty("isDocumentVisibleGA") YesOrNo isDocumentVisibleGA,
                        @JsonProperty("parentClaimantIsApplicant") YesOrNo parentClaimantIsApplicant,
                        @JsonProperty("gaApplicantDisplayName") String gaApplicantDisplayName,
                        @JsonProperty("caseLink") CaseLink caseLink,
@@ -117,6 +126,7 @@ public class GeneralApplication implements MappableObject {
                        @JsonProperty("litigiousPartyID") String litigiousPartyID,
                        @JsonProperty("generalAppSuperClaimType") String generalAppSuperClaimType,
                        @JsonProperty("caseManagementLocation") CaseLocationCivil caseManagementLocation,
+                       @JsonProperty("gAcaseManagementLocation") GACaseLocation gAcaseManagementLocation,
                        @JsonProperty("isCcmccLocation") YesOrNo isCcmccLocation,
                        @JsonProperty("caseManagementCategory") GACaseManagementCategory caseManagementCategory,
                        @JsonProperty("CaseAccessCategory") CaseCategory caseAccessCategory,
@@ -126,6 +136,8 @@ public class GeneralApplication implements MappableObject {
                        @JsonProperty("generalAppVaryJudgementType") YesOrNo generalAppVaryJudgementType,
                        @JsonProperty("generalAppN245FormUpload") Document generalAppN245FormUpload,
                        @JsonProperty("generalAppHearingDate") GAHearingDateGAspec generalAppHearingDate,
+                       @JsonProperty("generalAppParentCaseLink") GeneralAppParentCaseLink generalAppParentCaseLink,
+                       @JsonProperty("respondentsResponses") List<Element<GARespondentResponse>> respondentsResponses,
                        @JsonProperty("isGaApplicantLip") YesOrNo isGaApplicantLip,
                        @JsonProperty("isGaRespondentOneLip") YesOrNo isGaRespondentOneLip,
                        @JsonProperty("isGaRespondentTwoLip") YesOrNo isGaRespondentTwoLip,
@@ -153,9 +165,11 @@ public class GeneralApplication implements MappableObject {
         this.generalAppHearingDetails = generalAppHearingDetails;
         this.generalAppApplnSolicitor = generalAppApplnSolicitor;
         this.generalAppRespondentSolicitors = generalAppRespondentSolicitors;
+        this.generalAppApplicantAddlSolicitors = generalAppApplicantAddlSolicitors;
         this.generalAppEvidenceDocument = generalAppEvidenceDocument;
         this.generalAppDateDeadline = generalAppDateDeadline;
         this.isMultiParty = isMultiParty;
+        this.isDocumentVisibleGA = isDocumentVisibleGA;
         this.parentClaimantIsApplicant = parentClaimantIsApplicant;
         this.gaApplicantDisplayName = gaApplicantDisplayName;
         this.caseLink = caseLink;
@@ -169,6 +183,7 @@ public class GeneralApplication implements MappableObject {
         this.litigiousPartyID = litigiousPartyID;
         this.generalAppSuperClaimType = generalAppSuperClaimType;
         this.caseManagementLocation = caseManagementLocation;
+        this.gAcaseManagementLocation = gAcaseManagementLocation;
         this.isCcmccLocation = isCcmccLocation;
         this.caseManagementCategory = caseManagementCategory;
         this.caseAccessCategory = caseAccessCategory;
@@ -178,6 +193,8 @@ public class GeneralApplication implements MappableObject {
         this.generalAppVaryJudgementType = generalAppVaryJudgementType;
         this.generalAppN245FormUpload = generalAppN245FormUpload;
         this.generalAppHearingDate = generalAppHearingDate;
+        this.generalAppParentCaseLink = generalAppParentCaseLink;
+        this.respondentsResponses = respondentsResponses;
         this.isGaApplicantLip = isGaApplicantLip;
         this.isGaRespondentOneLip = isGaRespondentOneLip;
         this.isGaRespondentTwoLip = isGaRespondentTwoLip;

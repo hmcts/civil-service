@@ -92,7 +92,7 @@ public interface NotificationData {
     String UPLOADED_DOCUMENTS = "uploaded documents";
     String HWF_MORE_INFO_DATE = "date";
     String HWF_MORE_INFO_DOCUMENTS = "documents";
-    String HWF_MORE_INFO_DOCUMENTS_WELSH  = "documentsWelsh";
+    String HWF_MORE_INFO_DOCUMENTS_WELSH = "documentsWelsh";
 
     // hwf outcome
     String REASONS = "reasons";
@@ -130,5 +130,4 @@ public interface NotificationData {
     String LIP_CONTACT_WELSH = "welshContact";
 
     Map<String, String> addProperties(CaseData caseData);
-
 }
