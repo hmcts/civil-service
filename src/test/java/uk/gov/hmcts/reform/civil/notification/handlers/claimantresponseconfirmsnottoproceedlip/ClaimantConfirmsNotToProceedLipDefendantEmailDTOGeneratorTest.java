@@ -124,21 +124,6 @@ public class ClaimantConfirmsNotToProceedLipDefendantEmailDTOGeneratorTest {
     }
 
     @Test
-    void shouldReturnCorrectEmailTemplateWhenLipVLipDisabledAndClaimantDontWantToProceedWithFulLDefence() {
-        CaseData caseData = CaseData.builder()
-            .defenceRouteRequired(DISPUTES_THE_CLAIM)
-            .applicant1ProceedWithClaim(NO)
-            .build();
-        String expectedTemplateId = "template-id";
-
-        when(notificationsProperties.getClaimantSolicitorConfirmsNotToProceed()).thenReturn(expectedTemplateId);
-
-        String actualTemplateId = emailDTOGenerator.getEmailTemplateId(caseData);
-
-        assertThat(actualTemplateId).isEqualTo(expectedTemplateId);
-    }
-
-    @Test
     void shouldReturnCorrectReferenceTemplate() {
         String referenceTemplate = emailDTOGenerator.getReferenceTemplate();
 
@@ -214,25 +199,4 @@ public class ClaimantConfirmsNotToProceedLipDefendantEmailDTOGeneratorTest {
         assertThat(updatedProperties).containsEntry(CLAIM_LEGAL_ORG_NAME_SPEC, partyName);
     }
 
-    @Test
-    void shouldReturnCorrectCustomPropertiesWhenIsNotPartAdmitPayImmediatelyAcceptedAndLipVLipDisabled() {
-        Party party = Party.builder().build();
-        CaseData caseData = CaseData.builder()
-            .defenceRouteRequired(DISPUTES_THE_CLAIM)
-            .applicant1ProceedWithClaim(NO)
-            .respondent1(party)
-            .build();
-
-        String partyName = "partyName";
-        MockedStatic<PartyUtils> partyUtilsMockedStatic = Mockito.mockStatic(PartyUtils.class);
-        partyUtilsMockedStatic.when(() -> PartyUtils.getPartyNameBasedOnType(party, false)).thenReturn(partyName);
-
-        Map<String, String> properties = new HashMap<>();
-        Map<String, String> updatedProperties = emailDTOGenerator.addCustomProperties(properties, caseData);
-
-        partyUtilsMockedStatic.close();
-
-        assertThat(updatedProperties.size()).isEqualTo(1);
-        assertThat(updatedProperties).containsEntry(CLAIM_LEGAL_ORG_NAME_SPEC, partyName);
-    }
 }
