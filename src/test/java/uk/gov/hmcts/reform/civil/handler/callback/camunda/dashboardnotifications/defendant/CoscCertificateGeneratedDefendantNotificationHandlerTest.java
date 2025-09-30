@@ -83,7 +83,6 @@ class CoscCertificateGeneratedDefendantNotificationHandlerTest extends BaseCallb
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-
             when(toggleService.isCoSCEnabled()).thenReturn(true);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -113,7 +112,6 @@ class CoscCertificateGeneratedDefendantNotificationHandlerTest extends BaseCallb
                     .caseLink(CaseLink.builder().caseReference("54326781").build())
                     .generalAppType(GAApplicationType.builder().types(singletonList(CONFIRM_CCJ_DEBT_PAID)).build())
                     .build());
-
             when(toggleService.isCoSCEnabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedSmallClaim()

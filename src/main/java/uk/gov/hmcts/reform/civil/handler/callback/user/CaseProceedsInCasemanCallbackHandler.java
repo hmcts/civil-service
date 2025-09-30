@@ -87,7 +87,7 @@ public class CaseProceedsInCasemanCallbackHandler extends CallbackHandler {
 
     private CoscApplicationStatus updateCoScApplicationStatus(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (featureToggleService.isCoSCEnabled() && (caseData.isLipvLipOneVOne() || caseData.isLRvLipOneVOne())) {
+        if (caseData.isLipvLipOneVOne() || caseData.isLRvLipOneVOne()) {
             return CoscApplicationStatus.ACTIVE.equals(caseData.getCoSCApplicationStatus())
                 ? CoscApplicationStatus.INACTIVE
                 : caseData.getCoSCApplicationStatus();

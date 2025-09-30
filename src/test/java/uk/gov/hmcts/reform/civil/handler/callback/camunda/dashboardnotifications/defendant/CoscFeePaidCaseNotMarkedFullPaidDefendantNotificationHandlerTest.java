@@ -116,7 +116,6 @@ class CoscFeePaidCaseNotMarkedFullPaidDefendantNotificationHandlerTest extends B
                 .respondent1Represented(YesOrNo.NO).build().toBuilder()
                 .generalApplications(gaApplications)
                 .build();
-
             when(toggleService.isCoSCEnabled()).thenReturn(true);
 
             HashMap<String, Object> scenarioParams = new HashMap<>();

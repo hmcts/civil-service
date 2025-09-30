@@ -236,15 +236,6 @@ class FeatureToggleServiceTest {
     }
 
     @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsCoSCEnabled(Boolean toggleStat) {
-        var isCoSCEnabledKey = "isCoSCEnabled";
-        givenToggle(isCoSCEnabledKey, toggleStat);
-
-        assertThat(featureToggleService.isCoSCEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
     @CsvSource({
         "someLocation, true, true",
         "someLocation, false, false",
