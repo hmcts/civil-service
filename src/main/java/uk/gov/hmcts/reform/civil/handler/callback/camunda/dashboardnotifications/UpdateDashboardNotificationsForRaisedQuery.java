@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.querymanagement.QueryManagementCamundaService;
 import uk.gov.hmcts.reform.civil.service.querymanagement.QueryManagementVariables;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
@@ -43,7 +42,6 @@ public class UpdateDashboardNotificationsForRaisedQuery extends CallbackHandler 
     public static final String TASK_ID = "UpdateDashboardNotificationsRaisedQm";
     private final DashboardScenariosService dashboardScenariosService;
     private final DashboardNotificationsParamsMapper mapper;
-    private final FeatureToggleService featureToggleService;
     private final CoreCaseUserService coreCaseUserService;
     private final QueryManagementCamundaService runtimeService;
 
@@ -66,9 +64,6 @@ public class UpdateDashboardNotificationsForRaisedQuery extends CallbackHandler 
 
     private CallbackResponse notifyPartyForQueryRaised(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (!featureToggleService.isPublicQueryManagementEnabled(caseData)) {
-            return AboutToStartOrSubmitCallbackResponse.builder().build();
-        }
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         ScenarioRequestParams
             notificationParams = ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build();
