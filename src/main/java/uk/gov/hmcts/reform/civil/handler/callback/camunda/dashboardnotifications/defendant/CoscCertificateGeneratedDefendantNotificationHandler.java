@@ -49,7 +49,7 @@ public class CoscCertificateGeneratedDefendantNotificationHandler extends Dashbo
 
     @Override
     public Map<String, Boolean> getScenarios(CaseData caseData) {
-        return CoscHandlerUtility.addScenario(featureToggleService.isCoSCEnabled());
+        return CoscHandlerUtility.addScenario(true);
     }
 
     @Override
