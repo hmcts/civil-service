@@ -57,7 +57,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.POST_
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
-    HearingFormGenerator.class,
+    HearingFormGeneratorGeneralApplication.class,
     JacksonAutoConfiguration.class
 })
 class HearingFormGeneratorTest {
@@ -90,7 +90,7 @@ class HearingFormGeneratorTest {
     private CaseDetailsConverter caseDetailsConverter;
 
     @Autowired
-    private HearingFormGenerator generator;
+    private HearingFormGeneratorGeneralApplication generator;
     @MockBean
     private DocmosisService docmosisService;
 
@@ -248,14 +248,14 @@ class HearingFormGeneratorTest {
 
     @Test
     void test_getHearingTimeFormatted() {
-        assertThat(HearingFormGenerator.getHearingTimeFormatted("error")).isNull();
-        assertThat(HearingFormGenerator.getHearingTimeFormatted("0800")).isEqualTo("08:00");
+        assertThat(HearingFormGeneratorGeneralApplication.getHearingTimeFormatted("error")).isNull();
+        assertThat(HearingFormGeneratorGeneralApplication.getHearingTimeFormatted("0800")).isEqualTo("08:00");
     }
 
     @Test
     void test_getHearingDurationString() {
         CaseData caseData = CaseDataBuilder.builder().hearingScheduledApplication(YES).build();
-        String durationString = HearingFormGenerator.getHearingDurationString(caseData);
+        String durationString = HearingFormGeneratorGeneralApplication.getHearingDurationString(caseData);
         assertThat(durationString).isEqualTo(GAHearingDuration.HOUR_1.getDisplayedValue());
     }
 
@@ -264,7 +264,7 @@ class HearingFormGeneratorTest {
         CaseData caseData = CaseData.builder().gaHearingNoticeDetail(GAHearingNoticeDetail.builder()
                 .hearingDuration(GAHearingDuration.OTHER)
                 .hearingDurationOther("One year").build()).build();
-        String durationString = HearingFormGenerator.getHearingDurationString(caseData);
+        String durationString = HearingFormGeneratorGeneralApplication.getHearingDurationString(caseData);
         assertThat(durationString).isEqualTo("One year");
     }
 
@@ -278,11 +278,11 @@ class HearingFormGeneratorTest {
         when(caseDetailsConverter.toCaseDataGA(any()))
                 .thenReturn(caseData);
         AssertionsForClassTypes
-                .assertThat(HearingFormGenerator.canViewResp(caseData, generalAppCaseData, "2")).isTrue();
+                .assertThat(HearingFormGeneratorGeneralApplication.canViewResp(caseData, generalAppCaseData, "2")).isTrue();
         AssertionsForClassTypes
-                .assertThat(HearingFormGenerator.canViewResp(caseData, generalAppCaseData, "1")).isFalse();
+                .assertThat(HearingFormGeneratorGeneralApplication.canViewResp(caseData, generalAppCaseData, "1")).isFalse();
         AssertionsForClassTypes
-                .assertThat(HearingFormGenerator.canViewClaimant(caseData, generalAppCaseData)).isFalse();
+                .assertThat(HearingFormGeneratorGeneralApplication.canViewClaimant(caseData, generalAppCaseData)).isFalse();
     }
 
     @Test
@@ -295,11 +295,11 @@ class HearingFormGeneratorTest {
         when(caseDetailsConverter.toCaseDataGA(any()))
                 .thenReturn(caseData);
         AssertionsForClassTypes
-                .assertThat(HearingFormGenerator.canViewResp(caseData, generalAppCaseData, "2")).isFalse();
+                .assertThat(HearingFormGeneratorGeneralApplication.canViewResp(caseData, generalAppCaseData, "2")).isFalse();
         AssertionsForClassTypes
-                .assertThat(HearingFormGenerator.canViewResp(caseData, generalAppCaseData, "1")).isTrue();
+                .assertThat(HearingFormGeneratorGeneralApplication.canViewResp(caseData, generalAppCaseData, "1")).isTrue();
         AssertionsForClassTypes
-                .assertThat(HearingFormGenerator.canViewClaimant(caseData, generalAppCaseData)).isFalse();
+                .assertThat(HearingFormGeneratorGeneralApplication.canViewClaimant(caseData, generalAppCaseData)).isFalse();
     }
 
     @Test
@@ -312,11 +312,11 @@ class HearingFormGeneratorTest {
         when(caseDetailsConverter.toCaseDataGA(any()))
                 .thenReturn(caseData);
         AssertionsForClassTypes
-                .assertThat(HearingFormGenerator.canViewResp(caseData, generalAppCaseData, "2")).isFalse();
+                .assertThat(HearingFormGeneratorGeneralApplication.canViewResp(caseData, generalAppCaseData, "2")).isFalse();
         AssertionsForClassTypes
-                .assertThat(HearingFormGenerator.canViewResp(caseData, generalAppCaseData, "1")).isFalse();
+                .assertThat(HearingFormGeneratorGeneralApplication.canViewResp(caseData, generalAppCaseData, "1")).isFalse();
         AssertionsForClassTypes
-                .assertThat(HearingFormGenerator.canViewClaimant(caseData, generalAppCaseData)).isTrue();
+                .assertThat(HearingFormGeneratorGeneralApplication.canViewClaimant(caseData, generalAppCaseData)).isTrue();
     }
 
     @Test
@@ -329,11 +329,11 @@ class HearingFormGeneratorTest {
         when(caseDetailsConverter.toCaseDataGA(any()))
                 .thenReturn(caseData);
         AssertionsForClassTypes
-                .assertThat(HearingFormGenerator.canViewResp(caseData, generalAppCaseData, "2")).isTrue();
+                .assertThat(HearingFormGeneratorGeneralApplication.canViewResp(caseData, generalAppCaseData, "2")).isTrue();
         AssertionsForClassTypes
-                .assertThat(HearingFormGenerator.canViewResp(caseData, generalAppCaseData, "1")).isTrue();
+                .assertThat(HearingFormGeneratorGeneralApplication.canViewResp(caseData, generalAppCaseData, "1")).isTrue();
         AssertionsForClassTypes
-                .assertThat(HearingFormGenerator.canViewClaimant(caseData, generalAppCaseData)).isTrue();
+                .assertThat(HearingFormGeneratorGeneralApplication.canViewClaimant(caseData, generalAppCaseData)).isTrue();
     }
 
     @Test

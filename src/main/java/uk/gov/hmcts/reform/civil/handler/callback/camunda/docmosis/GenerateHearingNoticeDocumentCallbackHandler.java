@@ -19,7 +19,7 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.GaForLipService;
 import uk.gov.hmcts.reform.civil.service.SendFinalOrderPrintService;
-import uk.gov.hmcts.reform.civil.service.docmosis.hearingorder.HearingFormGenerator;
+import uk.gov.hmcts.reform.civil.service.docmosis.hearingorder.HearingFormGeneratorGeneralApplication;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
@@ -44,7 +44,7 @@ public class GenerateHearingNoticeDocumentCallbackHandler extends CallbackHandle
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(GENERATE_HEARING_NOTICE_DOCUMENT);
     private static final String TASK_ID = "GenerateHearingNoticeDocument";
-    private final HearingFormGenerator hearingFormGenerator;
+    private final HearingFormGeneratorGeneralApplication hearingFormGenerator;
     private final ObjectMapper objectMapper;
     private final AssignCategoryId assignCategoryId;
 

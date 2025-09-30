@@ -24,7 +24,7 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.GaForLipService;
 import uk.gov.hmcts.reform.civil.service.SendFinalOrderPrintService;
-import uk.gov.hmcts.reform.civil.service.docmosis.hearingorder.HearingFormGenerator;
+import uk.gov.hmcts.reform.civil.service.docmosis.hearingorder.HearingFormGeneratorGeneralApplication;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -48,7 +48,7 @@ class GenerateHearingNoticeDocumentCallbackHandlerTest extends BaseCallbackHandl
     @Autowired
     private GenerateHearingNoticeDocumentCallbackHandler handler;
     @MockBean
-    private HearingFormGenerator hearingFormGenerator;
+    private HearingFormGeneratorGeneralApplication hearingFormGenerator;
     @Autowired
     private ObjectMapper mapper;
 

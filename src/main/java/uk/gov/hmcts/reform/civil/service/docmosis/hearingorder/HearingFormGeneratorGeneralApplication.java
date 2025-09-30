@@ -41,7 +41,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.POST_
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> {
+public class HearingFormGeneratorGeneralApplication implements TemplateDataGenerator<HearingForm> {
 
     private final CaseDetailsConverter caseDetailsConverter;
     private final DocumentManagementService documentManagementService;
