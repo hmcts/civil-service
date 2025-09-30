@@ -111,7 +111,6 @@ class CoscCertificateGeneratedDefendantNotificationHandlerTest extends BaseCallb
                     .caseLink(CaseLink.builder().caseReference("54326781").build())
                     .generalAppType(GAApplicationType.builder().types(singletonList(CONFIRM_CCJ_DEBT_PAID)).build())
                     .build());
-            when(toggleService.isCoSCEnabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedSmallClaim()
                 .caseDataLip(CaseDataLiP.builder().applicant1SettleClaim(YesOrNo.YES).build())
