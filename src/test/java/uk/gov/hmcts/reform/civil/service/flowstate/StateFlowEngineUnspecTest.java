@@ -44,7 +44,7 @@ public class StateFlowEngineUnspecTest {
 
     @BeforeEach
     void setup() {
-        given(featureToggleService.isGeneralApplicationsEnabled()).willReturn(false);
+        given(featureToggleService.isJOLiveFeedActive()).willReturn(false);
     }
 
     static Stream<Arguments> caseDataStream() {
@@ -119,9 +119,9 @@ public class StateFlowEngineUnspecTest {
         //When
         StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
-        // Then Claim will have GENERAL_APPLICATION_ENABLED and RPA_CONTINUOUS_FEED
+        // Then Claim will have IS_JO_LIVE_FEED_ACTIVE and RPA_CONTINUOUS_FEED
         assertThat(stateFlow.getFlags()).contains(
-            entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
+            entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false)
         );
     }
 
@@ -135,7 +135,7 @@ public class StateFlowEngineUnspecTest {
         assertThat(stateFlow.getFlags()).contains(
             entry(FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), true)
         );
-        assertThat(stateFlow.getFlags()).hasSize(13);    // bonus: if this fails, a flag was added/removed but tests were not updated
+        assertThat(stateFlow.getFlags()).hasSize(11);    // bonus: if this fails, a flag was added/removed but tests were not updated
     }
 
     @ParameterizedTest(name = "{index}: The state flow flags ONE_RESPONDENT_REPRESENTATIVE " +
@@ -150,7 +150,7 @@ public class StateFlowEngineUnspecTest {
             entry(FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), false),
             entry(FlowFlag.TWO_RESPONDENT_REPRESENTATIVES.name(), true)
         );
-        assertThat(stateFlow.getFlags()).hasSize(14);    // bonus: if this fails, a flag was added/removed but tests were not updated
+        assertThat(stateFlow.getFlags()).hasSize(12);    // bonus: if this fails, a flag was added/removed but tests were not updated
     }
 
     public interface StubbingFn extends Function<FeatureToggleService, OngoingStubbing<Boolean>> {
@@ -158,8 +158,8 @@ public class StateFlowEngineUnspecTest {
 
     static Stream<Arguments> commonFlagNames() {
         return Stream.of(
-            arguments(FlowFlag.GENERAL_APPLICATION_ENABLED.name(),
-                      (StubbingFn)(featureToggleService) -> when(featureToggleService.isGeneralApplicationsEnabled())));
+            arguments(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(),
+                      (StubbingFn)(featureToggleService) -> when(featureToggleService.isJOLiveFeedActive())));
     }
 
     @ParameterizedTest(name = "{index}: The feature flags are carried to the appropriate state flow flags")

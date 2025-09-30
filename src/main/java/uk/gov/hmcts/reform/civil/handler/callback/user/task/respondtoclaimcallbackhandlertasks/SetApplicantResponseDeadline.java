@@ -46,7 +46,7 @@ import static uk.gov.hmcts.reform.civil.utils.WitnessUtils.addEventAndDateAddedT
 @Slf4j
 public class SetApplicantResponseDeadline implements CaseTask {
 
-    private static final int RESPONSE_CLAIM_DEADLINE_EXTENSION_MONTHS = 24;
+    private static final int RESPONSE_CLAIM_DEADLINE_EXTENSION_MONTHS = 36;
     private final Time time;
     private final DeadlinesCalculator deadlinesCalculator;
     private final FrcDocumentsUtils frcDocumentsUtils;
@@ -204,7 +204,6 @@ public class SetApplicantResponseDeadline implements CaseTask {
 
         Party updatedRespondent1 = caseData.getRespondent1().toBuilder()
             .primaryAddress(caseData.getRespondent1Copy().getPrimaryAddress())
-            .flags(caseData.getRespondent1Copy().getFlags())
             .build();
 
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder()
@@ -215,7 +214,6 @@ public class SetApplicantResponseDeadline implements CaseTask {
             && ofNullable(caseData.getRespondent2Copy()).isPresent()) {
             Party updatedRespondent2 = caseData.getRespondent2().toBuilder()
                 .primaryAddress(caseData.getRespondent2Copy().getPrimaryAddress())
-                .flags(caseData.getRespondent2Copy().getFlags())
                 .build();
 
             updatedData.respondent2(updatedRespondent2).respondent2Copy(null);

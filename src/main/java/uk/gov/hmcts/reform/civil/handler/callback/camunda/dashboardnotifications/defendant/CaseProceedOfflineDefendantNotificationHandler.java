@@ -60,7 +60,7 @@ public class CaseProceedOfflineDefendantNotificationHandler extends DashboardCal
 
     @Override
     public String getScenario(CaseData caseData) {
-        if (featureToggleService.isCoSCEnabled() && caseData.getActiveJudgment() != null) {
+        if (caseData.getActiveJudgment() != null) {
             if (caseData.isFastTrackClaim()) {
                 return SCENARIO_AAA6_UPDATE_CASE_PROCEED_IN_CASE_MAN_DEFENDANT_FAST_TRACK.getScenario();
             }

@@ -35,7 +35,6 @@ public class DefendantDefaultJudgementScenarioTest extends  DashboardBaseIntegra
                 .build();
 
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
-        when(featureToggleService.isGeneralApplicationsEnabled()).thenReturn(true);
 
         defaultJudgementIssuedDefendantNotificationHandler.handle(callbackParams(caseData));
         handler.handle(callbackParams(caseData));

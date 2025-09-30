@@ -57,7 +57,6 @@ import static uk.gov.hmcts.reform.civil.utils.DefaultJudgmentUtils.calculateFixe
 import static uk.gov.hmcts.reform.civil.utils.DefaultJudgmentUtils.calculateFixedCostsOnEntry;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
-import static uk.gov.hmcts.reform.civil.utils.PersistDataUtils.persistFlagsForParties;
 
 @Service
 @RequiredArgsConstructor
@@ -80,7 +79,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     public static final String PARTIAL_PAYMENT_OFFLINE = "This feature is currently not available, please see guidance below";
     public static final String DJ_NOT_VALID_FOR_THIS_LIP_CLAIM = "The Claim is not eligible for Default Judgment.";
     private static final List<CaseEvent> EVENTS = List.of(DEFAULT_JUDGEMENT_SPEC);
-    private static final int DEFAULT_JUDGEMENT_SPEC_DEADLINE_EXTENSION_MONTHS = 24;
+    private static final int DEFAULT_JUDGEMENT_SPEC_DEADLINE_EXTENSION_MONTHS = 36;
     private final ObjectMapper objectMapper;
     private final InterestCalculator interestCalculator;
     private final FeatureToggleService toggleService;
@@ -536,10 +535,6 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             caseDataBuilder.businessProcess(BusinessProcess.ready(DEFAULT_JUDGEMENT_SPEC));
         }
 
-        CaseData oldCaseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetailsBefore());
-
-        // persist party flags (ccd issue)
-        persistFlagsForParties(oldCaseData, caseData, caseDataBuilder);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .state(nextState)

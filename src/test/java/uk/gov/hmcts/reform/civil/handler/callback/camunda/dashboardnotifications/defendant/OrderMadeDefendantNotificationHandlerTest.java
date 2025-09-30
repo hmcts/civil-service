@@ -593,6 +593,35 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
         }
 
         @Test
+        void shouldRecordScenarioDefendantFinalOrderFastTrackNotReadyTrial_whenInvokedForNro() {
+            CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build().toBuilder()
+                .respondent1Represented(YesOrNo.NO)
+                .claimsTrack(ClaimsTrack.fastTrack)
+                .drawDirectionsOrderRequired(YesOrNo.NO)
+                .build();
+            when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
+            when(toggleService.isCarmEnabledForCase(any())).thenReturn(false);
+            when(toggleService.isCuiGaNroEnabled()).thenReturn(true);
+            when(toggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).thenReturn(false);
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                    CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT.name())
+                        .caseDetails(CaseDetails.builder().state(All_FINAL_ORDERS_ISSUED.toString()).build()).build())
+                .build();
+
+            handler.handle(params);
+            HashMap<String, Object> scenarioParams = new HashMap<>();
+
+            // Then
+            verifyDeleteNotificationsAndTaskListUpdates(caseData);
+            verify(dashboardScenariosService).recordScenarios(
+                "BEARER_TOKEN",
+                "Scenario.AAA6.Update.TaskList.TrialReady.FinalOrders.Defendant",
+                caseData.getCcdCaseReference().toString(),
+                ScenarioRequestParams.builder().params(scenarioParams).build()
+            );
+        }
+
+        @Test
         void shouldRecordScenarioDefendantFinalOrderFastTrackTrialReady_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build().toBuilder()
                 .respondent1Represented(YesOrNo.NO)
