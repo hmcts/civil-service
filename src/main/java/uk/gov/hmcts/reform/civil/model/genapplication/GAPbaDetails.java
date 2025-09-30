@@ -32,7 +32,7 @@ public class GAPbaDetails {
                  @JsonProperty("generalAppPayInformationText") String generalAppPayInformationText,
                     @JsonProperty("serviceRequestReference") String serviceReqReference,
                  @JsonProperty("additionalPaymentServiceRef") String additionalPaymentServiceRef,
-                 @JsonProperty("additionalPaymentDetails") PaymentDetails additionalPaymentDetails){
+                 @JsonProperty("additionalPaymentDetails") PaymentDetails additionalPaymentDetails) {
 
         this.fee = fee;
         this.paymentDetails = paymentDetails;

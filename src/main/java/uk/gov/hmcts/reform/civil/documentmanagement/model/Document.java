@@ -47,7 +47,7 @@ public class Document {
     }
 
     @JsonIgnore
-    public static Document toDocument(Document document,DocumentType documentType) {
+    public static Document toDocument(Document document, DocumentType documentType) {
         return Document.builder()
                 .documentUrl(document.getDocumentUrl())
                 .documentBinaryUrl(document.getDocumentBinaryUrl())

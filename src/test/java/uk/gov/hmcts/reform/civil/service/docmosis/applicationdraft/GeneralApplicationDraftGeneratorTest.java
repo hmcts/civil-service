@@ -74,9 +74,9 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 @SuppressWarnings("ALL")
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
-        JacksonAutoConfiguration.class,
-        CaseDetailsConverter.class,
-        GeneralApplicationDraftGenerator.class
+    JacksonAutoConfiguration.class,
+    CaseDetailsConverter.class,
+    GeneralApplicationDraftGenerator.class
 })
 class GeneralApplicationDraftGeneratorTest extends BaseCallbackHandlerTest {
 

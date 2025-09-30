@@ -70,10 +70,10 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
-        GenerateApplicationDraftCallbackHandler.class,
-        JacksonAutoConfiguration.class,
-        CaseDetailsConverter.class,
-        AssignCategoryId.class
+    GenerateApplicationDraftCallbackHandler.class,
+    JacksonAutoConfiguration.class,
+    CaseDetailsConverter.class,
+    AssignCategoryId.class
 })
 class GenerateApplicationDraftCallbackHandlerTest extends BaseCallbackHandlerTest {
 

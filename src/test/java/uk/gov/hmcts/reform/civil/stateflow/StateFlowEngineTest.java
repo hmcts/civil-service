@@ -568,7 +568,6 @@ public class StateFlowEngineTest {
                 .isEqualTo(ADDITIONAL_INFO.fullName());
     }
 
-
     @Test
     void shouldReturn_Additional_Info_WhenJudgeMadeDecisionForRespondentWelsh() {
         when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);

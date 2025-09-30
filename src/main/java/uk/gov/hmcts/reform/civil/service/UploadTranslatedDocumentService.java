@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.DocUploadUtils;
-import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -26,20 +25,20 @@ import java.util.Optional;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_GA_LIP;
-import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.APPLICATION_SUMMARY_DOCUMENT_RESPONDED;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.APPLICATION_SUMMARY_DOCUMENT;
+import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.APPLICATION_SUMMARY_DOCUMENT_RESPONDED;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.APPROVE_OR_EDIT_ORDER;
+import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.DISMISSAL_ORDER;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.GENERAL_ORDER;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.HEARING_NOTICE;
+import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.HEARING_ORDER;
+import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.JUDGES_DIRECTIONS_ORDER;
+import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.REQUEST_FOR_MORE_INFORMATION_ORDER;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.REQUEST_MORE_INFORMATION_APPLICANT;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.REQUEST_MORE_INFORMATION_RESPONDENT;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.WRITTEN_REPRESENTATIONS_APPLICANT;
-import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.JUDGES_DIRECTIONS_ORDER;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.WRITTEN_REPRESENTATIONS_ORDER_CONCURRENT;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.WRITTEN_REPRESENTATIONS_ORDER_SEQUENTIAL;
-import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.REQUEST_FOR_MORE_INFORMATION_ORDER;
-import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.HEARING_ORDER;
-import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.DISMISSAL_ORDER;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.WRITTEN_REPRESENTATIONS_RESPONDENT;
 
 @RequiredArgsConstructor
@@ -102,17 +101,14 @@ public class UploadTranslatedDocumentService {
 
     private List<Element<CaseDocument>> getExistingDocumentsByType(CaseData caseData, DocumentType documentType) {
         return switch (documentType) {
-            case REQUEST_FOR_INFORMATION, SEND_APP_TO_OTHER_PARTY ->
-                    ofNullable(caseData.getRequestForInformationDocumentGA()).orElse(new ArrayList<>());
+            case REQUEST_FOR_INFORMATION, SEND_APP_TO_OTHER_PARTY -> ofNullable(caseData.getRequestForInformationDocumentGA()).orElse(new ArrayList<>());
             case DIRECTION_ORDER -> ofNullable(caseData.getDirectionOrderDocumentGA()).orElse(new ArrayList<>());
             case GENERAL_ORDER -> ofNullable(caseData.getGeneralOrderDocumentGA()).orElse(new ArrayList<>());
             case HEARING_ORDER -> ofNullable(caseData.getHearingOrderDocumentGA()).orElse(new ArrayList<>());
             case HEARING_NOTICE -> ofNullable(caseData.getHearingNoticeDocumentGA()).orElse(new ArrayList<>());
             case DISMISSAL_ORDER -> ofNullable(caseData.getDismissalOrderDocumentGA()).orElse(new ArrayList<>());
-            case WRITTEN_REPRESENTATION_CONCURRENT ->
-                    ofNullable(caseData.getWrittenRepConcurrentDocumentGA()).orElse(new ArrayList<>());
-            case WRITTEN_REPRESENTATION_SEQUENTIAL ->
-                    ofNullable(caseData.getWrittenRepSequentialDocumentGA()).orElse(new ArrayList<>());
+            case WRITTEN_REPRESENTATION_CONCURRENT -> ofNullable(caseData.getWrittenRepConcurrentDocumentGA()).orElse(new ArrayList<>());
+            case WRITTEN_REPRESENTATION_SEQUENTIAL -> ofNullable(caseData.getWrittenRepSequentialDocumentGA()).orElse(new ArrayList<>());
             case GENERAL_APPLICATION_DRAFT -> ofNullable(caseData.getGaDraftDocumentGA()).orElse(new ArrayList<>());
             default -> new ArrayList<>();
         };
@@ -332,7 +328,7 @@ public class UploadTranslatedDocumentService {
                     );
                     preTranslationWrittenRepsApplicant.ifPresent(applicantPreTranslation::remove);
                     caseDataBuilder.preTranslationGaDocsApplicant(applicantPreTranslation);
-                }  else if (document.getValue().getDocumentType().equals(WRITTEN_REPRESENTATIONS_RESPONDENT)) {
+                } else if (document.getValue().getDocumentType().equals(WRITTEN_REPRESENTATIONS_RESPONDENT)) {
                     Optional<Element<CaseDocument>> preTranslationWrittenRepsRespondent = preTranslationGaDocuments.stream()
                             .filter(item -> "Written representation".equals(item.getValue().getDocumentName())
                                     && DocUploadUtils.RESPONDENT_ONE.equals(item.getValue().getCreatedBy()))
@@ -354,7 +350,7 @@ public class UploadTranslatedDocumentService {
                     );
                     preTranslationMoreInfoApplicant.ifPresent(applicantPreTranslation::remove);
                     caseDataBuilder.preTranslationGaDocsApplicant(applicantPreTranslation);
-                }  else if (document.getValue().getDocumentType().equals(REQUEST_MORE_INFORMATION_RESPONDENT)) {
+                } else if (document.getValue().getDocumentType().equals(REQUEST_MORE_INFORMATION_RESPONDENT)) {
                     Optional<Element<CaseDocument>> preTranslationMoreInfoRespondent = preTranslationGaDocuments.stream()
                             .filter(item -> "Additional information".equals(item.getValue().getDocumentName())
                                     && DocUploadUtils.RESPONDENT_ONE.equals(item.getValue().getCreatedBy()))
@@ -436,7 +432,8 @@ public class UploadTranslatedDocumentService {
                     documentName = "Additional information";
                     role = DocUploadUtils.RESPONDENT_ONE;
                 }
-                default -> { }
+                default -> {
+                }
             }
             if (documentName != null && !DocUploadUtils.uploadedDocumentAwaitingTranslation(updatedCaseData, role, documentName)) {
                 docUploadDashboardNotificationService.createDashboardNotification(caseData, role, authToken, false);

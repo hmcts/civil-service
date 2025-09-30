@@ -62,11 +62,11 @@ import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.SUMMARY
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @SpringBootTest(classes = {
-        AssignCaseToUserCallbackHandler.class,
-        AssignCaseToResopondentSolHelper.class,
-        GaForLipService.class,
-        JacksonAutoConfiguration.class,
-        CaseDetailsConverter.class
+    AssignCaseToUserCallbackHandler.class,
+    AssignCaseToResopondentSolHelper.class,
+    GaForLipService.class,
+    JacksonAutoConfiguration.class,
+    CaseDetailsConverter.class
 })
 public class AssignCaseToUserCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -333,7 +333,7 @@ public class AssignCaseToUserCallbackHandlerTest extends BaseCallbackHandlerTest
                             generalApplication
                                     .getGeneralAppRespondentSolicitors().get(0).getValue().getId(), null,
                             CaseRole.DEFENDANT
-                    );
+                );
         }
     }
 

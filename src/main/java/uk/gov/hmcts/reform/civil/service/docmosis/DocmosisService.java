@@ -46,7 +46,6 @@ public class DocmosisService {
         }
     }
 
-
     public YesOrNo reasonAvailable(CaseData caseData) {
         if (Objects.nonNull(caseData.getJudicialDecisionMakeOrder().getShowReasonForDecision())
             && caseData.getJudicialDecisionMakeOrder().getShowReasonForDecision().equals(YesOrNo.NO)) {

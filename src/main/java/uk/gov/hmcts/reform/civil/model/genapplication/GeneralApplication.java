@@ -60,7 +60,7 @@ public class GeneralApplication implements MappableObject {
     private final String litigiousPartyID;
     private final String generalAppSuperClaimType;
     private final CaseLocationCivil caseManagementLocation;
-    private final GACaseLocation gAcaseManagementLocation;
+    private final GACaseLocation gaCaseManagementLocation;
     private final YesOrNo isCcmccLocation;
     private final GACaseManagementCategory caseManagementCategory;
     private final CaseCategory caseAccessCategory;
@@ -126,7 +126,7 @@ public class GeneralApplication implements MappableObject {
                        @JsonProperty("litigiousPartyID") String litigiousPartyID,
                        @JsonProperty("generalAppSuperClaimType") String generalAppSuperClaimType,
                        @JsonProperty("caseManagementLocation") CaseLocationCivil caseManagementLocation,
-                       @JsonProperty("gAcaseManagementLocation") GACaseLocation gAcaseManagementLocation,
+                       @JsonProperty("gAcaseManagementLocation") GACaseLocation gaCaseManagementLocation,
                        @JsonProperty("isCcmccLocation") YesOrNo isCcmccLocation,
                        @JsonProperty("caseManagementCategory") GACaseManagementCategory caseManagementCategory,
                        @JsonProperty("CaseAccessCategory") CaseCategory caseAccessCategory,
@@ -183,7 +183,7 @@ public class GeneralApplication implements MappableObject {
         this.litigiousPartyID = litigiousPartyID;
         this.generalAppSuperClaimType = generalAppSuperClaimType;
         this.caseManagementLocation = caseManagementLocation;
-        this.gAcaseManagementLocation = gAcaseManagementLocation;
+        this.gaCaseManagementLocation = gaCaseManagementLocation;
         this.isCcmccLocation = isCcmccLocation;
         this.caseManagementCategory = caseManagementCategory;
         this.caseAccessCategory = caseAccessCategory;

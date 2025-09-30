@@ -879,12 +879,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @Builder.Default
     private final List<Element<CaseDocument>> dismissalOrderDocumentGA = new ArrayList<>();
 
-//    @Builder.Default
-//    private final List<CaseDocument> preTranslationGaDocsApplicant = new ArrayList<>();
-//
-//    @Builder.Default
-//    private final List<CaseDocument> preTranslationGaDocsRespondent = new ArrayList<>();
-
     @JsonIgnore
     public boolean isHWFTypeApplication() {
         return getHwfFeeType() == FeeType.APPLICATION;
@@ -2047,7 +2041,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
                 || (Objects.nonNull(caseData.getAdditionalHwfDetails())
                 && caseData.getAdditionalHwfDetails().getHwfCaseEvent() == CaseEvent.NO_REMISSION_HWF_GA);
     }
-
 
     @JsonIgnore
     public boolean isApplicationBilingual() {

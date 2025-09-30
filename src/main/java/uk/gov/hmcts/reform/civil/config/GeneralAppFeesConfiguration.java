@@ -21,7 +21,6 @@ public class GeneralAppFeesConfiguration {
     private final String certificateOfSatisfaction;
     private final String applicationUncloakAdditionalFee;
 
-
     public GeneralAppFeesConfiguration(
             @Value("${fees.api.url}") String url,
             @Value("${genApp.fee.endpoint}") String endpoint,

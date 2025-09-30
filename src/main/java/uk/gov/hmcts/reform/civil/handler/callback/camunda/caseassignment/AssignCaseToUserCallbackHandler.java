@@ -77,7 +77,6 @@ public class AssignCaseToUserCallbackHandler extends CallbackHandler {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         String caseId = caseData.getCcdCaseReference().toString();
         log.info("CaseData in AssignCaseToUserCallbackHandler: {}", caseId);
-        List<String> errors = new ArrayList<>();
 
         if (caseData.getCcdState().equals(PENDING_APPLICATION_ISSUED)) {
             GASolicitorDetailsGAspec applicantSolicitor = caseData.getGeneralAppApplnSolicitor();
@@ -153,6 +152,8 @@ public class AssignCaseToUserCallbackHandler extends CallbackHandler {
             }
 
         }
+
+        List<String> errors = new ArrayList<>();
 
         rolesAndAccessAssignmentService.copyAllocatedRolesFromRolesAndAccess(caseData.getGeneralAppParentCaseLink().getCaseReference(), caseId);
 

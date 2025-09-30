@@ -1,4 +1,3 @@
-// BuildNext.java
 package uk.gov.hmcts.reform.civil.stateflow.grammar;
 
 /**

@@ -53,10 +53,10 @@ import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.FL
 import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.FLOW_STATE;
 
 @SpringBootTest(classes = {
-        ApplicationProcessCaseEventTaskHandler.class,
-        JacksonAutoConfiguration.class,
-        CaseDetailsConverter.class,
-        StateFlowEngine.class
+    ApplicationProcessCaseEventTaskHandler.class,
+    JacksonAutoConfiguration.class,
+    CaseDetailsConverter.class,
+    StateFlowEngine.class
 })
 @ExtendWith(SpringExtension.class)
 class ApplicationProcessCaseEventTaskHandlerTest {
@@ -127,7 +127,6 @@ class ApplicationProcessCaseEventTaskHandlerTest {
             verify(coreCaseDataService).submitGaUpdate(eq(CASE_ID), any(CaseDataContent.class));
             verify(externalTaskService).complete(mockTask, variables);
         }
-
 
         @Test
         void shouldCallHandleFailureMethod_whenExceptionFromBusinessLogic() {

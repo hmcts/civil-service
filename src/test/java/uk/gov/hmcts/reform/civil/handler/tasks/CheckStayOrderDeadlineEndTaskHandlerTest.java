@@ -38,9 +38,9 @@ import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.RELIEF_
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.STAY_THE_CLAIM;
 
 @SpringBootTest(classes = {
-        JacksonAutoConfiguration.class,
-        CaseDetailsConverter.class,
-        CheckStayOrderDeadlineEndTaskHandler.class})
+    JacksonAutoConfiguration.class,
+    CaseDetailsConverter.class,
+    CheckStayOrderDeadlineEndTaskHandler.class})
 class CheckStayOrderDeadlineEndTaskHandlerTest {
 
     @MockBean

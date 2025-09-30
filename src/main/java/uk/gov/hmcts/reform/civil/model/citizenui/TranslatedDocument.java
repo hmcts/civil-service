@@ -40,7 +40,6 @@ import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.WR
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.WRITTEN_REPRESENTATION_RESPONDENT_TRANSLATED;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.WRITTEN_REPRESENTATION_SEQUENTIAL;
 
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

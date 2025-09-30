@@ -70,11 +70,11 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
-        GeneratePDFDocumentCallbackHandler.class,
-        JacksonAutoConfiguration.class,
-        CaseDetailsConverter.class,
-        AssignCategoryId.class},
-        properties = {"print.service.enabled=true"})
+    GeneratePDFDocumentCallbackHandler.class,
+    JacksonAutoConfiguration.class,
+    CaseDetailsConverter.class,
+    AssignCategoryId.class},
+    properties = {"print.service.enabled=true"})
 class GeneratePDFDocumentCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean

@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.sampledata;
 
-
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 
@@ -15,7 +14,6 @@ import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.HE
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.REQUEST_FOR_INFORMATION;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.WRITTEN_REPRESENTATION_CONCURRENT;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.WRITTEN_REPRESENTATION_SEQUENTIAL;
-
 
 public final class PDFBuilder {
 

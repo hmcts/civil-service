@@ -27,9 +27,9 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @SpringBootTest(classes = {
-        SolicitorEmailValidation.class,
-        GaForLipService.class,
-        JacksonAutoConfiguration.class,
+    SolicitorEmailValidation.class,
+    GaForLipService.class,
+    JacksonAutoConfiguration.class,
 })
 public class SolicitorEmailValidationTest {
 
@@ -96,7 +96,6 @@ public class SolicitorEmailValidationTest {
         assertThat(caseData.getGeneralAppRespondentSolicitors().stream().findFirst().get().getValue().getEmail())
                 .isEqualTo(DUMMY_EMAIL);
     }
-
 
     @Test
     void shouldMatchRespondentOneEmailId_LIPvsLR_DEF() {

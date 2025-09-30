@@ -50,10 +50,10 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @SpringBootTest(classes = {
-        RespondToJudgeAddlnInfoHandler.class,
-        CaseDetailsConverter.class,
-        JacksonAutoConfiguration.class},
-        properties = {"reference.database.enabled=false"})
+    RespondToJudgeAddlnInfoHandler.class,
+    CaseDetailsConverter.class,
+    JacksonAutoConfiguration.class},
+    properties = {"reference.database.enabled=false"})
 public class RespondToJudgeAddlnInfoHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired

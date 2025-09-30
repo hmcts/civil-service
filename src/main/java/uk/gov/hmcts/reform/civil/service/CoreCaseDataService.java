@@ -281,22 +281,6 @@ public class CoreCaseDataService {
         return coreCaseDataApi.getCase(userToken, authTokenGenerator.generate(), caseId.toString());
     }
 
-    public CaseDetails getCaseGA(Long caseId, String authorisation) {
-        return coreCaseDataApi.getCase(authorisation, authTokenGenerator.generate(), caseId.toString());
-    }
-
-    public CaseDetails getCaseGA(Long caseId) {
-        String userToken = userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
-        try {
-            return getCase(caseId, userToken);
-        } catch (Exception e) {
-            log.info(e.getMessage());
-            log.info(RETRY_MSG);
-            userToken = userService.refreshAccessToken(userConfig.getUserName(), userConfig.getPassword());
-            return getCase(caseId, userToken);
-        }
-    }
-
     public CaseDetails getCase(Long caseId, String userToken) {
         return coreCaseDataApi.getCase(userToken, authTokenGenerator.generate(), caseId.toString());
     }

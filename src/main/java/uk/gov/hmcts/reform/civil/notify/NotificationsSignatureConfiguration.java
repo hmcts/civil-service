@@ -38,7 +38,7 @@ public class NotificationsSignatureConfiguration {
                                                @Value("${notifications.raiseQueryLipWelsh}")String raiseQueryLipWelsh,
                                                @Value("${notifications.lipContactEmailWelsh}")String lipContactEmailWelsh,
                                                @Value("${notifications.specContact}")String specContact,
-                                               @Value("${notifications.welshContact}") String welshContact){
+                                               @Value("${notifications.welshContact}") String welshContact) {
 
         this.hmctsSignature = hmctsSignature;
         this.phoneContact = phoneContact;

@@ -597,7 +597,7 @@ public class CaseDataBuilder {
     private DisposalHearingJudgesRecitalDJ disposalHearingJudgesRecitalDJ;
     private TrialHearingJudgesRecital trialHearingJudgesRecitalDJ;
     private CaseLocationCivil caseManagementLocation;
-    private  GACaseLocation gAcaseManagementLocation;
+    private  GACaseLocation gaCaseManagementLocation;
     private DisposalHearingOrderMadeWithoutHearingDJ disposalHearingOrderMadeWithoutHearingDJ;
     private DisposalHearingFinalDisposalHearingTimeDJ disposalHearingFinalDisposalHearingTimeDJ;
     private DJPaymentTypeSelection paymentTypeSelection;
@@ -8421,6 +8421,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder ccdCaseReference(Long ccdCaseReference) {
+        this.ccdCaseReference = ccdCaseReference;
+        return this;
+    }
+
     public CaseDataBuilder emailPartyReference(String emailPartyReference) {
         this.emailPartyReference = emailPartyReference;
         return this;
@@ -8496,11 +8501,6 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder ccdCaseReference(Long ccdCaseReference) {
-        this.ccdCaseReference = ccdCaseReference;
-        return this;
-    }
-
     public CaseDataBuilder isGaRespondentOneLip(YesOrNo isGaRespondentOneLip) {
         this.isGaRespondentOneLip = isGaRespondentOneLip;
         return this;
@@ -8567,7 +8567,7 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder gaCaseManagementLocation(GACaseLocation caseManagementLocation) {
-        this.gAcaseManagementLocation = caseManagementLocation;
+        this.gaCaseManagementLocation = caseManagementLocation;
         return this;
     }
 
@@ -8717,7 +8717,7 @@ public class CaseDataBuilder {
                 .generalAppParentCaseLink(application.getGeneralAppParentCaseLink())
                 .generalAppRespondentSolicitors(application.getGeneralAppRespondentSolicitors())
                 .isCcmccLocation(application.getIsCcmccLocation())
-                .gaCaseManagementLocation(application.getGAcaseManagementLocation())
+                .gaCaseManagementLocation(application.getGaCaseManagementLocation())
                 .build();
     }
 
@@ -8741,7 +8741,7 @@ public class CaseDataBuilder {
                 .generalAppParentCaseLink(application.getGeneralAppParentCaseLink())
                 .generalAppRespondentSolicitors(application.getGeneralAppRespondentSolicitors())
                 .isCcmccLocation(application.getIsCcmccLocation())
-                .gaCaseManagementLocation(application.getGAcaseManagementLocation())
+                .gaCaseManagementLocation(application.getGaCaseManagementLocation())
                 .build();
     }
 
@@ -8765,7 +8765,7 @@ public class CaseDataBuilder {
                 .generalAppParentCaseLink(application.getGeneralAppParentCaseLink())
                 .generalAppRespondentSolicitors(application.getGeneralAppRespondentSolicitors())
                 .isCcmccLocation(application.getIsCcmccLocation())
-                .gaCaseManagementLocation(application.getGAcaseManagementLocation())
+                .gaCaseManagementLocation(application.getGaCaseManagementLocation())
                 .build();
     }
 

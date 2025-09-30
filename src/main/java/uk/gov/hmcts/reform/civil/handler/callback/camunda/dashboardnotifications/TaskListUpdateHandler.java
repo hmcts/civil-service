@@ -79,7 +79,6 @@ public abstract class TaskListUpdateHandler extends DashboardCallbackHandler {
         this.caseDetailsConverter = caseDetailsConverter;
     }
 
-
     public boolean isMainCase() {
         return true;
     }

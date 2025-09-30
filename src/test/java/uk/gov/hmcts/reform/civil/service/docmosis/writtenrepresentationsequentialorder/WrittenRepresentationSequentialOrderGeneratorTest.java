@@ -52,9 +52,9 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorServic
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
-        WrittenRepresentationSequentialOrderGenerator.class,
-        JacksonAutoConfiguration.class,
-        CaseDetailsConverter.class
+    WrittenRepresentationSequentialOrderGenerator.class,
+    JacksonAutoConfiguration.class,
+    CaseDetailsConverter.class
 })
 class WrittenRepresentationSequentialOrderGeneratorTest {
 

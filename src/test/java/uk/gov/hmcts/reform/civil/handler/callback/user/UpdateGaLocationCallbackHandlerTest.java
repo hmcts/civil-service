@@ -215,7 +215,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
                                                                  .email("abc@gmail.com").build()))
                 .isMultiParty(NO)
                 .isCcmccLocation(YES)
-                .gAcaseManagementLocation(GACaseLocation.builder()
+                .gaCaseManagementLocation(GACaseLocation.builder()
                                             .baseLocation("687686")
                                             .region("4").build())
                 .parentClaimantIsApplicant(YES)

@@ -24,7 +24,7 @@ import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_RESPONSE;
 
 @Service
-public class DeleteExpiredResponseRespondentNotificationSearchService extends ElasticSearchService {
+public class DeleteExpiredResponseRespondentNotificationSearchService extends ElasticSearchGeneralApplicationService {
 
     public static final LocalTime END_OF_BUSINESS_DAY = LocalTime.of(16, 0, 0);
 
@@ -65,17 +65,17 @@ public class DeleteExpiredResponseRespondentNotificationSearchService extends El
     }
 
     @Override
-    public Query query(final int startIndex, final CaseState caseState) {
+    Query query(final int startIndex, final CaseState caseState) {
         return null;
     }
 
     @Override
-    public Query queryForOrderMade(final int startIndex, final CaseState caseState, final GeneralApplicationTypes gaType) {
+    Query queryForOrderMade(final int startIndex, final CaseState caseState, final GeneralApplicationTypes gaType) {
         return null;
     }
 
     @Override
-    public Query queryForBusinessProcessStatus(final int startIndex, final BusinessProcessStatus processStatus) {
+    Query queryForBusinessProcessStatus(final int startIndex, final BusinessProcessStatus processStatus) {
         return null;
     }
 

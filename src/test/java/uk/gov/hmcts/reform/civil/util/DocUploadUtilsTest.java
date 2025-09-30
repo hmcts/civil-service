@@ -194,8 +194,8 @@ public class DocUploadUtilsTest {
 
     @ParameterizedTest
     @CsvSource({
-            "RESPOND_TO_JUDGE_ADDITIONAL_INFO,REQUEST_FOR_INFORMATION",
-            "RESPOND_TO_JUDGE_WRITTEN_REPRESENTATION,WRITTEN_REPRESENTATION_SEQUENTIAL"
+        "RESPOND_TO_JUDGE_ADDITIONAL_INFO,REQUEST_FOR_INFORMATION",
+        "RESPOND_TO_JUDGE_WRITTEN_REPRESENTATION,WRITTEN_REPRESENTATION_SEQUENTIAL"
     })
     public void should_getDocumentType(String event, DocumentType name) {
         CaseEvent caseEvent = CaseEvent.valueOf(event);
