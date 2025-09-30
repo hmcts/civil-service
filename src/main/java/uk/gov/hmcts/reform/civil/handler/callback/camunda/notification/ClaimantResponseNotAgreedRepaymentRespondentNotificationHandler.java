@@ -54,11 +54,18 @@ public class ClaimantResponseNotAgreedRepaymentRespondentNotificationHandler ext
 
         notificationService.sendMail(
             getEmail(caseData),
-            getTemplateForLip(caseData),
+            addTemplate(caseData),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
         return AboutToStartOrSubmitCallbackResponse.builder().build();
+    }
+
+    private String addTemplate(CaseData caseData) {
+        return (caseData.isApplicant1NotRepresented())
+            ? getTemplateForLip(caseData)
+            : notificationsProperties.getNotifyClaimantLrTemplate();
+
     }
 
     private String getTemplateForLip(CaseData caseData) {
