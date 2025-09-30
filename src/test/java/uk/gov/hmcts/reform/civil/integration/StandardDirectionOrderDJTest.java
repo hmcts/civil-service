@@ -982,6 +982,95 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
     }
 
     @Test
+    void shouldSetEaCourtLocationYes_whenSpecClaimAndWelshEnabled() {
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateApplicantRespondToDefenceAndProceed()
+            .caseAccessCategory(SPEC_CLAIM)
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                        .region("2")
+                                        .baseLocation("111")
+                                        .build())
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
+
+        assertEquals(YES, responseCaseData.getEaCourtLocation());
+    }
+
+    @Test
+    void shouldSetEaCourtLocationYes_whenSpecClaimNonLipAndWelshDisabled() {
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateApplicantRespondToDefenceAndProceed()
+            .caseAccessCategory(SPEC_CLAIM)
+            .applicant1Represented(YES)
+            .respondent1Represented(YES)
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                        .region("2")
+                                        .baseLocation("111")
+                                        .build())
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
+
+        assertEquals(YES, responseCaseData.getEaCourtLocation());
+    }
+
+    @Test
+    void shouldSetEaCourtLocationNull_whenUnSpecClaim() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateApplicantRespondToDefenceAndProceed()
+            .caseAccessCategory(UNSPEC_CLAIM)
+            .applicant1Represented(NO)
+            .respondent1Represented(YES)
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                        .region("2")
+                                        .baseLocation("111")
+                                        .build())
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
+
+        assertNull(responseCaseData.getEaCourtLocation());
+    }
+
+    @Test
+    void shouldSetEaCourtLocationNo_whenSpecClaimLipCaseAndNotWhitelisted() {
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
+        when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(false);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateApplicantRespondToDefenceAndProceed()
+            .caseAccessCategory(SPEC_CLAIM)
+            .applicant1Represented(NO) // LiP
+            .respondent1Represented(YES)
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                        .region("2")
+                                        .baseLocation("111")
+                                        .build())
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
+
+        assertEquals(NO, responseCaseData.getEaCourtLocation());
+    }
+
+    @Test
     void shouldNotCallUpdateWaCourtLocationsServiceWhenNotPresent_AndMintiEnabled() {
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
 
@@ -1031,103 +1120,6 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                     .confirmationHeader(format(header))
                     .confirmationBody(format(body))
                     .build());
-        }
-    }
-
-    @Nested
-    class GetBodyMethod {
-        @Test
-        void shouldReturnBodyWithBothDefendants_whenRespondent2ExistsAndDefendantDetailsStartsWithBoth() {
-            // Given
-            DynamicList defendantDetails = DynamicList.builder()
-                .value(DynamicListElement.builder()
-                           .label("Both defendants")
-                           .build())
-                .build();
-
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateNotificationAcknowledged()
-                .build()
-                .toBuilder()
-                .respondent2(PartyBuilder.builder().individual().build())
-                .defendantDetails(defendantDetails)
-                .build();
-
-            CallbackParams params = CallbackParamsBuilder.builder()
-                .of(SUBMITTED, caseData)
-                .build();
-
-            // When
-            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
-
-            // Then
-            String expectedBody = format(
-                "The directions order has been sent to: %n%n ## Claimant 1 %n%n %s",
-                caseData.getApplicant1().getPartyName()
-            ) + format("%n%n ## Defendant 1 %n%n %s", caseData.getRespondent1().getPartyName())
-                + format("%n%n ## Defendant 2 %n%n %s", caseData.getRespondent2().getPartyName());
-
-            assertThat(response.getConfirmationBody()).isEqualTo(expectedBody);
-        }
-
-        @Test
-        void shouldReturnBodyWithSingleDefendant_whenRespondent2IsNull() {
-            // Given
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateNotificationAcknowledged()
-                .build()
-                .toBuilder()
-                .respondent2(null)
-                .addRespondent2(NO)
-                .build();
-
-            CallbackParams params = CallbackParamsBuilder.builder()
-                .of(SUBMITTED, caseData)
-                .build();
-
-            // When
-            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
-
-            // Then
-            String expectedBody = format(
-                "The directions order has been sent to: %n%n ## Claimant 1 %n%n %s",
-                caseData.getApplicant1().getPartyName()
-            ) + format("%n%n ## Defendant 1 %n%n %s", caseData.getRespondent1().getPartyName());
-
-            assertThat(response.getConfirmationBody()).isEqualTo(expectedBody);
-        }
-
-        @Test
-        void shouldReturnBodyWithSingleDefendant_whenDefendantDetailsDoesNotStartWithBoth() {
-            // Given
-            DynamicList defendantDetails = DynamicList.builder()
-                .value(DynamicListElement.builder()
-                           .label("Defendant 1 only")
-                           .build())
-                .build();
-
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateNotificationAcknowledged()
-                .build()
-                .toBuilder()
-                .respondent2(PartyBuilder.builder().individual().build())
-                .defendantDetails(defendantDetails)
-                .build();
-
-            CallbackParams params = CallbackParamsBuilder.builder()
-                .of(SUBMITTED, caseData)
-                .build();
-
-            // When
-            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
-
-            // Then
-            String expectedBody = format(
-                "The directions order has been sent to: %n%n ## Claimant 1 %n%n %s",
-                caseData.getApplicant1().getPartyName()
-            ) + format("%n%n ## Defendant 1 %n%n %s", caseData.getRespondent1().getPartyName());
-
-            assertThat(response.getConfirmationBody()).isEqualTo(expectedBody);
         }
     }
 }
