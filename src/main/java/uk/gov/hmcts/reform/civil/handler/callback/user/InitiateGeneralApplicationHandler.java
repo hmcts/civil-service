@@ -198,16 +198,12 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     }
 
     private boolean isCoscEnabledAndUserNotLip(CallbackParams callbackParams) {
-        if (featureToggleService.isCoSCEnabled()) {
-            UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
-            List<String> roles = coreCaseUserService.getUserCaseRoles(
+        UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
+        List<String> roles = coreCaseUserService.getUserCaseRoles(
                 callbackParams.getCaseData().getCcdCaseReference().toString(),
                 userInfo.getUid()
-            );
-            return !(UserRoleUtils.isLIPDefendant(roles) || UserRoleUtils.isLIPClaimant(roles));
-        } else {
-            return false;
-        }
+        );
+        return !(UserRoleUtils.isLIPDefendant(roles) || UserRoleUtils.isLIPClaimant(roles));
     }
 
     private CallbackResponse gaValidateType(CallbackParams callbackParams) {
