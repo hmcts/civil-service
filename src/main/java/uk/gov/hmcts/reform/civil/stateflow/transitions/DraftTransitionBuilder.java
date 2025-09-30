@@ -45,8 +45,8 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     Map.entry(DASHBOARD_SERVICE_ENABLED.name(), isDashBoardEnabledForCase(c)),
                     Map.entry(CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled()),
                     Map.entry(BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()),
-                    Map.entry(JO_ONLINE_LIVE_ENABLED.name(), featureToggleService.isJudgmentOnlineLive()),
-                    Map.entry(IS_JO_LIVE_FEED_ACTIVE.name(), featureToggleService.isJOLiveFeedActive()),
+                    Map.entry(JO_ONLINE_LIVE_ENABLED.name(), true),
+                    Map.entry(IS_JO_LIVE_FEED_ACTIVE.name(), true),
                     Map.entry(DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnlineForCase(c)),
                     Map.entry(CLAIM_STATE_DURING_NOC.name(), getMainClaimCcdState(c)),
                     Map.entry(WELSH_ENABLED.name(), featureToggleService.isWelshEnabledForMainCase()),
@@ -66,8 +66,8 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     Map.entry(DASHBOARD_SERVICE_ENABLED.name(), isDashBoardEnabledForCase(c)),
                     Map.entry(CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled()),
                     Map.entry(BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()),
-                    Map.entry(JO_ONLINE_LIVE_ENABLED.name(), featureToggleService.isJudgmentOnlineLive()),
-                    Map.entry(IS_JO_LIVE_FEED_ACTIVE.name(), featureToggleService.isJOLiveFeedActive()),
+                    Map.entry(JO_ONLINE_LIVE_ENABLED.name(), true),
+                    Map.entry(IS_JO_LIVE_FEED_ACTIVE.name(), true),
                     Map.entry(DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnlineForCase(c)),
                     Map.entry(CLAIM_STATE_DURING_NOC.name(), getMainClaimCcdState(c)),
                     Map.entry(WELSH_ENABLED.name(), featureToggleService.isWelshEnabledForMainCase()),
@@ -83,8 +83,8 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     Map.entry(DASHBOARD_SERVICE_ENABLED.name(), isDashBoardEnabledForCase(c)),
                     Map.entry(CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled()),
                     Map.entry(BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()),
-                    Map.entry(JO_ONLINE_LIVE_ENABLED.name(), featureToggleService.isJudgmentOnlineLive()),
-                    Map.entry(IS_JO_LIVE_FEED_ACTIVE.name(), featureToggleService.isJOLiveFeedActive()),
+                    Map.entry(JO_ONLINE_LIVE_ENABLED.name(), true),
+                    Map.entry(IS_JO_LIVE_FEED_ACTIVE.name(), true),
                     Map.entry(DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnlineForCase(c)),
                     Map.entry(CLAIM_STATE_DURING_NOC.name(), getMainClaimCcdState(c)),
                     Map.entry(WELSH_ENABLED.name(), featureToggleService.isWelshEnabledForMainCase()),
@@ -103,8 +103,8 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     Map.entry(DASHBOARD_SERVICE_ENABLED.name(), isDashBoardEnabledForCase(c)),
                     Map.entry(CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled()),
                     Map.entry(BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()),
-                    Map.entry(JO_ONLINE_LIVE_ENABLED.name(), featureToggleService.isJudgmentOnlineLive()),
-                    Map.entry(IS_JO_LIVE_FEED_ACTIVE.name(), featureToggleService.isJOLiveFeedActive()),
+                    Map.entry(JO_ONLINE_LIVE_ENABLED.name(), true),
+                    Map.entry(IS_JO_LIVE_FEED_ACTIVE.name(), true),
                     Map.entry(DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnlineForCase(c)),
                     Map.entry(CLAIM_STATE_DURING_NOC.name(), getMainClaimCcdState(c)),
                     Map.entry(WELSH_ENABLED.name(), featureToggleService.isWelshEnabledForMainCase()),
@@ -122,8 +122,8 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     Map.entry(DASHBOARD_SERVICE_ENABLED.name(), isDashBoardEnabledForCase(c)),
                     Map.entry(CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled()),
                     Map.entry(BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()),
-                    Map.entry(JO_ONLINE_LIVE_ENABLED.name(), featureToggleService.isJudgmentOnlineLive()),
-                    Map.entry(IS_JO_LIVE_FEED_ACTIVE.name(), featureToggleService.isJOLiveFeedActive()),
+                    Map.entry(JO_ONLINE_LIVE_ENABLED.name(), true),
+                    Map.entry(IS_JO_LIVE_FEED_ACTIVE.name(), true),
                     Map.entry(DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnlineForCase(c)),
                     Map.entry(CLAIM_STATE_DURING_NOC.name(), getMainClaimCcdState(c)),
                     Map.entry(WELSH_ENABLED.name(), featureToggleService.isWelshEnabledForMainCase()),
@@ -141,8 +141,8 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     Map.entry(DASHBOARD_SERVICE_ENABLED.name(), isDashBoardEnabledForCase(c)),
                     Map.entry(CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled()),
                     Map.entry(BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()),
-                    Map.entry(JO_ONLINE_LIVE_ENABLED.name(), featureToggleService.isJudgmentOnlineLive()),
-                    Map.entry(IS_JO_LIVE_FEED_ACTIVE.name(), featureToggleService.isJOLiveFeedActive()),
+                    Map.entry(JO_ONLINE_LIVE_ENABLED.name(), true),
+                    Map.entry(IS_JO_LIVE_FEED_ACTIVE.name(), true),
                     Map.entry(DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnlineForCase(c)),
                     Map.entry(CLAIM_STATE_DURING_NOC.name(), getMainClaimCcdState(c)),
                     Map.entry(WELSH_ENABLED.name(), featureToggleService.isWelshEnabledForMainCase()),
@@ -218,7 +218,6 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
 
     public boolean isJudgmentByAdmissionIssuedForCase(CaseData caseData) {
         return caseContainsLiP.test(caseData)
-            && featureToggleService.isJudgmentOnlineLive()
             && caseData.getActiveJudgment() != null
             && JudgmentType.JUDGMENT_BY_ADMISSION.equals(caseData.getActiveJudgment().getType())
             && caseData.getCcdState() == CaseState.All_FINAL_ORDERS_ISSUED;

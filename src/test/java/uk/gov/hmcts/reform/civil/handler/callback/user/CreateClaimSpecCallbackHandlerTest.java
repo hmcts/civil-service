@@ -301,7 +301,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_whenIndividualDateOfBirthIsInTheFuture() {
             // Given
-            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .applicant1(PartyBuilder.builder().individual()
@@ -320,7 +319,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_whenSoleTraderDateOfBirthIsInTheFuture() {
             // Given
-            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .applicant1(PartyBuilder.builder().individual()
@@ -339,7 +337,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnNoError_whenIndividualDateOfBirthIsInThePast() {
             // Given
-            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .applicant1(PartyBuilder.builder().individual()
@@ -358,7 +355,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnNoError_whenSoleTraderDateOfBirthIsInThePast() {
             // Given
-            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .applicant1(PartyBuilder.builder().individual()
@@ -377,7 +373,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_when_address_exceeds_max_length() {
             // Given
-            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .applicant1(Party.builder().type(Party.Type.ORGANISATION)
@@ -404,7 +399,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_when_address_exceeds_max_length_in_Company_name() {
             // Given
-            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .applicant1(Party.builder()
@@ -425,7 +419,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_when_address_exceeds_max_length_in_Individual_name() {
             // Given
-            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .applicant1(Party.builder()
@@ -448,7 +441,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_when_address_exceeds_max_length_in_sole_trader_name() {
             // Given
-            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .applicant1(Party.builder()
@@ -471,7 +463,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_when_address_exceeds_max_length_in_org_name() {
             // Given
-            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .applicant1(Party.builder()
@@ -493,7 +484,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldNotError_when_address_exceeds_max_length_in_org_name_when_flag_in_off() {
             // Given
-            when(toggleService.isJudgmentOnlineLive()).thenReturn(false);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .applicant1(Party.builder()
@@ -588,7 +578,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_when_address_exceeds_max_length() {
             // Given
-            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .applicant2(Party.builder().type(Party.Type.INDIVIDUAL)
@@ -615,7 +604,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_when_address_exceeds_max_length_in_Company_name() {
             // Given
-            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .applicant2(Party.builder()
@@ -636,7 +624,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_when_address_exceeds_max_length_in_Individual_name() {
             // Given
-            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .applicant2(Party.builder()
@@ -659,7 +646,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_when_address_exceeds_max_length_in_sole_trader_name() {
             // Given
-            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .applicant2(Party.builder()
@@ -682,7 +668,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_when_address_exceeds_max_length_in_org_name() {
             // Given
-            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .applicant2(Party.builder()
@@ -1604,11 +1589,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Nested
         class Respondent1Address {
 
-            @BeforeEach
-            void setup() {
-                when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
-            }
-
             @Test
             void shouldReturnNoErrors_whenRespondent1AddressValid() {
                 // Given
@@ -1657,11 +1637,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Nested
         class Respondent2Address {
-
-            @BeforeEach
-            void setup() {
-                when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
-            }
 
             @Test
             void shouldReturnNoErrors_whenRespondent2AddressValid() {
@@ -1977,7 +1952,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnErrors_whenRespondent1PartyNameNotValid() {
             // Given
-            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .respondent1(Party.builder().type(Party.Type.ORGANISATION)
@@ -1998,7 +1972,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnErrors_whenRespondent2PartyNameNotValid() {
             // Given
-            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .respondent2(Party.builder().type(Party.Type.INDIVIDUAL)

@@ -39,12 +39,10 @@ public class ValidateRespondentDetailsTask {
         Party respondent = getRespondent.apply(caseData);
 
         List<String> errors = postcodeValidator.validate(respondent.getPrimaryAddress().getPostCode());
-        if (featureToggleService.isJudgmentOnlineLive()) {
-            if (respondent.getPrimaryAddress() != null) {
-                partyValidator.validateAddress(respondent.getPrimaryAddress(), errors);
-            }
-            partyValidator.validateName(respondent.getPartyName(), errors);
+        if (respondent.getPrimaryAddress() != null) {
+            partyValidator.validateAddress(respondent.getPrimaryAddress(), errors);
         }
+        partyValidator.validateName(respondent.getPartyName(), errors);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .data(errors.isEmpty()

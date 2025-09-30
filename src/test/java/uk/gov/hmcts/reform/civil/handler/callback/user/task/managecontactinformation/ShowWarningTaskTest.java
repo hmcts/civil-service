@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.UpdateDetailsForm;
-import uk.gov.hmcts.reform.civil.model.UpdatePartyDetailsForm;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
@@ -32,7 +31,6 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_ONE_ID;
 
 @ExtendWith(MockitoExtension.class)
@@ -132,32 +130,6 @@ class ShowWarningTaskTest {
     }
 
     @Test
-    void shouldReturnPostcodeValidationErrorWhenSpecClaim() {
-        // Given a SPEC_CLAIM
-        Party applicant1 = PartyBuilder.builder().company().build();
-        CaseData caseData = CaseData.builder()
-            .caseAccessCategory(SPEC_CLAIM)
-            .updateDetailsForm(UpdateDetailsForm.builder()
-                                   .partyChosen(DynamicList.builder()
-                                                    .value(DynamicListElement.builder().code(CLAIMANT_ONE_ID).label("Claimant 1").build())
-                                                    .listItems(List.of(DynamicListElement.builder().label("something").build())).build())
-                                   .updateExpertsDetailsForm(wrapElements(UpdatePartyDetailsForm.builder().partyId("123").build()))
-                                   .build())
-            .applicant1(applicant1)
-            .build();
-        CaseData oldCaseData = CaseData.builder().build();
-        uk.gov.hmcts.reform.ccd.client.model.CaseDetails caseDetailsBefore = CaseDetails.builder().build();
-
-        when(caseDetailsConverter.toCaseData(caseDetailsBefore)).thenReturn(oldCaseData);
-        when(postcodeValidator.validate(any())).thenReturn(List.of("Invalid postcode"));
-
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse)
-            handler.showWarning(caseData, caseDetailsBefore);
-
-        assertThat(response.getErrors()).contains("Invalid postcode");
-    }
-
-    @Test
     void shouldValidateNameWhenFeatureToggleEnabled() {
         // Given the feature toggle is enabled and name is too long
         UpdateDetailsForm updateDetailsForm = UpdateDetailsForm.builder()
@@ -175,7 +147,6 @@ class ShowWarningTaskTest {
         CaseData caseData = CaseData.builder().caseAccessCategory(SPEC_CLAIM).applicant1(applicant1).updateDetailsForm(updateDetailsForm).build();
         CaseData oldCaseData = CaseData.builder().applicant1(applicant1).build();
         uk.gov.hmcts.reform.ccd.client.model.CaseDetails caseDetailsBefore = CaseDetails.builder().build();
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         when(partyValidator.validateName(caseData.getApplicant1().getPartyName(), List.of())).thenReturn(List.of("Name exceeds maximum length 70"));
         when(caseDetailsConverter.toCaseData(caseDetailsBefore)).thenReturn(oldCaseData);
 
@@ -208,7 +179,6 @@ class ShowWarningTaskTest {
         CaseData caseData = CaseData.builder().caseAccessCategory(SPEC_CLAIM).applicant1(applicant1).updateDetailsForm(updateDetailsForm).build();
         CaseData oldCaseData = CaseData.builder().applicant1(applicant1).build();
         uk.gov.hmcts.reform.ccd.client.model.CaseDetails caseDetailsBefore = CaseDetails.builder().build();
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         List<String> errorList = List.of("exceeds maximum length 35");
         when(partyValidator.validateAddress(any(Address.class), anyList())).thenReturn(errorList);
         when(partyValidator.validateName(applicant1.getPartyName(), errorList)).thenReturn(errorList);

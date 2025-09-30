@@ -76,8 +76,8 @@ public class DraftTransitionBuilderTest {
             entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
             entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
             entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-            entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
-            entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
+            entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), true),
+            entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), true),
             entry("ONE_RESPONDENT_REPRESENTATIVE", true),
             entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false),
             entry(FlowFlag.WELSH_ENABLED.name(), false),
@@ -96,8 +96,8 @@ public class DraftTransitionBuilderTest {
             entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
             entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
             entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-            entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
-            entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
+            entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), true),
+            entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), true),
             entry("ONE_RESPONDENT_REPRESENTATIVE", true),
             entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false),
             entry(FlowFlag.WELSH_ENABLED.name(), false),
@@ -173,8 +173,8 @@ public class DraftTransitionBuilderTest {
             entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
             entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
             entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-            entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
-            entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
+            entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), true),
+            entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), true),
             entry("ONE_RESPONDENT_REPRESENTATIVE", false),
             entry("TWO_RESPONDENT_REPRESENTATIVES", true),
             entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false),
@@ -212,8 +212,8 @@ public class DraftTransitionBuilderTest {
             entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
             entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), true),
             entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-            entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
-            entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
+            entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), true),
+            entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), true),
             entry("UNREPRESENTED_DEFENDANT_ONE", true),
             entry("UNREPRESENTED_DEFENDANT_TWO", true),
             entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), true),
@@ -252,7 +252,6 @@ public class DraftTransitionBuilderTest {
     void shouldResolve_whenOnlyOneUnrepresentedDefendant() {
         when(mockFeatureToggleService.isDashboardEnabledForCase(any())).thenReturn(true);
         when(mockFeatureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
-        when(mockFeatureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1UnrepresentedDefendant()
             .defendant1LIPAtClaimIssued(YES).build();
 
@@ -263,7 +262,7 @@ public class DraftTransitionBuilderTest {
             entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), true),
             entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
             entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), true),
-            entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
+            entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), true),
             entry("UNREPRESENTED_DEFENDANT_ONE", true),
             entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), true),
             entry(FlowFlag.WELSH_ENABLED.name(), false),
@@ -294,8 +293,8 @@ public class DraftTransitionBuilderTest {
             entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
             entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), true),
             entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-            entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
-            entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
+            entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), true),
+            entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), true),
             entry("UNREPRESENTED_DEFENDANT_ONE", true),
             entry("UNREPRESENTED_DEFENDANT_TWO", false),
             entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false),
@@ -319,7 +318,6 @@ public class DraftTransitionBuilderTest {
     @Test
     void shouldResolve_whenUnrepresentedDefendantWithJudgmentByAdmissionForNoc() {
         when(mockFeatureToggleService.isDashboardEnabledForCase(any())).thenReturn(true);
-        when(mockFeatureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         when(mockFeatureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
@@ -337,7 +335,7 @@ public class DraftTransitionBuilderTest {
             entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), true),
             entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
             entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), true),
-            entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
+            entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), true),
             entry("UNREPRESENTED_DEFENDANT_ONE", true),
             entry("UNREPRESENTED_DEFENDANT_TWO", false),
             entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), true),

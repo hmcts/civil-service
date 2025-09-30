@@ -29,20 +29,6 @@ class SpecDefRespEmailHelperTest {
     }
 
     @Test
-    void shouldReturnImmediatelyTemplate_whenFullAdmissionAndImmediatePayment() {
-        CaseData caseData = CaseData.builder()
-            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-            .build();
-
-        String expectedTemplate = "immediately-template";
-        when(notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpec()).thenReturn(expectedTemplate);
-
-        String actual = helper.getAppSolTemplate(caseData);
-        assertEquals(expectedTemplate, actual);
-    }
-
-    @Test
     void shouldReturn1v2DS_whenMultiPartyScenarioIs1v2TwoLegalRep() {
         CaseData caseData = mock(CaseData.class);
         when(caseData.getDefenceAdmitPartPaymentTimeRouteRequired()).thenReturn(null);
@@ -153,14 +139,13 @@ class SpecDefRespEmailHelperTest {
     }
 
     @Test
-    void shouldReturnImmediatelyTemplate_whenFullAdmissionAndImmediatePayment_judgmentOnlineFlagEnabled() {
+    void shouldReturnImmediatelyTemplate_whenFullAdmissionAndImmediatePayment() {
         CaseData caseData = CaseData.builder()
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .build();
 
         String expectedTemplate = "immediately-template-jo";
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         when(notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpecJBA()).thenReturn(expectedTemplate);
 
         String actual = helper.getAppSolTemplate(caseData);

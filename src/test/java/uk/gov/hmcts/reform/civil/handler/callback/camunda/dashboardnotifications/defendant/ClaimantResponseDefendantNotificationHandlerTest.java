@@ -19,7 +19,6 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTim
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
@@ -65,7 +64,6 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_DEFENDANT_CARM;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_PART_ADMIT_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_DEFENDANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT_ACCEPTED_DEFENDANT_PLAN_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_REQUEST_CCJ_CLAIMANT_REJECTS_DEF_PLAN_CLAIMANT_DISAGREES_COURT_PLAN_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT_CLAIMANT_REJECTS_COURT_AGREES_WITH_CLAIMANT_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_REJECTED_NOT_PAID_DEFENDANT;
@@ -629,50 +627,11 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
     }
 
     @Test
-    void shouldCreateNotificationForDefendantWhenClaimantLrAcceptPaymentPlan() {
-        HashMap<String, Object> params = new HashMap<>();
-
-        when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(false);
-
-        CaseData caseData = CaseData.builder()
-            .legacyCaseReference("reference")
-            .ccdCaseReference(1000001L)
-            .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
-            .respondent1Represented(YesOrNo.NO)
-            .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES)
-            .ccjPaymentDetails(CCJPaymentDetails.builder()
-                                   .ccjPaymentPaidSomeOption(YesOrNo.NO)
-                                   .build())
-            .build();
-
-        CallbackParams callbackParams = CallbackParamsBuilder.builder()
-            .of(ABOUT_TO_SUBMIT, caseData)
-            .build();
-
-        handler.handle(callbackParams);
-        verify(dashboardScenariosService).recordScenarios(
-            "BEARER_TOKEN",
-            SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT_ACCEPTED_DEFENDANT_PLAN_DEFENDANT.getScenario(),
-            caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
-        );
-        verify(dashboardScenariosService).recordScenarios(
-            "BEARER_TOKEN",
-            SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_DEFENDANT.getScenario(),
-            caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(params).build()
-        );
-    }
-
-    @Test
     void shouldReturnNullWhenNothingIsMatched_Applicant1RejectPaymentPlan() {
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(false);
 
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
@@ -696,7 +655,6 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(false);
 
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
@@ -721,7 +679,6 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
@@ -980,7 +937,6 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)

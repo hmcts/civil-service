@@ -2322,11 +2322,6 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         class MidShowWarningJudgmentOnline {
             private static final String PAGE_ID = "show-warning";
 
-            @BeforeEach
-            void setup() {
-                when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
-            }
-
             @ParameterizedTest
             @ValueSource(strings = {CLAIMANT_ONE_ID, CLAIMANT_TWO_ID})
             void shouldReturnErrorForClaimantManageInformation(String partyChosenId) {

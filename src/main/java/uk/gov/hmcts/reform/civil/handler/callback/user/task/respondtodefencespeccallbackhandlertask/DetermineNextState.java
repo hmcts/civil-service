@@ -190,8 +190,7 @@ public class DetermineNextState extends CallbackHandler {
     }
 
     private boolean isDefenceAdmitPayImmediately(CaseData caseData) {
-        return featureToggleService.isJudgmentOnlineLive()
-            && IMMEDIATELY.equals(caseData.getDefenceAdmitPartPaymentTimeRouteRequired());
+        return IMMEDIATELY.equals(caseData.getDefenceAdmitPartPaymentTimeRouteRequired());
     }
 
     private String getNextState(CaseData caseData) {
@@ -219,16 +218,13 @@ public class DetermineNextState extends CallbackHandler {
                                                CaseData.CaseDataBuilder<?, ?> builder,
                                                BusinessProcess businessProcess) {
         String nextState;
-        if (featureToggleService.isJudgmentOnlineLive()
-            && (caseData.isPayByInstallment() || caseData.isPayBySetDate())) {
+        if ((caseData.isPayByInstallment() || caseData.isPayBySetDate())) {
             nextState = CaseState.All_FINAL_ORDERS_ISSUED.name();
             businessProcess = BusinessProcess.ready(JUDGEMENT_BY_ADMISSION_NON_DIVERGENT_SPEC);
         } else {
             nextState = CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name();
         }
-        if (featureToggleService.isJudgmentOnlineLive()) {
-            judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData, builder);
-        }
+        judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData, builder);
 
         return Pair.of(nextState, businessProcess);
     }

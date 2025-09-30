@@ -56,8 +56,7 @@ public class JudgementByAdmissionIssuedClaimantDashboardNotificationHandler exte
     }
 
     private boolean isActiveJudgmentExist(CaseData caseData) {
-        return (featureToggleService.isJudgmentOnlineLive()
-            && caseData.getActiveJudgment() != null
+        return (caseData.getActiveJudgment() != null
             && JudgmentState.ISSUED.equals(caseData.getActiveJudgment().getState())
             && JudgmentType.JUDGMENT_BY_ADMISSION.equals(caseData.getActiveJudgment().getType()));
     }

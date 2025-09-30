@@ -259,12 +259,10 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     }
 
     private List<String> validatePartyDetails(Party party, List<String> errors) {
-        if (toggleService.isJudgmentOnlineLive()) {
-            if (party.getPrimaryAddress() != null) {
-                partyValidator.validateAddress(party.getPrimaryAddress(), errors);
-            }
-            partyValidator.validateName(party.getPartyName(), errors);
+        if (party.getPrimaryAddress() != null) {
+            partyValidator.validateAddress(party.getPrimaryAddress(), errors);
         }
+        partyValidator.validateName(party.getPartyName(), errors);
         return errors;
     }
 

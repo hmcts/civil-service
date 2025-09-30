@@ -82,7 +82,6 @@ class JudgementByAdmissionIssuedDefendantDashboardNotificationHandlerTest extend
     void shouldCreateDashboardNotifications_whenDashboardIsEnabled() {
         params.put("ccdCaseReference", "123");
 
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
         CaseData caseData = CaseData.builder()
@@ -120,7 +119,6 @@ class JudgementByAdmissionIssuedDefendantDashboardNotificationHandlerTest extend
     void shouldCreateDashboardNotificationsWhenPaymentPlanAcceptedAndCCJ() {
         params.put("ccdCaseReference", "123");
 
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
         CaseData caseData = CaseData.builder()
@@ -149,7 +147,6 @@ class JudgementByAdmissionIssuedDefendantDashboardNotificationHandlerTest extend
     void shouldNotCreateDashboardNotificationsWhenRespondentIsNotLip() {
         params.put("ccdCaseReference", "123");
 
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
         CaseData caseData = CaseData.builder()
@@ -177,7 +174,6 @@ class JudgementByAdmissionIssuedDefendantDashboardNotificationHandlerTest extend
     void shouldCreateDashboardNotifications_WhenLipvsLipIndividualOrSoleTraderWithJoIssued() {
         params.put("ccdCaseReference", "123");
 
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
         CaseData caseData = CaseData.builder()
@@ -215,7 +211,6 @@ class JudgementByAdmissionIssuedDefendantDashboardNotificationHandlerTest extend
     void shouldCreateDashboardNotifications_WhenLipvsLipCompanyOrOrganisationWithRepaymentPlanAccepted() {
         params.put("ccdCaseReference", "123");
 
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
         CaseData caseData = CaseData.builder()

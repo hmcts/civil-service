@@ -481,7 +481,7 @@ public class EventHistoryMapper {
     }
 
     private LocalDateTime getDateOfDjCreated(CaseData caseData) {
-        return featureToggleService.isJOLiveFeedActive() && Objects.nonNull(caseData.getJoDJCreatedDate())
+        return Objects.nonNull(caseData.getJoDJCreatedDate())
             ? caseData.getJoDJCreatedDate()
             : LocalDateTime.now();
     }
@@ -610,8 +610,7 @@ public class EventHistoryMapper {
     private void buildCoscEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         boolean joMarkedPaidInFullDateExists = caseData.getJoMarkedPaidInFullIssueDate() != null;
 
-        if (featureToggleService.isJOLiveFeedActive()
-            && ((joMarkedPaidInFullDateExists && caseData.getJoDefendantMarkedPaidInFullIssueDate() == null)
+        if (((joMarkedPaidInFullDateExists && caseData.getJoDefendantMarkedPaidInFullIssueDate() == null)
                 || caseData.hasCoscCert())
         ) {
             // date received when mark paid in full by claimant is issued or when the scheduler runs at the cosc deadline at 4pm
@@ -639,12 +638,8 @@ public class EventHistoryMapper {
         if (caseData.isCcjRequestJudgmentByAdmission()) {
             buildJudgmentByAdmissionEventDetails(builder, caseData);
 
-            String miscTextRequested = RPA_REASON_JUDGMENT_BY_ADMISSION;
-            String detailsTextRequested = RPA_REASON_JUDGMENT_BY_ADMISSION;
-            if (featureToggleService.isJOLiveFeedActive()) {
-                miscTextRequested = RECORD_JUDGMENT;
-                detailsTextRequested = RPA_RECORD_JUDGMENT_REASON;
-            }
+            String miscTextRequested = RECORD_JUDGMENT;
+            String detailsTextRequested = RPA_RECORD_JUDGMENT_REASON;
 
             builder.miscellaneous((Event.builder()
                 .eventSequence(prepareEventSequence(builder.build()))
@@ -659,7 +654,7 @@ public class EventHistoryMapper {
     }
 
     private void buildSetAsideJudgment(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        if (featureToggleService.isJOLiveFeedActive() && caseData.getJoSetAsideReason() != null) {
+        if (caseData.getJoSetAsideReason() != null) {
             List<Event> events = new ArrayList<>();
             events.add(buildSetAsideJudgmentEvent(builder, caseData, RESPONDENT_ID));
             if (null != caseData.getRespondent2()) {
@@ -730,7 +725,7 @@ public class EventHistoryMapper {
         builder.judgmentByAdmission((Event.builder()
             .eventSequence(prepareEventSequence(builder.build()))
             .eventCode(JUDGEMENT_BY_ADMISSION.getCode())
-            .litigiousPartyID(featureToggleService.isJOLiveFeedActive() ? RESPONDENT_ID : APPLICANT_ID)
+            .litigiousPartyID(RESPONDENT_ID)
             .dateReceived(getJbADate(caseData))
             .eventDetails(judgmentByAdmissionEvent)
             .eventDetailsText("")
@@ -2505,11 +2500,7 @@ public class EventHistoryMapper {
             && !caseData.getDefendantDetailsSpec().getValue()
             .getLabel().startsWith("Both");
         String miscTextRequested =  "RPA Reason: Default Judgment requested and claim moved offline.";
-        String miscTextGranted = "RPA Reason: Default Judgment granted and claim moved offline.";
-
-        if (featureToggleService.isJOLiveFeedActive()) {
-            miscTextGranted = RECORD_JUDGMENT;
-        }
+        String miscTextGranted = RECORD_JUDGMENT;
 
         if (caseData.getDefendantDetailsSpec() != null) {
             builder.miscellaneous(
@@ -2565,16 +2556,15 @@ public class EventHistoryMapper {
     }
 
     private String getJBAInstallmentPeriod(CaseData caseData) {
-        boolean joLiveFeedActive = featureToggleService.isJOLiveFeedActive();
         boolean payByInstallment = hasCourtDecisionInFavourOfClaimant(caseData) ? caseData.applicant1SuggestedPayByInstalments() : caseData.isPayByInstallment();
         if (payByInstallment) {
             return getInstallmentPeriodForRequestJudgmentByAdmission(payByInstallment, caseData);
         }
         boolean payBySetDate = hasCourtDecisionInFavourOfClaimant(caseData) ? caseData.applicant1SuggestedPayBySetDate() : caseData.isPayBySetDate();
         boolean payImmediately = hasCourtDecisionInFavourOfClaimant(caseData) ? caseData.applicant1SuggestedPayImmediately() : caseData.isPayImmediately();
-        if (joLiveFeedActive && payBySetDate) {
+        if (payBySetDate) {
             return "FUL";
-        } else if (joLiveFeedActive && payImmediately) {
+        } else if (payImmediately) {
             return "FW";
         } else {
             return null;
@@ -2725,8 +2715,6 @@ public class EventHistoryMapper {
     }
 
     private LocalDateTime getJbADate(CaseData caseData) {
-        return featureToggleService.isJOLiveFeedActive()
-            ? caseData.getJoJudgementByAdmissionIssueDate()
-            : setApplicant1ResponseDate(caseData);
+        return caseData.getJoJudgementByAdmissionIssueDate();
     }
 }

@@ -75,7 +75,6 @@ class RecordJudgementDefendantNotificationHandlerTest extends BaseCallbackHandle
     void shouldCreateDashboardNotifications_whenDashboardIsEnabled() {
         params.put("ccdCaseReference", "123");
 
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
         CaseData caseData = CaseData.builder()

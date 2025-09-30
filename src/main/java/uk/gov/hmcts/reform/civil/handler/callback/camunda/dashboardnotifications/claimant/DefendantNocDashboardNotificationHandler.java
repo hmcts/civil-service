@@ -117,7 +117,7 @@ public class DefendantNocDashboardNotificationHandler extends CallbackHandler {
     }
 
     private String getScenario(CaseData caseData) {
-        if (featureToggleService.isLrAdmissionBulkEnabled() && featureToggleService.isJudgmentOnlineLive()
+        if (featureToggleService.isLrAdmissionBulkEnabled()
             && CaseState.All_FINAL_ORDERS_ISSUED.equals(caseData.getPreviousCCDState()) && nonNull(caseData.getActiveJudgment())) {
             return SCENARIO_AAA6_DEFENDANT_NOTICE_OF_CHANGE_JBA_CLAIM_MOVES_OFFLINE_CLAIMANT.getScenario();
         }

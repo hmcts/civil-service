@@ -976,7 +976,6 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldCaptureCCDPreState_whenProceedInHeritageSystemRequested() {
             when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
-            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)

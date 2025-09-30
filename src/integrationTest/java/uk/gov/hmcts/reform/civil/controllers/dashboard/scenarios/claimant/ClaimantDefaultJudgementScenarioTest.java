@@ -9,7 +9,6 @@ import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -30,8 +29,6 @@ public class ClaimantDefaultJudgementScenarioTest extends DashboardBaseIntegrati
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)
             .build();
-
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
         defaultJudgementIssuedClaimantNotificationHandler.handle(callbackParams(caseData));
 
@@ -61,8 +58,6 @@ public class ClaimantDefaultJudgementScenarioTest extends DashboardBaseIntegrati
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)
             .build();
-
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
         defaultJudgementIssuedClaimantNotificationHandler.handle(callbackParams(caseData));
 

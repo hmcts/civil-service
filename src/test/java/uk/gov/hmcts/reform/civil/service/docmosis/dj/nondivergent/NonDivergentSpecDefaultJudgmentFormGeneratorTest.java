@@ -251,7 +251,6 @@ class NonDivergentSpecDefaultJudgmentFormGeneratorTest {
 
     @Test
     void shouldGenerateClaimantDocsNonDivergentWelsh_whenValidDataIsProvidedLip() {
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N121_SPEC_CLAIMANT)))
             .thenReturn(new DocmosisDocument(N121_SPEC_CLAIMANT.getDocumentTitle(), bytes));
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N121_SPEC_CLAIMANT_WELSH)))
