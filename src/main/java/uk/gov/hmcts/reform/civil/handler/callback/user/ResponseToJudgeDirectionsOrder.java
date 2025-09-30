@@ -55,7 +55,7 @@ public class ResponseToJudgeDirectionsOrder extends CallbackHandler {
         CaseData caseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetails());
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         String userId = idamClient.getUserInfo(authToken).getUid();
-        CaseData.CaseDataBuilder<?,?> caseDataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         String role = DocUploadUtils.getUserRole(caseData, userId);
         DocUploadUtils.addDocumentToAddl(caseData,
                                          caseDataBuilder,

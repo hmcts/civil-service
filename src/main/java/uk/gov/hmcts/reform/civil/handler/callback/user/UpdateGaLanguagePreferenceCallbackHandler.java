@@ -53,7 +53,7 @@ public class UpdateGaLanguagePreferenceCallbackHandler extends CallbackHandler {
         boolean claimantBilingual = BILINGUAL_TYPES.contains(civilCaseData.getClaimantBilingualLanguagePreference());
         boolean defendantBilingual = civilCaseData.getRespondent1LiPResponseGA() != null
             && BILINGUAL_TYPES.contains(civilCaseData.getRespondent1LiPResponseGA().getRespondent1ResponseLanguage());
-        CaseData.CaseDataBuilder<?,?> caseDataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         if (caseData.getParentClaimantIsApplicant() == YesOrNo.YES) {
             caseDataBuilder.applicantBilingualLanguagePreferenceGA(claimantBilingual ? YesOrNo.YES : YesOrNo.NO);
             caseDataBuilder.respondentBilingualLanguagePreferenceGA(defendantBilingual ? YesOrNo.YES : YesOrNo.NO);

@@ -74,9 +74,9 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 @SuppressWarnings("ALL")
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
-    JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class,
-    GeneralApplicationDraftGenerator.class
+        JacksonAutoConfiguration.class,
+        CaseDetailsConverter.class,
+        GeneralApplicationDraftGenerator.class
 })
 class GeneralApplicationDraftGeneratorTest extends BaseCallbackHandlerTest {
 
@@ -104,14 +104,14 @@ class GeneralApplicationDraftGeneratorTest extends BaseCallbackHandlerTest {
     GeneralApplicationDraftGenerator generalApplicationDraftGenerator;
     List<Element<GARespondentResponse>> respondentsResponses = new ArrayList<>();
     DynamicListElement location1 = DynamicListElement.builder()
-        .code(String.valueOf(UUID.randomUUID())).label("Site Name 2 - Address2 - 28000").build();
+            .code(String.valueOf(UUID.randomUUID())).label("Site Name 2 - Address2 - 28000").build();
 
     @Test
     void shouldNotGenerateApplicationDraftDocument() {
         CaseData caseData = getSampleGeneralApplicationCaseData(NO, YES);
 
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(GENERAL_APPLICATION_DRAFT)))
-            .thenReturn(new DocmosisDocument(GENERAL_APPLICATION_DRAFT.getDocumentTitle(), bytes));
+                .thenReturn(new DocmosisDocument(GENERAL_APPLICATION_DRAFT.getDocumentTitle(), bytes));
 
         when(listGeneratorService.applicationType(caseData)).thenReturn("Extend time");
         when(listGeneratorService.claimantsName(caseData)).thenReturn("Test Claimant1 Name");
@@ -126,11 +126,11 @@ class GeneralApplicationDraftGeneratorTest extends BaseCallbackHandlerTest {
         generalApplicationDraftGenerator.generate(caseData, BEARER_TOKEN);
 
         verify(documentManagementService).uploadDocument(
-            BEARER_TOKEN,
-            new PDF(any(), any(), DocumentType.GENERAL_APPLICATION_DRAFT)
+                BEARER_TOKEN,
+                new PDF(any(), any(), DocumentType.GENERAL_APPLICATION_DRAFT)
         );
         verify(documentGeneratorService).generateDocmosisDocument(any(GADraftForm.class),
-                                                                  eq(GENERAL_APPLICATION_DRAFT));
+                eq(GENERAL_APPLICATION_DRAFT));
         var templateData = generalApplicationDraftGenerator.getTemplateData(caseData);
         assertThat(templateData.getIsCasePastDueDate()).isEqualTo(true);
     }
@@ -140,7 +140,7 @@ class GeneralApplicationDraftGeneratorTest extends BaseCallbackHandlerTest {
         CaseData caseData = getSampleGeneralAppCaseDataWithDeadLineReached(NO, YES);
 
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(GENERAL_APPLICATION_DRAFT)))
-            .thenReturn(new DocmosisDocument(GENERAL_APPLICATION_DRAFT.getDocumentTitle(), bytes));
+                .thenReturn(new DocmosisDocument(GENERAL_APPLICATION_DRAFT.getDocumentTitle(), bytes));
 
         when(listGeneratorService.applicationType(caseData)).thenReturn("Extend time");
         when(listGeneratorService.claimantsName(caseData)).thenReturn("Test Claimant1 Name");
@@ -155,8 +155,8 @@ class GeneralApplicationDraftGeneratorTest extends BaseCallbackHandlerTest {
         generalApplicationDraftGenerator.generate(caseData, BEARER_TOKEN);
 
         verify(documentManagementService).uploadDocument(
-            BEARER_TOKEN,
-            new PDF(any(), any(), DocumentType.GENERAL_APPLICATION_DRAFT)
+                BEARER_TOKEN,
+                new PDF(any(), any(), DocumentType.GENERAL_APPLICATION_DRAFT)
         );
         verify(documentGeneratorService).generateDocmosisDocument(any(GADraftForm.class), eq(GENERAL_APPLICATION_DRAFT));
         var templateData = generalApplicationDraftGenerator.getTemplateData(caseData);
@@ -167,13 +167,13 @@ class GeneralApplicationDraftGeneratorTest extends BaseCallbackHandlerTest {
     void shouldGenerateDocumentWithApplicantAndRespondent1Response_1v1_test() {
         List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
         GASolicitorDetailsGAspec respondent1 = GASolicitorDetailsGAspec.builder().id("id")
-            .email(DUMMY_EMAIL).organisationIdentifier("org2").build();
+                .email(DUMMY_EMAIL).organisationIdentifier("org2").build();
 
         respondentSols.add(element(respondent1));
         CaseData caseData = getCase(respondentSols, NO);
 
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(GENERAL_APPLICATION_DRAFT)))
-            .thenReturn(new DocmosisDocument(GENERAL_APPLICATION_DRAFT.getDocumentTitle(), bytes));
+                .thenReturn(new DocmosisDocument(GENERAL_APPLICATION_DRAFT.getDocumentTitle(), bytes));
 
         when(listGeneratorService.applicationType(caseData)).thenReturn("Extend time");
         when(listGeneratorService.claimantsName(caseData)).thenReturn("Test Claimant1 Name");
@@ -193,16 +193,16 @@ class GeneralApplicationDraftGeneratorTest extends BaseCallbackHandlerTest {
     void shouldGenerateDocumentWithApplicantAndRespondent1ResponseJudgeUncloaks() {
         List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
         GASolicitorDetailsGAspec respondent1 = GASolicitorDetailsGAspec.builder().id("id")
-            .email(DUMMY_EMAIL).organisationIdentifier("org2").build();
+                .email(DUMMY_EMAIL).organisationIdentifier("org2").build();
 
         respondentSols.add(element(respondent1));
         CaseData caseData = getCase(respondentSols, NO).toBuilder()
-            .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(NO).build())
-            .applicationIsCloaked(NO)
-            .build();
+                .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(NO).build())
+                .applicationIsCloaked(NO)
+                .build();
 
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(GENERAL_APPLICATION_DRAFT)))
-            .thenReturn(new DocmosisDocument(GENERAL_APPLICATION_DRAFT.getDocumentTitle(), bytes));
+                .thenReturn(new DocmosisDocument(GENERAL_APPLICATION_DRAFT.getDocumentTitle(), bytes));
 
         when(listGeneratorService.applicationType(caseData)).thenReturn("Extend time");
         when(listGeneratorService.claimantsName(caseData)).thenReturn("Test Claimant1 Name");
@@ -222,16 +222,16 @@ class GeneralApplicationDraftGeneratorTest extends BaseCallbackHandlerTest {
     void shouldNotGenerateDocumentWithApplicantAndRespondent1ResponseWhenApplnCloaked() {
         List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
         GASolicitorDetailsGAspec respondent1 = GASolicitorDetailsGAspec.builder().id("id")
-            .email(DUMMY_EMAIL).organisationIdentifier("org2").build();
+                .email(DUMMY_EMAIL).organisationIdentifier("org2").build();
 
         respondentSols.add(element(respondent1));
         CaseData caseData = getCase(respondentSols, NO).toBuilder()
-            .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(NO).build())
-            .applicationIsCloaked(YES)
-            .build();
+                .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(NO).build())
+                .applicationIsCloaked(YES)
+                .build();
 
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(GENERAL_APPLICATION_DRAFT)))
-            .thenReturn(new DocmosisDocument(GENERAL_APPLICATION_DRAFT.getDocumentTitle(), bytes));
+                .thenReturn(new DocmosisDocument(GENERAL_APPLICATION_DRAFT.getDocumentTitle(), bytes));
 
         when(listGeneratorService.applicationType(caseData)).thenReturn("Extend time");
         when(listGeneratorService.claimantsName(caseData)).thenReturn("Test Claimant1 Name");
@@ -251,10 +251,10 @@ class GeneralApplicationDraftGeneratorTest extends BaseCallbackHandlerTest {
     void shouldGenerateDocumentWithApplicantAndRespondentsResponse_1v2_test() {
         List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
         GASolicitorDetailsGAspec respondent1 = GASolicitorDetailsGAspec.builder().id("id")
-            .email(DUMMY_EMAIL).organisationIdentifier("org2").build();
+                .email(DUMMY_EMAIL).organisationIdentifier("org2").build();
 
         GASolicitorDetailsGAspec respondent2 = GASolicitorDetailsGAspec.builder().id("id")
-            .email(DUMMY_EMAIL).organisationIdentifier("org2").build();
+                .email(DUMMY_EMAIL).organisationIdentifier("org2").build();
 
         respondentSols.add(element(respondent1));
         respondentSols.add(element(respondent2));
@@ -262,7 +262,7 @@ class GeneralApplicationDraftGeneratorTest extends BaseCallbackHandlerTest {
         CaseData caseData = getCase(respondentSols, YES);
 
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(GENERAL_APPLICATION_DRAFT)))
-            .thenReturn(new DocmosisDocument(GENERAL_APPLICATION_DRAFT.getDocumentTitle(), bytes));
+                .thenReturn(new DocmosisDocument(GENERAL_APPLICATION_DRAFT.getDocumentTitle(), bytes));
 
         when(listGeneratorService.applicationType(caseData)).thenReturn("Extend time");
         when(listGeneratorService.claimantsName(caseData)).thenReturn("Test Claimant1 Name");
@@ -284,223 +284,223 @@ class GeneralApplicationDraftGeneratorTest extends BaseCallbackHandlerTest {
 
         List<GAHearingSupportRequirements> respSupportReq1 = new ArrayList<>();
         respSupportReq1
-            .add(GAHearingSupportRequirements.OTHER_SUPPORT);
+                .add(GAHearingSupportRequirements.OTHER_SUPPORT);
 
         List<GAHearingSupportRequirements> respSupportReq2 = new ArrayList<>();
         respSupportReq2
-            .add(GAHearingSupportRequirements.LANGUAGE_INTERPRETER);
+                .add(GAHearingSupportRequirements.LANGUAGE_INTERPRETER);
         List<Element<GAUnavailabilityDates>> resp1UnavailabilityDates = new ArrayList<>();
         resp1UnavailabilityDates.add(element(GAUnavailabilityDates.builder()
-                                         .unavailableTrialDateTo(LocalDate.now().plusDays(5))
-                                         .unavailableTrialDateFrom(LocalDate.now()).build()));
+                .unavailableTrialDateTo(LocalDate.now().plusDays(5))
+                .unavailableTrialDateFrom(LocalDate.now()).build()));
         List<Element<GAUnavailabilityDates>> resp2UnavailabilityDates = new ArrayList<>();
         resp2UnavailabilityDates.add(element(GAUnavailabilityDates.builder()
-                                         .unavailableTrialDateTo(LocalDate.now().plusDays(3))
-                                         .unavailableTrialDateFrom(LocalDate.now()).build()));
+                .unavailableTrialDateTo(LocalDate.now().plusDays(3))
+                .unavailableTrialDateFrom(LocalDate.now()).build()));
         List<Element<GARespondentResponse>> respondentsResponses = new ArrayList<>();
         respondentsResponses
-            .add(element(GARespondentResponse.builder()
-                             .gaHearingDetails(GAHearingDetails.builder()
-                                                   .vulnerabilityQuestionsYesOrNo(vulQuestion1)
-                                                   .vulnerabilityQuestion("dummy1")
-                                                   .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
-                                                   .hearingDuration(GAHearingDuration.HOUR_1)
-                                                   .supportRequirement(respSupportReq1)
-                                                   .unavailableTrialRequiredYesOrNo(YES)
-                                                   .generalAppUnavailableDates(resp1UnavailabilityDates)
-                                                   .hearingPreferredLocation(hasResp1PreferLocation == YES
-                                                                                 ? DynamicList.builder()
-                                                       .listItems(List.of(location1))
-                                                       .value(location1).build() : null)
-                                                   .build())
-                             .gaRespondentDetails("1L").build()));
+                .add(element(GARespondentResponse.builder()
+                        .gaHearingDetails(GAHearingDetails.builder()
+                                .vulnerabilityQuestionsYesOrNo(vulQuestion1)
+                                .vulnerabilityQuestion("dummy1")
+                                .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
+                                .hearingDuration(GAHearingDuration.HOUR_1)
+                                .supportRequirement(respSupportReq1)
+                                .unavailableTrialRequiredYesOrNo(YES)
+                                .generalAppUnavailableDates(resp1UnavailabilityDates)
+                                .hearingPreferredLocation(hasResp1PreferLocation == YES
+                                        ? DynamicList.builder()
+                                        .listItems(List.of(location1))
+                                        .value(location1).build() : null)
+                                .build())
+                        .gaRespondentDetails("1L").build()));
         if (addRespondent == YES) {
             respondentsResponses
-                .add(element(GARespondentResponse.builder()
-                                 .gaHearingDetails(GAHearingDetails.builder()
-                                                       .vulnerabilityQuestionsYesOrNo(vulQuestion2)
-                                                       .vulnerabilityQuestion("dummy2")
-                                                       .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
-                                                       .hearingDuration(GAHearingDuration.MINUTES_30)
-                                                       .supportRequirement(respSupportReq2)
-                                                       .generalAppUnavailableDates(resp2UnavailabilityDates)
-                                                       .hearingPreferredLocation(hasResp2PreferLocation == YES
-                                                                                     ? DynamicList.builder()
-                                                           .listItems(List.of(location1))
-                                                           .value(location1).build() : null)
-                                                       .build())
-                                 .gaRespondentDetails("2L").build()));
+                    .add(element(GARespondentResponse.builder()
+                            .gaHearingDetails(GAHearingDetails.builder()
+                                    .vulnerabilityQuestionsYesOrNo(vulQuestion2)
+                                    .vulnerabilityQuestion("dummy2")
+                                    .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
+                                    .hearingDuration(GAHearingDuration.MINUTES_30)
+                                    .supportRequirement(respSupportReq2)
+                                    .generalAppUnavailableDates(resp2UnavailabilityDates)
+                                    .hearingPreferredLocation(hasResp2PreferLocation == YES
+                                            ? DynamicList.builder()
+                                            .listItems(List.of(location1))
+                                            .value(location1).build() : null)
+                                    .build())
+                            .gaRespondentDetails("2L").build()));
         }
         return respondentsResponses;
     }
 
     private CaseData getCase(List<Element<GASolicitorDetailsGAspec>> respondentSols,
-                                                 YesOrNo addRespondent) {
+                             YesOrNo addRespondent) {
         List<GeneralApplicationTypes> types = List.of(
-            (GeneralApplicationTypes.SUMMARY_JUDGEMENT));
+                (GeneralApplicationTypes.SUMMARY_JUDGEMENT));
         DynamicListElement location1 = DynamicListElement.builder()
-            .code(String.valueOf(UUID.randomUUID())).label("Site Name 2 - Address2 - 28000").build();
+                .code(String.valueOf(UUID.randomUUID())).label("Site Name 2 - Address2 - 28000").build();
         return CaseData.builder()
-            .claimant1PartyName("Test Claimant1 Name")
-            .defendant1PartyName("Test Defendant1 Name")
-            .ccdCaseReference(CHILD_CCD_REF)
-            .generalAppHearingDate(
-                GAHearingDateGAspec.builder()
-                    .hearingScheduledPreferenceYesNo(YES).hearingScheduledDate(LocalDate.now()).build())
-            .generalAppRespondentSolicitors(respondentSols)
-            .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(YES).build())
-            .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(NO).build())
-            .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YES).build())
-            .generalAppStatementOfTruth(GAStatementOfTruth.builder().build())
-            .generalAppHearingDetails(GAHearingDetails.builder()
-                                          .hearingPreferredLocation(DynamicList.builder()
-                                                                        .listItems(List.of(location1))
-                                                                        .value(location1).build())
-                                          .vulnerabilityQuestionsYesOrNo(YES)
-                                          .vulnerabilityQuestion("dummy2")
-                                          .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
-                                          .hearingDuration(GAHearingDuration.MINUTES_30)
-                                          .hearingDetailsEmailID(DUMMY_EMAIL)
-                                          .hearingDetailsTelephoneNumber(DUMMY_TELEPHONE_NUM).build())
-            .hearingDetailsResp(GAHearingDetails.builder()
-                                    .hearingPreferredLocation(
-                                        DynamicList.builder()
-                                            .listItems(List.of(location1))
-                                            .value(location1).build())
-                                    .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
-                                    .hearingDuration(GAHearingDuration.MINUTES_30)
-                                    .hearingDetailsEmailID(DUMMY_EMAIL)
-                                    .hearingDetailsTelephoneNumber(DUMMY_TELEPHONE_NUM)
-                                    .build())
-            .respondentsResponses(getRespondentResponses1nad2(YES, YES, YES, YES, addRespondent))
-            .generalAppRespondent1Representative(
-                GARespondentRepresentative.builder()
-                    .generalAppRespondent1Representative(YES)
-                    .build())
-            .generalAppType(
-                GAApplicationType
-                    .builder()
-                    .types(types).build())
-            .parentClaimantIsApplicant(YES)
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
-                                          .caseReference(PARENT_CCD_REF.toString()).build())
-            .build();
+                .claimant1PartyName("Test Claimant1 Name")
+                .defendant1PartyName("Test Defendant1 Name")
+                .ccdCaseReference(CHILD_CCD_REF)
+                .generalAppHearingDate(
+                        GAHearingDateGAspec.builder()
+                                .hearingScheduledPreferenceYesNo(YES).hearingScheduledDate(LocalDate.now()).build())
+                .generalAppRespondentSolicitors(respondentSols)
+                .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(YES).build())
+                .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(NO).build())
+                .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YES).build())
+                .generalAppStatementOfTruth(GAStatementOfTruth.builder().build())
+                .generalAppHearingDetails(GAHearingDetails.builder()
+                        .hearingPreferredLocation(DynamicList.builder()
+                                .listItems(List.of(location1))
+                                .value(location1).build())
+                        .vulnerabilityQuestionsYesOrNo(YES)
+                        .vulnerabilityQuestion("dummy2")
+                        .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
+                        .hearingDuration(GAHearingDuration.MINUTES_30)
+                        .hearingDetailsEmailID(DUMMY_EMAIL)
+                        .hearingDetailsTelephoneNumber(DUMMY_TELEPHONE_NUM).build())
+                .hearingDetailsResp(GAHearingDetails.builder()
+                        .hearingPreferredLocation(
+                                DynamicList.builder()
+                                        .listItems(List.of(location1))
+                                        .value(location1).build())
+                        .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
+                        .hearingDuration(GAHearingDuration.MINUTES_30)
+                        .hearingDetailsEmailID(DUMMY_EMAIL)
+                        .hearingDetailsTelephoneNumber(DUMMY_TELEPHONE_NUM)
+                        .build())
+                .respondentsResponses(getRespondentResponses1nad2(YES, YES, YES, YES, addRespondent))
+                .generalAppRespondent1Representative(
+                        GARespondentRepresentative.builder()
+                                .generalAppRespondent1Representative(YES)
+                                .build())
+                .generalAppType(
+                        GAApplicationType
+                                .builder()
+                                .types(types).build())
+                .parentClaimantIsApplicant(YES)
+                .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
+                        .caseReference(PARENT_CCD_REF.toString()).build())
+                .build();
     }
 
     private CaseData getSampleGeneralApplicationCaseData(YesOrNo isConsented, YesOrNo isTobeNotified) {
         return CaseDataBuilder.builder().buildCaseDateBaseOnGeneralApplication(
-                getGeneralApplication(isConsented, isTobeNotified))
-            .toBuilder()
-            .claimant1PartyName("Test Claimant1 Name")
-            .generalAppHearingDate(
-                GAHearingDateGAspec.builder()
-                    .hearingScheduledPreferenceYesNo(YES).hearingScheduledDate(LocalDate.now()).build())
-            .defendant1PartyName("Test Defendant1 Name")
-            .ccdCaseReference(CHILD_CCD_REF).build();
+                        getGeneralApplication(isConsented, isTobeNotified))
+                .toBuilder()
+                .claimant1PartyName("Test Claimant1 Name")
+                .generalAppHearingDate(
+                        GAHearingDateGAspec.builder()
+                                .hearingScheduledPreferenceYesNo(YES).hearingScheduledDate(LocalDate.now()).build())
+                .defendant1PartyName("Test Defendant1 Name")
+                .ccdCaseReference(CHILD_CCD_REF).build();
     }
 
     private CaseData getSampleGeneralAppCaseDataWithDeadLineReached(YesOrNo isConsented, YesOrNo isTobeNotified) {
         return CaseDataBuilder.builder().buildCaseDateBaseOnGeneralApplication(
-                getGeneralApplicationWithDeadlineReached(isConsented, isTobeNotified))
-            .toBuilder()
-            .claimant1PartyName("Test Claimant1 Name")
-            .generalAppHearingDate(
-                GAHearingDateGAspec.builder()
-                    .hearingScheduledPreferenceYesNo(YES).hearingScheduledDate(LocalDate.now()).build())
-            .defendant1PartyName("Test Defendant1 Name")
-            .ccdCaseReference(CHILD_CCD_REF).build();
+                        getGeneralApplicationWithDeadlineReached(isConsented, isTobeNotified))
+                .toBuilder()
+                .claimant1PartyName("Test Claimant1 Name")
+                .generalAppHearingDate(
+                        GAHearingDateGAspec.builder()
+                                .hearingScheduledPreferenceYesNo(YES).hearingScheduledDate(LocalDate.now()).build())
+                .defendant1PartyName("Test Defendant1 Name")
+                .ccdCaseReference(CHILD_CCD_REF).build();
     }
 
     private GeneralApplication getGeneralApplication(YesOrNo isConsented, YesOrNo isTobeNotified) {
         DynamicListElement location1 = DynamicListElement.builder()
-            .code(String.valueOf(UUID.randomUUID())).label("Site Name 2 - Address2 - 28000").build();
+                .code(String.valueOf(UUID.randomUUID())).label("Site Name 2 - Address2 - 28000").build();
         List<Element<GAUnavailabilityDates>> appUnavailabilityDates = new ArrayList<>();
         appUnavailabilityDates.add(element(GAUnavailabilityDates.builder()
-                                                 .unavailableTrialDateTo(LocalDate.now().plusDays(2))
-                                                 .unavailableTrialDateFrom(LocalDate.now()).build()));
+                .unavailableTrialDateTo(LocalDate.now().plusDays(2))
+                .unavailableTrialDateFrom(LocalDate.now()).build()));
         return GeneralApplication.builder()
-            .generalAppType(GAApplicationType.builder().types(List.of(RELIEF_FROM_SANCTIONS)).build())
-            .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(isConsented).build())
-            .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(isTobeNotified).build())
-            .generalAppPBADetails(
-                GAPbaDetails.builder()
-                    .fee(
-                        Fee.builder()
-                            .code("FE203")
-                            .calculatedAmountInPence(BigDecimal.valueOf(27500))
-                            .version("1")
-                            .build())
-                    .serviceReqReference(CUSTOMER_REFERENCE).build())
-            .generalAppDetailsOfOrder(STRING_CONSTANT)
-            .generalAppReasonsOfOrder(STRING_CONSTANT)
-            .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(NO).build())
-            .generalAppStatementOfTruth(GAStatementOfTruth.builder().build())
-            .generalAppHearingDetails(GAHearingDetails.builder()
-                                          .hearingPreferredLocation(DynamicList.builder()
-                                                                        .listItems(List.of(location1))
-                                                                        .value(location1).build())
-                                          .vulnerabilityQuestionsYesOrNo(YES)
-                                          .vulnerabilityQuestion("dummy2")
-                                          .generalAppUnavailableDates(appUnavailabilityDates)
-                                          .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
-                                          .hearingDuration(GAHearingDuration.MINUTES_30)
-                                          .hearingDetailsEmailID(DUMMY_EMAIL)
-                                          .hearingDetailsTelephoneNumber(DUMMY_TELEPHONE_NUM).build())
-            .generalAppRespondentSolicitors(wrapElements(GASolicitorDetailsGAspec.builder()
-                                                             .email("abc@gmail.com").build()))
-            .isMultiParty(NO)
-            .parentClaimantIsApplicant(YES)
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
-                                          .caseReference(PARENT_CCD_REF.toString()).build())
-            .build();
+                .generalAppType(GAApplicationType.builder().types(List.of(RELIEF_FROM_SANCTIONS)).build())
+                .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(isConsented).build())
+                .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(isTobeNotified).build())
+                .generalAppPBADetails(
+                        GAPbaDetails.builder()
+                                .fee(
+                                        Fee.builder()
+                                                .code("FE203")
+                                                .calculatedAmountInPence(BigDecimal.valueOf(27500))
+                                                .version("1")
+                                                .build())
+                                .serviceReqReference(CUSTOMER_REFERENCE).build())
+                .generalAppDetailsOfOrder(STRING_CONSTANT)
+                .generalAppReasonsOfOrder(STRING_CONSTANT)
+                .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(NO).build())
+                .generalAppStatementOfTruth(GAStatementOfTruth.builder().build())
+                .generalAppHearingDetails(GAHearingDetails.builder()
+                        .hearingPreferredLocation(DynamicList.builder()
+                                .listItems(List.of(location1))
+                                .value(location1).build())
+                        .vulnerabilityQuestionsYesOrNo(YES)
+                        .vulnerabilityQuestion("dummy2")
+                        .generalAppUnavailableDates(appUnavailabilityDates)
+                        .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
+                        .hearingDuration(GAHearingDuration.MINUTES_30)
+                        .hearingDetailsEmailID(DUMMY_EMAIL)
+                        .hearingDetailsTelephoneNumber(DUMMY_TELEPHONE_NUM).build())
+                .generalAppRespondentSolicitors(wrapElements(GASolicitorDetailsGAspec.builder()
+                        .email("abc@gmail.com").build()))
+                .isMultiParty(NO)
+                .parentClaimantIsApplicant(YES)
+                .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
+                        .caseReference(PARENT_CCD_REF.toString()).build())
+                .build();
     }
 
     private GeneralApplication getGeneralApplicationWithDeadlineReached(YesOrNo isConsented, YesOrNo isTobeNotified) {
         DynamicListElement location1 = DynamicListElement.builder()
-            .code(String.valueOf(UUID.randomUUID())).label("Site Name 2 - Address2 - 28000").build();
+                .code(String.valueOf(UUID.randomUUID())).label("Site Name 2 - Address2 - 28000").build();
         List<Element<GAUnavailabilityDates>> appUnavailabilityDates = new ArrayList<>();
         appUnavailabilityDates.add(element(GAUnavailabilityDates.builder()
-                                               .unavailableTrialDateTo(LocalDate.now().plusDays(2))
-                                               .unavailableTrialDateFrom(LocalDate.now()).build()));
+                .unavailableTrialDateTo(LocalDate.now().plusDays(2))
+                .unavailableTrialDateFrom(LocalDate.now()).build()));
         return GeneralApplication.builder()
-            .generalAppType(GAApplicationType.builder().types(List.of(RELIEF_FROM_SANCTIONS)).build())
-            .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(isConsented).build())
-            .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(isTobeNotified).build())
-            .generalAppHearingDate(
-                GAHearingDateGAspec.builder()
-                    .hearingScheduledPreferenceYesNo(YES).hearingScheduledDate(LocalDate.now()).build())
-            .generalAppPBADetails(
-                GAPbaDetails.builder()
-                    .fee(
-                        Fee.builder()
-                            .code("FE203")
-                            .calculatedAmountInPence(BigDecimal.valueOf(27500))
-                            .version("1")
-                            .build())
-                    .serviceReqReference(CUSTOMER_REFERENCE).build())
-            .generalAppDetailsOfOrder(STRING_CONSTANT)
-            .generalAppReasonsOfOrder(STRING_CONSTANT)
-            .generalAppDateDeadline(LocalDateTime.now().minusDays(2))
-            .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(NO).build())
-            .generalAppStatementOfTruth(GAStatementOfTruth.builder().build())
-            .generalAppHearingDetails(GAHearingDetails.builder()
-                                          .hearingPreferredLocation(DynamicList.builder()
-                                                                        .listItems(List.of(location1))
-                                                                        .value(location1).build())
-                                          .vulnerabilityQuestionsYesOrNo(YES)
-                                          .vulnerabilityQuestion("dummy2")
-                                          .generalAppUnavailableDates(appUnavailabilityDates)
-                                          .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
-                                          .hearingDuration(GAHearingDuration.MINUTES_30)
-                                          .hearingDetailsEmailID(DUMMY_EMAIL)
-                                          .hearingDetailsTelephoneNumber(DUMMY_TELEPHONE_NUM).build())
-            .generalAppRespondentSolicitors(wrapElements(GASolicitorDetailsGAspec.builder()
-                                                             .email("abc@gmail.com").build()))
-            .isMultiParty(NO)
-            .parentClaimantIsApplicant(YES)
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
-                                          .caseReference(PARENT_CCD_REF.toString()).build())
-            .build();
+                .generalAppType(GAApplicationType.builder().types(List.of(RELIEF_FROM_SANCTIONS)).build())
+                .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(isConsented).build())
+                .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(isTobeNotified).build())
+                .generalAppHearingDate(
+                        GAHearingDateGAspec.builder()
+                                .hearingScheduledPreferenceYesNo(YES).hearingScheduledDate(LocalDate.now()).build())
+                .generalAppPBADetails(
+                        GAPbaDetails.builder()
+                                .fee(
+                                        Fee.builder()
+                                                .code("FE203")
+                                                .calculatedAmountInPence(BigDecimal.valueOf(27500))
+                                                .version("1")
+                                                .build())
+                                .serviceReqReference(CUSTOMER_REFERENCE).build())
+                .generalAppDetailsOfOrder(STRING_CONSTANT)
+                .generalAppReasonsOfOrder(STRING_CONSTANT)
+                .generalAppDateDeadline(LocalDateTime.now().minusDays(2))
+                .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(NO).build())
+                .generalAppStatementOfTruth(GAStatementOfTruth.builder().build())
+                .generalAppHearingDetails(GAHearingDetails.builder()
+                        .hearingPreferredLocation(DynamicList.builder()
+                                .listItems(List.of(location1))
+                                .value(location1).build())
+                        .vulnerabilityQuestionsYesOrNo(YES)
+                        .vulnerabilityQuestion("dummy2")
+                        .generalAppUnavailableDates(appUnavailabilityDates)
+                        .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
+                        .hearingDuration(GAHearingDuration.MINUTES_30)
+                        .hearingDetailsEmailID(DUMMY_EMAIL)
+                        .hearingDetailsTelephoneNumber(DUMMY_TELEPHONE_NUM).build())
+                .generalAppRespondentSolicitors(wrapElements(GASolicitorDetailsGAspec.builder()
+                        .email("abc@gmail.com").build()))
+                .isMultiParty(NO)
+                .parentClaimantIsApplicant(YES)
+                .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
+                        .caseReference(PARENT_CCD_REF.toString()).build())
+                .build();
     }
 
     @Test
@@ -516,7 +516,7 @@ class GeneralApplicationDraftGeneratorTest extends BaseCallbackHandlerTest {
         CaseData caseData = getSampleGeneralApplicationCaseData(NO, YES);
         when(listGeneratorService.claimantsName(caseData)).thenReturn("Test Claimant1 Name");
         when(listGeneratorService.defendantsName(caseData))
-            .thenReturn("Test Defendant1 Name");
+                .thenReturn("Test Defendant1 Name");
 
         var templateData = generalApplicationDraftGenerator.getTemplateData(caseData);
 
@@ -525,19 +525,19 @@ class GeneralApplicationDraftGeneratorTest extends BaseCallbackHandlerTest {
 
     private void assertThatApplicantFieldsAreCorrect_DraftApp(GADraftForm templateData, CaseData caseData) {
         Assertions.assertAll(
-            "DraftApplication data should be as expected",
-            () -> assertEquals(templateData.getClaimNumber(), caseData.getCcdCaseReference().toString()),
-            () -> assertEquals(templateData.getClaimantName(), getClaimants(caseData)),
-            () -> assertEquals(templateData.getDefendantName(), getDefendants(caseData))
+                "DraftApplication data should be as expected",
+                () -> assertEquals(templateData.getClaimNumber(), caseData.getGeneralAppParentCaseLink().getCaseReference()),
+                () -> assertEquals(templateData.getClaimantName(), getClaimants(caseData)),
+                () -> assertEquals(templateData.getDefendantName(), getDefendants(caseData))
         );
     }
 
     private void assertThatRespondentFieldsAreCorrect_DraftApp(GADraftForm templateData, CaseData caseData) {
         Assertions.assertAll(
-            "DraftApplication data should be as expected",
-            () -> assertEquals(templateData.getClaimNumber(), caseData.getCcdCaseReference().toString()),
-            () -> assertEquals(templateData.getClaimantName(), getClaimants(caseData)),
-            () -> assertEquals(templateData.getDefendantName(), getDefendants(caseData))
+                "DraftApplication data should be as expected",
+                () -> assertEquals(templateData.getClaimNumber(), caseData.getGeneralAppParentCaseLink().getCaseReference()),
+                () -> assertEquals(templateData.getClaimantName(), getClaimants(caseData)),
+                () -> assertEquals(templateData.getDefendantName(), getDefendants(caseData))
         );
     }
 

@@ -69,7 +69,7 @@ public class RespondForInformationGeneratorTest {
     private void assertThatFieldsAreCorrect_RespondForInformation(JudgeDecisionPdfDocument templateData, CaseData caseData) {
         Assertions.assertAll(
                 "Respond For Information Document data should be as expected",
-                () -> assertEquals(templateData.getClaimNumber(), caseData.getCcdCaseReference().toString()),
+                () -> assertEquals(templateData.getClaimNumber(), caseData.getGeneralAppParentCaseLink().getCaseReference()),
                 () -> assertEquals(templateData.getClaimant1Name(), caseData.getClaimant1PartyName()),
                 () -> assertEquals(templateData.getDefendant1Name(), caseData.getDefendant1PartyName()),
                 () -> assertEquals(templateData.getJudgeNameTitle(), caseData.getApplicantPartyName()),

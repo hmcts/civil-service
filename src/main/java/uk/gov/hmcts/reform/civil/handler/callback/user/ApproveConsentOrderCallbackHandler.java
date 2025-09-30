@@ -57,7 +57,7 @@ public class ApproveConsentOrderCallbackHandler extends CallbackHandler {
 
     private CallbackResponse validateApplicationType(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?,?> caseDataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         List<GeneralApplicationTypes> validGATypes = List.of(STAY_THE_CLAIM);
         GAApproveConsentOrder.GAApproveConsentOrderBuilder gaApproveConsentOrderBuilder = GAApproveConsentOrder.builder();
         if (caseData.getGeneralAppDetailsOfOrder() != null) {
@@ -80,7 +80,7 @@ public class ApproveConsentOrderCallbackHandler extends CallbackHandler {
     private CallbackResponse populateConsentOrder(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<>();
-        CaseData.CaseDataBuilder<?,?> caseDataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         if (caseData.getApproveConsentOrder() != null
             && caseData.getApproveConsentOrder().getShowConsentOrderDate() != null
             && caseData.getApproveConsentOrder().getShowConsentOrderDate().equals(YesOrNo.YES)
@@ -106,7 +106,7 @@ public class ApproveConsentOrderCallbackHandler extends CallbackHandler {
 
     private CallbackResponse setBusinessProcess(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?,?> dataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> dataBuilder = caseData.toBuilder();
         dataBuilder.businessProcess(BusinessProcess.ready(APPROVE_CONSENT_ORDER)).build();
         log.info("Set business process to APPROVE_CONSENT_ORDER for caseId: {}", caseData.getCcdCaseReference());
         return AboutToStartOrSubmitCallbackResponse.builder()

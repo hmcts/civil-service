@@ -64,7 +64,6 @@ public class TranslatedDocumentUploadedApplicantNotificationHandler extends Call
         return EVENTS;
     }
 
-
     @Override
     public Map<String, String> addProperties(CaseData caseData, CaseData mainCaseData) {
         if (gaForLipService.isLipApp(caseData)) {

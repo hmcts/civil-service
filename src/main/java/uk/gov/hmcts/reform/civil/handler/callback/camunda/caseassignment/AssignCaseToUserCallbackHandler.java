@@ -74,10 +74,10 @@ public class AssignCaseToUserCallbackHandler extends CallbackHandler {
 
     private CallbackResponse assignOrgPolicy(CallbackParams callbackParams) {
         CaseData caseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetails());
-        List<String> errors = new ArrayList<>();
-        CaseData.CaseDataBuilder<?,?> caseDataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         String caseId = caseData.getCcdCaseReference().toString();
         log.info("CaseData in AssignCaseToUserCallbackHandler: {}", caseId);
+        List<String> errors = new ArrayList<>();
 
         if (caseData.getCcdState().equals(PENDING_APPLICATION_ISSUED)) {
             GASolicitorDetailsGAspec applicantSolicitor = caseData.getGeneralAppApplnSolicitor();

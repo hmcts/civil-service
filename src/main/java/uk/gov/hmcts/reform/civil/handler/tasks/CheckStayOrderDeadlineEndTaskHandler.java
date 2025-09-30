@@ -74,7 +74,6 @@ public class CheckStayOrderDeadlineEndTaskHandler extends BaseExternalTaskHandle
 
     }
 
-
     private void fireEventForStateChange(CaseData caseData) {
         Long caseId = caseData.getCcdCaseReference();
         log.info("Firing event END_SCHEDULER_CHECK_STAY_ORDER_DEADLINE to check applications with ORDER_MADE "

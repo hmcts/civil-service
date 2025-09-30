@@ -82,7 +82,7 @@ public class GeneralOrderGenerator implements TemplateDataGenerator<JudgeDecisio
                 .claimant2Name(caseData.getClaimant2PartyName() != null ? caseData.getClaimant2PartyName() : null)
                 .defendant1Name(caseData.getDefendant1PartyName())
                 .defendant2Name(caseData.getDefendant2PartyName() != null ? caseData.getDefendant2PartyName() : null)
-                .claimNumber(caseData.getCcdCaseReference().toString())
+                .claimNumber(caseData.getGeneralAppParentCaseLink().getCaseReference())
                 .courtName(docmosisService.getCaseManagementLocationVenueName(caseData, authorisation).getExternalShortName())
                 .siteName(caseData.getGaCaseManagementLocation().getSiteName())
                 .address(caseData.getGaCaseManagementLocation().getAddress())

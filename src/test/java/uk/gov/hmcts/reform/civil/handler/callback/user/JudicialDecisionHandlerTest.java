@@ -464,7 +464,7 @@ public class JudicialDecisionHandlerTest extends BaseCallbackHandlerTest {
                 (GeneralApplicationTypes.STAY_THE_CLAIM), (GeneralApplicationTypes.SUMMARY_JUDGEMENT));
 
             CaseData caseData = getHearingOrderApplnAndResp1and2(types, NO, YES, YES);
-            CaseData.CaseDataBuilder<?,?> builder = caseData.toBuilder();
+            CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
             builder.respondentsResponses(respondentsResponses);
             builder.generalAppHearingDetails(GAHearingDetails.builder()
                                                   .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
@@ -520,7 +520,7 @@ public class JudicialDecisionHandlerTest extends BaseCallbackHandlerTest {
                 (GeneralApplicationTypes.STAY_THE_CLAIM), (GeneralApplicationTypes.SUMMARY_JUDGEMENT));
 
             CaseData caseData = getHearingOrderApplnAndResp1and2(types, NO, YES, YES);
-            CaseData.CaseDataBuilder<?,?> builder = caseData.toBuilder();
+            CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
             builder.respondentsResponses(respondentsResponses);
 
             CallbackParams params = callbackParamsOf(builder.build(), ABOUT_TO_START);
@@ -565,7 +565,7 @@ public class JudicialDecisionHandlerTest extends BaseCallbackHandlerTest {
                 (GeneralApplicationTypes.STAY_THE_CLAIM), (GeneralApplicationTypes.SUMMARY_JUDGEMENT));
 
             CaseData caseData = getHearingOrderApplnAndResp1and2(types, NO, YES, YES);
-            CaseData.CaseDataBuilder<?,?> builder = caseData.toBuilder();
+            CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
             builder.respondentsResponses(respondentsResponses);
             builder.generalAppHearingDetails(GAHearingDetails.builder()
                                                  .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)

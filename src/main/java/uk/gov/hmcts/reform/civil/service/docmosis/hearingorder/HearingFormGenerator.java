@@ -82,7 +82,7 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
 
         CaseDetails parentCase = coreCaseDataService
                 .getCase(Long.parseLong(caseData.getGeneralAppParentCaseLink().getCaseReference()));
-        CaseData parentCaseData = caseDetailsConverter.toCaseData(parentCase);
+        CaseData parentCaseData = caseDetailsConverter.toCaseDataGA(parentCase);
         boolean claimant1exists = canViewClaimant(parentCaseData, caseData);
         boolean claimant2exists = claimant1exists && nonNull(caseData.getClaimant2PartyName());
         boolean defendant1exists = canViewResp(parentCaseData, caseData, "1");

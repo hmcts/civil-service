@@ -127,7 +127,7 @@ public class GeneratePDFDocumentCallbackHandler extends CallbackHandler {
 
         }
 
-        CaseData.CaseDataBuilder<?,?> caseDataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         CaseDocument decision = null;
         CaseDocument postJudgeOrderToLipApplicant = null;
         CaseDocument postJudgeOrderToLipRespondent = null;
@@ -658,7 +658,7 @@ public class GeneratePDFDocumentCallbackHandler extends CallbackHandler {
                 .build();
     }
 
-    private void setPreTranslationDocument(CaseData caseData, CaseData.CaseDataBuilder<?,?> caseDataBuilder,
+    private void setPreTranslationDocument(CaseData caseData, CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
                                            CaseDocument decision, PreTranslationGaDocumentType doctype) {
         List<Element<CaseDocument>> preTranslatedDocuments =
                 Optional.ofNullable(caseData.getPreTranslationGaDocuments())

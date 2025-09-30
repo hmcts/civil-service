@@ -439,7 +439,7 @@ public class UploadTranslatedDocumentServiceTest {
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.WRITTEN_REPS_RESPONSE_DOC)
             .build();
         //when
-        CaseData.CaseDataBuilder<?,?> builder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
         uploadTranslatedDocumentService.updateGADocumentsWithOriginalDocuments(builder);
 
         // Then
@@ -475,7 +475,7 @@ public class UploadTranslatedDocumentServiceTest {
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.WRITTEN_REPS_RESPONSE_DOC)
             .build();
         //when
-        CaseData.CaseDataBuilder<?,?> builder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
         uploadTranslatedDocumentService.updateGADocumentsWithOriginalDocuments(builder);
 
         // Then
@@ -511,7 +511,7 @@ public class UploadTranslatedDocumentServiceTest {
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.MORE_INFO_RESPONSE_DOC)
             .build();
         //when
-        CaseData.CaseDataBuilder<?,?> builder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
         uploadTranslatedDocumentService.updateGADocumentsWithOriginalDocuments(builder);
 
         // Then
@@ -547,7 +547,7 @@ public class UploadTranslatedDocumentServiceTest {
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.MORE_INFO_RESPONSE_DOC)
             .build();
         //when
-        CaseData.CaseDataBuilder<?,?> builder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
         uploadTranslatedDocumentService.updateGADocumentsWithOriginalDocuments(builder);
 
         // Then

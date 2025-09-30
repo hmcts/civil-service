@@ -62,30 +62,31 @@ public class UpdateGaLocationCallbackHandler extends CallbackHandler {
     private CallbackResponse updateCaseManagementLocation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+        String parentCaseReference = caseData.getGeneralAppParentCaseLink() != null
+                ? caseData.getGeneralAppParentCaseLink().getCaseReference() : caseData.getParentCaseReference();
         CaseData civilCaseData = caseDetailsConverter
-            .toCaseDataGA(coreCaseDataService
-                            .getCase(Long.parseLong(caseData.getGeneralAppParentCaseLink().getCaseReference())));
+                .toCaseDataGA(coreCaseDataService
+                        .getCase(Long.parseLong(parentCaseReference)));
         LocationRefData locationDetails = getWorkAllocationLocationDetails(civilCaseData.getGaCaseManagementLocation().getBaseLocation(),
-                                                                           authToken);
-
-        CaseData.CaseDataBuilder<?,?> caseDataBuilder = caseData.toBuilder();
+                authToken);
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         caseDataBuilder
-            .businessProcess(
-                BusinessProcess.builder()
-                    .camundaEvent(callbackParams.getRequest().getEventId())
-                    .status(BusinessProcessStatus.FINISHED)
-                    .build())
-            .isCcmccLocation(YesOrNo.NO)
-            .gaCaseManagementLocation(GACaseLocation.builder().baseLocation(civilCaseData.getGaCaseManagementLocation()
-                                                                              .getBaseLocation())
-                                        .region(civilCaseData.getGaCaseManagementLocation().getRegion())
-                                        .siteName(locationDetails.getSiteName())
-                                        .address(locationDetails.getCourtAddress())
-                                        .postcode(locationDetails.getPostcode())
-                                        .build())
-            .locationName(civilCaseData.getLocationName());
+                .businessProcess(
+                        BusinessProcess.builder()
+                                .camundaEvent(callbackParams.getRequest().getEventId())
+                                .status(BusinessProcessStatus.FINISHED)
+                                .build())
+                .isCcmccLocation(YesOrNo.NO)
+                .gaCaseManagementLocation(GACaseLocation.builder().baseLocation(civilCaseData.getGaCaseManagementLocation()
+                                .getBaseLocation())
+                        .region(civilCaseData.getGaCaseManagementLocation().getRegion())
+                        .siteName(locationDetails.getSiteName())
+                        .address(locationDetails.getCourtAddress())
+                        .postcode(locationDetails.getPostcode())
+                        .build())
+                .locationName(civilCaseData.getLocationName());
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
-            .build();
+                .data(caseDataBuilder.build().toMap(objectMapper))
+                .build();
     }
 }

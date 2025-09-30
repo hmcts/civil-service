@@ -111,7 +111,7 @@ class ConsentOrderGeneratorTest {
     private void assertThatFieldsAreCorrect_GeneralOrder(ConsentOrderForm templateData, CaseData caseData) {
         Assertions.assertAll(
             "ConsentOrderDocument data should be as expected",
-            () -> assertEquals(templateData.getClaimNumber(), caseData.getCcdCaseReference().toString()),
+            () -> assertEquals(templateData.getClaimNumber(), caseData.getGeneralAppParentCaseLink().getCaseReference()),
             () -> assertEquals(templateData.getClaimant1Name(), caseData.getClaimant1PartyName()),
             () -> assertEquals(YES, templateData.getIsMultiParty()),
             () -> assertEquals(templateData.getClaimant2Name(), caseData.getClaimant2PartyName()),
@@ -140,7 +140,7 @@ class ConsentOrderGeneratorTest {
     private void assertThatFieldsAreCorrect_GeneralOrder_1v1(ConsentOrderForm templateData, CaseData caseData) {
         Assertions.assertAll(
             "ConsentOrderDocument data should be as expected",
-            () -> assertEquals(templateData.getClaimNumber(), caseData.getCcdCaseReference().toString()),
+            () -> assertEquals(templateData.getClaimNumber(), caseData.getGeneralAppParentCaseLink().getCaseReference()),
             () -> assertEquals(templateData.getClaimant1Name(), caseData.getClaimant1PartyName()),
             () -> assertEquals(NO, templateData.getIsMultiParty()),
             () -> assertNull(templateData.getClaimant2Name()),

@@ -173,7 +173,7 @@ class WrittenRepresentationSequentialOrderGeneratorTest {
                                                                                 CaseData caseData) {
             Assertions.assertAll(
                     "Written Representation Sequential Document data should be as expected",
-                    () -> assertEquals(templateData.getClaimNumber(), caseData.getCcdCaseReference().toString()),
+                    () -> assertEquals(templateData.getClaimNumber(), caseData.getGeneralAppParentCaseLink().getCaseReference()),
                     () -> assertEquals(templateData.getJudgeNameTitle(), caseData.getJudgeTitle()),
                     () -> assertEquals(templateData.getClaimant1Name(), caseData.getClaimant1PartyName()),
                     () -> assertEquals(templateData.getClaimant2Name(), caseData.getClaimant2PartyName()),
@@ -222,7 +222,7 @@ class WrittenRepresentationSequentialOrderGeneratorTest {
                                                                                 CaseData caseData) {
             Assertions.assertAll(
                     "Written Representation Sequential Document data should be as expected",
-                    () -> assertEquals(templateData.getClaimNumber(), caseData.getCcdCaseReference().toString()),
+                    () -> assertEquals(templateData.getClaimNumber(), caseData.getGeneralAppParentCaseLink().getCaseReference()),
                     () -> assertEquals(templateData.getJudgeNameTitle(), caseData.getJudgeTitle()),
                     () -> assertEquals(templateData.getClaimant1Name(), caseData.getClaimant1PartyName()),
                     () -> assertEquals(templateData.getClaimant2Name(), caseData.getClaimant2PartyName()),
@@ -275,7 +275,7 @@ class WrittenRepresentationSequentialOrderGeneratorTest {
                                                                              CaseData caseData) {
             Assertions.assertAll(
                     "Written Representation Sequential Document data should be as expected",
-                    () -> assertEquals(templateData.getClaimNumber(), caseData.getCcdCaseReference().toString()),
+                    () -> assertEquals(templateData.getClaimNumber(), caseData.getGeneralAppParentCaseLink().getCaseReference()),
                     () -> assertEquals(templateData.getJudgeNameTitle(), caseData.getJudgeTitle()),
                     () -> assertEquals(templateData.getClaimant1Name(), caseData.getClaimant1PartyName()),
                     () -> assertEquals(templateData.getClaimant2Name(), caseData.getClaimant2PartyName()),
@@ -322,7 +322,7 @@ class WrittenRepresentationSequentialOrderGeneratorTest {
                                                                              CaseData caseData) {
             Assertions.assertAll(
                     "Written Representation Sequential Document data should be as expected",
-                    () -> assertEquals(templateData.getClaimNumber(), caseData.getCcdCaseReference().toString()),
+                    () -> assertEquals(templateData.getClaimNumber(), caseData.getGeneralAppParentCaseLink().getCaseReference()),
                     () -> assertEquals(templateData.getJudgeNameTitle(), caseData.getJudgeTitle()),
                     () -> assertEquals(templateData.getClaimant1Name(), caseData.getClaimant1PartyName()),
                     () -> assertEquals(templateData.getClaimant2Name(), caseData.getClaimant2PartyName()),
@@ -367,7 +367,7 @@ class WrittenRepresentationSequentialOrderGeneratorTest {
                                                                                  CaseData caseData) {
             Assertions.assertAll(
                     "Written Representation Sequential Document data should be as expected",
-                    () -> assertEquals(templateData.getClaimNumber(), caseData.getCcdCaseReference().toString()),
+                    () -> assertEquals(templateData.getClaimNumber(), caseData.getGeneralAppParentCaseLink().getCaseReference()),
                     () -> assertEquals(templateData.getJudgeNameTitle(), caseData.getJudgeTitle()),
                     () -> assertEquals(templateData.getClaimant1Name(), caseData.getClaimant1PartyName()),
                     () -> assertNull(templateData.getClaimant2Name()),

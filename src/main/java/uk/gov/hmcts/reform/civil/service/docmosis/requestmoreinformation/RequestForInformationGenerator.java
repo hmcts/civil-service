@@ -89,7 +89,7 @@ public class RequestForInformationGenerator implements TemplateDataGenerator<Jud
         LocationRefData courtLocation  = docmosisService.getCaseManagementLocationVenueName(caseData, authorisation);
         JudgeDecisionPdfDocument.JudgeDecisionPdfDocumentBuilder judgeDecisionPdfDocumentBuilder =
             JudgeDecisionPdfDocument.builder()
-                .claimNumber(caseData.getCcdCaseReference().toString())
+                .claimNumber(caseData.getGeneralAppParentCaseLink().getCaseReference())
                 .isMultiParty(caseData.getIsMultiParty())
                 .claimant1Name(caseData.getClaimant1PartyName())
                 .claimant2Name(caseData.getClaimant2PartyName() != null ? caseData.getClaimant2PartyName() : null)

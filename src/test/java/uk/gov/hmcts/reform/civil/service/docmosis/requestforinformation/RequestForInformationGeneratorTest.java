@@ -195,7 +195,7 @@ class RequestForInformationGeneratorTest {
                                                                       CaseData caseData) {
             Assertions.assertAll(
                 "Request For Information Document data should be as expected",
-                () -> assertEquals(templateData.getClaimNumber(), caseData.getCcdCaseReference().toString()),
+                () -> assertEquals(templateData.getClaimNumber(), caseData.getGeneralAppParentCaseLink().getCaseReference()),
                 () -> assertEquals(templateData.getClaimant1Name(), caseData.getClaimant1PartyName()),
                 () -> assertEquals(templateData.getClaimant2Name(), caseData.getClaimant2PartyName()),
                 () -> assertEquals(templateData.getDefendant1Name(), caseData.getDefendant1PartyName()),
@@ -239,7 +239,7 @@ class RequestForInformationGeneratorTest {
 
             Assertions.assertAll(
                 "Request For Information Document data should be as expected",
-                () -> assertEquals(templateData.getClaimNumber(), caseData.getCcdCaseReference().toString()),
+                () -> assertEquals(templateData.getClaimNumber(), caseData.getGeneralAppParentCaseLink().getCaseReference()),
                 () -> assertEquals(templateData.getClaimant1Name(), caseData.getClaimant1PartyName()),
                 () -> assertEquals(templateData.getCourtName(), "Manchester"),
                 () -> assertEquals(templateData.getDefendant1Name(), caseData.getDefendant1PartyName()),
@@ -278,7 +278,7 @@ class RequestForInformationGeneratorTest {
                                                                       CaseData caseData) {
             Assertions.assertAll(
                 "Request For Information Document data should be as expected",
-                () -> assertEquals(templateData.getClaimNumber(), caseData.getCcdCaseReference().toString()),
+                () -> assertEquals(templateData.getClaimNumber(), caseData.getGeneralAppParentCaseLink().getCaseReference()),
                 () -> assertEquals(templateData.getClaimant1Name(), caseData.getClaimant1PartyName()),
                 () -> assertEquals(templateData.getClaimant2Name(), caseData.getClaimant2PartyName()),
                 () -> assertEquals(templateData.getDefendant1Name(), caseData.getDefendant1PartyName()),
@@ -315,7 +315,7 @@ class RequestForInformationGeneratorTest {
                                                                       CaseData caseData) {
             Assertions.assertAll(
                 "Request For Information Document data should be as expected",
-                () -> assertEquals(templateData.getClaimNumber(), caseData.getCcdCaseReference().toString()),
+                () -> assertEquals(templateData.getClaimNumber(), caseData.getGeneralAppParentCaseLink().getCaseReference()),
                 () -> assertEquals(templateData.getClaimant1Name(), caseData.getClaimant1PartyName()),
                 () -> assertNull(templateData.getClaimant2Name()),
                 () -> assertEquals(NO, templateData.getIsMultiParty()),
@@ -347,7 +347,7 @@ class RequestForInformationGeneratorTest {
 
             Assertions.assertAll(
                 "Request For Information Document data should be as expected",
-                () -> assertEquals(templateData.getClaimNumber(), caseData.getCcdCaseReference().toString()),
+                () -> assertEquals(templateData.getClaimNumber(), caseData.getGeneralAppParentCaseLink().getCaseReference()),
                 () -> assertEquals(templateData.getClaimant1Name(), caseData.getClaimant1PartyName()),
                 () -> assertEquals(templateData.getCourtName(), "Manchester"),
                 () -> assertEquals(templateData.getDefendant1Name(), caseData.getDefendant1PartyName()),
@@ -378,7 +378,7 @@ class RequestForInformationGeneratorTest {
 
             Assertions.assertAll(
                 "Request For Information Document data should be as expected",
-                () -> assertEquals(templateData.getClaimNumber(), caseData.getCcdCaseReference().toString()),
+                () -> assertEquals(templateData.getClaimNumber(), caseData.getGeneralAppParentCaseLink().getCaseReference()),
                 () -> assertEquals(templateData.getClaimant1Name(), caseData.getClaimant1PartyName()),
                 () -> assertEquals(templateData.getCourtName(), "Manchester"),
                 () -> assertEquals(templateData.getCourtNameCy(), "Manceinion"),
@@ -411,7 +411,7 @@ class RequestForInformationGeneratorTest {
 
             Assertions.assertAll(
                 "Request For Information Document data should be as expected",
-                () -> assertEquals(templateData.getClaimNumber(), caseData.getCcdCaseReference().toString()),
+                () -> assertEquals(templateData.getClaimNumber(), caseData.getGeneralAppParentCaseLink().getCaseReference()),
                 () -> assertEquals(templateData.getClaimant1Name(), caseData.getClaimant1PartyName()),
                 () -> assertEquals(templateData.getCourtName(), "Manchester"),
                 () -> assertEquals(templateData.getCourtNameCy(), "Manchester"),

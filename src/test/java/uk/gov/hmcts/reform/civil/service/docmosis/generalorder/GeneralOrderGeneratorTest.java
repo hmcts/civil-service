@@ -155,7 +155,7 @@ class GeneralOrderGeneratorTest {
         private void assertThatFieldsAreCorrect_GeneralOrder(JudgeDecisionPdfDocument templateData, CaseData caseData) {
             Assertions.assertAll(
                 "GeneralOrderDocument data should be as expected",
-                () -> assertEquals(templateData.getClaimNumber(), caseData.getCcdCaseReference().toString()),
+                () -> assertEquals(templateData.getClaimNumber(), caseData.getGeneralAppParentCaseLink().getCaseReference()),
                 () -> assertEquals(templateData.getJudgeNameTitle(), caseData.getJudgeTitle()),
                 () -> assertEquals(templateData.getClaimant1Name(), caseData.getClaimant1PartyName()),
                 () -> assertEquals(templateData.getClaimant2Name(), caseData.getClaimant2PartyName()),
@@ -206,7 +206,7 @@ class GeneralOrderGeneratorTest {
         private void assertThatFieldsAreCorrect_GeneralOrder(JudgeDecisionPdfDocument templateData, CaseData caseData) {
             Assertions.assertAll(
                 "GeneralOrderDocument data should be as expected",
-                () -> assertEquals(templateData.getClaimNumber(), caseData.getCcdCaseReference().toString()),
+                () -> assertEquals(templateData.getClaimNumber(), caseData.getGeneralAppParentCaseLink().getCaseReference()),
                 () -> assertEquals(templateData.getJudgeNameTitle(), caseData.getJudgeTitle()),
                 () -> assertEquals(templateData.getClaimant1Name(), caseData.getClaimant1PartyName()),
                 () -> assertEquals(templateData.getClaimant2Name(), caseData.getClaimant2PartyName()),
@@ -251,7 +251,7 @@ class GeneralOrderGeneratorTest {
         private void assertThatFieldsAreCorrect_GeneralOrder_1v1(JudgeDecisionPdfDocument templateData, CaseData caseData) {
             Assertions.assertAll(
                 "GeneralOrderDocument data should be as expected",
-                () -> assertEquals(templateData.getClaimNumber(), caseData.getCcdCaseReference().toString()),
+                () -> assertEquals(templateData.getClaimNumber(), caseData.getGeneralAppParentCaseLink().getCaseReference()),
                 () -> assertEquals(templateData.getJudgeNameTitle(), caseData.getJudgeTitle()),
                 () -> assertEquals(templateData.getClaimant1Name(), caseData.getClaimant1PartyName()),
                 () -> assertNull(templateData.getClaimant2Name()),
@@ -299,7 +299,7 @@ class GeneralOrderGeneratorTest {
                                                                      CaseData caseData) {
             Assertions.assertAll(
                 "GeneralOrderDocument data should be as expected",
-                () -> assertEquals(templateData.getClaimNumber(), caseData.getCcdCaseReference().toString()),
+                () -> assertEquals(templateData.getClaimNumber(), caseData.getGeneralAppParentCaseLink().getCaseReference()),
                 () -> assertEquals(templateData.getJudgeNameTitle(), caseData.getJudgeTitle()),
                 () -> assertEquals(templateData.getClaimant1Name(), caseData.getClaimant1PartyName()),
                 () -> assertEquals(templateData.getClaimant2Name(), caseData.getClaimant2PartyName()),
@@ -357,7 +357,7 @@ class GeneralOrderGeneratorTest {
                                                                      CaseData caseData) {
             Assertions.assertAll(
                 "GeneralOrderDocument data should be as expected",
-                () -> assertEquals(templateData.getClaimNumber(), caseData.getCcdCaseReference().toString()),
+                () -> assertEquals(templateData.getClaimNumber(), caseData.getGeneralAppParentCaseLink().getCaseReference()),
                 () -> assertEquals(templateData.getJudgeNameTitle(), caseData.getJudgeTitle()),
                 () -> assertEquals(templateData.getCourtName(), "Manchester"),
                 () -> assertEquals(templateData.getClaimant1Name(), caseData.getClaimant1PartyName()),

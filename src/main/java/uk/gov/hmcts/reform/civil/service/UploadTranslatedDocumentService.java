@@ -51,9 +51,9 @@ public class UploadTranslatedDocumentService {
     private final DocUploadDashboardNotificationService docUploadDashboardNotificationService;
     private final DeadlinesCalculator deadlinesCalculator;
 
-    public CaseData.CaseDataBuilder<?,?> processTranslatedDocument(CaseData caseData, String translator) {
+    public CaseData.CaseDataBuilder<?, ?> processTranslatedDocument(CaseData caseData, String translator) {
         List<Element<TranslatedDocument>> translatedDocuments = caseData.getTranslatedDocumentsGA();
-        CaseData.CaseDataBuilder<?,?> caseDataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         if (Objects.nonNull(translatedDocuments)) {
             Map<DocumentType, List<Element<CaseDocument>>>
@@ -118,7 +118,7 @@ public class UploadTranslatedDocumentService {
         };
     }
 
-    private void updateCaseDataBuilderByType(CaseData caseData, CaseData.CaseDataBuilder<?,?> caseDataBuilder,
+    private void updateCaseDataBuilderByType(CaseData caseData, CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
                                              DocumentType documentType,
                                              List<Element<CaseDocument>> documents) {
         switch (documentType) {
@@ -167,7 +167,7 @@ public class UploadTranslatedDocumentService {
         }
     }
 
-    public void updateGADocumentsWithOriginalDocuments(CaseData.CaseDataBuilder<?,?> caseDataBuilder) {
+    public void updateGADocumentsWithOriginalDocuments(CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
         List<Element<CaseDocument>> bulkPrintOriginalDocuments = newArrayList();
         List<Element<TranslatedDocument>> translatedDocuments = caseDataBuilder.build().getTranslatedDocumentsGA();
         List<Element<CaseDocument>> preTranslationGaDocuments = caseDataBuilder.build().getPreTranslationGaDocuments();

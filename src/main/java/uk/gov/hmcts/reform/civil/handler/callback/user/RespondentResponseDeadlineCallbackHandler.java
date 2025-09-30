@@ -51,7 +51,7 @@ public class RespondentResponseDeadlineCallbackHandler extends CallbackHandler {
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         CaseData caseData = callbackParams.getCaseData().toBuilder()
                 .build();
-        CaseData.CaseDataBuilder<?,?> caseDataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.respondentResponseDeadlineChecked(YesOrNo.YES);
         HashMap<String, Object> paramsMap = mapper.mapCaseDataToParams(caseData);
         dashboardApiClient.recordScenario(callbackParams.getRequest().getCaseDetails().getId().toString(),

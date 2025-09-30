@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.civil.enums.dq.LengthOfHearing;
 import uk.gov.hmcts.reform.civil.enums.dq.OrderMadeOnTypes;
 import uk.gov.hmcts.reform.civil.enums.dq.PermissionToAppealTypes;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.GeneralAppParentCaseLink;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
@@ -2185,6 +2186,7 @@ class AssistedOrderFormGeneratorTest {
         appealShowOption.add(FinalOrderShowToggle.SHOW);
         return CaseData.builder()
             .ccdCaseReference(1644495739087775L)
+            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("1644495739087775").build())
             .claimant1PartyName("ClaimantName")
             .defendant1PartyName("defendant1PartyName")
             .claimant2PartyName("Test Claimant2 Name")
@@ -2194,7 +2196,7 @@ class AssistedOrderFormGeneratorTest {
             .gaCaseManagementLocation(GACaseLocation.builder().siteName("testing")
                                         .address("london court")
                                         .postcode("BA 117").build())
-            .assistedOrderMadeSelection(YesOrNo.YES)
+            .assistedOrderMadeSelection(YES)
             .assistedOrderMadeDateHeardDetails(AssistedOrderMadeDateHeardDetails.builder().singleDateSelection(
                 AssistedOrderDateHeard.builder().singleDate(LocalDate.now()).build()).build())
             .assistedOrderJudgeHeardFrom(judgeHeardFromShowOption)
@@ -2210,7 +2212,7 @@ class AssistedOrderFormGeneratorTest {
                                                   .assistedOrderCostsMakeAnOrderTopList(
                                                       AssistedOrderCostDropdownList.COSTS)
                                                   .assistedOrderCostsFirstDropdownAmount(BigDecimal.valueOf(78900)).build())
-            .publicFundingCostsProtection(YesOrNo.YES)
+            .publicFundingCostsProtection(YES)
             .assistedOrderFurtherHearingToggle(furtherHearingShowOption)
             .assistedOrderFurtherHearingDetails(AssistedOrderFurtherHearingDetails.builder()
                                                     .listFromDate(LocalDate.now().minusDays(5))
@@ -2218,7 +2220,7 @@ class AssistedOrderFormGeneratorTest {
                                                     .lengthOfHearingOther(HearingLength.builder().lengthListOtherDays(2)
                                                                               .lengthListOtherHours(5)
                                                                               .lengthListOtherMinutes(30).build())
-                                                    .datesToAvoid(YesOrNo.NO)
+                                                    .datesToAvoid(NO)
                                                     .hearingLocationList(DynamicList.builder().value(
                                                         DynamicListElement.builder().label("Other location").build()).build())
                                                     .alternativeHearingLocation(DynamicList.builder().value(
@@ -2240,7 +2242,7 @@ class AssistedOrderFormGeneratorTest {
                                           .detailText(TEST_TEXT)
                                           .date(LocalDate.now())
                                           .build())
-            .assistedOrderGiveReasonsYesNo(YesOrNo.YES)
+            .assistedOrderGiveReasonsYesNo(YES)
             .assistedOrderGiveReasonsDetails(AssistedOrderGiveReasonsDetails
                                                  .builder()
                                                  .reasonsText(TEST_TEXT)

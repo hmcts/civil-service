@@ -54,7 +54,7 @@ public class RespondForInformationGenerator implements TemplateDataGenerator<Jud
 
         JudgeDecisionPdfDocument.JudgeDecisionPdfDocumentBuilder judgeDecisionPdfDocumentBuilder =
                 JudgeDecisionPdfDocument.builder()
-                        .claimNumber(caseData.getCcdCaseReference().toString())
+                        .claimNumber(caseData.getGeneralAppParentCaseLink().getCaseReference())
                         .claimant1Name(caseData.getClaimant1PartyName())
                         .defendant1Name(caseData.getDefendant1PartyName())
                         .judgeComments(caseData.getGeneralAppAddlnInfoText())

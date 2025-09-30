@@ -83,7 +83,6 @@ public class WaitCivilDocUpdatedTaskHandler extends BaseExternalTaskHandler {
         return ExternalTaskData.builder().build();
     }
 
-
     private Map<String, Object> getUpdatedCaseData(CaseData gaCaseData) {
         Map<String, Object> output = gaCaseData.toMap(mapper);
         List<Element<CaseDocument>> updatedDocuments = newArrayList();

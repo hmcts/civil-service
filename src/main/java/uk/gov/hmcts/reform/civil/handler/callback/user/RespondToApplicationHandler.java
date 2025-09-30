@@ -318,7 +318,7 @@ public class RespondToApplicationHandler extends CallbackHandler {
     private CallbackResponse submitClaim(CallbackParams callbackParams) {
 
         CaseData caseData = caseDetailsConverter.toCaseDataGA(callbackParams.getRequest().getCaseDetails());
-        CaseData.CaseDataBuilder<?,?> caseDataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         UserInfo userInfo = idamClient.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
         String userId = userInfo.getUid();

@@ -52,7 +52,7 @@ public class RespondToWrittenRepresentationGenerator implements TemplateDataGene
 
         JudgeDecisionPdfDocument.JudgeDecisionPdfDocumentBuilder respondToWrittenRepDocumentBuilder =
             JudgeDecisionPdfDocument.builder()
-                .claimNumber(caseData.getCcdCaseReference().toString())
+                .claimNumber(caseData.getGeneralAppParentCaseLink().getCaseReference())
                 .claimant1Name(caseData.getClaimant1PartyName())
                 .defendant1Name(caseData.getDefendant1PartyName())
                 .judgeComments(caseData.getGeneralAppWrittenRepText())

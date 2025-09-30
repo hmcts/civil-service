@@ -738,7 +738,7 @@ class ParentCaseUpdateHelperTest {
     }
 
     private CaseData getGaVaryCaseData(String role, CaseState state, YesOrNo isMultiparty) {
-        CaseData.CaseDataBuilder<?,?> builder = CaseData.builder();
+        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
         builder.generalAppType(GAApplicationType.builder()
                 .types(List.of(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT)).build())
                 .ccdCaseReference(CaseDataBuilder.CASE_ID)
@@ -787,7 +787,7 @@ class ParentCaseUpdateHelperTest {
     }
 
     private CaseData getGaVaryCaseDataForAddlDoc(String role, CaseState state, YesOrNo isMultiparty) {
-        CaseData.CaseDataBuilder<?,?> builder = CaseData.builder();
+        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
         builder.generalAppType(GAApplicationType.builder()
                                    .types(List.of(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT)).build())
             .ccdCaseReference(CaseDataBuilder.CASE_ID)
@@ -843,7 +843,7 @@ class ParentCaseUpdateHelperTest {
 
     private CaseData getGaVaryCaseDataForCollection(String role, CaseState state, YesOrNo isMultiparty,
                                                     YesOrNo hasAgreed, YesOrNo isWithNotice) {
-        CaseData.CaseDataBuilder<?,?> builder = CaseData.builder();
+        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
         builder.generalAppType(GAApplicationType.builder()
                                    .types(List.of(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT)).build())
             .ccdCaseReference(CaseDataBuilder.CASE_ID)
@@ -889,7 +889,7 @@ class ParentCaseUpdateHelperTest {
     }
 
     private CaseData getVaryMainCaseData(String role) {
-        CaseData.CaseDataBuilder<?,?> builder = CaseData.builder();
+        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
 
         GeneralApplication generalApplication = GeneralApplication
                 .builder()
@@ -959,7 +959,7 @@ class ParentCaseUpdateHelperTest {
     }
 
     private CaseData getVaryMainCaseDataForCollectionBeforePayment(String role) {
-        CaseData.CaseDataBuilder<?,?> builder = CaseData.builder();
+        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
 
         GeneralApplication generalApplication = GeneralApplication
             .builder()
@@ -1026,7 +1026,7 @@ class ParentCaseUpdateHelperTest {
     }
 
     private CaseData getVaryMainCaseDataForCollectionAfterPayment(String role) {
-        CaseData.CaseDataBuilder<?,?> builder = CaseData.builder();
+        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
 
         GeneralApplication generalApplication = GeneralApplication
             .builder()
@@ -1093,7 +1093,7 @@ class ParentCaseUpdateHelperTest {
     }
 
     private CaseData getVaryMainCaseDataFor1V2SameSol_DefendantInitiateGA(String role) {
-        CaseData.CaseDataBuilder<?,?> builder = CaseData.builder();
+        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
 
         List<Element<GeneralApplicationsDetails>> generalApplicationsDetailsList = Lists.newArrayList();
 
@@ -1133,7 +1133,7 @@ class ParentCaseUpdateHelperTest {
     }
 
     private CaseData getCollectionsWithTwoExistingElements() {
-        CaseData.CaseDataBuilder<?,?> builder = CaseData.builder();
+        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
 
         // Claimant Collection with one element
         GeneralApplication generalApplication01 = GeneralApplication

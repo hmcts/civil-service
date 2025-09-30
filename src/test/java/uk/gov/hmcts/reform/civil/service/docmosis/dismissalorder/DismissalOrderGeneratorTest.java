@@ -132,7 +132,7 @@ class DismissalOrderGeneratorTest {
                                                                CaseData caseData) {
             Assertions.assertAll(
                 "Dismissal Order Document data should be as expected",
-                () -> assertEquals(templateData.getClaimNumber(), caseData.getCcdCaseReference().toString()),
+                    () -> assertEquals(templateData.getClaimNumber(), caseData.getGeneralAppParentCaseLink().getCaseReference()),
                 () -> assertEquals(templateData.getJudgeNameTitle(), caseData.getJudgeTitle()),
                 () -> assertEquals(templateData.getClaimant1Name(), caseData.getClaimant1PartyName()),
                 () -> assertEquals(templateData.getClaimant2Name(), caseData.getClaimant2PartyName()),
@@ -172,7 +172,7 @@ class DismissalOrderGeneratorTest {
                                                                CaseData caseData) {
             Assertions.assertAll(
                 "Dismissal Order Document data should be as expected",
-                () -> assertEquals(templateData.getClaimNumber(), caseData.getCcdCaseReference().toString()),
+                    () -> assertEquals(templateData.getClaimNumber(), caseData.getGeneralAppParentCaseLink().getCaseReference()),
                 () -> assertEquals(templateData.getJudgeNameTitle(), caseData.getJudgeTitle()),
                 () -> assertEquals(templateData.getClaimant1Name(), caseData.getClaimant1PartyName()),
                 () -> assertNull(templateData.getClaimant2Name()),
@@ -226,7 +226,7 @@ class DismissalOrderGeneratorTest {
                                                                CaseData caseData) {
             Assertions.assertAll(
                 "Dismissal Order Document data should be as expected",
-                () -> assertEquals(templateData.getClaimNumber(), caseData.getCcdCaseReference().toString()),
+                    () -> assertEquals(templateData.getClaimNumber(), caseData.getGeneralAppParentCaseLink().getCaseReference()),
                 () -> assertEquals(templateData.getClaimant1Name(), caseData.getClaimant1PartyName()),
                 () -> assertEquals(templateData.getClaimant2Name(), caseData.getClaimant2PartyName()),
                 () -> assertEquals(templateData.getDefendant1Name(), caseData.getDefendant1PartyName()),
@@ -276,7 +276,7 @@ class DismissalOrderGeneratorTest {
                                                                CaseData caseData) {
             Assertions.assertAll(
                 "Dismissal Order Document data should be as expected",
-                () -> assertEquals(templateData.getClaimNumber(), caseData.getCcdCaseReference().toString()),
+                    () -> assertEquals(templateData.getClaimNumber(), caseData.getGeneralAppParentCaseLink().getCaseReference()),
                 () -> assertEquals(templateData.getClaimant1Name(), caseData.getClaimant1PartyName()),
                 () -> assertEquals(templateData.getClaimant2Name(), caseData.getClaimant2PartyName()),
                 () -> assertEquals(templateData.getDefendant1Name(), caseData.getDefendant1PartyName()),
@@ -369,7 +369,7 @@ class DismissalOrderGeneratorTest {
                                                                    CaseData caseData) {
             Assertions.assertAll(
                 "Dismissal Order Document data should be as expected",
-                () -> assertEquals(templateData.getClaimNumber(), caseData.getCcdCaseReference().toString()),
+                    () -> assertEquals(templateData.getClaimNumber(), caseData.getGeneralAppParentCaseLink().getCaseReference()),
                 () -> assertEquals(templateData.getJudgeNameTitle(), caseData.getJudgeTitle()),
                 () -> assertEquals(templateData.getClaimant1Name(), caseData.getClaimant1PartyName()),
                 () -> assertNull(templateData.getClaimant2Name()),

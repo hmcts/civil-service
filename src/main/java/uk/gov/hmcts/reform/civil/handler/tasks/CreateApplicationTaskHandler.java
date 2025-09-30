@@ -86,8 +86,6 @@ public class CreateApplicationTaskHandler extends BaseExternalTaskHandler {
                 generalApplication = updateParentCaseGeneralApplication(variables, generalApplication, generalAppCaseData);
 
                 caseData = withoutNoticeNoConsent(generalApplication, caseData, generalAppCaseData);
-
-
             }
         }
 

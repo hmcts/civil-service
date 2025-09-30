@@ -64,7 +64,7 @@ public class GeneralApplicationDraftGenerator implements TemplateDataGenerator<G
 
         GADraftForm.GADraftFormBuilder gaDraftFormBuilder =
             GADraftForm.builder()
-                .claimNumber(caseData.getCcdCaseReference().toString())
+                .claimNumber(caseData.getGeneralAppParentCaseLink().getCaseReference())
                 .claimantName(claimantName)
                 .defendantName(defendantName)
                 .claimantReference(getReference(civilMainCase, "applicantSolicitor1Reference"))

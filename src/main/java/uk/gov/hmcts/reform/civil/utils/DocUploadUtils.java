@@ -6,6 +6,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -28,7 +29,7 @@ public class DocUploadUtils {
 
     }
 
-    public static void addUploadDocumentByTypeToAddl(CaseData caseData, CaseData.CaseDataBuilder<?,?> caseDataBuilder,
+    public static void addUploadDocumentByTypeToAddl(CaseData caseData, CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
                                                      List<Element<UploadDocumentByType>> source, String role,
                                                      boolean updateScheduler) {
         caseDataBuilder.isDocumentVisible(DocUploadUtils.isDocumentVisible(caseData));
@@ -49,7 +50,7 @@ public class DocUploadUtils {
                 .toList();
     }
 
-    public static void addDocumentToAddl(CaseData caseData, CaseData.CaseDataBuilder<?,?> caseDataBuilder,
+    public static void addDocumentToAddl(CaseData caseData, CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
                                          List<Element<Document>> source, String role, CaseEvent event,
                                          boolean updateScheduler) {
         if (Objects.isNull(source) || source.isEmpty()) {
@@ -60,7 +61,7 @@ public class DocUploadUtils {
         addToAddl(caseData, caseDataBuilder, docs, role, updateScheduler);
     }
 
-    public static void addToAddl(CaseData caseData, CaseData.CaseDataBuilder<?,?> caseDataBuilder,
+    public static void addToAddl(CaseData caseData, CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
                                  List<Element<CaseDocument>> tobeAdded, String role,
                                  boolean updateScheduler) {
         if (role.equals(DocUploadUtils.APPLICANT)) {
@@ -83,7 +84,7 @@ public class DocUploadUtils {
         caseDataBuilder.gaAddlDocStaff(addDocuments(tobeAdded, caseData.getGaAddlDocStaff()));
     }
 
-    public static void addDocumentToPreTranslation(CaseData caseData, CaseData.CaseDataBuilder<?,?> caseDataBuilder,
+    public static void addDocumentToPreTranslation(CaseData caseData, CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
                                                    List<Element<Document>> source, String role, CaseEvent event) {
         if (Objects.isNull(source) || source.isEmpty()) {
             return;
@@ -144,18 +145,32 @@ public class DocUploadUtils {
         if (Objects.isNull(source)) {
             return null;
         }
-        String documentType = getDocumentType(event);
+        DocumentType documentType = getDocumentType(event);
+        String documentName = getDocumentName(event);
         return source.stream()
                 .map(doc -> ElementUtils.element(CaseDocument.builder()
                         .documentLink(doc.getValue().toBuilder()
                                 .categoryID(AssignCategoryId.APPLICATIONS).build())
-                        .documentName(documentType)
+                        .documentName(documentName)
+                        .documentType(documentType)
                         .createdBy(role)
                         .createdDatetime(LocalDateTime.now()).build()))
                 .toList();
     }
 
-    public static String getDocumentType(CaseEvent event) {
+    public static DocumentType getDocumentType(CaseEvent event) {
+        switch (event) {
+
+            case RESPOND_TO_JUDGE_ADDITIONAL_INFO:
+                return DocumentType.REQUEST_FOR_INFORMATION;
+            case RESPOND_TO_JUDGE_WRITTEN_REPRESENTATION:
+                return DocumentType.WRITTEN_REPRESENTATION_SEQUENTIAL;
+            default:
+                return null;
+        }
+    }
+
+    public static String getDocumentName(CaseEvent event) {
         switch (event) {
             case INITIATE_GENERAL_APPLICATION:
                 return "Supporting evidence";
@@ -186,7 +201,7 @@ public class DocUploadUtils {
         return Objects.nonNull(caseData.getIsGaRespondentOneLip()) && caseData.getIsGaRespondentOneLip().equals(YES);
     }
 
-    public static void setRespondedValues(CaseData.CaseDataBuilder<?,?> caseDataBuilder, String role) {
+    public static void setRespondedValues(CaseData.CaseDataBuilder<?, ?> caseDataBuilder, String role) {
         if (role.equals(DocUploadUtils.APPLICANT)) {
             caseDataBuilder.isApplicantResponded(YES);
             caseDataBuilder.isRespondentResponded(null);

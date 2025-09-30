@@ -68,7 +68,7 @@ public class AdditionalFeeValueCallbackHandler extends CallbackHandler {
                 .orElse(null);
             GAPbaDetails generalAppPBADetails = caseData.getGeneralAppPBADetails()
                 .toBuilder().fee(feeForGA).build();
-            CaseData.CaseDataBuilder<?,?> builder = caseData.toBuilder();
+            CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
             builder.generalAppPBADetails(generalAppPBADetails);
             if (featureToggleService.isGaForLipsEnabled() && caseData.getIsGaApplicantLip() == YesOrNo.YES) {
                 builder.applicationFeeAmountInPence(applicationFee);

@@ -6,6 +6,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -186,7 +187,17 @@ public class DocUploadUtilsTest {
         "RESPOND_TO_APPLICATION,Respond evidence",
         "LINK_GENERAL_APPLICATION_CASE_TO_PARENT_CASE,Unsupported event"
     })
-    public void should_getDocumentType(String event, String name) {
+    public void should_getDocumentName(String event, String name) {
+        CaseEvent caseEvent = CaseEvent.valueOf(event);
+        assertThat(DocUploadUtils.getDocumentName(caseEvent)).isEqualTo(name);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "RESPOND_TO_JUDGE_ADDITIONAL_INFO,REQUEST_FOR_INFORMATION",
+            "RESPOND_TO_JUDGE_WRITTEN_REPRESENTATION,WRITTEN_REPRESENTATION_SEQUENTIAL"
+    })
+    public void should_getDocumentType(String event, DocumentType name) {
         CaseEvent caseEvent = CaseEvent.valueOf(event);
         assertThat(DocUploadUtils.getDocumentType(caseEvent)).isEqualTo(name);
     }

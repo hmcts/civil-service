@@ -88,7 +88,7 @@ public class AssistedOrderFormGenerator implements TemplateDataGenerator<Assiste
     public AssistedOrderForm getTemplateData(CaseData civilCaseData, CaseData caseData, String authorisation, FlowFlag userType) {
 
         AssistedOrderForm.AssistedOrderFormBuilder assistedOrderFormBuilder = AssistedOrderForm.builder()
-            .caseNumber(caseData.getCcdCaseReference().toString())
+            .caseNumber(caseData.getGeneralAppParentCaseLink().getCaseReference())
             .claimant1Name(caseData.getClaimant1PartyName())
             .claimant2Name(caseData.getClaimant2PartyName() != null ? caseData.getClaimant2PartyName() : null)
             .isMultiParty(caseData.getIsMultiParty())

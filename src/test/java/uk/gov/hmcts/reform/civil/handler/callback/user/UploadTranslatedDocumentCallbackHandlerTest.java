@@ -58,7 +58,7 @@ public class UploadTranslatedDocumentCallbackHandlerTest extends BaseCallbackHan
                     CaseEvent.UPLOAD_TRANSLATED_DOCUMENT,
                     CallbackType.ABOUT_TO_SUBMIT
             );
-            CaseData.CaseDataBuilder<?,?> caseDataBuilder = caseData.toBuilder();
+            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
             doReturn(caseDataBuilder)
                     .when(uploadTranslatedDocumentService)
                     .processTranslatedDocument(eq(caseData), anyString());

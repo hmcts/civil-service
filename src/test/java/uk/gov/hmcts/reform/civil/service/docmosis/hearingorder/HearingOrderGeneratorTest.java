@@ -156,7 +156,7 @@ class HearingOrderGeneratorTest {
         private void assertThatFieldsAreCorrect_HearingOrder(JudgeDecisionPdfDocument templateData, CaseData caseData) {
             Assertions.assertAll(
                 "Hearing Order Document data should be as expected",
-                () -> assertEquals(templateData.getClaimNumber(), caseData.getCcdCaseReference().toString()),
+                () -> assertEquals(templateData.getClaimNumber(), caseData.getGeneralAppParentCaseLink().getCaseReference()),
                 () -> assertEquals(templateData.getJudgeHearingLocation(), "sitename - location name - D12 8997"),
                 () -> assertEquals(templateData.getJudgeNameTitle(), caseData.getJudgeTitle()),
                 () -> assertEquals(templateData.getClaimant1Name(), caseData.getClaimant1PartyName()),
@@ -208,7 +208,7 @@ class HearingOrderGeneratorTest {
         private void assertThatFieldsAreCorrect_HearingOrder(JudgeDecisionPdfDocument templateData, CaseData caseData) {
             Assertions.assertAll(
                 "Hearing Order Document data should be as expected",
-                () -> assertEquals(templateData.getClaimNumber(), caseData.getCcdCaseReference().toString()),
+                () -> assertEquals(templateData.getClaimNumber(), caseData.getGeneralAppParentCaseLink().getCaseReference()),
                 () -> assertEquals(templateData.getJudgeHearingLocation(), "sitename - location name - D12 8997"),
                 () -> assertEquals(templateData.getJudgeNameTitle(), caseData.getJudgeTitle()),
                 () -> assertEquals(templateData.getClaimant1Name(), caseData.getClaimant1PartyName()),
@@ -266,7 +266,7 @@ class HearingOrderGeneratorTest {
                                                                      CaseData caseData) {
             Assertions.assertAll(
                 "Hearing Order Document data should be as expected",
-                () -> assertEquals(templateData.getClaimNumber(), caseData.getCcdCaseReference().toString()),
+                () -> assertEquals(templateData.getClaimNumber(), caseData.getGeneralAppParentCaseLink().getCaseReference()),
                 () -> assertEquals(templateData.getJudgeNameTitle(), caseData.getJudgeTitle()),
                 () -> assertEquals(templateData.getJudgeHearingLocation(), null),
                 () -> assertEquals(templateData.getClaimant1Name(), caseData.getClaimant1PartyName()),
@@ -316,7 +316,7 @@ class HearingOrderGeneratorTest {
                                                                      CaseData caseData) {
             Assertions.assertAll(
                 "Hearing Order Document data should be as expected",
-                () -> assertEquals(templateData.getClaimNumber(), caseData.getCcdCaseReference().toString()),
+                () -> assertEquals(templateData.getClaimNumber(), caseData.getGeneralAppParentCaseLink().getCaseReference()),
                 () -> assertEquals(templateData.getJudgeNameTitle(), caseData.getJudgeTitle()),
                 () -> assertEquals(templateData.getClaimant1Name(), caseData.getClaimant1PartyName()),
                 () -> assertEquals(templateData.getClaimant2Name(), caseData.getClaimant2PartyName()),
@@ -363,7 +363,7 @@ class HearingOrderGeneratorTest {
                                                                      CaseData caseData) {
             Assertions.assertAll(
                 "Hearing Order Document data should be as expected",
-                () -> assertEquals(templateData.getClaimNumber(), caseData.getCcdCaseReference().toString()),
+                () -> assertEquals(templateData.getClaimNumber(), caseData.getGeneralAppParentCaseLink().getCaseReference()),
                 () -> assertEquals(templateData.getJudgeNameTitle(), caseData.getJudgeTitle()),
                 () -> assertEquals(templateData.getClaimant1Name(), caseData.getClaimant1PartyName()),
                 () -> assertEquals(templateData.getClaimant2Name(), caseData.getClaimant2PartyName()),

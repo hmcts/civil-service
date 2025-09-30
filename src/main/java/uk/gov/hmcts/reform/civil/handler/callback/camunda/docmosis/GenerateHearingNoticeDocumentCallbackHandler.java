@@ -76,7 +76,7 @@ public class GenerateHearingNoticeDocumentCallbackHandler extends CallbackHandle
     private CallbackResponse generateHearingNoticeDocument(CallbackParams callbackParams) {
         log.info("Generate hearing notice document for case id: {}", callbackParams.getCaseData().getCcdCaseReference());
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?,?> caseDataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         buildDocument(callbackParams, caseDataBuilder, caseData);
         postHearingFormWithCoverLetterLip(callbackParams, caseData);
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -84,7 +84,7 @@ public class GenerateHearingNoticeDocumentCallbackHandler extends CallbackHandle
                 .build();
     }
 
-    private void buildDocument(CallbackParams callbackParams, CaseData.CaseDataBuilder<?,?> caseDataBuilder,
+    private void buildDocument(CallbackParams callbackParams, CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
                                CaseData caseData) {
         if (featureToggleService.isGaForWelshEnabled() && caseData.isApplicationBilingual()) {
             List<Element<CaseDocument>> preTranslatedDocuments =

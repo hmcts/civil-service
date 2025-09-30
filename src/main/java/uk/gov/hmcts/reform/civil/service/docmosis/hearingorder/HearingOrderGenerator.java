@@ -81,7 +81,7 @@ public class HearingOrderGenerator implements TemplateDataGenerator<JudgeDecisio
         JudgeDecisionPdfDocument.JudgeDecisionPdfDocumentBuilder judgeDecisionPdfDocumentBuilder =
             JudgeDecisionPdfDocument.builder()
                 .judgeNameTitle(caseData.getJudgeTitle())
-                .claimNumber(caseData.getCcdCaseReference().toString())
+                .claimNumber(caseData.getGeneralAppParentCaseLink().getCaseReference())
                 .isMultiParty(caseData.getIsMultiParty())
                 .claimant1Name(caseData.getClaimant1PartyName())
                 .claimant2Name(caseData.getClaimant2PartyName() != null ? caseData.getClaimant2PartyName() : null)

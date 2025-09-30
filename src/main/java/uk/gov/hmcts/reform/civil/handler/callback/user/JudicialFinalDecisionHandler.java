@@ -142,7 +142,7 @@ public class JudicialFinalDecisionHandler extends CallbackHandler {
 
     private CallbackResponse gaPopulateFinalOrderPreviewDoc(final CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?,?> caseDataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         List<String> errors = validAssistedOrderForm(caseData);
         if (caseData.getFinalOrderSelection().equals(FREE_FORM_ORDER)) {
             CaseDocument freeform = gaFreeFormOrderGenerator.generate(
@@ -167,7 +167,7 @@ public class JudicialFinalDecisionHandler extends CallbackHandler {
 
     private CallbackResponse setCaseName(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?,?> caseDataBuilder = caseData.toBuilder()
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder()
                 .caseNameHmctsInternal(getAllPartyNames(caseData));
         UserInfo userDetails = idamClient.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
         caseDataBuilder.judgeTitle(IdamUserUtils.getIdamUserFullName(userDetails));
@@ -184,7 +184,7 @@ public class JudicialFinalDecisionHandler extends CallbackHandler {
 
     public CallbackResponse populateFreeFormValues(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?,?> caseDataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         caseDataBuilder.orderOnCourtInitiative(FreeFormOrderValues.builder()
                 .onInitiativeSelectionTextArea(ON_INITIATIVE_SELECTION_TEST)
@@ -309,7 +309,7 @@ public class JudicialFinalDecisionHandler extends CallbackHandler {
 
     private CallbackResponse setFinalDecisionBusinessProcess(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?,?> caseDataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         if (featureToggleService.isGaForLipsEnabled()) {
             log.info("General app for LiP is enabled for caseId: {}", caseData.getCcdCaseReference());
             caseDataBuilder.bilingualHint(null);

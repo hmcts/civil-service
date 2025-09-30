@@ -82,7 +82,7 @@ public class WrittenRepresentationSequentialOrderGenerator implements TemplateDa
         JudgeDecisionPdfDocument.JudgeDecisionPdfDocumentBuilder judgeDecisionPdfDocumentBuilder =
                 JudgeDecisionPdfDocument.builder()
                         .judgeNameTitle(caseData.getJudgeTitle())
-                        .claimNumber(caseData.getCcdCaseReference().toString())
+                        .claimNumber(caseData.getGeneralAppParentCaseLink().getCaseReference())
                         .applicationType(collect)
                         .isMultiParty(caseData.getIsMultiParty())
                         .claimant1Name(caseData.getClaimant1PartyName())

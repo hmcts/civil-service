@@ -61,7 +61,7 @@ public class MoveToJudicialDecisionStateEventCallbackHandler extends CallbackHan
     private CallbackResponse changeApplicationState(CallbackParams callbackParams) {
         Long caseId = callbackParams.getCaseData().getCcdCaseReference();
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?,?> caseDataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         log.info("Changing state to APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION for caseId: {}", caseId);
         CaseDocument gaDraftDocument;
         if (isNull(caseData.getJudicialDecision()) && !gaForLipService.isGaForLip(caseData)) {

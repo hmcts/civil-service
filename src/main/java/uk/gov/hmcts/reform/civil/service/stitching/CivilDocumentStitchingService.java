@@ -99,7 +99,7 @@ public class CivilDocumentStitchingService implements DocumentStitcher {
             Bundle.builder().id("1").description(bundleTitle).eligibleForStitching("yes").documents(bundleDocuments).fileName(bundleFilename).build()
         ));
 
-        CaseData.CaseDataBuilder<?,?> caseDataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.caseBundles(idValueList);
         ((CaseDataParent.CaseDataParentBuilder<?, ?>) caseDataBuilder).caseDocuments(caseDocuments);
         caseDataBuilder.caseDocument1Name(bundleFilename);
