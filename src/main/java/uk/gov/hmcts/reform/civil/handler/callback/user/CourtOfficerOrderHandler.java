@@ -89,6 +89,7 @@ public class CourtOfficerOrderHandler extends CallbackHandler {
             caseDataBuilder.bilingualHint(YesOrNo.YES);
             caseDataBuilder.previewCourtOfficerOrder(null);
             caseDataBuilder.preTranslationDocuments(preTranslationDocuments);
+            caseDataBuilder.urgentFlag(YesOrNo.YES);
         } else {
             if (caseData.getPreviewCourtOfficerOrder() != null) {
                 caseDataBuilder.build().getCourtOfficersOrders().add(element(caseData.getPreviewCourtOfficerOrder()));

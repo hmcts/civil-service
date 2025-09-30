@@ -118,10 +118,6 @@ public class FeatureToggleService {
         return featureToggleApi.isFeatureEnabled("amend-bundle-enabled");
     }
 
-    public boolean isCoSCEnabled() {
-        return featureToggleApi.isFeatureEnabled("isCoSCEnabled");
-    }
-
     public boolean isGaForLipsEnabledAndLocationWhiteListed(String location) {
         return location != null
             && featureToggleApi.isFeatureEnabledForLocation("ea-courts-whitelisted-for-ga-lips", location, false)
@@ -148,17 +144,11 @@ public class FeatureToggleService {
         return featureToggleApi.isFeatureEnabled("hmc-cui-enabled");
     }
 
-    // if deleting this, also handle isQMPdfGeneratorEnabled() below
     public boolean isPublicQueryManagementEnabled(CaseData caseData) {
         if (caseContainsLiP.test(caseData)) {
             return isLipQueryManagementEnabled(caseData);
         }
-        return featureToggleApi.isFeatureEnabled("public-query-management");
-    }
-
-    public boolean isQMPdfGeneratorDisabled() {
-        // only generate pdf if flag is off
-        return featureToggleApi.isFeatureEnabled("public-query-management");
+        return true;
     }
 
     public boolean isGaForWelshEnabled() {

@@ -104,7 +104,6 @@ public class CaseProceedOfflineDefendantScenarioTest extends DashboardBaseIntegr
     @Test
     void shouldUpdateCaseProceedOffLineTaskList() throws Exception {
 
-        when(featureToggleService.isCoSCEnabled()).thenReturn(true);
         String caseId = "72016577333";
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
@@ -116,7 +115,6 @@ public class CaseProceedOfflineDefendantScenarioTest extends DashboardBaseIntegr
             .previousCCDState(CaseState.All_FINAL_ORDERS_ISSUED)
             .build();
         when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
-        when(featureToggleService.isCoSCEnabled()).thenReturn(true);
 
         handler.handle(callbackParams(caseData));
 
