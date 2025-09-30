@@ -409,7 +409,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
             }
         }
 
-        if (caseData.isLipvLipOneVOne() &&  featureToggleService.isDefendantNoCOnlineForCase(caseData)) {
+        if (caseData.isLipvLipOneVOne() || (caseData.isLipvLROneVOne() &&  featureToggleService.isDefendantNoCOnlineForCase(caseData))) {
             if (caseData.getCcdState() == CaseState.PENDING_CASE_ISSUED) {
                 return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_CLAIM_ISSUE;
             } else if (caseData.getCcdState() == CaseState.AWAITING_APPLICANT_INTENTION) {

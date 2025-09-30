@@ -504,7 +504,6 @@ class NotificationMediationUnsuccessfulDefendantLRHandlerTest extends BaseCallba
             return expectedProperties;
         }
 
-
         @Test
         void shouldNotSendNotificationToDefendant1LRforLiPvLrCase_LipVLipIsNotSet() {
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
