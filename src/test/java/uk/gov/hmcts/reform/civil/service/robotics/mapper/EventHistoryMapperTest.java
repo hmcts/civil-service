@@ -9021,11 +9021,6 @@ class EventHistoryMapperTest {
             .documentType(DocumentType.CERTIFICATE_OF_DEBT_PAYMENT)
             .build();
 
-        @BeforeEach
-        void setup() {
-            when(featureToggleService.isCoSCEnabled()).thenReturn(true);
-        }
-
         @Nested
         class CancelledStatus {
             @Test
