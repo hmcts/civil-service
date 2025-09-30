@@ -83,7 +83,6 @@ class CoscCertificateGeneratedDefendantNotificationHandlerTest extends BaseCallb
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-            when(toggleService.isCoSCEnabled()).thenReturn(true);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_COSC_GEN_FOR_DEFENDANT.name()).build()
