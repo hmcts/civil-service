@@ -11,8 +11,8 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.notify.NotificationException;
 import uk.gov.hmcts.reform.civil.service.HearingScheduledNotificationService;
-import uk.gov.hmcts.reform.civil.service.NotificationException;
 
 import java.util.List;
 import java.util.Map;

@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.ras.model.RoleAssignmentServiceResponse;
 import uk.gov.hmcts.reform.civil.ras.model.RoleCategory;
 import uk.gov.hmcts.reform.civil.ras.model.RoleRequest;
 import uk.gov.hmcts.reform.civil.ras.model.RoleType;
+import uk.gov.hmcts.reform.civil.service.RoleAssignmentsService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
