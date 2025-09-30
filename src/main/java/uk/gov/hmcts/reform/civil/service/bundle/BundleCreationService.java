@@ -9,12 +9,12 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.client.EvidenceManagementApiClient;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.event.BundleCreationTriggerEvent;
-import uk.gov.hmcts.reform.civil.helpers.bundle.BundleRequestMapper;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.helpers.bundle.BundleRequestMapper;
 import uk.gov.hmcts.reform.civil.model.bundle.BundleCreateRequest;
 import uk.gov.hmcts.reform.civil.model.bundle.BundleCreateResponse;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
-import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.civil.service.NoCacheUserService;
 
 @Slf4j
 @Service
@@ -25,7 +25,7 @@ public class BundleCreationService {
     private final BundleRequestMapper bundleRequestMapper;
     private final AuthTokenGenerator serviceAuthTokenGenerator;
     private final EvidenceManagementApiClient evidenceManagementApiClient;
-    private final UserService userService;
+    private final NoCacheUserService noCacheUserService;
     private final SystemUpdateUserConfiguration userConfig;
 
     @Value("${bundle.config}")
@@ -49,7 +49,7 @@ public class BundleCreationService {
     }
 
     private String getAccessToken() {
-        return userService.getAccessToken(
+        return noCacheUserService.getAccessToken(
             userConfig.getUserName(),
             userConfig.getPassword()
         );
