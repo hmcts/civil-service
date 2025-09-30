@@ -243,7 +243,6 @@ class CaseProceedOfflineClaimantNotificationHandlerTest extends BaseCallbackHand
                     .ccdCaseReference(1234L)
                     .build();
 
-            when(toggleService.isLipVLipEnabled()).thenReturn(true);
             when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);

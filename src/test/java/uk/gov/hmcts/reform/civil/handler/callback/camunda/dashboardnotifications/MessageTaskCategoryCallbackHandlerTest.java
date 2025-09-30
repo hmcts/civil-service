@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -39,11 +38,6 @@ class MessageTaskCategoryCallbackHandlerTest extends BaseCallbackHandlerTest {
     private DashboardNotificationsParamsMapper mapper;
     @Mock
     private FeatureToggleService featureToggleService;
-
-    @BeforeEach
-    void setup() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-    }
 
     @Test
     void shouldRecordScenario_ForAddingApplicationsAndMessagesToTheCourtTask() {

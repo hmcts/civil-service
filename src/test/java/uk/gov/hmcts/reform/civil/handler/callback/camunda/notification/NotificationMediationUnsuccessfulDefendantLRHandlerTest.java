@@ -508,7 +508,6 @@ class NotificationMediationUnsuccessfulDefendantLRHandlerTest extends BaseCallba
     @Test
     void shouldNotSendNotificationToDefendant1LRforLiPvLrCase_applicantRepresented() {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         CaseData caseData = CaseData.builder()
             .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(APPLICANT_PARTY_NAME).build())
             .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(CLAIMANT_EMAIL_ADDRESS).build())

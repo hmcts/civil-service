@@ -134,7 +134,6 @@ class ClaimantResponseNotAgreedRepaymentRespondentNotificationHandlerTest extend
         @Test
         void shouldNotifyClaimantLipWelsh_whenInvoked() {
             when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
-            given(featureToggleService.isLipVLipEnabled()).willReturn(true);
             when(notificationsProperties.getNotifyClaimantLipTemplateManualDeterminationForWelsh()).thenReturn(
                 "template-id-manual-determination");
 

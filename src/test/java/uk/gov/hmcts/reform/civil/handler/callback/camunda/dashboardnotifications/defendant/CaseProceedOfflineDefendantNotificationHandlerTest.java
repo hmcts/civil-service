@@ -172,7 +172,6 @@ class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCallbackHan
                 .ccdCaseReference(12890L)
                 .previousCCDState(CASE_PROGRESSION).build();
 
-            when(toggleService.isLipVLipEnabled()).thenReturn(true);
             when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
             when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
             HashMap<String, Object> scenarioParams = new HashMap<>();

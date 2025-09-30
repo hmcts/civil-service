@@ -703,7 +703,6 @@ class UploadTranslatedDocumentDefaultStrategyTest {
     @Test
     void shouldCopyOtherDocumentExceptSealedClaimForm() {
         //Given
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         TranslatedDocument translatedDocument1 = TranslatedDocument
             .builder()
             .documentType(CLAIM_ISSUE)
@@ -757,7 +756,6 @@ class UploadTranslatedDocumentDefaultStrategyTest {
             expectedTranslatedDocs,
             any(CaseData.class)
         )).willReturn(documents);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         TranslatedDocument translatedDocument1 = TranslatedDocument
             .builder()
             .documentType(CLAIM_ISSUE)
@@ -814,7 +812,6 @@ class UploadTranslatedDocumentDefaultStrategyTest {
             expectedTranslatedDocs,
             any(CaseData.class)
         )).willReturn(documents);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         TranslatedDocument translatedDocument1 = TranslatedDocument
             .builder()

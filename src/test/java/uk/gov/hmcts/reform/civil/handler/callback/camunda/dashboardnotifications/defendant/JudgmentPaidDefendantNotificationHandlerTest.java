@@ -80,8 +80,6 @@ public class JudgmentPaidDefendantNotificationHandlerTest extends BaseCallbackHa
                 CallbackRequest.builder().eventId(UPDATE_DASHBOARD_NOTIFICATIONS_JUDGMENT_PAID_DEFENDANT.name()).build()
             ).build();
 
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-
             handler.handle(params);
             verifyNoInteractions(dashboardScenariosService);
         }
@@ -100,8 +98,6 @@ public class JudgmentPaidDefendantNotificationHandlerTest extends BaseCallbackHa
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(UPDATE_DASHBOARD_NOTIFICATIONS_JUDGMENT_PAID_DEFENDANT.name()).build()
             ).build();
-
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
             handler.handle(params);
             verify(dashboardScenariosService).recordScenarios(

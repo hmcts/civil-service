@@ -129,7 +129,6 @@ class ClaimIssueNotificationsHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void createDashboardNotifications_queryManagement() {
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(featureToggleService.isLipQueryManagementEnabled(any())).thenReturn(true);
         LocalDateTime dateTime = LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay();
 
