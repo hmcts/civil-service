@@ -154,6 +154,7 @@ public class InitiateGeneralApplicationService {
     }
 
     private boolean isLipCase(CaseData caseData, CaseAssignmentUserRolesResource userRoles) {
+        log.info("Checking isLipCase for case: {} and application feature is enabled {}", caseData.getCcdCaseReference(), featureToggleService.isGaForLipsEnabled());
         if (featureToggleService.isGaForLipsEnabled() && (caseData.isRespondent1LiP() || caseData.isRespondent2LiP()
             || caseData.isApplicantNotRepresented())) {
 
@@ -393,7 +394,7 @@ public class InitiateGeneralApplicationService {
                 applicationBuilder.generalAppSubmittedDateGAspec(time.now());
             }
         }
-        if (featureToggleService.isCoSCEnabled() && caseData.getGeneralAppType().getTypes().contains(GeneralApplicationTypes.CONFIRM_CCJ_DEBT_PAID)) {
+        if (caseData.getGeneralAppType().getTypes().contains(GeneralApplicationTypes.CONFIRM_CCJ_DEBT_PAID)) {
             if (Objects.nonNull(caseData.getCertOfSC().getDebtPaymentEvidence()) && Objects.nonNull(caseData.getCertOfSC().getDebtPaymentEvidence().getDebtPaymentOption())) {
                 DebtPaymentOptions deptPaymentOption = caseData.getCertOfSC().getDebtPaymentEvidence().getDebtPaymentOption();
                 if (DebtPaymentOptions.MADE_FULL_PAYMENT_TO_COURT.equals(deptPaymentOption) || DebtPaymentOptions.UPLOAD_EVIDENCE_DEBT_PAID_IN_FULL.equals(deptPaymentOption)) {

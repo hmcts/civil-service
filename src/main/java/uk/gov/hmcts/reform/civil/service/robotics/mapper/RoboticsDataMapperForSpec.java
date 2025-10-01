@@ -64,6 +64,7 @@ public class RoboticsDataMapperForSpec {
     private final FeatureToggleService featureToggleService;
 
     public RoboticsCaseDataSpec toRoboticsCaseData(CaseData caseData, String authToken) {
+        log.info("Preparing Robotics data for spec caseId {}", caseData.getCcdCaseReference());
         requireNonNull(caseData);
         RoboticsCaseDataSpec.RoboticsCaseDataSpecBuilder builder = RoboticsCaseDataSpec.builder()
             .header(buildCaseHeader(caseData))
@@ -76,9 +77,8 @@ public class RoboticsDataMapperForSpec {
             || caseData.getCcdState() == CASE_DISMISSED) {
             builder.noticeOfChange(RoboticsDataUtil.buildNoticeOfChange(caseData));
         }
-        RoboticsCaseDataSpec build = builder.build();
-        log.info("Robotics Case Data: {}", build.toString());
-        return build;
+
+        return builder.build();
     }
 
     private ClaimDetails buildClaimDetails(CaseData caseData) {
