@@ -36,8 +36,6 @@ public class PartialRemissionHWFCallbackHandler extends CallbackHandler {
     public static final String ERR_MSG_REMISSION_AMOUNT_LESS_THAN_CLAIM_FEE = "Remission amount must be less than claim fee";
     public static final String ERR_MSG_REMISSION_AMOUNT_LESS_THAN_HEARING_FEE = "Remission amount must be less than hearing fee";
     public static final String ERR_MSG_REMISSION_AMOUNT_LESS_THAN_ZERO = "Remission amount must be greater than zero";
-    public static final String ERR_MSG_REMISSION_AMOUNT_LESS_THAN_GA_FEE = "Remission amount must be less than application fee";
-    public static final String ERR_MSG_REMISSION_AMOUNT_LESS_THAN_ADDITIONAL_FEE = "Remission amount must be less than additional application fee";
 
     private final ObjectMapper objectMapper;
     private final HWFFeePaymentOutcomeService hwfFeePaymentOutcomeService;

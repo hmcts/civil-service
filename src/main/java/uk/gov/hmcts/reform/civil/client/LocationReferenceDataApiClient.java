@@ -26,14 +26,6 @@ public interface LocationReferenceDataApiClient {
     );
 
     @GetMapping(value = "/refdata/location/court-venues")
-    List<LocationRefData> getCourtVenueByEpimmsId(
-            @RequestHeader("ServiceAuthorization") String serviceAuthorisation,
-            @RequestHeader("Authorization") final String authorisation,
-            @RequestParam("epimms_id") final String epimmsId,
-            @RequestParam("court_type_id") final String courtTypeId
-    );
-
-    @GetMapping(value = "/refdata/location/court-venues")
     List<LocationRefData> getCourtVenueByEpimmsIdAndType(
         @RequestHeader("ServiceAuthorization") String serviceAuthorisation,
         @RequestHeader("Authorization") final String authorisation,
@@ -72,11 +64,11 @@ public interface LocationReferenceDataApiClient {
 
     @GetMapping(value = "/refdata/location/court-venues")
     List<LocationRefData> getCourtVenue(
-            @RequestHeader("ServiceAuthorization") String serviceAuthorisation,
-            @RequestHeader("Authorization") final String authorisation,
-            @RequestParam("is_hearing_location") final String isHearingLocation,
-            @RequestParam("is_case_management_location") final String isCaseManagementLocation,
-            @RequestParam("court_type_id") final String courtTypeId,
-            @RequestParam("location_type") final String locationType
+        @RequestHeader("ServiceAuthorization") String serviceAuthorisation,
+        @RequestHeader("Authorization") final String authorisation,
+        @RequestParam("is_hearing_location") final String isHearingLocation,
+        @RequestParam("is_case_management_location") final String isCaseManagementLocation,
+        @RequestParam("court_type_id") final String courtTypeId,
+        @RequestParam("location_type") final String locationType
     );
 }
