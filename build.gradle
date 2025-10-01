@@ -319,6 +319,8 @@ configurations.all {
   exclude group: 'org.springframework.security', module: 'spring-security-rsa'
   exclude group: 'org.projectlombok', module: 'lombok-mapstruct-binding'
   exclude group: "com.vladmihalcea", module: "hibernate-types-52"
+  exclude group: "org.hibernate", module: "hibernate-core"
+  exclude group: "org.hibernate.common", module: "hibernate-commons-annotations"
 }
 
 dependencies {
@@ -350,6 +352,9 @@ dependencies {
 
   implementation group: 'org.flywaydb', name: 'flyway-core'
   implementation group: 'org.flywaydb', name: 'flyway-database-postgresql'
+
+  implementation "org.hibernate.orm:hibernate-core:6.6.29.Final"
+  implementation "org.hibernate.common:hibernate-commons-annotations:7.0.3.Final"
 
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix', version: '2.2.10.RELEASE'
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign'
