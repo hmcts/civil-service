@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.civil.service.camunda.CamundaRuntimeApi;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -58,12 +57,7 @@ class IncidentRetryEventHandlerTest {
 
         assertThat(result).isNotNull();
         verify(camundaRuntimeApi, never()).getLatestOpenIncidentForProcessInstance(
-            any(),
-            anyBoolean(),
-            anyString(),
-            any(),
-            any(),
-            anyInt()
+            any(), anyBoolean(), anyString(), any(), any(), anyInt()
         );
     }
 
@@ -100,7 +94,11 @@ class IncidentRetryEventHandlerTest {
         assertThat(result).isNotNull();
 
         for (ProcessInstanceDto pi : processInstances) {
-            verify(camundaRuntimeApi).setJobRetries("serviceAuth", "job-" + pi.getId(), Map.of("retries", 1));
+            verify(camundaRuntimeApi).modifyProcessInstance(
+                eq("serviceAuth"),
+                eq(pi.getId()),
+                anyMap()
+            );
         }
     }
 
@@ -123,11 +121,11 @@ class IncidentRetryEventHandlerTest {
         ExternalTaskData result = handler.handleTask(externalTask);
 
         assertThat(result).isNotNull();
-        verify(camundaRuntimeApi, never()).setJobRetries(any(), any(), any());
+        verify(camundaRuntimeApi, never()).modifyProcessInstance(any(), any(), anyMap());
     }
 
     @Test
-    void shouldHandleSetJobRetriesExceptionGracefully() {
+    void shouldHandleModifyProcessInstanceExceptionGracefully() {
         ProcessInstanceDto pi = newProcessInstance("proc1");
         IncidentDto incident = newIncident(pi.getId(), "inc1", "job1");
 
@@ -143,29 +141,14 @@ class IncidentRetryEventHandlerTest {
             any(), anyBoolean(), eq(pi.getId()), any(), any(), anyInt()
         )).thenReturn(List.of(incident));
 
-        doThrow(new RuntimeException("Failed to set retries"))
+        doThrow(new RuntimeException("Failed to modify process instance"))
             .when(camundaRuntimeApi)
-            .setJobRetries(any(), any(), any());
+            .modifyProcessInstance(any(), any(), anyMap());
 
         ExternalTaskData result = handler.handleTask(externalTask);
 
         assertThat(result).isNotNull();
-        verify(camundaRuntimeApi).setJobRetries(any(), any(), any());
-    }
-
-    // Helper methods
-    private ProcessInstanceDto newProcessInstance(String id) {
-        ProcessInstanceDto pi = new ProcessInstanceDto();
-        pi.setId(id);
-        return pi;
-    }
-
-    private IncidentDto newIncident(String processInstanceId, String incidentId, String jobId) {
-        IncidentDto inc = new IncidentDto();
-        inc.setId(incidentId);
-        inc.setProcessInstanceId(processInstanceId);
-        inc.setConfiguration(jobId);
-        return inc;
+        verify(camundaRuntimeApi).modifyProcessInstance(any(), any(), anyMap());
     }
 
     @Test
@@ -198,6 +181,22 @@ class IncidentRetryEventHandlerTest {
 
         handler.handleTask(externalTask);
 
-        verify(camundaRuntimeApi).setJobRetries("serviceAuth", "job1", Map.of("retries", 1));
+        verify(camundaRuntimeApi).modifyProcessInstance(eq("serviceAuth"), eq("proc1"), anyMap());
+    }
+
+    // Helper methods
+    private ProcessInstanceDto newProcessInstance(String id) {
+        ProcessInstanceDto pi = new ProcessInstanceDto();
+        pi.setId(id);
+        return pi;
+    }
+
+    private IncidentDto newIncident(String processInstanceId, String incidentId, String jobId) {
+        IncidentDto inc = new IncidentDto();
+        inc.setId(incidentId);
+        inc.setProcessInstanceId(processInstanceId);
+        inc.setConfiguration(jobId);
+        inc.setActivityId("activity1");
+        return inc;
     }
 }

@@ -29,13 +29,7 @@ class PaymentTimeRouteCaseDataUpdaterTest {
     private PaymentTimeRouteCaseDataUpdater updater;
 
     @Test
-    void shouldUpdateCaseDataWhenPaymentTimeIsImmediately() {
-        LocalDate expectedDate = LocalDate.now().plusDays(RespondentResponsePartAdmissionPaymentTimeLRspec.DAYS_TO_PAY_IMMEDIATELY);
-        when(deadlineCalculatorService.calculateExtendedDeadline(
-            org.mockito.ArgumentMatchers.any(java.time.LocalDateTime.class),
-            anyInt()
-        )).thenReturn(expectedDate);
-
+    void shouldNotUpdateCaseDataWhenPartPaymentPaidImmediately() {
         CaseData caseData = CaseData.builder()
                 .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
                 .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
@@ -45,18 +39,11 @@ class PaymentTimeRouteCaseDataUpdaterTest {
         updater.update(caseData, updatedData);
 
         RespondToClaimAdmitPartLRspec admitPartLRspec = updatedData.build().getRespondToClaimAdmitPartLRspec();
-        assertThat(admitPartLRspec).isNotNull();
-        assertThat(admitPartLRspec.getWhenWillThisAmountBePaid()).isEqualTo(expectedDate);
+        assertThat(admitPartLRspec).isNull();
     }
 
     @Test
-    void shouldUpdateWhenRespondent2IsPartAdmission() {
-        LocalDate expectedDate = LocalDate.now().plusDays(RespondentResponsePartAdmissionPaymentTimeLRspec.DAYS_TO_PAY_IMMEDIATELY);
-        when(deadlineCalculatorService.calculateExtendedDeadline(
-            org.mockito.ArgumentMatchers.any(java.time.LocalDateTime.class),
-            anyInt()
-        )).thenReturn(expectedDate);
-
+    void shouldNotUpdateWhenRespondent2IsPartAdmission() {
         CaseData caseData = CaseData.builder()
                 .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
                 .respondent2ClaimResponseTypeForSpec(PART_ADMISSION)
@@ -66,8 +53,7 @@ class PaymentTimeRouteCaseDataUpdaterTest {
         updater.update(caseData, updatedData);
 
         RespondToClaimAdmitPartLRspec admitPartLRspec = updatedData.build().getRespondToClaimAdmitPartLRspec();
-        assertThat(admitPartLRspec).isNotNull();
-        assertThat(admitPartLRspec.getWhenWillThisAmountBePaid()).isEqualTo(expectedDate);
+        assertThat(admitPartLRspec).isNull();
     }
 
     @Test
