@@ -1,8 +1,0 @@
-name: Check PR title and project linting
-on:
-  pull_request:
-    types:
-      - opened
-      - reopened
-      - edited
-      - synchronize
