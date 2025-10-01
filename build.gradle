@@ -327,7 +327,10 @@ dependencies {
   implementation 'com.github.hmcts:civil-commons:1.1.12'
   implementation project(':dashboard-notifications')
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
-  implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+  implementation("org.springframework.boot:spring-boot-starter-data-jpa") {
+    exclude group: "org.hibernate", module: "hibernate-core"
+    exclude group: "com.vladmihalcea", module: "hibernate-types-52"
+  }
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
   implementation group: 'org.springframework', name: 'spring-aspects'
