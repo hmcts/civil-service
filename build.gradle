@@ -318,8 +318,6 @@ configurations.all {
   }
   exclude group: 'org.springframework.security', module: 'spring-security-rsa'
   exclude group: 'org.projectlombok', module: 'lombok-mapstruct-binding'
-  exclude group: "org.hibernate", module: 'hibernate-core'
-  exclude group: 'org.hibernate.common', module: 'hibernate-commons-annotations'
   exclude group: "com.vladmihalcea", module: "hibernate-types-52"
 }
 
