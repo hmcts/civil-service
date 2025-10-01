@@ -14,7 +14,7 @@ import uk.gov.hmcts.reform.civil.helpers.bundle.BundleRequestMapper;
 import uk.gov.hmcts.reform.civil.model.bundle.BundleCreateRequest;
 import uk.gov.hmcts.reform.civil.model.bundle.BundleCreateResponse;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
-import uk.gov.hmcts.reform.civil.service.NoCacheUserService;
+import uk.gov.hmcts.reform.civil.service.UserService;
 
 @Slf4j
 @Service
@@ -25,7 +25,7 @@ public class BundleCreationService {
     private final BundleRequestMapper bundleRequestMapper;
     private final AuthTokenGenerator serviceAuthTokenGenerator;
     private final EvidenceManagementApiClient evidenceManagementApiClient;
-    private final NoCacheUserService noCacheUserService;
+    private final UserService userService;
     private final SystemUpdateUserConfiguration userConfig;
 
     @Value("${bundle.config}")
@@ -34,10 +34,16 @@ public class BundleCreationService {
 
     public BundleCreateResponse createBundle(BundleCreationTriggerEvent event) {
         CaseDetails caseDetails = coreCaseDataService.getCase(event.getCaseId());
-        return createNewBundleRequest(getAccessToken(), serviceAuthTokenGenerator.generate(),
-                            bundleRequestMapper.mapCaseDataToBundleCreateRequest(caseDetailsConverter.toCaseData(caseDetails),
-                                bundleConfig,
-                                caseDetails.getJurisdiction(), caseDetails.getCaseTypeId()));
+
+        return createNewBundleRequest(
+            "Bearer Token".equals(event.getAccessToken()) ? getAccessToken() : event.getAccessToken(),
+            serviceAuthTokenGenerator.generate(),
+            bundleRequestMapper.mapCaseDataToBundleCreateRequest(
+                caseDetailsConverter.toCaseData(caseDetails),
+                bundleConfig,
+                caseDetails.getJurisdiction(), caseDetails.getCaseTypeId()
+            )
+        );
     }
 
     public BundleCreateResponse createBundle(Long caseId) {
@@ -49,7 +55,7 @@ public class BundleCreationService {
     }
 
     private String getAccessToken() {
-        return noCacheUserService.getAccessToken(
+        return userService.getAccessToken(
             userConfig.getUserName(),
             userConfig.getPassword()
         );

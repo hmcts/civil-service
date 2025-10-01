@@ -54,6 +54,7 @@ class BundleCreationTriggerEventHandlerTest {
 
     private static final String TEST_URL = "url";
     private static final String TEST_FILE_NAME = "testFileName.pdf";
+    private static final String ACCESS_TOKEN = "ACCESS_TOKEN";
 
     @Mock
     private BundleCreationService bundleCreationService;
@@ -69,7 +70,7 @@ class BundleCreationTriggerEventHandlerTest {
     private Bundle bundle;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         bundle = Bundle.builder().value(BundleDetails.builder().title("Trial Bundle").id("1")
                                             .stitchStatus("new")
                                             .stitchedDocument(null)
@@ -189,7 +190,7 @@ class BundleCreationTriggerEventHandlerTest {
     @Test
     void testSendBundleCreationTriggerDoesNotThrowExceptionWhenItsAllGood() {
         // Given: Case details with all type of documents require for bundles
-        BundleCreationTriggerEvent event = new BundleCreationTriggerEvent(1L);
+        BundleCreationTriggerEvent event = new BundleCreationTriggerEvent(1L, ACCESS_TOKEN);
         when(coreCaseDataService.getCase(1L)).thenReturn(caseDetails);
         StartEventResponse response = StartEventResponse.builder()
             .caseDetails(CaseDetailsBuilder.builder().data(caseData).build()).eventId("event1").token("test").build();
@@ -278,7 +279,7 @@ class BundleCreationTriggerEventHandlerTest {
     @Test
     void verifyBundleNotificationEventTriggeredWhenBundleCreated() {
         // Given: Case details with all type of documents require for bundles
-        BundleCreationTriggerEvent event = new BundleCreationTriggerEvent(1L);
+        BundleCreationTriggerEvent event = new BundleCreationTriggerEvent(1L, ACCESS_TOKEN);
         when(coreCaseDataService.getCase(1L)).thenReturn(caseDetails);
         StartEventResponse response = StartEventResponse.builder()
             .caseDetails(CaseDetailsBuilder.builder().data(caseData).build()).eventId("event1").token("test").build();
@@ -296,7 +297,7 @@ class BundleCreationTriggerEventHandlerTest {
     void verifyNoBundleNotificationEventTriggeredWhenBundleNotCreated() {
         // Given: Case details with all type of documents require for bundles and throws exception from
         // createBundle service
-        BundleCreationTriggerEvent event = new BundleCreationTriggerEvent(1L);
+        BundleCreationTriggerEvent event = new BundleCreationTriggerEvent(1L, ACCESS_TOKEN);
         when(coreCaseDataService.getCase(1L)).thenReturn(caseDetails);
         StartEventResponse response = StartEventResponse.builder()
             .caseDetails(CaseDetailsBuilder.builder().data(caseData).build()).eventId("event1").token("test").build();

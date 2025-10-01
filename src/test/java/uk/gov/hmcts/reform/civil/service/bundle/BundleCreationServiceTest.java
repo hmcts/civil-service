@@ -29,7 +29,7 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
-import uk.gov.hmcts.reform.civil.service.NoCacheUserService;
+import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
 import java.time.LocalDate;
@@ -51,12 +51,11 @@ class BundleCreationServiceTest {
     @Mock
     private CaseDetailsConverter caseDetailsConverter;
     @Mock
-    private NoCacheUserService userService;
+    private UserService userService;
     @Mock
     SystemUpdateUserConfiguration userConfig;
     @Mock
     private CoreCaseDataService coreCaseDataService;
-
     @Mock
     private AuthTokenGenerator authTokenGenerator;
     @Mock
@@ -66,10 +65,12 @@ class BundleCreationServiceTest {
 
     private final String testUrl = "url";
     private final String testFileName = "testFileName.pdf";
+    private static final String ACCESS_TOKEN = "ACCESS_TOKEN";
+
     CaseData caseData;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         List<Element<UploadEvidenceWitness>> witnessEvidenceDocs = setupWitnessEvidenceDocs();
         List<Element<UploadEvidenceExpert>> expertEvidenceDocs = setupExpertEvidenceDocs();
         List<Element<UploadEvidenceDocumentType>> otherEvidenceDocs = setupOtherEvidenceDocs();
@@ -170,14 +171,11 @@ class BundleCreationServiceTest {
         given(bundleRequestMapper.mapCaseDataToBundleCreateRequest(any(), any(), any(), any())).willReturn(null);
         given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(null);
         given(coreCaseDataService.getCase(1L)).willReturn(caseDetails);
-        given(userConfig.getUserName()).willReturn("test");
-        given(userConfig.getPassword()).willReturn("test");
         given(objectMapper.convertValue(caseDetails.getData(), CaseData.class)).willReturn(caseData);
         given(authTokenGenerator.generate()).willReturn("test");
-        given(userService.getAccessToken("test", "test")).willReturn("test");
 
         //When: bundlecreation service is called
-        bundlingService.createBundle(new BundleCreationTriggerEvent(1L));
+        bundlingService.createBundle(new BundleCreationTriggerEvent(1L, ACCESS_TOKEN));
 
         //Then: BundleRest API should be called
         verify(evidenceManagementApiClient).createNewBundle(anyString(), anyString(), any());
