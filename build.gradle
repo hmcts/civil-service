@@ -319,8 +319,6 @@ configurations.all {
   exclude group: 'org.springframework.security', module: 'spring-security-rsa'
   exclude group: 'org.projectlombok', module: 'lombok-mapstruct-binding'
   exclude group: "com.vladmihalcea", module: "hibernate-types-52"
-  exclude group: "org.hibernate", module: "hibernate-core"
-  exclude group: "org.hibernate.common", module: "hibernate-commons-annotations"
 }
 
 dependencies {
@@ -352,9 +350,6 @@ dependencies {
 
   implementation group: 'org.flywaydb', name: 'flyway-core'
   implementation group: 'org.flywaydb', name: 'flyway-database-postgresql'
-
-  implementation "org.hibernate.orm:hibernate-core:6.6.29.Final"
-  implementation "org.hibernate.common:hibernate-commons-annotations:7.0.3.Final"
 
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix', version: '2.2.10.RELEASE'
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign'
@@ -449,17 +444,20 @@ dependencies {
 
   testImplementation group: 'org.springframework.statemachine', name: 'spring-statemachine-test', version: versions.springStatemachine
   testImplementation 'com.github.hmcts:fortify-client:1.4.9:all'
+
   //pact contract testing
   contractTestImplementation 'au.com.dius.pact.consumer:junit5:4.6.5'
   contractTestImplementation group: 'org.hamcrest', name: 'java-hamcrest', version: '2.0.0.0'
-  contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.13.4')
-  contractTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.13.4')
+  contractTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.13.4'
+  contractTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.13.4'
 
   contractTestImplementation sourceSets.main.runtimeClasspath
   contractTestImplementation sourceSets.test.runtimeClasspath
 
-  integrationTestImplementation('org.junit.jupiter:junit-jupiter-api:5.13.4')
-  integrationTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.13.4')
+  integrationTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.13.4'
+  integrationTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.13.4'
+  integrationTestImplementation group: 'org.hibernate.orm', name: 'hibernate-core', version: '6.6.29.Final'
+  integrationTestImplementation group: 'org.hibernate.common', name: 'hibernate-commons-annotations', version: '7.0.3.Final'
 
   testImplementation group: 'org.testcontainers', name: 'postgresql', version: versions.testcontainers
   testImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: versions.testcontainers
