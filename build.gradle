@@ -344,9 +344,7 @@ dependencies {
   implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.8.0'
   implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.8'
   implementation group: 'jakarta.servlet', name: 'jakarta.servlet-api', version: '6.1.0'
-  implementation('com.vladmihalcea:hibernate-types-60:2.21.1') {
-    exclude group: 'org.hibernate', module: 'hibernate-core'
-  }
+  implementation group: 'io.hypersistence', name: 'hypersistence-utils-hibernate-63', version: '3.11.0'
 
   implementation group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.49.5'
   implementation group: 'org.jdbi', name: 'jdbi3-spring4', version: '3.19.0'
@@ -459,8 +457,6 @@ dependencies {
 
   integrationTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.13.4'
   integrationTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.13.4'
-  integrationTestImplementation group: 'org.hibernate.orm', name: 'hibernate-core', version: '6.6.29.Final'
-  integrationTestImplementation group: 'org.hibernate.common', name: 'hibernate-commons-annotations', version: '7.0.3.Final'
 
   testImplementation group: 'org.testcontainers', name: 'postgresql', version: versions.testcontainers
   testImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: versions.testcontainers

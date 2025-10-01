@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.dashboard.entities;
 
-import com.vladmihalcea.hibernate.type.array.StringArrayType;
-import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
+import io.hypersistence.utils.hibernate.type.array.StringArrayType;
+import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.Type;

@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.dashboard.entities;
 
-import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
+import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.hibernate.annotations.Type;
 
