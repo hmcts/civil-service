@@ -9037,7 +9037,6 @@ class EventHistoryMapperTest {
 
         @BeforeEach
         void setup() {
-            when(featureToggleService.isCoSCEnabled()).thenReturn(true);
             when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
         }
 
