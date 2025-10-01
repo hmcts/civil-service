@@ -34,6 +34,14 @@ public interface LocationReferenceDataApiClient {
     );
 
     @GetMapping(value = "/refdata/location/court-venues")
+    List<LocationRefData> getCourtVenueByEpimmsId(
+            @RequestHeader("ServiceAuthorization") String serviceAuthorisation,
+            @RequestHeader("Authorization") final String authorisation,
+            @RequestParam("epimms_id") final String epimmsId,
+            @RequestParam("court_type_id") final String courtTypeId
+    );
+
+    @GetMapping(value = "/refdata/location/court-venues")
     List<LocationRefData> getCourtVenueByEpimmsIdWithCMLAndCourtType(
         @RequestHeader("ServiceAuthorization") String serviceAuthorisation,
         @RequestHeader("Authorization") final String authorisation,
