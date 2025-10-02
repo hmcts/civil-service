@@ -1266,8 +1266,11 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
-
-        assertThat(responseCaseData.getEaCourtLocation()).isEqualTo(NO);
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            assertThat(responseCaseData.getEaCourtLocation()).isEqualTo(NO);
+        } else {
+            assertThat(responseCaseData.getEaCourtLocation()).isNull();
+        }
     }
 
     @ParameterizedTest
@@ -1310,8 +1313,11 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                      .build(), ABOUT_TO_SUBMIT);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
-
-        assertEquals(eaCourtLocation, responseCaseData.getEaCourtLocation());
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            assertEquals(eaCourtLocation, responseCaseData.getEaCourtLocation());
+        } else {
+            assertThat(responseCaseData.getEaCourtLocation()).isNull();
+        }
     }
 
     @Test
