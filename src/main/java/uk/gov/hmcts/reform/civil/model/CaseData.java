@@ -802,9 +802,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final Document gaFinalOrderDocPreview;
     private final LocalDateTime mainCaseSubmittedDate;
 
-    @JsonProperty("CaseAccessCategory")
-    private final CaseCategory caseAccessCategory;
-
     //PDF Documents
     private final YesOrNo assistedOrderMadeSelection;
     private final AssistedOrderMadeDateHeardDetails assistedOrderMadeDateHeardDetails;
