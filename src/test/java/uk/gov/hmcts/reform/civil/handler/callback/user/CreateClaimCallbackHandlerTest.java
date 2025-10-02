@@ -1304,7 +1304,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     class MidStatementOfTruth {
 
         @Test
-        void shouldSetEmptyCallbackResponse_whenStatementOfTruthMidEventIsCalled() {
+        void shouldSetStatementOfTruthToNull_whenPopulated() {
             String name = "John Smith";
             String role = "Solicitor";
 
@@ -1315,7 +1315,8 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, MID, "statement-of-truth");
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertThat(response.getData()).isNull();
+            assertThat(response.getData())
+                .doesNotHaveToString("uiStatementOfTruth");
         }
     }
 
