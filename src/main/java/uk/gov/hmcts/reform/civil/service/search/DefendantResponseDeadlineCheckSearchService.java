@@ -41,8 +41,8 @@ public class DefendantResponseDeadlineCheckSearchService extends ElasticSearchSe
 
     public Query query(int startIndex, String timeNow) {
         log.info("Call to DefendantResponseDeadlineCheckSearchService query with index {} and timeNow {}", startIndex, timeNow);
-        if (featureToggleService.isWelshEnabledForMainCase()) {
-            return new Query(
+
+        return new Query(
                 boolQuery()
                     .minimumShouldMatch(1)
                     .should(boolQuery()
@@ -55,19 +55,6 @@ public class DefendantResponseDeadlineCheckSearchService extends ElasticSearchSe
                 List.of("reference"),
                 startIndex
             );
-        }
-        return new Query(
-            boolQuery()
-                .minimumShouldMatch(1)
-                .should(boolQuery()
-                            .must(rangeQuery("data.respondent1ResponseDeadline").lt(timeNow))
-                            .mustNot(matchQuery("data.respondent1ResponseDeadlineChecked", "Yes"))
-                            .must(beState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT))
-                            .must(haveNoOngoingBusinessProcess())
-                ),
-            List.of("reference"),
-            startIndex
-        );
     }
 
     public BoolQueryBuilder beState(CaseState state) {

@@ -29,7 +29,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_LIP_SIGN_SETTLEMENT_AGREEMENT_FORM;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SETTLEMENT_AGREEMENT;
@@ -37,6 +36,19 @@ import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SE
 @ExtendWith(MockitoExtension.class)
 class GenerateSettlementAgreementFormCallbackHandlerTest extends BaseCallbackHandlerTest {
 
+    private static final String BEARER_TOKEN = "BEARER_TOKEN";
+    private static final CaseDocument caseDocument = CaseDocument.builder()
+        .createdBy("John")
+        .documentName("document name")
+        .documentSize(0L)
+        .documentType(SETTLEMENT_AGREEMENT)
+        .createdDatetime(LocalDateTime.now())
+        .documentLink(Document.builder()
+                          .documentUrl("fake-url")
+                          .documentFileName("file-name")
+                          .documentBinaryUrl("binary-url")
+                          .build())
+        .build();
     private GenerateSettlementAgreementFormCallbackHandler handler;
     @Mock
     private SettlementAgreementFormGenerator formGenerator;
@@ -44,22 +56,7 @@ class GenerateSettlementAgreementFormCallbackHandlerTest extends BaseCallbackHan
     private SystemGeneratedDocumentService systemGeneratedDocumentService;
     @Mock
     private FeatureToggleService featureToggleService;
-
     private ObjectMapper mapper;
-
-    private static final String BEARER_TOKEN = "BEARER_TOKEN";
-    private static final CaseDocument caseDocument = CaseDocument.builder()
-            .createdBy("John")
-            .documentName("document name")
-            .documentSize(0L)
-            .documentType(SETTLEMENT_AGREEMENT)
-            .createdDatetime(LocalDateTime.now())
-            .documentLink(Document.builder()
-                    .documentUrl("fake-url")
-                    .documentFileName("file-name")
-                    .documentBinaryUrl("binary-url")
-                    .build())
-            .build();
 
     @BeforeEach
     public void setup() {
@@ -78,11 +75,11 @@ class GenerateSettlementAgreementFormCallbackHandlerTest extends BaseCallbackHan
     void shouldGenerateForm_whenAboutToSubmitCalled() {
         given(formGenerator.generate(any(CaseData.class), anyString())).willReturn(caseDocument);
         CaseData caseData = CaseDataBuilder.builder()
-                .respondent1(PartyBuilder.builder()
-                        .soleTrader().build().toBuilder()
-                        .type(Party.Type.INDIVIDUAL)
-                        .build())
-                .build();
+            .respondent1(PartyBuilder.builder()
+                             .soleTrader().build().toBuilder()
+                             .type(Party.Type.INDIVIDUAL)
+                             .build())
+            .build();
 
         handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
         verify(formGenerator).generate(caseData, BEARER_TOKEN);
@@ -98,27 +95,8 @@ class GenerateSettlementAgreementFormCallbackHandlerTest extends BaseCallbackHan
     }
 
     @Test
-    void shouldNotHideSettlementAgreementDocWhenClaimantHasWelshPreferenceAndWelshToggleDisabled() {
-        //Given
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
-        given(formGenerator.generate(
-            any(CaseData.class),
-            anyString()
-        )).willReturn(caseDocument);
-        CaseData caseData = CaseData.builder()
-            .claimantBilingualLanguagePreference("WELSH")
-            .build();
-
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
-        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-        assertThat(updatedData.getPreTranslationDocuments()).hasSize(0);
-        verify(formGenerator).generate(caseData, BEARER_TOKEN);
-    }
-
-    @Test
     void shouldHideSettlementAgreementDocWhenClaimantHasWelshPreference() {
         //Given
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         given(formGenerator.generate(
             any(CaseData.class),
             anyString()
@@ -127,7 +105,8 @@ class GenerateSettlementAgreementFormCallbackHandlerTest extends BaseCallbackHan
             .claimantBilingualLanguagePreference("WELSH")
             .build();
 
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
+        AboutToStartOrSubmitCallbackResponse response =
+            (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         assertThat(updatedData.getPreTranslationDocuments()).hasSize(1);
         verify(formGenerator).generate(caseData, BEARER_TOKEN);
@@ -136,18 +115,19 @@ class GenerateSettlementAgreementFormCallbackHandlerTest extends BaseCallbackHan
     @Test
     void shouldHideSettlementAgreementDocWhenDefendantHasWelshPreference() {
         //Given
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         given(formGenerator.generate(
             any(CaseData.class),
             anyString()
         )).willReturn(caseDocument);
         CaseData caseData = CaseData.builder()
             .caseDataLiP(CaseDataLiP.builder()
-                             .respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("WELSH").build())
+                             .respondent1LiPResponse(RespondentLiPResponse.builder()
+                                                         .respondent1ResponseLanguage("WELSH").build())
                              .build())
             .build();
 
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
+        AboutToStartOrSubmitCallbackResponse response =
+            (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         assertThat(updatedData.getPreTranslationDocuments()).hasSize(1);
         verify(formGenerator).generate(caseData, BEARER_TOKEN);

@@ -43,7 +43,6 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.HearingFeeUtils.calculateAndApplyFee;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getHearingDays;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getLocationRefData;
-import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.isWelshHearingTemplate;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getTotalHearingDurationInMinutes;
 
 @Service
@@ -100,8 +99,7 @@ public class GenerateHearingNoticeHmcHandler extends CallbackHandler {
 
         if (featureToggleService.isHmcForLipEnabled()
             // Check DQ document language if Welsh not enabled, only check main language flag if enabled
-            && ((!featureToggleService.isWelshEnabledForMainCase() && isWelshHearingTemplate(caseData))
-                || (featureToggleService.isWelshEnabledForMainCase() && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())))) {
+            && ((caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual()))) {
             String hearingLocationWelsh = getHearingLocation(camundaVars.getHearingId(), hearing,
                                                         bearerToken, locationRefDataService, true);
             buildDocument(callbackParams, caseDataBuilder, hearing, hearingLocationWelsh, camundaVars.getHearingId(), HEARING_NOTICE_HMC_WELSH);

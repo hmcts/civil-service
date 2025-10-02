@@ -275,8 +275,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             updatedData.showCarmFields(NO);
         }
 
-        if (featureToggleService.isWelshEnabledForMainCase()
-            && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
+        if (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual()) {
             updatedData.bilingualHint(YesOrNo.YES);
         }
 
@@ -1525,8 +1524,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         CaseDocument document = caseData.getSdoOrderDocument();
         if (document != null) {
-            if (featureToggleService.isWelshEnabledForMainCase()
-                && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
+            if (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual()) {
                 List<Element<CaseDocument>> sdoDocuments = callbackParams.getCaseData()
                     .getPreTranslationDocuments();
                 sdoDocuments.add(element(document));
@@ -1545,17 +1543,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         // LiP check ensures LiP cases will not automatically get whitelisted, and instead will have their own ea court check.
         boolean isLipCase = (caseData.isApplicantLiP() || caseData.isRespondent1LiP() || caseData.isRespondent2LiP());
-        if (featureToggleService.isWelshEnabledForMainCase()) {
-            dataBuilder.eaCourtLocation(YES);
-        } else {
-            if (!isLipCase) {
-                log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
-                dataBuilder.eaCourtLocation(YES);
-            } else {
-                boolean isLipCaseEaCourt = isLipCaseWithProgressionEnabledAndCourtWhiteListed(caseData);
-                dataBuilder.eaCourtLocation(isLipCaseEaCourt ? YesOrNo.YES : YesOrNo.NO);
-            }
-        }
+        dataBuilder.eaCourtLocation(YES);
 
         dataBuilder.disposalHearingMethodInPerson(deleteLocationList(
             caseData.getDisposalHearingMethodInPerson()));
@@ -1593,12 +1581,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
             .build();
-    }
-
-    private boolean isLipCaseWithProgressionEnabledAndCourtWhiteListed(CaseData caseData) {
-        return (caseData.isLipvLipOneVOne() || caseData.isLRvLipOneVOne()
-            || (caseData.isLipvLROneVOne() && featureToggleService.isDefendantNoCOnlineForCase(caseData)))
-            && featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation());
     }
 
     private SdoR2SmallClaimsHearing updateHearingAfterDeletingLocationList(SdoR2SmallClaimsHearing sdoR2SmallClaimsHearing) {

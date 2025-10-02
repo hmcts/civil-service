@@ -118,12 +118,6 @@ public class FeatureToggleService {
         return featureToggleApi.isFeatureEnabled("amend-bundle-enabled");
     }
 
-    public boolean isCaseProgressionEnabledAndLocationWhiteListed(String location) {
-        return location != null
-            && featureToggleApi.isFeatureEnabledForLocation("case-progression-location-whitelist", location, true)
-            && isCaseProgressionEnabled();
-    }
-
     public boolean isGaForLipsEnabledAndLocationWhiteListed(String location) {
         return location != null
             && featureToggleApi.isFeatureEnabledForLocation("ea-courts-whitelisted-for-ga-lips", location, false)
@@ -159,10 +153,6 @@ public class FeatureToggleService {
 
     public boolean isGaForWelshEnabled() {
         return featureToggleApi.isFeatureEnabled("generalApplicationsForWelshParty");
-    }
-
-    public boolean isWelshEnabledForMainCase() {
-        return featureToggleApi.isFeatureEnabled("enableWelshForMainCase");
     }
 
     public boolean isLipQueryManagementEnabled(CaseData caseData) {

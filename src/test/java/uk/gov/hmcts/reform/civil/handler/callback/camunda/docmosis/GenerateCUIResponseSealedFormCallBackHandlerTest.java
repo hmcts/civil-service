@@ -139,7 +139,6 @@ class GenerateCUIResponseSealedFormCallBackHandlerTest extends BaseCallbackHandl
     void shouldGenerateForm_whenIsLipVLipEnabledStitchingEnabled() {
         //Given
         when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
         ReflectionTestUtils.setField(handler, "stitchEnabled", false);
         List<Element<CaseDocument>> documents = List.of(
                 element(CaseDocument.builder().documentName("Stitched document").build()),
@@ -173,7 +172,6 @@ class GenerateCUIResponseSealedFormCallBackHandlerTest extends BaseCallbackHandl
     @Test
     void shouldGenerateForm_whenIsLipVLipEnabledStitchingEnabledButRespondent1ClaimResponseTypeForSpecIsFullAdmissionSoNoDqWillGenerate() {
         //Given
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
         List<Element<CaseDocument>> documents = List.of(
             element(CaseDocument.builder().documentName("responseForm.pdf").build()));
         given(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(any(CaseDocument.class), any(CaseData.class))).willReturn(documents);
@@ -201,17 +199,16 @@ class GenerateCUIResponseSealedFormCallBackHandlerTest extends BaseCallbackHandl
     @Test
     void shouldNotCreateDuplicateDocuments_whenStitchingEnabledAndStitchedDocumentCreated() {
         //Given
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         ReflectionTestUtils.setField(handler, "stitchEnabled", true);
-        
+
         List<Element<CaseDocument>> documents = List.of(
                 element(CaseDocument.builder().documentName("Stitched document").build()));
         given(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(any(CaseDocument.class), any(CaseData.class))).willReturn(documents);
         when(civilStitchService.generateStitchedCaseDocument(anyList(), anyString(), anyLong(), eq(DEFENDANT_DEFENCE),
                                                              anyString())).thenReturn(STITCHED_DOC);
         given(formGenerator.generate(any(CaseData.class), anyString())).willReturn(FORM);
-        
+
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
         systemGeneratedCaseDocuments.add(element(DIRECTIONS_QUESTIONNAIRE_DOC));
         CaseData caseData = CaseDataBuilder.builder()
@@ -232,17 +229,16 @@ class GenerateCUIResponseSealedFormCallBackHandlerTest extends BaseCallbackHandl
         long originalFormCount = updatedData.getSystemGeneratedCaseDocuments().stream()
                 .filter(doc -> doc.getValue().getDocumentName().equals(FORM.getDocumentName()))
                 .count();
-        
+
         assertThat(stitchedDocCount).isEqualTo(1);
         assertThat(originalFormCount).isEqualTo(0); // Original form should NOT be added when stitching occurs
-        
+
         verify(formGenerator).generate(caseData, BEARER_TOKEN);
     }
 
     @Test
     void shouldGenerateForm_whenIsLipVLipEnabledStitchingBilingual() {
         //Given
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         given(formGenerator.generate(any(CaseData.class), anyString())).willReturn(FORM);
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
         CaseData caseData = CaseDataBuilder.builder()

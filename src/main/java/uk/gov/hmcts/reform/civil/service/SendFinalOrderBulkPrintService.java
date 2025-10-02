@@ -36,8 +36,8 @@ public class SendFinalOrderBulkPrintService {
     public void sendFinalOrderToLIP(String authorisation, CaseData caseData, String task) {
         Language language = LanguageUtils.determineLanguageForBulkPrint(
             caseData,
-            TASK_ID_CLAIMANT.equals(task),
-            featureToggleService.isWelshEnabledForMainCase());
+            TASK_ID_CLAIMANT.equals(task)
+        );
         if (checkFinalOrderDocumentAvailable(caseData, language)) {
             List<CaseDocument> caseDocuments = new ArrayList<>();
             switch (language) {

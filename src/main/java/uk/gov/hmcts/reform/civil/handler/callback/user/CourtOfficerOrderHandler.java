@@ -83,8 +83,7 @@ public class CourtOfficerOrderHandler extends CallbackHandler {
     private CallbackResponse handleAboutToSubmit(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        if (featureToggleService.isWelshEnabledForMainCase()
-            && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
+        if (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual()) {
             List<Element<CaseDocument>> preTranslationDocuments = caseData.getPreTranslationDocuments();
             preTranslationDocuments.add(element(caseData.getPreviewCourtOfficerOrder()));
             caseDataBuilder.bilingualHint(YesOrNo.YES);
@@ -92,7 +91,7 @@ public class CourtOfficerOrderHandler extends CallbackHandler {
             caseDataBuilder.preTranslationDocuments(preTranslationDocuments);
             caseDataBuilder.urgentFlag(YesOrNo.YES);
         } else {
-            if (featureToggleService.isWelshEnabledForMainCase() && caseData.getPreviewCourtOfficerOrder() != null) {
+            if (caseData.getPreviewCourtOfficerOrder() != null) {
                 caseDataBuilder.build().getCourtOfficersOrders().add(element(caseData.getPreviewCourtOfficerOrder()));
                 caseDataBuilder.previewCourtOfficerOrder(null);
             }

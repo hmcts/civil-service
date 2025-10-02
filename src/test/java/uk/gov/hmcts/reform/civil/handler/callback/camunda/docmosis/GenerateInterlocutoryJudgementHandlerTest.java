@@ -32,7 +32,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.INTERLOCUTORY_JUDGEMENT;
 
@@ -101,35 +100,8 @@ class GenerateInterlocutoryJudgementHandlerTest extends BaseCallbackHandlerTest 
     }
 
     @Test
-    void shouldNotHideInterlocutoryJudgementDocWhenClaimantHasWelshPreferenceAndWelshToggleDisabled() {
-        //Given
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
-        given(interlocutoryJudgementDocGenerator.generateInterlocutoryJudgementDoc(
-            any(CaseData.class),
-            anyString()
-        )).willReturn(FORM);
-        CaseData caseData = CaseData.builder()
-            .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build())
-            .caseDataLiP(CaseDataLiP.builder()
-                             .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                        .claimantResponseOnCourtDecision(
-                                                            ClaimantResponseOnCourtDecisionType.JUDGE_REPAYMENT_DATE)
-                                                        .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT)
-                                                        .build())
-                             .build())
-            .claimantBilingualLanguagePreference("WELSH")
-            .build();
-
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
-        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-        assertThat(updatedData.getPreTranslationDocuments()).hasSize(0);
-        verify(interlocutoryJudgementDocGenerator).generateInterlocutoryJudgementDoc(caseData, BEARER_TOKEN);
-    }
-
-    @Test
     void shouldHideInterlocutoryJudgementDocWhenClaimantHasWelshPreference() {
         //Given
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         given(interlocutoryJudgementDocGenerator.generateInterlocutoryJudgementDoc(
             any(CaseData.class),
             anyString()
@@ -156,7 +128,7 @@ class GenerateInterlocutoryJudgementHandlerTest extends BaseCallbackHandlerTest 
     @Test
     void shouldHideInterlocutoryJudgementDocWhenDefendantHasWelshPreference() {
         //Given
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
+
         given(interlocutoryJudgementDocGenerator.generateInterlocutoryJudgementDoc(
             any(CaseData.class),
             anyString()
