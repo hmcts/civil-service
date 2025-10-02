@@ -1,4 +1,4 @@
-kubecjava:
+java:
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_FQDN}
   memoryRequests: 2Gi
