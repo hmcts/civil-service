@@ -19,7 +19,6 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
-import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.ClaimType;
 import uk.gov.hmcts.reform.civil.enums.ClaimTypeUnspec;
@@ -367,14 +366,12 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final YesOrNo specRespondent1Represented;
     private final YesOrNo specRespondent2Represented;
     private final List<TimelineOfEvents> specResponseTimelineOfEvents;
-    private final List<TimelineOfEvents> specResponseTimelineOfEvents2;
     private final TimelineUploadTypeSpec specClaimResponseTimelineList;
     private final Document specResponseTimelineDocumentFiles;
     private final List<Evidence> specResponselistYourEvidenceList;
     private final List<Evidence> specResponselistYourEvidenceList2;
 
     private final String detailsOfWhyDoesYouDisputeTheClaim;
-    private final String detailsOfWhyDoesYouDisputeTheClaim2;
 
     private final ResponseDocument respondent1SpecDefenceResponseDocument;
     private final ResponseDocument respondent2SpecDefenceResponseDocument;
@@ -497,8 +494,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String litigantFriendSelection;
     @Valid
     private final ClaimProceedsInCaseman claimProceedsInCaseman;
-    @Valid
-    private final ClaimProceedsInCasemanLR claimProceedsInCasemanLR;
 
     //CCD UI flag
     private final YesOrNo applicantSolicitor1PbaAccountsIsEmpty;
@@ -782,8 +777,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String gaRespondentDetails;
     private final String generalAppSuperClaimType;
     private final GAMakeApplicationAvailableCheck makeAppVisibleToRespondents;
-    private final String respondent1OrganisationIDCopy;
-    private final String respondent2OrganisationIDCopy;
     private final GAReferToJudgeGAspec referToJudge;
     private final GAReferToLegalAdvisorGAspec referToLegalAdvisor;
     private final LocalDateTime applicationClosedDate;
@@ -794,7 +787,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private GAHearingNoticeApplication gaHearingNoticeApplication;
     private GAHearingNoticeDetail gaHearingNoticeDetail;
     private String gaHearingNoticeInformation;
-    private final String migrationId;
     private final String freeFormRecitalText;
     private final String freeFormOrderedText;
     private final FreeFormOrderValues orderOnCourtInitiative;
@@ -835,8 +827,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     // GA for LIP
     private final YesOrNo isApplicantResponded;
     private final YesOrNo isRespondentResponded;
-    private final IdamUserDetails claimantUserDetails;
-    private final IdamUserDetails defendantUserDetails;
     private final HelpWithFees gaAdditionalHelpWithFees;
     private final uk.gov.hmcts.reform.civil.model.genapplication.HelpWithFeesDetails gaHwfDetails;
     private final uk.gov.hmcts.reform.civil.model.genapplication.HelpWithFeesDetails additionalHwfDetails;
