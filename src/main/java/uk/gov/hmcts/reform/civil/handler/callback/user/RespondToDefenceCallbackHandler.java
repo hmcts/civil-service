@@ -69,6 +69,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.buildElemCaseDocument;
 import static uk.gov.hmcts.reform.civil.utils.ExpertUtils.addEventAndDateAddedToApplicantExperts;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateDQPartyIds;
+import static uk.gov.hmcts.reform.civil.utils.PersistDataUtils.persistFlagsForParties;
 import static uk.gov.hmcts.reform.civil.utils.WitnessUtils.addEventAndDateAddedToApplicantWitnesses;
 
 @Service
@@ -108,7 +109,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             callbackKey(MID, "experts"), this::validateApplicantExperts,
             callbackKey(MID, "witnesses"), this::validateApplicantWitnesses,
             callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates,
-            callbackKey(MID, "statement-of-truth"), this::emptyCallbackResponse,
+            callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth,
             callbackKey(ABOUT_TO_SUBMIT), this::aboutToSubmit,
             callbackKey(SUBMITTED), this::buildConfirmation
         );
@@ -220,13 +221,32 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             .build();
     }
 
+    private CallbackResponse resetStatementOfTruth(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+
+        // resetting statement of truth field, this resets in the page, but the data is still sent to the db.
+        // setting null here does not clear, need to overwrite with value.
+        // must be to do with the way XUI cache data entered through the lifecycle of an event.
+        CaseData updatedCaseData = caseData.toBuilder()
+            .uiStatementOfTruth(StatementOfTruth.builder().role("").build())
+            .build();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(updatedCaseData.toMap(objectMapper))
+            .build();
+    }
+
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        CaseData oldCaseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetailsBefore());
         LocalDateTime currentTime = time.now();
 
         CaseData.CaseDataBuilder builder = caseData.toBuilder()
             .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE))
             .applicant1ResponseDate(currentTime);
+
+        // persist party flags (ccd issue)
+        persistFlagsForParties(oldCaseData, caseData, builder);
 
         log.debug(
             "Case management location for {} is {}",

@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallba
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallbackhandlertasks.ValidateUnavailableDates;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.UserService;
@@ -58,6 +59,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDEN
 
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings("unchecked")
 @Slf4j
 public class RespondToClaimCallbackHandler extends CallbackHandler implements ExpertsValidator, WitnessesValidator {
 
@@ -90,7 +92,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             .put(callbackKey(MID, "experts"), this::validateRespondentExperts)
             .put(callbackKey(MID, "witnesses"), this::validateRespondentWitnesses)
             .put(callbackKey(MID, "upload"), this::emptyCallbackResponse)
-            .put(callbackKey(MID, "statement-of-truth"), this::emptyCallbackResponse)
+            .put(callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::setApplicantResponseDeadline)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
@@ -163,6 +165,18 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .data(updatedData.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse resetStatementOfTruth(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        log.info("Resetting statement of truth for Case ID: {}", caseData.getCcdCaseReference());
+        CaseData updatedCaseData = caseData.toBuilder()
+            .uiStatementOfTruth(StatementOfTruth.builder().role("").build())
+            .build();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(updatedCaseData.toMap(objectMapper))
             .build();
     }
 
