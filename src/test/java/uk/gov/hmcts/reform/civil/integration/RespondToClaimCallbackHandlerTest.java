@@ -1263,7 +1263,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     class MidStatementOfTruth {
 
         @Test
-        void shouldSetEmptyCallbackResponse_whenStatementOfTruthMidEventIsCalled() {
+        void shouldSetStatementOfTruthFieldsToNull_whenPopulated() {
             String name = "John Smith";
             String role = "Solicitor";
             //Given
@@ -1275,7 +1275,10 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             //When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             //Then
-            assertThat(response.getData()).isNull();
+            assertThat(response.getData())
+                .extracting("uiStatementOfTruth")
+                .doesNotHaveToString("name")
+                .doesNotHaveToString("role");
         }
     }
 
