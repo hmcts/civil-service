@@ -102,7 +102,7 @@ def getCivilCcdDefinitionBranch() {
   for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "civilDefinitionBranch:")) {
     return label.minus("civilDefinitionBranch:").trim()
   }
-  return "test-2454"
+  return "master"
 }
 
 withPipeline(type, product, component) {
