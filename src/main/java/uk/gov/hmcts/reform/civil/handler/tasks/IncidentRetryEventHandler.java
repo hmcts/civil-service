@@ -186,7 +186,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
 
     private String resolveStartTime(String incidentStartTime) {
         return (incidentStartTime == null || incidentStartTime.isBlank())
-            ? INCIDENT_FORMATTER.format(Instant.now().minus(24, ChronoUnit.HOURS))
+            ? INCIDENT_FORMATTER.format(Instant.now().minus(23, ChronoUnit.HOURS))
             : incidentStartTime;
     }
 
