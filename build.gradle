@@ -341,7 +341,7 @@ dependencies {
 
   // CVE-2025-48734 force update of commons-beanutils.
   implementation group: 'commons-beanutils', name: 'commons-beanutils', version: '1.11.0'
-  implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.8.0'
+  implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.8.13'
   implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.8'
   implementation group: 'jakarta.servlet', name: 'jakarta.servlet-api', version: '6.1.0'
   implementation group: 'io.hypersistence', name: 'hypersistence-utils-hibernate-63', version: '3.11.0'
