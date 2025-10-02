@@ -8,7 +8,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentUploadException;
@@ -69,18 +68,6 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
         String errorMessage = "Document upload error with message: %s for case %s run by user %s";
         log.error(errorMessage.formatted(documentUploadException.getMessage(), getCaseId(contentCachingRequestWrapper),
                                          getUserId(contentCachingRequestWrapper)
-        ));
-        return new ResponseEntity<>("Document upload unsuccessful", new HttpHeaders(), HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(MaxUploadSizeExceededException.class)
-    public ResponseEntity<Object> documentUploadException(MaxUploadSizeExceededException maxUploadSizeExceededException,
-                                                          ContentCachingRequestWrapper contentCachingRequestWrapper) {
-        String errorMessage = "Max upload size exceeded error with message: %s for case %s run by user %s";
-        log.error(errorMessage.formatted(
-            maxUploadSizeExceededException.getMessage(),
-            getCaseId(contentCachingRequestWrapper),
-            getUserId(contentCachingRequestWrapper)
         ));
         return new ResponseEntity<>("Document upload unsuccessful", new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
