@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.testsupport.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
@@ -136,10 +136,10 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @MockBean
+    @MockitoBean
     private Time time;
 
-    @MockBean
+    @MockitoBean
     private DeadlinesCalculator deadlinesCalculator;
 
     @Autowired
@@ -154,19 +154,19 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Autowired
     private FrcDocumentsUtils frcDocumentsUtils;
 
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
 
-    @MockBean
+    @MockitoBean
     private CoreCaseUserService coreCaseUserService;
 
-    @MockBean
+    @MockitoBean
     private LocationReferenceDataService locationRefDataService;
 
-    @MockBean
+    @MockitoBean
     private CourtLocationUtils courtLocationUtils;
 
-    @MockBean
+    @MockitoBean
     private IStateFlowEngine stateFlowEngine;
 
     @Mock
@@ -175,7 +175,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Autowired
     private UserService userService;
 
-    @MockBean
+    @MockitoBean
     private CaseFlagsInitialiser caseFlagInitialiser;
 
     @Nested

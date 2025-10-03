@@ -9,7 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.testsupport.mockito.MockitoBean;
 import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -73,18 +73,18 @@ class FeesPaymentServiceTest {
 
     @Autowired
     private FeesPaymentService feesPaymentService;
-    @MockBean
+    @MockitoBean
     private PaymentsClient paymentsClient;
-    @MockBean
+    @MockitoBean
     private CoreCaseDataService coreCaseDataService;
     @Autowired
     private CaseDetailsConverter caseDetailsConverter;
     private ObjectMapper objectMapper = new ObjectMapper();
-    @MockBean
+    @MockitoBean
     private PinInPostConfiguration pinInPostConfiguration;
-    @MockBean
+    @MockitoBean
     private UpdatePaymentStatusService updatePaymentStatusService;
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
 
     @BeforeEach

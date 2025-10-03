@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.testsupport.mockito.MockitoBean;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -115,28 +115,28 @@ class DefaultJudgmentNonDivergentSpecPiPLetterGeneratorTest {
                               .documentBinaryUrl("binary-url")
                               .build()).build();
 
-    @MockBean
+    @MockitoBean
     private SecuredDocumentManagementService documentManagementService;
 
-    @MockBean
+    @MockitoBean
     private DocumentGeneratorService documentGeneratorService;
 
     @Autowired
     private DefaultJudgmentNonDivergentSpecPiPLetterGenerator generator;
 
-    @MockBean
+    @MockitoBean
     private BulkPrintService bulkPrintService;
 
-    @MockBean
+    @MockitoBean
     private DocumentDownloadService documentDownloadService;
 
-    @MockBean
+    @MockitoBean
     private PinInPostConfiguration pipInPostConfiguration;
 
-    @MockBean
+    @MockitoBean
     private GeneralAppFeesService generalAppFeesService;
 
-    @MockBean
+    @MockitoBean
     private CivilStitchService civilStitchService;
 
     @BeforeEach

@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.civil.service.robotics.utils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.testsupport.mockito.MockitoBean;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -22,7 +22,7 @@ public class LocationRefDataUtilTest {
 
     @InjectMocks
     private LocationRefDataUtil locationRefDataUtil;
-    @MockBean
+    @MockitoBean
     private LocationReferenceDataService locationRefDataService;
     private static final String BEARER_TOKEN = "Bearer Token";
 
