@@ -122,6 +122,7 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
     public SealedClaimFormForSpec getTemplateData(CaseData caseData) {
         Optional<SolicitorReferences> solicitorReferences = ofNullable(caseData.getSolicitorReferences());
         BigDecimal interest = interestCalculator.calculateInterest(caseData);
+
         return SealedClaimFormForSpec.builder()
             .ccdCaseReference(formatCcdCaseReference(caseData))
             .referenceNumber(caseData.getLegacyCaseReference())
