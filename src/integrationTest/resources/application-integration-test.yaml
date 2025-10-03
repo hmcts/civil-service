@@ -1,0 +1,4 @@
+spring:
+  flyway:
+    postgresql:
+      accept-unknown-versions: true
