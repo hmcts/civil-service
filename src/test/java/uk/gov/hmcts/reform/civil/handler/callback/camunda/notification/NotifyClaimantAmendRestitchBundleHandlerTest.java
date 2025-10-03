@@ -7,7 +7,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.testsupport.mockito.MockitoBean;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -58,13 +58,13 @@ class NotifyClaimantAmendRestitchBundleHandlerTest {
     public static final String BILINGUAL_TEMPLATE_ID = "bilingual-template-id";
     public static final String DATE_FORMAT = "dd-MM-yyyy";
 
-    @MockBean
+    @MockitoBean
     private NotificationService notificationService;
-    @MockBean
+    @MockitoBean
     private NotificationsProperties notificationsProperties;
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
-    @MockBean
+    @MockitoBean
     private NotificationsSignatureConfiguration configuration;
     @Autowired
     NotifyClaimantAmendRestitchBundleHandler handler;

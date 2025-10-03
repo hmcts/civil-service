@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback;
 
-import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.testsupport.mockito.MockitoBean;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -21,9 +21,9 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKN
 public abstract class BaseCallbackHandlerTest {
 
     public static final Long CASE_ID = 1594901956117591L;
-    @MockBean
+    @MockitoBean
     protected AuthTokenGenerator authTokenGenerator;
-    @MockBean
+    @MockitoBean
     protected UserService userService;
 
     public CallbackParams callbackParamsOf(Map<String, Object> data, CallbackType type, CaseState state) {

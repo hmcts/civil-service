@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.testsupport.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -176,39 +176,39 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     private RespondToClaimSpecCallbackHandler handler;
     @Autowired
     private ObjectMapper objectMapper;
-    @MockBean
+    @MockitoBean
     private Time time;
-    @MockBean
+    @MockitoBean
     private PaymentDateValidator validator;
-    @MockBean
+    @MockitoBean
     private UnavailableDateValidator dateValidator;
-    @MockBean
+    @MockitoBean
     private FeatureToggleService toggleService;
-    @MockBean
+    @MockitoBean
     private PostcodeValidator postcodeValidator;
-    @MockBean
+    @MockitoBean
     private DeadlinesCalculator deadlinesCalculator;
     @Autowired
     private UserService userService;
-    @MockBean
+    @MockitoBean
     private CoreCaseUserService coreCaseUserService;
     @Mock
     private StateFlow mockedStateFlow;
-    @MockBean
+    @MockitoBean
     private SimpleStateFlowEngine stateFlowEngine;
     @Mock
     private DateOfBirthValidator dateOfBirthValidator;
-    @MockBean
+    @MockitoBean
     private LocationReferenceDataService locationRefDataService;
-    @MockBean
+    @MockitoBean
     private CourtLocationUtils courtLocationUtils;
-    @MockBean
+    @MockitoBean
     private CaseFlagsInitialiser caseFlagsInitialiser;
-    @MockBean
+    @MockitoBean
     private DeadlineExtensionCalculatorService deadlineExtensionCalculatorService;
-    @MockBean
+    @MockitoBean
     private DQResponseDocumentUtils dqResponseDocumentUtils;
-    @MockBean
+    @MockitoBean
     private InterestCalculator interestCalculator;
 
     @Spy

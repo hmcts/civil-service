@@ -10,7 +10,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.testsupport.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.model.PreviousOrganisation;
@@ -88,21 +88,21 @@ class RoboticsDataMapperTest {
         .contactInformation(List.of(CONTACT_INFORMATION))
         .build();
 
-    @MockBean
+    @MockitoBean
     OrganisationApi organisationApi;
-    @MockBean
+    @MockitoBean
     AuthTokenGenerator authTokenGenerator;
-    @MockBean
+    @MockitoBean
     UserService userService;
-    @MockBean
+    @MockitoBean
     FeatureToggleService featureToggleService;
-    @MockBean
+    @MockitoBean
     PrdAdminUserConfiguration userConfig;
-    @MockBean
+    @MockitoBean
     private Time time;
-    @MockBean
+    @MockitoBean
     LocationReferenceDataService locationRefDataService;
-    @MockBean
+    @MockitoBean
     LocationRefDataUtil locationRefDataUtil;
     private static final String BEARER_TOKEN = "Bearer Token";
     LocalDateTime localDateTime;

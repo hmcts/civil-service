@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.testsupport.mockito.MockitoBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -66,34 +66,34 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_LIP_CLAIM;
     properties = {"reference.database.enabled=false"})
 class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-    @MockBean
+    @MockitoBean
     private DeadlinesCalculator deadlinesCalculator;
 
-    @MockBean
+    @MockitoBean
     private FeatureToggleService toggleService;
 
-    @MockBean
+    @MockitoBean
     private SpecReferenceNumberRepository specReferenceNumberRepository;
 
-    @MockBean
+    @MockitoBean
     private CaseFlagsInitialiser caseFlagInitialiser;
 
-    @MockBean
+    @MockitoBean
     private Time time;
 
-    @MockBean
+    @MockitoBean
     private DefendantPinToPostLRspecService defendantPinToPostLRspecService;
 
-    @MockBean
+    @MockitoBean
     private HelpWithFeesForTabService hwfForTabService;
 
-    @MockBean
+    @MockitoBean
     CoreCaseEventDataService coreCaseEventDataService;
 
     @Autowired
     private CreateClaimLipCallBackHandler handler;
 
-    @MockBean
+    @MockitoBean
     private LocationReferenceDataService locationReferenceDataService;
 
     public static final String REFERENCE_NUMBER = "000MC001";

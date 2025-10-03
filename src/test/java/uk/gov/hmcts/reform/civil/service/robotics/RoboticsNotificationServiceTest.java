@@ -11,7 +11,7 @@ import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.testsupport.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.config.PrdAdminUserConfiguration;
@@ -97,29 +97,29 @@ class RoboticsNotificationServiceTest {
     RoboticsEmailConfiguration emailConfiguration;
     @Autowired
     RoboticsDataMapper roboticsDataMapper;
-    @MockBean
+    @MockitoBean
     FeatureToggleService featureToggleService;
 
     @Captor
     private ArgumentCaptor<EmailData> emailDataArgumentCaptor;
     private static final String BEARER_TOKEN = "Bearer Token";
-    @MockBean
+    @MockitoBean
     SendGridClient sendGridClient;
-    @MockBean
+    @MockitoBean
     OrganisationApi organisationApi;
-    @MockBean
+    @MockitoBean
     AuthTokenGenerator authTokenGenerator;
-    @MockBean
+    @MockitoBean
     UserService userService;
-    @MockBean
+    @MockitoBean
     PrdAdminUserConfiguration userConfig;
-    @MockBean
+    @MockitoBean
     RoboticsDataMapperForSpec roboticsDataMapperForSpec;
-    @MockBean
+    @MockitoBean
     private Time time;
-    @MockBean
+    @MockitoBean
     LocationReferenceDataService locationRefDataService;
-    @MockBean
+    @MockitoBean
     LocationRefDataUtil locationRefDataUtil;
 
     LocalDateTime localDateTime;

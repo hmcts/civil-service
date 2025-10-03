@@ -1,18 +1,19 @@
 package uk.gov.hmcts.reform.dashboard.entities;
 
+import com.vladmihalcea.hibernate.type.json.JsonType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import org.hibernate.annotations.Type;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
@@ -64,7 +65,7 @@ public class DashboardNotificationsEntity implements Serializable {
     @Schema(name = "description_cy")
     private String descriptionCy;
 
-    @Type(type = "jsonb")
+    @Type(JsonType.class)
     @Column(name = "message_params", columnDefinition = "jsonb")
     @Schema(name = "message_params")
     private HashMap<String, Object> params;

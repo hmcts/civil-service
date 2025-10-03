@@ -10,7 +10,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.testsupport.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
@@ -70,14 +70,14 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
     private final ObjectMapper mapper = new ObjectMapper();
     @Autowired
     private GenerateDiscontinueClaimCallbackHandler handler;
-    @MockBean
+    @MockitoBean
     private NoticeOfDiscontinuanceFormGenerator formGenerator;
-    @MockBean
+    @MockitoBean
     private RuntimeService runTimeService;
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
 
-    @MockBean
+    @MockitoBean
     private OrganisationService organisationService;
     public static final String PROCESS_INSTANCE_ID = "processInstanceId";
 
