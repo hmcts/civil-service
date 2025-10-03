@@ -61,9 +61,6 @@ class DashboardScenarioProcessorTest {
 
     @Test
     void createDashboardScenario_shouldCallDashboardService() {
-        String caseId = "123";
-        String scenario = "Scenario.AAA6.ClaimIssue.ClaimSubmit.Required";
-
         CaseDetails caseDetails = CaseDetails.builder().build();
         CaseData caseData = CaseData.builder()
             .ccdCaseReference(123L)
@@ -74,11 +71,10 @@ class DashboardScenarioProcessorTest {
         when(userService.getAccessToken(anyString(), anyString())).thenReturn("mock-token");
         when(userConfig.getUserName()).thenReturn("user");
         when(userConfig.getPassword()).thenReturn("pass");
-        when(mapper.mapCaseDataToParams(caseData))
-            .thenReturn(new HashMap<String, Object>() {{
-                put("key", "value");
-            }});
+        when(mapper.mapCaseDataToParams(caseData)).thenReturn(new HashMap<>() {{put("key", "value");}});
 
+        String caseId = "123";
+        String scenario = "Scenario.AAA6.ClaimIssue.ClaimSubmit.Required";
         processor.createDashboardScenario(caseId, scenario);
 
         verify(dashboardScenariosService).createScenario(

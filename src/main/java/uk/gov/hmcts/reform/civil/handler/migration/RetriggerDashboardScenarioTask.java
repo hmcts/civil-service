@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.migration;
 
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseReference;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.DashboardScenarioCaseReference;
 import uk.gov.hmcts.reform.civil.handler.event.DashboardScenarioProcessor;
 import uk.gov.hmcts.reform.civil.model.CaseData;
