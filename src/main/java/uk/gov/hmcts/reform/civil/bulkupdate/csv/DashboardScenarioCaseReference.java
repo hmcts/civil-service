@@ -12,6 +12,7 @@ import lombok.experimental.SuperBuilder;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @SuperBuilder
 @Data
+@EqualsAndHashCode(callSuper = true)
 @JsonPropertyOrder(value = {"caseReference"})
 @AllArgsConstructor
 @NoArgsConstructor
