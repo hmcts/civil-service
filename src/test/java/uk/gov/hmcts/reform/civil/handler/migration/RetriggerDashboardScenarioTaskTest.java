@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.handler.migration;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseReference;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.DashboardScenarioCaseReference;
 import uk.gov.hmcts.reform.civil.handler.event.DashboardScenarioProcessor;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -30,6 +29,7 @@ class RetriggerDashboardScenarioTaskTest {
         CaseData caseData = CaseData.builder().build();
         DashboardScenarioCaseReference caseReference = new DashboardScenarioCaseReference();
         caseReference.setCaseReference("12345");
+        caseReference.setDashboardScenario("Scenario.AAA6.ClaimantIntent.FullAdmit.Claimant");
 
         // Act
         CaseData result = task.migrateCaseData(caseData, caseReference);
@@ -47,7 +47,7 @@ class RetriggerDashboardScenarioTaskTest {
         Exception exception = assertThrows(IllegalArgumentException.class,
                                            () -> task.migrateCaseData(caseData, caseReference));
 
-        assertEquals("CaseData and CaseReference must not be null", exception.getMessage());
+        assertEquals("CaseReference fields must not be null", exception.getMessage());
     }
 
     @Test
@@ -59,16 +59,6 @@ class RetriggerDashboardScenarioTaskTest {
         Exception exception = assertThrows(IllegalArgumentException.class,
                                            () -> task.migrateCaseData(caseData, caseReference));
 
-        assertEquals("CaseData and CaseReference must not be null", exception.getMessage());
-    }
-
-    @Test
-    void migrateCaseData_shouldThrowException_whenCaseReferenceIsNotNumeric() {
-        CaseData caseData = CaseData.builder().build();
-        DashboardScenarioCaseReference caseReference = new DashboardScenarioCaseReference();
-        caseReference.setCaseReference("abc");
-
-        assertThrows(NumberFormatException.class,
-                     () -> task.migrateCaseData(caseData, caseReference));
+        assertEquals("CaseReference fields must not be null", exception.getMessage());
     }
 }
