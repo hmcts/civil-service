@@ -61,9 +61,9 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
             caseReferences = caseIds.stream()
                 .map(id -> {
                     DashboardScenarioCaseReference instance = new DashboardScenarioCaseReference();
-                        instance.setCaseReference(id);
-                        instance.setDashboardScenario(scenario);
-                        return task.getType().cast(instance);
+                    instance.setCaseReference(id);
+                    instance.setDashboardScenario(scenario);
+                    return task.getType().cast(instance);
                 })
                 .toList();
             log.info("Created {} case references from Camunda variables", caseReferences.size());
