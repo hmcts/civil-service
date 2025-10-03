@@ -319,7 +319,6 @@ configurations.all {
   exclude group: 'org.springframework.security', module: 'spring-security-rsa'
   exclude group: 'org.projectlombok', module: 'lombok-mapstruct-binding'
   exclude group: "com.vladmihalcea", module: "hibernate-types-52"
-  exclude group: "org.apache.httpcomponents", module: "httpclient"
 }
 
 dependencies {
@@ -364,7 +363,7 @@ dependencies {
   implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '6.1.9'
   implementation group: 'com.github.hmcts.java-logging', name: 'logging-appinsights', version: '6.1.9'
 
-  implementation group: 'com.github.hmcts', name: 'core-case-data-store-client', version: '5.1.1'
+  implementation group: 'com.github.hmcts', name: 'core-case-data-store-client', version: '5.2.0'
   implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.1'
   implementation group: 'com.github.hmcts', name: 'send-letter-client', version: '3.0.23.1'
   implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version:'8.1'
