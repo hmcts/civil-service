@@ -56,8 +56,6 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDEN
 @Slf4j
 public class InformAgreedExtensionDateForSpecCallbackHandler extends CallbackHandler {
 
-    private static final List<CaseEvent> EVENTS = List.of(INFORM_AGREED_EXTENSION_DATE_SPEC);
-
     private final ExitSurveyContentService exitSurveyContentService;
     private final DeadlineExtensionValidator validator;
     private final ObjectMapper objectMapper;
@@ -90,10 +88,7 @@ public class InformAgreedExtensionDateForSpecCallbackHandler extends CallbackHan
 
     @Override
     public List<CaseEvent> handledEvents() {
-        if (toggleService.isPinInPostEnabled()) {
-            return List.of(EXTEND_RESPONSE_DEADLINE, INFORM_AGREED_EXTENSION_DATE_SPEC);
-        }
-        return EVENTS;
+        return List.of(EXTEND_RESPONSE_DEADLINE, INFORM_AGREED_EXTENSION_DATE_SPEC);
     }
 
     private CallbackResponse populateIsRespondent1Flag(CallbackParams callbackParams) {
