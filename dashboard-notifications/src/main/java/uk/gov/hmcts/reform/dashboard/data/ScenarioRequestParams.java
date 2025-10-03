@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.dashboard.data;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 
@@ -20,7 +21,7 @@ public class ScenarioRequestParams {
 
     @SuppressWarnings("java:S1319")
     @JsonCreator
-    public ScenarioRequestParams(HashMap<String, Object> params) {
+    public ScenarioRequestParams(@JsonProperty("params") HashMap<String, Object> params) {
         this.params = params;
     }
 }
