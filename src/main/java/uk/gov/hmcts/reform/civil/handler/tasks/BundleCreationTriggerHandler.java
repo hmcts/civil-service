@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.event.BundleCreationTriggerEvent;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.Bundle;
@@ -14,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.NoCacheUserService;
 import uk.gov.hmcts.reform.civil.service.search.BundleCreationTriggerService;
 
 import java.util.List;
@@ -29,8 +31,10 @@ public class BundleCreationTriggerHandler extends BaseExternalTaskHandler {
     private final ApplicationEventPublisher applicationEventPublisher;
     private final CaseDetailsConverter caseDetailsConverter;
     private final CoreCaseDataService coreCaseDataService;
+    private final SystemUpdateUserConfiguration userConfig;
     @Value("${stitch-bundle.wait-time-in-milliseconds}")
     private Integer waitTime;
+    private final NoCacheUserService noCacheUserService;
 
     @SuppressWarnings("java:S2142")
     @Override
@@ -39,11 +43,13 @@ public class BundleCreationTriggerHandler extends BaseExternalTaskHandler {
         List<Long> ids = cases.stream().map(CaseDetails::getId).sorted().toList();
         log.info("Job '{}' found {} case(s) with ids {}", externalTask.getTopicName(), cases.size(), ids);
         log.info("Initial  waitTime in milliseconds is {}", waitTime);
+        String accessToken = noCacheUserService.getAccessToken(userConfig.getUserName(),
+                                                         userConfig.getPassword());
         cases.forEach(caseDetails -> {
             try {
                 boolean isBundleCreated = getIsBundleCreatedForHearingDate(caseDetails.getId());
                 if (!isBundleCreated) {
-                    applicationEventPublisher.publishEvent(new BundleCreationTriggerEvent(caseDetails.getId()));
+                    applicationEventPublisher.publishEvent(new BundleCreationTriggerEvent(caseDetails.getId(), accessToken));
                     TimeUnit.MILLISECONDS.sleep(waitTime);
                 } else {
                     log.info("Bundle is already created for {}", caseDetails.getId());
