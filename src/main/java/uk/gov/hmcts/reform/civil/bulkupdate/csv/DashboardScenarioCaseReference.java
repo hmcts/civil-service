@@ -10,15 +10,14 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-@Data
 @SuperBuilder
-@EqualsAndHashCode
+@Data
 @JsonPropertyOrder(value = {"caseReference"})
 @AllArgsConstructor
 @NoArgsConstructor
 @SuppressWarnings("java:S1700")
-public class CaseReference {
+public class DashboardScenarioCaseReference extends CaseReference {
 
     @JsonProperty
-    private String caseReference;
+    private String dashboardScenario;
 }
