@@ -118,7 +118,6 @@ class CaseProceedsInCasemanApplicantNotificationCallbackHandlerTest extends Base
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
             handler.handle(params);

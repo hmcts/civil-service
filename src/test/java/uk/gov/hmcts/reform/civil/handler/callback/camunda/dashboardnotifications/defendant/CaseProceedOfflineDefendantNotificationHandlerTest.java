@@ -98,7 +98,6 @@ class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCallbackHan
                 .generalApplications(gaApplications)
                     .previousCCDState(AWAITING_APPLICANT_INTENTION).build();
 
-            when(toggleService.isLipVLipEnabled()).thenReturn(true);
             when(toggleService.isGaForLipsEnabled()).thenReturn(true);
             when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
             HashMap<String, Object> scenarioParams = new HashMap<>();
@@ -141,7 +140,6 @@ class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCallbackHan
                 .ccdCaseReference(12890L)
                 .previousCCDState(CASE_PROGRESSION).build();
 
-            when(toggleService.isLipVLipEnabled()).thenReturn(true);
             when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
             when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
             HashMap<String, Object> scenarioParams = new HashMap<>();
@@ -174,7 +172,6 @@ class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCallbackHan
                 .ccdCaseReference(12890L)
                 .previousCCDState(CASE_PROGRESSION).build();
 
-            when(toggleService.isLipVLipEnabled()).thenReturn(true);
             when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
             when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
             HashMap<String, Object> scenarioParams = new HashMap<>();
@@ -211,7 +208,6 @@ class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCallbackHan
                     .ccdCaseReference(12890L)
                     .previousCCDState(PENDING_CASE_ISSUED).build();
 
-            when(toggleService.isLipVLipEnabled()).thenReturn(true);
             when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
@@ -240,7 +236,6 @@ class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCallbackHan
                 .ccdCaseReference(12890L)
                 .previousCCDState(CASE_PROGRESSION).build();
 
-            when(toggleService.isLipVLipEnabled()).thenReturn(true);
             when(toggleService.isCaseProgressionEnabled()).thenReturn(false);
             when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
             HashMap<String, Object> scenarioParams = new HashMap<>();
@@ -270,7 +265,6 @@ class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCallbackHan
                     .ccdCaseReference(12890L)
                     .build();
 
-            when(toggleService.isLipVLipEnabled()).thenReturn(true);
             when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
@@ -317,7 +311,6 @@ class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCallbackHan
                 .previousCCDState(CaseState.All_FINAL_ORDERS_ISSUED)
                 .generalApplications(gaApplications)
                 .build();
-            when(toggleService.isLipVLipEnabled()).thenReturn(true);
             when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
             when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
 
@@ -349,7 +342,6 @@ class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCallbackHan
                 .responseClaimTrack(AllocatedTrack.FAST_CLAIM.toString())
                 .previousCCDState(CaseState.All_FINAL_ORDERS_ISSUED).build();
 
-            when(toggleService.isLipVLipEnabled()).thenReturn(true);
             when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);

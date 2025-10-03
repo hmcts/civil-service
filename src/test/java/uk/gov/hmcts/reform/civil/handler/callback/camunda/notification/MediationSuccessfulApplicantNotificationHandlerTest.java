@@ -140,7 +140,6 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             //Given
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
             Party applicant1 = PartyBuilder.builder().soleTrader()
                 .partyEmail(APPLICANT_LIP_MAIL)
                 .build();
@@ -172,7 +171,6 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             //Given
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
             Party applicant1 = PartyBuilder.builder().soleTrader()
                 .partyEmail(APPLICANT_LIP_MAIL)
                 .build();
@@ -205,7 +203,6 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             //Given
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
             Party applicant1 = PartyBuilder.builder().soleTrader()
                 .partyEmail(APPLICANT_LIP_MAIL)
                 .build();
@@ -370,7 +367,6 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             //Given
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP()
                 .applicant1Represented(NO)
                 .setClaimTypeToSpecClaim()
@@ -398,7 +394,6 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             //Given
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiPBilingual()
                 .legacyCaseReference(REFERENCE_NUMBER)

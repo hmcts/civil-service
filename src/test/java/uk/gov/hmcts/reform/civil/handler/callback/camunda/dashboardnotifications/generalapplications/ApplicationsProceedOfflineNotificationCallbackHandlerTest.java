@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.generalapplications;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,7 +33,6 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
@@ -67,23 +65,6 @@ class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends BaseCall
 
     @Nested
     class AboutToSubmitCallback {
-
-        @BeforeEach
-        void setup() {
-            when(toggleService.isLipVLipEnabled()).thenReturn(true);
-        }
-
-        @Test
-        void shouldNotCallRecordScenario_whenLipVLipIsDisabled() {
-            when(toggleService.isLipVLipEnabled()).thenReturn(false);
-
-            CallbackParams callbackParams = CallbackParamsBuilder.builder()
-                .of(ABOUT_TO_SUBMIT, CaseData.builder().build())
-                .build();
-
-            handler.handle(callbackParams);
-            verifyNoInteractions(dashboardScenariosService);
-        }
 
         @Test
         void shouldReturnCorrectActivityId_whenClaimant() {

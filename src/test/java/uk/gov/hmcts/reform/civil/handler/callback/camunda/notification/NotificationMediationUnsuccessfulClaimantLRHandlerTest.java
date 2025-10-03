@@ -163,7 +163,6 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
 
             //Given
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
             CaseData caseData = CaseData.builder()
                 .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(APPLICANT_PARTY_NAME)
                                 .partyEmail(CLAIMANT_EMAIL_ADDRESS)
@@ -197,7 +196,6 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
 
             //Given
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
             CaseData caseData = CaseData.builder()
                 .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(APPLICANT_PARTY_NAME)
                                 .partyEmail(CLAIMANT_EMAIL_ADDRESS)

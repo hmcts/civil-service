@@ -55,9 +55,7 @@ public class ApplicationsProceedOfflineNotificationCallbackHandler extends Callb
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return featureToggleService.isLipVLipEnabled()
-            ? Map.of(callbackKey(ABOUT_TO_SUBMIT), this::configureScenarioForProceedOffline)
-            : Map.of(callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse);
+        return Map.of(callbackKey(ABOUT_TO_SUBMIT), this::configureScenarioForProceedOffline);
     }
 
     @Override

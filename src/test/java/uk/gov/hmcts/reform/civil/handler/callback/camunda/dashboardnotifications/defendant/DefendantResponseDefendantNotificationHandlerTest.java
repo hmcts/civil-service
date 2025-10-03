@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -87,10 +86,6 @@ class DefendantResponseDefendantNotificationHandlerTest extends BaseCallbackHand
 
     @Nested
     class AboutToSubmitCallback {
-        @BeforeEach
-        void setup() {
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        }
 
         @Test
         void configureDashboardNotificationsForDefendantResponseForPartAdmitImmediately() {
@@ -409,8 +404,6 @@ class DefendantResponseDefendantNotificationHandlerTest extends BaseCallbackHand
             HashMap<String, Object> params = new HashMap<>();
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
                 .toBuilder()
                 .legacyCaseReference("reference")
@@ -440,8 +433,6 @@ class DefendantResponseDefendantNotificationHandlerTest extends BaseCallbackHand
             HashMap<String, Object> params = new HashMap<>();
 
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
                 .toBuilder()
@@ -475,8 +466,6 @@ class DefendantResponseDefendantNotificationHandlerTest extends BaseCallbackHand
 
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
                 .toBuilder()
                 .legacyCaseReference("reference")
@@ -507,8 +496,6 @@ class DefendantResponseDefendantNotificationHandlerTest extends BaseCallbackHand
             HashMap<String, Object> params = new HashMap<>();
 
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()

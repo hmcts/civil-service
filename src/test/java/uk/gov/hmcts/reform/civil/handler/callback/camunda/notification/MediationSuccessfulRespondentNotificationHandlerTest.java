@@ -444,7 +444,6 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
         void shouldNotifyDefendantLipVLrNotifyDefendant_whenInvoked() {
             //Given
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
@@ -479,7 +478,6 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
         void shouldNotifyDefendantLrVLipNotifyDefendant_whenInvoked() {
             //Given
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
@@ -514,7 +512,6 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
         void shouldNotSendNotificationToDefendantForLipVLip_whenInvoked() {
             //Given
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
             Party respondent1 = PartyBuilder.builder().soleTrader()
                 .partyEmail("respondent@example.com")

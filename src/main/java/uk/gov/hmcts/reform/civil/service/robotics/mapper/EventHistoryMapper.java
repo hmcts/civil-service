@@ -419,7 +419,7 @@ public class EventHistoryMapper {
         LocalDateTime paymentInFullDate = computePaymentInFullDate(caseData);
 
         // Costs and installments
-        BigDecimal amountOfCosts = (caseData.isApplicantLipOneVOne() && featureToggleService.isLipVLipEnabled())
+        BigDecimal amountOfCosts = (caseData.isApplicantLipOneVOne())
             ? MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence())
             : JudgmentsOnlineHelper.getFixedCostsOfJudgmentForDJ(caseData).add(
             JudgmentsOnlineHelper.getClaimFeeOfJudgmentForDJ(caseData));

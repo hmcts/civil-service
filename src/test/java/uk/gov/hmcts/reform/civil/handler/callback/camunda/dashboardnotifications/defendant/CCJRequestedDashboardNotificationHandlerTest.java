@@ -72,7 +72,6 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
         params.put("ccdCaseReference", "123");
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
@@ -97,7 +96,6 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
         params.put("ccdCaseReference", "12376868");
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(12376868L)
@@ -129,7 +127,6 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
         params.put("ccdCaseReference", "123");
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
@@ -158,7 +155,6 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
         params.put("ccdCaseReference", "123");
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)

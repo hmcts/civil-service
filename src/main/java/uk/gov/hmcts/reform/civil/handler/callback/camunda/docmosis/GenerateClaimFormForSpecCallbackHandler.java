@@ -70,7 +70,7 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         Long caseId = caseData.getCcdCaseReference();
         log.info("Generating claim form for spec claim for caseId {}", caseId);
-        if (featureToggleService.isLipVLipEnabled() && caseData.isApplicantNotRepresented()) {
+        if (caseData.isApplicantNotRepresented()) {
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .build();
         }

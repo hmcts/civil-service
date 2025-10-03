@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -71,10 +70,6 @@ class ClaimSettledDashboardNotificationHandlerTest  extends BaseCallbackHandlerT
 
     @Nested
     class AboutToSubmitCallback {
-        @BeforeEach
-        void setup() {
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        }
 
         @Test
         void shouldRecordScenarioQmLrIsOnAndIsNonEaCourt_whenInvoked() {

@@ -67,7 +67,6 @@ class DefendantNotifyDiscontinuanceDashboardNotificationHandlerTest extends Base
     void shouldCreateDashboardNotifications_whenDefendantIsLiPAndDiscontinuedClaim() {
         params.put("ccdCaseReference", "123");
 
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
         CaseData caseData = CaseData.builder()
@@ -93,7 +92,6 @@ class DefendantNotifyDiscontinuanceDashboardNotificationHandlerTest extends Base
     void shouldNotCreateDashboardNotifications_whenDefendantIsNotLiPAndDiscontinuedClaim() {
         params.put("ccdCaseReference", "123");
 
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
         CaseData caseData = CaseData.builder()

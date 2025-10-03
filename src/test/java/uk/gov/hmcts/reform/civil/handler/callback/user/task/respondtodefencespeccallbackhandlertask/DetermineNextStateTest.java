@@ -400,7 +400,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
             .build();
 
         when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         String resultState;
         if (postTranslation) {

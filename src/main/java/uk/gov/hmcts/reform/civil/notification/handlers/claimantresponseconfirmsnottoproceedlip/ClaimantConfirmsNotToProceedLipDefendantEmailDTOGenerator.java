@@ -26,7 +26,7 @@ public class ClaimantConfirmsNotToProceedLipDefendantEmailDTOGenerator extends D
     protected String getEmailTemplateId(CaseData caseData) {
         if (caseData.isPartAdmitPayImmediatelyAccepted()) {
             return notificationsProperties.getNotifyRespondentLipPartAdmitPayImmediatelyAcceptedSpec();
-        } else if (featureToggleService.isLipVLipEnabled() && caseData.isClaimantDontWantToProceedWithFulLDefenceFD()) {
+        } else if (caseData.isClaimantDontWantToProceedWithFulLDefenceFD()) {
             return caseData.isRespondentResponseBilingual()
                 ? notificationsProperties.getNotifyDefendantTranslatedDocumentUploaded()
                 : notificationsProperties.getRespondent1LipClaimUpdatedTemplate();
@@ -43,7 +43,7 @@ public class ClaimantConfirmsNotToProceedLipDefendantEmailDTOGenerator extends D
     @Override
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
         if (caseData.isPartAdmitPayImmediatelyAccepted()
-            || (featureToggleService.isLipVLipEnabled() && caseData.isClaimantDontWantToProceedWithFulLDefenceFD())) {
+            || caseData.isClaimantDontWantToProceedWithFulLDefenceFD()) {
             properties.put(CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference());
             properties.put(RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
         } else {

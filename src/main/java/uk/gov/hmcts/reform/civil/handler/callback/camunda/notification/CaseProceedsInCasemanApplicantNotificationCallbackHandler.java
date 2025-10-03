@@ -64,7 +64,7 @@ public class CaseProceedsInCasemanApplicantNotificationCallbackHandler extends C
     private CallbackResponse notifyApplicantSolicitorForCaseProceedsInCaseman(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        if (caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()) {
+        if (caseData.isLipvLipOneVOne()) {
             return AboutToStartOrSubmitCallbackResponse.builder().build();
         }
         notificationService.sendMail(

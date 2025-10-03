@@ -36,8 +36,8 @@ public class TranslatedDocumentUploadedClaimantNotificationHandler extends Callb
     private static final List<CaseEvent> EVENTS = List.of(CaseEvent.NOTIFY_CLAIMANT_TRANSLATED_DOCUMENT_UPLOADED);
     private static final String REFERENCE_TEMPLATE = "translated-document-uploaded-claimant-notification-%s";
     public static final String TASK_ID = "NotifyTranslatedDocumentUploadedToClaimant";
-    private final FeatureToggleService featureToggleService;
     final  OrganisationService organisationService;
+    private final FeatureToggleService featureToggleService;
     private final NotificationsSignatureConfiguration configuration;
 
     @Override
@@ -59,8 +59,7 @@ public class TranslatedDocumentUploadedClaimantNotificationHandler extends Callb
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-
-        if (caseData.isApplicantNotRepresented() && featureToggleService.isLipVLipEnabled()) {
+        if (caseData.isApplicantNotRepresented()) {
             HashMap<String, String> properties = new HashMap<>(Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                 CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
@@ -96,7 +95,7 @@ public class TranslatedDocumentUploadedClaimantNotificationHandler extends Callb
     }
 
     private String addTemplate(CaseData caseData) {
-        if (caseData.isApplicantNotRepresented() && featureToggleService.isLipVLipEnabled()) {
+        if (caseData.isApplicantNotRepresented()) {
             if (caseData.isClaimantBilingual()) {
                 return notificationsProperties.getNotifyLiPClaimantDefendantRespondedWelshLip();
             }
@@ -106,7 +105,7 @@ public class TranslatedDocumentUploadedClaimantNotificationHandler extends Callb
     }
 
     private String getEmail(CaseData caseData) {
-        return (caseData.isApplicantNotRepresented() && featureToggleService.isLipVLipEnabled())
+        return (caseData.isApplicantNotRepresented())
             ? caseData.getApplicant1Email()
             : caseData.getApplicantSolicitor1UserDetails().getEmail();
     }

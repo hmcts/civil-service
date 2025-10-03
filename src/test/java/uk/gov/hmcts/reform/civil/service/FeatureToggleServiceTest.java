@@ -75,15 +75,6 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsLipVLipInvoked(Boolean toggleStat) {
-        var lipVlipKey = "cuiReleaseTwoEnabled";
-        givenToggle(lipVlipKey, toggleStat);
-
-        assertThat(featureToggleService.isLipVLipEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsPinInPostEnabledInvoked(Boolean toggleStat) {
         var pinInPostKey = "pin-in-post";
         givenToggle(pinInPostKey, toggleStat);
@@ -230,9 +221,7 @@ class FeatureToggleServiceTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsDashboardEnabledForCase(Boolean toggleStat) {
-        var cuiReKey = "cuiReleaseTwoEnabled";
         var dashboardKey = "is-dashboard-enabled-for-case";
-        givenToggle(cuiReKey, toggleStat);
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
             .setClaimTypeToSpecClaim()

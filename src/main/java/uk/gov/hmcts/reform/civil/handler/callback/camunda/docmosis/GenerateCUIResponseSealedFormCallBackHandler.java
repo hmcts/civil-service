@@ -74,7 +74,7 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
 
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
-        if (stitchEnabled && caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()) {
+        if (stitchEnabled && caseData.isLipvLipOneVOne()) {
             List<DocumentMetaData> documentMetaDataList = fetchDocumentsToStitch(caseData, sealedForm);
             log.info("no of document sending for stitch {} for caseId {}", documentMetaDataList.size(), caseId);
             if (documentMetaDataList.size() > 1) {

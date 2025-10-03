@@ -110,7 +110,6 @@ class ClaimantResponseNotAgreedRepaymentRespondentNotificationHandlerTest extend
 
         @Test
         void shouldNotifyClaimantLip_whenInvoked() {
-            given(featureToggleService.isLipVLipEnabled()).willReturn(true);
             when(notificationsProperties.getNotifyClaimantLipTemplateManualDetermination()).thenReturn("template-id-manual-determination");
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
@@ -135,7 +134,6 @@ class ClaimantResponseNotAgreedRepaymentRespondentNotificationHandlerTest extend
         @Test
         void shouldNotifyClaimantLipWelsh_whenInvoked() {
             when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
-            given(featureToggleService.isLipVLipEnabled()).willReturn(true);
             when(notificationsProperties.getNotifyClaimantLipTemplateManualDeterminationForWelsh()).thenReturn(
                 "template-id-manual-determination");
 

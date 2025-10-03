@@ -145,7 +145,6 @@ class ClaimContinuingOnlineApplicantPartyForSpecNotificationHandlerTest extends 
         void shouldNotifyApplicant1WithBilingualEmailTemplateWhenClaimantIsBilingual() {
             when(notificationsProperties.getBilingualClaimantClaimContinuingOnlineForSpec())
                 .thenReturn(BILINGUAL_TEMPLATE_ID);
-            when(toggleService.isLipVLipEnabled()).thenReturn(true);
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));

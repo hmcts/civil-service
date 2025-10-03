@@ -226,7 +226,6 @@ class UploadTranslatedDocumentDefaultStrategyTest {
                 .ccdCaseReference(123L)
                 .build();
 
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
@@ -704,7 +703,6 @@ class UploadTranslatedDocumentDefaultStrategyTest {
     @Test
     void shouldCopyOtherDocumentExceptSealedClaimForm() {
         //Given
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         TranslatedDocument translatedDocument1 = TranslatedDocument
             .builder()
             .documentType(CLAIM_ISSUE)
@@ -758,7 +756,6 @@ class UploadTranslatedDocumentDefaultStrategyTest {
             expectedTranslatedDocs,
             any(CaseData.class)
         )).willReturn(documents);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         TranslatedDocument translatedDocument1 = TranslatedDocument
             .builder()
             .documentType(CLAIM_ISSUE)
@@ -815,7 +812,6 @@ class UploadTranslatedDocumentDefaultStrategyTest {
             expectedTranslatedDocs,
             any(CaseData.class)
         )).willReturn(documents);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         TranslatedDocument translatedDocument1 = TranslatedDocument
             .builder()

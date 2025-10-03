@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -101,10 +100,6 @@ class DefendantResponseClaimantNotificationHandlerTest extends BaseCallbackHandl
 
     @Nested
     class AboutToSubmitCallback {
-        @BeforeEach
-        void setup() {
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        }
 
         @ParameterizedTest
         @MethodSource("defendantTypeAndScenarioArguments")
@@ -114,7 +109,6 @@ class DefendantResponseClaimantNotificationHandlerTest extends BaseCallbackHandl
 
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
             LocalDate admitPaymentDeadline = OffsetDateTime.now().toLocalDate();
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
                 .toBuilder()
@@ -150,7 +144,6 @@ class DefendantResponseClaimantNotificationHandlerTest extends BaseCallbackHandl
         void configureDashboardNotificationsForDefendantResponseForFullAdmitPayByDate(Enum partyType, DashboardScenarios dashboardScenario) {
             HashMap<String, Object> params = new HashMap<>();
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
             LocalDate admitPaymentDeadline = OffsetDateTime.now().toLocalDate();
 
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
@@ -400,7 +393,6 @@ class DefendantResponseClaimantNotificationHandlerTest extends BaseCallbackHandl
         void configureDashboardNotificationsForDefendantResponseFullDefenseFastTackForClaimant(AllocatedTrack track) {
             HashMap<String, Object> params = new HashMap<>();
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceSpec().build()
                 .toBuilder()
@@ -466,8 +458,6 @@ class DefendantResponseClaimantNotificationHandlerTest extends BaseCallbackHandl
                 CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_RESPONSE.name()).build()
             ).build();
 
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-
             HashMap<String, Object> scenarioParams = new HashMap<>();
 
             handler.handle(params);
@@ -496,7 +486,6 @@ class DefendantResponseClaimantNotificationHandlerTest extends BaseCallbackHandl
     void configureDashboardNotificationsForDefendantResponseForFullAdmitFullPaidClaimant() {
         HashMap<String, Object> params = new HashMap<>();
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceSpec().build()
             .toBuilder()
@@ -532,9 +521,7 @@ class DefendantResponseClaimantNotificationHandlerTest extends BaseCallbackHandl
     void configureDashboardNotificationsForDefendantResponseForPartAdmitAfterNocClaimant() {
         HashMap<String, Object> params = new HashMap<>();
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
-
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
             .toBuilder()
             .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
@@ -575,7 +562,6 @@ class DefendantResponseClaimantNotificationHandlerTest extends BaseCallbackHandl
     void configureDashboardNotificationsForDefendantResponseForFullAdmitAfterNocClaimant() {
         HashMap<String, Object> params = new HashMap<>();
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
             .toBuilder()
@@ -609,7 +595,6 @@ class DefendantResponseClaimantNotificationHandlerTest extends BaseCallbackHandl
     void configureDashboardNotificationsForDefendantResponseFullDefenceDisputeAllClaimantCarm() {
         HashMap<String, Object> params = new HashMap<>();
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceSpec().build()
@@ -647,7 +632,6 @@ class DefendantResponseClaimantNotificationHandlerTest extends BaseCallbackHandl
     @Test
     void willNotConfigureDashboardNotificationsForDefendantResponseWhenRespondent1ClaimResponseTypeForSpecIsNull() {
         //given
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         LocalDate paymentDate = OffsetDateTime.now().toLocalDate().minusDays(5);
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceSpec().build()
             .toBuilder()

@@ -71,7 +71,6 @@ public class ClaimantConfirmsNotToProceedLipDefendantEmailDTOGeneratorTest {
         String expectedTemplateId = "template-id";
 
         when(notificationsProperties.getRespondent1LipClaimUpdatedTemplate()).thenReturn(expectedTemplateId);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         String actualTemplateId = emailDTOGenerator.getEmailTemplateId(caseData);
 
@@ -94,7 +93,6 @@ public class ClaimantConfirmsNotToProceedLipDefendantEmailDTOGeneratorTest {
         String expectedTemplateId = "template-id";
 
         when(notificationsProperties.getNotifyDefendantTranslatedDocumentUploaded()).thenReturn(expectedTemplateId);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         String actualTemplateId = emailDTOGenerator.getEmailTemplateId(caseData);
 
@@ -107,7 +105,6 @@ public class ClaimantConfirmsNotToProceedLipDefendantEmailDTOGeneratorTest {
         String expectedTemplateId = "template-id";
 
         when(notificationsProperties.getClaimantSolicitorConfirmsNotToProceed()).thenReturn(expectedTemplateId);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
 
         String actualTemplateId = emailDTOGenerator.getEmailTemplateId(caseData);
 
@@ -120,23 +117,6 @@ public class ClaimantConfirmsNotToProceedLipDefendantEmailDTOGeneratorTest {
         String expectedTemplateId = "template-id";
 
         when(notificationsProperties.getClaimantSolicitorConfirmsNotToProceed()).thenReturn(expectedTemplateId);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-
-        String actualTemplateId = emailDTOGenerator.getEmailTemplateId(caseData);
-
-        assertThat(actualTemplateId).isEqualTo(expectedTemplateId);
-    }
-
-    @Test
-    void shouldReturnCorrectEmailTemplateWhenLipVLipDisabledAndClaimantDontWantToProceedWithFulLDefence() {
-        CaseData caseData = CaseData.builder()
-            .defenceRouteRequired(DISPUTES_THE_CLAIM)
-            .applicant1ProceedWithClaim(NO)
-            .build();
-        String expectedTemplateId = "template-id";
-
-        when(notificationsProperties.getClaimantSolicitorConfirmsNotToProceed()).thenReturn(expectedTemplateId);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
 
         String actualTemplateId = emailDTOGenerator.getEmailTemplateId(caseData);
 
@@ -160,8 +140,6 @@ public class ClaimantConfirmsNotToProceedLipDefendantEmailDTOGeneratorTest {
             .legacyCaseReference(legacyCaseNumber)
             .respondent1(party)
             .build();
-
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         String partyName = "partyName";
         MockedStatic<PartyUtils> partyUtilsMockedStatic = Mockito.mockStatic(PartyUtils.class);
@@ -221,27 +199,4 @@ public class ClaimantConfirmsNotToProceedLipDefendantEmailDTOGeneratorTest {
         assertThat(updatedProperties).containsEntry(CLAIM_LEGAL_ORG_NAME_SPEC, partyName);
     }
 
-    @Test
-    void shouldReturnCorrectCustomPropertiesWhenIsNotPartAdmitPayImmediatelyAcceptedAndLipVLipDisabled() {
-        Party party = Party.builder().build();
-        CaseData caseData = CaseData.builder()
-            .defenceRouteRequired(DISPUTES_THE_CLAIM)
-            .applicant1ProceedWithClaim(NO)
-            .respondent1(party)
-            .build();
-
-        String partyName = "partyName";
-        MockedStatic<PartyUtils> partyUtilsMockedStatic = Mockito.mockStatic(PartyUtils.class);
-        partyUtilsMockedStatic.when(() -> PartyUtils.getPartyNameBasedOnType(party, false)).thenReturn(partyName);
-
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
-
-        Map<String, String> properties = new HashMap<>();
-        Map<String, String> updatedProperties = emailDTOGenerator.addCustomProperties(properties, caseData);
-
-        partyUtilsMockedStatic.close();
-
-        assertThat(updatedProperties.size()).isEqualTo(1);
-        assertThat(updatedProperties).containsEntry(CLAIM_LEGAL_ORG_NAME_SPEC, partyName);
-    }
 }

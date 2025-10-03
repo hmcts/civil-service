@@ -155,7 +155,7 @@ public class RoboticsNotificationService {
     private String getSubjectForSpec(CaseData caseData, String triggerEvent, boolean isMultiParty) {
         String subject;
         if (caseData.isRespondent1NotRepresented()) {
-            if (caseData.isLipvLipOneVOne() && toggleService.isLipVLipEnabled()) {
+            if (caseData.isLipvLipOneVOne()) {
                 if (nonNull(caseData.getPaymentTypeSelection())
                     && (caseData.getBusinessProcess().getCamundaEvent().equals(CaseEvent.DEFAULT_JUDGEMENT_SPEC.name())
                     || isNonDivergentSpecDJ(caseData))) {
