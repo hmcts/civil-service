@@ -62,7 +62,7 @@ class DashboardScenarioProcessorTest {
     @Test
     void createDashboardScenario_shouldCallDashboardService() {
         String caseId = "123";
-        String scenario = "SOME_SCENARIO";
+        String scenario = "Scenario.AAA6.ClaimIssue.ClaimSubmit.Required";
 
         CaseDetails caseDetails = CaseDetails.builder().build();
         CaseData caseData = CaseData.builder()
