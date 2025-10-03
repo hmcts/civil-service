@@ -70,10 +70,10 @@ class DashboardScenarioProcessorTest {
         when(coreCaseDataService.getCase(123L)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
         when(userService.getAccessToken(anyString(), anyString())).thenReturn("mock-token");
-        when(userConfig.getUserName()).thenReturn("user");
-        when(userConfig.getPassword()).thenReturn("pass");
         when(mapper.mapCaseDataToParams(caseData))
             .thenReturn(new HashMap<>(Map.of("key", "value")));
+        when(userConfig.getUserName()).thenReturn("user");
+        when(userConfig.getPassword()).thenReturn("pass");
 
         String caseId = "123";
         String scenario = "Scenario.AAA6.ClaimIssue.ClaimSubmit.Required";
@@ -99,8 +99,7 @@ class DashboardScenarioProcessorTest {
 
     @Test
     void fromScenario_shouldThrowExceptionForInvalidScenario() {
-        Exception exception = assertThrows(IllegalArgumentException.class, () ->
-            processor.fromScenario("INVALID_SCENARIO")
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> processor.fromScenario("INVALID_SCENARIO")
         );
 
         assertTrue(exception.getMessage().contains("No enum constant with scenario: INVALID_SCENARIO"));
