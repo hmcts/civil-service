@@ -71,7 +71,7 @@ class DashboardScenarioProcessorTest {
         when(userService.getAccessToken(anyString(), anyString())).thenReturn("mock-token");
         when(userConfig.getUserName()).thenReturn("user");
         when(userConfig.getPassword()).thenReturn("pass");
-        when(mapper.mapCaseDataToParams(caseData)).thenReturn(new HashMap<>() {{put("key", "value");}});
+        when(mapper.mapCaseDataToParams(caseData)).thenReturn(new HashMap<>(){{put("key", "value");}});
 
         String caseId = "123";
         String scenario = "Scenario.AAA6.ClaimIssue.ClaimSubmit.Required";
