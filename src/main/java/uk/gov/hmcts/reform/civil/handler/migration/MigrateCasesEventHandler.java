@@ -58,15 +58,15 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
         String scenario = externalTask.getVariable("scenario");
 
         if (caseIds != null && !caseIds.isEmpty() && scenario != null) {
-                caseReferences = caseIds.stream()
-                    .map(id -> {
-                        DashboardScenarioCaseReference instance = new DashboardScenarioCaseReference();
+            caseReferences = caseIds.stream()
+                .map(id -> {
+                    DashboardScenarioCaseReference instance = new DashboardScenarioCaseReference();
                         instance.setCaseReference(id);
                         instance.setDashboardScenario(scenario);
-                        return (T) instance;
-                    }).toList();
-                log.info("Created {} case references from Camunda variables", caseReferences.size());
-
+                        return task.getType().cast(instance);
+                })
+                .toList();
+            log.info("Created {} case references from Camunda variables", caseReferences.size());
         } else {
             log.info("caseIds or scenario are not provided. Falling back to csv check");
             // Fallback to CSV
