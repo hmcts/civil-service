@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import uk.gov.hmcts.reform.civil.model.taskmanagement.GetTasksResponse;
 import uk.gov.hmcts.reform.civil.model.taskmanagement.SearchTaskRequest;
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 @FeignClient(name = "wa", url = "${task-management.api.url}")
 public interface WaTaskManagementApiClient {

@@ -11,11 +11,11 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MvcResult;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.document.am.feign.CaseDocumentClientApi;
@@ -74,10 +74,10 @@ public class DocumentControllerTest extends BaseIntegrationTest {
     @Autowired
     private ObjectMapper mapper;
 
-    @MockBean
+    @MockitoBean
     private AuthTokenGenerator authTokenGenerator;
 
-    @MockBean
+    @MockitoBean
     private CaseDocumentClientApi caseDocumentClientApi;
 
     @Autowired
@@ -104,10 +104,10 @@ public class DocumentControllerTest extends BaseIntegrationTest {
     @InjectMocks
     private SealedClaimFormGeneratorForSpec sealedClaimFormGenerator;
 
-    @MockBean
+    @MockitoBean
     private RepresentativeService representativeService;
 
-    @MockBean
+    @MockitoBean
     private DocmosisApiClient docmosisApiClient;
 
     @Mock

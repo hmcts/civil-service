@@ -63,8 +63,8 @@ public class BundleRequestExecutor {
                              + "cause problems down the line.", endpoint, response1.getStatusCode().value());
                 log.info(
                     "Stitching endpoint returned {} with reason {}",
-                    response1.getStatusCodeValue(),
-                    response1.getStatusCode().getReasonPhrase()
+                    response1.getStatusCode(),
+                    ((HttpStatus) response1.getStatusCode()).getReasonPhrase()
                 );
                 throw new RetryableStitchingException();
             }
