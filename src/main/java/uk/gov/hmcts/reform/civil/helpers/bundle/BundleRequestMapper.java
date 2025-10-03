@@ -418,8 +418,7 @@ public class BundleRequestMapper {
             BundleFileNameList.CLAIM_FORM.getDisplayName()
         ));
         bundlingRequestDocuments.addAll(mapParticularsOfClaimDocs(caseData));
-        List<Element<CaseDocument>> clAndDfDocList = caseData.getDefendantResponseDocuments();
-        clAndDfDocList.addAll(caseData.getClaimantResponseDocuments());
+        List<Element<CaseDocument>> clAndDfDocList = caseData.getSystemGeneratedCaseDocuments();
         List<Element<CaseDocument>> sortedDefendantDefenceAndClaimantReply =
             bundleDocumentsRetrieval.getSortedDefendantDefenceAndClaimantReply(clAndDfDocList);
         sortedDefendantDefenceAndClaimantReply.forEach(caseDocumentElement -> {
