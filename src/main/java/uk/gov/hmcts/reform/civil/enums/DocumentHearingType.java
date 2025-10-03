@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.civil.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.DocumentContext.CONTENT;
@@ -9,6 +11,7 @@ import static uk.gov.hmcts.reform.civil.enums.DocumentContext.TITLE;
 
 @Getter
 @RequiredArgsConstructor
+@Slf4j
 public enum DocumentHearingType {
     TRI("trial", "dreial"),
     DIS("disposal hearing", "wrandawiad gwaredu"),
@@ -25,6 +28,10 @@ public enum DocumentHearingType {
      * @throws IllegalArgumentException If an unexpected hearing type is received.
      */
     public static DocumentHearingType getType(String hearingType) {
+        if (StringUtils.isBlank(hearingType)) {
+            log.error("Hearing type must not be null or blank - {}", hearingType);
+            throw new IllegalArgumentException("Hearing type must not be null or blank");
+        }
         String[] parts = hearingType.split("-");
         try {
             return DocumentHearingType.valueOf(parts.length == 2 ? parts[1] : hearingType);
