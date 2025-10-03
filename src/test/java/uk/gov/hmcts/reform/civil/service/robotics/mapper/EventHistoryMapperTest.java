@@ -8,7 +8,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.testsupport.mockito.MockitoBean;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
@@ -137,16 +137,16 @@ class EventHistoryMapperTest {
     private static final Event EMPTY_EVENT = Event.builder().build();
     private static final String BEARER_TOKEN = "Bearer Token";
 
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
 
-    @MockBean
+    @MockitoBean
     LocationRefDataUtil locationRefDataUtil;
 
     @Autowired
     EventHistoryMapper mapper;
 
-    @MockBean
+    @MockitoBean
     private Time time;
 
     LocalDateTime localDateTime;

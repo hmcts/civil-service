@@ -11,7 +11,7 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.testsupport.mockito.MockitoBean;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
@@ -58,13 +58,13 @@ class SecuredDocumentManagementServiceTest {
     private static final String USER_ROLES_JOINED = "caseworker-civil,caseworker-civil-solicitor";
     public static final String BEARER_TOKEN = "Bearer Token";
 
-    @MockBean
+    @MockitoBean
     private CaseDocumentClientApi caseDocumentClientApi;
-    @MockBean
+    @MockitoBean
     private DocumentDownloadClientApi documentDownloadClient;
-    @MockBean
+    @MockitoBean
     private AuthTokenGenerator authTokenGenerator;
-    @MockBean
+    @MockitoBean
     private UserService userService;
     @Autowired
     private ObjectMapper mapper;

@@ -8,7 +8,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.testsupport.mockito.MockitoBean;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRTLStatus;
@@ -37,7 +37,7 @@ class SetAsideJudgmentsOnlineMapperTest {
     private SetAsideJudgmentOnlineMapper judgmentOnlineMapper;
     @InjectMocks
     private RecordJudgmentOnlineMapper recordJudgmentMapper;
-    @MockBean
+    @MockitoBean
     private Time time;
     @Mock
     private InterestCalculator interestCalculator;

@@ -1,10 +1,11 @@
 package uk.gov.hmcts.reform.civil.config;
 
 import feign.Client;
-import feign.httpclient.ApacheHttpClient;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
+import feign.hc5.ApacheHttp5Client;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.core5.util.Timeout;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,7 +23,7 @@ public class HttpClientConfiguration {
 
     @Bean
     public Client getFeignHttpClient() {
-        return new ApacheHttpClient(getHttpClient());
+        return new ApacheHttp5Client(getHttpClient());
     }
 
     @Bean
@@ -33,29 +34,21 @@ public class HttpClientConfiguration {
     }
 
     private CloseableHttpClient getRestTemplateHttpClient() {
-        RequestConfig config = RequestConfig.custom()
-            .setConnectTimeout(readTimeout)
-            .setConnectionRequestTimeout(readTimeout)
-            .setSocketTimeout(readTimeout)
-            .build();
-
-        return HttpClientBuilder
-            .create()
-            .useSystemProperties()
-            .setDefaultRequestConfig(config)
-            .build();
+        return buildHttpClient(readTimeout);
     }
 
     private CloseableHttpClient getHttpClient() {
-        int timeout = 10000;
+        return buildHttpClient(10000);
+    }
+
+    private CloseableHttpClient buildHttpClient(int timeoutMillis) {
         RequestConfig config = RequestConfig.custom()
-            .setConnectTimeout(timeout)
-            .setConnectionRequestTimeout(timeout)
-            .setSocketTimeout(timeout)
+            .setConnectTimeout(Timeout.ofMilliseconds(timeoutMillis))
+            .setConnectionRequestTimeout(Timeout.ofMilliseconds(timeoutMillis))
+            .setResponseTimeout(Timeout.ofMilliseconds(timeoutMillis))
             .build();
 
-        return HttpClientBuilder
-            .create()
+        return HttpClients.custom()
             .useSystemProperties()
             .setDefaultRequestConfig(config)
             .build();

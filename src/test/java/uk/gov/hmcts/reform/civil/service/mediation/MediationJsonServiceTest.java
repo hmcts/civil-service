@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.testsupport.mockito.MockitoBean;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -71,7 +71,7 @@ public class MediationJsonServiceTest {
 
     private static final String LIP_MEDIATION_CONTACT_NAME = "Lip contact person";
 
-    @MockBean
+    @MockitoBean
     private OrganisationService organisationService;
 
     @Autowired

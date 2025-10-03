@@ -8,7 +8,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.testsupport.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
@@ -66,17 +66,17 @@ public class SealedClaimResponseFormGeneratorForSpecTest {
     private static final CaseData CASE_DATA_WITH_MULTI_PARTY = getCaseDataWithMultiParty();
     @Autowired
     private SealedClaimResponseFormGeneratorForSpec generator;
-    @MockBean
+    @MockitoBean
     private RepresentativeService representativeService;
-    @MockBean
+    @MockitoBean
     private DocumentGeneratorService documentGeneratorService;
-    @MockBean
+    @MockitoBean
     private DocumentManagementService documentManagementService;
-    @MockBean
+    @MockitoBean
     private CourtLocationUtils courtLocationUtils;
-    @MockBean
+    @MockitoBean
     private LocationReferenceDataService locationRefDataService;
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
     @Autowired
     private ReferenceNumberAndCourtDetailsPopulator referenceNumberPopulator;

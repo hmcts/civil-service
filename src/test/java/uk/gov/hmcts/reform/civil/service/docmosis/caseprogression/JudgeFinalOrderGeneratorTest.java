@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.testsupport.mockito.MockitoBean;
 import uk.gov.hmcts.reform.civil.documentmanagement.SecuredDocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
@@ -121,39 +121,39 @@ class JudgeFinalOrderGeneratorTest {
         .documentName(assistedForm)
         .documentType(JUDGE_FINAL_ORDER)
         .build();
-    @MockBean
+    @MockitoBean
     private SecuredDocumentManagementService documentManagementService;
-    @MockBean
+    @MockitoBean
     private DocumentGeneratorService documentGeneratorService;
-    @MockBean
+    @MockitoBean
     private UserService userService;
-    @MockBean
+    @MockitoBean
     private LocationReferenceDataService locationRefDataService;
-    @MockBean
+    @MockitoBean
     private DocumentHearingLocationHelper locationHelper;
     @Qualifier("judgeFinalOrderGenerator")
     @Autowired
     private JudgeFinalOrderGenerator generator;
-    @MockBean
+    @MockitoBean
     FeatureToggleService featureToggleService;
 
-    @MockBean
+    @MockitoBean
     private DefendantAttendsOrRepresentedTextBuilder defendantAttendsOrRepresentedTextBuilder;
-    @MockBean
+    @MockitoBean
     private ClaimantAttendsOrRepresentedTextBuilder claimantAttendsOrRepresentedTextBuilder;
-    @MockBean
+    @MockitoBean
     private AppealInitiativePopulator appealInitiativePopulator;
-    @MockBean
+    @MockitoBean
     private AttendeesRepresentationPopulator attendeesRepresentationPopulator;
-    @MockBean
+    @MockitoBean
     private CaseInfoPopulator caseInfoPopulator;
-    @MockBean
+    @MockitoBean
     private CostDetailsPopulator costsDetailsGroup;
-    @MockBean
+    @MockitoBean
     private HearingDetailsPopulator hearingDetailsPopulator;
-    @MockBean
+    @MockitoBean
     private JudgeCourtDetailsPopulator judgeCourtDetailsPopulator;
-    @MockBean
+    @MockitoBean
     private OrderDetailsPopulator orderDetailsPopulator;
 
     private static LocationRefData locationRefData = LocationRefData.builder().siteName("SiteName")

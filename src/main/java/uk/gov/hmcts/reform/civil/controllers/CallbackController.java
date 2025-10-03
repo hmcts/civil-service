@@ -25,8 +25,8 @@ import uk.gov.hmcts.reform.civil.service.http.HttpResponseHeadersService;
 
 import java.util.Objects;
 import java.util.Optional;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.constraints.NotNull;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.constraints.NotNull;
 
 @Tag(name = "Callback Controller")
 @Slf4j

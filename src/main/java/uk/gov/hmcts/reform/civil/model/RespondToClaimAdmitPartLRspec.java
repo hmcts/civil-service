@@ -8,7 +8,7 @@ import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.validation.groups.PaymentDateGroup;
 
 import java.time.LocalDate;
-import javax.validation.constraints.FutureOrPresent;
+import jakarta.validation.constraints.FutureOrPresent;
 
 @Data
 @Builder(toBuilder = true)

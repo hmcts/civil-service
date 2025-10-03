@@ -7,7 +7,7 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.testsupport.mockito.MockitoBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
@@ -70,31 +70,31 @@ class InformAgreedExtensionDateForSpecCallbackHandlerTest extends BaseCallbackHa
     @Autowired
     private InformAgreedExtensionDateForSpecCallbackHandler handler;
 
-    @MockBean
+    @MockitoBean
     private ExitSurveyContentService exitSurveyContentService;
 
-    @MockBean
+    @MockitoBean
     private DeadlinesCalculator deadlinesCalculator;
 
-    @MockBean
+    @MockitoBean
     private Time time;
 
-    @MockBean
+    @MockitoBean
     private CoreCaseUserService coreCaseUserService;
 
     @Autowired
     private UserService userService;
 
-    @MockBean
+    @MockitoBean
     private IStateFlowEngine stateFlowEngine;
 
-    @MockBean
+    @MockitoBean
     private FeatureToggleService toggleService;
 
     @Mock
     private StateFlow mockedStateFlow;
 
-    @MockBean
+    @MockitoBean
     private WorkingDayIndicator workingDayIndicator;
 
     @Nested

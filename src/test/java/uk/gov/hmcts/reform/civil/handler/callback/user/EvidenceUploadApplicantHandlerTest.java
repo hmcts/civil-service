@@ -10,7 +10,7 @@ import org.junit.platform.commons.util.ReflectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.testsupport.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -93,15 +93,15 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
 
     private final LocalDateTime time = LocalDateTime.now();
 
-    @MockBean
+    @MockitoBean
     private CoreCaseUserService coreCaseUserService;
-    @MockBean
+    @MockitoBean
     private CaseDetailsConverter caseDetailsConverter;
-    @MockBean
+    @MockitoBean
     private CoreCaseDataService coreCaseDataService;
-    @MockBean
+    @MockitoBean
     CaseData.CaseDataBuilder caseDataBuilder;
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
     @Autowired
     private final ObjectMapper mapper = new ObjectMapper();
