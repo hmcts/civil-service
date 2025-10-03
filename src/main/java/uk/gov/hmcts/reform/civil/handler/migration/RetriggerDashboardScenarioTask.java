@@ -7,13 +7,13 @@ import uk.gov.hmcts.reform.civil.handler.event.DashboardScenarioProcessor;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 @Component
-public class RetriggerDashboardScenarioTask extends MigrationTask<CaseReference> {
+public class RetriggerDashboardScenarioTask extends MigrationTask<DashboardScenarioCaseReference> {
 
     public DashboardScenarioProcessor processor;
 
     public RetriggerDashboardScenarioTask(
         DashboardScenarioProcessor processor) {
-        super(CaseReference.class);
+        super(DashboardScenarioCaseReference.class);
         this.processor = processor;
     }
 
@@ -32,13 +32,8 @@ public class RetriggerDashboardScenarioTask extends MigrationTask<CaseReference>
         return "This task triggers current scenario on the case";
     }
 
-    protected CaseData migrateCaseData(CaseData caseData, CaseReference caseReference) {
-        if (!(caseReference instanceof DashboardScenarioCaseReference caseRef)) {
-            throw new IllegalArgumentException("Expected DashboardScenarioCaseReference, got: "
-                                                   + (caseReference != null ? caseReference.getClass() : "null"));
-        }
-
-        if (caseRef.getCaseReference() == null || caseRef.getDashboardScenario() == null) {
+    protected CaseData migrateCaseData(CaseData caseData, DashboardScenarioCaseReference caseRef) {
+        if (caseRef == null || caseRef.getCaseReference() == null || caseRef.getDashboardScenario() == null) {
             throw new IllegalArgumentException("CaseReference fields must not be null");
         }
 

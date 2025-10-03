@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.migration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseReference;
+import uk.gov.hmcts.reform.civil.bulkupdate.csv.DashboardScenarioCaseReference;
 import uk.gov.hmcts.reform.civil.handler.event.DashboardScenarioProcessor;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
@@ -27,7 +28,7 @@ class RetriggerDashboardScenarioTaskTest {
     void migrateCaseData_shouldCallProcessorWithCorrectCaseReference() {
         // Arrange
         CaseData caseData = CaseData.builder().build();
-        CaseReference caseReference = new CaseReference();
+        DashboardScenarioCaseReference caseReference = new DashboardScenarioCaseReference();
         caseReference.setCaseReference("12345");
 
         // Act
@@ -41,7 +42,7 @@ class RetriggerDashboardScenarioTaskTest {
     @Test
     void migrateCaseData_shouldThrowException_whenCaseReferenceIsNull() {
         CaseData caseData = CaseData.builder().build();
-        CaseReference caseReference = null;
+        DashboardScenarioCaseReference caseReference = null;
 
         Exception exception = assertThrows(IllegalArgumentException.class,
                                            () -> task.migrateCaseData(caseData, caseReference));
@@ -52,7 +53,7 @@ class RetriggerDashboardScenarioTaskTest {
     @Test
     void migrateCaseData_shouldThrowException_whenCaseReferenceValueIsNull() {
         CaseData caseData = CaseData.builder().build();
-        CaseReference caseReference = new CaseReference();
+        DashboardScenarioCaseReference caseReference = new DashboardScenarioCaseReference();
         caseReference.setCaseReference(null);
 
         Exception exception = assertThrows(IllegalArgumentException.class,
@@ -64,7 +65,7 @@ class RetriggerDashboardScenarioTaskTest {
     @Test
     void migrateCaseData_shouldThrowException_whenCaseReferenceIsNotNumeric() {
         CaseData caseData = CaseData.builder().build();
-        CaseReference caseReference = new CaseReference();
+        DashboardScenarioCaseReference caseReference = new DashboardScenarioCaseReference();
         caseReference.setCaseReference("abc");
 
         assertThrows(NumberFormatException.class,
