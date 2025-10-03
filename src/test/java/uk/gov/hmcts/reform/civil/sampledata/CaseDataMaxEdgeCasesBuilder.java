@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.civil.sampledata;
 
 import joptsimple.internal.Strings;
-import uk.gov.hmcts.reform.ccd.model.Organisation;
-import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.model.Organisation;
+import uk.gov.hmcts.reform.civil.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.ClaimType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.model.ClaimValue;

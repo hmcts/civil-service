@@ -9,7 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
-import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -106,7 +106,7 @@ class RecordJudgmentDeterminationMeansApplicantNotificationHandlerTest extends B
                                  .partyName("Test")
                                  .individualLastName("Test Lastname")
                                  .individualFirstName("Test Firstname").build())
-                .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(uk.gov.hmcts.reform.civil.model.Organisation.builder()
                                                                                             .organisationID(ORG_NAME).build()).build()).build();
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));

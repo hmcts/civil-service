@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.civil.utils;
 
-import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
@@ -104,7 +104,7 @@ public class JudgmentOnlineUtils {
     public static Party getOrgDetails(OrganisationPolicy organisationPolicy, OrganisationService organisationService) {
         return Optional.ofNullable(organisationPolicy)
             .map(OrganisationPolicy::getOrganisation)
-            .map(uk.gov.hmcts.reform.ccd.model.Organisation::getOrganisationID)
+            .map(uk.gov.hmcts.reform.civil.model.Organisation::getOrganisationID)
             .map(organisationService::findOrganisationById)
             .flatMap(value -> value.map(o -> Party.builder()
                 .name(o.getName())

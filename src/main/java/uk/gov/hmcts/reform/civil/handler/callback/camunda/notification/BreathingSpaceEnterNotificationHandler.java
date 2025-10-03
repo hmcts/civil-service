@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
-import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -112,7 +112,7 @@ public class BreathingSpaceEnterNotificationHandler extends CallbackHandler impl
     private String getOrganisationName(OrganisationPolicy organisationPolicy, Supplier<String> defaultValue) {
         Optional<String> calculated = Optional.ofNullable(organisationPolicy)
             .map(OrganisationPolicy::getOrganisation)
-            .map(uk.gov.hmcts.reform.ccd.model.Organisation::getOrganisationID)
+            .map(uk.gov.hmcts.reform.civil.model.Organisation::getOrganisationID)
             .map(organisationService::findOrganisationById)
             .flatMap(o -> o.map(Organisation::getName));
         if (defaultValue == null) {

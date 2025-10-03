@@ -10,10 +10,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimStatusFactory;
 import uk.gov.hmcts.reform.cmc.client.ClaimStoreApi;
-import uk.gov.hmcts.reform.cmc.model.ClaimData;
-import uk.gov.hmcts.reform.cmc.model.CmcClaim;
-import uk.gov.hmcts.reform.cmc.model.CmcParty;
-import uk.gov.hmcts.reform.cmc.model.DefendantLinkStatus;
+import uk.gov.hmcts.reform.hmc.model.ClaimData;
+import uk.gov.hmcts.reform.hmc.model.CmcClaim;
+import uk.gov.hmcts.reform.hmc.model.CmcParty;
+import uk.gov.hmcts.reform.hmc.model.DefendantLinkStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

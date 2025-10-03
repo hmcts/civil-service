@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.civil.sampledata;
 
-import uk.gov.hmcts.reform.ccd.model.ChangeOrganisationApprovalStatus;
-import uk.gov.hmcts.reform.ccd.model.Organisation;
-import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.model.ChangeOrganisationApprovalStatus;
+import uk.gov.hmcts.reform.civil.model.Organisation;
+import uk.gov.hmcts.reform.civil.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.crd.model.Category;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
@@ -6233,7 +6233,7 @@ public class CaseDataBuilder {
     }
 
     public CaseData buildMakePaymentsCaseDataWithHearingDateWithoutClaimIssuedPbaDetails() {
-        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+        uk.gov.hmcts.reform.civil.model.Organisation orgId = uk.gov.hmcts.reform.civil.model.Organisation.builder()
             .organisationID("OrgId").build();
 
         return build().toBuilder()
@@ -6244,7 +6244,7 @@ public class CaseDataBuilder {
     }
 
     public CaseData buildMakePaymentsCaseDataWithHearingDateWithHearingFeePBADetails() {
-        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+        uk.gov.hmcts.reform.civil.model.Organisation orgId = uk.gov.hmcts.reform.civil.model.Organisation.builder()
             .organisationID("OrgId").build();
 
         return build().toBuilder()

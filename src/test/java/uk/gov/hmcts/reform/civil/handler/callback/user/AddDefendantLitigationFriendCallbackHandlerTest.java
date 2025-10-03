@@ -61,6 +61,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
     SimpleStateFlowBuilder.class,
     TransitionsTestConfiguration.class
 })
+
 class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
@@ -168,10 +169,9 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
 
     @Nested
     class AboutToSubmitWithMultiPartyToggleOn {
-        private LocalDateTime localDateTime;
 
         @BeforeEach
-        private void setup() {
+        void setup() {
             when(time.now()).thenReturn(LocalDateTime.now());
         }
 

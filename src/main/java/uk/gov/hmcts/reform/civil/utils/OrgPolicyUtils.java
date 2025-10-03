@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.civil.utils;
 
-import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
-import uk.gov.hmcts.reform.ccd.model.PreviousOrganisation;
-import uk.gov.hmcts.reform.ccd.model.PreviousOrganisationCollectionItem;
+import uk.gov.hmcts.reform.civil.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.model.PreviousOrganisation;
+import uk.gov.hmcts.reform.civil.model.PreviousOrganisationCollectionItem;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import java.util.Comparator;
 
