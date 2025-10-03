@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotific
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -71,7 +72,8 @@ class DashboardScenarioProcessorTest {
         when(userService.getAccessToken(anyString(), anyString())).thenReturn("mock-token");
         when(userConfig.getUserName()).thenReturn("user");
         when(userConfig.getPassword()).thenReturn("pass");
-        when(mapper.mapCaseDataToParams(caseData)).thenReturn(new HashMap<>(){{put("key", "value");}});
+        when(mapper.mapCaseDataToParams(caseData))
+            .thenReturn(new HashMap<>(Map.of("key", "value")));
 
         String caseId = "123";
         String scenario = "Scenario.AAA6.ClaimIssue.ClaimSubmit.Required";
