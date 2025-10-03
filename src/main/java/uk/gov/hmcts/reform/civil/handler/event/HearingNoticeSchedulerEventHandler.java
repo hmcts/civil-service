@@ -7,9 +7,12 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.event.HearingNoticeSchedulerTaskEvent;
 import uk.gov.hmcts.reform.civil.handler.tasks.variables.HearingNoticeMessageVars;
+import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.data.UserAuthContent;
 import uk.gov.hmcts.reform.civil.utils.HmcDataUtils;
@@ -19,6 +22,16 @@ import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotified;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedResponse;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedServiceData;
 import uk.gov.hmcts.reform.hmc.service.HearingsService;
+
+import java.util.Arrays;
+
+import static uk.gov.hmcts.reform.civil.enums.CaseState.All_FINAL_ORDERS_ISSUED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISCONTINUED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISMISSED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_SETTLED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_STAYED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CLOSED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
 
 @Slf4j
 @Service
@@ -32,7 +45,16 @@ public class HearingNoticeSchedulerEventHandler {
     private final HearingsService hearingsService;
     private final RuntimeService runtimeService;
     private final ObjectMapper mapper;
-
+    private final CoreCaseDataService coreCaseDataService;
+    private static final CaseState[] ALLOWED_CASE_STATES = {
+        CASE_SETTLED,
+        PROCEEDS_IN_HERITAGE_SYSTEM,
+        CASE_STAYED,
+        CASE_DISCONTINUED,
+        CASE_DISMISSED,
+        CLOSED,
+        All_FINAL_ORDERS_ISSUED
+    };
     @Async("asyncHandlerExecutor")
     @EventListener
     public void handle(HearingNoticeSchedulerTaskEvent event) {
@@ -54,12 +76,18 @@ public class HearingNoticeSchedulerEventHandler {
 
         if (hearingStatus.equals(ListAssistCaseStatus.LISTED)) {
             PartiesNotifiedResponse partiesNotified = getLatestPartiesNotifiedResponse(hearingId);
-            if (HmcDataUtils.hearingDataChanged(partiesNotified, hearing)) {
+            String caseReference = hearing.getCaseDetails().getCaseRef();
+            CaseDetails caseDetails = coreCaseDataService.getCase(Long.parseLong(caseReference));
+
+            boolean stateNotAllowedToGenerateHearingNotice = isNotAllowedState(caseDetails.getState(), caseReference);
+
+            if (stateNotAllowedToGenerateHearingNotice &&
+                HmcDataUtils.hearingDataChanged(partiesNotified, hearing)) {
                 log.info("Dispatching hearing notice task for hearing [{}].",
                         hearingId);
                 triggerHearingNoticeEvent(HearingNoticeMessageVars.builder()
                         .hearingId(hearingId)
-                        .caseId(hearing.getCaseDetails().getCaseRef())
+                        .caseId(caseReference)
                         .triggeredViaScheduler(true)
                         .build());
 
@@ -68,6 +96,16 @@ public class HearingNoticeSchedulerEventHandler {
             }
         } else {
             notifyHmc(hearingId, hearing, PartiesNotifiedServiceData.builder().build());
+        }
+    }
+
+    private static boolean isNotAllowedState(String state, String caseReferene) {
+        try {
+            CaseState caseState = CaseState.valueOf(state);
+            return Arrays.asList(ALLOWED_CASE_STATES).contains(caseState);
+        } catch (IllegalArgumentException e) {
+            log.info("Case state is not a valid one {} ", caseReferene);
+            return true;
         }
     }
 
