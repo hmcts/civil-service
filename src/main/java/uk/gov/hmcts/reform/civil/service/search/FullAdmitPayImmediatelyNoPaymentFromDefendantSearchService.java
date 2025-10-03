@@ -15,12 +15,14 @@ import java.util.List;
 
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
+import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 
 @Service
 public class FullAdmitPayImmediatelyNoPaymentFromDefendantSearchService extends ElasticSearchService {
 
-    private static final int BUSINESS_DAYS_FROM_NOW = 0;
+    private static final int BUSINESS_DAYS_FROM_NOW_MIN = 0;
+    private static final int BUSINESS_DAYS_FROM_NOW_MAX = 7;
     public static final LocalTime END_OF_BUSINESS_DAY = LocalTime.of(16, 0, 0);
 
     public FullAdmitPayImmediatelyNoPaymentFromDefendantSearchService(CoreCaseDataService coreCaseDataService) {
@@ -29,17 +31,20 @@ public class FullAdmitPayImmediatelyNoPaymentFromDefendantSearchService extends 
 
     public Query query(int startIndex) {
 
-        String targetDateString = DateUtils.addDaysSkippingWeekends(
-            LocalDate.now().minusDays(1), BUSINESS_DAYS_FROM_NOW).format(DateTimeFormatter.ISO_DATE);
+        String toDate = DateUtils.addDaysSkippingWeekends(
+            LocalDate.now().minusDays(1), BUSINESS_DAYS_FROM_NOW_MIN).format(DateTimeFormatter.ISO_DATE);
+
+        String fromDate = DateUtils.addDaysSkippingWeekends(
+            LocalDate.now().minusDays(1), BUSINESS_DAYS_FROM_NOW_MAX).format(DateTimeFormatter.ISO_DATE);
+
         return new Query(
             boolQuery()
                 .minimumShouldMatch(1)
                 .should(boolQuery()
-                            .must(matchQuery(
-                                "data.respondToClaimAdmitPartLRspec.whenWillThisAmountBePaid",
-                                targetDateString
-                            )).must(matchQuery(
-                        "data.respondent1ClaimResponseTypeForSpec",
+                            .must(rangeQuery(
+                                "data.respondToClaimAdmitPartLRspec.whenWillThisAmountBePaid")
+                                      .lte(toDate).gte(fromDate))
+                            .must(matchQuery("data.respondent1ClaimResponseTypeForSpec",
                         RespondentResponseType.FULL_ADMISSION
                     ))
                             .must(beState(AWAITING_APPLICANT_INTENTION))
