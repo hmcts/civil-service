@@ -35,6 +35,18 @@ public class CaseDetailsConverter {
         return objectMapper.convertValue(caseDataMap, CaseData.class);
     }
 
+    public CaseData toCaseDataGA(CaseDetails caseDetails) {
+        Map<String, Object> data = new HashMap<>(caseDetails.getData());
+        data.put("ccdCaseReference", caseDetails.getId());
+        if (caseDetails.getState() != null) {
+            data.put("ccdState", CaseState.valueOf(caseDetails.getState()));
+        }
+        if (caseDetails.getCreatedDate() != null) {
+            data.put("createdDate", caseDetails.getCreatedDate());
+        }
+        return objectMapper.convertValue(data, CaseData.class);
+    }
+
     public CaseData toGACaseData(CaseDetails caseDetails) {
         Map<String, Object> data = new HashMap<>(caseDetails.getData());
         data.remove("hwfFeeType");

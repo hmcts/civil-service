@@ -2,11 +2,16 @@ package uk.gov.hmcts.reform.civil.service.search;
 
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
@@ -22,6 +27,22 @@ public class EvidenceUploadNotificationSearchService extends ElasticSearchServic
 
     public EvidenceUploadNotificationSearchService(CoreCaseDataService coreCaseDataService) {
         super(coreCaseDataService);
+    }
+
+    public Set<CaseDetails> getApplications() {
+
+        SearchResult searchResult = coreCaseDataService
+                .searchGeneralApplication(query(START_INDEX));
+
+        int pages = calculatePages(searchResult);
+        List<CaseDetails> caseDetails = new ArrayList<>(searchResult.getCases());
+
+        for (int i = 1; i < pages; i++) {
+            caseDetails.addAll(coreCaseDataService
+                    .searchGeneralApplication(query(i * ES_DEFAULT_SEARCH_LIMIT)).getCases());
+        }
+
+        return new HashSet<>(caseDetails);
     }
 
     public Query query(int startIndex) {

@@ -46,4 +46,16 @@ public class HearingForm implements MappableObject {
     private final String deadlineDate;
     private final String claimantReferenceNumber;
     private final String defendantReferenceNumber;
+
+    private final String judgeHearingLocation;
+
+    private final boolean claimant1exists;
+    private final boolean defendant1exists;
+
+    private final String partyName;
+    private final String partyAddressAddressLine1;
+    private final String partyAddressAddressLine2;
+    private final String partyAddressAddressLine3;
+    private final String partyAddressPostTown;
+    private final String partyAddressPostCode;
 }

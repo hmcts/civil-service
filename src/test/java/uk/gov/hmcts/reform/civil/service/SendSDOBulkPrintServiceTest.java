@@ -101,6 +101,7 @@ class SendSDOBulkPrintServiceTest {
     void shouldPrintLetterSuccessfullyForDefendantLIPInWelsh() {
         Party applicant1 = createSoleTraderParty();
         CaseData caseData = createCaseDataWithTranslatedSDOOrder(applicant1);
+
         caseData = caseData.toBuilder().caseDataLiP(
             CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("WELSH").build()).build()).build();
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
@@ -108,6 +109,8 @@ class SendSDOBulkPrintServiceTest {
             .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
 
         sendSDOBulkPrintService.sendSDOOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
+
+        System.out.println(caseData);
 
         verifyPrintLetter(caseData, applicant1);
         ArgumentCaptor<CaseDocument[]> captor = ArgumentCaptor.forClass(CaseDocument[].class);
@@ -126,6 +129,8 @@ class SendSDOBulkPrintServiceTest {
             .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
 
         sendSDOBulkPrintService.sendSDOOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
+
+        System.out.println(caseData);
 
         verifyPrintLetter(caseData, applicant1);
         ArgumentCaptor<CaseDocument[]> captor = ArgumentCaptor.forClass(CaseDocument[].class);
