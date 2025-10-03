@@ -11,5 +11,6 @@ USER hmcts
 COPY lib/applicationinsights.json /opt/app/
 COPY build/libs/civil-service.jar /opt/app/
 
+
 EXPOSE 4000
 CMD [ "civil-service.jar" ]
