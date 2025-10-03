@@ -15,7 +15,7 @@
 * @hmcts/civil-admins
 * @hmcts/civil
 
-/.github/CODEOWNERS @hmcts/civil-admins
+CODEOWNERS @hmcts/civil-admins
 
 # Infra:
 charts/ @hmcts/civil-admins
