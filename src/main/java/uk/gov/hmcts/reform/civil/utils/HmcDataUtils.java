@@ -180,7 +180,7 @@ public class HmcDataUtils {
      *              "30 June 2023 at 14:00 for 2 hours"
      */
     public static String getHearingDaysText(HearingGetResponse hearing, Boolean inWelsh) {
-        return org.apache.commons.lang.StringUtils.join(getHearingDaysTextList(hearing, inWelsh), "\n");
+        return org.apache.commons.lang3.StringUtils.join(getHearingDaysTextList(hearing, inWelsh), "\n");
     }
 
     /**
@@ -374,7 +374,7 @@ public class HmcDataUtils {
     }
 
     private static String concatenateNames(List<String> names) {
-        return nonNull(names) && names.size() > 0 ? org.apache.commons.lang.StringUtils.join(names, "\n") : null;
+        return nonNull(names) && names.size() > 0 ? org.apache.commons.lang3.StringUtils.join(names, "\n") : null;
     }
 
     public static String getInPersonAttendeeNames(HearingGetResponse hearing) {

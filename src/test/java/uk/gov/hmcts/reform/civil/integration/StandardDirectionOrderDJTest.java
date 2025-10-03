@@ -11,7 +11,7 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.testsupport.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
@@ -94,21 +94,21 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
     private StandardDirectionOrderDJ handler;
     @Autowired
     private AssignCategoryId assignCategoryId;
-    @MockBean
+    @MockitoBean
     private DefaultJudgmentOrderFormGenerator defaultJudgmentOrderFormGenerator;
-    @MockBean
+    @MockitoBean
     private LocationReferenceDataService locationRefDataService;
-    @MockBean
+    @MockitoBean
     private UserDetails userDetails;
-    @MockBean
+    @MockitoBean
     private WorkingDayIndicator workingDayIndicator;
-    @MockBean
+    @MockitoBean
     private DeadlinesCalculator deadlinesCalculator;
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
-    @MockBean
+    @MockitoBean
     private CategoryService categoryService;
-    @MockBean
+    @MockitoBean
     private UpdateWaCourtLocationsService updateWaCourtLocationsService;
     @Mock
     private LocationHelper locationHelper;

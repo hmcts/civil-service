@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.testsupport.mockito.MockitoBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.documentmanagement.SecuredDocumentManagementService;
@@ -50,11 +50,11 @@ class TrialReadyFormGeneratorTest {
         .documentName(fileName_application)
         .documentType(TRIAL_READY_DOCUMENT)
         .build();
-    @MockBean
+    @MockitoBean
     private SecuredDocumentManagementService documentManagementService;
-    @MockBean
+    @MockitoBean
     private DocumentGeneratorService documentGeneratorService;
-    @MockBean
+    @MockitoBean
     private AssignCategoryId assignCategoryId;
     @Autowired
     private TrialReadyFormGenerator generator;

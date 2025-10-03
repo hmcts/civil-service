@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.testsupport.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
@@ -38,9 +38,9 @@ class RequestForReconsiderationNotificationDeadlineCallbackHandlerTest {
 
     @Autowired
     private RequestForReconsiderationNotificationDeadlineCallbackHandler handler;
-    @MockBean
+    @MockitoBean
     private DashboardNotificationsParamsMapper mapper;
-    @MockBean
+    @MockitoBean
     private DashboardScenariosService dashboardScenariosService;
 
     @Test

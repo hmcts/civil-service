@@ -3,18 +3,16 @@ package uk.gov.hmcts.reform.dashboard.entities;
 import com.vladmihalcea.hibernate.type.json.JsonType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
-import org.hibernate.annotations.TypeDefs;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
@@ -25,14 +23,6 @@ import java.util.UUID;
 @lombok.NoArgsConstructor
 @lombok.AllArgsConstructor
 @Entity
-@TypeDefs(
-    {
-        @TypeDef(
-            name = "jsonb",
-            typeClass = JsonType.class
-        )
-    }
-)
 @Table(name = "task_list", schema = "dbs")
 public class TaskListEntity implements Serializable {
 
@@ -86,7 +76,7 @@ public class TaskListEntity implements Serializable {
     @Schema(name = "updated_by")
     private String updatedBy;
 
-    @Type(type = "jsonb")
+    @Type(JsonType.class)
     @Column(columnDefinition = "jsonb")
     @Schema(name = "message_params")
     private HashMap<String, Object> messageParams;

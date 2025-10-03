@@ -7,7 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.testsupport.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.PrdAdminUserConfiguration;
@@ -67,25 +67,25 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 @ExtendWith(SpringExtension.class)
 class NotifyRoboticsOnContinuousFeedHandlerTest extends BaseCallbackHandlerTest {
 
-    @MockBean
+    @MockitoBean
     private RoboticsNotificationService roboticsNotificationService;
 
-    @MockBean
+    @MockitoBean
     OrganisationApi organisationApi;
-    @MockBean
+    @MockitoBean
     IdamClient idamClient;
-    @MockBean
+    @MockitoBean
     FeatureToggleService featureToggleService;
-    @MockBean
+    @MockitoBean
     PrdAdminUserConfiguration userConfig;
-    @MockBean
+    @MockitoBean
     private Time time;
-    @MockBean
+    @MockitoBean
     LocationRefDataUtil locationRefDataUtil;
     @Autowired
     private NotifyRoboticsOnContinuousFeedHandler handler;
 
-    @MockBean
+    @MockitoBean
     private JsonSchemaValidationService validationService;
 
     @Nested

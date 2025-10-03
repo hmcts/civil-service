@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.testsupport.mockito.MockitoBean;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -58,21 +58,21 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.RECOR
 })
 class RecordJudgmentDeterminationOfMeansPiPLetterGeneratorTest {
 
-    @MockBean
+    @MockitoBean
     private DocumentDownloadService documentDownloadService;
-    @MockBean
+    @MockitoBean
     private DocumentGeneratorService documentGeneratorService;
-    @MockBean
+    @MockitoBean
     private DocumentManagementService documentManagementService;
-    @MockBean
+    @MockitoBean
     private BulkPrintService bulkPrintService;
-    @MockBean
+    @MockitoBean
     private PinInPostConfiguration pinInPostConfiguration;
-    @MockBean
+    @MockitoBean
     private DefendantPinToPostLRspecService defendantPinToPostLRspecService;
     @Autowired
     private RecordJudgmentDeterminationOfMeansPiPLetterGenerator generator;
-    @MockBean
+    @MockitoBean
     private GeneralAppFeesService generalAppFeesService;
     private static final String RECORD_JUDGMENT_DETERMINATION_OF_MEANS_LETTER = "record-judgment-determination-of-means-letter";
     private static final byte[] LETTER_CONTENT = new byte[]{37, 80, 68, 70, 45, 49, 46, 53, 10, 37, -61, -92};

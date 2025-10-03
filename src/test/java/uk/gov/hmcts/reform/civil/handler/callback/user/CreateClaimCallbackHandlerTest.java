@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.testsupport.mockito.MockitoBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
@@ -132,16 +132,16 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Autowired
     private ObjectMapper objMapper;
 
-    @MockBean
+    @MockitoBean
     private Time time;
 
-    @MockBean
+    @MockitoBean
     private FeesService feesService;
 
-    @MockBean
+    @MockitoBean
     private OrganisationService organisationService;
 
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
 
     @Autowired
@@ -153,22 +153,22 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Autowired
     private ExitSurveyContentService exitSurveyContentService;
 
-    @MockBean
+    @MockitoBean
     private PostcodeValidator postcodeValidator;
 
-    @MockBean
+    @MockitoBean
     private DeadlinesCalculator deadlinesCalculator;
 
-    @MockBean
+    @MockitoBean
     private LocationReferenceDataService locationRefDataService;
 
-    @MockBean
+    @MockitoBean
     private CourtLocationUtils courtLocationUtility;
 
-    @MockBean
+    @MockitoBean
     private CaseFlagsInitialiser caseFlagInitialiser;
 
-    @MockBean
+    @MockitoBean
     CoreCaseEventDataService coreCaseEventDataService;
 
     @Autowired
@@ -180,7 +180,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Value("${civil.response-pack-url}")
     private String responsePackLink;
 
-    @MockBean
+    @MockitoBean
     private ToggleConfiguration toggleConfiguration;
 
     @Test

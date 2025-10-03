@@ -4,7 +4,7 @@ import com.microsoft.applicationinsights.TelemetryClient;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.testsupport.mockito.MockitoBean;
 
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
@@ -29,7 +29,7 @@ public class CallbackControllerTest extends BaseIntegrationTest {
 
     private CallbackRequest callbackRequest;
 
-    @MockBean
+    @MockitoBean
     private TelemetryClient telemetryClient;
 
     @BeforeEach

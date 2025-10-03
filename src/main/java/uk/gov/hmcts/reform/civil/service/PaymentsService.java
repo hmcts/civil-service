@@ -26,7 +26,7 @@ import uk.gov.hmcts.reform.payments.response.PaymentServiceResponse;
 import java.util.UUID;
 
 import static java.util.Optional.ofNullable;
-import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 
 @Service

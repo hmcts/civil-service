@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.civil.controllers.cases;
 
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.testsupport.mockito.MockitoBean;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.CaseDefinitionConstants;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
@@ -31,15 +31,15 @@ public class CaseAssignmentControllerTest extends BaseIntegrationTest {
     private static final String DEPRECATED_DEFENDENT_LINK_CHECK_URL = CASES_URL + "/reference/{caseReference}/ocmc";
     private static final String DEFENDENT_LINK_CHECK_URL = CASES_URL + "/reference/{caseReference}/defendant-link-status";
 
-    @MockBean
+    @MockitoBean
     private CaseLegacyReferenceSearchService caseByLegacyReferenceSearchService;
-    @MockBean
+    @MockitoBean
     private DefendantPinToPostLRspecService defendantPinToPostLRspecService;
-    @MockBean
+    @MockitoBean
     private AssignCaseService assignCaseService;
-    @MockBean
+    @MockitoBean
     private LipDefendantCaseAssignmentService lipDefendantCaseAssignmentService;
-    @MockBean
+    @MockitoBean
     private CoreCaseDataService coreCaseDataService;
 
     @Test

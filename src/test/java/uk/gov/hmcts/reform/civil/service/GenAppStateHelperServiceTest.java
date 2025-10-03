@@ -8,7 +8,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.testsupport.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -54,18 +54,18 @@ class GenAppStateHelperServiceTest {
     @Autowired
     private ObjectMapper mapper;
 
-    @MockBean
+    @MockitoBean
     private CoreCaseDataService coreCaseDataService;
-    @MockBean
+    @MockitoBean
     private InitiateGeneralApplicationService genAppService;
 
-    @MockBean
+    @MockitoBean
     private LocationService locationService;
 
     @Autowired
     private CaseDetailsConverter caseDetailsConverter;
 
-    @MockBean
+    @MockitoBean
     private LocationReferenceDataService locationRefDataService;
 
     private static final String APPLICATION_CLOSED_TEXT = "Application Closed";

@@ -11,7 +11,7 @@ import org.mockito.MockedStatic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.testsupport.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -71,17 +71,17 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 })
 class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-    @MockBean
+    @MockitoBean
     private Time time;
-    @MockBean
+    @MockitoBean
     private DeadlinesCalculator deadlinesCalculator;
-    @MockBean
+    @MockitoBean
     FeatureToggleService featureToggleService;
-    @MockBean
+    @MockitoBean
     OrganisationService organisationService;
-    @MockBean
+    @MockitoBean
     UpdateCaseManagementDetailsService updateCaseManagementDetailsService;
-    @MockBean
+    @MockitoBean
     RequestedCourtForClaimDetailsTab requestedCourtForClaimDetailsTab;
     @Autowired
     private RespondToClaimCuiCallbackHandler handler;

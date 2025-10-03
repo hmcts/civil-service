@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.testsupport.mockito.MockitoBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
@@ -59,22 +59,22 @@ class PaymentsServiceTest {
     private static final String CUSTOMER_REFERENCE = "12345";
     private static final String FEE_NOT_SET_CORRECTLY_ERROR = "Fees are not set correctly.";
 
-    @MockBean
+    @MockitoBean
     private PaymentsClient paymentsClient;
 
-    @MockBean
+    @MockitoBean
     private PaymentsConfiguration paymentsConfiguration;
 
-    @MockBean
+    @MockitoBean
     private OrganisationService organisationService;
 
-    @MockBean
+    @MockitoBean
     private HearingFeesService hearingFeesService;
 
     @Autowired
     private PaymentsService paymentsService;
 
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
 
     @BeforeEach

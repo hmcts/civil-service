@@ -152,10 +152,7 @@ class SendAndReplyMessageServiceTest {
                 );
             }
 
-            assertEquals(
-                List.of(buildExpectedMessage(expectedSenderRoleCategory, expectedUserRoleLabel)),
-                unwrapElements(actual)
-            );
+            assertSingleMessage(actual, expectedSenderRoleCategory, expectedUserRoleLabel);
         }
 
         @Test
@@ -189,10 +186,7 @@ class SendAndReplyMessageServiceTest {
                 );
             }
 
-            assertEquals(List.of(
-                message,
-                buildExpectedMessage(expectedSenderRoleCategory, expectedUserRoleLabel)
-            ), unwrapElements(actual));
+            assertMessageList(actual, expectedSenderRoleCategory, expectedUserRoleLabel);
         }
 
         @Test
@@ -221,10 +215,7 @@ class SendAndReplyMessageServiceTest {
                 );
             }
 
-            assertEquals(List.of(
-                message,
-                buildExpectedMessage(expectedSenderRoleCategory, expectedUserRoleLabel)
-            ), unwrapElements(actual));
+            assertMessageList(actual, expectedSenderRoleCategory, expectedUserRoleLabel);
         }
 
         @Test
@@ -256,10 +247,7 @@ class SendAndReplyMessageServiceTest {
                 );
             }
 
-            assertEquals(List.of(
-                message,
-                buildExpectedMessage(expectedSenderRoleCategory, expectedUserRoleLabel)
-            ), unwrapElements(actual));
+            assertMessageList(actual, expectedSenderRoleCategory, expectedUserRoleLabel);
         }
 
         @Test
@@ -290,10 +278,7 @@ class SendAndReplyMessageServiceTest {
                 );
             }
 
-            assertEquals(List.of(
-                message,
-                buildExpectedMessage(expectedSenderRoleCategory, expectedUserRoleLabel)
-            ), unwrapElements(actual));
+            assertMessageList(actual, expectedSenderRoleCategory, expectedUserRoleLabel);
         }
 
         @Test
@@ -326,10 +311,7 @@ class SendAndReplyMessageServiceTest {
                 );
             }
 
-            assertEquals(List.of(
-                message,
-                buildExpectedMessage(expectedSenderRoleCategory, expectedUserRoleLabel)
-            ), unwrapElements(actual));
+            assertMessageList(actual, expectedSenderRoleCategory, expectedUserRoleLabel);
         }
 
         @Test
@@ -361,10 +343,7 @@ class SendAndReplyMessageServiceTest {
                 );
             }
 
-            assertEquals(List.of(
-                message,
-                buildExpectedMessage(expectedSenderRoleCategory, expectedUserRoleLabel)
-            ), unwrapElements(actual));
+            assertMessageList(actual, expectedSenderRoleCategory, expectedUserRoleLabel);
         }
 
         @Test
@@ -397,10 +376,7 @@ class SendAndReplyMessageServiceTest {
                 );
             }
 
-            assertEquals(List.of(
-                message,
-                buildExpectedMessage(expectedSenderRoleCategory, expectedUserRoleLabel)
-            ), unwrapElements(actual));
+            assertMessageList(actual, expectedSenderRoleCategory, expectedUserRoleLabel);
         }
 
         @Test
@@ -432,10 +408,7 @@ class SendAndReplyMessageServiceTest {
                 );
             }
 
-            assertEquals(List.of(
-                message,
-                buildExpectedMessage(expectedSenderRoleCategory, expectedUserRoleLabel)
-            ), unwrapElements(actual));
+            assertMessageList(actual, expectedSenderRoleCategory, expectedUserRoleLabel);
         }
 
         @Test
@@ -467,10 +440,7 @@ class SendAndReplyMessageServiceTest {
                 );
             }
 
-            assertEquals(List.of(
-                message,
-                buildExpectedMessage(expectedSenderRoleCategory, expectedUserRoleLabel)
-            ), unwrapElements(actual));
+            assertMessageList(actual, expectedSenderRoleCategory, expectedUserRoleLabel);
         }
 
         @Test
@@ -500,10 +470,7 @@ class SendAndReplyMessageServiceTest {
                 );
             }
 
-            assertEquals(List.of(
-                message,
-                buildExpectedMessage(expectedSenderRoleCategory, expectedUserRoleLabel)
-            ), unwrapElements(actual));
+            assertMessageList(actual, expectedSenderRoleCategory, expectedUserRoleLabel);
         }
 
         @Test
@@ -535,10 +502,7 @@ class SendAndReplyMessageServiceTest {
                 );
             }
 
-            assertEquals(List.of(
-                message,
-                buildExpectedMessage(expectedSenderRoleCategory, expectedUserRoleLabel)
-            ), unwrapElements(actual));
+            assertMessageList(actual, expectedSenderRoleCategory, expectedUserRoleLabel);
         }
 
         private RoleAssignmentServiceResponse buildRoleAssignmentsResponse(List<RoleAssignmentResponse> roleAssignments) {
@@ -560,6 +524,28 @@ class SendAndReplyMessageServiceTest {
                 .senderName(String.format("%s, %s", USER_NAME, expectedUserRoleLabel))
                 .senderRoleType(expectedUserRole)
                 .build();
+        }
+
+        private void assertMessageList(List<Element<Message>> actual,
+                                       RolePool expectedSenderRoleCategory,
+                                       String expectedUserRoleLabel) {
+            List<Message> actualMessages = unwrapElements(actual);
+            Message expected = buildExpectedMessage(expectedSenderRoleCategory, expectedUserRoleLabel)
+                .toBuilder()
+                .messageId(actualMessages.get(1).getMessageId())
+                .build();
+            assertEquals(List.of(message, expected), actualMessages);
+        }
+
+        private void assertSingleMessage(List<Element<Message>> actual,
+                                          RolePool expectedSenderRoleCategory,
+                                          String expectedUserRoleLabel) {
+            List<Message> actualMessages = unwrapElements(actual);
+            Message expected = buildExpectedMessage(expectedSenderRoleCategory, expectedUserRoleLabel)
+                .toBuilder()
+                .messageId(actualMessages.get(0).getMessageId())
+                .build();
+            assertEquals(List.of(expected), actualMessages);
         }
 
     }

@@ -10,7 +10,7 @@ import org.mockito.MockedStatic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.testsupport.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
@@ -85,13 +85,13 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
     @Autowired
     private ObjectMapper objectMapper;
 
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
 
     @Autowired
     private JudgementService judgementService;
 
-    @MockBean
+    @MockitoBean
     private CaseDetailsConverter caseDetailsConverter;
 
     @Autowired
@@ -100,10 +100,10 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
     @Autowired
     AddressLinesMapper addressLineMapper;
 
-    @MockBean
+    @MockitoBean
     private InterestCalculator interestCalculator;
 
-    @MockBean
+    @MockitoBean
     private Time time;
 
     @Nested
