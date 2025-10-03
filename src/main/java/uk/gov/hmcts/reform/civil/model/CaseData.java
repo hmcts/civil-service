@@ -335,6 +335,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     private final YesOrNo bundleError;
     private final String bundleEvent;
+    private final YesOrNo fullAdmitNoPaymentSchedulerProcessed;
 
     public RespondentResponseTypeSpec getRespondent1ClaimResponseTypeForSpec() {
 
