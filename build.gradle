@@ -178,7 +178,7 @@ tasks.withType(Test) {
     exceptionFormat = 'full'
   }
   jacoco {
-    enabled = false
+    includes = ['uk.gov.hmcts.*']
   }
 }
 
@@ -275,6 +275,7 @@ configure(subprojects.findAll { it.name == 'dashboard-notifications' }) {
 }
 
 jacocoTestReport {
+  dependsOn test, integration
   executionData(test, integration)
   executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
   subprojects.each {
