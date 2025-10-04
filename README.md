@@ -201,24 +201,6 @@ Example
 ./gradlew -DdependencyCheck.failBuild=true -Dnvd.api.check.validforhours=24 -Dnvd.api.key=<YOUR_API_KEY_HERE> dependencyCheckAggregate
 ```
 
-## CFTLib- Running Locally
-```
-./gradlew bootWithCCD
-```
-If you're seeing errors when pulling images, run the following command:
-
-```shell
-az acr login --name hmctspublic --subscription 8999dec3-0104-4a27-94ee-6588559729d1
-```
-If you're seeing errors after importing bpmn files then run it again.
-XUI will be running on http://localhost:3000/
-
-After creating a case in XUI, complete the payment using service request.
-To update the payment success callback on a created case, please use [[civil-operation]](https://github.com/hmcts/civil-operations/)
-http://rpe-service-auth-provider-aat.service.core-compute-aat.internal/testing-support/lease to generate token
-then use http://localhost:4000/service-request-update-claim-issued endpoint with above token and then
-update body with case id and payment reference no
-
 ## Development / Debugging Environment - Preview with Mirrord
 
   As an alternative for a development environment there is a procedure in place where after running the command

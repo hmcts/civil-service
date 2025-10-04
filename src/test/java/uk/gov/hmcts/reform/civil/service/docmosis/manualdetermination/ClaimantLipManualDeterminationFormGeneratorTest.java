@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.testsupport.mockito.MockitoBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
@@ -49,13 +49,13 @@ class ClaimantLipManualDeterminationFormGeneratorTest {
             .documentName(fileName_application)
             .documentType(LIP_MANUAL_DETERMINATION)
             .build();
-    @MockBean
+    @MockitoBean
     private DocumentGeneratorService documentGeneratorService;
-    @MockBean
+    @MockitoBean
     private DocumentManagementService documentManagementService;
     @Autowired
     private ClaimantLipManualDeterminationFormGenerator generator;
-    @MockBean
+    @MockitoBean
     private ClaimantResponseUtils claimantResponseUtils;
 
     @BeforeEach
