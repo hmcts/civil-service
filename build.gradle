@@ -32,19 +32,13 @@ def versions = [
   tika              : '2.9.4'
 ]
 
-def coverageRequested = gradle.startParameter.taskNames.any { it.toLowerCase().contains('jacoco') }
-
-def toolchainVersionProvider = providers.gradleProperty('toolchainVersion')
-  .map { Integer.parseInt(it) }
-  .orElse(coverageRequested ? 21 : 25)
-
 allprojects {
   sourceCompatibility = JavaVersion.VERSION_17
   targetCompatibility = JavaVersion.VERSION_17
 
   java {
     toolchain {
-      languageVersion = JavaLanguageVersion.of(toolchainVersionProvider.get())
+      languageVersion = JavaLanguageVersion.of(25)
     }
   }
 
