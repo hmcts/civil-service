@@ -178,7 +178,10 @@ tasks.withType(Test) {
     exceptionFormat = 'full'
   }
   jacoco {
-    includes = ['uk.gov.hmcts.*']
+    includes = [
+            'uk.gov.hmcts.reform.civil.*',
+            'uk.gov.hmcts.reform.dashboard.*'
+    ]
   }
 }
 
