@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.stitching;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,13 +20,16 @@ import uk.gov.hmcts.reform.civil.model.BundleRequest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.nio.charset.Charset;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 
 @ExtendWith(MockitoExtension.class)
 class BundleRequestExecutorTest {
@@ -108,6 +112,41 @@ class BundleRequestExecutorTest {
         RetryableStitchingException exception = assertThrows(
             RetryableStitchingException.class,
             () -> bundleRequestExecutor.post(request, endpoint, "not important")
+        );
+
+        assertEquals("Stitching failed, retrying...", exception.getMessage());
+    }
+
+    @Test
+    void whenErrorBodyCannotBeParsed_thenStillThrowsRetryableException() throws JsonProcessingException {
+        // Given
+        String endpoint = "some url";
+        var mockObjectMapper = mock(ObjectMapper.class);
+        BundleRequestExecutor executorWithMockedMapper = new BundleRequestExecutor(
+            evidenceManagementApiClient,
+            serviceAuthTokenGenerator,
+            caseDetailsConverter,
+            mockObjectMapper
+        );
+
+        given(evidenceManagementApiClient.stitchBundle(any(), any(), any(BundleRequest.class)))
+            .willThrow(new RestClientResponseException(
+                "random exception",
+                500,
+                "Internal server error",
+                HttpHeaders.EMPTY,
+                "not-json".getBytes(),
+                Charset.defaultCharset()
+            ));
+        given(mockObjectMapper.readValue(any(String.class), eq(Map.class)))
+            .willThrow(new RuntimeException("Cannot parse"));
+
+        BundleRequest request = BundleRequest.builder().build();
+
+        // When / Then
+        RetryableStitchingException exception = assertThrows(
+            RetryableStitchingException.class,
+            () -> executorWithMockedMapper.post(request, endpoint, "not important")
         );
 
         assertEquals("Stitching failed, retrying...", exception.getMessage());
