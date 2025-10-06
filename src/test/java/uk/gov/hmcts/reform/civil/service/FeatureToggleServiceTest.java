@@ -105,15 +105,6 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenFastTrackUpliftsEnabled(Boolean toggleStat) {
-        var caseFileKey = "fast-track-uplifts";
-        givenToggle(caseFileKey, toggleStat);
-
-        assertThat(featureToggleService.isFastTrackUpliftsEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenLocationWhiteListed(Boolean toggleStat) {
         final String feature = "case-progression-location-whitelist";
         String location = "000000";
