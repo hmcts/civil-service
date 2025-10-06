@@ -120,10 +120,6 @@ class AsyncCaseMigrationServiceTest {
 
     @Test
     void shouldUpdateCaseStateWhenUpdatedStatePresent() {
-        // Arrange
-        CaseReference caseReference = new CaseReference("12345");
-        List<CaseReference> caseReferences = List.of(caseReference);
-
         @SuppressWarnings("unchecked")
         MigrationTask<CaseReference> migrationTask = mock(MigrationTask.class);
         CaseData caseData = mock(CaseData.class);
@@ -133,6 +129,9 @@ class AsyncCaseMigrationServiceTest {
         when(coreCaseDataService.startUpdate(anyString(), eq(CaseEvent.UPDATE_CASE_DATA))).thenReturn(startEventResponse);
         when(startEventResponse.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
+
+        CaseReference caseReference = new CaseReference("12345");
+        List<CaseReference> caseReferences = List.of(caseReference);
         when(migrationTask.migrateCaseData(caseData, caseReference)).thenReturn(caseData);
         when(migrationTask.getUpdatedState(any())).thenReturn(Optional.of("NEW_STATE"));
         when(migrationTask.getEventSummary()).thenReturn("summary");
