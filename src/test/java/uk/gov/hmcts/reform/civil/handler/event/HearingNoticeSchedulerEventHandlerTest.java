@@ -376,5 +376,4 @@ class HearingNoticeSchedulerEventHandlerTest {
                     .build())
             .build();
     }
-
 }

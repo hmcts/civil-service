@@ -44,7 +44,7 @@ public class HearingNoticeSchedulerEventHandler {
     private final RuntimeService runtimeService;
     private final ObjectMapper mapper;
     private final CoreCaseDataService coreCaseDataService;
-    static final CaseState[] ALLOWED_CASE_STATES = {
+    static final CaseState[] DISALLOWED_CASE_STATES = {
         CASE_SETTLED,
         PROCEEDS_IN_HERITAGE_SYSTEM,
         CASE_STAYED,
@@ -102,7 +102,7 @@ public class HearingNoticeSchedulerEventHandler {
     private static boolean isNotAllowedState(String state, String caseReferene) {
         try {
             CaseState caseState = CaseState.valueOf(state);
-            return Arrays.asList(ALLOWED_CASE_STATES).contains(caseState);
+            return Arrays.asList(DISALLOWED_CASE_STATES).contains(caseState);
         } catch (IllegalArgumentException e) {
             log.info("Case state is not a valid one {} ", caseReferene);
             return true;
