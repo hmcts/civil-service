@@ -216,14 +216,14 @@ class OrganisationApiTest {
     }
 
     @Test
-    void interface_HasTwoMethods() {
+    void interface_HasThreeMethods() {
         // Act
         Method[] methods = OrganisationApi.class.getDeclaredMethods();
 
         // Assert
-        assertThat(methods).hasSize(2);
+        assertThat(methods).hasSize(3);
         assertThat(Arrays.stream(methods).map(Method::getName))
-            .containsExactlyInAnyOrder("findUserOrganisation", "findOrganisationById");
+            .containsExactlyInAnyOrder("findUserOrganisation", "findOrganisationById", "findOrganisationByUserId");
     }
 
     @Test

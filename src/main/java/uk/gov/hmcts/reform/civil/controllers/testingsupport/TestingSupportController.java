@@ -11,17 +11,21 @@ import org.camunda.bpm.client.task.impl.ExternalTaskImpl;
 import org.camunda.community.rest.client.model.HistoricProcessInstanceDto;
 import org.camunda.community.rest.client.model.ProcessInstanceWithVariablesDto;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.reform.ccd.client.model.CaseAssignmentUserRolesResource;
 import uk.gov.hmcts.reform.civil.controllers.testingsupport.model.TestCamundaProcess;
+import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.event.HearingFeePaidEvent;
 import uk.gov.hmcts.reform.civil.event.HearingFeeUnpaidEvent;
 import uk.gov.hmcts.reform.civil.event.TrialReadyNotificationEvent;
@@ -30,13 +34,20 @@ import uk.gov.hmcts.reform.civil.handler.event.HearingFeeUnpaidEventHandler;
 import uk.gov.hmcts.reform.civil.event.BundleCreationTriggerEvent;
 import uk.gov.hmcts.reform.civil.handler.event.BundleCreationTriggerEventHandler;
 import uk.gov.hmcts.reform.civil.handler.event.TrialReadyNotificationEventHandler;
+import uk.gov.hmcts.reform.civil.handler.tasks.CheckStayOrderDeadlineEndTaskHandler;
+import uk.gov.hmcts.reform.civil.handler.tasks.CheckUnlessOrderDeadlineEndTaskHandler;
 import uk.gov.hmcts.reform.civil.handler.tasks.ClaimDismissedHandler;
+import uk.gov.hmcts.reform.civil.handler.tasks.GAJudgeRevisitTaskHandler;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.judgments.CjesMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper;
@@ -45,6 +56,7 @@ import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSp
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 
 import java.util.List;
+import java.util.Objects;
 
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.STARTED;
 
@@ -70,6 +82,13 @@ public class TestingSupportController {
     private final HearingFeeUnpaidEventHandler hearingFeeUnpaidHandler;
     private final TrialReadyNotificationEventHandler trialReadyNotificationHandler;
     private final BundleCreationTriggerEventHandler bundleCreationTriggerEventHandler;
+
+    private final CheckStayOrderDeadlineEndTaskHandler checkStayOrderDeadlineEndTaskHandler;
+    private final CheckUnlessOrderDeadlineEndTaskHandler checkUnlessOrderDeadlineEndTaskHandler;
+    private final UserService userService;
+    private final OrganisationService organisationService;
+    private final CoreCaseUserService coreCaseUserService;
+    private final GAJudgeRevisitTaskHandler gaJudgeRevisitTaskHandler;
 
     private static final String BEARER_TOKEN = "Bearer Token";
     private static final String SUCCESS = "success";
@@ -267,5 +286,94 @@ public class TestingSupportController {
         ResponseEntity<List<HistoricProcessInstanceDto>> response =
                 camundaRestEngineClient.getProcessInstances(processInstanceId, definitionKey, variables);
         return new ResponseEntity<>(response.getBody(), response.getStatusCode());
+    }
+
+
+    /*Check if Camunda Event CREATE_GENERAL_APPLICATION_CASE is Finished
+    if so, generalApplicationsDetails object will be populated with GA case references*/
+    @GetMapping("/testing-support/case/{caseId}/business-process/ga")
+    public ResponseEntity<BusinessProcessInfo> getGACaseReference(@PathVariable("caseId") Long caseId) {
+        log.info("Get GA case reference for caseId: {}", caseId);
+        CaseData caseData = caseDetailsConverter.toCaseData(coreCaseDataService.getCase(caseId));
+
+        int size = caseData.getGeneralApplications().size();
+
+        /**
+         * Check the business process status of latest GA case
+         * if caseData.getGeneralApplications() collection size is more than 1
+         */
+
+        var generalApplication = caseData.getGeneralApplications().get(size - 1);
+
+        var businessProcess = Objects.requireNonNull(generalApplication).getValue().getBusinessProcess();
+        var businessProcessInfo = new BusinessProcessInfo(businessProcess);
+
+        log.info("GA Business process status: " + businessProcess.getStatus() + " Camunda Event: " + businessProcess
+                .getCamundaEvent());
+
+        if (businessProcess.getStatus() == STARTED) {
+            try {
+                camundaRestEngineClient.findIncidentByProcessInstanceId(businessProcess.getProcessInstanceId())
+                        .map(camundaRestEngineClient::getIncidentMessage)
+                        .ifPresent(businessProcessInfo::setIncidentMessage);
+            } catch (FeignException e) {
+                if (e.status() != 404) {
+                    businessProcessInfo.setIncidentMessage(e.contentUTF8());
+                }
+            }
+        }
+
+        return new ResponseEntity<>(businessProcessInfo, HttpStatus.OK);
+    }
+
+    @GetMapping("/testing-support/trigger-judge-revisit-process-event/{state}/{genAppType}")
+    public ResponseEntity<String> getJudgeRevisitProcessEvent(@PathVariable("state") String ccdState,
+                                                              @PathVariable("genAppType") String genAppType) {
+
+        String responseMsg = "success";
+        ExternalTaskImpl externalTask = new ExternalTaskImpl();
+        try {
+            if (ccdState.equals("ORDER_MADE")) {
+                if (genAppType.equals("STAY_THE_CLAIM")) {
+                    checkStayOrderDeadlineEndTaskHandler.handleTask(externalTask);
+                } else {
+                    checkUnlessOrderDeadlineEndTaskHandler.handleTask(externalTask);
+                }
+            } else {
+                gaJudgeRevisitTaskHandler.handleTask(externalTask);
+            }
+        } catch (Exception e) {
+            responseMsg = "failed";
+        }
+
+        return new ResponseEntity<>(responseMsg, HttpStatus.OK);
+    }
+
+    @PostMapping(value = {"/user-roles/{caseId}", "/user-roles/{caseId}"})
+    @Operation(summary = "user roles for the cases")
+    public CaseAssignmentUserRolesResource getUserRoles(
+            @PathVariable("caseId") String caseId) {
+        return coreCaseUserService.getUserRoles(caseId);
+    }
+
+    @PostMapping(value = {"/assignCase/{caseId}", "/assignCase/{caseId}/{caseRole}"})
+    @Operation(summary = "Assign case to user")
+    public void assignCase(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
+                           @PathVariable("caseId") String caseId,
+                           @PathVariable("caseRole") CaseRole caseRole) {
+        String userId = userService.getUserInfo(authorisation).getUid();
+        String organisationId = organisationService.findOrganisation(authorisation)
+                .map(Organisation::getOrganisationIdentifier).orElse(null);
+        coreCaseUserService.assignCase(caseId, userId, organisationId, caseRole);
+        log.info("Assign caseId: {}", caseId);
+    }
+
+    @GetMapping(value = {"/getOrgDetails"})
+    @Operation(summary = "Assign case to user")
+    public String getOrgDetailsByUser(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation) {
+        String userId = userService.getUserInfo(authorisation).getUid();
+        return organisationService.findOrganisationByUserId(userId)
+                .map(Organisation::getOrganisationIdentifier).orElse(null);
+
     }
 }
