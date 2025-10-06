@@ -542,21 +542,24 @@ public class SdoHelper {
         return "";
     }
 
-    public static String getFastTrackAllocation(CaseData caseData, boolean fastTrackUpliftsEnabled) {
-        if (fastTrackUpliftsEnabled) {
-            FastTrackAllocation fastTrackAllocation = caseData.getFastTrackAllocation();
-            String reasons = "";
-            if (fastTrackAllocation != null) {
-                reasons = getFastTrackAllocationReason(fastTrackAllocation, reasons);
-                if (NO.equals(fastTrackAllocation.getAssignComplexityBand())) {
-                    return String.format("%s%s%s", FAST_TRACK_ALLOCATION_BASE, FAST_TRACK_ALLOCATION_NO_COMPLEXITY, reasons);
-                } else if (YES.equals(fastTrackAllocation.getAssignComplexityBand())) {
-                    String band = String.format(
-                        FAST_TRACK_ALLOCATION_WTIH_COMPLEXITY,
-                        fastTrackAllocation.getBand().getLabel().toLowerCase()
-                    );
-                    return String.format("%s%s%s", FAST_TRACK_ALLOCATION_BASE, band, reasons);
-                }
+    public static String getFastTrackAllocation(CaseData caseData) {
+        FastTrackAllocation fastTrackAllocation = caseData.getFastTrackAllocation();
+        String reasons = "";
+        if (fastTrackAllocation != null) {
+            reasons = getFastTrackAllocationReason(fastTrackAllocation, reasons);
+            if (NO.equals(fastTrackAllocation.getAssignComplexityBand())) {
+                return String.format(
+                    "%s%s%s",
+                    FAST_TRACK_ALLOCATION_BASE,
+                    FAST_TRACK_ALLOCATION_NO_COMPLEXITY,
+                    reasons
+                );
+            } else if (YES.equals(fastTrackAllocation.getAssignComplexityBand())) {
+                String band = String.format(
+                    FAST_TRACK_ALLOCATION_WTIH_COMPLEXITY,
+                    fastTrackAllocation.getBand().getLabel().toLowerCase()
+                );
+                return String.format("%s%s%s", FAST_TRACK_ALLOCATION_BASE, band, reasons);
             }
         }
         return "";

@@ -1441,7 +1441,7 @@ public class SdoHelperTest {
 
             String expectedText = "The claim is allocated to the Fast Track and is assigned to complexity band 2 because some reasons";
 
-            assertThat(SdoHelper.getFastTrackAllocation(caseData, true)).isEqualTo(expectedText);
+            assertThat(SdoHelper.getFastTrackAllocation(caseData)).isEqualTo(expectedText);
         }
 
         @Test
@@ -1460,7 +1460,7 @@ public class SdoHelperTest {
 
             String expectedText = "The claim is allocated to the Fast Track and is assigned to complexity band 2";
 
-            assertThat(SdoHelper.getFastTrackAllocation(caseData, true)).isEqualTo(expectedText);
+            assertThat(SdoHelper.getFastTrackAllocation(caseData)).isEqualTo(expectedText);
         }
 
         @Test
@@ -1478,7 +1478,7 @@ public class SdoHelperTest {
 
             String expectedText = "The claim is allocated to the Fast Track and is not assigned to a complexity band";
 
-            assertThat(SdoHelper.getFastTrackAllocation(caseData, true)).isEqualTo(expectedText);
+            assertThat(SdoHelper.getFastTrackAllocation(caseData)).isEqualTo(expectedText);
         }
 
         @Test
@@ -1497,7 +1497,7 @@ public class SdoHelperTest {
 
             String expectedText = "The claim is allocated to the Fast Track and is not assigned to a complexity band because some more reasons";
 
-            assertThat(SdoHelper.getFastTrackAllocation(caseData, true)).isEqualTo(expectedText);
+            assertThat(SdoHelper.getFastTrackAllocation(caseData)).isEqualTo(expectedText);
         }
     }
 
