@@ -74,7 +74,7 @@ class RetriggerUpdateLocationDataHandlerTest {
         ExternalTask externalTask = mock(ExternalTask.class);
         when(externalTask.getVariable("caseIds")).thenReturn(null);
 
-        assertThrows(AssertionError.class, () -> handler.handleTask(externalTask));
+        assertThrows(IllegalArgumentException.class, () -> handler.handleTask(externalTask));
     }
 
     @Test
@@ -83,6 +83,6 @@ class RetriggerUpdateLocationDataHandlerTest {
         when(externalTask.getVariable("caseIds")).thenReturn("1");
         when(externalTask.getVariable("ePimId")).thenReturn(null);
 
-        assertThrows(AssertionError.class, () -> handler.handleTask(externalTask));
+        assertThrows(IllegalArgumentException.class, () -> handler.handleTask(externalTask));
     }
 }
