@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.web.context.request.RequestContextHolder;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseReference;
@@ -20,6 +21,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -157,5 +159,37 @@ class AsyncCaseMigrationServiceTest {
 
         // Assert: verify no submission attempted
         verify(coreCaseDataService, times(0)).submitUpdate(anyString(), any(CaseDataContent.class));
+    }
+
+    @Test
+    void shouldResetRequestContextHolderAfterEachCase() {
+        @SuppressWarnings("unchecked")
+        MigrationTask<CaseReference> migrationTask = mock(MigrationTask.class);
+        when(coreCaseDataService.startUpdate(anyString(), any())).thenReturn(mock(StartEventResponse.class));
+
+        asyncCaseMigrationService.migrateCasesAsync(migrationTask, List.of(new CaseReference("12345")), null);
+
+        assertNull(RequestContextHolder.getRequestAttributes(), "RequestContext should be reset after migration");
+    }
+
+    @Test
+    void shouldPauseBetweenBatchesWhenBatchSizeReached() {
+        AsyncCaseMigrationService batchService = new AsyncCaseMigrationService(
+            coreCaseDataService,
+            caseDetailsConverter,
+            objectMapper,
+            1, // batch size = 1
+            0  // avoid real sleep
+        );
+
+        @SuppressWarnings("unchecked")
+        MigrationTask<CaseReference> migrationTask = mock(MigrationTask.class);
+        when(migrationTask.migrateCaseData(any(), any())).thenReturn(mock(CaseData.class));
+        when(coreCaseDataService.startUpdate(anyString(), any())).thenReturn(mock(StartEventResponse.class));
+
+        List<CaseReference> caseReferences = List.of(new CaseReference("1"), new CaseReference("2"));
+        batchService.migrateCasesAsync(migrationTask, caseReferences, null);
+
+        verify(coreCaseDataService, times(2)).startUpdate(anyString(), eq(CaseEvent.UPDATE_CASE_DATA));
     }
 }

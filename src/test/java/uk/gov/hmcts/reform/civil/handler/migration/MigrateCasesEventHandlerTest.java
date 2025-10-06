@@ -122,6 +122,30 @@ class MigrateCasesEventHandlerTest {
     }
 
     @Test
+    void shouldHandleTaskWithCaseIdsAndStateWhenScenarioIsNull() {
+        // Arrange
+        ExternalTask externalTask = mock(ExternalTask.class);
+        when(externalTask.getVariable("taskName")).thenReturn("testTask");
+        when(externalTask.getVariable("caseIds")).thenReturn(List.of("111", "222"));
+        when(externalTask.getVariable("scenario")).thenReturn(null); // scenario is null
+        when(externalTask.getVariable("state")).thenReturn("IN_PROGRESS"); // state is present
+
+        @SuppressWarnings("unchecked")
+        MigrationTask<CaseReference> migrationTask = mock(MigrationTask.class);
+        when(migrationTask.getType()).thenReturn(CaseReference.class);
+        when(migrationTaskFactory.getMigrationTask("testTask")).thenReturn(Optional.of(migrationTask));
+
+        // Act
+        ExternalTaskData result = handler.handleTask(externalTask);
+
+        // Assert
+        assertNotNull(result);
+        // Ensure migrateCasesAsync is called with the correct state value
+        verify(asyncCaseMigrationService, times(1))
+            .migrateCasesAsync(eq(migrationTask), anyList(), eq("IN_PROGRESS"));
+    }
+
+    @Test
     void shouldReturnCaseReferencesFromEncryptedCsvFile() {
         String csvFileName = "encrypted.csv";
         List<CaseReference> mockReferences = List.of(new CaseReference("12345"), new CaseReference("67890"));
