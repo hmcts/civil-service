@@ -147,9 +147,16 @@ class HearingNoticeSchedulerEventHandlerTest {
                 .triggeredViaScheduler(true)
                 .build());
         when(hearingsService.getHearingResponse(anyString(), anyString())).thenReturn(
-            createHearing(CASE_ID, ListAssistCaseStatus.LISTED));
+            createHearing(ListAssistCaseStatus.LISTED));
         when(hearingsService.getPartiesNotifiedResponses(anyString(), anyString())).thenReturn(
             PartiesNotifiedResponses.builder().build());
+
+        CaseDetails mockCaseDetails = CaseDetails.builder()
+            .id(Long.parseLong(CASE_ID))
+            .state("CASE_PROGRESSION")
+            .build();
+
+        when(coreCaseDataService.getCase(Long.parseLong(CASE_ID))).thenReturn(mockCaseDetails);
 
         handler.handle(new HearingNoticeSchedulerTaskEvent(HEARING_ID));
 
@@ -171,7 +178,7 @@ class HearingNoticeSchedulerEventHandlerTest {
                 .dispatchedHearingIds(List.of())
                 .build());
         when(hearingsService.getHearingResponse(AUTH_TOKEN, HEARING_ID)).thenReturn(
-            createHearing(CASE_ID, ListAssistCaseStatus.CASE_CLOSED));
+            createHearing(ListAssistCaseStatus.CASE_CLOSED));
         when(hearingsService.getPartiesNotifiedResponses(AUTH_TOKEN, HEARING_ID)).thenReturn(
             PartiesNotifiedResponses.builder().responses(List.of()).build());
 
@@ -205,7 +212,7 @@ class HearingNoticeSchedulerEventHandlerTest {
                 .triggeredViaScheduler(true)
                 .build());
         when(hearingsService.getHearingResponse(AUTH_TOKEN, HEARING_ID)).thenReturn(
-            createHearing(CASE_ID, ListAssistCaseStatus.LISTED));
+            createHearing(ListAssistCaseStatus.LISTED));
         when(hearingsService.getPartiesNotifiedResponses(AUTH_TOKEN, HEARING_ID)).thenReturn(
             PartiesNotifiedResponses.builder().responses(List.of(
                 PartiesNotifiedResponse.builder()
@@ -218,6 +225,13 @@ class HearingNoticeSchedulerEventHandlerTest {
                                      .build())
                     .build()
             )).build());
+
+        CaseDetails mockCaseDetails = CaseDetails.builder()
+            .id(Long.parseLong(CASE_ID))
+            .state("CASE_PROGRESSION")
+            .build();
+
+        when(coreCaseDataService.getCase(Long.parseLong(CASE_ID))).thenReturn(mockCaseDetails);
 
         handler.handle(new HearingNoticeSchedulerTaskEvent(HEARING_ID));
 
@@ -242,7 +256,7 @@ class HearingNoticeSchedulerEventHandlerTest {
                 .triggeredViaScheduler(true)
                 .build());
         when(hearingsService.getHearingResponse(AUTH_TOKEN, HEARING_ID)).thenReturn(
-            createHearing(CASE_ID, ListAssistCaseStatus.LISTED));
+            createHearing(ListAssistCaseStatus.LISTED));
         when(hearingsService.getPartiesNotifiedResponses(AUTH_TOKEN, HEARING_ID)).thenReturn(
             PartiesNotifiedResponses.builder().responses(List.of(
                 PartiesNotifiedResponse.builder()
@@ -255,6 +269,14 @@ class HearingNoticeSchedulerEventHandlerTest {
                                      .build())
                     .build()
             )).build());
+
+
+        CaseDetails mockCaseDetails = CaseDetails.builder()
+            .id(Long.parseLong(CASE_ID))
+            .state("CASE_PROGRESSION")
+            .build();
+
+        when(coreCaseDataService.getCase(Long.parseLong(CASE_ID))).thenReturn(mockCaseDetails);
 
         handler.handle(new HearingNoticeSchedulerTaskEvent(HEARING_ID));
 
@@ -277,7 +299,7 @@ class HearingNoticeSchedulerEventHandlerTest {
                 .build());
 
         when(hearingsService.getHearingResponse(AUTH_TOKEN, HEARING_ID)).thenReturn(
-            createHearing(CASE_ID, ListAssistCaseStatus.LISTED));
+            createHearing(ListAssistCaseStatus.LISTED));
 
         when(hearingsService.getPartiesNotifiedResponses(AUTH_TOKEN, HEARING_ID)).thenReturn(
             PartiesNotifiedResponses.builder().responses(List.of(
@@ -293,6 +315,14 @@ class HearingNoticeSchedulerEventHandlerTest {
                                      .build())
                     .build()
             )).build());
+
+
+        CaseDetails mockCaseDetails = CaseDetails.builder()
+            .id(Long.parseLong(CASE_ID))
+            .state("CASE_PROGRESSION")
+            .build();
+
+        when(coreCaseDataService.getCase(Long.parseLong(CASE_ID))).thenReturn(mockCaseDetails);
 
         handler.handle(new HearingNoticeSchedulerTaskEvent(HEARING_ID));
 
@@ -323,13 +353,13 @@ class HearingNoticeSchedulerEventHandlerTest {
         verify(runtimeService, times(0)).createMessageCorrelation(MESSAGE_ID);
     }
 
-    private HearingGetResponse createHearing(String caseId, ListAssistCaseStatus hearingStatus) {
+    private HearingGetResponse createHearing(ListAssistCaseStatus hearingStatus) {
         return HearingGetResponse.builder()
             .hearingDetails(HearingDetails.builder().build())
             .requestDetails(HearingRequestDetails.builder()
                                 .versionNumber(VERSION.longValue())
                                 .build())
-            .caseDetails(CaseDetailsHearing.builder().caseRef(caseId).build())
+            .caseDetails(CaseDetailsHearing.builder().caseRef(HearingNoticeSchedulerEventHandlerTest.CASE_ID).build())
             .partyDetails(List.of(PartyDetailsModel.builder().build()))
             .hearingResponse(
                 HearingResponse.builder()

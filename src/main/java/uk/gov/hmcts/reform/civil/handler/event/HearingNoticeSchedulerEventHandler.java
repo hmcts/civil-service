@@ -44,7 +44,7 @@ public class HearingNoticeSchedulerEventHandler {
     private final RuntimeService runtimeService;
     private final ObjectMapper mapper;
     private final CoreCaseDataService coreCaseDataService;
-    private static final CaseState[] ALLOWED_CASE_STATES = {
+    static final CaseState[] ALLOWED_CASE_STATES = {
         CASE_SETTLED,
         PROCEEDS_IN_HERITAGE_SYSTEM,
         CASE_STAYED,
@@ -81,7 +81,7 @@ public class HearingNoticeSchedulerEventHandler {
 
             boolean stateNotAllowedToGenerateHearingNotice = isNotAllowedState(caseDetails.getState(), caseReference);
 
-            if (stateNotAllowedToGenerateHearingNotice
+            if (!stateNotAllowedToGenerateHearingNotice
                 && HmcDataUtils.hearingDataChanged(partiesNotified, hearing)) {
                 log.info("Dispatching hearing notice task for hearing [{}].",
                         hearingId);
