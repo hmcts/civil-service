@@ -147,14 +147,13 @@ class AsyncCaseMigrationServiceTest {
 
     @Test
     void shouldHandleRuntimeExceptionDuringMigration() {
-        CaseReference caseReference = new CaseReference("12345");
-        List<CaseReference> caseReferences = List.of(caseReference);
-
         @SuppressWarnings("unchecked")
         MigrationTask<CaseReference> migrationTask = mock(MigrationTask.class);
         when(coreCaseDataService.startUpdate(anyString(), eq(CaseEvent.UPDATE_CASE_DATA)))
             .thenThrow(new RuntimeException("Test Exception"));
 
+        CaseReference caseReference = new CaseReference("12345");
+        List<CaseReference> caseReferences = List.of(caseReference);
         asyncCaseMigrationService.migrateCasesAsync(migrationTask, caseReferences, null);
 
         // Assert: verify no submission attempted
