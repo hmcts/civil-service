@@ -493,7 +493,9 @@ dependencies {
   }
 }
 
-mainClassName = 'uk.gov.hmcts.reform.civil.Application'
+application {
+  mainClass = 'uk.gov.hmcts.reform.civil.Application'
+}
 
 bootJar {
   getArchiveFileName().set(provider {
