@@ -40,7 +40,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -270,7 +274,6 @@ class HearingNoticeSchedulerEventHandlerTest {
                     .build()
             )).build());
 
-
         CaseDetails mockCaseDetails = CaseDetails.builder()
             .id(Long.parseLong(CASE_ID))
             .state("CASE_PROGRESSION")
@@ -315,7 +318,6 @@ class HearingNoticeSchedulerEventHandlerTest {
                                      .build())
                     .build()
             )).build());
-
 
         CaseDetails mockCaseDetails = CaseDetails.builder()
             .id(Long.parseLong(CASE_ID))
