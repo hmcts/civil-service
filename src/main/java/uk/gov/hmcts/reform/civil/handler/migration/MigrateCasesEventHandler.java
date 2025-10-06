@@ -54,12 +54,20 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
         List<String> caseIds = externalTask.getVariable("caseIds");
         String scenario = externalTask.getVariable("scenario");
 
-        if (caseIds != null && !caseIds.isEmpty() && scenario != null) {
+        if (caseIds != null && !caseIds.isEmpty()) {
             caseReferences = caseIds.stream()
                 .map(id -> {
-                    DashboardScenarioCaseReference instance = new DashboardScenarioCaseReference();
-                    instance.setCaseReference(id);
-                    instance.setDashboardScenario(scenario);
+                    Object instance;
+                    if (scenario != null) {
+                        DashboardScenarioCaseReference scenarioInstance = new DashboardScenarioCaseReference();
+                        scenarioInstance.setCaseReference(id);
+                        scenarioInstance.setDashboardScenario(scenario);
+                        instance = scenarioInstance;
+                    } else {
+                        CaseReference caseRef = new CaseReference();
+                        caseRef.setCaseReference(id);
+                        instance = caseRef;
+                    }
                     return task.getType().cast(instance);
                 })
                 .toList();

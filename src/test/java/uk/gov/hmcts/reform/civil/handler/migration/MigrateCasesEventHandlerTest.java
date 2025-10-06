@@ -21,8 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -138,5 +137,46 @@ class MigrateCasesEventHandlerTest {
     void shouldReturnEmptyListWhenCsvFileNameIsNull() {
         List<CaseReference> result = handler.getCaseReferenceList(CaseReference.class, null);
         assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void shouldFallbackToCsvWhenCaseIdsEmpty() {
+        ExternalTask externalTask = mock(ExternalTask.class);
+        when(externalTask.getVariable("taskName")).thenReturn("testTask");
+        when(externalTask.getVariable("caseIds")).thenReturn(List.of());
+        when(externalTask.getVariable("csvFileName")).thenReturn("test.csv");
+
+        @SuppressWarnings("unchecked")
+        MigrationTask<CaseReference> migrationTask = mock(MigrationTask.class);
+        when(migrationTask.getType()).thenReturn(CaseReference.class);
+        when(migrationTaskFactory.getMigrationTask("testTask")).thenReturn(Optional.of(migrationTask));
+
+        List<CaseReference> mockReferences = List.of(new CaseReference("999"));
+        when(caseReferenceCsvLoader.loadCaseReferenceList(CaseReference.class, "test.csv")).thenReturn(mockReferences);
+
+        handler.handleTask(externalTask);
+
+        verify(asyncCaseMigrationService).migrateCasesAsync(migrationTask, mockReferences, null);
+    }
+
+    @Test
+    void shouldReturnEmptyExternalTaskDataWhenNoCaseReferencesFound() {
+        ExternalTask externalTask = mock(ExternalTask.class);
+        when(externalTask.getVariable("taskName")).thenReturn("testTask");
+        when(externalTask.getVariable("caseIds")).thenReturn(List.of());
+
+        @SuppressWarnings("unchecked")
+        MigrationTask<CaseReference> migrationTask = mock(MigrationTask.class);
+        when(migrationTask.getType()).thenReturn(CaseReference.class);
+        when(migrationTaskFactory.getMigrationTask("testTask")).thenReturn(Optional.of(migrationTask));
+
+        // CSV fallback returns empty list
+        when(caseReferenceCsvLoader.loadCaseReferenceList(CaseReference.class, "empty.csv")).thenReturn(List.of());
+        when(externalTask.getVariable("csvFileName")).thenReturn("empty.csv");
+
+        ExternalTaskData result = handler.handleTask(externalTask);
+
+        assertNotNull(result);
+        verify(asyncCaseMigrationService, times(0)).migrateCasesAsync(any(), anyList(), any());
     }
 }
