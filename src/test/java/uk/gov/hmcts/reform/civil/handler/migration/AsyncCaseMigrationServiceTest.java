@@ -142,7 +142,7 @@ class AsyncCaseMigrationServiceTest {
         asyncCaseMigrationService.migrateCasesAsync(migrationTask, caseReferences, "OLD_STATE");
 
         // Assert
-        verify(coreCaseDataService).submitUpdate(eq("12345"), any(CaseDataContent.class));
+        verify(coreCaseDataService).startUpdate(eq("12345"), any(CaseEvent.class));
     }
 
     @Test
