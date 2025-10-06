@@ -41,9 +41,6 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
     public ExternalTaskData handleTask(ExternalTask externalTask) {
         assert externalTask.getVariable(TASK_NAME) != null;
 
-        if (externalTask.getVariable(CSV_FILE_NAME) == null) {
-            throw new AssertionError("csvFileName is null");
-        }
         String taskName = externalTask.getVariable(TASK_NAME);
         MigrationTask<? extends CaseReference> task = migrationTaskFactory
             .getMigrationTask(taskName)
