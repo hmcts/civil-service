@@ -368,6 +368,29 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Test
+    void shouldThrowError_whenLRVsLiPCourtIsNotWhitelistedForNroNotEnabled() {
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimIssued1v1LiP()
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                        .baseLocation("45678")
+                                        .region("4").build())
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
+        given(initiateGeneralAppService.caseContainsLiP(any())).willReturn(true);
+        given(featureToggleService.isGaForLipsEnabled()).willReturn(true);
+        given(featureToggleService.isCuiGaNroEnabled()).willReturn(false);
+        given(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).willReturn(false);
+        given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        assertThat(response.getErrors()).isNotNull();
+    }
+
+    @Test
     void shouldThrowError_whenLRVsLiPAndLipsNotEnabled() {
 
         CaseData caseData = CaseDataBuilder.builder()
@@ -429,6 +452,33 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         given(featureToggleService.isGaForLipsEnabled()).willReturn(true);
         given(featureToggleService.isGaForWelshEnabled()).willReturn(true);
         given(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).willReturn(true);
+        given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        assertThat(response.getErrors()).isEmpty();
+    }
+
+    @Test
+    void shouldNotThrowError_whenLRVsLiPAndLiPIsBilingualGaForWelshEnabledForNro() {
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimIssued1v1LiP()
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+            .defendantUserDetails(IdamUserDetails.builder().email("abc@defendant").build())
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                        .baseLocation("45678")
+                                        .region("4").build())
+            .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(
+                RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH").build()).build())
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
+        given(initiateGeneralAppService.caseContainsLiP(any())).willReturn(true);
+        given(featureToggleService.isGaForLipsEnabled()).willReturn(true);
+        given(featureToggleService.isGaForWelshEnabled()).willReturn(true);
+        given(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).willReturn(false);
+        given(featureToggleService.isCuiGaNroEnabled()).willReturn(true);
         given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -811,7 +861,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldNotCauseAnyErrors_whenGaTypeIsNotSettleOrDiscontinueConsentCoscEnabled() {
 
-            when(featureToggleService.isCoSCEnabled()).thenReturn(true);
             when(theUserService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
 
             when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
@@ -842,7 +891,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
             when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
                 .thenReturn(List.of(CaseRole.APPLICANTSOLICITORONE.getFormattedName()));
-            when(featureToggleService.isCoSCEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder
                 .builder()
                 .ccdCaseReference(1234L)
@@ -863,7 +911,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldCauseError_whenGaTypeIsNotSettleOrDiscontinueConsentNoCoscEnabled() {
 
-            when(featureToggleService.isCoSCEnabled()).thenReturn(true);
             when(theUserService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
 
             when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
@@ -1229,7 +1276,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                                 .code(FEE_CODE)
                                 .calculatedAmountInPence(fee275)
                                 .version(FEE_VERSION).build());
-            when(featureToggleService.isCoSCEnabled()).thenReturn(true);
             when(theUserService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
 
             when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
@@ -1284,7 +1330,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                                 .build());
             CaseData caseData = GeneralApplicationDetailsBuilder.builder().getTestCaseDataForApplicationFee(
                 CaseDataBuilder.builder().build(), false, false);
-            when(featureToggleService.isCoSCEnabled()).thenReturn(true);
 
             when(theUserService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
 
@@ -1334,7 +1379,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = GeneralApplicationDetailsBuilder.builder().getTestCaseDataForApplicationFee(
                 CaseDataBuilder.builder().build(), false, false);
 
-            when(featureToggleService.isCoSCEnabled()).thenReturn(true);
             when(theUserService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
                 .thenReturn(List.of(CaseRole.APPLICANTSOLICITORONE.getFormattedName()));
@@ -1513,7 +1557,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
                                                                             .email(APPLICANT_EMAIL_ID_CONSTANT)
                                                                             .build());
-
+            when(theUserService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(initiateGeneralAppService.buildCaseData(any(CaseData.CaseDataBuilder.class),
                     any(CaseData.class), any(UserDetails.class), anyString())).thenAnswer((Answer) invocation -> invocation.getArguments()[1]
             );

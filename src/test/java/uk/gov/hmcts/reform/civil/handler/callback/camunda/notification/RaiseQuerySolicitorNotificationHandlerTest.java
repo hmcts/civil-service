@@ -26,7 +26,6 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.querymanagement.QueryManagementCamundaService;
 import uk.gov.hmcts.reform.civil.service.querymanagement.QueryManagementVariables;
@@ -74,9 +73,6 @@ class RaiseQuerySolicitorNotificationHandlerTest extends BaseCallbackHandlerTest
 
     @Mock
     private QueryManagementCamundaService runtimeService;
-
-    @Mock
-    private FeatureToggleService featureToggleService;
 
     @Mock
     private NotificationsSignatureConfiguration configuration;
@@ -178,10 +174,8 @@ class RaiseQuerySolicitorNotificationHandlerTest extends BaseCallbackHandlerTest
             when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("welshHmctsSignature"));
             when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("welshPhoneContact"));
             when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
-            when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
-            when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
-            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
         }
 
         @Test
@@ -291,43 +285,24 @@ class RaiseQuerySolicitorNotificationHandlerTest extends BaseCallbackHandlerTest
     }
 
     private CaseData createCaseDataWithQueries() {
-        CaseQueriesCollection applicantQuery = CaseQueriesCollection.builder()
-            .roleOnCase(CaseRole.APPLICANTSOLICITORONE.toString())
-            .caseMessages(wrapElements(CaseMessage.builder()
-                                           .id("1")
-                                           .build()))
-            .build();
-
-        CaseQueriesCollection respondent1Query = CaseQueriesCollection.builder()
-            .roleOnCase(CaseRole.RESPONDENTSOLICITORONE.toString())
-            .caseMessages(wrapElements(CaseMessage.builder()
-                                           .id("2")
-                                           .build()))
-            .build();
-
-        CaseQueriesCollection respondent2Query = CaseQueriesCollection.builder()
-            .roleOnCase(CaseRole.RESPONDENTSOLICITORTWO.toString())
-            .caseMessages(wrapElements(CaseMessage.builder()
-                                           .id("3")
-                                           .build()))
-            .build();
-
         CaseQueriesCollection publicQueries = CaseQueriesCollection.builder()
-            .caseMessages(wrapElements(CaseMessage.builder()
-                                           .id("1")
-                                           .build(),
-                                       CaseMessage.builder()
-                                           .id("3")
-                                           .build(),
-                                       CaseMessage.builder()
-                                           .id("2")
-                                           .build(),
-                                       CaseMessage.builder()
-                                           .id("4")
-                                           .build(),
-                                       CaseMessage.builder()
-                                           .id("5")
-                                           .build()))
+            .caseMessages(wrapElements(
+                CaseMessage.builder()
+                    .id("1")
+                    .build(),
+                CaseMessage.builder()
+                    .id("3")
+                    .build(),
+                CaseMessage.builder()
+                    .id("2")
+                    .build(),
+                CaseMessage.builder()
+                    .id("4")
+                    .build(),
+                CaseMessage.builder()
+                    .id("5")
+                    .build()
+            ))
             .build();
 
         return CaseDataBuilder.builder().atStateClaimIssued().build()
@@ -337,10 +312,7 @@ class RaiseQuerySolicitorNotificationHandlerTest extends BaseCallbackHandlerTest
                                                 .build())
             .respondentSolicitor1EmailAddress("respondent1@email.com")
             .respondentSolicitor2EmailAddress("respondent2@email.com")
-            .qmApplicantSolicitorQueries(applicantQuery)
             .queries(publicQueries)
-            .qmRespondentSolicitor1Queries(respondent1Query)
-            .qmRespondentSolicitor2Queries(respondent2Query)
             .businessProcess(BusinessProcess.builder()
                                  .processInstanceId("123")
                                  .build())
@@ -349,9 +321,9 @@ class RaiseQuerySolicitorNotificationHandlerTest extends BaseCallbackHandlerTest
 
     @NotNull
     private Map<String, String> getNotificationDataMapLip(CaseData caseData) {
-        Map<String, String> expectedProperties = new HashMap<>(addCommonProperties());
-        expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
-        expectedProperties.put(CNBC_CONTACT, configuration.getCnbcContact());
+        Map<String, String> expectedProperties = new HashMap<>(addCommonProperties(true));
+        expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getRaiseQueryLr());
+        expectedProperties.put(CNBC_CONTACT, configuration.getRaiseQueryLr());
         expectedProperties.putAll(Map.of(
             "partyReferences", "Claimant reference: 12345 - Defendant reference: 6789",
             "name", "a b",
@@ -363,7 +335,7 @@ class RaiseQuerySolicitorNotificationHandlerTest extends BaseCallbackHandlerTest
 
     @NotNull
     private Map<String, String> getNotificationDataMap(CaseData caseData) {
-        Map<String, String> expectedProperties = new HashMap<>(addCommonProperties());
+        Map<String, String> expectedProperties = new HashMap<>(addCommonProperties(false));
         expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getRaiseQueryLr());
         expectedProperties.put(CNBC_CONTACT, configuration.getRaiseQueryLr());
         expectedProperties.putAll(Map.of(
@@ -376,7 +348,7 @@ class RaiseQuerySolicitorNotificationHandlerTest extends BaseCallbackHandlerTest
     }
 
     @NotNull
-    public Map<String, String> addCommonProperties() {
+    public Map<String, String> addCommonProperties(boolean isLip) {
         Map<String, String> expectedProperties = new HashMap<>();
         expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
         expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
@@ -385,8 +357,13 @@ class RaiseQuerySolicitorNotificationHandlerTest extends BaseCallbackHandlerTest
         expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
         expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
         expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
-        expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
-        expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+        if (isLip) {
+            expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
+            expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+        } else {
+            expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
+            expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+        }
         return expectedProperties;
     }
 

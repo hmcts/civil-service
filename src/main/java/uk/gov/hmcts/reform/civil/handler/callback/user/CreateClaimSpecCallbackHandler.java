@@ -102,7 +102,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         + "<li><a href=\"%s\" target=\"_blank\">N9B</a></li></ul><li>and any supporting documents</li></ul>"
         + "to the defendant within 4 months."
         + "%n%nFollowing this, you will need to file a Certificate of Service and supporting documents "
-        + "to : <a href=\"mailto:OCMCNton@justice.gov.uk\">OCMCNton@justice.gov.uk</a>. The Certificate of Service form can be found here:"
+        + "to : <a href=\"mailto:contactocmc@justice.gov.uk\">contactocmc@justice.gov.uk</a>. The Certificate of Service form can be found here:"
         + "%n%n<ul><li><a href=\"%s\" target=\"_blank\">N215</a></li></ul>";
 
     private static final String ERROR_MESSAGE_SCHEDULED_DATE_OF_FLIGHT_MUST_BE_TODAY_OR_IN_THE_PAST =
@@ -144,7 +144,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             .put(callbackKey(MID, "appOrgPolicy"), this::validateApplicantSolicitorOrgPolicy)
             .put(callbackKey(MID, "repOrgPolicy"), this::validateRespondentSolicitorOrgPolicy)
             .put(callbackKey(MID, "rep2OrgPolicy"), this::validateRespondentSolicitor2OrgPolicy)
-            .put(callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth)
+            .put(callbackKey(MID, "statement-of-truth"), this::emptyCallbackResponse)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::submitClaim)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .put(callbackKey(MID, "respondent1"), this::validateRespondent1Details)
@@ -305,20 +305,6 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(validateEmailService.validate(caseData.getRespondentSolicitor1EmailAddress()))
-            .build();
-    }
-
-    private CallbackResponse resetStatementOfTruth(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-
-        // resetting statement of truth field, this resets in the page, but the data is still sent to the db.
-        // must be to do with the way XUI cache data entered through the lifecycle of an event.
-        CaseData updatedCaseData = caseData.toBuilder()
-            .uiStatementOfTruth(null)
-            .build();
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseData.toMap(objectMapper))
             .build();
     }
 

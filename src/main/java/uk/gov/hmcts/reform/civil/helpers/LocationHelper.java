@@ -274,7 +274,12 @@ public class LocationHelper {
         Optional<LocationRefData> matchingLocation = getMatching(getLocations.get(), requestedCourt);
         Long reference = updatedData.build().getCcdCaseReference();
         if (log.isInfoEnabled()) {
-            log.info("Case {}, requested court is {}", reference, requestedCourt != null ? "defined" : "undefined");
+            Optional.ofNullable(requestedCourt)
+                .map(RequestedCourt::getCaseLocation)
+                .map(CaseLocationCivil::getBaseLocation)
+                .ifPresentOrElse(baseLocation -> log.info("Case {}, requested court is {}", reference, baseLocation),
+                            () -> log.info("Case {}, requested court or location is missing", reference)
+                );
             log.info(
                 "Case {}, there {} a location matching to requested court",
                 reference,
