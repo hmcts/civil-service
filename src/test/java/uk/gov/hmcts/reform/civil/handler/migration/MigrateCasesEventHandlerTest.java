@@ -83,7 +83,7 @@ class MigrateCasesEventHandlerTest {
     void shouldHandleTaskWithCaseIdsAndScenario() {
         ExternalTask externalTask = mock(ExternalTask.class);
         when(externalTask.getVariable("taskName")).thenReturn("testTask");
-        when(externalTask.getVariable("caseIds")).thenReturn(List.of("123", "456"));
+        when(externalTask.getVariable("caseIds")).thenReturn("123,456");
         when(externalTask.getVariable("scenario")).thenReturn("SCENARIO_1");
 
         MigrationTask<? extends CaseReference> migrationTask = mock(MigrationTask.class);

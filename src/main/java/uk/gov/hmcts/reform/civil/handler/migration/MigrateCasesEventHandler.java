@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.utils.CaseMigrationEncryptionUtil;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Component
@@ -51,11 +52,16 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
     private <T extends CaseReference> ExternalTaskData handleTypedTask(ExternalTask externalTask, MigrationTask<T> task) {
         List<T> caseReferences;
 
-        List<String> caseIds = externalTask.getVariable("caseIds");
+        String caseIds = externalTask.getVariable("caseIds");
         String scenario = externalTask.getVariable("scenario");
 
         if (caseIds != null && !caseIds.isEmpty() && scenario != null) {
-            caseReferences = caseIds.stream()
+            List<String> caseIdList = Arrays.stream(caseIds.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .toList();
+
+            caseReferences = caseIdList.stream()
                 .map(id -> {
                     DashboardScenarioCaseReference instance = new DashboardScenarioCaseReference();
                     instance.setCaseReference(id);
@@ -63,6 +69,7 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
                     return task.getType().cast(instance);
                 })
                 .toList();
+
             log.info("Created {} case references from Camunda variables", caseReferences.size());
         } else {
             log.info("caseIds or scenario are not provided. Falling back to csv check");
