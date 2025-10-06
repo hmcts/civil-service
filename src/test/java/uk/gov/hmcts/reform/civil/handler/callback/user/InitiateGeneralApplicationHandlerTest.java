@@ -1582,7 +1582,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
-            assertThat(response).isEqualTo(SubmittedCallbackResponse.builder().build());
+            assertThat(response).isEqualTo(SubmittedCallbackResponse.builder().confirmationHeader("# You have submitted an application").build());
         }
     }
 }
