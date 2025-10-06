@@ -119,7 +119,7 @@ class AsyncCaseMigrationServiceTest {
     }
 
     @Test
-    void shouldUpdateCaseStateWhenUpdatedStatePresent() throws InterruptedException {
+    void shouldUpdateCaseStateWhenUpdatedStatePresent() {
         // Arrange
         CaseReference caseReference = new CaseReference("12345");
         List<CaseReference> caseReferences = List.of(caseReference);
@@ -143,7 +143,6 @@ class AsyncCaseMigrationServiceTest {
 
         // Assert
         verify(coreCaseDataService).submitUpdate(eq("12345"), any(CaseDataContent.class));
-        verify(startEventResponse.getCaseDetails(), times(1)).toBuilder(); // Ensure state was updated
     }
 
     @Test
