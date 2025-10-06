@@ -101,7 +101,8 @@ class AsyncCaseMigrationServiceTest {
         Map<String, Object> mockData = Map.of("key1", "value1", "key2", "value2");
         when(caseData.toMap(any())).thenReturn(mockData);
 
-        MigrationTask migrationTask = mock(MigrationTask.class);
+        @SuppressWarnings("unchecked")
+        MigrationTask<CaseReference> migrationTask = mock(MigrationTask.class);
         when(migrationTask.getEventDescription()).thenReturn("Test Migration Task");
         when(migrationTask.getEventSummary()).thenReturn("Migrating cases for test task");
 
@@ -123,6 +124,7 @@ class AsyncCaseMigrationServiceTest {
         CaseReference caseReference = new CaseReference("12345");
         List<CaseReference> caseReferences = List.of(caseReference);
 
+        @SuppressWarnings("unchecked")
         MigrationTask<CaseReference> migrationTask = mock(MigrationTask.class);
         CaseData caseData = mock(CaseData.class);
         StartEventResponse startEventResponse = mock(StartEventResponse.class);
@@ -149,6 +151,7 @@ class AsyncCaseMigrationServiceTest {
         CaseReference caseReference = new CaseReference("12345");
         List<CaseReference> caseReferences = List.of(caseReference);
 
+        @SuppressWarnings("unchecked")
         MigrationTask<CaseReference> migrationTask = mock(MigrationTask.class);
         when(coreCaseDataService.startUpdate(anyString(), eq(CaseEvent.UPDATE_CASE_DATA)))
             .thenThrow(new RuntimeException("Test Exception"));

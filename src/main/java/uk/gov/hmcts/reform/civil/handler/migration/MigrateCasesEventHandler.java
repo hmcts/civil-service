@@ -56,7 +56,6 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
 
         List<String> caseIds = externalTask.getVariable("caseIds");
         String scenario = externalTask.getVariable("scenario");
-        String state = externalTask.getVariable("state");
 
         if (caseIds != null && !caseIds.isEmpty() && scenario != null) {
             caseReferences = caseIds.stream()
@@ -84,6 +83,7 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
             return ExternalTaskData.builder().build();
         }
 
+        String state = externalTask.getVariable("state");
         asyncCaseMigrationService.migrateCasesAsync(task, caseReferences, state);
 
         return ExternalTaskData.builder().build();
