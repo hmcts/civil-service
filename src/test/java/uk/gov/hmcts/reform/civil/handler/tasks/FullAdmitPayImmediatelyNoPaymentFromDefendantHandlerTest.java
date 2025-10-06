@@ -23,6 +23,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -69,11 +70,11 @@ class FullAdmitPayImmediatelyNoPaymentFromDefendantHandlerTest {
         handler.handleTask(externalTask);
 
         verify(coreCaseDataService).triggerEvent(
-            caseId,
-            UPDATE_CASE_DATA,
+            eq(caseId),
+            eq(UPDATE_CASE_DATA),
             argThat(payload -> YesOrNo.YES.equals(payload.get("fullAdmitNoPaymentSchedulerProcessed"))),
-            EVENT_SUMMARY,
-            EVENT_DESCRIPTION
+            eq(EVENT_SUMMARY),
+            eq(EVENT_DESCRIPTION)
         );
 
         verify(applicationEventPublisher).publishEvent(
