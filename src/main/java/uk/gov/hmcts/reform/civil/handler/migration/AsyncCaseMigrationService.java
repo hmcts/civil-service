@@ -7,6 +7,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseReference;
@@ -17,6 +18,7 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -46,7 +48,8 @@ public class AsyncCaseMigrationService {
     @Async("asyncHandlerExecutor")
     public <T extends CaseReference> void migrateCasesAsync(
         MigrationTask<T> task,
-        List<T> caseReferences
+        List<T> caseReferences,
+        String state
     ) {
         int count = 0;
         int batchCount = 1;
@@ -62,8 +65,26 @@ public class AsyncCaseMigrationService {
                 }
                 log.info("Migrating case with ID: {}", caseReference);
                 StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseReference.getCaseReference(), CaseEvent.UPDATE_CASE_DATA);
-                CaseData caseData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
+                CaseDetails caseDetails = startEventResponse.getCaseDetails();
+                CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
                 caseData = task.migrateCaseData(caseData, caseReference);
+                Optional<String> updatedState = task.getUpdatedState(state);
+                if (updatedState.isPresent()) {
+                    String newState = updatedState.get();
+                    log.info("Updating case {} to new state: {}", caseReference.getCaseReference(), newState);
+
+                    caseDetails = caseDetails.toBuilder()
+                        .state(newState)
+                        .build();
+
+                    startEventResponse = StartEventResponse.builder()
+                        .caseDetails(caseDetails)
+                        .eventId(startEventResponse.getEventId())
+                        .token(startEventResponse.getToken())
+                        .build();
+                } else {
+                    log.info("No state change for case {}", caseReference.getCaseReference());
+                }
                 CaseDataContent caseDataContent = buildCaseDataContent(startEventResponse, caseData, task);
                 coreCaseDataService.submitUpdate(caseReference.getCaseReference(), caseDataContent);
                 log.info("Migration completed for case ID: {}", caseReference.getCaseReference());

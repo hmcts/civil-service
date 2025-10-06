@@ -79,7 +79,7 @@ class AsyncCaseMigrationServiceTest {
         when(caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails())).thenReturn(caseData);
         when(migrationTask.migrateCaseData(any(CaseData.class), any(CaseReference.class))).thenReturn(caseData);
 
-        asyncCaseMigrationService.migrateCasesAsync(migrationTask, mockReferences);
+        asyncCaseMigrationService.migrateCasesAsync(migrationTask, mockReferences, null);
 
         // Assert
         verify(coreCaseDataService, times(2)).startUpdate(anyString(), eq(CaseEvent.UPDATE_CASE_DATA));

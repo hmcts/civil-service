@@ -73,7 +73,7 @@ class MigrateCasesEventHandlerTest {
         ExternalTaskData result = handler.handleTask(externalTask);
 
         assertNotNull(result);
-        verify(asyncCaseMigrationService, times(1)).migrateCasesAsync(migrationTask, mockReferences);
+        verify(asyncCaseMigrationService, times(1)).migrateCasesAsync(migrationTask, mockReferences, null);
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -95,7 +95,7 @@ class MigrateCasesEventHandlerTest {
 
         assertNotNull(result);
         verify(asyncCaseMigrationService, times(1))
-            .migrateCasesAsync(eq(migrationTask), anyList());
+            .migrateCasesAsync(eq(migrationTask), anyList(), null);
     }
 
     @Test
