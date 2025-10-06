@@ -131,13 +131,13 @@ class AsyncCaseMigrationServiceTest {
         when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
 
         CaseReference caseReference = new CaseReference("12345");
-        List<CaseReference> caseReferences = List.of(caseReference);
         when(migrationTask.migrateCaseData(caseData, caseReference)).thenReturn(caseData);
         when(migrationTask.getUpdatedState(any())).thenReturn(Optional.of("NEW_STATE"));
         when(migrationTask.getEventSummary()).thenReturn("summary");
         when(migrationTask.getEventDescription()).thenReturn("description");
 
         // Act
+        List<CaseReference> caseReferences = List.of(caseReference);
         asyncCaseMigrationService.migrateCasesAsync(migrationTask, caseReferences, "OLD_STATE");
 
         // Assert
