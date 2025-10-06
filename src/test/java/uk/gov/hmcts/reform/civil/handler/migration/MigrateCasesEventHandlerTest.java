@@ -83,7 +83,6 @@ class MigrateCasesEventHandlerTest {
         when(externalTask.getVariable("taskName")).thenReturn("testTask");
         when(externalTask.getVariable("caseIds")).thenReturn(List.of("123", "456"));
         when(externalTask.getVariable("scenario")).thenReturn("SCENARIO_1");
-        when(externalTask.getVariable("csvFileName")).thenReturn("dummy.csv");
 
         MigrationTask<? extends CaseReference> migrationTask = mock(MigrationTask.class);
         when(migrationTask.getType()).thenReturn((Class) DashboardScenarioCaseReference.class);
