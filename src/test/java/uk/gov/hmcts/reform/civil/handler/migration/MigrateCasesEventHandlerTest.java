@@ -22,11 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class MigrateCasesEventHandlerTest {
@@ -56,6 +52,8 @@ class MigrateCasesEventHandlerTest {
     void shouldHandleTaskSuccessfullyWithCsv() {
         ExternalTask externalTask = mock(ExternalTask.class);
         when(externalTask.getVariable("taskName")).thenReturn("testTask");
+        when(externalTask.getVariable("caseIds")).thenReturn(List.of());
+        when(externalTask.getVariable("scenario")).thenReturn(null);
         when(externalTask.getVariable("csvFileName")).thenReturn("test.csv");
 
         @SuppressWarnings("unchecked")
@@ -82,7 +80,7 @@ class MigrateCasesEventHandlerTest {
         when(externalTask.getVariable("taskName")).thenReturn("testTask");
         when(externalTask.getVariable("caseIds")).thenReturn(List.of("123", "456"));
         when(externalTask.getVariable("scenario")).thenReturn("SCENARIO_1");
-        when(externalTask.getVariable("csvFileName")).thenReturn("dummy.csv");
+        when(externalTask.getVariable("state")).thenReturn(null);
 
         MigrationTask<? extends CaseReference> migrationTask = mock(MigrationTask.class);
         when(migrationTask.getType()).thenReturn((Class) DashboardScenarioCaseReference.class);
@@ -94,7 +92,7 @@ class MigrateCasesEventHandlerTest {
 
         assertNotNull(result);
         verify(asyncCaseMigrationService, times(1))
-            .migrateCasesAsync(eq(migrationTask), anyList(), null);
+            .migrateCasesAsync(eq(migrationTask), anyList(), isNull());
     }
 
     @Test
@@ -109,7 +107,6 @@ class MigrateCasesEventHandlerTest {
     void shouldThrowExceptionWhenMigrationTaskNotFound() {
         ExternalTask externalTask = mock(ExternalTask.class);
         when(externalTask.getVariable("taskName")).thenReturn("unknownTask");
-        when(externalTask.getVariable("csvFileName")).thenReturn("test.csv");
 
         when(migrationTaskFactory.getMigrationTask("unknownTask")).thenReturn(Optional.empty());
 
@@ -144,6 +141,8 @@ class MigrateCasesEventHandlerTest {
         ExternalTask externalTask = mock(ExternalTask.class);
         when(externalTask.getVariable("taskName")).thenReturn("testTask");
         when(externalTask.getVariable("caseIds")).thenReturn(List.of());
+        when(externalTask.getVariable("scenario")).thenReturn(null);
+        when(externalTask.getVariable("state")).thenReturn(null);
         when(externalTask.getVariable("csvFileName")).thenReturn("test.csv");
 
         @SuppressWarnings("unchecked")
@@ -164,15 +163,17 @@ class MigrateCasesEventHandlerTest {
         ExternalTask externalTask = mock(ExternalTask.class);
         when(externalTask.getVariable("taskName")).thenReturn("testTask");
         when(externalTask.getVariable("caseIds")).thenReturn(List.of());
+        when(externalTask.getVariable("scenario")).thenReturn(null); // stub scenario
+        when(externalTask.getVariable("csvFileName")).thenReturn("empty.csv"); // stub csvFileName
 
         @SuppressWarnings("unchecked")
         MigrationTask<CaseReference> migrationTask = mock(MigrationTask.class);
         when(migrationTask.getType()).thenReturn(CaseReference.class);
         when(migrationTaskFactory.getMigrationTask("testTask")).thenReturn(Optional.of(migrationTask));
 
-        // CSV fallback returns empty list
-        when(caseReferenceCsvLoader.loadCaseReferenceList(CaseReference.class, "empty.csv")).thenReturn(List.of());
-        when(externalTask.getVariable("csvFileName")).thenReturn("empty.csv");
+        // Use lenient for CSV loader to avoid strict stubbing errors
+        lenient().when(caseReferenceCsvLoader.loadCaseReferenceList(CaseReference.class, "empty.csv"))
+            .thenReturn(List.of());
 
         ExternalTaskData result = handler.handleTask(externalTask);
 
