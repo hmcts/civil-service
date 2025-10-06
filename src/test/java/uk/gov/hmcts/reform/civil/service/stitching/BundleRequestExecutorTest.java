@@ -9,6 +9,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClientResponseException;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
@@ -147,6 +148,27 @@ class BundleRequestExecutorTest {
         RetryableStitchingException exception = assertThrows(
             RetryableStitchingException.class,
             () -> executorWithMockedMapper.post(request, endpoint, "not important")
+        );
+
+        assertEquals("Stitching failed, retrying...", exception.getMessage());
+    }
+
+    @Test
+    void whenEndpointReturnsUnknownStatus_thenLogsUnknownReasonAndRetries() {
+        String endpoint = "some url";
+        BundleRequest request = BundleRequest.builder().build();
+
+        @SuppressWarnings("unchecked")
+        ResponseEntity<CaseDetails> responseEntity = mock(ResponseEntity.class);
+        given(responseEntity.getStatusCode()).willReturn(HttpStatusCode.valueOf(599));
+        given(responseEntity.getStatusCodeValue()).willReturn(599);
+
+        given(evidenceManagementApiClient.stitchBundle(any(), any(), any(BundleRequest.class)))
+            .willReturn(responseEntity);
+
+        RetryableStitchingException exception = assertThrows(
+            RetryableStitchingException.class,
+            () -> bundleRequestExecutor.post(request, endpoint, "not important")
         );
 
         assertEquals("Stitching failed, retrying...", exception.getMessage());
