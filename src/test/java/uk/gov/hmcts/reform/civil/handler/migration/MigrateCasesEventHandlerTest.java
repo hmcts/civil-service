@@ -58,6 +58,8 @@ class MigrateCasesEventHandlerTest {
         ExternalTask externalTask = mock(ExternalTask.class);
         when(externalTask.getVariable("taskName")).thenReturn("testTask");
         when(externalTask.getVariable("csvFileName")).thenReturn("test.csv");
+        when(externalTask.getVariable("caseIds")).thenReturn(null);
+        when(externalTask.getVariable("scenario")).thenReturn(null);
 
         @SuppressWarnings("unchecked")
         MigrationTask<CaseReference> migrationTask = mock(MigrationTask.class);
@@ -109,7 +111,6 @@ class MigrateCasesEventHandlerTest {
     void shouldThrowExceptionWhenMigrationTaskNotFound() {
         ExternalTask externalTask = mock(ExternalTask.class);
         when(externalTask.getVariable("taskName")).thenReturn("unknownTask");
-        when(externalTask.getVariable("csvFileName")).thenReturn("test.csv");
 
         when(migrationTaskFactory.getMigrationTask("unknownTask")).thenReturn(Optional.empty());
 
