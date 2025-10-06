@@ -38,8 +38,6 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYS
 @RequiredArgsConstructor
 public class HearingNoticeSchedulerEventHandler {
 
-    private static int maxRetries = 3;
-    private static String hearingNoticeMessage = "NOTIFY_HEARING_PARTIES";
     private final UserService userService;
     private final SystemUpdateUserConfiguration userConfig;
     private final HearingsService hearingsService;
@@ -55,9 +53,11 @@ public class HearingNoticeSchedulerEventHandler {
         CLOSED,
         All_FINAL_ORDERS_ISSUED
     };
+
     @Async("asyncHandlerExecutor")
     @EventListener
     public void handle(HearingNoticeSchedulerTaskEvent event) {
+        int maxRetries = 3;
         for (int i = 0; i < maxRetries; i++) {
             String hearingId = event.getHearingId();
             try {
@@ -81,8 +81,8 @@ public class HearingNoticeSchedulerEventHandler {
 
             boolean stateNotAllowedToGenerateHearingNotice = isNotAllowedState(caseDetails.getState(), caseReference);
 
-            if (stateNotAllowedToGenerateHearingNotice &&
-                HmcDataUtils.hearingDataChanged(partiesNotified, hearing)) {
+            if (stateNotAllowedToGenerateHearingNotice
+                && HmcDataUtils.hearingDataChanged(partiesNotified, hearing)) {
                 log.info("Dispatching hearing notice task for hearing [{}].",
                         hearingId);
                 triggerHearingNoticeEvent(HearingNoticeMessageVars.builder()
@@ -110,6 +110,7 @@ public class HearingNoticeSchedulerEventHandler {
     }
 
     private void triggerHearingNoticeEvent(HearingNoticeMessageVars messageVars) {
+        String hearingNoticeMessage = "NOTIFY_HEARING_PARTIES";
         runtimeService
             .createMessageCorrelation(hearingNoticeMessage)
             .setVariables(messageVars.toMap(mapper))
@@ -140,5 +141,4 @@ public class HearingNoticeSchedulerEventHandler {
             getSystemUpdateUser().getUserToken(), hearingId);
         return HmcDataUtils.getLatestHearingNoticeDetails(partiesNotified);
     }
-
 }
