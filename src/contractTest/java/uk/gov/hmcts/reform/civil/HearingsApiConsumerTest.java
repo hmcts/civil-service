@@ -263,10 +263,10 @@ public class HearingsApiConsumerTest extends BaseContractTest {
     }
 
     private DslPart buildUnnotifiedHearingsBody() {
-        return newJsonBody(body ->
-            body.minArrayLike("hearingIds", 1, id -> id.stringType(HEARING_ID))
-                .numberValue("totalFound", 1)
-        ).build();
+        return newJsonBody(body -> {
+            body.array("hearingIds", array -> array.stringValue(HEARING_ID));
+            body.numberValue("totalFound", 1);
+        }).build();
     }
 
     private DslPart buildHearingsBody() {
