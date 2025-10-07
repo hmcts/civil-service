@@ -51,8 +51,6 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
 
     private <T extends CaseReference> ExternalTaskData handleTypedTask(ExternalTask externalTask, MigrationTask<T> task) {
         List<T> caseReferences;
-
-
         String caseIds = externalTask.getVariable("caseIds");
         String scenario = externalTask.getVariable("scenario");
 
