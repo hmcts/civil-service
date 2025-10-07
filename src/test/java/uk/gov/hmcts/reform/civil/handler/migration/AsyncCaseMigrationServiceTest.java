@@ -5,6 +5,7 @@ import org.camunda.bpm.client.task.ExternalTask;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -22,8 +23,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -72,7 +73,7 @@ class AsyncCaseMigrationServiceTest {
         when(migrationTask.getEventSummary()).thenReturn("Migrating cases for test task");
 
         StartEventResponse startEventResponse = mock(StartEventResponse.class);
-        when(coreCaseDataService.startUpdate(anyString(), eq(CaseEvent.UPDATE_CASE_DATA))).thenReturn(startEventResponse);
+        when(coreCaseDataService.startUpdate(ArgumentMatchers.anyString(), ArgumentMatchers.eq(CaseEvent.UPDATE_CASE_DATA))).thenReturn(startEventResponse);
 
         uk.gov.hmcts.reform.ccd.client.model.CaseDetails caseDetails = mock(uk.gov.hmcts.reform.ccd.client.model.CaseDetails.class);
         when(startEventResponse.getCaseDetails()).thenReturn(caseDetails);
@@ -82,13 +83,13 @@ class AsyncCaseMigrationServiceTest {
         List<CaseReference> mockReferences = List.of(new CaseReference("12345"), new CaseReference("67890"));
 
         when(caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails())).thenReturn(caseData);
-        when(migrationTask.migrateCaseData(any(CaseData.class), any(CaseReference.class))).thenReturn(caseData);
+        when(migrationTask.migrateCaseData(ArgumentMatchers.any(CaseData.class), ArgumentMatchers.any(CaseReference.class))).thenReturn(caseData);
 
         asyncCaseMigrationService.migrateCasesAsync(migrationTask, mockReferences, null);
 
         // Assert
-        verify(coreCaseDataService, times(2)).startUpdate(anyString(), eq(CaseEvent.UPDATE_CASE_DATA));
-        verify(coreCaseDataService, times(2)).submitUpdate(anyString(), any(CaseDataContent.class));
+        verify(coreCaseDataService, times(2)).startUpdate(ArgumentMatchers.anyString(), ArgumentMatchers.eq(CaseEvent.UPDATE_CASE_DATA));
+        verify(coreCaseDataService, times(2)).submitUpdate(ArgumentMatchers.anyString(), ArgumentMatchers.any(CaseDataContent.class));
     }
 
     @Test
@@ -100,7 +101,7 @@ class AsyncCaseMigrationServiceTest {
 
         CaseData caseData = mock(CaseData.class);
         Map<String, Object> mockData = Map.of("key1", "value1", "key2", "value2");
-        when(caseData.toMap(any())).thenReturn(mockData);
+        when(caseData.toMap(ArgumentMatchers.any())).thenReturn(mockData);
 
         @SuppressWarnings("unchecked")
         MigrationTask<CaseReference> migrationTask = mock(MigrationTask.class);
@@ -127,13 +128,13 @@ class AsyncCaseMigrationServiceTest {
         StartEventResponse startEventResponse = mock(StartEventResponse.class);
         uk.gov.hmcts.reform.ccd.client.model.CaseDetails caseDetails = mock(uk.gov.hmcts.reform.ccd.client.model.CaseDetails.class);
 
-        when(coreCaseDataService.startUpdate(anyString(), eq(CaseEvent.UPDATE_CASE_DATA))).thenReturn(startEventResponse);
+        when(coreCaseDataService.startUpdate(ArgumentMatchers.anyString(), ArgumentMatchers.eq(CaseEvent.UPDATE_CASE_DATA))).thenReturn(startEventResponse);
         when(startEventResponse.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
 
         CaseReference caseReference = new CaseReference("12345");
         when(migrationTask.migrateCaseData(caseData, caseReference)).thenReturn(caseData);
-        when(migrationTask.getUpdatedState(any())).thenReturn(Optional.of("NEW_STATE"));
+        when(migrationTask.getUpdatedState(ArgumentMatchers.any())).thenReturn(Optional.of("NEW_STATE"));
         when(migrationTask.getEventSummary()).thenReturn("summary");
         when(migrationTask.getEventDescription()).thenReturn("description");
 
@@ -142,14 +143,14 @@ class AsyncCaseMigrationServiceTest {
         asyncCaseMigrationService.migrateCasesAsync(migrationTask, caseReferences, "OLD_STATE");
 
         // Assert
-        verify(coreCaseDataService).startUpdate(eq("12345"), any(CaseEvent.class));
+        verify(coreCaseDataService).startUpdate(ArgumentMatchers.eq("12345"), ArgumentMatchers.any(CaseEvent.class));
     }
 
     @Test
     void shouldHandleRuntimeExceptionDuringMigration() {
         @SuppressWarnings("unchecked")
         MigrationTask<CaseReference> migrationTask = mock(MigrationTask.class);
-        when(coreCaseDataService.startUpdate(anyString(), eq(CaseEvent.UPDATE_CASE_DATA)))
+        when(coreCaseDataService.startUpdate(ArgumentMatchers.anyString(), ArgumentMatchers.eq(CaseEvent.UPDATE_CASE_DATA)))
             .thenThrow(new RuntimeException("Test Exception"));
 
         CaseReference caseReference = new CaseReference("12345");
@@ -157,14 +158,14 @@ class AsyncCaseMigrationServiceTest {
         asyncCaseMigrationService.migrateCasesAsync(migrationTask, caseReferences, null);
 
         // Assert: verify no submission attempted
-        verify(coreCaseDataService, times(0)).submitUpdate(anyString(), any(CaseDataContent.class));
+        verify(coreCaseDataService, times(0)).submitUpdate(ArgumentMatchers.anyString(), ArgumentMatchers.any(CaseDataContent.class));
     }
 
     @Test
     void shouldResetRequestContextHolderAfterEachCase() {
         @SuppressWarnings("unchecked")
         MigrationTask<CaseReference> migrationTask = mock(MigrationTask.class);
-        when(coreCaseDataService.startUpdate(anyString(), any())).thenReturn(mock(StartEventResponse.class));
+        when(coreCaseDataService.startUpdate(ArgumentMatchers.anyString(), ArgumentMatchers.any())).thenReturn(mock(StartEventResponse.class));
 
         asyncCaseMigrationService.migrateCasesAsync(migrationTask, List.of(new CaseReference("12345")), null);
 
@@ -183,13 +184,13 @@ class AsyncCaseMigrationServiceTest {
 
         @SuppressWarnings("unchecked")
         MigrationTask<CaseReference> migrationTask = mock(MigrationTask.class);
-        when(migrationTask.migrateCaseData(any(), any())).thenReturn(mock(CaseData.class));
-        when(coreCaseDataService.startUpdate(anyString(), any())).thenReturn(mock(StartEventResponse.class));
+        when(migrationTask.migrateCaseData(ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(mock(CaseData.class));
+        when(coreCaseDataService.startUpdate(ArgumentMatchers.anyString(), ArgumentMatchers.any())).thenReturn(mock(StartEventResponse.class));
 
         List<CaseReference> caseReferences = List.of(new CaseReference("1"), new CaseReference("2"));
         batchService.migrateCasesAsync(migrationTask, caseReferences, null);
 
-        verify(coreCaseDataService, times(2)).startUpdate(anyString(), eq(CaseEvent.UPDATE_CASE_DATA));
+        verify(coreCaseDataService, times(2)).startUpdate(ArgumentMatchers.anyString(), ArgumentMatchers.eq(CaseEvent.UPDATE_CASE_DATA));
     }
 
     @Test
@@ -203,17 +204,17 @@ class AsyncCaseMigrationServiceTest {
             .caseDetails(CaseDetails.builder().id(10L).state("STATE").build())
             .build();
 
-        when(coreCaseDataService.startUpdate(anyString(), any())).thenReturn(startEventResponse);
-        when(caseDetailsConverter.toCaseData((CaseDetails) any())).thenReturn(mock(CaseData.class));
-        when(migrationTask.migrateCaseData(any(), any())).thenReturn(mock(CaseData.class));
-        when(migrationTask.getUpdatedState(any())).thenReturn(Optional.empty());
+        when(coreCaseDataService.startUpdate(ArgumentMatchers.anyString(), ArgumentMatchers.any())).thenReturn(startEventResponse);
+        when(caseDetailsConverter.toCaseData((CaseDetails) ArgumentMatchers.any())).thenReturn(mock(CaseData.class));
+        when(migrationTask.migrateCaseData(ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(mock(CaseData.class));
+        when(migrationTask.getUpdatedState(ArgumentMatchers.any())).thenReturn(Optional.empty());
         when(migrationTask.getEventSummary()).thenReturn("summary");
         when(migrationTask.getEventDescription()).thenReturn("description");
 
         asyncCaseMigrationService.migrateCasesAsync(migrationTask, List.of(new CaseReference("123")), "STATE");
 
         // Should still submit updates but without new state
-        verify(coreCaseDataService).submitUpdate(eq("123"), any(CaseDataContent.class));
+        verify(coreCaseDataService).submitUpdate(ArgumentMatchers.eq("123"), ArgumentMatchers.any(CaseDataContent.class));
     }
 
     @Test
@@ -225,7 +226,7 @@ class AsyncCaseMigrationServiceTest {
             .build();
 
         CaseData caseData = mock(CaseData.class);
-        when(caseData.toMap(any())).thenReturn(Map.of("a", "b"));
+        when(caseData.toMap(ArgumentMatchers.any())).thenReturn(Map.of("a", "b"));
 
         @SuppressWarnings("unchecked")
         MigrationTask<CaseReference> migrationTask = mock(MigrationTask.class);
@@ -252,12 +253,12 @@ class AsyncCaseMigrationServiceTest {
                              .build())
             .build();
 
-        when(coreCaseDataService.startUpdate(anyString(), any())).thenReturn(startEventResponse);
-        when(caseDetailsConverter.toCaseData((CaseDetails) any())).thenReturn(mock(CaseData.class));
+        when(coreCaseDataService.startUpdate(ArgumentMatchers.anyString(), ArgumentMatchers.any())).thenReturn(startEventResponse);
+        when(caseDetailsConverter.toCaseData((CaseDetails) ArgumentMatchers.any())).thenReturn(mock(CaseData.class));
 
         @SuppressWarnings("unchecked")
         MigrationTask<CaseReference> migrationTask = mock(MigrationTask.class);
-        when(migrationTask.migrateCaseData(any(), any())).thenReturn(mock(CaseData.class));
+        when(migrationTask.migrateCaseData(ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(mock(CaseData.class));
         when(migrationTask.getEventSummary()).thenReturn("summary");
         when(migrationTask.getEventDescription()).thenReturn("description");
 
@@ -265,7 +266,7 @@ class AsyncCaseMigrationServiceTest {
 
         asyncCaseMigrationService.migrateCasesAsync(migrationTask, List.of(new CaseReference("1")), null);
 
-        verify(coreCaseDataService).submitUpdate(eq("1"), captor.capture());
+        verify(coreCaseDataService).submitUpdate(ArgumentMatchers.eq("1"), captor.capture());
         CaseDataContent sent = captor.getValue();
 
         assertEquals("event123", sent.getEvent().getId());
