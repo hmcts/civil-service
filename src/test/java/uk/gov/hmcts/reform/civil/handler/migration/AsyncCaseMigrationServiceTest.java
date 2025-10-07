@@ -4,7 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.*;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.web.context.request.RequestContextHolder;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -20,11 +22,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -191,6 +190,55 @@ class AsyncCaseMigrationServiceTest {
         batchService.migrateCasesAsync(migrationTask, caseReferences, null);
 
         verify(coreCaseDataService, times(2)).startUpdate(anyString(), eq(CaseEvent.UPDATE_CASE_DATA));
+    }
+
+    @Test
+    void shouldNotChangeStateWhenUpdatedStateNotPresent() {
+        @SuppressWarnings("unchecked")
+        MigrationTask<CaseReference> migrationTask = mock(MigrationTask.class);
+
+        StartEventResponse startEventResponse = StartEventResponse.builder()
+            .eventId("eventX")
+            .token("tokenX")
+            .caseDetails(CaseDetails.builder().id(10L).state("STATE").build())
+            .build();
+
+        when(coreCaseDataService.startUpdate(anyString(), any())).thenReturn(startEventResponse);
+        when(caseDetailsConverter.toCaseData((CaseDetails) any())).thenReturn(mock(CaseData.class));
+        when(migrationTask.migrateCaseData(any(), any())).thenReturn(mock(CaseData.class));
+        when(migrationTask.getUpdatedState(any())).thenReturn(Optional.empty());
+        when(migrationTask.getEventSummary()).thenReturn("summary");
+        when(migrationTask.getEventDescription()).thenReturn("description");
+
+        asyncCaseMigrationService.migrateCasesAsync(migrationTask, List.of(new CaseReference("123")), "STATE");
+
+        // Should still submit updates but without new state
+        verify(coreCaseDataService).submitUpdate(eq("123"), any(CaseDataContent.class));
+    }
+
+    @Test
+    void shouldIncludeCorrectEventDetailsInBuiltCaseDataContent() {
+        StartEventResponse startEventResponse = StartEventResponse.builder()
+            .eventId("event123")
+            .token("tokenABC")
+            .caseDetails(CaseDetails.builder().id(999L).state("STATE").build())
+            .build();
+
+        CaseData caseData = mock(CaseData.class);
+        when(caseData.toMap(any())).thenReturn(Map.of("a", "b"));
+
+        @SuppressWarnings("unchecked")
+        MigrationTask<CaseReference> migrationTask = mock(MigrationTask.class);
+        when(migrationTask.getEventSummary()).thenReturn("Summary123");
+        when(migrationTask.getEventDescription()).thenReturn("Desc456");
+
+        CaseDataContent content = asyncCaseMigrationService.buildCaseDataContent(startEventResponse, caseData, migrationTask);
+
+        assertEquals("event123", content.getEvent().getId());
+        assertEquals("tokenABC", content.getEventToken());
+        assertEquals("Summary123", content.getEvent().getSummary());
+        assertEquals("Desc456", content.getEvent().getDescription());
+        assertEquals(Map.of("a", "b"), content.getData());
     }
 
     @Test
