@@ -5,8 +5,11 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Answers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -29,6 +32,7 @@ import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeCamundaServi
 import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeVariables;
 import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
+import uk.gov.hmcts.reform.civil.utils.HmcDataUtils;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingDaySchedule;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingDetails;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingGetResponse;
@@ -45,6 +49,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
@@ -58,6 +63,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_NOTICE_HMC;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_NOTICE_HMC_WELSH;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 
 @ExtendWith(MockitoExtension.class)
@@ -462,5 +468,155 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
         assertThat(updatedData.getHearingDocuments()).hasSize(1);
         assertThat(updatedData.getHearingDocumentsWelsh()).hasSize(1);
 
+    }
+
+    @Test
+    void shouldCreateWelshDocument_whenWelshFeatureEnabledAndAppendExistingDocuments() {
+        CaseDocument existingEnglish = CaseDocumentBuilder.builder()
+            .documentName("existing-hearing-notice")
+            .documentType(HEARING_FORM)
+            .build();
+        CaseDocument existingWelsh = CaseDocumentBuilder.builder()
+            .documentName("existing-hearing-notice-welsh")
+            .documentType(HEARING_FORM_WELSH)
+            .build();
+
+        CaseDataLiP caseDataLiP = CaseDataLiP.builder()
+            .respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH").build())
+            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimantFullDefence().build()
+            .toBuilder()
+            .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
+            .ccdState(CASE_PROGRESSION)
+            .caseAccessCategory(UNSPEC_CLAIM)
+            .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
+            .totalClaimAmount(new BigDecimal(1000))
+            .claimValue(null)
+            .totalInterest(BigDecimal.TEN)
+            .applicant1Represented(YesOrNo.NO)
+            .claimantBilingualLanguagePreference(Language.BOTH.toString())
+            .caseDataLiP(caseDataLiP)
+            .hearingDocuments(List.of(element(existingEnglish)))
+            .hearingDocumentsWelsh(List.of(element(existingWelsh)))
+            .build();
+
+        HearingDay hearingDay = HearingDay.builder()
+            .hearingStartDateTime(LocalDateTime.of(2023, 7, 1, 9, 0, 0))
+            .hearingEndDateTime(LocalDateTime.of(2023, 7, 1, 11, 0, 0))
+            .build();
+        LocalDateTime hearingResponseDate = LocalDateTime.of(2023, 6, 2, 0, 0, 0);
+        HearingGetResponse hearing = HearingGetResponse.builder()
+            .hearingResponse(HearingResponse.builder().hearingDaySchedule(List.of(
+                HearingDaySchedule.builder()
+                    .hearingVenueId(EPIMS)
+                    .hearingStartDateTime(hearingDay.getHearingStartDateTime())
+                    .hearingEndDateTime(hearingDay.getHearingEndDateTime())
+                    .build()))
+                .receivedDateTime(hearingResponseDate)
+                .build())
+            .requestDetails(HearingRequestDetails.builder()
+                                .versionNumber(VERSION_NUMBER)
+                                .build())
+            .hearingDetails(HearingDetails.builder()
+                                .hearingType(TRIAL_HEARING_TYPE)
+                                .build())
+            .build();
+        HearingNoticeVariables inputVariables = HearingNoticeVariables.builder()
+            .hearingId(HEARING_ID)
+            .caseId(CASE_ID)
+            .build();
+
+        List<LocationRefData> locations = List.of(LocationRefData.builder().epimmsId(EPIMS).build());
+        when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
+        when(camundaService.getProcessVariables(PROCESS_INSTANCE_ID)).thenReturn(inputVariables);
+        when(hearingsService.getHearingResponse(anyString(), anyString())).thenReturn(hearing);
+        when(hearingNoticeHmcGenerator.generate(any(), eq(hearing), anyString(), nullable(String.class), anyString(), eq(HEARING_NOTICE_HMC)))
+            .thenReturn(List.of(CASE_DOCUMENT));
+        when(hearingNoticeHmcGenerator.generate(any(), eq(hearing), anyString(), nullable(String.class), anyString(), eq(HEARING_NOTICE_HMC_WELSH)))
+            .thenReturn(List.of(CASE_DOCUMENT_WELSH));
+        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(false);
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        params.getRequest().setEventId(GENERATE_HEARING_NOTICE_HMC.name());
+
+        AboutToStartOrSubmitCallbackResponse actual = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        CaseData updatedData = mapper.convertValue(actual.getData(), CaseData.class);
+        assertThat(updatedData.getHearingDocuments()).hasSize(2);
+        assertThat(updatedData.getHearingDocumentsWelsh()).hasSize(2);
+        assertThat(unwrapElements(updatedData.getHearingDocuments()).get(0)).isEqualTo(CASE_DOCUMENT);
+        assertThat(unwrapElements(updatedData.getHearingDocuments()).get(1)).isEqualTo(existingEnglish);
+        assertThat(unwrapElements(updatedData.getHearingDocumentsWelsh()).get(0)).isEqualTo(CASE_DOCUMENT_WELSH);
+        assertThat(unwrapElements(updatedData.getHearingDocumentsWelsh()).get(1)).isEqualTo(existingWelsh);
+    }
+
+    @Test
+    void shouldReturnNullHearingLocationWhenReferenceDataUnavailable() {
+        CaseDocument existingEnglish = CaseDocumentBuilder.builder()
+            .documentName("existing-hearing-notice")
+            .documentType(HEARING_FORM)
+            .build();
+
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimantFullDefence().build()
+            .toBuilder()
+            .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
+            .ccdState(CASE_PROGRESSION)
+            .caseAccessCategory(SPEC_CLAIM)
+            .responseClaimTrack("SMALL_CLAIM")
+            .totalClaimAmount(new BigDecimal(1000))
+            .claimValue(null)
+            .totalInterest(BigDecimal.TEN)
+            .applicant1Represented(YesOrNo.YES)
+            .hearingDocuments(List.of(element(existingEnglish)))
+            .build();
+
+        HearingDay hearingDay = HearingDay.builder()
+            .hearingStartDateTime(LocalDateTime.of(2023, 7, 1, 9, 0, 0))
+            .hearingEndDateTime(LocalDateTime.of(2023, 7, 1, 11, 0, 0))
+            .build();
+        LocalDateTime hearingResponseDate = LocalDateTime.of(2023, 6, 2, 0, 0, 0);
+        HearingGetResponse hearing = HearingGetResponse.builder()
+            .hearingResponse(HearingResponse.builder().hearingDaySchedule(List.of(
+                HearingDaySchedule.builder()
+                    .hearingVenueId(EPIMS)
+                    .hearingStartDateTime(hearingDay.getHearingStartDateTime())
+                    .hearingEndDateTime(hearingDay.getHearingEndDateTime())
+                    .build()))
+                .receivedDateTime(hearingResponseDate)
+                .build())
+            .requestDetails(HearingRequestDetails.builder()
+                                .versionNumber(VERSION_NUMBER)
+                                .build())
+            .hearingDetails(HearingDetails.builder()
+                                .hearingType(TRIAL_HEARING_TYPE)
+                                .build())
+            .build();
+        HearingNoticeVariables inputVariables = HearingNoticeVariables.builder()
+            .hearingId(HEARING_ID)
+            .caseId(CASE_ID)
+            .build();
+
+        when(camundaService.getProcessVariables(PROCESS_INSTANCE_ID)).thenReturn(inputVariables);
+        when(hearingsService.getHearingResponse(anyString(), anyString())).thenReturn(hearing);
+        when(hearingNoticeHmcGenerator.generate(any(), eq(hearing), anyString(), nullable(String.class), anyString(), eq(HEARING_NOTICE_HMC)))
+            .thenReturn(List.of(CASE_DOCUMENT));
+        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(false);
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        params.getRequest().setEventId(GENERATE_HEARING_NOTICE_HMC.name());
+
+        try (MockedStatic<HmcDataUtils> utils = Mockito.mockStatic(HmcDataUtils.class, Answers.CALLS_REAL_METHODS)) {
+            utils.when(() -> HmcDataUtils.getLocationRefData(HEARING_ID, EPIMS, "BEARER_TOKEN", locationRefDataService))
+                .thenReturn(null);
+
+            AboutToStartOrSubmitCallbackResponse actual = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            CaseData updatedData = mapper.convertValue(actual.getData(), CaseData.class);
+            assertThat(updatedData.getHearingLocation().getValue().getLabel()).isNull();
+            assertThat(updatedData.getHearingDocuments()).hasSize(2);
+            assertThat(unwrapElements(updatedData.getHearingDocuments()).get(0)).isEqualTo(CASE_DOCUMENT);
+            assertThat(unwrapElements(updatedData.getHearingDocuments()).get(1)).isEqualTo(existingEnglish);
+        }
     }
 }
