@@ -2797,8 +2797,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldNotSetCcjJudgmentAmountShowInterest_whenPayImmediately_BulkAdmissionsEnabled() {
 
-            when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
-
             Fee fee = Fee.builder().version("1").code("CODE").calculatedAmountInPence(BigDecimal.valueOf(100)).build();
             CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                 .ccjPaymentPaidSomeOption(YesOrNo.NO)

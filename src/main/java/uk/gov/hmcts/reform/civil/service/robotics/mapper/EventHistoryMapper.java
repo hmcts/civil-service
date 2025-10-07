@@ -764,8 +764,7 @@ public class EventHistoryMapper {
     }
 
     private BigDecimal totalInterestForLrClaim(CaseData caseData) {
-        return featureToggleService.isLrAdmissionBulkEnabled() ? ZERO : Optional.ofNullable(caseData.getTotalInterest()).orElse(
-            ZERO);
+        return Optional.ofNullable(caseData.getTotalInterest()).orElse(ZERO);
     }
 
     private void buildRespondentDivergentResponse(EventHistory.EventHistoryBuilder builder, CaseData caseData,
