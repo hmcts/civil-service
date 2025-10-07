@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.utils.CaseMigrationEncryptionUtil;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Component
@@ -51,26 +52,24 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
     private <T extends CaseReference> ExternalTaskData handleTypedTask(ExternalTask externalTask, MigrationTask<T> task) {
         List<T> caseReferences;
 
-        List<String> caseIds = externalTask.getVariable("caseIds");
+        String caseIds = externalTask.getVariable("caseIds");
         String scenario = externalTask.getVariable("scenario");
 
-        if (caseIds != null && !caseIds.isEmpty()) {
-            caseReferences = caseIds.stream()
+        if (caseIds != null && !caseIds.isEmpty() && scenario != null) {
+            List<String> caseIdList = Arrays.stream(caseIds.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .toList();
+
+            caseReferences = caseIdList.stream()
                 .map(id -> {
-                    Object instance;
-                    if (scenario != null) {
-                        DashboardScenarioCaseReference scenarioInstance = new DashboardScenarioCaseReference();
-                        scenarioInstance.setCaseReference(id);
-                        scenarioInstance.setDashboardScenario(scenario);
-                        instance = scenarioInstance;
-                    } else {
-                        CaseReference caseRef = new CaseReference();
-                        caseRef.setCaseReference(id);
-                        instance = caseRef;
-                    }
+                    DashboardScenarioCaseReference instance = new DashboardScenarioCaseReference();
+                    instance.setCaseReference(id);
+                    instance.setDashboardScenario(scenario);
                     return task.getType().cast(instance);
                 })
                 .toList();
+
             log.info("Created {} case references from Camunda variables", caseReferences.size());
         } else {
             log.info("caseIds or scenario are not provided. Falling back to csv check");
@@ -88,8 +87,7 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
             return ExternalTaskData.builder().build();
         }
 
-        String state = externalTask.getVariable("state");
-        asyncCaseMigrationService.migrateCasesAsync(task, caseReferences, state);
+        asyncCaseMigrationService.migrateCasesAsync(task, caseReferences);
 
         return ExternalTaskData.builder().build();
     }

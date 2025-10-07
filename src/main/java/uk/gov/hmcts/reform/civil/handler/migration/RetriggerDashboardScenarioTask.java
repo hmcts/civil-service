@@ -8,7 +8,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 @Component
 public class RetriggerDashboardScenarioTask extends MigrationTask<DashboardScenarioCaseReference> {
 
-    public final DashboardScenarioProcessor processor;
+    public DashboardScenarioProcessor processor;
 
     public RetriggerDashboardScenarioTask(
         DashboardScenarioProcessor processor) {

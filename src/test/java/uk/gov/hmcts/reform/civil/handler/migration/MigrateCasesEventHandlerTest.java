@@ -21,12 +21,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -60,9 +57,9 @@ class MigrateCasesEventHandlerTest {
     void shouldHandleTaskSuccessfullyWithCsv() {
         ExternalTask externalTask = mock(ExternalTask.class);
         when(externalTask.getVariable("taskName")).thenReturn("testTask");
-        when(externalTask.getVariable("caseIds")).thenReturn(List.of());
-        when(externalTask.getVariable("scenario")).thenReturn(null);
         when(externalTask.getVariable("csvFileName")).thenReturn("test.csv");
+        when(externalTask.getVariable("caseIds")).thenReturn(null);
+        when(externalTask.getVariable("scenario")).thenReturn(null);
 
         @SuppressWarnings("unchecked")
         MigrationTask<CaseReference> migrationTask = mock(MigrationTask.class);
@@ -74,27 +71,6 @@ class MigrateCasesEventHandlerTest {
             new CaseReference("67890")
         );
         when(caseReferenceCsvLoader.loadCaseReferenceList(CaseReference.class, "test.csv")).thenReturn(mockReferences);
-
-        ExternalTaskData result = handler.handleTask(externalTask);
-
-        assertNotNull(result);
-        verify(asyncCaseMigrationService, times(1)).migrateCasesAsync(migrationTask, mockReferences, null);
-    }
-
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    @Test
-    void shouldHandleTaskWithCaseIdsAndScenario() {
-        ExternalTask externalTask = mock(ExternalTask.class);
-        when(externalTask.getVariable("taskName")).thenReturn("testTask");
-        when(externalTask.getVariable("caseIds")).thenReturn(List.of("123", "456"));
-        when(externalTask.getVariable("scenario")).thenReturn("SCENARIO_1");
-        when(externalTask.getVariable("state")).thenReturn(null);
-
-        MigrationTask<? extends CaseReference> migrationTask = mock(MigrationTask.class);
-        when(migrationTask.getType()).thenReturn((Class) DashboardScenarioCaseReference.class);
-        doReturn(Optional.of(migrationTask))
-            .when(migrationTaskFactory)
-            .getMigrationTask("testTask");
 
         ExternalTaskData result = handler.handleTask(externalTask);
 
@@ -121,28 +97,43 @@ class MigrateCasesEventHandlerTest {
         assertThrows(IllegalArgumentException.class, () -> handler.handleTask(externalTask));
     }
 
+    @SuppressWarnings({"unchecked", "rawtypes"})
     @Test
-    void shouldHandleTaskWithCaseIdsAndStateWhenScenarioIsNull() {
-        // Arrange
+    void shouldHandleTaskWithCaseIdsAndScenario() {
         ExternalTask externalTask = mock(ExternalTask.class);
         when(externalTask.getVariable("taskName")).thenReturn("testTask");
-        when(externalTask.getVariable("caseIds")).thenReturn(List.of("111", "222"));
-        when(externalTask.getVariable("scenario")).thenReturn(null); // scenario is null
-        when(externalTask.getVariable("state")).thenReturn("IN_PROGRESS"); // state is present
+        when(externalTask.getVariable("caseIds")).thenReturn("123,456");
+        when(externalTask.getVariable("scenario")).thenReturn("SCENARIO_1");
 
-        @SuppressWarnings("unchecked")
-        MigrationTask<CaseReference> migrationTask = mock(MigrationTask.class);
-        when(migrationTask.getType()).thenReturn(CaseReference.class);
-        when(migrationTaskFactory.getMigrationTask("testTask")).thenReturn(Optional.of(migrationTask));
+        MigrationTask<? extends CaseReference> migrationTask = mock(MigrationTask.class);
+        when(migrationTask.getType()).thenReturn((Class) DashboardScenarioCaseReference.class);
+        doReturn(Optional.of(migrationTask))
+            .when(migrationTaskFactory)
+            .getMigrationTask("testTask");
 
-        // Act
         ExternalTaskData result = handler.handleTask(externalTask);
 
-        // Assert
         assertNotNull(result);
-        // Ensure migrateCasesAsync is called with the correct state value
         verify(asyncCaseMigrationService, times(1))
-            .migrateCasesAsync(eq(migrationTask), anyList(), eq("IN_PROGRESS"));
+            .migrateCasesAsync(eq(migrationTask), anyList());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenTaskNameMissing() {
+        ExternalTask externalTask = mock(ExternalTask.class);
+        when(externalTask.getVariable("taskName")).thenReturn(null);
+
+        assertThrows(AssertionError.class, () -> handler.handleTask(externalTask));
+    }
+
+    @Test
+    void shouldThrowExceptionWhenMigrationTaskNotFound() {
+        ExternalTask externalTask = mock(ExternalTask.class);
+        when(externalTask.getVariable("taskName")).thenReturn("unknownTask");
+
+        when(migrationTaskFactory.getMigrationTask("unknownTask")).thenReturn(Optional.empty());
+
+        assertThrows(IllegalArgumentException.class, () -> handler.handleTask(externalTask));
     }
 
     @Test
@@ -166,50 +157,5 @@ class MigrateCasesEventHandlerTest {
     void shouldReturnEmptyListWhenCsvFileNameIsNull() {
         List<CaseReference> result = handler.getCaseReferenceList(CaseReference.class, null);
         assertTrue(result.isEmpty());
-    }
-
-    @Test
-    void shouldFallbackToCsvWhenCaseIdsEmpty() {
-        ExternalTask externalTask = mock(ExternalTask.class);
-        when(externalTask.getVariable("taskName")).thenReturn("testTask");
-        when(externalTask.getVariable("caseIds")).thenReturn(List.of());
-        when(externalTask.getVariable("scenario")).thenReturn(null);
-        when(externalTask.getVariable("state")).thenReturn(null);
-        when(externalTask.getVariable("csvFileName")).thenReturn("test.csv");
-
-        @SuppressWarnings("unchecked")
-        MigrationTask<CaseReference> migrationTask = mock(MigrationTask.class);
-        when(migrationTask.getType()).thenReturn(CaseReference.class);
-        when(migrationTaskFactory.getMigrationTask("testTask")).thenReturn(Optional.of(migrationTask));
-
-        List<CaseReference> mockReferences = List.of(new CaseReference("999"));
-        when(caseReferenceCsvLoader.loadCaseReferenceList(CaseReference.class, "test.csv")).thenReturn(mockReferences);
-
-        handler.handleTask(externalTask);
-
-        verify(asyncCaseMigrationService).migrateCasesAsync(migrationTask, mockReferences, null);
-    }
-
-    @Test
-    void shouldReturnEmptyExternalTaskDataWhenNoCaseReferencesFound() {
-        ExternalTask externalTask = mock(ExternalTask.class);
-        when(externalTask.getVariable("taskName")).thenReturn("testTask");
-        when(externalTask.getVariable("caseIds")).thenReturn(List.of());
-        when(externalTask.getVariable("scenario")).thenReturn(null); // stub scenario
-        when(externalTask.getVariable("csvFileName")).thenReturn("empty.csv"); // stub csvFileName
-
-        @SuppressWarnings("unchecked")
-        MigrationTask<CaseReference> migrationTask = mock(MigrationTask.class);
-        when(migrationTask.getType()).thenReturn(CaseReference.class);
-        when(migrationTaskFactory.getMigrationTask("testTask")).thenReturn(Optional.of(migrationTask));
-
-        // Use lenient for CSV loader to avoid strict stubbing errors
-        lenient().when(caseReferenceCsvLoader.loadCaseReferenceList(CaseReference.class, "empty.csv"))
-            .thenReturn(List.of());
-
-        ExternalTaskData result = handler.handleTask(externalTask);
-
-        assertNotNull(result);
-        verify(asyncCaseMigrationService, times(0)).migrateCasesAsync(any(), anyList(), any());
     }
 }
