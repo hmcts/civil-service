@@ -94,7 +94,6 @@ public class TestingSupportController {
     private static final String SUCCESS = "success";
     private static final String FAILED = "failed";
 
-
     @GetMapping("/testing-support/case/{caseId}/business-process")
     public ResponseEntity<BusinessProcessInfo> getBusinessProcess(@PathVariable("caseId") Long caseId) {
         CaseData caseData = caseDetailsConverter.toCaseData(coreCaseDataService.getCase(caseId));
