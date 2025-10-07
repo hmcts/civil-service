@@ -4,10 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseReference;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseReferenceCsvLoader;
@@ -191,5 +191,37 @@ class AsyncCaseMigrationServiceTest {
         batchService.migrateCasesAsync(migrationTask, caseReferences, null);
 
         verify(coreCaseDataService, times(2)).startUpdate(anyString(), eq(CaseEvent.UPDATE_CASE_DATA));
+    }
+
+    @Test
+    void shouldPassCorrectCaseDataContentToSubmitUpdate() {
+        StartEventResponse startEventResponse = StartEventResponse.builder()
+            .eventId("event123")
+            .token("token123")
+            .caseDetails(uk.gov.hmcts.reform.ccd.client.model.CaseDetails.builder()
+                             .id(1L)
+                             .state("STATE")
+                             .build())
+            .build();
+
+        when(coreCaseDataService.startUpdate(anyString(), any())).thenReturn(startEventResponse);
+        when(caseDetailsConverter.toCaseData((CaseDetails) any())).thenReturn(mock(CaseData.class));
+
+        @SuppressWarnings("unchecked")
+        MigrationTask<CaseReference> migrationTask = mock(MigrationTask.class);
+        when(migrationTask.migrateCaseData(any(), any())).thenReturn(mock(CaseData.class));
+        when(migrationTask.getEventSummary()).thenReturn("summary");
+        when(migrationTask.getEventDescription()).thenReturn("description");
+
+        ArgumentCaptor<CaseDataContent> captor = ArgumentCaptor.forClass(CaseDataContent.class);
+
+        asyncCaseMigrationService.migrateCasesAsync(migrationTask, List.of(new CaseReference("1")), null);
+
+        verify(coreCaseDataService).submitUpdate(eq("1"), captor.capture());
+        CaseDataContent sent = captor.getValue();
+
+        assertEquals("event123", sent.getEvent().getId());
+        assertEquals("token123", sent.getEventToken());
+        assertEquals("summary", sent.getEvent().getSummary());
     }
 }
