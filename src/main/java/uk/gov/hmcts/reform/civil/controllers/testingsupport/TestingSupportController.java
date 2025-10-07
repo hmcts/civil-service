@@ -94,6 +94,7 @@ public class TestingSupportController {
     private static final String SUCCESS = "success";
     private static final String FAILED = "failed";
 
+
     @GetMapping("/testing-support/case/{caseId}/business-process")
     public ResponseEntity<BusinessProcessInfo> getBusinessProcess(@PathVariable("caseId") Long caseId) {
         CaseData caseData = caseDetailsConverter.toCaseData(coreCaseDataService.getCase(caseId));
@@ -111,6 +112,31 @@ public class TestingSupportController {
                 }
             }
         }
+
+        return new ResponseEntity<>(businessProcessInfo, HttpStatus.OK);
+    }
+
+    @GetMapping("/testing-support/ga/case/{caseId}/business-process")
+    public ResponseEntity<BusinessProcessInfo> getBusinessProcessGa(@PathVariable("caseId") Long caseId) {
+        log.info("Get business process for caseId: {}", caseId);
+        CaseData caseData = caseDetailsConverter.toCaseDataGA(coreCaseDataService.getCase(caseId));
+        var businessProcess = caseData.getBusinessProcess();
+        var caseState = caseData.getCcdState();
+        var businessProcessInfo = new BusinessProcessInfo(businessProcess);
+
+        if (businessProcess.getStatus() == STARTED) {
+            try {
+                camundaRestEngineClient.findIncidentByProcessInstanceId(businessProcess.getProcessInstanceId())
+                        .map(camundaRestEngineClient::getIncidentMessage)
+                        .ifPresent(businessProcessInfo::setIncidentMessage);
+            } catch (FeignException e) {
+                if (e.status() != 404) {
+                    businessProcessInfo.setIncidentMessage(e.contentUTF8());
+                }
+            }
+        }
+
+        businessProcessInfo.setCcdState(caseState.toString());
 
         return new ResponseEntity<>(businessProcessInfo, HttpStatus.OK);
     }
@@ -138,6 +164,7 @@ public class TestingSupportController {
     private static class BusinessProcessInfo {
         private BusinessProcess businessProcess;
         private String incidentMessage;
+        private String ccdState;
 
         private BusinessProcessInfo(BusinessProcess businessProcess) {
             this.businessProcess = businessProcess;
@@ -220,8 +247,13 @@ public class TestingSupportController {
 
     @GetMapping("/testing-support/case/{caseId}")
     public ResponseEntity<CaseData> getCaseData(@PathVariable("caseId") Long caseId) {
-
         CaseData caseData = caseDetailsConverter.toCaseData(coreCaseDataService.getCase(caseId));
+        return new ResponseEntity<>(caseData, HttpStatus.OK);
+    }
+
+    @GetMapping("/testing-support/ga/case/{caseId}")
+    public ResponseEntity<CaseData> getCaseDataGa(@PathVariable("caseId") Long caseId) {
+        CaseData caseData = caseDetailsConverter.toCaseDataGA(coreCaseDataService.getCase(caseId));
         return new ResponseEntity<>(caseData, HttpStatus.OK);
     }
 
@@ -294,7 +326,7 @@ public class TestingSupportController {
     @GetMapping("/testing-support/case/{caseId}/business-process/ga")
     public ResponseEntity<BusinessProcessInfo> getGACaseReference(@PathVariable("caseId") Long caseId) {
         log.info("Get GA case reference for caseId: {}", caseId);
-        CaseData caseData = caseDetailsConverter.toCaseData(coreCaseDataService.getCase(caseId));
+        CaseData caseData = caseDetailsConverter.toCaseDataGA(coreCaseDataService.getCase(caseId));
 
         int size = caseData.getGeneralApplications().size();
 
