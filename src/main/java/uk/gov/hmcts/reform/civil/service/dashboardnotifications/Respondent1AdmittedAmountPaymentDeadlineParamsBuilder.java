@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.dashboardnotifications;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
@@ -18,6 +19,7 @@ import static uk.gov.hmcts.reform.civil.utils.AmountFormatter.formatAmount;
 
 @Component
 @AllArgsConstructor
+@Slf4j
 public class Respondent1AdmittedAmountPaymentDeadlineParamsBuilder extends DashboardNotificationsParamsBuilder {
 
     private final ClaimantResponseUtils claimantResponseUtils;
@@ -43,11 +45,15 @@ public class Respondent1AdmittedAmountPaymentDeadlineParamsBuilder extends Dashb
     }
 
     private static String formatDateEn(LocalDate date) {
-        return date != null ? DateUtils.formatDate(date) : "";
+        String formattedDate = date != null ? DateUtils.formatDate(date) : "";
+        log.debug("formattedDate: {}", formattedDate);
+        return formattedDate;
     }
 
     private static String formatDateCy(LocalDate date) {
-        return date != null ? DateUtils.formatDateInWelsh(date, PAD_DAYS) : "";
+        String formattedDateCy = date != null ? DateUtils.formatDateInWelsh(date, PAD_DAYS) : "";
+        log.debug("formattedDateCy: {}", formattedDateCy);
+        return formattedDateCy;
     }
 
     private static void putDescriptions(Map<String, Object> params, String descriptionEn, String descriptionCy) {
@@ -58,18 +64,19 @@ public class Respondent1AdmittedAmountPaymentDeadlineParamsBuilder extends Dashb
     @Override
     public void addParams(CaseData caseData, HashMap<String, Object> params) {
         final String defendantAdmittedAmount = getDefendantAdmittedAmount(caseData);
-        final LocalDate paymentDate = getPaymentDate(caseData);
-        final String paymentDateEn = formatDateEn(paymentDate);
-        final String paymentDateCy = formatDateCy(paymentDate);
+
         final String applicant1PartyName = getStringParam(params, PARAM_APPLICANT1_PARTY_NAME);
+        log.debug("defendantAdmittedAmount: {}, applicant1PartyName: {}",
+                  defendantAdmittedAmount, applicant1PartyName);
 
         if (caseData.isPartAdmitPayImmediatelyClaimSpec()) {
+            log.debug("PartAdmitPayImmediately is true");
             String descriptionEn = String.format("<p class=\"govuk-body\">You've said you owe %s plus the claim fee and " +
                                                   "any fixed costs claimed and offered to pay %s immediately. " +
                                                   "We will contact you when the claimant responds." +
                                                   "</p>",
                                               defendantAdmittedAmount,
-                                                 applicant1PartyName);
+                                               applicant1PartyName);
 
             String descriptionCy = String.format("<p class=\"govuk-body\">Rydych chi wedi dweud bod %s yn ddyledus gennych, " +
                                                   "a ffi’r hawliad ac unrhyw gostau sefydlog a hawlir ac rydych wedi cynnig i dalu %s ar unwaith. " +
@@ -79,8 +86,14 @@ public class Respondent1AdmittedAmountPaymentDeadlineParamsBuilder extends Dashb
             putDescriptions(params, descriptionEn, descriptionCy);
 
         } else if (nonNull(caseData.getRespondToClaimAdmitPartLRspec())) {
+            log.debug("PartAdmitPayImmediately is false");
+            final LocalDate paymentDate = getPaymentDate(caseData);
+            final String paymentDateEn = formatDateEn(paymentDate);
+            final String paymentDateCy = formatDateCy(paymentDate);
             final String amountIncludesTextEn = getStringParam(params, PARAM_AMOUNT_INCLUDES_TEXT_EN);
             final String amountIncludesTextCy = getStringParam(params, PARAM_AMOUNT_INCLUDES_TEXT_CY);
+            log.debug("paymentDate: {}, paymentDateEn: {}, paymentDateCy: {}, amountIncludesTextEn: {}, amountIncludesTextCy: {}",
+                      paymentDate, paymentDateEn, paymentDateCy, amountIncludesTextEn, amountIncludesTextCy);
 
             var descriptionEn = String.format("<p class=\"govuk-body\">You have offered to pay %s by %s%s. The payment must be received in %s's account by then, " +
                                                   "if not they can request a county court judgment.</p><p class=\"govuk-body\">" +
@@ -98,14 +111,11 @@ public class Respondent1AdmittedAmountPaymentDeadlineParamsBuilder extends Dashb
                                               paymentDateCy,
                                               amountIncludesTextCy,
                                               applicant1PartyName);
-
             putDescriptions(params, descriptionEn, descriptionCy);
-        }
-
-        if (nonNull(paymentDate) && nonNull(caseData.getRespondToClaimAdmitPartLRspec())) {
             putPaymentDeadlineParams(params, paymentDate, paymentDateEn, paymentDateCy);
-
         }
+
+
     }
 
     private static void putPaymentDeadlineParams(Map<String, Object> params,
@@ -120,8 +130,11 @@ public class Respondent1AdmittedAmountPaymentDeadlineParamsBuilder extends Dashb
     public String getDefendantAdmittedAmount(CaseData caseData) {
         BigDecimal defendantAdmittedAmount = claimantResponseUtils.getDefendantAdmittedAmount(caseData, true);
         if (nonNull(defendantAdmittedAmount)) {
-            return "£" + this.removeDoubleZeros(formatAmount(defendantAdmittedAmount));
+            String formattedDefendantAmount = "£" + this.removeDoubleZeros(formatAmount(defendantAdmittedAmount));
+            log.debug("formattedDefendantAmount: {}", formattedDefendantAmount);
+            return formattedDefendantAmount;
         }
+        log.debug("defendantAdmittedAmount is null, returning empty string");
         return "";
     }
 
