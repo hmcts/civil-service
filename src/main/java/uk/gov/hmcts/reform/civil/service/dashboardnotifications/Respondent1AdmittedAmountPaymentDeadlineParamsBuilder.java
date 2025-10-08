@@ -43,11 +43,11 @@ public class Respondent1AdmittedAmountPaymentDeadlineParamsBuilder extends Dashb
     }
 
     private static String formatDateEn(LocalDate date) {
-        return DateUtils.formatDate(date);
+        return date != null ? DateUtils.formatDate(date) : "";
     }
 
     private static String formatDateCy(LocalDate date) {
-        return DateUtils.formatDateInWelsh(date, PAD_DAYS);
+        return date != null ? DateUtils.formatDateInWelsh(date, PAD_DAYS) : "";
     }
 
     private static void putDescriptions(Map<String, Object> params, String descriptionEn, String descriptionCy) {
@@ -59,11 +59,6 @@ public class Respondent1AdmittedAmountPaymentDeadlineParamsBuilder extends Dashb
     public void addParams(CaseData caseData, HashMap<String, Object> params) {
         final String defendantAdmittedAmount = getDefendantAdmittedAmount(caseData);
         final LocalDate paymentDate = getPaymentDate(caseData);
-
-        if (paymentDate == null) {
-            return; // no date → nothing to build safely
-        }
-
         final String paymentDateEn = formatDateEn(paymentDate);
         final String paymentDateCy = formatDateCy(paymentDate);
         final String applicant1PartyName = getStringParam(params, PARAM_APPLICANT1_PARTY_NAME);
@@ -107,7 +102,7 @@ public class Respondent1AdmittedAmountPaymentDeadlineParamsBuilder extends Dashb
             putDescriptions(params, descriptionEn, descriptionCy);
         }
 
-        if (nonNull(caseData.getRespondToClaimAdmitPartLRspec())) {
+        if (nonNull(paymentDate) && nonNull(caseData.getRespondToClaimAdmitPartLRspec())) {
             putPaymentDeadlineParams(params, paymentDate, paymentDateEn, paymentDateCy);
 
         }
