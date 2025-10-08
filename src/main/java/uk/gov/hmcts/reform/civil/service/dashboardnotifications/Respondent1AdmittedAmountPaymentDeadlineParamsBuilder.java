@@ -114,8 +114,6 @@ public class Respondent1AdmittedAmountPaymentDeadlineParamsBuilder extends Dashb
             putDescriptions(params, descriptionEn, descriptionCy);
             putPaymentDeadlineParams(params, paymentDate, paymentDateEn, paymentDateCy);
         }
-
-
     }
 
     private static void putPaymentDeadlineParams(Map<String, Object> params,
