@@ -124,7 +124,7 @@ public class Respondent1AdmittedAmountPaymentDeadlineParamsBuilder extends Dashb
                                                  LocalDate paymentDate,
                                                  String paymentDateEn,
                                                  String paymentDateCy) {
-        params.put(RESP1_ADMITTED_AMOUNT_DEADLINE, nonNull(paymentDate)? paymentDate.atTime(END_OF_DAY): "");
+        params.put(RESP1_ADMITTED_AMOUNT_DEADLINE, nonNull(paymentDate) ? paymentDate.atTime(END_OF_DAY) : "");
         params.put(RESP1_ADMITTED_AMOUNT_DEADLINE_EN, paymentDateEn);
         params.put(RESP1_ADMITTED_AMOUNT_DEADLINE_CY, paymentDateCy);
     }
