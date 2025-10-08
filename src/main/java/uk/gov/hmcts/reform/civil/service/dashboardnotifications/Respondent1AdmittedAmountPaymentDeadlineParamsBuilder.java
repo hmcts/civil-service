@@ -39,9 +39,13 @@ public class Respondent1AdmittedAmountPaymentDeadlineParamsBuilder extends Dashb
     }
 
     private static LocalDate getPaymentDate(CaseData caseData) {
-        return Optional.ofNullable(caseData.getRespondToClaimAdmitPartLRspec())
+        LocalDate paymentDate = Optional.ofNullable(caseData.getRespondToClaimAdmitPartLRspec())
             .map(RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid)
             .orElse(null);
+        if (paymentDate == null) {
+            log.error("paymentDate is null, returning empty string");
+        }
+        return paymentDate;
     }
 
     private static String formatDateEn(LocalDate date) {
@@ -120,7 +124,7 @@ public class Respondent1AdmittedAmountPaymentDeadlineParamsBuilder extends Dashb
                                                  LocalDate paymentDate,
                                                  String paymentDateEn,
                                                  String paymentDateCy) {
-        params.put(RESP1_ADMITTED_AMOUNT_DEADLINE, paymentDate.atTime(END_OF_DAY));
+        params.put(RESP1_ADMITTED_AMOUNT_DEADLINE, nonNull(paymentDate)? paymentDate.atTime(END_OF_DAY): "");
         params.put(RESP1_ADMITTED_AMOUNT_DEADLINE_EN, paymentDateEn);
         params.put(RESP1_ADMITTED_AMOUNT_DEADLINE_CY, paymentDateCy);
     }
