@@ -72,7 +72,7 @@ public class AsyncCaseMigrationService {
                 if (updatedState.isPresent()) {
                     String newState = updatedState.get();
                     log.info("Updating case {} to new state: {}", caseReference.getCaseReference(), newState);
-                    caseData.toBuilder().nextState(newState).build();
+                    caseData = caseData.toBuilder().nextState(newState).build();
                 } else {
                     log.info("No state change for case {}", caseReference.getCaseReference());
                 }
