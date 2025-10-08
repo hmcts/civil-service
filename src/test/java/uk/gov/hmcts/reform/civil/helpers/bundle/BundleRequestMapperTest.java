@@ -322,6 +322,52 @@ class BundleRequestMapperTest {
         assertEquals(1, defenceCount);
     }
 
+    @Test
+    void shouldIncludeClaimantReplyWhenOnlyPresentInClaimantResponseDocumentList() {
+        // Given
+        given(featureToggleService.isCaseProgressionEnabled()).willReturn(false);
+        given(featureToggleService.isAmendBundleEnabled()).willReturn(false);
+
+        CaseDocument claimantReply = CaseDocument.builder()
+            .documentType(DocumentType.CLAIMANT_DEFENCE)
+            .createdBy("Claimant")
+            .documentLink(Document.builder()
+                              .documentUrl(TEST_URL + "/reply-only")
+                              .documentFileName("reply-only.pdf")
+                              .build())
+            .createdDatetime(LocalDateTime.of(2023, 4, 5, 14, 45))
+            .build();
+
+        Element<CaseDocument> replyElement = ElementUtils.element(claimantReply);
+
+        CaseData caseData = CaseData.builder()
+            .ccdCaseReference(789L)
+            .applicant1(Party.builder().partyName("Applicant").individualLastName("Applicant")
+                          .type(Party.Type.INDIVIDUAL).build())
+            .respondent1(Party.builder().partyName("Respondent").individualLastName("Respondent")
+                           .type(Party.Type.INDIVIDUAL).build())
+            .hearingDate(LocalDate.now())
+            .systemGeneratedCaseDocuments(new ArrayList<>())
+            .defendantResponseDocuments(new ArrayList<>())
+            .claimantResponseDocuments(new ArrayList<>(List.of(replyElement)))
+            .build();
+
+        // When
+        BundleCreateRequest bundleCreateRequest = bundleRequestMapper.mapCaseDataToBundleCreateRequest(caseData,
+            "sample.yaml", "test", "test");
+
+        List<Element<BundlingRequestDocument>> statementsOfCase =
+            bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments();
+
+        long claimantReplyDocs = statementsOfCase.stream()
+            .map(Element::getValue)
+            .filter(doc -> BundleFileNameList.CL_REPLY.getDisplayName().equals(doc.getDocumentType()))
+            .count();
+
+        // Then
+        assertEquals(1, claimantReplyDocs);
+    }
+
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void testBundleRequestMapperWithAllDocsAndCaseEvenEnable(boolean caseProgressionCuiEnabled) {
