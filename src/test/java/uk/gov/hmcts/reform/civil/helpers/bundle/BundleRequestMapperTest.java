@@ -13,12 +13,14 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.caseprogression.BundleFileNameList;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.TypeOfDocDocumentaryEvidenceOfTrial;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.DocumentWithRegex;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
 import uk.gov.hmcts.reform.civil.model.bundle.BundleCreateRequest;
+import uk.gov.hmcts.reform.civil.model.bundle.BundlingRequestDocument;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
@@ -208,6 +210,116 @@ class BundleRequestMapperTest {
         assertEquals("testFileName 12/12/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getDefendant2CostsBudgets().get(0).getValue().getDocumentFileName());
 
+    }
+
+    @Test
+    void shouldIncludeSingleCopyOfPleadingsWhenDuplicatedAcrossCaseDataLists() {
+        // Given
+        given(featureToggleService.isCaseProgressionEnabled()).willReturn(false);
+        given(featureToggleService.isAmendBundleEnabled()).willReturn(false);
+
+        CaseDocument defendantDefence = CaseDocument.builder()
+            .documentType(DocumentType.DEFENDANT_DEFENCE)
+            .createdBy("Defendant")
+            .documentLink(Document.builder()
+                              .documentUrl(TEST_URL + "/defence")
+                              .documentFileName("defence.pdf")
+                              .build())
+            .createdDatetime(LocalDateTime.of(2023, 1, 15, 10, 0))
+            .build();
+        CaseDocument claimantReply = CaseDocument.builder()
+            .documentType(DocumentType.CLAIMANT_DEFENCE)
+            .createdBy("Claimant")
+            .documentLink(Document.builder()
+                              .documentUrl(TEST_URL + "/reply")
+                              .documentFileName("reply.pdf")
+                              .build())
+            .createdDatetime(LocalDateTime.of(2023, 1, 16, 11, 30))
+            .build();
+
+        Element<CaseDocument> defendantElement = ElementUtils.element(defendantDefence);
+        Element<CaseDocument> claimantElement = ElementUtils.element(claimantReply);
+
+        List<Element<CaseDocument>> systemDocs = new ArrayList<>();
+        systemDocs.add(defendantElement);
+        systemDocs.add(claimantElement);
+
+        CaseData caseData = CaseData.builder()
+            .ccdCaseReference(123L)
+            .applicant1(Party.builder().partyName("Applicant").individualLastName("Applicant")
+                          .type(Party.Type.INDIVIDUAL).build())
+            .respondent1(Party.builder().partyName("Respondent").individualLastName("Respondent")
+                           .type(Party.Type.INDIVIDUAL).build())
+            .hearingDate(LocalDate.now())
+            .systemGeneratedCaseDocuments(systemDocs)
+            .defendantResponseDocuments(new ArrayList<>(List.of(defendantElement)))
+            .claimantResponseDocuments(new ArrayList<>(List.of(claimantElement)))
+            .build();
+
+        // When
+        BundleCreateRequest bundleCreateRequest = bundleRequestMapper.mapCaseDataToBundleCreateRequest(caseData,
+            "sample.yaml", "test", "test");
+
+        List<Element<BundlingRequestDocument>> statementsOfCase =
+            bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments();
+
+        long defenceDocs = statementsOfCase.stream()
+            .map(Element::getValue)
+            .filter(doc -> BundleFileNameList.DEFENCE.getDisplayName().equals(doc.getDocumentType()))
+            .count();
+        long claimantReplyDocs = statementsOfCase.stream()
+            .map(Element::getValue)
+            .filter(doc -> BundleFileNameList.CL_REPLY.getDisplayName().equals(doc.getDocumentType()))
+            .count();
+
+        // Then
+        assertEquals(1, defenceDocs);
+        assertEquals(1, claimantReplyDocs);
+    }
+
+    @Test
+    void shouldIncludeDefenceWhenOnlyPresentInResponseDocumentList() {
+        // Given
+        given(featureToggleService.isCaseProgressionEnabled()).willReturn(false);
+        given(featureToggleService.isAmendBundleEnabled()).willReturn(false);
+
+        CaseDocument defendantDefence = CaseDocument.builder()
+            .documentType(DocumentType.DEFENDANT_DEFENCE)
+            .createdBy("Defendant")
+            .documentLink(Document.builder()
+                              .documentUrl(TEST_URL + "/response-only")
+                              .documentFileName("defence-response.pdf")
+                              .build())
+            .createdDatetime(LocalDateTime.of(2023, 3, 20, 9, 0))
+            .build();
+
+        Element<CaseDocument> defenceElement = ElementUtils.element(defendantDefence);
+
+        CaseData caseData = CaseData.builder()
+            .ccdCaseReference(456L)
+            .applicant1(Party.builder().partyName("Applicant").individualLastName("Applicant")
+                          .type(Party.Type.INDIVIDUAL).build())
+            .respondent1(Party.builder().partyName("Respondent").individualLastName("Respondent")
+                           .type(Party.Type.INDIVIDUAL).build())
+            .hearingDate(LocalDate.now())
+            .systemGeneratedCaseDocuments(new ArrayList<>())
+            .defendantResponseDocuments(new ArrayList<>(List.of(defenceElement)))
+            .build();
+
+        // When
+        BundleCreateRequest bundleCreateRequest = bundleRequestMapper.mapCaseDataToBundleCreateRequest(caseData,
+            "sample.yaml", "test", "test");
+
+        List<Element<BundlingRequestDocument>> statementsOfCase =
+            bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments();
+
+        long defenceCount = statementsOfCase.stream()
+            .map(Element::getValue)
+            .filter(doc -> BundleFileNameList.DEFENCE.getDisplayName().equals(doc.getDocumentType()))
+            .count();
+
+        // Then
+        assertEquals(1, defenceCount);
     }
 
     @ParameterizedTest
