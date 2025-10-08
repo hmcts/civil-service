@@ -12,13 +12,12 @@ public class UpdateCaseStateTask extends MigrationTask<CaseReference> {
     }
 
     @Override
-    protected String getTaskName() {
-        return "UpdateCaseStateTask";
-    }
-
-    @Override
     protected String getEventSummary() {
         return "Update case state via migration task";
+    }
+
+    protected CaseData migrateCaseData(CaseData caseData, CaseReference caseRef) {
+        return caseData;
     }
 
     @Override
@@ -26,7 +25,8 @@ public class UpdateCaseStateTask extends MigrationTask<CaseReference> {
         return "This task update state on the case";
     }
 
-    protected CaseData migrateCaseData(CaseData caseData, CaseReference caseRef) {
-        return caseData;
+    @Override
+    protected String getTaskName() {
+        return "UpdateCaseStateTask";
     }
 }
