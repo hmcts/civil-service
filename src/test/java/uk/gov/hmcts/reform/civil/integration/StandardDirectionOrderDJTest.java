@@ -57,6 +57,7 @@ import java.util.Optional;
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -68,7 +69,9 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STANDARD_DIRECTION_ORDER_DJ;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.ACKNOWLEDGEMENT_OF_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -153,6 +156,11 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                 .isEqualTo("Mr. John Rambo v Mr. Sole Trader and Mr. John Rambo");
         }
 
+    }
+
+    @Test
+    void handleEventsReturnsTheExpectedCallbackEvent() {
+        assertThat(handler.handledEvents()).contains(STANDARD_DIRECTION_ORDER_DJ);
     }
 
     @Nested
@@ -907,8 +915,17 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                                                      .build(), ABOUT_TO_SUBMIT);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
-
-        assertEquals(eaCourtLocation, responseCaseData.getEaCourtLocation());
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            boolean isLipCase = caseData.isApplicantLiP() || caseData.isRespondent1LiP() || caseData.isRespondent2LiP();
+            if (!isLipCase) {
+                assertEquals(YES, eaCourtLocation);
+            } else {
+                boolean isLipCaseEaCourt = handler.isLipCaseWithProgressionEnabledAndCourtWhiteListed(caseData);
+                assertEquals(isLipCaseEaCourt ? YesOrNo.YES : YesOrNo.NO, eaCourtLocation);
+            }
+        } else {
+            assertNull(responseCaseData.getEaCourtLocation());
+        }
     }
 
     @ParameterizedTest
@@ -951,7 +968,106 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
 
-        assertEquals(eaCourtLocation, responseCaseData.getEaCourtLocation());
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            boolean isLipCase = caseData.isApplicantLiP() || caseData.isRespondent1LiP() || caseData.isRespondent2LiP();
+            if (!isLipCase) {
+                assertEquals(YES, eaCourtLocation);
+            } else {
+                boolean isLipCaseEaCourt = handler.isLipCaseWithProgressionEnabledAndCourtWhiteListed(caseData);
+                assertEquals(isLipCaseEaCourt ? YesOrNo.YES : YesOrNo.NO, eaCourtLocation);
+            }
+        } else {
+            assertNull(responseCaseData.getEaCourtLocation());
+        }
+    }
+
+    @Test
+    void shouldSetEaCourtLocationYes_whenSpecClaimAndWelshEnabled() {
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateApplicantRespondToDefenceAndProceed()
+            .caseAccessCategory(SPEC_CLAIM)
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                        .region("2")
+                                        .baseLocation("111")
+                                        .build())
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
+
+        assertEquals(YES, responseCaseData.getEaCourtLocation());
+    }
+
+    @Test
+    void shouldSetEaCourtLocationYes_whenSpecClaimNonLipAndWelshDisabled() {
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateApplicantRespondToDefenceAndProceed()
+            .caseAccessCategory(SPEC_CLAIM)
+            .applicant1Represented(YES)
+            .respondent1Represented(YES)
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                        .region("2")
+                                        .baseLocation("111")
+                                        .build())
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
+
+        assertEquals(YES, responseCaseData.getEaCourtLocation());
+    }
+
+    @Test
+    void shouldSetEaCourtLocationNull_whenUnSpecClaim() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateApplicantRespondToDefenceAndProceed()
+            .caseAccessCategory(UNSPEC_CLAIM)
+            .applicant1Represented(NO)
+            .respondent1Represented(YES)
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                        .region("2")
+                                        .baseLocation("111")
+                                        .build())
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
+
+        assertNull(responseCaseData.getEaCourtLocation());
+    }
+
+    @Test
+    void shouldSetEaCourtLocationNo_whenSpecClaimLipCaseAndNotWhitelisted() {
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
+        when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(false);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateApplicantRespondToDefenceAndProceed()
+            .caseAccessCategory(SPEC_CLAIM)
+            .applicant1Represented(NO) // LiP
+            .respondent1Represented(YES)
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                        .region("2")
+                                        .baseLocation("111")
+                                        .build())
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
+
+        assertEquals(NO, responseCaseData.getEaCourtLocation());
     }
 
     @Test

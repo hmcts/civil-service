@@ -91,6 +91,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STANDARD_DIRECTION_ORDER_DJ;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
@@ -716,16 +717,18 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         caseDataBuilder.businessProcess(BusinessProcess.ready(STANDARD_DIRECTION_ORDER_DJ));
         caseDataBuilder.hearingNotes(getHearingNotes(caseData));
 
-        boolean isLipCase = caseData.isApplicantLiP() || caseData.isRespondent1LiP() || caseData.isRespondent2LiP();
-        if (featureToggleService.isWelshEnabledForMainCase()) {
-            caseDataBuilder.eaCourtLocation(YES);
-        } else {
-            if (!isLipCase) {
-                log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            if (featureToggleService.isWelshEnabledForMainCase()) {
                 caseDataBuilder.eaCourtLocation(YES);
             } else {
-                boolean isLipCaseEaCourt = isLipCaseWithProgressionEnabledAndCourtWhiteListed(caseData);
-                caseDataBuilder.eaCourtLocation(isLipCaseEaCourt ? YesOrNo.YES : YesOrNo.NO);
+                boolean isLipCase = caseData.isApplicantLiP() || caseData.isRespondent1LiP() || caseData.isRespondent2LiP();
+                if (!isLipCase) {
+                    log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
+                    caseDataBuilder.eaCourtLocation(YES);
+                } else {
+                    boolean isLipCaseEaCourt = isLipCaseWithProgressionEnabledAndCourtWhiteListed(caseData);
+                    caseDataBuilder.eaCourtLocation(isLipCaseEaCourt ? YesOrNo.YES : YesOrNo.NO);
+                }
             }
         }
 
@@ -743,7 +746,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
             .build();
     }
 
-    private boolean isLipCaseWithProgressionEnabledAndCourtWhiteListed(CaseData caseData) {
+    public boolean isLipCaseWithProgressionEnabledAndCourtWhiteListed(CaseData caseData) {
         return (caseData.isLipvLipOneVOne() || caseData.isLRvLipOneVOne())
             && featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation());
     }

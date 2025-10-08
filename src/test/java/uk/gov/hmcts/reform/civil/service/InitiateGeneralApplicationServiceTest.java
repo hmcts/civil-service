@@ -1134,7 +1134,6 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
             .build()).build();
         data.getGeneralAppHearingDetails().getHearingPreferredLocation().setValue(null);
         when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPostSdo(), true));
-        when(featureToggleService.isCoSCEnabled()).thenReturn(true);
         CaseData result = service.buildCaseData(data.toBuilder(), data, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
@@ -1157,7 +1156,6 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
                                 .build()).build();
         data.getGeneralAppHearingDetails().getHearingPreferredLocation().setValue(null);
         when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPostSdo(), true));
-        when(featureToggleService.isCoSCEnabled()).thenReturn(true);
         CaseData result = service.buildCaseData(data.toBuilder(), data, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
@@ -1171,15 +1169,15 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     void shouldExtendDeadline_buildCaseData() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataCollectionOfApps(CaseData.builder().build());
-        when(calc.addMonthsToDateToNextWorkingDayAtMidnight(24, LocalDate.now()))
-            .thenReturn(LocalDateTime.now().plusMonths(24));
+        when(calc.addMonthsToDateToNextWorkingDayAtMidnight(36, LocalDate.now()))
+            .thenReturn(LocalDateTime.now().plusMonths(36));
         when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPostSdo(), true));
 
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getClaimDismissedDeadline().toLocalDate())
-            .isEqualTo(LocalDateTime.now().plusMonths(24).toLocalDate());
+            .isEqualTo(LocalDateTime.now().plusMonths(36).toLocalDate());
     }
 
     private void assertCaseDateEntries(CaseData caseData) {

@@ -88,12 +88,22 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
 
     private void handleRespondents(SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder, CaseData caseData) {
         if (MultiPartyScenario.getMultiPartyScenario(caseData) == MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP) {
-            builder.respondent1(getDefendant1v2ds(caseData));
+            SpecifiedParty currentRespondent = getDefendant1v2ds(caseData);
+            builder.respondent1(currentRespondent);
+
+            Optional.ofNullable(currentRespondent)
+                .map(SpecifiedParty::getRepresentative)
+                .map(Representative::getOrganisationName)
+                .ifPresent(builder::respondentRepresentativeOrganisationName);
         } else {
+            Representative respondent1Representative = representativeService.getRespondent1Representative(caseData);
             builder.respondent1(getSpecifiedParty(
                 caseData.getRespondent1(),
-                representativeService.getRespondent1Representative(caseData)
+                respondent1Representative
             ));
+            Optional.ofNullable(respondent1Representative)
+                .map(Representative::getOrganisationName)
+                .ifPresent(builder::respondentRepresentativeOrganisationName);
             Optional.ofNullable(caseData.getRespondent2()).ifPresent(
                 respondent2 ->
                     builder.respondent2(getSpecifiedParty(
