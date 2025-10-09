@@ -24,7 +24,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CASE_DATA;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class UpdateCaseDataCallbackHandler extends CallbackHandler {
+public class UpdateCaseStateCallbackHandler extends CallbackHandler {
 
     private final ObjectMapper objectMapper;
     private static final List<CaseEvent> EVENTS = Collections.singletonList(UPDATE_CASE_DATA);

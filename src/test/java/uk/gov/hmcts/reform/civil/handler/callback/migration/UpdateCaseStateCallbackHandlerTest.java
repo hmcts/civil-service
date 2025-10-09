@@ -12,14 +12,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class UpdateCaseDataCallbackHandlerTest {
+class UpdateCaseStateCallbackHandlerTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private UpdateCaseDataCallbackHandler handler;
+    private UpdateCaseStateCallbackHandler handler;
 
     @BeforeEach
     void setUp() {
-        handler = new UpdateCaseDataCallbackHandler(objectMapper);
+        handler = new UpdateCaseStateCallbackHandler(objectMapper);
     }
 
     @Test
