@@ -24,7 +24,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimSubmittedTransitionBuilder.claimIssueBilingual;
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimSubmittedTransitionBuilder.claimIssueHwF;
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimSubmittedTransitionBuilder.paymentFailed;
@@ -62,17 +61,15 @@ class ClaimSubmittedTransitionBuilderTest {
 
     @Test
     void shouldGoNocRoute_whenDefendantNoCOnline() {
-        when(mockFeatureToggleService.isPinInPostEnabled()).thenReturn(true);
         ClaimSubmittedTransitionBuilder claimSubmittedTransitionBuilder = new ClaimSubmittedTransitionBuilder(
             mockFeatureToggleService);
         result = claimSubmittedTransitionBuilder.buildTransitions();
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedPaymentFailed().build();
         assertTrue(paymentFailed.test(caseData));
-        assertThat(getCaseFlags(result.get(3), caseData)).hasSize(3).contains(
+        assertThat(getCaseFlags(result.get(3), caseData)).hasSize(2).contains(
             entry(FlowFlag.LIP_CASE.name(), true),
-            entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true),
-            entry(FlowFlag.PIP_ENABLED.name(), true)
+            entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true)
         );
     }
 

@@ -122,8 +122,7 @@ public class JudgementService {
     }
 
     private String ccjJudgmentStatement(CaseData caseData) {
-        if (caseData.isLRvLipOneVOne()
-            && featureToggleService.isPinInPostEnabled()) {
+        if (caseData.isLRvLipOneVOne()) {
             boolean hasPaymentOption = caseData.isPayImmediately() || caseData.isPayByInstallment() || caseData.isPayBySetDate();
             if (featureToggleService.isLrAdmissionBulkEnabled()
                 && hasPaymentOption) {
