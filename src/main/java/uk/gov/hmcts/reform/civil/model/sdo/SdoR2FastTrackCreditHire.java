@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.civil.enums.sdo.AddOrRemoveToggle;
 
-import javax.validation.constraints.Future;
+import jakarta.validation.constraints.Future;
 import java.time.LocalDate;
 import java.util.List;
 

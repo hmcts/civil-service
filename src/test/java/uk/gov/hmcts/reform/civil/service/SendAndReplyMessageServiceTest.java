@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -127,13 +128,30 @@ class SendAndReplyMessageServiceTest {
     @Nested
     class AddMessage {
 
+        private MockedStatic<UUID> mockedUUID;
+
+        @BeforeEach
+        void setupMockUUID() {
+            mockedUUID = Mockito.mockStatic(UUID.class);
+            mockedUUID.when(UUID::randomUUID).thenReturn(MESSAGE_ID);
+        }
+
+        @AfterEach
+        void closeMockUUID() {
+            mockedUUID.close();
+        }
+
         @Test
         void should_returnExpectedMessage_whenExistingMessagesAreNull() {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
 
             RolePool expectedSenderRoleCategory = RolePool.ADMIN;
             String expectedUserRoleLabel = "Hearing Centre Administrator";
-            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH, SUPPORTED_ROLES)).thenReturn(
+            when(roleAssignmentService.getRoleAssignmentsWithLabels(
+                USER_DETAILS.getId(),
+                USER_AUTH,
+                SUPPORTED_ROLES
+            )).thenReturn(
                 buildRoleAssignmentsResponse(List.of(
                     RoleAssignmentResponse.builder().roleName("hearing-centre-admin").roleLabel(
                         "Hearing Centre Administrator").roleCategory("ADMIN").build())
@@ -141,16 +159,13 @@ class SendAndReplyMessageServiceTest {
             );
 
             List<Element<Message>> actual = null;
-            try (MockedStatic<UUID> mockedStatic = Mockito.mockStatic(UUID.class)) {
-                mockedStatic.when(UUID::randomUUID).thenReturn(MESSAGE_ID);
 
-                actual = messageService.addMessage(
-                    null,
-                    MESSAGE_METADATA,
-                    MESSAGE_CONTENT,
-                    USER_AUTH
-                );
-            }
+            actual = messageService.addMessage(
+                null,
+                MESSAGE_METADATA,
+                MESSAGE_CONTENT,
+                USER_AUTH
+            );
 
             assertEquals(
                 List.of(buildExpectedMessage(expectedSenderRoleCategory, expectedUserRoleLabel)),
@@ -161,7 +176,11 @@ class SendAndReplyMessageServiceTest {
         @Test
         void should_returnExpectedMessage_forHearingCentreTeamLeader() {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
-            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH, SUPPORTED_ROLES)).thenReturn(
+            when(roleAssignmentService.getRoleAssignmentsWithLabels(
+                USER_DETAILS.getId(),
+                USER_AUTH,
+                SUPPORTED_ROLES
+            )).thenReturn(
                 buildRoleAssignmentsResponse(List.of(
                                                  RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
                                                  RoleAssignmentResponse.builder().roleName("hearing-centre-admin").roleLabel(
@@ -178,27 +197,30 @@ class SendAndReplyMessageServiceTest {
             messages.add(element(message));
 
             List<Element<Message>> actual = null;
-            try (MockedStatic<UUID> mockedStatic = Mockito.mockStatic(UUID.class)) {
-                mockedStatic.when(UUID::randomUUID).thenReturn(MESSAGE_ID);
 
-                actual = messageService.addMessage(
-                    messages,
-                    MESSAGE_METADATA,
-                    MESSAGE_CONTENT,
-                    USER_AUTH
-                );
-            }
+            actual = messageService.addMessage(
+                messages,
+                MESSAGE_METADATA,
+                MESSAGE_CONTENT,
+                USER_AUTH
+            );
 
-            assertEquals(List.of(
-                message,
-                buildExpectedMessage(expectedSenderRoleCategory, expectedUserRoleLabel)
-            ), unwrapElements(actual));
+            assertEquals(
+                List.of(
+                    message,
+                    buildExpectedMessage(expectedSenderRoleCategory, expectedUserRoleLabel)
+                ), unwrapElements(actual)
+            );
         }
 
         @Test
         void should_returnExpectedMessage_forCtsc() {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
-            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH, SUPPORTED_ROLES)).thenReturn(
+            when(roleAssignmentService.getRoleAssignmentsWithLabels(
+                USER_DETAILS.getId(),
+                USER_AUTH,
+                SUPPORTED_ROLES
+            )).thenReturn(
                 buildRoleAssignmentsResponse(List.of(
                                                  RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
                                                  RoleAssignmentResponse.builder().roleName("ctsc").roleLabel("CTSC").roleCategory("ADMIN").build()
@@ -210,27 +232,30 @@ class SendAndReplyMessageServiceTest {
             messages.add(element(message));
 
             List<Element<Message>> actual = null;
-            try (MockedStatic<UUID> mockedStatic = Mockito.mockStatic(UUID.class)) {
-                mockedStatic.when(UUID::randomUUID).thenReturn(MESSAGE_ID);
 
-                actual = messageService.addMessage(
-                    messages,
-                    MESSAGE_METADATA,
-                    MESSAGE_CONTENT,
-                    USER_AUTH
-                );
-            }
+            actual = messageService.addMessage(
+                messages,
+                MESSAGE_METADATA,
+                MESSAGE_CONTENT,
+                USER_AUTH
+            );
 
-            assertEquals(List.of(
-                message,
-                buildExpectedMessage(expectedSenderRoleCategory, expectedUserRoleLabel)
-            ), unwrapElements(actual));
+            assertEquals(
+                List.of(
+                    message,
+                    buildExpectedMessage(expectedSenderRoleCategory, expectedUserRoleLabel)
+                ), unwrapElements(actual)
+            );
         }
 
         @Test
         void should_returnExpectedMessage_forCtscTeamLeader() {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
-            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH, SUPPORTED_ROLES)).thenReturn(
+            when(roleAssignmentService.getRoleAssignmentsWithLabels(
+                USER_DETAILS.getId(),
+                USER_AUTH,
+                SUPPORTED_ROLES
+            )).thenReturn(
                 buildRoleAssignmentsResponse(List.of(
                                                  RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
                                                  RoleAssignmentResponse.builder().roleName("ctsc").roleLabel("CTSC").roleCategory("ADMIN").build(),
@@ -245,27 +270,30 @@ class SendAndReplyMessageServiceTest {
             messages.add(element(message));
 
             List<Element<Message>> actual = null;
-            try (MockedStatic<UUID> mockedStatic = Mockito.mockStatic(UUID.class)) {
-                mockedStatic.when(UUID::randomUUID).thenReturn(MESSAGE_ID);
 
-                actual = messageService.addMessage(
-                    messages,
-                    MESSAGE_METADATA,
-                    MESSAGE_CONTENT,
-                    USER_AUTH
-                );
-            }
+            actual = messageService.addMessage(
+                messages,
+                MESSAGE_METADATA,
+                MESSAGE_CONTENT,
+                USER_AUTH
+            );
 
-            assertEquals(List.of(
-                message,
-                buildExpectedMessage(expectedSenderRoleCategory, expectedUserRoleLabel)
-            ), unwrapElements(actual));
+            assertEquals(
+                List.of(
+                    message,
+                    buildExpectedMessage(expectedSenderRoleCategory, expectedUserRoleLabel)
+                ), unwrapElements(actual)
+            );
         }
 
         @Test
         void should_returnExpectedMessage_forTribunalCaseworker() {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
-            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH, SUPPORTED_ROLES)).thenReturn(
+            when(roleAssignmentService.getRoleAssignmentsWithLabels(
+                USER_DETAILS.getId(),
+                USER_AUTH,
+                SUPPORTED_ROLES
+            )).thenReturn(
                 buildRoleAssignmentsResponse(List.of(
                                                  RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
                                                  RoleAssignmentResponse.builder().roleName("tribunal-caseworker").roleLabel("Tribunal Caseworker").roleCategory(
@@ -279,27 +307,29 @@ class SendAndReplyMessageServiceTest {
             messages.add(element(message));
 
             List<Element<Message>> actual = null;
-            try (MockedStatic<UUID> mockedStatic = Mockito.mockStatic(UUID.class)) {
-                mockedStatic.when(UUID::randomUUID).thenReturn(MESSAGE_ID);
+            actual = messageService.addMessage(
+                messages,
+                MESSAGE_METADATA,
+                MESSAGE_CONTENT,
+                USER_AUTH
+            );
 
-                actual = messageService.addMessage(
-                    messages,
-                    MESSAGE_METADATA,
-                    MESSAGE_CONTENT,
-                    USER_AUTH
-                );
-            }
-
-            assertEquals(List.of(
-                message,
-                buildExpectedMessage(expectedSenderRoleCategory, expectedUserRoleLabel)
-            ), unwrapElements(actual));
+            assertEquals(
+                List.of(
+                    message,
+                    buildExpectedMessage(expectedSenderRoleCategory, expectedUserRoleLabel)
+                ), unwrapElements(actual)
+            );
         }
 
         @Test
         void should_returnExpectedMessage_forSeniorTribunalCaseworker() {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
-            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH, SUPPORTED_ROLES)).thenReturn(
+            when(roleAssignmentService.getRoleAssignmentsWithLabels(
+                USER_DETAILS.getId(),
+                USER_AUTH,
+                SUPPORTED_ROLES
+            )).thenReturn(
                 buildRoleAssignmentsResponse(List.of(
                                                  RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
                                                  RoleAssignmentResponse.builder().roleName("tribunal-caseworker").roleLabel("Tribunal Caseworker").roleCategory(
@@ -315,27 +345,29 @@ class SendAndReplyMessageServiceTest {
             messages.add(element(message));
 
             List<Element<Message>> actual = null;
-            try (MockedStatic<UUID> mockedStatic = Mockito.mockStatic(UUID.class)) {
-                mockedStatic.when(UUID::randomUUID).thenReturn(MESSAGE_ID);
+            actual = messageService.addMessage(
+                messages,
+                MESSAGE_METADATA,
+                MESSAGE_CONTENT,
+                USER_AUTH
+            );
 
-                actual = messageService.addMessage(
-                    messages,
-                    MESSAGE_METADATA,
-                    MESSAGE_CONTENT,
-                    USER_AUTH
-                );
-            }
-
-            assertEquals(List.of(
-                message,
-                buildExpectedMessage(expectedSenderRoleCategory, expectedUserRoleLabel)
-            ), unwrapElements(actual));
+            assertEquals(
+                List.of(
+                    message,
+                    buildExpectedMessage(expectedSenderRoleCategory, expectedUserRoleLabel)
+                ), unwrapElements(actual)
+            );
         }
 
         @Test
         void should_returnExpectedMessage_forNationalBusinessCentre() {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
-            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH, SUPPORTED_ROLES)).thenReturn(
+            when(roleAssignmentService.getRoleAssignmentsWithLabels(
+                USER_DETAILS.getId(),
+                USER_AUTH,
+                SUPPORTED_ROLES
+            )).thenReturn(
                 buildRoleAssignmentsResponse(List.of(
                                                  RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
                                                  RoleAssignmentResponse.builder().roleName("national-business-centre").roleLabel(
@@ -350,27 +382,30 @@ class SendAndReplyMessageServiceTest {
             messages.add(element(message));
 
             List<Element<Message>> actual = null;
-            try (MockedStatic<UUID> mockedStatic = Mockito.mockStatic(UUID.class)) {
-                mockedStatic.when(UUID::randomUUID).thenReturn(MESSAGE_ID);
 
-                actual = messageService.addMessage(
-                    messages,
-                    MESSAGE_METADATA,
-                    MESSAGE_CONTENT,
-                    USER_AUTH
-                );
-            }
+            actual = messageService.addMessage(
+                messages,
+                MESSAGE_METADATA,
+                MESSAGE_CONTENT,
+                USER_AUTH
+            );
 
-            assertEquals(List.of(
-                message,
-                buildExpectedMessage(expectedSenderRoleCategory, expectedUserRoleLabel)
-            ), unwrapElements(actual));
+            assertEquals(
+                List.of(
+                    message,
+                    buildExpectedMessage(expectedSenderRoleCategory, expectedUserRoleLabel)
+                ), unwrapElements(actual)
+            );
         }
 
         @Test
         void should_returnExpectedMessage_forNationalBusinessCentreTeamLeader() {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
-            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH, SUPPORTED_ROLES)).thenReturn(
+            when(roleAssignmentService.getRoleAssignmentsWithLabels(
+                USER_DETAILS.getId(),
+                USER_AUTH,
+                SUPPORTED_ROLES
+            )).thenReturn(
                 buildRoleAssignmentsResponse(List.of(
                                                  RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
                                                  RoleAssignmentResponse.builder().roleName("national-business-centre").roleLabel(
@@ -386,27 +421,29 @@ class SendAndReplyMessageServiceTest {
             messages.add(element(message));
 
             List<Element<Message>> actual = null;
-            try (MockedStatic<UUID> mockedStatic = Mockito.mockStatic(UUID.class)) {
-                mockedStatic.when(UUID::randomUUID).thenReturn(MESSAGE_ID);
+            actual = messageService.addMessage(
+                messages,
+                MESSAGE_METADATA,
+                MESSAGE_CONTENT,
+                USER_AUTH
+            );
 
-                actual = messageService.addMessage(
-                    messages,
-                    MESSAGE_METADATA,
-                    MESSAGE_CONTENT,
-                    USER_AUTH
-                );
-            }
-
-            assertEquals(List.of(
-                message,
-                buildExpectedMessage(expectedSenderRoleCategory, expectedUserRoleLabel)
-            ), unwrapElements(actual));
+            assertEquals(
+                List.of(
+                    message,
+                    buildExpectedMessage(expectedSenderRoleCategory, expectedUserRoleLabel)
+                ), unwrapElements(actual)
+            );
         }
 
         @Test
         void should_returnExpectedMessage_forDistrictJudge() {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
-            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH, SUPPORTED_ROLES)).thenReturn(
+            when(roleAssignmentService.getRoleAssignmentsWithLabels(
+                USER_DETAILS.getId(),
+                USER_AUTH,
+                SUPPORTED_ROLES
+            )).thenReturn(
                 buildRoleAssignmentsResponse(List.of(
                                                  RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
                                                  RoleAssignmentResponse.builder().roleName("judge").roleLabel("Judge").roleCategory("JUDICIAL").build(),
@@ -421,27 +458,30 @@ class SendAndReplyMessageServiceTest {
             messages.add(element(message));
 
             List<Element<Message>> actual = null;
-            try (MockedStatic<UUID> mockedStatic = Mockito.mockStatic(UUID.class)) {
-                mockedStatic.when(UUID::randomUUID).thenReturn(MESSAGE_ID);
 
-                actual = messageService.addMessage(
-                    messages,
-                    MESSAGE_METADATA,
-                    MESSAGE_CONTENT,
-                    USER_AUTH
-                );
-            }
+            actual = messageService.addMessage(
+                messages,
+                MESSAGE_METADATA,
+                MESSAGE_CONTENT,
+                USER_AUTH
+            );
 
-            assertEquals(List.of(
-                message,
-                buildExpectedMessage(expectedSenderRoleCategory, expectedUserRoleLabel)
-            ), unwrapElements(actual));
+            assertEquals(
+                List.of(
+                    message,
+                    buildExpectedMessage(expectedSenderRoleCategory, expectedUserRoleLabel)
+                ), unwrapElements(actual)
+            );
         }
 
         @Test
         void should_returnExpectedMessage_forCircuitJudge() {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
-            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH, SUPPORTED_ROLES)).thenReturn(
+            when(roleAssignmentService.getRoleAssignmentsWithLabels(
+                USER_DETAILS.getId(),
+                USER_AUTH,
+                SUPPORTED_ROLES
+            )).thenReturn(
                 buildRoleAssignmentsResponse(List.of(
                                                  RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
                                                  RoleAssignmentResponse.builder().roleName("judge").roleLabel("Judge").roleCategory("JUDICIAL").build(),
@@ -456,27 +496,29 @@ class SendAndReplyMessageServiceTest {
             messages.add(element(message));
 
             List<Element<Message>> actual = null;
-            try (MockedStatic<UUID> mockedStatic = Mockito.mockStatic(UUID.class)) {
-                mockedStatic.when(UUID::randomUUID).thenReturn(MESSAGE_ID);
+            actual = messageService.addMessage(
+                messages,
+                MESSAGE_METADATA,
+                MESSAGE_CONTENT,
+                USER_AUTH
+            );
 
-                actual = messageService.addMessage(
-                    messages,
-                    MESSAGE_METADATA,
-                    MESSAGE_CONTENT,
-                    USER_AUTH
-                );
-            }
-
-            assertEquals(List.of(
-                message,
-                buildExpectedMessage(expectedSenderRoleCategory, expectedUserRoleLabel)
-            ), unwrapElements(actual));
+            assertEquals(
+                List.of(
+                    message,
+                    buildExpectedMessage(expectedSenderRoleCategory, expectedUserRoleLabel)
+                ), unwrapElements(actual)
+            );
         }
 
         @Test
         void should_returnExpectedMessage_forJudge() {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
-            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH, SUPPORTED_ROLES)).thenReturn(
+            when(roleAssignmentService.getRoleAssignmentsWithLabels(
+                USER_DETAILS.getId(),
+                USER_AUTH,
+                SUPPORTED_ROLES
+            )).thenReturn(
                 buildRoleAssignmentsResponse(List.of(
                                                  RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
                                                  RoleAssignmentResponse.builder().roleName("judge").roleLabel("Judge").roleCategory("JUDICIAL").build()
@@ -489,32 +531,35 @@ class SendAndReplyMessageServiceTest {
             messages.add(element(message));
 
             List<Element<Message>> actual = null;
-            try (MockedStatic<UUID> mockedStatic = Mockito.mockStatic(UUID.class)) {
-                mockedStatic.when(UUID::randomUUID).thenReturn(MESSAGE_ID);
 
-                actual = messageService.addMessage(
-                    messages,
-                    MESSAGE_METADATA,
-                    MESSAGE_CONTENT,
-                    USER_AUTH
-                );
-            }
+            actual = messageService.addMessage(
+                messages,
+                MESSAGE_METADATA,
+                MESSAGE_CONTENT,
+                USER_AUTH
+            );
 
-            assertEquals(List.of(
-                message,
-                buildExpectedMessage(expectedSenderRoleCategory, expectedUserRoleLabel)
-            ), unwrapElements(actual));
+            assertEquals(
+                List.of(
+                    message,
+                    buildExpectedMessage(expectedSenderRoleCategory, expectedUserRoleLabel)
+                ), unwrapElements(actual)
+            );
         }
 
         @Test
         void should_returnExpectedMessage_forWluAdmin() {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
-            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH, SUPPORTED_ROLES)).thenReturn(buildRoleAssignmentsResponse(List.of(
-                                                 RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
-                                                 RoleAssignmentResponse.builder().roleName("wlu-admin").roleLabel(
-                                                     "WLU Administrator").roleCategory("ADMIN").build()
-                                             )
-                )
+            when(roleAssignmentService.getRoleAssignmentsWithLabels(
+                USER_DETAILS.getId(),
+                USER_AUTH,
+                SUPPORTED_ROLES
+            )).thenReturn(buildRoleAssignmentsResponse(List.of(
+                                                           RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
+                                                           RoleAssignmentResponse.builder().roleName("wlu-admin").roleLabel(
+                                                               "WLU Administrator").roleCategory("ADMIN").build()
+                                                       )
+                          )
             );
 
             List<Element<Message>> messages = new ArrayList<>();
@@ -524,21 +569,19 @@ class SendAndReplyMessageServiceTest {
             RolePool expectedSenderRoleCategory = RolePool.WLU_ADMIN;
             String expectedUserRoleLabel = "WLU Administrator";
 
-            try (MockedStatic<UUID> mockedStatic = Mockito.mockStatic(UUID.class)) {
-                mockedStatic.when(UUID::randomUUID).thenReturn(MESSAGE_ID);
+            actual = messageService.addMessage(
+                messages,
+                MESSAGE_METADATA,
+                MESSAGE_CONTENT,
+                USER_AUTH
+            );
 
-                actual = messageService.addMessage(
-                     messages,
-                     MESSAGE_METADATA,
-                     MESSAGE_CONTENT,
-                     USER_AUTH
-                );
-            }
-
-            assertEquals(List.of(
-                message,
-                buildExpectedMessage(expectedSenderRoleCategory, expectedUserRoleLabel)
-            ), unwrapElements(actual));
+            assertEquals(
+                List.of(
+                    message,
+                    buildExpectedMessage(expectedSenderRoleCategory, expectedUserRoleLabel)
+                ), unwrapElements(actual)
+            );
         }
 
         private RoleAssignmentServiceResponse buildRoleAssignmentsResponse(List<RoleAssignmentResponse> roleAssignments) {
@@ -569,116 +612,141 @@ class SendAndReplyMessageServiceTest {
 
         static Stream<Arguments> provideUserData() {
             return Stream.of(
-                Arguments.of(RolePool.JUDICIAL,
-                             RolePool.ADMIN,
-                             List.of(RoleAssignmentResponse.builder().roleName("hearing-centre-admin").roleLabel("Hearing Centre Administrator").roleCategory("ADMIN").build()),
-                             "Hearing Centre Administrator",
-                             "Judge"
+                Arguments.of(
+                    RolePool.JUDICIAL,
+                    RolePool.ADMIN,
+                    List.of(RoleAssignmentResponse.builder().roleName("hearing-centre-admin").roleLabel(
+                        "Hearing Centre Administrator").roleCategory("ADMIN").build()),
+                    "Hearing Centre Administrator",
+                    "Judge"
                 ),
-                Arguments.of(RolePool.JUDICIAL,
-                             RolePool.ADMIN,
-                             List.of(
-                                 RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
-                                 RoleAssignmentResponse.builder().roleName("hearing-centre-admin").roleLabel(
-                                     "Hearing Centre Administrator").roleCategory("ADMIN").build(),
-                                 RoleAssignmentResponse.builder().roleName("hearing-centre-team-leader").roleLabel(
-                                     "Hearing Centre Team Leader").roleCategory("ADMIN").build()
-                             ),
-                             "Hearing Centre Team Leader",
-                             "Judge"),
-                Arguments.of(RolePool.JUDICIAL,
-                             RolePool.ADMIN,
-                             List.of(
-                                 RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
-                                 RoleAssignmentResponse.builder().roleName("ctsc").roleLabel("CTSC").roleCategory("ADMIN").build()
-                             ),
-                             "CTSC",
-                             "Judge"
+                Arguments.of(
+                    RolePool.JUDICIAL,
+                    RolePool.ADMIN,
+                    List.of(
+                        RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
+                        RoleAssignmentResponse.builder().roleName("hearing-centre-admin").roleLabel(
+                            "Hearing Centre Administrator").roleCategory("ADMIN").build(),
+                        RoleAssignmentResponse.builder().roleName("hearing-centre-team-leader").roleLabel(
+                            "Hearing Centre Team Leader").roleCategory("ADMIN").build()
+                    ),
+                    "Hearing Centre Team Leader",
+                    "Judge"
                 ),
-                Arguments.of(RolePool.JUDICIAL,
-                             RolePool.ADMIN,
-                             List.of(
-                                 RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
-                                 RoleAssignmentResponse.builder().roleName("ctsc").roleLabel("CTSC").roleCategory("ADMIN").build(),
-                                 RoleAssignmentResponse.builder().roleName("ctsc-team-leader").roleLabel("CTSC Team Leader").roleCategory(
-                                     "ADMIN").build()
-                             ),
-                             "CTSC Team Leader",
-                             "Judge"),
-                Arguments.of(RolePool.JUDICIAL,
-                             RolePool.LEGAL_OPERATIONS,
-                             List.of(
-                                 RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
-                                 RoleAssignmentResponse.builder().roleName("tribunal-caseworker").roleLabel("Tribunal Caseworker").roleCategory(
-                                     "LEGAL_OPERATIONS").build()
-                             ),
-                             "Tribunal Caseworker",
-                             "Judge"),
-                Arguments.of(RolePool.JUDICIAL,
-                             RolePool.LEGAL_OPERATIONS,
-                             List.of(
-                                 RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
-                                 RoleAssignmentResponse.builder().roleName("tribunal-caseworker").roleLabel("Tribunal Caseworker").roleCategory(
-                                     "LEGAL_OPERATIONS").build(),
-                                 RoleAssignmentResponse.builder().roleName("senior-tribunal-caseworker").roleLabel(
-                                     "Senior Tribunal Caseworker").roleCategory("LEGAL_OPERATIONS").build()
-                             ),
-                             "Senior Tribunal Caseworker",
-                             "Judge"),
-                Arguments.of(RolePool.ADMIN,
-                             RolePool.JUDICIAL_DISTRICT,
-                             List.of(
-                                 RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
-                                 RoleAssignmentResponse.builder().roleName("judge").roleLabel("Judge").roleCategory("JUDICIAL").build(),
-                                 RoleAssignmentResponse.builder().roleName("district-judge").roleLabel("District Judge").roleCategory(
-                                     "JUDICIAL").build()
-                             ),
-                             "District Judge",
-                             "Hearing centre admin"),
-                Arguments.of(RolePool.ADMIN,
-                             RolePool.JUDICIAL_CIRCUIT,
-                             List.of(
-                                 RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
-                                 RoleAssignmentResponse.builder().roleName("judge").roleLabel("Judge").roleCategory("JUDICIAL").build(),
-                                 RoleAssignmentResponse.builder().roleName("circuit-judge").roleLabel("Circuit Judge").roleCategory(
-                                     "JUDICIAL").build()
-                             ),
-                             "Circuit Judge",
-                             "Hearing centre admin"),
-                Arguments.of(RolePool.ADMIN,
-                             RolePool.JUDICIAL,
-                             List.of(
-                                 RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
-                                 RoleAssignmentResponse.builder().roleName("judge").roleLabel("Judge").roleCategory("JUDICIAL").build()
-                             ),
-                             "Judge",
-                             "Hearing centre admin")
+                Arguments.of(
+                    RolePool.JUDICIAL,
+                    RolePool.ADMIN,
+                    List.of(
+                        RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
+                        RoleAssignmentResponse.builder().roleName("ctsc").roleLabel("CTSC").roleCategory("ADMIN").build()
+                    ),
+                    "CTSC",
+                    "Judge"
+                ),
+                Arguments.of(
+                    RolePool.JUDICIAL,
+                    RolePool.ADMIN,
+                    List.of(
+                        RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
+                        RoleAssignmentResponse.builder().roleName("ctsc").roleLabel("CTSC").roleCategory("ADMIN").build(),
+                        RoleAssignmentResponse.builder().roleName("ctsc-team-leader").roleLabel("CTSC Team Leader").roleCategory(
+                            "ADMIN").build()
+                    ),
+                    "CTSC Team Leader",
+                    "Judge"
+                ),
+                Arguments.of(
+                    RolePool.JUDICIAL,
+                    RolePool.LEGAL_OPERATIONS,
+                    List.of(
+                        RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
+                        RoleAssignmentResponse.builder().roleName("tribunal-caseworker").roleLabel("Tribunal Caseworker").roleCategory(
+                            "LEGAL_OPERATIONS").build()
+                    ),
+                    "Tribunal Caseworker",
+                    "Judge"
+                ),
+                Arguments.of(
+                    RolePool.JUDICIAL,
+                    RolePool.LEGAL_OPERATIONS,
+                    List.of(
+                        RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
+                        RoleAssignmentResponse.builder().roleName("tribunal-caseworker").roleLabel("Tribunal Caseworker").roleCategory(
+                            "LEGAL_OPERATIONS").build(),
+                        RoleAssignmentResponse.builder().roleName("senior-tribunal-caseworker").roleLabel(
+                            "Senior Tribunal Caseworker").roleCategory("LEGAL_OPERATIONS").build()
+                    ),
+                    "Senior Tribunal Caseworker",
+                    "Judge"
+                ),
+                Arguments.of(
+                    RolePool.ADMIN,
+                    RolePool.JUDICIAL_DISTRICT,
+                    List.of(
+                        RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
+                        RoleAssignmentResponse.builder().roleName("judge").roleLabel("Judge").roleCategory("JUDICIAL").build(),
+                        RoleAssignmentResponse.builder().roleName("district-judge").roleLabel("District Judge").roleCategory(
+                            "JUDICIAL").build()
+                    ),
+                    "District Judge",
+                    "Hearing centre admin"
+                ),
+                Arguments.of(
+                    RolePool.ADMIN,
+                    RolePool.JUDICIAL_CIRCUIT,
+                    List.of(
+                        RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
+                        RoleAssignmentResponse.builder().roleName("judge").roleLabel("Judge").roleCategory("JUDICIAL").build(),
+                        RoleAssignmentResponse.builder().roleName("circuit-judge").roleLabel("Circuit Judge").roleCategory(
+                            "JUDICIAL").build()
+                    ),
+                    "Circuit Judge",
+                    "Hearing centre admin"
+                ),
+                Arguments.of(
+                    RolePool.ADMIN,
+                    RolePool.JUDICIAL,
+                    List.of(
+                        RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
+                        RoleAssignmentResponse.builder().roleName("judge").roleLabel("Judge").roleCategory("JUDICIAL").build()
+                    ),
+                    "Judge",
+                    "Hearing centre admin"
+                )
             );
         }
 
         @ParameterizedTest
         @MethodSource("provideUserData")
         void shouldAddMessageReplyasBaseAndBaseToMessageHistory(RolePool originalSender,
-                                                                                     RolePool currentSender,
-                                                                                     List<RoleAssignmentResponse> roleAssignmentResponses,
-                                                                                     String newRoleLabel, String oldRoleLabel) {
+                                                                RolePool currentSender,
+                                                                List<RoleAssignmentResponse> roleAssignmentResponses,
+                                                                String newRoleLabel, String oldRoleLabel) {
             LocalDateTime updatedTime = LocalDateTime.of(2025, 1, 1, 10, 10);
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
             when(time.now()).thenReturn(updatedTime);
 
             String originalUserRoleLabel = oldRoleLabel;
             String newUserRoleLabel = newRoleLabel;
-            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH, SUPPORTED_ROLES)).thenReturn(
+            when(roleAssignmentService.getRoleAssignmentsWithLabels(
+                USER_DETAILS.getId(),
+                USER_AUTH,
+                SUPPORTED_ROLES
+            )).thenReturn(
                 buildRoleAssignmentsResponse(roleAssignmentResponses)
             );
 
             Element<Message> existingMessageToBeChanged = element(message.toBuilder()
-                                                           .senderName(String.format("%s, %s", USER_NAME, originalUserRoleLabel))
-                                                           .senderRoleType(originalSender)
-                                                           .recipientRoleType(currentSender)
-                                                           .sentTime(NOW)
-                                                           .isUrgent(YES)
-                                                           .build());
+                                                                      .senderName(String.format(
+                                                                          "%s, %s",
+                                                                          USER_NAME,
+                                                                          originalUserRoleLabel
+                                                                      ))
+                                                                      .senderRoleType(originalSender)
+                                                                      .recipientRoleType(currentSender)
+                                                                      .sentTime(NOW)
+                                                                      .isUrgent(YES)
+                                                                      .build());
 
             List<Element<Message>> messages = new ArrayList<>();
             messages.add(existingMessageToBeChanged);
@@ -709,22 +777,28 @@ class SendAndReplyMessageServiceTest {
 
             List<MessageReply> actualMessageHistory = unwrapElements(actualMessages.get(0).getHistory());
 
-            assertEquals(List.of(MessageReply.builder()
-                                     .messageContent("Existing message")
-                                     .isUrgent(YES)
-                                     .senderName(String.format("%s, %s", USER_NAME, originalUserRoleLabel))
-                                     .senderRoleType(originalSender)
-                                     .recipientRoleType(currentSender)
-                                     .subject("Subject")
-                                     .sentTime(updatedDateTime)
-                                     .build()), actualMessageHistory);
+            assertEquals(
+                List.of(MessageReply.builder()
+                            .messageContent("Existing message")
+                            .isUrgent(YES)
+                            .senderName(String.format("%s, %s", USER_NAME, originalUserRoleLabel))
+                            .senderRoleType(originalSender)
+                            .recipientRoleType(currentSender)
+                            .subject("Subject")
+                            .sentTime(updatedDateTime)
+                            .build()), actualMessageHistory
+            );
             assertEquals(expectedMessage, existingMessageToBeChanged.getValue());
         }
 
         @Test
         void shouldAddMessageReplyToExistingHistory_withTwoExistingReplies() {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
-            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH, SUPPORTED_ROLES)).thenReturn(
+            when(roleAssignmentService.getRoleAssignmentsWithLabels(
+                USER_DETAILS.getId(),
+                USER_AUTH,
+                SUPPORTED_ROLES
+            )).thenReturn(
                 buildRoleAssignmentsResponse(List.of(
                     RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
                     RoleAssignmentResponse.builder().roleName("hearing-centre-admin").roleLabel(
@@ -844,25 +918,27 @@ class SendAndReplyMessageServiceTest {
         void shouldCreateMessageSelectionList_withCorrectFormat() {
             DynamicList result = messageService.createMessageSelectionList(messages);
 
-            assertEquals(DynamicList.builder()
-                             .listItems(List.of(
-                                 DynamicListElement.builder()
-                                     .code(message1.getId().toString())
-                                     .label(
-                                         String.format(
-                                             "%s, 14 Nov 2024, 10:30:00 AM",
-                                             message1.getValue().getSubject()
-                                         ))
-                                     .build(),
-                                 DynamicListElement.builder()
-                                     .code(message2.getId().toString())
-                                     .label(String.format(
-                                         "%s, 14 Nov 2024, 12:45:00 PM",
-                                         message2.getValue().getSubject()
-                                     ))
-                                     .build()
-                             ))
-                             .build(), result);
+            assertEquals(
+                DynamicList.builder()
+                    .listItems(List.of(
+                        DynamicListElement.builder()
+                            .code(message1.getId().toString())
+                            .label(
+                                String.format(
+                                    "%s, 14 Nov 2024, 10:30:00 AM",
+                                    message1.getValue().getSubject()
+                                ))
+                            .build(),
+                        DynamicListElement.builder()
+                            .code(message2.getId().toString())
+                            .label(String.format(
+                                "%s, 14 Nov 2024, 12:45:00 PM",
+                                message2.getValue().getSubject()
+                            ))
+                            .build()
+                    ))
+                    .build(), result
+            );
         }
 
         @Test

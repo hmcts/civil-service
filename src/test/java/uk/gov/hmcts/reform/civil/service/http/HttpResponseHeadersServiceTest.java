@@ -13,7 +13,7 @@ import uk.gov.hmcts.reform.civil.model.taskmanagement.ClientContextWrapper;
 import uk.gov.hmcts.reform.civil.model.taskmanagement.Task;
 import uk.gov.hmcts.reform.civil.model.taskmanagement.UserTask;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.Base64;
 import java.util.HashMap;
 

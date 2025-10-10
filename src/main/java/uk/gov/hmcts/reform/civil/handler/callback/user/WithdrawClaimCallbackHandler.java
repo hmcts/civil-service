@@ -13,8 +13,8 @@ import uk.gov.hmcts.reform.civil.validation.groups.ClaimWithdrawalDateGroup;
 
 import java.util.List;
 import java.util.Map;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;

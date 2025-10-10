@@ -8,7 +8,7 @@ on:
 
 jobs:
   PublishToAzureArtifacts:
-    runs-on: ubuntu-latest 
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
@@ -20,7 +20,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: 17
+          java-version: 25
           cache: 'gradle'
 
       - name: Publish to Azure DevOps Artifacts
