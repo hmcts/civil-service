@@ -36,6 +36,11 @@ public class DateUtils {
         return dayOfMonth + " " + month + " " + date.getYear();
     }
 
+    public static String formatDateInWelsh(LocalDate date) {
+        String month = MonthNamesWelsh.getWelshNameByValue(date.getMonth().getValue());
+        return date.getDayOfMonth() + " " + month + " " + date.getYear();
+    }
+
     public static LocalDateTime convertFromUTC(LocalDateTime utcDate) {
         ZonedDateTime utcZonedDateTime = utcDate.atZone(ZoneId.of("UTC"));
         ZonedDateTime ukZonedDateTime = utcZonedDateTime.withZoneSameInstant(ZoneId.of("Europe/London"));
