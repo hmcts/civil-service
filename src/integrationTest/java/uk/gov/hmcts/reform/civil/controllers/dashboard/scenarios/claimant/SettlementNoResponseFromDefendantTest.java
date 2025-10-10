@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.claimant;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.testsupport.mockito.MockitoBean;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
@@ -30,7 +30,7 @@ public class SettlementNoResponseFromDefendantTest extends DashboardBaseIntegrat
 
     @Autowired
     private SettlementNoResponseFromDefendantEventHandler handler;
-    @MockBean
+    @MockitoBean
     private CoreCaseDataService coreCaseDataService;
 
     @Test

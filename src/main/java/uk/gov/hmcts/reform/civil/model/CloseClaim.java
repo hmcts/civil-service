@@ -5,7 +5,7 @@ import lombok.Data;
 import uk.gov.hmcts.reform.civil.validation.groups.ClaimWithdrawalDateGroup;
 
 import java.time.LocalDate;
-import javax.validation.constraints.PastOrPresent;
+import jakarta.validation.constraints.PastOrPresent;
 
 @Data
 @Builder

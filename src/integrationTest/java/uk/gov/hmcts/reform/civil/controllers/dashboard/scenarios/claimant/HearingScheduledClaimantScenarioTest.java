@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.claimant;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.testsupport.mockito.MockitoBean;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -40,10 +40,10 @@ public class HearingScheduledClaimantScenarioTest extends CaseProgressionDashboa
     @Autowired
     private HearingScheduledClaimantNotificationHandler handler;
 
-    @MockBean
+    @MockitoBean
     private HearingNoticeCamundaService hearingNoticeCamundaService;
 
-    @MockBean
+    @MockitoBean
     private HearingFeesService hearingFeesService;
 
     @Test

@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.civil.controllers.fees;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.testsupport.mockito.MockitoBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
@@ -35,10 +35,10 @@ class ServiceRequestUpdateCallbackControllerTest extends BaseIntegrationTest {
     private static final String ACCOUNT_NUMBER = "123445555";
     private static final String s2sToken = "s2s AuthToken";
 
-    @MockBean
+    @MockitoBean
     CoreCaseDataApi coreCaseDataApi;
 
-    @MockBean
+    @MockitoBean
     AuthTokenGenerator authTokenGenerator;
 
     @BeforeEach

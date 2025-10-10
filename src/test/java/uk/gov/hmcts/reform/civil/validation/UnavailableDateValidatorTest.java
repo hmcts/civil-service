@@ -17,7 +17,7 @@ import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
 
 import java.time.LocalDate;
 import java.util.List;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidatorContext;
 
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;

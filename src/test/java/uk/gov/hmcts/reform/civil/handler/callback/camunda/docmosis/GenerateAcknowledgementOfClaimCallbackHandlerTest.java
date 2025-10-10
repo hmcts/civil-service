@@ -7,7 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.testsupport.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -55,7 +55,7 @@ class GenerateAcknowledgementOfClaimCallbackHandlerTest extends BaseCallbackHand
             .build())
         .build();
 
-    @MockBean
+    @MockitoBean
     private AcknowledgementOfClaimGenerator acknowledgementOfClaimGenerator;
 
     @Autowired
@@ -67,7 +67,7 @@ class GenerateAcknowledgementOfClaimCallbackHandlerTest extends BaseCallbackHand
     @Autowired
     private AssignCategoryId assignCategoryId;
 
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
 
     @BeforeEach
