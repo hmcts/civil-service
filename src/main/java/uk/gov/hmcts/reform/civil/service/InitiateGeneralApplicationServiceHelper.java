@@ -80,24 +80,32 @@ public class InitiateGeneralApplicationServiceHelper {
         * */
         List<CaseAssignmentUserRole> caseAssignments = userRoles.getCaseAssignmentUserRoles();
 
-        String gaApplicantRoleOnMainCase = Optional.ofNullable(caseAssignments)
+        List<CaseAssignmentUserRole> applicantSolicitorList = Optional.ofNullable(caseAssignments)
             .orElse(Collections.emptyList())
             .stream()
-            .filter(caseAssigned -> Objects.equals(caseAssigned.getUserId(),
-                                                   userDetails != null ? userDetails.getId() : null))
+            .filter(caseAssigned -> Objects.equals(
+                caseAssigned.getUserId(),
+                userDetails != null ? userDetails.getId() : null
+            ))
+            .toList();
+
+        List<String> gaApplicantRolesOnMainCase = applicantSolicitorList.stream()
             .map(CaseAssignmentUserRole::getCaseRole)
-            .findFirst()
-            .orElse(null);
+            .toList();
 
         List<CaseAssignmentUserRole> respondentSolicitors = Optional.ofNullable(caseAssignments)
             .orElse(Collections.emptyList())
             .stream()
-            .filter(caseAssigned -> !Objects.equals(caseAssigned.getUserId(),
-                                                    userDetails != null ? userDetails.getId() : null))
-            .filter(caseAssigned -> !StringUtils.equalsAnyIgnoreCase(
-                gaApplicantRoleOnMainCase,
-                caseAssigned.getCaseRole()
+            .filter(caseAssignedRoleEntry -> !Objects.equals(
+                caseAssignedRoleEntry.getUserId(),
+                userDetails != null ? userDetails.getId() : null
             ))
+            .filter(caseAssignedRoleEntry ->
+                        gaApplicantRolesOnMainCase.stream()
+                            .noneMatch(applicantRole ->
+                                           StringUtils.equalsIgnoreCase(applicantRole, caseAssignedRoleEntry.getCaseRole())
+                            )
+            )
             .toList();
 
         /*
@@ -112,17 +120,15 @@ public class InitiateGeneralApplicationServiceHelper {
             .forename(userDetails.getForename())
             .surname(userDetails.getSurname());
 
-        List<CaseAssignmentUserRole> applicantSolicitor = userRoles.getCaseAssignmentUserRoles()
-            .stream().filter(user -> !respondentSolicitors.contains(user)).toList();
-        boolean sameDefSol1v2 = applicantSolicitor.size() == 2
-                && applicantSolicitor.get(0).getUserId()
-                .equals(applicantSolicitor.get(1).getUserId());
+        boolean sameDefSol1v2 = applicantSolicitorList.size() == 2
+                && applicantSolicitorList.get(0).getUserId()
+                .equals(applicantSolicitorList.get(1).getUserId());
 
         GeneralApplication.GeneralApplicationBuilder applicationBuilder = generalApplication.toBuilder();
         //only assign value if lip is applicant
         Boolean isGaAppSameAsParentCaseClLip = null;
-        if (!CollectionUtils.isEmpty(applicantSolicitor) && (applicantSolicitor.size() == 1 || sameDefSol1v2)) {
-            isGaAppSameAsParentCaseClLip = setSingleGaApplicant(applicantSolicitor, applicationBuilder,
+        if (!CollectionUtils.isEmpty(applicantSolicitorList) && (applicantSolicitorList.size() == 1 || sameDefSol1v2)) {
+            isGaAppSameAsParentCaseClLip = setSingleGaApplicant(applicantSolicitorList, applicationBuilder,
                     applicantBuilder,  applicant1OrgCaseRole, respondent1OrgCaseRole, caseData);
         }
         applicationBuilder
