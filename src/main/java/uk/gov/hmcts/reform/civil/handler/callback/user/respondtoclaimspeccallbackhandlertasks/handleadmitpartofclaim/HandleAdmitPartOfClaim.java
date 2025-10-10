@@ -42,10 +42,6 @@ public class HandleAdmitPartOfClaim implements CaseTask {
 
         List<String> errors = validatePaymentDate(caseData);
 
-        if (featureToggleService.isLrAdmissionBulkEnabled()) {
-            validateAdmittedClaimOwingAmount(errors, caseData);
-        }
-
         if (!errors.isEmpty()) {
             return buildErrorResponse(errors);
         }

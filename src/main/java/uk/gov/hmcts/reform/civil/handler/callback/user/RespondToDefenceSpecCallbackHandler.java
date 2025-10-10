@@ -319,11 +319,10 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         if (caseData.getCcjPaymentDetails() != null
             && YES.equals(caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeOption())) {
             return AboutToStartOrSubmitCallbackResponse.builder()
-                .errors(List.of(PARTIAL_PAYMENT_OFFLINE))
-                .build();
-        } else if (featureToggleService.isLrAdmissionBulkEnabled()
-                   && caseData.getFixedCosts() != null
-                   && NO.equals(caseData.getFixedCosts().getClaimFixedCosts())) {
+                    .errors(List.of(PARTIAL_PAYMENT_OFFLINE))
+                    .build();
+        } else if (caseData.getFixedCosts() != null
+                && NO.equals(caseData.getFixedCosts().getClaimFixedCosts())) {
             updatedCaseData.ccjPaymentDetails(judgementService.buildJudgmentAmountSummaryDetails(caseData));
         }
 

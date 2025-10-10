@@ -24,7 +24,6 @@ import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
-import java.math.BigDecimal;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
@@ -108,16 +107,6 @@ public class PopulateRespondent1Copy implements CaseTask {
         } else {
             log.debug("CaseId {}: CARM is not enabled for the case", caseData.getCcdCaseReference());
             updatedCaseData.showCarmFields(NO);
-        }
-
-        if (toggleService.isLrAdmissionBulkEnabled()) {
-            log.debug("CaseId {}: LR Admission Bulk is enabled", caseData.getCcdCaseReference());
-            updatedCaseData.totalClaimAmountPlusInterest(caseData.getClaimAmountInPounds().setScale(2));
-            updatedCaseData.totalClaimAmountPlusInterestString(caseData.getClaimAmountInPounds().setScale(2).toString());
-            BigDecimal interest = interestCalculator.calculateInterest(caseData).setScale(2);
-            BigDecimal totalAmountWithInterest = caseData.getTotalClaimAmount().add(interest).setScale(2);
-            updatedCaseData.totalClaimAmountPlusInterestAdmitPart(totalAmountWithInterest);
-            updatedCaseData.totalClaimAmountPlusInterestAdmitPartString(totalAmountWithInterest.toString());
         }
 
         log.info("CaseId {}: CARM fields update complete", caseData.getCcdCaseReference());
