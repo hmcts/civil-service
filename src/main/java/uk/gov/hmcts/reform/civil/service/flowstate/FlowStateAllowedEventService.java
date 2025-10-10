@@ -1561,6 +1561,7 @@ public class FlowStateAllowedEventService {
             List.of(
                 DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
                 REQUEST_JUDGEMENT_ADMISSION_SPEC,
+                INITIATE_GENERAL_APPLICATION,
                 NOC_REQUEST,
                 APPLY_NOC_DECISION,
                 CHANGE_LANGUAGE_PREFERENCE
@@ -1571,6 +1572,7 @@ public class FlowStateAllowedEventService {
             List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
                     NOC_REQUEST,
                     APPLY_NOC_DECISION,
+                    INITIATE_GENERAL_APPLICATION,
                     CHANGE_LANGUAGE_PREFERENCE)
         ),
         entry(
@@ -1578,6 +1580,7 @@ public class FlowStateAllowedEventService {
             List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
                     NOC_REQUEST,
                     APPLY_NOC_DECISION,
+                    INITIATE_GENERAL_APPLICATION,
                     CHANGE_LANGUAGE_PREFERENCE)
         ),
         entry(
@@ -1624,6 +1627,7 @@ public class FlowStateAllowedEventService {
             List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
                     NOC_REQUEST,
                     APPLY_NOC_DECISION,
+                    INITIATE_GENERAL_APPLICATION,
                     CHANGE_LANGUAGE_PREFERENCE)
         ),
         entry(
@@ -1631,6 +1635,7 @@ public class FlowStateAllowedEventService {
             List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
                     NOC_REQUEST,
                     APPLY_NOC_DECISION,
+                    INITIATE_GENERAL_APPLICATION,
                     CHANGE_LANGUAGE_PREFERENCE)
         ),
         entry(
@@ -2236,6 +2241,7 @@ public class FlowStateAllowedEventService {
                 LIP_CLAIM_SETTLED,
                 NOC_REQUEST,
                 APPLY_NOC_DECISION,
+                INITIATE_GENERAL_APPLICATION,
                 CHANGE_LANGUAGE_PREFERENCE
             )
         ),
