@@ -13,12 +13,14 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.caseprogression.BundleFileNameList;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.TypeOfDocDocumentaryEvidenceOfTrial;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.DocumentWithRegex;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
 import uk.gov.hmcts.reform.civil.model.bundle.BundleCreateRequest;
+import uk.gov.hmcts.reform.civil.model.bundle.BundlingRequestDocument;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
@@ -208,6 +210,162 @@ class BundleRequestMapperTest {
         assertEquals("testFileName 12/12/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getDefendant2CostsBudgets().get(0).getValue().getDocumentFileName());
 
+    }
+
+    @Test
+    void shouldIncludeSingleCopyOfPleadingsWhenDuplicatedAcrossCaseDataLists() {
+        // Given
+        given(featureToggleService.isCaseProgressionEnabled()).willReturn(false);
+        given(featureToggleService.isAmendBundleEnabled()).willReturn(false);
+
+        CaseDocument defendantDefence = CaseDocument.builder()
+            .documentType(DocumentType.DEFENDANT_DEFENCE)
+            .createdBy("Defendant")
+            .documentLink(Document.builder()
+                              .documentUrl(TEST_URL + "/defence")
+                              .documentFileName("defence.pdf")
+                              .build())
+            .createdDatetime(LocalDateTime.of(2023, 1, 15, 10, 0))
+            .build();
+        CaseDocument claimantReply = CaseDocument.builder()
+            .documentType(DocumentType.CLAIMANT_DEFENCE)
+            .createdBy("Claimant")
+            .documentLink(Document.builder()
+                              .documentUrl(TEST_URL + "/reply")
+                              .documentFileName("reply.pdf")
+                              .build())
+            .createdDatetime(LocalDateTime.of(2023, 1, 16, 11, 30))
+            .build();
+
+        Element<CaseDocument> defendantElement = ElementUtils.element(defendantDefence);
+        Element<CaseDocument> claimantElement = ElementUtils.element(claimantReply);
+
+        List<Element<CaseDocument>> systemDocs = new ArrayList<>();
+        systemDocs.add(defendantElement);
+        systemDocs.add(claimantElement);
+
+        CaseData caseData = CaseData.builder()
+            .ccdCaseReference(123L)
+            .applicant1(Party.builder().partyName("Applicant").individualLastName("Applicant")
+                          .type(Party.Type.INDIVIDUAL).build())
+            .respondent1(Party.builder().partyName("Respondent").individualLastName("Respondent")
+                           .type(Party.Type.INDIVIDUAL).build())
+            .hearingDate(LocalDate.now())
+            .systemGeneratedCaseDocuments(systemDocs)
+            .defendantResponseDocuments(new ArrayList<>(List.of(defendantElement)))
+            .claimantResponseDocuments(new ArrayList<>(List.of(claimantElement)))
+            .build();
+
+        // When
+        BundleCreateRequest bundleCreateRequest = bundleRequestMapper.mapCaseDataToBundleCreateRequest(caseData,
+            "sample.yaml", "test", "test");
+
+        List<Element<BundlingRequestDocument>> statementsOfCase =
+            bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments();
+
+        long defenceDocs = statementsOfCase.stream()
+            .map(Element::getValue)
+            .filter(doc -> BundleFileNameList.DEFENCE.getDisplayName().equals(doc.getDocumentType()))
+            .count();
+        long claimantReplyDocs = statementsOfCase.stream()
+            .map(Element::getValue)
+            .filter(doc -> BundleFileNameList.CL_REPLY.getDisplayName().equals(doc.getDocumentType()))
+            .count();
+
+        // Then
+        assertEquals(1, defenceDocs);
+        assertEquals(1, claimantReplyDocs);
+    }
+
+    @Test
+    void shouldIncludeDefenceWhenOnlyPresentInResponseDocumentList() {
+        // Given
+        given(featureToggleService.isCaseProgressionEnabled()).willReturn(false);
+        given(featureToggleService.isAmendBundleEnabled()).willReturn(false);
+
+        CaseDocument defendantDefence = CaseDocument.builder()
+            .documentType(DocumentType.DEFENDANT_DEFENCE)
+            .createdBy("Defendant")
+            .documentLink(Document.builder()
+                              .documentUrl(TEST_URL + "/response-only")
+                              .documentFileName("defence-response.pdf")
+                              .build())
+            .createdDatetime(LocalDateTime.of(2023, 3, 20, 9, 0))
+            .build();
+
+        Element<CaseDocument> defenceElement = ElementUtils.element(defendantDefence);
+
+        CaseData caseData = CaseData.builder()
+            .ccdCaseReference(456L)
+            .applicant1(Party.builder().partyName("Applicant").individualLastName("Applicant")
+                          .type(Party.Type.INDIVIDUAL).build())
+            .respondent1(Party.builder().partyName("Respondent").individualLastName("Respondent")
+                           .type(Party.Type.INDIVIDUAL).build())
+            .hearingDate(LocalDate.now())
+            .systemGeneratedCaseDocuments(new ArrayList<>())
+            .defendantResponseDocuments(new ArrayList<>(List.of(defenceElement)))
+            .build();
+
+        // When
+        BundleCreateRequest bundleCreateRequest = bundleRequestMapper.mapCaseDataToBundleCreateRequest(caseData,
+            "sample.yaml", "test", "test");
+
+        List<Element<BundlingRequestDocument>> statementsOfCase =
+            bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments();
+
+        long defenceCount = statementsOfCase.stream()
+            .map(Element::getValue)
+            .filter(doc -> BundleFileNameList.DEFENCE.getDisplayName().equals(doc.getDocumentType()))
+            .count();
+
+        // Then
+        assertEquals(1, defenceCount);
+    }
+
+    @Test
+    void shouldIncludeClaimantReplyWhenOnlyPresentInClaimantResponseDocumentList() {
+        // Given
+        given(featureToggleService.isCaseProgressionEnabled()).willReturn(false);
+        given(featureToggleService.isAmendBundleEnabled()).willReturn(false);
+
+        CaseDocument claimantReply = CaseDocument.builder()
+            .documentType(DocumentType.CLAIMANT_DEFENCE)
+            .createdBy("Claimant")
+            .documentLink(Document.builder()
+                              .documentUrl(TEST_URL + "/reply-only")
+                              .documentFileName("reply-only.pdf")
+                              .build())
+            .createdDatetime(LocalDateTime.of(2023, 4, 5, 14, 45))
+            .build();
+
+        Element<CaseDocument> replyElement = ElementUtils.element(claimantReply);
+
+        CaseData caseData = CaseData.builder()
+            .ccdCaseReference(789L)
+            .applicant1(Party.builder().partyName("Applicant").individualLastName("Applicant")
+                          .type(Party.Type.INDIVIDUAL).build())
+            .respondent1(Party.builder().partyName("Respondent").individualLastName("Respondent")
+                           .type(Party.Type.INDIVIDUAL).build())
+            .hearingDate(LocalDate.now())
+            .systemGeneratedCaseDocuments(new ArrayList<>())
+            .defendantResponseDocuments(new ArrayList<>())
+            .claimantResponseDocuments(new ArrayList<>(List.of(replyElement)))
+            .build();
+
+        // When
+        BundleCreateRequest bundleCreateRequest = bundleRequestMapper.mapCaseDataToBundleCreateRequest(caseData,
+            "sample.yaml", "test", "test");
+
+        List<Element<BundlingRequestDocument>> statementsOfCase =
+            bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments();
+
+        long claimantReplyDocs = statementsOfCase.stream()
+            .map(Element::getValue)
+            .filter(doc -> BundleFileNameList.CL_REPLY.getDisplayName().equals(doc.getDocumentType()))
+            .count();
+
+        // Then
+        assertEquals(1, claimantReplyDocs);
     }
 
     @ParameterizedTest
@@ -452,8 +610,6 @@ class BundleRequestMapperTest {
             .documentCaseSummaryRes(setupOtherEvidenceDocs(null))
             .documentCaseSummaryRes2(setupOtherEvidenceDocs(null))
             .documentForDisclosure(setupOtherEvidenceDocs(null))
-            .defendantResponseDocuments(getDefendantResponseDocs())
-            .claimantResponseDocuments(getClaimantResponseDocs())
             .dismissalOrderDocStaff(getOrderDoc(DocumentType.DISMISSAL_ORDER))
             .generalOrderDocStaff(getOrderDoc(DocumentType.GENERAL_ORDER))
             .documentCosts(setupOtherEvidenceDocs(null))
@@ -521,8 +677,6 @@ class BundleRequestMapperTest {
             .documentCaseSummaryRes(setupOtherEvidenceDocs(null))
             .documentCaseSummaryRes2(setupOtherEvidenceDocs(null))
             .documentForDisclosure(setupOtherEvidenceDocs(null))
-            .defendantResponseDocuments(getDefendantResponseDocs())
-            .claimantResponseDocuments(getClaimantResponseDocs())
             .dismissalOrderDocStaff(getOrderDoc(DocumentType.DISMISSAL_ORDER))
             .generalOrderDocStaff(getOrderDoc(DocumentType.GENERAL_ORDER))
             .documentCosts(setupOtherEvidenceDocs(null))
@@ -607,32 +761,6 @@ class BundleRequestMapperTest {
                                                         .expertOptionName("Other expert").build()));
 
         return  expertEvidenceDocs;
-    }
-
-    private List<Element<CaseDocument>> getClaimantResponseDocs() {
-        List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
-        CaseDocument caseDocumentDC =
-            CaseDocument.builder()
-                .documentType(DocumentType.CLAIMANT_DEFENCE)
-                .createdBy("Claimant")
-                .documentLink(Document.builder().documentUrl(TEST_URL).documentFileName(TEST_FILE_NAME).categoryID("").build())
-                .createdDatetime(LocalDateTime.of(2023, 2, 10, 2,
-                                                  2, 2)).build();
-        systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDC));
-        return systemGeneratedCaseDocuments;
-    }
-
-    private List<Element<CaseDocument>> getDefendantResponseDocs() {
-        List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
-        CaseDocument caseDocumentDC =
-            CaseDocument.builder()
-                .documentType(DocumentType.DEFENDANT_DEFENCE)
-                .createdBy("Defendant")
-                .documentLink(Document.builder().documentUrl(TEST_URL).documentFileName(TEST_FILE_NAME).categoryID("").build())
-                .createdDatetime(LocalDateTime.of(2023, 2, 10, 2,
-                                                  2, 2)).build();
-        systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDC));
-        return systemGeneratedCaseDocuments;
     }
 
     private List<Element<CaseDocument>> getOrderDoc(DocumentType docType) {
@@ -901,6 +1029,22 @@ class BundleRequestMapperTest {
                 .createdDatetime(LocalDateTime.of(2023, 2, 10, 2,
                                                   2, 2)).build();
         systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDJ));
+        CaseDocument caseDocumentCd =
+            CaseDocument.builder()
+                .documentType(DocumentType.CLAIMANT_DEFENCE)
+                .createdBy("Claimant")
+                .documentLink(Document.builder().documentUrl(TEST_URL).documentFileName(TEST_FILE_NAME).categoryID("").build())
+                .createdDatetime(LocalDateTime.of(2023, 2, 10, 2,
+                                                  2, 2)).build();
+        systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentCd));
+        CaseDocument caseDocumentDd =
+            CaseDocument.builder()
+                .documentType(DocumentType.DEFENDANT_DEFENCE)
+                .createdBy("Defendant")
+                .documentLink(Document.builder().documentUrl(TEST_URL).documentFileName(TEST_FILE_NAME).categoryID("").build())
+                .createdDatetime(LocalDateTime.of(2023, 2, 10, 2,
+                                                  2, 2)).build();
+        systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDd));
         return systemGeneratedCaseDocuments;
     }
 
