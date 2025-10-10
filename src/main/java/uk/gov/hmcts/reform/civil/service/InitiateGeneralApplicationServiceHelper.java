@@ -75,25 +75,6 @@ public class InitiateGeneralApplicationServiceHelper {
         CaseAssignmentUserRolesResource userRoles = getUserRoles(parentCaseId);
 
         /*
-        * Filter the case users to collect solicitors whose ID doesn't match with GA Applicant Solicitor's ID
-        * There can be multiple applicant solicitors
-        * */
-        List<CaseAssignmentUserRole> caseAssignments = userRoles.getCaseAssignmentUserRoles();
-
-        List<CaseAssignmentUserRole> applicantSolicitorList = Optional.ofNullable(caseAssignments)
-            .orElse(Collections.emptyList())
-            .stream()
-            .filter(caseAssigned -> Objects.equals(
-                caseAssigned.getUserId(),
-                userDetails != null ? userDetails.getId() : null
-            ))
-            .toList();
-
-        List<String> gaApplicantRolesOnMainCase = applicantSolicitorList.stream()
-            .map(CaseAssignmentUserRole::getCaseRole)
-            .toList();
-
-        /*
          * Set GA applicant solicitor details
          * */
         GASolicitorDetailsGAspec.GASolicitorDetailsGAspecBuilder applicantBuilder = GASolicitorDetailsGAspec
@@ -104,6 +85,21 @@ public class InitiateGeneralApplicationServiceHelper {
             .email(userDetails.getEmail())
             .forename(userDetails.getForename())
             .surname(userDetails.getSurname());
+
+        /*
+         * Filter the case users to collect solicitors whose ID doesn't match with GA Applicant Solicitor's ID
+         * There can be multiple applicant solicitors
+         * */
+        List<CaseAssignmentUserRole> caseAssignments = userRoles.getCaseAssignmentUserRoles();
+
+        List<CaseAssignmentUserRole> applicantSolicitorList = Optional.ofNullable(caseAssignments)
+            .orElse(Collections.emptyList())
+            .stream()
+            .filter(caseAssigned -> Objects.equals(
+                caseAssigned.getUserId(),
+                userDetails != null ? userDetails.getId() : null
+            ))
+            .toList();
 
         boolean sameDefSol1v2 = applicantSolicitorList.size() == 2
                 && applicantSolicitorList.get(0).getUserId()
@@ -118,6 +114,10 @@ public class InitiateGeneralApplicationServiceHelper {
         }
         applicationBuilder
             .generalAppApplnSolicitor(applicantBuilder.build());
+
+        List<String> gaApplicantRolesOnMainCase = applicantSolicitorList.stream()
+            .map(CaseAssignmentUserRole::getCaseRole)
+            .toList();
 
         List<CaseAssignmentUserRole> respondentSolicitors = Optional.ofNullable(caseAssignments)
             .orElse(Collections.emptyList())
