@@ -93,21 +93,6 @@ public class InitiateGeneralApplicationServiceHelper {
             .map(CaseAssignmentUserRole::getCaseRole)
             .toList();
 
-        List<CaseAssignmentUserRole> respondentSolicitors = Optional.ofNullable(caseAssignments)
-            .orElse(Collections.emptyList())
-            .stream()
-            .filter(caseAssignedRoleEntry -> !Objects.equals(
-                caseAssignedRoleEntry.getUserId(),
-                userDetails != null ? userDetails.getId() : null
-            ))
-            .filter(caseAssignedRoleEntry ->
-                        gaApplicantRolesOnMainCase.stream()
-                            .noneMatch(applicantRole ->
-                                           StringUtils.equalsIgnoreCase(applicantRole, caseAssignedRoleEntry.getCaseRole())
-                            )
-            )
-            .toList();
-
         /*
          * Set GA applicant solicitor details
          * */
@@ -133,6 +118,22 @@ public class InitiateGeneralApplicationServiceHelper {
         }
         applicationBuilder
             .generalAppApplnSolicitor(applicantBuilder.build());
+
+        List<CaseAssignmentUserRole> respondentSolicitors = Optional.ofNullable(caseAssignments)
+            .orElse(Collections.emptyList())
+            .stream()
+            .filter(caseAssignedRoleEntry -> !Objects.equals(
+                caseAssignedRoleEntry.getUserId(),
+                userDetails.getId()
+            ))
+            .filter(caseAssignedRoleEntry ->
+                        gaApplicantRolesOnMainCase.stream()
+                            .noneMatch(applicantRole ->
+                                           StringUtils.equalsIgnoreCase(applicantRole, caseAssignedRoleEntry.getCaseRole())
+                            )
+            )
+            .toList();
+
         GAParties applicantPartyData;
         /*
          * Set GA respondent solicitors' details
