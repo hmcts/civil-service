@@ -7,20 +7,25 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class OrganisationPolicy {
 
     @JsonProperty("Organisation")
-    private OrganisationId organisation;
+    private Organisation organisation;
 
     @JsonProperty("OrgPolicyReference")
     private String orgPolicyReference;
 
     @JsonProperty("OrgPolicyCaseAssignedRole")
     private String orgPolicyCaseAssignedRole;
+
+    @JsonProperty("PreviousOrganisations")
+    private List<PreviousOrganisationCollectionItem> previousOrganisations;
 
 }

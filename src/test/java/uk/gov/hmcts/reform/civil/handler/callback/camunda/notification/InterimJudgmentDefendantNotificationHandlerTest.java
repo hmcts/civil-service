@@ -10,7 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
-import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
@@ -144,7 +144,7 @@ public class InterimJudgmentDefendantNotificationHandlerTest extends BaseCallbac
                                  .build())
                 .respondent1OrganisationPolicy(OrganisationPolicy.builder()
                                                    .orgPolicyCaseAssignedRole("[RESPSOLICITORONE]")
-                                                   .organisation(uk.gov.hmcts.reform.ccd.model
+                                                   .organisation(uk.gov.hmcts.reform.civil.model
                                                                      .Organisation.builder().build()).build())
                 .legacyCaseReference("12DC910")
                 .respondent2OrganisationPolicy(null).build().toBuilder()

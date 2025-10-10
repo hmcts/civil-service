@@ -5,7 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
@@ -54,7 +54,7 @@ class JudgmentVariedDeterminationOfMeansRespSolTwoEmailDTOGeneratorTest {
                 .ccdCaseReference(CLAIM_REF)
                 .respondent2Represented(YesOrNo.YES)
                 .respondent2OrganisationPolicy(OrganisationPolicy.builder()
-                        .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                        .organisation(uk.gov.hmcts.reform.civil.model.Organisation.builder()
                                 .organisationID("F1")
                                 .build())
                         .build())

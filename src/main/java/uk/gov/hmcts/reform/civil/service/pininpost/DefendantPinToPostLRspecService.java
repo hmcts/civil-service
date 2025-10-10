@@ -16,7 +16,7 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.claimstore.ClaimStoreService;
 import uk.gov.hmcts.reform.civil.service.pininpost.exception.PinNotMatchException;
 import uk.gov.hmcts.reform.civil.utils.AccessCodeGenerator;
-import uk.gov.hmcts.reform.cmc.model.DefendantLinkStatus;
+import uk.gov.hmcts.reform.hmc.model.DefendantLinkStatus;
 
 import java.time.LocalDate;
 import java.util.HashMap;

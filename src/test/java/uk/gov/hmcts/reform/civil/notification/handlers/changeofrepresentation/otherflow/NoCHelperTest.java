@@ -6,7 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -68,7 +68,7 @@ class NoCHelperTest {
                             .individualLastName("A")
                             .partyName("Applicant A").build())
             .applicant1OrganisationPolicy(OrganisationPolicy.builder()
-                                              .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder().organisationID("QWERTY A").build())
+                                              .organisation(uk.gov.hmcts.reform.civil.model.Organisation.builder().organisationID("QWERTY A").build())
                                               .build())
             .respondent1(Party.builder()
                              .type(Party.Type.INDIVIDUAL)
