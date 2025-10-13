@@ -11,7 +11,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.dashboard.data.Notification;
 import uk.gov.hmcts.reform.dashboard.entities.DashboardNotificationsEntity;
 import uk.gov.hmcts.reform.dashboard.entities.NotificationActionEntity;
-import uk.gov.hmcts.reform.dashboard.entities.NotificationTemplateEntity;
 import uk.gov.hmcts.reform.dashboard.repositories.DashboardNotificationsRepository;
 import uk.gov.hmcts.reform.dashboard.repositories.NotificationActionRepository;
 import uk.gov.hmcts.reform.idam.client.IdamApi;
@@ -135,6 +134,14 @@ public class DashboardNotificationServiceTest {
             dashboardNotificationService.deleteByReferenceAndCitizenRole(reference, defendant);
             Mockito.verify(dashboardNotificationsRepository).deleteByReferenceAndCitizenRole(reference, defendant);
         }
+
+        @Test
+        void deleteNotificationsByNameAndReference() {
+            String templateName = "template.name";
+            String reference = "reference";
+            dashboardNotificationService.deleteByNameAndReference(templateName, reference);
+            Mockito.verify(dashboardNotificationsRepository).deleteByNameAndReference(templateName, reference);
+        }
     }
 
     @Test
@@ -144,14 +151,13 @@ public class DashboardNotificationServiceTest {
         DashboardNotificationsEntity notification2 = createDashboardNotificationsEntity();
         when(
             dashboardNotificationsRepository
-                .findByReferenceAndCitizenRoleAndDashboardNotificationsTemplatesId(
+                .findByReferenceAndCitizenRoleAndName(
                     any(), any(), any())).thenReturn(List.of(notification1, notification2));
-        NotificationTemplateEntity template = NotificationTemplateEntity.builder()
-            .id(1L)
-            .build();
         DashboardNotificationsEntity notification = DashboardNotificationsEntity.builder()
             .id(UUID.randomUUID())
-            .dashboardNotificationsTemplates(template)
+            .name("template.name")
+            .reference("reference")
+            .citizenRole("CLAIMANT")
             .build();
         dashboardNotificationService.saveOrUpdate(notification);
         verify(notificationActionRepository, times(2)).deleteByDashboardNotificationAndActionPerformed(any(DashboardNotificationsEntity.class), any());

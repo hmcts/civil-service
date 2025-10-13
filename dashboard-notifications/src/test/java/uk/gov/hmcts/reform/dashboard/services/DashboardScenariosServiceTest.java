@@ -8,13 +8,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.entities.DashboardNotificationsEntity;
-import uk.gov.hmcts.reform.dashboard.entities.NotificationTemplateEntity;
 import uk.gov.hmcts.reform.dashboard.entities.ScenarioEntity;
 import uk.gov.hmcts.reform.dashboard.entities.TaskItemTemplateEntity;
 import uk.gov.hmcts.reform.dashboard.entities.TaskListEntity;
-import uk.gov.hmcts.reform.dashboard.repositories.NotificationTemplateRepository;
 import uk.gov.hmcts.reform.dashboard.repositories.ScenarioRepository;
 import uk.gov.hmcts.reform.dashboard.repositories.TaskItemTemplateRepository;
+import uk.gov.hmcts.reform.dashboard.templates.NotificationTemplateCatalog;
+import uk.gov.hmcts.reform.dashboard.templates.NotificationTemplateDefinition;
 
 import java.util.HashMap;
 import java.util.List;
@@ -35,7 +35,7 @@ class DashboardScenariosServiceTest {
     @Mock
     private ScenarioRepository scenarioRepository;
     @Mock
-    private NotificationTemplateRepository notificationTemplateRepository;
+    private NotificationTemplateCatalog notificationTemplateCatalog;
     @Mock
     private DashboardNotificationService dashboardNotificationService;
     @Mock
@@ -47,7 +47,7 @@ class DashboardScenariosServiceTest {
     void setup() {
         dashboardScenariosService = new DashboardScenariosService(
             scenarioRepository,
-            notificationTemplateRepository,
+            notificationTemplateCatalog,
             dashboardNotificationService,
             taskListService,
             taskItemTemplateRepository
@@ -65,8 +65,8 @@ class DashboardScenariosServiceTest {
                                         .notificationsToDelete(new String[]{NOTIFICATION_DRAFT_CLAIM_START})
                                         .build()));
 
-        when(notificationTemplateRepository.findByName(NOTIFICATION_ISSUE_CLAIM_START))
-            .thenReturn(Optional.of(NotificationTemplateEntity.builder()
+        when(notificationTemplateCatalog.findByName(NOTIFICATION_ISSUE_CLAIM_START))
+            .thenReturn(Optional.of(NotificationTemplateDefinition.builder()
                                         .name(NOTIFICATION_ISSUE_CLAIM_START)
                                         .role("claimant")
                                         .titleEn("The ${animal} jumped over the ${target}.")
@@ -74,18 +74,16 @@ class DashboardScenariosServiceTest {
                                         .titleCy("The ${animal} jumped over the ${target}.")
                                         .descriptionCy("The ${animal} jumped over the ${target}.")
                                         .deadlineParam("deadlineParam")
-                                        .id(2L)
                                         .build()));
 
-        when(notificationTemplateRepository.findByName(NOTIFICATION_DRAFT_CLAIM_START))
-            .thenReturn(Optional.of(NotificationTemplateEntity.builder()
+        when(notificationTemplateCatalog.findByName(NOTIFICATION_DRAFT_CLAIM_START))
+            .thenReturn(Optional.of(NotificationTemplateDefinition.builder()
                                         .name(NOTIFICATION_DRAFT_CLAIM_START)
                                         .role("claimant")
                                         .titleEn("The ${animal} jumped over the ${target}.")
                                         .descriptionEn("The ${animal} jumped over the ${target}.")
                                         .titleCy("The ${animal} jumped over the ${target}.")
                                         .descriptionCy("The ${animal} jumped over the ${target}.")
-                                        .id(1L)
                                         .build()));
 
         when(taskItemTemplateRepository.findByScenarioName(SCENARIO_ISSUE_CLAIM_START))
@@ -130,9 +128,9 @@ class DashboardScenariosServiceTest {
         );
 
         verify(scenarioRepository).findByName(SCENARIO_ISSUE_CLAIM_START);
-        verify(notificationTemplateRepository).findByName(NOTIFICATION_ISSUE_CLAIM_START);
+        verify(notificationTemplateCatalog).findByName(NOTIFICATION_ISSUE_CLAIM_START);
         verify(taskItemTemplateRepository).findByScenarioName(SCENARIO_ISSUE_CLAIM_START);
-        verify(notificationTemplateRepository).findByName(NOTIFICATION_DRAFT_CLAIM_START);
+        verify(notificationTemplateCatalog).findByName(NOTIFICATION_DRAFT_CLAIM_START);
         verify(dashboardNotificationService).saveOrUpdate(any(DashboardNotificationsEntity.class));
         verify(taskListService).saveOrUpdate(any(TaskListEntity.class));
         verify(dashboardNotificationService).deleteByNameAndReferenceAndCitizenRole(
@@ -165,9 +163,9 @@ class DashboardScenariosServiceTest {
         );
 
         verify(scenarioRepository).findByName(SCENARIO_ISSUE_CLAIM_START);
-        verify(notificationTemplateRepository).findByName(NOTIFICATION_ISSUE_CLAIM_START);
+        verify(notificationTemplateCatalog).findByName(NOTIFICATION_ISSUE_CLAIM_START);
         verify(taskItemTemplateRepository).findByScenarioName(SCENARIO_ISSUE_CLAIM_START);
-        verify(notificationTemplateRepository).findByName(NOTIFICATION_DRAFT_CLAIM_START);
+        verify(notificationTemplateCatalog).findByName(NOTIFICATION_DRAFT_CLAIM_START);
         verify(dashboardNotificationService).saveOrUpdate(any(DashboardNotificationsEntity.class));
         verify(taskListService).saveOrUpdate(any(TaskListEntity.class));
         verify(dashboardNotificationService).deleteByNameAndReferenceAndCitizenRole(
