@@ -447,7 +447,9 @@ dependencies {
   testImplementation group: 'org.springframework.statemachine', name: 'spring-statemachine-test', version: versions.springStatemachine
   testImplementation 'com.github.hmcts:fortify-client:1.4.9:all'
   //pact contract testing
-  contractTestImplementation 'au.com.dius.pact.consumer:junit5:4.6.5'
+  contractTestImplementation 'au.com.dius.pact.consumer:junit5:4.6.17'
+  contractTestImplementation 'au.com.dius.pact.provider:junit5:4.6.17'
+  contractTestImplementation 'au.com.dius.pact.provider:junit5spring:4.6.17'
   contractTestImplementation group: 'org.hamcrest', name: 'java-hamcrest', version: '2.0.0.0'
   contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.11.4')
   contractTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.11.4')
@@ -616,4 +618,3 @@ publishing {
     }
   }
 }
-
