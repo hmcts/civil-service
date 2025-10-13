@@ -170,7 +170,7 @@ class ClaimSettledDashboardNotificationHandlerTest  extends BaseCallbackHandlerT
             scenarioParams.put("applicant1ClaimSettledDateCy", caseData.getApplicant1ClaimSettleDate());
 
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-            when(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).thenReturn(false);
+            when(featureToggleService.isLocationWhiteListed(any())).thenReturn(false);
             when(featureToggleService.isCuiGaNroEnabled()).thenReturn(true);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(

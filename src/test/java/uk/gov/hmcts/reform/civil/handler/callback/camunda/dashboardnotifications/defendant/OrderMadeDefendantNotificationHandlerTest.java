@@ -575,7 +575,7 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
             when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
             when(toggleService.isCarmEnabledForCase(any())).thenReturn(false);
             when(toggleService.isCuiGaNroEnabled()).thenReturn(true);
-            when(toggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).thenReturn(false);
+            when(toggleService.isLocationWhiteListed(any())).thenReturn(false);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT.name())
                         .caseDetails(CaseDetails.builder().state(All_FINAL_ORDERS_ISSUED.toString()).build()).build())
