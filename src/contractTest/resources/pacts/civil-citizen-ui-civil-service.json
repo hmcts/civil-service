@@ -32,7 +32,7 @@
           "paymentReference": "RC-1701-0909-0602-0418",
           "status": "Initiated",
           "nextUrl": "https://card.payments.service.gov.uk/secure/7b0716b2-40c4-413e-b62e-72c599c91960",
-          "dateCreated": "2023-11-27T13:15:06.313+00:00"
+          "dateCreated": 1701090906.313
         },
         "matchingRules": {
           "body": {
@@ -73,8 +73,7 @@
             "$.dateCreated": {
               "matchers": [
                 {
-                  "match": "timestamp",
-                  "timestamp": "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
+                  "match": "decimal"
                 }
               ],
               "combine": "AND"

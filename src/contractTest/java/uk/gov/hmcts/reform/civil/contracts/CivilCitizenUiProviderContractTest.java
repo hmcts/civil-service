@@ -2,18 +2,18 @@ package uk.gov.hmcts.reform.civil.contracts;
 
 import au.com.dius.pact.provider.junit5.PactVerificationContext;
 import au.com.dius.pact.provider.junit5.PactVerificationInvocationContextProvider;
-import au.com.dius.pact.provider.spring.junit5.MockMvcTestTarget;
 import au.com.dius.pact.provider.junitsupport.Provider;
 import au.com.dius.pact.provider.junitsupport.State;
 import au.com.dius.pact.provider.junitsupport.loader.PactFolder;
+import au.com.dius.pact.provider.spring.junit5.MockMvcTestTarget;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import uk.gov.hmcts.reform.civil.controllers.fees.FeesPaymentController;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
@@ -22,31 +22,37 @@ import uk.gov.hmcts.reform.civil.service.FeesPaymentService;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
-import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
 @Provider("civil-service")
 @PactFolder("src/contractTest/resources/pacts")
-@WebMvcTest(controllers = FeesPaymentController.class)
-@AutoConfigureMockMvc(addFilters = false)
 class CivilCitizenUiProviderContractTest {
 
     private static final String AUTH_HEADER = "Bearer some-auth-token";
     private static final String CASE_REFERENCE = "1234567890123456";
     private static final String PAYMENT_REFERENCE = "RC-1701-0909-0602-0418";
 
-    @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @Mock
     private FeesPaymentService feesPaymentService;
+    private AutoCloseable mocks;
 
     @BeforeEach
     void beforeEach(PactVerificationContext context) {
+        mocks = MockitoAnnotations.openMocks(this);
+        FeesPaymentController controller = new FeesPaymentController(feesPaymentService);
+        mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
         MockMvcTestTarget target = new MockMvcTestTarget();
         target.setMockMvc(mockMvc);
         context.setTarget(target);
-        reset(feesPaymentService);
+    }
+
+    @AfterEach
+    void tearDown() throws Exception {
+        if (mocks != null) {
+            mocks.close();
+        }
     }
 
     @TestTemplate
