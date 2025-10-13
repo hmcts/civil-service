@@ -29,21 +29,26 @@ public class MediationUnavailableDatesUtils {
         } else {
             for (Element<UnavailableDate> dateRange : datesUnavailableList) {
                 var unavailableDateType = dateRange.getValue().getUnavailableDateType();
-                LocalDate dateFrom = dateRange.getValue().getFromDate();
-                LocalDate dateTo = dateRange.getValue().getToDate();
                 if (unavailableDateType.equals(UnavailableDateType.SINGLE_DATE)) {
                     if (dateRange.getValue().getDate().isBefore(LocalDate.now())) {
                         errors.add(INVALID_UNAVAILABLE_DATE_BEFORE_TODAY);
                     } else if (dateRange.getValue().getDate().isAfter(LocalDate.now().plusMonths(3))) {
                         errors.add(INVALID_UNAVAILABLE_DATE_WHEN_MORE_THAN_3_MONTHS);
+                    } else {
+                        dateRange.getValue().setFromDate(null);
+                        dateRange.getValue().setToDate(null);
                     }
                 } else if (unavailableDateType.equals(UnavailableDateType.DATE_RANGE)) {
+                    LocalDate dateFrom = dateRange.getValue().getFromDate();
+                    LocalDate dateTo = dateRange.getValue().getToDate();
                     if (dateTo != null && dateTo.isBefore(dateFrom)) {
                         errors.add(INVALID_UNAVAILABILITY_RANGE);
                     } else if (dateFrom != null && dateFrom.isBefore(LocalDate.now())) {
                         errors.add(INVALID_UNAVAILABLE_DATE_FROM_BEFORE_TODAY);
                     } else if (dateTo != null && dateTo.isAfter(LocalDate.now().plusMonths(3))) {
                         errors.add(INVALID_UNAVAILABLE_DATE_TO_WHEN_MORE_THAN_3_MONTHS);
+                    } else {
+                        dateRange.getValue().setDate(null);
                     }
                 }
             }

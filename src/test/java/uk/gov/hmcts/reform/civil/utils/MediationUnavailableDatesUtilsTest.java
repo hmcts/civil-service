@@ -123,4 +123,53 @@ class MediationUnavailableDatesUtilsTest {
         checkUnavailable(errors, unavailableDates);
         assertThat(errors.size()).isEqualTo(0);
     }
+
+    @Test
+    void shouldClearDateFields_whenSingleDateIsValid() {
+        UnavailableDate date = UnavailableDate.builder()
+            .unavailableDateType(UnavailableDateType.SINGLE_DATE)
+            .date(LocalDate.of(2024, 2, 15))
+            .build();
+
+        List<Element<UnavailableDate>> unavailableDates = wrapElements(date);
+        checkUnavailable(errors, unavailableDates);
+
+        assertThat(errors).isEmpty();
+        assertThat(date.getFromDate()).isNull();
+        assertThat(date.getToDate()).isNull();
+    }
+
+    @Test
+    void shouldClearSingleDate_whenDateRangeIsValid() {
+        UnavailableDate date = UnavailableDate.builder()
+            .unavailableDateType(UnavailableDateType.DATE_RANGE)
+            .fromDate(LocalDate.of(2024, 2, 1))
+            .toDate(LocalDate.of(2024, 2, 5))
+            .date(LocalDate.of(2024, 1, 1)) // Should be cleared
+            .build();
+
+        List<Element<UnavailableDate>> unavailableDates = wrapElements(date);
+        checkUnavailable(errors, unavailableDates);
+
+        assertThat(errors).isEmpty();
+        assertThat(date.getDate()).isNull();
+    }
+
+    @Test
+    void shouldNotAddError_whenSingleDateIsExactlyTodayOr3MonthsAhead() {
+        List<Element<UnavailableDate>> dates = wrapElements(
+            UnavailableDate.builder()
+                .unavailableDateType(UnavailableDateType.SINGLE_DATE)
+                .date(now)
+                .build(),
+            UnavailableDate.builder()
+                .unavailableDateType(UnavailableDateType.SINGLE_DATE)
+                .date(now.plusMonths(3))
+                .build()
+        );
+
+        checkUnavailable(errors, dates);
+
+        assertThat(errors).isEmpty();
+    }
 }
