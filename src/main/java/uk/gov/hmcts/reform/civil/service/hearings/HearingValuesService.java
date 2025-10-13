@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
 import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
 import uk.gov.hmcts.reform.civil.exceptions.MissingFieldsUpdatedException;
 import uk.gov.hmcts.reform.civil.exceptions.NotEarlyAdopterCourtException;
-import uk.gov.hmcts.reform.civil.exceptions.IncludesLitigantInPersonException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.ServiceHearingValuesModel;
@@ -147,14 +146,10 @@ public class HearingValuesService {
         }
     }
 
-    private void isLrVLr(CaseData caseData) throws IncludesLitigantInPersonException {
+    private void isLrVLr(CaseData caseData) {
         if (caseData.isApplicantLiP() || caseData.isRespondent1LiP() || caseData.isRespondent2LiP()) {
-            if (featuretoggleService.isHmcForLipEnabled()) {
-                if (!featuretoggleService.isWelshEnabledForMainCase()) {
-                    isEarlyAdopter(caseData);
-                }
-            } else {
-                throw new IncludesLitigantInPersonException();
+            if (!featuretoggleService.isWelshEnabledForMainCase()) {
+                isEarlyAdopter(caseData);
             }
         }
     }
