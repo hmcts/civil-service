@@ -155,10 +155,11 @@ public class FeatureToggleService {
         return featureToggleApi.isFeatureEnabledForDate("is-defendant-noc-online-for-case", epoch, false);
     }
 
-    public boolean isHmcForLipEnabled() {
-        return featureToggleApi.isFeatureEnabled("hmc-cui-enabled");
+    public boolean isQueryManagementLRsEnabled() {
+        return featureToggleApi.isFeatureEnabled("query-management");
     }
 
+    // if deleting this, also handle isQMPdfGeneratorEnabled() below
     public boolean isPublicQueryManagementEnabled(CaseData caseData) {
         if (caseContainsLiP.test(caseData)) {
             return isLipQueryManagementEnabled(caseData);
