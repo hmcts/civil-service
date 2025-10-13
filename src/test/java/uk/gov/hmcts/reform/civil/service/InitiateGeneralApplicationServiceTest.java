@@ -776,7 +776,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
             .isEqualTo(STRING_NUM_CONSTANT);
 
         assertThat(result.getGeneralApplications().get(0).getValue()
-                       .getGeneralAppRespondentSolicitors().size()).isEqualTo(4);
+                       .getGeneralAppRespondentSolicitors().size()).isEqualTo(2);
 
         assertThat(result.getGeneralApplications().get(0).getValue().getLocationName())
             .isEqualTo("site name of CNBC");
@@ -803,7 +803,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
             .isEqualTo(STRING_NUM_CONSTANT);
 
         assertThat(result.getGeneralApplications().get(0).getValue()
-                       .getGeneralAppRespondentSolicitors().size()).isEqualTo(4);
+                       .getGeneralAppRespondentSolicitors().size()).isEqualTo(2);
 
         assertThat(result.getGeneralApplications().get(0).getValue().getLocationName())
             .isEqualTo("site name of CNBC");
