@@ -77,11 +77,8 @@ class Respondent1AdmittedAmountPaymentDeadlineParamsBuilderTest {
         // Arrange
         CaseData caseData = mock(CaseData.class);
         RespondToClaimAdmitPartLRspec admitPartLRspec = mock(RespondToClaimAdmitPartLRspec.class);
-        LocalDate paymentDate = LocalDate.parse("2023-10-01");
-
         when(caseData.isPartAdmitPayImmediatelyClaimSpec()).thenReturn(true);
         when(caseData.getRespondToClaimAdmitPartLRspec()).thenReturn(admitPartLRspec);
-        when(admitPartLRspec.getWhenWillThisAmountBePaid()).thenReturn(paymentDate);
         when(claimantResponseUtils.getDefendantAdmittedAmount(caseData, true)).thenReturn(new BigDecimal("100.00"));
 
         HashMap<String, Object> params = new HashMap<>();

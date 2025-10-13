@@ -162,6 +162,7 @@ import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantSmallClaim.REST
 import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantSmallClaim.WITNESS_DESCRIPTION_TEXT;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle.SHOW;
@@ -1542,18 +1543,19 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         dataBuilder.sdoOrderDocument(null);
 
         dataBuilder.hearingNotes(getHearingNotes(caseData));
-
-        // LiP check ensures LiP cases will not automatically get whitelisted, and instead will have their own ea court check.
-        boolean isLipCase = (caseData.isApplicantLiP() || caseData.isRespondent1LiP() || caseData.isRespondent2LiP());
-        if (featureToggleService.isWelshEnabledForMainCase()) {
-            dataBuilder.eaCourtLocation(YES);
-        } else {
-            if (!isLipCase) {
-                log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            // LiP check ensures LiP cases will not automatically get whitelisted, and instead will have their own ea court check.
+            boolean isLipCase = (caseData.isApplicantLiP() || caseData.isRespondent1LiP() || caseData.isRespondent2LiP());
+            if (featureToggleService.isWelshEnabledForMainCase()) {
                 dataBuilder.eaCourtLocation(YES);
             } else {
-                boolean isLipCaseEaCourt = isLipCaseWithProgressionEnabledAndCourtWhiteListed(caseData);
-                dataBuilder.eaCourtLocation(isLipCaseEaCourt ? YesOrNo.YES : YesOrNo.NO);
+                if (!isLipCase) {
+                    log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
+                    dataBuilder.eaCourtLocation(YES);
+                } else {
+                    boolean isLipCaseEaCourt = isLipCaseWithProgressionEnabledAndCourtWhiteListed(caseData);
+                    dataBuilder.eaCourtLocation(isLipCaseEaCourt ? YesOrNo.YES : YesOrNo.NO);
+                }
             }
         }
 
