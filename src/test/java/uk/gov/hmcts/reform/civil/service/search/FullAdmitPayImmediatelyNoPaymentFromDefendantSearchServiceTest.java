@@ -12,6 +12,7 @@ import java.util.List;
 
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
+import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 
 class FullAdmitPayImmediatelyNoPaymentFromDefendantSearchServiceTest extends ElasticSearchServiceTest {
 
@@ -31,8 +32,10 @@ class FullAdmitPayImmediatelyNoPaymentFromDefendantSearchServiceTest extends Ela
         BoolQueryBuilder query = boolQuery()
             .minimumShouldMatch(1)
             .should(boolQuery()
-                        .must(matchQuery("data.respondToClaimAdmitPartLRspec.whenWillThisAmountBePaid",
-                                         expectedDate))
+                        .mustNot(matchQuery("data.fullAdmitNoPaymentSchedulerProcessed", "Yes"))
+                        .must(rangeQuery(
+                            "data.respondToClaimAdmitPartLRspec.whenWillThisAmountBePaid")
+                                  .gte("now-8d/d").lte("now-1d/d"))
                         .must(matchQuery(
                             "data.respondent1ClaimResponseTypeForSpec",
                             RespondentResponseType.FULL_ADMISSION
