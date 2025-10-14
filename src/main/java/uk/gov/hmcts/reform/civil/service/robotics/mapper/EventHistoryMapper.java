@@ -51,6 +51,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
+import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
@@ -62,8 +63,11 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -138,6 +142,7 @@ public class EventHistoryMapper {
     private final EventHistorySequencer eventHistorySequencer;
     private final LocationRefDataUtil locationRefDataUtil;
     private final Time time;
+    private final Map<FlowState.Main, FlowStateHandler> stateHandlers = createStateHandlers();
     public static final String BS_REF = "Breathing space reference";
     public static final String BS_START_DT = "actual start date";
     public static final String BS_END_DATE = "actual end date";
@@ -159,119 +164,11 @@ public class EventHistoryMapper {
         EventHistory.EventHistoryBuilder builder = EventHistory.builder()
             .directionsQuestionnaireFiled(List.of(Event.builder().build()));
 
-        stateFlowEngine.evaluate(caseData).getStateHistory()
-            .forEach(state -> {
-                FlowState.Main flowState = (FlowState.Main) FlowState.fromFullName(state.getName());
-                switch (flowState) {
-                    case TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT:
-                        buildUnrepresentedDefendant(builder, caseData);
-                        break;
-                    case TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT:
-                        buildUnregisteredAndUnrepresentedDefendant(builder, caseData);
-                        break;
-                    case TAKEN_OFFLINE_UNREGISTERED_DEFENDANT:
-                        buildUnregisteredDefendant(builder, caseData);
-                        break;
-                    case CLAIM_ISSUED:
-                        buildClaimIssued(builder, caseData);
-                        break;
-                    case CLAIM_NOTIFIED:
-                        buildClaimantHasNotifiedDefendant(builder, caseData);
-                        break;
-                    case TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED:
-                        buildTakenOfflineAfterClaimNotified(builder, caseData);
-                        break;
-                    case CLAIM_DETAILS_NOTIFIED:
-                        buildClaimDetailsNotified(builder, caseData);
-                        break;
-                    case NOTIFICATION_ACKNOWLEDGED:
-                        buildAcknowledgementOfServiceReceived(builder, caseData);
-                        break;
-                    case NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION, CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION:
-                        buildConsentExtensionFilingDefence(builder, caseData);
-                        break;
-                    case FULL_DEFENCE:
-                        buildRespondentFullDefence(builder, caseData);
-                        break;
-                    case FULL_ADMISSION:
-                        buildRespondentFullAdmission(builder, caseData);
-                        break;
-                    case PART_ADMISSION:
-                        buildRespondentPartAdmission(builder, caseData);
-                        break;
-                    case COUNTER_CLAIM:
-                        buildRespondentCounterClaim(builder, caseData);
-                        break;
-                    // AWAITING_RESPONSES states would only happen in 1v2 diff sol after 1 defendant responses.
-                    // These states will not show in the history mapper after the second defendant response.
-                    // It can share the same RPA builder as DIVERGENT_RESPOND state because it builds events according
-                    // to defendant response
-                    // DIVERGENT_RESPOND states would only happen in 1v2 diff sol after both defendant responds.
-                    case AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED, AWAITING_RESPONSES_FULL_ADMIT_RECEIVED, AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED:
-                        buildRespondentDivergentResponse(builder, caseData, false);
-                        break;
-                    case DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE, DIVERGENT_RESPOND_GO_OFFLINE:
-                        buildRespondentDivergentResponse(builder, caseData, true);
-                        break;
-                    case FULL_DEFENCE_NOT_PROCEED:
-                        buildFullDefenceNotProceed(builder, caseData);
-                        break;
-                    case FULL_DEFENCE_PROCEED:
-                        buildFullDefenceProceed(builder, caseData, authToken);
-                        break;
-                    case TAKEN_OFFLINE_BY_STAFF:
-                        buildTakenOfflineByStaff(builder, caseData);
-                        buildGeneralFormApplicationEventsStrikeOutOrder(builder, caseData);
-                        break;
-                    case CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE:
-                        buildClaimDismissedPastDeadline(builder, caseData,
-                                                        stateFlowEngine.evaluate(caseData).getStateHistory()
-                        );
-                        break;
-                    case CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE:
-                        buildClaimDismissedPastNotificationsDeadline(
-                            builder,
-                            caseData,
-                            "RPA Reason: Claim dismissed. Claimant hasn't taken action since the "
-                                + "claim was issued."
-                        );
-                        break;
-                    case CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE:
-                        buildClaimDismissedPastNotificationsDeadline(
-                            builder,
-                            caseData,
-                            "RPA Reason: Claim dismissed. Claimant hasn't notified defendant of the "
-                                + "claim details within the allowed 2 weeks."
-                        );
-                        break;
-                    case TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED:
-                        buildOfflineAfterClaimsDetailsNotified(
-                            builder,
-                            caseData
-                        );
-                        break;
-                    case TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE:
-                        buildClaimTakenOfflinePastApplicantResponse(builder, caseData);
-                        break;
-                    case TAKEN_OFFLINE_SDO_NOT_DRAWN:
-                        buildSDONotDrawn(builder, caseData);
-                        break;
-                    case TAKEN_OFFLINE_AFTER_SDO:
-                        buildClaimTakenOfflineAfterSDO(builder, caseData);
-                        break;
-                    case PART_ADMIT_REJECT_REPAYMENT, FULL_ADMIT_REJECT_REPAYMENT:
-                        buildSpecAdmitRejectRepayment(builder, caseData);
-                        break;
-                    case IN_MEDIATION:
-                        buildClaimInMediation(builder, caseData);
-                        break;
-                    case TAKEN_OFFLINE_SPEC_DEFENDANT_NOC, TAKEN_OFFLINE_SPEC_DEFENDANT_NOC_AFTER_JBA:
-                        buildTakenOfflineDueToDefendantNoc(builder, caseData);
-                        break;
-                    default:
-                        break;
-                }
-            });
+        StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+        List<State> stateHistory = stateFlow.getStateHistory();
+        HandlerContext context = new HandlerContext(authToken, stateHistory);
+
+        stateHistory.forEach(state -> handleFlowState(builder, caseData, context, state));
 
         buildRespondent1LitigationFriendEvent(builder, caseData);
         buildRespondent2LitigationFriendEvent(builder, caseData);
@@ -312,6 +209,124 @@ public class EventHistoryMapper {
         EventHistory eventHistory = eventHistorySequencer.sortEvents(builder.build());
         log.info("Event history: {}", eventHistory);
         return eventHistory;
+    }
+
+    private void handleFlowState(EventHistory.EventHistoryBuilder builder,
+                                 CaseData caseData,
+                                 HandlerContext context,
+                                 State state) {
+        FlowState flowState = FlowState.fromFullName(state.getName());
+        if (flowState instanceof FlowState.Main) {
+            FlowState.Main mainState = (FlowState.Main) flowState;
+            FlowStateHandler handler = stateHandlers.get(mainState);
+            if (handler != null) {
+                handler.handle(builder, caseData, context, state);
+            }
+        }
+    }
+
+    private Map<FlowState.Main, FlowStateHandler> createStateHandlers() {
+        Map<FlowState.Main, FlowStateHandler> handlers = new EnumMap<>(FlowState.Main.class);
+
+        handlers.put(FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT,
+            (builder, data, context, state) -> buildUnrepresentedDefendant(builder, data));
+        handlers.put(FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT,
+            (builder, data, context, state) -> buildUnregisteredAndUnrepresentedDefendant(builder, data));
+        handlers.put(FlowState.Main.TAKEN_OFFLINE_UNREGISTERED_DEFENDANT,
+            (builder, data, context, state) -> buildUnregisteredDefendant(builder, data));
+        handlers.put(FlowState.Main.CLAIM_ISSUED,
+            (builder, data, context, state) -> buildClaimIssued(builder, data));
+        handlers.put(FlowState.Main.CLAIM_NOTIFIED,
+            (builder, data, context, state) -> buildClaimantHasNotifiedDefendant(builder, data));
+        handlers.put(FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED,
+            (builder, data, context, state) -> buildTakenOfflineAfterClaimNotified(builder, data));
+        handlers.put(FlowState.Main.CLAIM_DETAILS_NOTIFIED,
+            (builder, data, context, state) -> buildClaimDetailsNotified(builder, data));
+        handlers.put(FlowState.Main.NOTIFICATION_ACKNOWLEDGED,
+            (builder, data, context, state) -> buildAcknowledgementOfServiceReceived(builder, data));
+        handlers.put(FlowState.Main.NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION,
+            (builder, data, context, state) -> buildConsentExtensionFilingDefence(builder, data));
+        handlers.put(FlowState.Main.CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION,
+            (builder, data, context, state) -> buildConsentExtensionFilingDefence(builder, data));
+        handlers.put(FlowState.Main.FULL_DEFENCE,
+            (builder, data, context, state) -> buildRespondentFullDefence(builder, data));
+        handlers.put(FlowState.Main.FULL_ADMISSION,
+            (builder, data, context, state) -> buildRespondentFullAdmission(builder, data));
+        handlers.put(FlowState.Main.PART_ADMISSION,
+            (builder, data, context, state) -> buildRespondentPartAdmission(builder, data));
+        handlers.put(FlowState.Main.COUNTER_CLAIM,
+            (builder, data, context, state) -> buildRespondentCounterClaim(builder, data));
+        handlers.put(FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED,
+            (builder, data, context, state) -> buildRespondentDivergentResponse(builder, data, false));
+        handlers.put(FlowState.Main.AWAITING_RESPONSES_FULL_ADMIT_RECEIVED,
+            (builder, data, context, state) -> buildRespondentDivergentResponse(builder, data, false));
+        handlers.put(FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED,
+            (builder, data, context, state) -> buildRespondentDivergentResponse(builder, data, false));
+        handlers.put(FlowState.Main.DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE,
+            (builder, data, context, state) -> buildRespondentDivergentResponse(builder, data, true));
+        handlers.put(FlowState.Main.DIVERGENT_RESPOND_GO_OFFLINE,
+            (builder, data, context, state) -> buildRespondentDivergentResponse(builder, data, true));
+        handlers.put(FlowState.Main.FULL_DEFENCE_NOT_PROCEED,
+            (builder, data, context, state) -> buildFullDefenceNotProceed(builder, data));
+        handlers.put(FlowState.Main.FULL_DEFENCE_PROCEED,
+            (builder, data, context, state) -> buildFullDefenceProceed(builder, data, context.authToken));
+        handlers.put(FlowState.Main.TAKEN_OFFLINE_BY_STAFF,
+            (builder, data, context, state) -> {
+                buildTakenOfflineByStaff(builder, data);
+                buildGeneralFormApplicationEventsStrikeOutOrder(builder, data);
+            });
+        handlers.put(FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE,
+            (builder, data, context, state) -> buildClaimDismissedPastDeadline(builder, data, context.stateHistory));
+        handlers.put(FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE,
+            (builder, data, context, state) -> buildClaimDismissedPastNotificationsDeadline(
+                builder,
+                data,
+                "RPA Reason: Claim dismissed. Claimant hasn't taken action since the claim was issued."
+            ));
+        handlers.put(FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE,
+            (builder, data, context, state) -> buildClaimDismissedPastNotificationsDeadline(
+                builder,
+                data,
+                "RPA Reason: Claim dismissed. Claimant hasn't notified defendant of the claim details within the allowed 2 weeks."
+            ));
+        handlers.put(FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED,
+            (builder, data, context, state) -> buildOfflineAfterClaimsDetailsNotified(builder, data));
+        handlers.put(FlowState.Main.TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE,
+            (builder, data, context, state) -> buildClaimTakenOfflinePastApplicantResponse(builder, data));
+        handlers.put(FlowState.Main.TAKEN_OFFLINE_SDO_NOT_DRAWN,
+            (builder, data, context, state) -> buildSDONotDrawn(builder, data));
+        handlers.put(FlowState.Main.TAKEN_OFFLINE_AFTER_SDO,
+            (builder, data, context, state) -> buildClaimTakenOfflineAfterSDO(builder, data));
+        handlers.put(FlowState.Main.PART_ADMIT_REJECT_REPAYMENT,
+            (builder, data, context, state) -> buildSpecAdmitRejectRepayment(builder, data));
+        handlers.put(FlowState.Main.FULL_ADMIT_REJECT_REPAYMENT,
+            (builder, data, context, state) -> buildSpecAdmitRejectRepayment(builder, data));
+        handlers.put(FlowState.Main.IN_MEDIATION,
+            (builder, data, context, state) -> buildClaimInMediation(builder, data));
+        handlers.put(FlowState.Main.TAKEN_OFFLINE_SPEC_DEFENDANT_NOC,
+            (builder, data, context, state) -> buildTakenOfflineDueToDefendantNoc(builder, data));
+        handlers.put(FlowState.Main.TAKEN_OFFLINE_SPEC_DEFENDANT_NOC_AFTER_JBA,
+            (builder, data, context, state) -> buildTakenOfflineDueToDefendantNoc(builder, data));
+
+        return Collections.unmodifiableMap(handlers);
+    }
+
+    @FunctionalInterface
+    private interface FlowStateHandler {
+        void handle(EventHistory.EventHistoryBuilder builder,
+                    CaseData caseData,
+                    HandlerContext context,
+                    State state);
+    }
+
+    private static class HandlerContext {
+        private final String authToken;
+        private final List<State> stateHistory;
+
+        HandlerContext(String authToken, List<State> stateHistory) {
+            this.authToken = authToken;
+            this.stateHistory = stateHistory;
+        }
     }
 
     private void buildTakenOfflineAfterDefendantNoCDeadlinePassed(EventHistory.EventHistoryBuilder builder,
