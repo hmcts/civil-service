@@ -135,7 +135,6 @@ class SendHearingToLiPCallbackHandlerTest extends BaseCallbackHandlerTest {
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(SEND_HEARING_TO_LIP_DEFENDANT_HMC.name());
         when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
-        when(featureToggleService.isHmcForLipEnabled()).thenReturn(true);
         // when
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -157,7 +156,6 @@ class SendHearingToLiPCallbackHandlerTest extends BaseCallbackHandlerTest {
         params.getRequest().setEventId(SEND_HEARING_TO_LIP_CLAIMANT_HMC.name());
         // when
         when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
-        when(featureToggleService.isHmcForLipEnabled()).thenReturn(true);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         // then
