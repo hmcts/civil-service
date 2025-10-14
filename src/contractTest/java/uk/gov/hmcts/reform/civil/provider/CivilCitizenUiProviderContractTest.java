@@ -9,6 +9,12 @@ import au.com.dius.pact.provider.junitsupport.IgnoreNoPactsToVerify;
 import au.com.dius.pact.provider.junitsupport.loader.SelectorBuilder;
 import au.com.dius.pact.provider.spring.junit5.MockMvcTestTarget;
 import au.com.dius.pact.provider.junit5.PactVerificationContext;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestTemplate;
@@ -23,6 +29,7 @@ import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
 import uk.gov.hmcts.reform.civil.service.FeesPaymentService;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
@@ -37,7 +44,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @IgnoreNoPactsToVerify
 class CivilCitizenUiProviderContractTest {
 
-    private static final String AUTH_HEADER = "Bearer some-auth-token";
+    private static final String AUTH_HEADER = "Bearer some-access-token";
     private static final String CASE_REFERENCE = "1234567890123456";
     private static final String PAYMENT_REFERENCE = "RC-1701-0909-0602-0418";
 
@@ -64,8 +71,9 @@ class CivilCitizenUiProviderContractTest {
         }
         mocks = MockitoAnnotations.openMocks(this);
         FeesPaymentController controller = new FeesPaymentController(feesPaymentService);
+        MappingJackson2HttpMessageConverter messageConverter = new MappingJackson2HttpMessageConverter(buildObjectMapper());
         mockMvc = MockMvcBuilders.standaloneSetup(controller)
-            .setMessageConverters(new MappingJackson2HttpMessageConverter())
+            .setMessageConverters(messageConverter)
             .alwaysDo(result -> result.getResponse().setContentType(APPLICATION_JSON_VALUE))
             .build();
         MockMvcTestTarget target = new MockMvcTestTarget();
@@ -123,5 +131,29 @@ class CivilCitizenUiProviderContractTest {
                 .paymentAmount(new BigDecimal("200"))
                 .build()
         );
+    }
+
+    private ObjectMapper buildObjectMapper() {
+        ObjectMapper mapper = JsonMapper.builder()
+            .addModule(new JavaTimeModule())
+            .build();
+        SimpleModule module = new SimpleModule();
+        module.addSerializer(OffsetDateTime.class, new OffsetDateTimeEpochSecondsSerializer());
+        mapper.registerModule(module);
+        return mapper;
+    }
+
+    private static class OffsetDateTimeEpochSecondsSerializer extends com.fasterxml.jackson.databind.JsonSerializer<OffsetDateTime> {
+
+        @Override
+        public void serialize(OffsetDateTime value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+            if (value == null) {
+                gen.writeNull();
+                return;
+            }
+            long epochMillis = value.toInstant().toEpochMilli();
+            BigDecimal epochSeconds = BigDecimal.valueOf(epochMillis, 3);
+            gen.writeNumber(epochSeconds);
+        }
     }
 }
