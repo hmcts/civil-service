@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
@@ -27,6 +28,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -41,7 +43,6 @@ import static uk.gov.hmcts.reform.civil.utils.OrgPolicyUtils.getRespondent2Solic
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@SuppressWarnings("unchecked")
 public class InitiateGeneralApplicationServiceHelper {
 
     private final CaseAssignmentApi caseAssignmentApi;
@@ -73,11 +74,6 @@ public class InitiateGeneralApplicationServiceHelper {
 
         CaseAssignmentUserRolesResource userRoles = getUserRoles(parentCaseId);
 
-        /*Filter the case users to collect solicitors whose ID doesn't match with GA Applicant Solicitor's ID*/
-        List<CaseAssignmentUserRole> respondentSolicitors = userRoles.getCaseAssignmentUserRoles().stream()
-            .filter(caseAssigned -> !caseAssigned.getUserId().equals(userDetails.getId()))
-            .toList();
-
         /*
          * Set GA applicant solicitor details
          * */
@@ -90,21 +86,54 @@ public class InitiateGeneralApplicationServiceHelper {
             .forename(userDetails.getForename())
             .surname(userDetails.getSurname());
 
-        List<CaseAssignmentUserRole> applicantSolicitor = userRoles.getCaseAssignmentUserRoles()
-            .stream().filter(user -> !respondentSolicitors.contains(user)).toList();
-        boolean sameDefSol1v2 = applicantSolicitor.size() == 2
-                && applicantSolicitor.get(0).getUserId()
-                .equals(applicantSolicitor.get(1).getUserId());
+        /*
+         * Filter the case users to collect solicitors whose ID doesn't match with GA Applicant Solicitor's ID
+         * There can be multiple applicant solicitors
+         * */
+        List<CaseAssignmentUserRole> caseAssignments = userRoles.getCaseAssignmentUserRoles();
+
+        List<CaseAssignmentUserRole> applicantSolicitorList = Optional.ofNullable(caseAssignments)
+            .orElse(Collections.emptyList())
+            .stream()
+            .filter(caseAssigned -> Objects.equals(
+                caseAssigned.getUserId(),
+                userDetails != null ? userDetails.getId() : null
+            ))
+            .toList();
+
+        boolean sameDefSol1v2 = applicantSolicitorList.size() == 2
+                && applicantSolicitorList.get(0).getUserId()
+                .equals(applicantSolicitorList.get(1).getUserId());
 
         GeneralApplication.GeneralApplicationBuilder applicationBuilder = generalApplication.toBuilder();
         //only assign value if lip is applicant
         Boolean isGaAppSameAsParentCaseClLip = null;
-        if (!CollectionUtils.isEmpty(applicantSolicitor) && (applicantSolicitor.size() == 1 || sameDefSol1v2)) {
-            isGaAppSameAsParentCaseClLip = setSingleGaApplicant(applicantSolicitor, applicationBuilder,
+        if (!CollectionUtils.isEmpty(applicantSolicitorList) && (applicantSolicitorList.size() == 1 || sameDefSol1v2)) {
+            isGaAppSameAsParentCaseClLip = setSingleGaApplicant(applicantSolicitorList, applicationBuilder,
                     applicantBuilder,  applicant1OrgCaseRole, respondent1OrgCaseRole, caseData);
         }
         applicationBuilder
             .generalAppApplnSolicitor(applicantBuilder.build());
+
+        List<String> gaApplicantRolesOnMainCase = applicantSolicitorList.stream()
+            .map(CaseAssignmentUserRole::getCaseRole)
+            .toList();
+
+        List<CaseAssignmentUserRole> respondentSolicitors = Optional.ofNullable(caseAssignments)
+            .orElse(Collections.emptyList())
+            .stream()
+            .filter(caseAssignedRoleEntry -> !Objects.equals(
+                caseAssignedRoleEntry.getUserId(),
+                userDetails.getId()
+            ))
+            .filter(caseAssignedRoleEntry ->
+                        gaApplicantRolesOnMainCase.stream()
+                            .noneMatch(applicantRole ->
+                                           StringUtils.equalsIgnoreCase(applicantRole, caseAssignedRoleEntry.getCaseRole())
+                            )
+            )
+            .toList();
+
         GAParties applicantPartyData;
         /*
          * Set GA respondent solicitors' details
