@@ -1,11 +1,14 @@
 package uk.gov.hmcts.reform.civil.provider;
 
-import au.com.dius.pact.provider.junit5.PactVerificationContext;
 import au.com.dius.pact.provider.junit5.PactVerificationInvocationContextProvider;
 import au.com.dius.pact.provider.junitsupport.Provider;
 import au.com.dius.pact.provider.junitsupport.State;
-import au.com.dius.pact.provider.junitsupport.loader.PactFolder;
+import au.com.dius.pact.provider.junitsupport.loader.PactBroker;
+import au.com.dius.pact.provider.junitsupport.loader.PactBrokerConsumerVersionSelectors;
+import au.com.dius.pact.provider.junitsupport.IgnoreNoPactsToVerify;
+import au.com.dius.pact.provider.junitsupport.loader.SelectorBuilder;
 import au.com.dius.pact.provider.spring.junit5.MockMvcTestTarget;
+import au.com.dius.pact.provider.junit5.PactVerificationContext;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestTemplate;
@@ -25,7 +28,11 @@ import java.time.OffsetDateTime;
 import static org.mockito.Mockito.when;
 
 @Provider("civil-service")
-@PactFolder("src/contractTest/resources/pacts")
+@PactBroker(
+    url = "${PACT_BROKER_FULL_URL:http://localhost:80}",
+    providerBranch = "${pact.provider.branch}"
+)
+@IgnoreNoPactsToVerify
 class CivilCitizenUiProviderContractTest {
 
     private static final String AUTH_HEADER = "Bearer some-auth-token";
@@ -38,14 +45,25 @@ class CivilCitizenUiProviderContractTest {
     private FeesPaymentService feesPaymentService;
     private AutoCloseable mocks;
 
+    @PactBrokerConsumerVersionSelectors
+    static SelectorBuilder consumerVersionSelectors() {
+        return new SelectorBuilder()
+            .matchingBranch()
+            .mainBranch()
+            .deployedOrReleased();
+    }
+
     @BeforeEach
     void beforeEach(PactVerificationContext context) {
+        System.setProperty("pact.verifier.publishResults", "true");
         mocks = MockitoAnnotations.openMocks(this);
         FeesPaymentController controller = new FeesPaymentController(feesPaymentService);
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
         MockMvcTestTarget target = new MockMvcTestTarget();
         target.setMockMvc(mockMvc);
-        context.setTarget(target);
+        if (context != null) {
+            context.setTarget(target);
+        }
     }
 
     @AfterEach
@@ -58,7 +76,9 @@ class CivilCitizenUiProviderContractTest {
     @TestTemplate
     @ExtendWith(PactVerificationInvocationContextProvider.class)
     void verifyPactInteractions(PactVerificationContext context) {
-        context.verifyInteraction();
+        if (context != null) {
+            context.verifyInteraction();
+        }
     }
 
     @State("Claim issue payment can be initiated for case 1234567890123456")

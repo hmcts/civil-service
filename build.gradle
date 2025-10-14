@@ -553,10 +553,14 @@ project.ext {
 }
 
 pact {
+  broker {
+    pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'http://localhost:80'
+  }
   publish {
     pactDirectory = 'pacts'
     pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'http://localhost:80'
     tags = [System.getenv("PACT_BRANCH_NAME") ?: 'Dev']
+    consumerBranch = System.getenv("PACT_BRANCH_NAME") ?: 'Dev'
     version = project.pactVersion
   }
 }
@@ -566,6 +570,7 @@ tasks.register('contract', Test) {
   description = 'Runs the consumer Pact tests'
   setTestClassesDirs(sourceSets.contractTest.output.classesDirs)
   setClasspath(sourceSets.contractTest.runtimeClasspath)
+  useJUnitPlatform()
   systemProperty 'pact.rootDir', "pacts"
 }
 
@@ -575,6 +580,49 @@ tasks.register('runAndPublishConsumerPactTests', Test) {
   testClassesDirs = sourceSets.contractTest.output.classesDirs
   classpath = sourceSets.contractTest.runtimeClasspath
   finalizedBy(pactPublish)
+}
+
+tasks.register('providerContractTests', Test) {
+  description = 'Runs ONLY the provider Pact verification tests.'
+  group = 'Verification'
+
+  useJUnitPlatform()
+  testClassesDirs = sourceSets.contractTest.output.classesDirs
+  classpath = sourceSets.contractTest.runtimeClasspath
+  include '**/provider/**'
+}
+
+tasks.register('runProviderPactVerification') {
+  description = 'Entry point for Jenkins to run provider contract tests.'
+  group = 'Verification'
+
+  dependsOn tasks.named('providerContractTests')
+}
+
+tasks.withType(Test).configureEach { t ->
+  testLogging {
+    exceptionFormat = 'full'
+    showCauses = true
+    showExceptions = true
+    showStackTraces = true
+    showStandardStreams = true
+    events "passed", "skipped", "failed", "standard_out", "standard_error"
+  }
+
+  if (project.hasProperty('pact.verifier.publishResults')) {
+    systemProperty 'pact.verifier.publishResults', project.property('pact.verifier.publishResults')
+  }
+  if (project.hasProperty('pact.provider.version')) {
+    systemProperty 'pact.provider.version', project.property('pact.provider.version')
+  } else {
+    systemProperty 'pact.provider.version', project.pactVersion
+  }
+
+  if (project.hasProperty('pact.provider.branch')) {
+    systemProperty 'pact.provider.branch', project.property('pact.provider.branch')
+  } else {
+    systemProperty 'pact.provider.branch', System.getenv("PACT_BRANCH_NAME") ?: "Dev"
+  }
 }
 
 def getCheckedOutGitCommitHash() {
