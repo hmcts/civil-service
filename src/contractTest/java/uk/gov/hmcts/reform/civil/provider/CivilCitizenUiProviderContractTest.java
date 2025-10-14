@@ -46,7 +46,7 @@ class CivilCitizenUiProviderContractTest {
     private AutoCloseable mocks;
 
     @PactBrokerConsumerVersionSelectors
-    static SelectorBuilder consumerVersionSelectors() {
+    public static SelectorBuilder consumerVersionSelectors() {
         return new SelectorBuilder()
             .matchingBranch()
             .mainBranch()
