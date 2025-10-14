@@ -17,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import uk.gov.hmcts.reform.civil.controllers.fees.FeesPaymentController;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
@@ -56,9 +57,15 @@ class CivilCitizenUiProviderContractTest {
     @BeforeEach
     void beforeEach(PactVerificationContext context) {
         System.setProperty("pact.verifier.publishResults", "true");
+        String brokerUrl = System.getenv("PACT_BROKER_FULL_URL");
+        if (brokerUrl != null && !brokerUrl.isBlank()) {
+            System.setProperty("pactbroker.url", brokerUrl);
+        }
         mocks = MockitoAnnotations.openMocks(this);
         FeesPaymentController controller = new FeesPaymentController(feesPaymentService);
-        mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(controller)
+            .setMessageConverters(new MappingJackson2HttpMessageConverter())
+            .build();
         MockMvcTestTarget target = new MockMvcTestTarget();
         target.setMockMvc(mockMvc);
         if (context != null) {
