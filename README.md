@@ -274,7 +274,9 @@ For that you should have such file as this:
   },
   "operator": false,
   "agent": {
-    "flush_connections": false
+    "flush_connections": false,
+    "startup_timeout": 300,
+    "namespace": "civil"
   }
 }
 ```
