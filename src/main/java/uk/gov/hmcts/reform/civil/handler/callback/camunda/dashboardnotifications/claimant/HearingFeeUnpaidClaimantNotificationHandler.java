@@ -24,13 +24,16 @@ public class HearingFeeUnpaidClaimantNotificationHandler extends CaseProgression
     private static final List<CaseEvent> EVENTS = List.of(CREATE_DASHBOARD_NOTIFICATION_FOR_HEARING_FEE_UNPAID_FOR_CLAIMANT1);
     public static final String TASK_ID = "CreateHearingFeeUnpaidDashboardNotificationsForClaimant";
     private final DashboardNotificationService dashboardNotificationService;
+    private final SdoHelper sdoHelper;
 
     public HearingFeeUnpaidClaimantNotificationHandler(DashboardScenariosService dashboardScenariosService,
                                                        DashboardNotificationsParamsMapper mapper,
                                                        FeatureToggleService featureToggleService,
-                                                       DashboardNotificationService dashboardNotificationService) {
+                                                       DashboardNotificationService dashboardNotificationService,
+                                                       SdoHelper sdoHelper) {
         super(dashboardScenariosService, mapper, featureToggleService);
         this.dashboardNotificationService = dashboardNotificationService;
+        this.sdoHelper = sdoHelper;
     }
 
     @Override
@@ -45,7 +48,7 @@ public class HearingFeeUnpaidClaimantNotificationHandler extends CaseProgression
 
     @Override
     public String getScenario(CaseData caseData) {
-        return isNull(caseData.getTrialReadyApplicant()) && SdoHelper.isFastTrack(caseData)
+        return isNull(caseData.getTrialReadyApplicant()) && sdoHelper.isFastTrack(caseData)
             ? SCENARIO_AAA6_HEARING_FEE_UNPAID_CLAIMANT.getScenario()
             : SCENARIO_AAA6_HEARING_FEE_UNPAID_TRIAL_READY_CLAIMANT.getScenario();
     }

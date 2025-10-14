@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.dashboardnotifications;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -12,7 +13,10 @@ import java.util.HashMap;
 import java.util.Optional;
 
 @Component
+@RequiredArgsConstructor
 public class HearingDocumentDeadlineParamsBuilder extends DashboardNotificationsParamsBuilder {
+
+    private final SdoHelper sdoHelper;
 
     @Override
     public void addParams(CaseData caseData, HashMap<String, Object> params) {
@@ -24,9 +28,9 @@ public class HearingDocumentDeadlineParamsBuilder extends DashboardNotifications
     }
 
     Optional<LocalDate> getHearingDocumentDeadline(CaseData caseData) {
-        if (SdoHelper.isSmallClaimsTrack(caseData)) {
+        if (sdoHelper.isSmallClaimsTrack(caseData)) {
             return Optional.empty();
-        } else if (SdoHelper.isFastTrack(caseData)) {
+        } else if (sdoHelper.isFastTrack(caseData)) {
             return Optional.ofNullable(caseData.getFastTrackDisclosureOfDocuments())
                 .map(FastTrackDisclosureOfDocuments::getDate3);
         } else {

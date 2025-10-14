@@ -22,10 +22,14 @@ public class TrialArrangementsDefendantNotificationHandler extends CaseProgressi
     private static final List<CaseEvent> EVENTS = List.of(CREATE_DASHBOARD_NOTIFICATION_CP_TRIAL_ARRANGEMENTS_DEFENDANT);
     public static final String TASK_ID = "GenerateDashboardDefendantNotificationTrialArrangements";
 
+    private final SdoHelper sdoHelper;
+
     public TrialArrangementsDefendantNotificationHandler(DashboardScenariosService dashboardScenariosService,
                                                          DashboardNotificationsParamsMapper mapper,
-                                                         FeatureToggleService featureToggleService) {
+                                                         FeatureToggleService featureToggleService,
+                                                         SdoHelper sdoHelper) {
         super(dashboardScenariosService, mapper, featureToggleService);
+        this.sdoHelper = sdoHelper;
     }
 
     @Override
@@ -45,7 +49,7 @@ public class TrialArrangementsDefendantNotificationHandler extends CaseProgressi
 
     @Override
     public boolean shouldRecordScenario(CaseData caseData) {
-        return caseData.isRespondent1NotRepresented() && SdoHelper.isFastTrack(caseData)
+        return caseData.isRespondent1NotRepresented() && sdoHelper.isFastTrack(caseData)
             && isNull(caseData.getTrialReadyRespondent1());
     }
 }

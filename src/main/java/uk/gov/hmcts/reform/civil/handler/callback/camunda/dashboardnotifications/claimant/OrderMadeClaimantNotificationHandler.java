@@ -50,6 +50,7 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
     public static final String TASK_ID = "GenerateDashboardNotificationFinalOrderClaimant";
     private final DashboardNotificationService dashboardNotificationService;
     private final TaskListService taskListService;
+    private final SdoHelper sdoHelper;
     public static final String GA = "Applications";
 
     public OrderMadeClaimantNotificationHandler(DashboardScenariosService dashboardScenariosService,
@@ -57,12 +58,14 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
                                                 FeatureToggleService featureToggleService, ObjectMapper objectMapper,
                                                 WorkingDayIndicator workingDayIndicator,
                                                 DashboardNotificationService dashboardNotificationService,
-                                                TaskListService taskListService) {
+                                                TaskListService taskListService,
+                                                SdoHelper sdoHelper) {
         super(dashboardScenariosService, mapper, featureToggleService, workingDayIndicator);
         this.objectMapper = objectMapper;
         this.workingDayIndicator = workingDayIndicator;
         this.dashboardNotificationService = dashboardNotificationService;
         this.taskListService = taskListService;
+        this.sdoHelper = sdoHelper;
     }
 
     @Override
@@ -184,7 +187,7 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
     }
 
     private boolean isOrderMadeFastTrackTrialNotResponded(CaseData caseData) {
-        return SdoHelper.isFastTrack(caseData) && isNull(caseData.getTrialReadyApplicant());
+        return sdoHelper.isFastTrack(caseData) && isNull(caseData.getTrialReadyApplicant());
     }
 
     private void deleteNotificationAndInactiveTasks(CaseData caseData) {

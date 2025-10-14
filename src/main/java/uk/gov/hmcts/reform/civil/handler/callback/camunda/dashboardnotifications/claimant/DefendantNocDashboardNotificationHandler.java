@@ -45,6 +45,7 @@ public class DefendantNocDashboardNotificationHandler extends CallbackHandler {
     private final DashboardNotificationService dashboardNotificationService;
     private final DashboardNotificationsParamsMapper mapper;
     private final FeatureToggleService featureToggleService;
+    private final SdoHelper sdoHelper;
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
@@ -85,7 +86,7 @@ public class DefendantNocDashboardNotificationHandler extends CallbackHandler {
             );
         }
 
-        if (isNull(caseData.getTrialReadyApplicant()) && SdoHelper.isFastTrack(caseData)) {
+        if (isNull(caseData.getTrialReadyApplicant()) && sdoHelper.isFastTrack(caseData)) {
             dashboardScenariosService.recordScenarios(
                 authToken,
                 SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT_TRIAL_ARRANGEMENTS_TASK_LIST.getScenario(),

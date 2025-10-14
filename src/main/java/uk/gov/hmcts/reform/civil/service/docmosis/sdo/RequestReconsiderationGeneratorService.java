@@ -25,6 +25,7 @@ public class RequestReconsiderationGeneratorService {
     private final DocumentGeneratorService documentGeneratorService;
     private final DocumentManagementService documentManagementService;
     private final UserService userService;
+    private final SdoHelper sdoHelper;
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
         MappableObject templateData;
@@ -71,12 +72,12 @@ public class RequestReconsiderationGeneratorService {
             .caseNumber(caseData.getLegacyCaseReference())
             .applicant1(caseData.getApplicant1())
             .hasApplicant2(
-                SdoHelper.hasSharedVariable(caseData, "applicant2")
+                sdoHelper.hasSharedVariable(caseData, "applicant2")
             )
             .applicant2(caseData.getApplicant2())
             .respondent1(caseData.getRespondent1())
             .hasRespondent2(
-                SdoHelper.hasSharedVariable(caseData, "respondent2")
+                sdoHelper.hasSharedVariable(caseData, "respondent2")
             )
             .respondent2(caseData.getRespondent2())
             .upholdingPreviousOrderReason(caseData.getUpholdingPreviousOrderReason());

@@ -223,6 +223,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     private final DeadlinesCalculator deadlinesCalculator;
     private final SdoGeneratorService sdoGeneratorService;
     private final FeatureToggleService featureToggleService;
+    private final SdoHelper sdoHelper;
     private final LocationHelper locationHelper;
     private final AssignCategoryId assignCategoryId;
     private final CategoryService categoryService;
@@ -1235,14 +1236,14 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.setFastTrackFlag(NO).build();
         updatedData.isSdoR2NewScreen(NO).build();
 
-        if (SdoHelper.isSmallClaimsTrack(caseData)) {
+        if (sdoHelper.isSmallClaimsTrack(caseData)) {
             updatedData.setSmallClaimsFlag(YES).build();
-            if (SdoHelper.isSDOR2ScreenForDRHSmallClaim(caseData)) {
+            if (sdoHelper.isSDOR2ScreenForDRHSmallClaim(caseData)) {
                 updatedData.isSdoR2NewScreen(YES).build();
             }
-        } else if (SdoHelper.isFastTrack(caseData)) {
+        } else if (sdoHelper.isFastTrack(caseData)) {
             updatedData.setFastTrackFlag(YES).build();
-            if (SdoHelper.isNihlFastTrack(caseData)) {
+            if (sdoHelper.isNihlFastTrack(caseData)) {
                 updatedData.isSdoR2NewScreen(YES).build();
             }
         }
@@ -1411,11 +1412,11 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             if (!witnessValidationErrorMessage.isEmpty()) {
                 errors.add(witnessValidationErrorMessage);
             }
-        } else if (SdoHelper.isSDOR2ScreenForDRHSmallClaim(caseData)) {
+        } else if (sdoHelper.isSDOR2ScreenForDRHSmallClaim(caseData)) {
             errors.addAll(validateDRHFields(caseData));
         }
 
-        if (SdoHelper.isNihlFastTrack(caseData)) {
+        if (sdoHelper.isNihlFastTrack(caseData)) {
             List<String> errorsNihl;
             errorsNihl = validateFieldsNihl(caseData);
             if (!errorsNihl.isEmpty()) {
@@ -1565,7 +1566,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             caseData.getFastTrackMethodInPerson()));
         dataBuilder.smallClaimsMethodInPerson(deleteLocationList(
             caseData.getSmallClaimsMethodInPerson()));
-        if (SdoHelper.isSDOR2ScreenForDRHSmallClaim(caseData)
+        if (sdoHelper.isSDOR2ScreenForDRHSmallClaim(caseData)
             && caseData.getSdoR2SmallClaimsHearing() != null) {
             dataBuilder.sdoR2SmallClaimsHearing(updateHearingAfterDeletingLocationList(caseData.getSdoR2SmallClaimsHearing()));
         }
@@ -1620,16 +1621,16 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         CaseCategory caseAccessCategory = caseData.getCaseAccessCategory();
         switch (caseAccessCategory) {
             case UNSPEC_CLAIM:// unspec use allocatedTrack to hold claims track value
-                if (SdoHelper.isSmallClaimsTrack(caseData)) {
+                if (sdoHelper.isSmallClaimsTrack(caseData)) {
                     dataBuilder.allocatedTrack(SMALL_CLAIM);
-                } else if (SdoHelper.isFastTrack(caseData)) {
+                } else if (sdoHelper.isFastTrack(caseData)) {
                     dataBuilder.allocatedTrack(FAST_CLAIM);
                 }
                 break;
             case SPEC_CLAIM:// spec claims use responseClaimTrack to hold claims track value
-                if (SdoHelper.isSmallClaimsTrack(caseData)) {
+                if (sdoHelper.isSmallClaimsTrack(caseData)) {
                     dataBuilder.responseClaimTrack(SMALL_CLAIM.name());
-                } else if (SdoHelper.isFastTrack(caseData)) {
+                } else if (sdoHelper.isFastTrack(caseData)) {
                     dataBuilder.responseClaimTrack(FAST_CLAIM.name());
                 }
                 break;

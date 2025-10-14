@@ -58,6 +58,12 @@ import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearing;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearingLengthOther;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsAddNewDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
+import uk.gov.hmcts.reform.civil.helpers.sdo.strategy.DisposalHearingSdoStrategy;
+import uk.gov.hmcts.reform.civil.helpers.sdo.strategy.FastTrackSdoStrategy;
+import uk.gov.hmcts.reform.civil.helpers.sdo.strategy.NihlSdoStrategy;
+import uk.gov.hmcts.reform.civil.helpers.sdo.strategy.SdoPartyStrategy;
+import uk.gov.hmcts.reform.civil.helpers.sdo.strategy.SdoTrialStrategy;
+import uk.gov.hmcts.reform.civil.helpers.sdo.strategy.SmallClaimsSdoStrategy;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.math.BigDecimal;
@@ -73,6 +79,15 @@ import static uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingFinalDisposalHe
 
 public class SdoHelperTest {
 
+    private final SdoHelper sdoHelper = new SdoHelper(
+        new SmallClaimsSdoStrategy(),
+        new FastTrackSdoStrategy(),
+        new NihlSdoStrategy(),
+        new DisposalHearingSdoStrategy(),
+        new SdoTrialStrategy(),
+        new SdoPartyStrategy()
+    );
+
     @Nested
     class IsSmallClaimsTrackTests {
         @Test
@@ -85,7 +100,7 @@ public class SdoHelperTest {
                 .claimsTrack(ClaimsTrack.smallClaimsTrack)
                 .build();
 
-            assertThat(SdoHelper.isSmallClaimsTrack(caseData)).isTrue();
+            assertThat(sdoHelper.isSmallClaimsTrack(caseData)).isTrue();
         }
 
         @Test
@@ -98,7 +113,7 @@ public class SdoHelperTest {
                 .drawDirectionsOrderSmallClaims(YES)
                 .build();
 
-            assertThat(SdoHelper.isSmallClaimsTrack(caseData)).isTrue();
+            assertThat(sdoHelper.isSmallClaimsTrack(caseData)).isTrue();
         }
 
         @Test
@@ -107,7 +122,7 @@ public class SdoHelperTest {
                 .atStateClaimDraft()
                 .build();
 
-            assertThat(SdoHelper.isSmallClaimsTrack(caseData)).isFalse();
+            assertThat(sdoHelper.isSmallClaimsTrack(caseData)).isFalse();
         }
     }
 
@@ -123,7 +138,7 @@ public class SdoHelperTest {
                 .claimsTrack(ClaimsTrack.fastTrack)
                 .build();
 
-            assertThat(SdoHelper.isFastTrack(caseData)).isTrue();
+            assertThat(sdoHelper.isFastTrack(caseData)).isTrue();
         }
 
         @Test
@@ -137,7 +152,7 @@ public class SdoHelperTest {
                 .orderType(OrderType.DECIDE_DAMAGES)
                 .build();
 
-            assertThat(SdoHelper.isFastTrack(caseData)).isTrue();
+            assertThat(sdoHelper.isFastTrack(caseData)).isTrue();
         }
 
         @Test
@@ -146,7 +161,7 @@ public class SdoHelperTest {
                 .atStateClaimDraft()
                 .build();
 
-            assertThat(SdoHelper.isFastTrack(caseData)).isFalse();
+            assertThat(sdoHelper.isFastTrack(caseData)).isFalse();
         }
     }
 
@@ -169,7 +184,7 @@ public class SdoHelperTest {
                 .trialAdditionalDirectionsForFastTrack(fastTrackList)
                 .build();
 
-            assertThat(SdoHelper.isNihlFastTrack(caseData)).isTrue();
+            assertThat(sdoHelper.isNihlFastTrack(caseData)).isTrue();
         }
 
         @Test
@@ -186,7 +201,7 @@ public class SdoHelperTest {
                 .fastClaims(fastTrackList)
                 .build();
 
-            assertThat(SdoHelper.isNihlFastTrack(caseData)).isTrue();
+            assertThat(sdoHelper.isNihlFastTrack(caseData)).isTrue();
         }
 
         @ParameterizedTest
@@ -212,7 +227,7 @@ public class SdoHelperTest {
                                 .altHearingCourtLocationList(isAltLoc ? (options.toBuilder().value(selectedCourt).build()) : null)
                                 .build())
                 .build();
-            assertThat(SdoHelper.getHearingLocationNihl(caseData)).isNotNull();
+            assertThat(sdoHelper.getHearingLocationNihl(caseData)).isNotNull();
         }
 
         @Test
@@ -225,7 +240,7 @@ public class SdoHelperTest {
                                 .physicalBundlePartyTxt("Test")
                                 .physicalBundleOptions(PhysicalTrialBundleOptions.PARTY).build())
                 .build();
-            assertThat(SdoHelper.getPhysicalTrialTextNihl(caseData)).isNotEmpty();
+            assertThat(sdoHelper.getPhysicalTrialTextNihl(caseData)).isNotEmpty();
         }
 
         @Test
@@ -238,7 +253,7 @@ public class SdoHelperTest {
                                 .physicalBundlePartyTxt("Test")
                                 .physicalBundleOptions(PhysicalTrialBundleOptions.NONE).build())
                 .build();
-            assertThat(SdoHelper.getPhysicalTrialTextNihl(caseData)).isEmpty();
+            assertThat(sdoHelper.getPhysicalTrialTextNihl(caseData)).isEmpty();
         }
 
         @ParameterizedTest
@@ -256,7 +271,7 @@ public class SdoHelperTest {
                                                                 .isRestrictPages(isPages ? YES : NO).build())
                                           .build())
                 .build();
-            assertThat(SdoHelper.isRestrictPagesNihl(caseData)).isEqualTo(isPages);
+            assertThat(sdoHelper.isRestrictPagesNihl(caseData)).isEqualTo(isPages);
         }
 
         @ParameterizedTest
@@ -274,7 +289,7 @@ public class SdoHelperTest {
                                                                     .isRestrictWitness(isWitness ? YES : NO).build())
                                           .build())
                 .build();
-            assertThat(SdoHelper.isRestrictWitnessNihl(caseData)).isEqualTo(isWitness);
+            assertThat(sdoHelper.isRestrictWitnessNihl(caseData)).isEqualTo(isWitness);
         }
 
         @ParameterizedTest
@@ -294,7 +309,7 @@ public class SdoHelperTest {
                                                           .build())
                                                   .build())
                 .build();
-            assertThat(SdoHelper.isApplicationToRelyOnFurtherNihl(caseData)).isEqualTo(toRely ? "Yes" : "No");
+            assertThat(sdoHelper.isApplicationToRelyOnFurtherNihl(caseData)).isEqualTo(toRely ? "Yes" : "No");
         }
 
         @ParameterizedTest
@@ -309,7 +324,7 @@ public class SdoHelperTest {
                                          .isClaimForPecuniaryLoss(isClaim ? YES : NO)
                                          .build())
                 .build();
-            assertThat(SdoHelper.isClaimForPecuniaryLossNihl(caseData)).isEqualTo(isClaim);
+            assertThat(sdoHelper.isClaimForPecuniaryLossNihl(caseData)).isEqualTo(isClaim);
         }
 
         @Test
@@ -321,7 +336,7 @@ public class SdoHelperTest {
                 .sdoR2Trial(SdoR2Trial.builder()
                                 .methodOfHearing((getHearingMethodList("INTER", "In Person"))).build())
                 .build();
-            assertThat(SdoHelper.getSdoTrialMethodOfHearing(caseData)).isNotEmpty();
+            assertThat(sdoHelper.getSdoTrialMethodOfHearing(caseData)).isNotEmpty();
         }
 
         @ParameterizedTest
@@ -336,7 +351,7 @@ public class SdoHelperTest {
                                 .lengthListOther(isOther ? SdoR2TrialHearingLengthOther.builder().trialLengthDays(4).trialLengthHours(4).trialLengthMinutes(4).build() : null)
                                 .build())
                 .build();
-            assertThat(SdoHelper.getSdoTrialHearingTimeAllocated(caseData)).isEqualTo(isOther ? "4 days, 4 hours and 4 minutes" : "4 hours");
+            assertThat(sdoHelper.getSdoTrialHearingTimeAllocated(caseData)).isEqualTo(isOther ? "4 days, 4 hours and 4 minutes" : "4 hours");
         }
     }
 
@@ -344,19 +359,19 @@ public class SdoHelperTest {
     class GetSmallClaimsAdditionalDirectionEnumTests {
         @Test
         void shouldReturnCorrectEnum_whenValidAdditionalDirectionName() {
-            assertThat(SdoHelper.getSmallClaimsAdditionalDirectionEnum("smallClaimCreditHire"))
+            assertThat(sdoHelper.getSmallClaimsAdditionalDirectionEnum("smallClaimCreditHire"))
                 .isEqualTo(SmallTrack.smallClaimCreditHire);
-            assertThat(SdoHelper.getSmallClaimsAdditionalDirectionEnum("smallClaimRoadTrafficAccident"))
+            assertThat(sdoHelper.getSmallClaimsAdditionalDirectionEnum("smallClaimRoadTrafficAccident"))
                 .isEqualTo(SmallTrack.smallClaimRoadTrafficAccident);
-            assertThat(SdoHelper.getSmallClaimsAdditionalDirectionEnum("smallClaimDisputeResolutionHearing"))
+            assertThat(sdoHelper.getSmallClaimsAdditionalDirectionEnum("smallClaimDisputeResolutionHearing"))
                 .isEqualTo(SmallTrack.smallClaimDisputeResolutionHearing);
-            assertThat(SdoHelper.getSmallClaimsAdditionalDirectionEnum("smallClaimFlightDelay"))
+            assertThat(sdoHelper.getSmallClaimsAdditionalDirectionEnum("smallClaimFlightDelay"))
                 .isEqualTo(SmallTrack.smallClaimFlightDelay);
         }
 
         @Test
         void shouldReturnNull_whenInvalidAdditionalDirectionName() {
-            assertThat(SdoHelper.getSmallClaimsAdditionalDirectionEnum("test")).isEqualTo(null);
+            assertThat(sdoHelper.getSmallClaimsAdditionalDirectionEnum("test")).isEqualTo(null);
         }
     }
 
@@ -374,7 +389,7 @@ public class SdoHelperTest {
                 .smallClaims(directions)
                 .build();
 
-            assertThat(SdoHelper.hasSmallAdditionalDirections(caseData, "smallClaimCreditHire"))
+            assertThat(sdoHelper.hasSmallAdditionalDirections(caseData, "smallClaimCreditHire"))
                 .isTrue();
         }
 
@@ -390,7 +405,7 @@ public class SdoHelperTest {
                 .smallClaims(directions)
                 .build();
 
-            assertThat(SdoHelper.hasSmallAdditionalDirections(caseData, "smallClaimRoadTrafficAccident"))
+            assertThat(sdoHelper.hasSmallAdditionalDirections(caseData, "smallClaimRoadTrafficAccident"))
                 .isTrue();
         }
 
@@ -406,7 +421,7 @@ public class SdoHelperTest {
                 .smallClaims(directions)
                 .build();
 
-            assertThat(SdoHelper.hasSmallAdditionalDirections(caseData, "smallClaimDisputeResolutionHearing"))
+            assertThat(sdoHelper.hasSmallAdditionalDirections(caseData, "smallClaimDisputeResolutionHearing"))
                 .isTrue();
         }
 
@@ -420,7 +435,7 @@ public class SdoHelperTest {
                 .claimsTrack(ClaimsTrack.smallClaimsTrack)
                 .build();
 
-            assertThat(SdoHelper.hasSmallAdditionalDirections(caseData, "smallClaimRoadTrafficAccident"))
+            assertThat(sdoHelper.hasSmallAdditionalDirections(caseData, "smallClaimRoadTrafficAccident"))
                 .isFalse();
         }
 
@@ -436,7 +451,7 @@ public class SdoHelperTest {
                 .smallClaims(directions)
                 .build();
 
-            assertThat(SdoHelper.hasSmallAdditionalDirections(caseData, "smallClaimFlightDelay"))
+            assertThat(sdoHelper.hasSmallAdditionalDirections(caseData, "smallClaimFlightDelay"))
                 .isTrue();
         }
     }
@@ -458,7 +473,7 @@ public class SdoHelperTest {
                 .smallClaimsHearing(smallClaimsHearing)
                 .build();
 
-            assertThat(SdoHelper.getSmallClaimsHearingTimeLabel(caseData)).isEqualTo("four hours");
+            assertThat(sdoHelper.getSmallClaimsHearingTimeLabel(caseData)).isEqualTo("four hours");
         }
 
         @Test
@@ -479,7 +494,7 @@ public class SdoHelperTest {
                 .smallClaimsHearing(smallClaimsHearing)
                 .build();
 
-            assertThat(SdoHelper.getSmallClaimsHearingTimeLabel(caseData)).isEqualTo(expected);
+            assertThat(sdoHelper.getSmallClaimsHearingTimeLabel(caseData)).isEqualTo(expected);
         }
 
         @Test
@@ -488,7 +503,7 @@ public class SdoHelperTest {
                 .atStateClaimDraft()
                 .build();
 
-            assertThat(SdoHelper.getSmallClaimsHearingTimeLabel(caseData)).isEqualTo("");
+            assertThat(sdoHelper.getSmallClaimsHearingTimeLabel(caseData)).isEqualTo("");
         }
     }
 
@@ -510,7 +525,7 @@ public class SdoHelperTest {
                 .disposalHearingHearingTime(disposalHearingHearingTime)
                 .build();
 
-            assertThat(SdoHelper.getDisposalHearingTimeLabel(caseData)).isEqualTo("15 minutes");
+            assertThat(sdoHelper.getDisposalHearingTimeLabel(caseData)).isEqualTo("15 minutes");
         }
 
         @Test
@@ -532,7 +547,7 @@ public class SdoHelperTest {
                 .disposalHearingHearingTime(disposalHearingHearingTime)
                 .build();
 
-            assertThat(SdoHelper.getDisposalHearingTimeLabel(caseData)).isEqualTo(expected);
+            assertThat(sdoHelper.getDisposalHearingTimeLabel(caseData)).isEqualTo(expected);
         }
 
         @Test
@@ -554,7 +569,7 @@ public class SdoHelperTest {
                 .disposalHearingHearingTime(disposalHearingHearingTime)
                 .build();
 
-            assertThat(SdoHelper.getDisposalHearingTimeLabel(caseData)).isEqualTo(expected);
+            assertThat(sdoHelper.getDisposalHearingTimeLabel(caseData)).isEqualTo(expected);
         }
 
         @Test
@@ -576,7 +591,7 @@ public class SdoHelperTest {
                 .disposalHearingHearingTime(disposalHearingHearingTime)
                 .build();
 
-            assertThat(SdoHelper.getDisposalHearingTimeLabel(caseData)).isEqualTo(expected);
+            assertThat(sdoHelper.getDisposalHearingTimeLabel(caseData)).isEqualTo(expected);
         }
 
         @Test
@@ -598,7 +613,7 @@ public class SdoHelperTest {
                 .disposalHearingHearingTime(disposalHearingHearingTime)
                 .build();
 
-            assertThat(SdoHelper.getDisposalHearingTimeLabel(caseData)).isEqualTo(expected);
+            assertThat(sdoHelper.getDisposalHearingTimeLabel(caseData)).isEqualTo(expected);
         }
 
         @Test
@@ -620,7 +635,7 @@ public class SdoHelperTest {
                 .disposalHearingHearingTime(disposalHearingHearingTime)
                 .build();
 
-            assertThat(SdoHelper.getDisposalHearingTimeLabel(caseData)).isEqualTo(expected);
+            assertThat(sdoHelper.getDisposalHearingTimeLabel(caseData)).isEqualTo(expected);
         }
 
         @Test
@@ -629,7 +644,7 @@ public class SdoHelperTest {
                 .atStateClaimDraft()
                 .build();
 
-            assertThat(SdoHelper.getDisposalHearingTimeLabel(caseData)).isEqualTo("");
+            assertThat(sdoHelper.getDisposalHearingTimeLabel(caseData)).isEqualTo("");
         }
     }
 
@@ -649,7 +664,7 @@ public class SdoHelperTest {
                 .fastTrackHearingTime(fastTrackHearingTime)
                 .build();
 
-            assertThat(SdoHelper.getFastClaimsHearingTimeLabel(caseData)).isEqualTo("4 hours");
+            assertThat(sdoHelper.getFastClaimsHearingTimeLabel(caseData)).isEqualTo("4 hours");
         }
 
         @Test
@@ -669,7 +684,7 @@ public class SdoHelperTest {
                 .fastTrackHearingTime(fastTrackHearingTime)
                 .build();
 
-            assertThat(SdoHelper.getFastClaimsHearingTimeLabel(caseData)).isEqualTo(expected);
+            assertThat(sdoHelper.getFastClaimsHearingTimeLabel(caseData)).isEqualTo(expected);
         }
 
         @Test
@@ -678,7 +693,7 @@ public class SdoHelperTest {
                 .atStateClaimDraft()
                 .build();
 
-            assertThat(SdoHelper.getSmallClaimsHearingTimeLabel(caseData)).isEqualTo("");
+            assertThat(sdoHelper.getSmallClaimsHearingTimeLabel(caseData)).isEqualTo("");
         }
     }
 
@@ -693,7 +708,7 @@ public class SdoHelperTest {
                 .smallClaimsMethodTelephoneHearing(SmallClaimsMethodTelephoneHearing.telephoneTheCourt)
                 .build();
 
-            assertThat(SdoHelper.getSmallClaimsMethodTelephoneHearingLabel(caseData)).isEqualTo("the court");
+            assertThat(sdoHelper.getSmallClaimsMethodTelephoneHearingLabel(caseData)).isEqualTo("the court");
         }
 
         @Test
@@ -702,7 +717,7 @@ public class SdoHelperTest {
                 .atStateClaimDraft()
                 .build();
 
-            assertThat(SdoHelper.getSmallClaimsMethodTelephoneHearingLabel(caseData)).isEqualTo("");
+            assertThat(sdoHelper.getSmallClaimsMethodTelephoneHearingLabel(caseData)).isEqualTo("");
         }
     }
 
@@ -717,7 +732,7 @@ public class SdoHelperTest {
                 .smallClaimsMethodVideoConferenceHearing(SmallClaimsMethodVideoConferenceHearing.videoTheCourt)
                 .build();
 
-            assertThat(SdoHelper.getSmallClaimsMethodVideoConferenceHearingLabel(caseData)).isEqualTo("the court");
+            assertThat(sdoHelper.getSmallClaimsMethodVideoConferenceHearingLabel(caseData)).isEqualTo("the court");
         }
 
         @Test
@@ -726,7 +741,7 @@ public class SdoHelperTest {
                 .atStateClaimDraft()
                 .build();
 
-            assertThat(SdoHelper.getSmallClaimsMethodVideoConferenceHearingLabel(caseData)).isEqualTo("");
+            assertThat(sdoHelper.getSmallClaimsMethodVideoConferenceHearingLabel(caseData)).isEqualTo("");
         }
     }
 
@@ -744,7 +759,7 @@ public class SdoHelperTest {
                         .build())
                 .build();
 
-            assertThat(SdoHelper.showCarmMediationSection(caseData, true)).isTrue();
+            assertThat(sdoHelper.showCarmMediationSection(caseData, true)).isTrue();
         }
 
         @Test
@@ -758,7 +773,7 @@ public class SdoHelperTest {
                         .build())
                 .build();
 
-            assertThat(SdoHelper.showCarmMediationSection(caseData, false)).isFalse();
+            assertThat(sdoHelper.showCarmMediationSection(caseData, false)).isFalse();
         }
 
         @Test
@@ -770,7 +785,7 @@ public class SdoHelperTest {
                     SmallClaimsMediation.builder().build())
                 .build();
 
-            assertThat(SdoHelper.showCarmMediationSection(caseData, false)).isFalse();
+            assertThat(sdoHelper.showCarmMediationSection(caseData, false)).isFalse();
         }
 
         @Test
@@ -784,7 +799,7 @@ public class SdoHelperTest {
                         .build())
                 .build();
 
-            assertThat(SdoHelper.getSmallClaimsMediationText(caseData)).isEqualTo("small claims mediation text");
+            assertThat(sdoHelper.getSmallClaimsMediationText(caseData)).isEqualTo("small claims mediation text");
         }
 
         @Test
@@ -797,7 +812,7 @@ public class SdoHelperTest {
                         .build())
                 .build();
 
-            assertThat(SdoHelper.getSmallClaimsMediationText(caseData)).isNull();
+            assertThat(sdoHelper.getSmallClaimsMediationText(caseData)).isNull();
         }
 
         @Test
@@ -806,7 +821,7 @@ public class SdoHelperTest {
                 .atStateClaimSubmitted2v1RespondentRegistered()
                 .build();
 
-            assertThat(SdoHelper.getSmallClaimsMediationText(caseData)).isNull();
+            assertThat(sdoHelper.getSmallClaimsMediationText(caseData)).isNull();
         }
     }
 
@@ -818,7 +833,7 @@ public class SdoHelperTest {
                 .atStateClaimSubmitted2v1RespondentRegistered()
                 .build();
 
-            assertThat(SdoHelper.hasSharedVariable(caseData, "applicant2")).isTrue();
+            assertThat(sdoHelper.hasSharedVariable(caseData, "applicant2")).isTrue();
         }
 
         @Test
@@ -828,7 +843,7 @@ public class SdoHelperTest {
                 .multiPartyClaimTwoDefendantSolicitors()
                 .build();
 
-            assertThat(SdoHelper.hasSharedVariable(caseData, "respondent2")).isTrue();
+            assertThat(sdoHelper.hasSharedVariable(caseData, "respondent2")).isTrue();
         }
 
         @Test
@@ -837,9 +852,9 @@ public class SdoHelperTest {
                 .atStateClaimDraft()
                 .build();
 
-            assertThat(SdoHelper.hasSharedVariable(caseData, "applicant2")).isFalse();
-            assertThat(SdoHelper.hasSharedVariable(caseData, "respondent2")).isFalse();
-            assertThat(SdoHelper.hasSharedVariable(caseData, "invalid input")).isFalse();
+            assertThat(sdoHelper.hasSharedVariable(caseData, "applicant2")).isFalse();
+            assertThat(sdoHelper.hasSharedVariable(caseData, "respondent2")).isFalse();
+            assertThat(sdoHelper.hasSharedVariable(caseData, "invalid input")).isFalse();
         }
     }
 
@@ -858,12 +873,12 @@ public class SdoHelperTest {
                 .smallClaimsFlightDelayToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
                 .build();
 
-            assertThat(SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsHearingToggle")).isTrue();
-            assertThat(SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsMethodToggle")).isTrue();
-            assertThat(SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsDocumentsToggle")).isTrue();
-            assertThat(SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsWitnessStatementToggle"))
+            assertThat(sdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsHearingToggle")).isTrue();
+            assertThat(sdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsMethodToggle")).isTrue();
+            assertThat(sdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsDocumentsToggle")).isTrue();
+            assertThat(sdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsWitnessStatementToggle"))
                 .isTrue();
-            assertThat(SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsFlightDelayToggle"))
+            assertThat(sdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsFlightDelayToggle"))
                 .isTrue();
         }
 
@@ -885,7 +900,7 @@ public class SdoHelperTest {
                 .smallClaimsAddNewDirections(List.of(smallClaimsAddNewDirectionsElement))
                 .build();
 
-            assertThat(SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsAddNewDirections")).isTrue();
+            assertThat(sdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsAddNewDirections")).isTrue();
         }
 
         @Test
@@ -894,12 +909,12 @@ public class SdoHelperTest {
                 .atStateClaimDraft()
                 .build();
 
-            assertThat(SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsHearingToggle")).isFalse();
-            assertThat(SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsDocumentsToggle")).isFalse();
-            assertThat(SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsWitnessStatementToggle"))
+            assertThat(sdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsHearingToggle")).isFalse();
+            assertThat(sdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsDocumentsToggle")).isFalse();
+            assertThat(sdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsWitnessStatementToggle"))
                 .isFalse();
-            assertThat(SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsAddNewDirections")).isFalse();
-            assertThat(SdoHelper.hasSmallClaimsVariable(caseData, "invalid input")).isFalse();
+            assertThat(sdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsAddNewDirections")).isFalse();
+            assertThat(sdoHelper.hasSmallClaimsVariable(caseData, "invalid input")).isFalse();
         }
     }
 
@@ -907,25 +922,25 @@ public class SdoHelperTest {
     class GetFastTrackAdditionalDirectionEnumTests {
         @Test
         void shouldReturnCorrectEnum_whenValidAdditionalDirectionName() {
-            assertThat(SdoHelper.getFastTrackAdditionalDirectionEnum("fastClaimBuildingDispute"))
+            assertThat(sdoHelper.getFastTrackAdditionalDirectionEnum("fastClaimBuildingDispute"))
                 .isEqualTo(FastTrack.fastClaimBuildingDispute);
-            assertThat(SdoHelper.getFastTrackAdditionalDirectionEnum("fastClaimClinicalNegligence"))
+            assertThat(sdoHelper.getFastTrackAdditionalDirectionEnum("fastClaimClinicalNegligence"))
                 .isEqualTo(FastTrack.fastClaimClinicalNegligence);
-            assertThat(SdoHelper.getFastTrackAdditionalDirectionEnum("fastClaimCreditHire"))
+            assertThat(sdoHelper.getFastTrackAdditionalDirectionEnum("fastClaimCreditHire"))
                 .isEqualTo(FastTrack.fastClaimCreditHire);
-            assertThat(SdoHelper.getFastTrackAdditionalDirectionEnum("fastClaimEmployersLiability"))
+            assertThat(sdoHelper.getFastTrackAdditionalDirectionEnum("fastClaimEmployersLiability"))
                 .isEqualTo(FastTrack.fastClaimEmployersLiability);
-            assertThat(SdoHelper.getFastTrackAdditionalDirectionEnum("fastClaimHousingDisrepair"))
+            assertThat(sdoHelper.getFastTrackAdditionalDirectionEnum("fastClaimHousingDisrepair"))
                 .isEqualTo(FastTrack.fastClaimHousingDisrepair);
-            assertThat(SdoHelper.getFastTrackAdditionalDirectionEnum("fastClaimPersonalInjury"))
+            assertThat(sdoHelper.getFastTrackAdditionalDirectionEnum("fastClaimPersonalInjury"))
                 .isEqualTo(FastTrack.fastClaimPersonalInjury);
-            assertThat(SdoHelper.getFastTrackAdditionalDirectionEnum("fastClaimRoadTrafficAccident"))
+            assertThat(sdoHelper.getFastTrackAdditionalDirectionEnum("fastClaimRoadTrafficAccident"))
                 .isEqualTo(FastTrack.fastClaimRoadTrafficAccident);
         }
 
         @Test
         void shouldReturnNull_whenInvalidAdditionalDirectionName() {
-            assertThat(SdoHelper.getFastTrackAdditionalDirectionEnum("test")).isEqualTo(null);
+            assertThat(sdoHelper.getFastTrackAdditionalDirectionEnum("test")).isEqualTo(null);
         }
     }
 
@@ -943,7 +958,7 @@ public class SdoHelperTest {
                 .fastClaims(directions)
                 .build();
 
-            assertThat(SdoHelper.hasFastAdditionalDirections(caseData, "fastClaimBuildingDispute"))
+            assertThat(sdoHelper.hasFastAdditionalDirections(caseData, "fastClaimBuildingDispute"))
                 .isTrue();
         }
 
@@ -959,7 +974,7 @@ public class SdoHelperTest {
                 .fastClaims(directions)
                 .build();
 
-            assertThat(SdoHelper.hasFastAdditionalDirections(caseData, "fastClaimClinicalNegligence"))
+            assertThat(sdoHelper.hasFastAdditionalDirections(caseData, "fastClaimClinicalNegligence"))
                 .isTrue();
         }
 
@@ -975,7 +990,7 @@ public class SdoHelperTest {
                 .fastClaims(directions)
                 .build();
 
-            assertThat(SdoHelper.hasFastAdditionalDirections(caseData, "fastClaimCreditHire"))
+            assertThat(sdoHelper.hasFastAdditionalDirections(caseData, "fastClaimCreditHire"))
                 .isTrue();
         }
 
@@ -991,7 +1006,7 @@ public class SdoHelperTest {
                 .fastClaims(directions)
                 .build();
 
-            assertThat(SdoHelper.hasFastAdditionalDirections(caseData, "fastClaimEmployersLiability"))
+            assertThat(sdoHelper.hasFastAdditionalDirections(caseData, "fastClaimEmployersLiability"))
                 .isTrue();
         }
 
@@ -1007,7 +1022,7 @@ public class SdoHelperTest {
                 .fastClaims(directions)
                 .build();
 
-            assertThat(SdoHelper.hasFastAdditionalDirections(caseData, "fastClaimHousingDisrepair"))
+            assertThat(sdoHelper.hasFastAdditionalDirections(caseData, "fastClaimHousingDisrepair"))
                 .isTrue();
         }
 
@@ -1023,7 +1038,7 @@ public class SdoHelperTest {
                 .fastClaims(directions)
                 .build();
 
-            assertThat(SdoHelper.hasFastAdditionalDirections(caseData, "fastClaimPersonalInjury"))
+            assertThat(sdoHelper.hasFastAdditionalDirections(caseData, "fastClaimPersonalInjury"))
                 .isTrue();
         }
 
@@ -1039,7 +1054,7 @@ public class SdoHelperTest {
                 .fastClaims(directions)
                 .build();
 
-            assertThat(SdoHelper.hasFastAdditionalDirections(caseData, "fastClaimRoadTrafficAccident"))
+            assertThat(sdoHelper.hasFastAdditionalDirections(caseData, "fastClaimRoadTrafficAccident"))
                 .isTrue();
         }
 
@@ -1053,7 +1068,7 @@ public class SdoHelperTest {
                 .claimsTrack(ClaimsTrack.fastTrack)
                 .build();
 
-            assertThat(SdoHelper.hasFastAdditionalDirections(caseData, "fastClaimBuildingDispute"))
+            assertThat(sdoHelper.hasFastAdditionalDirections(caseData, "fastClaimBuildingDispute"))
                 .isFalse();
         }
     }
@@ -1077,18 +1092,18 @@ public class SdoHelperTest {
                 .fastTrackTrialToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
                 .build();
 
-            assertThat(SdoHelper.hasFastTrackVariable(caseData, "fastTrackAltDisputeResolutionToggle"))
+            assertThat(sdoHelper.hasFastTrackVariable(caseData, "fastTrackAltDisputeResolutionToggle"))
                 .isTrue();
-            assertThat(SdoHelper.hasFastTrackVariable(caseData, "fastTrackVariationOfDirectionsToggle"))
+            assertThat(sdoHelper.hasFastTrackVariable(caseData, "fastTrackVariationOfDirectionsToggle"))
                 .isTrue();
-            assertThat(SdoHelper.hasFastTrackVariable(caseData, "fastTrackSettlementToggle")).isTrue();
-            assertThat(SdoHelper.hasFastTrackVariable(caseData, "fastTrackDisclosureOfDocumentsToggle"))
+            assertThat(sdoHelper.hasFastTrackVariable(caseData, "fastTrackSettlementToggle")).isTrue();
+            assertThat(sdoHelper.hasFastTrackVariable(caseData, "fastTrackDisclosureOfDocumentsToggle"))
                 .isTrue();
-            assertThat(SdoHelper.hasFastTrackVariable(caseData, "fastTrackWitnessOfFactToggle")).isTrue();
-            assertThat(SdoHelper.hasFastTrackVariable(caseData, "fastTrackSchedulesOfLossToggle")).isTrue();
-            assertThat(SdoHelper.hasFastTrackVariable(caseData, "fastTrackCostsToggle")).isTrue();
-            assertThat(SdoHelper.hasFastTrackVariable(caseData, "fastTrackTrialToggle")).isTrue();
-            assertThat(SdoHelper.hasFastTrackVariable(caseData, "fastTrackMethodToggle")).isTrue();
+            assertThat(sdoHelper.hasFastTrackVariable(caseData, "fastTrackWitnessOfFactToggle")).isTrue();
+            assertThat(sdoHelper.hasFastTrackVariable(caseData, "fastTrackSchedulesOfLossToggle")).isTrue();
+            assertThat(sdoHelper.hasFastTrackVariable(caseData, "fastTrackCostsToggle")).isTrue();
+            assertThat(sdoHelper.hasFastTrackVariable(caseData, "fastTrackTrialToggle")).isTrue();
+            assertThat(sdoHelper.hasFastTrackVariable(caseData, "fastTrackMethodToggle")).isTrue();
         }
 
         @Test
@@ -1103,7 +1118,7 @@ public class SdoHelperTest {
                 .claimsTrack(ClaimsTrack.fastTrack)
                 .build();
 
-            assertThat(SdoHelper.hasFastTrackVariable(caseData, "fastTrackTrialDateToToggle")).isTrue();
+            assertThat(sdoHelper.hasFastTrackVariable(caseData, "fastTrackTrialDateToToggle")).isTrue();
         }
 
         @Test
@@ -1116,7 +1131,7 @@ public class SdoHelperTest {
                 .atStateSdoTrialDj()
                 .build();
 
-            assertThat(SdoHelper.hasDisposalVariable(caseData, "disposalHearingDateToToggle")).isTrue();
+            assertThat(sdoHelper.hasDisposalVariable(caseData, "disposalHearingDateToToggle")).isTrue();
         }
 
         @Test
@@ -1137,7 +1152,7 @@ public class SdoHelperTest {
                 .fastTrackAddNewDirections(List.of(fastTrackAddNewDirectionsElement))
                 .build();
 
-            assertThat(SdoHelper.hasFastTrackVariable(caseData, "fastTrackAddNewDirections")).isTrue();
+            assertThat(sdoHelper.hasFastTrackVariable(caseData, "fastTrackAddNewDirections")).isTrue();
         }
 
         @Test
@@ -1146,20 +1161,20 @@ public class SdoHelperTest {
                 .atStateClaimDraft()
                 .build();
 
-            assertThat(SdoHelper.hasFastTrackVariable(caseData, "fastTrackAltDisputeResolutionToggle"))
+            assertThat(sdoHelper.hasFastTrackVariable(caseData, "fastTrackAltDisputeResolutionToggle"))
                 .isFalse();
-            assertThat(SdoHelper.hasFastTrackVariable(caseData, "fastTrackVariationOfDirectionsToggle"))
+            assertThat(sdoHelper.hasFastTrackVariable(caseData, "fastTrackVariationOfDirectionsToggle"))
                 .isFalse();
-            assertThat(SdoHelper.hasFastTrackVariable(caseData, "fastTrackSettlementToggle")).isFalse();
-            assertThat(SdoHelper.hasFastTrackVariable(caseData, "fastTrackDisclosureOfDocumentsToggle"))
+            assertThat(sdoHelper.hasFastTrackVariable(caseData, "fastTrackSettlementToggle")).isFalse();
+            assertThat(sdoHelper.hasFastTrackVariable(caseData, "fastTrackDisclosureOfDocumentsToggle"))
                 .isFalse();
-            assertThat(SdoHelper.hasFastTrackVariable(caseData, "fastTrackWitnessOfFactToggle")).isFalse();
-            assertThat(SdoHelper.hasFastTrackVariable(caseData, "fastTrackSchedulesOfLossToggle")).isFalse();
-            assertThat(SdoHelper.hasFastTrackVariable(caseData, "fastTrackCostsToggle")).isFalse();
-            assertThat(SdoHelper.hasFastTrackVariable(caseData, "fastTrackTrialToggle")).isFalse();
+            assertThat(sdoHelper.hasFastTrackVariable(caseData, "fastTrackWitnessOfFactToggle")).isFalse();
+            assertThat(sdoHelper.hasFastTrackVariable(caseData, "fastTrackSchedulesOfLossToggle")).isFalse();
+            assertThat(sdoHelper.hasFastTrackVariable(caseData, "fastTrackCostsToggle")).isFalse();
+            assertThat(sdoHelper.hasFastTrackVariable(caseData, "fastTrackTrialToggle")).isFalse();
 
-            assertThat(SdoHelper.hasFastTrackVariable(caseData, "fastTrackAddNewDirections")).isFalse();
-            assertThat(SdoHelper.hasFastTrackVariable(caseData, "invalid input")).isFalse();
+            assertThat(sdoHelper.hasFastTrackVariable(caseData, "fastTrackAddNewDirections")).isFalse();
+            assertThat(sdoHelper.hasFastTrackVariable(caseData, "invalid input")).isFalse();
         }
     }
 
@@ -1174,7 +1189,7 @@ public class SdoHelperTest {
                 .fastTrackMethodTelephoneHearing(FastTrackMethodTelephoneHearing.telephoneTheCourt)
                 .build();
 
-            assertThat(SdoHelper.getFastTrackMethodTelephoneHearingLabel(caseData)).isEqualTo("the court");
+            assertThat(sdoHelper.getFastTrackMethodTelephoneHearingLabel(caseData)).isEqualTo("the court");
         }
 
         @Test
@@ -1183,7 +1198,7 @@ public class SdoHelperTest {
                 .atStateClaimDraft()
                 .build();
 
-            assertThat(SdoHelper.getFastTrackMethodTelephoneHearingLabel(caseData)).isEqualTo("");
+            assertThat(sdoHelper.getFastTrackMethodTelephoneHearingLabel(caseData)).isEqualTo("");
         }
     }
 
@@ -1198,7 +1213,7 @@ public class SdoHelperTest {
                 .fastTrackMethodVideoConferenceHearing(FastTrackMethodVideoConferenceHearing.videoTheCourt)
                 .build();
 
-            assertThat(SdoHelper.getFastTrackMethodVideoConferenceHearingLabel(caseData)).isEqualTo("the court");
+            assertThat(sdoHelper.getFastTrackMethodVideoConferenceHearingLabel(caseData)).isEqualTo("the court");
         }
 
         @Test
@@ -1207,7 +1222,7 @@ public class SdoHelperTest {
                 .atStateClaimDraft()
                 .build();
 
-            assertThat(SdoHelper.getFastTrackMethodVideoConferenceHearingLabel(caseData)).isEqualTo("");
+            assertThat(sdoHelper.getFastTrackMethodVideoConferenceHearingLabel(caseData)).isEqualTo("");
         }
     }
 
@@ -1241,7 +1256,7 @@ public class SdoHelperTest {
                 + " / an electronic bundle of digital documents"
                 + " / a case summary containing no more than 500 words";
 
-            assertThat(SdoHelper.getFastTrackTrialBundleTypeText(caseData)).isEqualTo(expectedText);
+            assertThat(sdoHelper.getFastTrackTrialBundleTypeText(caseData)).isEqualTo(expectedText);
         }
 
         @Test
@@ -1270,7 +1285,7 @@ public class SdoHelperTest {
             String expectedText = "an indexed bundle of documents, with each page clearly numbered"
                 + " / an electronic bundle of digital documents";
 
-            assertThat(SdoHelper.getFastTrackTrialBundleTypeText(caseData)).isEqualTo(expectedText);
+            assertThat(sdoHelper.getFastTrackTrialBundleTypeText(caseData)).isEqualTo(expectedText);
         }
 
         @Test
@@ -1299,7 +1314,7 @@ public class SdoHelperTest {
             String expectedText = "an indexed bundle of documents, with each page clearly numbered"
                 + " / a case summary containing no more than 500 words";
 
-            assertThat(SdoHelper.getFastTrackTrialBundleTypeText(caseData)).isEqualTo(expectedText);
+            assertThat(sdoHelper.getFastTrackTrialBundleTypeText(caseData)).isEqualTo(expectedText);
         }
 
         @Test
@@ -1328,7 +1343,7 @@ public class SdoHelperTest {
             String expectedText = "an electronic bundle of digital documents"
                 + " / a case summary containing no more than 500 words";
 
-            assertThat(SdoHelper.getFastTrackTrialBundleTypeText(caseData)).isEqualTo(expectedText);
+            assertThat(sdoHelper.getFastTrackTrialBundleTypeText(caseData)).isEqualTo(expectedText);
         }
 
         @Test
@@ -1355,7 +1370,7 @@ public class SdoHelperTest {
 
             String expectedText = "an indexed bundle of documents, with each page clearly numbered";
 
-            assertThat(SdoHelper.getFastTrackTrialBundleTypeText(caseData)).isEqualTo(expectedText);
+            assertThat(sdoHelper.getFastTrackTrialBundleTypeText(caseData)).isEqualTo(expectedText);
         }
 
         @Test
@@ -1382,7 +1397,7 @@ public class SdoHelperTest {
 
             String expectedText = "an electronic bundle of digital documents";
 
-            assertThat(SdoHelper.getFastTrackTrialBundleTypeText(caseData)).isEqualTo(expectedText);
+            assertThat(sdoHelper.getFastTrackTrialBundleTypeText(caseData)).isEqualTo(expectedText);
         }
 
         @Test
@@ -1409,7 +1424,7 @@ public class SdoHelperTest {
 
             String expectedText = "a case summary containing no more than 500 words";
 
-            assertThat(SdoHelper.getFastTrackTrialBundleTypeText(caseData)).isEqualTo(expectedText);
+            assertThat(sdoHelper.getFastTrackTrialBundleTypeText(caseData)).isEqualTo(expectedText);
         }
 
         @Test
@@ -1418,7 +1433,7 @@ public class SdoHelperTest {
                 .atStateClaimDraft()
                 .build();
 
-            assertThat(SdoHelper.getFastTrackTrialBundleTypeText(caseData)).isEqualTo("");
+            assertThat(sdoHelper.getFastTrackTrialBundleTypeText(caseData)).isEqualTo("");
         }
     }
 
@@ -1441,7 +1456,7 @@ public class SdoHelperTest {
 
             String expectedText = "The claim is allocated to the Fast Track and is assigned to complexity band 2 because some reasons";
 
-            assertThat(SdoHelper.getFastTrackAllocation(caseData)).isEqualTo(expectedText);
+            assertThat(sdoHelper.getFastTrackAllocation(caseData)).isEqualTo(expectedText);
         }
 
         @Test
@@ -1460,7 +1475,7 @@ public class SdoHelperTest {
 
             String expectedText = "The claim is allocated to the Fast Track and is assigned to complexity band 2";
 
-            assertThat(SdoHelper.getFastTrackAllocation(caseData)).isEqualTo(expectedText);
+            assertThat(sdoHelper.getFastTrackAllocation(caseData)).isEqualTo(expectedText);
         }
 
         @Test
@@ -1478,7 +1493,7 @@ public class SdoHelperTest {
 
             String expectedText = "The claim is allocated to the Fast Track and is not assigned to a complexity band";
 
-            assertThat(SdoHelper.getFastTrackAllocation(caseData)).isEqualTo(expectedText);
+            assertThat(sdoHelper.getFastTrackAllocation(caseData)).isEqualTo(expectedText);
         }
 
         @Test
@@ -1497,7 +1512,7 @@ public class SdoHelperTest {
 
             String expectedText = "The claim is allocated to the Fast Track and is not assigned to a complexity band because some more reasons";
 
-            assertThat(SdoHelper.getFastTrackAllocation(caseData)).isEqualTo(expectedText);
+            assertThat(sdoHelper.getFastTrackAllocation(caseData)).isEqualTo(expectedText);
         }
     }
 
@@ -1519,7 +1534,7 @@ public class SdoHelperTest {
                 .disposalHearingFinalDisposalHearing(disposalHearingFinalDisposalHearing)
                 .build();
 
-            assertThat(SdoHelper.getDisposalHearingFinalDisposalHearingTimeLabel(caseData)).isEqualTo("30 minutes");
+            assertThat(sdoHelper.getDisposalHearingFinalDisposalHearingTimeLabel(caseData)).isEqualTo("30 minutes");
         }
 
         @Test
@@ -1528,7 +1543,7 @@ public class SdoHelperTest {
                 .atStateClaimDraft()
                 .build();
 
-            assertThat(SdoHelper.getDisposalHearingFinalDisposalHearingTimeLabel(caseData)).isEqualTo("");
+            assertThat(sdoHelper.getDisposalHearingFinalDisposalHearingTimeLabel(caseData)).isEqualTo("");
         }
     }
 
@@ -1543,7 +1558,7 @@ public class SdoHelperTest {
                 .disposalHearingMethodTelephoneHearing(DisposalHearingMethodTelephoneHearing.telephoneTheCourt)
                 .build();
 
-            assertThat(SdoHelper.getDisposalHearingMethodTelephoneHearingLabel(caseData)).isEqualTo("the court");
+            assertThat(sdoHelper.getDisposalHearingMethodTelephoneHearingLabel(caseData)).isEqualTo("the court");
         }
 
         @Test
@@ -1552,7 +1567,7 @@ public class SdoHelperTest {
                 .atStateClaimDraft()
                 .build();
 
-            assertThat(SdoHelper.getDisposalHearingMethodTelephoneHearingLabel(caseData)).isEqualTo("");
+            assertThat(sdoHelper.getDisposalHearingMethodTelephoneHearingLabel(caseData)).isEqualTo("");
         }
     }
 
@@ -1567,7 +1582,7 @@ public class SdoHelperTest {
                 .disposalHearingMethodVideoConferenceHearing(DisposalHearingMethodVideoConferenceHearing.videoTheCourt)
                 .build();
 
-            assertThat(SdoHelper.getDisposalHearingMethodVideoConferenceHearingLabel(caseData)).isEqualTo("the court");
+            assertThat(sdoHelper.getDisposalHearingMethodVideoConferenceHearingLabel(caseData)).isEqualTo("the court");
         }
 
         @Test
@@ -1576,7 +1591,7 @@ public class SdoHelperTest {
                 .atStateClaimDraft()
                 .build();
 
-            assertThat(SdoHelper.getDisposalHearingMethodVideoConferenceHearingLabel(caseData)).isEqualTo("");
+            assertThat(sdoHelper.getDisposalHearingMethodVideoConferenceHearingLabel(caseData)).isEqualTo("");
         }
     }
 
@@ -1606,7 +1621,7 @@ public class SdoHelperTest {
                 + " / an electronic bundle of digital documents"
                 + " / a case summary containing no more than 500 words";
 
-            assertThat(SdoHelper.getDisposalHearingBundleTypeText(caseData)).isEqualTo(expectedText);
+            assertThat(sdoHelper.getDisposalHearingBundleTypeText(caseData)).isEqualTo(expectedText);
         }
 
         @Test
@@ -1631,7 +1646,7 @@ public class SdoHelperTest {
             String expectedText = "an indexed bundle of documents, with each page clearly numbered"
                 + " / an electronic bundle of digital documents";
 
-            assertThat(SdoHelper.getDisposalHearingBundleTypeText(caseData)).isEqualTo(expectedText);
+            assertThat(sdoHelper.getDisposalHearingBundleTypeText(caseData)).isEqualTo(expectedText);
         }
 
         @Test
@@ -1656,7 +1671,7 @@ public class SdoHelperTest {
             String expectedText = "an indexed bundle of documents, with each page clearly numbered"
                 + " / a case summary containing no more than 500 words";
 
-            assertThat(SdoHelper.getDisposalHearingBundleTypeText(caseData)).isEqualTo(expectedText);
+            assertThat(sdoHelper.getDisposalHearingBundleTypeText(caseData)).isEqualTo(expectedText);
         }
 
         @Test
@@ -1681,7 +1696,7 @@ public class SdoHelperTest {
             String expectedText = "an electronic bundle of digital documents"
                 + " / a case summary containing no more than 500 words";
 
-            assertThat(SdoHelper.getDisposalHearingBundleTypeText(caseData)).isEqualTo(expectedText);
+            assertThat(sdoHelper.getDisposalHearingBundleTypeText(caseData)).isEqualTo(expectedText);
         }
 
         @Test
@@ -1704,7 +1719,7 @@ public class SdoHelperTest {
 
             String expectedText = "an indexed bundle of documents, with each page clearly numbered";
 
-            assertThat(SdoHelper.getDisposalHearingBundleTypeText(caseData)).isEqualTo(expectedText);
+            assertThat(sdoHelper.getDisposalHearingBundleTypeText(caseData)).isEqualTo(expectedText);
         }
 
         @Test
@@ -1727,7 +1742,7 @@ public class SdoHelperTest {
 
             String expectedText = "an electronic bundle of digital documents";
 
-            assertThat(SdoHelper.getDisposalHearingBundleTypeText(caseData)).isEqualTo(expectedText);
+            assertThat(sdoHelper.getDisposalHearingBundleTypeText(caseData)).isEqualTo(expectedText);
         }
 
         @Test
@@ -1750,7 +1765,7 @@ public class SdoHelperTest {
 
             String expectedText = "a case summary containing no more than 500 words";
 
-            assertThat(SdoHelper.getDisposalHearingBundleTypeText(caseData)).isEqualTo(expectedText);
+            assertThat(sdoHelper.getDisposalHearingBundleTypeText(caseData)).isEqualTo(expectedText);
         }
 
         @Test
@@ -1759,7 +1774,7 @@ public class SdoHelperTest {
                 .atStateClaimDraft()
                 .build();
 
-            assertThat(SdoHelper.getDisposalHearingBundleTypeText(caseData)).isEqualTo("");
+            assertThat(sdoHelper.getDisposalHearingBundleTypeText(caseData)).isEqualTo("");
         }
     }
 
@@ -1783,23 +1798,23 @@ public class SdoHelperTest {
                 .disposalHearingCostsToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
                 .build();
 
-            assertThat(SdoHelper.hasDisposalVariable(caseData, "disposalHearingDisclosureOfDocumentsToggle"))
+            assertThat(sdoHelper.hasDisposalVariable(caseData, "disposalHearingDisclosureOfDocumentsToggle"))
                 .isTrue();
-            assertThat(SdoHelper.hasDisposalVariable(caseData, "disposalHearingWitnessOfFactToggle"))
+            assertThat(sdoHelper.hasDisposalVariable(caseData, "disposalHearingWitnessOfFactToggle"))
                 .isTrue();
-            assertThat(SdoHelper.hasDisposalVariable(caseData, "disposalHearingMedicalEvidenceToggle"))
+            assertThat(sdoHelper.hasDisposalVariable(caseData, "disposalHearingMedicalEvidenceToggle"))
                 .isTrue();
-            assertThat(SdoHelper.hasDisposalVariable(caseData, "disposalHearingQuestionsToExpertsToggle"))
+            assertThat(sdoHelper.hasDisposalVariable(caseData, "disposalHearingQuestionsToExpertsToggle"))
                 .isTrue();
-            assertThat(SdoHelper.hasDisposalVariable(caseData, "disposalHearingSchedulesOfLossToggle"))
+            assertThat(sdoHelper.hasDisposalVariable(caseData, "disposalHearingSchedulesOfLossToggle"))
                 .isTrue();
-            assertThat(SdoHelper.hasDisposalVariable(caseData, "disposalHearingFinalDisposalHearingToggle"))
+            assertThat(sdoHelper.hasDisposalVariable(caseData, "disposalHearingFinalDisposalHearingToggle"))
                 .isTrue();
-            assertThat(SdoHelper.hasDisposalVariable(caseData, "disposalHearingMethodToggle")).isTrue();
-            assertThat(SdoHelper.hasDisposalVariable(caseData, "disposalHearingBundleToggle")).isTrue();
-            assertThat(SdoHelper.hasDisposalVariable(caseData, "disposalHearingClaimSettlingToggle"))
+            assertThat(sdoHelper.hasDisposalVariable(caseData, "disposalHearingMethodToggle")).isTrue();
+            assertThat(sdoHelper.hasDisposalVariable(caseData, "disposalHearingBundleToggle")).isTrue();
+            assertThat(sdoHelper.hasDisposalVariable(caseData, "disposalHearingClaimSettlingToggle"))
                 .isTrue();
-            assertThat(SdoHelper.hasDisposalVariable(caseData, "disposalHearingCostsToggle")).isTrue();
+            assertThat(sdoHelper.hasDisposalVariable(caseData, "disposalHearingCostsToggle")).isTrue();
         }
 
         @Test
@@ -1820,7 +1835,7 @@ public class SdoHelperTest {
                 .disposalHearingAddNewDirections(List.of(disposalHearingAddNewDirectionsElement))
                 .build();
 
-            assertThat(SdoHelper.hasDisposalVariable(caseData, "disposalHearingAddNewDirections")).isTrue();
+            assertThat(sdoHelper.hasDisposalVariable(caseData, "disposalHearingAddNewDirections")).isTrue();
         }
 
         @Test
@@ -1829,27 +1844,27 @@ public class SdoHelperTest {
                 .atStateClaimDraft()
                 .build();
 
-            assertThat(SdoHelper.hasDisposalVariable(caseData, "disposalHearingDisclosureOfDocumentsToggle"))
+            assertThat(sdoHelper.hasDisposalVariable(caseData, "disposalHearingDisclosureOfDocumentsToggle"))
                 .isFalse();
-            assertThat(SdoHelper.hasDisposalVariable(caseData, "disposalHearingWitnessOfFactToggle"))
+            assertThat(sdoHelper.hasDisposalVariable(caseData, "disposalHearingWitnessOfFactToggle"))
                 .isFalse();
-            assertThat(SdoHelper.hasDisposalVariable(caseData, "disposalHearingMedicalEvidenceToggle"))
+            assertThat(sdoHelper.hasDisposalVariable(caseData, "disposalHearingMedicalEvidenceToggle"))
                 .isFalse();
-            assertThat(SdoHelper.hasDisposalVariable(caseData, "disposalHearingQuestionsToExpertsToggle"))
+            assertThat(sdoHelper.hasDisposalVariable(caseData, "disposalHearingQuestionsToExpertsToggle"))
                 .isFalse();
-            assertThat(SdoHelper.hasDisposalVariable(caseData, "disposalHearingSchedulesOfLossToggle"))
+            assertThat(sdoHelper.hasDisposalVariable(caseData, "disposalHearingSchedulesOfLossToggle"))
                 .isFalse();
-            assertThat(SdoHelper.hasDisposalVariable(caseData, "fastTrackSchedulesOfLossToggle")).isFalse();
-            assertThat(SdoHelper.hasDisposalVariable(caseData, "disposalHearingFinalDisposalHearingToggle"))
+            assertThat(sdoHelper.hasDisposalVariable(caseData, "fastTrackSchedulesOfLossToggle")).isFalse();
+            assertThat(sdoHelper.hasDisposalVariable(caseData, "disposalHearingFinalDisposalHearingToggle"))
                 .isFalse();
-            assertThat(SdoHelper.hasDisposalVariable(caseData, "disposalHearingBundleToggle")).isFalse();
-            assertThat(SdoHelper.hasDisposalVariable(caseData, "disposalHearingClaimSettlingToggle"))
+            assertThat(sdoHelper.hasDisposalVariable(caseData, "disposalHearingBundleToggle")).isFalse();
+            assertThat(sdoHelper.hasDisposalVariable(caseData, "disposalHearingClaimSettlingToggle"))
                 .isFalse();
-            assertThat(SdoHelper.hasDisposalVariable(caseData, "disposalHearingCostsToggle")).isFalse();
+            assertThat(sdoHelper.hasDisposalVariable(caseData, "disposalHearingCostsToggle")).isFalse();
 
-            assertThat(SdoHelper.hasDisposalVariable(caseData, "disposalHearingAddNewDirections")).isFalse();
+            assertThat(sdoHelper.hasDisposalVariable(caseData, "disposalHearingAddNewDirections")).isFalse();
 
-            assertThat(SdoHelper.hasDisposalVariable(caseData, "invalid input")).isFalse();
+            assertThat(sdoHelper.hasDisposalVariable(caseData, "invalid input")).isFalse();
         }
     }
 
@@ -1866,7 +1881,7 @@ public class SdoHelperTest {
                 .smallClaims(List.of(SmallTrack.smallClaimDisputeResolutionHearing))
                 .build();
 
-            assertThat(SdoHelper.isSDOR2ScreenForDRHSmallClaim(caseData)).isTrue();
+            assertThat(sdoHelper.isSDOR2ScreenForDRHSmallClaim(caseData)).isTrue();
         }
 
         @Test
@@ -1881,7 +1896,7 @@ public class SdoHelperTest {
                     List.of(SmallTrack.smallClaimDisputeResolutionHearing))
                 .build();
 
-            assertThat(SdoHelper.isSDOR2ScreenForDRHSmallClaim(caseData)).isTrue();
+            assertThat(sdoHelper.isSDOR2ScreenForDRHSmallClaim(caseData)).isTrue();
         }
 
         @ParameterizedTest
@@ -1901,9 +1916,9 @@ public class SdoHelperTest {
                 ).build()).build())
                 .build();
             if (location.equals("hearing_location")) {
-                assertThat(SdoHelper.getHearingLocationDrh(caseData).getValue().getCode()).isEqualTo(location);
+                assertThat(sdoHelper.getHearingLocationDrh(caseData).getValue().getCode()).isEqualTo(location);
             } else {
-                assertThat(SdoHelper.getHearingLocationDrh(caseData).getValue().getCode()).isEqualTo("alt_location");
+                assertThat(sdoHelper.getHearingLocationDrh(caseData).getValue().getCode()).isEqualTo("alt_location");
             }
         }
 
@@ -1921,7 +1936,7 @@ public class SdoHelperTest {
                                                                                               HearingOnRadioOptions.OPEN_DATE).build())
                 .build();
 
-            assertThat(SdoHelper.hasSdoR2HearingTrialWindow(caseData)).isEqualTo(window);
+            assertThat(sdoHelper.hasSdoR2HearingTrialWindow(caseData)).isEqualTo(window);
         }
 
         @ParameterizedTest
@@ -1940,9 +1955,9 @@ public class SdoHelperTest {
                 .build();
 
             if (selection.getLabel() != SmallClaimsSdoR2TimeEstimate.OTHER.getLabel()) {
-                assertThat(SdoHelper.getSdoR2HearingTime(caseData)).isEqualTo(selection.getLabel());
+                assertThat(sdoHelper.getSdoR2HearingTime(caseData)).isEqualTo(selection.getLabel());
             } else {
-                assertThat(SdoHelper.getSdoR2HearingTime(caseData)).isEqualTo("1 days, 2 hours, 3 minutes");
+                assertThat(sdoHelper.getSdoR2HearingTime(caseData)).isEqualTo("1 days, 2 hours, 3 minutes");
             }
         }
 
@@ -1961,9 +1976,9 @@ public class SdoHelperTest {
                 .build();
 
             if (option == SmallClaimsSdoR2PhysicalTrialBundleOptions.NO) {
-                assertThat(SdoHelper.getSdoR2SmallClaimsPhysicalTrialBundleTxt(caseData)).isEqualTo("None");
+                assertThat(sdoHelper.getSdoR2SmallClaimsPhysicalTrialBundleTxt(caseData)).isEqualTo("None");
             } else {
-                assertThat(SdoHelper.getSdoR2SmallClaimsPhysicalTrialBundleTxt(caseData)).isEqualTo("test_text");
+                assertThat(sdoHelper.getSdoR2SmallClaimsPhysicalTrialBundleTxt(caseData)).isEqualTo("test_text");
             }
         }
 
@@ -1982,11 +1997,11 @@ public class SdoHelperTest {
                 .build();
 
             if (key.equals("TEL")) {
-                assertThat(SdoHelper.getSdoR2SmallClaimsHearingMethod(caseData)).isEqualTo("by telephone");
+                assertThat(sdoHelper.getSdoR2SmallClaimsHearingMethod(caseData)).isEqualTo("by telephone");
             } else if (key.equals("VID")) {
-                assertThat(SdoHelper.getSdoR2SmallClaimsHearingMethod(caseData)).isEqualTo("by video");
+                assertThat(sdoHelper.getSdoR2SmallClaimsHearingMethod(caseData)).isEqualTo("by video");
             } else if (key.equals("INTER")) {
-                assertThat(SdoHelper.getSdoR2SmallClaimsHearingMethod(caseData)).isEqualTo("in person");
+                assertThat(sdoHelper.getSdoR2SmallClaimsHearingMethod(caseData)).isEqualTo("in person");
             }
         }
 
@@ -2001,11 +2016,11 @@ public class SdoHelperTest {
                 .build();
 
             if (key.equals("TEL")) {
-                assertThat(SdoHelper.getSdoTrialMethodOfHearing(caseData)).isEqualTo("by telephone");
+                assertThat(sdoHelper.getSdoTrialMethodOfHearing(caseData)).isEqualTo("by telephone");
             } else if (key.equals("VID")) {
-                assertThat(SdoHelper.getSdoTrialMethodOfHearing(caseData)).isEqualTo("by video conference");
+                assertThat(sdoHelper.getSdoTrialMethodOfHearing(caseData)).isEqualTo("by video conference");
             } else if (key.equals("INTER")) {
-                assertThat(SdoHelper.getSdoTrialMethodOfHearing(caseData)).isEqualTo("in person");
+                assertThat(sdoHelper.getSdoTrialMethodOfHearing(caseData)).isEqualTo("in person");
             }
         }
 
@@ -2032,7 +2047,7 @@ public class SdoHelperTest {
                         .build())
                 .build();
 
-            assertThat(SdoHelper.showCarmMediationSectionDRH(caseData, true)).isTrue();
+            assertThat(sdoHelper.showCarmMediationSectionDRH(caseData, true)).isTrue();
         }
 
         @Test
@@ -2046,7 +2061,7 @@ public class SdoHelperTest {
                         .build())
                 .build();
 
-            assertThat(SdoHelper.showCarmMediationSectionDRH(caseData, false)).isFalse();
+            assertThat(sdoHelper.showCarmMediationSectionDRH(caseData, false)).isFalse();
         }
 
         @Test
@@ -2058,7 +2073,7 @@ public class SdoHelperTest {
                     SdoR2SmallClaimsMediation.builder().build())
                 .build();
 
-            assertThat(SdoHelper.showCarmMediationSectionDRH(caseData, false)).isFalse();
+            assertThat(sdoHelper.showCarmMediationSectionDRH(caseData, false)).isFalse();
         }
 
         @Test
@@ -2072,7 +2087,7 @@ public class SdoHelperTest {
                         .build())
                 .build();
 
-            assertThat(SdoHelper.getSmallClaimsMediationTextDRH(caseData)).isEqualTo("small claims mediation text");
+            assertThat(sdoHelper.getSmallClaimsMediationTextDRH(caseData)).isEqualTo("small claims mediation text");
         }
 
         @Test
@@ -2085,7 +2100,7 @@ public class SdoHelperTest {
                         .build())
                 .build();
 
-            assertThat(SdoHelper.getSmallClaimsMediationTextDRH(caseData)).isNull();
+            assertThat(sdoHelper.getSmallClaimsMediationTextDRH(caseData)).isNull();
         }
 
         @Test
@@ -2094,7 +2109,7 @@ public class SdoHelperTest {
                 .atStateClaimSubmitted2v1RespondentRegistered()
                 .build();
 
-            assertThat(SdoHelper.getSmallClaimsMediationTextDRH(caseData)).isNull();
+            assertThat(sdoHelper.getSmallClaimsMediationTextDRH(caseData)).isNull();
         }
     }
 

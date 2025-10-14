@@ -27,15 +27,19 @@ public class ConfirmOrderReviewClaimantNotificationHandler extends ConfirmOrderR
     private static final String TASK_ID = "UpdateTaskListConfirmOrderReviewClaimant";
     private static final String USER_ROLE = "CLAIMANT";
 
+    private final SdoHelper sdoHelper;
+
     public ConfirmOrderReviewClaimantNotificationHandler(DashboardScenariosService dashboardScenariosService,
                                                          DashboardNotificationsParamsMapper mapper,
                                                          FeatureToggleService featureToggleService,
                                                          ObjectMapper objectMapper,
                                                          DashboardNotificationService dashboardNotificationService,
-                                                         TaskListService taskListService) {
+                                                         TaskListService taskListService,
+                                                         SdoHelper sdoHelper) {
         super(dashboardScenariosService, mapper, featureToggleService,
               objectMapper, USER_ROLE, TASK_ID, CASE_EVENTS,
               dashboardNotificationService, taskListService);
+        this.sdoHelper = sdoHelper;
     }
 
     @Override
@@ -53,6 +57,6 @@ public class ConfirmOrderReviewClaimantNotificationHandler extends ConfirmOrderR
     }
 
     private boolean isOrderMadeFastTrackTrialNotResponded(CaseData caseData) {
-        return SdoHelper.isFastTrack(caseData) && isNull(caseData.getTrialReadyApplicant());
+        return sdoHelper.isFastTrack(caseData) && isNull(caseData.getTrialReadyApplicant());
     }
 }

@@ -49,6 +49,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
+import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.SDOHearingNotes;
@@ -236,6 +237,9 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private SdoGeneratorService sdoGeneratorService;
+
+    @MockBean
+    private SdoHelper sdoHelper;
 
     @MockBean
     private NonWorkingDaysCollection nonWorkingDaysCollection;
@@ -1323,7 +1327,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
 
         handler = new CreateSDOCallbackHandler(objectMapper, locationRefDataService, workingDayIndicator,
-                                               deadlinesCalculator, sdoGeneratorService, featureToggleService, locationHelper,
+                                               deadlinesCalculator, sdoGeneratorService, featureToggleService, sdoHelper, locationHelper,
                                                         assignCategoryId, categoryService,
                                                         Optional.empty());
 
