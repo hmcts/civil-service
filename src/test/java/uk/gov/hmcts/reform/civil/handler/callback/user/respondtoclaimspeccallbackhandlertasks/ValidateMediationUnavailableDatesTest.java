@@ -96,7 +96,7 @@ class ValidateMediationUnavailableDatesTest {
         AboutToStartOrSubmitCallbackResponse response =
             (AboutToStartOrSubmitCallbackResponse) validateMediationUnavailableDates.execute(params);
 
-        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getErrors()).isNull();
         Map<String, Object> responseData = response.getData();
         assertThat(responseData).isNotNull();
     }
@@ -109,7 +109,7 @@ class ValidateMediationUnavailableDatesTest {
         AboutToStartOrSubmitCallbackResponse response =
             (AboutToStartOrSubmitCallbackResponse) validateMediationUnavailableDates.execute(params);
 
-        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getErrors()).isNull();
         Map<String, Object> responseData = response.getData();
         assertThat(responseData).isNotNull();
     }
@@ -124,7 +124,7 @@ class ValidateMediationUnavailableDatesTest {
         AboutToStartOrSubmitCallbackResponse response =
             (AboutToStartOrSubmitCallbackResponse) validateMediationUnavailableDates.execute(params);
 
-        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getErrors()).isNull();
 
         CaseData updatedCaseData = mapper.convertValue(response.getData(), CaseData.class);
         UnavailableDate dateEntry =
