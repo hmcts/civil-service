@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.contracts;
+package uk.gov.hmcts.reform.civil.provider;
 
 import au.com.dius.pact.provider.junit5.PactVerificationContext;
 import au.com.dius.pact.provider.junit5.PactVerificationInvocationContextProvider;
