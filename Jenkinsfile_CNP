@@ -120,7 +120,7 @@ withPipeline(type, product, component) {
     }
   }
   onMaster {
-    enablePactAs([AppPipelineDsl.PactRoles.CONSUMER])
+    enablePactAs([AppPipelineDsl.PactRoles.CONSUMER, AppPipelineDsl.PactRoles.PROVIDER])
     env.ENVIRONMENT = "aat"
     loadVaultSecrets(secrets)
   }
