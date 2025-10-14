@@ -27,6 +27,7 @@ import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
 import static org.mockito.Mockito.when;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Provider("civil-service")
 @PactBroker(
@@ -65,6 +66,7 @@ class CivilCitizenUiProviderContractTest {
         FeesPaymentController controller = new FeesPaymentController(feesPaymentService);
         mockMvc = MockMvcBuilders.standaloneSetup(controller)
             .setMessageConverters(new MappingJackson2HttpMessageConverter())
+            .alwaysDo(result -> result.getResponse().setContentType(APPLICATION_JSON_VALUE))
             .build();
         MockMvcTestTarget target = new MockMvcTestTarget();
         target.setMockMvc(mockMvc);
