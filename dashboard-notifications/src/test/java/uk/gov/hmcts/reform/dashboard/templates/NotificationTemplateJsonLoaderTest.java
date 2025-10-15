@@ -104,7 +104,6 @@ class NotificationTemplateJsonLoaderTest {
 
     @Test
     void shouldWrapIoExceptionsWhenLoadingTemplates() throws IOException {
-        ObjectMapper mockedMapper = mock(ObjectMapper.class);
         PathMatchingResourcePatternResolver mockedResolver = mock(PathMatchingResourcePatternResolver.class);
         Resource resource = mock(Resource.class);
         when(mockedResolver.getResources("pattern")).thenReturn(new Resource[]{resource});
@@ -114,6 +113,7 @@ class NotificationTemplateJsonLoaderTest {
         NotificationTemplatesProperties properties = new NotificationTemplatesProperties();
         properties.setLocation("pattern");
 
+        ObjectMapper mockedMapper = mock(ObjectMapper.class);
         NotificationTemplateJsonLoader loader = new NotificationTemplateJsonLoader(mockedMapper, mockedResolver, properties);
 
         assertThatThrownBy(loader::loadTemplates)
