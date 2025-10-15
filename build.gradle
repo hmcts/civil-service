@@ -292,6 +292,10 @@ jacocoTestReport.dependsOn subprojects.collect { project ->
   project.tasks.findByName('jacocoTestReport')
 }.findAll { it != null }
 
+tasks.named('test') {
+  finalizedBy jacocoTestReport
+}
+
 ext.libraries = [
   junit5: [
     "org.junit.jupiter:junit-jupiter-api:${versions.junit}",

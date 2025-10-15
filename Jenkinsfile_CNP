@@ -128,10 +128,6 @@ withPipeline(type, product, component) {
     loadVaultSecrets(secrets)
   }
 
-  afterSuccess('test') {
-    steps.sh './gradlew jacocoTestReport'
-  }
-
   afterAlways('test') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/build/reports/jacoco/**'
   }
