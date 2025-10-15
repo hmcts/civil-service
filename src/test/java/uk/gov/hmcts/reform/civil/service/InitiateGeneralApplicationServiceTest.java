@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.testsupport.mockito.MockitoBean;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CaseAssignmentApi;
 import uk.gov.hmcts.reform.ccd.client.model.CaseAssignmentUserRole;
@@ -129,42 +129,42 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     @Autowired
     private InitiateGeneralApplicationServiceHelper helper;
 
-    @MockBean
+    @MockitoBean
     private CaseAssignmentApi caseAssignmentApi;
 
-    @MockBean
+    @MockitoBean
     private GeneralAppsDeadlinesCalculator calc;
 
-    @MockBean
+    @MockitoBean
     private OrganisationApi organisationApi;
 
-    @MockBean
+    @MockitoBean
     private UserService userService;
 
-    @MockBean
+    @MockitoBean
     private LocationService locationService;
 
-    @MockBean
+    @MockitoBean
     private UserRoleCaching userRoleCaching;
 
-    @MockBean
+    @MockitoBean
     private WorkingDayIndicator workingDayIndicator;
 
-    @MockBean
+    @MockitoBean
     private CrossAccessUserConfiguration crossAccessUserConfiguration;
 
-    @MockBean
+    @MockitoBean
     private AuthTokenGenerator authTokenGenerator;
 
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
 
-    @MockBean
+    @MockitoBean
     private CoreCaseEventDataService coreCaseEventDataService;
 
-    @MockBean
+    @MockitoBean
     private Time time;
-    @MockBean
+    @MockitoBean
     private GeneralAppFeesService feesService;
 
     @BeforeEach

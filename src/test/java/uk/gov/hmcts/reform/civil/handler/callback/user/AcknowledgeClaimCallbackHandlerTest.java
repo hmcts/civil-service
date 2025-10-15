@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.testsupport.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
@@ -75,10 +75,10 @@ import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.RESPONSE_DEAD
 })
 class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-    @MockBean
+    @MockitoBean
     private DeadlinesCalculator deadlinesCalculator;
 
-    @MockBean
+    @MockitoBean
     private Time time;
 
     @Autowired
@@ -93,10 +93,10 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Autowired
     private AssignCategoryId assignCategoryId;
 
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
 
-    @MockBean
+    @MockitoBean
     private CoreCaseUserService coreCaseUserService;
 
     @Nested

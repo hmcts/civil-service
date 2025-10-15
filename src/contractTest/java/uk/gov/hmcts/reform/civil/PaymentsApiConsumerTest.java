@@ -11,7 +11,7 @@ import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.testsupport.mockito.MockitoBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
@@ -55,13 +55,13 @@ public class PaymentsApiConsumerTest extends BaseContractTest {
     @Autowired
     private PaymentsService paymentsService;
 
-    @MockBean
+    @MockitoBean
     AuthTokenGenerator authTokenGenerator;
 
-    @MockBean
+    @MockitoBean
     private OrganisationService organisationService;
 
-    @MockBean
+    @MockitoBean
     private PaymentsConfiguration paymentsConfiguration;
 
     private CaseData caseData = CaseDataBuilder.builder().buildClaimIssuedPaymentCaseDataWithPba(ACCOUNT_NUMBER);
