@@ -552,7 +552,19 @@ project.ext {
   pactVersion = getCheckedOutGitCommitHash()
 }
 
-def pactBranchName = System.getenv("PACT_BRANCH_NAME") ?: System.getenv("BRANCH_NAME") ?: 'Dev'
+def resolveBranchName() {
+  def candidate = System.getenv("PACT_BRANCH_NAME")
+    ?: System.getenv("BRANCH_NAME")
+    ?: System.getenv("GIT_BRANCH")
+    ?: System.getenv("CHANGE_BRANCH")
+    ?: 'Dev'
+  return candidate
+    .replaceFirst('^origin/', '')
+    .replaceFirst('^refs/heads/', '')
+    .trim()
+}
+
+def pactBranchName = resolveBranchName()
 def publishVerifierResults = project.hasProperty('pact.verifier.publishResults')
   ? project.property('pact.verifier.publishResults').toString().toBoolean()
   : 'master'.equalsIgnoreCase(pactBranchName)
