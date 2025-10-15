@@ -292,6 +292,8 @@ jacocoTestReport.dependsOn subprojects.collect { project ->
   project.tasks.findByName('jacocoTestReport')
 }.findAll { it != null }
 
+jacocoTestReport.dependsOn tasks.matching { it.name.startsWith('compile') || it.name.startsWith('process') }
+
 tasks.named('test') {
   finalizedBy jacocoTestReport
 }
