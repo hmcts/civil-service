@@ -56,6 +56,7 @@ public class ShowConditionFlagsCaseUpdater implements HandleAdmitPartOfClaimCase
             currentShowFlags.add(WHEN_WILL_CLAIM_BE_PAID);
         }
         updatedCaseData.showConditionFlags(currentShowFlags);
+        check1v1PartAdmitLRBulkAdmission(updatedCaseData);
 
     }
 
@@ -291,6 +292,8 @@ public class ShowConditionFlagsCaseUpdater implements HandleAdmitPartOfClaimCase
 
     private void check1v1PartAdmitLRBulkAdmission(CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
         log.info("Checking 1v1 Part Admit LR Bulk Admission");
-        updatedCaseData.build();
+        CaseData caseData = updatedCaseData.build();
+            updatedCaseData.partAdmit1v1Defendant(MultiPartyScenario.isOneVOne(caseData)
+                    && caseData.isPartAdmitClaimSpec() ? YES : NO);
     }
 }
