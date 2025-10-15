@@ -54,6 +54,10 @@ class NotificationTemplateCatalogTest {
             .name("Template.Two")
             .titleEn("Second")
             .build();
+        NotificationTemplateDefinition replacement = NotificationTemplateDefinition.builder()
+            .name("Template.One")
+            .titleEn("Replacement")
+            .build();
 
         NotificationTemplateJsonLoader loader = mock(NotificationTemplateJsonLoader.class);
         when(loader.loadTemplates()).thenReturn(List.of(first));
@@ -61,11 +65,13 @@ class NotificationTemplateCatalogTest {
         NotificationTemplateCatalog reloadedCatalog = new NotificationTemplateCatalog(loader);
         assertThat(reloadedCatalog.findByName("Template.One")).contains(first);
 
-        when(loader.loadTemplates()).thenReturn(List.of(second));
+        when(loader.loadTemplates()).thenReturn(List.of(first, replacement, second));
         reloadedCatalog.reload();
 
         assertThat(reloadedCatalog.findByName("Template.Two")).contains(second);
-        assertThat(reloadedCatalog.findByName("Template.One")).isEmpty();
+        assertThat(reloadedCatalog.findByName("Template.One"))
+            .isPresent()
+            .contains(replacement);
         assertThatThrownBy(() -> reloadedCatalog.findAll().add(first))
             .isInstanceOf(UnsupportedOperationException.class);
     }

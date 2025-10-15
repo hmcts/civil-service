@@ -7,7 +7,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Component
 public class NotificationTemplateCatalog {
@@ -33,14 +32,10 @@ public class NotificationTemplateCatalog {
     }
 
     public synchronized void reload() {
-        Map<String, NotificationTemplateDefinition> loaded = loader.loadTemplates().stream()
-            .filter(def -> Objects.nonNull(def.getName()))
-            .collect(Collectors.toMap(
-                NotificationTemplateDefinition::getName,
-                def -> def,
-                (existing, replacement) -> replacement,
-                LinkedHashMap::new
-            ));
+        Map<String, NotificationTemplateDefinition> loaded = new LinkedHashMap<>();
+        loader.loadTemplates().stream()
+            .filter(definition -> Objects.nonNull(definition.getName()))
+            .forEach(definition -> loaded.put(definition.getName(), definition));
         this.templates = Map.copyOf(loaded);
     }
 }

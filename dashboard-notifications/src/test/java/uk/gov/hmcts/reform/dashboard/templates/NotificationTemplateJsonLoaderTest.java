@@ -120,4 +120,39 @@ class NotificationTemplateJsonLoaderTest {
             .isInstanceOf(NotificationTemplatesLoadingException.class)
             .hasMessageContaining("Failed to parse notification template definition");
     }
+
+    @Test
+    void shouldSkipNullDefinitionsWhenLoadingTemplates() throws IOException {
+        ObjectMapper mockedMapper = mock(ObjectMapper.class);
+        PathMatchingResourcePatternResolver mockedResolver = mock(PathMatchingResourcePatternResolver.class);
+        Resource resource = mock(Resource.class);
+
+        when(mockedResolver.getResources("pattern")).thenReturn(new Resource[]{resource});
+        when(resource.getFilename()).thenReturn("template.json");
+        when(mockedMapper.readValue(any(InputStream.class), eq(NotificationTemplateDefinition.class)))
+            .thenReturn(null);
+
+        NotificationTemplatesProperties properties = new NotificationTemplatesProperties();
+        properties.setLocation("pattern");
+
+        NotificationTemplateJsonLoader loader = new NotificationTemplateJsonLoader(mockedMapper, mockedResolver, properties);
+
+        assertThat(loader.loadTemplates()).isEmpty();
+    }
+
+    @Test
+    void shouldWrapIOExceptionWhenResolvingResources() throws IOException {
+        ObjectMapper mockedMapper = mock(ObjectMapper.class);
+        PathMatchingResourcePatternResolver mockedResolver = mock(PathMatchingResourcePatternResolver.class);
+        when(mockedResolver.getResources("pattern")).thenThrow(new IOException("resolver failure"));
+
+        NotificationTemplatesProperties properties = new NotificationTemplatesProperties();
+        properties.setLocation("pattern");
+
+        NotificationTemplateJsonLoader loader = new NotificationTemplateJsonLoader(mockedMapper, mockedResolver, properties);
+
+        assertThatThrownBy(loader::loadTemplates)
+            .isInstanceOf(NotificationTemplatesLoadingException.class)
+            .hasMessageContaining("Unable to read notification template definitions");
+    }
 }
