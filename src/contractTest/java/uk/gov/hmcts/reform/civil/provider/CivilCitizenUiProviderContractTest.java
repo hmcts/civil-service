@@ -60,6 +60,10 @@ class CivilCitizenUiProviderContractTest {
     private FeesPaymentService feesPaymentService;
     private AutoCloseable mocks;
 
+    static {
+        setupPactResultPublishing();
+    }
+
     @PactBrokerConsumerVersionSelectors
     public static SelectorBuilder consumerVersionSelectors() {
         return new SelectorBuilder()
