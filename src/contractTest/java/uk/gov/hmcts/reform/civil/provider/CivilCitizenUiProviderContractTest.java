@@ -51,8 +51,6 @@ class CivilCitizenUiProviderContractTest {
     private static final String AUTH_HEADER = "Bearer some-access-token";
     private static final String CASE_REFERENCE = "1234567890123456";
     private static final String PAYMENT_REFERENCE = "RC-1701-0909-0602-0418";
-    private static final String CONTRACT_TEST_PROPERTIES = "application.properties";
-    private static final String PACT_VERIFIER_PUBLISH_RESULTS = "pact.verifier.publishResults";
 
     private MockMvc mockMvc;
 
@@ -60,38 +58,12 @@ class CivilCitizenUiProviderContractTest {
     private FeesPaymentService feesPaymentService;
     private AutoCloseable mocks;
 
-    static {
-        setupPactResultPublishing();
-    }
-
     @PactBrokerConsumerVersionSelectors
     public static SelectorBuilder consumerVersionSelectors() {
         return new SelectorBuilder()
             .matchingBranch()
             .mainBranch()
             .deployedOrReleased();
-    }
-
-    @BeforeAll
-    static void setupPactResultPublishing() {
-        if (System.getProperty(PACT_VERIFIER_PUBLISH_RESULTS) != null) {
-            return;
-        }
-        try (InputStream inputStream = CivilCitizenUiProviderContractTest.class
-            .getClassLoader()
-            .getResourceAsStream(CONTRACT_TEST_PROPERTIES)) {
-            if (inputStream == null) {
-                return;
-            }
-            Properties properties = new Properties();
-            properties.load(inputStream);
-            String propertyValue = properties.getProperty(PACT_VERIFIER_PUBLISH_RESULTS);
-            if (propertyValue != null) {
-                System.setProperty(PACT_VERIFIER_PUBLISH_RESULTS, propertyValue);
-            }
-        } catch (IOException exception) {
-            throw new UncheckedIOException("Unable to load contract test properties", exception);
-        }
     }
 
     @BeforeEach
