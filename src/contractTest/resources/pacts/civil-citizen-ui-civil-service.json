@@ -1,9 +1,9 @@
 {
   "provider": {
-    "name": "civil-service"
+    "name": "civil_service"
   },
   "consumer": {
-    "name": "civil-citizen-ui"
+    "name": "civil_citizen_ui"
   },
   "interactions": [
     {
