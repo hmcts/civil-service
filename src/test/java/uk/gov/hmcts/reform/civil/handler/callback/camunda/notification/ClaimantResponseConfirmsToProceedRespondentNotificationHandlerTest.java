@@ -12,7 +12,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
-import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
@@ -437,7 +437,7 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
                 .atStateClaimDetailsNotified()
                 .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
                 .respondent2OrganisationPolicy(OrganisationPolicy.builder()
-                                                   .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                                                   .organisation(uk.gov.hmcts.reform.civil.model.Organisation.builder()
                                                                      .organisationID("Resp_2_Org_Id")
                                                                      .build()).build())
                 .respondentSolicitor2EmailAddress("resp2_sol_email")

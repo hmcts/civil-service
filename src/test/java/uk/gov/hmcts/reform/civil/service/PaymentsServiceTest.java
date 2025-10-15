@@ -8,7 +8,7 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
@@ -105,7 +105,7 @@ class PaymentsServiceTest {
 
     @Test
     void validateRequestShouldThrowAnError_whenFeeDetailsNotProvided() {
-        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+        uk.gov.hmcts.reform.civil.model.Organisation orgId = uk.gov.hmcts.reform.civil.model.Organisation.builder()
             .organisationID("OrgId").build();
         CaseData caseData = CaseData.builder()
             .claimIssuedPBADetails(SRPbaDetails.builder().build())
@@ -121,7 +121,7 @@ class PaymentsServiceTest {
 
     @Test
     void validateRequestShouldThrowAnError_whenFeeDetailsNotProvided_withSpecAllocatedTrack() {
-        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+        uk.gov.hmcts.reform.civil.model.Organisation orgId = uk.gov.hmcts.reform.civil.model.Organisation.builder()
             .organisationID("OrgId").build();
         CaseData caseData = CaseData.builder()
             .responseClaimTrack(FAST_CLAIM.name())
@@ -138,7 +138,7 @@ class PaymentsServiceTest {
 
     @Test
     void validateRequestShouldThrowAnError_whenFeeDetailsDoNotHaveFeeCode() {
-        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+        uk.gov.hmcts.reform.civil.model.Organisation orgId = uk.gov.hmcts.reform.civil.model.Organisation.builder()
             .organisationID("OrgId").build();
         CaseData caseData = CaseData.builder()
             .claimIssuedPBADetails(SRPbaDetails.builder()
@@ -159,7 +159,7 @@ class PaymentsServiceTest {
 
     @Test
     void validateRequestShouldThrowAnError_whenFeeDetailsDoNotHaveFeeAmount() {
-        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+        uk.gov.hmcts.reform.civil.model.Organisation orgId = uk.gov.hmcts.reform.civil.model.Organisation.builder()
             .organisationID("OrgId").build();
         CaseData caseData = CaseData.builder()
             .claimIssuedPBADetails(SRPbaDetails.builder()
@@ -180,7 +180,7 @@ class PaymentsServiceTest {
 
     @Test
     void shouldCreateCreditAccountPayment_whenValidCaseDetails() {
-        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+        uk.gov.hmcts.reform.civil.model.Organisation orgId = uk.gov.hmcts.reform.civil.model.Organisation.builder()
                 .organisationID("OrgId").build();
         SRPbaDetails hfPbaDetails = SRPbaDetails.builder()
                 .serviceReqReference("request-reference")
