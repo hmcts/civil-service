@@ -242,7 +242,6 @@ public class DashboardNotificationServiceTest {
 
         @Test
         void shouldReuseExistingClickActionIdWhenRecordingSecondClick() {
-            String authToken = "Auth-token";
             DashboardNotificationsEntity notification = getNotification(id);
             NotificationActionEntity existingAction = NotificationActionEntity.builder()
                 .id(99L)
@@ -254,6 +253,7 @@ public class DashboardNotificationServiceTest {
             when(dashboardNotificationsRepository.findById(id)).thenReturn(Optional.of(notification));
             when(dashboardNotificationsRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
+            String authToken = "Auth-token";
             UserDetails userDetails = Mockito.mock(UserDetails.class);
             when(userDetails.getFullName()).thenReturn("Claimant user");
             when(idamApi.retrieveUserDetails(authToken)).thenReturn(userDetails);
