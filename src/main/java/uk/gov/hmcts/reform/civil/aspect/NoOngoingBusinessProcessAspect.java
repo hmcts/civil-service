@@ -42,7 +42,7 @@ public class NoOngoingBusinessProcessAspect {
         if (callbackParams.getType() == SUBMITTED
             || caseEvent.isCamundaEvent()
             || caseData.hasNoOngoingBusinessProcess()
-            || caseEvent.equals(CaseEvent.migrateCase)
+            || (caseEvent.equals(CaseEvent.migrateCase) || caseEvent.equals(CaseEvent.UPDATE_CASE_DATA))
         ) {
             return joinPoint.proceed();
         }

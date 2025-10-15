@@ -37,6 +37,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ACKNOWLEDGE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.START_BUSINESS_PROCESS;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CASE_DATA;
 
 @ExtendWith(MockitoExtension.class)
 class NoOngoingBusinessProcessAspectTest {
@@ -133,6 +134,27 @@ class NoOngoingBusinessProcessAspectTest {
 
             assertThat(result).isEqualTo(response);
             verify(proceedingJoinPoint, never()).proceed();
+        }
+
+        @ParameterizedTest
+        @SneakyThrows
+        @EnumSource(value = BusinessProcessStatus.class, names = "FINISHED", mode = EnumSource.Mode.EXCLUDE)
+        void shouldNotProceedWhenOngoingBusinessProcessUpdateCaseData(BusinessProcessStatus status) {
+            AboutToStartOrSubmitCallbackResponse response = AboutToStartOrSubmitCallbackResponse.builder().build();
+            mockProceedingJoinPoint(response);
+
+            CallbackParams callbackParams = createCallbackParams(
+                UPDATE_CASE_DATA.name(),
+                CaseDataBuilder.builder()
+                    .atStateClaimDetailsNotified()
+                    .businessProcess(BusinessProcess.builder().status(status).build())
+                    .build()
+            );
+
+            Object result = aspect.checkOngoingBusinessProcess(proceedingJoinPoint, callbackParams);
+
+            assertThat(result).isEqualTo(response);
+            verify(proceedingJoinPoint).proceed();
         }
 
         @ParameterizedTest
