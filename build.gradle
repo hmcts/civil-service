@@ -271,6 +271,14 @@ sonarqube {
   }
 }
 
+configure(subprojects.findAll { it.name == 'dashboard-notifications' }) {
+  sonarqube {
+    properties {
+      property "sonar.coverage.jacoco.xmlReportPaths", "${rootProject.buildDir}/reports/jacoco/test/jacocoTestReport.xml"
+    }
+  }
+}
+
 jacocoTestReport {
   executionData(test, integration)
   executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
