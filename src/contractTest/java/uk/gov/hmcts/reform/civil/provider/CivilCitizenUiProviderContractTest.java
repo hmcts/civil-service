@@ -36,7 +36,7 @@ import java.time.OffsetDateTime;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
-@Provider("civil-service")
+@Provider("civil_service")
 @PactBroker(
     url = "${PACT_BROKER_FULL_URL:http://localhost:80}",
     providerBranch = "${pact.provider.branch}"
