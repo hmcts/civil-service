@@ -288,6 +288,10 @@ jacocoTestReport.dependsOn {
   subprojects*.test
 }
 
+jacocoTestReport.dependsOn subprojects.collect { project ->
+  project.tasks.findByName('jacocoTestReport')
+}.findAll { it != null }
+
 ext.libraries = [
   junit5: [
     "org.junit.jupiter:junit-jupiter-api:${versions.junit}",
@@ -616,4 +620,3 @@ publishing {
     }
   }
 }
-
