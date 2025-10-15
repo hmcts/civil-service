@@ -64,7 +64,6 @@ class CivilCitizenUiProviderContractTest {
 
     @BeforeEach
     void beforeEach(PactVerificationContext context) {
-        System.setProperty("pact.verifier.publishResults", "true");
         String brokerUrl = System.getenv("PACT_BROKER_FULL_URL");
         if (brokerUrl != null && !brokerUrl.isBlank()) {
             System.setProperty("pactbroker.url", brokerUrl);
