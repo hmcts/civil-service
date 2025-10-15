@@ -114,6 +114,8 @@ class CoreCaseDataServiceV2Test {
                                                          CASE_TYPE, CASE_ID, EVENT_ID
             )).thenReturn(buildStartEventResponse());
 
+            when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
+
             when(coreCaseDataApi.submitEventForCaseWorker(
                      eq(USER_AUTH_TOKEN),
                      eq(SERVICE_AUTH_TOKEN),
@@ -129,16 +131,12 @@ class CoreCaseDataServiceV2Test {
 
         @Test
         void triggerUpdateLocationEpimdsIdEvent_WhenApplicant1DQRequestedCourtCalled() {
-            service.triggerUpdateLocationEpimdsIdEvent(Long.valueOf(CASE_ID),
-                                                       CaseEvent.valueOf(EVENT_ID),
-                                                       "12345",
-                                                       "2",
-                                                        "yes",
-                                                       "yes",
-                                                       "yes",
-                                                       "yes",
-                                                       "Summary",
-                                                       "Desc"
+            service.triggerUpdateCaseMgmtLocation(Long.valueOf(CASE_ID),
+                                                  CaseEvent.valueOf(EVENT_ID),
+                                                  "12345",
+                                                  "court closed as a cml",
+                                                  "Summary",
+                                                  "Desc"
             );
 
             verify(coreCaseDataApi).startEventForCaseWorker(USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, USER_ID,
