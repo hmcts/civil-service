@@ -7,13 +7,15 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Component
 public class NotificationTemplateCatalog {
 
     private final NotificationTemplateJsonLoader loader;
 
-    private volatile Map<String, NotificationTemplateDefinition> templates = Map.of();
+    private final AtomicReference<Map<String, NotificationTemplateDefinition>> templates =
+        new AtomicReference<>(Map.of());
 
     public NotificationTemplateCatalog(NotificationTemplateJsonLoader loader) {
         this.loader = loader;
@@ -24,11 +26,11 @@ public class NotificationTemplateCatalog {
         if (name == null) {
             return Optional.empty();
         }
-        return Optional.ofNullable(templates.get(name));
+        return Optional.ofNullable(templates.get().get(name));
     }
 
     public Collection<NotificationTemplateDefinition> findAll() {
-        return templates.values();
+        return templates.get().values();
     }
 
     public synchronized void reload() {
@@ -36,6 +38,6 @@ public class NotificationTemplateCatalog {
         loader.loadTemplates().stream()
             .filter(definition -> Objects.nonNull(definition.getName()))
             .forEach(definition -> loaded.put(definition.getName(), definition));
-        this.templates = Map.copyOf(loaded);
+        templates.set(Map.copyOf(loaded));
     }
 }
