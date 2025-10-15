@@ -33,4 +33,9 @@ class NotificationTemplateCatalogTest {
     void shouldExposeAllTemplates() {
         assertThat(catalog.findAll()).hasSize(2);
     }
+
+    @Test
+    void shouldReturnEmptyWhenTemplateNameIsNull() {
+        assertThat(catalog.findByName(null)).isEmpty();
+    }
 }
