@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import uk.gov.hmcts.reform.dashboard.config.NotificationTemplatesProperties;
+import uk.gov.hmcts.reform.dashboard.templates.NotificationTemplatesLoadingException;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -12,6 +13,7 @@ import java.io.InputStream;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -84,5 +86,38 @@ class NotificationTemplateJsonLoaderTest {
 
         assertThat(definitions).hasSize(1);
         assertThat(definitions.get(0).getTitleEn()).isEqualTo("Second");
+    }
+
+    @Test
+    void shouldReturnEmptyListWhenNoTemplatesFound() throws IOException {
+        ObjectMapper mockedMapper = mock(ObjectMapper.class);
+        PathMatchingResourcePatternResolver mockedResolver = mock(PathMatchingResourcePatternResolver.class);
+        when(mockedResolver.getResources("pattern")).thenReturn(new Resource[0]);
+
+        NotificationTemplatesProperties properties = new NotificationTemplatesProperties();
+        properties.setLocation("pattern");
+
+        NotificationTemplateJsonLoader loader = new NotificationTemplateJsonLoader(mockedMapper, mockedResolver, properties);
+
+        assertThat(loader.loadTemplates()).isEmpty();
+    }
+
+    @Test
+    void shouldWrapIoExceptionsWhenLoadingTemplates() throws IOException {
+        ObjectMapper mockedMapper = mock(ObjectMapper.class);
+        PathMatchingResourcePatternResolver mockedResolver = mock(PathMatchingResourcePatternResolver.class);
+        Resource resource = mock(Resource.class);
+        when(mockedResolver.getResources("pattern")).thenReturn(new Resource[]{resource});
+        when(resource.getDescription()).thenReturn("test.json");
+        when(resource.getInputStream()).thenThrow(new IOException("boom"));
+
+        NotificationTemplatesProperties properties = new NotificationTemplatesProperties();
+        properties.setLocation("pattern");
+
+        NotificationTemplateJsonLoader loader = new NotificationTemplateJsonLoader(mockedMapper, mockedResolver, properties);
+
+        assertThatThrownBy(loader::loadTemplates)
+            .isInstanceOf(NotificationTemplatesLoadingException.class)
+            .hasMessageContaining("Failed to parse notification template definition");
     }
 }
