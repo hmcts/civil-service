@@ -37,6 +37,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
@@ -339,6 +340,74 @@ class BundleRequestMapperTest {
             .count();
 
         assertEquals(1, defenceDocuments);
+    }
+
+    @Test
+    void shouldIncludeDefenceWhenDocumentLinkMissing() {
+        CaseDocument defenceWithoutLink = CaseDocument.builder()
+            .documentType(DocumentType.DEFENDANT_DEFENCE)
+            .documentName("no-link-defence.pdf")
+            .createdBy("Civil")
+            .documentLink(Document.builder()
+                              .documentFileName("no-link-defence.pdf")
+                              .build())
+            .createdDatetime(LocalDateTime.of(2025, 8, 18, 14, 43, 46))
+            .build();
+        Element<CaseDocument> defenceElement = new Element<>(null, defenceWithoutLink);
+
+        CaseData caseData = getCaseData().toBuilder()
+            .defendantResponseDocuments(new ArrayList<>())
+            .claimantResponseDocuments(new ArrayList<>())
+            .duplicateClaimantDefendantResponseDocs(new ArrayList<>())
+            .systemGeneratedCaseDocuments(List.of(defenceElement))
+            .duplicateSystemGeneratedCaseDocs(new ArrayList<>())
+            .build();
+
+        given(featureToggleService.isCaseProgressionEnabled()).willReturn(true);
+        given(featureToggleService.isAmendBundleEnabled()).willReturn(false);
+
+        BundleCreateRequest bundleCreateRequest = bundleRequestMapper.mapCaseDataToBundleCreateRequest(caseData,
+            "sample.yaml", "test", "test");
+
+        boolean defencePresent = bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments()
+            .stream()
+            .anyMatch(document -> document.getValue().getDocumentFileName().contains("DF 1 Defence 18/08/2025"));
+
+        assertTrue(defencePresent);
+    }
+
+    @Test
+    void shouldIgnoreNonDefenceDocuments() {
+        CaseDocument nonDefenceDoc = CaseDocument.builder()
+            .documentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
+            .createdBy("Defendant")
+            .documentLink(Document.builder()
+                              .documentUrl(TEST_URL + "/dq")
+                              .documentFileName("dq.pdf")
+                              .build())
+            .createdDatetime(LocalDateTime.of(2023, 2, 10, 2, 2, 2))
+            .build();
+
+        CaseData caseData = getCaseData().toBuilder()
+            .defendantResponseDocuments(List.of(ElementUtils.element(nonDefenceDoc)))
+            .claimantResponseDocuments(new ArrayList<>())
+            .systemGeneratedCaseDocuments(new ArrayList<>())
+            .duplicateSystemGeneratedCaseDocs(new ArrayList<>())
+            .duplicateClaimantDefendantResponseDocs(new ArrayList<>())
+            .build();
+
+        given(featureToggleService.isCaseProgressionEnabled()).willReturn(true);
+        given(featureToggleService.isAmendBundleEnabled()).willReturn(false);
+
+        BundleCreateRequest bundleCreateRequest = bundleRequestMapper.mapCaseDataToBundleCreateRequest(caseData,
+            "sample.yaml", "test", "test");
+
+        long defenceDocuments = bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments()
+            .stream()
+            .filter(document -> document.getValue().getDocumentType().equals(BundleFileNameList.DEFENCE.getDisplayName()))
+            .count();
+
+        assertEquals(0, defenceDocuments);
     }
 
     @ParameterizedTest
