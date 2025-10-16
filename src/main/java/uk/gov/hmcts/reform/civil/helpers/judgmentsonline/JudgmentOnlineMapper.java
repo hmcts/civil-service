@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
+import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 
 import java.math.BigDecimal;
@@ -26,6 +27,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 public abstract class JudgmentOnlineMapper {
 
     private static final int MAX_LENGTH_PARTY_NAME = 70;
+    private final Time time;
 
     public JudgmentDetails addUpdateActiveJudgment(CaseData caseData) {
         JudgmentDetails activeJudgment = isNull(caseData.getActiveJudgment()) ? JudgmentDetails.builder()
@@ -121,7 +123,7 @@ public abstract class JudgmentOnlineMapper {
             caseDataBuilder.joFullyPaymentMadeDate(activeJudgment.getFullyPaymentMadeDate());
         }
         caseDataBuilder.joRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(activeJudgment, interest))
-            .joJudgementByAdmissionIssueDate(LocalDateTime.now());
+            .joJudgementByAdmissionIssueDate(time.now());
     }
 
     protected abstract JudgmentState getJudgmentState(CaseData caseData);

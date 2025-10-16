@@ -1,12 +1,10 @@
 package uk.gov.hmcts.reform.civil.helpers;
 
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.ClaimValue;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
@@ -15,13 +13,10 @@ import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -32,41 +27,20 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 
 @Slf4j
 @Component
+@NoArgsConstructor
 public class LocationHelper {
 
     private static final Set<Party.Type> PEOPLE = EnumSet.of(Party.Type.INDIVIDUAL, Party.Type.SOLE_TRADER);
-    private final BigDecimal ccmccAmount;
-    private final String ccmccRegionId;
-    private final String ccmccEpimsId;
-    private final String cnbcRegionId;
-    private final String cnbcEpimsId;
-    private final FeatureToggleService featureToggleService;
-
-    public LocationHelper(
-        @Value("${genApp.lrd.ccmcc.amountPounds}") BigDecimal ccmccAmount,
-        @Value("${genApp.lrd.ccmcc.epimsId}") String ccmccEpimsId,
-        @Value("${genApp.lrd.ccmcc.regionId}") String ccmccRegionId,
-        @Value("${court-location.specified-claim.epimms-id}") String cnbcEpimsId,
-        @Value("${court-location.specified-claim.region-id}") String cnbcRegionId,
-        FeatureToggleService featureToggleService) {
-
-        this.ccmccAmount = ccmccAmount;
-        this.ccmccRegionId = ccmccRegionId;
-        this.ccmccEpimsId = ccmccEpimsId;
-        this.cnbcEpimsId = cnbcEpimsId;
-        this.cnbcRegionId = cnbcRegionId;
-        this.featureToggleService = featureToggleService;
-    }
 
     public Optional<RequestedCourt> getCaseManagementLocation(CaseData caseData) {
-        return getCaseManagementLocationDefault(caseData, false);
+        return getCaseManagementLocationDefault(caseData);
     }
 
-    public Optional<RequestedCourt> getCaseManagementLocationWhenLegalAdvisorSdo(CaseData caseData, boolean legalAdvisorSdo) {
-        return getCaseManagementLocationDefault(caseData, legalAdvisorSdo);
+    public Optional<RequestedCourt> getCaseManagementLocationWhenLegalAdvisorSdo(CaseData caseData) {
+        return getCaseManagementLocationDefault(caseData);
     }
 
-    private Optional<RequestedCourt> getCaseManagementLocationDefault(CaseData caseData, boolean isLegalAdvisorSdo) {
+    private Optional<RequestedCourt> getCaseManagementLocationDefault(CaseData caseData) {
         List<RequestedCourt> prioritized = new ArrayList<>();
         boolean leadDefendantIs1 = leadDefendantIs1(caseData);
         Supplier<Party.Type> getDefendantType;
@@ -83,36 +57,15 @@ public class LocationHelper {
                 .map(Respondent2DQ::getRespondent2DQRequestedCourt);
         }
 
-        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
-            && ccmccAmount.compareTo(getClaimValue(caseData)) > 0) {
-            if (!isLegalAdvisorSdo) {
-                log.debug("Case {}, specified claim over 1000, CML set to CCMCC", caseData.getCcdCaseReference());
-                return Optional.of(RequestedCourt.builder().caseLocation(getCcmccCaseLocation()).build());
-            } else {
-                log.debug("Case {}, specified claim over 1000, Legal advisor,  CML set to preferred location", caseData.getCcdCaseReference());
-                assignSpecPreferredCourt(caseData, getDefendantType, getDefendantCourt, prioritized);
-                return prioritized.stream().findFirst();
-            }
-        }
-
-        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory()) && ccmccAmount.compareTo(getClaimValue(caseData)) <= 0) {
-            log.debug("Case {}, specified claim under 1000.", caseData.getCcdCaseReference());
-
-            if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)
-                && isMultiOrIntTrackSpec(caseData)
-                && caseData.isLipCase()) {
-                log.debug("Case {}, specified claim under 1000 for multiTrack", caseData.getCcdCaseReference());
-                return Optional.of(RequestedCourt.builder().caseLocation(getCnbcCaseLocation()).build());
-            } else {
-                log.debug("Case {}, specified claim under 1000 for not multiTrack", caseData.getCcdCaseReference());
-                assignSpecPreferredCourt(caseData, getDefendantType, getDefendantCourt, prioritized);
-                return prioritized.stream().findFirst();
-            }
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            log.info("Case {}, specified claim CML set to preferred location", caseData.getCcdCaseReference());
+            assignSpecPreferredCourt(caseData, getDefendantType, getDefendantCourt, prioritized);
+            return prioritized.stream().findFirst();
         }
 
         if (UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             getClaimantRequestedCourt(caseData).ifPresent(requestedCourt -> {
-                log.debug("Case {}, Claimant has requested a court", caseData.getCcdCaseReference());
+                log.info("Case {}, unspec claim, Claimant has requested a court", caseData.getCcdCaseReference());
                 prioritized.add(requestedCourt);
             });
             return prioritized.stream().findFirst();
@@ -141,25 +94,6 @@ public class LocationHelper {
         return StringUtils.isNotBlank(requestedCourt.getResponseCourtCode())
             || Optional.ofNullable(requestedCourt.getResponseCourtLocations())
             .map(DynamicList::getValue).isPresent();
-    }
-
-    private BigDecimal getClaimValue(CaseData caseData) {
-        // super claim type is not always loaded
-        return Stream.of(
-                caseData.getTotalClaimAmount(),
-                Optional.ofNullable(caseData.getClaimValue()).map(ClaimValue::toPounds).orElse(null)
-            )
-            .filter(Objects::nonNull)
-            .findFirst()
-            .orElse(BigDecimal.ZERO);
-    }
-
-    private CaseLocationCivil getCcmccCaseLocation() {
-        return CaseLocationCivil.builder().baseLocation(ccmccEpimsId).region(ccmccRegionId).build();
-    }
-
-    private CaseLocationCivil getCnbcCaseLocation() {
-        return CaseLocationCivil.builder().baseLocation(cnbcEpimsId).region(cnbcRegionId).build();
     }
 
     /**
@@ -274,7 +208,12 @@ public class LocationHelper {
         Optional<LocationRefData> matchingLocation = getMatching(getLocations.get(), requestedCourt);
         Long reference = updatedData.build().getCcdCaseReference();
         if (log.isInfoEnabled()) {
-            log.info("Case {}, requested court is {}", reference, requestedCourt != null ? "defined" : "undefined");
+            Optional.ofNullable(requestedCourt)
+                .map(RequestedCourt::getCaseLocation)
+                .map(CaseLocationCivil::getBaseLocation)
+                .ifPresentOrElse(baseLocation -> log.info("Case {}, requested court is {}", reference, baseLocation),
+                            () -> log.info("Case {}, requested court or location is missing", reference)
+                );
             log.info(
                 "Case {}, there {} a location matching to requested court",
                 reference,
@@ -296,11 +235,5 @@ public class LocationHelper {
     private boolean isValidCaseLocation(CaseLocationCivil caseLocation) {
         return caseLocation != null && StringUtils.isNotBlank(caseLocation.getBaseLocation())
             && StringUtils.isNotBlank(caseLocation.getRegion());
-    }
-
-    private boolean isMultiOrIntTrackSpec(CaseData caseData) {
-        return AllocatedTrack.INTERMEDIATE_CLAIM.name().equals(caseData.getResponseClaimTrack())
-            || AllocatedTrack.MULTI_CLAIM.name().equals(caseData.getResponseClaimTrack());
-
     }
 }
