@@ -27,11 +27,13 @@ import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleFileNameHelper.getEvidenceUploadDocsByPartyAndDocType;
 import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleFileNameHelper.getWitnessDocsByPartyAndDocType;
@@ -418,10 +420,10 @@ public class BundleRequestMapper {
             BundleFileNameList.CLAIM_FORM.getDisplayName()
         ));
         bundlingRequestDocuments.addAll(mapParticularsOfClaimDocs(caseData));
-        List<Element<CaseDocument>> clAndDfDocList = caseData.getDefendantResponseDocuments();
-        clAndDfDocList.addAll(caseData.getClaimantResponseDocuments());
         List<Element<CaseDocument>> sortedDefendantDefenceAndClaimantReply =
-            bundleDocumentsRetrieval.getSortedDefendantDefenceAndClaimantReply(clAndDfDocList);
+            bundleDocumentsRetrieval.getSortedDefendantDefenceAndClaimantReply(
+                collectDefenceAndReplyDocuments(caseData)
+            );
         sortedDefendantDefenceAndClaimantReply.forEach(caseDocumentElement -> {
             String docType = caseDocumentElement.getValue().getDocumentType().equals(DocumentType.DEFENDANT_DEFENCE)
                 ? BundleFileNameList.DEFENCE.getDisplayName() : BundleFileNameList.CL_REPLY.getDisplayName();
@@ -430,6 +432,8 @@ public class BundleRequestMapper {
                 party = PartyType.DEFENDANT1.getDisplayName();
             } else if (caseDocumentElement.getValue().getCreatedBy().equalsIgnoreCase("Defendant 2")) {
                 party = PartyType.DEFENDANT2.getDisplayName();
+            } else if (caseDocumentElement.getValue().getDocumentType() == DocumentType.DEFENDANT_DEFENCE) {
+                party = PartyType.DEFENDANT1.getDisplayName();
             } else {
                 party = "";
             }
@@ -477,6 +481,58 @@ public class BundleRequestMapper {
                                                                    ))
         );
         return ElementUtils.wrapElements(bundlingRequestDocuments);
+    }
+
+    private List<Element<CaseDocument>> collectDefenceAndReplyDocuments(CaseData caseData) {
+        Map<String, Element<CaseDocument>> uniqueDocuments = new LinkedHashMap<>();
+
+        Stream.of(
+                caseData.getDefendantResponseDocuments(),
+                caseData.getClaimantResponseDocuments(),
+                caseData.getDuplicateClaimantDefendantResponseDocs(),
+                caseData.getSystemGeneratedCaseDocuments(),
+                caseData.getDuplicateSystemGeneratedCaseDocs()
+            )
+            .filter(Objects::nonNull)
+            .forEach(source -> source.stream()
+                .forEach(element -> addDefenceDocument(uniqueDocuments, element)));
+
+        Stream.of(
+                caseData.getRespondent1GeneratedResponseDocument(),
+                caseData.getRespondent2GeneratedResponseDocument(),
+                caseData.getRespondent1ClaimResponseDocumentSpec(),
+                caseData.getRespondent2ClaimResponseDocumentSpec()
+            )
+            .filter(Objects::nonNull)
+            .forEach(caseDocument -> addDefenceDocument(uniqueDocuments, ElementUtils.<CaseDocument>element(caseDocument)));
+
+        return new ArrayList<>(uniqueDocuments.values());
+    }
+
+    private void addDefenceDocument(Map<String, Element<CaseDocument>> uniqueDocuments,
+                                    Element<CaseDocument> element) {
+        if (element == null || element.getValue() == null) {
+            return;
+        }
+        CaseDocument caseDocument = element.getValue();
+        if (caseDocument.getDocumentType() != DocumentType.DEFENDANT_DEFENCE
+            && caseDocument.getDocumentType() != DocumentType.CLAIMANT_DEFENCE) {
+            return;
+        }
+        Document documentLink = caseDocument.getDocumentLink();
+        StringBuilder keyBuilder = new StringBuilder();
+        if (caseDocument.getDocumentType() != null) {
+            keyBuilder.append(caseDocument.getDocumentType().name());
+        }
+        keyBuilder.append(":");
+        if (documentLink != null && documentLink.getDocumentUrl() != null) {
+            keyBuilder.append(documentLink.getDocumentUrl());
+        } else if (element.getId() != null) {
+            keyBuilder.append(element.getId());
+        } else if (caseDocument.getDocumentName() != null) {
+            keyBuilder.append(caseDocument.getDocumentName());
+        }
+        uniqueDocuments.putIfAbsent(keyBuilder.toString(), element);
     }
 
     private List<Element<BundlingRequestDocument>> mapTrialDocuments(CaseData caseData) {

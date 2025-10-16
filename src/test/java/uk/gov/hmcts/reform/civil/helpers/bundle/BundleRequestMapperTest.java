@@ -210,6 +210,70 @@ class BundleRequestMapperTest {
 
     }
 
+    @Test
+    void shouldIncludeDefenceFromSystemGeneratedDocuments() {
+        CaseData baseCaseData = getCaseData();
+        List<Element<CaseDocument>> systemGeneratedDocs = new ArrayList<>(baseCaseData.getSystemGeneratedCaseDocuments());
+        CaseDocument systemGeneratedDefence = CaseDocument.builder()
+            .documentType(DocumentType.DEFENDANT_DEFENCE)
+            .createdBy("Defendant")
+            .documentLink(Document.builder()
+                              .documentUrl(TEST_URL + "/system-defence")
+                              .documentFileName("system-defence.pdf")
+                              .build())
+            .createdDatetime(LocalDateTime.of(2023, 2, 11, 2, 2, 2))
+            .build();
+        systemGeneratedDocs.add(ElementUtils.element(systemGeneratedDefence));
+
+        CaseData caseData = baseCaseData.toBuilder()
+            .defendantResponseDocuments(new ArrayList<>())
+            .systemGeneratedCaseDocuments(systemGeneratedDocs)
+            .build();
+
+        given(featureToggleService.isCaseProgressionEnabled()).willReturn(true);
+        given(featureToggleService.isAmendBundleEnabled()).willReturn(false);
+
+        BundleCreateRequest bundleCreateRequest = bundleRequestMapper.mapCaseDataToBundleCreateRequest(caseData,
+            "sample.yaml", "test", "test");
+
+        boolean defencePresent = bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments()
+            .stream()
+            .anyMatch(document -> document.getValue().getDocumentFileName().contains("Defence 11/02/2023"));
+
+        assertEquals(true, defencePresent);
+    }
+
+    @Test
+    void shouldIncludeDefenceFromSpecResponseDocument() {
+        CaseDocument specDefence = CaseDocument.builder()
+            .documentType(DocumentType.DEFENDANT_DEFENCE)
+            .createdBy("Civil")
+            .documentLink(Document.builder()
+                              .documentUrl(TEST_URL + "/spec-defence")
+                              .documentFileName("spec-defence.pdf")
+                              .build())
+            .createdDatetime(LocalDateTime.of(2025, 8, 18, 14, 43, 46))
+            .build();
+
+        CaseData caseData = getCaseData().toBuilder()
+            .defendantResponseDocuments(new ArrayList<>())
+            .systemGeneratedCaseDocuments(new ArrayList<>())
+            .respondent1ClaimResponseDocumentSpec(specDefence)
+            .build();
+
+        given(featureToggleService.isCaseProgressionEnabled()).willReturn(true);
+        given(featureToggleService.isAmendBundleEnabled()).willReturn(false);
+
+        BundleCreateRequest bundleCreateRequest = bundleRequestMapper.mapCaseDataToBundleCreateRequest(caseData,
+            "sample.yaml", "test", "test");
+
+        boolean defencePresent = bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments()
+            .stream()
+            .anyMatch(document -> document.getValue().getDocumentFileName().contains("DF 1 Defence 18/08/2025"));
+
+        assertEquals(true, defencePresent);
+    }
+
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void testBundleRequestMapperWithAllDocsAndCaseEvenEnable(boolean caseProgressionCuiEnabled) {
