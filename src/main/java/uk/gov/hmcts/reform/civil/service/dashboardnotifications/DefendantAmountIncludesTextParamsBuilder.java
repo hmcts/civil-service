@@ -14,17 +14,19 @@ public class DefendantAmountIncludesTextParamsBuilder extends DashboardNotificat
         if (caseData.isPayBySetDate() || caseData.isPayByInstallment()) {
             if (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
                 params.put("defendantAmountIncludesTextEn",
-                    " (this amount includes interest if it has been claimed which may continue to accrue to the date of Judgment, settlement agreement or earlier payment)");
+                    "(this amount includes interest if it has been claimed which may continue to accrue to the date of Judgment, settlement agreement or earlier payment)");
                 params.put("defendantAmountIncludesTextCy",
-                    " (mae’r swm hwn yn cynnwys llog os yw wedi’i hawlio a gall barhau i gronni hyd dyddiad y Dyfarniad, " +
+                    "(mae’r swm hwn yn cynnwys llog os yw wedi’i hawlio a gall barhau i gronni hyd dyddiad y Dyfarniad, " +
                         "y cytundeb setlo neu daliad cynharach)");
             } else if (RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
-                boolean isInstalment = caseData.isPayByInstallment();
-                params.put("defendantAmountIncludesTextEn",
-                    isInstalment ? " plus the claim fee and any fixed costs claimed" : " plus the claim fee");
-                params.put("defendantAmountIncludesTextCy",
-                    isInstalment ? " ynghyd â ffi’r hawliad ac unrhyw gostau sefydlog a hawlir" : " ynghyd â ffi’r hawliad");
+                {
+                    params.put("defendantAmountIncludesTextEn",
+                        "plus the claim fee and any fixed costs claimed");
+                    params.put("defendantAmountIncludesTextCy",
+                        "ynghyd â ffi’r hawliad ac unrhyw gostau sefydlog a hawlir");
+                }
             }
         }
     }
 }
+

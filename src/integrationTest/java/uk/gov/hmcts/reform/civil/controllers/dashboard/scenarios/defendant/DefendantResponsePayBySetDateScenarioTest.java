@@ -53,14 +53,14 @@ public class DefendantResponsePayBySetDateScenarioTest extends DashboardBaseInte
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Response to the claim"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">You have offered to pay £1000 plus the claim fee by " +
+                    "<p class=\"govuk-body\">You have offered to pay £1000 plus the claim fee and any fixed costs claimed by " +
                         DateUtils.formatDate(responseDeadline) + ". " +
                         "We will contact you when the claimant responds to your offer.</p>" +
                         "<p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a></p>"
                 ),
                 jsonPath("$[0].titleCy").value("Ymateb i’r hawliad"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">Rydych wedi cynnig talu £1000 ynghyd â ffi’r hawliad erbyn " +
+                    "<p class=\"govuk-body\">Rydych wedi cynnig talu £1000 ynghyd â ffi’r hawliad ac unrhyw gostau sefydlog a hawlir erbyn " +
                         DateUtils.formatDateInWelsh(responseDeadline, false) + ". " +
                         "Byddwn yn cysylltu â chi pan fydd yr hawlydd yn ymateb i’ch cynnig.</p>" +
                         "<p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">Gweld eich ymateb</a></p>"

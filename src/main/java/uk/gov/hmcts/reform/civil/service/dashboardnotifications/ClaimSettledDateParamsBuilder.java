@@ -24,8 +24,6 @@ public class ClaimSettledDateParamsBuilder extends DashboardNotificationsParamsB
 
     private Optional<LocalDate> getClaimSettleDate(CaseData caseData) {
         return Optional.ofNullable(getRespondToClaim(caseData))
-            .map(RespondToClaim::getWhenWasThisAmountPaid)
-            .or(() -> Optional.ofNullable(caseData.getCaseDataLiP())
-                .map(lip -> lip.getApplicant1ClaimSettledDate()));
+            .map(RespondToClaim::getWhenWasThisAmountPaid);
     }
 }
