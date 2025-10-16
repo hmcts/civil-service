@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.caseprogression.BundleFileNameList;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.TypeOfDocDocumentaryEvidenceOfTrial;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.DocumentWithRegex;
@@ -272,6 +273,72 @@ class BundleRequestMapperTest {
             .anyMatch(document -> document.getValue().getDocumentFileName().contains("DF 1 Defence 18/08/2025"));
 
         assertEquals(true, defencePresent);
+    }
+
+    @Test
+    void shouldIncludeClaimantReplyDocument() {
+        CaseDocument claimantReply = CaseDocument.builder()
+            .documentType(DocumentType.CLAIMANT_DEFENCE)
+            .createdBy("Claimant")
+            .documentLink(Document.builder()
+                              .documentUrl(TEST_URL + "/claimant-reply")
+                              .documentFileName("claimant-reply.pdf")
+                              .build())
+            .createdDatetime(LocalDateTime.of(2023, 2, 10, 2, 2, 2))
+            .build();
+
+        CaseData caseData = getCaseData().toBuilder()
+            .defendantResponseDocuments(new ArrayList<>())
+            .claimantResponseDocuments(List.of(ElementUtils.element(claimantReply)))
+            .build();
+
+        given(featureToggleService.isCaseProgressionEnabled()).willReturn(true);
+        given(featureToggleService.isAmendBundleEnabled()).willReturn(false);
+
+        BundleCreateRequest bundleCreateRequest = bundleRequestMapper.mapCaseDataToBundleCreateRequest(caseData,
+            "sample.yaml", "test", "test");
+
+        long claimantReplies = bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments()
+            .stream()
+            .filter(document -> document.getValue().getDocumentType().equals(BundleFileNameList.CL_REPLY.getDisplayName()))
+            .count();
+
+        assertEquals(1, claimantReplies);
+    }
+
+    @Test
+    void shouldDeduplicateDefenceDocumentsAcrossSources() {
+        CaseDocument duplicateDefence = CaseDocument.builder()
+            .documentType(DocumentType.DEFENDANT_DEFENCE)
+            .createdBy("Defendant")
+            .documentLink(Document.builder()
+                              .documentUrl(TEST_URL + "/duplicate-defence")
+                              .documentFileName("duplicate-defence.pdf")
+                              .build())
+            .createdDatetime(LocalDateTime.of(2023, 2, 10, 2, 2, 2))
+            .build();
+
+        List<Element<CaseDocument>> defendantResponseDocs = List.of(ElementUtils.element(duplicateDefence));
+        List<Element<CaseDocument>> systemGeneratedDocs = new ArrayList<>(getCaseData().getSystemGeneratedCaseDocuments());
+        systemGeneratedDocs.add(ElementUtils.element(duplicateDefence));
+
+        CaseData caseData = getCaseData().toBuilder()
+            .defendantResponseDocuments(defendantResponseDocs)
+            .systemGeneratedCaseDocuments(systemGeneratedDocs)
+            .build();
+
+        given(featureToggleService.isCaseProgressionEnabled()).willReturn(true);
+        given(featureToggleService.isAmendBundleEnabled()).willReturn(false);
+
+        BundleCreateRequest bundleCreateRequest = bundleRequestMapper.mapCaseDataToBundleCreateRequest(caseData,
+            "sample.yaml", "test", "test");
+
+        long defenceDocuments = bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments()
+            .stream()
+            .filter(document -> document.getValue().getDocumentType().equals(BundleFileNameList.DEFENCE.getDisplayName()))
+            .count();
+
+        assertEquals(1, defenceDocuments);
     }
 
     @ParameterizedTest
