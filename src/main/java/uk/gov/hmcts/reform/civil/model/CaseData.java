@@ -153,6 +153,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String applicantPartyName;
     private final CertOfSC certOfSC;
     private final String gaWaTrackLabel;
+    private final String nextState;
 
     private final YesOrNo generalAppVaryJudgementType;
     private final YesOrNo generalAppParentClaimantIsApplicant;
@@ -335,6 +336,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     private final YesOrNo bundleError;
     private final String bundleEvent;
+    private final YesOrNo fullAdmitNoPaymentSchedulerProcessed;
 
     public RespondentResponseTypeSpec getRespondent1ClaimResponseTypeForSpec() {
 
@@ -610,7 +612,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<CaseDocument>> gaDraftDocRespondentSolTwo;
 
     private final List<Element<CaseDocument>> gaRespondDoc;
-
+    private final List<Element<CaseDocument>> preTranslationGaDocsApplicant;
+    private final List<Element<CaseDocument>> preTranslationGaDocsRespondent;
     @Builder.Default
     private final List<Element<CaseDocument>> hearingDocuments = new ArrayList<>();
 

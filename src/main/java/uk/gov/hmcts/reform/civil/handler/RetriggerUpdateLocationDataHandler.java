@@ -20,43 +20,38 @@ public class RetriggerUpdateLocationDataHandler extends BaseExternalTaskHandler 
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
-        if (externalTask.getVariable("caseIds") == null) {
-            throw new AssertionError("caseIds is null");
+        String caseIds = externalTask.getVariable("caseIds");
+        if (caseIds == null) {
+            throw new IllegalArgumentException("caseIds is null");
         }
         String epimsId = externalTask.getVariable("ePimId");
         if (epimsId == null) {
-            throw new AssertionError("ePimId is null");
+            throw new IllegalArgumentException("ePimId is null");
         }
-
-        String caseManagementLocation = externalTask.getVariable("caseManagementLocation");
-        String courtLocation = externalTask.getVariable("courtLocation");
-        String applicant1DQRequestedCourt = externalTask.getVariable("applicant1DQRequestedCourt");
-        String respondent1DQRequestedCourt = externalTask.getVariable("respondent1DQRequestedCourt");
-        String region = externalTask.getVariable("region");
-
-        String caseIds = externalTask.getVariable("caseIds");
-        String eventSummary = "Update locations epimId by " + epimsId;
-        String eventDescription = "Process ID: %s".formatted(externalTask.getProcessInstanceId());
+        String transferReason = externalTask.getVariable("reason");
+        if (transferReason == null) {
+            throw new IllegalArgumentException("transferReason is null");
+        }
+        String eventSummary = "Updated case management location with epimId " + epimsId;
+        String eventDescription = "Updated case management location with epimId " + epimsId;
 
         for (String caseId : caseIds.split(",")) {
             try {
-                log.info("Re-trigger update epimsId for CaseId: {} started", caseId);
+                log.info("Re-trigger update case management location with epimsId for CaseId: {} started", caseId);
                 externalTask.getAllVariables().put("caseId", caseId);
-                coreCaseDataService.triggerUpdateLocationEpimdsIdEvent(
+                coreCaseDataService.triggerUpdateCaseMgmtLocation(
                     parseLong(caseId.trim()),
-                    CaseEvent.UPDATE_CASE_DATA,
+                    CaseEvent.TRANSFER_ONLINE_CASE,
                     epimsId,
-                    region,
-                    caseManagementLocation,
-                    courtLocation,
-                    applicant1DQRequestedCourt,
-                    respondent1DQRequestedCourt,
+                    transferReason,
                     eventSummary,
                     eventDescription
                 );
-                log.info("Re-trigger update epimsId for CaseId: {} finished. ePimsId: {}", caseId, epimsId);
+                log.info("Re-trigger update case management location with epimsId for CaseId: {} finished. ePimsId: {}",
+                         caseId, epimsId);
             } catch (Exception e) {
-                log.error("ERROR Re-trigger update epimsId for  CaseId: {}. ePimsId: {},  {}", caseId, epimsId, e.getMessage(), e);
+                log.error("ERROR Re-trigger update case management location with epimsId for  CaseId: {}. ePimsId: {},  {}",
+                          caseId, epimsId, e.getMessage(), e);
             }
         }
         return ExternalTaskData.builder().build();
