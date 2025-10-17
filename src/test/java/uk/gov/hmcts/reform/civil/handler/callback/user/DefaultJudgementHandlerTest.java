@@ -379,7 +379,7 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
                     + " will be referred to a judge for directions.";
                 CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                     .legacyCaseReference("111111")
-                    .applicant1(PartyBuilder.builder().build())
+                    .applicant1(PartyBuilder.builder().individual().build())
                     .respondent1(PartyBuilder.builder().individual().build())
                     .build();
 
@@ -400,11 +400,11 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
                     + "and tell you what happens next.";
                 CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                     .legacyCaseReference("111111")
-                    .respondent1(PartyBuilder.builder().build())
-                    .respondent2(PartyBuilder.builder().build())
+                    .respondent1(PartyBuilder.builder().soleTrader().build())
+                    .respondent2(PartyBuilder.builder().soleTrader().build())
                     .addRespondent2(YesOrNo.YES)
                     .respondent2SameLegalRepresentative(YesOrNo.YES)
-                    .applicant1(PartyBuilder.builder().build())
+                    .applicant1(PartyBuilder.builder().individual().build())
                     .defendantDetails(DynamicList.builder()
                                           .value(DynamicListElement.builder()
                                                      .label("Test User")
@@ -428,11 +428,11 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
                     + " and your case will be referred to a judge for directions.";
                 CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                     .legacyCaseReference("111111")
-                    .respondent1(PartyBuilder.builder().build())
-                    .respondent2(PartyBuilder.builder().build())
+                    .respondent1(PartyBuilder.builder().soleTrader().build())
+                    .respondent2(PartyBuilder.builder().soleTrader().build())
                     .addRespondent2(YesOrNo.YES)
                     .respondent2SameLegalRepresentative(YesOrNo.YES)
-                    .applicant1(PartyBuilder.builder().build())
+                    .applicant1(PartyBuilder.builder().individual().build())
                     .defendantDetails(DynamicList.builder()
                                           .value(DynamicListElement.builder()
                                                      .label("Both")
@@ -469,5 +469,3 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
         assertThat(actualDate).isEqualTo(expectedDate);
     }
 }
-
-

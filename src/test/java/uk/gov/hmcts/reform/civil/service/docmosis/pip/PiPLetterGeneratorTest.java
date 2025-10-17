@@ -1,5 +1,13 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.pip;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.function.UnaryOperator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,6 +22,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DownloadedDocumentResponse;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
@@ -24,15 +33,14 @@ import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.pip.PiPLetter;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
+import uk.gov.hmcts.reform.civil.model.genapplication.GACaseLocation;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
+import uk.gov.hmcts.reform.civil.service.ga.GaCaseDataEnricher;
 import uk.gov.hmcts.reform.civil.stitch.service.CivilStitchService;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -51,6 +59,11 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.PIN_I
 
 @ExtendWith(MockitoExtension.class)
 class PiPLetterGeneratorTest {
+
+    private static final ObjectMapper GA_OBJECT_MAPPER = new ObjectMapper()
+        .registerModule(new JavaTimeModule())
+        .registerModule(new Jdk8Module());
+    private final GaCaseDataEnricher gaCaseDataEnricher = new GaCaseDataEnricher();
 
     @InjectMocks
     private PiPLetterGenerator piPLetterGenerator;
@@ -149,7 +162,7 @@ class PiPLetterGeneratorTest {
     }
 
     private CaseData buildCaseData(YesOrNo respondent1Represented, ServedDocumentFiles servedDocumentFiles) {
-        return CaseData.builder()
+        return gaCaseData(builder -> builder
             .legacyCaseReference(CLAIM_REFERENCE)
             .ccdCaseReference(1234123412341234L)
             .applicant1(Party.builder()
@@ -164,8 +177,7 @@ class PiPLetterGeneratorTest {
             .systemGeneratedCaseDocuments(setupSystemGeneratedCaseDocs())
             .respondent1PinToPostLRspec(DefendantPinToPostLRspec.builder().accessCode(PIN).build())
             .specRespondent1Represented(respondent1Represented)
-            .servedDocumentFiles(servedDocumentFiles)
-            .build();
+            .servedDocumentFiles(servedDocumentFiles));
     }
 
     private List<Element<CaseDocument>> setupSystemGeneratedCaseDocs() {
@@ -226,5 +238,24 @@ class PiPLetterGeneratorTest {
                               .documentBinaryUrl("binary-url")
                               .build())
             .build();
+    }
+
+    private CaseData gaCaseData(UnaryOperator<CaseData.CaseDataBuilder<?, ?>> customiser) {
+        GeneralApplicationCaseData gaCaseData = GeneralApplicationCaseDataBuilder.builder()
+            .withCcdCaseReference(CaseDataBuilder.CASE_ID)
+            .withGeneralAppParentCaseReference(CaseDataBuilder.PARENT_CASE_ID)
+            .withLocationName("Nottingham County Court and Family Court (and Crown)")
+            .withGaCaseManagementLocation(GACaseLocation.builder()
+                                              .siteName("testing")
+                                              .address("london court")
+                                              .baseLocation("2")
+                                              .postcode("BA 117")
+                                              .build())
+            .build();
+
+        CaseData converted = GA_OBJECT_MAPPER.convertValue(gaCaseData, CaseData.class);
+        CaseData enriched = gaCaseDataEnricher.enrich(converted, gaCaseData);
+
+        return customiser.apply(enriched.toBuilder()).build();
     }
 }

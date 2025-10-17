@@ -1,29 +1,25 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.generalapplications;
 
-import lombok.RequiredArgsConstructor;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
-import uk.gov.hmcts.reform.civil.callback.Callback;
-import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.GaDashboardCallbackHandler;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.GADetailsRespondentSol;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails;
-import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import java.util.List;
-import java.util.Map;
-
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_APPLICATION_PROCEED_OFFLINE_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_APPLICATION_PROCEED_OFFLINE_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT;
@@ -32,18 +28,14 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_UPDATE_CASE_PROCEED_IN_CASE_MAN_DEFENDANT;
 
 @Service
-@RequiredArgsConstructor
-public class ApplicationsProceedOfflineNotificationCallbackHandler extends CallbackHandler {
+public class ApplicationsProceedOfflineNotificationCallbackHandler extends GaDashboardCallbackHandler {
 
     private static final List<CaseEvent> EVENTS =
         List.of(CREATE_DASHBOARD_NOTIFICATION_APPLICATION_PROCEED_OFFLINE_CLAIMANT,
                 CREATE_DASHBOARD_NOTIFICATION_APPLICATION_PROCEED_OFFLINE_DEFENDANT);
     public static final String TASK_ID_CLAIMANT = "claimantLipApplicationOfflineDashboardNotification";
     public static final String TASK_ID_DEFENDANT = "defendantLipApplicationOfflineDashboardNotification";
-    private final DashboardScenariosService dashboardScenariosService;
     private final DashboardNotificationService dashboardNotificationService;
-    private final DashboardNotificationsParamsMapper mapper;
-    private final FeatureToggleService featureToggleService;
     private static final String CLAIMANT = "Claimant";
     private static final String DEFENDANT = "Defendant";
 
@@ -53,11 +45,13 @@ public class ApplicationsProceedOfflineNotificationCallbackHandler extends Callb
         "Application Dismissed"
     );
 
-    @Override
-    protected Map<String, Callback> callbacks() {
-        return featureToggleService.isLipVLipEnabled()
-            ? Map.of(callbackKey(ABOUT_TO_SUBMIT), this::configureScenarioForProceedOffline)
-            : Map.of(callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse);
+    public ApplicationsProceedOfflineNotificationCallbackHandler(DashboardScenariosService dashboardScenariosService,
+                                                                 DashboardNotificationService dashboardNotificationService,
+                                                                 DashboardNotificationsParamsMapper mapper,
+                                                                 FeatureToggleService featureToggleService,
+                                                                 ObjectMapper objectMapper) {
+        super(dashboardScenariosService, mapper, featureToggleService, objectMapper);
+        this.dashboardNotificationService = dashboardNotificationService;
     }
 
     @Override
@@ -74,13 +68,23 @@ public class ApplicationsProceedOfflineNotificationCallbackHandler extends Callb
         return EVENTS;
     }
 
-    private CallbackResponse configureScenarioForProceedOffline(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
+    @Override
+    protected String getScenario(CaseData caseData) {
+        return null;
+    }
+
+    @Override
+    public CallbackResponse configureDashboardScenario(CallbackParams callbackParams) {
+        CaseData caseData = resolveCaseData(callbackParams);
+        if (caseData == null) {
+            return AboutToStartOrSubmitCallbackResponse.builder().build();
+        }
         if (!caseData.getCcdState().equals(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)) {
             return AboutToStartOrSubmitCallbackResponse.builder().build();
         }
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        String notificationType = notificationType(callbackParams);
+        String eventId = callbackParams.getRequest().getEventId();
+        String notificationType = notificationType(eventId, caseData);
         if (notificationType == null) {
             return AboutToStartOrSubmitCallbackResponse.builder().build();
         }
@@ -107,9 +111,7 @@ public class ApplicationsProceedOfflineNotificationCallbackHandler extends Callb
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
-    private String notificationType(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        String eventId = callbackParams.getRequest().getEventId();
+    private String notificationType(String eventId, CaseData caseData) {
         if (eventId.equals(CREATE_DASHBOARD_NOTIFICATION_APPLICATION_PROCEED_OFFLINE_CLAIMANT.name())
             && caseData.isApplicantLiP()) {
             dashboardNotificationService.deleteByReferenceAndCitizenRole(caseData.getCcdCaseReference().toString(), CLAIMANT);

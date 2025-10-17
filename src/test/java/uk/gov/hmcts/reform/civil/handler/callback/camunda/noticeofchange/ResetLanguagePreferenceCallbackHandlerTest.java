@@ -24,6 +24,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESET_LANGUAGE_PREFERENCE;
 
+import java.util.Optional;
+
 @ExtendWith(MockitoExtension.class)
 public class ResetLanguagePreferenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -97,7 +99,9 @@ public class ResetLanguagePreferenceCallbackHandlerTest extends BaseCallbackHand
                 .handle(params);
 
             CaseData updatedCaseData = mapper.convertValue(response.getData(), CaseData.class);
-            assertThat(updatedCaseData.getCaseDataLiP().getRespondent1LiPResponse().getRespondent1ResponseLanguage()).isNull();
+            Optional<RespondentLiPResponse> respondentLip = Optional.ofNullable(updatedCaseData.getCaseDataLiP())
+                .map(CaseDataLiP::getRespondent1LiPResponse);
+            assertThat(respondentLip.orElse(null)).isNull();
             assertThat(updatedCaseData.getDefendantLanguagePreferenceDisplay()).isNull();
         }
     }

@@ -1,5 +1,12 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.judgmentonline;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.function.UnaryOperator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,30 +18,30 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
 import uk.gov.hmcts.reform.civil.documentmanagement.SecuredDocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DownloadedDocumentResponse;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
-import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.docmosis.judgmentonline.JudgmentByAdmissionLiPDefendantLetter;
+import uk.gov.hmcts.reform.civil.model.genapplication.GACaseLocation;
+import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.BulkPrintService;
 import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
-import uk.gov.hmcts.reform.civil.stitch.service.CivilStitchService;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
+import uk.gov.hmcts.reform.civil.service.ga.GaCaseDataEnricher;
+import uk.gov.hmcts.reform.civil.stitch.service.CivilStitchService;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -79,7 +86,12 @@ class JudgmentByAdmissionPiPLetterGeneratorTest {
         .individualLastName("John")
         .build();
 
-    private static final CaseData CASE_DATA = CaseData.builder()
+    private static final ObjectMapper GA_OBJECT_MAPPER = new ObjectMapper()
+        .registerModule(new JavaTimeModule())
+        .registerModule(new Jdk8Module());
+    private static final GaCaseDataEnricher GA_CASE_DATA_ENRICHER = new GaCaseDataEnricher();
+
+    private static final CaseData CASE_DATA = gaCaseData(builder -> builder
         .legacyCaseReference(CLAIM_REFERENCE)
         .ccdCaseReference(16543480L)
         .applicant1(Party.builder()
@@ -97,8 +109,7 @@ class JudgmentByAdmissionPiPLetterGeneratorTest {
                            .documentName("DefendantJBA.pdf")
                            .documentLink(Document.builder().documentFileName("DefendantJBA.pdf").documentBinaryUrl(
                                "Binary/url").documentUrl("url").build())
-                           .createdDatetime(LocalDateTime.now()).build()).build()))
-        .build();
+                           .createdDatetime(LocalDateTime.now()).build()).build())));
     private static final byte[] LETTER_CONTENT = new byte[]{37, 80, 68, 70, 45, 49, 46, 53, 10, 37, -61, -92};
 
     @MockBean
@@ -192,5 +203,24 @@ class JudgmentByAdmissionPiPLetterGeneratorTest {
         //Then
         assertThat(judgmentByAdmissionLiPDefendantLetter.getVaryJudgmentFee()).isEqualTo("£15.00");
         assertThat(judgmentByAdmissionLiPDefendantLetter.getCertifOfSatisfactionFee()).isEqualTo("£14.00");
+    }
+
+    private static CaseData gaCaseData(UnaryOperator<CaseData.CaseDataBuilder<?, ?>> customiser) {
+        GeneralApplicationCaseData gaCaseData = GeneralApplicationCaseDataBuilder.builder()
+            .withCcdCaseReference(16543480L)
+            .withGeneralAppParentCaseReference("16543480")
+            .withLocationName("Nottingham County Court and Family Court (and Crown)")
+            .withGaCaseManagementLocation(GACaseLocation.builder()
+                                              .siteName("testing")
+                                              .address("london court")
+                                              .baseLocation("000001")
+                                              .postcode("BA 117")
+                                              .build())
+            .build();
+
+        CaseData converted = GA_OBJECT_MAPPER.convertValue(gaCaseData, CaseData.class);
+        CaseData enriched = GA_CASE_DATA_ENRICHER.enrich(converted, gaCaseData);
+
+        return customiser.apply(enriched.toBuilder()).build();
     }
 }

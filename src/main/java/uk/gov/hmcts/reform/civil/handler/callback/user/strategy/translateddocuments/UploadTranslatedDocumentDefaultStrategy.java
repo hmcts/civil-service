@@ -63,15 +63,17 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder
             aboutToStartOrSubmitCallbackResponseBuilder = AboutToStartOrSubmitCallbackResponse.builder();
+        List<Element<TranslatedDocument>> translatedDocuments = resolveTranslatedDocuments(caseData, caseDataBuilder);
         updateSystemGeneratedDocumentsWithOriginalDocuments(
             callbackParams,
             caseDataBuilder,
-            aboutToStartOrSubmitCallbackResponseBuilder
+            aboutToStartOrSubmitCallbackResponseBuilder,
+            translatedDocuments
         );
-        CaseEvent businessProcessEvent = getBusinessProcessEvent(caseData);
-        updateNoticeOfDiscontinuanceTranslatedDoc(callbackParams, caseDataBuilder);
+        CaseEvent businessProcessEvent = getBusinessProcessEvent(caseData, translatedDocuments);
+        updateNoticeOfDiscontinuanceTranslatedDoc(caseData, caseDataBuilder, translatedDocuments);
         updateDocumentCollectionsWithTranslationDocuments(
-            caseData, caseDataBuilder);
+            caseData, caseDataBuilder, translatedDocuments);
         CaseDataLiP caseDataLip = caseData.getCaseDataLiP();
 
         if (businessProcessEvent != null) {
@@ -100,9 +102,9 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
     private void updateSystemGeneratedDocumentsWithOriginalDocuments(CallbackParams callbackParams,
                                                                      CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
                                                                      AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder
-                                                                         aboutToStartOrSubmitCallbackResponseBuilder) {
+                                                                         aboutToStartOrSubmitCallbackResponseBuilder,
+                                                                     List<Element<TranslatedDocument>> translatedDocuments) {
         CaseData caseData = callbackParams.getCaseData();
-        List<Element<TranslatedDocument>> translatedDocuments = caseData.getTranslatedDocuments();
         List<Element<CaseDocument>> preTranslationDocuments = caseData.getPreTranslationDocuments();
         List<Element<CaseDocument>> systemGeneratedDocuments = caseData.getSystemGeneratedCaseDocuments();
         List<Element<CaseDocument>> finalOrderDocuments = caseData.getFinalOrderDocumentCollection();
@@ -291,10 +293,12 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
         }
     }
 
-    private void updateNoticeOfDiscontinuanceTranslatedDoc(CallbackParams callbackParams,
-                                                           CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
-        CaseData caseData = callbackParams.getCaseData();
-        List<Element<TranslatedDocument>> translatedDocuments = caseData.getTranslatedDocuments();
+    private void updateNoticeOfDiscontinuanceTranslatedDoc(CaseData caseData,
+                                                           CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
+                                                           List<Element<TranslatedDocument>> translatedDocuments) {
+        if (translatedDocuments.isEmpty()) {
+            return;
+        }
         Iterator<Element<TranslatedDocument>> iterator = translatedDocuments.iterator();
         while (iterator.hasNext()) {
             Element<TranslatedDocument> translateDocument = iterator.next();
@@ -311,13 +315,13 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
     }
 
     private void updateDocumentCollectionsWithTranslationDocuments(CaseData caseData,
-                                                                   CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
-        List<Element<TranslatedDocument>> translatedDocuments = caseData.getTranslatedDocuments();
+                                                                   CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
+                                                                   List<Element<TranslatedDocument>> translatedDocuments) {
         List<Element<TranslatedDocument>> addToSystemGenerated = new ArrayList<>();
         List<Element<TranslatedDocument>> addToHearingDocuments = new ArrayList<>();
         List<Element<TranslatedDocument>> addToFinalOrders = new ArrayList<>();
         List<Element<TranslatedDocument>> addToCourtOfficerOrders = new ArrayList<>();
-        if (featureToggleService.isCaseProgressionEnabled() && Objects.nonNull(translatedDocuments)) {
+        if (featureToggleService.isCaseProgressionEnabled() && !translatedDocuments.isEmpty()) {
             translatedDocuments.forEach(document -> {
                 if (document.getValue().getDocumentType().equals(ORDER_NOTICE)) {
                     document.getValue().getFile().setCategoryID("orders");
@@ -361,6 +365,19 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                     caseData
                 );
             caseDataBuilder.hearingDocumentsWelsh(updatedHearingDocumentsWelsh);
+            List<Element<CaseDocument>> hearingDocuments =
+                Optional.ofNullable(caseData.getHearingDocuments())
+                    .map(ArrayList::new)
+                    .orElseGet(ArrayList::new);
+            if (hearingDocuments.isEmpty()) {
+                addToHearingDocuments.forEach(document -> hearingDocuments.add(
+                    element(CaseDocument.toCaseDocument(
+                        document.getValue().getFile(),
+                        document.getValue().getCorrespondingDocumentType(document.getValue().getDocumentType())
+                    ))
+                ));
+            }
+            caseDataBuilder.hearingDocuments(hearingDocuments);
         }
         List<Element<CaseDocument>> updatedFinalOrderDocuments =
             systemGeneratedDocumentService.getFinalOrderDocumentsWithAddedDocument(addToFinalOrders, caseData);
@@ -369,39 +386,38 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
         caseDataBuilder.finalOrderDocumentCollection(updatedFinalOrderDocuments);
     }
 
-    private CaseEvent getBusinessProcessEvent(CaseData caseData) {
+    private CaseEvent getBusinessProcessEvent(CaseData caseData,
+                                              List<Element<TranslatedDocument>> translatedDocuments) {
         if (featureToggleService.isCaseProgressionEnabled()) {
-            List<Element<TranslatedDocument>> translatedDocuments = caseData.getTranslatedDocuments();
-
-            if (Objects.nonNull(translatedDocuments) && translatedDocuments.size() > 0
+            if (!translatedDocuments.isEmpty()
                 && translatedDocuments.get(0).getValue().getDocumentType().equals(ORDER_NOTICE)) {
                 return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_ORDER_NOTICE;
-            } else if (Objects.nonNull(translatedDocuments)
+            } else if (!translatedDocuments.isEmpty()
                 && translatedDocuments.get(0).getValue().getDocumentType().equals(STANDARD_DIRECTION_ORDER)) {
                 return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_SDO;
-            } else if (Objects.nonNull(translatedDocuments)
+            } else if (!translatedDocuments.isEmpty()
                 && ((translatedDocuments.get(0).getValue().getDocumentType().equals(INTERLOCUTORY_JUDGMENT))
                 || (translatedDocuments.get(0).getValue().getDocumentType().equals(MANUAL_DETERMINATION)))) {
                 return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_CLAIMANT_REJECTS_REPAYMENT_PLAN;
-            } else if (Objects.nonNull(translatedDocuments)
+            } else if (!translatedDocuments.isEmpty()
                 && (translatedDocuments.get(0).getValue().getDocumentType().equals(FINAL_ORDER))) {
                 return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_ORDER;
-            } else if (Objects.nonNull(translatedDocuments)
+            } else if (!translatedDocuments.isEmpty()
                 && isContainsSpecifiedDocType(translatedDocuments, NOTICE_OF_DISCONTINUANCE_DEFENDANT)) {
                 return CaseEvent.UPLOAD_TRANSLATED_DISCONTINUANCE_DOC;
-            } else if (Objects.nonNull(translatedDocuments)
+            } else if (!translatedDocuments.isEmpty()
                 && translatedDocuments.get(0).getValue().getDocumentType().equals(SETTLEMENT_AGREEMENT)) {
                 return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_SETTLEMENT_AGREEMENT;
-            } else if (Objects.nonNull(translatedDocuments)
+            } else if (!translatedDocuments.isEmpty()
                 && translatedDocuments.get(0).getValue().getDocumentType().equals(COURT_OFFICER_ORDER)) {
                 return CaseEvent.COURT_OFFICER_ORDER;
-            } else if (Objects.nonNull(translatedDocuments)
+            } else if (!translatedDocuments.isEmpty()
                 && translatedDocuments.get(0).getValue().getDocumentType().equals(DECISION_MADE_ON_APPLICATIONS)) {
                 return CaseEvent.DECISION_ON_RECONSIDERATION_REQUEST;
-            } else if (Objects.nonNull(translatedDocuments)
+            } else if (!translatedDocuments.isEmpty()
                 && translatedDocuments.get(0).getValue().getDocumentType().equals(HEARING_NOTICE)) {
                 return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_HEARING_NOTICE;
-            } else if (Objects.nonNull(translatedDocuments)
+            } else if (!translatedDocuments.isEmpty()
                 && isContainsSpecifiedDocType(translatedDocuments, DEFENDANT_RESPONSE)
                 && caseData.isLipvLROneVOne()
                 && featureToggleService.isWelshEnabledForMainCase()) {
@@ -424,6 +440,31 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
             }
         }
         return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT;
+    }
+
+    private List<Element<TranslatedDocument>> resolveTranslatedDocuments(CaseData caseData,
+                                                                         CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
+        List<Element<TranslatedDocument>> translatedDocuments = caseData.getTranslatedDocuments();
+        if (translatedDocuments != null) {
+            caseDataBuilder.translatedDocuments(translatedDocuments);
+            return translatedDocuments;
+        }
+
+        return Optional.ofNullable(caseData.getCaseDataLiP())
+            .map(caseDataLiP -> {
+                List<Element<TranslatedDocument>> lipDocuments = Optional.ofNullable(caseDataLiP.getTranslatedDocuments())
+                    .map(ArrayList::new)
+                    .orElseGet(ArrayList::new);
+                if (lipDocuments.isEmpty()) {
+                    return lipDocuments;
+                }
+                caseDataBuilder.translatedDocuments(lipDocuments);
+                caseDataBuilder.caseDataLiP(caseDataLiP.toBuilder()
+                                               .translatedDocuments(lipDocuments)
+                                               .build());
+                return lipDocuments;
+            })
+            .orElseGet(Collections::emptyList);
     }
 
     private boolean isContainsSpecifiedDocType(List<Element<TranslatedDocument>> translatedDocuments,

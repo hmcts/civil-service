@@ -1,6 +1,13 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.hearing;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.function.UnaryOperator;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,6 +32,7 @@ import uk.gov.hmcts.reform.civil.enums.hearing.HearingChannel;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingNoticeList;
 import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.FeePaymentOutcomeDetails;
@@ -33,18 +41,17 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
+import uk.gov.hmcts.reform.civil.model.genapplication.GACaseLocation;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
+import uk.gov.hmcts.reform.civil.service.ga.GaCaseDataEnricher;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
-
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -90,6 +97,10 @@ public class HearingFormGeneratorTest {
         .courtName("Court Name").region("Region").regionId("4").courtVenueId("000")
         .courtTypeId("10").courtLocationCode("121")
         .epimmsId("000000").build();
+    private static final ObjectMapper GA_OBJECT_MAPPER = new ObjectMapper()
+        .registerModule(new JavaTimeModule())
+        .registerModule(new Jdk8Module());
+    private final GaCaseDataEnricher gaCaseDataEnricher = new GaCaseDataEnricher();
 
     @MockBean
     private SecuredDocumentManagementService documentManagementService;
@@ -296,7 +307,7 @@ public class HearingFormGeneratorTest {
                                                             PaymentDetails hearingFeePaymentDetails, FeePaymentOutcomeDetails feePaymentOutcomeDetails,
                                                             String expected) {
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = gaCaseData(builder -> builder
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
             .ccdState(ccdState)
@@ -305,8 +316,7 @@ public class HearingFormGeneratorTest {
             .respondent1Represented(respondent1Represented)
             .hearingFeePaymentDetails(hearingFeePaymentDetails)
             .hearingHelpFeesReferenceNumber("123")
-            .feePaymentOutcomeDetails(feePaymentOutcomeDetails)
-            .build();
+            .feePaymentOutcomeDetails(feePaymentOutcomeDetails));
 
         assertThat(generator.listingOrRelistingWithFeeDue(caseData)).isEqualTo(expected);
     }
@@ -376,5 +386,24 @@ public class HearingFormGeneratorTest {
 
         assertThat(generator.getHearingDuration(caseData)).isEqualTo(mintiHearingDuration);
 
+    }
+
+    private CaseData gaCaseData(UnaryOperator<CaseData.CaseDataBuilder<?, ?>> customiser) {
+        GeneralApplicationCaseData gaCaseData = GeneralApplicationCaseDataBuilder.builder()
+            .withCcdCaseReference(CaseDataBuilder.CASE_ID)
+            .withGeneralAppParentCaseReference(CaseDataBuilder.PARENT_CASE_ID)
+            .withLocationName("Nottingham County Court and Family Court (and Crown)")
+            .withGaCaseManagementLocation(GACaseLocation.builder()
+                                              .siteName("testing")
+                                              .address("london court")
+                                              .baseLocation("2")
+                                              .postcode("BA 117")
+                                              .build())
+            .build();
+
+        CaseData converted = GA_OBJECT_MAPPER.convertValue(gaCaseData, CaseData.class);
+        CaseData enriched = gaCaseDataEnricher.enrich(converted, gaCaseData);
+
+        return customiser.apply(enriched.toBuilder()).build();
     }
 }

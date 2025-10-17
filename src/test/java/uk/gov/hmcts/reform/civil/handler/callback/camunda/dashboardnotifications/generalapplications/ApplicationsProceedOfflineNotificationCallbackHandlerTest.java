@@ -4,7 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
@@ -21,8 +20,8 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
@@ -52,7 +51,6 @@ class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends BaseCall
     private static final String EVENT_ID_DEFENDANT = "CREATE_DASHBOARD_NOTIFICATION_APPLICATION_PROCEED_OFFLINE_DEFENDANT";
     private static final String TASK_ID_CLAIMANT = "claimantLipApplicationOfflineDashboardNotification";
     private static final String TASK_ID_DEFENDANT = "defendantLipApplicationOfflineDashboardNotification";
-    @InjectMocks
     private ApplicationsProceedOfflineNotificationCallbackHandler handler;
     @Mock
     private DashboardScenariosService dashboardScenariosService;
@@ -64,6 +62,17 @@ class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends BaseCall
     private FeatureToggleService toggleService;
     private static final String CLAIMANT = "Claimant";
     private static final String DEFENDANT = "Defendant";
+
+    @BeforeEach
+    void init() {
+        handler = new ApplicationsProceedOfflineNotificationCallbackHandler(
+            dashboardScenariosService,
+            dashboardNotificationService,
+            mapper,
+            toggleService,
+            objectMapper
+        );
+    }
 
     @Nested
     class AboutToSubmitCallback {

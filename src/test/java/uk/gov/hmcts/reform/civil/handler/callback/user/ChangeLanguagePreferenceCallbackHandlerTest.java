@@ -15,6 +15,9 @@ import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.ChangeLanguagePreference;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -35,10 +38,12 @@ public class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHan
 
     private ChangeLanguagePreferenceCallbackHandler handler;
     private ObjectMapper mapper;
+    private CaseDetailsConverter caseDetailsConverter;
 
     @BeforeEach
     void setup() {
         mapper = new ObjectMapper().registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+        caseDetailsConverter = new CaseDetailsConverter(mapper);
         handler = new ChangeLanguagePreferenceCallbackHandler(mapper);
     }
 
@@ -209,7 +214,7 @@ public class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHan
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
-            CaseData updatedCaseData = mapper.convertValue(response.getData(), CaseData.class);
+            CaseData updatedCaseData = caseDetailsConverter.toCaseData(response.getData());
             assertThat(updatedCaseData.getClaimantBilingualLanguagePreference()).isEqualTo("WELSH");
             assertThat(updatedCaseData.getClaimantLanguagePreferenceDisplay()).isEqualTo(WELSH);
             assertThat(updatedCaseData.getBusinessProcess().getCamundaEvent()).isEqualTo(CHANGE_LANGUAGE_PREFERENCE.name());
@@ -233,8 +238,14 @@ public class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHan
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
-            CaseData updatedCaseData = mapper.convertValue(response.getData(), CaseData.class);
-            assertThat(updatedCaseData.getCaseDataLiP().getRespondent1LiPResponse().getRespondent1ResponseLanguage()).isEqualTo("BOTH");
+            CaseData updatedCaseData = caseDetailsConverter.toCaseData(response.getData());
+            Optional<RespondentLiPResponse> respondentLip = Optional.ofNullable(updatedCaseData.getCaseDataLiP())
+                .map(CaseDataLiP::getRespondent1LiPResponse);
+            assertThat(respondentLip.map(RespondentLiPResponse::getRespondent1ResponseLanguage).orElse(null))
+                .isEqualTo("BOTH");
+            assertThat(Optional.ofNullable(updatedCaseData.getRespondent1LiPResponse())
+                .map(RespondentLiPResponse::getRespondent1ResponseLanguage).orElse(null))
+                .isEqualTo("BOTH");
             assertThat(updatedCaseData.getDefendantLanguagePreferenceDisplay()).isEqualTo(ENGLISH_AND_WELSH);
         }
     }

@@ -65,6 +65,8 @@ class GenerateDashboardNotificationHwfHandlerTest extends BaseCallbackHandlerTes
 
             handler.handle(callbackParams);
 
+            System.out.println(caseData);
+
             verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
                 "Scenario.AAA6.ClaimIssue.HWF.Requested",

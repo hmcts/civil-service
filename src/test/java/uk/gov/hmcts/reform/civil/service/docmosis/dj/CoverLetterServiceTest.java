@@ -1,5 +1,12 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.dj;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.function.UnaryOperator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -8,24 +15,24 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.core.io.ByteArrayResource;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentDownloadException;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
-
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DownloadedDocumentResponse;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.judgmentonline.JudgementCoverLetter;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
+import uk.gov.hmcts.reform.civil.model.genapplication.GACaseLocation;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
+import uk.gov.hmcts.reform.civil.service.ga.GaCaseDataEnricher;
 import uk.gov.hmcts.reform.civil.stitch.service.CivilStitchService;
-
-import java.io.IOException;
-import java.time.LocalDate;
-import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
@@ -36,6 +43,10 @@ import static org.mockito.Mockito.when;
 
 class CoverLetterServiceTest {
 
+    private static final ObjectMapper GA_OBJECT_MAPPER = new ObjectMapper()
+        .registerModule(new JavaTimeModule())
+        .registerModule(new Jdk8Module());
+    private static final GaCaseDataEnricher GA_CASE_DATA_ENRICHER = new GaCaseDataEnricher();
     @Mock
     private DocumentGeneratorService documentGeneratorService;
     @Mock
@@ -55,8 +66,8 @@ class CoverLetterServiceTest {
     @Test
     void shouldGenerateDocumentWithCoverLetter_whenStitchingEnabled() {
         CaseDocument coverLetter = mock(CaseDocument.class);
-        CaseData caseData = CaseData.builder()
-            .legacyCaseReference("001MC001").build();
+        CaseData caseData = gaCaseData(builder -> builder
+            .legacyCaseReference("001MC001"));
         Party party = PartyBuilder.builder().individual().build();
 
         DocumentMetaData metaData = new DocumentMetaData(mock(Document.class), "doc", LocalDate.now().toString());
@@ -94,8 +105,8 @@ class CoverLetterServiceTest {
             "http://docstore/documents/1234").documentFileName("file.pdf").build()).build();
         Document document = Document.builder().documentUrl("http://docstore/documents/1234").documentFileName("file.pdf").build();
         DocumentMetaData metaData = new DocumentMetaData(document, "doc", LocalDate.now().toString());
-        CaseData caseData = CaseData.builder()
-            .legacyCaseReference("001MC001").build();
+        CaseData caseData = gaCaseData(builder -> builder
+            .legacyCaseReference("001MC001"));
         Party party = PartyBuilder.builder().individual().build();
 
         when(documentManagementService.uploadDocument(anyString(), any(PDF.class))).thenReturn(stitchedDoc);
@@ -133,8 +144,8 @@ class CoverLetterServiceTest {
             "http://docstore/documents/1234").documentFileName("file.pdf").build()).build();
         Document document = Document.builder().documentUrl("http://docstore/documents/1234").documentFileName("file.pdf").build();
         DocumentMetaData metaData = new DocumentMetaData(document, "doc", LocalDate.now().toString());
-        CaseData caseData = CaseData.builder()
-            .legacyCaseReference("001MC001").build();
+        CaseData caseData = gaCaseData(builder -> builder
+            .legacyCaseReference("001MC001"));
         Party party = PartyBuilder.builder().individual().build();
 
         when(documentGeneratorService.generateDocmosisDocument(any(), any())).thenReturn(new DocmosisDocument(
@@ -165,8 +176,8 @@ class CoverLetterServiceTest {
 
     @Test
     void shouldBuildTemplateDataCorrectly() {
-        CaseData caseData = CaseData.builder()
-            .legacyCaseReference("001MC001").build();
+        CaseData caseData = gaCaseData(builder -> builder
+            .legacyCaseReference("001MC001"));
         Party party = PartyBuilder.builder().individual().build();
 
         JudgementCoverLetter result = coverLetterService.buildTemplateData(party, caseData);
@@ -195,8 +206,8 @@ class CoverLetterServiceTest {
             .build();
 
         DocumentMetaData metaData = new DocumentMetaData(document, "doc", LocalDate.now().toString());
-        CaseData caseData = CaseData.builder()
-            .legacyCaseReference("001MC001").build();
+        CaseData caseData = gaCaseData(builder -> builder
+            .legacyCaseReference("001MC001"));
         Party party = PartyBuilder.builder().individual().build();
 
         when(documentGeneratorService.generateDocmosisDocument(any(), any()))
@@ -221,5 +232,24 @@ class CoverLetterServiceTest {
                                )
         ).isInstanceOf(DocumentDownloadException.class)
             .hasMessageContaining("file.pdf");
+    }
+
+    private CaseData gaCaseData(UnaryOperator<CaseData.CaseDataBuilder<?, ?>> customiser) {
+        GeneralApplicationCaseData gaCaseData = GeneralApplicationCaseDataBuilder.builder()
+            .withCcdCaseReference(CaseDataBuilder.CASE_ID)
+            .withGeneralAppParentCaseReference(CaseDataBuilder.PARENT_CASE_ID)
+            .withLocationName("Nottingham County Court and Family Court (and Crown)")
+            .withGaCaseManagementLocation(GACaseLocation.builder()
+                                              .siteName("testing")
+                                              .address("london court")
+                                              .baseLocation("000000")
+                                              .postcode("BA 117")
+                                              .build())
+            .build();
+
+        CaseData converted = GA_OBJECT_MAPPER.convertValue(gaCaseData, CaseData.class);
+        CaseData enriched = GA_CASE_DATA_ENRICHER.enrich(converted, gaCaseData);
+
+        return customiser.apply(enriched.toBuilder()).build();
     }
 }

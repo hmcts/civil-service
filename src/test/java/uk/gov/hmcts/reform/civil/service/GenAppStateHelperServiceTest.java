@@ -13,6 +13,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil;
@@ -22,6 +23,7 @@ import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
+import uk.gov.hmcts.reform.civil.service.ga.GaCaseDataEnricher;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,7 +46,8 @@ import static uk.gov.hmcts.reform.civil.service.GenAppStateHelperService.Require
 @SpringBootTest(classes = {
     GenAppStateHelperService.class,
     JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class
+    CaseDetailsConverter.class,
+    GaCaseDataEnricher.class
 })
 class GenAppStateHelperServiceTest {
 
@@ -487,6 +490,25 @@ class GenAppStateHelperServiceTest {
                 );
 
             service.triggerEvent(caseData, MAIN_CASE_CLOSED);
+
+            verify(coreCaseDataService, times(1)).triggerGeneralApplicationEvent(1234L, MAIN_CASE_CLOSED);
+            verify(coreCaseDataService, times(1)).triggerGeneralApplicationEvent(2345L, MAIN_CASE_CLOSED);
+            verifyNoMoreInteractions(coreCaseDataService);
+        }
+
+        @Test
+        void shouldTriggerGeneralApplicationEvent_whenGaCaseDataProvided() {
+            CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+                .getTestCaseDataWithDetails(CaseData.builder().build(),
+                                            true,
+                                            true,
+                                            true, true,
+                                            getOriginalStatusOfGeneralApplication()
+                );
+
+            GeneralApplicationCaseData gaCaseData = mapper.convertValue(caseData, GeneralApplicationCaseData.class);
+
+            service.triggerEvent(gaCaseData, MAIN_CASE_CLOSED);
 
             verify(coreCaseDataService, times(1)).triggerGeneralApplicationEvent(1234L, MAIN_CASE_CLOSED);
             verify(coreCaseDataService, times(1)).triggerGeneralApplicationEvent(2345L, MAIN_CASE_CLOSED);

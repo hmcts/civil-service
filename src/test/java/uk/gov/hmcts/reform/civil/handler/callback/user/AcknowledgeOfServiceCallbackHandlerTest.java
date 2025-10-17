@@ -28,7 +28,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
@@ -212,13 +212,13 @@ class AcknowledgeOfServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
         void aboutToSubmit_NewResponseDeadline() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
-                .respondent1Copy(Party.builder().partyName("Party 2").primaryAddress(
-                                                                        Address
-                                                                            .builder()
-                                                                            .addressLine1("Triple street")
-                                                                            .postCode("Postcode")
-                                                                            .build())
-                                     .build())
+                .respondent1Copy(PartyBuilder.builder().soleTrader().build().toBuilder()
+                    .partyName("Party 2")
+                    .primaryAddress(Address.builder()
+                        .addressLine1("Triple street")
+                        .postCode("Postcode")
+                        .build())
+                    .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
             CallbackRequest request = CallbackRequest.builder()
@@ -245,20 +245,20 @@ class AcknowledgeOfServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .multiPartyClaimTwoDefendantSolicitors()
-                .respondent1Copy(Party.builder().partyName("Party 2").primaryAddress(
-                        Address
-                            .builder()
-                            .addressLine1("Triple street")
-                            .postCode("Postcode")
-                            .build())
-                                     .build())
-                .respondent2Copy(Party.builder().partyName("Respondent 2").primaryAddress(
-                        Address
-                            .builder()
-                            .addressLine1("Triple street")
-                            .postCode("Postcode")
-                            .build())
-                                     .build())
+                .respondent1Copy(PartyBuilder.builder().soleTrader().build().toBuilder()
+                    .partyName("Party 2")
+                    .primaryAddress(Address.builder()
+                        .addressLine1("Triple street")
+                        .postCode("Postcode")
+                        .build())
+                    .build())
+                .respondent2Copy(PartyBuilder.builder().soleTrader().build().toBuilder()
+                    .partyName("Respondent 2")
+                    .primaryAddress(Address.builder()
+                        .addressLine1("Triple street")
+                        .postCode("Postcode")
+                        .build())
+                    .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
             CallbackRequest request = CallbackRequest.builder()

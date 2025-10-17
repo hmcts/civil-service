@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service;
 
+import com.launchdarkly.sdk.server.interfaces.LDClientInterface;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,10 +33,12 @@ class FeatureToggleServiceTest {
     private FeatureToggleApi featureToggleApi;
 
     private FeatureToggleService featureToggleService;
+    private LDClientInterface internalClient;
+    private String environment;
 
     @BeforeEach
     void setUp() {
-        featureToggleService = new FeatureToggleService(featureToggleApi);
+        featureToggleService = new FeatureToggleService(featureToggleApi, internalClient, environment);
     }
 
     @ParameterizedTest

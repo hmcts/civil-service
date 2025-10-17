@@ -1,11 +1,17 @@
 package uk.gov.hmcts.reform.civil.service;
 
-import lombok.RequiredArgsConstructor;
+import com.launchdarkly.sdk.LDUser;
+import com.launchdarkly.sdk.server.interfaces.LDClientInterface;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleApi;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
@@ -15,10 +21,19 @@ import static uk.gov.hmcts.reform.civil.utils.JudgeReallocatedClaimTrack.judgeRe
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class FeatureToggleService {
 
     private final FeatureToggleApi featureToggleApi;
+    private final LDClientInterface internalClient;
+    private final String environment;
+
+    @Autowired
+    public FeatureToggleService(FeatureToggleApi featureToggleApi, LDClientInterface internalClient, @Value("${launchdarkly.env}") String environment) {
+        this.featureToggleApi = featureToggleApi;
+        this.internalClient = internalClient;
+        this.environment = environment;
+        Runtime.getRuntime().addShutdownHook(new Thread(this::close));
+    }
 
     public boolean isFeatureEnabled(String feature) {
         return this.featureToggleApi.isFeatureEnabled(feature);
@@ -42,14 +57,14 @@ public class FeatureToggleService {
 
     public boolean isLocationWhiteListedForCaseProgression(String locationEpimms) {
         return
-            // because default value is true
-            locationEpimms != null
-                && featureToggleApi
-                .isFeatureEnabledForLocation(
-                    "case-progression-location-whitelist",
-                    locationEpimms,
-                    true
-                );
+                // because default value is true
+                locationEpimms != null
+                        && featureToggleApi
+                        .isFeatureEnabledForLocation(
+                                "case-progression-location-whitelist",
+                                locationEpimms,
+                                true
+                        );
     }
 
     public boolean isTransferOnlineCaseEnabled() {
@@ -73,8 +88,8 @@ public class FeatureToggleService {
         long epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
         boolean isSpecClaim = SPEC_CLAIM.equals(caseData.getCaseAccessCategory());
         return isSpecClaim
-            && featureToggleApi.isFeatureEnabledForDate("cam-enabled-for-case",
-                                                        epoch, false);
+                && featureToggleApi.isFeatureEnabledForDate("cam-enabled-for-case",
+                epoch, false);
     }
 
     public boolean isGaForLipsEnabled() {
@@ -107,7 +122,7 @@ public class FeatureToggleService {
             epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
         }
         return featureToggleApi.isFeatureEnabled("cuiReleaseTwoEnabled")
-            && featureToggleApi.isFeatureEnabledForDate("is-dashboard-enabled-for-case", epoch, false);
+                && featureToggleApi.isFeatureEnabledForDate("is-dashboard-enabled-for-case", epoch, false);
     }
 
     public boolean isAmendBundleEnabled() {
@@ -116,19 +131,19 @@ public class FeatureToggleService {
 
     public boolean isCaseProgressionEnabledAndLocationWhiteListed(String location) {
         return location != null
-            && featureToggleApi.isFeatureEnabledForLocation("case-progression-location-whitelist", location, true)
-            && isCaseProgressionEnabled();
+                && featureToggleApi.isFeatureEnabledForLocation("case-progression-location-whitelist", location, true)
+                && isCaseProgressionEnabled();
     }
 
     public boolean isGaForLipsEnabledAndLocationWhiteListed(String location) {
         return location != null
-            && featureToggleApi.isFeatureEnabledForLocation("ea-courts-whitelisted-for-ga-lips", location, false)
-            && isGaForLipsEnabled();
+                && featureToggleApi.isFeatureEnabledForLocation("ea-courts-whitelisted-for-ga-lips", location, false)
+                && isGaForLipsEnabled();
     }
 
     public boolean isJOLiveFeedActive() {
         return isJudgmentOnlineLive()
-            && featureToggleApi.isFeatureEnabled("isJOLiveFeedActive");
+                && featureToggleApi.isFeatureEnabled("isJOLiveFeedActive");
     }
 
     public boolean isDefendantNoCOnlineForCase(CaseData caseData)  {
@@ -154,6 +169,16 @@ public class FeatureToggleService {
         return true;
     }
 
+    public boolean isPublicQueryManagementEnabledGa(GeneralApplicationCaseData caseData) {
+        if (caseData == null) {
+            return true;
+        }
+        if (gaCaseContainsLip(caseData)) {
+            return isLipQueryManagementEnabledGa(caseData);
+        }
+        return true;
+    }
+
     public boolean isGaForWelshEnabled() {
         return featureToggleApi.isFeatureEnabled("generalApplicationsForWelshParty");
     }
@@ -168,11 +193,45 @@ public class FeatureToggleService {
         return featureToggleApi.isFeatureEnabledForDate("cui-query-management", epoch, false);
     }
 
+    public boolean isLipQueryManagementEnabledGa(GeneralApplicationCaseData caseData) {
+        if (caseData == null || caseData.getSubmittedDate() == null) {
+            return featureToggleApi.isFeatureEnabled("cui-query-management");
+        }
+        ZoneId zoneId = ZoneId.systemDefault();
+        long epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
+        return featureToggleApi.isFeatureEnabledForDate("cui-query-management", epoch, false);
+    }
+
     public boolean isLrAdmissionBulkEnabled() {
         return featureToggleApi.isFeatureEnabled("lr-admission-bulk");
     }
 
     public boolean isCuiGaNroEnabled() {
         return featureToggleApi.isFeatureEnabled("cui-ga-nro");
+    }
+
+    public boolean isOrganisationOnboarded(String orgId) {
+        LDUser ldUser = createLDUser().custom("orgId", orgId).build();
+        return internalClient.boolVariation("isOrganisationOnboarded", ldUser, false);
+    }
+
+    public LDUser.Builder createLDUser() {
+        return new LDUser.Builder("civil-service")
+                .custom("timestamp", String.valueOf(System.currentTimeMillis()))
+                .custom("environment", environment);
+    }
+
+    private void close() {
+        try {
+            internalClient.close();
+        } catch (IOException e) {
+            log.error("Error in closing the Launchdarkly client::", e);
+        }
+    }
+
+    private boolean gaCaseContainsLip(GeneralApplicationCaseData caseData) {
+        return YesOrNo.YES.equals(caseData.getIsGaApplicantLip())
+            || YesOrNo.YES.equals(caseData.getIsGaRespondentOneLip())
+            || YesOrNo.YES.equals(caseData.getIsGaRespondentTwoLip());
     }
 }

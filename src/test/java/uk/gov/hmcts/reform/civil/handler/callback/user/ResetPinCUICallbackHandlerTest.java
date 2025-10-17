@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -13,9 +12,9 @@ import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
-import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notification.handlers.resetpin.ResetPinDefendantLipNotifier;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
 
 import java.time.LocalDate;
@@ -40,13 +39,10 @@ public class ResetPinCUICallbackHandlerTest extends BaseCallbackHandlerTest {
     @Mock
     private PinInPostConfiguration pipInPostConfiguration;
 
-    private ObjectMapper objectMapper = new ObjectMapper();
-
     private ResetPinCUICallbackHandler handler;
 
     @BeforeEach
     public void setUpTest() {
-        objectMapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
         handler = new ResetPinCUICallbackHandler(
             defendantPinToPostLRspecService,
             resetPinDefendantLipNotifier,
@@ -136,7 +132,8 @@ public class ResetPinCUICallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldNotReturnErrorWhenDefendantEmailIsPresent() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
-                .respondent1(Party.builder()
+                .respondent1(PartyBuilder.builder()
+                                 .individual()
                                  .partyEmail("test@gmail.com").build())
                 .addRespondent1PinToPostLRspec(DefendantPinToPostLRspec.builder()
                                                    .accessCode("000MC08")
@@ -154,7 +151,7 @@ public class ResetPinCUICallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnErrorWhenAccessCodeIsMissing() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
-                .respondent1(Party.builder().partyEmail("test@gmail.com").build())
+                .respondent1(PartyBuilder.builder().individual().partyEmail("test@gmail.com").build())
                 .addRespondent1PinToPostLRspec(DefendantPinToPostLRspec.builder()
                                                    .accessCode(null)
                                                    .build())

@@ -1,5 +1,8 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,6 +27,7 @@ import uk.gov.hmcts.reform.civil.enums.dq.ExpenseTypeLRspec;
 import uk.gov.hmcts.reform.civil.enums.dq.IncomeTypeLRspec;
 import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ChildrenByAgeGroupLRspec;
@@ -56,9 +60,12 @@ import uk.gov.hmcts.reform.civil.model.dq.HomeDetails;
 import uk.gov.hmcts.reform.civil.model.dq.RecurringExpenseLRspec;
 import uk.gov.hmcts.reform.civil.model.dq.RecurringIncomeLRspec;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
+import uk.gov.hmcts.reform.civil.model.genapplication.GACaseLocation;
+import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
+import uk.gov.hmcts.reform.civil.service.ga.GaCaseDataEnricher;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
@@ -68,6 +75,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.UnaryOperator;
 
 import static java.time.LocalDateTime.now;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -91,6 +99,10 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 class SealedClaimLipResponseFormGeneratorTest {
 
     private static final String AUTHORIZATION = "authorization";
+    private static final ObjectMapper GA_OBJECT_MAPPER = new ObjectMapper()
+        .registerModule(new JavaTimeModule())
+        .registerModule(new Jdk8Module());
+    private static final GaCaseDataEnricher GA_CASE_DATA_ENRICHER = new GaCaseDataEnricher();
     @MockBean
     private DocumentGeneratorService documentGeneratorService;
     @MockBean
@@ -106,6 +118,8 @@ class SealedClaimLipResponseFormGeneratorTest {
     private InterestCalculator interestCalculator;
     @Captor
     ArgumentCaptor<PDF> uploadDocumentArgumentCaptor;
+    @Captor
+    ArgumentCaptor<SealedClaimLipResponseForm> templateDataCaptor;
 
     @Test
     void shouldGenerateDocumentSuccessfully() {
@@ -128,7 +142,8 @@ class SealedClaimLipResponseFormGeneratorTest {
         CaseDocument result = generator.generate(caseData, AUTHORIZATION);
         //Then
         assertThat(result).isEqualTo(caseDocument);
-        verify(documentGeneratorService).generateDocmosisDocument(templateData, DEFENDANT_RESPONSE_LIP_SPEC);
+        verify(documentGeneratorService).generateDocmosisDocument(templateDataCaptor.capture(), eq(DEFENDANT_RESPONSE_LIP_SPEC));
+        assertThat(templateDataCaptor.getValue()).usingRecursiveComparison().isEqualTo(templateData);
         verify(documentManagementService).uploadDocument(
             eq(AUTHORIZATION),
             uploadDocumentArgumentCaptor.capture()
@@ -161,13 +176,15 @@ class SealedClaimLipResponseFormGeneratorTest {
         given(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), any())).willReturn(
             docmosisDocument);
         given(documentManagementService.uploadDocument(anyString(), any(PDF.class))).willReturn(caseDocument);
+        CaseData caseData = builder.build();
         SealedClaimLipResponseForm templateData = generator
-            .getTemplateData(builder.build());
+            .getTemplateData(caseData);
         //When
-        CaseDocument result = generator.generate(builder.build(), AUTHORIZATION);
+        CaseDocument result = generator.generate(caseData, AUTHORIZATION);
         //Then
         assertThat(result).isEqualTo(caseDocument);
-        verify(documentGeneratorService).generateDocmosisDocument(templateData, DEFENDANT_RESPONSE_LIP_SPEC);
+        verify(documentGeneratorService).generateDocmosisDocument(templateDataCaptor.capture(), eq(DEFENDANT_RESPONSE_LIP_SPEC));
+        assertThat(templateDataCaptor.getValue()).usingRecursiveComparison().isEqualTo(templateData);
         verify(documentManagementService).uploadDocument(
             eq(AUTHORIZATION),
             uploadDocumentArgumentCaptor.capture()
@@ -191,8 +208,9 @@ class SealedClaimLipResponseFormGeneratorTest {
                     .build()
             );
 
+        CaseData caseData = builder.build();
         SealedClaimLipResponseForm templateData = generator
-            .getTemplateData(builder.build());
+            .getTemplateData(caseData);
         Assertions.assertEquals(LocalDate.now(), templateData.getGenerationDate());
     }
 
@@ -630,7 +648,7 @@ class SealedClaimLipResponseFormGeneratorTest {
     }
 
     private CaseData.CaseDataBuilder<?, ?> commonData() {
-        return CaseData.builder()
+        return gaCaseData(builder -> builder
             .legacyCaseReference("reference")
             .ccdCaseReference(1234567890123456L)
             .solicitorReferences(SolicitorReferences.builder()
@@ -638,7 +656,7 @@ class SealedClaimLipResponseFormGeneratorTest {
                                      .respondentSolicitor1Reference("defendant reference")
                                      .build())
             .applicant1(company("A"))
-            .totalClaimAmount(BigDecimal.valueOf(10_000));
+            .totalClaimAmount(BigDecimal.valueOf(10_000))).toBuilder();
     }
 
     private Party company(String suffix) {
@@ -703,8 +721,9 @@ class SealedClaimLipResponseFormGeneratorTest {
                     .build()
             );
 
+        CaseData caseData = builder.build();
         SealedClaimLipResponseForm templateData = generator
-            .getTemplateData(builder.build());
+            .getTemplateData(caseData);
         Assertions.assertEquals("company B", templateData.getDefendant1MediationCompanyName());
         Assertions.assertEquals("email B", templateData.getDefendant1MediationEmail());
         Assertions.assertEquals("phone B", templateData.getDefendant1MediationContactNumber());
@@ -735,8 +754,9 @@ class SealedClaimLipResponseFormGeneratorTest {
                     .build()
             );
 
+        CaseData caseData = builder.build();
         SealedClaimLipResponseForm templateData = generator
-            .getTemplateData(builder.build());
+            .getTemplateData(caseData);
         Assertions.assertEquals("Jake", templateData.getDefendant1MediationCompanyName());
         Assertions.assertEquals("test@gmail.com", templateData.getDefendant1MediationEmail());
         Assertions.assertEquals("23454656", templateData.getDefendant1MediationContactNumber());
@@ -773,8 +793,9 @@ class SealedClaimLipResponseFormGeneratorTest {
                     .build()
             );
 
+        CaseData caseData = builder.build();
         SealedClaimLipResponseForm templateData = generator
-            .getTemplateData(builder.build());
+            .getTemplateData(caseData);
         Assertions.assertEquals("Jake", templateData.getDefendant1MediationCompanyName());
         Assertions.assertEquals("test@gmail.com", templateData.getDefendant1MediationEmail());
         Assertions.assertEquals("23454656", templateData.getDefendant1MediationContactNumber());
@@ -813,8 +834,9 @@ class SealedClaimLipResponseFormGeneratorTest {
                     .build()
             );
 
+        CaseData caseData = builder.build();
         SealedClaimLipResponseForm templateData = generator
-            .getTemplateData(builder.build());
+            .getTemplateData(caseData);
         Assertions.assertEquals("Jake", templateData.getDefendant1MediationCompanyName());
         Assertions.assertEquals("test@gmail.com", templateData.getDefendant1MediationEmail());
         Assertions.assertEquals("23454656", templateData.getDefendant1MediationContactNumber());
@@ -839,8 +861,9 @@ class SealedClaimLipResponseFormGeneratorTest {
                     .build()
             );
 
+        CaseData caseData = builder.build();
         SealedClaimLipResponseForm templateData = generator
-            .getTemplateData(builder.build());
+            .getTemplateData(caseData);
         Assertions.assertEquals("company B", templateData.getDefendant1MediationCompanyName());
         Assertions.assertEquals("email B", templateData.getDefendant1MediationEmail());
         Assertions.assertEquals("phone B", templateData.getDefendant1MediationContactNumber());
@@ -861,8 +884,9 @@ class SealedClaimLipResponseFormGeneratorTest {
                     .build()
             );
 
+        CaseData caseData = builder.build();
         SealedClaimLipResponseForm templateData = generator
-            .getTemplateData(builder.build());
+            .getTemplateData(caseData);
         Assertions.assertEquals("company B", templateData.getDefendant1MediationCompanyName());
         Assertions.assertEquals("email B", templateData.getDefendant1MediationEmail());
         Assertions.assertEquals("phone B", templateData.getDefendant1MediationContactNumber());
@@ -885,8 +909,9 @@ class SealedClaimLipResponseFormGeneratorTest {
                     .build()
             );
 
+        CaseData caseData = builder.build();
         SealedClaimLipResponseForm templateData = generator
-            .getTemplateData(builder.build());
+            .getTemplateData(caseData);
         Assertions.assertEquals("company B", templateData.getDefendant1MediationCompanyName());
         Assertions.assertEquals("email B", templateData.getDefendant1MediationEmail());
         Assertions.assertEquals("phone B", templateData.getDefendant1MediationContactNumber());
@@ -926,8 +951,9 @@ class SealedClaimLipResponseFormGeneratorTest {
                     .build()
             );
 
+        CaseData caseData = builder.build();
         SealedClaimLipResponseForm templateData = generator
-            .getTemplateData(builder.build());
+            .getTemplateData(caseData);
         Assertions.assertEquals("Name B Surname B", templateData.getDefendant1MediationCompanyName());
         Assertions.assertEquals("test@gmail.com", templateData.getDefendant1MediationEmail());
         Assertions.assertEquals("23454656", templateData.getDefendant1MediationContactNumber());
@@ -941,7 +967,7 @@ class SealedClaimLipResponseFormGeneratorTest {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
         LocalDate whenWillPay = LocalDate.now().plusDays(5);
         //When
-        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder()
+        CaseData.CaseDataBuilder<?, ?> builder = gaCaseData(b -> b
             .applicant1(company("A"))
             .applicant1Represented(YesOrNo.NO)
             .respondent1Represented(YesOrNo.NO)
@@ -956,12 +982,31 @@ class SealedClaimLipResponseFormGeneratorTest {
                     .whenWillThisAmountBePaid(whenWillPay)
                     .build())
             .totalClaimAmount(BigDecimal.valueOf(10_000))
-            .uiStatementOfTruth(StatementOfTruth.builder().name("Test").role("Test").build());
+            .uiStatementOfTruth(StatementOfTruth.builder().name("Test").role("Test").build())).toBuilder();
 
         //Then
         SealedClaimLipResponseForm templateData = generator
             .getTemplateData(builder.build());
         assertThat(templateData.getUiStatementOfTruth().getName()).isEqualTo("Test");
         assertThat(templateData.getUiStatementOfTruth().getRole()).isEqualTo("Test");
+    }
+
+    private CaseData gaCaseData(UnaryOperator<CaseData.CaseDataBuilder<?, ?>> customiser) {
+        GeneralApplicationCaseData gaCaseData = GeneralApplicationCaseDataBuilder.builder()
+            .withCcdCaseReference(1234567890123456L)
+            .withGeneralAppParentCaseReference("1234567890123456")
+            .withLocationName("Nottingham County Court and Family Court (and Crown)")
+            .withGaCaseManagementLocation(GACaseLocation.builder()
+                                              .siteName("testing")
+                                              .address("london court")
+                                              .baseLocation("000000")
+                                              .postcode("BA 117")
+                                              .build())
+            .build();
+
+        CaseData converted = GA_OBJECT_MAPPER.convertValue(gaCaseData, CaseData.class);
+        CaseData enriched = GA_CASE_DATA_ENRICHER.enrich(converted, gaCaseData);
+
+        return customiser.apply(enriched.toBuilder()).build();
     }
 }

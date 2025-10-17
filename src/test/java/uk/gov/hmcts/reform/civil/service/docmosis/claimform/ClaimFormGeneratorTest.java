@@ -1,5 +1,8 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.claimform;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -11,11 +14,14 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.claimform.ClaimForm;
 import uk.gov.hmcts.reform.civil.model.docmosis.claimform.ClaimFormMapper;
+import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
+import uk.gov.hmcts.reform.civil.service.ga.GaCaseDataEnricher;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -32,6 +38,9 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.GENER
 class ClaimFormGeneratorTest {
 
     private static final String AUTHORISATION = "authorisation";
+    private static final ObjectMapper GA_OBJECT_MAPPER = new ObjectMapper()
+        .registerModule(new JavaTimeModule())
+        .registerModule(new Jdk8Module());
     @Mock
     private ClaimFormMapper claimFormMapper;
     @Mock
@@ -44,11 +53,12 @@ class ClaimFormGeneratorTest {
 
     @InjectMocks
     private ClaimFormGenerator generator;
+    private final GaCaseDataEnricher gaCaseDataEnricher = new GaCaseDataEnricher();
 
     @Test
     void shouldGenerateDraftClaimForm() {
         //Given
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = gaCaseData();
         ClaimForm claimForm = ClaimForm.builder().build();
         given(claimFormMapper.toClaimForm(any())).willReturn(claimForm);
         DocmosisDocument docmosisDocument = DocmosisDocument.builder().build();
@@ -71,7 +81,7 @@ class ClaimFormGeneratorTest {
     @Test
     void shouldGenerateClaimantClaimForm() {
         //Given
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = gaCaseData();
         ClaimForm claimForm = ClaimForm.builder().build();
         given(claimFormMapper.toClaimForm(any())).willReturn(claimForm);
         DocmosisDocument docmosisDocument = DocmosisDocument.builder().build();
@@ -94,7 +104,7 @@ class ClaimFormGeneratorTest {
     @Test
     void shouldGenerateDefendantClaimForm() {
         //Given
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = gaCaseData();
         ClaimForm claimForm = ClaimForm.builder().build();
         given(claimFormMapper.toClaimForm(any())).willReturn(claimForm);
         DocmosisDocument docmosisDocument = DocmosisDocument.builder().build();
@@ -114,4 +124,9 @@ class ClaimFormGeneratorTest {
         assertThat(document.getDocumentType()).isEqualTo(DocumentType.SEALED_CLAIM);
     }
 
+    private CaseData gaCaseData() {
+        GeneralApplicationCaseData gaCaseData = GeneralApplicationCaseDataBuilder.builder().build();
+        CaseData converted = GA_OBJECT_MAPPER.convertValue(gaCaseData, CaseData.class);
+        return gaCaseDataEnricher.enrich(converted, gaCaseData);
+    }
 }

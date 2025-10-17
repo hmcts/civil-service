@@ -75,6 +75,10 @@ public class CallbackController {
             .pageId(pageId.orElse(null))
             .caseData(caseDetailsConverter.toCaseData(caseDetails))
             .caseDataBefore(caseDetailsBefore != null ? caseDetailsConverter.toCaseData(caseDetailsBefore) : null)
+            .gaCaseData(caseDetailsConverter.toGeneralApplicationCaseData(caseDetails))
+            .gaCaseDataBefore(caseDetailsBefore != null
+                ? caseDetailsConverter.toGeneralApplicationCaseData(caseDetailsBefore)
+                : null)
             .build();
 
         CallbackResponse callbackResponse = callbackHandlerFactory.dispatch(callbackParams);
