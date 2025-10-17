@@ -14,11 +14,13 @@ public class DiscontinueClaimPartiesAllPartiesEmailGenerator extends AllPartiesE
         DiscontinueClaimPartiesAppSolOneEmailDTOGenerator discontinueClaimPartiesAppSolOneEmailDTOGenerator,
         DiscontinueClaimPartiesDefendantEmailDTOGenerator discontinueClaimPartiesDefendantEmailDTOGenerator,
         DiscontinueClaimPartiesRespSolOneEmailDTOGenerator discontinueClaimPartiesRespSolOneEmailDTOGenerator,
-        DiscontinueClaimPartiesRespSolTwoEmailDTOGenerator discontinueClaimPartiesRespSolTwoEmailDTOGenerator
+        DiscontinueClaimPartiesRespSolTwoEmailDTOGenerator discontinueClaimPartiesRespSolTwoEmailDTOGenerator,
+        DiscontinueClaimPartiesValidationFailureAppSolOneEmailDTOGenerator discontinueClaimPartiesValidationFailureAppSolOneEmailDTOGenerator
     ) {
         super(List.of(discontinueClaimPartiesAppSolOneEmailDTOGenerator,
                       discontinueClaimPartiesDefendantEmailDTOGenerator,
                       discontinueClaimPartiesRespSolOneEmailDTOGenerator,
-                      discontinueClaimPartiesRespSolTwoEmailDTOGenerator));
+                      discontinueClaimPartiesRespSolTwoEmailDTOGenerator,
+                      discontinueClaimPartiesValidationFailureAppSolOneEmailDTOGenerator));
     }
 }
