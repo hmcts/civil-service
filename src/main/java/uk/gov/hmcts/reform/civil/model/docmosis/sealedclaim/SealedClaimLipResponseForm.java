@@ -2,13 +2,16 @@ package uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-
+import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.EmployerDetailsLRspec;
 import uk.gov.hmcts.reform.civil.model.PartnerAndDependentsLRspec;
@@ -44,6 +47,7 @@ import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_AD
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils.formatCcdCaseReference;
 
+@Slf4j
 @Getter
 @Builder(toBuilder = true)
 @AllArgsConstructor
@@ -81,6 +85,7 @@ public class SealedClaimLipResponseForm implements MappableObject {
     private final boolean checkCarmToggle;
     private final StatementOfTruth uiStatementOfTruth;
     private final String faContent;
+    private static final ObjectMapper mapper = new ObjectMapper();
 
     @JsonIgnore
     public static SealedClaimLipResponseForm toTemplate(final CaseData caseData, BigDecimal admittedAmount) {
@@ -104,7 +109,17 @@ public class SealedClaimLipResponseForm implements MappableObject {
         addFinancialDetails(caseData, builder);
         addSelfEmploymentDetails(caseData, builder);
         addCourtOrderDetails(caseData, builder);
-        return builder.build();
+        SealedClaimLipResponseForm obj = builder.build();
+
+        mapper.registerModule(new JavaTimeModule());
+        try {
+            log.info("Template Data :: {}", mapper.writeValueAsString(obj));
+        } catch (JsonProcessingException e) {
+            log.info("ERROR ----------");
+            throw new IllegalArgumentException(e);
+        }
+
+        return obj;
 
     }
 
