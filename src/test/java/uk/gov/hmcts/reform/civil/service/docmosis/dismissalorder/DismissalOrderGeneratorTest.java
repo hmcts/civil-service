@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
@@ -21,13 +22,14 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.judgedecisionpdfdocument.JudgeDecisionPdfDocument;
-import uk.gov.hmcts.reform.civil.model.genapplication.GACaseLocation;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAJudicialMakeAnOrder;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
+import uk.gov.hmcts.reform.civil.service.ga.GaCaseDataEnricher;
 
 import java.time.LocalDate;
 
@@ -68,6 +70,13 @@ class DismissalOrderGeneratorTest {
     private ObjectMapper mapper;
     @MockBean
     private DocmosisService docmosisService;
+    @MockBean
+    private GaCaseDataEnricher gaCaseDataEnricher;
+
+    @BeforeEach
+    void setup() {
+        when(gaCaseDataEnricher.enrich(any(), any())).thenAnswer(invocation -> invocation.getArgument(0));
+    }
 
     @Test
     void shouldGenerateDismissalOrderDocument() {
@@ -91,7 +100,9 @@ class DismissalOrderGeneratorTest {
     @Test
     void shouldThrowExceptionWhenNoLocationMatch() {
         CaseData caseData = CaseDataBuilder.builder().dismissalOrderApplication()
-            .gaCaseManagementLocation(GACaseLocation.builder().baseLocation("8").build()).build();
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("8").build())
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("8").build())
+            .build();
 
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DISMISSAL_ORDER)))
             .thenReturn(new DocmosisDocument(DISMISSAL_ORDER.getDocumentTitle(), bytes));
@@ -153,7 +164,8 @@ class DismissalOrderGeneratorTest {
             CaseData caseData = CaseDataBuilder.builder().dismissalOrderApplication().build().toBuilder()
                 .defendant2PartyName(null)
                 .claimant2PartyName(null)
-                .gaCaseManagementLocation(GACaseLocation.builder().baseLocation("3").build())
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("3").build())
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("3").build())
                 .isMultiParty(NO)
                 .build();
             when(docmosisService.reasonAvailable(any())).thenReturn(YesOrNo.NO);
@@ -184,9 +196,9 @@ class DismissalOrderGeneratorTest {
                 () -> assertEquals(templateData.getJudicialByCourtsInitiative(), caseData
                     .getJudicialDecisionMakeOrder().getOrderCourtOwnInitiative()
                     + " ".concat(LocalDate.now().format(DATE_FORMATTER))),
-                () -> assertEquals(templateData.getAddress(), caseData.getGaCaseManagementLocation().getAddress()),
-                () -> assertEquals(templateData.getSiteName(), caseData.getGaCaseManagementLocation().getSiteName()),
-                () -> assertEquals(templateData.getPostcode(), caseData.getGaCaseManagementLocation().getPostcode()),
+                () -> assertEquals(templateData.getAddress(), caseData.getCaseManagementLocation().getAddress()),
+                () -> assertEquals(templateData.getSiteName(), caseData.getCaseManagementLocation().getSiteName()),
+                () -> assertEquals(templateData.getPostcode(), caseData.getCaseManagementLocation().getPostcode()),
                 () -> assertEquals(templateData.getDismissalOrder(),
                                    caseData.getJudicialDecisionMakeOrder().getDismissalOrderText()));
         }
@@ -195,7 +207,8 @@ class DismissalOrderGeneratorTest {
         void whenJudgeMakeDecision_ShouldGetDissmisalOrderData_Option2() {
             CaseData caseData = CaseDataBuilder.builder().dismissalOrderApplication().build().toBuilder()
                 .isMultiParty(YES)
-                .gaCaseManagementLocation(GACaseLocation.builder().baseLocation("2").build())
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("2").build())
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("2").build())
                 .build();
 
             CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
@@ -350,7 +363,8 @@ class DismissalOrderGeneratorTest {
                 .defendant2PartyName(null)
                 .claimant2PartyName(null)
                 .parentClaimantIsApplicant(NO)
-                .gaCaseManagementLocation(GACaseLocation.builder().baseLocation("3").build())
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("3").build())
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("3").build())
                 .isMultiParty(NO)
                 .build();
             when(docmosisService.reasonAvailable(any())).thenReturn(YesOrNo.NO);
@@ -381,9 +395,9 @@ class DismissalOrderGeneratorTest {
                 () -> assertEquals(templateData.getJudicialByCourtsInitiative(), caseData
                     .getJudicialDecisionMakeOrder().getOrderCourtOwnInitiative()
                     + " ".concat(LocalDate.now().format(DATE_FORMATTER))),
-                () -> assertEquals(templateData.getAddress(), caseData.getGaCaseManagementLocation().getAddress()),
-                () -> assertEquals(templateData.getSiteName(), caseData.getGaCaseManagementLocation().getSiteName()),
-                () -> assertEquals(templateData.getPostcode(), caseData.getGaCaseManagementLocation().getPostcode()),
+                () -> assertEquals(templateData.getAddress(), caseData.getCaseManagementLocation().getAddress()),
+                () -> assertEquals(templateData.getSiteName(), caseData.getCaseManagementLocation().getSiteName()),
+                () -> assertEquals(templateData.getPostcode(), caseData.getCaseManagementLocation().getPostcode()),
                 () -> assertEquals(templateData.getDismissalOrder(),
                                    caseData.getJudicialDecisionMakeOrder().getDismissalOrderText()),
                 () -> assertEquals("applicant1 partyname", templateData.getPartyName()),

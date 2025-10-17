@@ -1,13 +1,9 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -21,17 +17,11 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 @ExtendWith(MockitoExtension.class)
 public class DefendantResponseDeadlineCheckCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-    @InjectMocks
     private DefendantResponseDeadlineCheckCallbackHandler handler;
-
-    @Mock
-    private ObjectMapper objectMapper;
 
     @BeforeEach
     void setUp() {
-        objectMapper = new ObjectMapper();
         handler = new DefendantResponseDeadlineCheckCallbackHandler(objectMapper);
-        objectMapper.registerModule(new JavaTimeModule());
     }
 
     @Nested

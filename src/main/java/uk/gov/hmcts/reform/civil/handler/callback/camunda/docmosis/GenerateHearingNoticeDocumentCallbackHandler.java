@@ -12,6 +12,8 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.welshenhancements.PreTranslationGaDocumentType;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.GaCallbackDataUtil;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -74,24 +76,27 @@ public class GenerateHearingNoticeDocumentCallbackHandler extends CallbackHandle
     }
 
     private CallbackResponse generateHearingNoticeDocument(CallbackParams callbackParams) {
-        log.info("Generate hearing notice document for case id: {}", callbackParams.getCaseData().getCcdCaseReference());
-        CaseData caseData = callbackParams.getCaseData();
+        GeneralApplicationCaseData gaCaseData = GaCallbackDataUtil.resolveGaCaseData(callbackParams, objectMapper);
+        CaseData caseData = GaCallbackDataUtil.mergeToCaseData(gaCaseData, callbackParams.getCaseData(), objectMapper);
+        log.info("Generate hearing notice document for case id: {}", caseData.getCcdCaseReference());
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        buildDocument(callbackParams, caseDataBuilder, caseData);
-        postHearingFormWithCoverLetterLip(callbackParams, caseData);
+        buildDocument(callbackParams, caseDataBuilder, caseData, gaCaseData);
+        postHearingFormWithCoverLetterLip(callbackParams, caseData, gaCaseData);
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(caseDataBuilder.build().toMap(objectMapper))
                 .build();
     }
 
     private void buildDocument(CallbackParams callbackParams, CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
-                               CaseData caseData) {
+                               CaseData caseData, GeneralApplicationCaseData gaCaseData) {
+        GeneralApplicationCaseData currentGaCaseData = gaCaseData != null
+                ? gaCaseData : objectMapper.convertValue(caseData, GeneralApplicationCaseData.class);
         if (featureToggleService.isGaForWelshEnabled() && caseData.isApplicationBilingual()) {
             List<Element<CaseDocument>> preTranslatedDocuments =
                     Optional.ofNullable(caseData.getPreTranslationGaDocuments())
                             .orElseGet(ArrayList::new);
             preTranslatedDocuments.addAll(wrapElements(hearingFormGenerator.generate(
-                    callbackParams.getCaseData(),
+                    currentGaCaseData,
                     callbackParams.getParams().get(BEARER_TOKEN).toString()
             )));
             assignCategoryId.assignCategoryIdToCollection(
@@ -102,23 +107,27 @@ public class GenerateHearingNoticeDocumentCallbackHandler extends CallbackHandle
             caseDataBuilder.preTranslationGaDocuments(preTranslatedDocuments);
             caseDataBuilder.preTranslationGaDocumentType(PreTranslationGaDocumentType.HEARING_NOTICE_DOC);
         } else {
-            List<Element<CaseDocument>> documents = ofNullable(caseData.getHearingNoticeDocumentGA())
+            List<Element<CaseDocument>> documents = ofNullable(caseData.getHearingNoticeDocument())
                     .orElse(newArrayList());
             documents.addAll(wrapElements(hearingFormGenerator.generate(
-                    callbackParams.getCaseData(),
+                    currentGaCaseData,
                     callbackParams.getParams().get(BEARER_TOKEN).toString()
             )));
 
             assignCategoryId.assignCategoryIdToCollection(documents, document -> document.getValue().getDocumentLink(),
                     AssignCategoryId.APPLICATIONS);
-            caseDataBuilder.hearingNoticeDocumentGA(documents);
+            caseDataBuilder.hearingNoticeDocument(documents);
         }
 
     }
 
-    private void postHearingFormWithCoverLetterLip(CallbackParams callbackParams, CaseData caseData) {
+    private void postHearingFormWithCoverLetterLip(CallbackParams callbackParams, CaseData caseData,
+                                                   GeneralApplicationCaseData gaCaseData) {
         CaseData civilCaseData = CaseData.builder().build();
-        if (gaForLipService.isGaForLip(caseData)) {
+        GeneralApplicationCaseData currentGaCaseData = gaCaseData != null
+            ? gaCaseData
+            : objectMapper.convertValue(caseData, GeneralApplicationCaseData.class);
+        if (gaForLipService.isGaForLip(currentGaCaseData)) {
             civilCaseData = caseDetailsConverter
                     .toCaseData(coreCaseDataService
                             .getCase(Long.parseLong(caseData.getGeneralAppParentCaseLink().getCaseReference())));
@@ -128,11 +137,11 @@ public class GenerateHearingNoticeDocumentCallbackHandler extends CallbackHandle
         /*
          * Generate Judge Request for Information order document with LIP Applicant Post Address
          * */
-        if (gaForLipService.isLipApp(caseData)
+        if (gaForLipService.isLipAppGa(currentGaCaseData)
                 && (!featureToggleService.isGaForWelshEnabled() || !caseData.isApplicationBilingual())) {
             postJudgeOrderToLipApplicant = hearingFormGenerator.generate(
                     civilCaseData,
-                    caseData,
+                    currentGaCaseData,
                     callbackParams.getParams().get(BEARER_TOKEN).toString(),
                     FlowFlag.POST_JUDGE_ORDER_LIP_APPLICANT
             );
@@ -142,11 +151,11 @@ public class GenerateHearingNoticeDocumentCallbackHandler extends CallbackHandle
          * Generate Judge Request for Information order document with LIP Respondent Post Address
          * if GA is with notice
          * */
-        if (gaForLipService.isLipResp(caseData)
+        if (gaForLipService.isLipRespGa(currentGaCaseData)
                 && (!featureToggleService.isGaForWelshEnabled() || !caseData.isApplicationBilingual())) {
             postJudgeOrderToLipRespondent = hearingFormGenerator.generate(
                     civilCaseData,
-                    caseData,
+                    currentGaCaseData,
                     callbackParams.getParams().get(BEARER_TOKEN).toString(),
                     FlowFlag.POST_JUDGE_ORDER_LIP_RESPONDENT
             );

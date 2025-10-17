@@ -1,5 +1,9 @@
 package uk.gov.hmcts.reform.civil.service;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +17,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.Notificat
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationDataGA;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.GASolicitorDetailsGAspec;
@@ -72,6 +77,11 @@ public class HearingScheduledNotificationServiceTest {
     private static final String CUSTOM_PARTY_REFERENCE = "Claimant Reference: ABC limited - Defendant Reference: Defendant Ltd";
     private Map<String, String> customProp = new HashMap<>();
 
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
+        .registerModule(new JavaTimeModule())
+        .registerModule(new Jdk8Module())
+        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
     @BeforeEach
     void setup() {
         when(notificationsProperties.getHearingNoticeTemplate())
@@ -93,6 +103,10 @@ public class HearingScheduledNotificationServiceTest {
         when(configuration.getWelshHmctsSignature()).thenReturn("Hawliadau am Arian yn y Llys Sifil Ar-lein \n Gwasanaeth Llysoedd a Thribiwnlysoedd EF");
         when(configuration.getWelshPhoneContact()).thenReturn("Ffôn: 0300 303 5174");
         when(configuration.getWelshOpeningHours()).thenReturn("Dydd Llun i ddydd Iau, 9am – 5pm, dydd Gwener, 9am – 4.30pm");
+        when(solicitorEmailValidation.validateSolicitorEmail(
+            any(CaseData.class),
+            any(GeneralApplicationCaseData.class)
+        )).thenAnswer(invocation -> invocation.getArgument(1));
     }
 
     private Map<String, String> getNotificationDataMap(boolean customEmailReference) {
@@ -149,13 +163,9 @@ public class HearingScheduledNotificationServiceTest {
     @Test
     void notificationShouldSendToDefendantsWhenInvoked() {
 
-        CaseData caseData = CaseDataBuilder.builder().hearingScheduledApplication(YesOrNo.NO)
-            .build();
-        when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(CaseData.builder().ccdState(CaseState.CASE_PROGRESSION).build());
-
-        when(solicitorEmailValidation
-                 .validateSolicitorEmail(any(), any()))
-            .thenReturn(caseData);
+        CaseData caseData = toGaCaseData(CaseDataBuilder.builder().hearingScheduledApplication(YesOrNo.NO)
+            .build());
+        when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(emptyGaCaseDataWithState(CaseState.CASE_PROGRESSION));
 
         hearingScheduledNotificationService.sendNotificationForDefendant(caseData);
         verify(notificationService, times(2)).sendMail(
@@ -169,14 +179,10 @@ public class HearingScheduledNotificationServiceTest {
     @Test
     void notificationShouldSendEmailReferenceWhenSolicitorReferenceisPresent() {
 
-        CaseData caseData = CaseDataBuilder.builder().hearingScheduledApplication(YesOrNo.NO)
+        CaseData caseData = toGaCaseData(CaseDataBuilder.builder().hearingScheduledApplication(YesOrNo.NO)
             .emailPartyReference("Claimant Reference: ABC limited - Defendant Reference: Defendant Ltd")
-            .build();
-        when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(CaseData.builder().ccdState(CaseState.CASE_PROGRESSION).build());
-
-        when(solicitorEmailValidation
-                 .validateSolicitorEmail(any(), any()))
-            .thenReturn(caseData);
+            .build());
+        when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(emptyGaCaseDataWithState(CaseState.CASE_PROGRESSION));
 
         hearingScheduledNotificationService.sendNotificationForDefendant(caseData);
         verify(notificationService, times(2)).sendMail(
@@ -189,13 +195,10 @@ public class HearingScheduledNotificationServiceTest {
 
     @Test
     void notificationShouldSendToClaimantWhenInvoked() {
-        CaseData caseData = CaseDataBuilder.builder().hearingScheduledApplication(YesOrNo.NO)
-            .build();
+        CaseData caseData = toGaCaseData(CaseDataBuilder.builder().hearingScheduledApplication(YesOrNo.NO)
+            .build());
 
-        when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(CaseData.builder().ccdState(CaseState.CASE_PROGRESSION).build());
-        when(solicitorEmailValidation
-                 .validateSolicitorEmail(any(), any()))
-            .thenReturn(caseData);
+        when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(emptyGaCaseDataWithState(CaseState.CASE_PROGRESSION));
 
         hearingScheduledNotificationService.sendNotificationForClaimant(caseData);
         verify(notificationService, times(1)).sendMail(
@@ -210,7 +213,7 @@ public class HearingScheduledNotificationServiceTest {
     void notificationShouldSendToLipDefendantWhenInvoked() {
         when(gaForLipService.isLipApp(any())).thenReturn(false);
         when(gaForLipService.isLipResp(any())).thenReturn(true);
-        when(gaForLipService.isGaForLip(any())).thenReturn(true);
+        when(gaForLipService.isGaForLip(any(CaseData.class))).thenReturn(true);
         when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
                                                                   + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
         List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
@@ -219,16 +222,13 @@ public class HearingScheduledNotificationServiceTest {
             .forename("forename").organisationIdentifier("2").build();
         respondentSols.add(element(respondent1));
 
-        CaseData caseData = CaseDataBuilder.builder().hearingScheduledApplication(YesOrNo.NO)
+        CaseData caseData = toGaCaseData(CaseDataBuilder.builder().hearingScheduledApplication(YesOrNo.NO)
             .isGaApplicantLip(YesOrNo.NO)
             .isGaRespondentOneLip(YES)
             .generalAppRespondentSolicitors(respondentSols)
             .defendant2PartyName(null)
-            .build();
-        when(solicitorEmailValidation
-                 .validateSolicitorEmail(any(), any()))
-            .thenReturn(caseData);
-        when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(CaseData.builder().build());
+            .build());
+        when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(emptyGaCaseData());
 
         hearingScheduledNotificationService.sendNotificationForDefendant(caseData);
         verify(notificationService, times(1)).sendMail(
@@ -243,16 +243,13 @@ public class HearingScheduledNotificationServiceTest {
     void notificationShouldSendToLipApplicantWhenInvoked() {
         when(gaForLipService.isLipApp(any())).thenReturn(true);
         when(gaForLipService.isLipResp(any())).thenReturn(false);
-        when(gaForLipService.isGaForLip(any())).thenReturn(true);
-        CaseData caseData = CaseDataBuilder.builder().hearingScheduledApplication(YesOrNo.NO)
+        when(gaForLipService.isGaForLip(any(CaseData.class))).thenReturn(true);
+        CaseData caseData = toGaCaseData(CaseDataBuilder.builder().hearingScheduledApplication(YesOrNo.NO)
             .isGaApplicantLip(YesOrNo.YES)
             .isGaRespondentOneLip(YesOrNo.NO)
             .defendant2PartyName(null)
-            .build();
-        when(solicitorEmailValidation
-                 .validateSolicitorEmail(any(), any()))
-            .thenReturn(caseData);
-        when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(CaseData.builder().build());
+            .build());
+        when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(emptyGaCaseData());
         when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
                                                                   + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
 
@@ -269,20 +266,17 @@ public class HearingScheduledNotificationServiceTest {
     void notificationWelshShouldSendToLipApplicantWhenInvoked() {
         when(gaForLipService.isLipApp(any())).thenReturn(true);
         when(gaForLipService.isLipResp(any())).thenReturn(false);
-        when(gaForLipService.isGaForLip(any())).thenReturn(true);
-        CaseData caseData = CaseDataBuilder.builder().hearingScheduledApplication(YesOrNo.NO)
+        when(gaForLipService.isGaForLip(any(CaseData.class))).thenReturn(true);
+        CaseData caseData = toGaCaseData(CaseDataBuilder.builder().hearingScheduledApplication(YesOrNo.NO)
             .isGaApplicantLip(YesOrNo.YES)
             .isGaRespondentOneLip(YesOrNo.NO)
             .parentClaimantIsApplicant(YES)
-            .applicantBilingualLanguagePreferenceGA(YES)
+            .applicantBilingualLanguagePreference(YES)
             .defendant2PartyName(null)
-            .build();
+            .build());
         when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
                                                                   + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
-        when(solicitorEmailValidation
-                 .validateSolicitorEmail(any(), any()))
-            .thenReturn(caseData);
-        CaseData claimantClaimIssueFlag = CaseData.builder().claimantBilingualLanguagePreference(Language.WELSH.toString()).build();
+        CaseData claimantClaimIssueFlag = toGaCaseData(CaseData.builder().claimantBilingualLanguagePreference(Language.WELSH.toString()).build());
         when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(claimantClaimIssueFlag);
 
         hearingScheduledNotificationService.sendNotificationForClaimant(caseData);
@@ -294,4 +288,26 @@ public class HearingScheduledNotificationServiceTest {
         );
     }
 
+    private static CaseData toGaCaseData(CaseDataBuilder builder) {
+        return toGaCaseData(builder.build());
+    }
+
+    private static CaseData toGaCaseData(CaseData caseData) {
+        Long ccdCaseReference = caseData.getCcdCaseReference();
+        CaseState ccdState = caseData.getCcdState();
+        GeneralApplicationCaseData gaCaseData = OBJECT_MAPPER.convertValue(caseData, GeneralApplicationCaseData.class);
+        CaseData rebuilt = OBJECT_MAPPER.convertValue(gaCaseData, CaseData.class);
+        return rebuilt.toBuilder()
+            .ccdCaseReference(ccdCaseReference)
+            .ccdState(ccdState)
+            .build();
+    }
+
+    private static CaseData emptyGaCaseData() {
+        return toGaCaseData(CaseData.builder().build());
+    }
+
+    private static CaseData emptyGaCaseDataWithState(CaseState state) {
+        return emptyGaCaseData().toBuilder().ccdState(state).build();
+    }
 }

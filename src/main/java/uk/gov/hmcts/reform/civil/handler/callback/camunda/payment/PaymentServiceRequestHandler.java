@@ -12,6 +12,8 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.GaCallbackDataUtil;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
@@ -69,30 +71,37 @@ public class PaymentServiceRequestHandler extends CallbackHandler {
     }
 
     private CallbackResponse makePaymentServiceReq(CallbackParams callbackParams) {
-        var caseData = callbackParams.getCaseData();
+        GeneralApplicationCaseData gaCaseData = GaCallbackDataUtil.resolveGaCaseData(callbackParams, objectMapper);
+        var caseData = GaCallbackDataUtil.mergeToCaseData(gaCaseData, callbackParams.getCaseData(), objectMapper);
+        if (caseData == null) {
+            throw new IllegalArgumentException("Case data missing from callback params");
+        }
         var authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         List<String> errors = new ArrayList<>();
         try {
             log.info("calling payment service request " + caseData.getCcdCaseReference());
             String serviceRequestReference = GeneralAppFeesService.FREE_REF;
-            boolean freeGa = feeService.isFreeApplication(caseData);
-            boolean freeGaLip = isFreeGaLip(caseData);
-            if (!freeGa && !isHelpWithFees(caseData) && !freeGaLip) {
+            boolean freeGa = gaCaseData != null
+                ? feeService.isFreeApplication(gaCaseData)
+                : feeService.isFreeApplication(caseData);
+            boolean freeGaLip = isFreeGaLip(gaCaseData, caseData);
+            if (!freeGa && !isHelpWithFees(gaCaseData, caseData) && !freeGaLip) {
                 serviceRequestReference = paymentsService.createServiceRequest(caseData, authToken)
                         .getServiceRequestReference();
             }
-            GAPbaDetails pbaDetails = caseData.getGeneralAppPBADetails();
-            GAPbaDetails.GAPbaDetailsBuilder pbaDetailsBuilder = pbaDetails.toBuilder();
-            pbaDetailsBuilder
-                    .fee(caseData.getGeneralAppPBADetails().getFee())
-                    .serviceReqReference(serviceRequestReference);
-            caseData = caseData.toBuilder()
-                .generalAppPBADetails(pbaDetailsBuilder
-                                          .fee(caseData.getGeneralAppPBADetails().getFee())
-                                          .serviceReqReference(serviceRequestReference).build())
-                .build();
+            GAPbaDetails existingDetails = Optional.ofNullable(gaCaseData)
+                .map(GeneralApplicationCaseData::getGeneralAppPBADetails)
+                .orElse(caseData.getGeneralAppPBADetails());
+            GAPbaDetails.GAPbaDetailsBuilder pbaDetailsBuilder = Optional.ofNullable(existingDetails)
+                .map(GAPbaDetails::toBuilder)
+                .orElse(GAPbaDetails.builder());
+            if (existingDetails != null && existingDetails.getFee() != null) {
+                pbaDetailsBuilder.fee(existingDetails.getFee());
+            }
+            pbaDetailsBuilder.serviceReqReference(serviceRequestReference);
             if (freeGa || freeGaLip) {
-                PaymentDetails paymentDetails = ofNullable(pbaDetails.getPaymentDetails())
+                PaymentDetails paymentDetails = ofNullable(existingDetails)
+                        .map(GAPbaDetails::getPaymentDetails)
                         .map(PaymentDetails::toBuilder)
                         .orElse(PaymentDetails.builder())
                         .status(SUCCESS)
@@ -102,10 +111,18 @@ public class PaymentServiceRequestHandler extends CallbackHandler {
                         .errorMessage(null)
                         .build();
                 pbaDetailsBuilder.paymentDetails(paymentDetails)
-                                .paymentSuccessfulDate(time.now()).build();
+                    .paymentSuccessfulDate(time.now());
             }
+            GAPbaDetails updatedDetails = pbaDetailsBuilder.build();
             caseData = caseData.toBuilder()
-                    .generalAppPBADetails(pbaDetailsBuilder.build()).build();
+                .generalAppPBADetails(updatedDetails)
+                .build();
+            if (gaCaseData != null) {
+                gaCaseData = gaCaseData.toBuilder()
+                    .generalAppPBADetails(updatedDetails)
+                    .build();
+                caseData = GaCallbackDataUtil.mergeToCaseData(gaCaseData, caseData, objectMapper);
+            }
         } catch (FeignException e) {
             log.info(String.format("Http Status %s ", e.status()), e);
             errors.add(ERROR_MESSAGE);
@@ -117,17 +134,31 @@ public class PaymentServiceRequestHandler extends CallbackHandler {
             .build();
     }
 
-    protected boolean isHelpWithFees(CaseData caseData) {
-        return Optional.ofNullable(caseData.getGeneralAppHelpWithFees())
+    protected boolean isHelpWithFees(GeneralApplicationCaseData gaCaseData, CaseData caseData) {
+        if (gaCaseData != null && gaCaseData.getGeneralAppHelpWithFees() != null) {
+            return gaCaseData.getGeneralAppHelpWithFees().getHelpWithFee() == YesOrNo.YES;
+        }
+        return Optional.ofNullable(caseData)
+            .map(CaseData::getGeneralAppHelpWithFees)
             .map(helpWithFees -> helpWithFees.getHelpWithFee())
             .filter(isHwf -> isHwf == YesOrNo.YES)
             .isPresent();
     }
 
-    protected boolean isFreeGaLip(CaseData caseData) {
-        return (featureToggleService.isGaForLipsEnabled() && gaForLipService.isGaForLip(caseData)
-            && Objects.nonNull(caseData.getGeneralAppPBADetails())
-            && Objects.nonNull(caseData.getGeneralAppPBADetails().getFee())
-            && (FREE_KEYWORD.equalsIgnoreCase(caseData.getGeneralAppPBADetails().getFee().getCode())));
+    protected boolean isFreeGaLip(GeneralApplicationCaseData gaCaseData, CaseData caseData) {
+        GeneralApplicationCaseData lipCheckData = gaCaseData != null
+            ? gaCaseData
+            : GaCallbackDataUtil.toGaCaseData(caseData, objectMapper);
+        if (!featureToggleService.isGaForLipsEnabled()
+            || lipCheckData == null
+            || !gaForLipService.isGaForLip(lipCheckData)) {
+            return false;
+        }
+        GAPbaDetails details = Optional.ofNullable(gaCaseData)
+            .map(GeneralApplicationCaseData::getGeneralAppPBADetails)
+            .orElse(caseData.getGeneralAppPBADetails());
+        return Objects.nonNull(details)
+            && Objects.nonNull(details.getFee())
+            && (FREE_KEYWORD.equalsIgnoreCase(details.getFee().getCode()));
     }
 }

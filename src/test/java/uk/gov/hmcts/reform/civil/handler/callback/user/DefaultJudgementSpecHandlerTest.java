@@ -1714,9 +1714,9 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             String body = "A default judgment has been sent to John Smith. "
                 + "The claim will now progress offline (on paper)";
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .applicant1(PartyBuilder.builder().build())
-                .respondent1(PartyBuilder.builder().build())
-                .respondent2(PartyBuilder.builder().build())
+                .applicant1(PartyBuilder.builder().individual().build())
+                .respondent1(PartyBuilder.builder().individual().build())
+                .respondent2(PartyBuilder.builder().individual().build())
                 .addRespondent2(YesOrNo.YES)
                 .respondent2SameLegalRepresentative(YesOrNo.YES)
                 .defendantDetailsSpec(DynamicList.builder()
@@ -1740,9 +1740,9 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 + "target=\"_blank\">Download  default judgment</a> "
                 + "%n%n The defendant will be served the Default Judgment.";
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .applicant1(PartyBuilder.builder().build())
-                .respondent1(PartyBuilder.builder().build())
-                .respondent2(PartyBuilder.builder().build())
+                .applicant1(PartyBuilder.builder().individual().build())
+                .respondent1(PartyBuilder.builder().individual().build())
+                .respondent2(PartyBuilder.builder().individual().build())
                 .addRespondent2(YesOrNo.YES)
                 .respondent2SameLegalRepresentative(YesOrNo.YES)
                 .defendantDetailsSpec(DynamicList.builder()
@@ -1764,8 +1764,8 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnJudgementRequestedResponse_whenLrVLip() {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .applicant1(PartyBuilder.builder().build())
-                .respondent1(PartyBuilder.builder().build())
+                .applicant1(PartyBuilder.builder().individual().build())
+                .respondent1(PartyBuilder.builder().individual().build())
                 .respondent1Represented(NO)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
@@ -1786,8 +1786,8 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 + "%n%n The defendant will be served with the Default Judgment.";
             when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .applicant1(PartyBuilder.builder().build())
-                .respondent1(PartyBuilder.builder().build())
+                .applicant1(PartyBuilder.builder().individual().build())
+                .respondent1(PartyBuilder.builder().individual().build())
                 .respondent1Represented(NO)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);

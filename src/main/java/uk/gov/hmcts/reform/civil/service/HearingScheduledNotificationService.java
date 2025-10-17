@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.GaCallbackDataUtil;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationDataGA;
 import uk.gov.hmcts.reform.civil.handler.callback.user.JudicialFinalDecisionHandler;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -59,21 +61,28 @@ public class HearingScheduledNotificationService implements NotificationDataGA {
         customProps.put(GA_HEARING_TIME, hearingTime.toString());
         customProps.put(PARTY_REFERENCE,
             Objects.requireNonNull(getSolicitorReferences(caseData.getEmailPartyReference())));
-        if (gaForLipService.isGaForLip(caseData)) {
+        GeneralApplicationCaseData gaCaseData = GaCallbackDataUtil.toGaCaseData(caseData, objectMapper);
+        if (gaCaseData != null && gaForLipService.isGaForLip(gaCaseData)) {
             customProps.put(CASE_TITLE, Objects.requireNonNull(JudicialFinalDecisionHandler
-                                                                   .getAllPartyNames(caseData)));
+                                                                   .getAllPartyNames(gaCaseData)));
         } else {
             customProps.remove(CASE_TITLE);
             customProps.remove(GA_LIP_APPLICANT_NAME);
             customProps.remove(GA_LIP_RESP_NAME);
         }
-        addAllFooterItems(caseData, mainCaseData, customProps, configuration,
-                           featureToggleService.isPublicQueryManagementEnabled(caseData));
+        if (gaCaseData != null) {
+            addAllFooterItems(gaCaseData, mainCaseData, customProps, configuration,
+                               featureToggleService.isPublicQueryManagementEnabled(caseData));
+        } else {
+            addAllFooterItems(caseData, mainCaseData, customProps, configuration,
+                               featureToggleService.isPublicQueryManagementEnabled(caseData));
+        }
         return customProps;
     }
 
     public Map<String, String> addPropertiesByType(CaseData caseData, CaseData mainCaseData, String gaLipType) {
-        if (gaForLipService.isLipApp(caseData) && gaLipType.equals(APPLICANT)) {
+        GeneralApplicationCaseData gaCaseData = GaCallbackDataUtil.toGaCaseData(caseData, objectMapper);
+        if (gaCaseData != null && gaForLipService.isLipAppGa(gaCaseData) && gaLipType.equals(APPLICANT)) {
             String isLipAppName = caseData.getApplicantPartyName();
             customProps.put(
                 GA_LIP_APPLICANT_NAME,
@@ -82,7 +91,7 @@ public class HearingScheduledNotificationService implements NotificationDataGA {
             customProps.remove(GA_LIP_RESP_NAME);
         }
 
-        if (gaForLipService.isLipResp(caseData) && gaLipType.equals(RESPONDENT)) {
+        if (gaCaseData != null && gaForLipService.isLipRespGa(gaCaseData) && gaLipType.equals(RESPONDENT)) {
             String isLipRespondentName = caseData.getDefendant1PartyName();
             customProps.remove(GA_LIP_APPLICANT_NAME);
             customProps.put(GA_LIP_RESP_NAME, Objects.requireNonNull(isLipRespondentName));
@@ -109,15 +118,19 @@ public class HearingScheduledNotificationService implements NotificationDataGA {
             .toCaseDataGA(coreCaseDataService
                             .getCase(Long.parseLong(caseData.getGeneralAppParentCaseLink().getCaseReference())));
 
-        caseData = solicitorEmailValidation.validateSolicitorEmail(civilCaseData, caseData);
+        GeneralApplicationCaseData gaCaseData = solicitorEmailValidation.validateSolicitorEmail(
+            civilCaseData,
+            GaCallbackDataUtil.toGaCaseData(caseData, objectMapper)
+        );
+        CaseData updatedCaseData = GaCallbackDataUtil.mergeToCaseData(gaCaseData, caseData, objectMapper);
 
-        sendNotification(caseData, civilCaseData, caseData.getGeneralAppApplnSolicitor().getEmail(),
-                         gaForLipService.isLipApp(caseData)
-                             ? getLiPApplicantTemplates(caseData)
+        sendNotification(updatedCaseData, civilCaseData, updatedCaseData.getGeneralAppApplnSolicitor().getEmail(),
+                         gaForLipService.isLipAppGa(gaCaseData)
+                             ? getLiPApplicantTemplates(updatedCaseData)
                              : notificationProperties.getHearingNoticeTemplate(), APPLICANT);
-        log.info("Sending hearing scheduled notification for claimant for Case ID: {}", caseData.getCcdCaseReference());
+        log.info("Sending hearing scheduled notification for claimant for Case ID: {}", updatedCaseData.getCcdCaseReference());
 
-        return caseData;
+        return updatedCaseData;
     }
 
     private String getLiPApplicantTemplates(CaseData caseData) {
@@ -140,20 +153,24 @@ public class HearingScheduledNotificationService implements NotificationDataGA {
             .toCaseDataGA(coreCaseDataService
                             .getCase(Long.parseLong(caseData.getGeneralAppParentCaseLink().getCaseReference())));
 
-        caseData = solicitorEmailValidation.validateSolicitorEmail(civilCaseData, caseData);
-
-        List<Element<GASolicitorDetailsGAspec>> respondentSolicitor = caseData
-            .getGeneralAppRespondentSolicitors();
-        CaseData updatedCaseData = caseData;
-        respondentSolicitor.forEach((respondent) -> sendNotification(
-            updatedCaseData,
+        GeneralApplicationCaseData gaCaseData = solicitorEmailValidation.validateSolicitorEmail(
             civilCaseData,
-            respondent.getValue().getEmail(), gaForLipService.isLipResp(updatedCaseData)
-                ? getLiPRespondentTemplate(civilCaseData, updatedCaseData)
+            GaCallbackDataUtil.toGaCaseData(caseData, objectMapper)
+        );
+        CaseData updatedCaseData = GaCallbackDataUtil.mergeToCaseData(gaCaseData, caseData, objectMapper);
+
+        List<Element<GASolicitorDetailsGAspec>> respondentSolicitor = updatedCaseData
+            .getGeneralAppRespondentSolicitors();
+        CaseData finalCaseData = updatedCaseData;
+        respondentSolicitor.forEach((respondent) -> sendNotification(
+            finalCaseData,
+            civilCaseData,
+            respondent.getValue().getEmail(), gaForLipService.isLipRespGa(gaCaseData)
+                ? getLiPRespondentTemplate(civilCaseData, finalCaseData)
                 : notificationProperties.getHearingNoticeTemplate(), RESPONDENT));
 
-        log.info("Sending hearing scheduled notification for respondent for Case ID: {}", caseData.getCcdCaseReference());
-        return caseData;
+        log.info("Sending hearing scheduled notification for respondent for Case ID: {}", updatedCaseData.getCcdCaseReference());
+        return updatedCaseData;
     }
 
     private String getLiPRespondentTemplate(CaseData civilCaseData, CaseData caseData) {

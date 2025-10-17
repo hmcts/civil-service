@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.callback.DashboardCallbackHandler;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.dq.GAJudgeDecisionOption;
 import uk.gov.hmcts.reform.civil.enums.dq.GAJudgeRequestMoreInfoOption;
@@ -22,14 +22,15 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_WRITTEN_REPRESENTATION_REQUIRED_RESPONDENT;
 
 @Service
-public class CreateMakeDecisionDashboardNotificationForRespondentHandler extends DashboardCallbackHandler {
+public class CreateMakeDecisionDashboardNotificationForRespondentHandler extends GaDashboardCallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(CaseEvent.CREATE_RESPONDENT_DASHBOARD_NOTIFICATION_FOR_MAKE_DECISION);
 
     public CreateMakeDecisionDashboardNotificationForRespondentHandler(DashboardScenariosService dashboardScenariosService,
                                                                        DashboardNotificationsParamsMapper mapper,
-                                                                       FeatureToggleService featureToggleService) {
-        super(dashboardScenariosService, mapper, featureToggleService);
+                                                                       FeatureToggleService featureToggleService,
+                                                                       ObjectMapper objectMapper) {
+        super(dashboardScenariosService, mapper, featureToggleService, objectMapper);
     }
 
     @Override

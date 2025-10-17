@@ -1,13 +1,14 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.callback.DashboardCallbackHandler;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.GaDashboardCallbackHandler;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 import uk.gov.hmcts.reform.dashboard.services.TaskListService;
@@ -24,7 +25,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_CLAIMANT;
 
 @Service
-public class CaseProceedOfflineClaimantNotificationHandler extends DashboardCallbackHandler {
+public class CaseProceedOfflineClaimantNotificationHandler extends GaDashboardCallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_CASE_PROCEED_OFFLINE);
     private static final List<CaseState> caseMovedInCaseManStates = List.of(CaseState.AWAITING_APPLICANT_INTENTION,
@@ -45,8 +46,9 @@ public class CaseProceedOfflineClaimantNotificationHandler extends DashboardCall
                                                          DashboardNotificationsParamsMapper mapper,
                                                          FeatureToggleService featureToggleService,
                                                          DashboardNotificationService dashboardNotificationService,
-                                                         TaskListService taskListService) {
-        super(dashboardScenariosService, mapper, featureToggleService);
+                                                         TaskListService taskListService,
+                                                         ObjectMapper objectMapper) {
+        super(dashboardScenariosService, mapper, featureToggleService, objectMapper);
         this.dashboardNotificationService = dashboardNotificationService;
         this.taskListService = taskListService;
     }

@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleApi;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -167,6 +169,16 @@ public class FeatureToggleService {
         return true;
     }
 
+    public boolean isPublicQueryManagementEnabledGa(GeneralApplicationCaseData caseData) {
+        if (caseData == null) {
+            return true;
+        }
+        if (gaCaseContainsLip(caseData)) {
+            return isLipQueryManagementEnabledGa(caseData);
+        }
+        return true;
+    }
+
     public boolean isGaForWelshEnabled() {
         return featureToggleApi.isFeatureEnabled("generalApplicationsForWelshParty");
     }
@@ -176,6 +188,15 @@ public class FeatureToggleService {
     }
 
     public boolean isLipQueryManagementEnabled(CaseData caseData) {
+        ZoneId zoneId = ZoneId.systemDefault();
+        long epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
+        return featureToggleApi.isFeatureEnabledForDate("cui-query-management", epoch, false);
+    }
+
+    public boolean isLipQueryManagementEnabledGa(GeneralApplicationCaseData caseData) {
+        if (caseData == null || caseData.getSubmittedDate() == null) {
+            return featureToggleApi.isFeatureEnabled("cui-query-management");
+        }
         ZoneId zoneId = ZoneId.systemDefault();
         long epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
         return featureToggleApi.isFeatureEnabledForDate("cui-query-management", epoch, false);
@@ -206,5 +227,11 @@ public class FeatureToggleService {
         } catch (IOException e) {
             log.error("Error in closing the Launchdarkly client::", e);
         }
+    }
+
+    private boolean gaCaseContainsLip(GeneralApplicationCaseData caseData) {
+        return YesOrNo.YES.equals(caseData.getIsGaApplicantLip())
+            || YesOrNo.YES.equals(caseData.getIsGaRespondentOneLip())
+            || YesOrNo.YES.equals(caseData.getIsGaRespondentTwoLip());
     }
 }

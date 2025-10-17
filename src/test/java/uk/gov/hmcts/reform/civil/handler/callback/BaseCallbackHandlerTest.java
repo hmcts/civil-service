@@ -1,5 +1,10 @@
 package uk.gov.hmcts.reform.civil.handler.callback;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.MapperFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
@@ -10,6 +15,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.UserService;
 
@@ -26,6 +32,33 @@ public abstract class BaseCallbackHandlerTest {
     protected AuthTokenGenerator authTokenGenerator;
     @MockBean
     protected UserService userService;
+    protected final ObjectMapper objectMapper = new ObjectMapper()
+        .registerModule(new JavaTimeModule())
+        .registerModule(new Jdk8Module())
+        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+        .configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true)
+        .configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS, true);
+
+    protected GeneralApplicationCaseData toGaCaseData(CaseData caseData) {
+        if (caseData == null) {
+            return null;
+        }
+        Map<String, Object> map = caseData.toMap(objectMapper);
+        if (!map.containsKey("ccdCaseReference") && caseData.getCcdCaseReference() != null) {
+            map.put("ccdCaseReference", caseData.getCcdCaseReference());
+        }
+        if (!map.containsKey("ccdState") && caseData.getCcdState() != null) {
+            map.put("ccdState", caseData.getCcdState());
+        }
+        GeneralApplicationCaseData converted = objectMapper.convertValue(map, GeneralApplicationCaseData.class);
+        if (caseData.getCcdCaseReference() != null || caseData.getCcdState() != null) {
+            return converted.toBuilder()
+                .ccdCaseReference(caseData.getCcdCaseReference())
+                .ccdState(caseData.getCcdState())
+                .build();
+        }
+        return converted;
+    }
 
     public CallbackParams callbackParamsOf(Map<String, Object> data, CallbackType type, CaseState state) {
         return callbackParamsOf(data, state, type, null, null, Map.of(Params.BEARER_TOKEN, "BEARER_TOKEN"));
@@ -132,6 +165,7 @@ public abstract class BaseCallbackHandlerTest {
                                                 .build())
                          .build())
             .caseData(caseData)
+            .gaCaseData(toGaCaseData(caseData))
             .version(version)
             .params(params)
             .build();
@@ -147,6 +181,7 @@ public abstract class BaseCallbackHandlerTest {
                          .caseDetails(caseDetails)
                          .build())
             .caseData(caseData)
+            .gaCaseData(toGaCaseData(caseData))
             .params(Map.of(Params.BEARER_TOKEN, "BEARER_TOKEN"))
             .build();
     }
@@ -165,6 +200,7 @@ public abstract class BaseCallbackHandlerTest {
                          .caseDetailsBefore(CaseDetails.builder().data(new HashMap<>()).id(CASE_ID).build())
                          .build())
             .caseData(caseData)
+            .gaCaseData(toGaCaseData(caseData))
             .version(version)
             .params(params)
             .build();
@@ -184,7 +220,9 @@ public abstract class BaseCallbackHandlerTest {
                 .caseDetailsBefore(CaseDetails.builder().data(new HashMap<>()).id(CASE_ID).build())
                 .build())
             .caseData(caseData)
+            .gaCaseData(toGaCaseData(caseData))
             .caseDataBefore(caseDataBefore)
+            .gaCaseDataBefore(toGaCaseData(caseDataBefore))
             .version(version)
             .params(params)
             .build();
@@ -205,6 +243,7 @@ public abstract class BaseCallbackHandlerTest {
                          .caseDetailsBefore(CaseDetails.builder().data(new HashMap<>()).id(CASE_ID).build())
                          .build())
             .caseData(caseData)
+            .gaCaseData(toGaCaseData(caseData))
             .version(version)
             .params(params)
             .build();
@@ -224,6 +263,7 @@ public abstract class BaseCallbackHandlerTest {
                          .caseDetailsBefore(CaseDetails.builder().data(new HashMap<>()).id(CASE_ID).build())
                          .build())
             .caseData(caseData)
+            .gaCaseData(toGaCaseData(caseData))
             .version(version)
             .params(params)
             .build();
@@ -260,6 +300,7 @@ public abstract class BaseCallbackHandlerTest {
             .version(version)
             .params(params)
             .caseData(caseData)
+            .gaCaseData(toGaCaseData(caseData))
             .build();
     }
 
@@ -280,6 +321,24 @@ public abstract class BaseCallbackHandlerTest {
             .build();
     }
 
+    public CallbackParams gaCallbackParamsOf(GeneralApplicationCaseData gaCaseData, CallbackType type) {
+        return gaCallbackParamsOf(gaCaseData, null, type);
+    }
+
+    public CallbackParams gaCallbackParamsOf(GeneralApplicationCaseData gaCaseData,
+                                             CaseData caseData,
+                                             CallbackType type) {
+        return CallbackParams.builder()
+            .type(type)
+            .request(CallbackRequest.builder()
+                         .caseDetails(CaseDetails.builder().data(new HashMap<>()).id(CASE_ID).build())
+                         .build())
+            .caseData(caseData)
+            .gaCaseData(gaCaseData)
+            .params(Map.of(Params.BEARER_TOKEN, "BEARER_TOKEN"))
+            .build();
+    }
+
     public CallbackParams specCallbackParamsOf(CaseData caseData,
                                                CallbackType type,
                                                CallbackVersion version,
@@ -295,6 +354,7 @@ public abstract class BaseCallbackHandlerTest {
                          .eventId(eventId)
                          .build())
             .caseData(caseData)
+            .gaCaseData(toGaCaseData(caseData))
             .version(version)
             .params(params)
             .build();

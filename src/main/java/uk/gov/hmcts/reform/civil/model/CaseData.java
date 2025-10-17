@@ -4,9 +4,11 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.jackson.Jacksonized;
 import org.apache.commons.lang3.StringUtils;
@@ -723,7 +725,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final GARespondentRepresentative generalAppRespondent1Representative;
     private final String generalAppRespondReason;
     private final String generalAppRespondConsentReason;
-    private List<Element<TranslatedDocument>> translatedDocumentsGA;
+    @JsonProperty("translatedDocuments")
+    private List<Element<TranslatedDocument>> translatedDocuments;
     private List<Element<TranslatedDocument>> translatedDocumentsBulkPrint;
     private final List<CaseDocument> originalDocumentsBulkPrint;
     private final List<Element<Document>> generalAppRespondDocument;
@@ -843,10 +846,13 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private YesOrNo respondentResponseDeadlineChecked;
     //Case name for manage case
     private String caseNameGaInternal;
-    //private String claimantBilingualLanguagePreference;
-    private RespondentLiPResponse respondent1LiPResponseGA;
-    private YesOrNo applicantBilingualLanguagePreferenceGA;
-    private YesOrNo respondentBilingualLanguagePreferenceGA;
+    @Getter(AccessLevel.NONE)
+    @JsonProperty("respondent1LiPResponse")
+    private RespondentLiPResponse respondent1LiPResponse;
+    @JsonProperty("applicantBilingualLanguagePreference")
+    private YesOrNo applicantBilingualLanguagePreference;
+    @JsonProperty("respondentBilingualLanguagePreference")
+    private YesOrNo respondentBilingualLanguagePreference;
     //WA claim track description
     private final String emailPartyReference;
 
@@ -1879,6 +1885,26 @@ public class CaseData extends CaseDataParent implements MappableObject {
             && this.getCcdState() == CaseState.AWAITING_APPLICANT_INTENTION;
     }
 
+    @Override
+    @JsonIgnore
+    public List<Element<TranslatedDocument>> getTranslatedDocuments() {
+        List<Element<TranslatedDocument>> lipDocuments = super.getTranslatedDocuments();
+        if (!lipDocuments.isEmpty()) {
+            return lipDocuments;
+        }
+        return Optional.ofNullable(translatedDocuments).orElse(Collections.emptyList());
+    }
+
+    @JsonIgnore
+    public RespondentLiPResponse getRespondent1LiPResponse() {
+        if (respondent1LiPResponse != null) {
+            return respondent1LiPResponse;
+        }
+        return Optional.ofNullable(getCaseDataLiP())
+            .map(CaseDataLiP::getRespondent1LiPResponse)
+            .orElse(null);
+    }
+
     @JsonIgnore
     public boolean isUrgent() {
         return Optional.ofNullable(this.getGeneralAppUrgencyRequirement())
@@ -1889,14 +1915,12 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public boolean isApplicantBilingual() {
-        return Objects.nonNull(applicantBilingualLanguagePreferenceGA)
-                && applicantBilingualLanguagePreferenceGA.equals(YES);
+        return YES.equals(applicantBilingualLanguagePreference);
     }
 
     @JsonIgnore
     public boolean isRespondentBilingual() {
-        return Objects.nonNull(respondentBilingualLanguagePreferenceGA)
-                && respondentBilingualLanguagePreferenceGA.equals(YES);
+        return YES.equals(respondentBilingualLanguagePreference);
     }
 
     @JsonIgnore
@@ -2035,12 +2059,5 @@ public class CaseData extends CaseDataParent implements MappableObject {
     public boolean isApplicationBilingual() {
         return ((this.getIsGaApplicantLip() == YES && this.isApplicantBilingual())
                 || (this.getIsGaRespondentOneLip() == YES && this.isRespondentBilingual()));
-    }
-
-    @JsonIgnore
-    public String getDefendantBilingualLanguagePreferenceGA() {
-        return Optional.ofNullable(getRespondent1LiPResponseGA())
-                .map(RespondentLiPResponse::getRespondent1ResponseLanguage)
-                .orElse(null);
     }
 }

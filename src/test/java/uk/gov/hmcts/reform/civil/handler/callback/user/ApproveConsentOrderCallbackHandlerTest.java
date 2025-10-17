@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement;
 import uk.gov.hmcts.reform.civil.sampledata.PDFBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.consentorder.ConsentOrderGenerator;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -117,7 +118,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
         @BeforeEach
         void setup() {
 
-            when(consentOrderGenerator.generate(any(), any()))
+            when(consentOrderGenerator.generate(any(GeneralApplicationCaseData.class), any()))
                 .thenReturn(PDFBuilder.CONSENT_ORDER_DOCUMENT);
         }
 

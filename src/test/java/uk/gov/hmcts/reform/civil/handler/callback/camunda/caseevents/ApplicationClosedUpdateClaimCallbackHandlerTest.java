@@ -1,23 +1,20 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.verification.VerificationMode;
-import org.springframework.test.util.ReflectionTestUtils;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.GenAppStateHelperService;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,6 +22,7 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -35,22 +33,20 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLICATION_CLOSED_UP
 @ExtendWith(MockitoExtension.class)
 class ApplicationClosedUpdateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-    @InjectMocks
-    private ApplicationClosedUpdateClaimCallbackHandler handler;
-
-    @InjectMocks
-    private ObjectMapper mapper;
-
     @Mock
     private GenAppStateHelperService helperService;
 
+    private ApplicationClosedUpdateClaimCallbackHandler handler;
+    private ObjectMapper objectMapper;
+
     private static final String APPLICATION_CLOSED_DESCRIPTION = "Application Closed";
-    private static final VerificationMode ONCE = Mockito.times(1);
 
     @BeforeEach
     void prepare() {
-        ReflectionTestUtils.setField(handler, "objectMapper", new ObjectMapper().registerModule(new JavaTimeModule())
-            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS));
+        objectMapper = new ObjectMapper()
+            .registerModule(new JavaTimeModule())
+            .registerModule(new Jdk8Module());
+        handler = new ApplicationClosedUpdateClaimCallbackHandler(helperService, objectMapper);
     }
 
     @Test
@@ -67,10 +63,11 @@ class ApplicationClosedUpdateClaimCallbackHandlerTest extends BaseCallbackHandle
                                         true, true,
                                         getOriginalStatusOfGeneralApplication_test1()
             );
+        GeneralApplicationCaseData expectedGa = toGaCaseData(caseData);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
         when(helperService.updateApplicationDetailsInClaim(
-            any(),
+            any(GeneralApplicationCaseData.class),
             eq(APPLICATION_CLOSED_DESCRIPTION),
             eq(GenAppStateHelperService.RequiredState.APPLICATION_CLOSED)
         ))
@@ -79,8 +76,8 @@ class ApplicationClosedUpdateClaimCallbackHandlerTest extends BaseCallbackHandle
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         assertThat(response.getErrors()).isNull();
-        verify(helperService, ONCE).updateApplicationDetailsInClaim(
-            caseData,
+        verify(helperService, times(1)).updateApplicationDetailsInClaim(
+            expectedGa,
             APPLICATION_CLOSED_DESCRIPTION,
             GenAppStateHelperService.RequiredState.APPLICATION_CLOSED
         );
@@ -116,7 +113,7 @@ class ApplicationClosedUpdateClaimCallbackHandlerTest extends BaseCallbackHandle
             );
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
-        when(helperService.updateApplicationDetailsInClaim(any(), any(), any()))
+        when(helperService.updateApplicationDetailsInClaim(any(GeneralApplicationCaseData.class), any(), any()))
             .thenThrow(new RuntimeException("Some Error"));
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -124,10 +121,39 @@ class ApplicationClosedUpdateClaimCallbackHandlerTest extends BaseCallbackHandle
         assertThat(response.getErrors()).isNotNull();
         assertThat(response.getErrors())
             .contains("Error occurred while updating claim with application status: " + "Some Error");
-        verify(helperService, ONCE).updateApplicationDetailsInClaim(
-            caseData,
+        verify(helperService, times(1)).updateApplicationDetailsInClaim(
+            toGaCaseData(caseData),
             APPLICATION_CLOSED_DESCRIPTION,
             GenAppStateHelperService.RequiredState.APPLICATION_CLOSED
+        );
+        verifyNoMoreInteractions(helperService);
+    }
+
+    @Test
+    void callHelperServiceWithGaCaseDataWhenOnlyGaPayloadPresent() {
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+            .getTestCaseDataWithDetails(CaseData.builder().build(),
+                true,
+                true,
+                true, true,
+                getOriginalStatusOfGeneralApplication_test1()
+            );
+        GeneralApplicationCaseData gaCaseData = toGaCaseData(caseData);
+        CallbackParams params = gaCallbackParamsOf(gaCaseData, ABOUT_TO_SUBMIT);
+
+        when(helperService.updateApplicationDetailsInClaim(
+            any(GeneralApplicationCaseData.class),
+            eq(APPLICATION_CLOSED_DESCRIPTION),
+            eq(GenAppStateHelperService.RequiredState.APPLICATION_CLOSED)
+        )).thenReturn(caseData);
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        assertThat(response.getErrors()).isNull();
+        verify(helperService, times(1)).updateApplicationDetailsInClaim(
+            eq(gaCaseData),
+            eq(APPLICATION_CLOSED_DESCRIPTION),
+            eq(GenAppStateHelperService.RequiredState.APPLICATION_CLOSED)
         );
         verifyNoMoreInteractions(helperService);
     }
@@ -147,4 +173,3 @@ class ApplicationClosedUpdateClaimCallbackHandlerTest extends BaseCallbackHandle
         return latestStatus;
     }
 }
-

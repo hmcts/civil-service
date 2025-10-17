@@ -11,13 +11,14 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.GaCallbackDataUtil;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.GenAppStateHelperService;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -51,24 +52,50 @@ public class TriggerGenAppLocationUpdateCallbackHandler extends CallbackHandler 
     }
 
     private CallbackResponse triggerGaEvent(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData gaCaseData = GaCallbackDataUtil.resolveGaCaseData(callbackParams, objectMapper);
+        CaseData caseData = GaCallbackDataUtil.mergeToCaseData(gaCaseData, callbackParams.getCaseData(), objectMapper);
+        if (caseData == null) {
+            throw new IllegalArgumentException("Case data missing from callback params");
+        }
 
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         try {
-            if (!(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(
+            boolean hasGaApplications = gaCaseData != null
+                && !io.jsonwebtoken.lang.Collections.isEmpty(gaCaseData.getGeneralApplications());
+            boolean hasCaseApplications = !io.jsonwebtoken.lang.Collections.isEmpty(caseData.getGeneralApplications());
+            boolean shouldSetEaFlag = !(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(
                 caseData.getCaseManagementLocation().getBaseLocation()))
                 && caseData.isLipCase()
-                && (Objects.nonNull(caseData.getGeneralApplications()) && !caseData.getGeneralApplications().isEmpty())
-                && !featureToggleService.isCuiGaNroEnabled()) {
-                caseDataBuilder.gaEaCourtLocation(YesOrNo.YES);
+                && (hasGaApplications || hasCaseApplications)
+                && !featureToggleService.isCuiGaNroEnabled();
+
+            if (shouldSetEaFlag) {
+                caseData = caseData.toBuilder().gaEaCourtLocation(YesOrNo.YES).build();
             }
-            if (caseData.getGeneralApplications() != null && !caseData.getGeneralApplications().isEmpty()) {
-                caseData = helperService.updateApplicationLocationDetailsInClaim(caseData, authToken);
+
+            if (hasGaApplications || hasCaseApplications) {
+                if (hasGaApplications) {
+                    caseData = helperService.updateApplicationLocationDetailsInClaim(gaCaseData, authToken);
+                    gaCaseData = GaCallbackDataUtil.toGaCaseData(caseData, objectMapper);
+                } else {
+                    caseData = helperService.updateApplicationLocationDetailsInClaim(caseData, authToken);
+                    gaCaseData = GaCallbackDataUtil.toGaCaseData(caseData, objectMapper);
+                }
+                if (shouldSetEaFlag) {
+                    caseData = caseData.toBuilder().gaEaCourtLocation(YesOrNo.YES).build();
+                }
                 if (callbackParams.getRequest().getEventId().equals(TRIGGER_UPDATE_GA_LOCATION.name())) {
-                    helperService.triggerEvent(caseData, TRIGGER_LOCATION_UPDATE);
+                    if (gaCaseData != null && !io.jsonwebtoken.lang.Collections.isEmpty(gaCaseData.getGeneralApplications())) {
+                        helperService.triggerEvent(gaCaseData, TRIGGER_LOCATION_UPDATE);
+                    } else {
+                        helperService.triggerEvent(caseData, TRIGGER_LOCATION_UPDATE);
+                    }
                 } else if (callbackParams.getRequest().getEventId().equals(TRIGGER_TASK_RECONFIG_GA.name())) {
-                    helperService.triggerEvent(caseData, TRIGGER_TASK_RECONFIG);
+                    if (gaCaseData != null && !io.jsonwebtoken.lang.Collections.isEmpty(gaCaseData.getGeneralApplications())) {
+                        helperService.triggerEvent(gaCaseData, TRIGGER_TASK_RECONFIG);
+                    } else {
+                        helperService.triggerEvent(caseData, TRIGGER_TASK_RECONFIG);
+                    }
                 }
             }
         } catch (Exception e) {
@@ -78,7 +105,7 @@ public class TriggerGenAppLocationUpdateCallbackHandler extends CallbackHandler 
             return AboutToStartOrSubmitCallbackResponse.builder().errors(List.of(errorMessage)).build();
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 

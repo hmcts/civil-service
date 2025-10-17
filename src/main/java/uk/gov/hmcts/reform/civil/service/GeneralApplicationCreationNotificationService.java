@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.GaCallbackDataUtil;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationDataGA;
 import uk.gov.hmcts.reform.civil.handler.callback.user.JudicialFinalDecisionHandler;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -59,9 +61,13 @@ public class GeneralApplicationCreationNotificationService  implements Notificat
             .toCaseDataGA(coreCaseDataService
                             .getCase(Long.parseLong(caseData.getGeneralAppParentCaseLink().getCaseReference())));
 
-        CaseData updatedCaseData = solicitorEmailValidation.validateSolicitorEmail(civilCaseData, caseData);
+        GeneralApplicationCaseData gaCaseData = solicitorEmailValidation.validateSolicitorEmail(
+            civilCaseData,
+            toGaCaseData(caseData)
+        );
 
-        boolean isNotificationCriteriaSatisfied = isNotificationCriteriaSatisfied(updatedCaseData);
+        CaseData gaAsCaseData = GaCallbackDataUtil.mergeToCaseData(gaCaseData, caseData, objectMapper);
+        boolean isNotificationCriteriaSatisfied = isNotificationCriteriaSatisfied(gaAsCaseData);
 
         /*
          * Send email to Respondents if application is withNotice and non-urgent
@@ -69,15 +75,15 @@ public class GeneralApplicationCreationNotificationService  implements Notificat
         if (isNotificationCriteriaSatisfied) {
 
             log.info("Sending general notification to respondents for Case ID: {}", caseReference);
-            List<Element<GASolicitorDetailsGAspec>> respondentSolicitor = updatedCaseData
+            List<Element<GASolicitorDetailsGAspec>> respondentSolicitor = gaCaseData
                 .getGeneralAppRespondentSolicitors();
 
             respondentSolicitor
                 .forEach((RS) ->
-                             sendNotificationToGeneralAppRespondent(updatedCaseData,
+                             sendNotificationToGeneralAppRespondent(gaCaseData,
                                                                     civilCaseData,
                                                                     RS.getValue().getEmail(),
-                                     getTemplate(updatedCaseData, false, civilCaseData)
+                                     getTemplate(gaCaseData, false)
                              ));
         }
 
@@ -85,37 +91,37 @@ public class GeneralApplicationCreationNotificationService  implements Notificat
         * Send email to Respondent if application is urgent, with notice and fee is paid
         * */
         boolean isUrgentApplnNotificationCriteriaSatisfied
-            = isUrgentApplnNotificationCriteriaSatisfied(updatedCaseData);
+            = isUrgentApplnNotificationCriteriaSatisfied(gaAsCaseData);
 
         if (isUrgentApplnNotificationCriteriaSatisfied
-            && isFeePaid(updatedCaseData)) {
+            && isFeePaid(gaCaseData)) {
             log.info("Sending urgent notification to respondents for Case ID: {}", caseReference);
 
-            List<Element<GASolicitorDetailsGAspec>> respondentSolicitor = updatedCaseData
+            List<Element<GASolicitorDetailsGAspec>> respondentSolicitor = gaCaseData
                 .getGeneralAppRespondentSolicitors();
 
             respondentSolicitor
                 .forEach((RS) ->
                              sendNotificationToGeneralAppRespondent(
-                                 updatedCaseData,
+                                 gaCaseData,
                                  civilCaseData,
                                  RS.getValue().getEmail(),
-                                 getTemplate(updatedCaseData, true, civilCaseData)));
+                                 getTemplate(gaCaseData, true)));
         }
 
         return caseData;
     }
 
-    public boolean isFeePaid(CaseData caseData) {
+    public boolean isFeePaid(GeneralApplicationCaseData caseData) {
         return caseData.getGeneralAppPBADetails() != null
             && (caseData.getGeneralAppPBADetails().getFee().getCode().equals("FREE")
             || (caseData.getGeneralAppPBADetails().getPaymentDetails() != null
             && caseData.getGeneralAppPBADetails().getPaymentDetails().getStatus().equals(PaymentStatus.SUCCESS)));
     }
 
-    private String getTemplate(CaseData caseData, boolean urgent, CaseData civilCaseData) {
-        if (gaForLipService.isLipResp(caseData)) {
-            return getLiPTemplate(civilCaseData, caseData);
+    private String getTemplate(GeneralApplicationCaseData caseData, boolean urgent) {
+        if (gaForLipService.isLipRespGa(caseData)) {
+            return getLiPTemplate(caseData);
         } else {
             return urgent ? notificationProperties
                     .getUrgentGeneralAppRespondentEmailTemplate() : notificationProperties
@@ -123,7 +129,7 @@ public class GeneralApplicationCreationNotificationService  implements Notificat
         }
     }
 
-    private String getLiPTemplate(CaseData civilCaseData, CaseData caseData) {
+    private String getLiPTemplate(GeneralApplicationCaseData caseData) {
         return caseData.isRespondentBilingual()
             ? notificationProperties.getLipGeneralAppRespondentEmailTemplateInWelsh()
             : notificationProperties.getLipGeneralAppRespondentEmailTemplate();
@@ -133,7 +139,10 @@ public class GeneralApplicationCreationNotificationService  implements Notificat
         return Objects.requireNonNullElse(emailPartyReference, EMPTY_SOLICITOR_REFERENCES_1V1);
     }
 
-    private void sendNotificationToGeneralAppRespondent(CaseData caseData, CaseData mainCaseData, String recipient, String emailTemplate)
+    private void sendNotificationToGeneralAppRespondent(GeneralApplicationCaseData caseData,
+                                                       CaseData mainCaseData,
+                                                       String recipient,
+                                                       String emailTemplate)
         throws NotificationException {
         var caseReference = caseData.getCcdCaseReference();
         try {
@@ -153,11 +162,15 @@ public class GeneralApplicationCreationNotificationService  implements Notificat
 
     @Override
     public Map<String, String> addProperties(CaseData caseData, CaseData mainCaseData) {
+        return addProperties(toGaCaseData(caseData), mainCaseData);
+    }
+
+    public Map<String, String> addProperties(GeneralApplicationCaseData caseData, CaseData mainCaseData) {
         String lipRespName = "";
         String caseTitle = "";
-        if (gaForLipService.isLipResp(caseData)) {
-            lipRespName = caseData.getParentClaimantIsApplicant().equals(YES) ? caseData.getDefendant1PartyName() :
-                caseData.getClaimant1PartyName();
+        if (gaForLipService.isLipRespGa(caseData)) {
+            lipRespName = caseData.getParentClaimantIsApplicant().equals(YES) ? caseData.getDefendant1PartyName()
+                : caseData.getClaimant1PartyName();
             caseTitle = JudicialFinalDecisionHandler.getAllPartyNames(caseData);
 
         }
@@ -166,8 +179,7 @@ public class GeneralApplicationCreationNotificationService  implements Notificat
             CASE_REFERENCE, caseData.getGeneralAppParentCaseLink().getCaseReference(),
             GENAPP_REFERENCE, String.valueOf(Objects.requireNonNull(caseData.getCcdCaseReference())),
             GA_NOTIFICATION_DEADLINE, DateFormatHelper
-                .formatLocalDateTime(caseData
-                                         .getGeneralAppNotificationDeadlineDate(), DATE),
+                .formatLocalDateTime(caseData.getGeneralAppNotificationDeadlineDate(), DATE),
             PARTY_REFERENCE,
             Objects.requireNonNull(getSolicitorReferences(caseData.getEmailPartyReference())),
             GA_LIP_RESP_NAME, lipRespName,
@@ -175,8 +187,12 @@ public class GeneralApplicationCreationNotificationService  implements Notificat
             CASE_TITLE, Objects.requireNonNull(caseTitle)
         ));
         addAllFooterItems(caseData, mainCaseData, properties, configuration,
-                           featureToggleService.isPublicQueryManagementEnabled(caseData));
+                           featureToggleService.isPublicQueryManagementEnabledGa(caseData));
         return properties;
+    }
+
+    private GeneralApplicationCaseData toGaCaseData(CaseData caseData) {
+        return GaCallbackDataUtil.toGaCaseData(caseData, objectMapper);
     }
 
 }

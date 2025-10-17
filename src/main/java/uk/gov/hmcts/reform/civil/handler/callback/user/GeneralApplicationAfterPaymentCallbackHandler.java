@@ -12,6 +12,8 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.GaCallbackDataUtil;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
@@ -54,12 +56,13 @@ public class GeneralApplicationAfterPaymentCallbackHandler extends CallbackHandl
 
     private CallbackResponse generalAppAfterPayment(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        GeneralApplicationCaseData gaCaseData = GaCallbackDataUtil.toGaCaseData(caseData, objectMapper);
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         PaymentStatus paymentStatus = Optional.of(caseData).map(CaseData::getGeneralAppPBADetails).map(GAPbaDetails::getPaymentDetails)
             .map(PaymentDetails::getStatus).orElse(null);
 
         // No need to initiate business process if payment status is failed
-        if (gaForLipService.isLipApp(caseData) && paymentStatus == PaymentStatus.FAILED) {
+        if (gaForLipService.isLipAppGa(gaCaseData) && paymentStatus == PaymentStatus.FAILED) {
             log.info("Payment status is failed for caseId: {}", caseData.getCcdCaseReference());
             return getCallbackResponse(caseDataBuilder);
         }

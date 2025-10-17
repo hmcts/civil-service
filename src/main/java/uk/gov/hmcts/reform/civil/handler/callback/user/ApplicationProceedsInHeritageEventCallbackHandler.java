@@ -11,6 +11,8 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.GaCallbackDataUtil;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DocUploadDashboardNotificationService;
@@ -54,6 +56,7 @@ public class ApplicationProceedsInHeritageEventCallbackHandler extends CallbackH
 
     private CallbackResponse changeApplicationStateToProceedsInHeritage(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        GeneralApplicationCaseData gaCaseData = GaCallbackDataUtil.toGaCaseData(caseData, objectMapper);
         Long caseId = caseData.getCcdCaseReference();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         if (!NON_LIVE_STATES.contains(caseData.getCcdState())) {
@@ -67,11 +70,11 @@ public class ApplicationProceedsInHeritageEventCallbackHandler extends CallbackH
                         .status(BusinessProcessStatus.FINISHED)
                         .build())
                 .applicationTakenOfflineDate(time.now());
-            if (gaForLipService.isGaForLip(caseData)) {
-                if (gaForLipService.isLipApp(caseData)) {
+            if (gaForLipService.isGaForLip(gaCaseData)) {
+                if (gaForLipService.isLipAppGa(gaCaseData)) {
                     dashboardNotificationService.createOfflineResponseDashboardNotification(caseData, "APPLICANT", authToken);
                 }
-                if (gaForLipService.isLipResp(caseData)) {
+                if (gaForLipService.isLipRespGa(gaCaseData)) {
                     dashboardNotificationService.createOfflineResponseDashboardNotification(caseData, "RESPONDENT", authToken);
                 }
             }

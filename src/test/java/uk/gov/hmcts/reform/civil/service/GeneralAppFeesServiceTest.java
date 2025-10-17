@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -12,11 +14,13 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.client.FeesApiClient;
 import uk.gov.hmcts.reform.civil.config.GeneralAppFeesConfiguration;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.FeeLookupResponseDto;
@@ -24,6 +28,8 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDateGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement;
+import uk.gov.hmcts.reform.civil.service.ga.GaCaseDataEnricher;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Collections;
@@ -34,10 +40,12 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.OTHER;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.SET_ASIDE_JUDGEMENT;
@@ -75,9 +83,22 @@ class GeneralAppFeesServiceTest {
 
     @Mock
     private GeneralAppFeesConfiguration feesConfiguration;
+    
+    @Mock
+    private GaCaseDataEnricher gaCaseDataEnricher;
+
+    @Spy
+    private ObjectMapper objectMapper = new ObjectMapper();
 
     @InjectMocks
     private GeneralAppFeesService generalAppFeesService;
+
+    @BeforeEach
+    void setUp() {
+        objectMapper.registerModule(new JavaTimeModule());
+        lenient().when(gaCaseDataEnricher.enrich(any(CaseData.class), any(GeneralApplicationCaseData.class)))
+            .thenAnswer(invocation -> invocation.getArgument(0));
+    }
 
     @Nested
     class FeeForJOWithApplicationType {
@@ -448,6 +469,36 @@ class GeneralAppFeesServiceTest {
             } else if (generalApplicationTypes == GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT) {
                 assertThat(keywords).contains(APPLICATION_TO_VARY_OR_SUSPEND);
             }
+        }
+
+        @Test
+        void shouldCalculateFeeFromGeneralApplicationCaseData() {
+            when(feesApiClient.lookupFee(
+                anyString(),
+                anyString(),
+                anyString(),
+                anyString(),
+                anyString(),
+                keywordCaptor.capture()
+            )).thenReturn(FEE_POUNDS);
+            when(feesConfiguration.getService()).thenReturn(GENERAL_SERVICE);
+            when(feesConfiguration.getChannel()).thenReturn(DEFAULT_CHANNEL);
+            when(feesConfiguration.getJurisdiction1()).thenReturn(CIVIL_JURISDICTION);
+            when(feesConfiguration.getJurisdiction2()).thenReturn(CIVIL_JURISDICTION);
+            when(feesConfiguration.getEvent()).thenReturn(GENERAL_APPLICATION);
+            when(feesConfiguration.getConsentedOrWithoutNoticeKeyword()).thenReturn(GENERAL_APP_WITHOUT_NOTICE);
+
+            CaseData caseData = getFeeCase(
+                List.of(GeneralApplicationTypes.SETTLE_BY_CONSENT),
+                YesOrNo.NO,
+                YesOrNo.NO,
+                null
+            );
+
+            GeneralApplicationCaseData gaCaseData = objectMapper.convertValue(caseData, GeneralApplicationCaseData.class);
+
+            Fee feeDto = generalAppFeesService.getFeeForGA(gaCaseData);
+            assertThat(feeDto).isEqualTo(FEE_PENCE);
         }
     }
 

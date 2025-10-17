@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.utils;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 
@@ -61,6 +62,18 @@ public class EmailFooterUtils {
         return properties;
     }
 
+    public static Map<String, String> addAllFooterItems(GeneralApplicationCaseData caseData, CaseData mainCaseData,
+                                                        Map<String, String> properties,
+                                                        NotificationsSignatureConfiguration configuration,
+                                                        boolean isPublicQMEnabled) {
+        addCommonFooterSignature(properties, configuration);
+        addCommonFooterSignatureWelsh(properties, configuration);
+        addSpecAndUnspecContact(caseData, mainCaseData, properties, configuration, isPublicQMEnabled);
+        addLipContact(caseData, mainCaseData, properties, configuration, isPublicQMEnabled);
+        addWelshLipContact(caseData, mainCaseData, properties, configuration, isPublicQMEnabled);
+        return properties;
+    }
+
     public static void addCommonFooterSignature(Map<String, String> properties,
                                                 NotificationsSignatureConfiguration configuration) {
         properties.putAll(Map.of(HMCTS_SIGNATURE, configuration.getHmctsSignature(),
@@ -92,6 +105,19 @@ public class EmailFooterUtils {
         }
     }
 
+    private static void addSpecAndUnspecContact(GeneralApplicationCaseData caseData, CaseData mainCaseData,
+                                                Map<String, String> properties,
+                                                NotificationsSignatureConfiguration configuration,
+                                                boolean isPublicQMEnabled) {
+        log.info("add LR contact (GA)");
+        if (!queryNotAllowedCaseStates(mainCaseData)
+            && (!isLipCase(caseData) || (isPublicQMEnabled && isLipCase(caseData)))) {
+            properties.put(SPEC_UNSPEC_CONTACT, RAISE_QUERY_LR);
+        } else {
+            properties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+        }
+    }
+
     public static void addLipContact(CaseData caseData, CaseData mainCaseData, Map<String, String> properties,
                                      NotificationsSignatureConfiguration configuration,
                                      boolean isPublicQMEnabled) {
@@ -101,6 +127,19 @@ public class EmailFooterUtils {
         log.info("!isLipCase(caseData) " + !isLipCase(caseData));
         log.info("res rep " + caseData.getRespondent1Represented());
         log.info("app rep " + caseData.getApplicant1Represented());
+        if (!queryNotAllowedCaseStates(mainCaseData)
+            && isLipCase(caseData) && isPublicQMEnabled) {
+            properties.put(SPEC_CONTACT, RAISE_QUERY_LIP);
+        } else {
+            properties.put(SPEC_CONTACT, configuration.getSpecContact());
+        }
+    }
+
+    private static void addLipContact(GeneralApplicationCaseData caseData, CaseData mainCaseData,
+                                      Map<String, String> properties,
+                                      NotificationsSignatureConfiguration configuration,
+                                      boolean isPublicQMEnabled) {
+        log.info("add lip contact (GA)");
         if (!queryNotAllowedCaseStates(mainCaseData)
             && isLipCase(caseData) && isPublicQMEnabled) {
             properties.put(SPEC_CONTACT, RAISE_QUERY_LIP);
@@ -126,9 +165,27 @@ public class EmailFooterUtils {
         }
     }
 
+    private static void addWelshLipContact(GeneralApplicationCaseData caseData, CaseData mainCaseData,
+                                           Map<String, String> properties,
+                                           NotificationsSignatureConfiguration configuration,
+                                           boolean isPublicQMEnabled) {
+        log.info("add welsh lip contact (GA)");
+        if (!queryNotAllowedCaseStates(mainCaseData)
+            && isLipCase(caseData) && isPublicQMEnabled) {
+            properties.put(WELSH_CONTACT, RAISE_QUERY_LIP_WELSH);
+        } else {
+            properties.put(WELSH_CONTACT, configuration.getWelshContact());
+        }
+    }
+
     private static boolean isLipCase(CaseData caseData) {
         log.info("getIsGaApplicantLip " + caseData.getIsGaApplicantLip());
         log.info("getIsGaRespondentOneLip " + caseData.getIsGaRespondentOneLip());
+        return YesOrNo.YES.equals(caseData.getIsGaApplicantLip())
+            || YesOrNo.YES.equals(caseData.getIsGaRespondentOneLip());
+    }
+
+    private static boolean isLipCase(GeneralApplicationCaseData caseData) {
         return YesOrNo.YES.equals(caseData.getIsGaApplicantLip())
             || YesOrNo.YES.equals(caseData.getIsGaRespondentOneLip());
     }

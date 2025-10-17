@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -35,6 +36,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.eq;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.OBTAIN_ADDITIONAL_PAYMENT_REF;
 import static uk.gov.hmcts.reform.civil.enums.dq.GAJudgeRequestMoreInfoOption.REQUEST_MORE_INFORMATION;
@@ -92,12 +94,12 @@ class AdditionalPaymentsReferenceCallbackHandlerTest  extends BaseCallbackHandle
                     REQUEST_MORE_INFORMATION, YesOrNo.NO, YesOrNo.NO)
                 .build();
             when(judicialDecisionHelper
-                     .isApplicationUncloakedWithAdditionalFee(caseData)).thenReturn(true);
+                     .isApplicationUncloakedWithAdditionalFee(any(CaseData.class))).thenReturn(true);
 
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            verify(paymentsService).createServiceRequest(caseData, BEARER_TOKEN);
+            verify(paymentsService).createServiceRequest(any(CaseData.class), eq(BEARER_TOKEN));
             assertThat(extractPaymentRequestReferenceFromResponse(response))
                 .isEqualTo(PAYMENT_REQUEST_REFERENCE);
         }
@@ -108,7 +110,7 @@ class AdditionalPaymentsReferenceCallbackHandlerTest  extends BaseCallbackHandle
                 .build();
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(judicialDecisionHelper
-                     .isApplicationUncloakedWithAdditionalFee(caseData)).thenReturn(false);
+                     .isApplicationUncloakedWithAdditionalFee(any(CaseData.class))).thenReturn(false);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             verify(paymentsService, never()).createServiceRequest(any(), any());
@@ -138,10 +140,10 @@ class AdditionalPaymentsReferenceCallbackHandlerTest  extends BaseCallbackHandle
                                                                              YesOrNo.NO, YesOrNo.NO)
                 .build();
             when(judicialDecisionHelper
-                     .isApplicationUncloakedWithAdditionalFee(caseData)).thenReturn(true);
+                     .isApplicationUncloakedWithAdditionalFee(any(CaseData.class))).thenReturn(true);
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             assertThrows(FeignException.class, () -> handler.handle(params));
-            verify(paymentsService).createServiceRequest(caseData, BEARER_TOKEN);
+            verify(paymentsService).createServiceRequest(any(CaseData.class), eq(BEARER_TOKEN));
         }
 
         @Test
@@ -155,11 +157,11 @@ class AdditionalPaymentsReferenceCallbackHandlerTest  extends BaseCallbackHandle
                 .build();
 
             when(judicialDecisionHelper
-                     .isApplicationUncloakedWithAdditionalFee(caseData)).thenReturn(true);
+                     .isApplicationUncloakedWithAdditionalFee(any(CaseData.class))).thenReturn(true);
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            verify(paymentsService).createServiceRequest(caseData, BEARER_TOKEN);
+            verify(paymentsService).createServiceRequest(any(CaseData.class), eq(BEARER_TOKEN));
 
             assertThat(extractPaymentRequestReferenceFromResponse(response)).isNull();
             assertThat(response.getErrors()).isEmpty();
@@ -180,6 +182,23 @@ class AdditionalPaymentsReferenceCallbackHandlerTest  extends BaseCallbackHandle
             assertThat(handler.handledEvents()).contains(OBTAIN_ADDITIONAL_PAYMENT_REF);
         }
 
+        @Test
+        void shouldMakeAdditionalPaymentReference_whenGaCaseDataOnlyProvided() {
+            var caseData = CaseDataBuilder.builder()
+                .judicialDecisionWithUncloakRequestForInformationApplication(
+                    REQUEST_MORE_INFORMATION, YesOrNo.NO, YesOrNo.NO)
+                .build();
+            GeneralApplicationCaseData gaCaseData = toGaCaseData(caseData);
+            when(judicialDecisionHelper
+                     .isApplicationUncloakedWithAdditionalFee(any(CaseData.class))).thenReturn(true);
+
+            params = gaCallbackParamsOf(gaCaseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            verify(paymentsService).createServiceRequest(any(CaseData.class), eq(BEARER_TOKEN));
+            assertThat(extractPaymentRequestReferenceFromResponse(response))
+                .isEqualTo(PAYMENT_REQUEST_REFERENCE);
+        }
     }
 
     private String extractPaymentRequestReferenceFromResponse(AboutToStartOrSubmitCallbackResponse response) {

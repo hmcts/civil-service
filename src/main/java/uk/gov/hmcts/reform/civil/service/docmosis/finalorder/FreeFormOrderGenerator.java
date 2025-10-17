@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.finalorder;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -7,6 +9,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
@@ -16,6 +19,7 @@ import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
+import uk.gov.hmcts.reform.civil.service.ga.GaCaseDataEnricher;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -36,6 +40,8 @@ public class FreeFormOrderGenerator implements TemplateDataGenerator<FreeFormOrd
     private final DocumentManagementService documentManagementService;
     private final DocumentGeneratorService documentGeneratorService;
     private final DocmosisService docmosisService;
+    private final GaCaseDataEnricher gaCaseDataEnricher;
+    private final ObjectMapper objectMapper;
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern(" d MMMM yyyy");
     private static final String FILE_TIMESTAMP_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
@@ -51,6 +57,15 @@ public class FreeFormOrderGenerator implements TemplateDataGenerator<FreeFormOrd
         FreeFormOrder templateData = getTemplateData(civilCaseData, caseData, authorisation, userType);
         log.info("Generate free form order for caseId: {}", caseData.getCcdCaseReference());
         return  generateDocmosisDocument(templateData, authorisation, userType);
+    }
+
+    public CaseDocument generate(GeneralApplicationCaseData gaCaseData, String authorisation) {
+        return generate(asCaseData(gaCaseData), authorisation);
+    }
+
+    public CaseDocument generate(CaseData civilCaseData, GeneralApplicationCaseData gaCaseData,
+                                 String authorisation, FlowFlag userType) {
+        return generate(civilCaseData, asCaseData(gaCaseData), authorisation, userType);
     }
 
     public CaseDocument generateDocmosisDocument(FreeFormOrder templateData, String authorisation, FlowFlag userType) {
@@ -71,6 +86,8 @@ public class FreeFormOrderGenerator implements TemplateDataGenerator<FreeFormOrd
     @Override
     public FreeFormOrder getTemplateData(CaseData civilCaseData, CaseData caseData, String authorisation, FlowFlag userType) {
 
+        var caseLocation = caseData.getCaseManagementLocation();
+
         FreeFormOrder.FreeFormOrderBuilder freeFormOrderBuilder = FreeFormOrder.builder()
             .judgeNameTitle(caseData.getJudgeTitle())
             .caseNumber(caseData.getCcdCaseReference().toString())
@@ -80,9 +97,9 @@ public class FreeFormOrderGenerator implements TemplateDataGenerator<FreeFormOrd
             .freeFormOrderedText(caseData.getFreeFormOrderedText())
             .freeFormOrderValue(getFreeFormOrderValue(caseData))
             .courtName(docmosisService.getCaseManagementLocationVenueName(caseData, authorisation).getExternalShortName())
-            .siteName(caseData.getGaCaseManagementLocation().getSiteName())
-            .address(caseData.getGaCaseManagementLocation().getAddress())
-            .postcode(caseData.getGaCaseManagementLocation().getPostcode())
+            .siteName(caseLocation != null ? caseLocation.getSiteName() : null)
+            .address(caseLocation != null ? caseLocation.getAddress() : null)
+            .postcode(caseLocation != null ? caseLocation.getPostcode() : null)
             .isMultiParty(caseData.getIsMultiParty())
             .claimant1Name(caseData.getClaimant1PartyName())
             .claimant2Name(caseData.getClaimant2PartyName() != null ? caseData.getClaimant2PartyName() : null)
@@ -103,6 +120,11 @@ public class FreeFormOrderGenerator implements TemplateDataGenerator<FreeFormOrd
         }
 
         return freeFormOrderBuilder.build();
+    }
+
+    public FreeFormOrder getTemplateData(CaseData civilCaseData, GeneralApplicationCaseData gaCaseData,
+                                         String authorisation, FlowFlag userType) {
+        return getTemplateData(civilCaseData, asCaseData(gaCaseData), authorisation, userType);
     }
 
     protected String getFreeFormOrderValue(CaseData caseData) {
@@ -143,5 +165,14 @@ public class FreeFormOrderGenerator implements TemplateDataGenerator<FreeFormOrd
         }
 
         return FREE_FORM_ORDER;
+    }
+
+    private CaseData asCaseData(GeneralApplicationCaseData gaCaseData) {
+        if (gaCaseData == null) {
+            return CaseData.builder().build();
+        }
+        ObjectMapper mapperWithJavaTime = objectMapper.copy().registerModule(new JavaTimeModule());
+        CaseData converted = mapperWithJavaTime.convertValue(gaCaseData, CaseData.class);
+        return gaCaseDataEnricher.enrich(converted, gaCaseData);
     }
 }

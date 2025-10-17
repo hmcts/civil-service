@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -79,7 +80,7 @@ class UploadAdditionalDocumentsCallbackHandlerTest extends BaseCallbackHandlerTe
 
     @BeforeEach
     public void setUp() throws IOException {
-        when(gaForLipService.isGaForLip(any(CaseData.class))).thenReturn(false);
+        when(gaForLipService.isGaForLip(any(GeneralApplicationCaseData.class))).thenReturn(false);
 
         when(idamClient.getUserInfo(anyString())).thenReturn(UserInfo.builder()
                                                                  .sub(DUMMY_EMAIL)
@@ -278,7 +279,7 @@ class UploadAdditionalDocumentsCallbackHandlerTest extends BaseCallbackHandlerTe
         @Test
         void shouldSetUpReadyBusinessProcessWhenApplicationIsNonUrgentAndAddedToRespCollection() {
 
-            when(gaForLipService.isGaForLip(any(CaseData.class))).thenReturn(true);
+            when(gaForLipService.isGaForLip(any(GeneralApplicationCaseData.class))).thenReturn(true);
             List<Element<UploadDocumentByType>> uploadDocumentByRespondent = new ArrayList<>();
             uploadDocumentByRespondent.add(element(UploadDocumentByType.builder()
                                                        .documentType("witness")

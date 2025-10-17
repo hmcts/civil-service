@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.applicationdraft;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -12,12 +13,14 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.GAHearingSupportRequirements;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.enums.dq.SupportRequirements;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.GADraftForm;
 import uk.gov.hmcts.reform.civil.model.docmosis.UnavailableDates;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentResponse;
+import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentDebtorOfferGAspec;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.GaForLipService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
@@ -50,90 +53,95 @@ public class GeneralApplicationDraftGenerator implements TemplateDataGenerator<G
     private final DocumentGeneratorService documentGeneratorService;
     private final ListGeneratorService listGeneratorService;
     private final CoreCaseDataService coreCaseDataService;
+    private final ObjectMapper objectMapper;
     private static final int ONE_V_ONE = 1;
     private static final int ONE_V_TWO = 2;
     private final GaForLipService gaForLipService;
 
     @Override
     public GADraftForm getTemplateData(CaseData caseData)  {
+        GeneralApplicationCaseData gaCaseData = objectMapper.convertValue(caseData, GeneralApplicationCaseData.class);
+        return buildTemplate(gaCaseData);
+    }
 
+    private GADraftForm buildTemplate(GeneralApplicationCaseData gaCaseData) {
         CaseDetails civilMainCase = coreCaseDataService
-            .getCase(Long.parseLong(caseData.getGeneralAppParentCaseLink().getCaseReference()));
-        String claimantName = listGeneratorService.claimantsName(caseData);
-        String defendantName = listGeneratorService.defendantsName(caseData);
+            .getCase(Long.parseLong(gaCaseData.getGeneralAppParentCaseLink().getCaseReference()));
+        String claimantName = listGeneratorService.claimantsName(gaCaseData);
+        String defendantName = listGeneratorService.defendantsName(gaCaseData);
 
         GADraftForm.GADraftFormBuilder gaDraftFormBuilder =
             GADraftForm.builder()
-                .claimNumber(caseData.getGeneralAppParentCaseLink().getCaseReference())
+                .claimNumber(gaCaseData.getGeneralAppParentCaseLink().getCaseReference())
                 .claimantName(claimantName)
                 .defendantName(defendantName)
                 .claimantReference(getReference(civilMainCase, "applicantSolicitor1Reference"))
                 .defendantReference(getReference(civilMainCase, "respondentSolicitor1Reference"))
                 .date(LocalDate.now())
-                .applicantPartyName(caseData.getApplicantPartyName())
-                .isCasePastDueDate(validateCasePastDueDate(caseData))
-                .hasAgreed(caseData.getGeneralAppRespondentAgreement().getHasAgreed())
-                .isWithNotice(isWithNoticeApplication(caseData))
-                .reasonsForWithoutNotice(caseData.getGeneralAppInformOtherParty() != null ? caseData.getGeneralAppInformOtherParty()
+                .applicantPartyName(gaCaseData.getApplicantPartyName())
+                .isCasePastDueDate(validateCasePastDueDate(gaCaseData))
+                .hasAgreed(gaCaseData.getGeneralAppRespondentAgreement().getHasAgreed())
+                .isWithNotice(isWithNoticeApplication(gaCaseData))
+                .reasonsForWithoutNotice(gaCaseData.getGeneralAppInformOtherParty() != null ? gaCaseData.getGeneralAppInformOtherParty()
                                              .getReasonsForWithoutNotice() : null)
-                .generalAppUrgency(Objects.nonNull(caseData.getGeneralAppUrgencyRequirement())
-                        ? caseData.getGeneralAppUrgencyRequirement().getGeneralAppUrgency() : null)
-                .urgentAppConsiderationDate(Objects.nonNull(caseData.getGeneralAppUrgencyRequirement())
-                        ? caseData.getGeneralAppUrgencyRequirement().getUrgentAppConsiderationDate() : null)
-                .reasonsForUrgency(Objects.nonNull(caseData.getGeneralAppUrgencyRequirement())
-                        ? caseData.getGeneralAppUrgencyRequirement().getReasonsForUrgency() : null)
-                .generalAppType(caseData.getGeneralAppType().getTypes().stream()
+                .generalAppUrgency(Objects.nonNull(gaCaseData.getGeneralAppUrgencyRequirement())
+                        ? gaCaseData.getGeneralAppUrgencyRequirement().getGeneralAppUrgency() : null)
+                .urgentAppConsiderationDate(Objects.nonNull(gaCaseData.getGeneralAppUrgencyRequirement())
+                        ? gaCaseData.getGeneralAppUrgencyRequirement().getUrgentAppConsiderationDate() : null)
+                .reasonsForUrgency(Objects.nonNull(gaCaseData.getGeneralAppUrgencyRequirement())
+                        ? gaCaseData.getGeneralAppUrgencyRequirement().getReasonsForUrgency() : null)
+                .generalAppType(gaCaseData.getGeneralAppType().getTypes().stream()
                                     .map(GeneralApplicationTypes::getDisplayedValue)
                                     .collect(Collectors.joining(", ")))
-                .generalAppDetailsOfOrder(caseData.getGeneralAppDetailsOfOrder())
-                .generalAppReasonsOfOrder(caseData.getGeneralAppReasonsOfOrder())
-                .hearingYesorNo(Objects.nonNull(caseData.getGeneralAppHearingDate())
-                                    ? caseData.getGeneralAppHearingDate().getHearingScheduledPreferenceYesNo() : null)
-                .hearingDate(Objects.nonNull(caseData.getGeneralAppHearingDate())
-                                 ? caseData.getGeneralAppHearingDate().getHearingScheduledDate()
+                .generalAppDetailsOfOrder(gaCaseData.getGeneralAppDetailsOfOrder())
+                .generalAppReasonsOfOrder(gaCaseData.getGeneralAppReasonsOfOrder())
+                .hearingYesorNo(Objects.nonNull(gaCaseData.getGeneralAppHearingDate())
+                                    ? gaCaseData.getGeneralAppHearingDate().getHearingScheduledPreferenceYesNo() : null)
+                .hearingDate(Objects.nonNull(gaCaseData.getGeneralAppHearingDate())
+                                 ? gaCaseData.getGeneralAppHearingDate().getHearingScheduledDate()
                                  : null)
-                .hearingPreferencesPreferredType(caseData.getGeneralAppHearingDetails()
-                                                     .getHearingPreferencesPreferredType()
-                                                     .getDisplayedValue())
-                .reasonForPreferredHearingType(caseData.getGeneralAppHearingDetails()
-                                                   .getReasonForPreferredHearingType())
-                .hearingPreferredLocation(getHearingLocation(caseData))
-                .hearingDetailsTelephoneNumber(caseData.getGeneralAppHearingDetails()
-                                                   .getHearingDetailsTelephoneNumber())
+                .hearingPreferencesPreferredType(gaCaseData.getGeneralAppHearingDetails()
+                                                    .getHearingPreferencesPreferredType()
+                                                    .getDisplayedValue())
+                .reasonForPreferredHearingType(gaCaseData.getGeneralAppHearingDetails()
+                                                  .getReasonForPreferredHearingType())
+                .hearingPreferredLocation(getHearingLocation(gaCaseData))
+                .hearingDetailsTelephoneNumber(gaCaseData.getGeneralAppHearingDetails()
+                                                  .getHearingDetailsTelephoneNumber())
 
-                .hearingDetailsEmailId(caseData.getGeneralAppHearingDetails()
+                .hearingDetailsEmailId(gaCaseData.getGeneralAppHearingDetails()
                                            .getHearingDetailsEmailID())
-                .unavailableTrialRequiredYesOrNo(caseData.getGeneralAppHearingDetails()
+                .unavailableTrialRequiredYesOrNo(gaCaseData.getGeneralAppHearingDetails()
                                                      .getUnavailableTrialRequiredYesOrNo())
-                .unavailableTrialDates(getAppUnavailabilityDates(caseData.getGeneralAppHearingDetails()))
-                .vulnerabilityQuestionsYesOrNo(caseData.getGeneralAppHearingDetails().getVulnerabilityQuestionsYesOrNo())
-                .supportRequirement(getGaSupportRequirement(caseData))
-                .supportRequirementSignLanguage(caseData.getGeneralAppHearingDetails().getSupportRequirementSignLanguage())
-                .isSignLanguageExists(checkAdditionalSupport(caseData, SIGN_INTERPRETER))
-                .supportRequirementLanguageInterpreter(caseData.getGeneralAppHearingDetails()
-                                                           .getSupportRequirementLanguageInterpreter())
-                .isLanguageInterpreterExists(checkAdditionalSupport(caseData, LANGUAGE_INTERPRETER))
-                .supportRequirementOther(caseData.getGeneralAppHearingDetails().getSupportRequirementOther())
-                .isOtherSupportExists(checkAdditionalSupport(caseData, OTHER_SUPPORT))
-                .name(caseData.getGeneralAppStatementOfTruth() != null ? caseData
+                .unavailableTrialDates(getAppUnavailabilityDates(gaCaseData.getGeneralAppHearingDetails()))
+                .vulnerabilityQuestionsYesOrNo(gaCaseData.getGeneralAppHearingDetails().getVulnerabilityQuestionsYesOrNo())
+                .supportRequirement(getGaSupportRequirement(gaCaseData))
+                .supportRequirementSignLanguage(gaCaseData.getGeneralAppHearingDetails().getSupportRequirementSignLanguage())
+                .isSignLanguageExists(checkAdditionalSupport(gaCaseData, SIGN_INTERPRETER))
+                .supportRequirementLanguageInterpreter(gaCaseData.getGeneralAppHearingDetails()
+                                                          .getSupportRequirementLanguageInterpreter())
+                .isLanguageInterpreterExists(checkAdditionalSupport(gaCaseData, LANGUAGE_INTERPRETER))
+                .supportRequirementOther(gaCaseData.getGeneralAppHearingDetails().getSupportRequirementOther())
+                .isOtherSupportExists(checkAdditionalSupport(gaCaseData, OTHER_SUPPORT))
+                .name(gaCaseData.getGeneralAppStatementOfTruth() != null ? gaCaseData
                     .getGeneralAppStatementOfTruth().getName() : null)
-                .role(caseData.getGeneralAppStatementOfTruth() != null && caseData
-                    .getGeneralAppStatementOfTruth().getRole() != null ? caseData
+                .role(gaCaseData.getGeneralAppStatementOfTruth() != null && gaCaseData
+                    .getGeneralAppStatementOfTruth().getRole() != null ? gaCaseData
                     .getGeneralAppStatementOfTruth().getRole() : null)
                 .date(LocalDate.now());
 
-        if (caseData.getRespondentsResponses() != null && caseData.getRespondentsResponses().size() >= ONE_V_ONE) {
-            GAHearingDetails gaResp1HearingDetails = caseData.getRespondentsResponses().get(0)
+        if (gaCaseData.getRespondentsResponses() != null && gaCaseData.getRespondentsResponses().size() >= ONE_V_ONE) {
+            GAHearingDetails gaResp1HearingDetails = gaCaseData.getRespondentsResponses().get(0)
                 .getValue().getGaHearingDetails();
-            GARespondentResponse resp1Response = caseData.getRespondentsResponses().get(0).getValue();
+            GARespondentResponse resp1Response = gaCaseData.getRespondentsResponses().get(0).getValue();
             gaDraftFormBuilder = gaDraftFormBuilder.build().toBuilder()
-                .isVaryJudgmentApp(checkAppIsVaryJudgment(caseData))
-                .isConsentOrderApp(checkAppIsConsentOrder(caseData))
-                .isOneVTwoApp(caseData.getRespondentsResponses().size() >= ONE_V_TWO ? YesOrNo.YES : YesOrNo.NO)
+                .isVaryJudgmentApp(checkAppIsVaryJudgment(gaCaseData))
+                .isConsentOrderApp(checkAppIsConsentOrder(gaCaseData))
+                .isOneVTwoApp(gaCaseData.getRespondentsResponses().size() >= ONE_V_TWO ? YesOrNo.YES : YesOrNo.NO)
                 .resp1HasAgreed(resp1Response.getGeneralAppRespondent1Representative())
                 .gaResp1Consent(resp1Response.getGeneralAppRespondent1Representative())
-                .resp1DebtorOffer(caseData.getGaRespondentDebtorOffer() != null
-                                      ? caseData.getGaRespondentDebtorOffer().getRespondentDebtorOffer()
+                .resp1DebtorOffer(getRespondentDebtorOffer(gaCaseData) != null
+                                      ? getRespondentDebtorOffer(gaCaseData).getRespondentDebtorOffer()
                                           .getDisplayedValue() : null)
                 .resp1DeclineReason(resp1Response.getGaRespondentResponseReason())
                 .resp1HearingYesOrNo(gaResp1HearingDetails.getHearingYesorNo())
@@ -141,37 +149,37 @@ public class GeneralApplicationDraftGenerator implements TemplateDataGenerator<G
                                                .getHearingPreferencesPreferredType().getDisplayedValue())
                 .resp1Hearingdate(gaResp1HearingDetails.getHearingDate())
                 .resp1ReasonForPreferredType(gaResp1HearingDetails
-                                                 .getReasonForPreferredHearingType())
-                .resp1PreferredLocation(getRespHearingLocation(caseData, ONE_V_ONE))
+                                                .getReasonForPreferredHearingType())
+                .resp1PreferredLocation(getRespHearingLocation(gaCaseData, ONE_V_ONE))
                 .resp1PreferredTelephone(gaResp1HearingDetails.getHearingDetailsTelephoneNumber())
                 .resp1PreferredEmail(gaResp1HearingDetails.getHearingDetailsEmailID())
                 .resp1UnavailableTrialRequired(gaResp1HearingDetails.getUnavailableTrialRequiredYesOrNo())
-                .resp1UnavailableTrialDates(getResp1UnavailabilityDates(caseData))
+                .resp1UnavailableTrialDates(getResp1UnavailabilityDates(gaCaseData))
                 .resp1VulnerableQuestions(gaResp1HearingDetails.getVulnerabilityQuestionsYesOrNo())
-                .resp1SupportRequirement(getRespSupportRequirement(caseData, ONE_V_ONE))
+                .resp1SupportRequirement(getRespSupportRequirement(gaCaseData, ONE_V_ONE))
                 .resp1SignLanguage(gaResp1HearingDetails.getSupportRequirementSignLanguage())
-                .isResp1SignLanguageExists(checkResp1AdditionalSupport(caseData, SIGN_INTERPRETER))
+                .isResp1SignLanguageExists(checkResp1AdditionalSupport(gaCaseData, SIGN_INTERPRETER))
                 .resp1LanguageInterpreter(gaResp1HearingDetails
                                               .getSupportRequirementLanguageInterpreter())
-                .isResp1LanguageInterpreterExists(checkResp1AdditionalSupport(caseData, LANGUAGE_INTERPRETER))
-                .isResp1OtherSupportExists(checkResp1AdditionalSupport(caseData, OTHER_SUPPORT))
+                .isResp1LanguageInterpreterExists(checkResp1AdditionalSupport(gaCaseData, LANGUAGE_INTERPRETER))
+                .isResp1OtherSupportExists(checkResp1AdditionalSupport(gaCaseData, OTHER_SUPPORT))
                 .resp1Other(gaResp1HearingDetails.getSupportRequirementOther())
-                .isLipCase(gaForLipService.isGaForLip(caseData) ? YesOrNo.YES : YesOrNo.NO)
-                .responseSotName(caseData.getGeneralAppResponseStatementOfTruth() != null ? caseData
+                .isLipCase(gaForLipService.isGaForLip(gaCaseData) ? YesOrNo.YES : YesOrNo.NO)
+                .responseSotName(gaCaseData.getGeneralAppResponseStatementOfTruth() != null ? gaCaseData
                     .getGeneralAppResponseStatementOfTruth().getName() : null)
-                .responseSotRole(caseData.getGeneralAppResponseStatementOfTruth() != null && caseData
-                    .getGeneralAppResponseStatementOfTruth().getRole() != null ? caseData
+                .responseSotRole(gaCaseData.getGeneralAppResponseStatementOfTruth() != null && gaCaseData
+                    .getGeneralAppResponseStatementOfTruth().getRole() != null ? gaCaseData
                     .getGeneralAppResponseStatementOfTruth().getRole() : null);
         }
-        if (caseData.getRespondentsResponses() != null && caseData.getRespondentsResponses().size() > ONE_V_ONE) {
-            GAHearingDetails gaResp2HearingDetails = caseData.getRespondentsResponses().get(1)
+        if (gaCaseData.getRespondentsResponses() != null && gaCaseData.getRespondentsResponses().size() > ONE_V_ONE) {
+            GAHearingDetails gaResp2HearingDetails = gaCaseData.getRespondentsResponses().get(1)
                 .getValue().getGaHearingDetails();
-            GARespondentResponse resp2Response = caseData.getRespondentsResponses().get(1).getValue();
+            GARespondentResponse resp2Response = gaCaseData.getRespondentsResponses().get(1).getValue();
             gaDraftFormBuilder = gaDraftFormBuilder.build().toBuilder()
                 .resp2HasAgreed(resp2Response.getGeneralAppRespondent1Representative())
                 .gaResp2Consent(resp2Response.getGeneralAppRespondent1Representative())
-                .resp2DebtorOffer(caseData.getGaRespondentDebtorOffer() != null
-                                      ? caseData.getGaRespondentDebtorOffer()
+                .resp2DebtorOffer(getRespondentDebtorOffer(gaCaseData) != null
+                                      ? getRespondentDebtorOffer(gaCaseData)
                                     .getRespondentDebtorOffer().getDisplayedValue() : null)
                 .resp2DeclineReason(resp2Response.getGaRespondentResponseReason())
                 .resp2HearingYesOrNo(gaResp2HearingDetails.getHearingYesorNo())
@@ -179,37 +187,37 @@ public class GeneralApplicationDraftGenerator implements TemplateDataGenerator<G
                                                .getHearingPreferencesPreferredType().getDisplayedValue())
                 .resp2Hearingdate(gaResp2HearingDetails.getHearingDate())
                 .resp2ReasonForPreferredType(gaResp2HearingDetails
-                                                 .getReasonForPreferredHearingType())
-                .resp2PreferredLocation(getRespHearingLocation(caseData, ONE_V_TWO))
+                                                .getReasonForPreferredHearingType())
+                .resp2PreferredLocation(getRespHearingLocation(gaCaseData, ONE_V_TWO))
                 .resp2PreferredTelephone(gaResp2HearingDetails.getHearingDetailsTelephoneNumber())
                 .resp2PreferredEmail(gaResp2HearingDetails.getHearingDetailsEmailID())
                 .resp2UnavailableTrialRequired(gaResp2HearingDetails.getUnavailableTrialRequiredYesOrNo())
-                .resp2UnavailableTrialDates(getResp2UnavailabilityDates(caseData))
+                .resp2UnavailableTrialDates(getResp2UnavailabilityDates(gaCaseData))
                 .resp2VulnerableQuestions(gaResp2HearingDetails.getVulnerabilityQuestionsYesOrNo())
-                .resp2SupportRequirement(getRespSupportRequirement(caseData, ONE_V_TWO))
+                .resp2SupportRequirement(getRespSupportRequirement(gaCaseData, ONE_V_TWO))
                 .resp2SignLanguage(gaResp2HearingDetails.getSupportRequirementSignLanguage())
-                .isResp2SignLanguageExists(checkResp2AdditionalSupport(caseData, SIGN_INTERPRETER))
+                .isResp2SignLanguageExists(checkResp2AdditionalSupport(gaCaseData, SIGN_INTERPRETER))
                 .resp2LanguageInterpreter(gaResp2HearingDetails
                                               .getSupportRequirementLanguageInterpreter())
-                .isResp2LanguageInterpreterExists(checkResp2AdditionalSupport(caseData, LANGUAGE_INTERPRETER))
+                .isResp2LanguageInterpreterExists(checkResp2AdditionalSupport(gaCaseData, LANGUAGE_INTERPRETER))
                 .resp2Other(gaResp2HearingDetails.getSupportRequirementOther())
-                .isResp2OtherSupportExists(checkResp2AdditionalSupport(caseData, OTHER_SUPPORT));
+                .isResp2OtherSupportExists(checkResp2AdditionalSupport(gaCaseData, OTHER_SUPPORT));
         }
 
         return gaDraftFormBuilder.build();
     }
 
-    private YesOrNo isWithNoticeApplication(CaseData caseData) {
-        if (Objects.nonNull(caseData.getApplicationIsCloaked())
-            && caseData.getApplicationIsCloaked().equals(YesOrNo.NO)) {
+    private YesOrNo isWithNoticeApplication(GeneralApplicationCaseData gaCaseData) {
+        if (Objects.nonNull(gaCaseData.getApplicationIsCloaked())
+            && gaCaseData.getApplicationIsCloaked().equals(YesOrNo.NO)) {
             return YesOrNo.YES;
         }
 
-        return caseData.getGeneralAppInformOtherParty().getIsWithNotice();
+        return gaCaseData.getGeneralAppInformOtherParty().getIsWithNotice();
     }
 
-    private Boolean validateCasePastDueDate(CaseData caseData) {
-        return caseData.getRespondentsResponses() == null;
+    private Boolean validateCasePastDueDate(GeneralApplicationCaseData gaCaseData) {
+        return gaCaseData.getRespondentsResponses() == null || gaCaseData.getRespondentsResponses().isEmpty();
     }
 
     private List<UnavailableDates> getAppUnavailabilityDates(GAHearingDetails hearingDetails) {
@@ -221,63 +229,63 @@ public class GeneralApplicationDraftGenerator implements TemplateDataGenerator<G
                 .toList();
     }
 
-    private List<UnavailableDates> getResp1UnavailabilityDates(CaseData caseData) {
-        if (caseData.getRespondentsResponses() != null && caseData.getRespondentsResponses().size() == ONE_V_ONE) {
-            return getAppUnavailabilityDates(caseData.getRespondentsResponses().get(0).getValue().getGaHearingDetails());
+    private List<UnavailableDates> getResp1UnavailabilityDates(GeneralApplicationCaseData gaCaseData) {
+        if (gaCaseData.getRespondentsResponses() != null && gaCaseData.getRespondentsResponses().size() == ONE_V_ONE) {
+            return getAppUnavailabilityDates(gaCaseData.getRespondentsResponses().get(0).getValue().getGaHearingDetails());
         }
         return Collections.emptyList();
     }
 
-    private List<UnavailableDates> getResp2UnavailabilityDates(CaseData caseData) {
-        if (caseData.getRespondentsResponses() != null && caseData.getRespondentsResponses().size() == ONE_V_TWO) {
-            return getAppUnavailabilityDates(caseData.getRespondentsResponses().get(1).getValue().getGaHearingDetails());
+    private List<UnavailableDates> getResp2UnavailabilityDates(GeneralApplicationCaseData gaCaseData) {
+        if (gaCaseData.getRespondentsResponses() != null && gaCaseData.getRespondentsResponses().size() == ONE_V_TWO) {
+            return getAppUnavailabilityDates(gaCaseData.getRespondentsResponses().get(1).getValue().getGaHearingDetails());
         }
         return Collections.emptyList();
     }
 
-    private Boolean checkAdditionalSupport(CaseData caseData, SupportRequirements additionalSupport) {
-        String appSupportRequirement = getGaSupportRequirement(caseData);
-        log.info("Check additional support for caseId: {}", caseData.getCcdCaseReference());
+    private Boolean checkAdditionalSupport(GeneralApplicationCaseData gaCaseData, SupportRequirements additionalSupport) {
+        String appSupportRequirement = getGaSupportRequirement(gaCaseData);
+        log.info("Check additional support for caseId: {}", gaCaseData.getCcdCaseReference());
         return appSupportRequirement != null && appSupportRequirement.contains(additionalSupport.getDisplayedValue());
     }
 
-    private Boolean checkResp1AdditionalSupport(CaseData caseData, SupportRequirements additionalSupport) {
-        String resp1SupportRequirement = getRespSupportRequirement(caseData, ONE_V_ONE);
-        log.info("Check additional support for respondent 1 for caseId: {}", caseData.getCcdCaseReference());
+    private Boolean checkResp1AdditionalSupport(GeneralApplicationCaseData gaCaseData, SupportRequirements additionalSupport) {
+        String resp1SupportRequirement = getRespSupportRequirement(gaCaseData, ONE_V_ONE);
+        log.info("Check additional support for respondent 1 for caseId: {}", gaCaseData.getCcdCaseReference());
         return resp1SupportRequirement != null && resp1SupportRequirement.contains(additionalSupport.getDisplayedValue());
     }
 
-    private Boolean checkResp2AdditionalSupport(CaseData caseData, SupportRequirements additionalSupport) {
-        String resp2SupportRequirement = getRespSupportRequirement(caseData, ONE_V_TWO);
-        log.info("Check additional support for respondent 2 for caseId: {}", caseData.getCcdCaseReference());
+    private Boolean checkResp2AdditionalSupport(GeneralApplicationCaseData gaCaseData, SupportRequirements additionalSupport) {
+        String resp2SupportRequirement = getRespSupportRequirement(gaCaseData, ONE_V_TWO);
+        log.info("Check additional support for respondent 2 for caseId: {}", gaCaseData.getCcdCaseReference());
         return resp2SupportRequirement != null && resp2SupportRequirement.contains(additionalSupport.getDisplayedValue());
 
     }
 
-    private YesOrNo checkAppIsConsentOrder(CaseData caseData) {
+    private YesOrNo checkAppIsConsentOrder(GeneralApplicationCaseData gaCaseData) {
         YesOrNo isConsentOrderApp;
-        isConsentOrderApp = caseData.getGeneralAppConsentOrder() != null ? YesOrNo.YES : YesOrNo.NO;
+        isConsentOrderApp = gaCaseData.getGeneralAppConsentOrder() != null ? YesOrNo.YES : YesOrNo.NO;
         return isConsentOrderApp;
     }
 
-    private YesOrNo checkAppIsVaryJudgment(CaseData caseData) {
+    private YesOrNo checkAppIsVaryJudgment(GeneralApplicationCaseData gaCaseData) {
         YesOrNo isVaryJudgmentApp;
-        isVaryJudgmentApp = caseData.getGeneralAppType().getTypes().contains(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT)
+        isVaryJudgmentApp = gaCaseData.getGeneralAppType().getTypes().contains(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT)
             ? YesOrNo.YES : YesOrNo.NO;
         return isVaryJudgmentApp;
     }
 
-    private String getRespSupportRequirement(CaseData caseData, int size) {
+    private String getRespSupportRequirement(GeneralApplicationCaseData gaCaseData, int size) {
         String gaRespSupportRequirement = null;
-        if (size == ONE_V_ONE  && caseData.getRespondentsResponses().get(0).getValue().getGaHearingDetails() != null
-            && caseData.getRespondentsResponses().get(0).getValue().getGaHearingDetails()
+        if (size == ONE_V_ONE  && gaCaseData.getRespondentsResponses().get(0).getValue().getGaHearingDetails() != null
+            && gaCaseData.getRespondentsResponses().get(0).getValue().getGaHearingDetails()
             .getSupportRequirement() != null) {
-            gaRespSupportRequirement = caseData.getRespondentsResponses().get(0).getValue()
+            gaRespSupportRequirement = gaCaseData.getRespondentsResponses().get(0).getValue()
                 .getGaHearingDetails().getSupportRequirement().stream().map(
                 GAHearingSupportRequirements::getDisplayedValue).collect(Collectors.joining(", "));
-        } else if (size == ONE_V_TWO  && caseData.getRespondentsResponses().get(1).getValue().getGaHearingDetails() != null
-                && caseData.getRespondentsResponses().get(1).getValue().getGaHearingDetails().getSupportRequirement() != null) {
-            gaRespSupportRequirement = caseData.getRespondentsResponses().get(1).getValue()
+        } else if (size == ONE_V_TWO  && gaCaseData.getRespondentsResponses().get(1).getValue().getGaHearingDetails() != null
+                && gaCaseData.getRespondentsResponses().get(1).getValue().getGaHearingDetails().getSupportRequirement() != null) {
+            gaRespSupportRequirement = gaCaseData.getRespondentsResponses().get(1).getValue()
                 .getGaHearingDetails().getSupportRequirement().stream().map(
                     GAHearingSupportRequirements::getDisplayedValue).collect(Collectors.joining(", "));
         }
@@ -285,29 +293,29 @@ public class GeneralApplicationDraftGenerator implements TemplateDataGenerator<G
         return gaRespSupportRequirement;
     }
 
-    private String getGaSupportRequirement(CaseData caseData) {
+    private String getGaSupportRequirement(GeneralApplicationCaseData gaCaseData) {
         String gaSupportRequirement = null;
-        if (caseData.getGeneralAppHearingDetails() != null
-            && caseData.getGeneralAppHearingDetails().getSupportRequirement() != null) {
-            gaSupportRequirement = caseData.getGeneralAppHearingDetails().getSupportRequirement().stream().map(
+        if (gaCaseData.getGeneralAppHearingDetails() != null
+            && gaCaseData.getGeneralAppHearingDetails().getSupportRequirement() != null) {
+            gaSupportRequirement = gaCaseData.getGeneralAppHearingDetails().getSupportRequirement().stream().map(
                 GAHearingSupportRequirements::getDisplayedValue).collect(Collectors.joining(", "));
         }
         return  gaSupportRequirement;
     }
 
-    private String getHearingLocation(CaseData caseData) {
+    private String getHearingLocation(GeneralApplicationCaseData gaCaseData) {
         String preferredLocation = null;
-        if (caseData.getGeneralAppHearingDetails() != null
-            && caseData.getGeneralAppHearingDetails().getHearingPreferredLocation() != null) {
-            preferredLocation = caseData.getGeneralAppHearingDetails().getHearingPreferredLocation()
+        if (gaCaseData.getGeneralAppHearingDetails() != null
+            && gaCaseData.getGeneralAppHearingDetails().getHearingPreferredLocation() != null) {
+            preferredLocation = gaCaseData.getGeneralAppHearingDetails().getHearingPreferredLocation()
                 .getValue().getLabel();
         }
         return preferredLocation;
     }
 
-    private String getRespHearingLocation(CaseData caseData, int size) {
+    private String getRespHearingLocation(GeneralApplicationCaseData gaCaseData, int size) {
         String preferredLocation = null;
-        GAHearingDetails resp1HearingDetails = caseData.getRespondentsResponses()
+        GAHearingDetails resp1HearingDetails = gaCaseData.getRespondentsResponses()
             .get(0).getValue().getGaHearingDetails();
 
         if (resp1HearingDetails != null
@@ -317,15 +325,19 @@ public class GeneralApplicationDraftGenerator implements TemplateDataGenerator<G
             preferredLocation = resp1HearingDetails.getHearingPreferredLocation()
                 .getValue().getLabel();
         } else if (size == ONE_V_TWO
-            && caseData.getRespondentsResponses().get(1).getValue().getGaHearingDetails()
+            && gaCaseData.getRespondentsResponses().get(1).getValue().getGaHearingDetails()
             .getHearingPreferredLocation() != null
-            && caseData.getRespondentsResponses().get(1).getValue().getGaHearingDetails()
+            && gaCaseData.getRespondentsResponses().get(1).getValue().getGaHearingDetails()
             .getHearingPreferredLocation().getValue() != null) {
-            preferredLocation = caseData.getRespondentsResponses().get(1).getValue()
+            preferredLocation = gaCaseData.getRespondentsResponses().get(1).getValue()
                 .getGaHearingDetails().getHearingPreferredLocation()
                 .getValue().getLabel();
         }
         return preferredLocation;
+    }
+
+    private GARespondentDebtorOfferGAspec getRespondentDebtorOffer(GeneralApplicationCaseData gaCaseData) {
+        return gaCaseData.getGaRespondentDebtorOffer();
     }
 
     @SuppressWarnings("unchecked")
@@ -336,16 +348,16 @@ public class GeneralApplicationDraftGenerator implements TemplateDataGenerator<G
         return null;
     }
 
-    public CaseDocument generate(CaseData caseData, String authorisation) {
+    public CaseDocument generate(GeneralApplicationCaseData gaCaseData, String authorisation) {
         try {
-            GADraftForm templateData = getTemplateData(caseData);
+            GADraftForm templateData = buildTemplate(gaCaseData);
             DocmosisTemplates docmosisTemplate = getDocmosisTemplate();
 
             DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
                 templateData,
                 docmosisTemplate
             );
-            log.info("Generate general application draft for caseId: {}", caseData.getCcdCaseReference());
+            log.info("Generate general application draft for caseId: {}", gaCaseData.getCcdCaseReference());
 
             return documentManagementService.uploadDocument(
                 authorisation,
@@ -355,7 +367,7 @@ public class GeneralApplicationDraftGenerator implements TemplateDataGenerator<G
             );
         } catch (Exception e) {
             // Catch all other exceptions
-            log.error("Error generating general application draft for caseId: {}", caseData.getCcdCaseReference(), e);
+            log.error("Error generating general application draft for caseId: {}", gaCaseData.getCcdCaseReference(), e);
             throw new RuntimeException("Error generating general application draft", e); // Rethrow or handle as needed
         }
     }

@@ -61,7 +61,7 @@ public class MoveToAdditionalResponseTimeExpiredCallbackHandlerTest extends Base
             handler.handle(params);
 
             verify(parentCaseUpdateHelper, times(1)).updateParentWithGAState(
-                caseData,
+                toGaCaseData(caseData),
                 ADDITIONAL_RESPONSE_TIME_EXPIRED.getDisplayedValue()
             );
         }

@@ -20,9 +20,11 @@ import uk.gov.hmcts.reform.civil.enums.dq.GAByCourtsInitiativeGAspec;
 import uk.gov.hmcts.reform.civil.enums.dq.GAHearingDuration;
 import uk.gov.hmcts.reform.civil.enums.dq.GAHearingSupportRequirements;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.GaCallbackDataUtil;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.caseprogression.FreeFormOrderValues;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
@@ -267,14 +269,19 @@ public class JudicialDecisionHandler extends CallbackHandler {
     private CallbackResponse checkInputForNextPage(CallbackParams callbackParams) {
 
         CaseData caseData = callbackParams.getCaseData();
+        GeneralApplicationCaseData gaCaseData = GaCallbackDataUtil.toGaCaseData(caseData, objectMapper);
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.judicialDecision(GAJudicialDecision.builder().build());
         UserInfo userDetails = idamClient.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
         caseDataBuilder.judgeTitle(IdamUserUtils.getIdamUserFullName(userDetails));
 
-        if (caseData.getApplicationIsCloaked() == null && !gaForLipService.isGaForLip(caseData)) {
+        if (caseData.getApplicationIsCloaked() == null
+            && gaCaseData != null
+            && !gaForLipService.isGaForLip(gaCaseData)) {
             caseDataBuilder.applicationIsCloaked(helper.isApplicationCreatedWithoutNoticeByApplicant(caseData));
-        } else if (caseData.getApplicationIsCloaked() == null && gaForLipService.isGaForLip(caseData)) {
+        } else if (caseData.getApplicationIsCloaked() == null
+            && gaCaseData != null
+            && gaForLipService.isGaForLip(gaCaseData)) {
             caseDataBuilder.applicationIsCloaked(helper.isLipApplicationCreatedWithoutNoticeByApplicant(caseData));
         }
 
@@ -590,6 +597,7 @@ public class JudicialDecisionHandler extends CallbackHandler {
 
     private CallbackResponse gaValidateMakeDecisionScreen(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        GeneralApplicationCaseData gaCaseData = GaCallbackDataUtil.toGaCaseData(caseData, objectMapper);
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
 
         GAJudicialMakeAnOrder judicialDecisionMakeOrder = caseData.getJudicialDecisionMakeOrder();
@@ -603,10 +611,11 @@ public class JudicialDecisionHandler extends CallbackHandler {
                     .judicialDecisionMakeOrder(makeAnOrderBuilder(caseData, callbackParams).build());
 
             CaseDocument judgeDecision = null;
+            GeneralApplicationCaseData gaSnapshot = buildGaCaseData(caseDataBuilder);
             if (judicialDecisionMakeOrder.getOrderText() != null
                     && judicialDecisionMakeOrder.getMakeAnOrder().equals(APPROVE_OR_EDIT)) {
                 judgeDecision = generalOrderGenerator.generate(
-                        caseDataBuilder.build(),
+                        gaSnapshot,
                         callbackParams.getParams().get(BEARER_TOKEN).toString()
                 );
                 log.info("General order is generated for caseId: {}", caseData.getCcdCaseReference());
@@ -614,14 +623,14 @@ public class JudicialDecisionHandler extends CallbackHandler {
             } else if (judicialDecisionMakeOrder.getDirectionsText() != null
                     && judicialDecisionMakeOrder.getMakeAnOrder().equals(GIVE_DIRECTIONS_WITHOUT_HEARING)) {
                 judgeDecision = directionOrderGenerator.generate(
-                        caseDataBuilder.build(),
+                        gaSnapshot,
                         callbackParams.getParams().get(BEARER_TOKEN).toString()
                 );
                 log.info("Direction order is generated for caseId: {}", caseData.getCcdCaseReference());
                 caseDataBuilder.judicialMakeOrderDocPreview(judgeDecision.getDocumentLink());
             } else if (judicialDecisionMakeOrder.getMakeAnOrder().equals(DISMISS_THE_APPLICATION)) {
                 judgeDecision = dismissalOrderGenerator.generate(
-                        caseDataBuilder.build(),
+                        gaSnapshot,
                         callbackParams.getParams().get(BEARER_TOKEN).toString()
                 );
                 log.info("Dismissal order is generated for caseId: {}", caseData.getCcdCaseReference());
@@ -648,9 +657,18 @@ public class JudicialDecisionHandler extends CallbackHandler {
         return errors;
     }
 
+    private GeneralApplicationCaseData buildGaCaseData(CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
+        return buildGaCaseData(caseDataBuilder.build());
+    }
+
+    private GeneralApplicationCaseData buildGaCaseData(CaseData caseData) {
+        return objectMapper.convertValue(caseData, GeneralApplicationCaseData.class);
+    }
+
     private CallbackResponse gaValidateMakeAnOrder(CallbackParams callbackParams) {
 
         CaseData caseData = callbackParams.getCaseData();
+        GeneralApplicationCaseData gaCaseData = GaCallbackDataUtil.toGaCaseData(caseData, objectMapper);
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
 
         caseDataBuilder.judicialDecisionMakeOrder(makeAnOrderBuilder(caseData, callbackParams).build());
@@ -663,11 +681,13 @@ public class JudicialDecisionHandler extends CallbackHandler {
         if ((caseData.getApplicationIsUncloakedOnce() == null
                 && helper.isLipApplicationCreatedWithoutNoticeByApplicant(caseData).equals(YES)
                 && caseData.getJudicialDecision().getDecision().equals(MAKE_ORDER_FOR_WRITTEN_REPRESENTATIONS)
-                && gaForLipService.isGaForLip(caseData))
+                && gaCaseData != null
+                && gaForLipService.isGaForLip(gaCaseData))
                 || (caseData.getApplicationIsUncloakedOnce() == null
                 && helper.isApplicationCreatedWithoutNoticeByApplicant(caseData).equals(YES)
                 && caseData.getJudicialDecision().getDecision().equals(MAKE_ORDER_FOR_WRITTEN_REPRESENTATIONS)
-                && !gaForLipService.isGaForLip(caseData))
+                && gaCaseData != null
+                && !gaForLipService.isGaForLip(gaCaseData))
                 || (caseData.getApplicationIsUncloakedOnce() != null
                 && caseData.getJudicialDecision().getDecision().equals(MAKE_ORDER_FOR_WRITTEN_REPRESENTATIONS)
                 && caseData.getApplicationIsUncloakedOnce().equals(NO))) {
@@ -794,8 +814,11 @@ public class JudicialDecisionHandler extends CallbackHandler {
                         && caseData.getJudicialDecisionRequestMoreInfo().getRequestMoreInfoOption()
                         .equals(REQUEST_MORE_INFORMATION))) {
 
+            CaseData gaFallback = caseDataBuilder.build();
+            GeneralApplicationCaseData gaSnapshot = buildGaCaseData(gaFallback);
             judgeDecision = requestForInformationGenerator.generate(
-                    caseDataBuilder.build(),
+                    gaSnapshot,
+                    gaFallback,
                     callbackParams.getParams().get(BEARER_TOKEN).toString());
             log.info("Request for information is generated for caseId: {}", caseData.getCcdCaseReference());
 
@@ -863,6 +886,7 @@ public class JudicialDecisionHandler extends CallbackHandler {
         dataBuilder.businessProcess(BusinessProcess.ready(MAKE_DECISION)).build();
 
         var isApplicationUncloaked = isApplicationContinuesCloakedAfterJudicialDecision(caseData);
+        GeneralApplicationCaseData gaCaseData = GaCallbackDataUtil.toGaCaseData(caseData, objectMapper);
         if (Objects.isNull(isApplicationUncloaked)
                 && helper.isApplicationCreatedWithoutNoticeByApplicant(caseData).equals(NO)) {
             dataBuilder.applicationIsCloaked(NO);
@@ -873,12 +897,12 @@ public class JudicialDecisionHandler extends CallbackHandler {
         if (isApplicationUncloaked != null
                 && isApplicationUncloaked.equals(NO)) {
             dataBuilder.applicationIsUncloakedOnce(YES);
-            assignCaseToResopondentSolHelper.assignCaseToRespondentSolicitor(caseData, caseId);
-        } else if (caseData.getIsGaRespondentOneLip() == YES) {
+            assignCaseToResopondentSolHelper.assignCaseToRespondentSolicitor(gaCaseData, caseId);
+        } else if (gaCaseData != null && gaCaseData.getIsGaRespondentOneLip() == YES) {
             /*
              * Assign case respondent solicitors if LiP respondent so they can access application and order doc
              * */
-            assignCaseToResopondentSolHelper.assignCaseToRespondentSolicitor(caseData, caseId);
+            assignCaseToResopondentSolHelper.assignCaseToRespondentSolicitor(gaCaseData, caseId);
         }
 
         if (Objects.nonNull(caseData.getJudicialMakeOrderDocPreview())) {

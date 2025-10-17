@@ -87,7 +87,7 @@ public class WaitCivilDocUpdatedTaskHandlerTest {
 
     @BeforeEach
     void init() {
-        when(gaForLipService.isGaForLip(any())).thenReturn(false);
+        when(gaForLipService.isGaForLip(any(CaseData.class))).thenReturn(false);
         when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
         CaseDocument caseDocumentNow = CaseDocument.builder().documentName("current")
                 .documentLink(Document.builder().documentUrl("url")
@@ -202,7 +202,7 @@ public class WaitCivilDocUpdatedTaskHandlerTest {
         ExternalTaskInput externalTaskInput = ExternalTaskInput.builder().caseId(CASE_ID)
             .caseEvent(WAIT_GA_DRAFT).build();
         when(mapper.convertValue(any(), eq(ExternalTaskInput.class))).thenReturn(externalTaskInput);
-        when(gaForLipService.isGaForLip(any())).thenReturn(true);
+        when(gaForLipService.isGaForLip(any(CaseData.class))).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().withNoticeDraftAppCaseData().toBuilder()
             .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
@@ -233,7 +233,7 @@ public class WaitCivilDocUpdatedTaskHandlerTest {
         ExternalTaskInput externalTaskInput = ExternalTaskInput.builder().caseId(CASE_ID)
             .caseEvent(WAIT_GA_DRAFT).build();
         when(mapper.convertValue(any(), eq(ExternalTaskInput.class))).thenReturn(externalTaskInput);
-        when(gaForLipService.isGaForLip(any())).thenReturn(false);
+        when(gaForLipService.isGaForLip(any(CaseData.class))).thenReturn(false);
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().withNoticeDraftAppCaseData().toBuilder()
             .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
@@ -270,7 +270,7 @@ public class WaitCivilDocUpdatedTaskHandlerTest {
             .build();
 
         when(mapper.convertValue(any(), eq(ExternalTaskInput.class))).thenReturn(externalTaskInput);
-        when(gaForLipService.isGaForLip(any())).thenReturn(true); // GA for LIP condition
+        when(gaForLipService.isGaForLip(any(CaseData.class))).thenReturn(true); // GA for LIP condition
         var draftDocumentsList = List.of(
             Element.<CaseDocument>builder()
                 .id(UUID.fromString(uid1))
@@ -326,7 +326,7 @@ public class WaitCivilDocUpdatedTaskHandlerTest {
                            .build())
                 .build()
         );
-        CaseData gaLipCaseData = CaseData.builder().applicantBilingualLanguagePreferenceGA(YesOrNo.YES).gaDraftDocument(draftDocumentsList).build();
+        CaseData gaLipCaseData = CaseData.builder().applicantBilingualLanguagePreference(YesOrNo.YES).gaDraftDocument(draftDocumentsList).build();
         CaseDetails caseDetails = CaseDetailsBuilder.builder().data(gaLipCaseData).build();
 
         Map<String, Object> mockOutputMap = new HashMap<>();

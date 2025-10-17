@@ -22,7 +22,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.judgedecisionpdfdocument.JudgeDecisionPdfDocument;
-import uk.gov.hmcts.reform.civil.model.genapplication.GACaseLocation;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAJudgesHearingListGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAOrderCourtOwnInitiativeGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAOrderWithoutNoticeGAspec;
@@ -95,7 +95,8 @@ class HearingOrderGeneratorTest {
 
         CaseData caseData = CaseDataBuilder.builder()
             .hearingOrderApplication(YesOrNo.NO, YesOrNo.NO)
-            .gaCaseManagementLocation(GACaseLocation.builder().baseLocation("8").build())
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("8").build())
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("8").build())
             .build();
 
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class),
@@ -175,9 +176,9 @@ class HearingOrderGeneratorTest {
                                    caseData.getJudicialListForHearing().getJudicialTimeEstimate().getDisplayedValue()),
                 () -> assertEquals(templateData.getJudgeRecital(), caseData.getJudicialGeneralHearingOrderRecital()),
                 () -> assertEquals(templateData.getHearingOrder(), caseData.getJudicialGOHearingDirections()),
-                () -> assertEquals(templateData.getAddress(), caseData.getGaCaseManagementLocation().getAddress()),
-                () -> assertEquals(templateData.getSiteName(), caseData.getGaCaseManagementLocation().getSiteName()),
-                () -> assertEquals(templateData.getPostcode(), caseData.getGaCaseManagementLocation().getPostcode()),
+                () -> assertEquals(templateData.getAddress(), caseData.getCaseManagementLocation().getAddress()),
+                () -> assertEquals(templateData.getSiteName(), caseData.getCaseManagementLocation().getSiteName()),
+                () -> assertEquals(templateData.getPostcode(), caseData.getCaseManagementLocation().getPostcode()),
                 () -> assertEquals("applicant1 partyname", templateData.getPartyName()),
                 () -> assertEquals("address1", templateData.getPartyAddressAddressLine1()),
                 () -> assertEquals("address2", templateData.getPartyAddressAddressLine2()),
@@ -227,9 +228,9 @@ class HearingOrderGeneratorTest {
                                    caseData.getJudicialListForHearing().getJudicialTimeEstimate().getDisplayedValue()),
                 () -> assertEquals(templateData.getJudgeRecital(), caseData.getJudicialGeneralHearingOrderRecital()),
                 () -> assertEquals(templateData.getHearingOrder(), caseData.getJudicialGOHearingDirections()),
-                () -> assertEquals(templateData.getAddress(), caseData.getGaCaseManagementLocation().getAddress()),
-                () -> assertEquals(templateData.getSiteName(), caseData.getGaCaseManagementLocation().getSiteName()),
-                () -> assertEquals(templateData.getPostcode(), caseData.getGaCaseManagementLocation().getPostcode())
+                () -> assertEquals(templateData.getAddress(), caseData.getCaseManagementLocation().getAddress()),
+                () -> assertEquals(templateData.getSiteName(), caseData.getCaseManagementLocation().getSiteName()),
+                () -> assertEquals(templateData.getPostcode(), caseData.getCaseManagementLocation().getPostcode())
             );
         }
 
@@ -245,7 +246,8 @@ class HearingOrderGeneratorTest {
                                             .hearingPreferencesPreferredType(GAJudicialHearingType.PAPER_HEARING)
                                             .judicialTimeEstimate(GAHearingDuration.MINUTES_15)
                                             .build())
-                .gaCaseManagementLocation(GACaseLocation.builder().baseLocation("3").build())
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("3").build())
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("3").build())
                 .build();
 
             CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
@@ -296,7 +298,8 @@ class HearingOrderGeneratorTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .hearingOrderApplication(YesOrNo.NO, YesOrNo.YES).build().toBuilder()
                 .isMultiParty(NO)
-                .gaCaseManagementLocation(GACaseLocation.builder().baseLocation("2").build())
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("2").build())
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("2").build())
                 .build();
 
             CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();

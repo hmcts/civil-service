@@ -84,7 +84,7 @@ class GaForLipServiceTest {
     @Test
     void shouldReturnAnyTrue_app_is_welsh() {
         CaseData caseData =
-            CaseData.builder().parentClaimantIsApplicant(YesOrNo.YES).applicantBilingualLanguagePreferenceGA(YesOrNo.YES)
+            CaseData.builder().parentClaimantIsApplicant(YesOrNo.YES).applicantBilingualLanguagePreference(YesOrNo.YES)
                 .build();
         assertThat(gaForLipService.anyWelsh(caseData)).isTrue();
     }
@@ -92,7 +92,7 @@ class GaForLipServiceTest {
     @Test
     void shouldReturnAnyTrue_resp_is_welsh() {
         CaseData caseData =
-            CaseData.builder().parentClaimantIsApplicant(YesOrNo.YES).respondentBilingualLanguagePreferenceGA(YesOrNo.YES)
+            CaseData.builder().parentClaimantIsApplicant(YesOrNo.YES).respondentBilingualLanguagePreference(YesOrNo.YES)
                 .build();
         assertThat(gaForLipService.anyWelsh(caseData)).isTrue();
     }
@@ -106,7 +106,7 @@ class GaForLipServiceTest {
     @Test
     void shouldReturnNoticeTrue_app_is_welsh() {
         CaseData caseData = CaseData.builder()
-            .applicantBilingualLanguagePreferenceGA(YesOrNo.YES)
+            .applicantBilingualLanguagePreference(YesOrNo.YES)
             .parentClaimantIsApplicant(YesOrNo.YES)
             .generalAppInformOtherParty(GAInformOtherParty.builder()
                                             .isWithNotice(YesOrNo.YES).build())
@@ -118,7 +118,7 @@ class GaForLipServiceTest {
     void shouldReturnNoticeTrue_resp_is_welsh() {
         CaseData caseData = CaseData.builder()
             .parentClaimantIsApplicant(YesOrNo.YES)
-            .respondentBilingualLanguagePreferenceGA(YesOrNo.YES)
+            .respondentBilingualLanguagePreference(YesOrNo.YES)
             .generalAppInformOtherParty(GAInformOtherParty.builder()
                                             .isWithNotice(YesOrNo.YES).build())
             .build();

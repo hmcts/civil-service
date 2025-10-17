@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.enums.dq.GAHearingType;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.GARespondentRepresentative;
@@ -31,6 +32,7 @@ import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.GADraftForm;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
+import uk.gov.hmcts.reform.civil.model.genapplication.GACaseLocation;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDateGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
@@ -43,10 +45,12 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAUnavailabilityDates;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.GaForLipService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.ListGeneratorService;
+import uk.gov.hmcts.reform.civil.service.ga.GaCaseDataEnricher;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -55,6 +59,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.UnaryOperator;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -99,6 +104,7 @@ class GeneralApplicationDraftGeneratorTest extends BaseCallbackHandlerTest {
     private GaForLipService gaForLipService;
     @Autowired
     ObjectMapper objectMapper;
+    private final GaCaseDataEnricher gaCaseDataEnricher = new GaCaseDataEnricher();
 
     @Autowired
     GeneralApplicationDraftGenerator generalApplicationDraftGenerator;
@@ -106,16 +112,32 @@ class GeneralApplicationDraftGeneratorTest extends BaseCallbackHandlerTest {
     DynamicListElement location1 = DynamicListElement.builder()
             .code(String.valueOf(UUID.randomUUID())).label("Site Name 2 - Address2 - 28000").build();
 
+    private GeneralApplicationCaseData buildGaCaseData(CaseData caseData) {
+        return objectMapper.convertValue(caseData, GeneralApplicationCaseData.class);
+    }
+
+    private void stubListGenerators(CaseData caseData,
+                                    GeneralApplicationCaseData gaCaseData,
+                                    String applicationType,
+                                    String claimantName,
+                                    String defendantName) {
+        when(listGeneratorService.applicationType(caseData)).thenReturn(applicationType);
+        when(listGeneratorService.applicationType(gaCaseData)).thenReturn(applicationType);
+        when(listGeneratorService.claimantsName(caseData)).thenReturn(claimantName);
+        when(listGeneratorService.claimantsName(gaCaseData)).thenReturn(claimantName);
+        when(listGeneratorService.defendantsName(caseData)).thenReturn(defendantName);
+        when(listGeneratorService.defendantsName(gaCaseData)).thenReturn(defendantName);
+    }
+
     @Test
     void shouldNotGenerateApplicationDraftDocument() {
         CaseData caseData = getSampleGeneralApplicationCaseData(NO, YES);
+        GeneralApplicationCaseData gaCaseData = buildGaCaseData(caseData);
 
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(GENERAL_APPLICATION_DRAFT)))
                 .thenReturn(new DocmosisDocument(GENERAL_APPLICATION_DRAFT.getDocumentTitle(), bytes));
 
-        when(listGeneratorService.applicationType(caseData)).thenReturn("Extend time");
-        when(listGeneratorService.claimantsName(caseData)).thenReturn("Test Claimant1 Name");
-        when(listGeneratorService.defendantsName(caseData)).thenReturn("Test Defendant1 Name");
+        stubListGenerators(caseData, gaCaseData, "Extend time", "Test Claimant1 Name", "Test Defendant1 Name");
         Map<String, String> refMap = new HashMap<>();
         refMap.put("applicantSolicitor1Reference", "app1ref");
         refMap.put("respondentSolicitor1Reference", "resp1ref");
@@ -123,7 +145,7 @@ class GeneralApplicationDraftGeneratorTest extends BaseCallbackHandlerTest {
         caseDataContent.put("solicitorReferences", refMap);
         CaseDetails parentCaseDetails = CaseDetails.builder().data(caseDataContent).build();
         when(coreCaseDataService.getCase(PARENT_CCD_REF)).thenReturn(parentCaseDetails);
-        generalApplicationDraftGenerator.generate(caseData, BEARER_TOKEN);
+        generalApplicationDraftGenerator.generate(gaCaseData, BEARER_TOKEN);
 
         verify(documentManagementService).uploadDocument(
                 BEARER_TOKEN,
@@ -138,13 +160,12 @@ class GeneralApplicationDraftGeneratorTest extends BaseCallbackHandlerTest {
     @Test
     void shouldGenerateApplicationDraftDocumentWithNoticeButRespondentNotRespondedOnTime() {
         CaseData caseData = getSampleGeneralAppCaseDataWithDeadLineReached(NO, YES);
+        GeneralApplicationCaseData gaCaseData = buildGaCaseData(caseData);
 
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(GENERAL_APPLICATION_DRAFT)))
                 .thenReturn(new DocmosisDocument(GENERAL_APPLICATION_DRAFT.getDocumentTitle(), bytes));
 
-        when(listGeneratorService.applicationType(caseData)).thenReturn("Extend time");
-        when(listGeneratorService.claimantsName(caseData)).thenReturn("Test Claimant1 Name");
-        when(listGeneratorService.defendantsName(caseData)).thenReturn("Test Defendant1 Name");
+        stubListGenerators(caseData, gaCaseData, "Extend time", "Test Claimant1 Name", "Test Defendant1 Name");
         Map<String, String> refMap = new HashMap<>();
         refMap.put("applicantSolicitor1Reference", "app1ref");
         refMap.put("respondentSolicitor1Reference", "resp1ref");
@@ -152,7 +173,7 @@ class GeneralApplicationDraftGeneratorTest extends BaseCallbackHandlerTest {
         caseDataContent.put("solicitorReferences", refMap);
         CaseDetails parentCaseDetails = CaseDetails.builder().data(caseDataContent).build();
         when(coreCaseDataService.getCase(PARENT_CCD_REF)).thenReturn(parentCaseDetails);
-        generalApplicationDraftGenerator.generate(caseData, BEARER_TOKEN);
+        generalApplicationDraftGenerator.generate(gaCaseData, BEARER_TOKEN);
 
         verify(documentManagementService).uploadDocument(
                 BEARER_TOKEN,
@@ -171,13 +192,12 @@ class GeneralApplicationDraftGeneratorTest extends BaseCallbackHandlerTest {
 
         respondentSols.add(element(respondent1));
         CaseData caseData = getCase(respondentSols, NO);
+        GeneralApplicationCaseData gaCaseData = buildGaCaseData(caseData);
 
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(GENERAL_APPLICATION_DRAFT)))
                 .thenReturn(new DocmosisDocument(GENERAL_APPLICATION_DRAFT.getDocumentTitle(), bytes));
 
-        when(listGeneratorService.applicationType(caseData)).thenReturn("Extend time");
-        when(listGeneratorService.claimantsName(caseData)).thenReturn("Test Claimant1 Name");
-        when(listGeneratorService.defendantsName(caseData)).thenReturn("Test Defendant1 Name");
+        stubListGenerators(caseData, gaCaseData, "Extend time", "Test Claimant1 Name", "Test Defendant1 Name");
         Map<String, String> refMap = new HashMap<>();
         refMap.put("applicantSolicitor1Reference", "app1ref");
         refMap.put("respondentSolicitor1Reference", "resp1ref");
@@ -200,13 +220,14 @@ class GeneralApplicationDraftGeneratorTest extends BaseCallbackHandlerTest {
                 .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(NO).build())
                 .applicationIsCloaked(NO)
                 .build();
+        GeneralApplicationCaseData gaCaseData = buildGaCaseData(caseData);
 
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(GENERAL_APPLICATION_DRAFT)))
                 .thenReturn(new DocmosisDocument(GENERAL_APPLICATION_DRAFT.getDocumentTitle(), bytes));
 
-        when(listGeneratorService.applicationType(caseData)).thenReturn("Extend time");
-        when(listGeneratorService.claimantsName(caseData)).thenReturn("Test Claimant1 Name");
-        when(listGeneratorService.defendantsName(caseData)).thenReturn("Test Defendant1 Name");
+        when(listGeneratorService.applicationType(gaCaseData)).thenReturn("Extend time");
+        when(listGeneratorService.claimantsName(gaCaseData)).thenReturn("Test Claimant1 Name");
+        when(listGeneratorService.defendantsName(gaCaseData)).thenReturn("Test Defendant1 Name");
         Map<String, String> refMap = new HashMap<>();
         refMap.put("applicantSolicitor1Reference", "app1ref");
         refMap.put("respondentSolicitor1Reference", "resp1ref");
@@ -229,13 +250,12 @@ class GeneralApplicationDraftGeneratorTest extends BaseCallbackHandlerTest {
                 .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(NO).build())
                 .applicationIsCloaked(YES)
                 .build();
+        GeneralApplicationCaseData gaCaseData = buildGaCaseData(caseData);
 
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(GENERAL_APPLICATION_DRAFT)))
                 .thenReturn(new DocmosisDocument(GENERAL_APPLICATION_DRAFT.getDocumentTitle(), bytes));
 
-        when(listGeneratorService.applicationType(caseData)).thenReturn("Extend time");
-        when(listGeneratorService.claimantsName(caseData)).thenReturn("Test Claimant1 Name");
-        when(listGeneratorService.defendantsName(caseData)).thenReturn("Test Defendant1 Name");
+        stubListGenerators(caseData, gaCaseData, "Extend time", "Test Claimant1 Name", "Test Defendant1 Name");
         Map<String, String> refMap = new HashMap<>();
         refMap.put("applicantSolicitor1Reference", "app1ref");
         refMap.put("respondentSolicitor1Reference", "resp1ref");
@@ -260,13 +280,12 @@ class GeneralApplicationDraftGeneratorTest extends BaseCallbackHandlerTest {
         respondentSols.add(element(respondent2));
 
         CaseData caseData = getCase(respondentSols, YES);
+        GeneralApplicationCaseData gaCaseData = buildGaCaseData(caseData);
 
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(GENERAL_APPLICATION_DRAFT)))
                 .thenReturn(new DocmosisDocument(GENERAL_APPLICATION_DRAFT.getDocumentTitle(), bytes));
 
-        when(listGeneratorService.applicationType(caseData)).thenReturn("Extend time");
-        when(listGeneratorService.claimantsName(caseData)).thenReturn("Test Claimant1 Name");
-        when(listGeneratorService.defendantsName(caseData)).thenReturn("Test Defendant1 Name");
+        stubListGenerators(caseData, gaCaseData, "Extend time", "Test Claimant1 Name", "Test Defendant1 Name");
         Map<String, String> refMap = new HashMap<>();
         refMap.put("applicantSolicitor1Reference", "app1ref");
         refMap.put("respondentSolicitor1Reference", "resp1ref");
@@ -340,7 +359,7 @@ class GeneralApplicationDraftGeneratorTest extends BaseCallbackHandlerTest {
                 (GeneralApplicationTypes.SUMMARY_JUDGEMENT));
         DynamicListElement location1 = DynamicListElement.builder()
                 .code(String.valueOf(UUID.randomUUID())).label("Site Name 2 - Address2 - 28000").build();
-        return CaseData.builder()
+        return gaCaseData(builder -> builder
                 .claimant1PartyName("Test Claimant1 Name")
                 .defendant1PartyName("Test Defendant1 Name")
                 .ccdCaseReference(CHILD_CCD_REF)
@@ -383,8 +402,7 @@ class GeneralApplicationDraftGeneratorTest extends BaseCallbackHandlerTest {
                                 .types(types).build())
                 .parentClaimantIsApplicant(YES)
                 .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
-                        .caseReference(PARENT_CCD_REF.toString()).build())
-                .build();
+                        .caseReference(PARENT_CCD_REF.toString()).build()));
     }
 
     private CaseData getSampleGeneralApplicationCaseData(YesOrNo isConsented, YesOrNo isTobeNotified) {
@@ -514,9 +532,8 @@ class GeneralApplicationDraftGeneratorTest extends BaseCallbackHandlerTest {
         when(coreCaseDataService.getCase(PARENT_CCD_REF)).thenReturn(parentCaseDetails);
 
         CaseData caseData = getSampleGeneralApplicationCaseData(NO, YES);
-        when(listGeneratorService.claimantsName(caseData)).thenReturn("Test Claimant1 Name");
-        when(listGeneratorService.defendantsName(caseData))
-                .thenReturn("Test Defendant1 Name");
+        GeneralApplicationCaseData gaCaseData = buildGaCaseData(caseData);
+        stubListGenerators(caseData, gaCaseData, "Extend time", "Test Claimant1 Name", "Test Defendant1 Name");
 
         var templateData = generalApplicationDraftGenerator.getTemplateData(caseData);
 
@@ -572,4 +589,22 @@ class GeneralApplicationDraftGeneratorTest extends BaseCallbackHandlerTest {
         return String.join(", ", defendantsName);
     }
 
+    private CaseData gaCaseData(UnaryOperator<CaseData.CaseDataBuilder<?, ?>> customiser) {
+        GeneralApplicationCaseData gaCaseData = GeneralApplicationCaseDataBuilder.builder()
+            .withCcdCaseReference(CaseDataBuilder.CASE_ID)
+            .withGeneralAppParentCaseReference(CaseDataBuilder.PARENT_CASE_ID)
+            .withLocationName("Nottingham County Court and Family Court (and Crown)")
+            .withGaCaseManagementLocation(GACaseLocation.builder()
+                                              .siteName("testing")
+                                              .address("london court")
+                                              .baseLocation("2")
+                                              .postcode("BA 117")
+                                              .build())
+            .build();
+
+        CaseData converted = objectMapper.convertValue(gaCaseData, CaseData.class);
+        CaseData enriched = gaCaseDataEnricher.enrich(converted, gaCaseData);
+
+        return customiser.apply(enriched.toBuilder()).build();
+    }
 }

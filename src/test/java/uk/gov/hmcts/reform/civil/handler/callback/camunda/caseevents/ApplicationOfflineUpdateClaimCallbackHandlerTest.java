@@ -70,7 +70,7 @@ class ApplicationOfflineUpdateClaimCallbackHandlerTest extends BaseCallbackHandl
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
         when(helperService.updateApplicationDetailsInClaim(
-            any(),
+            any(CaseData.class),
             eq(APPLICATION_PROCEEDS_OFFLINE_DESCRIPTION),
             eq(GenAppStateHelperService.RequiredState.APPLICATION_PROCEEDS_OFFLINE)
         ))
@@ -116,7 +116,7 @@ class ApplicationOfflineUpdateClaimCallbackHandlerTest extends BaseCallbackHandl
             );
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
-        when(helperService.updateApplicationDetailsInClaim(any(), any(), any()))
+        when(helperService.updateApplicationDetailsInClaim(any(CaseData.class), any(), any()))
             .thenThrow(new RuntimeException("Some Error"));
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -148,4 +148,3 @@ class ApplicationOfflineUpdateClaimCallbackHandlerTest extends BaseCallbackHandl
         return latestStatus;
     }
 }
-

@@ -1,9 +1,9 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.callback.DashboardCallbackHandler;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -18,14 +18,15 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 
 @Slf4j
 @Service
-public class CreateRespondentDashboardNotificationForApplicationSubmittedHandler extends DashboardCallbackHandler {
+public class CreateRespondentDashboardNotificationForApplicationSubmittedHandler extends GaDashboardCallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(CaseEvent.CREATE_APPLICATION_SUBMITTED_DASHBOARD_NOTIFICATION_FOR_RESPONDENT);
 
     public CreateRespondentDashboardNotificationForApplicationSubmittedHandler(DashboardScenariosService dashboardScenariosService,
                                                                                DashboardNotificationsParamsMapper mapper,
-                                                                               FeatureToggleService featureToggleService) {
-        super(dashboardScenariosService, mapper, featureToggleService);
+                                                                               FeatureToggleService featureToggleService,
+                                                                               ObjectMapper objectMapper) {
+        super(dashboardScenariosService, mapper, featureToggleService, objectMapper);
     }
 
     @Override

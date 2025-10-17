@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.genapplication.GASolicitorDetailsGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.UploadDocumentByType;
 
@@ -102,14 +103,22 @@ public class DocUploadUtils {
         }
     }
 
-    public static String getUserRole(CaseData caseData, String userId) {
-        if (caseData.getParentClaimantIsApplicant().equals(YesOrNo.YES) && caseData.getGeneralAppApplnSolicitor().getId().equals(userId)
-                || (caseData.getParentClaimantIsApplicant().equals(YesOrNo.NO) && caseData.getGeneralAppApplnSolicitor().getId().equals(userId))
+    public static String getUserRole(CaseData caseData, GeneralApplicationCaseData gaCaseData, String userId) {
+        if (gaCaseData == null) {
+            throw new IllegalArgumentException("GeneralApplicationCaseData is required to resolve GA user roles");
+        }
+
+        if (caseData.getParentClaimantIsApplicant().equals(YesOrNo.YES)
+                && caseData.getGeneralAppApplnSolicitor().getId().equals(userId)
+                || (caseData.getParentClaimantIsApplicant().equals(YesOrNo.NO)
+                && caseData.getGeneralAppApplnSolicitor().getId().equals(userId))
                 || (caseData.getGeneralAppApplicantAddlSolicitors() != null
-                && caseData.getGeneralAppApplicantAddlSolicitors().stream().filter(appSolUser -> appSolUser.getValue().getId()
-                .equals(userId)).toList().size() == 1)) {
+                && caseData.getGeneralAppApplicantAddlSolicitors().stream()
+                .filter(appSolUser -> appSolUser.getValue().getId().equals(userId))
+                .toList()
+                .size() == 1)) {
             return APPLICANT;
-        } else if (caseData.getGeneralAppRespondentSolicitors() != null && isLipRespondent(caseData)) {
+        } else if (caseData.getGeneralAppRespondentSolicitors() != null && isLipRespondent(gaCaseData)) {
             return RESPONDENT_ONE;
         } else if (caseData.getGeneralAppRespondentSolicitors() != null) {
             String orgID = caseData.getGeneralAppRespondentSolicitors().get(0).getValue().getOrganisationIdentifier();
@@ -197,8 +206,8 @@ public class DocUploadUtils {
         }
     }
 
-    private static boolean isLipRespondent(CaseData caseData) {
-        return Objects.nonNull(caseData.getIsGaRespondentOneLip()) && caseData.getIsGaRespondentOneLip().equals(YES);
+    private static boolean isLipRespondent(GeneralApplicationCaseData gaCaseData) {
+        return gaCaseData.getIsGaRespondentOneLip() == YES;
     }
 
     public static void setRespondedValues(CaseData.CaseDataBuilder<?, ?> caseDataBuilder, String role) {

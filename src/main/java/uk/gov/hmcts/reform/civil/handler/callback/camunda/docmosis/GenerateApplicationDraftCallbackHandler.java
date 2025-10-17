@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.enums.welshenhancements.PreTranslationGaDocumentType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.GaForLipService;
 import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
@@ -69,58 +70,65 @@ public class GenerateApplicationDraftCallbackHandler extends CallbackHandler {
     }
 
     // Generate Draft Document if it's Urgent application and fee is FREE
-    private boolean isApplicationUrgentAndFreeFee(CaseData caseData) {
-        return generalAppFeesService.isFreeApplication(caseData)
-                && caseData.getGeneralAppUrgencyRequirement() != null
-                && YES.equals(caseData.getGeneralAppUrgencyRequirement().getGeneralAppUrgency());
+    private boolean isApplicationUrgentAndFreeFee(GeneralApplicationCaseData gaCaseData) {
+        return generalAppFeesService.isFreeApplication(gaCaseData)
+                && gaCaseData.getGeneralAppUrgencyRequirement() != null
+                && YES.equals(gaCaseData.getGeneralAppUrgencyRequirement().getGeneralAppUrgency());
     }
 
     // Generate Draft Document if it's Urgent application and after fee is paid
     // Initiate General application after payment camunda task started
-    private boolean isApplicationUrgentAndFeePaid(CaseData caseData) {
-        return isFeePaid(caseData) && caseData.getGeneralAppUrgencyRequirement() != null
-                && YES.equals(caseData.getGeneralAppUrgencyRequirement()
+    private boolean isApplicationUrgentAndFeePaid(GeneralApplicationCaseData gaCaseData) {
+        return isFeePaid(gaCaseData) && gaCaseData.getGeneralAppUrgencyRequirement() != null
+                && YES.equals(gaCaseData.getGeneralAppUrgencyRequirement()
                 .getGeneralAppUrgency());
 
     }
 
     // Generate Draft Document if it's non-urgent, without notice and after fee is paid
-    private boolean isGANonUrgentWithOutNoticeFeePaid(CaseData caseData) {
-        return isFeePaid(caseData) && caseData.getGeneralAppInformOtherParty() != null
-                && NO.equals(caseData.getGeneralAppInformOtherParty().getIsWithNotice());
+    private boolean isGANonUrgentWithOutNoticeFeePaid(GeneralApplicationCaseData gaCaseData) {
+        return isFeePaid(gaCaseData) && gaCaseData.getGeneralAppInformOtherParty() != null
+                && NO.equals(gaCaseData.getGeneralAppInformOtherParty().getIsWithNotice());
     }
 
-    private boolean isFeePaid(CaseData caseData) {
-        return caseData.getGeneralAppPBADetails() != null
-                && !caseData.getGeneralAppPBADetails().getFee().getCode().equals("FREE")
-                && caseData.getGeneralAppPBADetails().getPaymentDetails() != null
-                && caseData.getGeneralAppPBADetails().getPaymentDetails().getStatus().equals(PaymentStatus.SUCCESS);
+    private boolean isFeePaid(GeneralApplicationCaseData gaCaseData) {
+        return gaCaseData.getGeneralAppPBADetails() != null
+                && gaCaseData.getGeneralAppPBADetails().getFee() != null
+                && !gaCaseData.getGeneralAppPBADetails().getFee().getCode().equals("FREE")
+                && gaCaseData.getGeneralAppPBADetails().getPaymentDetails() != null
+                && gaCaseData.getGeneralAppPBADetails().getPaymentDetails().getStatus().equals(PaymentStatus.SUCCESS);
     }
 
     private CallbackResponse createPDFdocument(CallbackParams callbackParams) {
 
         CaseData caseData = callbackParams.getCaseData();
+        GeneralApplicationCaseData gaCaseData = callbackParams.getGaCaseData();
+        Objects.requireNonNull(gaCaseData, "gaCaseData must be present on CallbackParams");
 
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         CaseDocument gaDraftDocument;
+        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
 
-        if (gaForLipService.isGaForLip(caseData)) {
-            if (generalAppFeesService.isFreeApplication(caseData) || isFeePaid(caseData)) {
+        if (gaForLipService.isGaForLip(gaCaseData)) {
+            if (generalAppFeesService.isFreeApplication(gaCaseData) || isFeePaid(gaCaseData)) {
 
                 List<Element<CaseDocument>> draftApplicationList = caseData.getGaDraftDocument();
                 if (Objects.isNull(draftApplicationList)) {
                     draftApplicationList = newArrayList();
                 }
 
+                GeneralApplicationCaseData snapshotGaData = objectMapper.convertValue(
+                    caseDataBuilder.build(), GeneralApplicationCaseData.class);
+
                 gaDraftDocument = gaDraftGenerator.generate(
-                        caseDataBuilder.build(),
-                        callbackParams.getParams().get(BEARER_TOKEN).toString()
+                        snapshotGaData,
+                        authToken
                 );
 
                 if (featureToggleService.isGaForWelshEnabled()
-                        && (((caseData.getIsGaApplicantLip() == YES
-                        && caseData.isApplicantBilingual())
-                        || (caseData.isRespondentBilingual() && caseData.getIsGaRespondentOneLip() == YES)))) {
+                        && (((gaCaseData.getIsGaApplicantLip() == YES
+                        && gaCaseData.isApplicantBilingual())
+                        || (gaCaseData.isRespondentBilingual() && gaCaseData.getIsGaRespondentOneLip() == YES)))) {
                     List<Element<CaseDocument>> preTranslatedDocuments =
                             Optional.ofNullable(caseData.getPreTranslationGaDocuments())
                                     .orElseGet(ArrayList::new);
@@ -131,8 +139,8 @@ public class GenerateApplicationDraftCallbackHandler extends CallbackHandler {
                             AssignCategoryId.APPLICATIONS
                     );
 
-                    if (caseData.getRespondentsResponses() != null
-                            && !caseData.getRespondentsResponses().isEmpty()
+                    if (gaCaseData.getRespondentsResponses() != null
+                            && !gaCaseData.getRespondentsResponses().isEmpty()
                             && caseData.getCcdState().equals(CaseState.AWAITING_RESPONDENT_RESPONSE)) {
                         caseDataBuilder.preTranslationGaDocumentType(PreTranslationGaDocumentType.RESPOND_TO_APPLICATION_SUMMARY_DOC);
                     } else {
@@ -156,15 +164,20 @@ public class GenerateApplicationDraftCallbackHandler extends CallbackHandler {
             3. Draft document should be generated only if Free fee application
             4. Draft document should be generated only after payment is made for urgent application and without notice
             */
-            if ((isApplicationUrgentAndFreeFee(caseData)
-                    || isGANonUrgentWithOutNoticeFeePaid(caseData)
-                    || isApplicationUrgentAndFeePaid(caseData)
-                    || isRespondentsResponseSatisfied(caseData, caseDataBuilder.build()))
+            if ((isApplicationUrgentAndFreeFee(gaCaseData)
+                    || isGANonUrgentWithOutNoticeFeePaid(gaCaseData)
+                    || isApplicationUrgentAndFeePaid(gaCaseData)
+                    || isRespondentsResponseSatisfied(
+                        gaCaseData,
+                        objectMapper.convertValue(caseDataBuilder.build(), GeneralApplicationCaseData.class)))
                     && isNull(caseData.getJudicialDecision())) {
 
+                GeneralApplicationCaseData snapshotGaData = objectMapper.convertValue(
+                    caseDataBuilder.build(), GeneralApplicationCaseData.class);
+
                 gaDraftDocument = gaDraftGenerator.generate(
-                        caseDataBuilder.build(),
-                        callbackParams.getParams().get(BEARER_TOKEN).toString()
+                        snapshotGaData,
+                        authToken
                 );
 
                 List<Element<CaseDocument>> draftApplicationList = newArrayList();

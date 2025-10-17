@@ -10,6 +10,8 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.GaCallbackDataUtil;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -53,10 +55,11 @@ public class ResponseToJudgeDirectionsOrder extends CallbackHandler {
     protected CallbackResponse submitClaim(CallbackParams callbackParams) {
 
         CaseData caseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetails());
+        GeneralApplicationCaseData gaCaseData = GaCallbackDataUtil.toGaCaseData(caseData, objectMapper);
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         String userId = idamClient.getUserInfo(authToken).getUid();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        String role = DocUploadUtils.getUserRole(caseData, userId);
+        String role = DocUploadUtils.getUserRole(caseData, gaCaseData, userId);
         DocUploadUtils.addDocumentToAddl(caseData,
                                          caseDataBuilder,
                                          ElementUtils.wrapElements(caseData.getGeneralAppDirOrderUpload()),
@@ -69,7 +72,7 @@ public class ResponseToJudgeDirectionsOrder extends CallbackHandler {
         CaseData updatedCaseData = caseDataBuilder.build();
 
         // Generate Dashboard Notification for Lip Party
-        if (gaForLipService.isGaForLip(caseData)) {
+        if (gaForLipService.isGaForLip(gaCaseData)) {
             log.info("General dashboard notification for Lip party for caseId: {}", caseData.getCcdCaseReference());
             docUploadDashboardNotificationService.createDashboardNotification(caseData, role, authToken, false);
             docUploadDashboardNotificationService.createResponseDashboardNotification(caseData, "APPLICANT", authToken);

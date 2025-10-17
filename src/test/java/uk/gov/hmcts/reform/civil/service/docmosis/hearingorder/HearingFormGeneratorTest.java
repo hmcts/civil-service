@@ -1,5 +1,16 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.hearingorder;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.UnaryOperator;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -15,6 +26,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.GAJudicialHearingType;
 import uk.gov.hmcts.reform.civil.enums.dq.GAHearingDuration;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.GeneralAppParentCaseLink;
@@ -22,23 +34,18 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.genapplication.GACaseLocation;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingNoticeDetail;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import uk.gov.hmcts.reform.civil.service.ga.GaCaseDataEnricher;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -58,10 +65,14 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.POST_
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
     HearingFormGeneratorGeneralApplication.class,
-    JacksonAutoConfiguration.class
+    JacksonAutoConfiguration.class,
+    GaCaseDataEnricher.class
 })
 class HearingFormGeneratorTest {
 
+    private static final ObjectMapper GA_OBJECT_MAPPER = new ObjectMapper()
+        .registerModule(new JavaTimeModule())
+        .registerModule(new Jdk8Module());
     private static final String BEARER_TOKEN = "Bearer Token";
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
     List<DynamicListElement> listItems = Arrays.asList(DynamicListElement.builder()
@@ -91,6 +102,9 @@ class HearingFormGeneratorTest {
 
     @Autowired
     private HearingFormGeneratorGeneralApplication generator;
+
+    @Autowired
+    private GaCaseDataEnricher gaCaseDataEnricher;
     @MockBean
     private DocmosisService docmosisService;
 
@@ -200,7 +214,7 @@ class HearingFormGeneratorTest {
         )).thenReturn(caseDetails);
 
         CaseData caseData = CaseDataBuilder.builder().hearingScheduledApplication(YES)
-            .gaCaseManagementLocation(GACaseLocation.builder().baseLocation("8").build())
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("8").build())
             .build();
 
         Exception exception =
@@ -261,9 +275,9 @@ class HearingFormGeneratorTest {
 
     @Test
     void test_getHearingDurationStringOther() {
-        CaseData caseData = CaseData.builder().gaHearingNoticeDetail(GAHearingNoticeDetail.builder()
+        CaseData caseData = gaCaseData(builder -> builder.gaHearingNoticeDetail(GAHearingNoticeDetail.builder()
                 .hearingDuration(GAHearingDuration.OTHER)
-                .hearingDurationOther("One year").build()).build();
+                .hearingDurationOther("One year").build()));
         String durationString = HearingFormGeneratorGeneralApplication.getHearingDurationString(caseData);
         assertThat(durationString).isEqualTo("One year");
     }
@@ -274,7 +288,7 @@ class HearingFormGeneratorTest {
                         false,
                         false,
                         true, true).build();
-        CaseData generalAppCaseData = CaseData.builder().ccdCaseReference(CaseDataBuilder.CASE_ID).build();
+        CaseData generalAppCaseData = gaCaseData(builder -> builder.ccdCaseReference(CaseDataBuilder.CASE_ID));
         when(caseDetailsConverter.toCaseDataGA(any()))
                 .thenReturn(caseData);
         AssertionsForClassTypes
@@ -291,7 +305,7 @@ class HearingFormGeneratorTest {
                         false,
                         true,
                         false, true).build();
-        CaseData generalAppCaseData = CaseData.builder().ccdCaseReference(CaseDataBuilder.CASE_ID).build();
+        CaseData generalAppCaseData = gaCaseData(builder -> builder.ccdCaseReference(CaseDataBuilder.CASE_ID));
         when(caseDetailsConverter.toCaseDataGA(any()))
                 .thenReturn(caseData);
         AssertionsForClassTypes
@@ -308,7 +322,7 @@ class HearingFormGeneratorTest {
                         true,
                         false,
                         false, true).build();
-        CaseData generalAppCaseData = CaseData.builder().ccdCaseReference(CaseDataBuilder.CASE_ID).build();
+        CaseData generalAppCaseData = gaCaseData(builder -> builder.ccdCaseReference(CaseDataBuilder.CASE_ID));
         when(caseDetailsConverter.toCaseDataGA(any()))
                 .thenReturn(caseData);
         AssertionsForClassTypes
@@ -325,7 +339,7 @@ class HearingFormGeneratorTest {
                         true,
                         true,
                         true, true).build();
-        CaseData generalAppCaseData = CaseData.builder().ccdCaseReference(CaseDataBuilder.CASE_ID).build();
+        CaseData generalAppCaseData = gaCaseData(builder -> builder.ccdCaseReference(CaseDataBuilder.CASE_ID));
         when(caseDetailsConverter.toCaseDataGA(any()))
                 .thenReturn(caseData);
         AssertionsForClassTypes
@@ -400,5 +414,24 @@ class HearingFormGeneratorTest {
             assertEquals("respondent1posttown", templateData.getPartyAddressPostTown());
             assertEquals("respondent1postcode", templateData.getPartyAddressPostCode());
         }
+    }
+
+    private CaseData gaCaseData(UnaryOperator<CaseData.CaseDataBuilder<?, ?>> customiser) {
+        GeneralApplicationCaseData gaCaseData = GeneralApplicationCaseDataBuilder.builder()
+            .withCcdCaseReference(CaseDataBuilder.CASE_ID)
+            .withGeneralAppParentCaseReference(CaseDataBuilder.PARENT_CASE_ID)
+            .withLocationName("Nottingham County Court and Family Court (and Crown)")
+            .withGaCaseManagementLocation(GACaseLocation.builder()
+                                              .siteName("testing")
+                                              .address("london court")
+                                              .baseLocation("2")
+                                              .postcode("BA 117")
+                                              .build())
+            .build();
+
+        CaseData converted = GA_OBJECT_MAPPER.convertValue(gaCaseData, CaseData.class);
+        CaseData enriched = gaCaseDataEnricher.enrich(converted, gaCaseData);
+
+        return customiser.apply(enriched.toBuilder()).build();
     }
 }

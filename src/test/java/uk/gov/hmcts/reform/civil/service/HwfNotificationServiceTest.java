@@ -1,14 +1,18 @@
 package uk.gov.hmcts.reform.civil.service;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.HwFMoreInfoRequiredDocuments;
 import uk.gov.hmcts.reform.civil.enums.NoRemissionDetailsSummary;
@@ -25,6 +29,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GASolicitorDetailsGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.HelpWithFeesDetails;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
@@ -74,6 +79,11 @@ import static uk.gov.hmcts.reform.civil.utils.DateUtils.formatDateInWelsh;
 @MockitoSettings(strictness = Strictness.LENIENT)
 public class HwfNotificationServiceTest {
 
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
+        .registerModule(new JavaTimeModule())
+        .registerModule(new Jdk8Module())
+        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
     private static final String EMAIL_TEMPLATE_MORE_INFO_HWF = "test-hwf-more-info-id";
     private static final String EMAIL_TEMPLATE_INVALID_HWF_REFERENCE = "test-hwf-invalidrefnumber-id";
     private static final String EMAIL_TEMPLATE_UPDATE_REF_NUMBER = "test-hwf-updaterefnumber-id";
@@ -112,10 +122,10 @@ public class HwfNotificationServiceTest {
     private FeatureToggleService featureToggleService;
     @Mock
     private NotificationsSignatureConfiguration configuration;
-    @InjectMocks
+
     private HwfNotificationService service;
 
-    private static final CaseData GA_CASE_DATA = CaseDataBuilder.builder()
+    private static final CaseData GA_CASE_DATA = toGaCaseData(CaseDataBuilder.builder()
             .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("1").build())
             .ccdState(AWAITING_APPLICATION_PAYMENT)
             .parentClaimantIsApplicant(YesOrNo.YES)
@@ -133,9 +143,9 @@ public class HwfNotificationServiceTest {
                     .fee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(100000)).build())
                     .build())
             .hwfFeeType(FeeType.APPLICATION)
-            .build();
+            .build());
 
-    private static final CaseData ADDITIONAL_CASE_DATA = CaseDataBuilder.builder()
+    private static final CaseData ADDITIONAL_CASE_DATA = toGaCaseData(CaseDataBuilder.builder()
             .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("1").build())
             .ccdState(APPLICATION_ADD_PAYMENT)
             .ccdCaseReference(1111222233334444L)
@@ -153,16 +163,23 @@ public class HwfNotificationServiceTest {
                     .fee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(100000)).build())
                     .build())
             .hwfFeeType(FeeType.ADDITIONAL)
-            .build();
+            .build());
 
-    private static final CaseData CIVIL_WELSH_CLA = CaseData.builder().claimantBilingualLanguagePreference("WELSH").build();
-    private static final CaseData CIVIL_WELSH_DEF = CaseData.builder()
-        .respondent1LiPResponseGA(
-        RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH").build()
-    ).build();
+    private static final CaseData CIVIL_WELSH_CLA = toGaCaseData(CaseData.builder()
+        .claimantBilingualLanguagePreference("WELSH")
+        .build());
+    private static final CaseData CIVIL_WELSH_DEF = toGaCaseData(CaseData.builder()
+        .respondent1LiPResponse(
+            RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH").build()
+        )
+        .build());
 
     @BeforeEach
     void setup() {
+        service = new HwfNotificationService(notificationService, notificationsProperties,
+            caseDetailsConverter, coreCaseDataService, solicitorEmailValidation,
+            featureToggleService, configuration, OBJECT_MAPPER);
+
         when(coreCaseDataService.getCase(any())).thenReturn(CaseDetails.builder().build());
         when(notificationsProperties.getNotifyApplicantForHwFMoreInformationNeeded()).thenReturn(
                 EMAIL_TEMPLATE_MORE_INFO_HWF);
@@ -199,6 +216,11 @@ public class HwfNotificationServiceTest {
         when(configuration.getWelshHmctsSignature()).thenReturn("Hawliadau am Arian yn y Llys Sifil Ar-lein \n Gwasanaeth Llysoedd a Thribiwnlysoedd EF");
         when(configuration.getWelshPhoneContact()).thenReturn("Ffôn: 0300 303 5174");
         when(configuration.getWelshOpeningHours()).thenReturn("Dydd Llun i ddydd Iau, 9am – 5pm, dydd Gwener, 9am – 4.30pm");
+        when(featureToggleService.isPublicQueryManagementEnabledGa(any(GeneralApplicationCaseData.class))).thenReturn(false);
+        when(solicitorEmailValidation.validateSolicitorEmail(
+            any(CaseData.class),
+            any(GeneralApplicationCaseData.class)
+        )).thenAnswer(invocation -> invocation.getArgument(1));
     }
 
     @Test
@@ -214,8 +236,7 @@ public class HwfNotificationServiceTest {
                                 getMoreInformationDocumentList()).build())
                 .parentCaseReference(GA_REFERENCE)
                 .gaHwfDetails(hwfeeDetails).build();
-        when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
-        when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(CaseData.builder().build());
+        when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(emptyGaCaseData());
         // When
         service.sendNotification(caseData);
 
@@ -235,14 +256,13 @@ public class HwfNotificationServiceTest {
             .hwfCaseEvent(MORE_INFORMATION_HWF_GA).build();
         CaseData caseData = GA_CASE_DATA.toBuilder()
             .parentCaseReference(GA_REFERENCE)
-            .applicantBilingualLanguagePreferenceGA(YesOrNo.YES)
+            .applicantBilingualLanguagePreference(YesOrNo.YES)
             .isGaApplicantLip(YesOrNo.YES)
             .helpWithFeesMoreInformationGa(HelpWithFeesMoreInformation.builder()
                                                .hwFMoreInfoDocumentDate(NOW)
                                                .hwFMoreInfoRequiredDocuments(
                                                    getMoreInformationDocumentList()).build())
             .gaHwfDetails(hwfeeDetails).build();
-        when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
         when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(CIVIL_WELSH_CLA);
         // When
         service.sendNotification(caseData);
@@ -269,9 +289,7 @@ public class HwfNotificationServiceTest {
                 .parentCaseReference(GA_REFERENCE)
                 .isGaApplicantLip(YesOrNo.YES)
                 .additionalHwfDetails(hwfeeDetails).build();
-
-        when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
-        when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(CaseData.builder().build());
+        when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(emptyGaCaseData());
         // When
         service.sendNotification(caseData);
 
@@ -292,15 +310,13 @@ public class HwfNotificationServiceTest {
         CaseData caseData = ADDITIONAL_CASE_DATA.toBuilder()
             .parentCaseReference(GA_REFERENCE)
             .parentClaimantIsApplicant(YesOrNo.NO)
-            .applicantBilingualLanguagePreferenceGA(YesOrNo.YES)
+            .applicantBilingualLanguagePreference(YesOrNo.YES)
             .isGaApplicantLip(YesOrNo.YES)
             .helpWithFeesMoreInformationAdditional(HelpWithFeesMoreInformation.builder()
                                                        .hwFMoreInfoDocumentDate(NOW)
                                                        .hwFMoreInfoRequiredDocuments(
                                                            getMoreInformationDocumentList()).build())
             .additionalHwfDetails(hwfeeDetails).build();
-
-        when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
         when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(CIVIL_WELSH_DEF);
         // When
         service.sendNotification(caseData);
@@ -409,8 +425,7 @@ public class HwfNotificationServiceTest {
         CaseData caseData = GA_CASE_DATA.toBuilder().gaHwfDetails(hwfeeDetails)
             .isGaApplicantLip(YesOrNo.YES)
             .parentCaseReference(GA_REFERENCE).build();
-        when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
-        when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(CaseData.builder().build());
+        when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(emptyGaCaseData());
         // When
         service.sendNotification(caseData);
 
@@ -433,9 +448,8 @@ public class HwfNotificationServiceTest {
             .parentCaseReference(GA_REFERENCE)
             .parentClaimantIsApplicant(YesOrNo.NO)
             .isGaApplicantLip(YesOrNo.YES)
-            .applicantBilingualLanguagePreferenceGA(YesOrNo.YES)
+            .applicantBilingualLanguagePreference(YesOrNo.YES)
             .gaHwfDetails(hwfeeDetails).build();
-        when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
         when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(CIVIL_WELSH_DEF);
         // When
         service.sendNotification(caseData);
@@ -457,8 +471,7 @@ public class HwfNotificationServiceTest {
         CaseData caseData = ADDITIONAL_CASE_DATA.toBuilder()
             .isGaApplicantLip(YesOrNo.YES)
             .additionalHwfDetails(hwfeeDetails).parentCaseReference(GA_REFERENCE).build();
-        when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
-        when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(CaseData.builder().build());
+        when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(emptyGaCaseData());
         // When
         service.sendNotification(caseData);
 
@@ -478,10 +491,9 @@ public class HwfNotificationServiceTest {
             .hwfCaseEvent(UPDATE_HELP_WITH_FEE_NUMBER_GA)
             .build();
         CaseData caseData = ADDITIONAL_CASE_DATA.toBuilder()
-            .parentCaseReference(GA_REFERENCE).applicantBilingualLanguagePreferenceGA(YesOrNo.YES)
+            .parentCaseReference(GA_REFERENCE).applicantBilingualLanguagePreference(YesOrNo.YES)
             .isGaApplicantLip(YesOrNo.YES)
             .additionalHwfDetails(hwfeeDetails).build();
-        when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
         when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(CIVIL_WELSH_CLA);
         // When
         service.sendNotification(caseData);
@@ -503,9 +515,7 @@ public class HwfNotificationServiceTest {
         CaseData caseData = GA_CASE_DATA.toBuilder().gaHwfDetails(hwfeeDetails)
             .isGaApplicantLip(YesOrNo.YES)
             .parentCaseReference(GA_REFERENCE).build();
-
-        when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
-        when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(CaseData.builder().build());
+        when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(emptyGaCaseData());
         // When
         service.sendNotification(caseData);
 
@@ -526,10 +536,8 @@ public class HwfNotificationServiceTest {
             .build();
         CaseData caseData = GA_CASE_DATA.toBuilder()
             .isGaApplicantLip(YesOrNo.YES)
-            .parentCaseReference(GA_REFERENCE).applicantBilingualLanguagePreferenceGA(YesOrNo.YES)
+            .parentCaseReference(GA_REFERENCE).applicantBilingualLanguagePreference(YesOrNo.YES)
             .gaHwfDetails(hwfeeDetails).build();
-
-        when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
         when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(CIVIL_WELSH_CLA);
         // When
         service.sendNotification(caseData);
@@ -552,9 +560,7 @@ public class HwfNotificationServiceTest {
         CaseData caseData = ADDITIONAL_CASE_DATA.toBuilder().additionalHwfDetails(hwfeeDetails)
             .isGaApplicantLip(YesOrNo.YES)
             .parentCaseReference(GA_REFERENCE).build();
-
-        when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
-        when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(CaseData.builder().build());
+        when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(emptyGaCaseData());
         // When
         service.sendNotification(caseData);
 
@@ -577,10 +583,8 @@ public class HwfNotificationServiceTest {
         CaseData caseData = ADDITIONAL_CASE_DATA.toBuilder()
             .parentCaseReference(GA_REFERENCE)
             .isGaRespondentOneLip(YesOrNo.YES)
-            .parentClaimantIsApplicant(YesOrNo.NO).applicantBilingualLanguagePreferenceGA(YesOrNo.YES)
+            .parentClaimantIsApplicant(YesOrNo.NO).applicantBilingualLanguagePreference(YesOrNo.YES)
             .additionalHwfDetails(hwfeeDetails).build();
-
-        when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
         when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(CIVIL_WELSH_DEF);
         // When
         service.sendNotification(caseData);
@@ -649,9 +653,7 @@ public class HwfNotificationServiceTest {
         CaseData caseData = GA_CASE_DATA.toBuilder().gaHwfDetails(hwfeeDetails)
             .isGaApplicantLip(YesOrNo.YES)
             .parentCaseReference(GA_REFERENCE).build();
-
-        when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
-        when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(CaseData.builder().build());
+        when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(emptyGaCaseData());
         // When
         service.sendNotification(caseData);
 
@@ -675,10 +677,8 @@ public class HwfNotificationServiceTest {
 
         CaseData caseData = GA_CASE_DATA.toBuilder()
             .isGaApplicantLip(YesOrNo.YES)
-            .parentCaseReference(GA_REFERENCE).applicantBilingualLanguagePreferenceGA(YesOrNo.YES)
+            .parentCaseReference(GA_REFERENCE).applicantBilingualLanguagePreference(YesOrNo.YES)
             .gaHwfDetails(hwfeeDetails).build();
-
-        when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
         when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(CIVIL_WELSH_CLA);
         // When
         service.sendNotification(caseData);
@@ -703,9 +703,7 @@ public class HwfNotificationServiceTest {
         CaseData caseData = ADDITIONAL_CASE_DATA.toBuilder().additionalHwfDetails(hwfeeDetails)
             .isGaApplicantLip(YesOrNo.YES)
             .parentCaseReference(GA_REFERENCE).build();
-
-        when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
-        when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(CaseData.builder().build());
+        when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(emptyGaCaseData());
         // When
         service.sendNotification(caseData);
 
@@ -730,11 +728,9 @@ public class HwfNotificationServiceTest {
         CaseData caseData = ADDITIONAL_CASE_DATA.toBuilder()
             .parentCaseReference(GA_REFERENCE)
             .parentClaimantIsApplicant(YesOrNo.NO)
-            .applicantBilingualLanguagePreferenceGA(YesOrNo.YES)
+            .applicantBilingualLanguagePreference(YesOrNo.YES)
             .isGaApplicantLip(YesOrNo.YES)
             .additionalHwfDetails(hwfeeDetails).build();
-
-        when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
         when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(CIVIL_WELSH_DEF);
         // When
         service.sendNotification(caseData);
@@ -758,8 +754,7 @@ public class HwfNotificationServiceTest {
         CaseData caseData = GA_CASE_DATA.toBuilder().gaHwfDetails(hwfeeDetails)
             .isGaApplicantLip(YesOrNo.YES)
             .parentCaseReference(GA_REFERENCE).build();
-        when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
-        when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(CaseData.builder().build());
+        when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(emptyGaCaseData());
         // When
         service.sendNotification(caseData);
 
@@ -781,10 +776,9 @@ public class HwfNotificationServiceTest {
             .outstandingFee(new BigDecimal(OUTSTANDING_AMOUNT_IN_POUNDS))
             .build();
         CaseData caseData = GA_CASE_DATA.toBuilder()
-            .parentCaseReference(GA_REFERENCE).applicantBilingualLanguagePreferenceGA(YesOrNo.YES)
+            .parentCaseReference(GA_REFERENCE).applicantBilingualLanguagePreference(YesOrNo.YES)
             .isGaApplicantLip(YesOrNo.YES)
             .gaHwfDetails(hwfeeDetails).build();
-        when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
         when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(CIVIL_WELSH_CLA);
         // When
         service.sendNotification(caseData);
@@ -808,8 +802,7 @@ public class HwfNotificationServiceTest {
         CaseData caseData = ADDITIONAL_CASE_DATA.toBuilder().additionalHwfDetails(hwfeeDetails)
             .isGaApplicantLip(YesOrNo.YES)
             .parentCaseReference(GA_REFERENCE).build();
-        when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
-        when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(CaseData.builder().build());
+        when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(emptyGaCaseData());
         // When
         service.sendNotification(caseData);
 
@@ -833,10 +826,9 @@ public class HwfNotificationServiceTest {
         CaseData caseData = ADDITIONAL_CASE_DATA.toBuilder()
             .parentCaseReference(GA_REFERENCE)
             .parentClaimantIsApplicant(YesOrNo.NO)
-            .applicantBilingualLanguagePreferenceGA(YesOrNo.YES)
+            .applicantBilingualLanguagePreference(YesOrNo.YES)
             .isGaApplicantLip(YesOrNo.YES)
             .additionalHwfDetails(hwfeeDetails).build();
-        when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
         when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(CIVIL_WELSH_DEF);
         // When
         service.sendNotification(caseData);
@@ -959,9 +951,7 @@ public class HwfNotificationServiceTest {
         CaseData caseData = GA_CASE_DATA.toBuilder().gaHwfDetails(hwfeeDetails)
             .isGaApplicantLip(YesOrNo.YES)
             .parentCaseReference(GA_REFERENCE).build();
-
-        when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
-        when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(CaseData.builder().build());
+        when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(emptyGaCaseData());
         // When
         service.sendNotification(caseData);
 
@@ -985,11 +975,9 @@ public class HwfNotificationServiceTest {
 
         CaseData caseData = GA_CASE_DATA.toBuilder().gaHwfDetails(hwfeeDetails)
             .parentClaimantIsApplicant(YesOrNo.YES)
-            .applicantBilingualLanguagePreferenceGA(YesOrNo.YES)
+            .applicantBilingualLanguagePreference(YesOrNo.YES)
             .isGaApplicantLip(YesOrNo.YES)
             .parentCaseReference(GA_REFERENCE).build();
-
-        when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
         when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(CIVIL_WELSH_CLA);
         // When
         service.sendNotification(caseData);
@@ -1015,9 +1003,7 @@ public class HwfNotificationServiceTest {
         CaseData caseData = ADDITIONAL_CASE_DATA.toBuilder().additionalHwfDetails(hwfeeDetails)
             .isGaApplicantLip(YesOrNo.YES)
             .parentCaseReference(GA_REFERENCE).build();
-
-        when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
-        when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(CaseData.builder().build());
+        when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(emptyGaCaseData());
         // When
         service.sendNotification(caseData);
 
@@ -1052,6 +1038,21 @@ public class HwfNotificationServiceTest {
         properties.put(NotificationData.PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 "
             + "\n For all other matters, call 0300 123 7050");
         return properties;
+    }
+
+    private static CaseData toGaCaseData(CaseData caseData) {
+        Long ccdCaseReference = caseData.getCcdCaseReference();
+        CaseState ccdState = caseData.getCcdState();
+        GeneralApplicationCaseData gaCaseData = OBJECT_MAPPER.convertValue(caseData, GeneralApplicationCaseData.class);
+        CaseData rebuilt = OBJECT_MAPPER.convertValue(gaCaseData, CaseData.class);
+        return rebuilt.toBuilder()
+            .ccdCaseReference(ccdCaseReference)
+            .ccdState(ccdState)
+            .build();
+    }
+
+    private static CaseData emptyGaCaseData() {
+        return toGaCaseData(CaseData.builder().build());
     }
 
 }

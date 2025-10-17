@@ -11,6 +11,9 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.GaCallbackDataUtil;
+import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.service.JudicialDecisionHelper;
 import uk.gov.hmcts.reform.civil.service.PaymentsService;
@@ -20,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
@@ -58,7 +62,12 @@ public class AdditionalPaymentsReferenceCallbackHandler extends CallbackHandler 
 
     private CallbackResponse getAdditionalPaymentReference(CallbackParams callbackParams) {
 
-        var caseData = callbackParams.getCaseData();
+        GeneralApplicationCaseData gaCaseData = GaCallbackDataUtil.resolveGaCaseData(callbackParams, objectMapper);
+        CaseData caseData = GaCallbackDataUtil.mergeToCaseData(gaCaseData, callbackParams.getCaseData(), objectMapper);
+
+        if (caseData == null) {
+            throw new IllegalArgumentException("Case data missing from callback params");
+        }
         var authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         List<String> errors = new ArrayList<>();
         if (judicialDecisionHelper.isApplicationUncloakedWithAdditionalFee(caseData)) {
@@ -70,12 +79,21 @@ public class AdditionalPaymentsReferenceCallbackHandler extends CallbackHandler 
                         caseData,
                         authToken
                     ).getServiceRequestReference();
-                GAPbaDetails paymentDetails = ofNullable(caseData.getGeneralAppPBADetails())
+                GAPbaDetails existingDetails = Optional.ofNullable(gaCaseData)
+                    .map(GeneralApplicationCaseData::getGeneralAppPBADetails)
+                    .orElse(caseData.getGeneralAppPBADetails());
+                GAPbaDetails paymentDetails = ofNullable(existingDetails)
                     .map(GAPbaDetails::toBuilder)
                     .orElse(GAPbaDetails.builder())
                     .additionalPaymentServiceRef(paymentServiceRequest)
                     .build();
                 caseData = caseData.toBuilder().generalAppPBADetails(paymentDetails).build();
+                if (gaCaseData != null) {
+                    gaCaseData = gaCaseData.toBuilder()
+                        .generalAppPBADetails(paymentDetails)
+                        .build();
+                    caseData = GaCallbackDataUtil.mergeToCaseData(gaCaseData, caseData, objectMapper);
+                }
             } catch (FeignException e) {
                 if (e.status() == 403) {
                     throw e;

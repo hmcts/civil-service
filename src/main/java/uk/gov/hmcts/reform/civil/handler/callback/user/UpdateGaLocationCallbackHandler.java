@@ -15,14 +15,13 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.genapplication.GACaseLocation;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.GeneralAppLocationRefDataService;
 
 import java.util.List;
 import java.util.Map;
-
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIGGER_LOCATION_UPDATE;
@@ -67,9 +66,18 @@ public class UpdateGaLocationCallbackHandler extends CallbackHandler {
         CaseData civilCaseData = caseDetailsConverter
                 .toCaseDataGA(coreCaseDataService
                         .getCase(Long.parseLong(parentCaseReference)));
-        LocationRefData locationDetails = getWorkAllocationLocationDetails(civilCaseData.getGaCaseManagementLocation().getBaseLocation(),
-                authToken);
+        CaseLocationCivil parentLocation = civilCaseData.getCaseManagementLocation();
+        String parentBaseLocation = parentLocation != null ? parentLocation.getBaseLocation() : null;
+        LocationRefData locationDetails = getWorkAllocationLocationDetails(parentBaseLocation, authToken);
+        String parentRegion = parentLocation != null ? parentLocation.getRegion() : null;
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        CaseLocationCivil updatedLocation = CaseLocationCivil.builder()
+            .baseLocation(parentBaseLocation)
+            .region(parentRegion)
+            .siteName(locationDetails.getSiteName())
+            .address(locationDetails.getCourtAddress())
+            .postcode(locationDetails.getPostcode())
+            .build();
         caseDataBuilder
                 .businessProcess(
                         BusinessProcess.builder()
@@ -77,13 +85,7 @@ public class UpdateGaLocationCallbackHandler extends CallbackHandler {
                                 .status(BusinessProcessStatus.FINISHED)
                                 .build())
                 .isCcmccLocation(YesOrNo.NO)
-                .gaCaseManagementLocation(GACaseLocation.builder().baseLocation(civilCaseData.getGaCaseManagementLocation()
-                                .getBaseLocation())
-                        .region(civilCaseData.getGaCaseManagementLocation().getRegion())
-                        .siteName(locationDetails.getSiteName())
-                        .address(locationDetails.getCourtAddress())
-                        .postcode(locationDetails.getPostcode())
-                        .build())
+                .caseManagementLocation(updatedLocation)
                 .locationName(civilCaseData.getLocationName());
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(caseDataBuilder.build().toMap(objectMapper))

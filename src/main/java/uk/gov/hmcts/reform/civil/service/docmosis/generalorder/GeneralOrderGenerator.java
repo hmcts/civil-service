@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.generalorder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
@@ -8,16 +9,17 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.dq.FinalOrderShowToggle;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.judgedecisionpdfdocument.JudgeDecisionPdfDocument;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAJudicialMakeAnOrder;
-import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
+import uk.gov.hmcts.reform.civil.service.ga.GaCaseDataEnricher;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -32,11 +34,11 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.POST_
 @RequiredArgsConstructor
 public class GeneralOrderGenerator implements TemplateDataGenerator<JudgeDecisionPdfDocument> {
 
-    private LocationRefData caseManagementLocationDetails;
     private final DocumentManagementService documentManagementService;
     private final DocumentGeneratorService documentGeneratorService;
-    private final ObjectMapper mapper;
+    private final ObjectMapper objectMapper;
     private final DocmosisService docmosisService;
+    private final GaCaseDataEnricher gaCaseDataEnricher;
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
 
@@ -48,6 +50,14 @@ public class GeneralOrderGenerator implements TemplateDataGenerator<JudgeDecisio
 
         JudgeDecisionPdfDocument templateData = getTemplateData(civilCaseData, caseData, authorisation, userType);
         return  generateDocmosisDocument(templateData, authorisation, userType);
+    }
+
+    public CaseDocument generate(GeneralApplicationCaseData gaCaseData, String authorisation) {
+        return generate(asCaseData(gaCaseData), authorisation);
+    }
+
+    public CaseDocument generate(CaseData civilCaseData, GeneralApplicationCaseData gaCaseData, String authorisation, FlowFlag userType) {
+        return generate(civilCaseData, asCaseData(gaCaseData), authorisation, userType);
     }
 
     public CaseDocument generateDocmosisDocument(JudgeDecisionPdfDocument templateData, String authorisation, FlowFlag userType) {
@@ -74,6 +84,8 @@ public class GeneralOrderGenerator implements TemplateDataGenerator<JudgeDecisio
     @Override
     public JudgeDecisionPdfDocument getTemplateData(CaseData civilCaseData, CaseData caseData, String authorisation, FlowFlag userType) {
 
+        var caseLocation = caseData.getCaseManagementLocation();
+
         JudgeDecisionPdfDocument.JudgeDecisionPdfDocumentBuilder judgeDecisionPdfDocumentBuilder =
             JudgeDecisionPdfDocument.builder()
                 .judgeNameTitle(caseData.getJudgeTitle())
@@ -84,9 +96,9 @@ public class GeneralOrderGenerator implements TemplateDataGenerator<JudgeDecisio
                 .defendant2Name(caseData.getDefendant2PartyName() != null ? caseData.getDefendant2PartyName() : null)
                 .claimNumber(caseData.getGeneralAppParentCaseLink().getCaseReference())
                 .courtName(docmosisService.getCaseManagementLocationVenueName(caseData, authorisation).getExternalShortName())
-                .siteName(caseData.getGaCaseManagementLocation().getSiteName())
-                .address(caseData.getGaCaseManagementLocation().getAddress())
-                .postcode(caseData.getGaCaseManagementLocation().getPostcode())
+                .siteName(caseLocation != null ? caseLocation.getSiteName() : null)
+                .address(caseLocation != null ? caseLocation.getAddress() : null)
+                .postcode(caseLocation != null ? caseLocation.getPostcode() : null)
                 .judgeRecital(showRecital(caseData) ? caseData.getJudicialDecisionMakeOrder().getJudgeRecitalText() : null)
                 .generalOrder(caseData.getJudicialDecisionMakeOrder().getOrderText())
                 .submittedOn(LocalDate.now())
@@ -124,5 +136,14 @@ public class GeneralOrderGenerator implements TemplateDataGenerator<JudgeDecisio
                 && Objects.nonNull(judicialDecisionMakeOrder.getShowJudgeRecitalText())
                 && Objects.nonNull(judicialDecisionMakeOrder.getShowJudgeRecitalText().get(0))
                 && judicialDecisionMakeOrder.getShowJudgeRecitalText().get(0).equals(FinalOrderShowToggle.SHOW);
+    }
+
+    private CaseData asCaseData(GeneralApplicationCaseData gaCaseData) {
+        if (gaCaseData == null) {
+            return CaseData.builder().build();
+        }
+        ObjectMapper mapperWithJavaTime = objectMapper.copy().registerModule(new JavaTimeModule());
+        CaseData converted = mapperWithJavaTime.convertValue(gaCaseData, CaseData.class);
+        return gaCaseDataEnricher.enrich(converted, gaCaseData);
     }
 }

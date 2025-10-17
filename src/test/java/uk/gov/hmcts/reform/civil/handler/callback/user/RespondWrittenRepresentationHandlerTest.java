@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -253,7 +254,7 @@ public class RespondWrittenRepresentationHandlerTest extends BaseCallbackHandler
         Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
         });
         CallbackParams params = callbackParamsOf(dataMap, CallbackType.ABOUT_TO_SUBMIT);
-        when(gaForLipService.isGaForLip(any())).thenReturn(true);
+        when(gaForLipService.isGaForLip(any(GeneralApplicationCaseData.class))).thenReturn(true);
 
         handler.handle(params);
         verify(docUploadDashboardNotificationService).createDashboardNotification(any(CaseData.class), anyString(), anyString(), anyBoolean());
@@ -279,13 +280,13 @@ public class RespondWrittenRepresentationHandlerTest extends BaseCallbackHandler
         generalAppAddlnInfoUpload.add(element(document2));
 
         CaseData caseData = getCase(generalAppAddlnInfoUpload, null, null);
-        caseData = caseData.toBuilder().isGaApplicantLip(YES).applicantBilingualLanguagePreferenceGA(YES)
+        caseData = caseData.toBuilder().isGaApplicantLip(YES).applicantBilingualLanguagePreference(YES)
             .generalAppWrittenRepText("test").build();
 
         Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
         });
         CallbackParams params = callbackParamsOf(dataMap, CallbackType.ABOUT_TO_SUBMIT);
-        when(gaForLipService.isGaForLip(any())).thenReturn(true);
+        when(gaForLipService.isGaForLip(any(GeneralApplicationCaseData.class))).thenReturn(true);
 
         handler.handle(params);
         verify(docUploadDashboardNotificationService, never()).createDashboardNotification(any(CaseData.class), anyString(), anyString(), anyBoolean());
@@ -310,13 +311,13 @@ public class RespondWrittenRepresentationHandlerTest extends BaseCallbackHandler
         generalAppAddlnInfoUpload.add(element(document2));
 
         CaseData caseData = getCase(generalAppAddlnInfoUpload, null, null);
-        caseData = caseData.toBuilder().isGaApplicantLip(YES).applicantBilingualLanguagePreferenceGA(YES)
+        caseData = caseData.toBuilder().isGaApplicantLip(YES).applicantBilingualLanguagePreference(YES)
                 .preTranslationGaDocuments(List.of(element(CaseDocument.builder().documentName("Written representation").createdBy("Applicant").build()))).build();
 
         Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
         });
         CallbackParams params = callbackParamsOf(dataMap, CallbackType.ABOUT_TO_SUBMIT);
-        when(gaForLipService.isGaForLip(any())).thenReturn(true);
+        when(gaForLipService.isGaForLip(any(GeneralApplicationCaseData.class))).thenReturn(true);
 
         handler.handle(params);
         verify(docUploadDashboardNotificationService, never()).createDashboardNotification(any(CaseData.class), anyString(), anyString(), anyBoolean());

@@ -97,8 +97,8 @@ public class EndGeneralAppBusinessProcessCallbackHandler extends CallbackHandler
                 parentCaseUpdateHelper.updateMasterCollectionForHwf(data);
             }
 
-        } else if (Objects.nonNull(data.getFinalOrderSelectionGA())) {
-            if (data.getFinalOrderSelectionGA().equals(ASSISTED_ORDER)
+        } else if (Objects.nonNull(data.getFinalOrderSelection())) {
+            if (data.getFinalOrderSelection().equals(ASSISTED_ORDER)
                 && Objects.nonNull(data.getAssistedOrderFurtherHearingDetails())) {
                 newState = LISTING_FOR_A_HEARING;
             } else {

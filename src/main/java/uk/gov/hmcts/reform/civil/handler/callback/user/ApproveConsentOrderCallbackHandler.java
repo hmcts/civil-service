@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApproveConsentOrder;
 import uk.gov.hmcts.reform.civil.service.docmosis.consentorder.ConsentOrderGenerator;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -89,11 +90,15 @@ public class ApproveConsentOrderCallbackHandler extends CallbackHandler {
             errors.add(ORDER_DATE_IN_PAST);
         }
 
-        CaseDocument consentOrderDocument;
+        GeneralApplicationCaseData snapshotGaData = objectMapper.convertValue(
+            caseDataBuilder.build(),
+            GeneralApplicationCaseData.class
+        );
 
-        consentOrderDocument = consentOrderGenerator.generate(
-                caseDataBuilder.build(),
-                callbackParams.getParams().get(BEARER_TOKEN).toString());
+        CaseDocument consentOrderDocument = consentOrderGenerator.generate(
+            snapshotGaData,
+            callbackParams.getParams().get(BEARER_TOKEN).toString()
+        );
 
         caseDataBuilder.consentOrderDocPreview(consentOrderDocument.getDocumentLink());
 

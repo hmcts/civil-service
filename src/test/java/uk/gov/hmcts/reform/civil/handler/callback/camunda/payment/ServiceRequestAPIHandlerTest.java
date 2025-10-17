@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.payment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import feign.FeignException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -32,6 +34,7 @@ import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -66,7 +69,9 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
 
     @BeforeEach
     public void setup() {
-        objectMapper = new ObjectMapper().registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+        objectMapper = new ObjectMapper()
+            .registerModule(new JavaTimeModule())
+            .registerModule(new Jdk8Module());
         handler = new ServiceRequestAPIHandler(paymentsService, objectMapper, hearingFeesService, camundaService);
         caseData = CaseDataBuilder.builder().buildMakePaymentsCaseData();
     }
@@ -90,7 +95,7 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
             //WHEN
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             //THEN
-            verify(paymentsService).createServiceRequest(caseData, "BEARER_TOKEN");
+            verify(paymentsService).createServiceRequest(any(CaseData.class), eq("BEARER_TOKEN"));
             CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
             String serviceRequestReference = responseCaseData.getClaimIssuedPBADetails().getServiceReqReference();
             assertThat(serviceRequestReference).isEqualTo(SUCCESSFUL_PAYMENT_REFERENCE);
@@ -107,7 +112,7 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
             //WHEN
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             //THEN
-            verify(paymentsService).createServiceRequest(caseData, "BEARER_TOKEN");
+            verify(paymentsService).createServiceRequest(any(CaseData.class), eq("BEARER_TOKEN"));
             CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
             String serviceRequestReference = responseCaseData.getClaimIssuedPBADetails().getServiceReqReference();
             assertThat(serviceRequestReference).isEqualTo(SUCCESSFUL_PAYMENT_REFERENCE);
@@ -135,7 +140,7 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
             //WHEN
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             //THEN
-            verify(paymentsService).createServiceRequest(caseData, "BEARER_TOKEN");
+            verify(paymentsService).createServiceRequest(any(CaseData.class), eq("BEARER_TOKEN"));
             CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
             String serviceRequestReference = responseCaseData.getHearingFeePBADetails().getServiceReqReference();
             assertThat(serviceRequestReference).isEqualTo(SUCCESSFUL_PAYMENT_REFERENCE);
@@ -162,7 +167,7 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
             //WHEN
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             //THEN
-            verify(paymentsService).createServiceRequest(caseData, "BEARER_TOKEN");
+            verify(paymentsService).createServiceRequest(any(CaseData.class), eq("BEARER_TOKEN"));
             CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
             String serviceRequestReference = responseCaseData.getHearingFeePBADetails().getServiceReqReference();
             assertThat(serviceRequestReference).isEqualTo(SUCCESSFUL_PAYMENT_REFERENCE);
@@ -213,7 +218,7 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
             //When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             //Then
-            verify(paymentsService).createServiceRequest(caseData, "BEARER_TOKEN");
+            verify(paymentsService).createServiceRequest(any(CaseData.class), eq("BEARER_TOKEN"));
             assertThat(extractHearingPaymentDetailsFromResponse(response).getServiceReqReference())
                 .isEqualTo(SUCCESSFUL_PAYMENT_REFERENCE);
         }
@@ -294,7 +299,7 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
                 .build();
 
             assertThat(actual).isEqualTo(expected);
-            verify(paymentsService).createServiceRequest(caseData, "BEARER_TOKEN");
+            verify(paymentsService).createServiceRequest(any(CaseData.class), eq("BEARER_TOKEN"));
         }
 
         @Test
@@ -326,7 +331,7 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
                 .build();
 
             assertThat(actual).isEqualTo(expected);
-            verify(paymentsService).createServiceRequest(caseData, "BEARER_TOKEN");
+            verify(paymentsService).createServiceRequest(any(CaseData.class), eq("BEARER_TOKEN"));
         }
 
         @ParameterizedTest

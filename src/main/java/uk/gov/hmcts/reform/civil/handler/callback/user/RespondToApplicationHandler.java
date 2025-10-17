@@ -17,6 +17,8 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.GADebtorPaymentPlanGAspec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.GaCallbackDataUtil;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -178,17 +180,20 @@ public class RespondToApplicationHandler extends CallbackHandler {
     }
 
     private SubmittedCallbackResponse buildResponseConfirmation(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
+        GeneralApplicationCaseData gaCaseData = GaCallbackDataUtil.resolveGaCaseData(callbackParams, objectMapper);
+        CaseData caseData = GaCallbackDataUtil.mergeToCaseData(gaCaseData, callbackParams.getCaseData(), objectMapper);
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         // Generate Dashboard Notification for Lip Party
-        if (gaForLipService.isGaForLip(caseData) && !(featureToggleService.isGaForWelshEnabled() && caseData.isApplicationBilingual())) {
+        if (gaCaseData != null
+            && gaForLipService.isGaForLip(gaCaseData)
+            && !(featureToggleService.isGaForWelshEnabled() && caseData.isApplicationBilingual())) {
 
             if (caseData.getParentClaimantIsApplicant().equals(YesOrNo.NO) && caseData.getGeneralAppType().getTypes().contains(
                 GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT)) {
-                if (gaForLipService.isLipApp(caseData)) {
+                if (gaForLipService.isLipAppGa(gaCaseData)) {
                     dashboardNotificationService.createOfflineResponseDashboardNotification(caseData, "APPLICANT", authToken);
                 }
-                if (gaForLipService.isLipResp(caseData)) {
+                if (gaForLipService.isLipRespGa(gaCaseData)) {
                     dashboardNotificationService.createOfflineResponseDashboardNotification(caseData, "RESPONDENT", authToken);
                 }
             } else {
@@ -205,11 +210,12 @@ public class RespondToApplicationHandler extends CallbackHandler {
 
     public List<String> applicationExistsValidation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        GeneralApplicationCaseData gaCaseData = GaCallbackDataUtil.toGaCaseData(caseData, objectMapper);
         UserInfo userInfo = idamClient.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
 
         List<Element<GARespondentResponse>> respondentResponse = caseData.getRespondentsResponses();
         boolean isNotAllowedForLip =
-            gaForLipService.isLipResp(caseData) && JudicialDecisionNotificationUtil.isUrgent(caseData);
+            gaForLipService.isLipRespGa(gaCaseData) && JudicialDecisionNotificationUtil.isUrgent(caseData);
         List<String> errors = new ArrayList<>();
         if (caseData.getCcdState() == CaseState
             .APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION && !isNotAllowedForLip
@@ -317,12 +323,13 @@ public class RespondToApplicationHandler extends CallbackHandler {
     private CallbackResponse submitClaim(CallbackParams callbackParams) {
 
         CaseData caseData = caseDetailsConverter.toCaseDataGA(callbackParams.getRequest().getCaseDetails());
+        GeneralApplicationCaseData gaCaseData = GaCallbackDataUtil.toGaCaseData(caseData, objectMapper);
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         UserInfo userInfo = idamClient.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
         String userId = userInfo.getUid();
         List<Element<GARespondentResponse>> respondentsResponses =
-            addResponse(buildResponse(caseData, userInfo), caseData.getRespondentsResponses());
+            addResponse(buildResponse(caseData, gaCaseData, userInfo), caseData.getRespondentsResponses());
 
         caseDataBuilder.respondentsResponses(respondentsResponses);
         caseDataBuilder.hearingDetailsResp(null); // Empty HearingDetails Respondent details as its added in the field RespondetsResponses collection
@@ -330,7 +337,7 @@ public class RespondToApplicationHandler extends CallbackHandler {
         caseDataBuilder.gaRespondentConsent(null);
         caseDataBuilder.generalAppRespondReason(null);
         caseDataBuilder.generalAppRespondConsentReason(null);
-        String role = DocUploadUtils.getUserRole(caseData, userId);
+        String role = DocUploadUtils.getUserRole(caseData, gaCaseData, userId);
         addResponseDoc(caseDataBuilder, caseData, role);
         caseDataBuilder.generalAppRespondDocument(null);
         caseDataBuilder.generalAppRespondConsentDocument(null);
@@ -355,10 +362,13 @@ public class RespondToApplicationHandler extends CallbackHandler {
                 documents, role, CaseEvent.RESPOND_TO_APPLICATION, false);
     }
 
-    private GAHearingDetails populateHearingDetailsResp(CaseData caseData, UserInfo userInfo) {
+    private GAHearingDetails populateHearingDetailsResp(CaseData caseData,
+                                                        GeneralApplicationCaseData gaCaseData,
+                                                        UserInfo userInfo) {
         GAHearingDetails gaHearingDetailsResp;
         String preferredType = caseData.getHearingDetailsResp().getHearingPreferencesPreferredType().name();
-        if ((preferredType.equals(PREFERRED_TYPE_IN_PERSON) || caseData.getIsGaRespondentOneLip() == YES)
+        if ((preferredType.equals(PREFERRED_TYPE_IN_PERSON)
+            || (gaCaseData != null && gaCaseData.getIsGaRespondentOneLip() == YES))
             && Objects.nonNull(caseData.getHearingDetailsResp().getHearingPreferredLocation())
             && Objects.nonNull(caseData.getHearingDetailsResp().getHearingPreferredLocation().getValue())) {
             String applicationLocationLabel = caseData.getHearingDetailsResp()
@@ -391,12 +401,13 @@ public class RespondToApplicationHandler extends CallbackHandler {
 
     private String checkIfEmailIdMatch(UserInfo userInfo,
                                        CaseData civilCaseData, CaseData gaCaseData) {
+        GeneralApplicationCaseData generalApplicationCaseData = GaCallbackDataUtil.toGaCaseData(gaCaseData, objectMapper);
 
         // civil claim claimant
         if (!gaCaseData.getParentClaimantIsApplicant().equals(YES)
             && (Objects.nonNull(civilCaseData.getApplicantSolicitor1UserDetails())
             && userInfo.getSub().equals(civilCaseData.getApplicantSolicitor1UserDetails().getEmail())
-            || gaForLipService.isLipResp(gaCaseData))) {
+            || (generalApplicationCaseData != null && gaForLipService.isLipRespGa(generalApplicationCaseData)))) {
 
             log.info("Return Civil Claim Defendant two party Name if GA Solicitor Email ID "
                          + "as same as Civil Claim Claimant Solicitor Two Email");
@@ -436,7 +447,9 @@ public class RespondToApplicationHandler extends CallbackHandler {
         return newApplication;
     }
 
-    private GARespondentResponse buildResponse(CaseData caseData, UserInfo userInfo) {
+    private GARespondentResponse buildResponse(CaseData caseData,
+                                               GeneralApplicationCaseData gaCaseData,
+                                               UserInfo userInfo) {
 
         YesOrNo generalOther = NO;
         if (Objects.nonNull(caseData.getGeneralAppConsentOrder())) {
@@ -461,7 +474,7 @@ public class RespondToApplicationHandler extends CallbackHandler {
                                                      ? generalOther
                                                      : caseData.getGeneralAppRespondent1Representative()
                 .getGeneralAppRespondent1Representative())
-            .gaHearingDetails(populateHearingDetailsResp(caseData, userInfo))
+            .gaHearingDetails(populateHearingDetailsResp(caseData, gaCaseData, userInfo))
             .gaRespondentResponseReason(reason)
             .gaRespondentDetails(userInfo.getUid()).build();
 

@@ -140,7 +140,7 @@ public class CreateApplicationTaskHandlerTest {
             assertThat(data.getClaimantGaAppDetails()).hasSize(2);
             assertThat(data.getRespondentSolGaAppDetails()).hasSize(1);
             assertThat(data.getRespondentSolTwoGaAppDetails()).isEmpty();
-            assertThat(data.getGaDetailsMasterCollectionGA()).hasSize(2);
+            assertThat(data.getGaDetailsMasterCollection()).hasSize(2);
         }
 
         @Test
@@ -152,7 +152,7 @@ public class CreateApplicationTaskHandlerTest {
             assertThat(data.getClaimantGaAppDetails()).hasSize(2);
             assertThat(data.getRespondentSolGaAppDetails()).hasSize(1);
             assertThat(data.getRespondentSolTwoGaAppDetails()).isEmpty();
-            assertThat(data.getGaDetailsMasterCollectionGA()).hasSize(2);
+            assertThat(data.getGaDetailsMasterCollection()).hasSize(2);
         }
 
         @Test
@@ -164,7 +164,7 @@ public class CreateApplicationTaskHandlerTest {
             assertThat(data.getClaimantGaAppDetails()).hasSize(2);
             assertThat(data.getRespondentSolGaAppDetails()).hasSize(1);
             assertThat(data.getRespondentSolTwoGaAppDetails()).isEmpty();
-            assertThat(data.getGaDetailsMasterCollectionGA()).hasSize(2);
+            assertThat(data.getGaDetailsMasterCollection()).hasSize(2);
         }
 
         @Test
@@ -176,7 +176,7 @@ public class CreateApplicationTaskHandlerTest {
             assertThat(data.getClaimantGaAppDetails()).hasSize(1);
             assertThat(data.getRespondentSolGaAppDetails()).hasSize(2);
             assertThat(data.getRespondentSolTwoGaAppDetails()).isEmpty();
-            assertThat(data.getGaDetailsMasterCollectionGA()).hasSize(2);
+            assertThat(data.getGaDetailsMasterCollection()).hasSize(2);
         }
 
         @Test
@@ -188,7 +188,7 @@ public class CreateApplicationTaskHandlerTest {
             assertThat(data.getClaimantGaAppDetails()).hasSize(1);
             assertThat(data.getRespondentSolGaAppDetails()).hasSize(2);
             assertThat(data.getRespondentSolTwoGaAppDetails()).isEmpty();
-            assertThat(data.getGaDetailsMasterCollectionGA()).hasSize(2);
+            assertThat(data.getGaDetailsMasterCollection()).hasSize(2);
         }
 
         @Test
@@ -200,7 +200,7 @@ public class CreateApplicationTaskHandlerTest {
             assertThat(data.getClaimantGaAppDetails()).hasSize(2);
             assertThat(data.getRespondentSolGaAppDetails()).hasSize(1);
             assertThat(data.getRespondentSolTwoGaAppDetails()).isEmpty();
-            assertThat(data.getGaDetailsMasterCollectionGA()).hasSize(2);
+            assertThat(data.getGaDetailsMasterCollection()).hasSize(2);
         }
 
         @Test
@@ -212,7 +212,7 @@ public class CreateApplicationTaskHandlerTest {
             assertThat(data.getClaimantGaAppDetails()).hasSize(1);
             assertThat(data.getRespondentSolGaAppDetails()).hasSize(1);
             assertThat(data.getRespondentSolTwoGaAppDetails()).hasSize(1);
-            assertThat(data.getGaDetailsMasterCollectionGA()).hasSize(2);
+            assertThat(data.getGaDetailsMasterCollection()).hasSize(2);
         }
 
         @Test
@@ -224,7 +224,7 @@ public class CreateApplicationTaskHandlerTest {
             assertThat(data.getClaimantGaAppDetails()).hasSize(1);
             assertThat(data.getRespondentSolGaAppDetails()).hasSize(2);
             assertThat(data.getRespondentSolTwoGaAppDetails()).isEmpty();
-            assertThat(data.getGaDetailsMasterCollectionGA()).hasSize(2);
+            assertThat(data.getGaDetailsMasterCollection()).hasSize(2);
         }
 
         private GeneralApplication getGeneralApplication(String organisationIdentifier,
@@ -283,7 +283,7 @@ public class CreateApplicationTaskHandlerTest {
             assertThat(data.getClaimantGaAppDetails()).hasSize(1);
             assertThat(data.getClaimantGaAppDetails()).allMatch(element -> element.getValue().getParentClaimantIsApplicant() != null);
             assertThat(data.getRespondentSolTwoGaAppDetails()).isEmpty();
-            assertThat(data.getGaDetailsMasterCollectionGA()).isEmpty();
+            assertThat(data.getGaDetailsMasterCollection()).isEmpty();
         }
 
         @Test
@@ -295,7 +295,7 @@ public class CreateApplicationTaskHandlerTest {
             assertThat(data.getRespondentSolGaAppDetails()).hasSize(1);
             assertThat(data.getClaimantGaAppDetails()).isEmpty();
             assertThat(data.getRespondentSolTwoGaAppDetails()).isEmpty();
-            assertThat(data.getGaDetailsMasterCollectionGA()).isEmpty();
+            assertThat(data.getGaDetailsMasterCollection()).isEmpty();
 
         }
 
@@ -308,7 +308,7 @@ public class CreateApplicationTaskHandlerTest {
             assertThat(data.getRespondentSolGaAppDetails()).hasSize(1);
             assertThat(data.getRespondentSolTwoGaAppDetails()).isEmpty();
             assertThat(data.getClaimantGaAppDetails()).isEmpty();
-            assertThat(data.getGaDetailsMasterCollectionGA()).isEmpty();
+            assertThat(data.getGaDetailsMasterCollection()).isEmpty();
 
         }
 
@@ -321,7 +321,7 @@ public class CreateApplicationTaskHandlerTest {
             assertThat(data.getRespondentSolGaAppDetails()).isEmpty();
             assertThat(data.getRespondentSolTwoGaAppDetails()).hasSize(1);
             assertThat(data.getClaimantGaAppDetails()).isEmpty();
-            assertThat(data.getGaDetailsMasterCollectionGA()).isEmpty();
+            assertThat(data.getGaDetailsMasterCollection()).isEmpty();
 
         }
 
@@ -338,7 +338,7 @@ public class CreateApplicationTaskHandlerTest {
             assertThat(data.getRespondentSolGaAppDetails()).isEmpty();
             assertThat(data.getClaimantGaAppDetails()).hasSize(1);
             assertThat(data.getRespondentSolTwoGaAppDetails()).isEmpty();
-            assertThat(data.getGaDetailsMasterCollectionGA()).isEmpty();
+            assertThat(data.getGaDetailsMasterCollection()).isEmpty();
 
         }
 
@@ -351,7 +351,7 @@ public class CreateApplicationTaskHandlerTest {
             assertThat(data.getRespondentSolGaAppDetails()).isEmpty();
             assertThat(data.getClaimantGaAppDetails()).hasSize(1);
             assertThat(data.getRespondentSolTwoGaAppDetails()).isEmpty();
-            assertThat(data.getGaDetailsMasterCollectionGA()).isEmpty();
+            assertThat(data.getGaDetailsMasterCollection()).isEmpty();
         }
 
         @Test
@@ -366,7 +366,7 @@ public class CreateApplicationTaskHandlerTest {
             assertThat(data.getRespondentSolGaAppDetails()).allMatch(element -> element.getValue().getParentClaimantIsApplicant() != null);
             assertThat(data.getClaimantGaAppDetails()).isEmpty();
             assertThat(data.getRespondentSolTwoGaAppDetails()).isEmpty();
-            assertThat(data.getGaDetailsMasterCollectionGA()).isEmpty();
+            assertThat(data.getGaDetailsMasterCollection()).isEmpty();
         }
 
         @Test
@@ -378,7 +378,7 @@ public class CreateApplicationTaskHandlerTest {
             assertThat(data.getRespondentSolGaAppDetails()).hasSize(1);
             assertThat(data.getClaimantGaAppDetails()).isEmpty();
             assertThat(data.getRespondentSolTwoGaAppDetails()).isEmpty();
-            assertThat(data.getGaDetailsMasterCollectionGA()).isEmpty();
+            assertThat(data.getGaDetailsMasterCollection()).isEmpty();
         }
 
         @Test
@@ -390,7 +390,7 @@ public class CreateApplicationTaskHandlerTest {
             assertThat(data.getRespondentSolGaAppDetails()).hasSize(1);
             assertThat(data.getClaimantGaAppDetails()).isEmpty();
             assertThat(data.getRespondentSolTwoGaAppDetails()).isEmpty();
-            assertThat(data.getGaDetailsMasterCollectionGA()).isEmpty();
+            assertThat(data.getGaDetailsMasterCollection()).isEmpty();
         }
 
         @Test
@@ -405,7 +405,7 @@ public class CreateApplicationTaskHandlerTest {
             assertThat(data.getRespondentSolGaAppDetails()).hasSize(1);
             assertThat(data.getClaimantGaAppDetails()).isEmpty();
             assertThat(data.getRespondentSolTwoGaAppDetails()).isEmpty();
-            assertThat(data.getGaDetailsMasterCollectionGA()).isEmpty();
+            assertThat(data.getGaDetailsMasterCollection()).isEmpty();
         }
 
         @Test
@@ -417,7 +417,7 @@ public class CreateApplicationTaskHandlerTest {
             assertThat(data.getRespondentSolGaAppDetails()).isEmpty();
             assertThat(data.getRespondentSolTwoGaAppDetails()).hasSize(1);
             assertThat(data.getClaimantGaAppDetails()).isEmpty();
-            assertThat(data.getGaDetailsMasterCollectionGA()).isEmpty();
+            assertThat(data.getGaDetailsMasterCollection()).isEmpty();
 
         }
 
@@ -430,7 +430,7 @@ public class CreateApplicationTaskHandlerTest {
             assertThat(data.getRespondentSolGaAppDetails()).hasSize(1);
             assertThat(data.getRespondentSolTwoGaAppDetails()).isEmpty();
             assertThat(data.getClaimantGaAppDetails()).isEmpty();
-            assertThat(data.getGaDetailsMasterCollectionGA()).isEmpty();
+            assertThat(data.getGaDetailsMasterCollection()).isEmpty();
 
         }
 
@@ -443,7 +443,7 @@ public class CreateApplicationTaskHandlerTest {
             assertThat(data.getRespondentSolGaAppDetails()).hasSize(1);
             assertThat(data.getRespondentSolTwoGaAppDetails()).isEmpty();
             assertThat(data.getClaimantGaAppDetails()).isEmpty();
-            assertThat(data.getGaDetailsMasterCollectionGA()).isEmpty();
+            assertThat(data.getGaDetailsMasterCollection()).isEmpty();
 
         }
 
@@ -456,7 +456,7 @@ public class CreateApplicationTaskHandlerTest {
             assertThat(data.getRespondentSolGaAppDetails()).isEmpty();
             assertThat(data.getRespondentSolTwoGaAppDetails()).isEmpty();
             assertThat(data.getClaimantGaAppDetails()).hasSize(1);
-            assertThat(data.getGaDetailsMasterCollectionGA()).isEmpty();
+            assertThat(data.getGaDetailsMasterCollection()).isEmpty();
 
         }
 
@@ -514,7 +514,7 @@ public class CreateApplicationTaskHandlerTest {
             assertThat(data.getRespondentSolGaAppDetails()).isEmpty();
             assertThat(data.getRespondentSolTwoGaAppDetails()).isEmpty();
             assertThat(data.getClaimantGaAppDetails()).hasSize(1);
-            assertThat(data.getGaDetailsMasterCollectionGA()).isEmpty();
+            assertThat(data.getGaDetailsMasterCollection()).isEmpty();
 
         }
 
@@ -527,7 +527,7 @@ public class CreateApplicationTaskHandlerTest {
             assertThat(data.getRespondentSolGaAppDetails()).isEmpty();
             assertThat(data.getRespondentSolTwoGaAppDetails()).hasSize(1);
             assertThat(data.getClaimantGaAppDetails()).isEmpty();
-            assertThat(data.getGaDetailsMasterCollectionGA()).isEmpty();
+            assertThat(data.getGaDetailsMasterCollection()).isEmpty();
 
         }
 
@@ -540,7 +540,7 @@ public class CreateApplicationTaskHandlerTest {
             assertThat(data.getRespondentSolGaAppDetails()).isEmpty();
             assertThat(data.getRespondentSolTwoGaAppDetails()).hasSize(1);
             assertThat(data.getClaimantGaAppDetails()).isEmpty();
-            assertThat(data.getGaDetailsMasterCollectionGA()).isEmpty();
+            assertThat(data.getGaDetailsMasterCollection()).isEmpty();
 
         }
 
@@ -906,7 +906,7 @@ public class CreateApplicationTaskHandlerTest {
                 .generalAppEvidenceDocument(generalAppEvidenceDocument).build();
         caseData = caseData.toBuilder()
             .claimantBilingualLanguagePreference(claimantBilingual ? "BOTH" : null)
-            .respondent1LiPResponseGA(defendantBilingual
+            .respondent1LiPResponse(defendantBilingual
             ? RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH").build()
             : null)
             .build();

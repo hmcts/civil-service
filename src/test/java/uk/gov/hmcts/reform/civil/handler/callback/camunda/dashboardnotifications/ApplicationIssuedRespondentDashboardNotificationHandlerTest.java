@@ -1,15 +1,16 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -41,8 +42,18 @@ public class ApplicationIssuedRespondentDashboardNotificationHandlerTest extends
     private FeatureToggleService featureToggleService;
     @Mock
     private GeneralAppFeesService generalAppFeesService;
-    @InjectMocks
     private ApplicationIssuedRespondentDashboardNotificationHandler handler;
+
+    @BeforeEach
+    void setUp() {
+        handler = new ApplicationIssuedRespondentDashboardNotificationHandler(
+            dashboardScenariosService,
+            mapper,
+            featureToggleService,
+            generalAppFeesService,
+            objectMapper
+        );
+    }
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
@@ -69,7 +80,7 @@ public class ApplicationIssuedRespondentDashboardNotificationHandlerTest extends
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-            when(generalAppFeesService.isFreeApplication(caseData)).thenReturn(true);
+            when(generalAppFeesService.isFreeApplication(any(CaseData.class))).thenReturn(true);
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -104,6 +115,37 @@ public class ApplicationIssuedRespondentDashboardNotificationHandlerTest extends
 
             handler.handle(params);
             verifyNoInteractions(dashboardScenariosService);
+        }
+    }
+
+    @Nested
+    class GaCaseDataOnly {
+
+        @Test
+        void shouldRecordScenarioWhenGaDataProvided() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
+            caseData = caseData.toBuilder()
+                .parentCaseReference(caseData.getCcdCaseReference().toString())
+                .isGaRespondentOneLip(YesOrNo.YES)
+                .parentClaimantIsApplicant(YesOrNo.YES)
+                .build();
+            GeneralApplicationCaseData gaCaseData = toGaCaseData(caseData);
+
+            HashMap<String, Object> scenarioParams = new HashMap<>();
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+            when(generalAppFeesService.isFreeApplication(any(CaseData.class))).thenReturn(true);
+            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
+
+            CallbackParams params = gaCallbackParamsOf(gaCaseData, ABOUT_TO_SUBMIT);
+
+            handler.handle(params);
+
+            verify(dashboardScenariosService).recordScenarios(
+                "BEARER_TOKEN",
+                SCENARIO_AAA6_GENERAL_APPLICATION_SUBMITTED_NONURGENT_RESPONDENT.getScenario(),
+                gaCaseData.getCcdCaseReference().toString(),
+                ScenarioRequestParams.builder().params(scenarioParams).build()
+            );
         }
     }
 }

@@ -299,7 +299,7 @@ public class StateFlowEngineTest {
         CaseData caseData =
             CaseDataBuilder.builder().withNoticeCaseData().toBuilder()
                 .isGaApplicantLip(YES)
-                .applicantBilingualLanguagePreferenceGA(YES)
+                .applicantBilingualLanguagePreference(YES)
                 .parentClaimantIsApplicant(NO).build();
         StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
@@ -321,7 +321,7 @@ public class StateFlowEngineTest {
                 .isGaApplicantLip(NO)
                 .isGaRespondentOneLip(YES)
                 .parentClaimantIsApplicant(NO)
-                .respondentBilingualLanguagePreferenceGA(YES)
+                .respondentBilingualLanguagePreference(YES)
                 .build();
 
         StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
@@ -350,7 +350,7 @@ public class StateFlowEngineTest {
             .generalAppInformOtherParty(GAInformOtherParty.builder()
                                             .isWithNotice(YES).build())
             .isGaApplicantLip(YES)
-            .applicantBilingualLanguagePreferenceGA(YES)
+            .applicantBilingualLanguagePreference(YES)
             .parentClaimantIsApplicant(NO)
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
                                                .hasAgreed(YES).build()).build();
@@ -376,7 +376,7 @@ public class StateFlowEngineTest {
                 .isGaApplicantLip(NO)
                 .isGaRespondentOneLip(YES)
                 .parentClaimantIsApplicant(NO)
-                .respondentBilingualLanguagePreferenceGA(NO)
+                .respondentBilingualLanguagePreference(NO)
                 .build();
 
         StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
@@ -397,7 +397,7 @@ public class StateFlowEngineTest {
         CaseData caseData = CaseDataBuilder.builder().buildPaymentSuccessfulCaseDataGA().toBuilder()
             .judicialDecision(GAJudicialDecision.builder().decision(MAKE_AN_ORDER).build())
             .isGaApplicantLip(YES)
-            .applicantBilingualLanguagePreferenceGA(YES)
+            .applicantBilingualLanguagePreference(YES)
             .isGaRespondentOneLip(YES)
             .judicialDecisionMakeOrder(
                 GAJudicialMakeAnOrder.builder().makeAnOrder(
@@ -426,7 +426,7 @@ public class StateFlowEngineTest {
         CaseData caseData = CaseDataBuilder.builder().buildPaymentSuccessfulCaseDataGA().toBuilder()
             .judicialDecision(GAJudicialDecision.builder().decision(MAKE_AN_ORDER).build())
             .isGaApplicantLip(YES)
-            .respondentBilingualLanguagePreferenceGA(YES)
+            .respondentBilingualLanguagePreference(YES)
             .isGaRespondentOneLip(YES)
             .judicialDecisionMakeOrder(
                 GAJudicialMakeAnOrder.builder().makeAnOrder(
@@ -465,7 +465,7 @@ public class StateFlowEngineTest {
             .generalAppInformOtherParty(GAInformOtherParty.builder()
                                             .isWithNotice(YES).build())
             .parentClaimantIsApplicant(YES)
-            .applicantBilingualLanguagePreferenceGA(YES)
+            .applicantBilingualLanguagePreference(YES)
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
                                                .hasAgreed(YES).build()).build();
         StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
@@ -497,8 +497,8 @@ public class StateFlowEngineTest {
             .generalAppInformOtherParty(GAInformOtherParty.builder()
                                             .isWithNotice(YES).build())
             .parentClaimantIsApplicant(YES)
-            .applicantBilingualLanguagePreferenceGA(YES)
-            .respondentBilingualLanguagePreferenceGA(YES)
+            .applicantBilingualLanguagePreference(YES)
+            .respondentBilingualLanguagePreference(YES)
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
                                                .hasAgreed(YES).build()).build();
         StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
@@ -529,7 +529,7 @@ public class StateFlowEngineTest {
             .generalAppInformOtherParty(GAInformOtherParty.builder()
                                             .isWithNotice(YES).build())
             .parentClaimantIsApplicant(YES)
-            .applicantBilingualLanguagePreferenceGA(NO)
+            .applicantBilingualLanguagePreference(NO)
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
                                                .hasAgreed(YES).build()).build();
         StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
@@ -558,7 +558,7 @@ public class StateFlowEngineTest {
                 .parentClaimantIsApplicant(YES)
                 .isGaApplicantLip(YES)
                 .isGaRespondentOneLip(YES)
-                .applicantBilingualLanguagePreferenceGA(YES)
+                .applicantBilingualLanguagePreference(YES)
                 .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
                         .hasAgreed(YES).build()).build();
 
@@ -580,7 +580,7 @@ public class StateFlowEngineTest {
             .parentClaimantIsApplicant(YES)
             .isGaApplicantLip(YES)
             .isGaRespondentOneLip(YES)
-            .respondentBilingualLanguagePreferenceGA(YES)
+            .respondentBilingualLanguagePreference(YES)
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
                                                .hasAgreed(YES).build()).build();
         StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
@@ -604,7 +604,7 @@ public class StateFlowEngineTest {
                 .isGaApplicantLip(YES)
                 .isGaRespondentOneLip(YES)
                 .parentClaimantIsApplicant(YES)
-                .applicantBilingualLanguagePreferenceGA(NO)
+                .applicantBilingualLanguagePreference(NO)
                 .build();
 
         StateFlow stateFlow = stateFlowEngine.evaluate(caseData);

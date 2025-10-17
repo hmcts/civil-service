@@ -178,7 +178,7 @@ public class RespondToApplicationHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void buildResponseConfirmationReturnsCorrectMessageWhenGaHasLip() {
         when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
-        when(gaForLipService.isGaForLip(any())).thenReturn(true);
+        when(gaForLipService.isGaForLip(any(CaseData.class))).thenReturn(true);
         CallbackParams params = callbackParamsOf(getCase(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION),
                 CallbackType.SUBMITTED);
         var response = (SubmittedCallbackResponse) handler.handle(params);
@@ -191,7 +191,7 @@ public class RespondToApplicationHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void buildResponseConfirmationReturnsCorrectMessageWhenGaHasLipAndVaryJudgeApppLipVLip() {
         when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
-        when(gaForLipService.isGaForLip(any())).thenReturn(true);
+        when(gaForLipService.isGaForLip(any(CaseData.class))).thenReturn(true);
         when(gaForLipService.isLipApp(any())).thenReturn(true);
         when(gaForLipService.isLipResp(any())).thenReturn(true);
         CallbackParams params = callbackParamsOf(getVaryCase(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION),
@@ -205,7 +205,7 @@ public class RespondToApplicationHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void buildResponseConfirmationReturnsCorrectMessageWhenGaHasLipAndVaryJudgeApppLRvLR() {
-        when(gaForLipService.isGaForLip(any())).thenReturn(false);
+        when(gaForLipService.isGaForLip(any(CaseData.class))).thenReturn(false);
         when(gaForLipService.isLipApp(any())).thenReturn(false);
         when(gaForLipService.isLipResp(any())).thenReturn(false);
         CallbackParams params = callbackParamsOf(getVaryCase(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION),
@@ -219,11 +219,11 @@ public class RespondToApplicationHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void buildResponseConfirmationReturnsCorrectMessageWhenWelshFlagEnabledAndApplicantBilingual() {
         when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
-        when(gaForLipService.isGaForLip(any())).thenReturn(true);
+        when(gaForLipService.isGaForLip(any(CaseData.class))).thenReturn(true);
         when(gaForLipService.isLipApp(any())).thenReturn(true);
         when(gaForLipService.isLipResp(any())).thenReturn(false);
         CaseData casedata = getVaryCase(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION).toBuilder()
-                .isGaApplicantLip(YES).applicantBilingualLanguagePreferenceGA(YES).build();
+                .isGaApplicantLip(YES).applicantBilingualLanguagePreference(YES).build();
 
         CallbackParams params = callbackParamsOf(casedata, CallbackType.SUBMITTED);
         var response = (SubmittedCallbackResponse) handler.handle(params);
@@ -247,11 +247,11 @@ public class RespondToApplicationHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void buildResponseConfirmationReturnsCorrectMessageWhenWelshFlagDisabledAndApplicantNotBilingual() {
         when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
-        when(gaForLipService.isGaForLip(any())).thenReturn(true);
+        when(gaForLipService.isGaForLip(any(CaseData.class))).thenReturn(true);
         when(gaForLipService.isLipApp(any())).thenReturn(true);
         when(gaForLipService.isLipResp(any())).thenReturn(true);
         CaseData casedata = getVaryCase(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION).toBuilder()
-                .isGaApplicantLip(YES).applicantBilingualLanguagePreferenceGA(YES).build();
+                .isGaApplicantLip(YES).applicantBilingualLanguagePreference(YES).build();
 
         CallbackParams params = callbackParamsOf(casedata, CallbackType.SUBMITTED);
 
@@ -263,7 +263,7 @@ public class RespondToApplicationHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void buildResponseConfirmationReturnsCorrectMessageWhenGaHasLipAndVaryJudgeApppLipVLR() {
-        when(gaForLipService.isGaForLip(any())).thenReturn(true);
+        when(gaForLipService.isGaForLip(any(CaseData.class))).thenReturn(true);
         when(gaForLipService.isLipApp(any())).thenReturn(true);
         when(gaForLipService.isLipResp(any())).thenReturn(false);
         CallbackParams params = callbackParamsOf(getVaryCase(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION),
@@ -275,7 +275,7 @@ public class RespondToApplicationHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void buildResponseConfirmationReturnsCorrectMessageWhenGaHasLipAndVaryJudgeApppLRVLip() {
-        when(gaForLipService.isGaForLip(any())).thenReturn(true);
+        when(gaForLipService.isGaForLip(any(CaseData.class))).thenReturn(true);
         when(gaForLipService.isLipApp(any())).thenReturn(true);
         when(gaForLipService.isLipResp(any())).thenReturn(false);
         CallbackParams params = callbackParamsOf(getVaryCase(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION),
@@ -287,7 +287,7 @@ public class RespondToApplicationHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void buildResponseConfirmationReturnsCorrectMessage() {
-        when(gaForLipService.isGaForLip(any())).thenReturn(false);
+        when(gaForLipService.isGaForLip(any(CaseData.class))).thenReturn(false);
         CallbackParams params = callbackParamsOf(getCase(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION),
                 CallbackType.SUBMITTED);
         var response = (SubmittedCallbackResponse) handler.handle(params);

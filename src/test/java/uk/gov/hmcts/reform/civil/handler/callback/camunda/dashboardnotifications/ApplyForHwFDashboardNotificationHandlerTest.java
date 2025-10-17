@@ -1,14 +1,11 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -43,10 +40,12 @@ public class ApplyForHwFDashboardNotificationHandlerTest extends BaseCallbackHan
     private DashboardScenariosService dashboardScenariosService;
     @Mock
     private DashboardNotificationsParamsMapper mapper;
-    @InjectMocks
     private ApplyForHwFDashboardNotificationHandler handler;
-    @MockBean
-    private ObjectMapper objectMapper;
+
+    @BeforeEach
+    void setUpHandler() {
+        handler = new ApplyForHwFDashboardNotificationHandler(objectMapper, dashboardScenariosService, mapper);
+    }
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
@@ -61,13 +60,6 @@ public class ApplyForHwFDashboardNotificationHandlerTest extends BaseCallbackHan
 
     @Nested
     class AboutToSubmitCallback {
-
-        @BeforeEach
-        void setup() {
-            objectMapper = new ObjectMapper();
-            objectMapper.findAndRegisterModules();
-            handler = new ApplyForHwFDashboardNotificationHandler(objectMapper, dashboardScenariosService, mapper);
-        }
 
         @Test
         void shouldRecordApplicantScenario_ApplyForHwF_whenInvoked() {

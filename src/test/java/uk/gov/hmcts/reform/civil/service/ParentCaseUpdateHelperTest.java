@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -17,6 +18,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.GeneralAppParentCaseLink;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -30,6 +32,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
+import uk.gov.hmcts.reform.civil.service.ga.GaCaseDataEnricher;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -64,6 +67,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @SpringBootTest(classes = {
     ParentCaseUpdateHelper.class,
+    GaCaseDataEnricher.class,
     ObjectMapper.class,
 })
 class ParentCaseUpdateHelperTest {
@@ -89,7 +93,7 @@ class ParentCaseUpdateHelperTest {
         when(coreCaseDataService.startUpdate(any(), any())).thenReturn(getStartEventResponse(YES, NO));
         when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(caseData);
 
-        parentCaseUpdateHelper.updateParentApplicationVisibilityWithNewState(caseData, ORDER_MADE.toString());
+        parentCaseUpdateHelper.updateParentApplicationVisibilityWithNewState(toGaCaseData(caseData), ORDER_MADE.toString());
         verify(coreCaseDataService, times(1)).submitUpdate(any(), any());
     }
 
@@ -99,7 +103,7 @@ class ParentCaseUpdateHelperTest {
         when(coreCaseDataService.startUpdate(any(), any())).thenReturn(getStartEventResponse(YES, NO));
         when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(caseData);
 
-        parentCaseUpdateHelper.updateParentApplicationVisibilityWithNewState(caseData, ORDER_MADE.toString());
+        parentCaseUpdateHelper.updateParentApplicationVisibilityWithNewState(toGaCaseData(caseData), ORDER_MADE.toString());
         verify(coreCaseDataService, times(1)).submitUpdate(any(), any());
 
     }
@@ -110,7 +114,7 @@ class ParentCaseUpdateHelperTest {
         when(coreCaseDataService.startUpdate(any(), any())).thenReturn(getStartEventResponse(YES, NO));
         when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(caseData);
 
-        parentCaseUpdateHelper.updateParentApplicationVisibilityWithNewState(caseData, ORDER_MADE.toString());
+        parentCaseUpdateHelper.updateParentApplicationVisibilityWithNewState(toGaCaseData(caseData), ORDER_MADE.toString());
         verify(coreCaseDataService, times(1)).submitUpdate(any(), any());
 
     }
@@ -288,7 +292,7 @@ class ParentCaseUpdateHelperTest {
         CaseData civilCase = getVaryMainCaseData("RespondentSolTwo");
         when(coreCaseDataService.startUpdate(any(), any())).thenReturn(getStartEventResponse(YES, NO));
         when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(civilCase);
-        parentCaseUpdateHelper.updateParentWithGAState(gaCase, AWAITING_RESPONDENT_RESPONSE.toString());
+        parentCaseUpdateHelper.updateParentWithGAState(toGaCaseData(gaCase), AWAITING_RESPONDENT_RESPONSE.toString());
         verify(coreCaseDataService, times(1))
                 .caseDataContentFromStartEventResponse(any(), mapCaptor.capture());
         assertThat(mapCaptor.getValue().get("gaEvidenceDocRespondentSolTwo")).isNotNull();
@@ -307,7 +311,7 @@ class ParentCaseUpdateHelperTest {
         CaseData civilCase = getVaryMainCaseData("RespondentSol");
         when(coreCaseDataService.startUpdate(any(), any())).thenReturn(getStartEventResponse(YES, NO));
         when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(civilCase);
-        parentCaseUpdateHelper.updateParentWithGAState(gaCase, AWAITING_APPLICATION_PAYMENT.toString());
+        parentCaseUpdateHelper.updateParentWithGAState(toGaCaseData(gaCase), AWAITING_APPLICATION_PAYMENT.toString());
         verify(coreCaseDataService, times(1))
                 .caseDataContentFromStartEventResponse(any(), mapCaptor.capture());
         assertThat(mapCaptor.getValue().get("gaAddlDocRespondentSol")).isNotNull();
@@ -322,7 +326,7 @@ class ParentCaseUpdateHelperTest {
 
         when(coreCaseDataService.startUpdate(any(), any())).thenReturn(getStartEventResponse(YES, NO));
         when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(civilCase);
-        parentCaseUpdateHelper.updateJudgeAndRespondentCollectionAfterPayment(gaCase);
+        parentCaseUpdateHelper.updateJudgeAndRespondentCollectionAfterPayment(toGaCaseData(gaCase));
 
         verify(coreCaseDataService, times(1))
             .caseDataContentFromStartEventResponse(any(), mapCaptor.capture());
@@ -344,7 +348,7 @@ class ParentCaseUpdateHelperTest {
         CaseData civilCase = getVaryMainCaseDataForCollectionAfterPayment("RespondentSol");
         when(coreCaseDataService.startUpdate(any(), any())).thenReturn(getStartEventResponse(YES, NO));
         when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(civilCase);
-        parentCaseUpdateHelper.updateJudgeAndRespondentCollectionAfterPayment(gaCase);
+        parentCaseUpdateHelper.updateJudgeAndRespondentCollectionAfterPayment(toGaCaseData(gaCase));
         verify(coreCaseDataService, times(1))
             .caseDataContentFromStartEventResponse(any(), mapCaptor.capture());
         assertThat(mapCaptor.getValue().get("respondentSolTwoGaAppDetails")).isNotNull();
@@ -365,7 +369,7 @@ class ParentCaseUpdateHelperTest {
         CaseData civilCase = getVaryMainCaseDataForCollectionAfterPayment("RespondentSolTwo");
         when(coreCaseDataService.startUpdate(any(), any())).thenReturn(getStartEventResponse(YES, NO));
         when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(civilCase);
-        parentCaseUpdateHelper.updateJudgeAndRespondentCollectionAfterPayment(gaCase);
+        parentCaseUpdateHelper.updateJudgeAndRespondentCollectionAfterPayment(toGaCaseData(gaCase));
         verify(coreCaseDataService, times(1))
             .caseDataContentFromStartEventResponse(any(), mapCaptor.capture());
         assertThat(mapCaptor.getValue().get("respondentSolTwoGaAppDetails")).isNotNull();
@@ -386,7 +390,7 @@ class ParentCaseUpdateHelperTest {
         CaseData civilCase = getVaryMainCaseDataFor1V2SameSol_DefendantInitiateGA("RespondentSol");
         when(coreCaseDataService.startUpdate(any(), any())).thenReturn(getStartEventResponse(YES, NO));
         when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(civilCase);
-        parentCaseUpdateHelper.updateJudgeAndRespondentCollectionAfterPayment(gaCase);
+        parentCaseUpdateHelper.updateJudgeAndRespondentCollectionAfterPayment(toGaCaseData(gaCase));
         verify(coreCaseDataService, times(1))
             .caseDataContentFromStartEventResponse(any(), mapCaptor.capture());
         assertThat(mapCaptor.getValue().get("respondentSolTwoGaAppDetails")).isEqualTo(newArrayList());
@@ -403,7 +407,7 @@ class ParentCaseUpdateHelperTest {
         CaseData civilCase = getVaryMainCaseDataFor1V2SameSol_DefendantInitiateGA("Claimant");
         when(coreCaseDataService.startUpdate(any(), any())).thenReturn(getStartEventResponse(YES, NO));
         when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(civilCase);
-        parentCaseUpdateHelper.updateJudgeAndRespondentCollectionAfterPayment(gaCase);
+        parentCaseUpdateHelper.updateJudgeAndRespondentCollectionAfterPayment(toGaCaseData(gaCase));
         verify(coreCaseDataService, times(1))
             .caseDataContentFromStartEventResponse(any(), mapCaptor.capture());
         assertThat(mapCaptor.getValue().get("respondentSolTwoGaAppDetails")).isEqualTo(newArrayList());
@@ -419,7 +423,7 @@ class ParentCaseUpdateHelperTest {
         CaseData civilCase = getVaryMainCaseDataForCollectionAfterPayment("RespondentSolTwo");
         when(coreCaseDataService.startUpdate(any(), any())).thenReturn(getStartEventResponse(YES, NO));
         when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(civilCase);
-        parentCaseUpdateHelper.updateJudgeAndRespondentCollectionAfterPayment(gaCase);
+        parentCaseUpdateHelper.updateJudgeAndRespondentCollectionAfterPayment(toGaCaseData(gaCase));
         verify(coreCaseDataService, times(1))
             .caseDataContentFromStartEventResponse(any(), mapCaptor.capture());
         assertThat(mapCaptor.getValue().get("respondentSolTwoGaAppDetails")).isNotNull();
@@ -435,7 +439,7 @@ class ParentCaseUpdateHelperTest {
         CaseData civilCase = getVaryMainCaseDataForCollectionAfterPayment("Claimant");
         when(coreCaseDataService.startUpdate(any(), any())).thenReturn(getStartEventResponse(YES, NO));
         when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(civilCase);
-        parentCaseUpdateHelper.updateJudgeAndRespondentCollectionAfterPayment(gaCase);
+        parentCaseUpdateHelper.updateJudgeAndRespondentCollectionAfterPayment(toGaCaseData(gaCase));
         verify(coreCaseDataService, times(1))
             .caseDataContentFromStartEventResponse(any(), mapCaptor.capture());
         assertThat(mapCaptor.getValue().get("respondentSolTwoGaAppDetails")).isNotNull();
@@ -451,7 +455,7 @@ class ParentCaseUpdateHelperTest {
         CaseData civilCase = getVaryMainCaseDataForCollectionAfterPayment("Claimant");
         when(coreCaseDataService.startUpdate(any(), any())).thenReturn(getStartEventResponse(YES, NO));
         when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(civilCase);
-        parentCaseUpdateHelper.updateJudgeAndRespondentCollectionAfterPayment(gaCase);
+        parentCaseUpdateHelper.updateJudgeAndRespondentCollectionAfterPayment(toGaCaseData(gaCase));
         verify(coreCaseDataService, times(1))
             .caseDataContentFromStartEventResponse(any(), mapCaptor.capture());
         assertThat(mapCaptor.getValue().get("gaDetailsMasterCollection")).isNotNull();
@@ -466,7 +470,7 @@ class ParentCaseUpdateHelperTest {
         CaseData civilCase = getVaryMainCaseDataForCollectionAfterPayment("Claimant");
         when(coreCaseDataService.startUpdate(any(), any())).thenReturn(getStartEventResponse(NO, NO));
         when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(civilCase);
-        parentCaseUpdateHelper.updateJudgeAndRespondentCollectionAfterPayment(gaCase);
+        parentCaseUpdateHelper.updateJudgeAndRespondentCollectionAfterPayment(toGaCaseData(gaCase));
         verify(coreCaseDataService, times(1))
             .caseDataContentFromStartEventResponse(any(), mapCaptor.capture());
         assertThat(mapCaptor.getValue().get("gaDetailsMasterCollection")).isNotNull();
@@ -481,7 +485,7 @@ class ParentCaseUpdateHelperTest {
         CaseData civilCase = getVaryMainCaseDataForCollectionAfterPayment("RespondentSol");
         when(coreCaseDataService.startUpdate(any(), any())).thenReturn(getStartEventResponse(NO, NO));
         when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(civilCase);
-        parentCaseUpdateHelper.updateJudgeAndRespondentCollectionAfterPayment(gaCase);
+        parentCaseUpdateHelper.updateJudgeAndRespondentCollectionAfterPayment(toGaCaseData(gaCase));
         verify(coreCaseDataService, times(1))
             .caseDataContentFromStartEventResponse(any(), mapCaptor.capture());
         assertThat(mapCaptor.getValue().get("gaDetailsMasterCollection")).isNotNull();
@@ -496,7 +500,7 @@ class ParentCaseUpdateHelperTest {
         CaseData civilCase = getVaryMainCaseDataForCollectionAfterPayment("RespondentSolTwo");
         when(coreCaseDataService.startUpdate(any(), any())).thenReturn(getStartEventResponse(NO, NO));
         when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(civilCase);
-        parentCaseUpdateHelper.updateJudgeAndRespondentCollectionAfterPayment(gaCase);
+        parentCaseUpdateHelper.updateJudgeAndRespondentCollectionAfterPayment(toGaCaseData(gaCase));
         verify(coreCaseDataService, times(1))
             .caseDataContentFromStartEventResponse(any(), mapCaptor.capture());
         assertThat(mapCaptor.getValue().get("gaDetailsMasterCollection")).isNotNull();
@@ -512,7 +516,7 @@ class ParentCaseUpdateHelperTest {
         CaseData civilCase = getVaryMainCaseDataForCollectionAfterPayment("RespondentSol");
         when(coreCaseDataService.startUpdate(any(), any())).thenReturn(getStartEventResponse(YES, NO));
         when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(civilCase);
-        parentCaseUpdateHelper.updateJudgeAndRespondentCollectionAfterPayment(gaCase);
+        parentCaseUpdateHelper.updateJudgeAndRespondentCollectionAfterPayment(toGaCaseData(gaCase));
         verify(coreCaseDataService, times(1))
             .caseDataContentFromStartEventResponse(any(), mapCaptor.capture());
         assertThat(mapCaptor.getValue().get("respondentSolTwoGaAppDetails")).isNotNull();
@@ -528,7 +532,7 @@ class ParentCaseUpdateHelperTest {
         CaseData civilCase = getVaryMainCaseDataForCollectionAfterPayment("RespondentSol");
         when(coreCaseDataService.startUpdate(any(), any())).thenReturn(getStartEventResponse(YES, NO));
         when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(civilCase);
-        parentCaseUpdateHelper.updateJudgeAndRespondentCollectionAfterPayment(gaCase);
+        parentCaseUpdateHelper.updateJudgeAndRespondentCollectionAfterPayment(toGaCaseData(gaCase));
         verify(coreCaseDataService, times(1))
             .caseDataContentFromStartEventResponse(any(), mapCaptor.capture());
         assertThat(mapCaptor.getValue().get("gaDetailsMasterCollection")).isNotNull();
@@ -543,7 +547,7 @@ class ParentCaseUpdateHelperTest {
         CaseData civilCase = getVaryMainCaseDataFor1V2SameSol_DefendantInitiateGA("Claimant");
         when(coreCaseDataService.startUpdate(any(), any())).thenReturn(getStartEventResponse(YES, NO));
         when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(civilCase);
-        parentCaseUpdateHelper.updateMasterCollectionForHwf(gaCase);
+        parentCaseUpdateHelper.updateMasterCollectionForHwf(toGaCaseData(gaCase));
         verify(coreCaseDataService, times(1))
             .caseDataContentFromStartEventResponse(any(), mapCaptor.capture());
         assertThat(mapCaptor.getValue().get("gaDetailsMasterCollection")).isNotNull();
@@ -557,7 +561,7 @@ class ParentCaseUpdateHelperTest {
         CaseData civilCase = getCaseWithApplicationData(false);
         when(coreCaseDataService.startUpdate(any(), any())).thenReturn(getStartEventResponse(YES, NO));
         when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(civilCase);
-        parentCaseUpdateHelper.updateParentWithGAState(gaCase, AWAITING_APPLICATION_PAYMENT.toString());
+        parentCaseUpdateHelper.updateParentWithGAState(toGaCaseData(gaCase), AWAITING_APPLICATION_PAYMENT.toString());
         verify(coreCaseDataService, times(1))
                 .caseDataContentFromStartEventResponse(any(), mapCaptor.capture());
         assertThat(mapCaptor.getValue().get("gaEvidenceDocStaff")).isNull();
@@ -577,7 +581,7 @@ class ParentCaseUpdateHelperTest {
         when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(civilCase);
         when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
         CaseData gaCase = getGaVaryCaseDataForCollection("Claimant", AWAITING_APPLICATION_PAYMENT, NO, YES, NO);
-        parentCaseUpdateHelper.updateCollectionForWelshApplication(gaCase);
+        parentCaseUpdateHelper.updateCollectionForWelshApplication(toGaCaseData(gaCase));
         verify(coreCaseDataService, times(1))
             .caseDataContentFromStartEventResponse(any(), mapCaptor.capture());
         assertThat(mapCaptor.getValue().get("gaDetailsTranslationCollection")).isNotNull();
@@ -596,7 +600,7 @@ class ParentCaseUpdateHelperTest {
         when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(civilCase);
         when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
         CaseData gaCase = getGaVaryCaseDataForCollection("RespondentSol", AWAITING_APPLICATION_PAYMENT, NO, YES, NO);
-        parentCaseUpdateHelper.updateCollectionForWelshApplication(gaCase);
+        parentCaseUpdateHelper.updateCollectionForWelshApplication(toGaCaseData(gaCase));
         verify(coreCaseDataService, times(1))
             .caseDataContentFromStartEventResponse(any(), mapCaptor.capture());
         assertThat(mapCaptor.getValue().get("gaDetailsTranslationCollection")).isNotNull();
@@ -617,7 +621,7 @@ class ParentCaseUpdateHelperTest {
         when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(updatedCaseData);
         when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
         CaseData gaCase = getGaVaryCaseDataForCollection("Claimant", AWAITING_APPLICATION_PAYMENT, NO, YES, NO);
-        parentCaseUpdateHelper.updateJudgeAndRespondentCollectionAfterPayment(gaCase);
+        parentCaseUpdateHelper.updateJudgeAndRespondentCollectionAfterPayment(toGaCaseData(gaCase));
         verify(coreCaseDataService, times(1))
             .caseDataContentFromStartEventResponse(any(), mapCaptor.capture());
         assertThat(mapCaptor.getValue())
@@ -642,7 +646,7 @@ class ParentCaseUpdateHelperTest {
         when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(updatedCaseData);
         when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
         CaseData gaCase = getGaVaryCaseDataForCollection("RespondentSol", AWAITING_APPLICATION_PAYMENT, NO, YES, NO);
-        parentCaseUpdateHelper.updateMasterCollectionForHwf(gaCase);
+        parentCaseUpdateHelper.updateMasterCollectionForHwf(toGaCaseData(gaCase));
         verify(coreCaseDataService, times(1))
             .caseDataContentFromStartEventResponse(any(), mapCaptor.capture());
 
@@ -1221,5 +1225,15 @@ class ParentCaseUpdateHelperTest {
         builder.respondentSolTwoGaAppDetails(gaDetailsRespondentSolList2);
 
         return builder.build();
+    }
+
+    private GeneralApplicationCaseData toGaCaseData(CaseData caseData) {
+        ObjectMapper mapperWithJsr310 = objectMapper.copy();
+        mapperWithJsr310.registerModule(new JavaTimeModule());
+        GeneralApplicationCaseData converted = mapperWithJsr310.convertValue(caseData, GeneralApplicationCaseData.class);
+        return converted.toBuilder()
+            .ccdCaseReference(caseData.getCcdCaseReference())
+            .ccdState(caseData.getCcdState())
+            .build();
     }
 }

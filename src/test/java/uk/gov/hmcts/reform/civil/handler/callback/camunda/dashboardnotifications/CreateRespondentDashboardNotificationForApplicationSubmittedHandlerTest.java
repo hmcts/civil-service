@@ -1,14 +1,15 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
@@ -41,8 +42,17 @@ public class CreateRespondentDashboardNotificationForApplicationSubmittedHandler
     private DashboardNotificationsParamsMapper mapper;
     @Mock
     private FeatureToggleService featureToggleService;
-    @InjectMocks
     private CreateRespondentDashboardNotificationForApplicationSubmittedHandler handler;
+
+    @BeforeEach
+    void setUp() {
+        handler = new CreateRespondentDashboardNotificationForApplicationSubmittedHandler(
+            dashboardScenariosService,
+            mapper,
+            featureToggleService,
+            objectMapper
+        );
+    }
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
@@ -57,6 +67,35 @@ public class CreateRespondentDashboardNotificationForApplicationSubmittedHandler
 
     @Nested
     class AboutToSubmitCallback {
+
+        @Test
+        void shouldRecordScenarioWhenGaCaseDataProvided() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
+            caseData = caseData.toBuilder()
+                .parentCaseReference(caseData.getCcdCaseReference().toString())
+                .isGaApplicantLip(YesOrNo.YES)
+                .parentClaimantIsApplicant(YesOrNo.YES)
+                .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.YES).build())
+                .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(YesOrNo.NO).build())
+                .build();
+
+            GeneralApplicationCaseData gaCaseData = toGaCaseData(caseData);
+
+            HashMap<String, Object> scenarioParams = new HashMap<>();
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
+
+            CallbackParams params = gaCallbackParamsOf(gaCaseData, ABOUT_TO_SUBMIT);
+
+            handler.handle(params);
+
+            verify(dashboardScenariosService).recordScenarios(
+                "BEARER_TOKEN",
+                SCENARIO_AAA6_GENERAL_APPLICATION_SUBMITTED_NONURGENT_RESPONDENT.getScenario(),
+                gaCaseData.getCcdCaseReference().toString(),
+                ScenarioRequestParams.builder().params(scenarioParams).build()
+            );
+        }
 
         @Test
         void shouldRecordApplicationSubmittedRespondentScenarioForWithNoticeNonUrgentApplicationWhenInvoked() {

@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.callback.DashboardCallbackHandler;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.dq.GAJudgeDecisionOption;
 import uk.gov.hmcts.reform.civil.enums.dq.GAJudgeRequestMoreInfoOption;
@@ -22,7 +22,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_WRITTEN_REPRESENTATION_REQUIRED_APPLICANT;
 
 @Service
-public class CreateMakeDecisionDashboardNotificationForApplicantHandler extends DashboardCallbackHandler {
+public class CreateMakeDecisionDashboardNotificationForApplicantHandler extends GaDashboardCallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(CaseEvent.CREATE_APPLICANT_DASHBOARD_NOTIFICATION_FOR_MAKE_DECISION);
     private final JudicialDecisionHelper judicialDecisionHelper;
@@ -30,8 +30,9 @@ public class CreateMakeDecisionDashboardNotificationForApplicantHandler extends 
     public CreateMakeDecisionDashboardNotificationForApplicantHandler(DashboardScenariosService dashboardScenariosService,
                                                                       DashboardNotificationsParamsMapper mapper,
                                                                       FeatureToggleService featureToggleService,
-                                                                      JudicialDecisionHelper judicialDecisionHelper) {
-        super(dashboardScenariosService, mapper, featureToggleService);
+                                                                      JudicialDecisionHelper judicialDecisionHelper,
+                                                                      ObjectMapper objectMapper) {
+        super(dashboardScenariosService, mapper, featureToggleService, objectMapper);
         this.judicialDecisionHelper = judicialDecisionHelper;
     }
 

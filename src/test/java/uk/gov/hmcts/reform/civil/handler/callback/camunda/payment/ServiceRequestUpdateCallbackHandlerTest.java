@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.payment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,6 +12,10 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
+import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -24,7 +30,9 @@ class ServiceRequestUpdateCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @BeforeEach
     public void setup() {
-        objectMapper = new ObjectMapper().registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+        objectMapper = new ObjectMapper()
+            .registerModule(new JavaTimeModule())
+            .registerModule(new Jdk8Module());
         handler = new ServiceRequestUpdateCallbackHandler(objectMapper);
     }
 
@@ -39,6 +47,23 @@ class ServiceRequestUpdateCallbackHandlerTest extends BaseCallbackHandlerTest {
         //Then: response should contain hearingFeePBA details
         CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
         assertThat(caseData.getHearingFeePBADetails().getServiceReqReference()).isEqualTo(responseCaseData.getHearingFeePBADetails().getServiceReqReference());
+    }
+
+    @Test
+    void shouldReturnGaPaymentDetails_whenGaCaseDataProvided() {
+        GeneralApplicationCaseData gaCaseData = GeneralApplicationCaseDataBuilder.builder()
+            .withGeneralAppPBADetails(GAPbaDetails.builder()
+                .fee(Fee.builder().code("GA-FEE").version("1").build())
+                .serviceReqReference("GA-REF")
+                .build())
+            .build();
+
+        CallbackParams params = gaCallbackParamsOf(gaCaseData, ABOUT_TO_SUBMIT);
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+        assertThat(responseCaseData.getGeneralAppPBADetails().getServiceReqReference()).isEqualTo("GA-REF");
     }
 
     @Test

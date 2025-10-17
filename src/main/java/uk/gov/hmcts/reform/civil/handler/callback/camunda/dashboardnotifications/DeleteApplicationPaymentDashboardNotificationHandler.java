@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -9,6 +10,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.GaCallbackDataUtil;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.GaForLipService;
@@ -31,6 +33,7 @@ public class DeleteApplicationPaymentDashboardNotificationHandler extends Callba
     private static final List<CaseEvent> EVENTS = List.of(DELETE_APPLICATION_PAYMENT_DASHBOARD_NOTIFICATION);
     private final FeatureToggleService featureToggleService;
     private final GaForLipService gaForLipService;
+    private final ObjectMapper objectMapper;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -45,10 +48,15 @@ public class DeleteApplicationPaymentDashboardNotificationHandler extends Callba
     }
 
     private CallbackResponse deletePaymentDashboardNotification(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
+        CaseData caseData = GaCallbackDataUtil.resolveCaseData(callbackParams, objectMapper);
+        var gaCaseData = GaCallbackDataUtil.resolveGaCaseData(callbackParams, objectMapper);
+        if (caseData == null) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .build();
+        }
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
 
-        if (gaForLipService.isGaForLip(caseData) && gaForLipService.isLipApp(caseData)) {
+        if (gaCaseData != null && gaForLipService.isGaForLip(gaCaseData) && gaForLipService.isLipAppGa(gaCaseData)) {
             dashboardApiClient.deleteTemplateNotificationsForCaseIdentifierAndRole(
                 caseData.getCcdCaseReference().toString(),
                 APPLICANT_ROLE,

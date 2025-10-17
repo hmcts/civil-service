@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.jsonwebtoken.lang.Collections;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -8,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -15,6 +17,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GADetailsRespondentSol;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.service.ga.GaCaseDataEnricher;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,7 +38,7 @@ public class GenAppStateHelperService {
     private final CaseDetailsConverter caseDetailsConverter;
     private final InitiateGeneralApplicationService genAppService;
     private final LocationService locationService;
-
+    private final GaCaseDataEnricher gaCaseDataEnricher;
     private final ObjectMapper objectMapper;
 
     @Getter
@@ -76,6 +79,10 @@ public class GenAppStateHelperService {
         return true;
     }
 
+    public boolean triggerEvent(GeneralApplicationCaseData gaCaseData, CaseEvent event) {
+        return triggerEvent(toCaseData(gaCaseData), event);
+    }
+
     public CaseData updateApplicationLocationDetailsInClaim(CaseData caseData, String authToken) {
 
         if (!Collections.isEmpty(caseData.getGeneralApplications())) {
@@ -97,6 +104,10 @@ public class GenAppStateHelperService {
             caseData = caseData.toBuilder().generalApplications(wrapElements(genApps)).build();
         }
         return caseData;
+    }
+
+    public CaseData updateApplicationLocationDetailsInClaim(GeneralApplicationCaseData gaCaseData, String authToken) {
+        return updateApplicationLocationDetailsInClaim(toCaseData(gaCaseData), authToken);
     }
 
     public CaseData updateApplicationDetailsInClaim(CaseData caseData,
@@ -152,6 +163,11 @@ public class GenAppStateHelperService {
             });
         }
         return caseData;
+    }
+
+    public CaseData updateApplicationDetailsInClaim(GeneralApplicationCaseData gaCaseData,
+                                                    String updatedState, RequiredState gaFlow) {
+        return updateApplicationDetailsInClaim(toCaseData(gaCaseData), updatedState, gaFlow);
     }
 
     private boolean applicationFilterCriteria(GeneralApplicationsDetails gaDetails,
@@ -210,6 +226,24 @@ public class GenAppStateHelperService {
             }
         }
         return latestStatus;
+    }
+
+    private CaseData toCaseData(GeneralApplicationCaseData gaCaseData) {
+        if (gaCaseData == null) {
+            return null;
+        }
+        ObjectMapper mapperWithJsr310 = objectMapper.copy();
+        mapperWithJsr310.registerModule(new JavaTimeModule());
+        CaseData converted = mapperWithJsr310.convertValue(gaCaseData, CaseData.class);
+        CaseData enriched = gaCaseDataEnricher.enrich(converted, gaCaseData);
+        CaseData.CaseDataBuilder<?, ?> builder = enriched.toBuilder();
+        if (gaCaseData.getCcdCaseReference() != null) {
+            builder.ccdCaseReference(gaCaseData.getCcdCaseReference());
+        }
+        if (gaCaseData.getCcdState() != null) {
+            builder.ccdState(gaCaseData.getCcdState());
+        }
+        return builder.build();
     }
 
 }

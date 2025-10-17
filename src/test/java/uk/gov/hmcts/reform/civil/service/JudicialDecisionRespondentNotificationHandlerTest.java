@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.enums.dq.GAJudgeRequestMoreInfoOption;
 import uk.gov.hmcts.reform.civil.enums.dq.GAJudgeWrittenRepresentationsOptions;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationDataGA;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -53,7 +54,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.APPLICATION_ADD_PAYMENT;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -169,7 +169,7 @@ public class JudicialDecisionRespondentNotificationHandlerTest {
             .thenReturn(SAMPLE_LIP_TEMPLATE);
         when(notificationsProperties.getLipGeneralAppRespondentEmailTemplateInWelsh())
             .thenReturn(LIP_RES_WELSH_TEMPLATE);
-        when(gaForLipService.isLipApp(any())).thenReturn(false);
+        when(gaForLipService.isLipAppGa(any(GeneralApplicationCaseData.class))).thenReturn(false);
         when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
         when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
                                                              + "\n For all other matters, call 0300 123 7050");
@@ -181,6 +181,10 @@ public class JudicialDecisionRespondentNotificationHandlerTest {
         when(configuration.getWelshHmctsSignature()).thenReturn("Hawliadau am Arian yn y Llys Sifil Ar-lein \n Gwasanaeth Llysoedd a Thribiwnlysoedd EF");
         when(configuration.getWelshPhoneContact()).thenReturn("Ffôn: 0300 303 5174");
         when(configuration.getWelshOpeningHours()).thenReturn("Dydd Llun i ddydd Iau, 9am – 5pm, dydd Gwener, 9am – 4.30pm");
+        when(solicitorEmailValidation.validateSolicitorEmail(
+            any(CaseData.class),
+            any(GeneralApplicationCaseData.class)
+        )).thenAnswer(invocation -> invocation.getArgument(1));
     }
 
     @Nested
@@ -188,18 +192,16 @@ public class JudicialDecisionRespondentNotificationHandlerTest {
 
         @BeforeEach
         public void setup() {
-            when(gaForLipService.isGaForLip(any())).thenReturn(true);
-            when(gaForLipService.isLipApp(any())).thenReturn(true);
-            when(gaForLipService.isLipResp(any())).thenReturn(true);
+            when(gaForLipService.isGaForLip(any(CaseData.class))).thenReturn(true);
+            when(gaForLipService.isGaForLip(any(GeneralApplicationCaseData.class))).thenReturn(true);
+            when(gaForLipService.isLipAppGa(any(GeneralApplicationCaseData.class))).thenReturn(true);
+            when(gaForLipService.isLipRespGa(any(GeneralApplicationCaseData.class))).thenReturn(true);
         }
 
         public Map<String, String> customProp = new HashMap<>();
 
         @Test
         void sendNotificationRespondentConcurrentWrittenRep() {
-            when(solicitorEmailValidation.validateSolicitorEmail(any(), any()))
-                .thenReturn(caseDataForConcurrentWrittenOption(NO, YES)
-                                .toBuilder().businessProcess(businessProcess).build());
             when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(CaseData.builder().build());
 
             judicialRespondentNotificationService.sendNotification(caseDataForConcurrentWrittenOption(NO, YES), RESPONDENT)
@@ -214,9 +216,6 @@ public class JudicialDecisionRespondentNotificationHandlerTest {
 
         @Test
         void sendNotificationRespondentConcurrentWrittenRep_AddlnPayment() {
-            when(solicitorEmailValidation.validateSolicitorEmail(any(), any()))
-                .thenReturn(caseDataForConcurrentWrittenOption(NO, YES)
-                                .toBuilder().ccdState(APPLICATION_ADD_PAYMENT).build());
             when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(CaseData.builder().build());
 
             judicialRespondentNotificationService.sendNotification(caseDataForConcurrentWrittenOption(NO, YES), RESPONDENT)
@@ -231,12 +230,8 @@ public class JudicialDecisionRespondentNotificationHandlerTest {
 
         @Test
         void sendNotificationInWelshToRespondentConcurrentWrittenRep_AddlnPayment() {
-            when(solicitorEmailValidation.validateSolicitorEmail(any(), any()))
-                .thenReturn(caseDataForConcurrentWrittenOption(NO, YES)
-                                .toBuilder().respondentBilingualLanguagePreferenceGA(YES)
-                                .ccdState(APPLICATION_ADD_PAYMENT).build());
 
-            CaseData claimRespondentResponseLan = CaseData.builder().respondent1LiPResponseGA(RespondentLiPResponse.builder().respondent1ResponseLanguage(
+            CaseData claimRespondentResponseLan = CaseData.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage(
                 Language.BOTH.toString()).build()).build();
             when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(claimRespondentResponseLan);
             judicialRespondentNotificationService.sendNotification(caseDataForConcurrentWrittenOption(NO, YES), RESPONDENT)
@@ -251,9 +246,6 @@ public class JudicialDecisionRespondentNotificationHandlerTest {
 
         @Test
         void sendNotificationRespondentSequentialWrittenRep() {
-            when(solicitorEmailValidation.validateSolicitorEmail(any(), any()))
-                .thenReturn(caseDataForSequentialWrittenOption(NO, YES).toBuilder().businessProcess(businessProcess)
-                                .build());
             when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(CaseData.builder().build());
 
             judicialRespondentNotificationService.sendNotification(caseDataForSequentialWrittenOption(NO, YES)
@@ -269,10 +261,6 @@ public class JudicialDecisionRespondentNotificationHandlerTest {
 
         @Test
         void notificationUncloakShouldSendForDismissal_RespondentLIP() {
-
-            when(solicitorEmailValidation.validateSolicitorEmail(any(), any()))
-                .thenReturn(caseDataForJudgeDismissal(NO, NO, NO, NO, YES)
-                                .toBuilder().businessProcess(businessProcess).build());
             when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(CaseData.builder().build());
             judicialRespondentNotificationService.sendNotification(caseDataForJudgeDismissal(NO, NO, NO,  NO, YES)
                                                              .toBuilder()
@@ -294,8 +282,6 @@ public class JudicialDecisionRespondentNotificationHandlerTest {
                                                                                                 NO, YES, NO, YES)
                 .toBuilder().businessProcess(businessProcess).build();
             when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(CaseData.builder().build());
-            when(solicitorEmailValidation.validateSolicitorEmail(any(), any()))
-                .thenReturn(caseData);
 
             judicialRespondentNotificationService.sendNotification(caseData, RESPONDENT);
 
@@ -307,10 +293,6 @@ public class JudicialDecisionRespondentNotificationHandlerTest {
 
         @Test
         void notificationShouldSendSendToLipRespondent_IfApplicationUncloakedForApproveOrEdit() {
-
-            when(solicitorEmailValidation.validateSolicitorEmail(any(), any()))
-                .thenReturn(caseDataWithSolicitorDataOnlyForApplicationUncloakedJudgeApproveOrEdit(
-                    YES, NO, NO).toBuilder().businessProcess(businessProcess).build());
             when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(CaseData.builder().build());
 
             judicialRespondentNotificationService.sendNotification(
@@ -335,9 +317,6 @@ public class JudicialDecisionRespondentNotificationHandlerTest {
                 .ccdState(CaseState.APPLICATION_ADD_PAYMENT)
                 .generalAppType(GAApplicationType.builder()
                                                 .types(applicationTypeSummeryJudgement()).build()).build();
-
-            when(solicitorEmailValidation.validateSolicitorEmail(any(), any()))
-                .thenReturn(caseData);
             when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(CaseData.builder().build());
 
             judicialRespondentNotificationService.sendNotification(caseData, RESPONDENT);
@@ -352,9 +331,6 @@ public class JudicialDecisionRespondentNotificationHandlerTest {
 
         @Test
         void notificationShouldSendListForHearing() {
-
-            when(solicitorEmailValidation.validateSolicitorEmail(any(), any()))
-                .thenReturn(caseDataListForHearing());
             when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(CaseData.builder().build());
 
             judicialRespondentNotificationService.sendNotification(caseDataListForHearing(), RESPONDENT);
@@ -620,8 +596,6 @@ public class JudicialDecisionRespondentNotificationHandlerTest {
         void shouldNotSentNotification_WhenNotificationCriteria_NotMet() {
 
             CaseData caseData = caseDataForConcurrentWrittenOption().toBuilder().businessProcess(null).build();
-            when(solicitorEmailValidation.validateSolicitorEmail(any(), any()))
-                .thenReturn(caseData);
 
             judicialRespondentNotificationService.sendNotification(caseData, RESPONDENT);
             verify(notificationService, never()).sendMail(any(), any(), any(), any());
@@ -629,9 +603,6 @@ public class JudicialDecisionRespondentNotificationHandlerTest {
 
         @Test
         void notificationShouldSendThriceForConcurrentWrittenRepsWhenInvoked() {
-
-            when(solicitorEmailValidation.validateSolicitorEmail(any(), any()))
-                .thenReturn(caseDataForConcurrentWrittenOption());
 
             judicialRespondentNotificationService.sendNotification(caseDataForConcurrentWrittenOption(), RESPONDENT);
             verify(notificationService, times(2)).sendMail(
@@ -645,9 +616,6 @@ public class JudicialDecisionRespondentNotificationHandlerTest {
         @Test
         void notificationShouldSendThriceForSequentialWrittenRepsWhenInvoked() {
 
-            when(solicitorEmailValidation.validateSolicitorEmail(any(), any()))
-                .thenReturn(caseDataForSequentialWrittenOption());
-
             judicialRespondentNotificationService.sendNotification(caseDataForSequentialWrittenOption(), RESPONDENT);
             verify(notificationService, times(2)).sendMail(
                 DUMMY_EMAIL,
@@ -659,9 +627,6 @@ public class JudicialDecisionRespondentNotificationHandlerTest {
 
         @Test
         void notificationShouldSendForConcurrentWrittenRepsWhenInvoked() {
-
-            when(solicitorEmailValidation.validateSolicitorEmail(any(), any()))
-                .thenReturn(caseDataForConcurrentWrittenRepRespondentNotPresent());
 
             judicialRespondentNotificationService
                 .sendNotification(caseDataForConcurrentWrittenRepRespondentNotPresent(), RESPONDENT);
@@ -676,9 +641,6 @@ public class JudicialDecisionRespondentNotificationHandlerTest {
         @Test
         void notificationShouldSendForDismissal() {
 
-            when(solicitorEmailValidation.validateSolicitorEmail(any(), any()))
-                .thenReturn(caseDataForJudgeDismissal(NO, YES, NO));
-
             judicialRespondentNotificationService.sendNotification(caseDataForJudgeDismissal(NO, YES, NO), RESPONDENT);
             verify(notificationService, times(2)).sendMail(
                 DUMMY_EMAIL,
@@ -691,9 +653,6 @@ public class JudicialDecisionRespondentNotificationHandlerTest {
         @Test
         void notificationUncloakShouldSendForDismissal() {
 
-            when(solicitorEmailValidation.validateSolicitorEmail(any(), any()))
-                .thenReturn(caseDataForJudgeDismissal(NO, NO, NO));
-
             judicialRespondentNotificationService.sendNotification(caseDataForJudgeDismissal(NO, NO, NO), RESPONDENT);
             verify(notificationService, times(2)).sendMail(
                 DUMMY_EMAIL,
@@ -705,8 +664,6 @@ public class JudicialDecisionRespondentNotificationHandlerTest {
 
         @Test
         void notificationShouldSendIfJudicialApproval() {
-            when(solicitorEmailValidation.validateSolicitorEmail(any(), any()))
-                .thenReturn(caseDataForJudicialApprovalOfApplication(NO, YES));
 
             judicialRespondentNotificationService
                 .sendNotification(caseDataForJudicialApprovalOfApplication(NO, YES), RESPONDENT);
@@ -720,13 +677,6 @@ public class JudicialDecisionRespondentNotificationHandlerTest {
 
         @Test
         void notificationShouldSendIfJudicialDirectionOrder_AfterAdditionalPaymentReceived() {
-
-            when(solicitorEmailValidation.validateSolicitorEmail(any(), any()))
-                .thenReturn(caseDataForJudicialDirectionOrderOfApplication(NO, NO).toBuilder().generalAppPBADetails(
-                        GAPbaDetails.builder()
-                            .additionalPaymentDetails(buildAdditionalPaymentSuccessData())
-                            .build())
-                                .build());
 
             judicialRespondentNotificationService.sendNotification(
                 caseDataForJudicialApprovalOfApplication(NO, NO).toBuilder()
@@ -746,9 +696,6 @@ public class JudicialDecisionRespondentNotificationHandlerTest {
         @Test
         void notificationShouldSendIfJudicialDirectionOrder() {
 
-            when(solicitorEmailValidation.validateSolicitorEmail(any(), any()))
-                .thenReturn(caseDataForJudicialDirectionOrderOfApplication(NO, NO));
-
             judicialRespondentNotificationService
                 .sendNotification(caseDataForJudicialApprovalOfApplication(NO, NO), RESPONDENT);
             verify(notificationService, times(2)).sendMail(
@@ -762,9 +709,6 @@ public class JudicialDecisionRespondentNotificationHandlerTest {
         @Test
         void notificationUncloakShouldSendIfJudicialDirectionOrder() {
 
-            when(solicitorEmailValidation.validateSolicitorEmail(any(), any()))
-                .thenReturn(caseDataForJudicialDirectionOrderOfApplication(YES, NO));
-
             judicialRespondentNotificationService
                 .sendNotification(caseDataForJudicialDirectionOrderOfApplication(YES, NO), RESPONDENT);
             verify(notificationService, times(2)).sendMail(
@@ -777,9 +721,6 @@ public class JudicialDecisionRespondentNotificationHandlerTest {
 
         @Test
         void notificationShouldSendIfJudicialDirectionOrderRepArePresentInList() {
-
-            when(solicitorEmailValidation.validateSolicitorEmail(any(), any()))
-                .thenReturn(caseDataForJudicialDirectionOrderOfApplicationWhenRespondentsArePresentInList(NO, YES, NO));
 
             judicialRespondentNotificationService
                 .sendNotification(
@@ -796,9 +737,6 @@ public class JudicialDecisionRespondentNotificationHandlerTest {
         @Test
         void notificationUncloakShouldSendIfJudicialDirectionOrderRepArePresentInList() {
 
-            when(solicitorEmailValidation.validateSolicitorEmail(any(), any()))
-                .thenReturn(caseDataForJudicialDirectionOrderOfApplicationWhenRespondentsArePresentInList(NO, NO, NO));
-
             judicialRespondentNotificationService
                 .sendNotification(
                     caseDataForJudicialDirectionOrderOfApplicationWhenRespondentsArePresentInList(
@@ -814,9 +752,6 @@ public class JudicialDecisionRespondentNotificationHandlerTest {
         @Test
         void notificationShouldSendIfSequentialWrittenRepsArePresentInList() {
 
-            when(solicitorEmailValidation.validateSolicitorEmail(any(), any()))
-                .thenReturn(caseDataForSequentialWrittenRepInList());
-
             judicialRespondentNotificationService.sendNotification(caseDataForSequentialWrittenRepInList(), RESPONDENT);
             verify(notificationService, times(2)).sendMail(
                 DUMMY_EMAIL,
@@ -828,8 +763,6 @@ public class JudicialDecisionRespondentNotificationHandlerTest {
 
         @Test
         void notificationShouldSendForApplicationsApprovedWhenRespondentsAreInList() {
-            when(solicitorEmailValidation.validateSolicitorEmail(any(), any()))
-                .thenReturn(caseDataForApplicationsApprovedWhenRespondentsAreInList(NO, YES));
 
             judicialRespondentNotificationService
                 .sendNotification(caseDataForApplicationsApprovedWhenRespondentsAreInList(NO, YES), RESPONDENT);
@@ -844,9 +777,6 @@ public class JudicialDecisionRespondentNotificationHandlerTest {
         @Test
         void shouldSendNotificationToRespondent_ForApplicationApprovedUncloaked_WhenRespondentsAreInList() {
 
-            when(solicitorEmailValidation.validateSolicitorEmail(any(), any()))
-                .thenReturn(caseDataForApplicationsApprovedWhenRespondentsAreInList(NO, NO));
-
             judicialRespondentNotificationService
                 .sendNotification(caseDataForApplicationsApprovedWhenRespondentsAreInList(NO, NO), RESPONDENT);
             verify(notificationService, times(2)).sendMail(
@@ -859,15 +789,6 @@ public class JudicialDecisionRespondentNotificationHandlerTest {
 
         @Test
         void shouldSendNotification_WhenApplicationUncloaked() {
-
-            when(solicitorEmailValidation.validateSolicitorEmail(any(), any()))
-                .thenReturn(
-                    caseDataForApplicationsApprovedWhenRespondentsAreInList(NO, NO)
-                        .toBuilder()
-                        .generalAppPBADetails(GAPbaDetails.builder()
-                                                  .additionalPaymentDetails(buildAdditionalPaymentSuccessData())
-                                                  .build())
-                        .build());
 
             CaseData caseData = caseDataForApplicationsApprovedWhenRespondentsAreInList(NO, NO)
                 .toBuilder().generalAppPBADetails(
@@ -888,11 +809,6 @@ public class JudicialDecisionRespondentNotificationHandlerTest {
         @Test
         void notificationShouldSendApproveDamagesWhenRespondentsAreInList() {
 
-            when(solicitorEmailValidation.validateSolicitorEmail(any(), any()))
-                .thenReturn(
-                    caseDataForApplicationsApprovedStrikeOutWhenRespondentsAreInList(
-                        NO, YES, NO, "UNSPEC_CLAIM"));
-
             judicialRespondentNotificationService
                 .sendNotification(
                     caseDataForApplicationsApprovedStrikeOutWhenRespondentsAreInList(
@@ -907,11 +823,6 @@ public class JudicialDecisionRespondentNotificationHandlerTest {
 
         @Test
         void notificationShouldSendApproveOcmcWhenRespondentsAreInList() {
-
-            when(solicitorEmailValidation.validateSolicitorEmail(any(), any()))
-                .thenReturn(
-                    caseDataForApplicationsApprovedStrikeOutWhenRespondentsAreInList(
-                        NO, YES, NO, "SPEC_CLAIM"));
 
             judicialRespondentNotificationService
                 .sendNotification(
@@ -929,9 +840,6 @@ public class JudicialDecisionRespondentNotificationHandlerTest {
         @Test
         void notificationShouldSendForApplicationListForHearingWhenRespondentsAreAvailableInList() {
 
-            when(solicitorEmailValidation.validateSolicitorEmail(any(), any()))
-                .thenReturn(caseDataForListForHearingRespondentsAreInList(NO, YES));
-
             judicialRespondentNotificationService
                 .sendNotification(caseDataForListForHearingRespondentsAreInList(NO, YES), RESPONDENT);
             verify(notificationService, times(2)).sendMail(
@@ -944,9 +852,6 @@ public class JudicialDecisionRespondentNotificationHandlerTest {
 
         @Test
         void notificationShouldSendForHearingWhenRespondents_WithoutNotice() {
-
-            when(solicitorEmailValidation.validateSolicitorEmail(any(), any()))
-                .thenReturn(caseDataForListForHearingRespondentsAreInList(NO, NO));
 
             judicialRespondentNotificationService
                 .sendNotification(caseDataForListForHearingRespondentsAreInList(NO, NO), RESPONDENT);
@@ -961,9 +866,6 @@ public class JudicialDecisionRespondentNotificationHandlerTest {
         @Test
         void notificationShouldSendWhenApplicationIsDismissedByJudgeWhenRespondentsAreAvailableInList() {
 
-            when(solicitorEmailValidation.validateSolicitorEmail(any(), any()))
-                .thenReturn(caseDataForCaseDismissedByJudgeRespondentsAreInList(NO, YES, NO));
-
             judicialRespondentNotificationService.sendNotification(
                 caseDataForCaseDismissedByJudgeRespondentsAreInList(NO, YES, NO), RESPONDENT);
 
@@ -977,11 +879,6 @@ public class JudicialDecisionRespondentNotificationHandlerTest {
 
         @Test
         void notificationUncloakShouldSendForApprovedDamageWhenRespondentsAreInList() {
-
-            when(solicitorEmailValidation.validateSolicitorEmail(any(), any()))
-                .thenReturn(
-                    caseDataForApplicationsApprovedStrikeOutWhenRespondentsAreInList(
-                        NO, NO, NO, "UNSPEC_CLAIM"));
 
             judicialRespondentNotificationService
                 .sendNotification(
@@ -999,10 +896,6 @@ public class JudicialDecisionRespondentNotificationHandlerTest {
         @Test
         void notificationUncloakShouldSendForApprovedOcmcWhenRespondentsAreInList() {
 
-            when(solicitorEmailValidation.validateSolicitorEmail(any(), any()))
-                .thenReturn(caseDataForApplicationsApprovedStrikeOutWhenRespondentsAreInList(
-                    NO, NO, NO, "SPEC_CLAIM"));
-
             judicialRespondentNotificationService
                 .sendNotification(
                     caseDataForApplicationsApprovedStrikeOutWhenRespondentsAreInList(
@@ -1018,15 +911,6 @@ public class JudicialDecisionRespondentNotificationHandlerTest {
 
         @Test
         void shouldSendNotification_WhenAdditionalPaymentReceived_JudgeDismissedApplicationUncloaked() {
-
-            when(solicitorEmailValidation.validateSolicitorEmail(any(), any()))
-                .thenReturn(
-                    caseDataForCaseDismissedByJudgeRespondentsAreInList(NO, NO, YES).toBuilder()
-                        .generalAppPBADetails(GAPbaDetails.builder()
-                                                  .additionalPaymentDetails(buildAdditionalPaymentSuccessData())
-                                                  .build())
-                        .build()
-                );
 
             CaseData caseData = caseDataForCaseDismissedByJudgeRespondentsAreInList(NO, NO, YES)
                 .toBuilder().generalAppPBADetails(
@@ -1535,7 +1419,6 @@ public class JudicialDecisionRespondentNotificationHandlerTest {
             CaseData caseData = caseDataForJudicialRequestForInformationOfApplication(NO, YES, NO,
                                                                                       REQUEST_MORE_INFORMATION);
             when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(CaseData.builder().ccdState(CaseState.CASE_PROGRESSION).build());
-            when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
 
             judicialRespondentNotificationService.sendNotification(caseData, RESPONDENT);
 
@@ -1552,8 +1435,6 @@ public class JudicialDecisionRespondentNotificationHandlerTest {
 
             CaseData caseData = caseDataForJudicialRequestForInformationOfApplication(NO, NO, NO,
                                                                                       SEND_APP_TO_OTHER_PARTY);
-            when(solicitorEmailValidation.validateSolicitorEmail(any(), any()))
-                .thenReturn(caseData);
 
             judicialRespondentNotificationService.sendNotification(caseData, RESPONDENT);
 
@@ -1573,8 +1454,6 @@ public class JudicialDecisionRespondentNotificationHandlerTest {
                 .build();
 
             when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(CaseData.builder().ccdState(CaseState.CASE_PROGRESSION).build());
-            when(solicitorEmailValidation.validateSolicitorEmail(any(), any()))
-                .thenReturn(caseData);
 
             when(time.now()).thenReturn(responseDate);
             when(deadlinesCalculator.calculateApplicantResponseDeadline(

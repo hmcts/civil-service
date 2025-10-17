@@ -10,9 +10,10 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.GaCallbackDataUtil;
 import uk.gov.hmcts.reform.civil.service.DocUploadNotificationService;
-import uk.gov.hmcts.reform.civil.utils.JudicialDecisionNotificationUtil;
+import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.util.List;
 import java.util.Map;
@@ -40,17 +41,18 @@ public class DocUploadNotifyHandler extends CallbackHandler {
 
     private CallbackResponse notifyDocUpload(CallbackParams callbackParams) {
 
-        CaseData caseData = callbackParams.getCaseData();
+        GeneralApplicationCaseData gaCaseData = GaCallbackDataUtil.resolveGaCaseData(callbackParams, objectMapper);
+        CaseData caseData = GaCallbackDataUtil.mergeToCaseData(gaCaseData, callbackParams.getCaseData(), objectMapper);
 
         try {
-            docUploadNotificationService.notifyApplicantEvidenceUpload(caseData);
+            docUploadNotificationService.notifyApplicantEvidenceUpload(caseData, gaCaseData);
         } catch (Exception e) {
             log.warn("Failed to send email notification to applicant for case '{}', {}",
                     caseData.getCcdCaseReference().toString(), e.getMessage());
         }
-        if (JudicialDecisionNotificationUtil.isWithNotice(caseData)) {
+        if (gaCaseData != null && gaCaseData.isWithNotice()) {
             try {
-                docUploadNotificationService.notifyRespondentEvidenceUpload(caseData);
+                docUploadNotificationService.notifyRespondentEvidenceUpload(caseData, gaCaseData);
             } catch (Exception e) {
                 log.warn("Failed to send email notification to respondent solicitor for case '{}', {}",
                         caseData.getCcdCaseReference().toString(), e.getMessage());

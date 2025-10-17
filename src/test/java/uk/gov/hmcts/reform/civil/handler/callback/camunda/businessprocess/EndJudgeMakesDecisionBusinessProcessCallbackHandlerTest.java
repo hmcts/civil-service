@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.JudicialDecisionHelper;
@@ -69,7 +70,7 @@ class EndJudgeMakesDecisionBusinessProcessCallbackHandlerTest extends BaseCallba
         handler.handle(params);
 
         verify(parentCaseUpdateHelper, times(1))
-            .updateParentApplicationVisibilityWithNewState(any(), any());
+            .updateParentApplicationVisibilityWithNewState(any(GeneralApplicationCaseData.class), any());
 
     }
 
@@ -86,7 +87,7 @@ class EndJudgeMakesDecisionBusinessProcessCallbackHandlerTest extends BaseCallba
         handler.handle(params);
 
         verify(parentCaseUpdateHelper, times(1))
-            .updateParentWithGAState(any(), any());
+            .updateParentWithGAState(any(GeneralApplicationCaseData.class), any());
 
     }
 

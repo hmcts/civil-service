@@ -1,11 +1,13 @@
 package uk.gov.hmcts.reform.civil.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.GAJudgeDecisionOption;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import static java.util.Objects.nonNull;
@@ -36,6 +38,7 @@ import static uk.gov.hmcts.reform.civil.utils.RespondentsResponsesUtil.isRespond
 public class StateGeneratorService {
 
     private final JudicialDecisionHelper judicialDecisionHelper;
+    private final ObjectMapper objectMapper;
 
     public CaseState getCaseStateForEndJudgeBusinessProcess(CaseData data) {
         log.info("Starting getCaseStateForEndJudgeBusinessProcess for Case ID: {}", data.getCcdCaseReference());
@@ -105,16 +108,22 @@ public class StateGeneratorService {
         return caseData.getGeneralAppPBADetails().getAdditionalPaymentDetails() != null;
     }
 
-    private static boolean isConsentOrderRespondentSatisfied(CaseData caseData) {
-        return nonNull(caseData.getGeneralAppConsentOrder()) && isRespondentsResponseSatisfied(
-            caseData,
-            caseData.toBuilder().build()
-        );
+    private boolean isConsentOrderRespondentSatisfied(CaseData caseData) {
+        if (!nonNull(caseData.getGeneralAppConsentOrder())) {
+            return false;
+        }
+        GeneralApplicationCaseData original = toGeneralApplicationCaseData(caseData);
+        GeneralApplicationCaseData updated = toGeneralApplicationCaseData(caseData.toBuilder().build());
+        return isRespondentsResponseSatisfied(original, updated);
     }
 
     private boolean isUrgentWithoutNotice(CaseData caseData) {
         return caseData.getGeneralAppInformOtherParty() != null
             && YesOrNo.NO.equals(caseData.getGeneralAppInformOtherParty().getIsWithNotice())
             && caseData.isUrgent();
+    }
+
+    private GeneralApplicationCaseData toGeneralApplicationCaseData(CaseData caseData) {
+        return objectMapper.convertValue(caseData, GeneralApplicationCaseData.class);
     }
 }

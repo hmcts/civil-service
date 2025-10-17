@@ -33,11 +33,13 @@ public class DocmosisService {
             courtLocations = generalAppLocationRefDataService.getCourtLocations(authorisation);
         }
         assert courtLocations != null;
+        var caseLocation = caseData.getCaseManagementLocation();
         var matchingLocations =
             courtLocations
                 .stream()
-                .filter(location -> location.getEpimmsId()
-                    .equals(caseData.getGaCaseManagementLocation().getBaseLocation())).toList();
+                .filter(location -> caseLocation != null
+                    && location.getEpimmsId().equals(caseLocation.getBaseLocation()))
+                .toList();
 
         if (!matchingLocations.isEmpty()) {
             return matchingLocations.get(0);
@@ -84,6 +86,7 @@ public class DocmosisService {
     }
 
     public Boolean checkIfCnbc(CaseData caseData) {
-        return caseData.getGaCaseManagementLocation().getBaseLocation().equals(cnbcEpimmId);
+        var caseLocation = caseData.getCaseManagementLocation();
+        return caseLocation != null && cnbcEpimmId.equals(caseLocation.getBaseLocation());
     }
 }

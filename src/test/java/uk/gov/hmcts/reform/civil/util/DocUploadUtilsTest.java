@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.GASolicitorDetailsGAspec;
@@ -112,6 +113,13 @@ public class DocUploadUtilsTest {
                 .id("id33")
                 .email(DUMMY_EMAIL)
                 .organisationIdentifier("3").build()));
+        GASolicitorDetailsGAspec applicantSolicitor = GASolicitorDetailsGAspec.builder()
+            .id("2")
+            .forename("GAApplnSolicitor")
+            .email(DUMMY_EMAIL)
+            .organisationIdentifier("1")
+            .build();
+
         CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .ccdCaseReference(1678356749555475L)
@@ -121,14 +129,23 @@ public class DocUploadUtilsTest {
                 .generalAppRespondentSolicitors(gaRespSolicitors)
                 .parentClaimantIsApplicant(NO)
                 .isMultiParty(YES)
-                .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id("2").forename("GAApplnSolicitor")
-                        .email(DUMMY_EMAIL).organisationIdentifier("1").build())
+                .generalAppApplnSolicitor(applicantSolicitor)
                 .claimant1PartyName("Mr. John Rambo")
                 .defendant1PartyName("Mr. Sole Trader")
                 .build();
-        assertThat(DocUploadUtils.getUserRole(caseData, "2")).isEqualTo(DocUploadUtils.APPLICANT);
-        assertThat(DocUploadUtils.getUserRole(caseData, "id1")).isEqualTo(DocUploadUtils.RESPONDENT_ONE);
-        assertThat(DocUploadUtils.getUserRole(caseData, "id33")).isEqualTo(DocUploadUtils.RESPONDENT_TWO);
+
+        GeneralApplicationCaseData gaCaseData = GeneralApplicationCaseData.builder()
+            .parentClaimantIsApplicant(NO)
+            .isMultiParty(YES)
+            .generalAppApplnSolicitor(applicantSolicitor)
+            .generalAppRespondentSolicitors(gaRespSolicitors)
+            .isGaApplicantLip(NO)
+            .isGaRespondentOneLip(NO)
+            .build();
+
+        assertThat(DocUploadUtils.getUserRole(caseData, gaCaseData, "2")).isEqualTo(DocUploadUtils.APPLICANT);
+        assertThat(DocUploadUtils.getUserRole(caseData, gaCaseData, "id1")).isEqualTo(DocUploadUtils.RESPONDENT_ONE);
+        assertThat(DocUploadUtils.getUserRole(caseData, gaCaseData, "id33")).isEqualTo(DocUploadUtils.RESPONDENT_TWO);
     }
 
     @Test

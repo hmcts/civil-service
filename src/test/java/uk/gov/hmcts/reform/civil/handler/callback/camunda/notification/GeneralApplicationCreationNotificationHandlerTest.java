@@ -52,7 +52,7 @@ public class GeneralApplicationCreationNotificationHandlerTest extends BaseCallb
         var caseData = CaseDataBuilder.builder().generalOrderApplication()
                 .ccdState(CaseState.AWAITING_APPLICATION_PAYMENT)
                 .build();
-        when(generalAppFeesService.isFreeApplication(any())).thenReturn(false);
+        when(generalAppFeesService.isFreeApplication(any(CaseData.class))).thenReturn(false);
         doThrow(buildNotificationException())
             .when(gaNotificationService)
             .sendNotification(caseData);
@@ -66,7 +66,7 @@ public class GeneralApplicationCreationNotificationHandlerTest extends BaseCallb
         var caseData = CaseDataBuilder.builder().generalOrderApplication()
                 .ccdState(CaseState.PENDING_APPLICATION_ISSUED)
                 .build();
-        when(generalAppFeesService.isFreeApplication(any())).thenReturn(false);
+        when(generalAppFeesService.isFreeApplication(any(CaseData.class))).thenReturn(false);
 
         params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         handler.handle(params);
@@ -78,7 +78,7 @@ public class GeneralApplicationCreationNotificationHandlerTest extends BaseCallb
         var caseData = CaseDataBuilder.builder().generalOrderApplication()
                 .ccdState(CaseState.PENDING_APPLICATION_ISSUED)
                 .build();
-        when(generalAppFeesService.isFreeApplication(any())).thenReturn(true);
+        when(generalAppFeesService.isFreeApplication(any(CaseData.class))).thenReturn(true);
         when(gaNotificationService.sendNotification(any())).thenAnswer(i -> i.getArguments()[0]);
         params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         handler.handle(params);
@@ -90,7 +90,7 @@ public class GeneralApplicationCreationNotificationHandlerTest extends BaseCallb
         var caseData = CaseDataBuilder.builder().generalOrderApplication()
                 .ccdState(CaseState.AWAITING_APPLICATION_PAYMENT)
                 .build();
-        when(generalAppFeesService.isFreeApplication(any())).thenReturn(false);
+        when(generalAppFeesService.isFreeApplication(any(CaseData.class))).thenReturn(false);
         when(gaNotificationService.sendNotification(any())).thenAnswer(i -> i.getArguments()[0]);
         params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         handler.handle(params);
@@ -102,4 +102,3 @@ public class GeneralApplicationCreationNotificationHandlerTest extends BaseCallb
     }
 
 }
-

@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.service.docmosis;
 
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.util.ArrayList;
@@ -12,27 +13,41 @@ import java.util.stream.Collectors;
 public class ListGeneratorService {
 
     public String applicationType(CaseData caseData) {
-        List<GeneralApplicationTypes> types = caseData.getGeneralAppType().getTypes();
-        String collect = types.stream()
-            .map(GeneralApplicationTypes::getDisplayedValue).collect(Collectors.joining(", "));
-        return collect;
+        return applicationType(caseData.getGeneralAppType().getTypes());
+    }
+
+    public String applicationType(GeneralApplicationCaseData caseData) {
+        return applicationType(caseData.getGeneralAppType().getTypes());
+    }
+
+    private String applicationType(List<GeneralApplicationTypes> types) {
+        return types.stream()
+            .map(GeneralApplicationTypes::getDisplayedValue)
+            .collect(Collectors.joining(", "));
     }
 
     public String defendantsName(CaseData caseData) {
-        List<String> defendentNames = new ArrayList<>();
-        defendentNames.add(caseData.getDefendant1PartyName());
-        if (caseData.getDefendant2PartyName() != null) {
-            defendentNames.add(caseData.getDefendant2PartyName());
-        }
-        return String.join(", ", defendentNames);
+        return joinNames(caseData.getDefendant1PartyName(), caseData.getDefendant2PartyName());
+    }
+
+    public String defendantsName(GeneralApplicationCaseData caseData) {
+        return joinNames(caseData.getDefendant1PartyName(), caseData.getDefendant2PartyName());
     }
 
     public String claimantsName(CaseData caseData) {
-        List<String> claimantNames = new ArrayList<>();
-        claimantNames.add(caseData.getClaimant1PartyName());
-        if (caseData.getClaimant2PartyName() != null) {
-            claimantNames.add(caseData.getClaimant2PartyName());
+        return joinNames(caseData.getClaimant1PartyName(), caseData.getClaimant2PartyName());
+    }
+
+    public String claimantsName(GeneralApplicationCaseData caseData) {
+        return joinNames(caseData.getClaimant1PartyName(), caseData.getClaimant2PartyName());
+    }
+
+    private String joinNames(String primary, String secondary) {
+        List<String> names = new ArrayList<>();
+        names.add(primary);
+        if (secondary != null) {
+            names.add(secondary);
         }
-        return String.join(", ", claimantNames);
+        return String.join(", ", names);
     }
 }

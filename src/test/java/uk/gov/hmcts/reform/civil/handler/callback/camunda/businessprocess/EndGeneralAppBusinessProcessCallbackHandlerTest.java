@@ -56,6 +56,7 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.GaForLipService;
 import uk.gov.hmcts.reform.civil.service.ParentCaseUpdateHelper;
+import uk.gov.hmcts.reform.civil.service.ga.GaCaseDataEnricher;
 import uk.gov.hmcts.reform.civil.utils.JudicialDecisionNotificationUtil;
 
 import java.math.BigDecimal;
@@ -100,6 +101,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     CaseDetailsConverter.class,
     CoreCaseDataService.class,
     ParentCaseUpdateHelper.class,
+    GaCaseDataEnricher.class,
     ObjectMapper.class,
     JudicialDecisionNotificationUtil.class
 })
@@ -141,7 +143,7 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends BaseCallbac
 
         @BeforeEach
         void setUp() {
-            when(gaForLipService.isGaForLip(any())).thenReturn(true);
+            when(gaForLipService.isGaForLip(any(CaseData.class))).thenReturn(true);
         }
 
         @Test
@@ -176,7 +178,7 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends BaseCallbac
                 .build();
 
             when(coreCaseDataService.caseDataContentFromStartEventResponse(any(), anyMap())).thenCallRealMethod();
-            when(gaForLipService.isGaForLip(any())).thenReturn(true);
+            when(gaForLipService.isGaForLip(any(CaseData.class))).thenReturn(true);
             when(caseDetailsConverter.toCaseDataGA(getCallbackParamsGaForLipCaseData(NO).getRequest().getCaseDetails()))
                 .thenReturn(updatedCaseDate);
             when(coreCaseDataService.startUpdate(any(), any())).thenReturn(getStartEventResponse());
@@ -226,7 +228,7 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends BaseCallbac
                 .build();
 
             when(coreCaseDataService.caseDataContentFromStartEventResponse(any(), anyMap())).thenCallRealMethod();
-            when(gaForLipService.isGaForLip(any())).thenReturn(true);
+            when(gaForLipService.isGaForLip(any(CaseData.class))).thenReturn(true);
             when(caseDetailsConverter.toCaseDataGA(getCallbackParamsGaForLipCaseData(NO).getRequest().getCaseDetails()))
                 .thenReturn(updatedCaseDate);
             when(coreCaseDataService.startUpdate(any(), any())).thenReturn(getStartEventResponse());
@@ -277,7 +279,7 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends BaseCallbac
                 .build();
 
             when(coreCaseDataService.caseDataContentFromStartEventResponse(any(), anyMap())).thenCallRealMethod();
-            when(gaForLipService.isGaForLip(any())).thenReturn(true);
+            when(gaForLipService.isGaForLip(any(CaseData.class))).thenReturn(true);
             when(caseDetailsConverter.toCaseDataGA(getCallbackParamsGaForLipCaseData(NO).getRequest().getCaseDetails()))
                 .thenReturn(updatedCaseDate);
             when(coreCaseDataService.startUpdate(any(), any())).thenReturn(getStartEventResponse());
@@ -329,7 +331,7 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends BaseCallbac
                     .build();
 
             when(coreCaseDataService.caseDataContentFromStartEventResponse(any(), anyMap())).thenCallRealMethod();
-            when(gaForLipService.isGaForLip(any())).thenReturn(true);
+            when(gaForLipService.isGaForLip(any(CaseData.class))).thenReturn(true);
             when(caseDetailsConverter.toCaseDataGA(getCallbackParamsGaForLipCaseDataFullRemission().getRequest().getCaseDetails()))
                     .thenReturn(updatedCaseDate);
             when(coreCaseDataService.startUpdate(any(), any())).thenReturn(getStartEventResponse());
@@ -382,7 +384,7 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends BaseCallbac
                     .build();
 
             when(coreCaseDataService.caseDataContentFromStartEventResponse(any(), anyMap())).thenCallRealMethod();
-            when(gaForLipService.isGaForLip(any())).thenReturn(true);
+            when(gaForLipService.isGaForLip(any(CaseData.class))).thenReturn(true);
             when(caseDetailsConverter.toCaseDataGA(getCallbackParamsGaForLipCaseDataPartRemission().getRequest().getCaseDetails()))
                     .thenReturn(updatedCaseDate);
             when(coreCaseDataService.startUpdate(any(), any())).thenReturn(getStartEventResponse());
@@ -433,7 +435,7 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends BaseCallbac
                 .claimantGaAppDetails(wrapElements(claimantCollection))
                 .build();
 
-            when(gaForLipService.isGaForLip(any())).thenReturn(true);
+            when(gaForLipService.isGaForLip(any(CaseData.class))).thenReturn(true);
             when(caseDetailsConverter.toCaseDataGA(getCallbackParamsGaForLipCaseData(NO).getRequest().getCaseDetails()))
                 .thenReturn(updatedCaseDate);
             when(coreCaseDataService.startUpdate(any(), any())).thenReturn(getStartEventResponse());
@@ -1487,7 +1489,7 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends BaseCallbac
             return CaseDataBuilder.builder().buildCaseDateBaseOnGeneralApplication(
                             getGeneralApplication(isConsented, isTobeNotified))
                     .toBuilder().ccdCaseReference(CHILD_CCD_REF)
-                    .finalOrderSelectionGA(selection).assistedOrderFurtherHearingDetails(hearingDetails).build();
+                    .finalOrderSelection(selection).assistedOrderFurtherHearingDetails(hearingDetails).build();
         }
 
         private CallbackParams getCallbackParamsMulti(YesOrNo isConsented, YesOrNo isTobeNotified,

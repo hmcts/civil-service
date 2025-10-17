@@ -1,8 +1,10 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -20,10 +22,12 @@ import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocument;
 import uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.SendFinalOrderPrintService;
+import uk.gov.hmcts.reform.civil.service.ga.GaCaseDataEnricher;
 
 import java.util.List;
 
@@ -31,7 +35,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -48,6 +52,8 @@ public class SendTranslatedOrderToLiPCallbackHandlerTest extends BaseCallbackHan
     private CoreCaseDataService coreCaseDataService;
     @Mock
     private CaseDetailsConverter caseDetailsConverter;
+    @Mock
+    private GaCaseDataEnricher gaCaseDataEnricher;
     @InjectMocks
     private SendTranslatedOrderToLiPCallbackHandler handler;
     private static final String TASK_ID = "default";
@@ -60,6 +66,11 @@ public class SendTranslatedOrderToLiPCallbackHandlerTest extends BaseCallbackHan
     @Test
     void shouldReturnCorrectTaskId() {
         assertThat(handler.camundaActivityId(CallbackParams.builder().build())).isEqualTo(TASK_ID);
+    }
+
+    @BeforeEach
+    void setUp() {
+        lenient().when(gaCaseDataEnricher.enrich(any(), any())).thenAnswer(invocation -> invocation.getArgument(0));
     }
 
     @Nested
@@ -84,7 +95,7 @@ public class SendTranslatedOrderToLiPCallbackHandlerTest extends BaseCallbackHan
                                                  .value(TranslatedDocument.builder()
                                                             .file(printDocument)
                                                             .documentType(TranslatedDocumentType.GENERAL_ORDER).build()).build()))
-                .applicantBilingualLanguagePreferenceGA(YesOrNo.YES)
+                .applicantBilingualLanguagePreference(YesOrNo.YES)
                 .isGaApplicantLip(YesOrNo.YES)
                 .parentClaimantIsApplicant(YesOrNo.YES)
                 .build();
@@ -97,8 +108,7 @@ public class SendTranslatedOrderToLiPCallbackHandlerTest extends BaseCallbackHan
 
             handler.handle(params);
 
-            verify(sendOrderPrintService, times(1))
-                .sendJudgeTranslatedOrderToPrintForLIP(any(), eq(null), eq(printDocument), eq(caseData), eq(SEND_TRANSLATED_ORDER_TO_LIP_APPLICANT));
+            assertPrinted(null, printDocument, caseData, SEND_TRANSLATED_ORDER_TO_LIP_APPLICANT);
         }
 
         @Test
@@ -131,8 +141,7 @@ public class SendTranslatedOrderToLiPCallbackHandlerTest extends BaseCallbackHan
 
             handler.handle(params);
 
-            verify(sendOrderPrintService, times(1))
-                .sendJudgeTranslatedOrderToPrintForLIP(any(), eq(printDocument), eq(null), eq(caseData), eq(SEND_TRANSLATED_ORDER_TO_LIP_APPLICANT));
+            assertPrinted(printDocument, null, caseData, SEND_TRANSLATED_ORDER_TO_LIP_APPLICANT);
         }
 
         @Test
@@ -143,7 +152,7 @@ public class SendTranslatedOrderToLiPCallbackHandlerTest extends BaseCallbackHan
                 .translatedDocumentsBulkPrint(List.of(Element.<TranslatedDocument>builder()
                                                           .value(TranslatedDocument.builder()
                                                                      .documentType(TranslatedDocumentType.APPLICATION_SUMMARY_DOCUMENT).build()).build()))
-                .applicantBilingualLanguagePreferenceGA(YesOrNo.YES)
+                .applicantBilingualLanguagePreference(YesOrNo.YES)
                 .isGaApplicantLip(YesOrNo.YES)
                 .parentClaimantIsApplicant(YesOrNo.YES)
                 .build();
@@ -164,7 +173,10 @@ public class SendTranslatedOrderToLiPCallbackHandlerTest extends BaseCallbackHan
             Document printDocument = Document.builder().build();
             CaseDetails parentCaseDetails = CaseDetails.builder().build();
             CaseData parentCaseData = CaseData.builder()
-                .respondent1LiPResponseGA(RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH").build()).build();
+                .caseDataLiP(uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP.builder()
+                    .respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH").build())
+                    .build())
+                .build();
             when(coreCaseDataService.getCase(anyLong())).thenReturn(parentCaseDetails);
             when(caseDetailsConverter.toCaseData(parentCaseDetails)).thenReturn(parentCaseData);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
@@ -178,7 +190,7 @@ public class SendTranslatedOrderToLiPCallbackHandlerTest extends BaseCallbackHan
                                                           .value(TranslatedDocument.builder()
                                                                      .file(printDocument)
                                                                      .documentType(TranslatedDocumentType.GENERAL_ORDER).build()).build()))
-                .respondentBilingualLanguagePreferenceGA(YesOrNo.YES)
+                .respondentBilingualLanguagePreference(YesOrNo.YES)
                 .isGaApplicantLip(YesOrNo.YES)
                 .parentClaimantIsApplicant(YesOrNo.YES)
                 .build();
@@ -191,8 +203,7 @@ public class SendTranslatedOrderToLiPCallbackHandlerTest extends BaseCallbackHan
 
             handler.handle(params);
 
-            verify(sendOrderPrintService, times(1))
-                .sendJudgeTranslatedOrderToPrintForLIP(any(), eq(printDocument), eq(printDocument), eq(caseData), eq(SEND_TRANSLATED_ORDER_TO_LIP_RESPONDENT));
+            assertPrinted(printDocument, printDocument, caseData, SEND_TRANSLATED_ORDER_TO_LIP_RESPONDENT);
         }
 
         @Test
@@ -214,7 +225,7 @@ public class SendTranslatedOrderToLiPCallbackHandlerTest extends BaseCallbackHan
                                                           .value(TranslatedDocument.builder()
                                                                      .file(printDocument)
                                                                      .documentType(TranslatedDocumentType.GENERAL_ORDER).build()).build()))
-                .respondentBilingualLanguagePreferenceGA(YesOrNo.YES)
+                .respondentBilingualLanguagePreference(YesOrNo.YES)
                 .isGaApplicantLip(YesOrNo.YES)
                 .parentClaimantIsApplicant(YesOrNo.NO)
                 .build();
@@ -227,8 +238,7 @@ public class SendTranslatedOrderToLiPCallbackHandlerTest extends BaseCallbackHan
 
             handler.handle(params);
 
-            verify(sendOrderPrintService, times(1))
-                .sendJudgeTranslatedOrderToPrintForLIP(any(), eq(printDocument), eq(printDocument), eq(caseData), eq(SEND_TRANSLATED_ORDER_TO_LIP_RESPONDENT));
+            assertPrinted(printDocument, printDocument, caseData, SEND_TRANSLATED_ORDER_TO_LIP_RESPONDENT);
         }
 
         @Test
@@ -239,7 +249,7 @@ public class SendTranslatedOrderToLiPCallbackHandlerTest extends BaseCallbackHan
                 .translatedDocumentsBulkPrint(List.of(Element.<TranslatedDocument>builder()
                                                  .value(TranslatedDocument.builder()
                                                             .documentType(TranslatedDocumentType.GENERAL_ORDER).build()).build()))
-                .applicantBilingualLanguagePreferenceGA(YesOrNo.YES)
+                .applicantBilingualLanguagePreference(YesOrNo.YES)
                 .isGaApplicantLip(YesOrNo.YES)
                 .parentClaimantIsApplicant(YesOrNo.YES)
                 .build();
@@ -260,7 +270,7 @@ public class SendTranslatedOrderToLiPCallbackHandlerTest extends BaseCallbackHan
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
         caseData = caseData.toBuilder()
             .parentCaseReference(caseData.getCcdCaseReference().toString())
-            .applicantBilingualLanguagePreferenceGA(YesOrNo.YES)
+            .applicantBilingualLanguagePreference(YesOrNo.YES)
             .isGaApplicantLip(YesOrNo.YES)
             .parentClaimantIsApplicant(YesOrNo.YES)
             .build();
@@ -282,7 +292,7 @@ public class SendTranslatedOrderToLiPCallbackHandlerTest extends BaseCallbackHan
         caseData = caseData.toBuilder()
             .parentCaseReference(caseData.getCcdCaseReference().toString())
             .translatedDocumentsBulkPrint(List.of())
-            .applicantBilingualLanguagePreferenceGA(YesOrNo.YES)
+            .applicantBilingualLanguagePreference(YesOrNo.YES)
             .isGaApplicantLip(YesOrNo.YES)
             .parentClaimantIsApplicant(YesOrNo.YES)
             .build();
@@ -296,5 +306,23 @@ public class SendTranslatedOrderToLiPCallbackHandlerTest extends BaseCallbackHan
         handler.handle(params);
 
         verifyNoInteractions(sendOrderPrintService);
+    }
+
+    private void assertPrinted(Document expectedOriginal, Document expectedTranslated, CaseData expectedCaseData, CaseEvent event) {
+        ArgumentCaptor<Document> originalCaptor = ArgumentCaptor.forClass(Document.class);
+        ArgumentCaptor<Document> translatedCaptor = ArgumentCaptor.forClass(Document.class);
+        ArgumentCaptor<CaseData> caseDataCaptor = ArgumentCaptor.forClass(CaseData.class);
+
+        verify(sendOrderPrintService).sendJudgeTranslatedOrderToPrintForLIP(
+            any(),
+            originalCaptor.capture(),
+            translatedCaptor.capture(),
+            caseDataCaptor.capture(),
+            eq(event)
+        );
+
+        assertThat(originalCaptor.getValue()).isEqualTo(expectedOriginal);
+        assertThat(translatedCaptor.getValue()).isEqualTo(expectedTranslated);
+        assertThat(caseDataCaptor.getValue()).isEqualTo(expectedCaseData);
     }
 }

@@ -13,6 +13,8 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.GaCallbackDataUtil;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -74,6 +76,7 @@ public class AssignCaseToUserCallbackHandler extends CallbackHandler {
 
     private CallbackResponse assignOrgPolicy(CallbackParams callbackParams) {
         CaseData caseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetails());
+        GeneralApplicationCaseData gaCaseData = GaCallbackDataUtil.toGaCaseData(caseData, mapper);
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         String caseId = caseData.getCcdCaseReference().toString();
         log.info("CaseData in AssignCaseToUserCallbackHandler: {}", caseId);
@@ -86,7 +89,7 @@ public class AssignCaseToUserCallbackHandler extends CallbackHandler {
                     .build())
                 .orgPolicyCaseAssignedRole(APPLICANTSOLICITORONE.getFormattedName()).build());
 
-            if (!gaForLipService.isGaForLip(caseData)) {
+            if (!gaForLipService.isGaForLip(gaCaseData)) {
                 List<Element<GASolicitorDetailsGAspec>> applicantAddlSolList = caseData.getGeneralAppRespondentSolicitors().stream()
                     .filter(userOrgId -> (userOrgId.getValue().getOrganisationIdentifier()
                         .equalsIgnoreCase(caseData.getGeneralAppApplnSolicitor()
@@ -95,7 +98,7 @@ public class AssignCaseToUserCallbackHandler extends CallbackHandler {
             }
         }
 
-        if (!gaForLipService.isGaForLip(caseData)) {
+        if (!gaForLipService.isGaForLip(gaCaseData)) {
             List<Element<GASolicitorDetailsGAspec>> respondentSolicitorsList = caseData.getGeneralAppRespondentSolicitors().stream()
                 .filter(userOrgId -> !(userOrgId.getValue().getOrganisationIdentifier()
                     .equalsIgnoreCase(caseData.getGeneralAppApplnSolicitor().getOrganisationIdentifier()))).toList();
@@ -114,7 +117,7 @@ public class AssignCaseToUserCallbackHandler extends CallbackHandler {
             && caseData.getGeneralAppRespondentAgreement().getHasAgreed().equals(YES))))
             || (generalAppFeesService.isFreeApplication(caseData))) {
 
-            if (!gaForLipService.isGaForLip(caseData)) {
+            if (!gaForLipService.isGaForLip(gaCaseData)) {
 
                 List<Element<GASolicitorDetailsGAspec>> respondentSolicitorsList = caseData.getGeneralAppRespondentSolicitors().stream()
                     .filter(userOrgId -> !(userOrgId.getValue().getOrganisationIdentifier()
@@ -176,11 +179,12 @@ public class AssignCaseToUserCallbackHandler extends CallbackHandler {
     private CallbackResponse assignSolicitorCaseRole(CallbackParams callbackParams) {
 
         CaseData caseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetails());
+        GeneralApplicationCaseData gaCaseData = GaCallbackDataUtil.toGaCaseData(caseData, mapper);
         String caseId = caseData.getCcdCaseReference().toString();
 
         if (caseData.getCcdState().equals(PENDING_APPLICATION_ISSUED)) {
             GASolicitorDetailsGAspec applicantSolicitor = caseData.getGeneralAppApplnSolicitor();
-            if (!gaForLipService.isLipApp(caseData)) {
+            if (!gaForLipService.isLipAppGa(gaCaseData)) {
                 log.info("Assigning case to Applicant Solicitor One: {} and caseId: {}", applicantSolicitor.getId(), caseId);
                 coreCaseUserService.assignCase(caseId, applicantSolicitor.getId(),
                     applicantSolicitor.getOrganisationIdentifier(), APPLICANTSOLICITORONE
@@ -216,7 +220,7 @@ public class AssignCaseToUserCallbackHandler extends CallbackHandler {
             && caseData.getGeneralAppRespondentAgreement().getHasAgreed().equals(YES))))
             || (generalAppFeesService.isFreeApplication(caseData))) {
             log.info("Assigning case to Respondent Solicitor for caseId: {}", caseId);
-            assignCaseToResopondentSolHelper.assignCaseToRespondentSolicitor(caseData, caseId);
+            assignCaseToResopondentSolHelper.assignCaseToRespondentSolicitor(gaCaseData, caseId);
         }
 
         return SubmittedCallbackResponse.builder().build();

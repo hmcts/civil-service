@@ -5,6 +5,7 @@ import org.apache.commons.lang.StringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
@@ -23,13 +24,14 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.judgedecisionpdfdocument.JudgeDecisionPdfDocument;
-import uk.gov.hmcts.reform.civil.model.genapplication.GACaseLocation;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAJudicialMakeAnOrder;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
+import uk.gov.hmcts.reform.civil.service.ga.GaCaseDataEnricher;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -70,6 +72,13 @@ class GeneralOrderGeneratorTest {
     private ObjectMapper mapper;
     @MockBean
     private DocmosisService docmosisService;
+    @MockBean
+    private GaCaseDataEnricher gaCaseDataEnricher;
+
+    @BeforeEach
+    void setup() {
+        when(gaCaseDataEnricher.enrich(any(), any())).thenAnswer(invocation -> invocation.getArgument(0));
+    }
 
     @Test
     void shouldGenerateGeneralOrderDocument() {
@@ -93,7 +102,9 @@ class GeneralOrderGeneratorTest {
     void shouldThrowExceptionWhenNoLocationMatch() {
 
         CaseData caseData = CaseDataBuilder.builder().generalOrderApplication()
-            .gaCaseManagementLocation(GACaseLocation.builder().baseLocation("8").build()).build();
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("8").build())
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("8").build())
+            .build();
 
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(GENERAL_ORDER)))
             .thenReturn(new DocmosisDocument(GENERAL_ORDER.getDocumentTitle(), bytes));
@@ -171,9 +182,9 @@ class GeneralOrderGeneratorTest {
                     + " ".concat(LocalDate.now().format(DATE_FORMATTER))),
                 () -> assertEquals(templateData.getJudgeRecital(),
                                    caseData.getJudicialDecisionMakeOrder().getJudgeRecitalText()),
-                () -> assertEquals(templateData.getAddress(), caseData.getGaCaseManagementLocation().getAddress()),
-                () -> assertEquals(templateData.getSiteName(), caseData.getGaCaseManagementLocation().getSiteName()),
-                () -> assertEquals(templateData.getPostcode(), caseData.getGaCaseManagementLocation().getPostcode()),
+                () -> assertEquals(templateData.getAddress(), caseData.getCaseManagementLocation().getAddress()),
+                () -> assertEquals(templateData.getSiteName(), caseData.getCaseManagementLocation().getSiteName()),
+                () -> assertEquals(templateData.getPostcode(), caseData.getCaseManagementLocation().getPostcode()),
                 () -> assertEquals("applicant1 partyname", templateData.getPartyName()),
                 () -> assertEquals("address1", templateData.getPartyAddressAddressLine1()),
                 () -> assertEquals("address2", templateData.getPartyAddressAddressLine2()),
@@ -222,9 +233,9 @@ class GeneralOrderGeneratorTest {
                     + " ".concat(LocalDate.now().format(DATE_FORMATTER))),
                 () -> assertEquals(templateData.getJudgeRecital(),
                                    caseData.getJudicialDecisionMakeOrder().getJudgeRecitalText()),
-                () -> assertEquals(templateData.getAddress(), caseData.getGaCaseManagementLocation().getAddress()),
-                () -> assertEquals(templateData.getSiteName(), caseData.getGaCaseManagementLocation().getSiteName()),
-                () -> assertEquals(templateData.getPostcode(), caseData.getGaCaseManagementLocation().getPostcode())
+                () -> assertEquals(templateData.getAddress(), caseData.getCaseManagementLocation().getAddress()),
+                () -> assertEquals(templateData.getSiteName(), caseData.getCaseManagementLocation().getSiteName()),
+                () -> assertEquals(templateData.getPostcode(), caseData.getCaseManagementLocation().getPostcode())
             );
         }
 

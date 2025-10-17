@@ -156,7 +156,6 @@ import uk.gov.hmcts.reform.civil.model.genapplication.CaseLink;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationTypeLR;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApproveConsentOrder;
-import uk.gov.hmcts.reform.civil.model.genapplication.GACaseLocation;
 import uk.gov.hmcts.reform.civil.model.genapplication.GADetailsRespondentSol;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDateGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingNoticeApplication;
@@ -597,7 +596,6 @@ public class CaseDataBuilder {
     private DisposalHearingJudgesRecitalDJ disposalHearingJudgesRecitalDJ;
     private TrialHearingJudgesRecital trialHearingJudgesRecitalDJ;
     private CaseLocationCivil caseManagementLocation;
-    private  GACaseLocation gaCaseManagementLocation;
     private DisposalHearingOrderMadeWithoutHearingDJ disposalHearingOrderMadeWithoutHearingDJ;
     private DisposalHearingFinalDisposalHearingTimeDJ disposalHearingFinalDisposalHearingTimeDJ;
     private DJPaymentTypeSelection paymentTypeSelection;
@@ -790,7 +788,7 @@ public class CaseDataBuilder {
     protected List<Element<GeneralApplicationsDetails>> claimantGaAppDetails;
     protected List<Element<GADetailsRespondentSol>> respondentSolGaAppDetails;
     protected List<Element<GADetailsRespondentSol>> respondentSolTwoGaAppDetails;
-    protected List<Element<GeneralApplicationsDetails>> gaDetailsMasterCollectionGA;
+    protected List<Element<GeneralApplicationsDetails>> gaDetailsMasterCollection;
 
     protected GASolicitorDetailsGAspec generalAppApplnSolicitor;
     protected YesOrNo isGaRespondentOneLip;
@@ -5801,6 +5799,7 @@ public class CaseDataBuilder {
         );
 
         this.generalApplicationsDetails = generalApplicationsDetails;
+        this.gaDetailsMasterCollection = generalApplicationsDetails;
         return this;
     }
 
@@ -8228,7 +8227,9 @@ public class CaseDataBuilder {
             .breathing(breathing)
             .caseManagementOrderSelection(caseManagementOrderSelection)
             .generalApplications(generalApplications)
-            .gaDetailsMasterCollection(generalApplicationsDetails)
+            .gaDetailsMasterCollection(gaDetailsMasterCollection != null
+                ? gaDetailsMasterCollection
+                : generalApplicationsDetails)
             .respondent1PinToPostLRspec(respondent1PinToPostLRspec)
             .trialHearingMethodDJ(trialHearingMethodDJ)
             .hearingMethodValuesDisposalHearingDJ(hearingMethodValuesDisposalHearingDJ)
@@ -8385,7 +8386,7 @@ public class CaseDataBuilder {
             .approveConsentOrder(approveConsentOrder)
             .respondentSolGaAppDetails(respondentSolGaAppDetails)
             .respondentSolTwoGaAppDetails(respondentSolTwoGaAppDetails)
-            .gaDetailsMasterCollectionGA(gaDetailsMasterCollectionGA)
+            .gaDetailsMasterCollection(gaDetailsMasterCollection)
             .generalApplications(generalApplications)
         .build();
     }
@@ -8486,8 +8487,8 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder gaDetailsMasterCollection(List<Element<GeneralApplicationsDetails>>
-                                                             gaDetailsMasterCollectionGA) {
-        this.gaDetailsMasterCollectionGA = gaDetailsMasterCollectionGA;
+                                                             gaDetailsMasterCollection) {
+        this.gaDetailsMasterCollection = gaDetailsMasterCollection;
         return this;
     }
 
@@ -8566,9 +8567,17 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder gaCaseManagementLocation(GACaseLocation caseManagementLocation) {
-        this.gaCaseManagementLocation = caseManagementLocation;
-        return this;
+    private CaseLocationCivil toCaseLocationCivil(uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil location) {
+        if (location == null) {
+            return null;
+        }
+        return CaseLocationCivil.builder()
+            .region(location.getRegion())
+            .siteName(location.getSiteName())
+            .baseLocation(location.getBaseLocation())
+            .address(location.getAddress())
+            .postcode(location.getPostcode())
+            .build();
     }
 
     public CaseDataBuilder judicialDecisionRequestMoreInfo(GAJudicialRequestMoreInfo judicialDecisionRequestMoreInfo) {
@@ -8717,7 +8726,7 @@ public class CaseDataBuilder {
                 .generalAppParentCaseLink(application.getGeneralAppParentCaseLink())
                 .generalAppRespondentSolicitors(application.getGeneralAppRespondentSolicitors())
                 .isCcmccLocation(application.getIsCcmccLocation())
-                .gaCaseManagementLocation(application.getGaCaseManagementLocation())
+                .caseManagementLocation(toCaseLocationCivil(application.getCaseManagementLocation()))
                 .build();
     }
 
@@ -8741,7 +8750,7 @@ public class CaseDataBuilder {
                 .generalAppParentCaseLink(application.getGeneralAppParentCaseLink())
                 .generalAppRespondentSolicitors(application.getGeneralAppRespondentSolicitors())
                 .isCcmccLocation(application.getIsCcmccLocation())
-                .gaCaseManagementLocation(application.getGaCaseManagementLocation())
+                .caseManagementLocation(toCaseLocationCivil(application.getCaseManagementLocation()))
                 .build();
     }
 
@@ -8765,7 +8774,7 @@ public class CaseDataBuilder {
                 .generalAppParentCaseLink(application.getGeneralAppParentCaseLink())
                 .generalAppRespondentSolicitors(application.getGeneralAppRespondentSolicitors())
                 .isCcmccLocation(application.getIsCcmccLocation())
-                .gaCaseManagementLocation(application.getGaCaseManagementLocation())
+                .caseManagementLocation(toCaseLocationCivil(application.getCaseManagementLocation()))
                 .build();
     }
 
@@ -8808,7 +8817,7 @@ public class CaseDataBuilder {
                 .applicantPartyName("Test Applicant Name")
                 .createdDate(SUBMITTED_DATE_TIME)
                 .locationName("County Court")
-                .gaCaseManagementLocation(GACaseLocation.builder()
+                .caseManagementLocation(CaseLocationCivil.builder()
                         .siteName("County Court")
                         .baseLocation("2")
                         .region("4").build())
@@ -8840,7 +8849,7 @@ public class CaseDataBuilder {
                 .defendant2PartyName("Test Defendant2 Name")
                 .applicantPartyName("Test Applicant Name")
                 .judgeTitle("John Doe")
-                .gaCaseManagementLocation(GACaseLocation.builder().siteName("testing")
+                .caseManagementLocation(CaseLocationCivil.builder().siteName("testing")
                         .address("london court")
                         .baseLocation("2")
                         .postcode("BA 117").build())
@@ -8882,35 +8891,37 @@ public class CaseDataBuilder {
 
     public CaseData.CaseDataBuilder<?, ?> generalOrderApplication() {
         return CaseData.builder()
-                .ccdCaseReference(CASE_ID)
-                .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference(PARENT_CASE_ID).build())
-                .claimant1PartyName("Test Claimant1 Name")
-                .claimant2PartyName("Test Claimant2 Name")
-                .defendant1PartyName("Test Defendant1 Name")
-                .defendant2PartyName("Test Defendant2 Name")
-                .applicantPartyName("Test Applicant Name")
-                .judgeTitle("John Doe")
-                .gaCaseManagementLocation(GACaseLocation.builder().siteName("testing")
-                        .address("london court")
-                        .baseLocation("2")
-                        .postcode("BA 117").build())
-                .isMultiParty(NO)
-                .createdDate(SUBMITTED_DATE_TIME)
-                .generalAppType(GAApplicationType.builder()
-                        .types(singletonList(EXTEND_TIME))
-                        .build())
-                .judicialDecision(GAJudicialDecision.builder().decision(MAKE_AN_ORDER).build())
-                .judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder()
-                        .orderText("Test Order")
-                        .orderCourtOwnInitiative("abcd")
-                        .orderCourtOwnInitiativeDate(now())
-                        .judicialByCourtsInitiative(GAByCourtsInitiativeGAspec.OPTION_1)
-                        .reasonForDecisionText("Test Reason")
-                        .makeAnOrder(GAJudgeMakeAnOrderOption.APPROVE_OR_EDIT)
-                        .showJudgeRecitalText(List.of(FinalOrderShowToggle.SHOW))
-                        .judgeRecitalText("Test Judge's recital")
-                        .build())
-                .submittedOn(APPLICATION_SUBMITTED_DATE);
+            .ccdCaseReference(CASE_ID)
+            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference(PARENT_CASE_ID).build())
+            .claimant1PartyName("Test Claimant1 Name")
+            .claimant2PartyName("Test Claimant2 Name")
+            .defendant1PartyName("Test Defendant1 Name")
+            .defendant2PartyName("Test Defendant2 Name")
+            .applicantPartyName("Test Applicant Name")
+            .judgeTitle("John Doe")
+            .caseManagementLocation(CaseLocationCivil.builder()
+                .siteName("testing")
+                .address("london court")
+                .baseLocation("2")
+                .postcode("BA 117")
+                .build())
+            .isMultiParty(NO)
+            .createdDate(SUBMITTED_DATE_TIME)
+            .generalAppType(GAApplicationType.builder()
+                .types(singletonList(EXTEND_TIME))
+                .build())
+            .judicialDecision(GAJudicialDecision.builder().decision(MAKE_AN_ORDER).build())
+            .judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder()
+                .orderText("Test Order")
+                .orderCourtOwnInitiative("abcd")
+                .orderCourtOwnInitiativeDate(now())
+                .judicialByCourtsInitiative(GAByCourtsInitiativeGAspec.OPTION_1)
+                .reasonForDecisionText("Test Reason")
+                .makeAnOrder(GAJudgeMakeAnOrderOption.APPROVE_OR_EDIT)
+                .showJudgeRecitalText(List.of(FinalOrderShowToggle.SHOW))
+                .judgeRecitalText("Test Judge's recital")
+                .build())
+            .submittedOn(APPLICATION_SUBMITTED_DATE);
     }
 
     public CaseData.CaseDataBuilder<?, ?> generalOrderFreeFormApplication() {
@@ -8922,7 +8933,7 @@ public class CaseDataBuilder {
                 .defendant2PartyName("Test Defendant2 Name")
                 .applicantPartyName("Test Applicant Name")
                 .judgeTitle("John Doe")
-                .gaCaseManagementLocation(GACaseLocation.builder().siteName("testing")
+                .caseManagementLocation(CaseLocationCivil.builder().siteName("testing")
                         .address("london court")
                         .postcode("BA 117").build())
                 .isMultiParty(NO)
@@ -8953,7 +8964,7 @@ public class CaseDataBuilder {
                 .defendant2PartyName("Test Defendant2 Name")
                 .applicantPartyName("Test Applicant Name")
                 .judgeTitle("John Doe")
-                .gaCaseManagementLocation(GACaseLocation.builder().siteName("testing")
+                .caseManagementLocation(CaseLocationCivil.builder().siteName("testing")
                         .address("london court")
                         .postcode("BA 117").build())
                 .isMultiParty(NO)
@@ -8986,7 +8997,7 @@ public class CaseDataBuilder {
                 .applicantPartyName("Test Applicant Name")
                 .judgeTitle("John Doe")
                 .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference(PARENT_CASE_ID).build())
-                .gaCaseManagementLocation(GACaseLocation.builder().siteName("testing")
+                .caseManagementLocation(CaseLocationCivil.builder().siteName("testing")
                         .address("london court")
                         .baseLocation("1")
                         .postcode("BA 117").build())
@@ -9019,7 +9030,7 @@ public class CaseDataBuilder {
                 .defendant2PartyName("Test Defendant2 Name")
                 .applicantPartyName("Test Applicant Name")
                 .judgeTitle("John Doe")
-                .gaCaseManagementLocation(GACaseLocation.builder().siteName("testing")
+                .caseManagementLocation(CaseLocationCivil.builder().siteName("testing")
                         .address("london court")
                         .baseLocation("1")
                         .postcode("BA 117").build())
@@ -9068,7 +9079,7 @@ public class CaseDataBuilder {
                 .defendant2PartyName("Test Defendant2 Name")
                 .applicantPartyName("Test Applicant Name")
                 .createdDate(LocalDateTime.now())
-                .gaCaseManagementLocation(GACaseLocation.builder().siteName("testing")
+                .caseManagementLocation(CaseLocationCivil.builder().siteName("testing")
                         .address("london court")
                         .baseLocation("1")
                         .postcode("BA 117").build())
@@ -9147,7 +9158,7 @@ public class CaseDataBuilder {
                         .organisation(Organisation.builder().organisationID("3").build())
                         .build())
                 .judicialDecision(GAJudicialDecision.builder().decision(LIST_FOR_A_HEARING).build())
-                .gaCaseManagementLocation(GACaseLocation.builder().siteName("testing")
+                .caseManagementLocation(CaseLocationCivil.builder().siteName("testing")
                         .address("london court")
                         .baseLocation("1")
                         .postcode("BA 117").build())
@@ -9189,7 +9200,7 @@ public class CaseDataBuilder {
                 .defendant2PartyName("Test Defendant2 Name")
                 .applicantPartyName("Test Applicant Name")
                 .judgeTitle("John Doe")
-                .gaCaseManagementLocation(GACaseLocation.builder().siteName("testing")
+                .caseManagementLocation(CaseLocationCivil.builder().siteName("testing")
                         .address("london court")
                         .baseLocation("1")
                         .postcode("BA 117").build())
@@ -9222,7 +9233,7 @@ public class CaseDataBuilder {
                 .defendant1PartyName("Test Defendant1 Name")
                 .defendant2PartyName("Test Defendant2 Name")
                 .applicantPartyName("Test Applicant Name")
-                .gaCaseManagementLocation(GACaseLocation.builder().siteName("testing")
+                .caseManagementLocation(CaseLocationCivil.builder().siteName("testing")
                         .address("london court")
                         .postcode("BA 117").build())
                 .judicialByCourtsInitiativeForWrittenRep(GAByCourtsInitiativeGAspec.OPTION_1)
@@ -9249,7 +9260,7 @@ public class CaseDataBuilder {
                 .claimant2PartyName("Test Claimant2 Name")
                 .defendant1PartyName("Test Defendant1 Name")
                 .judgeTitle("John Doe")
-                .gaCaseManagementLocation(GACaseLocation.builder().siteName("testing")
+                .caseManagementLocation(CaseLocationCivil.builder().siteName("testing")
                         .address("london court")
                         .baseLocation("2")
                         .postcode("BA 117").build())
@@ -9281,7 +9292,7 @@ public class CaseDataBuilder {
                 .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference(PARENT_CASE_ID).build())
                 .claimant1PartyName("Test Claimant1 Name")
                 .locationName("Nottingham County Court and Family Court (and Crown)")
-                .gaCaseManagementLocation(GACaseLocation.builder().siteName("testing")
+                .caseManagementLocation(CaseLocationCivil.builder().siteName("testing")
                         .address("london court")
                         .baseLocation("2")
                         .postcode("BA 117").build())

@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.callback;
 import lombok.Builder;
 import lombok.Getter;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.util.Map;
@@ -18,6 +19,8 @@ public class CallbackParams {
     private String pageId;
     private CaseData caseData;
     private CaseData caseDataBefore;
+    private GeneralApplicationCaseData gaCaseData;
+    private GeneralApplicationCaseData gaCaseDataBefore;
 
     public enum Params {
         BEARER_TOKEN

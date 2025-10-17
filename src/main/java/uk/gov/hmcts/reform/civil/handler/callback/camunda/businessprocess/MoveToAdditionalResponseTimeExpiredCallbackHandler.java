@@ -10,11 +10,13 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.ParentCaseUpdateHelper;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static java.util.Collections.singletonList;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -55,8 +57,10 @@ public class MoveToAdditionalResponseTimeExpiredCallbackHandler extends Callback
     private CallbackResponse changeGADetailsStatusInParent(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         log.info("Updating parent with latest state of application-caseId: {}", caseData.getCcdCaseReference());
+        GeneralApplicationCaseData gaCaseData = callbackParams.getGaCaseData();
+        Objects.requireNonNull(gaCaseData, "gaCaseData must be present on CallbackParams");
         parentCaseUpdateHelper.updateParentWithGAState(
-            caseData,
+            gaCaseData,
             ADDITIONAL_RESPONSE_TIME_EXPIRED.getDisplayedValue()
         );
 

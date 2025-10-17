@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.payment;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.GAJudgeRequestMoreInfoOption;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
@@ -44,6 +45,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -105,13 +107,28 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends BaseCallb
     @Mock
     private GaForLipService gaForLipService;
 
-    @InjectMocks
     private ModifyStateAfterAdditionalFeeReceivedCallbackHandler handler;
 
     private final List<MakeAppAvailableCheckGAspec> makeAppAvailableCheck = List.of(MakeAppAvailableCheckGAspec.CONSENT_AGREEMENT_CHECKBOX);
 
     private final GAMakeApplicationAvailableCheck gaMakeApplicationAvailableCheck = GAMakeApplicationAvailableCheck.builder()
             .makeAppAvailableCheck(makeAppAvailableCheck).build();
+
+    @BeforeEach
+    void setUp() {
+        handler = new ModifyStateAfterAdditionalFeeReceivedCallbackHandler(
+            parentCaseUpdateHelper,
+            stateGeneratorService,
+            assignCaseToResopondentSolHelper,
+            dashboardScenariosService,
+            mapper,
+            featureToggleService,
+            gaForLipService,
+            coreCaseDataService,
+            caseDetailsConverter,
+            objectMapper
+        );
+    }
 
     @Test
     void shouldRespondWithStateChanged() {
@@ -138,8 +155,8 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends BaseCallb
         assertThat(response.getState()).isEqualTo(AWAITING_RESPONDENT_RESPONSE.toString());
 
         verify(assignCaseToResopondentSolHelper, times(1)).assignCaseToRespondentSolicitor(
-                any(),
-                any()
+                any(GeneralApplicationCaseData.class),
+                anyString()
         );
     }
 
@@ -169,8 +186,8 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends BaseCallb
         assertThat(response.getState()).isEqualTo(AWAITING_RESPONDENT_RESPONSE.toString());
 
         verify(assignCaseToResopondentSolHelper, times(1)).assignCaseToRespondentSolicitor(
-                any(),
-                any()
+                any(GeneralApplicationCaseData.class),
+                anyString()
         );
     }
 
@@ -194,8 +211,8 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends BaseCallb
         assertThat(response.getState()).isEqualTo(AWAITING_RESPONDENT_RESPONSE.toString());
 
         verify(assignCaseToResopondentSolHelper, times(0)).assignCaseToRespondentSolicitor(
-                any(),
-                any()
+                any(GeneralApplicationCaseData.class),
+                anyString()
         );
     }
 
@@ -212,7 +229,7 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends BaseCallb
         handler.handle(params);
 
         verify(parentCaseUpdateHelper, times(1)).updateParentApplicationVisibilityWithNewState(
-                caseData,
+                toGaCaseData(caseData),
                 AWAITING_RESPONDENT_RESPONSE.getDisplayedValue()
         );
     }
@@ -239,14 +256,14 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends BaseCallb
                 .thenReturn(AWAITING_RESPONDENT_RESPONSE);
         when(coreCaseDataService.getCase(any())).thenReturn(CaseDetails.builder().build());
         when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(caseData);
-        when(gaForLipService.isGaForLip(caseData)).thenReturn(true);
+        when(gaForLipService.isGaForLip(any(CaseData.class))).thenReturn(true);
         CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
         HashMap<String, Object> scenarioParams = new HashMap<>();
 
         handler.handle(params);
 
         verify(parentCaseUpdateHelper, times(1)).updateParentApplicationVisibilityWithNewState(
-                caseData,
+                toGaCaseData(caseData),
                 AWAITING_RESPONDENT_RESPONSE.getDisplayedValue()
         );
         verify(dashboardScenariosService).recordScenarios(
@@ -285,14 +302,14 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends BaseCallb
                 .thenReturn(AWAITING_RESPONDENT_RESPONSE);
         when(coreCaseDataService.getCase(any())).thenReturn(CaseDetails.builder().build());
         when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(caseData);
-        when(gaForLipService.isGaForLip(caseData)).thenReturn(true);
+        when(gaForLipService.isGaForLip(any(CaseData.class))).thenReturn(true);
         CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
         HashMap<String, Object> scenarioParams = new HashMap<>();
 
         handler.handle(params);
 
         verify(parentCaseUpdateHelper, times(1)).updateParentApplicationVisibilityWithNewState(
-                caseData,
+                toGaCaseData(caseData),
                 AWAITING_RESPONDENT_RESPONSE.getDisplayedValue()
         );
         verify(dashboardScenariosService).recordScenarios(
@@ -331,14 +348,14 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends BaseCallb
                 .thenReturn(AWAITING_RESPONDENT_RESPONSE);
         when(coreCaseDataService.getCase(any())).thenReturn(CaseDetails.builder().build());
         when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(caseData);
-        when(gaForLipService.isGaForLip(caseData)).thenReturn(true);
+        when(gaForLipService.isGaForLip(any(CaseData.class))).thenReturn(true);
         CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
         HashMap<String, Object> scenarioParams = new HashMap<>();
 
         handler.handle(params);
 
         verify(parentCaseUpdateHelper, times(1)).updateParentApplicationVisibilityWithNewState(
-                caseData,
+                toGaCaseData(caseData),
                 AWAITING_RESPONDENT_RESPONSE.getDisplayedValue()
         );
         verify(dashboardScenariosService).recordScenarios(
@@ -377,7 +394,7 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends BaseCallb
 
         HashMap<String, Object> scenarioParams = new HashMap<>();
 
-        when(gaForLipService.isGaForLip(caseData)).thenReturn(true);
+        when(gaForLipService.isGaForLip(any(CaseData.class))).thenReturn(true);
         when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
         when(stateGeneratorService.getCaseStateForEndJudgeBusinessProcess(any()))
                 .thenReturn(AWAITING_RESPONDENT_RESPONSE);
@@ -416,7 +433,7 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends BaseCallb
 
         HashMap<String, Object> scenarioParams = new HashMap<>();
 
-        when(gaForLipService.isGaForLip(caseData)).thenReturn(true);
+        when(gaForLipService.isGaForLip(any(CaseData.class))).thenReturn(true);
         when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
         when(stateGeneratorService.getCaseStateForEndJudgeBusinessProcess(any()))
                 .thenReturn(AWAITING_RESPONDENT_RESPONSE);
@@ -458,7 +475,7 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends BaseCallb
 
         HashMap<String, Object> scenarioParams = new HashMap<>();
 
-        when(gaForLipService.isGaForLip(caseData)).thenReturn(true);
+        when(gaForLipService.isGaForLip(any(CaseData.class))).thenReturn(true);
         when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
         when(stateGeneratorService.getCaseStateForEndJudgeBusinessProcess(any()))
                 .thenReturn(AWAITING_RESPONDENT_RESPONSE);
@@ -500,7 +517,7 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends BaseCallb
 
         HashMap<String, Object> scenarioParams = new HashMap<>();
 
-        when(gaForLipService.isGaForLip(caseData)).thenReturn(true);
+        when(gaForLipService.isGaForLip(any(CaseData.class))).thenReturn(true);
         when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
         when(stateGeneratorService.getCaseStateForEndJudgeBusinessProcess(any()))
                 .thenReturn(AWAITING_RESPONDENT_RESPONSE);
@@ -539,7 +556,7 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends BaseCallb
 
         HashMap<String, Object> scenarioParams = new HashMap<>();
 
-        when(gaForLipService.isGaForLip(caseData)).thenReturn(true);
+        when(gaForLipService.isGaForLip(any(CaseData.class))).thenReturn(true);
         when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
         when(stateGeneratorService.getCaseStateForEndJudgeBusinessProcess(any()))
                 .thenReturn(AWAITING_RESPONDENT_RESPONSE);
@@ -570,7 +587,7 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends BaseCallb
 
         HashMap<String, Object> scenarioParams = new HashMap<>();
 
-        when(gaForLipService.isGaForLip(caseData)).thenReturn(false);
+        when(gaForLipService.isGaForLip(any(CaseData.class))).thenReturn(false);
         when(stateGeneratorService.getCaseStateForEndJudgeBusinessProcess(any()))
                 .thenReturn(AWAITING_RESPONDENT_RESPONSE);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -596,7 +613,7 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends BaseCallb
 
         HashMap<String, Object> scenarioParams = new HashMap<>();
 
-        when(gaForLipService.isGaForLip(caseData)).thenReturn(true);
+        when(gaForLipService.isGaForLip(any(CaseData.class))).thenReturn(true);
         when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
         when(stateGeneratorService.getCaseStateForEndJudgeBusinessProcess(any()))
                 .thenReturn(AWAITING_RESPONDENT_RESPONSE);
@@ -628,7 +645,7 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends BaseCallb
 
         HashMap<String, Object> scenarioParams = new HashMap<>();
 
-        when(gaForLipService.isGaForLip(caseData)).thenReturn(true);
+        when(gaForLipService.isGaForLip(any(CaseData.class))).thenReturn(true);
         when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
         when(stateGeneratorService.getCaseStateForEndJudgeBusinessProcess(any()))
                 .thenReturn(AWAITING_RESPONDENT_RESPONSE);
@@ -653,7 +670,7 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends BaseCallb
                         .additionalPaymentDetails(PaymentDetails.builder()
                                 .status(PaymentStatus.FAILED).build()).build())
                 .build();
-        when(gaForLipService.isLipApp(caseData)).thenReturn(true);
+        when(gaForLipService.isLipAppGa(any(GeneralApplicationCaseData.class))).thenReturn(true);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
         handler.handle(params);
@@ -670,7 +687,7 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends BaseCallb
                         .additionalPaymentDetails(PaymentDetails.builder()
                                 .status(PaymentStatus.FAILED).build()).build())
                 .build();
-        when(gaForLipService.isLipApp(caseData)).thenReturn(true);
+        when(gaForLipService.isLipAppGa(any(GeneralApplicationCaseData.class))).thenReturn(true);
         CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
         handler.handle(params);

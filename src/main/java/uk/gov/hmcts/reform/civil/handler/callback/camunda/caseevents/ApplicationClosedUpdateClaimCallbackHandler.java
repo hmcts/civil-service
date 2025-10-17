@@ -11,6 +11,8 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.GaCallbackDataUtil;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.GenAppStateHelperService;
 
@@ -53,13 +55,32 @@ public class ApplicationClosedUpdateClaimCallbackHandler extends CallbackHandler
     }
 
     private CallbackResponse triggerGeneralApplicationClosure(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
+        GeneralApplicationCaseData gaCaseData = GaCallbackDataUtil.resolveGaCaseData(callbackParams, objectMapper);
+        CaseData caseData = GaCallbackDataUtil.mergeToCaseData(gaCaseData, callbackParams.getCaseData(), objectMapper);
+        if (caseData == null) {
+            throw new IllegalArgumentException("Case data missing from callback params");
+        }
         List<String> errors = new ArrayList<>();
-        if (!Collections.isEmpty(caseData.getGeneralApplications())) {
+        boolean hasGaApplications = gaCaseData != null && !Collections.isEmpty(gaCaseData.getGeneralApplications());
+        boolean hasCaseApplications = !Collections.isEmpty(caseData.getGeneralApplications());
+
+        if (hasGaApplications || hasCaseApplications) {
             try {
-                caseData = helper.updateApplicationDetailsInClaim(caseData,
+                if (hasGaApplications) {
+                    caseData = helper.updateApplicationDetailsInClaim(
+                        gaCaseData,
                         APPLICATION_CLOSED_DESCRIPTION,
                         GenAppStateHelperService.RequiredState.APPLICATION_CLOSED);
+                } else {
+                    caseData = helper.updateApplicationDetailsInClaim(
+                        caseData,
+                        APPLICATION_CLOSED_DESCRIPTION,
+                        GenAppStateHelperService.RequiredState.APPLICATION_CLOSED);
+                }
+                if (gaCaseData != null) {
+                    gaCaseData = GaCallbackDataUtil.toGaCaseData(caseData, objectMapper);
+                    caseData = GaCallbackDataUtil.mergeToCaseData(gaCaseData, caseData, objectMapper);
+                }
             } catch (Exception e) {
                 String errorMessage = "Error occurred while updating claim with application status: " + e.getMessage();
                 log.error(errorMessage);

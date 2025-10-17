@@ -1,10 +1,13 @@
 package uk.gov.hmcts.reform.civil.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.GaCallbackDataUtil;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.utils.DocUploadUtils;
@@ -30,12 +33,16 @@ public class DocUploadDashboardNotificationService {
     private final DashboardApiClient dashboardApiClient;
     private final GaForLipService gaForLipService;
     private final DashboardNotificationsParamsMapper mapper;
+    private final ObjectMapper objectMapper;
 
     public void createDashboardNotification(CaseData caseData, String role, String authToken, boolean itsUploadAddlDocEvent) {
-
+        GeneralApplicationCaseData gaCaseData = toGaCaseData(caseData);
+        if (caseData == null || gaCaseData == null) {
+            return;
+        }
         if (isWithNoticeOrConsent(caseData)) {
             log.info("Case {} is with notice or consent and the dashboard service is enabled", caseData.getCcdCaseReference());
-            List<String> scenarios = getDashboardScenario(role, caseData, itsUploadAddlDocEvent);
+            List<String> scenarios = getDashboardScenario(role, caseData, gaCaseData, itsUploadAddlDocEvent);
             ScenarioRequestParams scenarioParams = ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(
                 caseData)).build();
             scenarios.forEach(scenario -> dashboardApiClient.recordScenario(
@@ -48,10 +55,14 @@ public class DocUploadDashboardNotificationService {
     }
 
     public void createResponseDashboardNotification(CaseData caseData, String role, String authToken) {
+        GeneralApplicationCaseData gaCaseData = toGaCaseData(caseData);
+        if (caseData == null || gaCaseData == null) {
+            return;
+        }
 
         if ((role.equalsIgnoreCase("APPLICANT")
             || (isWithNoticeOrConsent(caseData) && role.equalsIgnoreCase("RESPONDENT")))) {
-            String scenario = getResponseDashboardScenario(role, caseData);
+            String scenario = getResponseDashboardScenario(role, gaCaseData);
             ScenarioRequestParams scenarioParams = ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(
                 caseData)).build();
             if (scenario != null) {
@@ -65,10 +76,10 @@ public class DocUploadDashboardNotificationService {
         }
     }
 
-    private String getResponseDashboardScenario(String role, CaseData caseData) {
-        if (role.equalsIgnoreCase("APPLICANT") && gaForLipService.isLipApp(caseData)) {
+    private String getResponseDashboardScenario(String role, GeneralApplicationCaseData caseData) {
+        if (role.equalsIgnoreCase("APPLICANT") && gaForLipService.isLipAppGa(caseData)) {
             return SCENARIO_AAA6_GENERAL_APPLICATION_RESPONSE_SUBMITTED_APPLICANT.getScenario();
-        } else if (role.equalsIgnoreCase("RESPONDENT") && gaForLipService.isLipResp(caseData)) {
+        } else if (role.equalsIgnoreCase("RESPONDENT") && gaForLipService.isLipRespGa(caseData)) {
             return SCENARIO_AAA6_GENERAL_APPLICATION_RESPONSE_SUBMITTED_RESPONDENT.getScenario();
         }
         return null;
@@ -102,14 +113,17 @@ public class DocUploadDashboardNotificationService {
         return null;
     }
 
-    private List<String> getDashboardScenario(String role, CaseData caseData, boolean itsUploadAddlDocEvent) {
+    private List<String> getDashboardScenario(String role,
+                                              CaseData caseData,
+                                              GeneralApplicationCaseData gaCaseData,
+                                              boolean itsUploadAddlDocEvent) {
         List<String> scenarios = new ArrayList<>();
-        if (DocUploadUtils.APPLICANT.equals(role) && gaForLipService.isLipResp(caseData)) {
+        if (DocUploadUtils.APPLICANT.equals(role) && gaForLipService.isLipRespGa(gaCaseData)) {
             scenarios.add(SCENARIO_OTHER_PARTY_UPLOADED_DOC_RESPONDENT.getScenario());
-        } else if (DocUploadUtils.RESPONDENT_ONE.equals(role) && gaForLipService.isLipApp(caseData)) {
+        } else if (DocUploadUtils.RESPONDENT_ONE.equals(role) && gaForLipService.isLipAppGa(gaCaseData)) {
             if (itsUploadAddlDocEvent
-                && caseData.isUrgent()
-                && caseData.getIsGaRespondentOneLip() == YesOrNo.NO) {
+                && gaCaseData.isUrgent()
+                && gaCaseData.getIsGaRespondentOneLip() == YesOrNo.NO) {
                 scenarios.add(SCENARIO_AAA6_GENERAL_APPLICATION_RESPONSE_SUBMITTED_APPLICANT.getScenario());
             }
             scenarios.add(SCENARIO_OTHER_PARTY_UPLOADED_DOC_APPLICANT.getScenario());
@@ -120,5 +134,9 @@ public class DocUploadDashboardNotificationService {
     private boolean isWithNoticeOrConsent(CaseData caseData) {
         return JudicialDecisionNotificationUtil.isWithNotice(caseData)
             || caseData.getGeneralAppConsentOrder() == YES;
+    }
+
+    private GeneralApplicationCaseData toGaCaseData(CaseData caseData) {
+        return caseData == null ? null : GaCallbackDataUtil.toGaCaseData(caseData, objectMapper);
     }
 }

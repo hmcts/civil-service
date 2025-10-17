@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.hearingorder;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -9,6 +11,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.dq.GAHearingDuration;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -23,6 +26,7 @@ import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
+import uk.gov.hmcts.reform.civil.service.ga.GaCaseDataEnricher;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -48,6 +52,8 @@ public class HearingFormGeneratorGeneralApplication implements TemplateDataGener
     private final DocumentGeneratorService documentGeneratorService;
     private final CoreCaseDataService coreCaseDataService;
     private final DocmosisService docmosisService;
+    private final GaCaseDataEnricher gaCaseDataEnricher;
+    private final ObjectMapper objectMapper;
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
 
@@ -61,6 +67,15 @@ public class HearingFormGeneratorGeneralApplication implements TemplateDataGener
         HearingForm templateData = getTemplateData(civilCaseData, caseData, authorisation, userType);
         log.info("Generate hearing form for caseId: {}", caseData.getCcdCaseReference());
         return generateDocmosisDocument(templateData, authorisation, userType);
+    }
+
+    public CaseDocument generate(GeneralApplicationCaseData gaCaseData, String authorisation) {
+        return generate(asCaseData(gaCaseData), authorisation);
+    }
+
+    public CaseDocument generate(CaseData civilCaseData, GeneralApplicationCaseData gaCaseData,
+                                 String authorisation, FlowFlag userType) {
+        return generate(civilCaseData, asCaseData(gaCaseData), authorisation, userType);
     }
 
     public CaseDocument generateDocmosisDocument(HearingForm templateData, String authorisation, FlowFlag userType) {
@@ -129,6 +144,11 @@ public class HearingFormGeneratorGeneralApplication implements TemplateDataGener
         }
 
         return hearingFormBuilder.build();
+    }
+
+    public HearingForm getTemplateData(CaseData civilCaseData, GeneralApplicationCaseData gaCaseData,
+                                       String authorisation, FlowFlag userType) {
+        return getTemplateData(civilCaseData, asCaseData(gaCaseData), authorisation, userType);
     }
 
     protected String getCaseNumberFormatted(CaseData caseData) {
@@ -205,5 +225,14 @@ public class HearingFormGeneratorGeneralApplication implements TemplateDataGener
             return POST_JUDGE_HEARING_APPLICATION_LIP;
         }
         return HEARING_APPLICATION;
+    }
+
+    private CaseData asCaseData(GeneralApplicationCaseData gaCaseData) {
+        if (gaCaseData == null) {
+            return CaseData.builder().build();
+        }
+        ObjectMapper mapperWithJavaTime = objectMapper.copy().registerModule(new JavaTimeModule());
+        CaseData converted = mapperWithJavaTime.convertValue(gaCaseData, CaseData.class);
+        return gaCaseDataEnricher.enrich(converted, gaCaseData);
     }
 }

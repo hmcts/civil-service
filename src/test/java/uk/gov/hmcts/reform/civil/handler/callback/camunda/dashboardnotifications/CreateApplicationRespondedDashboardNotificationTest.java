@@ -110,7 +110,7 @@ public class CreateApplicationRespondedDashboardNotificationTest extends BaseCal
 
     @Test
     void buildResponseConfirmationReturnsCorrectMessageWhenGaHasLipAndVaryJudgeApppLRvLR() {
-        when(gaForLipService.isGaForLip(any())).thenReturn(false);
+        when(gaForLipService.isGaForLip(any(CaseData.class))).thenReturn(false);
         when(gaForLipService.isLipApp(any())).thenReturn(false);
         when(gaForLipService.isLipResp(any())).thenReturn(false);
         CallbackParams params = callbackParamsOf(getVaryCase(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION),
@@ -123,7 +123,7 @@ public class CreateApplicationRespondedDashboardNotificationTest extends BaseCal
 
     @Test
     void buildResponseConfirmationReturnsCorrectMessageWhenGaHasLipAndVaryJudgeApppLipVLR() {
-        when(gaForLipService.isGaForLip(any())).thenReturn(true);
+        when(gaForLipService.isGaForLip(any(CaseData.class))).thenReturn(true);
         when(gaForLipService.isLipApp(any())).thenReturn(true);
         when(gaForLipService.isLipResp(any())).thenReturn(false);
         CallbackParams params = callbackParamsOf(getVaryCase(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION),
@@ -135,7 +135,7 @@ public class CreateApplicationRespondedDashboardNotificationTest extends BaseCal
 
     @Test
     void buildResponseConfirmationReturnsCorrectMessageWhenGaHasLipAndVaryJudgeApppLRVLip() {
-        when(gaForLipService.isGaForLip(any())).thenReturn(true);
+        when(gaForLipService.isGaForLip(any(CaseData.class))).thenReturn(true);
         when(gaForLipService.isLipApp(any())).thenReturn(true);
         when(gaForLipService.isLipResp(any())).thenReturn(false);
         CallbackParams params = callbackParamsOf(getVaryCase(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION),

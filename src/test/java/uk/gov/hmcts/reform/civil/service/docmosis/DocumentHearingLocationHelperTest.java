@@ -1,5 +1,12 @@
 package uk.gov.hmcts.reform.civil.service.docmosis;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -8,14 +15,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
+import uk.gov.hmcts.reform.civil.model.genapplication.GACaseLocation;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.ga.GaCaseDataEnricher;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
@@ -25,15 +31,19 @@ import static org.mockito.Mockito.when;
     DocumentHearingLocationHelper.class})
 public class DocumentHearingLocationHelperTest {
 
+    private static final ObjectMapper GA_OBJECT_MAPPER = new ObjectMapper()
+        .registerModule(new JavaTimeModule())
+        .registerModule(new Jdk8Module());
     @Autowired
     private DocumentHearingLocationHelper hearingLocationHelper;
     @MockBean
     private LocationReferenceDataService locationRefDataService;
+    private final GaCaseDataEnricher gaCaseDataEnricher = new GaCaseDataEnricher();
 
     @Test
     void whenFormDefined_thenReturnForm() {
         String fromForm = "label from form";
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = gaCaseData();
         String authorisation = "authorisation";
 
         LocationRefData location1 = LocationRefData.builder().build();
@@ -51,12 +61,7 @@ public class DocumentHearingLocationHelperTest {
     @Test
     void whenNotMatchingForm_thenDefaultToCaseLocation() {
         String fromForm = "label from form";
-        CaseData caseData = CaseData.builder()
-            .caseManagementLocation(CaseLocationCivil.builder()
-                                        .baseLocation("base location")
-                                        .region("region")
-                                        .build())
-            .build();
+        CaseData caseData = caseDataWithLocation("base location", "region");
         String authorisation = "authorisation";
 
         LocationRefData location1 = LocationRefData.builder()
@@ -82,12 +87,7 @@ public class DocumentHearingLocationHelperTest {
     @Test
     void whenSeveralLocations_thenDefaultToFirst() {
         String fromForm = "label from form";
-        CaseData caseData = CaseData.builder()
-            .caseManagementLocation(CaseLocationCivil.builder()
-                                        .baseLocation("base location")
-                                        .region("region")
-                                        .build())
-            .build();
+        CaseData caseData = caseDataWithLocation("base location", "region");
         String authorisation = "authorisation";
 
         LocationRefData location1 = LocationRefData.builder()
@@ -118,13 +118,7 @@ public class DocumentHearingLocationHelperTest {
     void whenCcmccLocation_thenReturnCcmcDetails() {
         String authorisation = "authorisation";
         String ccmcEpimmId = hearingLocationHelper.ccmccEpimmId;
-        CaseData caseData = CaseData.builder()
-            .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
-            .caseManagementLocation(CaseLocationCivil.builder()
-                                        .baseLocation(ccmcEpimmId)
-                                        .region("CCMCC region")
-                                        .build())
-            .build();
+        CaseData caseData = caseDataWithLocation(ccmcEpimmId, "CCMCC region", CaseCategory.UNSPEC_CLAIM);
 
         LocationRefData location1 = LocationRefData.builder()
             .regionId(caseData.getCaseManagementLocation().getRegion())
@@ -145,13 +139,7 @@ public class DocumentHearingLocationHelperTest {
     void whenCnbcLocation_thenReturnCnbcDetails() {
         String authorisation = "authorisation";
         String cnbcEpimmId = hearingLocationHelper.cnbcEpimmId;
-        CaseData caseData = CaseData.builder()
-            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-            .caseManagementLocation(CaseLocationCivil.builder()
-                                        .baseLocation(cnbcEpimmId)
-                                        .region("CNBC region")
-                                        .build())
-            .build();
+        CaseData caseData = caseDataWithLocation(cnbcEpimmId, "CNBC region", CaseCategory.SPEC_CLAIM);
 
         LocationRefData location1 = LocationRefData.builder()
             .regionId(caseData.getCaseManagementLocation().getRegion())
@@ -179,13 +167,7 @@ public class DocumentHearingLocationHelperTest {
                 .siteName("court 3").courtAddress("3 address").postcode("Y03 7RB").build()
         );
         String authorisation = "authorisation";
-        CaseData caseData = CaseData.builder()
-            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-            .caseManagementLocation(CaseLocationCivil.builder()
-                                        .baseLocation("00002")
-                                        .region("random region")
-                                        .build())
-            .build();
+        CaseData caseData = caseDataWithLocation("00002", "random region", CaseCategory.SPEC_CLAIM);
 
         LocationRefData location1 = LocationRefData.builder()
             .regionId(caseData.getCaseManagementLocation().getRegion())
@@ -209,17 +191,41 @@ public class DocumentHearingLocationHelperTest {
                 .siteName("court 3").courtAddress("3 address").postcode("Y03 7RB").build()
         );
         String authorisation = "authorisation";
-        CaseData caseData = CaseData.builder()
-            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-            .caseManagementLocation(CaseLocationCivil.builder()
-                                        .baseLocation("00009")
-                                        .region("random region")
-                                        .build())
-            .build();
+        CaseData caseData = caseDataWithLocation("00009", "random region", CaseCategory.SPEC_CLAIM);
 
         when(locationRefDataService.getHearingCourtLocations(authorisation)).thenReturn(locations);
         assertThrows(IllegalArgumentException.class, () -> hearingLocationHelper
             .getCaseManagementLocationDetailsNro(caseData, locationRefDataService, authorisation));
     }
 
+    private CaseData caseDataWithLocation(String baseLocation, String region) {
+        return caseDataWithLocation(baseLocation, region, null);
+    }
+
+    private CaseData caseDataWithLocation(String baseLocation, String region, CaseCategory category) {
+        return gaCaseData(category, builder -> builder.withGaCaseManagementLocation(
+            GACaseLocation.builder()
+                .baseLocation(baseLocation)
+                .region(region)
+                .build()
+        ));
+    }
+
+    private CaseData gaCaseData(CaseCategory category, Consumer<GeneralApplicationCaseDataBuilder> customiser) {
+        GeneralApplicationCaseDataBuilder builder = GeneralApplicationCaseDataBuilder.builder();
+        customiser.accept(builder);
+        GeneralApplicationCaseData gaCaseData = builder.build();
+        CaseData converted = GA_OBJECT_MAPPER.convertValue(gaCaseData, CaseData.class);
+        CaseData enriched = gaCaseDataEnricher.enrich(converted, gaCaseData);
+
+        if (category != null) {
+            enriched = enriched.toBuilder().caseAccessCategory(category).build();
+        }
+
+        return enriched;
+    }
+
+    private CaseData gaCaseData() {
+        return gaCaseData(null, builder -> { });
+    }
 }

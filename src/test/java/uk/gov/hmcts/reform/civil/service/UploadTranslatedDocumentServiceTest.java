@@ -1,8 +1,10 @@
 package uk.gov.hmcts.reform.civil.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -10,17 +12,20 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection;
 import uk.gov.hmcts.reform.civil.enums.welshenhancements.PreTranslationGaDocumentType;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocument;
 import uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
+import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -36,6 +41,10 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 public class UploadTranslatedDocumentServiceTest {
 
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
+        .registerModule(new JavaTimeModule())
+        .registerModule(new Jdk8Module());
+
     @Mock
     private FeatureToggleService featureToggleService;
 
@@ -48,7 +57,6 @@ public class UploadTranslatedDocumentServiceTest {
     @Mock
     private DocUploadDashboardNotificationService docUploadDashboardNotificationService;
 
-    @InjectMocks
     private UploadTranslatedDocumentService uploadTranslatedDocumentService;
 
     @Mock
@@ -58,6 +66,13 @@ public class UploadTranslatedDocumentServiceTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+        uploadTranslatedDocumentService = new UploadTranslatedDocumentService(
+            assignCategoryId,
+            gaForLipService,
+            docUploadDashboardNotificationService,
+            deadlinesCalculator,
+            OBJECT_MAPPER
+        );
     }
 
     String translator = "translator";
@@ -75,14 +90,14 @@ public class UploadTranslatedDocumentServiceTest {
             .build();
         translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
 
-        CaseData caseData = CaseData.builder()
-            .translatedDocumentsGA(translatedDocuments)
+        CaseData caseData = gaCaseData().toBuilder()
+            .translatedDocuments(translatedDocuments)
             .build();
         // When
         CaseData result = uploadTranslatedDocumentService.processTranslatedDocument(caseData, translator).build();
 
         // Then
-        assertThat(result.getGeneralOrderDocumentGA()).isNotNull();
+        assertThat(result.getGeneralOrderDocument()).isNotNull();
         verify(assignCategoryId, times(1)).assignCategoryIdToCollection(
             anyList(),
             any(),
@@ -93,8 +108,8 @@ public class UploadTranslatedDocumentServiceTest {
     @Test
     void shouldNotProcessWhenNoTranslatedDocumentsPresent() {
         // Given
-        CaseData caseData = CaseData.builder()
-            .translatedDocumentsGA(null) // No translated documents
+        CaseData caseData = gaCaseData().toBuilder()
+            .translatedDocuments(null) // No translated documents
             .build();
 
         // When
@@ -128,17 +143,17 @@ public class UploadTranslatedDocumentServiceTest {
         ));
         when(deadlinesCalculator.calculateApplicantResponseDeadline(
             any(LocalDateTime.class), any(Integer.class))).thenReturn(deadline);
-        CaseData caseData = CaseData.builder()
-            .translatedDocumentsGA(translatedDocuments)
+        CaseData caseData = gaCaseData().toBuilder()
+            .translatedDocuments(translatedDocuments)
             .preTranslationGaDocuments(preTranslationGaDocuments)
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.APPLICATION_SUMMARY_DOC)
             .build();
-        //when
-        uploadTranslatedDocumentService.updateGADocumentsWithOriginalDocuments(caseData.toBuilder());
+        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
+        uploadTranslatedDocumentService.updateGADocumentsWithOriginalDocuments(builder);
+        CaseData updatedCaseData = builder.build();
 
-        // Then
-        assertThat(caseData.getGaDraftDocumentGA()).isNotNull();
-        assertThat(caseData.getPreTranslationGaDocuments().isEmpty()).isTrue();
+        assertThat(updatedCaseData.getGaDraftDocument()).isNotNull();
+        assertThat(updatedCaseData.getPreTranslationGaDocuments().isEmpty()).isTrue();
     }
 
     @Test
@@ -162,17 +177,17 @@ public class UploadTranslatedDocumentServiceTest {
         List<Element<CaseDocument>> preTranslationGaDocuments = new ArrayList<>(List.of(
             element(originalDocument)
         ));
-        CaseData caseData = CaseData.builder()
-            .translatedDocumentsGA(translatedDocuments)
+        CaseData caseData = gaCaseData().toBuilder()
+            .translatedDocuments(translatedDocuments)
             .preTranslationGaDocuments(preTranslationGaDocuments)
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.WRITTEN_REPRESENTATION_ORDER_DOC)
             .build();
-        //when
-        uploadTranslatedDocumentService.updateGADocumentsWithOriginalDocuments(caseData.toBuilder());
+        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
+        uploadTranslatedDocumentService.updateGADocumentsWithOriginalDocuments(builder);
+        CaseData updatedCaseData = builder.build();
 
-        // Then
-        assertThat(caseData.getWrittenRepConcurrentDocumentGA().isEmpty()).isFalse();
-        assertThat(caseData.getPreTranslationGaDocuments().isEmpty()).isTrue();
+        assertThat(updatedCaseData.getWrittenRepConcurrentDocument().isEmpty()).isFalse();
+        assertThat(updatedCaseData.getPreTranslationGaDocuments().isEmpty()).isTrue();
     }
 
     @Test
@@ -196,17 +211,17 @@ public class UploadTranslatedDocumentServiceTest {
         List<Element<CaseDocument>> preTranslationGaDocuments = new ArrayList<>(List.of(
             element(originalDocument)
         ));
-        CaseData caseData = CaseData.builder()
-            .translatedDocumentsGA(translatedDocuments)
+        CaseData caseData = gaCaseData().toBuilder()
+            .translatedDocuments(translatedDocuments)
             .preTranslationGaDocuments(preTranslationGaDocuments)
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.HEARING_NOTICE_DOC)
             .build();
-        //when
-        uploadTranslatedDocumentService.updateGADocumentsWithOriginalDocuments(caseData.toBuilder());
+        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
+        uploadTranslatedDocumentService.updateGADocumentsWithOriginalDocuments(builder);
+        CaseData updatedCaseData = builder.build();
 
-        // Then
-        assertThat(caseData.getHearingNoticeDocumentGA().isEmpty()).isFalse();
-        assertThat(caseData.getPreTranslationGaDocuments().isEmpty()).isTrue();
+        assertThat(updatedCaseData.getHearingNoticeDocument().isEmpty()).isFalse();
+        assertThat(updatedCaseData.getPreTranslationGaDocuments().isEmpty()).isTrue();
     }
 
     @Test
@@ -230,17 +245,17 @@ public class UploadTranslatedDocumentServiceTest {
         List<Element<CaseDocument>> preTranslationGaDocuments = new ArrayList<>(List.of(
             element(originalDocument)
         ));
-        CaseData caseData = CaseData.builder()
-            .translatedDocumentsGA(translatedDocuments)
+        CaseData caseData = gaCaseData().toBuilder()
+            .translatedDocuments(translatedDocuments)
             .preTranslationGaDocuments((preTranslationGaDocuments))
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.DIRECTIONS_ORDER_DOC)
             .build();
-        //when
-        uploadTranslatedDocumentService.updateGADocumentsWithOriginalDocuments(caseData.toBuilder());
+        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
+        uploadTranslatedDocumentService.updateGADocumentsWithOriginalDocuments(builder);
+        CaseData updatedCaseData = builder.build();
 
-        // Then
-        assertThat(caseData.getDirectionOrderDocumentGA().isEmpty()).isFalse();
-        assertThat(caseData.getPreTranslationGaDocuments().isEmpty()).isTrue();
+        assertThat(updatedCaseData.getDirectionOrderDocument().isEmpty()).isFalse();
+        assertThat(updatedCaseData.getPreTranslationGaDocuments().isEmpty()).isTrue();
     }
 
     @Test
@@ -264,17 +279,17 @@ public class UploadTranslatedDocumentServiceTest {
         List<Element<CaseDocument>> preTranslationGaDocuments = new ArrayList<>(List.of(
             element(originalDocument)
         ));
-        CaseData caseData = CaseData.builder()
-            .translatedDocumentsGA(translatedDocuments)
+        CaseData caseData = gaCaseData().toBuilder()
+            .translatedDocuments(translatedDocuments)
             .preTranslationGaDocuments(preTranslationGaDocuments)
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.WRITTEN_REPRESENTATION_ORDER_DOC)
             .build();
-        //when
-        uploadTranslatedDocumentService.updateGADocumentsWithOriginalDocuments(caseData.toBuilder());
+        CaseData.CaseDataBuilder<?, ?> builderSeq = caseData.toBuilder();
+        uploadTranslatedDocumentService.updateGADocumentsWithOriginalDocuments(builderSeq);
+        CaseData updatedCaseDataSeq = builderSeq.build();
 
-        // Then
-        assertThat(caseData.getWrittenRepSequentialDocumentGA().isEmpty()).isFalse();
-        assertThat(caseData.getPreTranslationGaDocuments().isEmpty()).isTrue();
+        assertThat(updatedCaseDataSeq.getWrittenRepSequentialDocument().isEmpty()).isFalse();
+        assertThat(updatedCaseDataSeq.getPreTranslationGaDocuments().isEmpty()).isTrue();
     }
 
     @Test
@@ -298,17 +313,17 @@ public class UploadTranslatedDocumentServiceTest {
         List<Element<CaseDocument>> preTranslationGaDocuments = new ArrayList<>(List.of(
             element(originalDocument)
         ));
-        CaseData caseData = CaseData.builder()
-            .translatedDocumentsGA(translatedDocuments)
+        CaseData caseData = gaCaseData().toBuilder()
+            .translatedDocuments(translatedDocuments)
             .preTranslationGaDocuments(preTranslationGaDocuments)
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.REQUEST_MORE_INFORMATION_ORDER_DOC)
             .build();
-        //when
-        uploadTranslatedDocumentService.updateGADocumentsWithOriginalDocuments(caseData.toBuilder());
+        CaseData.CaseDataBuilder<?, ?> builderRfi = caseData.toBuilder();
+        uploadTranslatedDocumentService.updateGADocumentsWithOriginalDocuments(builderRfi);
+        CaseData updatedCaseDataRfi = builderRfi.build();
 
-        // Then
-        assertThat(caseData.getRequestForInformationDocumentGA().isEmpty()).isFalse();
-        assertThat(caseData.getPreTranslationGaDocuments().isEmpty()).isTrue();
+        assertThat(updatedCaseDataRfi.getRequestForInformationDocument().isEmpty()).isFalse();
+        assertThat(updatedCaseDataRfi.getPreTranslationGaDocuments().isEmpty()).isTrue();
     }
 
     @Test
@@ -332,16 +347,17 @@ public class UploadTranslatedDocumentServiceTest {
         List<Element<CaseDocument>> preTranslationGaDocuments = new ArrayList<>(List.of(
             element(originalDocument)
         ));
-        CaseData caseData = CaseData.builder()
-            .translatedDocumentsGA(translatedDocuments)
+        CaseData caseData = gaCaseData().toBuilder()
+            .translatedDocuments(translatedDocuments)
             .preTranslationGaDocuments(preTranslationGaDocuments)
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.HEARING_ORDER_DOC)
             .build();
-        //when
-        uploadTranslatedDocumentService.updateGADocumentsWithOriginalDocuments(caseData.toBuilder());
-        // Then
-        assertThat(caseData.getHearingOrderDocumentGA().isEmpty()).isFalse();
-        assertThat(caseData.getPreTranslationGaDocuments().isEmpty()).isTrue();
+        CaseData.CaseDataBuilder<?, ?> builderHearingOrder = caseData.toBuilder();
+        uploadTranslatedDocumentService.updateGADocumentsWithOriginalDocuments(builderHearingOrder);
+        CaseData updatedCaseDataHearingOrder = builderHearingOrder.build();
+
+        assertThat(updatedCaseDataHearingOrder.getHearingOrderDocument().isEmpty()).isFalse();
+        assertThat(updatedCaseDataHearingOrder.getPreTranslationGaDocuments().isEmpty()).isTrue();
     }
 
     @Test
@@ -365,17 +381,17 @@ public class UploadTranslatedDocumentServiceTest {
         List<Element<CaseDocument>> preTranslationGaDocuments = new ArrayList<>(List.of(
             element(originalDocument)
         ));
-        CaseData caseData = CaseData.builder()
-            .translatedDocumentsGA(translatedDocuments)
+        CaseData caseData = gaCaseData().toBuilder()
+            .translatedDocuments(translatedDocuments)
             .preTranslationGaDocuments(preTranslationGaDocuments)
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.GENERAL_ORDER_DOC)
             .build();
-        //when
-        uploadTranslatedDocumentService.updateGADocumentsWithOriginalDocuments(caseData.toBuilder());
+        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
+        uploadTranslatedDocumentService.updateGADocumentsWithOriginalDocuments(builder);
+        CaseData updatedCaseData = builder.build();
 
-        // Then
-        assertThat(caseData.getGeneralOrderDocumentGA().isEmpty()).isFalse();
-        assertThat(caseData.getPreTranslationGaDocuments().isEmpty()).isTrue();
+        assertThat(updatedCaseData.getGeneralOrderDocument().isEmpty()).isFalse();
+        assertThat(updatedCaseData.getPreTranslationGaDocuments().isEmpty()).isTrue();
     }
 
     @Test
@@ -399,17 +415,17 @@ public class UploadTranslatedDocumentServiceTest {
         List<Element<CaseDocument>> preTranslationGaDocuments = new ArrayList<>(List.of(
             element(originalDocument)
         ));
-        CaseData caseData = CaseData.builder()
-            .translatedDocumentsGA(translatedDocuments)
+        CaseData caseData = gaCaseData().toBuilder()
+            .translatedDocuments(translatedDocuments)
             .preTranslationGaDocuments(preTranslationGaDocuments)
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.DISMISSAL_ORDER_DOC)
             .build();
-        //when
-        uploadTranslatedDocumentService.updateGADocumentsWithOriginalDocuments(caseData.toBuilder());
+        CaseData.CaseDataBuilder<?, ?> builderDismissal = caseData.toBuilder();
+        uploadTranslatedDocumentService.updateGADocumentsWithOriginalDocuments(builderDismissal);
+        CaseData updatedCaseDataDismissal = builderDismissal.build();
 
-        // Then
-        assertThat(caseData.getDismissalOrderDocumentGA().isEmpty()).isFalse();
-        assertThat(caseData.getPreTranslationGaDocuments().isEmpty()).isTrue();
+        assertThat(updatedCaseDataDismissal.getDismissalOrderDocument().isEmpty()).isFalse();
+        assertThat(updatedCaseDataDismissal.getPreTranslationGaDocuments().isEmpty()).isTrue();
     }
 
     @Test
@@ -433,8 +449,8 @@ public class UploadTranslatedDocumentServiceTest {
         List<Element<CaseDocument>> preTranslationGaDocuments = new ArrayList<>(List.of(
             element(originalDocument)
         ));
-        CaseData caseData = CaseData.builder()
-            .translatedDocumentsGA(translatedDocuments)
+        CaseData caseData = gaCaseData().toBuilder()
+            .translatedDocuments(translatedDocuments)
             .preTranslationGaDocuments(preTranslationGaDocuments)
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.WRITTEN_REPS_RESPONSE_DOC)
             .build();
@@ -469,8 +485,8 @@ public class UploadTranslatedDocumentServiceTest {
         List<Element<CaseDocument>> preTranslationGaDocuments = new ArrayList<>(List.of(
             element(originalDocument)
         ));
-        CaseData caseData = CaseData.builder()
-            .translatedDocumentsGA(translatedDocuments)
+        CaseData caseData = gaCaseData().toBuilder()
+            .translatedDocuments(translatedDocuments)
             .preTranslationGaDocuments(preTranslationGaDocuments)
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.WRITTEN_REPS_RESPONSE_DOC)
             .build();
@@ -505,8 +521,8 @@ public class UploadTranslatedDocumentServiceTest {
         List<Element<CaseDocument>> preTranslationGaDocuments = new ArrayList<>(List.of(
             element(originalDocument)
         ));
-        CaseData caseData = CaseData.builder()
-            .translatedDocumentsGA(translatedDocuments)
+        CaseData caseData = gaCaseData().toBuilder()
+            .translatedDocuments(translatedDocuments)
             .preTranslationGaDocuments(preTranslationGaDocuments)
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.MORE_INFO_RESPONSE_DOC)
             .build();
@@ -541,8 +557,8 @@ public class UploadTranslatedDocumentServiceTest {
         List<Element<CaseDocument>> preTranslationGaDocuments = new ArrayList<>(List.of(
             element(originalDocument)
         ));
-        CaseData caseData = CaseData.builder()
-            .translatedDocumentsGA(translatedDocuments)
+        CaseData caseData = gaCaseData().toBuilder()
+            .translatedDocuments(translatedDocuments)
             .preTranslationGaDocuments(preTranslationGaDocuments)
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.MORE_INFO_RESPONSE_DOC)
             .build();
@@ -565,8 +581,8 @@ public class UploadTranslatedDocumentServiceTest {
             .file(mock(Document.class))
             .build();
         translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
-        CaseData caseData = CaseData.builder()
-            .translatedDocumentsGA(translatedDocuments)
+        CaseData caseData = gaCaseData().toBuilder()
+            .translatedDocuments(translatedDocuments)
             .generalAppPBADetails(GAPbaDetails.builder().fee(Fee.builder().code("F1234").build()).build())
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.APPLICATION_SUMMARY_DOC)
             .build();
@@ -584,8 +600,8 @@ public class UploadTranslatedDocumentServiceTest {
             .file(mock(Document.class))
             .build();
         translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
-        CaseData caseData = CaseData.builder()
-            .translatedDocumentsGA(translatedDocuments)
+        CaseData caseData = gaCaseData().toBuilder()
+            .translatedDocuments(translatedDocuments)
             .generalAppPBADetails(GAPbaDetails.builder().fee(Fee.builder().code("FREE").build()).build())
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.APPLICATION_SUMMARY_DOC)
             .build();
@@ -603,8 +619,8 @@ public class UploadTranslatedDocumentServiceTest {
             .file(mock(Document.class))
             .build();
         translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
-        CaseData caseData = CaseData.builder()
-            .translatedDocumentsGA(translatedDocuments)
+        CaseData caseData = gaCaseData().toBuilder()
+            .translatedDocuments(translatedDocuments)
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.RESPOND_TO_APPLICATION_SUMMARY_DOC)
             .build();
         // When
@@ -621,8 +637,8 @@ public class UploadTranslatedDocumentServiceTest {
             .file(mock(Document.class))
             .build();
         translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
-        CaseData caseData = CaseData.builder()
-            .translatedDocumentsGA(translatedDocuments)
+        CaseData caseData = gaCaseData().toBuilder()
+            .translatedDocuments(translatedDocuments)
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.WRITTEN_REPRESENTATION_ORDER_DOC)
             .build();
         // When
@@ -639,8 +655,8 @@ public class UploadTranslatedDocumentServiceTest {
             .file(mock(Document.class))
             .build();
         translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
-        CaseData caseData = CaseData.builder()
-            .translatedDocumentsGA(translatedDocuments)
+        CaseData caseData = gaCaseData().toBuilder()
+            .translatedDocuments(translatedDocuments)
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.WRITTEN_REPRESENTATION_ORDER_DOC)
             .build();
         // When
@@ -657,8 +673,8 @@ public class UploadTranslatedDocumentServiceTest {
             .file(mock(Document.class))
             .build();
         translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
-        CaseData caseData = CaseData.builder()
-            .translatedDocumentsGA(translatedDocuments)
+        CaseData caseData = gaCaseData().toBuilder()
+            .translatedDocuments(translatedDocuments)
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.HEARING_ORDER_DOC)
             .build();
         // When
@@ -675,8 +691,8 @@ public class UploadTranslatedDocumentServiceTest {
             .file(mock(Document.class))
             .build();
         translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
-        CaseData caseData = CaseData.builder()
-            .translatedDocumentsGA(translatedDocuments)
+        CaseData caseData = gaCaseData().toBuilder()
+            .translatedDocuments(translatedDocuments)
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.REQUEST_MORE_INFORMATION_ORDER_DOC)
             .build();
         // When
@@ -693,8 +709,8 @@ public class UploadTranslatedDocumentServiceTest {
             .file(mock(Document.class))
             .build();
         translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
-        CaseData caseData = CaseData.builder()
-            .translatedDocumentsGA(translatedDocuments)
+        CaseData caseData = gaCaseData().toBuilder()
+            .translatedDocuments(translatedDocuments)
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.FINAL_ORDER_DOC)
             .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
             .build();
@@ -712,8 +728,8 @@ public class UploadTranslatedDocumentServiceTest {
             .file(mock(Document.class))
             .build();
         translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
-        CaseData caseData = CaseData.builder()
-            .translatedDocumentsGA(translatedDocuments)
+        CaseData caseData = gaCaseData().toBuilder()
+            .translatedDocuments(translatedDocuments)
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.GENERAL_ORDER_DOC)
             .build();
         // When
@@ -730,8 +746,8 @@ public class UploadTranslatedDocumentServiceTest {
             .file(mock(Document.class))
             .build();
         translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
-        CaseData caseData = CaseData.builder()
-            .translatedDocumentsGA(translatedDocuments)
+        CaseData caseData = gaCaseData().toBuilder()
+            .translatedDocuments(translatedDocuments)
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.DISMISSAL_ORDER_DOC)
             .build();
         // When
@@ -748,8 +764,8 @@ public class UploadTranslatedDocumentServiceTest {
             .file(mock(Document.class))
             .build();
         translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
-        CaseData caseData = CaseData.builder()
-            .translatedDocumentsGA(translatedDocuments)
+        CaseData caseData = gaCaseData().toBuilder()
+            .translatedDocuments(translatedDocuments)
             .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.GENERAL_ORDER_DOC)
             .build();
@@ -767,8 +783,8 @@ public class UploadTranslatedDocumentServiceTest {
             .file(mock(Document.class))
             .build();
         translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
-        CaseData caseData = CaseData.builder()
-            .translatedDocumentsGA(translatedDocuments)
+        CaseData caseData = gaCaseData().toBuilder()
+            .translatedDocuments(translatedDocuments)
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.GENERAL_ORDER_DOC)
             .build();
         // When
@@ -785,8 +801,8 @@ public class UploadTranslatedDocumentServiceTest {
             .file(mock(Document.class))
             .build();
         translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
-        CaseData caseData = CaseData.builder()
-            .translatedDocumentsGA(translatedDocuments)
+        CaseData caseData = gaCaseData().toBuilder()
+            .translatedDocuments(translatedDocuments)
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.DIRECTIONS_ORDER_DOC)
             .build();
         // When
@@ -803,8 +819,8 @@ public class UploadTranslatedDocumentServiceTest {
             .file(mock(Document.class))
             .build();
         translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
-        CaseData caseData = CaseData.builder()
-            .translatedDocumentsGA(translatedDocuments)
+        CaseData caseData = gaCaseData().toBuilder()
+            .translatedDocuments(translatedDocuments)
             .preTranslationGaDocumentType(null)
             .build();
         // When
@@ -821,8 +837,8 @@ public class UploadTranslatedDocumentServiceTest {
             .file(mock(Document.class))
             .build();
         translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
-        CaseData caseData = CaseData.builder()
-            .translatedDocumentsGA(translatedDocuments)
+        CaseData caseData = gaCaseData().toBuilder()
+            .translatedDocuments(translatedDocuments)
             .preTranslationGaDocumentType(null)
             .build();
         // When
@@ -839,8 +855,8 @@ public class UploadTranslatedDocumentServiceTest {
             .file(mock(Document.class))
             .build();
         translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
-        CaseData caseData = CaseData.builder()
-            .translatedDocumentsGA(translatedDocuments)
+        CaseData caseData = gaCaseData().toBuilder()
+            .translatedDocuments(translatedDocuments)
             .preTranslationGaDocumentType(null)
             .build();
         // When
@@ -857,8 +873,8 @@ public class UploadTranslatedDocumentServiceTest {
             .file(mock(Document.class))
             .build();
         translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
-        CaseData caseData = CaseData.builder()
-            .translatedDocumentsGA(translatedDocuments)
+        CaseData caseData = gaCaseData().toBuilder()
+            .translatedDocuments(translatedDocuments)
             .preTranslationGaDocumentType(null)
             .build();
         // When
@@ -875,8 +891,8 @@ public class UploadTranslatedDocumentServiceTest {
             .file(mock(Document.class))
             .build();
         translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
-        CaseData caseData = CaseData.builder()
-            .translatedDocumentsGA(translatedDocuments)
+        CaseData caseData = gaCaseData().toBuilder()
+            .translatedDocuments(translatedDocuments)
             .preTranslationGaDocumentType(null)
             .build();
         // When
@@ -893,8 +909,8 @@ public class UploadTranslatedDocumentServiceTest {
             .file(mock(Document.class))
             .build();
         translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
-        CaseData caseData = CaseData.builder()
-            .translatedDocumentsGA(translatedDocuments)
+        CaseData caseData = gaCaseData().toBuilder()
+            .translatedDocuments(translatedDocuments)
             .preTranslationGaDocumentType(null)
             .build();
         // When
@@ -984,38 +1000,38 @@ public class UploadTranslatedDocumentServiceTest {
                           .uploadTimestamp("01-01-2025").build())
                 .build()).build());
 
-        CaseData caseData = CaseData.builder()
-            .translatedDocumentsGA(translatedDocuments)
+        CaseData caseData = gaCaseData().toBuilder()
+            .translatedDocuments(translatedDocuments)
             .build();
 
         // When
         CaseData result = uploadTranslatedDocumentService.processTranslatedDocument(caseData, translator).build();
 
         // Then
-        assertThat(result.getGeneralOrderDocumentGA()).isNotNull();
-        assertThat(result.getHearingOrderDocumentGA()).isNotNull();
-        assertThat(result.getHearingNoticeDocumentGA()).isNotNull();
-        assertThat(result.getDirectionOrderDocumentGA()).isNotNull();
-        assertThat(result.getWrittenRepSequentialDocumentGA()).isNotNull();
-        assertThat(result.getWrittenRepConcurrentDocumentGA()).isNotNull();
-        assertThat(result.getDismissalOrderDocumentGA()).isNotNull();
-        assertThat(result.getGaDraftDocumentGA()).isNotNull();
-        assertThat(result.getGeneralOrderDocumentGA().get(0).getValue().getCreatedBy()).isEqualTo(translator);
+        assertThat(result.getGeneralOrderDocument()).isNotNull();
+        assertThat(result.getHearingOrderDocument()).isNotNull();
+        assertThat(result.getHearingNoticeDocument()).isNotNull();
+        assertThat(result.getDirectionOrderDocument()).isNotNull();
+        assertThat(result.getWrittenRepSequentialDocument()).isNotNull();
+        assertThat(result.getWrittenRepConcurrentDocument()).isNotNull();
+        assertThat(result.getDismissalOrderDocument()).isNotNull();
+        assertThat(result.getGaDraftDocument()).isNotNull();
+        assertThat(result.getGeneralOrderDocument().get(0).getValue().getCreatedBy()).isEqualTo(translator);
         verify(assignCategoryId, times(9)).assignCategoryIdToCollection(anyList(), any(), any());
     }
 
     @Test
     void shouldSendUserUploadNotificationWrittenRepsApplicant() {
-        when(gaForLipService.isGaForLip(any())).thenReturn(true);
+        when(gaForLipService.isGaForLip(any(GeneralApplicationCaseData.class))).thenReturn(true);
         List<Element<TranslatedDocument>> translatedDocuments = new ArrayList<>();
         TranslatedDocument translatedDocument = TranslatedDocument.builder()
             .documentType(TranslatedDocumentType.WRITTEN_REPRESENTATIONS_APPLICANT)
             .file(mock(Document.class))
             .build();
         translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
-        CaseData caseData = CaseData.builder()
-            .translatedDocumentsGA(translatedDocuments).build();
-        CaseData updatedCaseData = CaseData.builder().build();
+        CaseData caseData = gaCaseData().toBuilder()
+            .translatedDocuments(translatedDocuments).build();
+        CaseData updatedCaseData = gaCaseData().toBuilder().build();
 
         uploadTranslatedDocumentService.sendUserUploadNotification(caseData, updatedCaseData, "auth");
 
@@ -1025,16 +1041,16 @@ public class UploadTranslatedDocumentServiceTest {
 
     @Test
     void shouldSendUserUploadNotificationWrittenRepsRespondent() {
-        when(gaForLipService.isGaForLip(any())).thenReturn(true);
+        when(gaForLipService.isGaForLip(any(GeneralApplicationCaseData.class))).thenReturn(true);
         List<Element<TranslatedDocument>> translatedDocuments = new ArrayList<>();
         TranslatedDocument translatedDocument = TranslatedDocument.builder()
             .documentType(TranslatedDocumentType.WRITTEN_REPRESENTATIONS_RESPONDENT)
             .file(mock(Document.class))
             .build();
         translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
-        CaseData caseData = CaseData.builder()
-            .translatedDocumentsGA(translatedDocuments).build();
-        CaseData updatedCaseData = CaseData.builder().build();
+        CaseData caseData = gaCaseData().toBuilder()
+            .translatedDocuments(translatedDocuments).build();
+        CaseData updatedCaseData = gaCaseData().toBuilder().build();
 
         uploadTranslatedDocumentService.sendUserUploadNotification(caseData, updatedCaseData, "auth");
 
@@ -1044,16 +1060,16 @@ public class UploadTranslatedDocumentServiceTest {
 
     @Test
     void shouldSendUserUploadNotificationMoreInfoApplicant() {
-        when(gaForLipService.isGaForLip(any())).thenReturn(true);
+        when(gaForLipService.isGaForLip(any(GeneralApplicationCaseData.class))).thenReturn(true);
         List<Element<TranslatedDocument>> translatedDocuments = new ArrayList<>();
         TranslatedDocument translatedDocument = TranslatedDocument.builder()
             .documentType(TranslatedDocumentType.REQUEST_MORE_INFORMATION_APPLICANT)
             .file(mock(Document.class))
             .build();
         translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
-        CaseData caseData = CaseData.builder()
-            .translatedDocumentsGA(translatedDocuments).build();
-        CaseData updatedCaseData = CaseData.builder().build();
+        CaseData caseData = gaCaseData().toBuilder()
+            .translatedDocuments(translatedDocuments).build();
+        CaseData updatedCaseData = gaCaseData().toBuilder().build();
 
         uploadTranslatedDocumentService.sendUserUploadNotification(caseData, updatedCaseData, "auth");
 
@@ -1063,20 +1079,31 @@ public class UploadTranslatedDocumentServiceTest {
 
     @Test
     void shouldSendUserUploadNotificationMoreInfoRespondent() {
-        when(gaForLipService.isGaForLip(any())).thenReturn(true);
+        when(gaForLipService.isGaForLip(any(GeneralApplicationCaseData.class))).thenReturn(true);
         List<Element<TranslatedDocument>> translatedDocuments = new ArrayList<>();
         TranslatedDocument translatedDocument = TranslatedDocument.builder()
             .documentType(TranslatedDocumentType.REQUEST_MORE_INFORMATION_RESPONDENT)
             .file(mock(Document.class))
             .build();
         translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
-        CaseData caseData = CaseData.builder()
-            .translatedDocumentsGA(translatedDocuments).build();
-        CaseData updatedCaseData = CaseData.builder().build();
+        CaseData caseData = gaCaseData().toBuilder()
+            .translatedDocuments(translatedDocuments).build();
+        CaseData updatedCaseData = gaCaseData().toBuilder().build();
 
         uploadTranslatedDocumentService.sendUserUploadNotification(caseData, updatedCaseData, "auth");
 
         verify(docUploadDashboardNotificationService).createDashboardNotification(eq(caseData), eq("Respondent One"), eq("auth"), eq(false));
         verify(docUploadDashboardNotificationService, never()).createResponseDashboardNotification(eq(caseData), eq("APPLICANT"), eq("auth"));
+    }
+
+    private CaseData gaCaseData() {
+        return gaCaseData(builder -> { });
+    }
+
+    private CaseData gaCaseData(Consumer<GeneralApplicationCaseDataBuilder> customiser) {
+        GeneralApplicationCaseDataBuilder builder = GeneralApplicationCaseDataBuilder.builder();
+        customiser.accept(builder);
+        GeneralApplicationCaseData gaCaseData = builder.build();
+        return OBJECT_MAPPER.convertValue(gaCaseData, CaseData.class);
     }
 }

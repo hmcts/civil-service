@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.consentorder;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -7,6 +9,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.ConsentOrderForm;
@@ -15,6 +18,7 @@ import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
+import uk.gov.hmcts.reform.civil.service.ga.GaCaseDataEnricher;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -31,9 +35,13 @@ public class ConsentOrderGenerator implements TemplateDataGenerator<ConsentOrder
     private final DocumentManagementService documentManagementService;
     private final DocumentGeneratorService documentGeneratorService;
     private final DocmosisService docmosisService;
+    private final GaCaseDataEnricher gaCaseDataEnricher;
+    private final ObjectMapper objectMapper;
 
     @Override
-    public ConsentOrderForm getTemplateData(CaseData caseData, String authorisation)  {
+    public ConsentOrderForm getTemplateData(CaseData caseData, String authorisation) {
+
+        var caseLocation = caseData.getCaseManagementLocation();
 
         ConsentOrderForm.ConsentOrderFormBuilder consentOrderFormBuilder =
             ConsentOrderForm.builder()
@@ -45,13 +53,17 @@ public class ConsentOrderGenerator implements TemplateDataGenerator<ConsentOrder
                 .defendant2Name(caseData.getDefendant2PartyName() != null ? caseData.getDefendant2PartyName() : null)
                 .orderDate(LocalDate.now())
                 .courtName(docmosisService.getCaseManagementLocationVenueName(caseData, authorisation).getExternalShortName())
-                .siteName(caseData.getGaCaseManagementLocation().getSiteName())
-                .address(caseData.getGaCaseManagementLocation().getAddress())
-                .postcode(caseData.getGaCaseManagementLocation().getPostcode())
+                .siteName(caseLocation != null ? caseLocation.getSiteName() : null)
+                .address(caseLocation != null ? caseLocation.getAddress() : null)
+                .postcode(caseLocation != null ? caseLocation.getPostcode() : null)
                 .consentOrder(caseData.getApproveConsentOrder()
                                   .getConsentOrderDescription());
 
         return consentOrderFormBuilder.build();
+    }
+
+    public ConsentOrderForm getTemplateData(GeneralApplicationCaseData gaCaseData, String authorisation) {
+        return getTemplateData(asCaseData(gaCaseData), authorisation);
     }
 
     protected String getDateFormatted(LocalDate date) {
@@ -78,6 +90,16 @@ public class ConsentOrderGenerator implements TemplateDataGenerator<ConsentOrder
             new PDF(getFileName(docmosisTemplate), docmosisDocument.getBytes(),
                     DocumentType.CONSENT_ORDER)
         );
+    }
+
+    public CaseDocument generate(GeneralApplicationCaseData gaCaseData, String authorisation) {
+        return generate(asCaseData(gaCaseData), authorisation);
+    }
+
+    private CaseData asCaseData(GeneralApplicationCaseData gaCaseData) {
+        ObjectMapper mapperWithJavaTime = objectMapper.copy().registerModule(new JavaTimeModule());
+        CaseData converted = mapperWithJavaTime.convertValue(gaCaseData, CaseData.class);
+        return gaCaseDataEnricher.enrich(converted, gaCaseData);
     }
 
     private String getFileName(DocmosisTemplates docmosisTemplate) {

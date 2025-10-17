@@ -31,6 +31,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.NON_LIVE_STATES;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLICATION_PROCEEDS_IN_HERITAGE;
@@ -62,7 +64,7 @@ class ApplicationProceedsInHeritageEventCallbackHandlerTest  extends BaseCallbac
         void setup() {
             localDateTime = LocalDateTime.now();
             when(time.now()).thenReturn(localDateTime);
-            when(gaForLipService.isGaForLip(any())).thenReturn(false);
+            when(gaForLipService.isGaForLip(any(GeneralApplicationCaseData.class))).thenReturn(false);
         }
 
         @ParameterizedTest(name = "The application is in {0} state")
@@ -92,9 +94,9 @@ class ApplicationProceedsInHeritageEventCallbackHandlerTest  extends BaseCallbac
 
         @Test
         void shouldThrowNotificationTwiceWhenCaseIsLipVsLip() {
-            when(gaForLipService.isGaForLip(any())).thenReturn(true);
-            when(gaForLipService.isLipApp(any())).thenReturn(true);
-            when(gaForLipService.isLipResp(any())).thenReturn(true);
+            when(gaForLipService.isGaForLip(any(GeneralApplicationCaseData.class))).thenReturn(true);
+            when(gaForLipService.isLipAppGa(any(GeneralApplicationCaseData.class))).thenReturn(true);
+            when(gaForLipService.isLipRespGa(any(GeneralApplicationCaseData.class))).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                 .ccdCaseReference(1234L)
                 .ccdState(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION).build();
@@ -109,9 +111,9 @@ class ApplicationProceedsInHeritageEventCallbackHandlerTest  extends BaseCallbac
 
         @Test
         void shouldNotSendAnyDashboardNotificationsWhenLRvsLR() {
-            when(gaForLipService.isGaForLip(any())).thenReturn(false);
-            when(gaForLipService.isLipApp(any())).thenReturn(false);
-            when(gaForLipService.isLipResp(any())).thenReturn(false);
+            when(gaForLipService.isGaForLip(any(GeneralApplicationCaseData.class))).thenReturn(false);
+            when(gaForLipService.isLipAppGa(any(GeneralApplicationCaseData.class))).thenReturn(false);
+            when(gaForLipService.isLipRespGa(any(GeneralApplicationCaseData.class))).thenReturn(false);
             CaseData caseData = CaseDataBuilder.builder()
                 .ccdCaseReference(1234L)
                 .ccdState(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION).build();
@@ -126,9 +128,9 @@ class ApplicationProceedsInHeritageEventCallbackHandlerTest  extends BaseCallbac
 
         @Test
         void shouldThrowNotificationApplicationWhenItisLipCaseAndLipApplicant() {
-            when(gaForLipService.isGaForLip(any())).thenReturn(true);
-            when(gaForLipService.isLipApp(any())).thenReturn(true);
-            when(gaForLipService.isLipResp(any())).thenReturn(false);
+            when(gaForLipService.isGaForLip(any(GeneralApplicationCaseData.class))).thenReturn(true);
+            when(gaForLipService.isLipAppGa(any(GeneralApplicationCaseData.class))).thenReturn(true);
+            when(gaForLipService.isLipRespGa(any(GeneralApplicationCaseData.class))).thenReturn(false);
             CaseData caseData = CaseDataBuilder.builder()
                 .ccdCaseReference(1234L)
                 .ccdState(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION).build();
@@ -142,9 +144,9 @@ class ApplicationProceedsInHeritageEventCallbackHandlerTest  extends BaseCallbac
 
         @Test
         void shouldThrowNotificationOnlyOnceToLipApplicant() {
-            when(gaForLipService.isGaForLip(any())).thenReturn(true);
-            when(gaForLipService.isLipApp(any())).thenReturn(true);
-            when(gaForLipService.isLipResp(any())).thenReturn(false);
+            when(gaForLipService.isGaForLip(any(GeneralApplicationCaseData.class))).thenReturn(true);
+            when(gaForLipService.isLipAppGa(any(GeneralApplicationCaseData.class))).thenReturn(true);
+            when(gaForLipService.isLipRespGa(any(GeneralApplicationCaseData.class))).thenReturn(false);
             CaseData caseData = CaseDataBuilder.builder()
                 .ccdCaseReference(1234L)
                 .ccdState(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION).build();

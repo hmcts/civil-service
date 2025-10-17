@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.JudicialDecisionHelper;
 import uk.gov.hmcts.reform.civil.service.ParentCaseUpdateHelper;
@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.service.StateGeneratorService;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.END_JUDGE_BUSINESS_PROCESS_GASPEC;
@@ -31,7 +32,6 @@ public class EndJudgeMakesDecisionBusinessProcessCallbackHandler extends Callbac
 
     private static final List<CaseEvent> EVENTS = List.of(END_JUDGE_BUSINESS_PROCESS_GASPEC);
 
-    private final CaseDetailsConverter caseDetailsConverter;
     private final ParentCaseUpdateHelper parentCaseUpdateHelper;
     private final StateGeneratorService stateGeneratorService;
     private final JudicialDecisionHelper judicialDecisionHelper;
@@ -48,14 +48,16 @@ public class EndJudgeMakesDecisionBusinessProcessCallbackHandler extends Callbac
 
     private CallbackResponse endJudgeBusinessProcess(CallbackParams callbackParams) {
         log.info("End judge makes decision business process for caseId: {}", callbackParams.getCaseData().getCcdCaseReference());
-        CaseData data = caseDetailsConverter.toCaseDataGA(callbackParams.getRequest().getCaseDetails());
+        CaseData data = callbackParams.getCaseData();
+        GeneralApplicationCaseData gaCaseData = callbackParams.getGaCaseData();
+        Objects.requireNonNull(gaCaseData, "gaCaseData must be present on CallbackParams");
         CaseState newState = getNewStateDependingOn(data);
         if (isApplicationMakeVisibleToDefendant(data)
             || (data.getIsGaRespondentOneLip() == YesOrNo.YES && newState != APPLICATION_ADD_PAYMENT)) {
             parentCaseUpdateHelper.updateParentApplicationVisibilityWithNewState(
-                data, newState.getDisplayedValue());
+                gaCaseData, newState.getDisplayedValue());
         } else {
-            parentCaseUpdateHelper.updateParentWithGAState(data, newState.getDisplayedValue());
+            parentCaseUpdateHelper.updateParentWithGAState(gaCaseData, newState.getDisplayedValue());
         }
 
         return evaluateReady(callbackParams, newState);

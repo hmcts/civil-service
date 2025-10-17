@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.callback.DashboardCallbackHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
@@ -15,7 +15,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPS_APPLICATION_FEE_REQUIRED_APPLICANT;
 
 @Service
-public class ApplicationIssuedFeeRequiredHandler extends DashboardCallbackHandler {
+public class ApplicationIssuedFeeRequiredHandler extends GaDashboardCallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FOR_GA_APPLICANT);
     private final GeneralAppFeesService generalAppFeesService;
@@ -23,8 +23,9 @@ public class ApplicationIssuedFeeRequiredHandler extends DashboardCallbackHandle
     public ApplicationIssuedFeeRequiredHandler(DashboardScenariosService dashboardScenariosService,
                                                DashboardNotificationsParamsMapper mapper,
                                                FeatureToggleService featureToggleService,
-                                               GeneralAppFeesService generalAppFeesService) {
-        super(dashboardScenariosService, mapper, featureToggleService);
+                                               GeneralAppFeesService generalAppFeesService,
+                                               ObjectMapper objectMapper) {
+        super(dashboardScenariosService, mapper, featureToggleService, objectMapper);
         this.generalAppFeesService = generalAppFeesService;
     }
 

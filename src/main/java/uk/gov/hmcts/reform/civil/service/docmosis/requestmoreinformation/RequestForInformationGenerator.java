@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.requestmoreinformation;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -8,6 +10,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.dq.GAJudgeRequestMoreInfoOption;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
@@ -15,12 +18,14 @@ import uk.gov.hmcts.reform.civil.model.docmosis.judgedecisionpdfdocument.JudgeDe
 import uk.gov.hmcts.reform.civil.model.genapplication.GAJudicialRequestMoreInfo;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.GaCallbackDataUtil;
 import uk.gov.hmcts.reform.civil.service.GaForLipService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
+import uk.gov.hmcts.reform.civil.service.ga.GaCaseDataEnricher;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
@@ -47,6 +52,8 @@ public class RequestForInformationGenerator implements TemplateDataGenerator<Jud
     private final DocumentGeneratorService documentGeneratorService;
     private final DocmosisService docmosisService;
     private final GaForLipService gaForLipService;
+    private final ObjectMapper objectMapper;
+    private final GaCaseDataEnricher gaCaseDataEnricher;
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
         JudgeDecisionPdfDocument templateData = getTemplateData(null, caseData, authorisation, FlowFlag.ONE_RESPONDENT_REPRESENTATIVE);
@@ -60,6 +67,26 @@ public class RequestForInformationGenerator implements TemplateDataGenerator<Jud
 
         log.info("Generate request for information for caseId: {}", caseData.getCcdCaseReference());
         return generateDocmosisDocument(templateData, caseData, authorisation, userType);
+    }
+
+    public CaseDocument generate(GeneralApplicationCaseData gaCaseData, String authorisation) {
+        return generate(gaCaseData, null, authorisation);
+    }
+
+    public CaseDocument generate(GeneralApplicationCaseData gaCaseData, CaseData fallbackCaseData, String authorisation) {
+        return generate(asCaseData(gaCaseData, fallbackCaseData), authorisation);
+    }
+
+    public CaseDocument generate(CaseData civilCaseData, GeneralApplicationCaseData gaCaseData, String authorisation, FlowFlag userType) {
+        return generate(civilCaseData, gaCaseData, null, authorisation, userType);
+    }
+
+    public CaseDocument generate(CaseData civilCaseData,
+                                 GeneralApplicationCaseData gaCaseData,
+                                 CaseData fallbackCaseData,
+                                 String authorisation,
+                                 FlowFlag userType) {
+        return generate(civilCaseData, asCaseData(gaCaseData, fallbackCaseData), authorisation, userType);
     }
 
     public CaseDocument generateDocmosisDocument(JudgeDecisionPdfDocument templateData, CaseData caseData, String authorisation, FlowFlag userType) {
@@ -87,6 +114,12 @@ public class RequestForInformationGenerator implements TemplateDataGenerator<Jud
     @Override
     public JudgeDecisionPdfDocument getTemplateData(CaseData civilCaseData, CaseData caseData, String authorisation, FlowFlag userType) {
         LocationRefData courtLocation  = docmosisService.getCaseManagementLocationVenueName(caseData, authorisation);
+        var caseLocation = caseData.getCaseManagementLocation();
+
+        LocalDate applicationCreatedDate = Optional.ofNullable(caseData.getCreatedDate())
+            .map(LocalDateTime::toLocalDate)
+            .orElse(LocalDate.now());
+
         JudgeDecisionPdfDocument.JudgeDecisionPdfDocumentBuilder judgeDecisionPdfDocumentBuilder =
             JudgeDecisionPdfDocument.builder()
                 .claimNumber(caseData.getGeneralAppParentCaseLink().getCaseReference())
@@ -98,16 +131,16 @@ public class RequestForInformationGenerator implements TemplateDataGenerator<Jud
                 .courtName(courtLocation.getVenueName())
                 .courtNameCy(caseData.isApplicantBilingual() ? (Objects.nonNull(courtLocation.getWelshExternalShortName())
                                  ? courtLocation.getWelshExternalShortName() : courtLocation.getVenueName()) : null)
-                .siteName(caseData.getGaCaseManagementLocation().getSiteName())
-                .address(caseData.getGaCaseManagementLocation().getAddress())
-                .postcode(caseData.getGaCaseManagementLocation().getPostcode())
+                .siteName(caseLocation != null ? caseLocation.getSiteName() : null)
+                .address(caseLocation != null ? caseLocation.getAddress() : null)
+                .postcode(caseLocation != null ? caseLocation.getPostcode() : null)
                 .judgeRecital(caseData.getJudicialDecisionRequestMoreInfo().getJudgeRecitalText())
                 .judgeComments(caseData.getJudicialDecisionRequestMoreInfo().getJudgeRequestMoreInfoText())
                 .submittedOn(LocalDate.now())
                 .dateBy(caseData.getJudicialDecisionRequestMoreInfo().getJudgeRequestMoreInfoByDate())
                 .additionalApplicationFee(getAdditionalApplicationFee(caseData))
-                .applicationCreatedDate(caseData.getCreatedDate().toLocalDate())
-                .applicationCreatedDateCy((caseData.isApplicantBilingual()) ? formatDateInWelsh(caseData.getCreatedDate().toLocalDate()) : null);
+                .applicationCreatedDate(applicationCreatedDate)
+                .applicationCreatedDateCy(caseData.isApplicantBilingual() ? formatDateInWelsh(applicationCreatedDate) : null);
 
         if (List.of(FlowFlag.POST_JUDGE_ORDER_LIP_APPLICANT, FlowFlag.POST_JUDGE_ORDER_LIP_RESPONDENT).contains(userType)) {
             boolean parentClaimantIsApplicant = caseData.identifyParentClaimantIsApplicant(caseData);
@@ -125,6 +158,7 @@ public class RequestForInformationGenerator implements TemplateDataGenerator<Jud
     }
 
     private DocmosisTemplates getDocmosisTemplate(CaseData caseData, FlowFlag userType) {
+        GeneralApplicationCaseData gaCaseData = GaCallbackDataUtil.toGaCaseData(caseData, objectMapper);
         GAJudgeRequestMoreInfoOption gaJudgeRequestMoreInfoOption = getGAJudgeRequestMoreInfoOption(caseData);
 
         if (List.of(FlowFlag.POST_JUDGE_ORDER_LIP_APPLICANT, FlowFlag.POST_JUDGE_ORDER_LIP_RESPONDENT).contains(userType)) {
@@ -133,7 +167,9 @@ public class RequestForInformationGenerator implements TemplateDataGenerator<Jud
                 : POST_JUDGE_REQUEST_FOR_INFORMATION_ORDER_LIP;
         }
 
-        if (gaForLipService.isLipApp(caseData)  && gaJudgeRequestMoreInfoOption == GAJudgeRequestMoreInfoOption.SEND_APP_TO_OTHER_PARTY) {
+        if (gaCaseData != null
+            && gaForLipService.isLipAppGa(gaCaseData)
+            && gaJudgeRequestMoreInfoOption == GAJudgeRequestMoreInfoOption.SEND_APP_TO_OTHER_PARTY) {
             if (caseData.isApplicantBilingual()) {
                 return REQUEST_FOR_INFORMATION_SEND_TO_OTHER_PARTY_BILINGUAL;
             } else {
@@ -144,6 +180,7 @@ public class RequestForInformationGenerator implements TemplateDataGenerator<Jud
     }
 
     private DocumentType getDocumentType(CaseData caseData, FlowFlag userType) {
+        GeneralApplicationCaseData gaCaseData = GaCallbackDataUtil.toGaCaseData(caseData, objectMapper);
         GAJudgeRequestMoreInfoOption gaJudgeRequestMoreInfoOption = getGAJudgeRequestMoreInfoOption(caseData);
 
         if (List.of(FlowFlag.POST_JUDGE_ORDER_LIP_APPLICANT, FlowFlag.POST_JUDGE_ORDER_LIP_RESPONDENT).contains(userType)) {
@@ -152,7 +189,9 @@ public class RequestForInformationGenerator implements TemplateDataGenerator<Jud
                 : DocumentType.REQUEST_FOR_INFORMATION;
         }
 
-        if (gaForLipService.isLipApp(caseData) && gaJudgeRequestMoreInfoOption == GAJudgeRequestMoreInfoOption.SEND_APP_TO_OTHER_PARTY) {
+        if (gaCaseData != null
+            && gaForLipService.isLipAppGa(gaCaseData)
+            && gaJudgeRequestMoreInfoOption == GAJudgeRequestMoreInfoOption.SEND_APP_TO_OTHER_PARTY) {
             return DocumentType.SEND_APP_TO_OTHER_PARTY;
         }
 
@@ -173,5 +212,14 @@ public class RequestForInformationGenerator implements TemplateDataGenerator<Jud
     private GAJudgeRequestMoreInfoOption getGAJudgeRequestMoreInfoOption(CaseData caseData) {
         return Optional.ofNullable(caseData.getJudicialDecisionRequestMoreInfo())
             .map(GAJudicialRequestMoreInfo::getRequestMoreInfoOption).orElse(null);
+    }
+
+    private CaseData asCaseData(GeneralApplicationCaseData gaCaseData, CaseData fallbackCaseData) {
+        if (gaCaseData == null) {
+            return fallbackCaseData != null ? fallbackCaseData : CaseData.builder().build();
+        }
+        ObjectMapper mapperWithJavaTime = objectMapper.copy().registerModule(new JavaTimeModule());
+        CaseData merged = GaCallbackDataUtil.mergeToCaseData(gaCaseData, fallbackCaseData, mapperWithJavaTime);
+        return gaCaseDataEnricher.enrich(merged, gaCaseData);
     }
 }

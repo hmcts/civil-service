@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -23,6 +24,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.UploadTranslatedDocumentService;
+import uk.gov.hmcts.reform.civil.service.ga.GaCaseDataEnricher;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
@@ -34,6 +36,8 @@ public class UploadTranslatedDocumentCallbackHandlerTest extends BaseCallbackHan
     private UploadTranslatedDocumentService uploadTranslatedDocumentService;
     @Mock
     IdamClient idamClient;
+    @Mock
+    private GaCaseDataEnricher gaCaseDataEnricher;
     @InjectMocks
     private UploadTranslatedDocumentCallbackHandler handler;
 
@@ -41,8 +45,9 @@ public class UploadTranslatedDocumentCallbackHandlerTest extends BaseCallbackHan
     void setUp() {
         objectMapper = new ObjectMapper();
         objectMapper.findAndRegisterModules();
-        handler = new UploadTranslatedDocumentCallbackHandler(objectMapper, idamClient, uploadTranslatedDocumentService);
+        handler = new UploadTranslatedDocumentCallbackHandler(objectMapper, idamClient, uploadTranslatedDocumentService, gaCaseDataEnricher);
         when(idamClient.getUserInfo(any())).thenReturn(UserInfo.builder().uid("uid").givenName("").familyName("translator").build());
+        lenient().when(gaCaseDataEnricher.enrich(any(), any())).thenAnswer(invocation -> invocation.getArgument(0));
     }
 
     @Nested

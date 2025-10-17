@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.ParentCaseUpdateHelper;
@@ -62,7 +63,7 @@ public class EndHearingScheduledBusinessProcessCallbackHandlerTest extends BaseC
         handler.handle(params);
 
         verify(parentCaseUpdateHelper, times(1))
-            .updateParentWithGAState(any(), any());
+            .updateParentWithGAState(any(GeneralApplicationCaseData.class), any());
     }
 
     private CallbackParams getCallbackParams(CaseData caseData) {
@@ -81,6 +82,7 @@ public class EndHearingScheduledBusinessProcessCallbackHandlerTest extends BaseC
                                            .eventId("END_HEARING_SCHEDULED_PROCESS_GASPEC")
                                            .build())
                               .caseData(caseData)
+                              .gaCaseData(toGaCaseData(caseData))
                               .version(null)
                               .params(null)
                               .build();

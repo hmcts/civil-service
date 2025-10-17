@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.finalorder;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -10,7 +12,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.AppealOriginTypes;
 import uk.gov.hmcts.reform.civil.enums.dq.AssistedCostTypesList;
-import uk.gov.hmcts.reform.civil.enums.dq.AssistedOrderCostDropdownList;
+import uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums;
 import uk.gov.hmcts.reform.civil.enums.dq.DefendantRepresentationType;
 import uk.gov.hmcts.reform.civil.enums.dq.FinalOrderShowToggle;
 import uk.gov.hmcts.reform.civil.enums.dq.LengthOfHearing;
@@ -18,6 +20,7 @@ import uk.gov.hmcts.reform.civil.enums.dq.OrderMadeOnTypes;
 import uk.gov.hmcts.reform.civil.enums.dq.PermissionToAppealTypes;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.AssistedOrderForm;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.genapplication.HearingLength;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisService;
@@ -25,6 +28,7 @@ import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
+import uk.gov.hmcts.reform.civil.service.ga.GaCaseDataEnricher;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.time.LocalDate;
@@ -52,6 +56,8 @@ public class AssistedOrderFormGenerator implements TemplateDataGenerator<Assiste
     private final DocumentManagementService documentManagementService;
     private final DocumentGeneratorService documentGeneratorService;
     private final DocmosisService docmosisService;
+    private final GaCaseDataEnricher gaCaseDataEnricher;
+    private final ObjectMapper objectMapper;
 
     private static final String FILE_TIMESTAMP_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
@@ -67,6 +73,15 @@ public class AssistedOrderFormGenerator implements TemplateDataGenerator<Assiste
         AssistedOrderForm templateData = getTemplateData(civilCaseData, caseData, authorisation, userType);
         log.info("Generate assisted order form for caseId: {}", caseData.getCcdCaseReference());
         return generateDocmosisDocument(templateData, authorisation, userType);
+    }
+
+    public CaseDocument generate(GeneralApplicationCaseData gaCaseData, String authorisation) {
+        return generate(asCaseData(gaCaseData), authorisation);
+    }
+
+    public CaseDocument generate(CaseData civilCaseData, GeneralApplicationCaseData gaCaseData,
+                                 String authorisation, FlowFlag userType) {
+        return generate(civilCaseData, asCaseData(gaCaseData), authorisation, userType);
     }
 
     public CaseDocument generateDocmosisDocument(AssistedOrderForm templateData, String authorisation, FlowFlag userType) {
@@ -86,6 +101,8 @@ public class AssistedOrderFormGenerator implements TemplateDataGenerator<Assiste
     @Override
     public AssistedOrderForm getTemplateData(CaseData civilCaseData, CaseData caseData, String authorisation, FlowFlag userType) {
 
+        var caseLocation = caseData.getCaseManagementLocation();
+
         AssistedOrderForm.AssistedOrderFormBuilder assistedOrderFormBuilder = AssistedOrderForm.builder()
             .caseNumber(caseData.getGeneralAppParentCaseLink().getCaseReference())
             .claimant1Name(caseData.getClaimant1PartyName())
@@ -96,9 +113,9 @@ public class AssistedOrderFormGenerator implements TemplateDataGenerator<Assiste
                                 .getIsMultiParty().equals(YesOrNo.YES) ? caseData.getDefendant2PartyName() : null)
             .courtLocation(docmosisService
                                .getCaseManagementLocationVenueName(caseData, authorisation).getExternalShortName())
-            .siteName(caseData.getGaCaseManagementLocation().getSiteName())
-            .address(caseData.getGaCaseManagementLocation().getAddress())
-            .postcode(caseData.getGaCaseManagementLocation().getPostcode())
+            .siteName(caseLocation != null ? caseLocation.getSiteName() : null)
+            .address(caseLocation != null ? caseLocation.getAddress() : null)
+            .postcode(caseLocation != null ? caseLocation.getPostcode() : null)
             .receivedDate(LocalDate.now())
             .judgeNameTitle(caseData.getJudgeTitle())
             .isOrderMade(caseData.getAssistedOrderMadeSelection())
@@ -171,6 +188,11 @@ public class AssistedOrderFormGenerator implements TemplateDataGenerator<Assiste
         return assistedOrderFormBuilder.build();
     }
 
+    public AssistedOrderForm getTemplateData(CaseData civilCaseData, GeneralApplicationCaseData gaCaseData,
+                                             String authorisation, FlowFlag userType) {
+        return getTemplateData(civilCaseData, asCaseData(gaCaseData), authorisation, userType);
+    }
+
     protected String getCostsReservedText(CaseData caseData) {
         return caseData.getAssistedCostTypes().getDisplayedValue().equals(AssistedCostTypesList.COSTS_RESERVED.getDisplayedValue())
             && nonNull(caseData.getCostReservedDetails()) ? caseData.getCostReservedDetails().getDetailText() : null;
@@ -179,7 +201,7 @@ public class AssistedOrderFormGenerator implements TemplateDataGenerator<Assiste
     protected String getBespokeCostOrderText(CaseData caseData) {
         return caseData.getAssistedCostTypes().getDisplayedValue()
                 .equals(AssistedCostTypesList.BESPOKE_COSTS_ORDER.getDisplayedValue())
-                && nonNull(caseData.getAssistedOrderCostsBespokeGA()) ? "\n\n" + caseData.getAssistedOrderCostsBespokeGA().getDetailText() : null;
+                && nonNull(caseData.getAssistedOrderCostsBespoke()) ? "\n\n" + caseData.getAssistedOrderCostsBespoke().getBesPokeCostDetailsText() : null;
     }
 
     protected Boolean checkIsOtherRepresentation(CaseData caseData) {
@@ -283,9 +305,9 @@ public class AssistedOrderFormGenerator implements TemplateDataGenerator<Assiste
     }
 
     protected Boolean checkIsQocsProtectionEnabled(CaseData caseData) {
-        return nonNull(caseData.getAssistedOrderMakeAnOrderForCostsGA())
-            && nonNull(caseData.getAssistedOrderMakeAnOrderForCostsGA().getMakeAnOrderForCostsYesOrNo())
-            && caseData.getAssistedOrderMakeAnOrderForCostsGA().getMakeAnOrderForCostsYesOrNo().equals(
+        return nonNull(caseData.getAssistedOrderMakeAnOrderForCosts())
+            && nonNull(caseData.getAssistedOrderMakeAnOrderForCosts().getMakeAnOrderForCostsYesOrNo())
+            && caseData.getAssistedOrderMakeAnOrderForCosts().getMakeAnOrderForCostsYesOrNo().equals(
             YES);
     }
 
@@ -359,54 +381,54 @@ public class AssistedOrderFormGenerator implements TemplateDataGenerator<Assiste
     }
 
     protected String getSummarilyAssessed(CaseData caseData) {
-        return nonNull(caseData.getAssistedOrderMakeAnOrderForCostsGA())
-            && nonNull(caseData.getAssistedOrderMakeAnOrderForCostsGA().getMakeAnOrderForCostsList())
-            && caseData.getAssistedOrderMakeAnOrderForCostsGA().getAssistedOrderCostsMakeAnOrderTopList().equals(
-            AssistedOrderCostDropdownList.COSTS)
+        return nonNull(caseData.getAssistedOrderMakeAnOrderForCosts())
+            && nonNull(caseData.getAssistedOrderMakeAnOrderForCosts().getMakeAnOrderForCostsList())
+            && caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderClaimantDefendantFirstDropdown().equals(
+            CostEnums.COSTS)
             ? populateSummarilyAssessedText(caseData) : null;
     }
 
     protected LocalDate getSummarilyAssessedDate(CaseData caseData) {
-        return nonNull(caseData.getAssistedOrderMakeAnOrderForCostsGA())
-            && nonNull(caseData.getAssistedOrderMakeAnOrderForCostsGA().getMakeAnOrderForCostsList())
-            && caseData.getAssistedOrderMakeAnOrderForCostsGA().getAssistedOrderCostsMakeAnOrderTopList().equals(
-            AssistedOrderCostDropdownList.COSTS)
-            ? caseData.getAssistedOrderMakeAnOrderForCostsGA().getAssistedOrderCostsFirstDropdownDate() : null;
+        return nonNull(caseData.getAssistedOrderMakeAnOrderForCosts())
+            && nonNull(caseData.getAssistedOrderMakeAnOrderForCosts().getMakeAnOrderForCostsList())
+            && caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderClaimantDefendantFirstDropdown().equals(
+            CostEnums.COSTS)
+            ? caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderCostsFirstDropdownDate() : null;
     }
 
     protected String populateSummarilyAssessedText(CaseData caseData) {
-        if (caseData.getAssistedOrderMakeAnOrderForCostsGA().getMakeAnOrderForCostsList().equals(
-            AssistedOrderCostDropdownList.CLAIMANT)) {
+        if (caseData.getAssistedOrderMakeAnOrderForCosts().getMakeAnOrderForCostsList().equals(
+            CostEnums.CLAIMANT)) {
             return format(
                 "The claimant shall pay the defendant's costs (both fixed and summarily assessed as appropriate) "
                     + "in the sum of £%s. Such sum shall be paid by 4pm on",
-                MonetaryConversions.penniesToPounds(caseData.getAssistedOrderMakeAnOrderForCostsGA().getAssistedOrderCostsFirstDropdownAmount()));
+                MonetaryConversions.penniesToPounds(caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderCostsFirstDropdownAmount()));
         } else {
             return format(
                 "The defendant shall pay the claimant's costs (both fixed and summarily assessed as appropriate) "
                     + "in the sum of £%s. Such sum shall be paid by 4pm on",
-                MonetaryConversions.penniesToPounds(caseData.getAssistedOrderMakeAnOrderForCostsGA().getAssistedOrderCostsFirstDropdownAmount()));
+                MonetaryConversions.penniesToPounds(caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderCostsFirstDropdownAmount()));
         }
     }
 
     protected String getDetailedAssessment(CaseData caseData) {
-        return nonNull(caseData.getAssistedOrderMakeAnOrderForCostsGA())
-            && nonNull(caseData.getAssistedOrderMakeAnOrderForCostsGA().getMakeAnOrderForCostsList())
-            && caseData.getAssistedOrderMakeAnOrderForCostsGA().getAssistedOrderCostsMakeAnOrderTopList().equals(
-            AssistedOrderCostDropdownList.SUBJECT_DETAILED_ASSESSMENT)
+        return nonNull(caseData.getAssistedOrderMakeAnOrderForCosts())
+            && nonNull(caseData.getAssistedOrderMakeAnOrderForCosts().getMakeAnOrderForCostsList())
+            && caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderClaimantDefendantFirstDropdown().equals(
+            CostEnums.SUBJECT_DETAILED_ASSESSMENT)
             ? populateDetailedAssessmentText(caseData) : null;
     }
 
     protected String populateDetailedAssessmentText(CaseData caseData) {
         String standardOrIndemnity;
-        if (caseData.getAssistedOrderMakeAnOrderForCostsGA().getAssistedOrderAssessmentSecondDropdownList1().equals(
-            AssistedOrderCostDropdownList.INDEMNITY_BASIS)) {
+        if (caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderAssessmentSecondDropdownList1().equals(
+            CostEnums.INDEMNITY_BASIS)) {
             standardOrIndemnity = "on the indemnity basis if not agreed";
         } else {
             standardOrIndemnity = "on the standard basis if not agreed";
         }
 
-        if (caseData.getAssistedOrderMakeAnOrderForCostsGA().getMakeAnOrderForCostsList().equals(AssistedOrderCostDropdownList.CLAIMANT)) {
+        if (caseData.getAssistedOrderMakeAnOrderForCosts().getMakeAnOrderForCostsList().equals(CostEnums.CLAIMANT)) {
             return format(
                 "The claimant shall pay the defendant's costs to be subject to a detailed assessment %s",
                 standardOrIndemnity
@@ -419,27 +441,27 @@ public class AssistedOrderFormGenerator implements TemplateDataGenerator<Assiste
     }
 
     protected String getInterimPayment(CaseData caseData) {
-        return nonNull(caseData.getAssistedOrderMakeAnOrderForCostsGA())
-            && nonNull(caseData.getAssistedOrderMakeAnOrderForCostsGA().getMakeAnOrderForCostsList())
-            && caseData.getAssistedOrderMakeAnOrderForCostsGA().getAssistedOrderCostsMakeAnOrderTopList().equals(
-            AssistedOrderCostDropdownList.SUBJECT_DETAILED_ASSESSMENT)
-            && caseData.getAssistedOrderMakeAnOrderForCostsGA().getAssistedOrderAssessmentSecondDropdownList2().equals(
-            AssistedOrderCostDropdownList.YES)
+        return nonNull(caseData.getAssistedOrderMakeAnOrderForCosts())
+            && nonNull(caseData.getAssistedOrderMakeAnOrderForCosts().getMakeAnOrderForCostsList())
+            && caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderClaimantDefendantFirstDropdown().equals(
+            CostEnums.SUBJECT_DETAILED_ASSESSMENT)
+            && caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderAssessmentSecondDropdownList2().equals(
+            CostEnums.YES)
             ? populateInterimPaymentText(caseData) : null;
     }
 
     protected String populateInterimPaymentText(CaseData caseData) {
         return format(
             "An interim payment of £%s on account of costs shall be paid by 4pm on ",
-            MonetaryConversions.penniesToPounds(caseData.getAssistedOrderMakeAnOrderForCostsGA().getAssistedOrderAssessmentThirdDropdownAmount()));
+            MonetaryConversions.penniesToPounds(caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderAssessmentThirdDropdownAmount()));
     }
 
     protected LocalDate getInterimPaymentDate(CaseData caseData) {
-        return nonNull(caseData.getAssistedOrderMakeAnOrderForCostsGA())
-            && nonNull(caseData.getAssistedOrderMakeAnOrderForCostsGA().getMakeAnOrderForCostsList())
-            && caseData.getAssistedOrderMakeAnOrderForCostsGA().getAssistedOrderCostsMakeAnOrderTopList().equals(
-            AssistedOrderCostDropdownList.SUBJECT_DETAILED_ASSESSMENT)
-            ? caseData.getAssistedOrderMakeAnOrderForCostsGA().getAssistedOrderAssessmentThirdDropdownDate() : null;
+        return nonNull(caseData.getAssistedOrderMakeAnOrderForCosts())
+            && nonNull(caseData.getAssistedOrderMakeAnOrderForCosts().getMakeAnOrderForCostsList())
+            && caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderClaimantDefendantFirstDropdown().equals(
+            CostEnums.SUBJECT_DETAILED_ASSESSMENT)
+            ? caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderAssessmentThirdDropdownDate() : null;
     }
 
     protected String getFurtherHearingLocation(CaseData caseData) {
@@ -595,5 +617,14 @@ public class AssistedOrderFormGenerator implements TemplateDataGenerator<Assiste
             return POST_JUDGE_ASSISTED_ORDER_FORM_LIP;
         }
         return ASSISTED_ORDER_FORM;
+    }
+
+    private CaseData asCaseData(GeneralApplicationCaseData gaCaseData) {
+        if (gaCaseData == null) {
+            return CaseData.builder().build();
+        }
+        ObjectMapper mapperWithJavaTime = objectMapper.copy().registerModule(new JavaTimeModule());
+        CaseData converted = mapperWithJavaTime.convertValue(gaCaseData, CaseData.class);
+        return gaCaseDataEnricher.enrich(converted, gaCaseData);
     }
 }

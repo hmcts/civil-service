@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.ChangeLanguagePreference;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.PreferredLanguage;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.UserType;
@@ -122,11 +123,18 @@ public class ChangeLanguagePreferenceCallbackHandler extends CallbackHandler {
                                                                   CaseData.CaseDataBuilder<?, ?> builder,
                                                                   PreferredLanguage preferredLanguage,
                                                                   String revisedBilingualPreference) {
-        CaseDataLiP caseDataLiP = caseData.getCaseDataLiP();
+        CaseDataLiP caseDataLiP = Optional.ofNullable(caseData.getCaseDataLiP())
+            .orElse(CaseDataLiP.builder().build());
+        var existingResponse = Optional.ofNullable(caseDataLiP.getRespondent1LiPResponse())
+            .orElse(RespondentLiPResponse.builder().build());
+        var updatedResponse = existingResponse.toBuilder()
+            .respondent1ResponseLanguage(revisedBilingualPreference)
+            .build();
+
         builder.caseDataLiP(caseDataLiP.toBuilder()
-                                .respondent1LiPResponse(caseDataLiP.getRespondent1LiPResponse().toBuilder()
-                                                            .respondent1ResponseLanguage(revisedBilingualPreference).build())
-                                .build());
+                .respondent1LiPResponse(updatedResponse)
+                .build());
+        builder.respondent1LiPResponse(updatedResponse);
         builder.defendantLanguagePreferenceDisplay(preferredLanguage);
     }
 }

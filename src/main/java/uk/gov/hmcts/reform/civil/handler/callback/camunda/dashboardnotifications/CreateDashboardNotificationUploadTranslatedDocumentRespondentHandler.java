@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.callback.DashboardCallbackHandler;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -16,14 +16,15 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPS_TRANSLATED_DOCUMENT_UPLOADED_RESPONDENT;
 
 @Service
-public class CreateDashboardNotificationUploadTranslatedDocumentRespondentHandler extends DashboardCallbackHandler {
+public class CreateDashboardNotificationUploadTranslatedDocumentRespondentHandler extends GaDashboardCallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(CREATE_RESPONDENT_DASHBOARD_NOTIFICATION_TRANSLATED_DOC);
 
     public CreateDashboardNotificationUploadTranslatedDocumentRespondentHandler(DashboardScenariosService dashboardScenariosService,
                                                                                 DashboardNotificationsParamsMapper mapper,
-                                                                                FeatureToggleService featureToggleService) {
-        super(dashboardScenariosService, mapper, featureToggleService);
+                                                                                FeatureToggleService featureToggleService,
+                                                                                ObjectMapper objectMapper) {
+        super(dashboardScenariosService, mapper, featureToggleService, objectMapper);
     }
 
     @Override

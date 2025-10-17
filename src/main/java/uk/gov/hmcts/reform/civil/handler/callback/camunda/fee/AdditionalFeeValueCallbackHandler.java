@@ -12,6 +12,8 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.GeneralAppFeesConfiguration;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.GaCallbackDataUtil;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
@@ -58,22 +60,43 @@ public class AdditionalFeeValueCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse getAdditionalFeeValue(CallbackParams callbackParams) {
-        var caseData = callbackParams.getCaseData();
+        GeneralApplicationCaseData gaCaseData = GaCallbackDataUtil.resolveGaCaseData(callbackParams, objectMapper);
+        CaseData caseData = GaCallbackDataUtil.mergeToCaseData(gaCaseData, callbackParams.getCaseData(), objectMapper);
+
+        if (caseData == null) {
+            throw new IllegalArgumentException("Case data missing from callback params");
+        }
 
         if (judicialDecisionHelper.isApplicationUncloakedWithAdditionalFee(caseData)) {
             Fee feeForGA = feeService.getFeeForGA(feesConfiguration.getApplicationUncloakAdditionalFee(), null, null);
-            BigDecimal applicationFee = Optional.ofNullable(caseData.getGeneralAppPBADetails())
+            GAPbaDetails existingDetails = Optional.ofNullable(gaCaseData)
+                .map(GeneralApplicationCaseData::getGeneralAppPBADetails)
+                .orElse(caseData.getGeneralAppPBADetails());
+            BigDecimal applicationFee = Optional.ofNullable(existingDetails)
                 .map(GAPbaDetails::getFee)
                 .map(Fee::getCalculatedAmountInPence)
                 .orElse(null);
-            GAPbaDetails generalAppPBADetails = caseData.getGeneralAppPBADetails()
-                .toBuilder().fee(feeForGA).build();
-            CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
-            builder.generalAppPBADetails(generalAppPBADetails);
-            if (featureToggleService.isGaForLipsEnabled() && caseData.getIsGaApplicantLip() == YesOrNo.YES) {
+            GAPbaDetails generalAppPBADetails = Optional.ofNullable(existingDetails)
+                .map(GAPbaDetails::toBuilder)
+                .orElse(GAPbaDetails.builder())
+                .fee(feeForGA)
+                .build();
+            CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
+                .generalAppPBADetails(generalAppPBADetails);
+            YesOrNo isGaApplicantLip = caseData.getIsGaApplicantLip();
+            if (isGaApplicantLip == null && gaCaseData != null) {
+                isGaApplicantLip = gaCaseData.getIsGaApplicantLip();
+            }
+            if (featureToggleService.isGaForLipsEnabled() && isGaApplicantLip == YesOrNo.YES) {
                 builder.applicationFeeAmountInPence(applicationFee);
             }
             caseData = builder.build();
+            if (gaCaseData != null) {
+                gaCaseData = gaCaseData.toBuilder()
+                    .generalAppPBADetails(generalAppPBADetails)
+                    .build();
+                caseData = GaCallbackDataUtil.mergeToCaseData(gaCaseData, caseData, objectMapper);
+            }
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))

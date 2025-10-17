@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.GeneralAppFeesConfiguration;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
@@ -92,7 +93,7 @@ class AdditionalFeeValueCallbackHandlerTest extends BaseCallbackHandlerTest {
             .build();
 
         when(judicialDecisionHelper
-                 .isApplicationUncloakedWithAdditionalFee(caseData)).thenReturn(true);
+                 .isApplicationUncloakedWithAdditionalFee(any(CaseData.class))).thenReturn(true);
 
         params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -116,8 +117,9 @@ class AdditionalFeeValueCallbackHandlerTest extends BaseCallbackHandlerTest {
             .requestForInformationApplication()
             .build();
         when(judicialDecisionHelper
-                 .isApplicationUncloakedWithAdditionalFee(caseData)).thenReturn(false);
+                 .isApplicationUncloakedWithAdditionalFee(any(CaseData.class))).thenReturn(false);
         params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        handler.handle(params);
         verify(generalAppFeesService, never()).getFeeForGA(any(), any(), any());
     }
 
@@ -137,7 +139,7 @@ class AdditionalFeeValueCallbackHandlerTest extends BaseCallbackHandlerTest {
             .build();
 
         when(judicialDecisionHelper
-                 .isApplicationUncloakedWithAdditionalFee(caseData)).thenReturn(true);
+                 .isApplicationUncloakedWithAdditionalFee(any(CaseData.class))).thenReturn(true);
 
         BigDecimal expectedApplicationFeeAmount = caseData.getGeneralAppPBADetails().getFee().getCalculatedAmountInPence();
         params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -159,13 +161,43 @@ class AdditionalFeeValueCallbackHandlerTest extends BaseCallbackHandlerTest {
             .build();
 
         when(judicialDecisionHelper
-                 .isApplicationUncloakedWithAdditionalFee(caseData)).thenReturn(true);
+                 .isApplicationUncloakedWithAdditionalFee(any(CaseData.class))).thenReturn(true);
 
         params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
         Exception exception = assertThrows(RuntimeException.class, () -> handler.handle(params));
 
         assertThat(exception.getMessage()).isEqualTo(SOME_EXCEPTION);
+    }
+
+    @Test
+    void shouldReturnAdditionalFeeValue_whenGaCaseDataOnlyProvided() {
+        when(generalAppFeesService.getFeeForGA(any(), any(), any()))
+            .thenReturn(Fee.builder()
+                .calculatedAmountInPence(TEST_FEE_AMOUNT_POUNDS_167)
+                .code(TEST_FEE_CODE)
+                .version(VERSION)
+                .build());
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .judicialDecisionWithUncloakRequestForInformationApplication(
+                REQUEST_MORE_INFORMATION, YesOrNo.NO, YesOrNo.NO)
+            .build();
+        GeneralApplicationCaseData gaCaseData = toGaCaseData(caseData);
+
+        when(judicialDecisionHelper
+                 .isApplicationUncloakedWithAdditionalFee(any(CaseData.class))).thenReturn(true);
+
+        CallbackParams params = gaCallbackParamsOf(gaCaseData, ABOUT_TO_SUBMIT);
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        Fee expectedFeeDto = Fee.builder()
+            .calculatedAmountInPence(TEST_FEE_AMOUNT_POUNDS_167)
+            .code(TEST_FEE_CODE)
+            .version(VERSION)
+            .build();
+
+        assertThat(extractAdditionalUncloakFee(response)).isEqualTo(expectedFeeDto);
     }
 
     private Fee extractAdditionalUncloakFee(AboutToStartOrSubmitCallbackResponse response) {

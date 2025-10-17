@@ -5,7 +5,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
@@ -44,6 +47,9 @@ public class DocUploadDashboardNotificationServiceTest {
     @InjectMocks
     private DocUploadDashboardNotificationService docUploadDashboardNotificationService;
 
+    @Spy
+    private ObjectMapper objectMapper = new ObjectMapper();
+
     @Mock
     DashboardApiClient dashboardApiClient;
     @Mock
@@ -71,7 +77,7 @@ public class DocUploadDashboardNotificationServiceTest {
                                                                                   "http://dm-store:8080/documents")
                                                                               .build()).build()));
             HashMap<String, Object> scenarioParams = new HashMap<>();
-            when(gaForLipService.isLipResp(any(CaseData.class))).thenReturn(true);
+            when(gaForLipService.isLipRespGa(any(GeneralApplicationCaseData.class))).thenReturn(true);
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
             CaseData caseData = CaseDataBuilder.builder()
@@ -116,7 +122,7 @@ public class DocUploadDashboardNotificationServiceTest {
                                                                                   "http://dm-store:8080/documents")
                                                                               .build()).build()));
             HashMap<String, Object> scenarioParams = new HashMap<>();
-            when(gaForLipService.isLipApp(any(CaseData.class))).thenReturn(true);
+            when(gaForLipService.isLipAppGa(any(GeneralApplicationCaseData.class))).thenReturn(true);
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
             CaseData caseData = CaseDataBuilder.builder()
@@ -174,7 +180,7 @@ public class DocUploadDashboardNotificationServiceTest {
                                              .organisationIdentifier("2").build()));
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
-            when(gaForLipService.isLipApp(any(CaseData.class))).thenReturn(true);
+            when(gaForLipService.isLipAppGa(any(GeneralApplicationCaseData.class))).thenReturn(true);
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
             CaseData caseData = CaseDataBuilder.builder()
@@ -230,7 +236,7 @@ public class DocUploadDashboardNotificationServiceTest {
                                              .organisationIdentifier("2").build()));
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
-            when(gaForLipService.isLipApp(any(CaseData.class))).thenReturn(true);
+            when(gaForLipService.isLipAppGa(any(GeneralApplicationCaseData.class))).thenReturn(true);
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
             CaseData caseData = CaseDataBuilder.builder()
@@ -286,7 +292,7 @@ public class DocUploadDashboardNotificationServiceTest {
                                              .organisationIdentifier("2").build()));
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
-            when(gaForLipService.isLipResp(any(CaseData.class))).thenReturn(true);
+            when(gaForLipService.isLipRespGa(any(GeneralApplicationCaseData.class))).thenReturn(true);
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
             CaseData caseData = CaseDataBuilder.builder()
@@ -438,7 +444,7 @@ public class DocUploadDashboardNotificationServiceTest {
                                              .organisationIdentifier("2").build()));
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
-            when(gaForLipService.isLipApp(any(CaseData.class))).thenReturn(true);
+            when(gaForLipService.isLipAppGa(any(GeneralApplicationCaseData.class))).thenReturn(true);
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
             CaseData caseData = CaseDataBuilder.builder()

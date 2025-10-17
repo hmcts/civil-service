@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.ga.GaCaseDataEnricher;
 
 import java.util.Arrays;
 import java.util.List;
@@ -31,6 +32,7 @@ public class UpdateGaLanguagePreferenceCallbackHandler extends CallbackHandler {
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final ObjectMapper objectMapper;
+    private final GaCaseDataEnricher gaCaseDataEnricher;
 
     private static final List<String> BILINGUAL_TYPES = Arrays.asList("BOTH", "WELSH");
 
@@ -46,20 +48,23 @@ public class UpdateGaLanguagePreferenceCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse updateLanguagePreference(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
+        CaseData caseData = gaCaseDataEnricher.enrich(
+            callbackParams.getCaseData(),
+            callbackParams.getGaCaseData()
+        );
         CaseData civilCaseData = caseDetailsConverter
             .toCaseData(coreCaseDataService
                             .getCase(Long.parseLong(caseData.getGeneralAppParentCaseLink().getCaseReference())));
         boolean claimantBilingual = BILINGUAL_TYPES.contains(civilCaseData.getClaimantBilingualLanguagePreference());
-        boolean defendantBilingual = civilCaseData.getRespondent1LiPResponseGA() != null
-            && BILINGUAL_TYPES.contains(civilCaseData.getRespondent1LiPResponseGA().getRespondent1ResponseLanguage());
+        boolean defendantBilingual = civilCaseData.getRespondent1LiPResponse() != null
+            && BILINGUAL_TYPES.contains(civilCaseData.getRespondent1LiPResponse().getRespondent1ResponseLanguage());
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         if (caseData.getParentClaimantIsApplicant() == YesOrNo.YES) {
-            caseDataBuilder.applicantBilingualLanguagePreferenceGA(claimantBilingual ? YesOrNo.YES : YesOrNo.NO);
-            caseDataBuilder.respondentBilingualLanguagePreferenceGA(defendantBilingual ? YesOrNo.YES : YesOrNo.NO);
+            caseDataBuilder.applicantBilingualLanguagePreference(claimantBilingual ? YesOrNo.YES : YesOrNo.NO);
+            caseDataBuilder.respondentBilingualLanguagePreference(defendantBilingual ? YesOrNo.YES : YesOrNo.NO);
         } else {
-            caseDataBuilder.applicantBilingualLanguagePreferenceGA(defendantBilingual ? YesOrNo.YES : YesOrNo.NO);
-            caseDataBuilder.respondentBilingualLanguagePreferenceGA(claimantBilingual ? YesOrNo.YES : YesOrNo.NO);
+            caseDataBuilder.applicantBilingualLanguagePreference(defendantBilingual ? YesOrNo.YES : YesOrNo.NO);
+            caseDataBuilder.respondentBilingualLanguagePreference(claimantBilingual ? YesOrNo.YES : YesOrNo.NO);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()

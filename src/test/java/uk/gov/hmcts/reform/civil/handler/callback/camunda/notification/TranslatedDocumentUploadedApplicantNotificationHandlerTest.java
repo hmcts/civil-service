@@ -1,36 +1,38 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Consumer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.GeneralAppParentCaseLink;
-import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.GASolicitorDetailsGAspec;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.GaForLipService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.SolicitorEmailValidation;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
@@ -41,11 +43,11 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @ExtendWith(MockitoExtension.class)
 public class TranslatedDocumentUploadedApplicantNotificationHandlerTest extends BaseCallbackHandlerTest {
 
-    @InjectMocks
     private TranslatedDocumentUploadedApplicantNotificationHandler handler;
     @Mock
     private NotificationService notificationService;
@@ -66,11 +68,27 @@ public class TranslatedDocumentUploadedApplicantNotificationHandlerTest extends 
     @Mock
     private NotificationsSignatureConfiguration configuration;
 
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
+        .registerModule(new JavaTimeModule())
+        .registerModule(new Jdk8Module());
+
     @Nested
     class AboutToSubmitCallback {
 
         @BeforeEach
         void setUp() {
+            handler = new TranslatedDocumentUploadedApplicantNotificationHandler(
+                notificationService,
+                notificationsProperties,
+                caseDetailsConverter,
+                gaForLipService,
+                coreCaseDataService,
+                solicitorEmailValidation,
+                organisationService,
+                featureToggleService,
+                configuration,
+                OBJECT_MAPPER
+            );
             when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
             when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
                                                                  + "\n For all other matters, call 0300 123 7050");
@@ -80,31 +98,33 @@ public class TranslatedDocumentUploadedApplicantNotificationHandlerTest extends 
             when(configuration.getWelshHmctsSignature()).thenReturn("Hawliadau am Arian yn y Llys Sifil Ar-lein \n Gwasanaeth Llysoedd a Thribiwnlysoedd EF");
             when(configuration.getWelshPhoneContact()).thenReturn("Ffôn: 0300 303 5174");
             when(configuration.getWelshOpeningHours()).thenReturn("Dydd Llun i ddydd Iau, 9am – 5pm, dydd Gwener, 9am – 4.30pm");
+            when(solicitorEmailValidation.validateSolicitorEmail(
+                any(CaseData.class),
+                any(GeneralApplicationCaseData.class)
+            )).thenAnswer(invocation -> invocation.getArgument(1));
         }
 
         @Test
         void shouldSendNotificationLiPApplicantConsent_WhenParentCaseInEnglish() {
             // Given
-            CaseData caseData =
-                CaseData.builder()
-                    .applicantPartyName("applicant1")
-                    .defendant1PartyName("respondent1")
-                    .generalAppRespondentSolicitors(List.of(
-                        Element.<GASolicitorDetailsGAspec>builder()
-                            .value(GASolicitorDetailsGAspec.builder().email("respondent@gmail.com").build()).build()))
-                    .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("1234567").build())
-                    .generalAppConsentOrder(YES)
-                    .ccdCaseReference(Long.valueOf("56786"))
-                    .parentCaseReference("56789")
-                    .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().email("applicant@gmail.com").build())
-                    .isGaApplicantLip(YES)
-                    .build();
+            CaseData caseData = gaCaseData(builder -> builder
+                .withApplicantPartyName("applicant1")
+                .withDefendant1PartyName("respondent1")
+                .withGeneralAppRespondentSolicitors(
+                    wrapElements(GASolicitorDetailsGAspec.builder().email("respondent@gmail.com").build()))
+                .withIsGaApplicantLip(YES)
+                .withGeneralAppParentCaseReference("56789")
+                .withGeneralAppApplnSolicitor(GASolicitorDetailsGAspec.builder().email("applicant@gmail.com").build())
+            ).toBuilder()
+                .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("1234567").build())
+                .generalAppConsentOrder(YES)
+                .ccdCaseReference(56786L)
+                .parentCaseReference("56789")
+                .build();
             CaseDetails civil = CaseDetails.builder().id(123L).data(Map.of("case_data", caseData)).build();
-
-            when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
             when(coreCaseDataService.getCase(any())).thenReturn(civil);
             when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(caseData);
-            when(gaForLipService.isLipApp(caseData)).thenReturn(true);
+            when(gaForLipService.isLipAppGa(any(GeneralApplicationCaseData.class))).thenReturn(true);
             when(notificationsProperties.getLipGeneralAppApplicantEmailTemplate()).thenReturn("template-id");
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CaseEvent.NOTIFY_RESPONDENT_TRANSLATED_DOCUMENT_UPLOADED_GA.name())
@@ -125,28 +145,26 @@ public class TranslatedDocumentUploadedApplicantNotificationHandlerTest extends 
         @Test
         void shouldSendNotificationLiPApplicantConsent_WhenParentCaseInWelsh() {
             // Given
-            CaseData caseData =
-                CaseData.builder()
-                    .applicantPartyName("applicant1")
-                    .defendant1PartyName("respondent1")
-                    .generalAppRespondentSolicitors(List.of(
-                        Element.<GASolicitorDetailsGAspec>builder()
-                            .value(GASolicitorDetailsGAspec.builder().email("respondent@gmail.com").build()).build()))
-                    .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("1234567").build())
-                    .generalAppConsentOrder(YES)
-                    .ccdCaseReference(Long.valueOf("56786"))
-                    .parentCaseReference("56789")
-                    .isGaApplicantLip(YES)
-                    .parentClaimantIsApplicant(YES)
-                    .applicantBilingualLanguagePreferenceGA(YES)
-                    .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().email("applicant@gmail.com").build())
-                    .build();
+            CaseData caseData = gaCaseData(builder -> builder
+                .withApplicantPartyName("applicant1")
+                .withDefendant1PartyName("respondent1")
+                .withGeneralAppRespondentSolicitors(
+                    wrapElements(GASolicitorDetailsGAspec.builder().email("respondent@gmail.com").build()))
+                .withIsGaApplicantLip(YES)
+                .withParentClaimantIsApplicant(YES)
+                .withApplicantBilingualPreference(YES)
+                .withGeneralAppParentCaseReference("56789")
+                .withGeneralAppApplnSolicitor(GASolicitorDetailsGAspec.builder().email("applicant@gmail.com").build())
+            ).toBuilder()
+                .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("1234567").build())
+                .generalAppConsentOrder(YES)
+                .ccdCaseReference(56786L)
+                .parentCaseReference("56789")
+                .build();
             CaseDetails civil = CaseDetails.builder().id(123L).data(Map.of("case_data", caseData)).build();
-
-            when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
             when(coreCaseDataService.getCase(any())).thenReturn(civil);
             when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(caseData);
-            when(gaForLipService.isLipApp(caseData)).thenReturn(true);
+            when(gaForLipService.isLipAppGa(any(GeneralApplicationCaseData.class))).thenReturn(true);
             when(notificationsProperties.getNotifyApplicantLiPTranslatedDocumentUploadedWhenParentCaseInBilingual()).thenReturn(
                 "template-id");
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -168,28 +186,26 @@ public class TranslatedDocumentUploadedApplicantNotificationHandlerTest extends 
         @Test
         void shouldSendNotificationApplicantConsentForLR() {
             // Given
-            CaseData caseData =
-                CaseData.builder()
-                    .applicantPartyName("applicant1")
-                    .defendant1PartyName("respondent1")
-                    .generalAppRespondentSolicitors(List.of(
-                        Element.<GASolicitorDetailsGAspec>builder()
-                            .value(GASolicitorDetailsGAspec.builder().email("respondent@gmail.com").build()).build()))
-                    .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("1234567").build())
-                    .generalAppConsentOrder(YES)
-                    .ccdCaseReference(Long.valueOf("56786"))
-                    .parentCaseReference("56789")
-                    .isGaApplicantLip(NO)
-                    .parentClaimantIsApplicant(YES)
-                    .respondentBilingualLanguagePreferenceGA(YES)
-                    .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().email("applicant@gmail.com").build())
-                    .build();
+            CaseData caseData = gaCaseData(builder -> builder
+                .withApplicantPartyName("applicant1")
+                .withDefendant1PartyName("respondent1")
+                .withGeneralAppRespondentSolicitors(
+                    wrapElements(GASolicitorDetailsGAspec.builder().email("respondent@gmail.com").build()))
+                .withGeneralAppParentCaseReference("56789")
+                .withIsGaApplicantLip(NO)
+                .withParentClaimantIsApplicant(YES)
+                .withRespondentBilingualPreference(YES)
+                .withGeneralAppApplnSolicitor(GASolicitorDetailsGAspec.builder().email("applicant@gmail.com").build())
+            ).toBuilder()
+                .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("1234567").build())
+                .generalAppConsentOrder(YES)
+                .ccdCaseReference(56786L)
+                .parentCaseReference("56789")
+                .build();
             CaseDetails civil = CaseDetails.builder().id(123L).data(Map.of("case_data", caseData)).build();
-
-            when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
             when(coreCaseDataService.getCase(any())).thenReturn(civil);
             when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(caseData);
-            when(gaForLipService.isLipApp(caseData)).thenReturn(false);
+            when(gaForLipService.isLipAppGa(any(GeneralApplicationCaseData.class))).thenReturn(false);
             when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(Organisation.builder()
                                                                                              .name("LegalRep")
                                                                                              .build()));
@@ -210,5 +226,12 @@ public class TranslatedDocumentUploadedApplicantNotificationHandlerTest extends 
                 anyString()
             );
         }
+    }
+
+    private CaseData gaCaseData(Consumer<GeneralApplicationCaseDataBuilder> customiser) {
+        GeneralApplicationCaseDataBuilder builder = GeneralApplicationCaseDataBuilder.builder();
+        customiser.accept(builder);
+        GeneralApplicationCaseData gaCaseData = builder.build();
+        return OBJECT_MAPPER.convertValue(gaCaseData, CaseData.class);
     }
 }

@@ -1,14 +1,16 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -29,7 +31,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_RESPONDENT_DAS
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPS_TRANSLATED_DOCUMENT_UPLOADED_RESPONDENT;
 
 @ExtendWith(MockitoExtension.class)
-public class CreateDashboardNotificationUploadTranslatedDocumentRespondentHandlerTest {
+public class CreateDashboardNotificationUploadTranslatedDocumentRespondentHandlerTest extends BaseCallbackHandlerTest {
 
     @Mock
     private DashboardScenariosService dashboardScenariosService;
@@ -37,8 +39,17 @@ public class CreateDashboardNotificationUploadTranslatedDocumentRespondentHandle
     private DashboardNotificationsParamsMapper mapper;
     @Mock
     private FeatureToggleService featureToggleService;
-    @InjectMocks
     private CreateDashboardNotificationUploadTranslatedDocumentRespondentHandler handler;
+
+    @BeforeEach
+    void setUp() {
+        handler = new CreateDashboardNotificationUploadTranslatedDocumentRespondentHandler(
+            dashboardScenariosService,
+            mapper,
+            featureToggleService,
+            objectMapper
+        );
+    }
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
@@ -93,5 +104,32 @@ public class CreateDashboardNotificationUploadTranslatedDocumentRespondentHandle
             verifyNoInteractions(dashboardScenariosService);
         }
 
+    }
+
+    @Nested
+    class GaCaseDataOnly {
+
+        @Test
+        void shouldRecordScenarioWhenGaCaseDataProvided() {
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
+            caseData = caseData.toBuilder().parentCaseReference(caseData.getCcdCaseReference().toString())
+                .isGaRespondentOneLip(YesOrNo.YES)
+                .build();
+            GeneralApplicationCaseData gaCaseData = toGaCaseData(caseData);
+            HashMap<String, Object> scenarioParams = new HashMap<>();
+            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
+
+            CallbackParams params = gaCallbackParamsOf(gaCaseData, ABOUT_TO_SUBMIT);
+
+            handler.handle(params);
+
+            verify(dashboardScenariosService).recordScenarios(
+                "BEARER_TOKEN",
+                SCENARIO_AAA6_GENERAL_APPS_TRANSLATED_DOCUMENT_UPLOADED_RESPONDENT.getScenario(),
+                gaCaseData.getCcdCaseReference().toString(),
+                ScenarioRequestParams.builder().params(scenarioParams).build()
+            );
+        }
     }
 }

@@ -14,15 +14,16 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseprogression.FreeFormOrderValues;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.model.finalorders.AssistedOrderCostDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.finalorder.AppealTypeChoiceList;
 import uk.gov.hmcts.reform.civil.model.genapplication.finalorder.AppealTypeChoices;
 import uk.gov.hmcts.reform.civil.model.genapplication.finalorder.AssistedOrderAppealDetails;
-import uk.gov.hmcts.reform.civil.model.genapplication.finalorder.AssistedOrderCost;
 import uk.gov.hmcts.reform.civil.model.genapplication.finalorder.AssistedOrderDateHeard;
 import uk.gov.hmcts.reform.civil.model.genapplication.finalorder.AssistedOrderFurtherHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.finalorder.AssistedOrderHeardRepresentation;
@@ -210,8 +211,8 @@ public class JudicialFinalDecisionHandler extends CallbackHandler {
         caseDataBuilder.assistedOrderFurtherHearingDetails(AssistedOrderFurtherHearingDetails.builder()
                                                                .datesToAvoid(NO).build());
         caseDataBuilder
-            .assistedOrderMakeAnOrderForCostsGA(
-                AssistedOrderCost
+            .assistedOrderMakeAnOrderForCosts(
+                AssistedOrderCostDetails
                     .builder()
                     .assistedOrderAssessmentThirdDropdownDate(
                         deadlinesCalculator
@@ -219,7 +220,8 @@ public class JudicialFinalDecisionHandler extends CallbackHandler {
                     .assistedOrderCostsFirstDropdownDate(
                         deadlinesCalculator
                             .getJudicialOrderDeadlineDate(LocalDateTime.now(), 14))
-                    .makeAnOrderForCostsYesOrNo(NO).build())
+                    .makeAnOrderForCostsYesOrNo(NO)
+                    .build())
             .publicFundingCostsProtection(NO);
 
         caseDataBuilder
@@ -347,11 +349,12 @@ public class JudicialFinalDecisionHandler extends CallbackHandler {
             && caseData.getAssistedOrderFurtherHearingDetails().getDatesToAvoidDateDropdown().getDatesToAvoidDates().isBefore(LocalDate.now())) {
             errors.add(String.format(PAST_DATE_NOT_ALLOWED, "Further Hearing"));
         }
-        if (nonNull(caseData.getAssistedOrderMakeAnOrderForCostsGA())
-            && ((nonNull(caseData.getAssistedOrderMakeAnOrderForCostsGA().getAssistedOrderCostsFirstDropdownDate())
-            && caseData.getAssistedOrderMakeAnOrderForCostsGA().getAssistedOrderCostsFirstDropdownDate().isBefore(LocalDate.now()))
-            || (nonNull(caseData.getAssistedOrderMakeAnOrderForCostsGA().getAssistedOrderAssessmentThirdDropdownDate())
-            && caseData.getAssistedOrderMakeAnOrderForCostsGA().getAssistedOrderAssessmentThirdDropdownDate().isBefore(LocalDate.now())))) {
+        AssistedOrderCostDetails costDetails = caseData.getAssistedOrderMakeAnOrderForCosts();
+        if (costDetails != null
+            && ((nonNull(costDetails.getAssistedOrderCostsFirstDropdownDate())
+            && costDetails.getAssistedOrderCostsFirstDropdownDate().isBefore(LocalDate.now()))
+            || (nonNull(costDetails.getAssistedOrderAssessmentThirdDropdownDate())
+            && costDetails.getAssistedOrderAssessmentThirdDropdownDate().isBefore(LocalDate.now())))) {
             errors.add(String.format(PAST_DATE_NOT_ALLOWED, "Make an order for detailed/summary costs"));
         }
         validateAssertedOrderDatesForAppeal(caseData, errors);
@@ -409,6 +412,16 @@ public class JudicialFinalDecisionHandler extends CallbackHandler {
                         && (NO.equals(caseData.getRespondent2SameLegalRepresentative())
                             || Objects.isNull(caseData.getRespondent2SameLegalRepresentative()))
                         ? ", " + caseData.getDefendant2PartyName() : "");
+    }
+
+    public static String getAllPartyNames(GeneralApplicationCaseData caseData) {
+        return format("%s v %s%s",
+                      caseData.getClaimant1PartyName(),
+                      caseData.getDefendant1PartyName(),
+                      nonNull(caseData.getDefendant2PartyName())
+                          && (NO.equals(caseData.getRespondent2SameLegalRepresentative())
+                          || Objects.isNull(caseData.getRespondent2SameLegalRepresentative()))
+                          ? ", " + caseData.getDefendant2PartyName() : "");
     }
 
     private String getCaseNumberFormatted(CaseData caseData) {

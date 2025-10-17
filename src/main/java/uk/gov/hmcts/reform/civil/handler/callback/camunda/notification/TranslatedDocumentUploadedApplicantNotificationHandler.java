@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -9,6 +10,8 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.GaCallbackDataUtil;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
@@ -45,6 +48,7 @@ public class TranslatedDocumentUploadedApplicantNotificationHandler extends Call
     private final OrganisationService organisationService;
     private final FeatureToggleService featureToggleService;
     private final NotificationsSignatureConfiguration configuration;
+    private final ObjectMapper objectMapper;
 
     private static final List<CaseEvent> EVENTS = List.of(CaseEvent.NOTIFY_APPLICANT_TRANSLATED_DOCUMENT_UPLOADED_GA);
     private static final String REFERENCE_TEMPLATE = "translated-document-uploaded-applicant-notification-%s";
@@ -63,7 +67,12 @@ public class TranslatedDocumentUploadedApplicantNotificationHandler extends Call
 
     @Override
     public Map<String, String> addProperties(CaseData caseData, CaseData mainCaseData) {
-        if (gaForLipService.isLipApp(caseData)) {
+        GeneralApplicationCaseData gaCaseData = GaCallbackDataUtil.toGaCaseData(caseData, objectMapper);
+        return addProperties(gaCaseData, mainCaseData);
+    }
+
+    private Map<String, String> addProperties(GeneralApplicationCaseData caseData, CaseData mainCaseData) {
+        if (gaForLipService.isLipAppGa(caseData)) {
             String caseTitle = DocUploadNotificationService.getAllPartyNames(caseData);
             String isLipAppName = caseData.getApplicantPartyName();
             HashMap<String, String> properties = new HashMap<>(Map.of(
@@ -72,7 +81,7 @@ public class TranslatedDocumentUploadedApplicantNotificationHandler extends Call
                 CASE_REFERENCE, caseData.getParentCaseReference()
             ));
             addAllFooterItems(caseData, mainCaseData, properties, configuration,
-                              featureToggleService.isPublicQueryManagementEnabled(caseData));
+                              featureToggleService.isPublicQueryManagementEnabledGa(caseData));
             return properties;
         }
         HashMap<String, String> properties = new HashMap<>(Map.of(
@@ -85,24 +94,28 @@ public class TranslatedDocumentUploadedApplicantNotificationHandler extends Call
     }
 
     private CallbackResponse notifyApplicant(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
+        GeneralApplicationCaseData gaCaseData = GaCallbackDataUtil.resolveGaCaseData(callbackParams, objectMapper);
+        CaseData caseData = GaCallbackDataUtil.mergeToCaseData(gaCaseData, callbackParams.getCaseData(), objectMapper);
         log.info("Translated document uploaded for applicant for case: {}", caseData.getCcdCaseReference());
-        CaseData civilCaseData = caseDetailsConverter
-            .toCaseDataGA(coreCaseDataService
-                            .getCase(Long.parseLong(caseData.getGeneralAppParentCaseLink().getCaseReference())));
+        CaseData civilCaseData = caseDetailsConverter.toCaseDataGA(
+            coreCaseDataService.getCase(Long.parseLong(gaCaseData.getGeneralAppParentCaseLink().getCaseReference()))
+        );
 
-        caseData = solicitorEmailValidation.validateSolicitorEmail(civilCaseData, caseData);
+        GeneralApplicationCaseData updatedGaCaseData = solicitorEmailValidation.validateSolicitorEmail(
+            civilCaseData,
+            gaCaseData
+        );
         notificationService.sendMail(
-            caseData.getGeneralAppApplnSolicitor().getEmail(),
-            addTemplate(caseData),
-            addProperties(caseData, civilCaseData),
-            String.format(REFERENCE_TEMPLATE, caseData.getCcdCaseReference())
+            updatedGaCaseData.getGeneralAppApplnSolicitor().getEmail(),
+            addTemplate(updatedGaCaseData),
+            addProperties(updatedGaCaseData, civilCaseData),
+            String.format(REFERENCE_TEMPLATE, updatedGaCaseData.getCcdCaseReference())
         );
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
-    private String addTemplate(CaseData caseData) {
-        if (gaForLipService.isLipApp(caseData)) {
+    private String addTemplate(GeneralApplicationCaseData caseData) {
+        if (gaForLipService.isLipAppGa(caseData)) {
             if (caseData.isApplicantBilingual()) {
                 return notificationsProperties.getNotifyApplicantLiPTranslatedDocumentUploadedWhenParentCaseInBilingual();
             }
@@ -112,7 +125,7 @@ public class TranslatedDocumentUploadedApplicantNotificationHandler extends Call
 
     }
 
-    public String getApplicantLegalOrganizationName(CaseData caseData) {
+    public String getApplicantLegalOrganizationName(GeneralApplicationCaseData caseData) {
         var organisationId = caseData.getGeneralAppApplnSolicitor().getOrganisationIdentifier();
         return organisationService.findOrganisationById(organisationId)
                 .map(Organisation::getName)

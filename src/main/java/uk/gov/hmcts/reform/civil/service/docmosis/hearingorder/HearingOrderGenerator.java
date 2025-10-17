@@ -78,6 +78,8 @@ public class HearingOrderGenerator implements TemplateDataGenerator<JudgeDecisio
     @Override
     public JudgeDecisionPdfDocument getTemplateData(CaseData civilCaseData, CaseData caseData, String authorisation, FlowFlag userType) {
 
+        var caseLocation = caseData.getCaseManagementLocation();
+
         JudgeDecisionPdfDocument.JudgeDecisionPdfDocumentBuilder judgeDecisionPdfDocumentBuilder =
             JudgeDecisionPdfDocument.builder()
                 .judgeNameTitle(caseData.getJudgeTitle())
@@ -98,9 +100,9 @@ public class HearingOrderGenerator implements TemplateDataGenerator<JudgeDecisio
                                           .getHearingPreferencesPreferredType() == GAJudicialHearingType.IN_PERSON
                                           ? caseData.getJudicialListForHearing()
                     .getHearingPreferredLocation().getValue().getLabel() : null)
-                .siteName(caseData.getGaCaseManagementLocation().getSiteName())
-                .address(caseData.getGaCaseManagementLocation().getAddress())
-                .postcode(caseData.getGaCaseManagementLocation().getPostcode())
+                .siteName(caseLocation != null ? caseLocation.getSiteName() : null)
+                .address(caseLocation != null ? caseLocation.getAddress() : null)
+                .postcode(caseLocation != null ? caseLocation.getPostcode() : null)
                 .judicialByCourtsInitiativeListForHearing(populateJudicialByCourtsInitiative(caseData));
 
         if (List.of(FlowFlag.POST_JUDGE_ORDER_LIP_APPLICANT, FlowFlag.POST_JUDGE_ORDER_LIP_RESPONDENT).contains(userType)) {

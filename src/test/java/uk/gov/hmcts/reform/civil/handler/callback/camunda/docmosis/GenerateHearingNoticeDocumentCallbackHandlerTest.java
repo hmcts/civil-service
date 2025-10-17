@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.GeneralAppParentCaseLink;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
@@ -25,6 +26,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.GaForLipService;
 import uk.gov.hmcts.reform.civil.service.SendFinalOrderPrintService;
 import uk.gov.hmcts.reform.civil.service.docmosis.hearingorder.HearingFormGeneratorGeneralApplication;
+import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -33,6 +35,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.anyString;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.enums.welshenhancements.PreTranslationGaDocumentType.HEARING_NOTICE_DOC;
 
@@ -80,18 +83,18 @@ class GenerateHearingNoticeDocumentCallbackHandlerTest extends BaseCallbackHandl
         CaseDocument caseDocument = CaseDocument.builder()
             .documentLink(Document.builder().documentUrl("doc").build()).build();
 
-        when(hearingFormGenerator.generate(any(), any())).thenReturn(caseDocument);
-        when(gaForLipService.isGaForLip(any())).thenReturn(false);
+        when(hearingFormGenerator.generate(any(GeneralApplicationCaseData.class), anyString())).thenReturn(caseDocument);
+        when(gaForLipService.isGaForLip(any(CaseData.class))).thenReturn(false);
         when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder().generalOrderApplication()
             .isGaApplicantLip(YesOrNo.YES)
-            .applicantBilingualLanguagePreferenceGA(YesOrNo.YES)
+            .applicantBilingualLanguagePreference(YesOrNo.YES)
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-        assertThat(updatedData.getHearingNoticeDocumentGA().size()).isEqualTo(0);
+        assertThat(updatedData.getHearingNoticeDocument()).isNull();
         assertThat(updatedData.getPreTranslationGaDocuments().size()).isEqualTo(1);
         assertThat(updatedData.getPreTranslationGaDocumentType()).isEqualTo(HEARING_NOTICE_DOC);
     }
@@ -101,8 +104,8 @@ class GenerateHearingNoticeDocumentCallbackHandlerTest extends BaseCallbackHandl
         CaseDocument caseDocument = CaseDocument.builder()
             .documentLink(Document.builder().documentUrl("doc").build()).build();
 
-        when(hearingFormGenerator.generate(any(), any())).thenReturn(caseDocument);
-        when(gaForLipService.isGaForLip(any())).thenReturn(false);
+        when(hearingFormGenerator.generate(any(GeneralApplicationCaseData.class), any())).thenReturn(caseDocument);
+        when(gaForLipService.isGaForLip(any(CaseData.class))).thenReturn(false);
         when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
         CaseData caseData = CaseDataBuilder.builder().generalOrderApplication()
             .build();
@@ -110,7 +113,7 @@ class GenerateHearingNoticeDocumentCallbackHandlerTest extends BaseCallbackHandl
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-        assertThat(updatedData.getHearingNoticeDocumentGA().size()).isEqualTo(1);
+        assertThat(updatedData.getHearingNoticeDocument().size()).isEqualTo(1);
     }
 
     @Test
@@ -118,10 +121,10 @@ class GenerateHearingNoticeDocumentCallbackHandlerTest extends BaseCallbackHandl
         CaseDocument caseDocument = CaseDocument.builder()
             .documentLink(Document.builder().documentUrl("doc").build()).build();
 
-        when(hearingFormGenerator.generate(any(), any())).thenReturn(caseDocument);
+        when(hearingFormGenerator.generate(any(GeneralApplicationCaseData.class), anyString())).thenReturn(caseDocument);
         when(gaForLipService.isLipApp(any())).thenReturn(true);
         when(gaForLipService.isLipResp(any())).thenReturn(true);
-        when(hearingFormGenerator.generate(any(), any(), any(), any())).thenReturn(caseDocument);
+        when(hearingFormGenerator.generate(any(CaseData.class), any(GeneralApplicationCaseData.class), anyString(), any(FlowFlag.class))).thenReturn(caseDocument);
 
         when(coreCaseDataService.getCase(any())).thenReturn(CaseDetails.builder().build());
         when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(CaseData.builder().build());
@@ -133,9 +136,9 @@ class GenerateHearingNoticeDocumentCallbackHandlerTest extends BaseCallbackHandl
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-        assertThat(updatedData.getHearingNoticeDocumentGA().size()).isEqualTo(1);
-        verify(hearingFormGenerator, times(1)).generate(any(), any());
-        verify(hearingFormGenerator, times(2)).generate(any(), any(), any(), any());
+        assertThat(updatedData.getHearingNoticeDocument().size()).isEqualTo(1);
+        verify(hearingFormGenerator, times(1)).generate(any(GeneralApplicationCaseData.class), anyString());
+        verify(hearingFormGenerator, times(2)).generate(any(CaseData.class), any(GeneralApplicationCaseData.class), anyString(), any(FlowFlag.class));
         verify(sendFinalOrderPrintService, times(2)).sendJudgeFinalOrderToPrintForLIP(any(), any(), any(), any(), any());
     }
 
@@ -144,11 +147,11 @@ class GenerateHearingNoticeDocumentCallbackHandlerTest extends BaseCallbackHandl
         CaseDocument caseDocument = CaseDocument.builder()
             .documentLink(Document.builder().documentUrl("doc").build()).build();
 
-        when(hearingFormGenerator.generate(any(), any())).thenReturn(caseDocument);
+        when(hearingFormGenerator.generate(any(GeneralApplicationCaseData.class), any())).thenReturn(caseDocument);
         when(gaForLipService.isLipApp(any())).thenReturn(true);
         when(gaForLipService.isLipResp(any())).thenReturn(true);
         when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
-        when(hearingFormGenerator.generate(any(), any(), any(), any())).thenReturn(caseDocument);
+        when(hearingFormGenerator.generate(any(CaseData.class), any(GeneralApplicationCaseData.class), anyString(), any(FlowFlag.class))).thenReturn(caseDocument);
 
         when(coreCaseDataService.getCase(any())).thenReturn(CaseDetails.builder().build());
         when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(CaseData.builder().build());
@@ -160,8 +163,8 @@ class GenerateHearingNoticeDocumentCallbackHandlerTest extends BaseCallbackHandl
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-        assertThat(updatedData.getHearingNoticeDocumentGA().size()).isEqualTo(1);
-        verify(hearingFormGenerator, times(2)).generate(any(), any(), any(), any());
+        assertThat(updatedData.getHearingNoticeDocument().size()).isEqualTo(1);
+        verify(hearingFormGenerator, times(2)).generate(any(CaseData.class), any(GeneralApplicationCaseData.class), anyString(), any(FlowFlag.class));
         verify(sendFinalOrderPrintService, times(2)).sendJudgeFinalOrderToPrintForLIP(any(), any(), any(), any(), any());
     }
 
@@ -170,17 +173,17 @@ class GenerateHearingNoticeDocumentCallbackHandlerTest extends BaseCallbackHandl
         CaseDocument caseDocument = CaseDocument.builder()
             .documentLink(Document.builder().documentUrl("doc").build()).build();
 
-        when(hearingFormGenerator.generate(any(), any())).thenReturn(caseDocument);
+        when(hearingFormGenerator.generate(any(GeneralApplicationCaseData.class), anyString())).thenReturn(caseDocument);
         when(gaForLipService.isLipApp(any())).thenReturn(true);
         when(gaForLipService.isLipResp(any())).thenReturn(true);
         when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
-        when(hearingFormGenerator.generate(any(), any(), any(), any())).thenReturn(caseDocument);
+        when(hearingFormGenerator.generate(any(CaseData.class), any(GeneralApplicationCaseData.class), anyString(), any(FlowFlag.class))).thenReturn(caseDocument);
 
         when(coreCaseDataService.getCase(any())).thenReturn(CaseDetails.builder().build());
         when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(CaseData.builder().build());
         CaseData caseData = CaseDataBuilder.builder().generalOrderApplication()
             .isGaApplicantLip(YesOrNo.YES)
-            .applicantBilingualLanguagePreferenceGA(YesOrNo.YES)
+            .applicantBilingualLanguagePreference(YesOrNo.YES)
             .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.NO).build())
             .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("1234").build())
             .build();
@@ -188,7 +191,7 @@ class GenerateHearingNoticeDocumentCallbackHandlerTest extends BaseCallbackHandl
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-        assertThat(updatedData.getHearingNoticeDocumentGA().size()).isEqualTo(0);
+        assertThat(updatedData.getHearingNoticeDocument()).isNull();
         verifyNoInteractions(sendFinalOrderPrintService);
 
     }

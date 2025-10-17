@@ -1,11 +1,14 @@
 package uk.gov.hmcts.reform.civil.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.HwFMoreInfoRequiredDocuments;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.GaCallbackDataUtil;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationDataGA;
 import uk.gov.hmcts.reform.civil.handler.callback.user.JudicialFinalDecisionHandler;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -47,6 +50,7 @@ public class HwfNotificationService implements NotificationDataGA {
     private CaseEvent event;
     private final FeatureToggleService featureToggleService;
     private final NotificationsSignatureConfiguration configuration;
+    private final ObjectMapper objectMapper;
 
     private static final String ERROR_HWF_EVENT = "Hwf Event not support";
 
@@ -59,18 +63,21 @@ public class HwfNotificationService implements NotificationDataGA {
                 .toCaseDataGA(coreCaseDataService
                         .getCase(Long.parseLong(caseData.getGeneralAppParentCaseLink().getCaseReference())));
 
-        caseData = solicitorEmailValidation.validateSolicitorEmail(civilCaseData, caseData);
-        if (Objects.isNull(event)) {
-            event = getEvent(caseData);
-        }
-        log.info("Sending help with fees notification for Case ID: {}", caseData.getCcdCaseReference());
+        GeneralApplicationCaseData gaCaseData = solicitorEmailValidation.validateSolicitorEmail(
+            civilCaseData,
+            toGaCaseData(caseData)
+        );
+        CaseData updatedCaseData = GaCallbackDataUtil.mergeToCaseData(gaCaseData, caseData, objectMapper);
+
+        CaseEvent resolvedEvent = Objects.isNull(event) ? getEvent(updatedCaseData) : event;
+        log.info("Sending help with fees notification for Case ID: {}", updatedCaseData.getCcdCaseReference());
 
         notificationService.sendMail(
-                caseData.getGeneralAppApplnSolicitor().getEmail(),
-                caseData.isApplicantBilingual() ? getTemplateBilingual(event) :
-                    getTemplate(event),
-                addAllProperties(caseData, civilCaseData, event),
-                caseData.getGeneralAppParentCaseLink().getCaseReference()
+                updatedCaseData.getGeneralAppApplnSolicitor().getEmail(),
+                updatedCaseData.isApplicantBilingual() ? getTemplateBilingual(resolvedEvent) :
+                    getTemplate(resolvedEvent),
+                addAllProperties(updatedCaseData, civilCaseData, resolvedEvent),
+                updatedCaseData.getGeneralAppParentCaseLink().getCaseReference()
         );
     }
 
@@ -88,6 +95,7 @@ public class HwfNotificationService implements NotificationDataGA {
     }
 
     private Map<String, String> getCommonProperties(CaseData caseData, CaseData mainCaseData) {
+        GeneralApplicationCaseData gaCaseData = toGaCaseData(caseData);
         HashMap<String, String> properties = new HashMap<>(Map.of(
                 CASE_REFERENCE, caseData.getParentCaseReference(),
                 CLAIMANT_NAME, caseData.getApplicantPartyName(),
@@ -95,8 +103,8 @@ public class HwfNotificationService implements NotificationDataGA {
                 TYPE_OF_FEE_WELSH, caseData.getHwfFeeType().getLabelInWelsh(),
                 HWF_REFERENCE_NUMBER, caseData.getGeneralAppHelpWithFees().getHelpWithFeesReferenceNumber()
         ));
-        addAllFooterItems(caseData, mainCaseData, properties, configuration,
-                          featureToggleService.isPublicQueryManagementEnabled(caseData));
+        addAllFooterItems(gaCaseData, mainCaseData, properties, configuration,
+                          featureToggleService.isPublicQueryManagementEnabledGa(gaCaseData));
         return properties;
     }
 
@@ -258,5 +266,9 @@ public class HwfNotificationService implements NotificationDataGA {
                 CASE_TITLE, caseTitle,
                 APPLICANT_NAME, caseData.getApplicantPartyName()
                 );
+    }
+
+    private GeneralApplicationCaseData toGaCaseData(CaseData caseData) {
+        return GaCallbackDataUtil.toGaCaseData(caseData, objectMapper);
     }
 }

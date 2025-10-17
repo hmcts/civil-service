@@ -42,6 +42,7 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAJudgesHearingListGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAJudicialDecision;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAJudicialMakeAnOrder;
@@ -93,6 +94,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -221,7 +223,7 @@ public class JudicialDecisionHandlerTest extends BaseCallbackHandlerTest {
         when(featureToggleService.isGaForLipsEnabled()).thenReturn(false);
         when(coreCaseDataService.getCase(any())).thenReturn(CaseDetails.builder().build());
         when(caseDetailsConverter.toCaseDataGA(any())).thenReturn(CaseData.builder().build());
-        when(gaForLipService.isGaForLip(any())).thenReturn(false);
+        when(gaForLipService.isGaForLip(any(CaseData.class))).thenReturn(false);
     }
 
     @Test
@@ -272,7 +274,7 @@ public class JudicialDecisionHandlerTest extends BaseCallbackHandlerTest {
         void testAboutToStartForApplicationCloakedForLipCase() {
 
             when(helper.isLipApplicationCreatedWithoutNoticeByApplicant(any())).thenReturn(YES);
-            when(gaForLipService.isGaForLip(any())).thenReturn(true);
+            when(gaForLipService.isGaForLip(any(CaseData.class))).thenReturn(true);
             List<GeneralApplicationTypes> types = List.of(
                 (GeneralApplicationTypes.STAY_THE_CLAIM), (GeneralApplicationTypes.SUMMARY_JUDGEMENT));
 
@@ -289,7 +291,7 @@ public class JudicialDecisionHandlerTest extends BaseCallbackHandlerTest {
         void testAboutToStartForApplicationCloakedForLipCaseWhenApplicationIsNotCloaked() {
 
             when(helper.isLipApplicationCreatedWithoutNoticeByApplicant(any())).thenReturn(YES);
-            when(gaForLipService.isGaForLip(any())).thenReturn(true);
+            when(gaForLipService.isGaForLip(any(CaseData.class))).thenReturn(true);
             List<GeneralApplicationTypes> types = List.of(
                 (GeneralApplicationTypes.STAY_THE_CLAIM), (GeneralApplicationTypes.SUMMARY_JUDGEMENT));
 
@@ -1765,13 +1767,13 @@ public class JudicialDecisionHandlerTest extends BaseCallbackHandlerTest {
         void setup() {
             when(deadlinesCalculator.getJudicialOrderDeadlineDate(any(), anyInt())).thenReturn(localDatePlus7days);
 
-            when(writtenRepresentationSequentialOrderGenerator.generate(any(), any()))
+            when(writtenRepresentationSequentialOrderGenerator.generate(any(CaseData.class), anyString()))
                 .thenReturn(PDFBuilder.WRITTEN_REPRESENTATION_SEQUENTIAL_DOCUMENT);
 
-            when(hearingOrderGenerator.generate(any(), any()))
+            when(hearingOrderGenerator.generate(any(CaseData.class), anyString()))
                 .thenReturn(PDFBuilder.HEARING_ORDER_DOCUMENT);
 
-            when(writtenRepresentationConcurrentOrderGenerator.generate(any(), any()))
+            when(writtenRepresentationConcurrentOrderGenerator.generate(any(CaseData.class), anyString()))
                 .thenReturn(PDFBuilder.WRITTEN_REPRESENTATION_CONCURRENT_DOCUMENT);
 
         }
@@ -2221,7 +2223,7 @@ public class JudicialDecisionHandlerTest extends BaseCallbackHandlerTest {
 
         @BeforeEach
         void setUp() {
-            when(gaForLipService.isGaForLip(any())).thenReturn(false);
+            when(gaForLipService.isGaForLip(any(CaseData.class))).thenReturn(false);
             when(deadlinesCalculator.getJudicialOrderDeadlineDate(any(), anyInt())).thenReturn(localDatePlus7days);
 
         }
@@ -2266,8 +2268,10 @@ public class JudicialDecisionHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldGenerateFinalOrderPreviewDocumentWhenPopulateFinalOrderPreviewDocIsCalled() {
-            when(gaFreeFormOrderGenerator.generate(any(), any())).thenReturn(CaseDocument
+            when(gaFreeFormOrderGenerator.generate(any(GeneralApplicationCaseData.class), anyString())).thenReturn(CaseDocument
                                                                                .builder().documentLink(Document.builder().build()).build());
+            when(gaFreeFormOrderGenerator.generate(any(CaseData.class), anyString())).thenReturn(CaseDocument
+                .builder().documentLink(Document.builder().build()).build());
             CaseData caseData = CaseDataBuilder.builder().build();
             CallbackParams params = callbackParamsOf(caseData, MID, "populate-final-order-preview-doc");
 
@@ -2300,7 +2304,7 @@ public class JudicialDecisionHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnErrorForWrittenRepresentationWithOutNoticeApplnForJudgeRevisitLipCase() {
             List<GeneralApplicationTypes> types = List.of((GeneralApplicationTypes.STRIKE_OUT));
-            when(gaForLipService.isGaForLip(any())).thenReturn(true);
+            when(gaForLipService.isGaForLip(any(CaseData.class))).thenReturn(true);
             when(helper.isLipApplicationCreatedWithoutNoticeByApplicant(any())).thenReturn(YES);
 
             CaseData caseData = getHearingOrderApplnAndResp(types, NO, NO);
@@ -2321,7 +2325,7 @@ public class JudicialDecisionHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldNotReturnErrorForWrittenRepresentationWithOutNoticeApplnForJudgeRevisitLipCase() {
             List<GeneralApplicationTypes> types = List.of((GeneralApplicationTypes.STRIKE_OUT));
-            when(gaForLipService.isGaForLip(any())).thenReturn(true);
+            when(gaForLipService.isGaForLip(any(CaseData.class))).thenReturn(true);
             when(helper.isApplicationCreatedWithoutNoticeByApplicant(any())).thenReturn(NO);
             when(helper.isLipApplicationCreatedWithoutNoticeByApplicant(any())).thenReturn(NO);
 
@@ -2422,7 +2426,7 @@ public class JudicialDecisionHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnErrorForWrittenRepWithOutNoticeApplnForLipCase() {
             List<GeneralApplicationTypes> types = List.of((GeneralApplicationTypes.STRIKE_OUT));
-            when(gaForLipService.isGaForLip(any())).thenReturn(true);
+            when(gaForLipService.isGaForLip(any(CaseData.class))).thenReturn(true);
             when(helper.isApplicationCreatedWithoutNoticeByApplicant(any())).thenReturn(NO);
             when(helper.isLipApplicationCreatedWithoutNoticeByApplicant(any())).thenReturn(YES);
 
@@ -2765,11 +2769,17 @@ public class JudicialDecisionHandlerTest extends BaseCallbackHandlerTest {
         void setup() {
             when(deadlinesCalculator.getJudicialOrderDeadlineDate(any(), anyInt())).thenReturn(localDatePlus7days);
 
-            when(generalOrderGenerator.generate(any(), any()))
+            when(generalOrderGenerator.generate(any(GeneralApplicationCaseData.class), any()))
                 .thenReturn(PDFBuilder.GENERAL_ORDER_DOCUMENT);
-            when(directionOrderGenerator.generate(any(), any()))
+            when(generalOrderGenerator.generate(any(CaseData.class), any()))
+                .thenReturn(PDFBuilder.GENERAL_ORDER_DOCUMENT);
+            when(directionOrderGenerator.generate(any(GeneralApplicationCaseData.class), any()))
                 .thenReturn(PDFBuilder.DIRECTION_ORDER_DOCUMENT);
-            when(dismissalOrderGenerator.generate(any(), any()))
+            when(directionOrderGenerator.generate(any(CaseData.class), any()))
+                .thenReturn(PDFBuilder.DIRECTION_ORDER_DOCUMENT);
+            when(dismissalOrderGenerator.generate(any(GeneralApplicationCaseData.class), any()))
+                .thenReturn(PDFBuilder.DISMISSAL_ORDER_DOCUMENT);
+            when(dismissalOrderGenerator.generate(any(CaseData.class), any()))
                 .thenReturn(PDFBuilder.DISMISSAL_ORDER_DOCUMENT);
         }
 
@@ -2850,7 +2860,7 @@ public class JudicialDecisionHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getErrors()).isEmpty();
 
-            verify(generalOrderGenerator).generate(any(CaseData.class), eq("BEARER_TOKEN"));
+            verify(generalOrderGenerator).generate(any(GeneralApplicationCaseData.class), eq("BEARER_TOKEN"));
 
             CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
 
@@ -2867,7 +2877,7 @@ public class JudicialDecisionHandlerTest extends BaseCallbackHandlerTest {
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            verify(directionOrderGenerator).generate(any(CaseData.class), eq("BEARER_TOKEN"));
+            verify(directionOrderGenerator).generate(any(GeneralApplicationCaseData.class), eq("BEARER_TOKEN"));
 
             CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
 
@@ -2883,7 +2893,7 @@ public class JudicialDecisionHandlerTest extends BaseCallbackHandlerTest {
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            verify(dismissalOrderGenerator).generate(any(CaseData.class), eq("BEARER_TOKEN"));
+            verify(dismissalOrderGenerator).generate(any(GeneralApplicationCaseData.class), eq("BEARER_TOKEN"));
 
             CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
 
@@ -2980,7 +2990,7 @@ public class JudicialDecisionHandlerTest extends BaseCallbackHandlerTest {
             when(deadlinesCalculator.calculateApplicantResponseDeadline(
                 any(LocalDateTime.class), any(Integer.class))).thenReturn(deadline);
 
-            when(requestForInformationGenerator.generate(any(), any()))
+            when(requestForInformationGenerator.generate(any(GeneralApplicationCaseData.class), any(CaseData.class), any()))
                 .thenReturn(PDFBuilder.REQUEST_FOR_INFORMATION_DOCUMENT);
         }
 
@@ -3000,7 +3010,7 @@ public class JudicialDecisionHandlerTest extends BaseCallbackHandlerTest {
 
             var response = (AboutToStartOrSubmitCallbackResponse)handler.handle(params);
 
-            verify(requestForInformationGenerator).generate(any(CaseData.class), eq("BEARER_TOKEN"));
+            verify(requestForInformationGenerator).generate(any(GeneralApplicationCaseData.class), any(CaseData.class), eq("BEARER_TOKEN"));
 
             CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
 
@@ -3025,7 +3035,7 @@ public class JudicialDecisionHandlerTest extends BaseCallbackHandlerTest {
 
             var response = (AboutToStartOrSubmitCallbackResponse)handler.handle(params);
 
-            verify(requestForInformationGenerator).generate(any(CaseData.class), eq("BEARER_TOKEN"));
+            verify(requestForInformationGenerator).generate(any(GeneralApplicationCaseData.class), any(CaseData.class), eq("BEARER_TOKEN"));
 
             CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
 
@@ -4081,4 +4091,3 @@ public class JudicialDecisionHandlerTest extends BaseCallbackHandlerTest {
         return dateOfService.getHour() >= 16;
     }
 }
-

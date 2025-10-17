@@ -18,9 +18,11 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.GeneralAppParentCaseLink;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.ga.GaCaseDataEnricher;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIGGER_GA_LANGUAGE_UPDATE;
 
@@ -38,12 +40,15 @@ public class UpdateGaLanguagePreferenceCallbackHandlerTest extends BaseCallbackH
 
     @Mock
     private CaseDetails mockCaseDetails;
+    @Mock
+    private GaCaseDataEnricher gaCaseDataEnricher;
 
     @BeforeEach
     void setUp() {
         objectMapper = new ObjectMapper();
         objectMapper.findAndRegisterModules();
-        handler = new UpdateGaLanguagePreferenceCallbackHandler(coreCaseDataService, caseDetailsConverter, objectMapper);
+        handler = new UpdateGaLanguagePreferenceCallbackHandler(coreCaseDataService, caseDetailsConverter, objectMapper, gaCaseDataEnricher);
+        lenient().when(gaCaseDataEnricher.enrich(any(), any())).thenAnswer(invocation -> invocation.getArgument(0));
     }
 
     @Test
@@ -68,8 +73,8 @@ public class UpdateGaLanguagePreferenceCallbackHandlerTest extends BaseCallbackH
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
 
-            assertThat(responseCaseData.getApplicantBilingualLanguagePreferenceGA()).isEqualTo(YesOrNo.NO);
-            assertThat(responseCaseData.getRespondentBilingualLanguagePreferenceGA()).isEqualTo(YesOrNo.NO);
+            assertThat(responseCaseData.getApplicantBilingualLanguagePreference()).isEqualTo(YesOrNo.NO);
+            assertThat(responseCaseData.getRespondentBilingualLanguagePreference()).isEqualTo(YesOrNo.NO);
         }
 
         @Test
@@ -80,7 +85,7 @@ public class UpdateGaLanguagePreferenceCallbackHandlerTest extends BaseCallbackH
                 .build();
             CaseData civilCaseData = CaseData.builder()
                 .claimantBilingualLanguagePreference("ENGLISH")
-                .respondent1LiPResponseGA(RespondentLiPResponse.builder().respondent1ResponseLanguage("ENGLISH").build())
+                .respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("ENGLISH").build())
                 .build();
             when(coreCaseDataService.getCase(any())).thenReturn(mockCaseDetails);
             when(caseDetailsConverter.toCaseData(mockCaseDetails)).thenReturn(civilCaseData);
@@ -89,8 +94,8 @@ public class UpdateGaLanguagePreferenceCallbackHandlerTest extends BaseCallbackH
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
 
-            assertThat(responseCaseData.getApplicantBilingualLanguagePreferenceGA()).isEqualTo(YesOrNo.NO);
-            assertThat(responseCaseData.getRespondentBilingualLanguagePreferenceGA()).isEqualTo(YesOrNo.NO);
+            assertThat(responseCaseData.getApplicantBilingualLanguagePreference()).isEqualTo(YesOrNo.NO);
+            assertThat(responseCaseData.getRespondentBilingualLanguagePreference()).isEqualTo(YesOrNo.NO);
         }
 
         @Test
@@ -101,7 +106,7 @@ public class UpdateGaLanguagePreferenceCallbackHandlerTest extends BaseCallbackH
                 .build();
             CaseData civilCaseData = CaseData.builder()
                 .claimantBilingualLanguagePreference("WELSH")
-                .respondent1LiPResponseGA(RespondentLiPResponse.builder().respondent1ResponseLanguage("WELSH").build())
+                .respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("WELSH").build())
                 .build();
             when(coreCaseDataService.getCase(any())).thenReturn(mockCaseDetails);
             when(caseDetailsConverter.toCaseData(mockCaseDetails)).thenReturn(civilCaseData);
@@ -110,8 +115,8 @@ public class UpdateGaLanguagePreferenceCallbackHandlerTest extends BaseCallbackH
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
 
-            assertThat(responseCaseData.getApplicantBilingualLanguagePreferenceGA()).isEqualTo(YesOrNo.YES);
-            assertThat(responseCaseData.getRespondentBilingualLanguagePreferenceGA()).isEqualTo(YesOrNo.YES);
+            assertThat(responseCaseData.getApplicantBilingualLanguagePreference()).isEqualTo(YesOrNo.YES);
+            assertThat(responseCaseData.getRespondentBilingualLanguagePreference()).isEqualTo(YesOrNo.YES);
         }
 
         @Test
@@ -122,7 +127,7 @@ public class UpdateGaLanguagePreferenceCallbackHandlerTest extends BaseCallbackH
                 .build();
             CaseData civilCaseData = CaseData.builder()
                 .claimantBilingualLanguagePreference("BOTH")
-                .respondent1LiPResponseGA(RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH").build())
+                .respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH").build())
                 .build();
             when(coreCaseDataService.getCase(any())).thenReturn(mockCaseDetails);
             when(caseDetailsConverter.toCaseData(mockCaseDetails)).thenReturn(civilCaseData);
@@ -131,8 +136,8 @@ public class UpdateGaLanguagePreferenceCallbackHandlerTest extends BaseCallbackH
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
 
-            assertThat(responseCaseData.getApplicantBilingualLanguagePreferenceGA()).isEqualTo(YesOrNo.YES);
-            assertThat(responseCaseData.getRespondentBilingualLanguagePreferenceGA()).isEqualTo(YesOrNo.YES);
+            assertThat(responseCaseData.getApplicantBilingualLanguagePreference()).isEqualTo(YesOrNo.YES);
+            assertThat(responseCaseData.getRespondentBilingualLanguagePreference()).isEqualTo(YesOrNo.YES);
         }
 
         @Test
@@ -149,8 +154,8 @@ public class UpdateGaLanguagePreferenceCallbackHandlerTest extends BaseCallbackH
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
 
-            assertThat(responseCaseData.getApplicantBilingualLanguagePreferenceGA()).isEqualTo(YesOrNo.NO);
-            assertThat(responseCaseData.getRespondentBilingualLanguagePreferenceGA()).isEqualTo(YesOrNo.NO);
+            assertThat(responseCaseData.getApplicantBilingualLanguagePreference()).isEqualTo(YesOrNo.NO);
+            assertThat(responseCaseData.getRespondentBilingualLanguagePreference()).isEqualTo(YesOrNo.NO);
         }
 
         @Test
@@ -161,7 +166,7 @@ public class UpdateGaLanguagePreferenceCallbackHandlerTest extends BaseCallbackH
                 .build();
             CaseData civilCaseData = CaseData.builder()
                 .claimantBilingualLanguagePreference("ENGLISH")
-                .respondent1LiPResponseGA(RespondentLiPResponse.builder().respondent1ResponseLanguage("ENGLISH").build())
+                .respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("ENGLISH").build())
                 .build();
             when(coreCaseDataService.getCase(any())).thenReturn(mockCaseDetails);
             when(caseDetailsConverter.toCaseData(mockCaseDetails)).thenReturn(civilCaseData);
@@ -170,8 +175,8 @@ public class UpdateGaLanguagePreferenceCallbackHandlerTest extends BaseCallbackH
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
 
-            assertThat(responseCaseData.getApplicantBilingualLanguagePreferenceGA()).isEqualTo(YesOrNo.NO);
-            assertThat(responseCaseData.getRespondentBilingualLanguagePreferenceGA()).isEqualTo(YesOrNo.NO);
+            assertThat(responseCaseData.getApplicantBilingualLanguagePreference()).isEqualTo(YesOrNo.NO);
+            assertThat(responseCaseData.getRespondentBilingualLanguagePreference()).isEqualTo(YesOrNo.NO);
         }
 
         @Test
@@ -182,7 +187,7 @@ public class UpdateGaLanguagePreferenceCallbackHandlerTest extends BaseCallbackH
                 .build();
             CaseData civilCaseData = CaseData.builder()
                 .claimantBilingualLanguagePreference("WELSH")
-                .respondent1LiPResponseGA(RespondentLiPResponse.builder().respondent1ResponseLanguage("WELSH").build())
+                .respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("WELSH").build())
                 .build();
             when(coreCaseDataService.getCase(any())).thenReturn(mockCaseDetails);
             when(caseDetailsConverter.toCaseData(mockCaseDetails)).thenReturn(civilCaseData);
@@ -191,8 +196,8 @@ public class UpdateGaLanguagePreferenceCallbackHandlerTest extends BaseCallbackH
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
 
-            assertThat(responseCaseData.getApplicantBilingualLanguagePreferenceGA()).isEqualTo(YesOrNo.YES);
-            assertThat(responseCaseData.getRespondentBilingualLanguagePreferenceGA()).isEqualTo(YesOrNo.YES);
+            assertThat(responseCaseData.getApplicantBilingualLanguagePreference()).isEqualTo(YesOrNo.YES);
+            assertThat(responseCaseData.getRespondentBilingualLanguagePreference()).isEqualTo(YesOrNo.YES);
         }
 
         @Test
@@ -203,7 +208,7 @@ public class UpdateGaLanguagePreferenceCallbackHandlerTest extends BaseCallbackH
                 .build();
             CaseData civilCaseData = CaseData.builder()
                 .claimantBilingualLanguagePreference("BOTH")
-                .respondent1LiPResponseGA(RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH").build())
+                .respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH").build())
                 .build();
             when(coreCaseDataService.getCase(any())).thenReturn(mockCaseDetails);
             when(caseDetailsConverter.toCaseData(mockCaseDetails)).thenReturn(civilCaseData);
@@ -212,8 +217,8 @@ public class UpdateGaLanguagePreferenceCallbackHandlerTest extends BaseCallbackH
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
 
-            assertThat(responseCaseData.getApplicantBilingualLanguagePreferenceGA()).isEqualTo(YesOrNo.YES);
-            assertThat(responseCaseData.getRespondentBilingualLanguagePreferenceGA()).isEqualTo(YesOrNo.YES);
+            assertThat(responseCaseData.getApplicantBilingualLanguagePreference()).isEqualTo(YesOrNo.YES);
+            assertThat(responseCaseData.getRespondentBilingualLanguagePreference()).isEqualTo(YesOrNo.YES);
         }
     }
 }

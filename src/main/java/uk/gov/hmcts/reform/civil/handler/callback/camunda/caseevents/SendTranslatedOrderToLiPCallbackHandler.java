@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.SendFinalOrderPrintService;
+import uk.gov.hmcts.reform.civil.service.ga.GaCaseDataEnricher;
 
 import java.util.List;
 import java.util.Map;
@@ -47,6 +48,7 @@ public class SendTranslatedOrderToLiPCallbackHandler extends CallbackHandler {
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final SendFinalOrderPrintService sendFinalOrderPrintService;
+    private final GaCaseDataEnricher gaCaseDataEnricher;
 
     private static final List<String> ENGLISH_TYPES = List.of("ENGLISH", "BOTH");
     private static final List<String> WELSH_TYPES = List.of("WELSH", "BOTH");
@@ -77,7 +79,10 @@ public class SendTranslatedOrderToLiPCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse sendTranslatedOrderLetter(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
+        CaseData caseData = gaCaseDataEnricher.enrich(
+            callbackParams.getCaseData(),
+            callbackParams.getGaCaseData()
+        );
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
         if (printServiceEnabled && isDocumentCorrectType(caseData)) {
             CaseDocument originalCaseDocument = caseData.getOriginalDocumentsBulkPrint().get(caseData.getOriginalDocumentsBulkPrint().size() - 1);
@@ -101,7 +106,7 @@ public class SendTranslatedOrderToLiPCallbackHandler extends CallbackHandler {
         boolean isClaimant = (caseEvent == SEND_TRANSLATED_ORDER_TO_LIP_APPLICANT && caseData.getParentClaimantIsApplicant() == YesOrNo.YES)
                 || (caseEvent == SEND_TRANSLATED_ORDER_TO_LIP_RESPONDENT && caseData.getParentClaimantIsApplicant() == YesOrNo.NO);
         String claimantLanguage = parentCaseData.getClaimantBilingualLanguagePreference() != null ? parentCaseData.getClaimantBilingualLanguagePreference() : "ENGLISH";
-        String defendantLanguage = parentCaseData.getDefendantBilingualLanguagePreferenceGA() != null ? parentCaseData.getDefendantBilingualLanguagePreferenceGA() : "ENGLISH";
+        String defendantLanguage = parentCaseData.getDefendantBilingualLanguagePreference() != null ? parentCaseData.getDefendantBilingualLanguagePreference() : "ENGLISH";
         if (isClaimant) {
             return languageTypes.contains(claimantLanguage);
         } else {

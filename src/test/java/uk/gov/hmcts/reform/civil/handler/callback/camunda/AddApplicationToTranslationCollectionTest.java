@@ -45,7 +45,7 @@ public class AddApplicationToTranslationCollectionTest extends BaseCallbackHandl
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
             handler.handle(params);
             verify(parentCaseUpdateHelper, times(1))
-                .updateCollectionForWelshApplication(caseData);
+                .updateCollectionForWelshApplication(toGaCaseData(caseData));
         }
     }
 }

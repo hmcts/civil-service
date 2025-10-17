@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -10,6 +11,8 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.GaCallbackDataUtil;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -24,7 +27,6 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.GaForLipService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.SolicitorEmailValidation;
-import uk.gov.hmcts.reform.civil.utils.JudicialDecisionNotificationUtil;
 
 import java.util.HashMap;
 import java.util.List;
@@ -51,6 +53,7 @@ public class TranslatedDocumentUploadedRespondentNotificationHandler extends Cal
     private final OrganisationService organisationService;
     private final FeatureToggleService featureToggleService;
     private final NotificationsSignatureConfiguration configuration;
+    private final ObjectMapper objectMapper;
 
     private static final List<CaseEvent> EVENTS = List.of(CaseEvent.NOTIFY_RESPONDENT_TRANSLATED_DOCUMENT_UPLOADED_GA);
     private static final String REFERENCE_TEMPLATE = "translated-document-uploaded-applicant-notification-%s";
@@ -72,9 +75,9 @@ public class TranslatedDocumentUploadedRespondentNotificationHandler extends Cal
         return Map.of();
     }
 
-    public Map<String, String> addPropertiesForRespondent(CaseData caseData, CaseData mainCaseData,
+    public Map<String, String> addPropertiesForRespondent(GeneralApplicationCaseData caseData, CaseData mainCaseData,
                                                           Element<GASolicitorDetailsGAspec> respondentSolicitor) {
-        if (gaForLipService.isLipResp(caseData)) {
+        if (gaForLipService.isLipRespGa(caseData)) {
             String caseTitle = DocUploadNotificationService.getAllPartyNames(caseData);
             String isLipResName =
                 caseData.getParentClaimantIsApplicant().equals(NO) ? caseData.getClaimant1PartyName() :
@@ -85,7 +88,7 @@ public class TranslatedDocumentUploadedRespondentNotificationHandler extends Cal
                 CASE_REFERENCE, caseData.getParentCaseReference()
             ));
             addAllFooterItems(caseData, mainCaseData, properties, configuration,
-                              featureToggleService.isPublicQueryManagementEnabled(caseData));
+                              featureToggleService.isPublicQueryManagementEnabledGa(caseData));
             return properties;
         }
         HashMap<String, String> properties = new HashMap<>(Map.of(
@@ -93,32 +96,37 @@ public class TranslatedDocumentUploadedRespondentNotificationHandler extends Cal
             CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(respondentSolicitor)
         ));
         addAllFooterItems(caseData, mainCaseData, properties, configuration,
-                           featureToggleService.isPublicQueryManagementEnabled(caseData));
+                           featureToggleService.isPublicQueryManagementEnabledGa(caseData));
         return properties;
     }
 
     private CallbackResponse notifyRespondent(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
+        GeneralApplicationCaseData gaCaseData = GaCallbackDataUtil.resolveGaCaseData(callbackParams, objectMapper);
+        CaseData caseData = GaCallbackDataUtil.mergeToCaseData(gaCaseData, callbackParams.getCaseData(), objectMapper);
 
         log.info("Translated document uploaded for respondent for case: {}", caseData.getCcdCaseReference());
-        CaseData civilCaseData = caseDetailsConverter
-            .toCaseDataGA(coreCaseDataService
-                            .getCase(Long.parseLong(caseData.getGeneralAppParentCaseLink().getCaseReference())));
+        CaseData civilCaseData = caseDetailsConverter.toCaseDataGA(
+            coreCaseDataService.getCase(Long.parseLong(gaCaseData.getGeneralAppParentCaseLink().getCaseReference()))
+        );
 
-        CaseData validatedCaseData = solicitorEmailValidation.validateSolicitorEmail(civilCaseData, caseData);
+        GeneralApplicationCaseData validatedGaCaseData = solicitorEmailValidation.validateSolicitorEmail(
+            civilCaseData,
+            gaCaseData
+        );
+        CaseData validatedCaseData = GaCallbackDataUtil.mergeToCaseData(validatedGaCaseData, caseData, objectMapper);
 
         if (areRespondentSolicitorsPresent(validatedCaseData)
-            && (JudicialDecisionNotificationUtil.isWithNotice(caseData)
-            || caseData.getGeneralAppConsentOrder() == YesOrNo.YES)) {
-            validatedCaseData.getGeneralAppRespondentSolicitors().forEach(respondentSolicitor ->
+            && (validatedGaCaseData.isWithNotice()
+            || validatedGaCaseData.getGeneralAppConsentOrder() == YesOrNo.YES)) {
+            validatedGaCaseData.getGeneralAppRespondentSolicitors().forEach(respondentSolicitor ->
                                                                               notificationService.sendMail(
                                                                                   respondentSolicitor.getValue()
                                                                                       .getEmail(),
                                                                                   addTemplate(
-                                                                                      caseData
+                                                                                      validatedGaCaseData
                                                                                   ),
                                                                                   addPropertiesForRespondent(
-                                                                                      caseData,
+                                                                                      validatedGaCaseData,
                                                                                       civilCaseData,
                                                                                       respondentSolicitor
                                                                                   ),
@@ -133,8 +141,8 @@ public class TranslatedDocumentUploadedRespondentNotificationHandler extends Cal
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
-    private String addTemplate(CaseData caseData) {
-        if (gaForLipService.isLipResp(caseData)) {
+    private String addTemplate(GeneralApplicationCaseData caseData) {
+        if (gaForLipService.isLipRespGa(caseData)) {
             if (caseData.isRespondentBilingual()) {
                 return notificationsProperties.getNotifyRespondentLiPTranslatedDocumentUploadedWhenParentCaseInBilingual();
             }

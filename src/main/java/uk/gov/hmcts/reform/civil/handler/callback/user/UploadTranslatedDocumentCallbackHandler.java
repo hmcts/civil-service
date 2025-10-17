@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.UploadTranslatedDocumentService;
+import uk.gov.hmcts.reform.civil.service.ga.GaCaseDataEnricher;
 import uk.gov.hmcts.reform.civil.utils.IdamUserUtils;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
@@ -32,6 +33,7 @@ public class UploadTranslatedDocumentCallbackHandler extends CallbackHandler {
     private final ObjectMapper objectMapper;
     private final IdamClient idamClient;
     private final UploadTranslatedDocumentService uploadTranslatedDocumentService;
+    private final GaCaseDataEnricher gaCaseDataEnricher;
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(UPLOAD_TRANSLATED_DOCUMENT);
 
@@ -43,7 +45,10 @@ public class UploadTranslatedDocumentCallbackHandler extends CallbackHandler {
     }
 
     protected CallbackResponse submitUploadTranslatedDocuments(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
+        CaseData caseData = gaCaseDataEnricher.enrich(
+            callbackParams.getCaseData(),
+            callbackParams.getGaCaseData()
+        );
         UserInfo userDetails = idamClient.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
         String translator = IdamUserUtils.getIdamUserFullName(userDetails);
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();

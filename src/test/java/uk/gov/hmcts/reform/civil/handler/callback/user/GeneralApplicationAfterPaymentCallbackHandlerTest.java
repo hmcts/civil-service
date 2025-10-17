@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.GeneralAppParentCaseLink;
@@ -68,7 +69,7 @@ public class GeneralApplicationAfterPaymentCallbackHandlerTest extends BaseCallb
         CaseData caseData = getSampleGeneralApplicationCaseData(NO, YES);
         caseData = addGeneralAppType(caseData, GeneralApplicationTypes.CONFIRM_CCJ_DEBT_PAID);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        when(gaForLipService.isLipApp(any(CaseData.class))).thenReturn(false);
+        when(gaForLipService.isLipAppGa(any(GeneralApplicationCaseData.class))).thenReturn(false);
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
@@ -79,7 +80,7 @@ public class GeneralApplicationAfterPaymentCallbackHandlerTest extends BaseCallb
     void shouldTriggerTheEventAndAboutToSubmit() {
         CaseData caseData = getSampleGeneralApplicationCaseData(NO, YES);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        when(gaForLipService.isLipApp(any(CaseData.class))).thenReturn(false);
+        when(gaForLipService.isLipAppGa(any(GeneralApplicationCaseData.class))).thenReturn(false);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
         assertThat(responseCaseData.getBusinessProcess().getCamundaEvent()).isEqualTo(INITIATE_GENERAL_APPLICATION_AFTER_PAYMENT.name());
@@ -91,7 +92,7 @@ public class GeneralApplicationAfterPaymentCallbackHandlerTest extends BaseCallb
         caseData = addPaymentStatusToGAPbaDetails(caseData, PaymentStatus.FAILED);
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        when(gaForLipService.isLipApp(any(CaseData.class))).thenReturn(true);
+        when(gaForLipService.isLipAppGa(any(GeneralApplicationCaseData.class))).thenReturn(true);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
         assertThat(responseCaseData.getBusinessProcess()).isNull();
@@ -103,7 +104,7 @@ public class GeneralApplicationAfterPaymentCallbackHandlerTest extends BaseCallb
         caseData = addPaymentStatusToGAPbaDetails(caseData, PaymentStatus.SUCCESS);
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        when(gaForLipService.isLipApp(any(CaseData.class))).thenReturn(true);
+        when(gaForLipService.isLipAppGa(any(GeneralApplicationCaseData.class))).thenReturn(true);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
         assertThat(responseCaseData.getBusinessProcess().getCamundaEvent()).isEqualTo(INITIATE_GENERAL_APPLICATION_AFTER_PAYMENT.name());
@@ -170,4 +171,3 @@ public class GeneralApplicationAfterPaymentCallbackHandlerTest extends BaseCallb
             .build();
     }
 }
-

@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
@@ -117,12 +118,15 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             0
         );
 
+        private CaseDetailsConverter caseDetailsConverter;
+
         @BeforeEach
         void setup() {
             now = LocalDateTime.now();
             given(time.now()).willReturn(now);
             given(deadlinesCalculator.calculateApplicantResponseDeadline(any())).willReturn(respondToDeadline);
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
+            caseDetailsConverter = new CaseDetailsConverter(mapper);
         }
 
         @Test
@@ -271,7 +275,7 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         private CaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {
-            return mapper.convertValue(response.getData(), CaseData.class);
+            return caseDetailsConverter.toCaseData(response.getData());
         }
 
         @Test

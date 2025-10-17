@@ -12,6 +12,8 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.GaCallbackDataUtil;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -61,10 +63,11 @@ public class UploadAdditionalDocumentsCallbackHandler extends CallbackHandler {
 
     private CallbackResponse submitDocuments(CallbackParams callbackParams) {
         CaseData caseData = caseDetailsConverter.toCaseDataGA(callbackParams.getRequest().getCaseDetails());
+        GeneralApplicationCaseData gaCaseData = GaCallbackDataUtil.toGaCaseData(caseData, objectMapper);
         String userId = idamClient.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString()).getUid();
-        caseData = buildBundleData(caseData, userId);
+        caseData = buildBundleData(caseData, gaCaseData, userId);
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        String role = DocUploadUtils.getUserRole(caseData, userId);
+        String role = DocUploadUtils.getUserRole(caseData, gaCaseData, userId);
         DocUploadUtils.addUploadDocumentByTypeToAddl(caseData, caseDataBuilder,
                                                      caseData.getUploadDocument(), role, true);
 
@@ -73,7 +76,7 @@ public class UploadAdditionalDocumentsCallbackHandler extends CallbackHandler {
         CaseData updatedCaseData = caseDataBuilder.build();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         // Generate Dashboard Notification for Lip Party
-        if (gaForLipService.isGaForLip(caseData)) {
+        if (gaForLipService.isGaForLip(gaCaseData)) {
             docUploadDashboardNotificationService.createDashboardNotification(caseData, role, authToken, true);
         }
 
@@ -82,8 +85,8 @@ public class UploadAdditionalDocumentsCallbackHandler extends CallbackHandler {
             .build();
     }
 
-    private CaseData buildBundleData(CaseData caseData, String userId) {
-        String role = DocUploadUtils.getUserRole(caseData, userId);
+    private CaseData buildBundleData(CaseData caseData, GeneralApplicationCaseData gaCaseData, String userId) {
+        String role = DocUploadUtils.getUserRole(caseData, gaCaseData, userId);
         if (Objects.nonNull(caseData.getUploadDocument())) {
             List<Element<UploadDocumentByType>> exBundle = caseData.getUploadDocument()
                 .stream().filter(x -> !x.getValue().getDocumentType().toLowerCase()

@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
@@ -64,6 +65,7 @@ public class CreateApplicationTaskHandler extends BaseExternalTaskHandler {
         CaseData caseData = caseDetailsConverter.toCaseDataGA(startEventResponse.getCaseDetails());
         var generalApplications = caseData.getGeneralApplications();
         CaseData generalAppCaseData = null;
+        GeneralApplicationCaseData generalApplicationCaseData = null;
 
         if (generalApplications != null && !generalApplications.isEmpty()) {
 
@@ -79,13 +81,14 @@ public class CreateApplicationTaskHandler extends BaseExternalTaskHandler {
                 GeneralApplication generalApplication = genApps.get().getValue();
 
                 boolean claimantBilingual = BILINGUAL_TYPES.contains(caseData.getClaimantBilingualLanguagePreference());
-                boolean defendantBilingual = caseData.getRespondent1LiPResponseGA() != null
-                    && BILINGUAL_TYPES.contains(caseData.getRespondent1LiPResponseGA().getRespondent1ResponseLanguage());
+                boolean defendantBilingual = caseData.getRespondent1LiPResponse() != null
+                    && BILINGUAL_TYPES.contains(caseData.getRespondent1LiPResponse().getRespondent1ResponseLanguage());
                 generalAppCaseData = createGeneralApplicationCase(caseId, generalApplication, claimantBilingual, defendantBilingual);
+                generalApplicationCaseData = toGaCaseData(generalAppCaseData);
                 log.debug("General application case created with ID: {}", generalAppCaseData.getCcdCaseReference());
-                generalApplication = updateParentCaseGeneralApplication(variables, generalApplication, generalAppCaseData);
+                generalApplication = updateParentCaseGeneralApplication(variables, generalApplication, generalApplicationCaseData);
 
-                caseData = withoutNoticeNoConsent(generalApplication, caseData, generalAppCaseData);
+                caseData = withoutNoticeNoConsent(generalApplication, caseData, generalApplicationCaseData);
             }
         }
 
@@ -101,7 +104,7 @@ public class CreateApplicationTaskHandler extends BaseExternalTaskHandler {
 
     private CaseData withoutNoticeNoConsent(GeneralApplication generalApplication,
                                             CaseData caseData,
-                                            CaseData generalAppCaseData) {
+                                            GeneralApplicationCaseData generalAppCaseData) {
 
         /*
          * Add the case to applicant solicitor collection if parent claimant is applicant
@@ -183,7 +186,7 @@ public class CreateApplicationTaskHandler extends BaseExternalTaskHandler {
     }
 
     private GeneralApplicationsDetails buildApplication(GeneralApplication generalApplication,
-                                                        CaseData generalAppCaseData) {
+                                                        GeneralApplicationCaseData generalAppCaseData) {
         List<GeneralApplicationTypes> types = generalApplication.getGeneralAppType().getTypes();
         String collect = types.stream().map(GeneralApplicationTypes::getDisplayedValue)
             .collect(Collectors.joining(", "));
@@ -203,7 +206,7 @@ public class CreateApplicationTaskHandler extends BaseExternalTaskHandler {
     }
 
     private GADetailsRespondentSol buildRespApplication(GeneralApplication generalApplication,
-                                                        CaseData generalAppCaseData) {
+                                                        GeneralApplicationCaseData generalAppCaseData) {
         List<GeneralApplicationTypes> types = generalApplication.getGeneralAppType().getTypes();
         String collect = types.stream().map(GeneralApplicationTypes::getDisplayedValue)
             .collect(Collectors.joining(", "));
@@ -243,7 +246,7 @@ public class CreateApplicationTaskHandler extends BaseExternalTaskHandler {
 
     private GeneralApplication updateParentCaseGeneralApplication(ExternalTaskInput variables,
                                                                   GeneralApplication generalApplication,
-                                                                  CaseData generalAppCaseData) {
+                                                                  GeneralApplicationCaseData generalAppCaseData) {
 
         return generalApplication.toBuilder()
                 .generalAppN245FormUpload(null)
@@ -331,6 +334,17 @@ public class CreateApplicationTaskHandler extends BaseExternalTaskHandler {
         }
 
         return YES;
+    }
+
+    private GeneralApplicationCaseData toGaCaseData(CaseData caseData) {
+        if (caseData == null) {
+            return null;
+        }
+        GeneralApplicationCaseData converted = mapper.convertValue(caseData, GeneralApplicationCaseData.class);
+        return converted.toBuilder()
+            .ccdCaseReference(caseData.getCcdCaseReference())
+            .ccdState(caseData.getCcdState())
+            .build();
     }
 
     @Override

@@ -1,9 +1,9 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
@@ -51,8 +52,18 @@ public class ApplicationIssuedFeeRequiredHandlerTest extends BaseCallbackHandler
     private FeatureToggleService featureToggleService;
     @Mock
     private GeneralAppFeesService generalAppFeesService;
-    @InjectMocks
     private ApplicationIssuedFeeRequiredHandler handler;
+
+    @BeforeEach
+    void setUp() {
+        handler = new ApplicationIssuedFeeRequiredHandler(
+            dashboardScenariosService,
+            mapper,
+            featureToggleService,
+            generalAppFeesService,
+            objectMapper
+        );
+    }
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
@@ -120,7 +131,7 @@ public class ApplicationIssuedFeeRequiredHandlerTest extends BaseCallbackHandler
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-            when(generalAppFeesService.isFreeApplication(any())).thenReturn(true);
+            when(generalAppFeesService.isFreeApplication(any(CaseData.class))).thenReturn(true);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FOR_GA_APPLICANT.name())
@@ -157,6 +168,37 @@ public class ApplicationIssuedFeeRequiredHandlerTest extends BaseCallbackHandler
 
             handler.handle(params);
             verifyNoInteractions(dashboardScenariosService);
+        }
+
+        @Test
+        void shouldRecordScenarioWhenOnlyGaCaseDataProvided() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
+            caseData = caseData.toBuilder()
+                .parentCaseReference(caseData.getCcdCaseReference().toString())
+                .isGaApplicantLip(YesOrNo.YES)
+                .parentClaimantIsApplicant(YesOrNo.YES)
+                .generalAppPBADetails(GAPbaDetails.builder()
+                    .fee(Fee.builder()
+                        .calculatedAmountInPence(new BigDecimal(100000))
+                        .build())
+                    .build())
+                .build();
+            GeneralApplicationCaseData gaCaseData = toGaCaseData(caseData);
+
+            HashMap<String, Object> scenarioParams = new HashMap<>();
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
+
+            CallbackParams params = gaCallbackParamsOf(gaCaseData, ABOUT_TO_SUBMIT);
+
+            handler.handle(params);
+
+            verify(dashboardScenariosService).recordScenarios(
+                "BEARER_TOKEN",
+                SCENARIO_AAA6_GENERAL_APPS_APPLICATION_FEE_REQUIRED_APPLICANT.getScenario(),
+                gaCaseData.getCcdCaseReference().toString(),
+                ScenarioRequestParams.builder().params(scenarioParams).build()
+            );
         }
 
     }

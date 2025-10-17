@@ -1,5 +1,14 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.UnaryOperator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,6 +23,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PaymentMethod;
@@ -31,23 +41,20 @@ import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.SealedClaimResponseF
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
+import uk.gov.hmcts.reform.civil.model.genapplication.GACaseLocation;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationAvailability;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationContactInformation;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.helpers.ReferenceNumberAndCourtDetailsPopulator;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.helpers.StatementOfTruthPopulator;
+import uk.gov.hmcts.reform.civil.service.ga.GaCaseDataEnricher;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -65,6 +72,10 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 public class SealedClaimResponseFormGeneratorForSpecTest {
 
     private static final String BEARER_TOKEN = "Bearer Token";
+    private static final ObjectMapper GA_OBJECT_MAPPER = new ObjectMapper()
+        .registerModule(new JavaTimeModule())
+        .registerModule(new Jdk8Module());
+    private static final GaCaseDataEnricher GA_CASE_DATA_ENRICHER = new GaCaseDataEnricher();
     private static final List<LocationRefData> LOCATIONS = List.of(LocationRefData.builder().siteName("SiteName").courtAddress("1").postcode("1")
                                                                        .courtName("Court Name").region("Region").regionId("4").courtVenueId("000")
                                                                        .courtTypeId("10").courtLocationCode("121")
@@ -121,7 +132,7 @@ public class SealedClaimResponseFormGeneratorForSpecTest {
 
     @Test
     public void contentCheckRespondent2() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = gaCaseData(builder -> builder
             .legacyCaseReference("case reference")
             .ccdCaseReference(1234567890123456L)
             .detailsOfWhyDoesYouDisputeTheClaim("why dispute the claim")
@@ -159,8 +170,7 @@ public class SealedClaimResponseFormGeneratorForSpecTest {
                              .type(Party.Type.COMPANY)
                              .companyName("defendant2 name")
                              .build())
-            .respondent2ResponseDate(LocalDateTime.now())
-            .build();
+            .respondent2ResponseDate(LocalDateTime.now()));
 
         SealedClaimResponseFormForSpec templateData = generator.getTemplateData(
             caseData, BEARER_TOKEN);
@@ -282,7 +292,7 @@ public class SealedClaimResponseFormGeneratorForSpecTest {
     }
 
     private static CaseData getCaseDataWithRespondent1Data() {
-        return CaseData.builder()
+        return gaCaseData(builder -> builder
             .legacyCaseReference("case reference")
             .detailsOfWhyDoesYouDisputeTheClaim("why dispute the claim")
             .respondent1DQ(Respondent1DQ.builder()
@@ -308,10 +318,10 @@ public class SealedClaimResponseFormGeneratorForSpecTest {
                             .build())
             .respondent1(Party.builder()
                              .type(Party.Type.COMPANY)
-                             .companyName("defendant name")
-                             .build())
+                            .companyName("defendant name")
+                            .build())
             .respondent1ResponseDate(LocalDateTime.now())
-            .build();
+        );
     }
 
     private static CaseData getCaseDataWithMultiParty() {
@@ -323,7 +333,7 @@ public class SealedClaimResponseFormGeneratorForSpecTest {
         timelines2.add(TimelineOfEvents.builder()
                           .value(TimelineOfEventDetails.builder()
                                      .timelineDate(LocalDate.now()).timelineDescription("test timeline2").build()).build());
-        return CaseData.builder()
+        return gaCaseData(builder -> builder
             .legacyCaseReference("case reference")
             .detailsOfWhyDoesYouDisputeTheClaim("why dispute the claim")
             .detailsOfWhyDoesYouDisputeTheClaim2("why dispute the claim 2")
@@ -390,11 +400,11 @@ public class SealedClaimResponseFormGeneratorForSpecTest {
                                                                   .build())
                                                         .build())
             .respondent2SpecDefenceResponseDocument(ResponseDocument.builder()
-                                                        .file(Document.builder()
-                                                                  .documentFileName("defendant2 evidence")
-                                                                  .build())
-                                                        .build())
-            .build();
+                                                       .file(Document.builder()
+                                                                 .documentFileName("defendant2 evidence")
+                                                                 .build())
+                                                       .build())
+        );
     }
 
     @Test
@@ -532,4 +542,22 @@ public class SealedClaimResponseFormGeneratorForSpecTest {
         assertThat(docmosisTemplatesArgumentCaptor.getValue()).isEqualTo(DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_SEALED_1V2_LR_ADMISSION_BULK);
     }
 
+    private static CaseData gaCaseData(UnaryOperator<CaseData.CaseDataBuilder<?, ?>> customiser) {
+        GeneralApplicationCaseData gaCaseData = GeneralApplicationCaseDataBuilder.builder()
+            .withCcdCaseReference(1234567890123456L)
+            .withGeneralAppParentCaseReference("1234567890123456")
+            .withLocationName("Nottingham County Court and Family Court (and Crown)")
+            .withGaCaseManagementLocation(GACaseLocation.builder()
+                                              .siteName("testing")
+                                              .address("london court")
+                                              .baseLocation("000000")
+                                              .postcode("BA 117")
+                                              .build())
+            .build();
+
+        CaseData converted = GA_OBJECT_MAPPER.convertValue(gaCaseData, CaseData.class);
+        CaseData enriched = GA_CASE_DATA_ENRICHER.enrich(converted, gaCaseData);
+
+        return customiser.apply(enriched.toBuilder()).build();
+    }
 }

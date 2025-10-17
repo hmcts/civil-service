@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -7,6 +8,8 @@ import uk.gov.hmcts.reform.civil.documentmanagement.DocumentUploadException;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.GaCallbackDataUtil;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocument;
 import uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType;
@@ -49,9 +52,10 @@ public class UploadTranslatedDocumentService {
     private final GaForLipService gaForLipService;
     private final DocUploadDashboardNotificationService docUploadDashboardNotificationService;
     private final DeadlinesCalculator deadlinesCalculator;
+    private final ObjectMapper objectMapper;
 
     public CaseData.CaseDataBuilder<?, ?> processTranslatedDocument(CaseData caseData, String translator) {
-        List<Element<TranslatedDocument>> translatedDocuments = caseData.getTranslatedDocumentsGA();
+        List<Element<TranslatedDocument>> translatedDocuments = caseData.getTranslatedDocuments();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         if (Objects.nonNull(translatedDocuments)) {
@@ -70,10 +74,13 @@ public class UploadTranslatedDocumentService {
                     updateCaseDataBuilderByType(caseData, caseDataBuilder, documentType, existingDocuments);
                 }
             });
+
+            caseDataBuilder.translatedDocumentsBulkPrint(translatedDocuments);
+        } else {
+            caseDataBuilder.translatedDocumentsBulkPrint(caseData.getTranslatedDocumentsBulkPrint());
         }
         // Copy to different field so XUI data can be cleared
-        caseDataBuilder.translatedDocumentsBulkPrint(caseData.getTranslatedDocumentsGA());
-        caseDataBuilder.translatedDocumentsGA(null);
+        caseDataBuilder.translatedDocuments(null);
         return caseDataBuilder;
     }
 
@@ -101,15 +108,15 @@ public class UploadTranslatedDocumentService {
 
     private List<Element<CaseDocument>> getExistingDocumentsByType(CaseData caseData, DocumentType documentType) {
         return switch (documentType) {
-            case REQUEST_FOR_INFORMATION, SEND_APP_TO_OTHER_PARTY -> ofNullable(caseData.getRequestForInformationDocumentGA()).orElse(new ArrayList<>());
-            case DIRECTION_ORDER -> ofNullable(caseData.getDirectionOrderDocumentGA()).orElse(new ArrayList<>());
-            case GENERAL_ORDER -> ofNullable(caseData.getGeneralOrderDocumentGA()).orElse(new ArrayList<>());
-            case HEARING_ORDER -> ofNullable(caseData.getHearingOrderDocumentGA()).orElse(new ArrayList<>());
-            case HEARING_NOTICE -> ofNullable(caseData.getHearingNoticeDocumentGA()).orElse(new ArrayList<>());
-            case DISMISSAL_ORDER -> ofNullable(caseData.getDismissalOrderDocumentGA()).orElse(new ArrayList<>());
-            case WRITTEN_REPRESENTATION_CONCURRENT -> ofNullable(caseData.getWrittenRepConcurrentDocumentGA()).orElse(new ArrayList<>());
-            case WRITTEN_REPRESENTATION_SEQUENTIAL -> ofNullable(caseData.getWrittenRepSequentialDocumentGA()).orElse(new ArrayList<>());
-            case GENERAL_APPLICATION_DRAFT -> ofNullable(caseData.getGaDraftDocumentGA()).orElse(new ArrayList<>());
+            case REQUEST_FOR_INFORMATION, SEND_APP_TO_OTHER_PARTY -> ofNullable(caseData.getRequestForInformationDocument()).orElse(new ArrayList<>());
+            case DIRECTION_ORDER -> ofNullable(caseData.getDirectionOrderDocument()).orElse(new ArrayList<>());
+            case GENERAL_ORDER -> ofNullable(caseData.getGeneralOrderDocument()).orElse(new ArrayList<>());
+            case HEARING_ORDER -> ofNullable(caseData.getHearingOrderDocument()).orElse(new ArrayList<>());
+            case HEARING_NOTICE -> ofNullable(caseData.getHearingNoticeDocument()).orElse(new ArrayList<>());
+            case DISMISSAL_ORDER -> ofNullable(caseData.getDismissalOrderDocument()).orElse(new ArrayList<>());
+            case WRITTEN_REPRESENTATION_CONCURRENT -> ofNullable(caseData.getWrittenRepConcurrentDocument()).orElse(new ArrayList<>());
+            case WRITTEN_REPRESENTATION_SEQUENTIAL -> ofNullable(caseData.getWrittenRepSequentialDocument()).orElse(new ArrayList<>());
+            case GENERAL_APPLICATION_DRAFT -> ofNullable(caseData.getGaDraftDocument()).orElse(new ArrayList<>());
             default -> new ArrayList<>();
         };
     }
@@ -119,32 +126,32 @@ public class UploadTranslatedDocumentService {
                                              List<Element<CaseDocument>> documents) {
         switch (documentType) {
             case DIRECTION_ORDER:
-                caseDataBuilder.directionOrderDocumentGA(documents);
+                caseDataBuilder.directionOrderDocument(documents);
                 break;
             case DISMISSAL_ORDER:
-                caseDataBuilder.dismissalOrderDocumentGA(documents);
+                caseDataBuilder.dismissalOrderDocument(documents);
                 break;
             case REQUEST_FOR_INFORMATION:
             case SEND_APP_TO_OTHER_PARTY:
-                caseDataBuilder.requestForInformationDocumentGA(documents);
+                caseDataBuilder.requestForInformationDocument(documents);
                 break;
             case GENERAL_ORDER:
-                caseDataBuilder.generalOrderDocumentGA(documents);
+                caseDataBuilder.generalOrderDocument(documents);
                 break;
             case HEARING_ORDER:
-                caseDataBuilder.hearingOrderDocumentGA(documents);
+                caseDataBuilder.hearingOrderDocument(documents);
                 break;
             case HEARING_NOTICE:
-                caseDataBuilder.hearingNoticeDocumentGA(documents);
+                caseDataBuilder.hearingNoticeDocument(documents);
                 break;
             case WRITTEN_REPRESENTATION_CONCURRENT:
-                caseDataBuilder.writtenRepConcurrentDocumentGA(documents);
+                caseDataBuilder.writtenRepConcurrentDocument(documents);
                 break;
             case WRITTEN_REPRESENTATION_SEQUENTIAL:
-                caseDataBuilder.writtenRepSequentialDocumentGA(documents);
+                caseDataBuilder.writtenRepSequentialDocument(documents);
                 break;
             case GENERAL_APPLICATION_DRAFT:
-                caseDataBuilder.gaDraftDocumentGA(documents);
+                caseDataBuilder.gaDraftDocument(documents);
                 break;
             case REQUEST_MORE_INFORMATION_APPLICANT_TRANSLATED:
             case JUDGES_DIRECTIONS_APPLICANT_TRANSLATED:
@@ -165,32 +172,32 @@ public class UploadTranslatedDocumentService {
 
     public void updateGADocumentsWithOriginalDocuments(CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
         List<Element<CaseDocument>> bulkPrintOriginalDocuments = newArrayList();
-        List<Element<TranslatedDocument>> translatedDocuments = caseDataBuilder.build().getTranslatedDocumentsGA();
+        List<Element<TranslatedDocument>> translatedDocuments = caseDataBuilder.build().getTranslatedDocuments();
         List<Element<CaseDocument>> preTranslationGaDocuments = caseDataBuilder.build().getPreTranslationGaDocuments();
-        List<Element<CaseDocument>> gaDraftDocumentGA;
-        if (Objects.isNull(caseDataBuilder.build().getGaDraftDocumentGA())) {
-            gaDraftDocumentGA = newArrayList();
+        List<Element<CaseDocument>> gaDraftDocument;
+        if (Objects.isNull(caseDataBuilder.build().getGaDraftDocument())) {
+            gaDraftDocument = newArrayList();
         } else {
-            gaDraftDocumentGA = caseDataBuilder.build().getGaDraftDocumentGA();
+            gaDraftDocument = caseDataBuilder.build().getGaDraftDocument();
         }
 
-        List<Element<CaseDocument>> generalOrderDocs = Objects.isNull(caseDataBuilder.build().getGeneralOrderDocumentGA())
-                ? newArrayList() : caseDataBuilder.build().getGeneralOrderDocumentGA();
+        List<Element<CaseDocument>> generalOrderDocs = Objects.isNull(caseDataBuilder.build().getGeneralOrderDocument())
+                ? newArrayList() : caseDataBuilder.build().getGeneralOrderDocument();
 
-        List<Element<CaseDocument>> writtenRepsSequentialDocs = Objects.isNull(caseDataBuilder.build().getWrittenRepSequentialDocumentGA())
-                ? newArrayList() : caseDataBuilder.build().getWrittenRepSequentialDocumentGA();
-        List<Element<CaseDocument>> writtenRepsConcurrentDocs = Objects.isNull(caseDataBuilder.build().getWrittenRepConcurrentDocumentGA())
-                ? newArrayList() : caseDataBuilder.build().getWrittenRepConcurrentDocumentGA();
-        List<Element<CaseDocument>> hearingNoticeDocs = Objects.isNull(caseDataBuilder.build().getHearingNoticeDocumentGA())
-                ? newArrayList() : caseDataBuilder.build().getHearingNoticeDocumentGA();
-        List<Element<CaseDocument>> requestMoreInformationDocs = Objects.isNull(caseDataBuilder.build().getRequestForInformationDocumentGA())
-                ? newArrayList() : caseDataBuilder.build().getRequestForInformationDocumentGA();
-        List<Element<CaseDocument>> directionOrder = Objects.isNull(caseDataBuilder.build().getDirectionOrderDocumentGA())
-                ? newArrayList() : caseDataBuilder.build().getDirectionOrderDocumentGA();
-        List<Element<CaseDocument>> dismissalOrderDocs = Objects.isNull(caseDataBuilder.build().getDismissalOrderDocumentGA())
-                ? newArrayList() : caseDataBuilder.build().getDismissalOrderDocumentGA();
-        List<Element<CaseDocument>> hearingOrders = Objects.isNull(caseDataBuilder.build().getHearingOrderDocumentGA())
-                ? newArrayList() : caseDataBuilder.build().getHearingOrderDocumentGA();
+        List<Element<CaseDocument>> writtenRepsSequentialDocs = Objects.isNull(caseDataBuilder.build().getWrittenRepSequentialDocument())
+                ? newArrayList() : caseDataBuilder.build().getWrittenRepSequentialDocument();
+        List<Element<CaseDocument>> writtenRepsConcurrentDocs = Objects.isNull(caseDataBuilder.build().getWrittenRepConcurrentDocument())
+                ? newArrayList() : caseDataBuilder.build().getWrittenRepConcurrentDocument();
+        List<Element<CaseDocument>> hearingNoticeDocs = Objects.isNull(caseDataBuilder.build().getHearingNoticeDocument())
+                ? newArrayList() : caseDataBuilder.build().getHearingNoticeDocument();
+        List<Element<CaseDocument>> requestMoreInformationDocs = Objects.isNull(caseDataBuilder.build().getRequestForInformationDocument())
+                ? newArrayList() : caseDataBuilder.build().getRequestForInformationDocument();
+        List<Element<CaseDocument>> directionOrder = Objects.isNull(caseDataBuilder.build().getDirectionOrderDocument())
+                ? newArrayList() : caseDataBuilder.build().getDirectionOrderDocument();
+        List<Element<CaseDocument>> dismissalOrderDocs = Objects.isNull(caseDataBuilder.build().getDismissalOrderDocument())
+                ? newArrayList() : caseDataBuilder.build().getDismissalOrderDocument();
+        List<Element<CaseDocument>> hearingOrders = Objects.isNull(caseDataBuilder.build().getHearingOrderDocument())
+                ? newArrayList() : caseDataBuilder.build().getHearingOrderDocument();
         List<Element<CaseDocument>> applicantPreTranslation = Objects.isNull(caseDataBuilder.build().getPreTranslationGaDocsApplicant())
                 ? newArrayList() : caseDataBuilder.build().getPreTranslationGaDocsApplicant();
         List<Element<CaseDocument>> respondentPreTranslation = Objects.isNull(caseDataBuilder.build().getPreTranslationGaDocsRespondent())
@@ -209,8 +216,8 @@ public class UploadTranslatedDocumentService {
                                     .calculateApplicantResponseDeadline(LocalDateTime.now(), 5));
                         }
                         preTranslationGADraftDocument.ifPresent(preTranslationGaDocuments::remove);
-                        preTranslationGADraftDocument.ifPresent(gaDraftDocumentGA::add);
-                        caseDataBuilder.gaDraftDocumentGA(gaDraftDocumentGA);
+                        preTranslationGADraftDocument.ifPresent(gaDraftDocument::add);
+                        caseDataBuilder.gaDraftDocument(gaDraftDocument);
                     }
                 } else if (document.getValue().getDocumentType().equals(WRITTEN_REPRESENTATIONS_ORDER_SEQUENTIAL)) {
                     Optional<Element<CaseDocument>> preTranslationWrittenRepsSequential = preTranslationGaDocuments.stream()
@@ -219,7 +226,7 @@ public class UploadTranslatedDocumentService {
                     preTranslationWrittenRepsSequential.ifPresent(preTranslationGaDocuments::remove);
                     preTranslationWrittenRepsSequential.ifPresent(writtenRepsSequentialDocs::add);
                     preTranslationWrittenRepsSequential.ifPresent(bulkPrintOriginalDocuments::add);
-                    caseDataBuilder.writtenRepSequentialDocumentGA(writtenRepsSequentialDocs);
+                    caseDataBuilder.writtenRepSequentialDocument(writtenRepsSequentialDocs);
                     caseDataBuilder.originalDocumentsBulkPrint(
                             bulkPrintOriginalDocuments.stream()
                                     .map(Element::getValue)
@@ -232,7 +239,7 @@ public class UploadTranslatedDocumentService {
                     preTranslationWrittenRepsConcurrent.ifPresent(preTranslationGaDocuments::remove);
                     preTranslationWrittenRepsConcurrent.ifPresent(writtenRepsConcurrentDocs::add);
                     preTranslationWrittenRepsConcurrent.ifPresent(bulkPrintOriginalDocuments::add);
-                    caseDataBuilder.writtenRepConcurrentDocumentGA(writtenRepsConcurrentDocs);
+                    caseDataBuilder.writtenRepConcurrentDocument(writtenRepsConcurrentDocs);
                     caseDataBuilder.originalDocumentsBulkPrint(
                             bulkPrintOriginalDocuments.stream()
                                     .map(Element::getValue)
@@ -246,7 +253,7 @@ public class UploadTranslatedDocumentService {
                     preTranslationGeneralOrder.ifPresent(preTranslationGaDocuments::remove);
                     preTranslationGeneralOrder.ifPresent(generalOrderDocs::add);
                     preTranslationGeneralOrder.ifPresent(bulkPrintOriginalDocuments::add);
-                    caseDataBuilder.generalOrderDocumentGA(generalOrderDocs);
+                    caseDataBuilder.generalOrderDocument(generalOrderDocs);
                     caseDataBuilder.originalDocumentsBulkPrint(
                             bulkPrintOriginalDocuments.stream()
                                     .map(Element::getValue)
@@ -259,7 +266,7 @@ public class UploadTranslatedDocumentService {
                     preTranslationHearingNotice.ifPresent(preTranslationGaDocuments::remove);
                     preTranslationHearingNotice.ifPresent(hearingNoticeDocs::add);
                     preTranslationHearingNotice.ifPresent(bulkPrintOriginalDocuments::add);
-                    caseDataBuilder.hearingNoticeDocumentGA(hearingNoticeDocs);
+                    caseDataBuilder.hearingNoticeDocument(hearingNoticeDocs);
                     caseDataBuilder.originalDocumentsBulkPrint(
                             bulkPrintOriginalDocuments.stream()
                                     .map(Element::getValue)
@@ -272,7 +279,7 @@ public class UploadTranslatedDocumentService {
                     preTranslationRequestMoreInformation.ifPresent(preTranslationGaDocuments::remove);
                     preTranslationRequestMoreInformation.ifPresent(requestMoreInformationDocs::add);
                     preTranslationRequestMoreInformation.ifPresent(bulkPrintOriginalDocuments::add);
-                    caseDataBuilder.requestForInformationDocumentGA(requestMoreInformationDocs);
+                    caseDataBuilder.requestForInformationDocument(requestMoreInformationDocs);
                     caseDataBuilder.originalDocumentsBulkPrint(
                             bulkPrintOriginalDocuments.stream()
                                     .map(Element::getValue)
@@ -285,7 +292,7 @@ public class UploadTranslatedDocumentService {
                     preTranslationHearingOrder.ifPresent(preTranslationGaDocuments::remove);
                     preTranslationHearingOrder.ifPresent(hearingOrders::add);
                     preTranslationHearingOrder.ifPresent(bulkPrintOriginalDocuments::add);
-                    caseDataBuilder.hearingOrderDocumentGA(hearingOrders);
+                    caseDataBuilder.hearingOrderDocument(hearingOrders);
                     caseDataBuilder.originalDocumentsBulkPrint(
                             bulkPrintOriginalDocuments.stream()
                                     .map(Element::getValue)
@@ -298,7 +305,7 @@ public class UploadTranslatedDocumentService {
                     preTranslationDirectionOrder.ifPresent(preTranslationGaDocuments::remove);
                     preTranslationDirectionOrder.ifPresent(directionOrder::add);
                     preTranslationDirectionOrder.ifPresent(bulkPrintOriginalDocuments::add);
-                    caseDataBuilder.directionOrderDocumentGA(directionOrder);
+                    caseDataBuilder.directionOrderDocument(directionOrder);
                     caseDataBuilder.originalDocumentsBulkPrint(
                             bulkPrintOriginalDocuments.stream()
                                     .map(Element::getValue)
@@ -311,7 +318,7 @@ public class UploadTranslatedDocumentService {
                     preTranslationDismissalOrder.ifPresent(preTranslationGaDocuments::remove);
                     preTranslationDismissalOrder.ifPresent(dismissalOrderDocs::add);
                     preTranslationDismissalOrder.ifPresent(bulkPrintOriginalDocuments::add);
-                    caseDataBuilder.dismissalOrderDocumentGA(dismissalOrderDocs);
+                    caseDataBuilder.dismissalOrderDocument(dismissalOrderDocs);
                     caseDataBuilder.originalDocumentsBulkPrint(
                             bulkPrintOriginalDocuments.stream()
                                     .map(Element::getValue)
@@ -367,7 +374,7 @@ public class UploadTranslatedDocumentService {
     }
 
     public CaseEvent getBusinessProcessEvent(CaseData caseData) {
-        List<Element<TranslatedDocument>> translatedDocuments = caseData.getTranslatedDocumentsGA();
+        List<Element<TranslatedDocument>> translatedDocuments = caseData.getTranslatedDocuments();
 
         if (Objects.nonNull(translatedDocuments)
                 && translatedDocuments.get(0).getValue().getDocumentType().equals(APPLICATION_SUMMARY_DOCUMENT)
@@ -410,8 +417,9 @@ public class UploadTranslatedDocumentService {
     }
 
     public void sendUserUploadNotification(CaseData caseData, CaseData updatedCaseData, String authToken) {
-        List<Element<TranslatedDocument>> translatedDocuments = caseData.getTranslatedDocumentsGA();
-        if (gaForLipService.isGaForLip(caseData) && Objects.nonNull(translatedDocuments) && translatedDocuments.size() > 0) {
+        List<Element<TranslatedDocument>> translatedDocuments = caseData.getTranslatedDocuments();
+        GeneralApplicationCaseData gaCaseData = GaCallbackDataUtil.toGaCaseData(caseData, objectMapper);
+        if (gaForLipService.isGaForLip(gaCaseData) && Objects.nonNull(translatedDocuments) && translatedDocuments.size() > 0) {
             TranslatedDocumentType translatedDocumentType = translatedDocuments.get(0).getValue().getDocumentType();
             String documentName = null;
             String role = null;

@@ -23,7 +23,6 @@ import uk.gov.hmcts.reform.civil.model.GeneralAppParentCaseLink;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.CaseLink;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
-import uk.gov.hmcts.reform.civil.model.genapplication.GACaseLocation;
 import uk.gov.hmcts.reform.civil.model.genapplication.GADetailsRespondentSol;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
@@ -34,6 +33,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAStatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -45,7 +45,6 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -110,27 +109,28 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
             assertThat(response.getErrors()).isNull();
 
             assertThat(response.getData()).extracting("businessProcess")
-                    .extracting("status").isEqualTo("FINISHED");
+                .extracting("status").isEqualTo("FINISHED");
 
             assertThat(response.getData()).extracting("businessProcess")
-                    .extracting("camundaEvent").isEqualTo(
-                        "TRIGGER_LOCATION_UPDATE");
+                .extracting("camundaEvent").isEqualTo(
+                    "TRIGGER_LOCATION_UPDATE");
 
             assertThat(response.getData()).containsEntry(
-                    "isCcmccLocation",
-                    "No");
+                "isCcmccLocation",
+                "No");
             assertThat(response.getData()).containsEntry(
                 "locationName",
                 "locationForRegion2");
-            assertThat(response.getData()).containsEntry(
-                "gaCaseManagementLocation",
-                Map.of(
-                    "region", "2",
-                    "baseLocation", "00000",
-                    "siteName", "locationOfRegion2",
-                    "address", "Prince William House, Peel Cross Road, Salford",
-                    "postcode", "M5 4RR"
-                ));
+
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
+            CaseLocationCivil expectedLocation = CaseLocationCivil.builder()
+                .region("2")
+                .baseLocation("00000")
+                .siteName("locationOfRegion2")
+                .address("Prince William House, Peel Cross Road, Salford")
+                .postcode("M5 4RR")
+                .build();
+            assertThat(updatedData.getCaseManagementLocation()).isEqualTo(expectedLocation);
         }
 
         protected List<LocationRefData> getSampleCourLocationsRefObject() {
@@ -176,15 +176,15 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
             assertThat(response.getData()).containsEntry(
                 "locationName",
                 "locationForRegion2");
-            assertThat(response.getData()).containsEntry(
-                "gaCaseManagementLocation",
-                Map.of(
-                    "region", "2",
-                    "baseLocation", "00000",
-                    "siteName", "locationOfRegion2",
-                    "address", "Prince William House, Peel Cross Road, Salford",
-                    "postcode", "M5 4RR"
-                ));
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
+            CaseLocationCivil expectedLocation = CaseLocationCivil.builder()
+                .region("2")
+                .baseLocation("00000")
+                .siteName("locationOfRegion2")
+                .address("Prince William House, Peel Cross Road, Salford")
+                .postcode("M5 4RR")
+                .build();
+            assertThat(updatedData.getCaseManagementLocation()).isEqualTo(expectedLocation);
         }
 
         private GeneralApplication getGeneralApplication(YesOrNo isConsented, YesOrNo isTobeNotified) {
@@ -215,7 +215,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
                                                                  .email("abc@gmail.com").build()))
                 .isMultiParty(NO)
                 .isCcmccLocation(YES)
-                .gaCaseManagementLocation(GACaseLocation.builder()
+                .caseManagementLocation(uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil.builder()
                                             .baseLocation("687686")
                                             .region("4").build())
                 .parentClaimantIsApplicant(YES)
@@ -227,7 +227,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
         private CaseData getParentCaseDataAfterUpdateFromCivilService(YesOrNo isConsented, YesOrNo isTobeNotified) {
             return CaseData.builder()
                 .generalApplications(wrapElements(getGeneralApplication(isConsented, isTobeNotified)))
-                .gaCaseManagementLocation(GACaseLocation.builder()
+                .caseManagementLocation(CaseLocationCivil.builder()
                                             .baseLocation("00000")
                                             .region("2")
                                             .siteName("locationForRegion2").build())

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +13,7 @@ import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
@@ -30,6 +32,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAStatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails;
+import uk.gov.hmcts.reform.civil.service.ga.GaCaseDataEnricher;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -62,6 +65,7 @@ public class ParentCaseUpdateHelper {
     private final CaseDetailsConverter caseDetailsConverter;
     private final CoreCaseDataService coreCaseDataService;
     private final FeatureToggleService featureToggleService;
+    private final GaCaseDataEnricher gaCaseDataEnricher;
     private final ObjectMapper mapper;
 
     private static final Logger log = LoggerFactory.getLogger(ParentCaseUpdateHelper.class);
@@ -94,10 +98,10 @@ public class ParentCaseUpdateHelper {
             APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION
     );
 
-    public void updateParentWithGAState(CaseData generalAppCaseData, String newState) {
+    public void updateParentWithGAState(GeneralApplicationCaseData gaCaseData, String newState) {
 
-        String applicationId = generalAppCaseData.getCcdCaseReference().toString();
-        String parentCaseId = generalAppCaseData.getGeneralAppParentCaseLink().getCaseReference();
+        String applicationId = gaCaseData.getCcdCaseReference().toString();
+        String parentCaseId = gaCaseData.getGeneralAppParentCaseLink().getCaseReference();
         String[] docVisibilityRoles = new String[4];
 
         StartEventResponse startEventResponse = coreCaseDataService.startUpdate(parentCaseId,
@@ -172,6 +176,7 @@ public class ParentCaseUpdateHelper {
         );
         docVisibilityRoles[3] = "Staff";
 
+        CaseData generalAppCaseData = toCaseData(gaCaseData);
         List<Element<GeneralApplication>> civilGeneralApplications = caseData.getGeneralApplications();
 
         if (generalAppCaseData.getCcdState().equals(PENDING_APPLICATION_ISSUED) && !isEmpty(civilGeneralApplications)) {
@@ -213,6 +218,10 @@ public class ParentCaseUpdateHelper {
         }
         coreCaseDataService.submitUpdate(parentCaseId, coreCaseDataService.caseDataContentFromStartEventResponse(
             startEventResponse, updateMap));
+    }
+
+    public void updateParentWithGAState(CaseData caseData, String newState) {
+        updateParentWithGAState(toGaCaseData(caseData), newState);
     }
 
     protected void updateEvidence(Map<String, Object> updateMap, CaseData civilCaseData,
@@ -276,16 +285,18 @@ public class ParentCaseUpdateHelper {
         return null;
     }
 
-    public void updateMasterCollectionForHwf(CaseData generalAppCaseData) {
+    public void updateMasterCollectionForHwf(GeneralApplicationCaseData gaCaseData) {
 
-        String parentCaseId = generalAppCaseData.getGeneralAppParentCaseLink().getCaseReference();
+        CaseData generalAppCaseData = toCaseData(gaCaseData);
+
+        String parentCaseId = gaCaseData.getGeneralAppParentCaseLink().getCaseReference();
         StartEventResponse startEventResponse = coreCaseDataService.startUpdate(
             parentCaseId,
             UPDATE_CASE_WITH_GA_STATE
         );
 
         CaseData parentCaseData = caseDetailsConverter.toCaseDataGA(startEventResponse.getCaseDetails());
-        String applicationId = generalAppCaseData.getCcdCaseReference().toString();
+        String applicationId = gaCaseData.getCcdCaseReference().toString();
 
         List<Element<GeneralApplicationsDetails>> gaClaimantDetails = ofNullable(
             parentCaseData.getClaimantGaAppDetails()).orElse(newArrayList());
@@ -345,10 +356,16 @@ public class ParentCaseUpdateHelper {
         coreCaseDataService.submitUpdate(parentCaseId, caseDataContent);
     }
 
-    public void updateJudgeAndRespondentCollectionAfterPayment(CaseData generalAppCaseData) {
+    public void updateMasterCollectionForHwf(CaseData caseData) {
+        updateMasterCollectionForHwf(toGaCaseData(caseData));
+    }
 
-        String applicationId = generalAppCaseData.getCcdCaseReference().toString();
-        String parentCaseId = generalAppCaseData.getGeneralAppParentCaseLink().getCaseReference();
+    public void updateJudgeAndRespondentCollectionAfterPayment(GeneralApplicationCaseData gaCaseData) {
+
+        CaseData generalAppCaseData = toCaseData(gaCaseData);
+
+        String applicationId = gaCaseData.getCcdCaseReference().toString();
+        String parentCaseId = gaCaseData.getGeneralAppParentCaseLink().getCaseReference();
         StartEventResponse startEventResponse = coreCaseDataService.startUpdate(
             parentCaseId,
             UPDATE_CASE_WITH_GA_STATE
@@ -469,9 +486,14 @@ public class ParentCaseUpdateHelper {
         coreCaseDataService.submitUpdate(parentCaseId, caseDataContent);
     }
 
-    public void updateCollectionForWelshApplication(CaseData generalAppCaseData) {
-        String applicationId = generalAppCaseData.getCcdCaseReference().toString();
-        String parentCaseId = generalAppCaseData.getGeneralAppParentCaseLink().getCaseReference();
+    public void updateJudgeAndRespondentCollectionAfterPayment(CaseData caseData) {
+        updateJudgeAndRespondentCollectionAfterPayment(toGaCaseData(caseData));
+    }
+
+    public void updateCollectionForWelshApplication(GeneralApplicationCaseData gaCaseData) {
+        CaseData generalAppCaseData = toCaseData(gaCaseData);
+        String applicationId = gaCaseData.getCcdCaseReference().toString();
+        String parentCaseId = gaCaseData.getGeneralAppParentCaseLink().getCaseReference();
         StartEventResponse startEventResponse = coreCaseDataService.startUpdate(
             parentCaseId,
             UPDATE_CASE_WITH_GA_STATE
@@ -499,6 +521,10 @@ public class ParentCaseUpdateHelper {
             startEventResponse, updateMap);
 
         coreCaseDataService.submitUpdate(parentCaseId, caseDataContent);
+    }
+
+    public void updateCollectionForWelshApplication(CaseData caseData) {
+        updateCollectionForWelshApplication(toGaCaseData(caseData));
     }
 
     private void addClaimantApplicationDetails(CaseData generalAppCaseData, String applicationId,
@@ -611,10 +637,12 @@ public class ParentCaseUpdateHelper {
         }
     }
 
-    public void updateParentApplicationVisibilityWithNewState(CaseData generalAppCaseData, String newState) {
+    public void updateParentApplicationVisibilityWithNewState(GeneralApplicationCaseData gaCaseData, String newState) {
 
-        String applicationId = generalAppCaseData.getCcdCaseReference().toString();
-        String parentCaseId = generalAppCaseData.getGeneralAppParentCaseLink().getCaseReference();
+        CaseData generalAppCaseData = toCaseData(gaCaseData);
+
+        String applicationId = gaCaseData.getCcdCaseReference().toString();
+        String parentCaseId = gaCaseData.getGeneralAppParentCaseLink().getCaseReference();
         log.info("Starting updateParentApplicationVisibilityWithNewState. New state: {}, Application ID: {}, Parent Case ID: {}", newState, applicationId, parentCaseId);
 
         StartEventResponse startEventResponse = coreCaseDataService
@@ -760,6 +788,10 @@ public class ParentCaseUpdateHelper {
             log.info("Submitted update for Parent Case ID: {}", parentCaseId);
         }
 
+    }
+
+    public void updateParentApplicationVisibilityWithNewState(CaseData caseData, String newState) {
+        updateParentApplicationVisibilityWithNewState(toGaCaseData(caseData), newState);
     }
 
     protected void updateCaseDocument(Map<String, Object> updateMap,
@@ -1045,6 +1077,51 @@ public class ParentCaseUpdateHelper {
         Map<String, Object> output = caseData.toMap(mapper);
         output.put(GENERAL_APPLICATIONS_DETAILS_FOR_WELSH, gaDetailsTranslationCollection);
         return output;
+    }
+
+    private CaseData toCaseData(GeneralApplicationCaseData gaCaseData) {
+        if (gaCaseData == null) {
+            return null;
+        }
+        ObjectMapper mapperWithJsr310 = mapper.copy();
+        mapperWithJsr310.registerModule(new JavaTimeModule());
+        CaseData converted = mapperWithJsr310.convertValue(gaCaseData, CaseData.class);
+        CaseData enriched = gaCaseDataEnricher.enrich(converted, gaCaseData);
+        CaseData.CaseDataBuilder<?, ?> builder = enriched.toBuilder();
+        if (gaCaseData.getCcdCaseReference() != null) {
+            builder.ccdCaseReference(gaCaseData.getCcdCaseReference());
+        }
+        if (gaCaseData.getCcdState() != null) {
+            builder.ccdState(gaCaseData.getCcdState());
+        }
+        return builder.build();
+    }
+
+    private GeneralApplicationCaseData toGaCaseData(CaseData caseData) {
+        if (caseData == null) {
+            return null;
+        }
+        GeneralApplicationCaseData converted = mapper.convertValue(caseData, GeneralApplicationCaseData.class);
+        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder builder = converted.toBuilder();
+        Long gaReference = caseData.getCcdCaseReference();
+        if (gaReference == null && !isEmpty(caseData.getGeneralApplications())) {
+            gaReference = caseData.getGeneralApplications().stream()
+                .map(Element::getValue)
+                .map(GeneralApplication::getCaseLink)
+                .filter(Objects::nonNull)
+                .map(CaseLink::getCaseReference)
+                .filter(StringUtils::hasText)
+                .map(Long::valueOf)
+                .findFirst()
+                .orElse(null);
+        }
+        if (gaReference != null) {
+            builder.ccdCaseReference(gaReference);
+        }
+        if (caseData.getCcdState() != null) {
+            builder.ccdState(caseData.getCcdState());
+        }
+        return builder.build();
     }
 
 }

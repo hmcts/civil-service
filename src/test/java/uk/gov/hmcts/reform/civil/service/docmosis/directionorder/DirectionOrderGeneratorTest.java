@@ -23,7 +23,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.judgedecisionpdfdocument.JudgeDecisionPdfDocument;
-import uk.gov.hmcts.reform.civil.model.genapplication.GACaseLocation;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAJudicialMakeAnOrder;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -31,6 +31,7 @@ import uk.gov.hmcts.reform.civil.service.GeneralAppLocationRefDataService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
+import uk.gov.hmcts.reform.civil.service.ga.GaCaseDataEnricher;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -75,6 +76,8 @@ class DirectionOrderGeneratorTest {
     private DocmosisService docmosisService;
     @MockBean
     private GeneralAppLocationRefDataService generalAppLocationRefDataService;
+    @MockBean
+    private GaCaseDataEnricher gaCaseDataEnricher;
 
     private static List<LocationRefData> locationRefData = Arrays
         .asList(LocationRefData.builder().epimmsId("1").externalShortName("Reading").build(),
@@ -85,6 +88,7 @@ class DirectionOrderGeneratorTest {
     public void setUp() {
 
         when(generalAppLocationRefDataService.getCourtLocations(any())).thenReturn(locationRefData);
+        when(gaCaseDataEnricher.enrich(any(), any())).thenAnswer(invocation -> invocation.getArgument(0));
     }
 
     @Test
@@ -109,7 +113,8 @@ class DirectionOrderGeneratorTest {
     @Test
     void shouldThrowExceptionWhenNoLocationMatch() {
         CaseData caseData = CaseDataBuilder.builder().directionOrderApplication()
-            .gaCaseManagementLocation(GACaseLocation.builder().baseLocation("8").build())
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("8").build())
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("8").build())
             .build();
 
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DIRECTION_ORDER)))
@@ -167,9 +172,9 @@ class DirectionOrderGeneratorTest {
                     + " ".concat(LocalDate.now().format(DATE_FORMATTER))),
                 () -> assertEquals(templateData.getJudgeRecital(),
                                    caseData.getJudicialDecisionMakeOrder().getJudgeRecitalText()),
-                () -> assertEquals(templateData.getAddress(), caseData.getGaCaseManagementLocation().getAddress()),
-                () -> assertEquals(templateData.getSiteName(), caseData.getGaCaseManagementLocation().getSiteName()),
-                () -> assertEquals(templateData.getPostcode(), caseData.getGaCaseManagementLocation().getPostcode())
+                () -> assertEquals(templateData.getAddress(), caseData.getCaseManagementLocation().getAddress()),
+                () -> assertEquals(templateData.getSiteName(), caseData.getCaseManagementLocation().getSiteName()),
+                () -> assertEquals(templateData.getPostcode(), caseData.getCaseManagementLocation().getPostcode())
             );
         }
 
@@ -178,7 +183,8 @@ class DirectionOrderGeneratorTest {
             CaseData caseData = CaseDataBuilder.builder().directionOrderApplication().build().toBuilder()
                 .defendant2PartyName(null)
                 .claimant2PartyName(null)
-                .gaCaseManagementLocation(GACaseLocation.builder().baseLocation("3").build())
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("3").build())
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("3").build())
                 .isMultiParty(NO)
                 .build();
 
@@ -212,7 +218,8 @@ class DirectionOrderGeneratorTest {
         void whenJudgeMakeDecision_ShouldGetHearingOrderData_Option2() {
             CaseData caseData = CaseDataBuilder.builder().directionOrderApplication().build().toBuilder()
                 .isMultiParty(YES)
-                .gaCaseManagementLocation(GACaseLocation.builder().baseLocation("2").build())
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("2").build())
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("2").build())
                 .build();
 
             CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
@@ -383,7 +390,8 @@ class DirectionOrderGeneratorTest {
                 .defendant2PartyName(null)
                 .claimant2PartyName(null)
                 .parentClaimantIsApplicant(YES)
-                .gaCaseManagementLocation(GACaseLocation.builder().baseLocation("3").build())
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("3").build())
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("3").build())
                 .isMultiParty(NO)
                 .build();
 
@@ -428,7 +436,8 @@ class DirectionOrderGeneratorTest {
                 .defendant2PartyName(null)
                 .claimant2PartyName(null)
                 .parentClaimantIsApplicant(YES)
-                .gaCaseManagementLocation(GACaseLocation.builder().baseLocation("3").build())
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("3").build())
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("3").build())
                 .isMultiParty(NO)
                 .build();
 

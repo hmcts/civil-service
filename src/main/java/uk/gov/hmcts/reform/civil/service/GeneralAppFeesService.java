@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -7,6 +9,7 @@ import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.civil.client.FeesApiClient;
 import uk.gov.hmcts.reform.civil.config.GeneralAppFeesConfiguration;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.FeeLookupResponseDto;
@@ -14,6 +17,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDateGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
+import uk.gov.hmcts.reform.civil.service.ga.GaCaseDataEnricher;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -35,6 +39,8 @@ public class GeneralAppFeesService {
 
     private final FeesApiClient feesApiClient;
     private final GeneralAppFeesConfiguration feesConfiguration;
+    private final GaCaseDataEnricher gaCaseDataEnricher;
+    private final ObjectMapper objectMapper;
     public static final String FREE_REF = "FREE";
     private static final Fee FREE_FEE = Fee.builder()
         .calculatedAmountInPence(BigDecimal.ZERO).code(FREE_REF).version("1").build();
@@ -75,6 +81,10 @@ public class GeneralAppFeesService {
             getInformOtherParty(caseData),
             getHearingDate(caseData)
         );
+    }
+
+    public Fee getFeeForGA(GeneralApplicationCaseData gaCaseData) {
+        return getFeeForGA(toCaseData(gaCaseData));
     }
 
     public Fee getFeeForGA(GeneralApplication generalApplication, LocalDate hearingScheduledDate) {
@@ -205,6 +215,10 @@ public class GeneralAppFeesService {
         return false;
     }
 
+    public boolean isFreeApplication(final GeneralApplicationCaseData gaCaseData) {
+        return isFreeApplication(toCaseData(gaCaseData));
+    }
+
     private Fee buildFeeDto(FeeLookupResponseDto feeLookupResponseDto) {
         BigDecimal calculatedAmount = feeLookupResponseDto.getFeeAmount()
             .multiply(PENCE_PER_POUND)
@@ -274,5 +288,23 @@ public class GeneralAppFeesService {
                     .isAfter(LocalDate.now().plusDays(GeneralAppFeesService.FREE_GA_DAYS));
         }
         return false;
+    }
+
+    private CaseData toCaseData(GeneralApplicationCaseData gaCaseData) {
+        if (gaCaseData == null) {
+            return null;
+        }
+        ObjectMapper mapperWithJsr310 = objectMapper.copy();
+        mapperWithJsr310.registerModule(new JavaTimeModule());
+        CaseData converted = mapperWithJsr310.convertValue(gaCaseData, CaseData.class);
+        CaseData enriched = gaCaseDataEnricher.enrich(converted, gaCaseData);
+        CaseData.CaseDataBuilder<?, ?> builder = enriched.toBuilder();
+        if (gaCaseData.getCcdCaseReference() != null) {
+            builder.ccdCaseReference(gaCaseData.getCcdCaseReference());
+        }
+        if (gaCaseData.getCcdState() != null) {
+            builder.ccdState(gaCaseData.getCcdState());
+        }
+        return builder.build();
     }
 }

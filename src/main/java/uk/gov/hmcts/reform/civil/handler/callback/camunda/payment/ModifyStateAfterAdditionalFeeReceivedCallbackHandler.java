@@ -1,5 +1,8 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.payment;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -13,11 +16,14 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.GaCallbackDataUtil;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.service.AssignCaseToResopondentSolHelper;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -30,6 +36,7 @@ import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -40,6 +47,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TO
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MODIFY_STATE_AFTER_ADDITIONAL_FEE_PAID;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NO_REMISSION_HWF_GA;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.dq.GAJudgeRequestMoreInfoOption.SEND_APP_TO_OTHER_PARTY;
@@ -73,6 +81,7 @@ public class ModifyStateAfterAdditionalFeeReceivedCallbackHandler extends Callba
     private final GaForLipService gaForLipService;
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
+    private final ObjectMapper objectMapper;
     private static final List<CaseEvent> EVENTS = singletonList(MODIFY_STATE_AFTER_ADDITIONAL_FEE_PAID);
 
     @Override
@@ -89,37 +98,54 @@ public class ModifyStateAfterAdditionalFeeReceivedCallbackHandler extends Callba
     }
 
     private CallbackResponse changeApplicationState(CallbackParams callbackParams) {
-        Long caseId = callbackParams.getCaseData().getCcdCaseReference();
-        CaseData caseData = callbackParams.getCaseData();
+        GeneralApplicationCaseData gaCaseData = getGaCaseData(callbackParams);
+        CaseData caseData = toCaseData(gaCaseData, callbackParams.getCaseData());
+        Long caseId = caseData != null && caseData.getCcdCaseReference() != null
+            ? caseData.getCcdCaseReference()
+            : Optional.ofNullable(callbackParams.getCaseData()).map(CaseData::getCcdCaseReference).orElse(null);
+        Objects.requireNonNull(caseId, "Case ID missing from GA case data");
         // Do not progress the application if payment not successful
-        if (gaForLipService.isLipApp(caseData) && getPaymentStatus(caseData) == PaymentStatus.FAILED) {
-            log.info("Payment status is failed for caseId: {}", caseData.getCcdCaseReference());
+        if (gaCaseData != null && gaForLipService.isLipAppGa(gaCaseData) && getPaymentStatus(gaCaseData) == PaymentStatus.FAILED) {
+            log.info("Payment status is failed for caseId: {}", caseId);
             return AboutToStartOrSubmitCallbackResponse.builder().build();
         }
-        String newCaseState = stateGeneratorService.getCaseStateForEndJudgeBusinessProcess(caseData).toString();
+        String newCaseState = caseData != null
+            ? stateGeneratorService.getCaseStateForEndJudgeBusinessProcess(caseData).toString()
+            : null;
         log.info("Changing state to {} for caseId: {}", newCaseState, caseId);
 
-        if (caseData.getMakeAppVisibleToRespondents() != null
-            || isApplicationUncloakedForRequestMoreInformation(caseData).equals(YES)) {
-            assignCaseToResopondentSolHelper.assignCaseToRespondentSolicitor(caseData, caseId.toString());
+        if (gaCaseData != null && (gaCaseData.getMakeAppVisibleToRespondents() != null
+            || isApplicationUncloakedForRequestMoreInformation(gaCaseData).equals(YES))) {
+            assignCaseToResopondentSolHelper.assignCaseToRespondentSolicitor(gaCaseData, caseId != null ? caseId.toString() : null);
             updateDashboardTaskListAndNotification(
                 callbackParams,
-                getScenariosAsList(getDashboardNotificationRespondentScenario(caseData)),
-                                                   caseData.getCcdCaseReference().toString());
+                caseData,
+                gaCaseData,
+                getScenariosAsList(getDashboardNotificationRespondentScenario(gaCaseData)),
+                caseId != null ? caseId.toString() : null
+            );
         }
 
-        updateDashboardTaskListAndNotification(callbackParams, getDashboardNotificationScenarioForApplicant(caseData), caseData.getCcdCaseReference().toString());
+        updateDashboardTaskListAndNotification(
+            callbackParams,
+            caseData,
+            gaCaseData,
+            getDashboardNotificationScenarioForApplicant(gaCaseData, caseData),
+            caseId != null ? caseId.toString() : null
+        );
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .state(newCaseState)
             .build();
     }
 
-    private void updateDashboardTaskListAndNotification(CallbackParams callbackParams, List<String> scenarios,
+    private void updateDashboardTaskListAndNotification(CallbackParams callbackParams,
+                                                        CaseData caseData,
+                                                        GeneralApplicationCaseData gaCaseData,
+                                                        List<String> scenarios,
                                                         String caseReference) {
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        CaseData caseData = callbackParams.getCaseData();
-        if (gaForLipService.isGaForLip(caseData)) {
+        if (gaCaseData != null && gaForLipService.isGaForLip(gaCaseData)) {
             ScenarioRequestParams scenarioParams = ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(
                     caseData)).build();
             if (scenarios != null) {
@@ -133,25 +159,32 @@ public class ModifyStateAfterAdditionalFeeReceivedCallbackHandler extends Callba
         }
     }
 
-    private List<String> getDashboardNotificationScenarioForApplicant(CaseData caseData) {
+    private List<String> getDashboardNotificationScenarioForApplicant(GeneralApplicationCaseData gaCaseData,
+                                                                      CaseData caseData) {
         List<String> scenarios = new ArrayList<>();
-        if (caseData.getIsGaApplicantLip() == YES
-            && (Objects.nonNull(caseData.getAdditionalHwfDetails()))) {
-            if (caseData.gaAdditionalFeeFullRemissionNotGrantedHWF(caseData)) {
-                scenarios.add(SCENARIO_AAA6_GENERAL_APPS_HWF_FEE_PAID_APPLICANT.getScenario());
-            } else {
-                scenarios.add(SCENARIO_AAA6_GENERAL_APPS_HWF_FULL_REMISSION_APPLICANT.getScenario());
-            }
+        YesOrNo applicantLip = gaCaseData != null && gaCaseData.getIsGaApplicantLip() != null
+            ? gaCaseData.getIsGaApplicantLip()
+            : caseData != null ? caseData.getIsGaApplicantLip() : NO;
+        boolean hasAdditionalHwf = (gaCaseData != null && gaCaseData.getAdditionalHwfDetails() != null)
+            || (caseData != null && caseData.getAdditionalHwfDetails() != null);
+        if (applicantLip == YES && hasAdditionalHwf) {
+            boolean notGranted = caseData != null
+                ? caseData.gaAdditionalFeeFullRemissionNotGrantedHWF(caseData)
+                : isAdditionalFeeRemissionNotGrantedFromGa(gaCaseData);
+            scenarios.add(notGranted
+                ? SCENARIO_AAA6_GENERAL_APPS_HWF_FEE_PAID_APPLICANT.getScenario()
+                : SCENARIO_AAA6_GENERAL_APPS_HWF_FULL_REMISSION_APPLICANT.getScenario());
         }
 
         scenarios.add(SCENARIO_AAA6_GENERAL_APPLICATION_SUBMITTED_APPLICANT.getScenario());
         return scenarios;
     }
 
-    private YesOrNo isApplicationUncloakedForRequestMoreInformation(CaseData caseData) {
-        if (caseData.getJudicialDecisionRequestMoreInfo() != null
-            && caseData.getJudicialDecisionRequestMoreInfo().getRequestMoreInfoOption() != null
-            && caseData.getJudicialDecisionRequestMoreInfo()
+    private YesOrNo isApplicationUncloakedForRequestMoreInformation(GeneralApplicationCaseData gaCaseData) {
+        if (gaCaseData != null
+            && gaCaseData.getJudicialDecisionRequestMoreInfo() != null
+            && gaCaseData.getJudicialDecisionRequestMoreInfo().getRequestMoreInfoOption() != null
+            && gaCaseData.getJudicialDecisionRequestMoreInfo()
             .getRequestMoreInfoOption().equals(SEND_APP_TO_OTHER_PARTY)) {
             return YES;
         }
@@ -159,9 +192,11 @@ public class ModifyStateAfterAdditionalFeeReceivedCallbackHandler extends Callba
     }
 
     private CallbackResponse changeGADetailsStatusInParent(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
+        GeneralApplicationCaseData gaCaseData = getGaCaseData(callbackParams);
+        CaseData caseData = toCaseData(gaCaseData, callbackParams.getCaseData());
+        Objects.requireNonNull(caseData, "Case data missing from GA case data");
         // Do not progress the application if payment not successful
-        if (gaForLipService.isLipApp(caseData) && getPaymentStatus(caseData) == PaymentStatus.FAILED) {
+        if (gaCaseData != null && gaForLipService.isLipAppGa(gaCaseData) && getPaymentStatus(gaCaseData) == PaymentStatus.FAILED) {
             log.info("Payment status is failed for caseId: {}", caseData.getCcdCaseReference());
             return SubmittedCallbackResponse.builder().build();
         }
@@ -171,16 +206,30 @@ public class ModifyStateAfterAdditionalFeeReceivedCallbackHandler extends Callba
                  newCaseState, caseData.getCcdCaseReference()
         );
         parentCaseUpdateHelper.updateParentApplicationVisibilityWithNewState(
-            caseData,
+            gaCaseData,
             newCaseState
+        );
+        updateDashboardTaskListAndNotification(
+            callbackParams,
+            caseData,
+            gaCaseData,
+            getDashboardNotificationScenarioForApplicant(gaCaseData, caseData),
+            caseData.getCcdCaseReference().toString()
+        );
+        updateDashboardTaskListAndNotification(
+            callbackParams,
+            caseData,
+            gaCaseData,
+            getScenariosAsList(getDashboardNotificationRespondentScenario(gaCaseData)),
+            caseData.getParentCaseReference()
         );
         updateTaskListClaimantAndDefendant(callbackParams, caseData);
         return SubmittedCallbackResponse.builder().build();
     }
 
-    private PaymentStatus getPaymentStatus(CaseData caseData) {
-        return Optional.of(caseData)
-            .map(CaseData::getGeneralAppPBADetails)
+    private PaymentStatus getPaymentStatus(GeneralApplicationCaseData gaCaseData) {
+        return Optional.ofNullable(gaCaseData)
+            .map(GeneralApplicationCaseData::getGeneralAppPBADetails)
             .map(GAPbaDetails::getAdditionalPaymentDetails)
             .map(PaymentDetails::getStatus).orElse(null);
     }
@@ -232,20 +281,26 @@ public class ModifyStateAfterAdditionalFeeReceivedCallbackHandler extends Callba
             && parentCaseData.getRespondentSolGaAppDetails().size() > 0) {
             defendantScenario = SCENARIO_AAA6_GENERAL_APPLICATION_AVAILABLE_DEFENDANT.getScenario();
         }
+        GeneralApplicationCaseData gaCaseData = GaCallbackDataUtil.toGaCaseData(caseData, objectMapper);
+
         updateDashboardTaskListAndNotification(
             callbackParams,
+            caseData,
+            gaCaseData,
             getScenariosAsList(claimantScenario),
             caseData.getParentCaseReference()
         );
         updateDashboardTaskListAndNotification(
             callbackParams,
+            caseData,
+            gaCaseData,
             getScenariosAsList(defendantScenario),
             caseData.getParentCaseReference()
         );
     }
 
-    private String getDashboardNotificationRespondentScenario(CaseData caseData) {
-        if (caseData.isUrgent()) {
+    private String getDashboardNotificationRespondentScenario(GeneralApplicationCaseData gaCaseData) {
+        if (gaCaseData != null && isUrgent(gaCaseData)) {
             return SCENARIO_AAA6_GENERAL_APPLICATION_SUBMITTED_URGENT_UNCLOAKED_RESPONDENT.getScenario();
         } else {
             return SCENARIO_AAA6_GENERAL_APPLICATION_SUBMITTED_NONURGENT_UNCLOAKED_RESPONDENT.getScenario();
@@ -256,5 +311,73 @@ public class ModifyStateAfterAdditionalFeeReceivedCallbackHandler extends Callba
         return Optional.ofNullable(scenario)
             .map(List::of)
             .orElse(Collections.emptyList());
+    }
+
+    private boolean isAdditionalFeeRemissionNotGrantedFromGa(GeneralApplicationCaseData gaCaseData) {
+        return (gaCaseData.getFeePaymentOutcomeDetails() != null
+            && gaCaseData.getFeePaymentOutcomeDetails().getHwfFullRemissionGrantedForAdditionalFee() == NO)
+            || (gaCaseData.getAdditionalHwfDetails() != null
+            && gaCaseData.getAdditionalHwfDetails().getHwfCaseEvent() == NO_REMISSION_HWF_GA);
+    }
+
+    private boolean isUrgent(GeneralApplicationCaseData gaCaseData) {
+        return Optional.ofNullable(gaCaseData)
+            .map(GeneralApplicationCaseData::getGeneralAppUrgencyRequirement)
+            .map(GAUrgencyRequirement::getGeneralAppUrgency)
+            .filter(urgency -> urgency == YES)
+            .isPresent();
+    }
+
+    private GeneralApplicationCaseData getGaCaseData(CallbackParams callbackParams) {
+        GeneralApplicationCaseData gaCaseData = callbackParams.getGaCaseData();
+        if (gaCaseData != null) {
+            return gaCaseData;
+        }
+        CaseData fallback = callbackParams.getCaseData();
+        if (fallback == null) {
+            throw new IllegalArgumentException("GA case data must be present on CallbackParams");
+        }
+        return toGaCaseData(fallback);
+    }
+
+    private CaseData toCaseData(GeneralApplicationCaseData gaCaseData, CaseData fallback) {
+        if (gaCaseData == null) {
+            return fallback;
+        }
+        ObjectMapper mapperWithJavaTime = objectMapper.copy();
+        mapperWithJavaTime.registerModule(new JavaTimeModule());
+        Map<String, Object> base = fallback != null
+            ? fallback.toMap(mapperWithJavaTime)
+            : Map.of();
+        Map<String, Object> gaMap = mapperWithJavaTime.convertValue(gaCaseData, new TypeReference<>() { });
+        Map<String, Object> merged = new HashMap<>(base);
+        merged.putAll(gaMap);
+        CaseData converted = mapperWithJavaTime.convertValue(merged, CaseData.class);
+        CaseData.CaseDataBuilder<?, ?> builder = converted.toBuilder();
+        if (gaCaseData.getCcdCaseReference() != null) {
+            builder.ccdCaseReference(gaCaseData.getCcdCaseReference());
+        } else if (fallback != null) {
+            builder.ccdCaseReference(fallback.getCcdCaseReference());
+        }
+        if (gaCaseData.getCcdState() != null) {
+            builder.ccdState(gaCaseData.getCcdState());
+        } else if (fallback != null) {
+            builder.ccdState(fallback.getCcdState());
+        }
+        return builder.build();
+    }
+
+    private GeneralApplicationCaseData toGaCaseData(CaseData caseData) {
+        ObjectMapper mapperWithJavaTime = objectMapper.copy();
+        mapperWithJavaTime.registerModule(new JavaTimeModule());
+        GeneralApplicationCaseData converted = mapperWithJavaTime.convertValue(caseData, GeneralApplicationCaseData.class);
+        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder builder = converted.toBuilder();
+        if (caseData.getCcdCaseReference() != null) {
+            builder.ccdCaseReference(caseData.getCcdCaseReference());
+        }
+        if (caseData.getCcdState() != null) {
+            builder.ccdState(caseData.getCcdState());
+        }
+        return builder.build();
     }
 }

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -11,6 +12,8 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.GaCallbackDataUtil;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DocUploadDashboardNotificationService;
 import uk.gov.hmcts.reform.civil.service.GaForLipService;
@@ -28,6 +31,7 @@ public class CreateApplicationRespondedDashboardNotificationHandler extends Call
 
     private final DocUploadDashboardNotificationService dashboardNotificationService;
     private final GaForLipService gaForLipService;
+    private final ObjectMapper objectMapper;
 
     private static final List<CaseEvent> EVENTS = List.of(CaseEvent.CREATE_APPLICATION_RESPONDED_DASHBOARD_NOTIFICATION
     );
@@ -44,20 +48,24 @@ public class CreateApplicationRespondedDashboardNotificationHandler extends Call
 
     public CallbackResponse configureDashboardScenario(CallbackParams callbackParams) {
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        CaseData caseData = callbackParams.getCaseData();
+        GeneralApplicationCaseData gaCaseData = GaCallbackDataUtil.resolveGaCaseData(callbackParams, objectMapper);
+        CaseData caseData = GaCallbackDataUtil.mergeToCaseData(gaCaseData, callbackParams.getCaseData(), objectMapper);
+        if (caseData == null) {
+            return AboutToStartOrSubmitCallbackResponse.builder().build();
+        }
         if (caseData.getParentClaimantIsApplicant().equals(YesOrNo.NO) && caseData.getGeneralAppType().getTypes().contains(
             GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT)) {
-            if (gaForLipService.isLipApp(caseData)) {
+            if (gaForLipService.isLipAppGa(gaCaseData)) {
                 dashboardNotificationService.createOfflineResponseDashboardNotification(caseData, "APPLICANT", authToken);
             }
-            if (gaForLipService.isLipResp(caseData)) {
+            if (gaForLipService.isLipRespGa(gaCaseData)) {
                 dashboardNotificationService.createOfflineResponseDashboardNotification(caseData, "RESPONDENT", authToken);
             }
         } else {
-            if (gaForLipService.isLipApp(caseData)) {
+            if (gaForLipService.isLipAppGa(gaCaseData)) {
                 dashboardNotificationService.createResponseDashboardNotification(caseData, "APPLICANT", authToken);
             }
-            if (gaForLipService.isLipResp(caseData)) {
+            if (gaForLipService.isLipRespGa(gaCaseData)) {
                 dashboardNotificationService.createResponseDashboardNotification(caseData, "RESPONDENT", authToken);
             }
         }

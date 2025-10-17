@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
@@ -55,8 +56,11 @@ public class GAResponseDeadlineTaskHandler extends BaseExternalTaskHandler {
     private void deleteDashboardNotifications(CaseDetails caseDetails) {
         Long caseId = caseDetails.getId();
         CaseData caseData = caseDetailsConverter.toCaseDataGA(caseDetails);
+        GeneralApplicationCaseData gaCaseData = caseDetailsConverter.toGeneralApplicationCaseData(caseDetails);
+        YesOrNo applicantLip = gaCaseData != null ? gaCaseData.getIsGaApplicantLip() : null;
+        YesOrNo respondentLip = gaCaseData != null ? gaCaseData.getIsGaRespondentOneLip() : null;
         log.info("Firing Event to delete dashboard notification caseId: {}", caseId);
-        if (YesOrNo.YES == caseData.getIsGaApplicantLip() || YesOrNo.YES == caseData.getIsGaRespondentOneLip()) {
+        if (YesOrNo.YES == applicantLip || YesOrNo.YES == respondentLip) {
             try {
                 log.info("calling triggerEvent");
                 coreCaseDataService.triggerEvent(caseId, RESPONDENT_RESPONSE_DEADLINE_CHECK);

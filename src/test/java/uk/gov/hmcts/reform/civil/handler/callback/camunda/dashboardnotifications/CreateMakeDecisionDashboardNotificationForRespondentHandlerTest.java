@@ -1,12 +1,12 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.enums.dq.GAJudgeDecisionOption;
 import uk.gov.hmcts.reform.civil.enums.dq.GAJudgeMakeAnOrderOption;
 import uk.gov.hmcts.reform.civil.enums.dq.GAJudgeRequestMoreInfoOption;
 import uk.gov.hmcts.reform.civil.enums.dq.GAJudgeWrittenRepresentationsOptions;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingNoticeApplication;
@@ -66,8 +67,17 @@ public class CreateMakeDecisionDashboardNotificationForRespondentHandlerTest ext
     private DashboardNotificationsParamsMapper mapper;
     @Mock
     private FeatureToggleService featureToggleService;
-    @InjectMocks
     private CreateMakeDecisionDashboardNotificationForRespondentHandler handler;
+
+    @BeforeEach
+    void setUp() {
+        handler = new CreateMakeDecisionDashboardNotificationForRespondentHandler(
+            dashboardScenariosService,
+            mapper,
+            featureToggleService,
+            objectMapper
+        );
+    }
 
     private final List<MakeAppAvailableCheckGAspec> makeAppAvailableCheck = List.of(MakeAppAvailableCheckGAspec.CONSENT_AGREEMENT_CHECKBOX);
 
@@ -87,6 +97,37 @@ public class CreateMakeDecisionDashboardNotificationForRespondentHandlerTest ext
 
     @Nested
     class AboutToSubmitCallback {
+
+        @Test
+        void shouldRecordMoreInfoScenarioWhenGaCaseDataProvided() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
+            caseData = caseData.toBuilder()
+                .parentCaseReference(caseData.getCcdCaseReference().toString())
+                .isGaApplicantLip(YesOrNo.YES)
+                .parentClaimantIsApplicant(YesOrNo.YES)
+                .judicialDecisionRequestMoreInfo(GAJudicialRequestMoreInfo.builder()
+                    .requestMoreInfoOption(GAJudgeRequestMoreInfoOption.REQUEST_MORE_INFORMATION)
+                    .deadlineForMoreInfoSubmission(LocalDateTime.now().plusDays(5)).build())
+                .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
+                .build();
+
+            GeneralApplicationCaseData gaCaseData = toGaCaseData(caseData);
+
+            HashMap<String, Object> scenarioParams = new HashMap<>();
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
+
+            CallbackParams params = gaCallbackParamsOf(gaCaseData, ABOUT_TO_SUBMIT);
+
+            handler.handle(params);
+
+            verify(dashboardScenariosService).recordScenarios(
+                "BEARER_TOKEN",
+                SCENARIO_AAA6_GENERAL_APPLICATION_REQUEST_MORE_INFO_RESPONDENT.getScenario(),
+                gaCaseData.getCcdCaseReference().toString(),
+                ScenarioRequestParams.builder().params(scenarioParams).build()
+            );
+        }
 
         @Test
         void shouldRecordMoreInfoRequiredRespondentScenarioWhenInvoked() {

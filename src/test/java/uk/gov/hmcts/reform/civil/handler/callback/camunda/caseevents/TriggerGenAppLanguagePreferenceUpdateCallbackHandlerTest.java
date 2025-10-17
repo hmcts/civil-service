@@ -38,7 +38,7 @@ public class TriggerGenAppLanguagePreferenceUpdateCallbackHandlerTest {
         void shouldTriggerGeneralApplicationEvent_whenCaseHasGeneralApplication() {
             CaseData caseData = CaseData.builder().build();
 
-            when(helperService.triggerEvent(any(), any())).thenReturn(true);
+            when(helperService.triggerEvent(any(CaseData.class), any())).thenReturn(true);
             CallbackParams params = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder()

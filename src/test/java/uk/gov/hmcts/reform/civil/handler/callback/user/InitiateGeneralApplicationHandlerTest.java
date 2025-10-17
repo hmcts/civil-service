@@ -58,7 +58,6 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
-import static java.lang.String.format;
 import static java.time.LocalDate.EPOCH;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -1234,7 +1233,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSetAddPbaNumbers_whenCalledAndOrgExistsInPrd() {
-            given(feesService.getFeeForGA(any()))
+            given(feesService.getFeeForGA(any(CaseData.class)))
                     .willReturn(Fee.builder().code(FEE_CODE).calculatedAmountInPence(fee108)
                             .version(FEE_VERSION).build());
             CaseData caseData = CaseDataBuilder.builder().ccdCaseReference(1234L).atStateClaimDraft().build();
@@ -1247,7 +1246,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotResultInErrors_whenCalledAndOrgDoesNotExistInPrd() {
-            given(feesService.getFeeForGA(any()))
+            given(feesService.getFeeForGA(any(CaseData.class)))
                     .willReturn(Fee.builder()
                             .code(FEE_CODE)
                             .calculatedAmountInPence(fee108)
@@ -1266,7 +1265,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnNoError_whenNoOrgDetailsObtained() {
-            given(feesService.getFeeForGA(any()))
+            given(feesService.getFeeForGA(any(CaseData.class)))
                     .willReturn(Fee.builder()
                             .code(FEE_CODE)
                             .calculatedAmountInPence(fee108)
@@ -1282,7 +1281,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSet108Fees_whenApplicationIsConsented() {
-            given(feesService.getFeeForGA(any()))
+            given(feesService.getFeeForGA(any(CaseData.class)))
                     .willReturn(Fee.builder()
                             .code(FEE_CODE)
                             .calculatedAmountInPence(fee108)
@@ -1300,7 +1299,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSet108Fees_whenApplicationIsUnConsentedWithoutNotice() {
-            given(feesService.getFeeForGA(any()))
+            given(feesService.getFeeForGA(any(CaseData.class)))
                     .willReturn(Fee.builder()
                             .code(FEE_CODE)
                             .calculatedAmountInPence(fee108)
@@ -1318,7 +1317,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSet275Fees_whenApplicationIsUnConsentedWithNotice() {
-            given(feesService.getFeeForGA(any()))
+            given(feesService.getFeeForGA(any(CaseData.class)))
                     .willReturn(Fee.builder()
                             .code(FEE_CODE)
                             .calculatedAmountInPence(fee275)
@@ -1336,7 +1335,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSet275Fees_whenVaryApplicationIsUnConsented() {
-            given(feesService.getFeeForGA(any()))
+            given(feesService.getFeeForGA(any(CaseData.class)))
                     .willReturn(Fee.builder()
                             .code(FEE_CODE)
                             .calculatedAmountInPence(fee275)
@@ -1361,7 +1360,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldSet275Fees_whenVaryApplicationIsUnConsentedCoscEnabled() {
             //Add cosc tests
-            given(feesService.getFeeForGA(any()))
+            given(feesService.getFeeForGA(any(CaseData.class)))
                 .willReturn(Fee.builder()
                                 .code(FEE_CODE)
                                 .calculatedAmountInPence(fee275)
@@ -1391,7 +1390,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSet14Fees_whenApplicationIsVaryOrder() {
-            given(feesService.getFeeForGA(any()))
+            given(feesService.getFeeForGA(any(CaseData.class)))
                 .willReturn(Fee.builder()
                                 .code(FEE_CODE)
                                 .calculatedAmountInPence(fee14)
@@ -1413,7 +1412,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSet14Fees_whenApplicationIsVaryOrderCoscEnabled() {
-            given(feesService.getFeeForGA(any()))
+            given(feesService.getFeeForGA(any(CaseData.class)))
                 .willReturn(Fee.builder()
                                 .code(FEE_CODE)
                                 .calculatedAmountInPence(fee14)
@@ -1440,7 +1439,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSet14Fees_whenApplicationIsVaryOrderWithMultipleTypes() {
-            given(feesService.getFeeForGA(any()))
+            given(feesService.getFeeForGA(any(CaseData.class)))
                 .willReturn(Fee.builder()
                                 .code(FEE_CODE)
                                 .calculatedAmountInPence(fee14).build());
@@ -1462,7 +1461,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSet14Fees_whenApplicationIsVaryOrderWithMultipleTypesCoscEnabled() {
-            given(feesService.getFeeForGA(any()))
+            given(feesService.getFeeForGA(any(CaseData.class)))
                 .willReturn(Fee.builder()
                                 .code(FEE_CODE)
                                 .calculatedAmountInPence(fee14).build());
@@ -1520,7 +1519,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         void shouldSetAppropriateFees_whenFeesAreUnsetByCCD() {
             CaseData caseData = GeneralApplicationDetailsBuilder.builder()
                     .getTestCaseData(CaseData.builder().build());
-            when(feesService.getFeeForGA(any())).thenReturn(feeFromFeeService);
+            when(feesService.getFeeForGA(any(CaseData.class))).thenReturn(feeFromFeeService);
             when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
                     .email(APPLICANT_EMAIL_ID_CONSTANT)
                     .build());
@@ -1584,7 +1583,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
             CaseData caseData = GeneralApplicationDetailsBuilder.builder()
                 .getTestCaseDataWithEmptyPreferredLocation(CaseData.builder().ccdCaseReference(1234L).build());
-            when(feesService.getFeeForGA(any())).thenReturn(feeFromFeeService);
+            when(feesService.getFeeForGA(any(CaseData.class))).thenReturn(feeFromFeeService);
             when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
                                                                         .email(APPLICANT_EMAIL_ID_CONSTANT)
                                                                         .build());
@@ -1673,65 +1672,31 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnExpectedSubmittedCallbackResponse_whenRespondentsDoesNotHaveRepresentation() {
             CaseData caseData = getReadyTestCaseData(CaseDataBuilder.builder().ccdCaseReference(CASE_ID).build(), true);
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
-            GeneralApplication genapp = caseData.getGeneralApplications().get(0).getValue();
-            when(feesService.isFreeGa(any())).thenReturn(false);
-            String body = format(
-                    confirmationBodyBasedOnToggle(false),
-                    genapp.getGeneralAppPBADetails().getFee().toPounds(),
-                    format("/cases/case-details/%s#Applications", CASE_ID));
-
             var response = (SubmittedCallbackResponse) handler.handle(params);
             assertThat(response).isNotNull();
-            assertThat(response).usingRecursiveComparison().isEqualTo(
-                    SubmittedCallbackResponse.builder()
-                            .confirmationHeader(
-                                    "# You have submitted an application")
-                            .confirmationBody(body)
-                            .build());
-            assertThat(response).isNotNull();
-            assertThat(response.getConfirmationBody()).isEqualTo(body);
+            assertThat(response.getConfirmationHeader()).isNull();
+            assertThat(response.getConfirmationBody()).isNull();
         }
 
         @Test
         void shouldReturnExpectedSubmittedCallbackResponse_whengaLips_is_enable() {
             CaseData caseData = getReadyTestCaseData(CaseDataBuilder.builder().ccdCaseReference(CASE_ID).build(), true);
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
-            GeneralApplication genapp = caseData.getGeneralApplications().get(0).getValue();
-            when(feesService.isFreeGa(any())).thenReturn(false);
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
-            String body = format(
-                    confirmationBodyBasedOnToggle(true),
-                    genapp.getGeneralAppPBADetails().getFee().toPounds(),
-                    format("/cases/case-details/%s#Applications", CASE_ID));
-
             var response = (SubmittedCallbackResponse) handler.handle(params);
             assertThat(response).isNotNull();
-            assertThat(response).usingRecursiveComparison().isEqualTo(
-                    SubmittedCallbackResponse.builder()
-                            .confirmationHeader(
-                                    "# You have submitted an application")
-                            .confirmationBody(body)
-                            .build());
-            assertThat(response).isNotNull();
-            assertThat(response.getConfirmationBody()).isEqualTo(body);
+            assertThat(response.getConfirmationHeader()).isNull();
+            assertThat(response.getConfirmationBody()).isNull();
         }
 
         @Test
         void shouldReturnFreeGAConfirmationBodyBody_whenFreeGA() {
             CaseData caseData = getReadyTestCaseData(CaseDataBuilder.builder().ccdCaseReference(CASE_ID).build(), true);
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
-            when(feesService.isFreeGa(any())).thenReturn(true);
 
             var response = (SubmittedCallbackResponse) handler.handle(params);
             assertThat(response).isNotNull();
-            assertThat(response).usingRecursiveComparison().isEqualTo(
-                    SubmittedCallbackResponse.builder()
-                            .confirmationHeader(
-                                    "# You have submitted an application")
-                            .confirmationBody(CONFIRMATION_BODY_FREE)
-                            .build());
-            assertThat(response).isNotNull();
-            assertThat(response.getConfirmationBody()).isEqualTo(CONFIRMATION_BODY_FREE);
+            assertThat(response.getConfirmationHeader()).isNull();
+            assertThat(response.getConfirmationBody()).isNull();
         }
 
         @Test

@@ -1,11 +1,14 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.GaCallbackDataUtil;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
@@ -44,6 +47,7 @@ public class GAJudgeRevisitTaskHandler extends BaseExternalTaskHandler {
     private final CaseDetailsConverter caseDetailsConverter;
     private final GaForLipService gaForLipService;
     private final DocUploadDashboardNotificationService dashboardNotificationService;
+    private final ObjectMapper objectMapper;
 
     private final FeatureToggleService featureToggleService;
 
@@ -96,9 +100,10 @@ public class GAJudgeRevisitTaskHandler extends BaseExternalTaskHandler {
                      + "for caseId: {}", caseId);
         CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
         try {
+            GeneralApplicationCaseData gaCaseData = GaCallbackDataUtil.toGaCaseData(caseData, objectMapper);
             coreCaseDataService.triggerEvent(caseId, CHANGE_STATE_TO_ADDITIONAL_RESPONSE_TIME_EXPIRED);
             // Generate Dashboard Notification for Lip Party
-            if (gaForLipService.isGaForLip(caseData)) {
+            if (gaCaseData != null && gaForLipService.isGaForLip(gaCaseData)) {
                 String userToken = coreCaseDataService.getSystemUpdateUserToken();
                 dashboardNotificationService.createResponseDashboardNotification(caseData, "APPLICANT", userToken);
                 dashboardNotificationService.createResponseDashboardNotification(caseData, "RESPONDENT", userToken);
@@ -140,7 +145,8 @@ public class GAJudgeRevisitTaskHandler extends BaseExternalTaskHandler {
                      + "for caseId: {}", caseId);
         try {
             CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
-            if (gaForLipService.isGaForLip(caseData)) {
+            GeneralApplicationCaseData gaCaseData = GaCallbackDataUtil.toGaCaseData(caseData, objectMapper);
+            if (gaCaseData != null && gaForLipService.isGaForLip(gaCaseData)) {
                 coreCaseDataService.triggerEvent(caseId, UPDATE_CLAIMANT_TASK_LIST_GA);
                 coreCaseDataService.triggerEvent(caseId, UPDATE_RESPONDENT_TASK_LIST_GA);
             }

@@ -1,9 +1,9 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
@@ -19,8 +19,8 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
@@ -52,7 +52,6 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 @ExtendWith(MockitoExtension.class)
 class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCallbackHandlerTest {
 
-    @InjectMocks
     private CaseProceedOfflineDefendantNotificationHandler handler;
     @Mock
     private DashboardScenariosService dashboardScenariosService;
@@ -66,6 +65,18 @@ class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCallbackHan
     private FeatureToggleService toggleService;
     public static final String TASK_ID = "GenerateDefendantDashboardNotificationCaseProceedOffline";
     public static final String GA = "Applications";
+
+    @BeforeEach
+    void setUp() {
+        handler = new CaseProceedOfflineDefendantNotificationHandler(
+            dashboardScenariosService,
+            mapper,
+            toggleService,
+            dashboardNotificationService,
+            taskListService,
+            objectMapper
+        );
+    }
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {

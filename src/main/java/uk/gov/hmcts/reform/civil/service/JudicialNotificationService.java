@@ -1,11 +1,14 @@
 package uk.gov.hmcts.reform.civil.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationDataGA;
 import uk.gov.hmcts.reform.civil.handler.callback.user.JudicialFinalDecisionHandler;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.GaCallbackDataUtil;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -60,13 +63,18 @@ public class JudicialNotificationService implements NotificationDataGA {
 
     private final FeatureToggleService featureToggleService;
     private final NotificationsSignatureConfiguration configuration;
+    private final ObjectMapper objectMapper;
 
     public CaseData sendNotification(CaseData caseData, String solicitorType) throws NotificationException {
         CaseData civilCaseData = caseDetailsConverter
             .toCaseDataGA(coreCaseDataService
                             .getCase(Long.parseLong(caseData.getGeneralAppParentCaseLink().getCaseReference())));
 
-        caseData = solicitorEmailValidation.validateSolicitorEmail(civilCaseData, caseData);
+        GeneralApplicationCaseData gaCaseData = solicitorEmailValidation.validateSolicitorEmail(
+            civilCaseData,
+            toGaCaseData(caseData)
+        );
+        caseData = GaCallbackDataUtil.mergeToCaseData(gaCaseData, caseData, objectMapper);
 
         switch (notificationCriterion(caseData)) {
             case CONCURRENT_WRITTEN_REP:
@@ -101,6 +109,12 @@ public class JudicialNotificationService implements NotificationDataGA {
 
     @Override
     public Map<String, String> addProperties(CaseData caseData, CaseData mainCaseData) {
+        return addProperties(toGaCaseData(caseData), mainCaseData);
+    }
+
+    public Map<String, String> addProperties(GeneralApplicationCaseData caseData, CaseData mainCaseData) {
+        CaseData gaCaseData = GaCallbackDataUtil.mergeToCaseData(caseData, null, objectMapper);
+
         customProps.put(
             GENAPP_REFERENCE,
             String.valueOf(Objects.requireNonNull(caseData.getCcdCaseReference()))
@@ -115,48 +129,42 @@ public class JudicialNotificationService implements NotificationDataGA {
         );
         customProps.put(
             GA_APPLICATION_TYPE,
-            Objects.requireNonNull(requiredGAType(caseData))
+            Objects.requireNonNull(requiredGAType(gaCaseData))
         );
 
         if (gaForLipService.isGaForLip(caseData)) {
             String caseTitle = JudicialFinalDecisionHandler.getAllPartyNames(caseData);
-            customProps.put(
-                CASE_TITLE,
-                Objects.requireNonNull(caseTitle)
-            );
-        }
-        if (gaForLipService.isLipApp(caseData)) {
-            String isLipAppName = caseData.getApplicantPartyName();
-
-            customProps.put(GA_LIP_APPLICANT_NAME, Objects.requireNonNull(isLipAppName));
-            customProps.remove(GA_LIP_RESP_NAME);
-        }
-
-        if (gaForLipService.isLipResp(caseData)
-            && isRespondentNotificationMakeDecisionEvent(caseData)) {
-            String isLipRespondentName =
-                caseData.getParentClaimantIsApplicant() == NO ? caseData.getClaimant1PartyName() :
-                    caseData.getDefendant1PartyName();
-            customProps.put(
-                GA_LIP_RESP_NAME,
-                Objects.requireNonNull(isLipRespondentName)
-            );
-            customProps.remove(GA_LIP_APPLICANT_NAME);
-        }
-
-        if (gaForLipService.isGaForLip(caseData)) {
-            String caseTitle = JudicialFinalDecisionHandler.getAllPartyNames(caseData);
-            customProps.put(
-                CASE_TITLE,
-                Objects.requireNonNull(caseTitle));
+            customProps.put(CASE_TITLE, Objects.requireNonNull(caseTitle));
         } else {
-            customProps.remove(GA_LIP_APPLICANT_NAME);
-            customProps.remove(GA_LIP_RESP_NAME);
             customProps.remove(CASE_TITLE);
         }
+
+        if (gaForLipService.isLipAppGa(caseData)) {
+            String isLipAppName = caseData.getApplicantPartyName();
+            customProps.put(GA_LIP_APPLICANT_NAME, Objects.requireNonNull(isLipAppName));
+            customProps.remove(GA_LIP_RESP_NAME);
+        } else {
+            customProps.remove(GA_LIP_APPLICANT_NAME);
+        }
+
+        if (gaForLipService.isLipRespGa(caseData)
+            && isRespondentNotificationMakeDecisionEvent(gaCaseData)) {
+            String isLipRespondentName =
+                caseData.getParentClaimantIsApplicant() == NO ? caseData.getClaimant1PartyName()
+                    : caseData.getDefendant1PartyName();
+            customProps.put(GA_LIP_RESP_NAME, Objects.requireNonNull(isLipRespondentName));
+            customProps.remove(GA_LIP_APPLICANT_NAME);
+        } else {
+            customProps.remove(GA_LIP_RESP_NAME);
+        }
+
         addAllFooterItems(caseData, mainCaseData, customProps, configuration,
-                           featureToggleService.isPublicQueryManagementEnabled(caseData));
+                           featureToggleService.isPublicQueryManagementEnabledGa(caseData));
         return customProps;
+    }
+
+    private GeneralApplicationCaseData toGaCaseData(CaseData caseData) {
+        return GaCallbackDataUtil.toGaCaseData(caseData, objectMapper);
     }
 
     private void sendNotificationForJudicialDecision(CaseData caseData, CaseData mainCaseData, String recipient, String template)
@@ -202,7 +210,7 @@ public class JudicialNotificationService implements NotificationDataGA {
                 caseData,
                 mainCaseData,
                 caseData.getGeneralAppApplnSolicitor().getEmail(),
-                gaForLipService.isLipApp(caseData) ? getLiPApplicantTemplate(caseData)
+                useGaForLipApplicantTemplate(caseData) ? getLiPApplicantTemplate(caseData)
                     : notificationProperties.getWrittenRepConcurrentRepresentationApplicantEmailTemplate()
             );
         }
@@ -255,7 +263,7 @@ public class JudicialNotificationService implements NotificationDataGA {
                 caseData,
                 mainCaseData,
                 caseData.getGeneralAppApplnSolicitor().getEmail(),
-                gaForLipService.isLipApp(caseData) ? getLiPApplicantTemplate(caseData)
+                useGaForLipApplicantTemplate(caseData) ? getLiPApplicantTemplate(caseData)
                     : notificationProperties.getWrittenRepSequentialRepresentationApplicantEmailTemplate()
             );
         }
@@ -443,7 +451,7 @@ public class JudicialNotificationService implements NotificationDataGA {
                 sendEmailToRespondent(
                     caseData,
                     mainCaseData,
-                    gaForLipService.isLipResp(caseData)
+                    useGaForLipRespondentTemplate(caseData)
                         ? getLiPRespondentTemplate(caseData)
                         : notificationProperties.getJudgeListsForHearingRespondentEmailTemplate()
                 );
@@ -455,7 +463,7 @@ public class JudicialNotificationService implements NotificationDataGA {
                 caseData,
                 mainCaseData,
                 caseData.getGeneralAppApplnSolicitor().getEmail(),
-                gaForLipService.isLipApp(caseData) ? getLiPApplicantTemplate(caseData)
+                useGaForLipApplicantTemplate(caseData) ? getLiPApplicantTemplate(caseData)
                     : notificationProperties.getJudgeListsForHearingApplicantEmailTemplate()
             );
         }
@@ -468,7 +476,7 @@ public class JudicialNotificationService implements NotificationDataGA {
                 sendEmailToRespondent(
                     caseData,
                     mainCaseData,
-                    gaForLipService.isLipResp(caseData)
+                    useGaForLipRespondentTemplate(caseData)
                         ? getLiPRespondentTemplate(caseData)
                         : notificationProperties.getJudgeFreeFormOrderRespondentEmailTemplate()
                 );
@@ -480,7 +488,7 @@ public class JudicialNotificationService implements NotificationDataGA {
                 caseData,
                 mainCaseData,
                 caseData.getGeneralAppApplnSolicitor().getEmail(),
-                gaForLipService.isLipApp(caseData)
+                useGaForLipApplicantTemplate(caseData)
                     ? getLiPApplicantTemplate(caseData)
                     : notificationProperties.getJudgeFreeFormOrderApplicantEmailTemplate()
             );
@@ -666,11 +674,13 @@ public class JudicialNotificationService implements NotificationDataGA {
     }
 
     public boolean useGaForLipRespondentTemplate(CaseData caseData) {
-        return gaForLipService.isLipResp(caseData);
+        GeneralApplicationCaseData gaCaseData = toGaCaseData(caseData);
+        return gaCaseData != null && gaForLipService.isLipRespGa(gaCaseData);
     }
 
     public boolean useGaForLipApplicantTemplate(CaseData caseData) {
-        return gaForLipService.isLipApp(caseData);
+        GeneralApplicationCaseData gaCaseData = toGaCaseData(caseData);
+        return gaCaseData != null && gaForLipService.isLipAppGa(gaCaseData);
     }
 
     private static boolean isRespondentNotificationMakeDecisionEvent(CaseData caseData) {

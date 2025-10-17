@@ -12,6 +12,8 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.welshenhancements.PreTranslationGaDocumentType;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.GaCallbackDataUtil;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -62,10 +64,11 @@ public class RespondToJudgeAddlnInfoHandler extends CallbackHandler {
     private CallbackResponse submitClaim(CallbackParams callbackParams) {
 
         CaseData caseData = caseDetailsConverter.toCaseDataGA(callbackParams.getRequest().getCaseDetails());
+        GeneralApplicationCaseData gaCaseData = GaCallbackDataUtil.toGaCaseData(caseData, objectMapper);
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         String userId = idamClient.getUserInfo(authToken).getUid();
-        String role = DocUploadUtils.getUserRole(caseData, userId);
+        String role = DocUploadUtils.getUserRole(caseData, gaCaseData, userId);
         List<Element<Document>> tobeAdded = caseData.getGeneralAppAddlnInfoUpload();
         if (Objects.isNull(tobeAdded)) {
             tobeAdded = new ArrayList<>();
@@ -105,7 +108,7 @@ public class RespondToJudgeAddlnInfoHandler extends CallbackHandler {
         caseDataBuilder.generalAppAddlnInfoText(null);
 
         // Generate Dashboard Notification for Lip Party
-        if (gaForLipService.isGaForLip(caseData)) {
+        if (gaForLipService.isGaForLip(gaCaseData)) {
             boolean sendDashboardNotificationToOtherParty =
                 !(translationRequired || DocUploadUtils.uploadedDocumentAwaitingTranslation(caseData, role, "Additional information"));
             if (sendDashboardNotificationToOtherParty) {

@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.service.docmosis.finalorder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,20 +14,25 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.documentmanagement.SecuredDocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.OrderOnCourtsList;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseprogression.FreeFormOrderValues;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.FreeFormOrder;
-import uk.gov.hmcts.reform.civil.model.genapplication.GACaseLocation;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
+import uk.gov.hmcts.reform.civil.enums.caseprogression.OrderOnCourtsList;
+import uk.gov.hmcts.reform.civil.model.caseprogression.FreeFormOrderValues;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
+import uk.gov.hmcts.reform.civil.service.ga.GaCaseDataEnricher;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -79,6 +85,30 @@ class FreeFormOrderGeneratorTest {
     private ObjectMapper mapper;
     @MockBean
     private DocmosisService docmosisService;
+    @MockBean
+    private GaCaseDataEnricher gaCaseDataEnricher;
+
+    @BeforeEach
+    void setup() {
+        when(gaCaseDataEnricher.enrich(any(), any())).thenAnswer(invocation -> {
+            CaseData converted = invocation.getArgument(0);
+            GeneralApplicationCaseData gaData = invocation.getArgument(1);
+            FreeFormOrderValues initiativeValues = FreeFormOrderValues.builder()
+                .onInitiativeSelectionTextArea("Initiative text")
+                .onInitiativeSelectionDate(LocalDate.now())
+                .build();
+            FreeFormOrderValues withoutNoticeValues = FreeFormOrderValues.builder()
+                .withoutNoticeSelectionTextArea("Without notice text")
+                .withoutNoticeSelectionDate(LocalDate.now())
+                .build();
+            return converted.toBuilder()
+                .ccdCaseReference(gaData.getCcdCaseReference())
+                .orderOnCourtsList(OrderOnCourtsList.ORDER_ON_COURT_INITIATIVE)
+                .orderOnCourtInitiative(initiativeValues)
+                .orderWithoutNotice(withoutNoticeValues)
+                .build();
+        });
+    }
 
     @Nested
     class GetTemplateDataLip {
@@ -89,7 +119,7 @@ class FreeFormOrderGeneratorTest {
                 .defendant2PartyName(null)
                 .claimant2PartyName(null)
                 .parentClaimantIsApplicant(NO)
-                .gaCaseManagementLocation(GACaseLocation.builder().baseLocation("3").build())
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("3").build())
                 .isMultiParty(NO)
                 .build();
 
@@ -177,6 +207,27 @@ class FreeFormOrderGeneratorTest {
     }
 
     @Test
+    void shouldGenerateFreeFormOrderFromGaCaseData() {
+        when(documentGeneratorService
+                 .generateDocmosisDocument(any(MappableObject.class), eq(DocmosisTemplates.FREE_FORM_ORDER)))
+            .thenReturn(new DocmosisDocument(DocmosisTemplates.FREE_FORM_ORDER.getDocumentTitle(), bytes));
+        when(documentManagementService.uploadDocument(any(String.class), any(PDF.class))).thenReturn(CASE_DOCUMENT);
+        when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
+            .thenReturn(LocationRefData.builder().epimmsId("2").venueName("London").build());
+
+        CaseData caseData = CaseDataBuilder.builder().finalOrderFreeForm().build();
+        GeneralApplicationCaseData gaCaseData = mapper.convertValue(caseData, GeneralApplicationCaseData.class)
+            .toBuilder()
+            .ccdCaseReference(1594901956117591L)
+            .build();
+
+        CaseDocument caseDocument = generator.generate(gaCaseData, BEARER_TOKEN);
+
+        assertThat(caseDocument).isNotNull();
+        verify(documentManagementService).uploadDocument(any(String.class), any(PDF.class));
+    }
+
+    @Test
     void shouldThrowExceptionWhenNoLocationMatch() {
         when(documentGeneratorService
                  .generateDocmosisDocument(
@@ -192,7 +243,7 @@ class FreeFormOrderGeneratorTest {
         CaseData caseData = CaseDataBuilder.builder().hearingScheduledApplication(YES).build()
             .toBuilder()
             .freeFormRecitalText("RecitalText")
-            .gaCaseManagementLocation(GACaseLocation.builder().baseLocation("8").build())
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("8").build())
             .freeFormOrderedText("OrderedText")
             .orderOnCourtsList(OrderOnCourtsList.NOT_APPLICABLE)
             .build();
@@ -211,7 +262,7 @@ class FreeFormOrderGeneratorTest {
                 .onInitiativeSelectionTextArea("test")
                 .onInitiativeSelectionDate(LocalDate.now())
                 .build();
-        CaseData caseData = CaseData.builder().orderOnCourtsList(ORDER_ON_COURT_INITIATIVE)
+        CaseData caseData = gaCaseData().toBuilder().orderOnCourtsList(ORDER_ON_COURT_INITIATIVE)
                 .orderOnCourtInitiative(values).build();
         String orderString = generator.getFreeFormOrderValue(caseData);
         assertThat(orderString).contains("test");
@@ -223,7 +274,7 @@ class FreeFormOrderGeneratorTest {
                 .withoutNoticeSelectionTextArea("test")
                 .withoutNoticeSelectionDate(LocalDate.now())
                 .build();
-        CaseData caseData = CaseData.builder().orderOnCourtsList(ORDER_WITHOUT_NOTICE)
+        CaseData caseData = gaCaseData().toBuilder().orderOnCourtsList(ORDER_WITHOUT_NOTICE)
                 .orderWithoutNotice(values).build();
         String orderString = generator.getFreeFormOrderValue(caseData);
         assertThat(orderString).contains("test");
@@ -283,7 +334,7 @@ class FreeFormOrderGeneratorTest {
             .finalOrderFreeForm().build().toBuilder()
             .defendant2PartyName(null)
             .claimant2PartyName(null)
-            .gaCaseManagementLocation(GACaseLocation.builder().baseLocation("3").build())
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("3").build())
             .isMultiParty(NO)
             .build();
 
@@ -309,5 +360,9 @@ class FreeFormOrderGeneratorTest {
             () -> assertEquals(NO, freeFormOrder.getIsMultiParty())
         );
     }
-}
 
+    private CaseData gaCaseData() {
+        GeneralApplicationCaseData gaCaseData = GeneralApplicationCaseDataBuilder.builder().build();
+        return mapper.convertValue(gaCaseData, CaseData.class);
+    }
+}

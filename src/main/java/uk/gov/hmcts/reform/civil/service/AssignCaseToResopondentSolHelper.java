@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.GASolicitorDetailsGAspec;
 
@@ -25,14 +25,14 @@ public class AssignCaseToResopondentSolHelper {
 
     private static final int FIRST_SOLICITOR = 0;
 
-    public void assignCaseToRespondentSolicitor(CaseData caseData, String caseId) {
+    public void assignCaseToRespondentSolicitor(GeneralApplicationCaseData caseData, String caseId) {
 
         /*
          * Assign case respondent solicitors if judge uncloak the application
          * */
         if (!CollectionUtils.isEmpty(caseData.getGeneralAppRespondentSolicitors())) {
 
-            if (!gaForLipService.isLipResp(caseData)) {
+            if (!gaForLipService.isLipRespGa(caseData)) {
 
                 List<Element<GASolicitorDetailsGAspec>> respondentSolList = caseData.getGeneralAppRespondentSolicitors().stream()
                     .filter(userOrgId -> !(userOrgId.getValue().getOrganisationIdentifier()

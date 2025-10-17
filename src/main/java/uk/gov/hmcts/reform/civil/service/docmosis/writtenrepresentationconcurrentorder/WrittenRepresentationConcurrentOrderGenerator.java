@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.writtenrepresentationconcurrentorder;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -9,6 +11,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.dq.GAByCourtsInitiativeGAspec;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.judgedecisionpdfdocument.JudgeDecisionPdfDocument;
@@ -18,6 +21,7 @@ import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.ListGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
+import uk.gov.hmcts.reform.civil.service.ga.GaCaseDataEnricher;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -38,6 +42,8 @@ public class WrittenRepresentationConcurrentOrderGenerator implements TemplateDa
     private final ListGeneratorService listGeneratorService;
 
     private final DocmosisService docmosisService;
+    private final GaCaseDataEnricher gaCaseDataEnricher;
+    private final ObjectMapper objectMapper;
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
 
@@ -52,6 +58,15 @@ public class WrittenRepresentationConcurrentOrderGenerator implements TemplateDa
         JudgeDecisionPdfDocument templateData = getTemplateData(civilCaseData, caseData, authorisation, userType);
         log.info("Generate written representation concurrent order for caseId: {}", caseData.getCcdCaseReference());
         return generateDocmosisDocument(templateData, authorisation, userType);
+    }
+
+    public CaseDocument generate(GeneralApplicationCaseData gaCaseData, String authorisation) {
+        return generate(asCaseData(gaCaseData), authorisation);
+    }
+
+    public CaseDocument generate(CaseData civilCaseData, GeneralApplicationCaseData gaCaseData,
+                                 String authorisation, FlowFlag userType) {
+        return generate(civilCaseData, asCaseData(gaCaseData), authorisation, userType);
     }
 
     public CaseDocument generateDocmosisDocument(JudgeDecisionPdfDocument templateData, String authorisation, FlowFlag userType) {
@@ -69,14 +84,16 @@ public class WrittenRepresentationConcurrentOrderGenerator implements TemplateDa
         );
     }
 
-    private String getFileName(DocmosisTemplates docmosisTemplate) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        return String.format(docmosisTemplate.getDocumentTitle(), LocalDateTime.now().format(formatter));
+    public JudgeDecisionPdfDocument getTemplateData(CaseData civilCaseData, GeneralApplicationCaseData gaCaseData,
+                                                    String authorisation, FlowFlag userType) {
+        return getTemplateData(civilCaseData, asCaseData(gaCaseData), authorisation, userType);
     }
 
     @Override
     public JudgeDecisionPdfDocument getTemplateData(CaseData civilCaseData, CaseData caseData, String authorisation, FlowFlag userType) {
         String collect = listGeneratorService.applicationType(caseData);
+
+        var caseLocation = caseData.getCaseManagementLocation();
 
         JudgeDecisionPdfDocument.JudgeDecisionPdfDocumentBuilder judgeDecisionPdfDocumentBuilder =
             JudgeDecisionPdfDocument.builder()
@@ -94,9 +111,9 @@ public class WrittenRepresentationConcurrentOrderGenerator implements TemplateDa
                                         .getWrittenConcurrentRepresentationsBy())
                 .submittedOn(LocalDate.now())
                 .courtName(docmosisService.getCaseManagementLocationVenueName(caseData, authorisation).getVenueName())
-                .siteName(caseData.getGaCaseManagementLocation().getSiteName())
-                .address(caseData.getGaCaseManagementLocation().getAddress())
-                .postcode(caseData.getGaCaseManagementLocation().getPostcode())
+                .siteName(caseLocation != null ? caseLocation.getSiteName() : null)
+                .address(caseLocation != null ? caseLocation.getAddress() : null)
+                .postcode(caseLocation != null ? caseLocation.getPostcode() : null)
                 .judicialByCourtsInitiativeForWrittenRep(populateJudicialByCourtsInitiative(caseData));
 
         if (List.of(FlowFlag.POST_JUDGE_ORDER_LIP_APPLICANT, FlowFlag.POST_JUDGE_ORDER_LIP_RESPONDENT).contains(userType)) {
@@ -113,6 +130,11 @@ public class WrittenRepresentationConcurrentOrderGenerator implements TemplateDa
         }
 
         return judgeDecisionPdfDocumentBuilder.build();
+    }
+
+    private String getFileName(DocmosisTemplates docmosisTemplate) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        return String.format(docmosisTemplate.getDocumentTitle(), LocalDateTime.now().format(formatter));
     }
 
     private String populateJudicialByCourtsInitiative(CaseData caseData) {
@@ -139,5 +161,14 @@ public class WrittenRepresentationConcurrentOrderGenerator implements TemplateDa
             return POST_JUDGE_WRITTEN_REPRESENTATION_CONCURRENT_LIP;
         }
         return WRITTEN_REPRESENTATION_CONCURRENT;
+    }
+
+    private CaseData asCaseData(GeneralApplicationCaseData gaCaseData) {
+        if (gaCaseData == null) {
+            return CaseData.builder().build();
+        }
+        ObjectMapper mapperWithJavaTime = objectMapper.copy().registerModule(new JavaTimeModule());
+        CaseData converted = mapperWithJavaTime.convertValue(gaCaseData, CaseData.class);
+        return gaCaseDataEnricher.enrich(converted, gaCaseData);
     }
 }

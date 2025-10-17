@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.service;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
@@ -61,9 +62,10 @@ import static uk.gov.hmcts.reform.civil.enums.dq.GAJudgeRequestMoreInfoOption.SE
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.SET_ASIDE_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
-@SpringBootTest(classes =
-    StateGeneratorService.class
-)
+@SpringBootTest(classes = {
+    StateGeneratorService.class,
+    JacksonAutoConfiguration.class
+})
 public class StateGeneratorServiceTest {
 
     @Autowired
@@ -379,4 +381,3 @@ public class StateGeneratorServiceTest {
         return respondentsResponses;
     }
 }
-

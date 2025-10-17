@@ -1,15 +1,16 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -37,8 +38,17 @@ public class CreateDashboardNotificationUploadTranslatedDocumentApplicantHandler
     private DashboardNotificationsParamsMapper mapper;
     @Mock
     private FeatureToggleService featureToggleService;
-    @InjectMocks
     private CreateDashboardNotificationUploadTranslatedDocumentApplicantHandler handler;
+
+    @BeforeEach
+    void setUp() {
+        handler = new CreateDashboardNotificationUploadTranslatedDocumentApplicantHandler(
+            dashboardScenariosService,
+            mapper,
+            featureToggleService,
+            objectMapper
+        );
+    }
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
@@ -72,6 +82,28 @@ public class CreateDashboardNotificationUploadTranslatedDocumentApplicantHandler
                     "BEARER_TOKEN",
                 SCENARIO_AAA6_GENERAL_APPS_TRANSLATED_DOCUMENT_UPLOADED_APPLICANT.getScenario(),
                     caseData.getCcdCaseReference().toString(),
+                ScenarioRequestParams.builder().params(scenarioParams).build()
+            );
+        }
+
+        @Test
+        void shouldRecordScenarioWhenOnlyGaCaseDataProvided() {
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
+            caseData = caseData.toBuilder().parentCaseReference(caseData.getCcdCaseReference().toString())
+                .isGaApplicantLip(YesOrNo.YES)
+                .build();
+            GeneralApplicationCaseData gaCaseData = toGaCaseData(caseData);
+            HashMap<String, Object> scenarioParams = new HashMap<>();
+            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
+
+            CallbackParams params = gaCallbackParamsOf(gaCaseData, ABOUT_TO_SUBMIT);
+            handler.handle(params);
+
+            verify(dashboardScenariosService).recordScenarios(
+                "BEARER_TOKEN",
+                SCENARIO_AAA6_GENERAL_APPS_TRANSLATED_DOCUMENT_UPLOADED_APPLICANT.getScenario(),
+                gaCaseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }

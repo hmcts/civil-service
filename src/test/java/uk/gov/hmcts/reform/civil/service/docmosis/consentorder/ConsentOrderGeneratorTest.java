@@ -1,5 +1,8 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.consentorder;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.LocalDate;
+import java.util.function.Consumer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,6 +14,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.documentmanagement.SecuredDocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
@@ -19,10 +23,10 @@ import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.genapplication.GACaseLocation;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
-
-import java.time.LocalDate;
+import uk.gov.hmcts.reform.civil.service.ga.GaCaseDataEnricher;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -43,13 +47,17 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.CONSE
 @ContextConfiguration(classes = {
     JacksonAutoConfiguration.class,
     CaseDetailsConverter.class,
-    ConsentOrderGenerator.class
+    ConsentOrderGenerator.class,
+    GaCaseDataEnricher.class
 })
 
 class ConsentOrderGeneratorTest {
 
     private static final String BEARER_TOKEN = "Bearer Token";
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
+    private final GaCaseDataEnricher gaCaseDataEnricher = new GaCaseDataEnricher();
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @MockBean
     private SecuredDocumentManagementService documentManagementService;
@@ -62,11 +70,13 @@ class ConsentOrderGeneratorTest {
 
     @Test
     void shouldThrowExceptionWhenNoLocationMatch() {
-        CaseData caseData = CaseDataBuilder.builder().consentOrderApplication()
-            .gaCaseManagementLocation(GACaseLocation.builder()
-                                        .siteName("County Court")
-                                        .baseLocation("8")
-                                        .region("4").build()).build();
+        CaseData caseData = consentOrderGaCaseData(builder -> builder.withGaCaseManagementLocation(
+            GACaseLocation.builder()
+                .siteName("County Court")
+                .baseLocation("8")
+                .region("4")
+                .build()
+        ));
 
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(CONSENT_ORDER_FORM)))
             .thenReturn(new DocmosisDocument(CONSENT_ORDER_FORM.getDocumentTitle(), bytes));
@@ -74,7 +84,7 @@ class ConsentOrderGeneratorTest {
             .when(docmosisService).getCaseManagementLocationVenueName(any(), any());
         Exception exception =
             assertThrows(IllegalArgumentException.class, ()
-                -> consentOrderGenerator.generate(caseData, BEARER_TOKEN));
+                -> consentOrderGenerator.generate(toGaCaseData(caseData), BEARER_TOKEN));
         String expectedMessage = "Court Name is not found in location data";
         String actualMessage = exception.getMessage();
         assertTrue(actualMessage.contains(expectedMessage));
@@ -82,13 +92,13 @@ class ConsentOrderGeneratorTest {
 
     @Test
     void shouldGenerateConsentOrderDocument() {
-        CaseData caseData = CaseDataBuilder.builder().consentOrderApplication().build();
+        CaseData caseData = consentOrderGaCaseData();
 
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(CONSENT_ORDER_FORM)))
             .thenReturn(new DocmosisDocument(CONSENT_ORDER_FORM.getDocumentTitle(), bytes));
         when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
             .thenReturn(LocationRefData.builder().epimmsId("2").externalShortName("London").build());
-        consentOrderGenerator.generate(caseData, BEARER_TOKEN);
+        consentOrderGenerator.generate(toGaCaseData(caseData), BEARER_TOKEN);
 
         verify(documentManagementService).uploadDocument(
             BEARER_TOKEN,
@@ -100,11 +110,11 @@ class ConsentOrderGeneratorTest {
 
     @Test
     void whenCaseWorkerMakeDecision_ShouldGetConsentOrderData() {
-        CaseData caseData = CaseDataBuilder.builder().consentOrderApplication().build().toBuilder().isMultiParty(YES)
+        CaseData caseData = consentOrderGaCaseData().toBuilder().isMultiParty(YES)
             .build();
         when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
             .thenReturn(LocationRefData.builder().epimmsId("2").externalShortName("London").build());
-        var templateData = consentOrderGenerator.getTemplateData(caseData, "auth");
+        var templateData = consentOrderGenerator.getTemplateData(toGaCaseData(caseData), "auth");
         assertThatFieldsAreCorrect_GeneralOrder(templateData, caseData);
     }
 
@@ -125,15 +135,16 @@ class ConsentOrderGeneratorTest {
 
     @Test
     void whenCaseWorkerMakeDecision_ShouldGetConsentOrderData_1v1() {
-        CaseData caseData = CaseDataBuilder.builder().consentOrderApplication().build().toBuilder()
+        CaseData caseData = consentOrderGaCaseData(builder -> builder.withGaCaseManagementLocation(
+            GACaseLocation.builder().baseLocation("3").build()
+        )).toBuilder()
             .defendant2PartyName(null)
             .claimant2PartyName(null)
-            .gaCaseManagementLocation(GACaseLocation.builder().baseLocation("3").build())
             .isMultiParty(NO)
             .build();
         when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
             .thenReturn(LocationRefData.builder().epimmsId("2").externalShortName("Manchester").build());
-        var templateData = consentOrderGenerator.getTemplateData(caseData, "auth");
+        var templateData = consentOrderGenerator.getTemplateData(toGaCaseData(caseData), "auth");
         assertThatFieldsAreCorrect_GeneralOrder_1v1(templateData, caseData);
     }
 
@@ -149,8 +160,8 @@ class ConsentOrderGeneratorTest {
             () -> assertEquals(templateData.getCourtName(), "Manchester"),
             () -> assertEquals(templateData.getConsentOrder(),
                                caseData.getApproveConsentOrder().getConsentOrderDescription()),
-            () -> assertEquals(templateData.getAddress(), caseData.getGaCaseManagementLocation().getAddress()),
-            () -> assertEquals(templateData.getPostcode(), caseData.getGaCaseManagementLocation().getPostcode())
+            () -> assertEquals(templateData.getAddress(), caseData.getCaseManagementLocation().getAddress()),
+            () -> assertEquals(templateData.getPostcode(), caseData.getCaseManagementLocation().getPostcode())
         );
     }
 
@@ -160,4 +171,25 @@ class ConsentOrderGeneratorTest {
         assertThat(dateString).isEqualTo(" 1 January 1970");
     }
 
+    private CaseData consentOrderGaCaseData() {
+        return consentOrderGaCaseData(builder -> builder.withGaCaseManagementLocation(
+            GACaseLocation.builder()
+                .siteName("County Court")
+                .baseLocation("2")
+                .region("4")
+                .build()
+        ));
+    }
+
+    private CaseData consentOrderGaCaseData(Consumer<GeneralApplicationCaseDataBuilder> customiser) {
+        CaseData base = CaseDataBuilder.builder().consentOrderApplication().build();
+        GeneralApplicationCaseDataBuilder builder = GeneralApplicationCaseDataBuilder.builder();
+        customiser.accept(builder);
+        GeneralApplicationCaseData gaCaseData = builder.build();
+        return gaCaseDataEnricher.enrich(base, gaCaseData);
+    }
+
+    private GeneralApplicationCaseData toGaCaseData(CaseData caseData) {
+        return objectMapper.convertValue(caseData, GeneralApplicationCaseData.class);
+    }
 }
