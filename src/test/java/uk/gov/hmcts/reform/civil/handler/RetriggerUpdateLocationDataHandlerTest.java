@@ -17,12 +17,9 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class RetriggerUpdateLocationDataHandlerTest {
 
-    private static final String EVENT_DESCRIPTION = "Process ID: 1";
-
     @Mock
     private CoreCaseDataService coreCaseDataService;
     private RetriggerUpdateLocationDataHandler handler;
-    private static final String YES = "Yes";
 
     @BeforeEach
     void setUp() {
@@ -33,39 +30,26 @@ class RetriggerUpdateLocationDataHandlerTest {
     void testHandleTask_RetriggerUpdateCaseData() {
         ExternalTask externalTask = mock(ExternalTask.class);
         when(externalTask.getVariable("caseIds")).thenReturn("1,2");
-        when(externalTask.getVariable("region")).thenReturn("2");
+        when(externalTask.getVariable("reason")).thenReturn("court closed as a cml");
         when(externalTask.getVariable("ePimId")).thenReturn("123456");
-        when(externalTask.getVariable("caseManagementLocation")).thenReturn(YES);
-        when(externalTask.getVariable("courtLocation")).thenReturn(YES);
-        when(externalTask.getVariable("applicant1DQRequestedCourt")).thenReturn(YES);
-        when(externalTask.getVariable("respondent1DQRequestedCourt")).thenReturn(YES);
-        when(externalTask.getProcessInstanceId()).thenReturn("1");
 
         handler.handleTask(externalTask);
 
-        verify(coreCaseDataService).triggerUpdateLocationEpimdsIdEvent(
+        verify(coreCaseDataService).triggerUpdateCaseMgmtLocation(
             1L,
-            CaseEvent.UPDATE_CASE_DATA,
+            CaseEvent.TRANSFER_ONLINE_CASE,
             "123456",
-            "2",
-            YES,
-            YES,
-            YES,
-            YES,
-            "Update locations epimId by 123456",
-            EVENT_DESCRIPTION
+            "court closed as a cml",
+            "Updated case management location with epimId 123456",
+            "Updated case management location with epimId 123456"
         );
-        verify(coreCaseDataService).triggerUpdateLocationEpimdsIdEvent(
+        verify(coreCaseDataService).triggerUpdateCaseMgmtLocation(
             2L,
-            CaseEvent.UPDATE_CASE_DATA,
+            CaseEvent.TRANSFER_ONLINE_CASE,
             "123456",
-            "2",
-            YES,
-            YES,
-            YES,
-            YES,
-            "Update locations epimId by 123456",
-            EVENT_DESCRIPTION
+            "court closed as a cml",
+            "Updated case management location with epimId 123456",
+            "Updated case management location with epimId 123456"
         );
     }
 
