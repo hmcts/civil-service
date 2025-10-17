@@ -101,35 +101,29 @@ public class PartialAdmitSetDateConfirmationText implements RespondToClaimConfir
         }
         final String P_TAG = ".</p>";
         sb.append("<p>Because you've said you will not pay immediately, ")
-            .append(applicantName)
-            .append(" can request a county court judgment against you for &#163;")
-            .append(admitOwed)
-            .append(featureToggleService.isLrAdmissionBulkEnabled()
-                        ? " plus the claim fee and any fixed costs claimed"
-                        : "")
-            .append(P_TAG)
-
-            .append(headingThreeText)
-            .append(applicantName)
-            .append(" disagrees that you only owe &#163;")
-            .append(admitOwed)
-            .append("</h3>");
+                .append(applicantName)
+                .append(" can request a county court judgment against you for &#163;")
+                .append(admitOwed)
+                .append(" plus the claim fee and any fixed costs claimed")
+                .append(P_TAG)
+                .append(headingThreeText)
+                .append(applicantName)
+                .append(" disagrees that you only owe &#163;")
+                .append(admitOwed)
+                .append("</h3>");
         if (caseData.hasDefendantAgreedToFreeMediation()) {
             sb.append("<p>We'll ask if they want to try mediation. ")
-              .append("If they agree we'll contact you to arrange a call with the mediator.</p>")
-              .append("<p>If they do not want to try mediation the court will review the case for the full amount of &#163;")
-                .append(totalClaimAmount)
-                .append(featureToggleService.isLrAdmissionBulkEnabled()
-                            ? " plus the claim fee and any costs and further interest claimed"
-                            : "")
-                .append(P_TAG);
+                    .append("If they agree we'll contact you to arrange a call with the mediator.</p>")
+                    .append(
+                            "<p>If they do not want to try mediation the court will review the case for the full amount of &#163;")
+                    .append(totalClaimAmount)
+                    .append(" plus the claim fee and any costs and further interest claimed")
+                    .append(P_TAG);
         } else {
             sb.append("<p>The court will review the case for the full amount of &#163;")
-              .append(totalClaimAmount)
-              .append(featureToggleService.isLrAdmissionBulkEnabled()
-                            ? " plus the claim fee and any costs and further interest claimed"
-                            : "")
-                  .append(P_TAG);
+                    .append(totalClaimAmount)
+                    .append(" plus the claim fee and any costs and further interest claimed")
+                    .append(P_TAG);
         }
         sb.append(headingThreeText)
             .append(applicantName)

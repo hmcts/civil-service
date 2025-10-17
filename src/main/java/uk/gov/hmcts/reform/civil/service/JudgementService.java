@@ -122,12 +122,12 @@ public class JudgementService {
     }
 
     private String ccjJudgmentStatement(CaseData caseData) {
-        if (caseData.isLRvLipOneVOne()
-            && featureToggleService.isPinInPostEnabled()) {
-            boolean hasPaymentOption = caseData.isPayImmediately() || caseData.isPayByInstallment() || caseData.isPayBySetDate();
-            if (featureToggleService.isLrAdmissionBulkEnabled()
-                && hasPaymentOption) {
-                return String.format(JUDGEMENT_ORDER_V2, ccjJudgementSubTotal(caseData).toString());
+        if (caseData.isLRvLipOneVOne() && featureToggleService.isPinInPostEnabled()) {
+            boolean hasPaymentOption =
+                    caseData.isPayImmediately() || caseData.isPayByInstallment() || caseData.isPayBySetDate();
+            if (hasPaymentOption) {
+                return String.format(
+                        JUDGEMENT_ORDER_V2, ccjJudgementSubTotal(caseData).toString());
             }
             if (featureToggleService.isJudgmentOnlineLive()
                 && hasPaymentOption) {
@@ -142,9 +142,7 @@ public class JudgementService {
     }
 
     public boolean isLRAdmissionRepaymentPlan(CaseData caseData) {
-        return featureToggleService.isLrAdmissionBulkEnabled()
-            && !caseData.isApplicantLiP()
-            && (caseData.isPayBySetDate() || caseData.isPayByInstallment());
+        return !caseData.isApplicantLiP() && (caseData.isPayBySetDate() || caseData.isPayByInstallment());
     }
 
     public boolean isLrFullAdmitRepaymentPlan(CaseData caseData) {
@@ -158,9 +156,7 @@ public class JudgementService {
     }
 
     public boolean isLrvLrOneVOneBulkAdmissionsEnabled(CaseData caseData) {
-        return featureToggleService.isLrAdmissionBulkEnabled()
-            && !caseData.isApplicantLiP()
-            && isOneVOne(caseData);
+        return !caseData.isApplicantLiP() && isOneVOne(caseData);
     }
 
     public boolean isLipvLip(CaseData caseData) {
