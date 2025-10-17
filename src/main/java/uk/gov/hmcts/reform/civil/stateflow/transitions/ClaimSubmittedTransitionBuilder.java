@@ -47,9 +47,6 @@ public class ClaimSubmittedTransitionBuilder extends MidTransitionBuilder {
             )
             .set(
                 (c, flags) -> {
-                    if (featureToggleService.isPinInPostEnabled()) {
-                        flags.put(FlowFlag.PIP_ENABLED.name(), true);
-                    }
                     if (claimIssueBilingual.test(c)) {
                         flags.put(FlowFlag.CLAIM_ISSUE_BILINGUAL.name(), true);
                     }

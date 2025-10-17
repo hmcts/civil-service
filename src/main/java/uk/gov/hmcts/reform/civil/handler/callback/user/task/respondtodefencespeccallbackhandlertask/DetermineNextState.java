@@ -87,7 +87,6 @@ public class DetermineNextState extends CallbackHandler {
         log.info("Determining next state (post translation) for Case: {}", caseData.getCcdCaseReference());
 
         if (V_2.equals(callbackParams.getVersion())
-            && featureToggleService.isPinInPostEnabled()
             && isOneVOne(caseData)) {
             log.debug("Pin in Post enabled for Case: {}", caseData.getCcdCaseReference());
             if (caseData.hasClaimantAgreedToFreeMediation()) {
@@ -131,7 +130,6 @@ public class DetermineNextState extends CallbackHandler {
 
         log.info("Determining next state for Case : {}", caseData.getCcdCaseReference());
         if (V_2.equals(callbackParams.getVersion())
-            && featureToggleService.isPinInPostEnabled()
             && isOneVOne(caseData)) {
 
             log.debug("Pin in Post enabled for Case : {}", caseData.getCcdCaseReference());
