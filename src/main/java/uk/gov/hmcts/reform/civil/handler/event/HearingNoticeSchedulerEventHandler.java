@@ -7,9 +7,12 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.event.HearingNoticeSchedulerTaskEvent;
 import uk.gov.hmcts.reform.civil.handler.tasks.variables.HearingNoticeMessageVars;
+import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.data.UserAuthContent;
 import uk.gov.hmcts.reform.civil.utils.HmcDataUtils;
@@ -20,22 +23,41 @@ import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedResponse;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedServiceData;
 import uk.gov.hmcts.reform.hmc.service.HearingsService;
 
+import java.util.Arrays;
+
+import static uk.gov.hmcts.reform.civil.enums.CaseState.All_FINAL_ORDERS_ISSUED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISCONTINUED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISMISSED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_SETTLED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_STAYED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CLOSED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class HearingNoticeSchedulerEventHandler {
 
-    private static int maxRetries = 3;
-    private static String hearingNoticeMessage = "NOTIFY_HEARING_PARTIES";
     private final UserService userService;
     private final SystemUpdateUserConfiguration userConfig;
     private final HearingsService hearingsService;
     private final RuntimeService runtimeService;
     private final ObjectMapper mapper;
+    private final CoreCaseDataService coreCaseDataService;
+    static final CaseState[] DISALLOWED_CASE_STATES = {
+        CASE_SETTLED,
+        PROCEEDS_IN_HERITAGE_SYSTEM,
+        CASE_STAYED,
+        CASE_DISCONTINUED,
+        CASE_DISMISSED,
+        CLOSED,
+        All_FINAL_ORDERS_ISSUED
+    };
 
     @Async("asyncHandlerExecutor")
     @EventListener
     public void handle(HearingNoticeSchedulerTaskEvent event) {
+        int maxRetries = 3;
         for (int i = 0; i < maxRetries; i++) {
             String hearingId = event.getHearingId();
             try {
@@ -54,12 +76,18 @@ public class HearingNoticeSchedulerEventHandler {
 
         if (hearingStatus.equals(ListAssistCaseStatus.LISTED)) {
             PartiesNotifiedResponse partiesNotified = getLatestPartiesNotifiedResponse(hearingId);
-            if (HmcDataUtils.hearingDataChanged(partiesNotified, hearing)) {
+            String caseReference = hearing.getCaseDetails().getCaseRef();
+            CaseDetails caseDetails = coreCaseDataService.getCase(Long.parseLong(caseReference));
+
+            boolean stateNotAllowedToGenerateHearingNotice = isNotAllowedState(caseDetails.getState(), caseReference);
+
+            if (!stateNotAllowedToGenerateHearingNotice
+                && HmcDataUtils.hearingDataChanged(partiesNotified, hearing)) {
                 log.info("Dispatching hearing notice task for hearing [{}].",
                         hearingId);
                 triggerHearingNoticeEvent(HearingNoticeMessageVars.builder()
                         .hearingId(hearingId)
-                        .caseId(hearing.getCaseDetails().getCaseRef())
+                        .caseId(caseReference)
                         .triggeredViaScheduler(true)
                         .build());
 
@@ -71,7 +99,18 @@ public class HearingNoticeSchedulerEventHandler {
         }
     }
 
+    private static boolean isNotAllowedState(String state, String caseReferene) {
+        try {
+            CaseState caseState = CaseState.valueOf(state);
+            return Arrays.asList(DISALLOWED_CASE_STATES).contains(caseState);
+        } catch (IllegalArgumentException e) {
+            log.info("Case state is not a valid one {} ", caseReferene);
+            return true;
+        }
+    }
+
     private void triggerHearingNoticeEvent(HearingNoticeMessageVars messageVars) {
+        String hearingNoticeMessage = "NOTIFY_HEARING_PARTIES";
         runtimeService
             .createMessageCorrelation(hearingNoticeMessage)
             .setVariables(messageVars.toMap(mapper))
@@ -102,5 +141,4 @@ public class HearingNoticeSchedulerEventHandler {
             getSystemUpdateUser().getUserToken(), hearingId);
         return HmcDataUtils.getLatestHearingNoticeDetails(partiesNotified);
     }
-
 }
