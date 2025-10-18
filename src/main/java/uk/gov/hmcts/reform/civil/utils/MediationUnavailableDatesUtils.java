@@ -29,8 +29,6 @@ public class MediationUnavailableDatesUtils {
         } else {
             for (Element<UnavailableDate> dateRange : datesUnavailableList) {
                 var unavailableDateType = dateRange.getValue().getUnavailableDateType();
-                LocalDate dateFrom = dateRange.getValue().getFromDate();
-                LocalDate dateTo = dateRange.getValue().getToDate();
                 if (unavailableDateType.equals(UnavailableDateType.SINGLE_DATE)) {
                     if (dateRange.getValue().getDate().isBefore(LocalDate.now())) {
                         errors.add(INVALID_UNAVAILABLE_DATE_BEFORE_TODAY);
@@ -38,6 +36,8 @@ public class MediationUnavailableDatesUtils {
                         errors.add(INVALID_UNAVAILABLE_DATE_WHEN_MORE_THAN_3_MONTHS);
                     }
                 } else if (unavailableDateType.equals(UnavailableDateType.DATE_RANGE)) {
+                    LocalDate dateFrom = dateRange.getValue().getFromDate();
+                    LocalDate dateTo = dateRange.getValue().getToDate();
                     if (dateTo != null && dateTo.isBefore(dateFrom)) {
                         errors.add(INVALID_UNAVAILABILITY_RANGE);
                     } else if (dateFrom != null && dateFrom.isBefore(LocalDate.now())) {
@@ -50,4 +50,23 @@ public class MediationUnavailableDatesUtils {
         }
     }
 
+    public static void normalizeUnavailableDates(List<Element<UnavailableDate>> datesUnavailableList) {
+        if (isEmpty(datesUnavailableList)) {
+            return;
+        }
+
+        for (Element<UnavailableDate> element : datesUnavailableList) {
+            UnavailableDate value = element.getValue();
+            if (value == null || value.getUnavailableDateType() == null) {
+                continue;
+            }
+
+            if (UnavailableDateType.SINGLE_DATE.equals(value.getUnavailableDateType())) {
+                value.setFromDate(null);
+                value.setToDate(null);
+            } else if (UnavailableDateType.DATE_RANGE.equals(value.getUnavailableDateType())) {
+                value.setDate(null);
+            }
+        }
+    }
 }

@@ -3399,7 +3399,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             // Then
             assertThat(response).isNotNull();
-            assertThat(response.getErrors()).isEmpty();
+            assertThat(response.getErrors()).isNull();
         }
 
         @Test
@@ -3433,7 +3433,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .handle(params);
 
             assertThat(response).isNotNull();
-            assertThat(response.getErrors()).isEmpty();
+            assertThat(response.getErrors()).isNull();
         }
 
         @Test
@@ -3454,7 +3454,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             // Then
             assertThat(response).isNotNull();
-            assertThat(response.getErrors()).isEmpty();
+            assertThat(response.getErrors()).isNull();
         }
 
         @Test
@@ -3488,7 +3488,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .handle(params);
 
             assertThat(response).isNotNull();
-            assertThat(response.getErrors()).isEmpty();
+            assertThat(response.getErrors()).isNull();
         }
 
         @Test
