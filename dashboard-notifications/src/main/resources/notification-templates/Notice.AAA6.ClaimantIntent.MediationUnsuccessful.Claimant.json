@@ -1,0 +1,8 @@
+{
+  "name": "Notice.AAA6.ClaimantIntent.MediationUnsuccessful.Claimant",
+  "role": "CLAIMANT",
+  "titleEn": "Mediation was unsuccessful",
+  "titleCy": "Nid oedd y cyfryngu yn llwyddiannus",
+  "descriptionEn": "<p class=\"govuk-body\">You weren't able to resolve your claim against ${respondent1PartyName} using mediation. The court will review the case. We'll contact you to tell you what to do next.</p>",
+  "descriptionCy": "<p class=\"govuk-body\">Nid oeddech yn gallu datrys eich hawliad yn erbyn ${respondent1PartyName} drwy gyfryngu. Bydd y llys yn adolygu’r achos. Byddwn yn cysylltu â chi i ddweud wrthych beth i’w wneud nesaf.</p>"
+}

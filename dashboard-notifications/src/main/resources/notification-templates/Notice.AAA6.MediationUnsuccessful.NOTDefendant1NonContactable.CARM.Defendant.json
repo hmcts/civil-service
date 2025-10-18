@@ -1,0 +1,8 @@
+{
+  "name": "Notice.AAA6.MediationUnsuccessful.NOTDefendant1NonContactable.CARM.Defendant",
+  "role": "DEFENDANT",
+  "titleEn": "Mediation appointment unsuccessful",
+  "titleCy": "Roedd eich apwyntiad cyfryngu yn aflwyddiannus",
+  "descriptionEn": "<p class=\"govuk-body\">You were not able to resolve this claim using mediation.</p> <p class=\"govuk-body\">This case will now be reviewed by the court.</p>",
+  "descriptionCy": "<p class=\"govuk-body\">Nid oeddech yn gallu datrys yr hawliad hwn drwy ddefnyddio cyfryngu.</p> <p class=\"govuk-body\">Bydd yr achos hwn nawr yn cael ei adolygu gan y llys.</p>"
+}

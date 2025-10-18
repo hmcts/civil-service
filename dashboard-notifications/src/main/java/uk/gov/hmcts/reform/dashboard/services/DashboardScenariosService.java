@@ -6,13 +6,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.entities.DashboardNotificationsEntity;
-import uk.gov.hmcts.reform.dashboard.entities.NotificationTemplateEntity;
 import uk.gov.hmcts.reform.dashboard.entities.ScenarioEntity;
 import uk.gov.hmcts.reform.dashboard.entities.TaskItemTemplateEntity;
 import uk.gov.hmcts.reform.dashboard.entities.TaskListEntity;
-import uk.gov.hmcts.reform.dashboard.repositories.NotificationTemplateRepository;
 import uk.gov.hmcts.reform.dashboard.repositories.ScenarioRepository;
 import uk.gov.hmcts.reform.dashboard.repositories.TaskItemTemplateRepository;
+import uk.gov.hmcts.reform.dashboard.templates.NotificationTemplateCatalog;
+import uk.gov.hmcts.reform.dashboard.templates.NotificationTemplateDefinition;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
@@ -30,18 +30,18 @@ import java.util.stream.Collectors;
 public class DashboardScenariosService {
 
     private final ScenarioRepository scenarioRepository;
-    private final NotificationTemplateRepository notificationTemplateRepository;
+    private final NotificationTemplateCatalog notificationTemplateCatalog;
     private final DashboardNotificationService dashboardNotificationService;
     private final TaskListService taskListService;
     private final TaskItemTemplateRepository taskItemTemplateRepository;
 
     public DashboardScenariosService(ScenarioRepository scenarioRepository,
-                                     NotificationTemplateRepository notificationTemplateRepository,
+                                     NotificationTemplateCatalog notificationTemplateCatalog,
                                      DashboardNotificationService dashboardNotificationService,
                                      TaskListService taskListService,
                                      TaskItemTemplateRepository taskItemTemplateRepository) {
         this.scenarioRepository = scenarioRepository;
-        this.notificationTemplateRepository = notificationTemplateRepository;
+        this.notificationTemplateCatalog = notificationTemplateCatalog;
         this.dashboardNotificationService = dashboardNotificationService;
         this.taskListService = taskListService;
         this.taskItemTemplateRepository = taskItemTemplateRepository;
@@ -70,8 +70,15 @@ public class DashboardScenariosService {
 
         scenario.getNotificationsToCreate().forEach((templateName, requestParamsKeys) -> {
 
-            Optional<NotificationTemplateEntity> notificationTemplate = notificationTemplateRepository
-                .findByName(templateName);
+            Optional<NotificationTemplateDefinition> notificationTemplate = notificationTemplateCatalog
+                .findByName(templateName)
+                .filter(template -> {
+                    if (template.isMarkedForDeletion()) {
+                        log.info("Skipping notification template {} because it is marked for deletion", templateName);
+                        return false;
+                    }
+                    return true;
+                });
 
             // build notification eng and wales
             //Supported templates "The ${animal} jumped over the ${target}."
@@ -105,7 +112,6 @@ public class DashboardScenariosService {
                     .reference(uniqueCaseIdentifier)
                     .name(template.getName())
                     .citizenRole(template.getRole())
-                    .dashboardNotificationsTemplates(template)
                     .titleCy(stringSubstitutor.replace(template.getTitleCy()))
                     .titleEn(stringSubstitutor.replace(template.getTitleEn()))
                     .descriptionCy(stringSubstitutor.replace(template.getDescriptionCy()))
@@ -113,6 +119,7 @@ public class DashboardScenariosService {
                     .createdAt(OffsetDateTime.now())
                     .updatedOn(OffsetDateTime.now())
                     .params(scenarioRequestParams.getParams())
+                    .timeToLive(template.getTimeToLive())
                     .deadline(notificationDeadline)
                     .build();
 
@@ -171,17 +178,24 @@ public class DashboardScenariosService {
     private void deleteNotificationForScenario(ScenarioEntity scenario, String uniqueCaseIdentifier) {
         Arrays.asList(scenario.getNotificationsToDelete()).forEach(templateName -> {
 
-            Optional<NotificationTemplateEntity> templateToRemove = notificationTemplateRepository
-                .findByName(templateName);
+            Optional<NotificationTemplateDefinition> templateToRemove = notificationTemplateCatalog.findByName(templateName);
 
-            templateToRemove.ifPresent(template -> {
+            if (templateToRemove.isPresent()) {
+                NotificationTemplateDefinition template = templateToRemove.get();
                 int noOfRowsRemoved = dashboardNotificationService.deleteByNameAndReferenceAndCitizenRole(
                     template.getName(),
                     uniqueCaseIdentifier,
                     template.getRole()
                 );
                 log.info("{} notifications removed for the template = {}", noOfRowsRemoved, templateName);
-            });
+            } else {
+                int removed = dashboardNotificationService.deleteByNameAndReference(templateName, uniqueCaseIdentifier);
+                log.info(
+                    "{} notifications removed for the template = {} without role information",
+                    removed,
+                    templateName
+                );
+            }
         });
     }
 }

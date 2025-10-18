@@ -1,0 +1,9 @@
+{
+  "name": "Notice.AAA6.DefResponse.MoreTimeRequested.Defendant",
+  "role": "DEFENDANT",
+  "titleEn": "More time requested",
+  "titleCy": "Cais am fwy o amser",
+  "descriptionEn": "<p class=\"govuk-body\">The response deadline is now ${defaultRespondTime} on ${respondent1ResponseDeadlineEn}. There are {daysLeftToRespond} days remaining for you<a href=\"{RESPONSE_TASK_LIST_URL}\" rel=\"noopener noreferrer\" class=\"govuk-link\"> respond to the claim</a>.</p>",
+  "descriptionCy": "<p class=\"govuk-body\">Y terfyn amser nawr yw ${defaultRespondTime} ar ${respondent1ResponseDeadlineCy}. Mae yna {daysLeftToRespond} diwrnod yn weddill i chi<a href=\"{RESPONSE_TASK_LIST_URL}\" rel=\"noopener noreferrer\" class=\"govuk-link\"> ymateb i’r hawliad</a>.</p>",
+  "deadlineParam": "respondent1ResponseDeadline"
+}

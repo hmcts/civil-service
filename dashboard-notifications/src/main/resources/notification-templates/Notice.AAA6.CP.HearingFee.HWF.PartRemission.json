@@ -1,0 +1,9 @@
+{
+  "name": "Notice.AAA6.CP.HearingFee.HWF.PartRemission",
+  "role": "CLAIMANT",
+  "titleEn": "Your help with fees application has been reviewed",
+  "titleCy": "Mae eich cais am help i dalu ffioedd wedi cael ei adolygu",
+  "descriptionEn": "<p class=\"govuk-body\">You'll get help with the hearing fee. ${hearingFeeRemissionAmount} will be covered by fee remission. You must still pay the remaining fee of ${hearingFeeOutStandingAmount} by ${hearingDueDateEn}. You can pay by phone by calling {civilMoneyClaimsTelephone}. If you do not pay, your claim will be struck out.</p>",
+  "descriptionCy": "<p class=\"govuk-body\">Byddwch yn cael help gyda ffi'r gwrandawiad. Bydd ${hearingFeeRemissionAmount} yn cael ei gyflenwi gan ddileu ffi. Rhaid i chi dal dalu'r ffi sy'n weddill o ${hearingFeeOutStandingAmount} erbyn ${hearingDueDateCy}. Gallwch dalu dros y ffôn drwy ffonio {civilMoneyClaimsTelephone}. Os na fyddwch yn talu, bydd eich hawliad yn cael ei ddileu.</p>",
+  "deadlineParam": "hearingDueDate"
+}

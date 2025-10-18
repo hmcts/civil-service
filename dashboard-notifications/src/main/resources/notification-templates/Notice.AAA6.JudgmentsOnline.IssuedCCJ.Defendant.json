@@ -1,0 +1,8 @@
+{
+  "name": "Notice.AAA6.JudgmentsOnline.IssuedCCJ.Defendant",
+  "role": "DEFENDANT",
+  "titleEn": "A judgment has been made against you",
+  "titleCy": "Mae Dyfarniad wedi’i wneud yn eich erbyn",
+  "descriptionEn": "<p class=\"govuk-body\">The judgment formalises the payment plan you’ve agreed with the claimant.<br>You’ve agreed to pay the claim amount of £${ccjDefendantAdmittedAmount} ${ccjPaymentMessageEn}. <br>The claimant’s details for payment and the full payment plan can be found on the judgment.<br>If you can no longer afford the repayments you’ve agreed with the claimant, you can make an application to vary the judgment.</p>",
+  "descriptionCy": "<p class=\"govuk-body\">Mae’r dyfarniad yn ffurfioli’r cynllun taliadau yr ydych wedi cytuno arno gyda’r hawlydd.<br>Rydych wedi cytuno i dalu’ swm yr hawliad, sef £${ccjDefendantAdmittedAmount} ${ccjPaymentMessageCy}. <br>Gellir dod o hyd i fanylion yr hawlydd ar gyfer talu a’r cynllun talu llawn ar y dyfarniad.<br>Os na allwch fforddio i dalu’r rhandaliadau rydych wedi cytuno arnynt gyda’r hawlydd, gallwch wneud cais i amrywio’r dyfarniad.</p>"
+}

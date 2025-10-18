@@ -1,0 +1,8 @@
+{
+  "name": "Notice.AAA6.Settle.ClaimPaidInFull.Defendant",
+  "role": "DEFENDANT",
+  "titleEn": "Claim marked as paid in full",
+  "titleCy": "Hawliad wedi’i nodi fel wedi ei dalu’n llawn",
+  "descriptionEn": "<p class=\"govuk-body\">This claim has been marked as paid in full as of ${settleClaimPaidInFullDateEn}.<br>You do not need to attend court and any hearings scheduled will not go ahead.</p>",
+  "descriptionCy": "<p class=\"govuk-body\">Mae’r hawliad hwn wedi’i farcio fel un a dalwyd yn llawn ers ${settleClaimPaidInFullDateCy}.<br>Nid oes angen i chi fynychu'r llys ac ni fydd unrhyw wrandawiadau a drefnwyd yn cael eu cynnal.</p>"
+}

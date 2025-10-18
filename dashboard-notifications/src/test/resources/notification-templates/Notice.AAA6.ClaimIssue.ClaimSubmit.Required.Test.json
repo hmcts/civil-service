@@ -1,0 +1,9 @@
+{
+  "name": "Notice.AAA6.ClaimIssue.ClaimSubmit.Required.Test",
+  "role": "CLAIMANT",
+  "titleEn": "Claim submission pending",
+  "titleCy": "Cyflwyniad hawliad ar y gweill",
+  "descriptionEn": "Your claim has not yet been issued. Complete the outstanding steps to continue.",
+  "descriptionCy": "Nid yw eich hawliad wedi'i gyhoeddi eto. Cwblhewch y camau sy'n weddill i barhau.",
+  "timeToLive": "singout"
+}
