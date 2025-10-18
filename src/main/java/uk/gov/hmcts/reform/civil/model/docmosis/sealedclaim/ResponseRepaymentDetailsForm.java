@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
@@ -32,6 +33,7 @@ import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.COUNTER
 @Builder(toBuilder = true)
 @AllArgsConstructor
 @EqualsAndHashCode
+@Slf4j
 public class ResponseRepaymentDetailsForm {
 
     private final String amountToPay;
@@ -148,9 +150,11 @@ public class ResponseRepaymentDetailsForm {
     }
 
     private static void addRepaymentMethod(CaseData caseData, ResponseRepaymentDetailsFormBuilder builder, BigDecimal totalAmount) {
+        log.info("Total amount: {}", totalAmount);
         if (caseData.isPayImmediately()) {
             Optional<LocalDate> whenWillThisAmountBePaid = Optional.ofNullable(caseData.getRespondToClaimAdmitPartLRspec()).map(
                 RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid);
+            log.info("When will this amount be paid: {}", whenWillThisAmountBePaid);
             whenWillThisAmountBePaid.ifPresent(paymentDate ->
                 addPayByDatePayImmediately(builder, totalAmount, paymentDate)
             );
@@ -173,6 +177,7 @@ public class ResponseRepaymentDetailsForm {
     }
 
     private static void addPayByDatePayImmediately(ResponseRepaymentDetailsFormBuilder builder, BigDecimal totalClaimAmount, LocalDate responseDate) {
+        log.info("Response date: {}", responseDate);
         builder.payBy(responseDate).amountToPay(totalClaimAmount + "");
     }
 
@@ -237,6 +242,7 @@ public class ResponseRepaymentDetailsForm {
             BigDecimal amountInPennies =
                 useRespondent2(caseData) ? caseData.getRespondToAdmittedClaimOwingAmount2() :
                     caseData.getRespondToAdmittedClaimOwingAmount();
+            log.info("Amount in pennies: {}", amountInPennies);
 
             addRepaymentMethod(
                 caseData,
