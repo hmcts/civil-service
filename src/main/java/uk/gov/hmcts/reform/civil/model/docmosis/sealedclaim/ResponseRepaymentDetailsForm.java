@@ -242,7 +242,6 @@ public class ResponseRepaymentDetailsForm {
             BigDecimal amountInPennies =
                 useRespondent2(caseData) ? caseData.getRespondToAdmittedClaimOwingAmount2() :
                     caseData.getRespondToAdmittedClaimOwingAmount();
-            log.info("Amount in pennies: {}", amountInPennies);
 
             addRepaymentMethod(
                 caseData,
