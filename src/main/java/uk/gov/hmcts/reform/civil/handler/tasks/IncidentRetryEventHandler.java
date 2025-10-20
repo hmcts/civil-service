@@ -186,7 +186,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
 
     private String resolveStartTime(String incidentStartTime) {
         return (incidentStartTime == null || incidentStartTime.isBlank())
-            ? INCIDENT_FORMATTER.format(Instant.now().minus(24, ChronoUnit.HOURS))
+            ? INCIDENT_FORMATTER.format(Instant.now().minus(23, ChronoUnit.HOURS))
             : incidentStartTime;
     }
 
@@ -267,6 +267,11 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
         modificationRequest.put("skipIoMappings", false);
 
         List<Map<String, Object>> instructions = new ArrayList<>();
+        Map<String, Object> cancelInstruction = new HashMap<>();
+        cancelInstruction.put("type", "cancel");
+        cancelInstruction.put("activityId", failedActivityId);
+        instructions.add(cancelInstruction);
+
         Map<String, Object> startBeforeInstruction = new HashMap<>();
         startBeforeInstruction.put("type", "startBeforeActivity");
         startBeforeInstruction.put("activityId", failedActivityId);

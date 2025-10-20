@@ -21,5 +21,4 @@ public class CaseReference {
 
     @JsonProperty
     private String caseReference;
-
 }
