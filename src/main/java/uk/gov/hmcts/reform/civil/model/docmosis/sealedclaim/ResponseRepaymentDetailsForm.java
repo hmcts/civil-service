@@ -140,7 +140,7 @@ public class ResponseRepaymentDetailsForm {
                                               BigDecimal totalAmount,
                                               BigDecimal admittedAmount) {
         if (caseData.isPayImmediately()) {
-            addPayByDatePayImmediately(builder, admittedAmount, caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid());
+            addPayByDatePayImmediately(builder, admittedAmount, caseData);
         } else if (caseData.isPayByInstallment()) {
             addRepaymentPlan(caseData, builder, totalAmount);
             builder.admittedAmount(admittedAmount);
@@ -152,12 +152,7 @@ public class ResponseRepaymentDetailsForm {
     private static void addRepaymentMethod(CaseData caseData, ResponseRepaymentDetailsFormBuilder builder, BigDecimal totalAmount) {
         log.info("Total amount: {}", totalAmount);
         if (caseData.isPayImmediately()) {
-            Optional<LocalDate> whenWillThisAmountBePaid = Optional.ofNullable(caseData.getRespondToClaimAdmitPartLRspec()).map(
-                RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid);
-            log.info("When will this amount be paid: {}", whenWillThisAmountBePaid);
-            whenWillThisAmountBePaid.ifPresent(paymentDate ->
-                addPayByDatePayImmediately(builder, totalAmount, paymentDate)
-            );
+            addPayByDatePayImmediately(builder, totalAmount, caseData);
         } else if (caseData.isPayByInstallment()) {
             addRepaymentPlan(caseData, builder, totalAmount);
         } else if (caseData.isPayBySetDate()) {
@@ -176,9 +171,13 @@ public class ResponseRepaymentDetailsForm {
         }
     }
 
-    private static void addPayByDatePayImmediately(ResponseRepaymentDetailsFormBuilder builder, BigDecimal totalClaimAmount, LocalDate responseDate) {
-        log.info("Response date: {}", responseDate);
-        builder.payBy(responseDate).amountToPay(totalClaimAmount + "");
+    private static void addPayByDatePayImmediately(ResponseRepaymentDetailsFormBuilder builder, BigDecimal totalClaimAmount, CaseData caseData) {
+        LocalDate whenWillThisAmountBePaid = Optional.ofNullable(caseData.getRespondToClaimAdmitPartLRspec()).map(
+            RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid).orElse(null);
+        if (whenWillThisAmountBePaid == null) {
+            log.info("When will this amount be paid is null");
+        }
+        builder.payBy(whenWillThisAmountBePaid).amountToPay(totalClaimAmount + "");
     }
 
     private static void addRepaymentPlan(CaseData caseData, ResponseRepaymentDetailsForm.ResponseRepaymentDetailsFormBuilder builder, BigDecimal totalClaimAmount) {
