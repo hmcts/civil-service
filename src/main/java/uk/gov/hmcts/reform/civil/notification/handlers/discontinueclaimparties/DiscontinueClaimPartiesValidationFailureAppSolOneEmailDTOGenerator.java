@@ -41,6 +41,7 @@ public class DiscontinueClaimPartiesValidationFailureAppSolOneEmailDTOGenerator 
 
     @Override
     public Boolean getShouldNotify(CaseData caseData) {
-        return !ConfirmOrderGivesPermission.YES.equals(caseData.getConfirmOrderGivesPermission());
+        return Boolean.TRUE.equals(super.getShouldNotify(caseData))
+            && !ConfirmOrderGivesPermission.YES.equals(caseData.getConfirmOrderGivesPermission());
     }
 }
