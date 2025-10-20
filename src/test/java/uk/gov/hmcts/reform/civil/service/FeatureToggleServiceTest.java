@@ -102,15 +102,6 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenFastTrackUpliftsEnabled(Boolean toggleStat) {
-        var caseFileKey = "fast-track-uplifts";
-        givenToggle(caseFileKey, toggleStat);
-
-        assertThat(featureToggleService.isFastTrackUpliftsEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenLocationWhiteListed(Boolean toggleStat) {
         final String feature = "case-progression-location-whitelist";
         String location = "000000";
@@ -247,15 +238,6 @@ class FeatureToggleServiceTest {
     }
 
     @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsCoSCEnabled(Boolean toggleStat) {
-        var isCoSCEnabledKey = "isCoSCEnabled";
-        givenToggle(isCoSCEnabledKey, toggleStat);
-
-        assertThat(featureToggleService.isCoSCEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
     @CsvSource({
         "someLocation, true, true",
         "someLocation, false, false",
@@ -305,11 +287,11 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsHmcForLipEnabled(Boolean toggleStat) {
-        var hmcCui = "hmc-cui-enabled";
-        givenToggle(hmcCui, toggleStat);
+    void shouldReturnCorrectValue_whenIsQMForLRs(Boolean toggleStat) {
+        var caseFlagsKey = "query-management";
+        givenToggle(caseFlagsKey, toggleStat);
 
-        assertThat(featureToggleService.isHmcForLipEnabled()).isEqualTo(toggleStat);
+        assertThat(featureToggleService.isQueryManagementLRsEnabled()).isEqualTo(toggleStat);
     }
 
     @ParameterizedTest

@@ -1,6 +1,7 @@
 #!groovy
 
 properties([
+  pipelineTriggers([cron('H 17 * * 1-5')]),
   copyArtifactPermission('/HMCTS_a_to_c_Nightly/civil-service/*'),
   parameters([
     choice(name: 'FORCE_GREEN_BUILD', choices: ['false', 'true'], 

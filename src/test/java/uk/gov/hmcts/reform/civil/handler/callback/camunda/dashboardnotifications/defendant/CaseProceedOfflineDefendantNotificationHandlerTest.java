@@ -319,7 +319,6 @@ class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCallbackHan
                 .build();
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
             when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
-            when(toggleService.isCoSCEnabled()).thenReturn(true);
             when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
@@ -352,7 +351,6 @@ class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCallbackHan
 
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
             when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
-            when(toggleService.isCoSCEnabled()).thenReturn(true);
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 

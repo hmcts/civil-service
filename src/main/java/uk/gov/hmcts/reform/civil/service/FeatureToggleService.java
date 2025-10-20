@@ -36,10 +36,6 @@ public class FeatureToggleService {
         return this.featureToggleApi.isFeatureEnabled("enable-rpa-emails");
     }
 
-    public boolean isFastTrackUpliftsEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("fast-track-uplifts");
-    }
-
     public boolean isLipVLipEnabled() {
         return featureToggleApi.isFeatureEnabled("cuiReleaseTwoEnabled");
     }
@@ -118,10 +114,6 @@ public class FeatureToggleService {
         return featureToggleApi.isFeatureEnabled("amend-bundle-enabled");
     }
 
-    public boolean isCoSCEnabled() {
-        return featureToggleApi.isFeatureEnabled("isCoSCEnabled");
-    }
-
     public boolean isCaseProgressionEnabledAndLocationWhiteListed(String location) {
         return location != null
             && featureToggleApi.isFeatureEnabledForLocation("case-progression-location-whitelist", location, true)
@@ -150,10 +142,11 @@ public class FeatureToggleService {
         return featureToggleApi.isFeatureEnabledForDate("is-defendant-noc-online-for-case", epoch, false);
     }
 
-    public boolean isHmcForLipEnabled() {
-        return featureToggleApi.isFeatureEnabled("hmc-cui-enabled");
+    public boolean isQueryManagementLRsEnabled() {
+        return featureToggleApi.isFeatureEnabled("query-management");
     }
 
+    // if deleting this, also handle isQMPdfGeneratorEnabled() below
     public boolean isPublicQueryManagementEnabled(CaseData caseData) {
         if (caseContainsLiP.test(caseData)) {
             return isLipQueryManagementEnabled(caseData);
