@@ -146,11 +146,12 @@ public class ResponseRepaymentDetailsForm {
             builder.admittedAmount(admittedAmount);
         } else if (caseData.isPayBySetDate()) {
             addPayBySetDate(caseData, builder, admittedAmount);
+        } else {
+            log.error("No repayment method selected for LIP");
         }
     }
 
     private static void addRepaymentMethod(CaseData caseData, ResponseRepaymentDetailsFormBuilder builder, BigDecimal totalAmount) {
-        log.info("Total amount: {}", totalAmount);
         if (caseData.isPayImmediately()) {
             addPayByDatePayImmediately(builder, totalAmount, caseData);
         } else if (caseData.isPayByInstallment()) {
@@ -175,7 +176,7 @@ public class ResponseRepaymentDetailsForm {
         LocalDate whenWillThisAmountBePaid = Optional.ofNullable(caseData.getRespondToClaimAdmitPartLRspec()).map(
             RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid).orElse(null);
         if (whenWillThisAmountBePaid == null) {
-            log.info("When will this amount be paid is null");
+            log.info("When will this amount be paid is not set.");
         }
         builder.payBy(whenWillThisAmountBePaid).amountToPay(totalClaimAmount + "");
     }
