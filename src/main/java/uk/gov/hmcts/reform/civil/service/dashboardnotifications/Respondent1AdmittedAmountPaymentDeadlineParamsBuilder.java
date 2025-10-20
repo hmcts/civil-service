@@ -72,6 +72,7 @@ public class Respondent1AdmittedAmountPaymentDeadlineParamsBuilder extends Dashb
         final LocalDate paymentDate = getPaymentDate(caseData);
         final String paymentDateEn = formatDateEn(paymentDate);
         final String paymentDateCy = formatDateCy(paymentDate);
+        putPaymentDeadlineParams(params, paymentDate, paymentDateEn, paymentDateCy);
 
         if (caseData.isPartAdmitPayImmediatelyClaimSpec()) {
             log.debug("PartAdmitPayImmediately is true");
@@ -113,7 +114,6 @@ public class Respondent1AdmittedAmountPaymentDeadlineParamsBuilder extends Dashb
                                               amountIncludesTextCy,
                                               applicant1PartyName);
             putDescriptions(params, descriptionEn, descriptionCy);
-            putPaymentDeadlineParams(params, paymentDate, paymentDateEn, paymentDateCy);
         }
     }
 
@@ -121,9 +121,11 @@ public class Respondent1AdmittedAmountPaymentDeadlineParamsBuilder extends Dashb
                                                  LocalDate paymentDate,
                                                  String paymentDateEn,
                                                  String paymentDateCy) {
-        params.put(RESP1_ADMITTED_AMOUNT_DEADLINE, nonNull(paymentDate) ? paymentDate.atTime(END_OF_DAY) : "");
-        params.put(RESP1_ADMITTED_AMOUNT_DEADLINE_EN, paymentDateEn);
-        params.put(RESP1_ADMITTED_AMOUNT_DEADLINE_CY, paymentDateCy);
+        if (nonNull(paymentDate)) {
+            params.put(RESP1_ADMITTED_AMOUNT_DEADLINE, paymentDate.atTime(END_OF_DAY));
+            params.put(RESP1_ADMITTED_AMOUNT_DEADLINE_EN, paymentDateEn);
+            params.put(RESP1_ADMITTED_AMOUNT_DEADLINE_CY, paymentDateCy);
+        }
     }
 
     public String getDefendantAdmittedAmount(CaseData caseData) {
