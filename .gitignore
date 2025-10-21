@@ -41,3 +41,4 @@ infrastructure/override.tf
 ### aat env file ###
 .aat-env
 /java_pid*.hprof
+/pacts/

@@ -1109,7 +1109,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             given(time.now()).willReturn(submittedDate);
 
             given(featureToggleService.isLocationWhiteListedForCaseProgression(anyString())).willReturn(true);
-            given(featureToggleService.isHmcForLipEnabled()).willReturn(false);
         }
 
         @Test
@@ -1143,7 +1142,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             userId = UUID.randomUUID().toString();
 
             given(time.now()).willReturn(submittedDate);
-            when(featureToggleService.isHmcForLipEnabled()).thenReturn(false);
         }
 
         @Test
