@@ -20,7 +20,6 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfir
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationTextSpecGenerator;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
-import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
@@ -87,7 +86,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 .put(callbackKey(MID, "experts"), this::validateRespondentExperts)
                 .put(callbackKey(MID, "witnesses"), this::validateRespondentWitnesses)
                 .put(callbackKey(MID, "upload"), this::emptyCallbackResponse)
-                .put(callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth)
+                .put(callbackKey(MID, "statement-of-truth"), this::emptyCallbackResponse)
                 .put(callbackKey(MID, "validate-payment-date"), this::validateRespondentPaymentDate)
                 .put(callbackKey(MID, "specCorrespondenceAddress"), this::validateCorrespondenceApplicantAddress)
                 .put(callbackKey(MID, "determineLoggedInSolicitor"), this::determineLoggedInSolicitor)
@@ -160,21 +159,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         return validateDateOfBirth.execute(callbackParams);
     }
 
-    private CallbackResponse resetStatementOfTruth(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-
-        // resetting statement of truth field, this resets in the page, but the data is still sent to the db.
-        // setting null here does not clear, need to overwrite with value.
-        // must be to do with the way XUI cache data entered through the lifecycle of an event.
-        CaseData updatedCaseData = caseData.toBuilder()
-                .uiStatementOfTruth(StatementOfTruth.builder().role("").build())
-                .build();
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-                .data(updatedCaseData.toMap(objectMapper))
-                .build();
-    }
-
     private CallbackResponse setApplicantResponseDeadline(CallbackParams callbackParams) {
         return setApplicantResponseDeadline.execute(callbackParams);
     }
@@ -216,10 +200,17 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         } else if (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
                 && (caseData.isPayBySetDate())) {
             return format(
-                    "<h2 class=\"govuk-heading-m\">What happens next</h2>"
-                            + "%n%nThe claimant has until 4pm on %s to respond to your claim. "
-                            + "We will let you know when they respond.%n%n",
-                    formatLocalDateTime(responseDeadline, DATE)
+                "<h2 class=\"govuk-heading-m\">What happens next</h2>"
+                    + "%n%nThe claimant has until 4pm on %s to respond to your claim. "
+                    + "We will let you know when they respond.%n%n",
+                formatLocalDateTime(responseDeadline, DATE)
+            );
+        } else if (caseData.isClaimantBilingual()) {
+            return format(
+                "<h2 class=\"govuk-heading-m\">What happens next</h2>"
+                    + "%n%nWe will let you know when the claimant responds."
+                    + "%n%n<a href=\"%s\" target=\"_blank\">Download questionnaire (opens in a new tab)</a>",
+                format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference())
             );
         } else {
             return format(

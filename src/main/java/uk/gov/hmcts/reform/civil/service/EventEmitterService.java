@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
 
 import static java.lang.String.format;
-import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getLatestQuery;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -35,7 +34,7 @@ public class EventEmitterService {
             }
             if (camundaEvent.equals("queryManagementRaiseQuery")
                 || camundaEvent.equals("queryManagementRespondQuery")) {
-                CaseMessage latestQuery = getLatestQuery(caseData);
+                CaseMessage latestQuery = caseData.getQueries().latest();
                 String queryId = latestQuery != null ? latestQuery.getId() : null;
                 runtimeService.createMessageCorrelation(camundaEvent)
                     .tenantId(TENANT_ID)
