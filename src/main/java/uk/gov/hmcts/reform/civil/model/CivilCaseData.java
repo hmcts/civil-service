@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.model;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.experimental.SuperBuilder;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
@@ -105,8 +106,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @SuperBuilder(toBuilder = true)
+@EqualsAndHashCode(callSuper = false)
 @Data
-public class CaseDataCaseSdo implements MappableObject {
+public class CivilCaseData extends BaseCaseData implements MappableObject {
 
     //default judgement SDO fields for trial/fast track
     private TrialHearingJudgesRecital trialHearingJudgesRecitalDJ;
