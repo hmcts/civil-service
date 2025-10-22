@@ -82,6 +82,8 @@ public class NotificationHandler extends CallbackHandler {
     private CaseDataContent getCaseContent(StartEventResponse startEventResponse, String fullSummary) {
         Map<String, Object> data = startEventResponse.getCaseDetails().getData();
 
+        data.put("notificationSummary", null);
+
         String cleanSummary = extractAttempted(fullSummary);
         String errors = extractErrors(fullSummary);
 
