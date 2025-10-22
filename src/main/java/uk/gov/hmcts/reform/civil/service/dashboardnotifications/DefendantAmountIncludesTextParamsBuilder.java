@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.dashboardnotifications;
 
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.util.HashMap;
