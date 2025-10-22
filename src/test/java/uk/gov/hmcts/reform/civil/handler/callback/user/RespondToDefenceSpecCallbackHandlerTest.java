@@ -48,17 +48,17 @@ import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentByAdmissionOnlineMapper;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.AirlineEpimsId;
-import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
+import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.FixedCosts;
 import uk.gov.hmcts.reform.civil.model.FlightDelayDetails;
-import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
-import uk.gov.hmcts.reform.civil.model.RespondToClaim;
-import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PaymentBySetDate;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
+import uk.gov.hmcts.reform.civil.model.RespondToClaim;
+import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
+import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
@@ -124,8 +124,8 @@ import java.util.stream.Stream;
 import static java.time.LocalDateTime.now;
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.BDDMockito.given;
@@ -1469,7 +1469,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldChangeCaseState_WhenRespondentRepaymentPlanAndFlagV2WithJudgementLiveAndLrVLrAdmissionBulk() {
             given(featureToggleService.isPinInPostEnabled()).willReturn(true);
             given(featureToggleService.isJudgmentOnlineLive()).willReturn(true);
-            given(featureToggleService.isLrAdmissionBulkEnabled()).willReturn(true);
             CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                 .ccjPaymentPaidSomeOption(YesOrNo.YES)
                 .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(500.0))
@@ -2238,7 +2237,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void summary_when_all_finals_order_issued_on_LR_bulk_admission() {
                 given(featureToggleService.isPinInPostEnabled()).willReturn(true);
-                given(featureToggleService.isLrAdmissionBulkEnabled()).willReturn(true);
                 CaseData caseData = CaseData.builder()
                     .respondent1Represented(YesOrNo.YES)
                     .applicant1Represented(YesOrNo.YES)
@@ -2264,7 +2262,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void summary_when_part_admit_pay_immediately_selected() {
                 given(featureToggleService.isPinInPostEnabled()).willReturn(true);
-                given(featureToggleService.isLrAdmissionBulkEnabled()).willReturn(true);
                 CaseData caseData = CaseData.builder()
                     .respondent1Represented(YesOrNo.YES)
                     .applicant1Represented(YesOrNo.YES)
@@ -2677,9 +2674,11 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldCheckValidateAmountPaid_withCcJPaymentDetailsWhenNoFixedCosts_BulkAdmissionsEnabled() {
 
-            when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
-
-            Fee fee = Fee.builder().version("1").code("CODE").calculatedAmountInPence(BigDecimal.valueOf(100)).build();
+            Fee fee = Fee.builder()
+                    .version("1")
+                    .code("CODE")
+                    .calculatedAmountInPence(BigDecimal.valueOf(100))
+                    .build();
             CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                 .ccjPaymentPaidSomeOption(YesOrNo.NO)
                 .build();
@@ -2712,9 +2711,11 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldCheckValidateAmountPaid_withCcJPaymentDetailsWhenNoFixedCosts_BulkAdmissionsDisabled() {
 
-            when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(false);
-
-            Fee fee = Fee.builder().version("1").code("CODE").calculatedAmountInPence(BigDecimal.valueOf(100)).build();
+            Fee fee = Fee.builder()
+                    .version("1")
+                    .code("CODE")
+                    .calculatedAmountInPence(BigDecimal.valueOf(100))
+                    .build();
             CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                 .ccjPaymentPaidSomeOption(YesOrNo.NO)
                 .build();
@@ -2732,19 +2733,21 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             BigDecimal claimFee = getCaseData(response).getCcjPaymentDetails().getCcjJudgmentAmountClaimFee();
-            assertNull(claimFee);
+            assertNotNull(claimFee);
             BigDecimal subTotal = getCaseData(response).getCcjPaymentDetails().getCcjJudgmentSummarySubtotalAmount();
-            assertNull(subTotal);
+            assertNotNull(subTotal);
             BigDecimal finalTotal = getCaseData(response).getCcjPaymentDetails().getCcjJudgmentTotalStillOwed();
-            assertNull(finalTotal);
+            assertNotNull(finalTotal);
         }
 
         @Test
         void shouldSetCcjJudgmentAmountShowInterest_whenPayBySetDate_BulkAdmissionsEnabled() {
 
-            when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
-
-            Fee fee = Fee.builder().version("1").code("CODE").calculatedAmountInPence(BigDecimal.valueOf(100)).build();
+            Fee fee = Fee.builder()
+                    .version("1")
+                    .code("CODE")
+                    .calculatedAmountInPence(BigDecimal.valueOf(100))
+                    .build();
             CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                 .ccjPaymentPaidSomeOption(YesOrNo.NO)
                 .build();
@@ -2767,9 +2770,11 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldSetCcjJudgmentAmountShowInterest_whenPayByInstallments_BulkAdmissionsEnabled() {
 
-            when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
-
-            Fee fee = Fee.builder().version("1").code("CODE").calculatedAmountInPence(BigDecimal.valueOf(100)).build();
+            Fee fee = Fee.builder()
+                    .version("1")
+                    .code("CODE")
+                    .calculatedAmountInPence(BigDecimal.valueOf(100))
+                    .build();
             CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                 .ccjPaymentPaidSomeOption(YesOrNo.NO)
                 .build();
@@ -2791,8 +2796,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotSetCcjJudgmentAmountShowInterest_whenPayImmediately_BulkAdmissionsEnabled() {
-
-            when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
 
             Fee fee = Fee.builder().version("1").code("CODE").calculatedAmountInPence(BigDecimal.valueOf(100)).build();
             CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
@@ -2854,8 +2857,11 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSetTheJudgmentSummaryDetailsToProceedOnJoFullAdmit() {
-            when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
-            Fee fee = Fee.builder().version("1").code("CODE").calculatedAmountInPence(BigDecimal.valueOf(100)).build();
+            Fee fee = Fee.builder()
+                    .version("1")
+                    .code("CODE")
+                    .calculatedAmountInPence(BigDecimal.valueOf(100))
+                    .build();
             CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                 .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(10000))
                 .ccjPaymentPaidSomeOption(YesOrNo.YES)
@@ -2892,8 +2898,11 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSetTheJudgmentSummaryDetailsToProceedOnJo() {
-            when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
-            Fee fee = Fee.builder().version("1").code("CODE").calculatedAmountInPence(BigDecimal.valueOf(100)).build();
+            Fee fee = Fee.builder()
+                    .version("1")
+                    .code("CODE")
+                    .calculatedAmountInPence(BigDecimal.valueOf(100))
+                    .build();
             CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                 .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(10000))
                 .ccjPaymentPaidSomeOption(YesOrNo.YES)
@@ -2931,8 +2940,11 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSetTheJudgmentSummaryDetailsToProceedOnJoOnPartAdmitClaim() {
-            when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
-            Fee fee = Fee.builder().version("1").code("CODE").calculatedAmountInPence(BigDecimal.valueOf(100)).build();
+            Fee fee = Fee.builder()
+                    .version("1")
+                    .code("CODE")
+                    .calculatedAmountInPence(BigDecimal.valueOf(100))
+                    .build();
             CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                 .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(10000))
                 .ccjPaymentPaidSomeOption(YesOrNo.YES)
@@ -3073,8 +3085,8 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnCorrectSummaryForAllFinalsOrderIssued() {
-            String expected = "The judgment request will be processed and a County"
-                + " Court Judgment (CCJ) will be issued, you will receive any further updates by email.";
+            String expected =
+                    "The judgment will order the defendant to pay £1041.00, including the claim fee, any fixed costs if claimed and interest if applicable, as shown:";
 
             when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
             when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
