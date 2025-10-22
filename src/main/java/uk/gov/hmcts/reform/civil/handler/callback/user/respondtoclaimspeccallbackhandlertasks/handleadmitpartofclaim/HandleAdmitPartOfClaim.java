@@ -42,6 +42,8 @@ public class HandleAdmitPartOfClaim implements CaseTask {
 
         List<String> errors = validatePaymentDate(caseData);
 
+        validateAdmittedClaimOwingAmount(errors, caseData);
+
         if (!errors.isEmpty()) {
             return buildErrorResponse(errors);
         }

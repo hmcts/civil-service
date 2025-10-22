@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
+import java.math.BigDecimal;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
@@ -107,6 +108,23 @@ public class PopulateRespondent1Copy implements CaseTask {
         } else {
             log.debug("CaseId {}: CARM is not enabled for the case", caseData.getCcdCaseReference());
             updatedCaseData.showCarmFields(NO);
+        }
+
+        BigDecimal claimInPounds = caseData.getClaimAmountInPounds();
+        if (claimInPounds != null && caseData.getTotalClaimAmount() != null) {
+            log.debug("CaseId {}: Calculating total claim amount with interest", caseData.getCcdCaseReference());
+            BigDecimal claimScaled = claimInPounds.setScale(2);
+            updatedCaseData.totalClaimAmountPlusInterest(claimScaled);
+            updatedCaseData.totalClaimAmountPlusInterestString(claimScaled.toString());
+
+            BigDecimal interest = interestCalculator.calculateInterest(caseData);
+            if (interest == null) {
+                interest = BigDecimal.ZERO;
+            }
+            interest = interest.setScale(2);
+            BigDecimal totalAmountWithInterest = caseData.getTotalClaimAmount().add(interest).setScale(2);
+            updatedCaseData.totalClaimAmountPlusInterestAdmitPart(totalAmountWithInterest);
+            updatedCaseData.totalClaimAmountPlusInterestAdmitPartString(totalAmountWithInterest.toString());
         }
 
         log.info("CaseId {}: CARM fields update complete", caseData.getCcdCaseReference());
