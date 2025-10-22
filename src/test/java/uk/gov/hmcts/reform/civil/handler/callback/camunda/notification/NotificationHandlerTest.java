@@ -93,7 +93,6 @@ class NotificationHandlerTest extends BaseCallbackHandlerTest {
         }
     }
 
-
     @Nested
     class SubmittedCallback {
 
