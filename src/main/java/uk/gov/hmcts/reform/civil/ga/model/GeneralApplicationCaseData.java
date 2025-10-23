@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.SuperBuilder;
+import lombok.extern.jackson.Jacksonized;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.ccd.model.SolicitorDetails;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -104,6 +105,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.POST_JUDGE_OR
 @EqualsAndHashCode(callSuper = false)
 @Data
 @SuperBuilder(toBuilder = true)
+@Jacksonized
 public class GeneralApplicationCaseData extends BaseCaseData implements MappableObject {
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
