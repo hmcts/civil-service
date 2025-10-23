@@ -27,33 +27,9 @@ import uk.gov.hmcts.reform.civil.ga.enums.dq.GAByCourtsInitiativeGAspec;
 import uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeDecisionOption;
 import uk.gov.hmcts.reform.civil.ga.enums.dq.OrderMadeOnTypes;
 import uk.gov.hmcts.reform.civil.ga.enums.welshenhancements.PreTranslationGaDocumentType;
-import uk.gov.hmcts.reform.civil.model.BaseCaseData;
-import uk.gov.hmcts.reform.civil.model.Bundle;
-import uk.gov.hmcts.reform.civil.model.BusinessProcess;
-import uk.gov.hmcts.reform.civil.model.IdValue;
-import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
-import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.model.Value;
-import uk.gov.hmcts.reform.civil.model.caseprogression.FreeFormOrderValues;
-import uk.gov.hmcts.reform.civil.model.citizenui.CertOfSC;
-import uk.gov.hmcts.reform.civil.model.citizenui.FeePaymentOutcomeDetails;
-import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
-import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesMoreInformation;
-import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
-import uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocument;
-import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.model.common.MappableObject;
-import uk.gov.hmcts.reform.civil.model.genapplication.CaseLink;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAApproveConsentOrder;
-import uk.gov.hmcts.reform.civil.ga.model.genapplication.GACaseLocation;
-import uk.gov.hmcts.reform.civil.model.genapplication.GACaseManagementCategory;
-import uk.gov.hmcts.reform.civil.model.genapplication.GADetailsRespondentSol;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDateGAspec;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAHearingNoticeApplication;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAHearingNoticeDetail;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudgesHearingListGAspec;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudicialDecision;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudicialMakeAnOrder;
@@ -62,17 +38,10 @@ import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudicialWrittenRepres
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAMakeApplicationAvailableCheck;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAOrderCourtOwnInitiativeGAspec;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAOrderWithoutNoticeGAspec;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAReferToJudgeGAspec;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAReferToLegalAdvisorGAspec;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GARespondentDebtorOfferGAspec;
-import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GARespondentResponse;
-import uk.gov.hmcts.reform.civil.model.genapplication.GASolicitorDetailsGAspec;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAStatementOfTruth;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
-import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
-import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.UploadDocumentByType;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.finalorder.AssistedOrderAppealDetails;
@@ -85,6 +54,37 @@ import uk.gov.hmcts.reform.civil.ga.model.genapplication.finalorder.AssistedOrde
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.finalorder.BeSpokeCostDetailText;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.finalorder.DetailText;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.finalorder.DetailTextWithDate;
+import uk.gov.hmcts.reform.civil.model.BaseCaseData;
+import uk.gov.hmcts.reform.civil.model.Bundle;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
+import uk.gov.hmcts.reform.civil.model.IdValue;
+import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationParty;
+import uk.gov.hmcts.reform.civil.model.Value;
+import uk.gov.hmcts.reform.civil.model.caseprogression.FreeFormOrderValues;
+import uk.gov.hmcts.reform.civil.model.citizenui.CertOfSC;
+import uk.gov.hmcts.reform.civil.model.citizenui.FeePaymentOutcomeDetails;
+import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
+import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesMoreInformation;
+import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
+import uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocument;
+import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.common.MappableObject;
+import uk.gov.hmcts.reform.civil.model.genapplication.CaseLink;
+import uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
+import uk.gov.hmcts.reform.civil.model.genapplication.GACaseManagementCategory;
+import uk.gov.hmcts.reform.civil.model.genapplication.GADetailsRespondentSol;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDateGAspec;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
+import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement;
+import uk.gov.hmcts.reform.civil.model.genapplication.GASolicitorDetailsGAspec;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAStatementOfTruth;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
+import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
+import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 
 import java.math.BigDecimal;
@@ -115,8 +115,6 @@ public class GeneralApplicationCaseData extends BaseCaseData implements Mappable
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private final LocalDateTime createdDate;
     private final String detailsOfClaim;
-    private Party applicant1;
-    private Party respondent1;
     private final YesOrNo addApplicant2;
     private final GAApplicationType generalAppType;
     private final GARespondentOrderAgreement generalAppRespondentAgreement;
@@ -142,15 +140,12 @@ public class GeneralApplicationCaseData extends BaseCaseData implements Mappable
     private final GARespondentRepresentative generalAppRespondent1Representative;
     private final String generalAppRespondReason;
     private final String generalAppRespondConsentReason;
-    private List<Element<TranslatedDocument>> translatedDocuments;
-    private List<Element<TranslatedDocument>> translatedDocumentsBulkPrint;
     private final List<Element<CaseDocument>> originalDocumentsBulkPrint;
     private final List<Element<Document>> generalAppRespondDocument;
     private final List<Element<Document>> generalAppRespondConsentDocument;
     private final List<Element<Document>> generalAppRespondDebtorDocument;
     @Deprecated
     private final List<Element<CaseDocument>> gaRespondDoc;
-
     private final List<Element<CaseDocument>> gaAddlDoc;
     private final List<Element<CaseDocument>> gaAddlDocStaff;
     private final List<Element<CaseDocument>> gaAddlDocClaimant;
@@ -163,7 +158,6 @@ public class GeneralApplicationCaseData extends BaseCaseData implements Mappable
     private final YesOrNo isMultiParty;
     private final YesOrNo parentClaimantIsApplicant;
     private final CaseLink caseLink;
-    private GeneralAppParentCaseLink generalAppParentCaseLink;
     private final IdamUserDetails applicantSolicitor1UserDetails;
     private final IdamUserDetails civilServiceUserRoles;
     private final List<Element<Document>> generalAppEvidenceDocument;
@@ -201,7 +195,7 @@ public class GeneralApplicationCaseData extends BaseCaseData implements Mappable
     private final String claimant2PartyName;
     private final String defendant1PartyName;
     private final String defendant2PartyName;
-    private final GACaseLocation caseManagementLocation;
+    private final CaseLocationCivil caseManagementLocation;
     private final YesOrNo isCcmccLocation;
     private final GACaseManagementCategory caseManagementCategory;
     private final String judicialGeneralHearingOrderRecital;
@@ -230,7 +224,6 @@ public class GeneralApplicationCaseData extends BaseCaseData implements Mappable
     private final List<Element<Document>> gaRespDocRespondentSol;
     @Deprecated
     private final List<Element<Document>> gaRespDocRespondentSolTwo;
-
     private final String gaRespondentDetails;
     private final LocalDate issueDate;
     private final String generalAppSuperClaimType;
@@ -251,9 +244,6 @@ public class GeneralApplicationCaseData extends BaseCaseData implements Mappable
     private final GAByCourtsInitiativeGAspec judicialByCourtsInitiativeListForHearing;
     private final GAByCourtsInitiativeGAspec judicialByCourtsInitiativeForWrittenRep;
     private final YesOrNo showRequestInfoPreviewDoc;
-    private GAHearingNoticeApplication gaHearingNoticeApplication;
-    private GAHearingNoticeDetail gaHearingNoticeDetail;
-    private String gaHearingNoticeInformation;
     private final String migrationId;
     private final String caseNameHmctsInternal;
     private final FinalOrderSelection finalOrderSelection;
@@ -264,13 +254,11 @@ public class GeneralApplicationCaseData extends BaseCaseData implements Mappable
     private final FreeFormOrderValues orderWithoutNotice;
     private final Document gaFinalOrderDocPreview;
     private final LocalDateTime mainCaseSubmittedDate;
-
     @JsonProperty("CaseAccessCategory")
     private final CaseCategory caseAccessCategory;
     private final YesOrNo generalAppVaryJudgementType;
     private final Document generalAppN245FormUpload;
     private final GAHearingDateGAspec generalAppHearingDate;
-
     //PDF Documents
     @Builder.Default
     private final List<Element<CaseDocument>> generalOrderDocument = new ArrayList<>();
@@ -284,10 +272,8 @@ public class GeneralApplicationCaseData extends BaseCaseData implements Mappable
     private final List<Element<CaseDocument>> gaDraftDocClaimant;
     private final List<Element<CaseDocument>> gaDraftDocRespondentSol;
     private final List<Element<CaseDocument>> gaDraftDocRespondentSolTwo;
-
     @Builder.Default
     private final List<Element<CaseDocument>> consentOrderDocument = new ArrayList<>();
-
     @Builder.Default
     private final List<Element<CaseDocument>> dismissalOrderDocument = new ArrayList<>();
     private final List<Element<CaseDocument>> dismissalOrderDocStaff;
@@ -319,7 +305,6 @@ public class GeneralApplicationCaseData extends BaseCaseData implements Mappable
     private final GAOrderWithoutNoticeGAspec orderWithoutNoticeListForHearing;
     private final GAOrderCourtOwnInitiativeGAspec orderCourtOwnInitiativeForWrittenRep;
     private final GAOrderWithoutNoticeGAspec orderWithoutNoticeForWrittenRep;
-
     private final YesOrNo assistedOrderMadeSelection;
     private final AssistedOrderMadeDateHeardDetails assistedOrderMadeDateHeardDetails;
     private final List<FinalOrderShowToggle> assistedOrderJudgeHeardFrom;
@@ -348,11 +333,9 @@ public class GeneralApplicationCaseData extends BaseCaseData implements Mappable
     private final String parentCaseReference;
     private final String judgeTitle;
     private final List<Element<UploadDocumentByType>> uploadDocument;
-
     private final YesOrNo applicant1Represented;
     private final YesOrNo respondent1Represented;
     private final YesOrNo specRespondent1Represented;
-
     // GA for LIP
     private final YesOrNo isGaApplicantLip;
     private final YesOrNo isGaRespondentOneLip;
@@ -371,12 +354,35 @@ public class GeneralApplicationCaseData extends BaseCaseData implements Mappable
     private final YesOrNo generalAppAskForCosts;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private final BigDecimal applicationFeeAmountInPence;
+    private final CertOfSC certOfSC;
+    //WA claim track description
+    private final String gaWaTrackLabel;
+    private final String emailPartyReference;
+    @Builder.Default
+    private final List<Value<Document>> caseDocuments = new ArrayList<>();
+    private final String caseDocument1Name;
+    @Builder.Default
+    private final List<IdValue<Bundle>> caseBundles = new ArrayList<>();
+    @Builder.Default
+    private final List<Element<CaseDocument>> preTranslationGaDocuments = new ArrayList<>();
+    private final PreTranslationGaDocumentType preTranslationGaDocumentType;
+    @Builder.Default
+    private final List<Element<CaseDocument>> preTranslationGaDocsApplicant = new ArrayList<>();
+    @Builder.Default
+    private final List<Element<CaseDocument>> preTranslationGaDocsRespondent = new ArrayList<>();
+    private GeneralApplicationParty applicant1;
+    private GeneralApplicationParty respondent1;
+    private List<Element<TranslatedDocument>> translatedDocuments;
+    private List<Element<TranslatedDocument>> translatedDocumentsBulkPrint;
+    private GeneralAppParentCaseLink generalAppParentCaseLink;
+    private GAHearingNoticeApplication gaHearingNoticeApplication;
+    private GAHearingNoticeDetail gaHearingNoticeDetail;
+    private String gaHearingNoticeInformation;
     @JsonUnwrapped
     private FeePaymentOutcomeDetails feePaymentOutcomeDetails;
     private String generalAppAddlnInfoText;
     private String generalAppWrittenRepText;
     private YesOrNo respondentResponseDeadlineChecked;
-    private final CertOfSC certOfSC;
     //Case name for manage case
     private String caseNameGaInternal;
     private String claimantBilingualLanguagePreference;
@@ -384,26 +390,6 @@ public class GeneralApplicationCaseData extends BaseCaseData implements Mappable
     private YesOrNo bilingualHint;
     private YesOrNo applicantBilingualLanguagePreference;
     private YesOrNo respondentBilingualLanguagePreference;
-    //WA claim track description
-    private final String gaWaTrackLabel;
-    private final String emailPartyReference;
-
-    @Builder.Default
-    private final List<Value<Document>> caseDocuments = new ArrayList<>();
-    private final String caseDocument1Name;
-
-    @Builder.Default
-    private final List<IdValue<Bundle>> caseBundles = new ArrayList<>();
-
-    @Builder.Default
-    private final List<Element<CaseDocument>> preTranslationGaDocuments = new ArrayList<>();
-    private final PreTranslationGaDocumentType preTranslationGaDocumentType;
-
-    @Builder.Default
-    private final List<Element<CaseDocument>> preTranslationGaDocsApplicant = new ArrayList<>();
-
-    @Builder.Default
-    private final List<Element<CaseDocument>> preTranslationGaDocsRespondent = new ArrayList<>();
 
     @JsonIgnore
     public boolean isHWFTypeApplication() {
@@ -437,13 +423,13 @@ public class GeneralApplicationCaseData extends BaseCaseData implements Mappable
     @JsonIgnore
     public boolean isApplicantBilingual() {
         return Objects.nonNull(applicantBilingualLanguagePreference)
-                && applicantBilingualLanguagePreference.equals(YES);
+            && applicantBilingualLanguagePreference.equals(YES);
     }
 
     @JsonIgnore
     public boolean isRespondentBilingual() {
         return Objects.nonNull(respondentBilingualLanguagePreference)
-                && respondentBilingualLanguagePreference.equals(YES);
+            && respondentBilingualLanguagePreference.equals(YES);
     }
 
     @JsonIgnore
