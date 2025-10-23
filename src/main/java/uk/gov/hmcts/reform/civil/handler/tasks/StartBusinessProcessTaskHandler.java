@@ -62,9 +62,9 @@ public class StartBusinessProcessTaskHandler extends BaseExternalTaskHandler {
                 if (!businessProcess.hasSameProcessInstanceId(externalTask.getProcessInstanceId())) {
                     log.error("Duplicated attempt to Start a business process -  CaseId ({}) CaseEvent ({}) " +
                                   "LegacyCaseReference ({}) AllocatedTrack ({})"
-                              + "externalTaskProcessInstanceId({}) businessProcessInstanceId({})", caseId,
-                              caseEvent, data.getLegacyCaseReference(), data.getAllocatedTrack(),
-                              externalTask.getProcessInstanceId(), businessProcess.getProcessInstanceId());
+                        + "externalTaskProcessInstanceId({}) businessProcessInstanceId({})", caseId,
+                        caseEvent, data.getLegacyCaseReference(), data.getAllocatedTrack(),
+                        externalTask.getProcessInstanceId(), businessProcess.getProcessInstanceId());
                     throw new BpmnError("ABORT");
                 }
                 return data;
