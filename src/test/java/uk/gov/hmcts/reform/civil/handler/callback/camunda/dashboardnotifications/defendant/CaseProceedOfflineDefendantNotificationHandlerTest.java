@@ -99,7 +99,6 @@ class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCallbackHan
                     .previousCCDState(AWAITING_APPLICANT_INTENTION).build();
 
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
-            when(toggleService.isGaForLipsEnabled()).thenReturn(true);
             when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
