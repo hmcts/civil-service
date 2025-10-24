@@ -13,7 +13,7 @@ import uk.gov.hmcts.reform.civil.service.robotics.JsonSchemaValidationService;
 import uk.gov.hmcts.reform.civil.service.robotics.RoboticsNotificationService;
 import uk.gov.hmcts.reform.civil.service.robotics.exception.JsonSchemaValidationException;
 import uk.gov.hmcts.reform.civil.service.robotics.exception.RoboticsDataException;
-import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForUnspec;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSpec;
 
 import java.util.Set;
@@ -29,7 +29,7 @@ public class RoboticsNotifier {
 
     protected final RoboticsNotificationService roboticsNotificationService;
     private final JsonSchemaValidationService jsonSchemaValidationService;
-    private final RoboticsDataMapper roboticsDataMapper;
+    private final RoboticsDataMapperForUnspec roboticsDataMapper;
     private final RoboticsDataMapperForSpec roboticsDataMapperForSpec;
     private final FeatureToggleService toggleService;
 
