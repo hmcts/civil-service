@@ -43,21 +43,17 @@ public class Respondent1AdmittedAmountPaymentDeadlineParamsBuilder extends Dashb
             .map(RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid)
             .orElse(null);
         if (paymentDate == null) {
-            log.error("paymentDate is null, returning empty string");
+            log.info("paymentDate is null, returning empty string");
         }
         return paymentDate;
     }
 
     private static String formatDateEn(LocalDate date) {
-        String formattedDate = date != null ? DateUtils.formatDate(date) : "";
-        log.debug("formattedDate: {}", formattedDate);
-        return formattedDate;
+        return date != null ? DateUtils.formatDate(date) : "";
     }
 
     private static String formatDateCy(LocalDate date) {
-        String formattedDateCy = date != null ? DateUtils.formatDateInWelsh(date, PAD_DAYS) : "";
-        log.debug("formattedDateCy: {}", formattedDateCy);
-        return formattedDateCy;
+        return date != null ? DateUtils.formatDateInWelsh(date, PAD_DAYS) : "";
     }
 
     private static void putDescriptions(Map<String, Object> params, String descriptionEn, String descriptionCy) {
@@ -72,6 +68,11 @@ public class Respondent1AdmittedAmountPaymentDeadlineParamsBuilder extends Dashb
         final String applicant1PartyName = getStringParam(params, PARAM_APPLICANT1_PARTY_NAME);
         log.debug("defendantAdmittedAmount: {}, applicant1PartyName: {}",
                   defendantAdmittedAmount, applicant1PartyName);
+
+        final LocalDate paymentDate = getPaymentDate(caseData);
+        final String paymentDateEn = formatDateEn(paymentDate);
+        final String paymentDateCy = formatDateCy(paymentDate);
+        putPaymentDeadlineParams(params, paymentDate, paymentDateEn, paymentDateCy);
 
         if (caseData.isPartAdmitPayImmediatelyClaimSpec()) {
             log.debug("PartAdmitPayImmediately is true");
@@ -91,9 +92,6 @@ public class Respondent1AdmittedAmountPaymentDeadlineParamsBuilder extends Dashb
 
         } else if (nonNull(caseData.getRespondToClaimAdmitPartLRspec())) {
             log.debug("PartAdmitPayImmediately is false");
-            final LocalDate paymentDate = getPaymentDate(caseData);
-            final String paymentDateEn = formatDateEn(paymentDate);
-            final String paymentDateCy = formatDateCy(paymentDate);
             final String amountIncludesTextEn = getStringParam(params, PARAM_AMOUNT_INCLUDES_TEXT_EN);
             final String amountIncludesTextCy = getStringParam(params, PARAM_AMOUNT_INCLUDES_TEXT_CY);
             log.debug("paymentDate: {}, paymentDateEn: {}, paymentDateCy: {}, amountIncludesTextEn: {}, amountIncludesTextCy: {}",
@@ -116,7 +114,6 @@ public class Respondent1AdmittedAmountPaymentDeadlineParamsBuilder extends Dashb
                                               amountIncludesTextCy,
                                               applicant1PartyName);
             putDescriptions(params, descriptionEn, descriptionCy);
-            putPaymentDeadlineParams(params, paymentDate, paymentDateEn, paymentDateCy);
         }
     }
 
@@ -124,9 +121,11 @@ public class Respondent1AdmittedAmountPaymentDeadlineParamsBuilder extends Dashb
                                                  LocalDate paymentDate,
                                                  String paymentDateEn,
                                                  String paymentDateCy) {
-        params.put(RESP1_ADMITTED_AMOUNT_DEADLINE, nonNull(paymentDate) ? paymentDate.atTime(END_OF_DAY) : "");
-        params.put(RESP1_ADMITTED_AMOUNT_DEADLINE_EN, paymentDateEn);
-        params.put(RESP1_ADMITTED_AMOUNT_DEADLINE_CY, paymentDateCy);
+        if (nonNull(paymentDate)) {
+            params.put(RESP1_ADMITTED_AMOUNT_DEADLINE, paymentDate.atTime(END_OF_DAY));
+            params.put(RESP1_ADMITTED_AMOUNT_DEADLINE_EN, paymentDateEn);
+            params.put(RESP1_ADMITTED_AMOUNT_DEADLINE_CY, paymentDateCy);
+        }
     }
 
     public String getDefendantAdmittedAmount(CaseData caseData) {

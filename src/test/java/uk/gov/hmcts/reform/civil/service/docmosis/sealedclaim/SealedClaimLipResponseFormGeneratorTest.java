@@ -303,7 +303,7 @@ class SealedClaimLipResponseFormGeneratorTest {
             .build();
         SealedClaimLipResponseForm templateData = generator
             .getTemplateData(caseData);
-        assertThat(templateData.getCommonDetails().getRepaymentPlan()).isNull();
+        assertThat(templateData.getCommonDetails().repaymentPlan()).isNull();
     }
 
     @Test
@@ -333,7 +333,7 @@ class SealedClaimLipResponseFormGeneratorTest {
         SealedClaimLipResponseForm templateData = generator
             .getTemplateData(caseData);
         Assertions.assertEquals(LocalDate.now(), templateData.getGenerationDate());
-        assertThat(templateData.getCommonDetails().getRepaymentPlan()).isNotNull();
+        assertThat(templateData.getCommonDetails().repaymentPlan()).isNotNull();
     }
 
     @Test
