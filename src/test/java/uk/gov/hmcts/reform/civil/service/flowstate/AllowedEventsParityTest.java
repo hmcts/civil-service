@@ -69,6 +69,12 @@ class AllowedEventsParityTest {
 
         for (String state : prod.keySet()) {
             assertThat(expected.get(state))
+                .as("Expected matrix contains duplicate events for state %s", state)
+                .doesNotHaveDuplicates();
+            assertThat(prod.get(state))
+                .as("Production UNSPEC map contains duplicate events for state %s", state)
+                .doesNotHaveDuplicates();
+            assertThat(expected.get(state))
                 .as("Events mismatch for state %s", state)
                 .containsExactlyInAnyOrderElementsOf(prod.get(state));
         }
@@ -100,6 +106,12 @@ class AllowedEventsParityTest {
             .containsExactlyInAnyOrderElementsOf(prod.keySet());
 
         for (String state : prod.keySet()) {
+            assertThat(expected.get(state))
+                .as("Expected SPEC matrix contains duplicate events for state %s", state)
+                .doesNotHaveDuplicates();
+            assertThat(prod.get(state))
+                .as("Production SPEC map contains duplicate events for state %s", state)
+                .doesNotHaveDuplicates();
             assertThat(expected.get(state))
                 .as("SPEC events mismatch for state %s", state)
                 .containsExactlyInAnyOrderElementsOf(prod.get(state));
