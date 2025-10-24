@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
+import uk.gov.hmcts.reform.civil.ga.callback.GeneralApplicationCallbackHandler;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.service.DocUploadDashboardNotificationService;
 import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
@@ -30,7 +31,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ApplicationProceedsInHeritageEventCallbackHandler extends CallbackHandler {
+public class ApplicationProceedsInHeritageEventCallbackHandler extends CallbackHandler implements GeneralApplicationCallbackHandler {
 
     private static final List<CaseEvent> APPLICATION_PROCEEDS_IN_HERITAGE_EVENTS =
         singletonList(APPLICATION_PROCEEDS_IN_HERITAGE);
