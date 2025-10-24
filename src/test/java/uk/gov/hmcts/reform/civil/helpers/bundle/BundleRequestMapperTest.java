@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.model.DocumentWithRegex;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
 import uk.gov.hmcts.reform.civil.model.bundle.BundleCreateRequest;
+import uk.gov.hmcts.reform.civil.model.bundle.BundlingRequestDocument;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
@@ -34,6 +35,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -137,20 +139,20 @@ class BundleRequestMapperTest {
                      bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments().get(11).getValue().getDocumentFileName());
         assertEquals("CL 1 Directions Questionnaire 10/02/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(0).getValue().getDocumentFileName());
-        assertEquals("DF 1 Directions Questionnaire 10/02/2023",
+        assertEquals("CL 1 Directions Questionnaire 11/03/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(1).getValue().getDocumentFileName());
-        if (featureToggleService.isCaseProgressionEnabled()) {
-            assertEquals("DF 1 Directions Questionnaire 12/03/2023",
-                         bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(2).getValue().getDocumentFileName());
-        }
+        assertEquals("DF 1 Directions Questionnaire 10/02/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(2).getValue().getDocumentFileName());
+        assertEquals("DF 1 Directions Questionnaire 12/03/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(3).getValue().getDocumentFileName());
         assertEquals("DF 2 Directions Questionnaire 10/02/2023",
-                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(caseProgressionCuiEnabled ? 3 : 2).getValue().getDocumentFileName());
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(4).getValue().getDocumentFileName());
         assertEquals("DF 2 Directions Questionnaire 11/02/2023",
-                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(caseProgressionCuiEnabled ? 4 : 3).getValue().getDocumentFileName());
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(5).getValue().getDocumentFileName());
         assertEquals("DF 2 Directions Questionnaire 10/03/2023",
-                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(caseProgressionCuiEnabled ? 5 : 4).getValue().getDocumentFileName());
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(6).getValue().getDocumentFileName());
         assertEquals("Directions Questionnaire 10/02/2023",
-                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(caseProgressionCuiEnabled ? 6 : 5).getValue().getDocumentFileName());
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(7).getValue().getDocumentFileName());
         assertEquals("Directions Order 10/02/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getOrdersDocuments().get(0).getValue().getDocumentFileName());
         assertEquals("Order 10/02/2023",
@@ -410,6 +412,106 @@ class BundleRequestMapperTest {
         assertEquals(0, defenceDocuments);
     }
 
+    @Test
+    void shouldIncludeDefendantDqWhenOnlyGenericCategoryPresent() {
+        CaseDocument defendantDq = CaseDocument.builder()
+            .documentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
+            .createdBy("Civil")
+            .documentLink(Document.builder()
+                              .documentUrl(TEST_URL + "/spec-dq")
+                              .documentFileName("spec-dq.pdf")
+                              .categoryID(DocCategory.DQ_DEF1.getValue())
+                              .build())
+            .createdDatetime(LocalDateTime.of(2025, 10, 24, 12, 0, 46))
+            .build();
+
+        CaseData caseData = CaseData.builder()
+            .ccdCaseReference(1L)
+            .systemGeneratedCaseDocuments(List.of(ElementUtils.element(defendantDq)))
+            .applicant1(Party.builder().individualFirstName("Happy").individualLastName("Person").type(Party.Type.INDIVIDUAL)
+                .partyName("Ms Happy Person").build())
+            .respondent1(Party.builder().individualFirstName("Sad").individualLastName("Human").type(Party.Type.INDIVIDUAL)
+                .partyName("Mr Sad Human").build())
+            .hearingDate(LocalDate.now())
+            .build();
+
+        given(featureToggleService.isCaseProgressionEnabled()).willReturn(false);
+        given(featureToggleService.isAmendBundleEnabled()).willReturn(false);
+
+        BundleCreateRequest bundleCreateRequest = bundleRequestMapper.mapCaseDataToBundleCreateRequest(caseData,
+            "sample.yaml", "test", "test");
+
+        List<Element<BundlingRequestDocument>> dqDocuments =
+            bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires();
+
+        assertEquals(1, dqDocuments.size());
+        assertEquals("DF 1 Directions Questionnaire 24/10/2025",
+            dqDocuments.get(0).getValue().getDocumentFileName());
+        assertEquals(TEST_URL + "/spec-dq",
+            dqDocuments.get(0).getValue().getDocumentLink().getDocumentUrl());
+    }
+
+    @Test
+    void shouldTreatMisCategorisedSealedClaimAsDefenceAndAvoidDuplicateClaimForm() {
+        CaseDocument claimForm = CaseDocument.builder()
+            .documentType(DocumentType.SEALED_CLAIM)
+            .documentLink(Document.builder()
+                              .documentUrl(TEST_URL + "/claim-form")
+                              .documentFileName("sealed_claim.pdf")
+                              .categoryID(DocCategory.CLAIMANT1_DETAILS_OF_CLAIM.getValue())
+                              .build())
+            .createdDatetime(LocalDateTime.of(2025, 10, 24, 12, 0, 35))
+            .createdBy("Civil")
+            .build();
+
+        CaseDocument misCategorisedDefence = CaseDocument.builder()
+            .documentType(DocumentType.SEALED_CLAIM)
+            .documentLink(Document.builder()
+                              .documentUrl(TEST_URL + "/response-sealed")
+                              .documentFileName("000MC013_response_sealed_form.pdf")
+                              .categoryID(DocCategory.DQ_DEF1.getValue())
+                              .build())
+            .createdDatetime(LocalDateTime.of(2025, 10, 24, 12, 0, 47))
+            .createdBy("Civil")
+            .build();
+
+        CaseData caseData = CaseData.builder()
+            .ccdCaseReference(1L)
+            .systemGeneratedCaseDocuments(List.of(
+                ElementUtils.element(claimForm),
+                ElementUtils.element(misCategorisedDefence)))
+            .applicant1(Party.builder().individualFirstName("Happy").individualLastName("Person")
+                .type(Party.Type.INDIVIDUAL).partyName("Ms Happy Person").build())
+            .respondent1(Party.builder().individualFirstName("Sad").individualLastName("Human")
+                .type(Party.Type.INDIVIDUAL).partyName("Mr Sad Human").build())
+            .hearingDate(LocalDate.now())
+            .build();
+
+        given(featureToggleService.isCaseProgressionEnabled()).willReturn(false);
+        given(featureToggleService.isAmendBundleEnabled()).willReturn(false);
+
+        BundleCreateRequest bundleCreateRequest = bundleRequestMapper.mapCaseDataToBundleCreateRequest(caseData,
+            "sample.yaml", "test", "test");
+
+        List<BundlingRequestDocument> statements = bundleCreateRequest.getCaseDetails().getCaseData()
+            .getStatementsOfCaseDocuments().stream().map(Element::getValue).collect(Collectors.toList());
+
+        long claimFormCount = statements.stream()
+            .filter(doc -> doc.getDocumentFileName().startsWith("Claim Form"))
+            .count();
+        long defenceCount = statements.stream()
+            .filter(doc -> doc.getDocumentFileName().contains("Defence"))
+            .count();
+
+        assertEquals(1, claimFormCount);
+        assertEquals(1, defenceCount);
+        BundlingRequestDocument defenceDoc = statements.stream()
+            .filter(doc -> doc.getDocumentFileName().contains("Defence"))
+            .findFirst()
+            .orElseThrow();
+        assertEquals(TEST_URL + "/response-sealed", defenceDoc.getDocumentLink().getDocumentUrl());
+    }
+
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void testBundleRequestMapperWithAllDocsAndCaseEvenEnable(boolean caseProgressionCuiEnabled) {
@@ -477,20 +579,20 @@ class BundleRequestMapperTest {
                      bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments().get(11).getValue().getDocumentFileName());
         assertEquals("CL 1 Directions Questionnaire 10/02/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(0).getValue().getDocumentFileName());
-        assertEquals("DF 1 Directions Questionnaire 10/02/2023",
+        assertEquals("CL 1 Directions Questionnaire 11/03/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(1).getValue().getDocumentFileName());
-        if (featureToggleService.isCaseProgressionEnabled()) {
-            assertEquals("DF 1 Directions Questionnaire 12/03/2023",
-                         bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(2).getValue().getDocumentFileName());
-        }
+        assertEquals("DF 1 Directions Questionnaire 10/02/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(2).getValue().getDocumentFileName());
+        assertEquals("DF 1 Directions Questionnaire 12/03/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(3).getValue().getDocumentFileName());
         assertEquals("DF 2 Directions Questionnaire 10/02/2023",
-                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(caseProgressionCuiEnabled ? 3 : 2).getValue().getDocumentFileName());
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(4).getValue().getDocumentFileName());
         assertEquals("DF 2 Directions Questionnaire 11/02/2023",
-                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(caseProgressionCuiEnabled ? 4 : 3).getValue().getDocumentFileName());
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(5).getValue().getDocumentFileName());
         assertEquals("DF 2 Directions Questionnaire 10/03/2023",
-                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(caseProgressionCuiEnabled ? 5 : 4).getValue().getDocumentFileName());
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(6).getValue().getDocumentFileName());
         assertEquals("Directions Questionnaire 10/02/2023",
-                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(caseProgressionCuiEnabled ? 6 : 5).getValue().getDocumentFileName());
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(7).getValue().getDocumentFileName());
         assertEquals("Directions Order 10/02/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getOrdersDocuments().get(0).getValue().getDocumentFileName());
         assertEquals("Order 10/02/2023",

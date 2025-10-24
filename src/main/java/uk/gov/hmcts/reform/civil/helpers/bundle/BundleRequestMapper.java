@@ -396,16 +396,20 @@ public class BundleRequestMapper {
         bundlingRequestDocuments.addAll(bundleDocumentsRetrieval.getDqByCategoryId(caseData,
                                                           DocCategory.APP1_DQ.getValue(), PartyType.CLAIMANT1));
         bundlingRequestDocuments.addAll(bundleDocumentsRetrieval.getDqByCategoryId(caseData,
+                                                          DocCategory.DQ_APP1.getValue(), PartyType.CLAIMANT1));
+        bundlingRequestDocuments.addAll(bundleDocumentsRetrieval.getDqByCategoryId(caseData,
                                                           DocCategory.DEF1_DEFENSE_DQ.getValue(), PartyType.DEFENDANT1));
-        if (featureToggleService.isCaseProgressionEnabled()) {
-            bundlingRequestDocuments.addAll(bundleDocumentsRetrieval.getDqByCategoryId(caseData,
-                                                              DocCategory.DQ_DEF1.getValue(), PartyType.DEFENDANT1));
-        }
+        bundlingRequestDocuments.addAll(bundleDocumentsRetrieval.getDqByCategoryId(caseData,
+                                                          DocCategory.DQ_DEF1.getValue(), PartyType.DEFENDANT1));
         bundlingRequestDocuments.addAll(bundleDocumentsRetrieval.getDqByCategoryId(caseData,
                                                           DocCategory.DEF2_DEFENSE_DQ.getValue(), PartyType.DEFENDANT2));
+        bundlingRequestDocuments.addAll(bundleDocumentsRetrieval.getDqByCategoryId(caseData,
+                                                          DocCategory.DQ_DEF2.getValue(), PartyType.DEFENDANT2));
 
         bundlingRequestDocuments.addAll(getDqWithNoCategoryId(caseData));
-        return ElementUtils.wrapElements(bundlingRequestDocuments);
+        return ElementUtils.wrapElements(bundlingRequestDocuments.stream()
+            .distinct()
+            .collect(Collectors.toList()));
     }
 
     private List<Element<BundlingRequestDocument>> mapStatementOfcaseDocs(CaseData caseData) {
@@ -425,24 +429,30 @@ public class BundleRequestMapper {
                 collectDefenceAndReplyDocuments(caseData)
             );
         sortedDefendantDefenceAndClaimantReply.forEach(caseDocumentElement -> {
-            String docType = caseDocumentElement.getValue().getDocumentType().equals(DocumentType.DEFENDANT_DEFENCE)
+            CaseDocument caseDocument = caseDocumentElement.getValue();
+            StatementOfCaseDocumentType statementDocType = resolveStatementDocumentType(caseDocument);
+            if (statementDocType == StatementOfCaseDocumentType.NONE) {
+                return;
+            }
+            String docType = statementDocType == StatementOfCaseDocumentType.DEFENCE
                 ? BundleFileNameList.DEFENCE.getDisplayName() : BundleFileNameList.CL_REPLY.getDisplayName();
+            String createdBy = caseDocument.getCreatedBy() == null ? "" : caseDocument.getCreatedBy();
             String party;
-            if (caseDocumentElement.getValue().getCreatedBy().equalsIgnoreCase("Defendant")) {
+            if (createdBy.equalsIgnoreCase("Defendant")) {
                 party = PartyType.DEFENDANT1.getDisplayName();
-            } else if (caseDocumentElement.getValue().getCreatedBy().equalsIgnoreCase("Defendant 2")) {
+            } else if (createdBy.equalsIgnoreCase("Defendant 2")) {
                 party = PartyType.DEFENDANT2.getDisplayName();
-            } else if (caseDocumentElement.getValue().getDocumentType() == DocumentType.DEFENDANT_DEFENCE) {
+            } else if (statementDocType == StatementOfCaseDocumentType.DEFENCE) {
                 party = PartyType.DEFENDANT1.getDisplayName();
             } else {
                 party = "";
             }
             String docName = generateDocName(docType, party, null,
-                                             caseDocumentElement.getValue().getCreatedDatetime().toLocalDate()
+                                             caseDocument.getCreatedDatetime().toLocalDate()
             );
             bundlingRequestDocuments.add(buildBundlingRequestDoc(
                 docName,
-                caseDocumentElement.getValue().getDocumentLink(),
+                caseDocument.getDocumentLink(),
                 docType
             ));
         });
@@ -515,15 +525,13 @@ public class BundleRequestMapper {
             return;
         }
         CaseDocument caseDocument = element.getValue();
-        if (caseDocument.getDocumentType() != DocumentType.DEFENDANT_DEFENCE
-            && caseDocument.getDocumentType() != DocumentType.CLAIMANT_DEFENCE) {
+        StatementOfCaseDocumentType statementDocType = resolveStatementDocumentType(caseDocument);
+        if (statementDocType == StatementOfCaseDocumentType.NONE) {
             return;
         }
         Document documentLink = caseDocument.getDocumentLink();
         StringBuilder keyBuilder = new StringBuilder();
-        if (caseDocument.getDocumentType() != null) {
-            keyBuilder.append(caseDocument.getDocumentType().name());
-        }
+        keyBuilder.append(statementDocType.name());
         keyBuilder.append(":");
         if (documentLink != null && documentLink.getDocumentUrl() != null) {
             keyBuilder.append(documentLink.getDocumentUrl());
@@ -533,6 +541,45 @@ public class BundleRequestMapper {
             keyBuilder.append(caseDocument.getDocumentName());
         }
         uniqueDocuments.putIfAbsent(keyBuilder.toString(), element);
+    }
+
+    private StatementOfCaseDocumentType resolveStatementDocumentType(CaseDocument caseDocument) {
+        if (caseDocument.getDocumentType() == DocumentType.DEFENDANT_DEFENCE) {
+            return StatementOfCaseDocumentType.DEFENCE;
+        }
+        if (caseDocument.getDocumentType() == DocumentType.CLAIMANT_DEFENCE) {
+            return StatementOfCaseDocumentType.CLAIMANT_REPLY;
+        }
+        if (caseDocument.getDocumentType() == DocumentType.SEALED_CLAIM && isMisCategorisedDefence(caseDocument)) {
+            return StatementOfCaseDocumentType.DEFENCE;
+        }
+        return StatementOfCaseDocumentType.NONE;
+    }
+
+    private boolean isMisCategorisedDefence(CaseDocument caseDocument) {
+        Document documentLink = caseDocument.getDocumentLink();
+        String categoryId = documentLink != null ? documentLink.getCategoryID() : null;
+        if (categoryId != null && isDefenceCategory(categoryId)) {
+            return true;
+        }
+        String fileName = documentLink != null ? documentLink.getDocumentFileName() : caseDocument.getDocumentName();
+        if (fileName != null && fileName.toLowerCase().contains("response")) {
+            return true;
+        }
+        return false;
+    }
+
+    private boolean isDefenceCategory(String categoryId) {
+        return DocCategory.DEF1_DEFENSE_DQ.getValue().equals(categoryId)
+            || DocCategory.DQ_DEF1.getValue().equals(categoryId)
+            || DocCategory.DEF2_DEFENSE_DQ.getValue().equals(categoryId)
+            || DocCategory.DQ_DEF2.getValue().equals(categoryId);
+    }
+
+    private enum StatementOfCaseDocumentType {
+        DEFENCE,
+        CLAIMANT_REPLY,
+        NONE
     }
 
     private List<Element<BundlingRequestDocument>> mapTrialDocuments(CaseData caseData) {
