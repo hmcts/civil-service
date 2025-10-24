@@ -103,7 +103,7 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean isEligibleForCCJ() {
-        if (isCasedDiscontinued()) {
+        if (isCasedDiscontinued() || isPaperResponse()) {
             return false;
         }
         return (caseData.getRespondent1ResponseDeadline() != null
