@@ -30,6 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.params.provider.Arguments.of;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CHANGE_LANGUAGE_PREFERENCE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISPATCH_BUSINESS_PROCESS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION_COSC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ACKNOWLEDGEMENT_OF_SERVICE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ACKNOWLEDGE_CLAIM;
@@ -109,6 +110,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PARTIAL_REMISSION_HWF
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RECORD_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REFER_JUDGE_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REFER_TO_JUDGE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REMOVE_DOCUMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_FOR_RECONSIDERATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_JUDGEMENT_ADMISSION_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESET_PIN;
@@ -134,6 +136,8 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.VALIDATE_DISCONTINUE_
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.WITHDRAW_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.asyncStitchingComplete;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.migrateCase;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.queryManagementRaiseQuery;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.queryManagementRespondQuery;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_ADMIT_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED;
@@ -143,6 +147,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_D
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_ISSUED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_ISSUED_PAYMENT_FAILED;
@@ -831,7 +836,6 @@ class FlowStateAllowedEventServiceTest {
                         migrateCase,
                         TAKE_CASE_OFFLINE,
                         GENERATE_DIRECTIONS_ORDER,
-                        TRIAL_READINESS,
                         EVIDENCE_UPLOAD_APPLICANT,
                         EVIDENCE_UPLOAD_RESPONDENT,
                         EVIDENCE_UPLOAD_JUDGE,
@@ -921,12 +925,6 @@ class FlowStateAllowedEventServiceTest {
                         SETTLE_CLAIM_MARK_PAID_FULL,
                         DISCONTINUE_CLAIM_CLAIMANT,
                         VALIDATE_DISCONTINUE_CLAIM_CLAIMANT
-                    }
-                ),
-                of(
-                    CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE,
-                    new CaseEvent[] {
-                        CASE_PROCEEDS_IN_CASEMAN
                     }
                 ),
                 of(
@@ -1040,6 +1038,36 @@ class FlowStateAllowedEventServiceTest {
                 of(
                     TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED,
                     new CaseEvent[] { APPLICATION_OFFLINE_UPDATE_CLAIM,
+                        migrateCase
+                    }
+                ),
+                of(
+                    TAKEN_OFFLINE_SDO_NOT_DRAWN,
+                    new CaseEvent[] {
+                        migrateCase
+                    }
+                ),
+                of(
+                    TAKEN_OFFLINE_AFTER_SDO,
+                    new CaseEvent[] {
+                        AMEND_PARTY_DETAILS
+                    }
+                ),
+                of(
+                    PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT,
+                    new CaseEvent[] {
+                        NOC_REQUEST,
+                        APPLY_NOC_DECISION,
+                        TAKE_CASE_OFFLINE,
+                        NOTIFY_DEFENDANT_OF_CLAIM,
+                        APPLICATION_OFFLINE_UPDATE_CLAIM,
+                        migrateCase
+                    }
+                ),
+                of(
+                    CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE,
+                    new CaseEvent[] {
+                        APPLICATION_CLOSED_UPDATE_CLAIM,
                         migrateCase
                     }
                 ),
@@ -1384,7 +1412,8 @@ class FlowStateAllowedEventServiceTest {
                         CONFIRM_ORDER_REVIEW,
                         ORDER_REVIEW_OBLIGATION_CHECK,
                         INITIATE_GENERAL_APPLICATION_COSC,
-                        CHANGE_LANGUAGE_PREFERENCE
+                        CHANGE_LANGUAGE_PREFERENCE,
+                        EVIDENCE_UPLOAD_APPLICANT
                     }
                 ),
                 of(
@@ -1506,6 +1535,7 @@ class FlowStateAllowedEventServiceTest {
                         MANAGE_STAY,
                         CONFIRM_ORDER_REVIEW,
                         NOC_REQUEST,
+                        APPLY_NOC_DECISION,
                         ORDER_REVIEW_OBLIGATION_CHECK,
                         INITIATE_GENERAL_APPLICATION_COSC,
                         CHANGE_LANGUAGE_PREFERENCE
@@ -1552,6 +1582,7 @@ class FlowStateAllowedEventServiceTest {
                         INVALID_HWF_REFERENCE,
                         CONFIRM_ORDER_REVIEW,
                         NOC_REQUEST,
+                        APPLY_NOC_DECISION,
                         ORDER_REVIEW_OBLIGATION_CHECK,
                         INITIATE_GENERAL_APPLICATION_COSC,
                         CHANGE_LANGUAGE_PREFERENCE
@@ -1587,6 +1618,8 @@ class FlowStateAllowedEventServiceTest {
                         DISCONTINUE_CLAIM_CLAIMANT,
                         VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                         CONFIRM_ORDER_REVIEW,
+                        NOC_REQUEST,
+                        APPLY_NOC_DECISION,
                         ORDER_REVIEW_OBLIGATION_CHECK,
                         INITIATE_GENERAL_APPLICATION_COSC,
                         CHANGE_LANGUAGE_PREFERENCE
@@ -1597,6 +1630,9 @@ class FlowStateAllowedEventServiceTest {
                     new CaseEvent[] {
                         DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
                         REQUEST_JUDGEMENT_ADMISSION_SPEC,
+                        INITIATE_GENERAL_APPLICATION,
+                        NOC_REQUEST,
+                        APPLY_NOC_DECISION,
                         CHANGE_LANGUAGE_PREFERENCE
                     }
                 ),
@@ -1604,6 +1640,9 @@ class FlowStateAllowedEventServiceTest {
                     PART_ADMIT_PROCEED,
                     new CaseEvent[] {
                         DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
+                        NOC_REQUEST,
+                        APPLY_NOC_DECISION,
+                        INITIATE_GENERAL_APPLICATION,
                         CHANGE_LANGUAGE_PREFERENCE
                     }
                 ),
@@ -1611,6 +1650,9 @@ class FlowStateAllowedEventServiceTest {
                     PART_ADMIT_NOT_PROCEED,
                     new CaseEvent[] {
                         DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
+                        NOC_REQUEST,
+                        APPLY_NOC_DECISION,
+                        INITIATE_GENERAL_APPLICATION,
                         CHANGE_LANGUAGE_PREFERENCE
                     }
                 ),
@@ -1624,11 +1666,14 @@ class FlowStateAllowedEventServiceTest {
                         DISMISS_CASE,
                         MANAGE_STAY,
                         CONFIRM_ORDER_REVIEW,
+                        NOC_REQUEST,
+                        APPLY_NOC_DECISION,
                         ORDER_REVIEW_OBLIGATION_CHECK,
                         REQUEST_JUDGEMENT_ADMISSION_SPEC,
                         JUDGMENT_PAID_IN_FULL,
                         INITIATE_GENERAL_APPLICATION,
                         REFER_JUDGE_DEFENCE_RECEIVED,
+                        GENERATE_DIRECTIONS_ORDER,
                         INITIATE_GENERAL_APPLICATION_COSC,
                         CHANGE_LANGUAGE_PREFERENCE
                     }
@@ -1637,6 +1682,8 @@ class FlowStateAllowedEventServiceTest {
                     PART_ADMIT_AGREE_SETTLE,
                     new CaseEvent[] {
                         DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
+                        NOC_REQUEST,
+                        APPLY_NOC_DECISION,
                         CHANGE_LANGUAGE_PREFERENCE
                     }
                 ),
@@ -1644,8 +1691,11 @@ class FlowStateAllowedEventServiceTest {
                     FULL_ADMIT_PAY_IMMEDIATELY,
                     new CaseEvent[] {
                         DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
+                        NOC_REQUEST,
+                        APPLY_NOC_DECISION,
                         REQUEST_JUDGEMENT_ADMISSION_SPEC,
                         REFER_JUDGE_DEFENCE_RECEIVED,
+                        GENERATE_DIRECTIONS_ORDER,
                         CHANGE_LANGUAGE_PREFERENCE
                     }
                 ),
@@ -1653,6 +1703,9 @@ class FlowStateAllowedEventServiceTest {
                     FULL_ADMIT_PROCEED,
                     new CaseEvent[] {
                         DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
+                        NOC_REQUEST,
+                        APPLY_NOC_DECISION,
+                        INITIATE_GENERAL_APPLICATION,
                         CHANGE_LANGUAGE_PREFERENCE
                     }
                 ),
@@ -1660,6 +1713,9 @@ class FlowStateAllowedEventServiceTest {
                     FULL_ADMIT_NOT_PROCEED,
                     new CaseEvent[] {
                         DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
+                        NOC_REQUEST,
+                        APPLY_NOC_DECISION,
+                        INITIATE_GENERAL_APPLICATION,
                         CHANGE_LANGUAGE_PREFERENCE
                     }
                 ),
@@ -1670,7 +1726,12 @@ class FlowStateAllowedEventServiceTest {
                         EDIT_JUDGMENT,
                         JUDGMENT_PAID_IN_FULL,
                         SET_ASIDE_JUDGMENT,
+                        NOC_REQUEST,
+                        APPLY_NOC_DECISION,
+                        INITIATE_GENERAL_APPLICATION,
                         REFER_JUDGE_DEFENCE_RECEIVED,
+                        GENERATE_DIRECTIONS_ORDER,
+                        INITIATE_GENERAL_APPLICATION_COSC,
                         CHANGE_LANGUAGE_PREFERENCE
                     }
                 ),
@@ -1700,7 +1761,6 @@ class FlowStateAllowedEventServiceTest {
                         migrateCase,
                         TAKE_CASE_OFFLINE,
                         GENERATE_DIRECTIONS_ORDER,
-                        TRIAL_READINESS,
                         EVIDENCE_UPLOAD_APPLICANT,
                         EVIDENCE_UPLOAD_RESPONDENT,
                         EVIDENCE_UPLOAD_JUDGE,
@@ -1718,7 +1778,6 @@ class FlowStateAllowedEventServiceTest {
                         CLAIMANT_RESPONSE_CUI,
                         UPLOAD_MEDIATION_DOCUMENTS,
                         CUI_UPLOAD_MEDIATION_DOCUMENTS,
-                        REQUEST_FOR_RECONSIDERATION,
                         DECISION_ON_RECONSIDERATION_REQUEST,
                         EDIT_JUDGMENT,
                         COURT_OFFICER_ORDER,
@@ -1737,6 +1796,8 @@ class FlowStateAllowedEventServiceTest {
                         UPDATE_HELP_WITH_FEE_NUMBER,
                         INVALID_HWF_REFERENCE,
                         CONFIRM_ORDER_REVIEW,
+                        NOC_REQUEST,
+                        APPLY_NOC_DECISION,
                         MEDIATION_UNSUCCESSFUL,
                         MEDIATION_SUCCESSFUL,
                         ORDER_REVIEW_OBLIGATION_CHECK,
@@ -1767,6 +1828,10 @@ class FlowStateAllowedEventServiceTest {
                         SETTLE_CLAIM_MARK_PAID_FULL,
                         DISCONTINUE_CLAIM_CLAIMANT,
                         VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                        CONFIRM_ORDER_REVIEW,
+                        NOC_REQUEST,
+                        APPLY_NOC_DECISION,
+                        ORDER_REVIEW_OBLIGATION_CHECK,
                         INITIATE_GENERAL_APPLICATION_COSC,
                         CHANGE_LANGUAGE_PREFERENCE
                     }
@@ -1923,6 +1988,8 @@ class FlowStateAllowedEventServiceTest {
                         DISMISS_CASE,
                         MANAGE_STAY,
                         CONFIRM_ORDER_REVIEW,
+                        NOC_REQUEST,
+                        APPLY_NOC_DECISION,
                         ORDER_REVIEW_OBLIGATION_CHECK,
                         INITIATE_GENERAL_APPLICATION_COSC,
                         CHANGE_LANGUAGE_PREFERENCE
@@ -1954,7 +2021,6 @@ class FlowStateAllowedEventServiceTest {
                         migrateCase,
                         TAKE_CASE_OFFLINE,
                         GENERATE_DIRECTIONS_ORDER,
-                        TRIAL_READINESS,
                         EVIDENCE_UPLOAD_APPLICANT,
                         EVIDENCE_UPLOAD_RESPONDENT,
                         EVIDENCE_UPLOAD_JUDGE,
@@ -1984,7 +2050,10 @@ class FlowStateAllowedEventServiceTest {
                         DISMISS_CASE,
                         MANAGE_STAY,
                         CONFIRM_ORDER_REVIEW,
+                        NOC_REQUEST,
+                        APPLY_NOC_DECISION,
                         ORDER_REVIEW_OBLIGATION_CHECK,
+                        INITIATE_GENERAL_APPLICATION_COSC,
                         CHANGE_LANGUAGE_PREFERENCE
                     }
                 ),
@@ -2014,7 +2083,6 @@ class FlowStateAllowedEventServiceTest {
                         migrateCase,
                         TAKE_CASE_OFFLINE,
                         GENERATE_DIRECTIONS_ORDER,
-                        TRIAL_READINESS,
                         EVIDENCE_UPLOAD_APPLICANT,
                         EVIDENCE_UPLOAD_RESPONDENT,
                         EVIDENCE_UPLOAD_JUDGE,
@@ -2044,6 +2112,8 @@ class FlowStateAllowedEventServiceTest {
                         INVALID_HWF_REFERENCE,
                         AMEND_RESTITCH_BUNDLE,
                         CONFIRM_ORDER_REVIEW,
+                        NOC_REQUEST,
+                        APPLY_NOC_DECISION,
                         ORDER_REVIEW_OBLIGATION_CHECK,
                         INITIATE_GENERAL_APPLICATION_COSC,
                         CHANGE_LANGUAGE_PREFERENCE
@@ -2100,7 +2170,6 @@ class FlowStateAllowedEventServiceTest {
                         migrateCase,
                         TAKE_CASE_OFFLINE,
                         GENERATE_DIRECTIONS_ORDER,
-                        TRIAL_READINESS,
                         EVIDENCE_UPLOAD_APPLICANT,
                         EVIDENCE_UPLOAD_RESPONDENT,
                         EVIDENCE_UPLOAD_JUDGE,
@@ -2151,6 +2220,8 @@ class FlowStateAllowedEventServiceTest {
                         DISMISS_CASE,
                         MANAGE_STAY,
                         CONFIRM_ORDER_REVIEW,
+                        NOC_REQUEST,
+                        APPLY_NOC_DECISION,
                         ORDER_REVIEW_OBLIGATION_CHECK,
                         CHANGE_LANGUAGE_PREFERENCE
                     }
@@ -2227,9 +2298,12 @@ class FlowStateAllowedEventServiceTest {
                         LIP_CLAIM_SETTLED,
                         DISCONTINUE_CLAIM_CLAIMANT,
                         VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                        NOC_REQUEST,
+                        APPLY_NOC_DECISION,
                         JUDGMENT_PAID_IN_FULL,
                         INITIATE_GENERAL_APPLICATION,
                         REFER_JUDGE_DEFENCE_RECEIVED,
+                        GENERATE_DIRECTIONS_ORDER,
                         INITIATE_GENERAL_APPLICATION_COSC,
                         CHANGE_LANGUAGE_PREFERENCE
                     }
@@ -2240,6 +2314,9 @@ class FlowStateAllowedEventServiceTest {
                         DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
                         REQUEST_JUDGEMENT_ADMISSION_SPEC,
                         LIP_CLAIM_SETTLED,
+                        NOC_REQUEST,
+                        APPLY_NOC_DECISION,
+                        INITIATE_GENERAL_APPLICATION,
                         CHANGE_LANGUAGE_PREFERENCE
                     }
                 ),
@@ -2261,10 +2338,14 @@ class FlowStateAllowedEventServiceTest {
                         DISMISS_CASE,
                         MANAGE_STAY,
                         CONFIRM_ORDER_REVIEW,
+                        NOC_REQUEST,
+                        APPLY_NOC_DECISION,
                         ORDER_REVIEW_OBLIGATION_CHECK,
                         INITIATE_GENERAL_APPLICATION,
                         REFER_JUDGE_DEFENCE_RECEIVED,
+                        GENERATE_DIRECTIONS_ORDER,
                         INITIATE_GENERAL_APPLICATION_COSC,
+                        EVIDENCE_UPLOAD_RESPONDENT,
                         CHANGE_LANGUAGE_PREFERENCE
                     }
                 ),
@@ -2290,6 +2371,8 @@ class FlowStateAllowedEventServiceTest {
                         INITIATE_GENERAL_APPLICATION,
                         ADD_UNAVAILABLE_DATES,
                         CHANGE_SOLICITOR_EMAIL,
+                        NOC_REQUEST,
+                        APPLY_NOC_DECISION,
                         ORDER_REVIEW_OBLIGATION_CHECK,
                         CHANGE_LANGUAGE_PREFERENCE
                     }
@@ -2660,64 +2743,113 @@ class FlowStateAllowedEventServiceTest {
         }
     }
 
-    @Test
-    void shouldReturnTrue_whenCaseEventIsMigrateCase() {
-        CaseDetails caseDetails =
-            CaseDetailsBuilder.builder()
-                .atStateAwaitingCaseDetailsNotification().build();
-        assertThat(flowStateAllowedEventService.isAllowed(caseDetails, migrateCase))
-            .isTrue();
-    }
+    @Nested
+    class IsEventAllowedWhiteList {
 
-    @Test
-    void shouldReturnTrue_whenCaseEventIsNotifyHearingParties() {
-        CaseDetails caseDetails =
-            CaseDetailsBuilder.builder()
-                .atStateAwaitingCaseDetailsNotification().build();
-        assertThat(flowStateAllowedEventService.isAllowed(caseDetails, NOTIFY_HEARING_PARTIES))
-            .isTrue();
-    }
+        @Test
+        void shouldReturnTrue_whenCaseEventIsMigrateCase() {
+            CaseDetails caseDetails =
+                CaseDetailsBuilder.builder()
+                    .atStateAwaitingCaseDetailsNotification().build();
+            assertThat(flowStateAllowedEventService.isAllowed(caseDetails, migrateCase))
+                .isTrue();
+        }
 
-    @Test
-    void shouldReturnTrue_whenCaseEventIsManageContactInformation() {
-        CaseDetails caseDetails =
-            CaseDetailsBuilder.builder()
-                .atStateAwaitingCaseDetailsNotification().build();
-        assertThat(flowStateAllowedEventService.isAllowed(caseDetails, MANAGE_CONTACT_INFORMATION))
-            .isTrue();
-    }
+        @Test
+        void shouldReturnTrue_whenCaseEventIsNotifyHearingParties() {
+            CaseDetails caseDetails =
+                CaseDetailsBuilder.builder()
+                    .atStateAwaitingCaseDetailsNotification().build();
+            assertThat(flowStateAllowedEventService.isAllowed(caseDetails, NOTIFY_HEARING_PARTIES))
+                .isTrue();
+        }
 
-    @Test
-    void shouldReturnTrue_whenCaseEventIsUpdateNextHearingInfo() {
-        CaseDetails caseDetails =
-            CaseDetailsBuilder.builder()
-                .atStateAwaitingCaseDetailsNotification().build();
-        assertThat(flowStateAllowedEventService.isAllowed(caseDetails, UpdateNextHearingInfo))
-            .isTrue();
-    }
+        @Test
+        void shouldReturnTrue_whenCaseEventIsManageContactInformation() {
+            CaseDetails caseDetails =
+                CaseDetailsBuilder.builder()
+                    .atStateAwaitingCaseDetailsNotification().build();
+            assertThat(flowStateAllowedEventService.isAllowed(caseDetails, MANAGE_CONTACT_INFORMATION))
+                .isTrue();
+        }
 
-    @Test
-    void shouldReturnTrue_whenAddCaseNoteEvent_forMediationUnsuccessfulProceedFlowstate() {
-        CaseDetails caseDetails = CaseDetailsBuilder.builder().atStateMediationUnsuccessful().build();
-        assertThat(flowStateAllowedEventService.isAllowed(caseDetails, ADD_CASE_NOTE))
-            .isTrue();
-    }
+        @Test
+        void shouldReturnTrue_whenCaseEventIsCaseProceedsInCaseman() {
+            CaseDetails caseDetails =
+                CaseDetailsBuilder.builder()
+                    .atStateAwaitingCaseDetailsNotification().build();
+            assertThat(flowStateAllowedEventService.isAllowed(caseDetails, CASE_PROCEEDS_IN_CASEMAN))
+                .isTrue();
+        }
 
-    @Test
-    void shouldReturnTrue_whenCaseEventIsUpdateNextHearingDetails() {
-        CaseDetails caseDetails =
-            CaseDetailsBuilder.builder()
-                .atStateAwaitingCaseDetailsNotification().build();
-        assertThat(flowStateAllowedEventService.isAllowed(caseDetails, UPDATE_NEXT_HEARING_DETAILS))
-            .isTrue();
-    }
+        @Test
+        void shouldReturnTrue_whenCaseEventIsUpdateNextHearingInfo() {
+            CaseDetails caseDetails =
+                CaseDetailsBuilder.builder()
+                    .atStateAwaitingCaseDetailsNotification().build();
+            assertThat(flowStateAllowedEventService.isAllowed(caseDetails, UpdateNextHearingInfo))
+                .isTrue();
+        }
 
-    @Test
-    void shouldReturnTrue_whenCaseEventIsSendAndReply() {
-        CaseDetails caseDetails =
-            CaseDetailsBuilder.builder()
-                .atStateAwaitingCaseDetailsNotification().build();
-        assertThat(flowStateAllowedEventService.isAllowed(caseDetails, SEND_AND_REPLY))
-            .isTrue();
+        @Test
+        void shouldReturnTrue_whenCaseEventIsUpdateNextHearingDetails() {
+            CaseDetails caseDetails =
+                CaseDetailsBuilder.builder()
+                    .atStateAwaitingCaseDetailsNotification().build();
+            assertThat(flowStateAllowedEventService.isAllowed(caseDetails, UPDATE_NEXT_HEARING_DETAILS))
+                .isTrue();
+        }
+
+        @Test
+        void shouldReturnTrue_whenCaseEventIsDispatchBusinessProcess() {
+            CaseDetails caseDetails =
+                CaseDetailsBuilder.builder()
+                    .atStateAwaitingCaseDetailsNotification().build();
+            assertThat(flowStateAllowedEventService.isAllowed(caseDetails, DISPATCH_BUSINESS_PROCESS))
+                .isTrue();
+        }
+
+        @Test
+        void shouldReturnTrue_whenCaseEventIsSendAndReply() {
+            CaseDetails caseDetails =
+                CaseDetailsBuilder.builder()
+                    .atStateAwaitingCaseDetailsNotification().build();
+            assertThat(flowStateAllowedEventService.isAllowed(caseDetails, SEND_AND_REPLY))
+                .isTrue();
+        }
+
+        @Test
+        void shouldReturnTrue_whenCaseEventIsManagementRaiseQuery() {
+            CaseDetails caseDetails =
+                CaseDetailsBuilder.builder()
+                    .atStateAwaitingCaseDetailsNotification().build();
+            assertThat(flowStateAllowedEventService.isAllowed(caseDetails, queryManagementRaiseQuery))
+                .isTrue();
+        }
+
+        @Test
+        void shouldReturnTrue_whenCaseEventIsManagementRespondQuery() {
+            CaseDetails caseDetails =
+                CaseDetailsBuilder.builder()
+                    .atStateAwaitingCaseDetailsNotification().build();
+            assertThat(flowStateAllowedEventService.isAllowed(caseDetails, queryManagementRespondQuery))
+                .isTrue();
+        }
+
+        @Test
+        void shouldReturnTrue_whenAddCaseNoteEvent_forMediationUnsuccessfulProceedFlowstate() {
+            CaseDetails caseDetails = CaseDetailsBuilder.builder().atStateMediationUnsuccessful().build();
+            assertThat(flowStateAllowedEventService.isAllowed(caseDetails, ADD_CASE_NOTE))
+                .isTrue();
+        }
+
+        @Test
+        void shouldReturnTrue_whenCaseEventIsRemoveDocument() {
+            CaseDetails caseDetails =
+                CaseDetailsBuilder.builder()
+                    .atStateAwaitingCaseDetailsNotification().build();
+            assertThat(flowStateAllowedEventService.isAllowed(caseDetails, REMOVE_DOCUMENT))
+                .isTrue();
+        }
     }
 }
