@@ -11,10 +11,13 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.client.EvidenceManagementApiClient;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.event.BundleCreationTriggerEvent;
-import uk.gov.hmcts.reform.civil.helpers.bundle.BundleRequestMapper;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.helpers.bundle.BundleRequestMapper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
@@ -24,9 +27,6 @@ import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.UserService;
@@ -56,7 +56,6 @@ class BundleCreationServiceTest {
     SystemUpdateUserConfiguration userConfig;
     @Mock
     private CoreCaseDataService coreCaseDataService;
-
     @Mock
     private AuthTokenGenerator authTokenGenerator;
     @Mock
@@ -66,10 +65,12 @@ class BundleCreationServiceTest {
 
     private final String testUrl = "url";
     private final String testFileName = "testFileName.pdf";
+    private static final String ACCESS_TOKEN = "ACCESS_TOKEN";
+
     CaseData caseData;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         List<Element<UploadEvidenceWitness>> witnessEvidenceDocs = setupWitnessEvidenceDocs();
         List<Element<UploadEvidenceExpert>> expertEvidenceDocs = setupExpertEvidenceDocs();
         List<Element<UploadEvidenceDocumentType>> otherEvidenceDocs = setupOtherEvidenceDocs();
@@ -170,14 +171,11 @@ class BundleCreationServiceTest {
         given(bundleRequestMapper.mapCaseDataToBundleCreateRequest(any(), any(), any(), any())).willReturn(null);
         given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(null);
         given(coreCaseDataService.getCase(1L)).willReturn(caseDetails);
-        given(userConfig.getUserName()).willReturn("test");
-        given(userConfig.getPassword()).willReturn("test");
         given(objectMapper.convertValue(caseDetails.getData(), CaseData.class)).willReturn(caseData);
         given(authTokenGenerator.generate()).willReturn("test");
-        given(userService.getAccessToken("test", "test")).willReturn("test");
 
         //When: bundlecreation service is called
-        bundlingService.createBundle(new BundleCreationTriggerEvent(1L));
+        bundlingService.createBundle(new BundleCreationTriggerEvent(1L, ACCESS_TOKEN));
 
         //Then: BundleRest API should be called
         verify(evidenceManagementApiClient).createNewBundle(anyString(), anyString(), any());
