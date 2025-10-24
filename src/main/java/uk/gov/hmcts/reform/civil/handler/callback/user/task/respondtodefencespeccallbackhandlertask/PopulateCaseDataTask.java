@@ -88,7 +88,7 @@ public class PopulateCaseDataTask implements CaseTask {
                     courtLocationUtils.getLocationsFromList(locations)).build()
             ).build());
 
-        if (V_2.equals(callbackParams.getVersion()) && featureToggleService.isPinInPostEnabled()) {
+        if (V_2.equals(callbackParams.getVersion())) {
             updatedCaseData.showResponseOneVOneFlag(responseOneVOneShowTagService.setUpOneVOneFlow(caseData));
             updatedCaseData.respondent1PaymentDateToStringSpec(paymentDateService.getFormattedPaymentDate(caseData));
 
@@ -144,12 +144,10 @@ public class PopulateCaseDataTask implements CaseTask {
                 }
             });
         }
-        if (featureToggleService.isPinInPostEnabled()) {
-            caseData.getSystemGeneratedCaseDocuments().forEach(document -> {
-                if (document.getValue().getDocumentName().contains("response_sealed_form.pdf")) {
-                    updatedCaseData.respondent1ClaimResponseDocumentSpec(document.getValue());
-                }
-            });
-        }
+        caseData.getSystemGeneratedCaseDocuments().forEach(document -> {
+            if (document.getValue().getDocumentName().contains("response_sealed_form.pdf")) {
+                updatedCaseData.respondent1ClaimResponseDocumentSpec(document.getValue());
+            }
+        });
     }
 }

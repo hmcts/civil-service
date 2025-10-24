@@ -167,7 +167,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         var caseData = callbackParams.getCaseData();
         final var caseDataBuilder = caseData.toBuilder();
         ArrayList<String> errors = new ArrayList<>();
-        if (featureToggleService.isPinInPostEnabled() && caseData.isRespondentResponseBilingual()) {
+        if (caseData.isRespondentResponseBilingual()) {
             errors.add(DJ_NOT_VALID_FOR_THIS_LIP_CLAIM);
         } else if (nonNull(caseData.getRespondent1ResponseDeadline())
             && caseData.getRespondent1ResponseDeadline().isAfter(LocalDateTime.now())) {
@@ -379,7 +379,6 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         //creates  the text on the page, based on calculated values
         StringBuilder repaymentBreakdown = new StringBuilder();
         if (caseData.isLRvLipOneVOne()
-            && toggleService.isPinInPostEnabled()
             && V_1.equals(callbackParams.getVersion())) {
             repaymentBreakdown.append(
                 "The Judgment request will be reviewed by the court, this case will proceed offline, you will receive any further updates by post.");
