@@ -1,0 +1,8 @@
+{
+  "name": "Notice.AAA6.CP.Case.Stayed.Claimant",
+  "role": "CLAIMANT",
+  "titleEn": "The case has been stayed",
+  "titleCy": "Mae’r achos wedi cael ei atal",
+  "descriptionEn": "<p class=\"govuk-body\">The case has been stayed. This could be as a result of a judge’s order. Any upcoming hearings will be cancelled.</p>",
+  "descriptionCy": "<p class=\"govuk-body\">Mae’r achos wedi’i atal. Gallai hyn fod o ganlyniad i orchymyn a waned gan farnwr. Bydd unrhyw wrandawiadau sydd i ddod yn cael eu canslo.</p>"
+}

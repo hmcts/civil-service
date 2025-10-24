@@ -1,0 +1,11 @@
+{
+  "name": "Notice.AAA6.Test.Template",
+  "role": "CLAIMANT",
+  "titleEn": "  Title in English  ",
+  "titleCy": " Teitl Cymraeg ",
+  "descriptionEn": "<p>Example</p>",
+  "descriptionCy": "<p>Enghraifft</p>",
+  "timeToLive": "P1D",
+  "deadlineParam": "deadline",
+  "delete": false
+}

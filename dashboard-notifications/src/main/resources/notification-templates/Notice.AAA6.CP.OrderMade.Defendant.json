@@ -1,0 +1,9 @@
+{
+  "name": "Notice.AAA6.CP.OrderMade.Defendant",
+  "role": "DEFENDANT",
+  "titleEn": "An order has been made",
+  "titleCy": "Mae gorchymyn wedi’i wneud",
+  "descriptionEn": "<p class=\"govuk-body\">The judge has made an order on your claim.</p><p class=\"govuk-body\"><a href=\"{VIEW_FINAL_ORDER}\" rel=\"noopener noreferrer\" target=\"_blank\" class=\"govuk-link\">View the order</a></p>",
+  "descriptionCy": "<p class=\"govuk-body\">Mae'r Barnwr wedi gwneud gorchymyn ar eich hawliad.</p><p class=\"govuk-body\"><a href=\"{VIEW_FINAL_ORDER}\" rel=\"noopener noreferrer\" target=\"_blank\" class=\"govuk-link\">Gweld y gorchymyn</a></p>",
+  "timeToLive": "Session"
+}

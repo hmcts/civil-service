@@ -1,0 +1,9 @@
+{
+  "name": "Notice.AAA6.CP.ReconDecisionMade.Claimant",
+  "role": "CLAIMANT",
+  "titleEn": "Request has been reviewed",
+  "titleCy": "Adolygwyd y cais",
+  "descriptionEn": "<p class=\"govuk-body\">A judge has made a decision on the order. Carefully <a href=\"{VIEW_DECISION_RECONSIDERATION}\" rel=\"noopener noreferrer\" target=\"_blank\" class=\"govuk-link\"> read and review the decision</a>.",
+  "descriptionCy": "<p class=\"govuk-body\">Mae barnwr wedi gwneud penderfyniad ar y gorchymyn. <a href=\"{VIEW_DECISION_RECONSIDERATION}\" rel=\"noopener noreferrer\" target=\"_blank\" class=\"govuk-link\"> Darllenwch ac adolygwch y penderfyniad</a> yn ofalus.",
+  "timeToLive": "Click"
+}

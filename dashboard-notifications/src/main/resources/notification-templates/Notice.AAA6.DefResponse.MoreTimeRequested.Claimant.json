@@ -1,0 +1,8 @@
+{
+  "name": "Notice.AAA6.DefResponse.MoreTimeRequested.Claimant",
+  "role": "CLAIMANT",
+  "titleEn": "More time requested",
+  "titleCy": "Cais am fwy o amser",
+  "descriptionEn": "<p class=\"govuk-body\">The response deadline for the defendant is now ${defaultRespondTime} on ${respondent1ResponseDeadlineEn}. There are {daysLeftToRespond} days remaining.</p>",
+  "descriptionCy": "<p class=\"govuk-body\">Y terfyn amser ar gyfer ymateb y diffynnydd nawr yw ${defaultRespondTime} ar ${respondent1ResponseDeadlineCy}. Mae yna {daysLeftToRespond} diwrnod yn weddill.</p>"
+}

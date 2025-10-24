@@ -1,0 +1,8 @@
+{
+  "name": "Notice.AAA6.GeneralApps.AdditionalApplicationFeeRequired.Applicant",
+  "role": "APPLICANT",
+  "titleEn": "You must pay an additional application fee",
+  "titleCy": "Rhaid i chi dalu ffi ychwanegol i wneud cais",
+  "descriptionEn": "<p class=\"govuk-body\">The court requires you to pay an additional fee before your application can progress further. <a href=\"{GA_VIEW_APPLICATION_URL}\" class=\"govuk-link\">Pay the additional application fee</a></p>",
+  "descriptionCy": "<p class=\"govuk-body\">Mae'r llys angen i chi dalu ffi ychwanegol cyn y gall eich cais gael ei brosesu ymhellach. <a href=\"{GA_VIEW_APPLICATION_URL}\" class=\"govuk-link\">Talu’r ffi ychwanegol i wneud cais</a></p>"
+}
