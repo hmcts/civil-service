@@ -980,14 +980,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
-    public String setUpJudgementFormattedPermittedDate(LocalDate extendedRespondent1ResponseDate) {
-        if (isJudgementDateNotPermitted()) {
-            return getFormattedJudgementPermittedDate(extendedRespondent1ResponseDate);
-        }
-        return null;
-    }
-
-    @JsonIgnore
     public String getFormattedJudgementPermittedDate(LocalDate extendedRespondent1ResponseDate) {
         return formatLocalDateTime(
             extendedRespondent1ResponseDate.atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY),
