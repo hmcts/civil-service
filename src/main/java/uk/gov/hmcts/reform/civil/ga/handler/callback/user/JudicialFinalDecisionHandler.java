@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.ga.callback.GeneralApplicationCallbackHandler;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.finalorder.AppealTypeChoiceList;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.finalorder.AppealTypeChoices;
@@ -51,7 +52,6 @@ import java.util.Objects;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
-import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.GENERALAPPLICATION_CASE_TYPE;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -68,7 +68,7 @@ import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class JudicialFinalDecisionHandler extends CallbackHandler {
+public class JudicialFinalDecisionHandler extends CallbackHandler implements GeneralApplicationCallbackHandler {
 
     public static final String DATE_HEARD_VALIDATION = "The date entered cannot be in the future";
     public static final String DATE_RANGE_NOT_ALLOWED = "The date range in %s should not have a 'from date', that is after the 'date to'";
@@ -121,11 +121,6 @@ public class JudicialFinalDecisionHandler extends CallbackHandler {
             callbackKey(ABOUT_TO_SUBMIT), this::setFinalDecisionBusinessProcess,
             callbackKey(SUBMITTED), this::buildConfirmation
         );
-    }
-
-    @Override
-    protected String getCaseType() {
-        return GENERALAPPLICATION_CASE_TYPE;
     }
 
     private CallbackResponse buildConfirmation(CallbackParams callbackParams) {

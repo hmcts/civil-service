@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 
 import static java.util.Optional.ofNullable;
-import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.CASE_TYPE;
 
 @Slf4j
 public abstract class CallbackHandler {
@@ -21,10 +20,6 @@ public abstract class CallbackHandler {
     protected abstract Map<String, Callback> callbacks();
 
     public abstract List<CaseEvent> handledEvents();
-
-    protected String getCaseType() {
-        return CASE_TYPE;
-    }
 
     protected String callbackKey(CallbackType type) {
         return type.getValue();

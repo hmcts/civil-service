@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.callback;
 
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
+import uk.gov.hmcts.reform.civil.ga.callback.GeneralApplicationCallbackHandler;
 
 import java.util.List;
 import java.util.Map;
@@ -49,7 +50,7 @@ class CaseTypeHandlerKeyFactoryTest {
     void shouldCreateGeneralApplicationCaseHandlerKeyGivenCallbackHandlerAndCaseEventForGeneralApplication() {
         final String expectedHandlerKey = GENERALAPPLICATION_CASE_TYPE + "-" + RESPOND_TO_APPLICATION.name();
         final String handlerKey = factory.createHandlerKey(
-            new GeneralApplicationCallbackHandler(),
+            new GaCallbackHandler(),
             RESPOND_TO_APPLICATION
         );
         assertEquals(expectedHandlerKey, handlerKey);
@@ -68,7 +69,7 @@ class CaseTypeHandlerKeyFactoryTest {
         }
     }
 
-    private static class GeneralApplicationCallbackHandler extends CallbackHandler {
+    private static class GaCallbackHandler extends CallbackHandler implements GeneralApplicationCallbackHandler {
 
         @Override
         protected Map<String, Callback> callbacks() {
@@ -78,11 +79,6 @@ class CaseTypeHandlerKeyFactoryTest {
         @Override
         public List<CaseEvent> handledEvents() {
             return List.of();
-        }
-
-        @Override
-        public String getCaseType() {
-            return GENERALAPPLICATION_CASE_TYPE;
         }
     }
 }

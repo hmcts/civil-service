@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.ga.handler.user;
+package uk.gov.hmcts.reform.civil.ga.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,7 +20,6 @@ import uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection;
 import uk.gov.hmcts.reform.civil.ga.enums.dq.ClaimantRepresentationType;
 import uk.gov.hmcts.reform.civil.ga.enums.dq.DefendantRepresentationType;
 import uk.gov.hmcts.reform.civil.ga.handler.GeneralApplicationBaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.ga.handler.callback.user.JudicialFinalDecisionHandler;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralAppParentCaseLink;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.finalorder.AppealTypeChoiceList;
