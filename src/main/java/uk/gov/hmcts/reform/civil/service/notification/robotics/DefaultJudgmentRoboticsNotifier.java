@@ -27,8 +27,7 @@ public class DefaultJudgmentRoboticsNotifier extends RoboticsNotifier {
 
     @Override
     public void sendNotifications(CaseData caseData, boolean multiPartyScenario, String authToken) {
-        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory()) && caseData.isRespondent1NotRepresented()
-            && toggleService.isPinInPostEnabled()) {
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory()) && caseData.isRespondent1NotRepresented()) {
             roboticsNotificationService.notifyJudgementLip(caseData, authToken);
         } else {
             super.sendNotifications(caseData, multiPartyScenario,
