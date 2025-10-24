@@ -29,172 +29,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.params.provider.Arguments.of;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CHANGE_LANGUAGE_PREFERENCE;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION_COSC;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ACKNOWLEDGEMENT_OF_SERVICE;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ACKNOWLEDGE_CLAIM;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_CASE_NOTE;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_DEFENDANT_LITIGATION_FRIEND;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_OR_AMEND_CLAIM_DOCUMENTS;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_UNAVAILABLE_DATES;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.AMEND_PARTY_DETAILS;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.AMEND_RESTITCH_BUNDLE;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLICATION_CLOSED_UPDATE_CLAIM;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLICATION_OFFLINE_UPDATE_CLAIM;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLY_NOC_DECISION;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.BUNDLE_CREATION_NOTIFICATION;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CASE_PROCEEDS_IN_CASEMAN;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CHANGE_SOLICITOR_EMAIL;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CITIZEN_CLAIM_ISSUE_PAYMENT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_CUI;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPEC;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CONFIRM_LISTING_COMPLETED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CONFIRM_ORDER_REVIEW;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.COURT_OFFICER_ORDER;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_AFTER_PAYMENT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC_AFTER_PAYMENT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_LIP_CLAIM;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SDO;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CUI_UPLOAD_MEDIATION_DOCUMENTS;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DECISION_ON_RECONSIDERATION_REQUEST;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_SPEC;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_CUI;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_SPEC;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_SIGN_SETTLEMENT_AGREEMENT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISCONTINUE_CLAIM;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISCONTINUE_CLAIM_CLAIMANT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISMISS_CASE;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISMISS_CLAIM;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EDIT_JUDGMENT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ENTER_BREATHING_SPACE_SPEC;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_APPLICANT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_JUDGE;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_RESPONDENT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EXTEND_RESPONSE_DEADLINE;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.FEE_PAYMENT_OUTCOME;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.FULL_REMISSION_HWF;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DIRECTIONS_ORDER;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_FEE_PAID;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_FEE_UNPAID;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_SCHEDULED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_SCHEDULED_RETRIGGER;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE_SPEC;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INVALID_HWF_REFERENCE;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.JUDGMENT_PAID_IN_FULL;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIFT_BREATHING_SPACE_SPEC;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIP_CLAIM_SETTLED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MANAGE_CONTACT_INFORMATION;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MANAGE_STAY;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MEDIATION_SUCCESSFUL;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MEDIATION_UNSUCCESSFUL;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MORE_INFORMATION_HWF;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MOVE_TO_DECISION_OUTCOME;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOC_REQUEST;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIMANT_CUI_FOR_DEADLINE_EXTENSION;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_CUI_FOR_DEADLINE_EXTENSION;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM_DETAILS;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_HEARING_PARTIES;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NO_REMISSION_HWF;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NotSuitable_SDO;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ORDER_REVIEW_OBLIGATION_CHECK;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PARTIAL_REMISSION_HWF_GRANTED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RECORD_JUDGMENT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REFER_JUDGE_DEFENCE_RECEIVED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REFER_TO_JUDGE;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_FOR_RECONSIDERATION;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_JUDGEMENT_ADMISSION_SPEC;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESET_PIN;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESUBMIT_CLAIM;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_AND_REPLY;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SERVICE_REQUEST_RECEIVED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SETTLE_CLAIM;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SETTLE_CLAIM_MARK_PAID_FULL;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SET_ASIDE_JUDGMENT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STANDARD_DIRECTION_ORDER_DJ;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STAY_CASE;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TAKE_CASE_OFFLINE;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRANSFER_ONLINE_CASE;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READINESS;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READY_CHECK;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READY_NOTIFICATION;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_NEXT_HEARING_DETAILS;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPLOAD_MEDIATION_DOCUMENTS;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPLOAD_TRANSLATED_DOCUMENT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UpdateNextHearingInfo;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.VALIDATE_DISCONTINUE_CLAIM_CLAIMANT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.WITHDRAW_CLAIM;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.asyncStitchingComplete;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.migrateCase;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.*;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_ADMIT_RECEIVED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CASE_STAYED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_ISSUED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_ISSUED_PAYMENT_FAILED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_ISSUED_PAYMENT_SUCCESSFUL;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_NOTIFIED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_SUBMITTED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.COUNTER_CLAIM;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DIVERGENT_RESPOND_GO_OFFLINE;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DRAFT;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMISSION;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMIT_AGREE_REPAYMENT;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMIT_JUDGMENT_ADMISSION;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMIT_NOT_PROCEED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMIT_PAY_IMMEDIATELY;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMIT_PROCEED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMIT_REJECT_REPAYMENT;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE_NOT_PROCEED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE_PROCEED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.IN_HEARING_READINESS;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.IN_MEDIATION;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.MEDIATION_UNSUCCESSFUL_PROCEED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMISSION;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMIT_AGREE_REPAYMENT;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMIT_AGREE_SETTLE;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMIT_NOT_PROCEED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMIT_NOT_SETTLED_NO_MEDIATION;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMIT_PAY_IMMEDIATELY;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMIT_PROCEED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMIT_REJECT_REPAYMENT;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PREPARE_FOR_HEARING_CONDUCT_HEARING;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.SIGN_SETTLEMENT_AGREEMENT;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.SPEC_DRAFT;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_SDO;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_BY_STAFF;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_SDO_NOT_DRAWN;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREGISTERED_DEFENDANT;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.*;
 
 @SpringBootTest(classes = {
     JacksonAutoConfiguration.class,
@@ -930,12 +767,6 @@ class FlowStateAllowedEventServiceTest {
                     }
                 ),
                 of(
-                    CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE,
-                    new CaseEvent[] {
-                        CASE_PROCEEDS_IN_CASEMAN
-                    }
-                ),
-                of(
                     PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA,
                     new CaseEvent[] {
                         TAKE_CASE_OFFLINE, APPLICATION_OFFLINE_UPDATE_CLAIM,
@@ -1040,6 +871,36 @@ class FlowStateAllowedEventServiceTest {
                 of(
                     TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED,
                     new CaseEvent[] { APPLICATION_OFFLINE_UPDATE_CLAIM,
+                        migrateCase
+                    }
+                ),
+                of(
+                    TAKEN_OFFLINE_SDO_NOT_DRAWN,
+                    new CaseEvent[] {
+                        migrateCase
+                    }
+                ),
+                of(
+                    TAKEN_OFFLINE_AFTER_SDO,
+                    new CaseEvent[] {
+                        AMEND_PARTY_DETAILS
+                    }
+                ),
+                of(
+                    PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT,
+                    new CaseEvent[] {
+                        NOC_REQUEST,
+                        APPLY_NOC_DECISION,
+                        TAKE_CASE_OFFLINE,
+                        NOTIFY_DEFENDANT_OF_CLAIM,
+                        APPLICATION_OFFLINE_UPDATE_CLAIM,
+                        migrateCase
+                    }
+                ),
+                of(
+                    CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE,
+                    new CaseEvent[] {
+                        APPLICATION_CLOSED_UPDATE_CLAIM,
                         migrateCase
                     }
                 ),
@@ -1384,7 +1245,8 @@ class FlowStateAllowedEventServiceTest {
                         CONFIRM_ORDER_REVIEW,
                         ORDER_REVIEW_OBLIGATION_CHECK,
                         INITIATE_GENERAL_APPLICATION_COSC,
-                        CHANGE_LANGUAGE_PREFERENCE
+                        CHANGE_LANGUAGE_PREFERENCE,
+                        EVIDENCE_UPLOAD_APPLICANT
                     }
                 ),
                 of(
@@ -1506,6 +1368,7 @@ class FlowStateAllowedEventServiceTest {
                         MANAGE_STAY,
                         CONFIRM_ORDER_REVIEW,
                         NOC_REQUEST,
+                        APPLY_NOC_DECISION,
                         ORDER_REVIEW_OBLIGATION_CHECK,
                         INITIATE_GENERAL_APPLICATION_COSC,
                         CHANGE_LANGUAGE_PREFERENCE
@@ -1552,6 +1415,7 @@ class FlowStateAllowedEventServiceTest {
                         INVALID_HWF_REFERENCE,
                         CONFIRM_ORDER_REVIEW,
                         NOC_REQUEST,
+                        APPLY_NOC_DECISION,
                         ORDER_REVIEW_OBLIGATION_CHECK,
                         INITIATE_GENERAL_APPLICATION_COSC,
                         CHANGE_LANGUAGE_PREFERENCE
@@ -1587,6 +1451,8 @@ class FlowStateAllowedEventServiceTest {
                         DISCONTINUE_CLAIM_CLAIMANT,
                         VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                         CONFIRM_ORDER_REVIEW,
+                        NOC_REQUEST,
+                        APPLY_NOC_DECISION,
                         ORDER_REVIEW_OBLIGATION_CHECK,
                         INITIATE_GENERAL_APPLICATION_COSC,
                         CHANGE_LANGUAGE_PREFERENCE
@@ -1597,6 +1463,9 @@ class FlowStateAllowedEventServiceTest {
                     new CaseEvent[] {
                         DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
                         REQUEST_JUDGEMENT_ADMISSION_SPEC,
+                        INITIATE_GENERAL_APPLICATION,
+                        NOC_REQUEST,
+                        APPLY_NOC_DECISION,
                         CHANGE_LANGUAGE_PREFERENCE
                     }
                 ),
@@ -1604,6 +1473,9 @@ class FlowStateAllowedEventServiceTest {
                     PART_ADMIT_PROCEED,
                     new CaseEvent[] {
                         DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
+                        NOC_REQUEST,
+                        APPLY_NOC_DECISION,
+                        INITIATE_GENERAL_APPLICATION,
                         CHANGE_LANGUAGE_PREFERENCE
                     }
                 ),
@@ -1611,6 +1483,9 @@ class FlowStateAllowedEventServiceTest {
                     PART_ADMIT_NOT_PROCEED,
                     new CaseEvent[] {
                         DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
+                        NOC_REQUEST,
+                        APPLY_NOC_DECISION,
+                        INITIATE_GENERAL_APPLICATION,
                         CHANGE_LANGUAGE_PREFERENCE
                     }
                 ),
@@ -1624,11 +1499,14 @@ class FlowStateAllowedEventServiceTest {
                         DISMISS_CASE,
                         MANAGE_STAY,
                         CONFIRM_ORDER_REVIEW,
+                        NOC_REQUEST,
+                        APPLY_NOC_DECISION,
                         ORDER_REVIEW_OBLIGATION_CHECK,
                         REQUEST_JUDGEMENT_ADMISSION_SPEC,
                         JUDGMENT_PAID_IN_FULL,
                         INITIATE_GENERAL_APPLICATION,
                         REFER_JUDGE_DEFENCE_RECEIVED,
+                        GENERATE_DIRECTIONS_ORDER,
                         INITIATE_GENERAL_APPLICATION_COSC,
                         CHANGE_LANGUAGE_PREFERENCE
                     }
@@ -1637,6 +1515,8 @@ class FlowStateAllowedEventServiceTest {
                     PART_ADMIT_AGREE_SETTLE,
                     new CaseEvent[] {
                         DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
+                        NOC_REQUEST,
+                        APPLY_NOC_DECISION,
                         CHANGE_LANGUAGE_PREFERENCE
                     }
                 ),
@@ -1644,8 +1524,11 @@ class FlowStateAllowedEventServiceTest {
                     FULL_ADMIT_PAY_IMMEDIATELY,
                     new CaseEvent[] {
                         DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
+                        NOC_REQUEST,
+                        APPLY_NOC_DECISION,
                         REQUEST_JUDGEMENT_ADMISSION_SPEC,
                         REFER_JUDGE_DEFENCE_RECEIVED,
+                        GENERATE_DIRECTIONS_ORDER,
                         CHANGE_LANGUAGE_PREFERENCE
                     }
                 ),
@@ -1653,6 +1536,9 @@ class FlowStateAllowedEventServiceTest {
                     FULL_ADMIT_PROCEED,
                     new CaseEvent[] {
                         DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
+                        NOC_REQUEST,
+                        APPLY_NOC_DECISION,
+                        INITIATE_GENERAL_APPLICATION,
                         CHANGE_LANGUAGE_PREFERENCE
                     }
                 ),
@@ -1660,6 +1546,9 @@ class FlowStateAllowedEventServiceTest {
                     FULL_ADMIT_NOT_PROCEED,
                     new CaseEvent[] {
                         DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
+                        NOC_REQUEST,
+                        APPLY_NOC_DECISION,
+                        INITIATE_GENERAL_APPLICATION,
                         CHANGE_LANGUAGE_PREFERENCE
                     }
                 ),
@@ -1670,7 +1559,12 @@ class FlowStateAllowedEventServiceTest {
                         EDIT_JUDGMENT,
                         JUDGMENT_PAID_IN_FULL,
                         SET_ASIDE_JUDGMENT,
+                        NOC_REQUEST,
+                        APPLY_NOC_DECISION,
+                        INITIATE_GENERAL_APPLICATION,
                         REFER_JUDGE_DEFENCE_RECEIVED,
+                        GENERATE_DIRECTIONS_ORDER,
+                        INITIATE_GENERAL_APPLICATION_COSC,
                         CHANGE_LANGUAGE_PREFERENCE
                     }
                 ),
@@ -1737,6 +1631,8 @@ class FlowStateAllowedEventServiceTest {
                         UPDATE_HELP_WITH_FEE_NUMBER,
                         INVALID_HWF_REFERENCE,
                         CONFIRM_ORDER_REVIEW,
+                        NOC_REQUEST,
+                        APPLY_NOC_DECISION,
                         MEDIATION_UNSUCCESSFUL,
                         MEDIATION_SUCCESSFUL,
                         ORDER_REVIEW_OBLIGATION_CHECK,
@@ -1767,6 +1663,10 @@ class FlowStateAllowedEventServiceTest {
                         SETTLE_CLAIM_MARK_PAID_FULL,
                         DISCONTINUE_CLAIM_CLAIMANT,
                         VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                        CONFIRM_ORDER_REVIEW,
+                        NOC_REQUEST,
+                        APPLY_NOC_DECISION,
+                        ORDER_REVIEW_OBLIGATION_CHECK,
                         INITIATE_GENERAL_APPLICATION_COSC,
                         CHANGE_LANGUAGE_PREFERENCE
                     }
@@ -1923,6 +1823,8 @@ class FlowStateAllowedEventServiceTest {
                         DISMISS_CASE,
                         MANAGE_STAY,
                         CONFIRM_ORDER_REVIEW,
+                        NOC_REQUEST,
+                        APPLY_NOC_DECISION,
                         ORDER_REVIEW_OBLIGATION_CHECK,
                         INITIATE_GENERAL_APPLICATION_COSC,
                         CHANGE_LANGUAGE_PREFERENCE
@@ -1984,7 +1886,10 @@ class FlowStateAllowedEventServiceTest {
                         DISMISS_CASE,
                         MANAGE_STAY,
                         CONFIRM_ORDER_REVIEW,
+                        NOC_REQUEST,
+                        APPLY_NOC_DECISION,
                         ORDER_REVIEW_OBLIGATION_CHECK,
+                        INITIATE_GENERAL_APPLICATION_COSC,
                         CHANGE_LANGUAGE_PREFERENCE
                     }
                 ),
@@ -2044,6 +1949,8 @@ class FlowStateAllowedEventServiceTest {
                         INVALID_HWF_REFERENCE,
                         AMEND_RESTITCH_BUNDLE,
                         CONFIRM_ORDER_REVIEW,
+                        NOC_REQUEST,
+                        APPLY_NOC_DECISION,
                         ORDER_REVIEW_OBLIGATION_CHECK,
                         INITIATE_GENERAL_APPLICATION_COSC,
                         CHANGE_LANGUAGE_PREFERENCE
@@ -2151,6 +2058,8 @@ class FlowStateAllowedEventServiceTest {
                         DISMISS_CASE,
                         MANAGE_STAY,
                         CONFIRM_ORDER_REVIEW,
+                        NOC_REQUEST,
+                        APPLY_NOC_DECISION,
                         ORDER_REVIEW_OBLIGATION_CHECK,
                         CHANGE_LANGUAGE_PREFERENCE
                     }
@@ -2227,9 +2136,12 @@ class FlowStateAllowedEventServiceTest {
                         LIP_CLAIM_SETTLED,
                         DISCONTINUE_CLAIM_CLAIMANT,
                         VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                        NOC_REQUEST,
+                        APPLY_NOC_DECISION,
                         JUDGMENT_PAID_IN_FULL,
                         INITIATE_GENERAL_APPLICATION,
                         REFER_JUDGE_DEFENCE_RECEIVED,
+                        GENERATE_DIRECTIONS_ORDER,
                         INITIATE_GENERAL_APPLICATION_COSC,
                         CHANGE_LANGUAGE_PREFERENCE
                     }
@@ -2240,6 +2152,9 @@ class FlowStateAllowedEventServiceTest {
                         DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
                         REQUEST_JUDGEMENT_ADMISSION_SPEC,
                         LIP_CLAIM_SETTLED,
+                        NOC_REQUEST,
+                        APPLY_NOC_DECISION,
+                        INITIATE_GENERAL_APPLICATION,
                         CHANGE_LANGUAGE_PREFERENCE
                     }
                 ),
@@ -2261,10 +2176,14 @@ class FlowStateAllowedEventServiceTest {
                         DISMISS_CASE,
                         MANAGE_STAY,
                         CONFIRM_ORDER_REVIEW,
+                        NOC_REQUEST,
+                        APPLY_NOC_DECISION,
                         ORDER_REVIEW_OBLIGATION_CHECK,
                         INITIATE_GENERAL_APPLICATION,
                         REFER_JUDGE_DEFENCE_RECEIVED,
+                        GENERATE_DIRECTIONS_ORDER,
                         INITIATE_GENERAL_APPLICATION_COSC,
+                        EVIDENCE_UPLOAD_RESPONDENT,
                         CHANGE_LANGUAGE_PREFERENCE
                     }
                 ),
@@ -2290,6 +2209,8 @@ class FlowStateAllowedEventServiceTest {
                         INITIATE_GENERAL_APPLICATION,
                         ADD_UNAVAILABLE_DATES,
                         CHANGE_SOLICITOR_EMAIL,
+                        NOC_REQUEST,
+                        APPLY_NOC_DECISION,
                         ORDER_REVIEW_OBLIGATION_CHECK,
                         CHANGE_LANGUAGE_PREFERENCE
                     }
@@ -2660,64 +2581,114 @@ class FlowStateAllowedEventServiceTest {
         }
     }
 
-    @Test
-    void shouldReturnTrue_whenCaseEventIsMigrateCase() {
-        CaseDetails caseDetails =
-            CaseDetailsBuilder.builder()
-                .atStateAwaitingCaseDetailsNotification().build();
-        assertThat(flowStateAllowedEventService.isAllowed(caseDetails, migrateCase))
-            .isTrue();
-    }
 
-    @Test
-    void shouldReturnTrue_whenCaseEventIsNotifyHearingParties() {
-        CaseDetails caseDetails =
-            CaseDetailsBuilder.builder()
-                .atStateAwaitingCaseDetailsNotification().build();
-        assertThat(flowStateAllowedEventService.isAllowed(caseDetails, NOTIFY_HEARING_PARTIES))
-            .isTrue();
-    }
+    @Nested
+    class IsEventAllowedWhiteList {
 
-    @Test
-    void shouldReturnTrue_whenCaseEventIsManageContactInformation() {
-        CaseDetails caseDetails =
-            CaseDetailsBuilder.builder()
-                .atStateAwaitingCaseDetailsNotification().build();
-        assertThat(flowStateAllowedEventService.isAllowed(caseDetails, MANAGE_CONTACT_INFORMATION))
-            .isTrue();
-    }
+        @Test
+        void shouldReturnTrue_whenCaseEventIsMigrateCase() {
+            CaseDetails caseDetails =
+                CaseDetailsBuilder.builder()
+                    .atStateAwaitingCaseDetailsNotification().build();
+            assertThat(flowStateAllowedEventService.isAllowed(caseDetails, migrateCase))
+                .isTrue();
+        }
 
-    @Test
-    void shouldReturnTrue_whenCaseEventIsUpdateNextHearingInfo() {
-        CaseDetails caseDetails =
-            CaseDetailsBuilder.builder()
-                .atStateAwaitingCaseDetailsNotification().build();
-        assertThat(flowStateAllowedEventService.isAllowed(caseDetails, UpdateNextHearingInfo))
-            .isTrue();
-    }
+        @Test
+        void shouldReturnTrue_whenCaseEventIsNotifyHearingParties() {
+            CaseDetails caseDetails =
+                CaseDetailsBuilder.builder()
+                    .atStateAwaitingCaseDetailsNotification().build();
+            assertThat(flowStateAllowedEventService.isAllowed(caseDetails, NOTIFY_HEARING_PARTIES))
+                .isTrue();
+        }
 
-    @Test
-    void shouldReturnTrue_whenAddCaseNoteEvent_forMediationUnsuccessfulProceedFlowstate() {
-        CaseDetails caseDetails = CaseDetailsBuilder.builder().atStateMediationUnsuccessful().build();
-        assertThat(flowStateAllowedEventService.isAllowed(caseDetails, ADD_CASE_NOTE))
-            .isTrue();
-    }
+        @Test
+        void shouldReturnTrue_whenCaseEventIsManageContactInformation() {
+            CaseDetails caseDetails =
+                CaseDetailsBuilder.builder()
+                    .atStateAwaitingCaseDetailsNotification().build();
+            assertThat(flowStateAllowedEventService.isAllowed(caseDetails, MANAGE_CONTACT_INFORMATION))
+                .isTrue();
+        }
 
-    @Test
-    void shouldReturnTrue_whenCaseEventIsUpdateNextHearingDetails() {
-        CaseDetails caseDetails =
-            CaseDetailsBuilder.builder()
-                .atStateAwaitingCaseDetailsNotification().build();
-        assertThat(flowStateAllowedEventService.isAllowed(caseDetails, UPDATE_NEXT_HEARING_DETAILS))
-            .isTrue();
-    }
+        @Test
+        void shouldReturnTrue_whenCaseEventIsCaseProceedsInCaseman() {
+            CaseDetails caseDetails =
+                CaseDetailsBuilder.builder()
+                    .atStateAwaitingCaseDetailsNotification().build();
+            assertThat(flowStateAllowedEventService.isAllowed(caseDetails, CASE_PROCEEDS_IN_CASEMAN))
+                .isTrue();
+        }
 
-    @Test
-    void shouldReturnTrue_whenCaseEventIsSendAndReply() {
-        CaseDetails caseDetails =
-            CaseDetailsBuilder.builder()
-                .atStateAwaitingCaseDetailsNotification().build();
-        assertThat(flowStateAllowedEventService.isAllowed(caseDetails, SEND_AND_REPLY))
-            .isTrue();
+        @Test
+        void shouldReturnTrue_whenCaseEventIsUpdateNextHearingInfo() {
+            CaseDetails caseDetails =
+                CaseDetailsBuilder.builder()
+                    .atStateAwaitingCaseDetailsNotification().build();
+            assertThat(flowStateAllowedEventService.isAllowed(caseDetails, UpdateNextHearingInfo))
+                .isTrue();
+        }
+
+        @Test
+        void shouldReturnTrue_whenCaseEventIsUpdateNextHearingDetails() {
+            CaseDetails caseDetails =
+                CaseDetailsBuilder.builder()
+                    .atStateAwaitingCaseDetailsNotification().build();
+            assertThat(flowStateAllowedEventService.isAllowed(caseDetails, UPDATE_NEXT_HEARING_DETAILS))
+                .isTrue();
+        }
+
+        @Test
+        void shouldReturnTrue_whenCaseEventIsDispatchBusinessProcess() {
+            CaseDetails caseDetails =
+                CaseDetailsBuilder.builder()
+                    .atStateAwaitingCaseDetailsNotification().build();
+            assertThat(flowStateAllowedEventService.isAllowed(caseDetails, DISPATCH_BUSINESS_PROCESS))
+                .isTrue();
+        }
+
+        @Test
+        void shouldReturnTrue_whenCaseEventIsSendAndReply() {
+            CaseDetails caseDetails =
+                CaseDetailsBuilder.builder()
+                    .atStateAwaitingCaseDetailsNotification().build();
+            assertThat(flowStateAllowedEventService.isAllowed(caseDetails, SEND_AND_REPLY))
+                .isTrue();
+        }
+
+        @Test
+        void shouldReturnTrue_whenCaseEventIsManagementRaiseQuery() {
+            CaseDetails caseDetails =
+                CaseDetailsBuilder.builder()
+                    .atStateAwaitingCaseDetailsNotification().build();
+            assertThat(flowStateAllowedEventService.isAllowed(caseDetails, queryManagementRaiseQuery))
+                .isTrue();
+        }
+
+        @Test
+        void shouldReturnTrue_whenCaseEventIsManagementRespondQuery() {
+            CaseDetails caseDetails =
+                CaseDetailsBuilder.builder()
+                    .atStateAwaitingCaseDetailsNotification().build();
+            assertThat(flowStateAllowedEventService.isAllowed(caseDetails, queryManagementRespondQuery))
+                .isTrue();
+        }
+
+        @Test
+        void shouldReturnTrue_whenAddCaseNoteEvent_forMediationUnsuccessfulProceedFlowstate() {
+            CaseDetails caseDetails = CaseDetailsBuilder.builder().atStateMediationUnsuccessful().build();
+            assertThat(flowStateAllowedEventService.isAllowed(caseDetails, ADD_CASE_NOTE))
+                .isTrue();
+        }
+
+        @Test
+        void shouldReturnTrue_whenCaseEventIsRemoveDocument() {
+            CaseDetails caseDetails =
+                CaseDetailsBuilder.builder()
+                    .atStateAwaitingCaseDetailsNotification().build();
+            assertThat(flowStateAllowedEventService.isAllowed(caseDetails, REMOVE_DOCUMENT))
+                .isTrue();
+        }
     }
 }
