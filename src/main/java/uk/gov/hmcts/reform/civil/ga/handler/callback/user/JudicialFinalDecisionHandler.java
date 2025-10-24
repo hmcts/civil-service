@@ -51,6 +51,7 @@ import java.util.Objects;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.GENERALAPPLICATION_CASE_TYPE;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -120,6 +121,11 @@ public class JudicialFinalDecisionHandler extends CallbackHandler {
             callbackKey(ABOUT_TO_SUBMIT), this::setFinalDecisionBusinessProcess,
             callbackKey(SUBMITTED), this::buildConfirmation
         );
+    }
+
+    @Override
+    protected String getCaseType() {
+        return GENERALAPPLICATION_CASE_TYPE;
     }
 
     private CallbackResponse buildConfirmation(CallbackParams callbackParams) {

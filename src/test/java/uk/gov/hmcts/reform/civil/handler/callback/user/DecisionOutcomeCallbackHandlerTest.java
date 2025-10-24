@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.callback.CaseTypeHandlerKeyFactory;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
@@ -69,8 +70,9 @@ class DecisionOutcomeCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void shouldHandleOnlyMoveToDecisionOutcomeEvent() {
         Map<String, CallbackHandler> handlers = new HashMap<>();
+        CaseTypeHandlerKeyFactory factory = new CaseTypeHandlerKeyFactory();
 
-        handler.register(handlers);
+        handler.register(handlers, factory);
 
         assertThat(handlers).containsExactly(entry(MOVE_TO_DECISION_OUTCOME.toString(), handler));
     }

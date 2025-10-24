@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.callback;
 
 import lombok.extern.slf4j.Slf4j;
-
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
@@ -12,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import static java.util.Optional.ofNullable;
+import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.CASE_TYPE;
 
 @Slf4j
 public abstract class CallbackHandler {
@@ -21,6 +21,10 @@ public abstract class CallbackHandler {
     protected abstract Map<String, Callback> callbacks();
 
     public abstract List<CaseEvent> handledEvents();
+
+    protected String getCaseType() {
+        return CASE_TYPE;
+    }
 
     protected String callbackKey(CallbackType type) {
         return type.getValue();
@@ -56,16 +60,20 @@ public abstract class CallbackHandler {
         }
 
         String lastExecutedActivityId = businessProcess.getActivityId();
-        log.info("Last executed activity id was: {} and current activity id for this request is: {}",
-                 lastExecutedActivityId, currentActivityId
+        log.info(
+            "Last executed activity id was: {} and current activity id for this request is: {}",
+            lastExecutedActivityId, currentActivityId
         );
 
         return businessProcess != null && currentActivityId.contains(lastExecutedActivityId);
     }
 
-    public void register(Map<String, CallbackHandler> handlers) {
+    public void register(Map<String, CallbackHandler> handlers, CaseTypeHandlerKeyFactory caseTypeHandlerKeyFactory) {
         handledEvents().forEach(
-            handledEvent -> handlers.put(handledEvent.name(), this));
+            handledEvent -> {
+                final String handleEventKey = caseTypeHandlerKeyFactory.createHandlerKey(this, handledEvent);
+                handlers.put(handleEventKey, this);
+            });
     }
 
     public CallbackResponse handle(CallbackParams callbackParams) {

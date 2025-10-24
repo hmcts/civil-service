@@ -24,18 +24,23 @@ public class CallbackHandlerFactory {
 
     private final HashMap<String, CallbackHandler> eventHandlers = new HashMap<>();
     private final CaseDetailsConverter caseDetailsConverter;
+    private final CaseTypeHandlerKeyFactory caseTypeHandlerKeyFactory;
 
     @Autowired
-    public CallbackHandlerFactory(CaseDetailsConverter caseDetailsConverter, CallbackHandler... beans) {
+    public CallbackHandlerFactory(CaseDetailsConverter caseDetailsConverter,
+                                  CaseTypeHandlerKeyFactory caseTypeHandlerKeyFactory,
+                                  CallbackHandler... beans) {
         this.caseDetailsConverter = caseDetailsConverter;
-        Arrays.asList(beans).forEach(bean -> bean.register(eventHandlers));
+        this.caseTypeHandlerKeyFactory = caseTypeHandlerKeyFactory;
+        Arrays.asList(beans).forEach(bean -> bean.register(eventHandlers, caseTypeHandlerKeyFactory));
     }
 
     @EventAllowed
     @NoOngoingBusinessProcess
     @EventEmitter
     public CallbackResponse dispatch(CallbackParams callbackParams) {
-        String eventId = callbackParams.getRequest().getEventId();
+        final String eventId = caseTypeHandlerKeyFactory.createHandlerKey(callbackParams);
+
         return ofNullable(eventHandlers.get(eventId))
             .map(h -> processEvent(h, callbackParams, eventId))
             .orElseThrow(() -> new CallbackException("Could not handle callback for event " + eventId));
