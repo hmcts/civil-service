@@ -515,11 +515,11 @@ public class BundleRequestMapper {
             }
         }
 
-        String categoryId = Optional.ofNullable(caseDocument.getDocumentLink())
+        Optional<String> categoryId = Optional.ofNullable(caseDocument.getDocumentLink())
             .map(Document::getCategoryID)
-            .orElse(null);
-        if (StringUtils.isNotBlank(categoryId)) {
-            String normalisedCategory = categoryId.trim().toLowerCase();
+            .filter(StringUtils::isNotBlank);
+        if (categoryId.isPresent()) {
+            String normalisedCategory = categoryId.get().trim().toLowerCase();
             if (normalisedCategory.contains("defendant2") || normalisedCategory.contains("respondent2")) {
                 return PartyType.DEFENDANT2.getDisplayName();
             }
