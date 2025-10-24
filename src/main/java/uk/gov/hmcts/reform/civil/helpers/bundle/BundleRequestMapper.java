@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.helpers.bundle;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
@@ -25,13 +26,18 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleFileNameHelper.getEvidenceUploadDocsByPartyAndDocType;
 import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleFileNameHelper.getWitnessDocsByPartyAndDocType;
@@ -418,27 +424,19 @@ public class BundleRequestMapper {
             BundleFileNameList.CLAIM_FORM.getDisplayName()
         ));
         bundlingRequestDocuments.addAll(mapParticularsOfClaimDocs(caseData));
-        List<Element<CaseDocument>> clAndDfDocList = caseData.getDefendantResponseDocuments();
-        clAndDfDocList.addAll(caseData.getClaimantResponseDocuments());
         List<Element<CaseDocument>> sortedDefendantDefenceAndClaimantReply =
-            bundleDocumentsRetrieval.getSortedDefendantDefenceAndClaimantReply(clAndDfDocList);
+            bundleDocumentsRetrieval.getSortedDefendantDefenceAndClaimantReply(collectDefenceAndReplyDocuments(caseData));
         sortedDefendantDefenceAndClaimantReply.forEach(caseDocumentElement -> {
-            String docType = caseDocumentElement.getValue().getDocumentType().equals(DocumentType.DEFENDANT_DEFENCE)
+            CaseDocument caseDocument = caseDocumentElement.getValue();
+            String docType = DocumentType.DEFENDANT_DEFENCE.equals(caseDocument.getDocumentType())
                 ? BundleFileNameList.DEFENCE.getDisplayName() : BundleFileNameList.CL_REPLY.getDisplayName();
-            String party;
-            if (caseDocumentElement.getValue().getCreatedBy().equalsIgnoreCase("Defendant")) {
-                party = PartyType.DEFENDANT1.getDisplayName();
-            } else if (caseDocumentElement.getValue().getCreatedBy().equalsIgnoreCase("Defendant 2")) {
-                party = PartyType.DEFENDANT2.getDisplayName();
-            } else {
-                party = "";
-            }
-            String docName = generateDocName(docType, party, null,
-                                             caseDocumentElement.getValue().getCreatedDatetime().toLocalDate()
-            );
+            String party = DocumentType.DEFENDANT_DEFENCE.equals(caseDocument.getDocumentType())
+                ? resolveDefenceParty(caseDocument) : "";
+            LocalDate documentDate = resolveDocumentDate(caseDocument, caseData);
+            String docName = generateDocName(docType, party, null, documentDate);
             bundlingRequestDocuments.add(buildBundlingRequestDoc(
                 docName,
-                caseDocumentElement.getValue().getDocumentLink(),
+                caseDocument.getDocumentLink(),
                 docType
             ));
         });
@@ -477,6 +475,66 @@ public class BundleRequestMapper {
                                                                    ))
         );
         return ElementUtils.wrapElements(bundlingRequestDocuments);
+    }
+
+    private List<Element<CaseDocument>> collectDefenceAndReplyDocuments(CaseData caseData) {
+        List<Element<CaseDocument>> documents = new ArrayList<>();
+        documents.addAll(Optional.ofNullable(caseData.getDefendantResponseDocuments()).orElse(Collections.emptyList()));
+        documents.addAll(Optional.ofNullable(caseData.getClaimantResponseDocuments()).orElse(Collections.emptyList()));
+        documents.addAll(Optional.ofNullable(caseData.getDuplicateClaimantDefendantResponseDocs()).orElse(Collections.emptyList()));
+        Optional.ofNullable(caseData.getSystemGeneratedCaseDocuments()).orElse(Collections.emptyList())
+            .stream()
+            .filter(element -> isDefenceOrClaimantReply(element.getValue()))
+            .forEach(documents::add);
+        Stream.of(caseData.getRespondent1ClaimResponseDocumentSpec(), caseData.getRespondent2ClaimResponseDocumentSpec())
+            .filter(Objects::nonNull)
+            .map(ElementUtils::element)
+            .forEach(documents::add);
+        return documents;
+    }
+
+    private boolean isDefenceOrClaimantReply(CaseDocument caseDocument) {
+        return caseDocument != null && (DocumentType.DEFENDANT_DEFENCE.equals(caseDocument.getDocumentType())
+            || DocumentType.CLAIMANT_DEFENCE.equals(caseDocument.getDocumentType()));
+    }
+
+    private String resolveDefenceParty(CaseDocument caseDocument) {
+        if (caseDocument == null) {
+            return PartyType.DEFENDANT1.getDisplayName();
+        }
+        String createdBy = caseDocument.getCreatedBy();
+        if (StringUtils.isNotBlank(createdBy)) {
+            if (createdBy.equalsIgnoreCase("Defendant 2") || createdBy.equalsIgnoreCase("Respondent 2")) {
+                return PartyType.DEFENDANT2.getDisplayName();
+            }
+            if (createdBy.equalsIgnoreCase("Defendant")
+                || createdBy.equalsIgnoreCase("Defendant 1")
+                || createdBy.equalsIgnoreCase("Respondent")
+                || createdBy.equalsIgnoreCase("Respondent 1")) {
+                return PartyType.DEFENDANT1.getDisplayName();
+            }
+        }
+
+        String categoryId = Optional.ofNullable(caseDocument.getDocumentLink())
+            .map(Document::getCategoryID)
+            .orElse(null);
+        if (StringUtils.isNotBlank(categoryId)) {
+            String normalisedCategory = categoryId.trim().toLowerCase();
+            if (normalisedCategory.contains("defendant2") || normalisedCategory.contains("respondent2")) {
+                return PartyType.DEFENDANT2.getDisplayName();
+            }
+        }
+
+        return PartyType.DEFENDANT1.getDisplayName();
+    }
+
+    private LocalDate resolveDocumentDate(CaseDocument caseDocument, CaseData caseData) {
+        return Optional.ofNullable(caseDocument)
+            .map(CaseDocument::getCreatedDatetime)
+            .map(LocalDateTime::toLocalDate)
+            .orElseGet(() -> Optional.ofNullable(caseData.getSubmittedDate())
+                .map(LocalDateTime::toLocalDate)
+                .orElseGet(() -> Optional.ofNullable(caseData.getHearingDate()).orElse(LocalDate.now())));
     }
 
     private List<Element<BundlingRequestDocument>> mapTrialDocuments(CaseData caseData) {

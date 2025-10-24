@@ -13,12 +13,14 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.caseprogression.BundleFileNameList;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.TypeOfDocDocumentaryEvidenceOfTrial;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.DocumentWithRegex;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
 import uk.gov.hmcts.reform.civil.model.bundle.BundleCreateRequest;
+import uk.gov.hmcts.reform.civil.model.bundle.BundlingRequestDocument;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
@@ -340,6 +342,55 @@ class BundleRequestMapperTest {
         assertEquals("testFileName 12/12/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getDefendant2CostsBudgets().get(0).getValue().getDocumentFileName());
 
+    }
+
+    @Test
+    void shouldIncludeDefenceFromSpecResponseDocument() {
+        CaseDocument defenceDocument = CaseDocument.builder()
+            .documentType(DocumentType.DEFENDANT_DEFENCE)
+            .createdBy("Civil")
+            .createdDatetime(LocalDateTime.of(2024, 1, 1, 10, 30))
+            .documentLink(Document.builder()
+                              .documentBinaryUrl(TEST_URL)
+                              .documentUrl(TEST_URL)
+                              .documentFileName(TEST_FILE_NAME)
+                              .categoryID("defendant1DefenseDirectionsQuestionnaire")
+                              .build())
+            .build();
+
+        CaseData caseData = CaseData.builder()
+            .ccdCaseReference(12345L)
+            .respondent1ClaimResponseDocumentSpec(defenceDocument)
+            .applicant1(Party.builder()
+                            .type(Party.Type.INDIVIDUAL)
+                            .individualLastName("Applicant")
+                            .build())
+            .respondent1(Party.builder()
+                             .type(Party.Type.INDIVIDUAL)
+                             .individualLastName("Respondent")
+                             .build())
+            .hearingDate(LocalDate.of(2024, 2, 10))
+            .submittedDate(LocalDateTime.of(2024, 1, 2, 9, 0))
+            .build();
+
+        given(featureToggleService.isCaseProgressionEnabled()).willReturn(false);
+        given(featureToggleService.isAmendBundleEnabled()).willReturn(false);
+
+        BundleCreateRequest bundleCreateRequest = bundleRequestMapper.mapCaseDataToBundleCreateRequest(
+            caseData,
+            "sample.yaml",
+            "test",
+            "test"
+        );
+
+        assertNotNull(bundleCreateRequest);
+        List<Element<BundlingRequestDocument>> statementsOfCaseDocuments =
+            bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments();
+        assertEquals(1, statementsOfCaseDocuments.size());
+        assertEquals("DF 1 Defence 01/01/2024",
+                     statementsOfCaseDocuments.get(0).getValue().getDocumentFileName());
+        assertEquals(BundleFileNameList.DEFENCE.getDisplayName(),
+                     statementsOfCaseDocuments.get(0).getValue().getDocumentType());
     }
 
     @Test
