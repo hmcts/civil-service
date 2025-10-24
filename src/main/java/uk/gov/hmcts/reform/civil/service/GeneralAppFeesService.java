@@ -31,7 +31,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 public class GeneralAppFeesService {
 
     private static final BigDecimal PENCE_PER_POUND = BigDecimal.valueOf(100);
-    private static final int FREE_GA_DAYS = 14;
+    protected static final int FREE_GA_DAYS = 14;
 
     private final FeesApiClient feesApiClient;
     private final GeneralAppFeesConfiguration feesConfiguration;
@@ -66,6 +66,20 @@ public class GeneralAppFeesService {
     public Fee getFeeForGALiP(List<GeneralApplicationTypes> applicationTypes, Boolean withConsent,
                               Boolean withNotice, LocalDate hearingDate) {
         return getFeeForGA(applicationTypes, withConsent, withNotice, hearingDate);
+    }
+
+    public boolean isFreeGa(GeneralApplication application) {
+        if (application.getGeneralAppType().getTypes().size() == 1
+            && application.getGeneralAppType().getTypes()
+            .contains(GeneralApplicationTypes.ADJOURN_HEARING)
+            && application.getGeneralAppRespondentAgreement() != null
+            && YES.equals(application.getGeneralAppRespondentAgreement().getHasAgreed())
+            && application.getGeneralAppHearingDate() != null
+            && application.getGeneralAppHearingDate().getHearingScheduledDate() != null) {
+            return application.getGeneralAppHearingDate().getHearingScheduledDate()
+                .isAfter(LocalDate.now().plusDays(GeneralAppFeesService.FREE_GA_DAYS));
+        }
+        return false;
     }
 
     public Fee getFeeForGA(CaseData caseData) {
