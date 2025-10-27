@@ -37,6 +37,8 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -222,6 +224,69 @@ class SubmitClaimTaskTest {
                 flightDelayDetails
             );
         assertThat(response.getData()).containsEntry("locationName", "Civil National Business Centre");
+    }
+
+    @Test
+    void shouldCallPinToPostOnlyIfCaseMatched() {
+        // Given
+        CaseData matchedCase = CaseData.builder()
+            .applicant1(Party.builder()
+                            .individualFirstName("Clay")
+                            .individualLastName("Mint")
+                            .partyName("Clay Mint")
+                            .type(Party.Type.INDIVIDUAL)
+                            .build())
+            .respondent1(Party.builder()
+                             .individualFirstName("John")
+                             .individualLastName("Doe")
+                             .partyName("John Doe")
+                             .type(Party.Type.INDIVIDUAL)
+                             .build())
+            .respondent1Represented(NO)
+            .addRespondent2(NO)
+            .addApplicant2(NO)
+            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("test@gmail.com").build())
+            .build();
+
+        // When
+        when(userService.getUserDetails("authToken")).thenReturn(UserDetails.builder().id("userId").build());
+        when(specReferenceNumberRepository.getSpecReferenceNumber()).thenReturn("12345");
+
+        submitClaimTask.submitClaim(matchedCase, "eventId", "authToken", NO, null);
+
+        // Then
+        verify(defendantPinToPostLRspecService).buildDefendantPinToPost();
+    }
+
+    @Test
+    void shouldNotCallPinToPostIfCaseNotMatched() {
+        // Given
+        CaseData notMatchedCase = CaseData.builder()
+            .applicant1(Party.builder()
+                            .individualFirstName("Clay")
+                            .individualLastName("Mint")
+                            .partyName("Clay Mint")
+                            .type(Party.Type.INDIVIDUAL)
+                            .build())
+            .respondent1(Party.builder()
+                             .companyName("Defendant Ltd.")
+                             .partyName("Defendant Ltd.")
+                             .type(Party.Type.COMPANY)
+                             .build())
+            .respondent1Represented(YES)
+            .addRespondent2(NO)
+            .addApplicant2(NO)
+            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("test@gmail.com").build())
+            .build();
+
+        // When
+        when(userService.getUserDetails("authToken")).thenReturn(UserDetails.builder().id("userId").build());
+        when(specReferenceNumberRepository.getSpecReferenceNumber()).thenReturn("12345");
+
+        submitClaimTask.submitClaim(notMatchedCase, "eventId", "authToken", NO, null);
+
+        // Then
+        verify(defendantPinToPostLRspecService, never()).buildDefendantPinToPost();
     }
 }
 
