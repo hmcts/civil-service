@@ -122,12 +122,10 @@ public class JudgementService {
     }
 
     private String ccjJudgmentStatement(CaseData caseData) {
-        if (caseData.isLRvLipOneVOne() && featureToggleService.isPinInPostEnabled()) {
-            boolean hasPaymentOption =
-                    caseData.isPayImmediately() || caseData.isPayByInstallment() || caseData.isPayBySetDate();
+        if (caseData.isLRvLipOneVOne()){
+            boolean hasPaymentOption = caseData.isPayImmediately() || caseData.isPayByInstallment() || caseData.isPayBySetDate();
             if (hasPaymentOption) {
-                return String.format(
-                        JUDGEMENT_ORDER_V2, ccjJudgementSubTotal(caseData).toString());
+                return String.format(JUDGEMENT_ORDER_V2, ccjJudgementSubTotal(caseData).toString());
             }
             if (featureToggleService.isJudgmentOnlineLive()
                 && hasPaymentOption) {

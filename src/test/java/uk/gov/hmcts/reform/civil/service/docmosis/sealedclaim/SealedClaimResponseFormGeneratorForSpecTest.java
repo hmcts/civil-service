@@ -13,7 +13,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PaymentMethod;
@@ -22,8 +21,6 @@ import uk.gov.hmcts.reform.civil.model.ResponseDocument;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.TimelineOfEventDetails;
 import uk.gov.hmcts.reform.civil.model.TimelineOfEvents;
-import uk.gov.hmcts.reform.civil.model.UnavailableDate;
-import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
@@ -31,8 +28,6 @@ import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.SealedClaimResponseF
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
-import uk.gov.hmcts.reform.civil.model.mediation.MediationAvailability;
-import uk.gov.hmcts.reform.civil.model.mediation.MediationContactInformation;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
@@ -53,8 +48,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
@@ -233,6 +226,39 @@ public class SealedClaimResponseFormGeneratorForSpecTest {
         );
     }
 
+    @Test
+    void shouldSelectTemplateWithRepaymentPlan() {
+        //Given
+        DocmosisDocument docmosisDocument = DocmosisDocument.builder().build();
+        given(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), any()))
+            .willReturn(docmosisDocument);
+        //When
+        generator.generate(CASE_DATA_WITH_RESPONDENT1, BEARER_TOKEN);
+        //Then
+        verify(documentGeneratorService).generateDocmosisDocument(templateDataCaptor.capture(), docmosisTemplatesArgumentCaptor.capture());
+        assertThat(docmosisTemplatesArgumentCaptor.getValue()).isEqualTo(DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_SEALED_1V1_INSTALLMENTS);
+    }
+
+    @Test
+    void shouldSelectMultipartyTemplate_whenMultipartyCase() {
+        //Given
+        DocmosisDocument docmosisDocument = DocmosisDocument.builder().build();
+        given(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), any()))
+            .willReturn(docmosisDocument);
+        CaseData multipartyCaseData = CASE_DATA_WITH_RESPONDENT1.toBuilder()
+            .respondent2(Party.builder()
+                             .type(Party.Type.COMPANY)
+                             .companyName("defendant2 name")
+                             .build())
+            .respondentResponseIsSame(YesOrNo.YES)
+            .build();
+        //When
+        generator.generate(multipartyCaseData, BEARER_TOKEN);
+        //Then
+        verify(documentGeneratorService).generateDocmosisDocument(templateDataCaptor.capture(), docmosisTemplatesArgumentCaptor.capture());
+        assertThat(docmosisTemplatesArgumentCaptor.getValue()).isEqualTo(DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_SEALED_1V2);
+    }
+
     private static CaseData getCaseDataWithRespondent1Data() {
         return CaseData.builder()
             .legacyCaseReference("case reference")
@@ -347,106 +373,6 @@ public class SealedClaimResponseFormGeneratorForSpecTest {
                                                                   .build())
                                                         .build())
             .build();
-    }
-
-    @Test
-    void shouldGenerateDocumentSuccessfully_AfterCarmEnabled_1v1() {
-        //Given
-        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
-        given(featureToggleService.isPinInPostEnabled()).willReturn(false);
-
-        List<Element<UnavailableDate>> resp1UnavailabilityDateRange = new ArrayList<>();
-        resp1UnavailabilityDateRange.add(element(UnavailableDate.builder()
-                                                .unavailableDateType(UnavailableDateType.DATE_RANGE)
-                                                .toDate(LocalDate.now().plusDays(5))
-                                                .fromDate(LocalDate.now()).build()));
-        //When
-        CaseData caseData = CASE_DATA_WITH_RESPONDENT1.toBuilder()
-            .resp1MediationContactInfo(MediationContactInformation.builder()
-                                           .firstName("Jane")
-                                           .lastName("Smith")
-                                           .emailAddress("jane.smith@email.com")
-                                           .telephoneNumber("123456789")
-                                           .build())
-            .resp1MediationAvailability(MediationAvailability.builder()
-                                            .isMediationUnavailablityExists(YesOrNo.YES)
-                                            .unavailableDatesForMediation(resp1UnavailabilityDateRange)
-                                            .build())
-            .build();
-        //Then
-        SealedClaimResponseFormForSpec templateData = generator.getTemplateData(
-            caseData, BEARER_TOKEN);
-        Assertions.assertEquals("Jane",
-                                templateData.getMediationFirstName());
-        Assertions.assertEquals("Smith",
-                                templateData.getMediationLastName());
-        Assertions.assertEquals("jane.smith@email.com",
-                                templateData.getMediationEmail());
-        Assertions.assertEquals("123456789",
-                                templateData.getMediationContactNumber());
-        Assertions.assertEquals(LocalDate.now(),
-                                templateData.getMediationUnavailableDatesList().get(0).getValue().getFromDate());
-        Assertions.assertEquals(LocalDate.now().plusDays(5),
-                                templateData.getMediationUnavailableDatesList().get(0).getValue().getToDate());
-    }
-
-    @Test
-    void shouldGenerateDocumentSuccessfully_AfterCarmEnabled_1v2DS() {
-        //Given
-        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
-        given(featureToggleService.isPinInPostEnabled()).willReturn(false);
-
-        List<Element<UnavailableDate>> resp2UnavailabilitySingleDate = new ArrayList<>();
-        resp2UnavailabilitySingleDate.add(element(UnavailableDate.builder()
-                                                      .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                                                      .date(LocalDate.now())
-                                                      .fromDate(LocalDate.now()).build()));
-        //When
-        CaseData caseData = CASE_DATA_WITH_MULTI_PARTY.toBuilder()
-            .resp2MediationContactInfo(MediationContactInformation.builder()
-                                           .firstName("Jane")
-                                           .lastName("Smith")
-                                           .emailAddress("jane.smith@email.com")
-                                           .telephoneNumber("123456789")
-                                           .build())
-            .resp2MediationAvailability(MediationAvailability.builder()
-                                            .isMediationUnavailablityExists(YesOrNo.YES)
-                                            .unavailableDatesForMediation(resp2UnavailabilitySingleDate)
-                                            .build())
-            .build();
-        //Then
-        SealedClaimResponseFormForSpec templateData = generator.getTemplateData(
-            caseData, BEARER_TOKEN);
-        Assertions.assertEquals("Jane",
-                                templateData.getMediationFirstName());
-        Assertions.assertEquals("Smith",
-                                templateData.getMediationLastName());
-        Assertions.assertEquals("jane.smith@email.com",
-                                templateData.getMediationEmail());
-        Assertions.assertEquals("123456789",
-                                templateData.getMediationContactNumber());
-        Assertions.assertEquals(LocalDate.now(),
-                                templateData.getMediationUnavailableDatesList().get(0).getValue().getFromDate());
-        Assertions.assertEquals(LocalDate.now(),
-                                templateData.getMediationUnavailableDatesList().get(0).getValue().getDate());
-    }
-
-    @Test
-    void shouldGenerateDocumentSuccessfully_AfterCarmDisabled() {
-        //Given
-        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
-        given(featureToggleService.isPinInPostEnabled()).willReturn(false);
-
-        //When
-        CaseData caseData = CASE_DATA_WITH_RESPONDENT1.toBuilder()
-            .responseClaimMediationSpecRequired(YesOrNo.YES)
-            .build();
-        //Then
-        SealedClaimResponseFormForSpec templateData = generator.getTemplateData(
-            caseData, BEARER_TOKEN);
-        Assertions.assertEquals(YesOrNo.YES,
-                                templateData.getMediation()
-        );
     }
 
     @Test
