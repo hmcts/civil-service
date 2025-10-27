@@ -84,7 +84,8 @@ public class JudgementService {
     }
 
     public BigDecimal ccjJudgmentFixedCost(CaseData caseData) {
-        if ((isLrFullAdmitRepaymentPlan(caseData) || isLRPartAdmitRepaymentPlan(caseData) || isLrPayImmediatelyPlan(caseData))
+        if ((isLrFullAdmitRepaymentPlan(caseData) || isLRPartAdmitRepaymentPlan(caseData) || isLrPayImmediatelyPlan(
+            caseData))
             && nonNull(caseData.getFixedCosts())
             && YesOrNo.YES.equals(caseData.getFixedCosts().getClaimFixedCosts())) {
             BigDecimal claimIssueFixedCost = MonetaryConversions.penniesToPounds(BigDecimal.valueOf(
@@ -122,7 +123,7 @@ public class JudgementService {
     }
 
     private String ccjJudgmentStatement(CaseData caseData) {
-        if (caseData.isLRvLipOneVOne()){
+        if (caseData.isLRvLipOneVOne()) {
             boolean hasPaymentOption = caseData.isPayImmediately() || caseData.isPayByInstallment() || caseData.isPayBySetDate();
             if (hasPaymentOption) {
                 return String.format(JUDGEMENT_ORDER_V2, ccjJudgementSubTotal(caseData).toString());
@@ -135,7 +136,8 @@ public class JudgementService {
         } else {
             return String.format(
                 isLrFullAdmitRepaymentPlan(caseData) || isLrPayImmediatelyPlan(caseData)
-                    ? JUDGEMENT_ORDER_V2 : JUDGEMENT_ORDER, ccjJudgementSubTotal(caseData).toString());
+                    ? JUDGEMENT_ORDER_V2 : JUDGEMENT_ORDER, ccjJudgementSubTotal(caseData).toString()
+            );
         }
     }
 
