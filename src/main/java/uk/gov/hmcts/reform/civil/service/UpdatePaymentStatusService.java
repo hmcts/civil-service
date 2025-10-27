@@ -7,7 +7,6 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -39,16 +38,24 @@ public class UpdatePaymentStatusService {
 
         try {
             log.info("Fetching case details for case reference [{}]", caseReference);
-            CaseDetails caseDetails = coreCaseDataService.getCase(Long.valueOf(caseReference));
+            StartEventResponse startEventResponse = coreCaseDataService.startUpdate(
+                caseReference,
+                getEventNameFromFeeType(feeType.name())
+            );
 
             log.info("Converting case details to CaseData for case reference [{}]", caseReference);
-            CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
+            CaseData caseData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
 
             log.info("Updating CaseData with state and payment details for case reference [{}], fee type [{}]", caseReference, feeType.name());
             caseData = updateCaseDataWithStateAndPaymentDetails(cardPaymentStatusResponse, caseData, feeType.name());
 
             log.info("Creating event for case reference [{}] with fee type [{}]", caseReference, feeType.name());
-            createEvent(caseData, caseReference, feeType.name());
+            CaseDataContent caseDataContent = buildCaseDataContent(
+                startEventResponse,
+                caseData
+            );
+
+            coreCaseDataService.submitUpdate(caseReference, caseDataContent);
 
         } catch (Exception ex) {
             log.error(
@@ -63,26 +70,11 @@ public class UpdatePaymentStatusService {
 
     }
 
-    private void createEvent(CaseData caseData, String caseReference, String feeType) {
-
-        StartEventResponse startEventResponse = coreCaseDataService.startUpdate(
-            caseReference,
-            getEventNameFromFeeType(feeType)
-        );
-
-        CaseDataContent caseDataContent = buildCaseDataContent(
-            startEventResponse,
-            caseData
-        );
-
-        coreCaseDataService.submitUpdate(caseReference, caseDataContent);
-    }
-
     private CaseEvent getEventNameFromFeeType(String feeType) {
 
         if (feeType.equals(FeeType.HEARING.name())) {
             return CITIZEN_HEARING_FEE_PAYMENT;
-        }  else {
+        } else {
             return CITIZEN_CLAIM_ISSUE_PAYMENT;
         }
     }
@@ -93,9 +85,9 @@ public class UpdatePaymentStatusService {
         return CaseDataContent.builder()
             .eventToken(startEventResponse.getToken())
             .event(Event.builder().id(startEventResponse.getEventId())
-                       .summary(null)
-                       .description(null)
-                       .build())
+                .summary(null)
+                .description(null)
+                .build())
             .data(updatedData)
             .build();
     }
