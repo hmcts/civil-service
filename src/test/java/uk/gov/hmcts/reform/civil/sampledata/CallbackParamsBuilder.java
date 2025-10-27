@@ -5,6 +5,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
+import uk.gov.hmcts.reform.civil.model.BaseCaseData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.util.Map;
@@ -17,6 +18,7 @@ public class CallbackParamsBuilder {
     private CallbackVersion version;
     private String pageId;
     private CaseData caseData;
+    private BaseCaseData baseCaseData;
 
     public static CallbackParamsBuilder builder() {
         return new CallbackParamsBuilder();
@@ -25,6 +27,18 @@ public class CallbackParamsBuilder {
     public CallbackParamsBuilder of(CallbackType type, CaseData caseData) {
         this.type = type;
         this.caseData = caseData;
+        this.request = CallbackRequest.builder()
+            .caseDetails(CaseDetailsBuilder.builder()
+                             .data(caseData)
+                             .build())
+            .build();
+        this.params = Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN");
+        return this;
+    }
+
+    public CallbackParamsBuilder of(CallbackType type, BaseCaseData caseData) {
+        this.type = type;
+        this.baseCaseData = caseData;
         this.request = CallbackRequest.builder()
             .caseDetails(CaseDetailsBuilder.builder()
                              .data(caseData)
@@ -74,6 +88,7 @@ public class CallbackParamsBuilder {
             .version(version)
             .pageId(pageId)
             .caseData(caseData)
+            .baseCaseData(baseCaseData)
             .build();
     }
 }
