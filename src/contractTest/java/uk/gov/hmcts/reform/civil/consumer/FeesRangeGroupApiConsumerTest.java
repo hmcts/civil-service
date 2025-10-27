@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil;
+package uk.gov.hmcts.reform.civil.consumer;
 
 import au.com.dius.pact.consumer.dsl.DslPart;
 import au.com.dius.pact.consumer.dsl.LambdaDslObject;
@@ -25,10 +25,10 @@ import static au.com.dius.pact.consumer.dsl.LambdaDsl.newJsonArray;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static uk.gov.hmcts.reform.civil.FeesLookupApiConsumerTest.CHANNEL;
-import static uk.gov.hmcts.reform.civil.FeesLookupApiConsumerTest.CMC_SERVICE;
-import static uk.gov.hmcts.reform.civil.FeesLookupApiConsumerTest.JURISDICTION_CC;
-import static uk.gov.hmcts.reform.civil.FeesLookupApiConsumerTest.JURISDICTION_CIVIL;
+import static uk.gov.hmcts.reform.civil.consumer.FeesLookupApiConsumerTest.CHANNEL;
+import static uk.gov.hmcts.reform.civil.consumer.FeesLookupApiConsumerTest.CMC_SERVICE;
+import static uk.gov.hmcts.reform.civil.consumer.FeesLookupApiConsumerTest.JURISDICTION_CC;
+import static uk.gov.hmcts.reform.civil.consumer.FeesLookupApiConsumerTest.JURISDICTION_CIVIL;
 import static uk.gov.hmcts.reform.civil.service.FeesClientService.EVENT_ISSUE;
 
 @PactTestFor(providerName = "feeRegister_rangeGroup")

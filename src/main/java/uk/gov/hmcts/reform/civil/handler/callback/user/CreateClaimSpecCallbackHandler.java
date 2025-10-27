@@ -144,7 +144,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             .put(callbackKey(MID, "appOrgPolicy"), this::validateApplicantSolicitorOrgPolicy)
             .put(callbackKey(MID, "repOrgPolicy"), this::validateRespondentSolicitorOrgPolicy)
             .put(callbackKey(MID, "rep2OrgPolicy"), this::validateRespondentSolicitor2OrgPolicy)
-            .put(callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth)
+            .put(callbackKey(MID, "statement-of-truth"), this::emptyCallbackResponse)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::submitClaim)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .put(callbackKey(MID, "respondent1"), this::validateRespondent1Details)
@@ -308,20 +308,6 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             .build();
     }
 
-    private CallbackResponse resetStatementOfTruth(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-
-        // resetting statement of truth field, this resets in the page, but the data is still sent to the db.
-        // must be to do with the way XUI cache data entered through the lifecycle of an event.
-        CaseData updatedCaseData = caseData.toBuilder()
-            .uiStatementOfTruth(null)
-            .build();
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseData.toMap(objectMapper))
-            .build();
-    }
-
     private CallbackResponse submitClaim(CallbackParams callbackParams) {
         return submitClaimTask.submitClaim(callbackParams.getCaseData(), callbackParams.getRequest().getEventId(),
             callbackParams.getParams().get(BEARER_TOKEN).toString(),
@@ -330,7 +316,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     }
 
     //--------v1 callback overloaded, return to single param
-    private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
+    SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         if (null != callbackParams.getRequest().getEventId()
             && callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC")) {
@@ -349,7 +335,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     static final String PAY_FEE_MESSAGE = "# Please now pay your claim fee%n# using the link below";
 
     private String getHeader(CaseData caseData) {
-        if (areRespondentsRepresentedAndRegistered(caseData) || isPinInPostCaseMatched(caseData)) {
+        if (areRespondentsRepresentedAndRegistered(caseData) || isCaseMatched(caseData)) {
             return format(PAY_FEE_MESSAGE);
         }
         return format(
@@ -364,7 +350,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
         return
             ((areRespondentsRepresentedAndRegistered(caseData)
-                || isPinInPostCaseMatched(caseData))
+                || isCaseMatched(caseData))
                 ? getConfirmationSummary(caseData)
                 : format(LIP_CONFIRMATION_BODY, format(
                     CASE_DOC_LOCATION,
@@ -492,7 +478,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
         return
             ((areRespondentsRepresentedAndRegistered(caseData)
-                || isPinInPostCaseMatched(caseData))
+                || isCaseMatched(caseData))
                 ? getSpecConfirmationSummary(caseData)
                 : format(
                 SPEC_LIP_CONFIRMATION_BODY_PBAV3,
@@ -555,11 +541,10 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             .build();
     }
 
-    private boolean isPinInPostCaseMatched(CaseData caseData) {
+    private boolean isCaseMatched(CaseData caseData) {
         return (caseData.getRespondent1Represented() == NO
             && caseData.getAddRespondent2() == NO
-            && caseData.getAddApplicant2() == NO
-            && toggleService.isPinInPostEnabled());
+            && caseData.getAddApplicant2() == NO);
     }
 
     private boolean areRespondentsRepresentedAndRegistered(CaseData caseData) {
