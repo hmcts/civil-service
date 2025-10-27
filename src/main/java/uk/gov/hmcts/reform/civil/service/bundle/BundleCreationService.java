@@ -9,8 +9,8 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.client.EvidenceManagementApiClient;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.event.BundleCreationTriggerEvent;
-import uk.gov.hmcts.reform.civil.helpers.bundle.BundleRequestMapper;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.helpers.bundle.BundleRequestMapper;
 import uk.gov.hmcts.reform.civil.model.bundle.BundleCreateRequest;
 import uk.gov.hmcts.reform.civil.model.bundle.BundleCreateResponse;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
@@ -34,10 +34,16 @@ public class BundleCreationService {
 
     public BundleCreateResponse createBundle(BundleCreationTriggerEvent event) {
         CaseDetails caseDetails = coreCaseDataService.getCase(event.getCaseId());
-        return createNewBundleRequest(getAccessToken(), serviceAuthTokenGenerator.generate(),
-                            bundleRequestMapper.mapCaseDataToBundleCreateRequest(caseDetailsConverter.toCaseData(caseDetails),
-                                bundleConfig,
-                                caseDetails.getJurisdiction(), caseDetails.getCaseTypeId()));
+
+        return createNewBundleRequest(
+            "Bearer Token".equals(event.getAccessToken()) ? getAccessToken() : event.getAccessToken(),
+            serviceAuthTokenGenerator.generate(),
+            bundleRequestMapper.mapCaseDataToBundleCreateRequest(
+                caseDetailsConverter.toCaseData(caseDetails),
+                bundleConfig,
+                caseDetails.getJurisdiction(), caseDetails.getCaseTypeId()
+            )
+        );
     }
 
     public BundleCreateResponse createBundle(Long caseId) {
