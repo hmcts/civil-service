@@ -7,12 +7,12 @@ import uk.gov.hmcts.reform.civil.model.PartyFlagStructure;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
-import uk.gov.hmcts.reform.civil.model.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.dq.Experts;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 @Component
 public class UpdateApplicantExpertsTask extends MigrationTask<CaseReference> {
@@ -36,83 +36,50 @@ public class UpdateApplicantExpertsTask extends MigrationTask<CaseReference> {
         return "UpdateApplicantExpertsTask";
     }
 
+    @Override
     protected CaseData migrateCaseData(CaseData caseData, CaseReference caseRef) {
         if (caseRef == null || caseRef.getCaseReference() == null) {
             throw new IllegalArgumentException("CaseReference fields must not be null");
         }
 
-        // --- Applicant Experts ---
+        // --- Update Applicant Experts ---
         List<Element<PartyFlagStructure>> updatedApplicantExperts =
-            Optional.ofNullable(caseData.getApplicantExperts())
-                .orElse(Collections.emptyList())
-                .stream()
-                .peek(element -> {
-                    PartyFlagStructure expert = element.getValue();
-                    if (expert.getFirstName() == null) {
-                        expert.setFirstName("TBC");
-                    }
-                    if (expert.getLastName() == null) {
-                        expert.setLastName("TBC");
-                    }
-                })
-                .toList();
+            updateElements(caseData.getApplicantExperts(), expert -> expert.toBuilder()
+                .firstName(expert.getFirstName() == null ? "TBC" : expert.getFirstName())
+                .lastName(expert.getLastName() == null ? "TBC" : expert.getLastName())
+                .build()
+            );
 
         Applicant1DQ applicant1DQ = caseData.getApplicant1DQ();
         Applicant2DQ applicant2DQ = caseData.getApplicant2DQ();
 
-        // --- Applicant 1 DQ Experts ---
+        // --- Update Applicant 1 DQ Experts ---
         if (applicant1DQ != null && applicant1DQ.getApplicant1DQExperts() != null) {
-            Experts applicant1DQExperts = applicant1DQ.getApplicant1DQExperts();
-
-            List<Element<Expert>> updatedDQExperts =
-                Optional.ofNullable(applicant1DQExperts.getDetails())
-                    .orElse(Collections.emptyList())
-                    .stream()
-                    .peek(element -> {
-                        Expert expert = element.getValue();
-                        if (expert.getFirstName() == null) {
-                            expert.setFirstName("TBC");
-                        }
-                        if (expert.getLastName() == null) {
-                            expert.setLastName("TBC");
-                        }
-                    })
-                    .toList();
-
-            applicant1DQExperts = applicant1DQExperts.toBuilder()
-                .details(updatedDQExperts)
+            Experts updatedExperts = applicant1DQ.getApplicant1DQExperts().toBuilder()
+                .details(updateElements(applicant1DQ.getApplicant1DQExperts().getDetails(),
+                                        expert -> expert.toBuilder()
+                                            .firstName(expert.getFirstName() == null ? "TBC" : expert.getFirstName())
+                                            .lastName(expert.getLastName() == null ? "TBC" : expert.getLastName())
+                                            .build()
+                ))
                 .build();
-
             applicant1DQ = applicant1DQ.toBuilder()
-                .applicant1DQExperts(applicant1DQExperts)
+                .applicant1DQExperts(updatedExperts)
                 .build();
         }
 
-        // --- Applicant 2 DQ Experts ---
+        // --- Update Applicant 2 DQ Experts ---
         if (applicant2DQ != null && applicant2DQ.getApplicant2DQExperts() != null) {
-            Experts applicant2DQExperts = applicant2DQ.getApplicant2DQExperts();
-
-            List<Element<Expert>> updatedApplicant2DQExperts =
-                Optional.ofNullable(applicant2DQExperts.getDetails())
-                    .orElse(Collections.emptyList())
-                    .stream()
-                    .peek(element -> {
-                        Expert expert = element.getValue();
-                        if (expert.getFirstName() == null) {
-                            expert.setFirstName("TBC");
-                        }
-                        if (expert.getLastName() == null) {
-                            expert.setLastName("TBC");
-                        }
-                    })
-                    .toList();
-
-            applicant2DQExperts = applicant2DQExperts.toBuilder()
-                .details(updatedApplicant2DQExperts)
+            Experts updatedExperts = applicant2DQ.getApplicant2DQExperts().toBuilder()
+                .details(updateElements(applicant2DQ.getApplicant2DQExperts().getDetails(),
+                                        expert -> expert.toBuilder()
+                                            .firstName(expert.getFirstName() == null ? "TBC" : expert.getFirstName())
+                                            .lastName(expert.getLastName() == null ? "TBC" : expert.getLastName())
+                                            .build()
+                ))
                 .build();
-
             applicant2DQ = applicant2DQ.toBuilder()
-                .applicant2DQExperts(applicant2DQExperts)
+                .applicant2DQExperts(updatedExperts)
                 .build();
         }
 
@@ -122,5 +89,19 @@ public class UpdateApplicantExpertsTask extends MigrationTask<CaseReference> {
             .applicant1DQ(applicant1DQ)
             .applicant2DQ(applicant2DQ)
             .build();
+    }
+
+    /**
+     * Generic helper method to update elements using a provided transformer function.
+     */
+    private <T> List<Element<T>> updateElements(List<Element<T>> elements, Function<T, T> transformer) {
+        return Optional.ofNullable(elements)
+            .orElse(Collections.emptyList())
+            .stream()
+            .map(element -> Element.<T>builder()
+                .id(element.getId())
+                .value(transformer.apply(element.getValue()))
+                .build())
+            .toList();
     }
 }
