@@ -12,6 +12,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.event.BundleCreationTriggerEvent;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.Bundle;
@@ -20,6 +21,7 @@ import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.NoCacheUserService;
 import uk.gov.hmcts.reform.civil.service.search.BundleCreationTriggerService;
 
 import java.time.LocalDate;
@@ -62,16 +64,27 @@ class BundleCreationTriggerHandlerTest {
     @Mock
     private ApplicationEventPublisher applicationEventPublisher;
 
+    @Mock
+    private SystemUpdateUserConfiguration userConfig;
+
+    @Mock
+    private NoCacheUserService noCacheUserService;
+
     @InjectMocks
     private BundleCreationTriggerHandler handler;
     private CaseData caseData;
     private CaseDetails caseDetails;
     private List<IdValue<Bundle>> caseBundles;
+    private static final String ACCESS_TOKEN = "ACCESS_TOKEN";
+    private static final String TEST = "test";
 
     @BeforeEach
     void init() {
-        when(mockTask.getTopicName()).thenReturn("test");
+        when(mockTask.getTopicName()).thenReturn(TEST);
         when(mockTask.getWorkerId()).thenReturn("worker");
+        when(userConfig.getUserName()).thenReturn(TEST);
+        when(userConfig.getPassword()).thenReturn(TEST);
+        when(noCacheUserService.getAccessToken(TEST, TEST)).thenReturn(ACCESS_TOKEN);
 
         caseBundles = new ArrayList<>();
         caseBundles.add(new IdValue<>("1", uk.gov.hmcts.reform.civil.model.Bundle.builder().id("1")
@@ -97,7 +110,7 @@ class BundleCreationTriggerHandlerTest {
 
         handler.execute(mockTask, externalTaskService);
 
-        verify(applicationEventPublisher).publishEvent(new BundleCreationTriggerEvent(caseId));
+        verify(applicationEventPublisher).publishEvent(new BundleCreationTriggerEvent(caseId, ACCESS_TOKEN));
         verify(externalTaskService).complete(mockTask, null);
     }
 
@@ -177,7 +190,7 @@ class BundleCreationTriggerHandlerTest {
         when(caseDetailsConverter.toCaseData(anyMap())).thenReturn(caseData);
         //When: getIsBundleCreatedForHearingDate is called
         //Then: its should return false indicating that bundle is not already created for this hearingDate
-        Assertions.assertEquals(handler.getIsBundleCreatedForHearingDate(1L), false);
+        Assertions.assertEquals(false, handler.getIsBundleCreatedForHearingDate(1L));
     }
 
     @Test
