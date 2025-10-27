@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.dashboard.data.TaskStatus;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -55,18 +56,13 @@ public class CaseProceedOfflineDefendantScenarioTest extends DashboardBaseIntegr
         doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "DEFENDANT")
             .andExpectAll(
                 status().is(HttpStatus.OK.value()),
-                jsonPath("$[0].reference").value(caseId.toString()),
-                jsonPath("$[0].taskNameEn").value(
-                    "<a>Upload hearing documents</a>"),
-                jsonPath("$[0].currentStatusEn").value("Inactive")
-
+                jsonPath("$", hasSize(0))
             );
     }
 
     @Test
     void should_create_case_proceed_offline__claimant_scenario_without_tasks() throws Exception {
 
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         String caseId = "72016577183";
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
@@ -114,7 +110,6 @@ public class CaseProceedOfflineDefendantScenarioTest extends DashboardBaseIntegr
             .activeJudgment(JudgmentDetails.builder().state(JudgmentState.ISSUED).build())
             .previousCCDState(CaseState.All_FINAL_ORDERS_ISSUED)
             .build();
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
 
         handler.handle(callbackParams(caseData));
 

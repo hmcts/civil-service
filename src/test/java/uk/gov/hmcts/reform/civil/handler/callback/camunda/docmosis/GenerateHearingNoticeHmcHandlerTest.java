@@ -161,7 +161,6 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
         when(camundaService.getProcessVariables(PROCESS_INSTANCE_ID)).thenReturn(inputVariables);
         when(hearingsService.getHearingResponse(anyString(), anyString())).thenReturn(hearing);
         when(hearingNoticeHmcGenerator.generate(eq(caseData), eq(hearing), anyString(), anyString(), anyString(), any())).thenReturn(List.of(CASE_DOCUMENT));
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         Fee expectedFee = Fee.builder()
             .calculatedAmountInPence(new BigDecimal(54500)).code("FEE0441").version("1").build();
         given(hearingFeesService.getFeeForHearingSmallClaims(any())).willReturn(expectedFee);
@@ -239,7 +238,6 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
         when(camundaService.getProcessVariables(PROCESS_INSTANCE_ID)).thenReturn(inputVariables);
         when(hearingsService.getHearingResponse(anyString(), anyString())).thenReturn(hearing);
         when(hearingNoticeHmcGenerator.generate(eq(caseData), eq(hearing), anyString(), anyString(), anyString(), any())).thenReturn(List.of(CASE_DOCUMENT));
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         Fee expectedFee = Fee.builder()
             .calculatedAmountInPence(new BigDecimal(54500)).code("FEE0441").version("1").build();
         given(hearingFeesService.getFeeForHearingSmallClaims(any())).willReturn(expectedFee);
@@ -324,7 +322,6 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
         when(camundaService.getProcessVariables(PROCESS_INSTANCE_ID)).thenReturn(inputVariables);
         when(hearingsService.getHearingResponse(anyString(), anyString())).thenReturn(hearing);
         when(hearingNoticeHmcGenerator.generate(eq(caseData), eq(hearing), anyString(), anyString(), anyString(), any())).thenReturn(List.of(CASE_DOCUMENT));
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(false);
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(GENERATE_HEARING_NOTICE_HMC.name());
@@ -390,7 +387,6 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
             .thenReturn(List.of(CASE_DOCUMENT));
         when(hearingNoticeHmcGenerator.generate(eq(caseData), eq(hearing), anyString(), anyString(), anyString(), eq(HEARING_NOTICE_HMC_WELSH)))
             .thenReturn(List.of(CASE_DOCUMENT_WELSH));
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(false);
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(GENERATE_HEARING_NOTICE_HMC.name());
@@ -457,7 +453,6 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
             .thenReturn(List.of(CASE_DOCUMENT));
         when(hearingNoticeHmcGenerator.generate(eq(caseData), eq(hearing), anyString(), anyString(), anyString(), eq(HEARING_NOTICE_HMC_WELSH)))
             .thenReturn(List.of(CASE_DOCUMENT_WELSH));
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(false);
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(GENERATE_HEARING_NOTICE_HMC.name());
@@ -534,7 +529,6 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
             .thenReturn(List.of(CASE_DOCUMENT));
         when(hearingNoticeHmcGenerator.generate(any(), eq(hearing), anyString(), nullable(String.class), anyString(), eq(HEARING_NOTICE_HMC_WELSH)))
             .thenReturn(List.of(CASE_DOCUMENT_WELSH));
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(false);
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -601,7 +595,6 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
         when(hearingsService.getHearingResponse(anyString(), anyString())).thenReturn(hearing);
         when(hearingNoticeHmcGenerator.generate(any(), eq(hearing), anyString(), nullable(String.class), anyString(), eq(HEARING_NOTICE_HMC)))
             .thenReturn(List.of(CASE_DOCUMENT));
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(false);
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(GENERATE_HEARING_NOTICE_HMC.name());
