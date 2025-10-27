@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.ServiceRequestUpdateDto;
+import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 
 import java.util.Optional;
 
@@ -69,7 +70,8 @@ public class PaymentRequestUpdateCallbackService {
 
     private void handlePaymentUpdate(ServiceRequestUpdateDto dto, CaseData caseData, FeeType feeType) {
         CardPaymentStatusResponse paymentStatusResponse = buildPaymentStatusResponse(dto);
-        caseData = updateCaseDataWithPaymentDetails(paymentStatusResponse, caseData, feeType);
+        String customerReference = getCustomerReference(dto, caseData, feeType);
+        caseData = updateCaseDataWithPaymentDetails(paymentStatusResponse, caseData, feeType, customerReference);
         updatePaymentStatus(feeType, dto.getCcdCaseNumber(), caseData);
     }
 
@@ -173,24 +175,33 @@ public class PaymentRequestUpdateCallbackService {
         }
     }
 
-    private CaseData updateCaseDataWithPaymentDetails(CardPaymentStatusResponse response, CaseData caseData, FeeType feeType) {
-        PaymentDetails updatedPayment = PaymentDetails.builder()
-                .status(PaymentStatus.valueOf(response.getStatus()))
+    private CaseData updateCaseDataWithPaymentDetails(CardPaymentStatusResponse response,
+                                                      CaseData caseData,
+                                                      FeeType feeType) {
+        return updateCaseDataWithPaymentDetails(response, caseData, feeType, null);
+    }
+
+    private CaseData updateCaseDataWithPaymentDetails(CardPaymentStatusResponse response,
+                                                      CaseData caseData,
+                                                      FeeType feeType,
+                                                      String customerReference) {
+        PaymentDetails existingPayment = getPaymentDetails(feeType, caseData);
+        PaymentDetails.PaymentDetailsBuilder builder = Optional.ofNullable(existingPayment)
+                .map(PaymentDetails::toBuilder)
+                .orElse(PaymentDetails.builder());
+
+        builder.status(resolvePaymentStatus(response.getStatus()))
                 .reference(response.getPaymentReference())
                 .errorCode(response.getErrorCode())
-                .errorMessage(response.getErrorDescription())
-                .build();
+                .errorMessage(response.getErrorDescription());
 
-        PaymentDetails mergedPayment = Optional.ofNullable(getPaymentDetails(feeType, caseData))
-                .map(existingPayment -> existingPayment.toBuilder()
-                        .status(updatedPayment.getStatus())
-                        .reference(updatedPayment.getReference())
-                        .errorCode(updatedPayment.getErrorCode())
-                        .errorMessage(updatedPayment.getErrorMessage())
-                        .build())
-                .orElse(updatedPayment);
+        if (customerReference != null) {
+            builder.customerReference(customerReference);
+        } else if (existingPayment != null) {
+            builder.customerReference(existingPayment.getCustomerReference());
+        }
 
-        return applyPaymentDetails(caseData, feeType, mergedPayment);
+        return applyPaymentDetails(caseData, feeType, builder.build());
     }
 
     private PaymentDetails getPaymentDetails(FeeType feeType, CaseData caseData) {
@@ -205,5 +216,17 @@ public class PaymentRequestUpdateCallbackService {
             case HEARING -> caseData.toBuilder().hearingFeePaymentDetails(paymentDetails).build();
             case CLAIMISSUED -> caseData.toBuilder().claimIssuedPaymentDetails(paymentDetails).build();
         };
+    }
+
+    private PaymentStatus resolvePaymentStatus(String status) {
+        return status != null ? PaymentStatus.valueOf(status.toUpperCase()) : null;
+    }
+
+    private String getCustomerReference(ServiceRequestUpdateDto dto, CaseData caseData, FeeType feeType) {
+        return Optional.ofNullable(dto.getPayment())
+                .map(PaymentDto::getCustomerReference)
+                .orElse(Optional.ofNullable(getPaymentDetails(feeType, caseData))
+                        .map(PaymentDetails::getCustomerReference)
+                        .orElse(null));
     }
 }

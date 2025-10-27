@@ -6,7 +6,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -23,9 +26,11 @@ import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.ServiceRequestUpdateDto;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import java.math.BigDecimal;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -50,13 +55,13 @@ class PaymentRequestUpdateCallbackServiceTest {
     private PaymentRequestUpdateCallbackService paymentRequestUpdateCallbackService;
 
     @Mock
-    private ObjectMapper objectMapper;
-
-    @Mock
     private CoreCaseDataService coreCaseDataService;
 
     @Mock
     private CaseDetailsConverter caseDetailsConverter;
+
+    @Spy
+    private ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
     private CaseData buildCaseData(CaseState state, BusinessProcessStatus businessProcessStatus, String camundaEvent, PaymentDetails paymentDetails) {
         return CaseDataBuilder.builder().receiveUpdatePaymentRequest().build().toBuilder()
@@ -86,6 +91,7 @@ class PaymentRequestUpdateCallbackServiceTest {
                         .paymentReference(REFERENCE)
                         .caseReference(REFERENCE)
                         .accountNumber(ACCOUNT_NUMBER)
+                        .customerReference("CUST-REF")
                         .build())
                 .build();
     }
@@ -233,6 +239,33 @@ class PaymentRequestUpdateCallbackServiceTest {
     }
 
     @Test
+    void shouldPersistCustomerReferenceFromCallback() {
+        CaseData caseData = buildCaseData(CaseState.CASE_PROGRESSION, BusinessProcessStatus.READY, BUSINESS_PROCESS, null)
+                .toBuilder()
+                .applicant1Represented(YesOrNo.YES)
+                .respondent1Represented(YesOrNo.YES)
+                .build();
+        CaseDetails caseDetails = buildCaseDetails(caseData);
+
+        when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
+        when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
+        when(coreCaseDataService.startUpdate(any(), any())).thenReturn(startEventResponse(
+                caseDetails,
+                CaseEvent.SERVICE_REQUEST_RECEIVED
+        ));
+        when(coreCaseDataService.submitUpdate(any(), any())).thenReturn(caseData);
+
+        paymentRequestUpdateCallbackService.processCallback(buildServiceDto(PAID), FeeType.HEARING.name());
+
+        ArgumentCaptor<CaseDataContent> captor = ArgumentCaptor.forClass(CaseDataContent.class);
+        verify(coreCaseDataService).submitUpdate(any(), captor.capture());
+
+        CaseData captured = objectMapper.convertValue(captor.getValue().getData(), CaseData.class);
+        assertThat(captured.getHearingFeePaymentDetails()).isNotNull();
+        assertThat(captured.getHearingFeePaymentDetails().getCustomerReference()).isEqualTo("CUST-REF");
+    }
+
+    @Test
     void shouldSubmitCitizenHearingFeePaymentEventIfFeeTypeIsHearing() {
         CaseData caseData = CaseDataBuilder.builder().receiveUpdatePaymentRequest().build();
         caseData = caseData.toBuilder()
@@ -302,6 +335,48 @@ class PaymentRequestUpdateCallbackServiceTest {
         verify(coreCaseDataService, never()).getCase(any());
         verify(coreCaseDataService, never()).startUpdate(any(), any());
         verify(coreCaseDataService, never()).submitUpdate(any(), any());
+    }
+
+    @Test
+    void shouldRetainExistingCustomerReferenceWhenUpdatingWithCardPaymentStatusResponse() {
+        PaymentDetails existingDetails = PaymentDetails.builder()
+                .customerReference("EXISTING-REF")
+                .status(PaymentStatus.FAILED)
+                .build();
+
+        CaseData caseData = CaseDataBuilder.builder().receiveUpdatePaymentRequest().build().toBuilder()
+                .ccdState(CaseState.CASE_PROGRESSION)
+                .businessProcess(BusinessProcess.builder()
+                        .status(BusinessProcessStatus.READY)
+                        .camundaEvent(BUSINESS_PROCESS)
+                        .build())
+                .applicant1Represented(YesOrNo.NO)
+                .respondent1Represented(YesOrNo.NO)
+                .hearingFeePaymentDetails(existingDetails)
+                .build();
+        CaseDetails caseDetails = buildCaseDetails(caseData);
+
+        when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
+        when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
+        when(coreCaseDataService.startUpdate(any(), any())).thenReturn(startEventResponse(
+                caseDetails,
+                CITIZEN_HEARING_FEE_PAYMENT
+        ));
+        when(coreCaseDataService.submitUpdate(any(), any())).thenReturn(caseData);
+
+        CardPaymentStatusResponse response = CardPaymentStatusResponse.builder()
+                .paymentReference(REFERENCE)
+                .status("Success")
+                .build();
+
+        paymentRequestUpdateCallbackService.updatePaymentStatus(FeeType.HEARING, CASE_ID.toString(), response);
+
+        ArgumentCaptor<CaseDataContent> captor = ArgumentCaptor.forClass(CaseDataContent.class);
+        verify(coreCaseDataService).submitUpdate(any(), captor.capture());
+
+        CaseData captured = objectMapper.convertValue(captor.getValue().getData(), CaseData.class);
+        assertThat(captured.getHearingFeePaymentDetails()).isNotNull();
+        assertThat(captured.getHearingFeePaymentDetails().getCustomerReference()).isEqualTo("EXISTING-REF");
     }
 
     private CardPaymentStatusResponse getCardPaymentStatusResponse() {
