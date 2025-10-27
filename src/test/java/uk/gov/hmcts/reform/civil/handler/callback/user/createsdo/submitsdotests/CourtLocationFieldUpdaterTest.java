@@ -5,12 +5,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.handler.callback.user.createsdo.submitsdo.CourtLocationFieldUpdater;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
@@ -24,29 +26,52 @@ class CourtLocationFieldUpdaterTest {
     private CourtLocationFieldUpdater courtLocationFieldUpdater;
 
     @Test
-    void shouldUpdateEaCourtLocationToYes() {
+    void shouldSetEaCourtLocationToYesWhenSpecSolicitorCase() {
         CaseData caseData = CaseData.builder()
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("1010101").region("orange").build())
-                .ccdCaseReference(1234L)
-                .build();
-        CaseData.CaseDataBuilder<?, ?> dataBuilder = CaseData.builder();
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("1010101").region("orange").build())
+            .ccdCaseReference(1234L)
+            .respondent1Represented(YES)
+            .build();
+
+        CaseData.CaseDataBuilder<?, ?> dataBuilder = caseData.toBuilder();
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
 
         courtLocationFieldUpdater.update(caseData, dataBuilder);
 
-        assertEquals(YES, dataBuilder.build().getEaCourtLocation());
+        assertThat(dataBuilder.build().getEaCourtLocation()).isEqualTo(YES);
     }
 
     @Test
-    void shouldUpdateEaCourtLocationToNoWhenCaseIsNotWhitelisted() {
+    void shouldSetEaCourtLocationToNoWhenSpecLipCaseNotWhitelisted() {
         CaseData caseData = CaseData.builder()
-                .ccdCaseReference(1234L)
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("1010101").region("orange").build())
-                .respondent1Represented(NO)
-                .build();
-        CaseData.CaseDataBuilder<?, ?> dataBuilder = CaseData.builder();
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("1010101").region("orange").build())
+            .ccdCaseReference(1234L)
+            .respondent1Represented(NO)
+            .applicant1Represented(NO)
+            .build();
+
+        CaseData.CaseDataBuilder<?, ?> dataBuilder = caseData.toBuilder();
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
 
         courtLocationFieldUpdater.update(caseData, dataBuilder);
 
-        assertEquals(NO, dataBuilder.build().getEaCourtLocation());
+        assertThat(dataBuilder.build().getEaCourtLocation()).isEqualTo(NO);
+    }
+
+    @Test
+    void shouldNotSetEaCourtLocationForUnspecClaim() {
+        CaseData caseData = CaseData.builder()
+            .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("1010101").region("orange").build())
+            .ccdCaseReference(1234L)
+            .respondent1Represented(YES)
+            .build();
+
+        CaseData.CaseDataBuilder<?, ?> dataBuilder = caseData.toBuilder();
+        courtLocationFieldUpdater.update(caseData, dataBuilder);
+
+        assertThat(dataBuilder.build().getEaCourtLocation()).isNull();
     }
 }

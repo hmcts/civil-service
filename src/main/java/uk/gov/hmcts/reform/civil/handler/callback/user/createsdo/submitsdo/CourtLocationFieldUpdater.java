@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @Slf4j
@@ -18,17 +19,19 @@ public class CourtLocationFieldUpdater implements SdoCaseDataFieldUpdater {
 
     @Override
     public void update(CaseData caseData, CaseData.CaseDataBuilder<?, ?> dataBuilder) {
-        boolean isLipCase = (caseData.isApplicantLiP() || caseData.isRespondent1LiP() || caseData.isRespondent2LiP());
-
-        if (featureToggleService.isWelshEnabledForMainCase()) {
-            dataBuilder.eaCourtLocation(YES);
-        } else {
-            if (!isLipCase) {
-                log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            // LiP check ensures LiP cases will not automatically get whitelisted, and instead will have their own ea court check.
+            boolean isLipCase = (caseData.isApplicantLiP() || caseData.isRespondent1LiP() || caseData.isRespondent2LiP());
+            if (featureToggleService.isWelshEnabledForMainCase()) {
                 dataBuilder.eaCourtLocation(YES);
             } else {
-                boolean isLipCaseEaCourt = isLipCaseWithProgressionEnabledAndCourtWhiteListed(caseData);
-                dataBuilder.eaCourtLocation(isLipCaseEaCourt ? YesOrNo.YES : YesOrNo.NO);
+                if (!isLipCase) {
+                    log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
+                    dataBuilder.eaCourtLocation(YES);
+                } else {
+                    boolean isLipCaseEaCourt = isLipCaseWithProgressionEnabledAndCourtWhiteListed(caseData);
+                    dataBuilder.eaCourtLocation(isLipCaseEaCourt ? YesOrNo.YES : YesOrNo.NO);
+                }
             }
         }
     }

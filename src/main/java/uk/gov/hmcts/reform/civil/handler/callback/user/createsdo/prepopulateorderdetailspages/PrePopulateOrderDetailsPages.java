@@ -226,7 +226,7 @@ public class PrePopulateOrderDetailsPages implements CaseTask {
         Optional<RequestedCourt> preferredCourt;
         if (isSpecClaim1000OrLessAndCcmcc(ccmccAmount).test(caseData)) {
             log.debug("Case qualifies for Legal Advisor SDO, fetching preferred court for caseId: {}", caseData.getCcdCaseReference());
-            preferredCourt = locationHelper.getCaseManagementLocationWhenLegalAdvisorSdo(caseData, true);
+            preferredCourt = locationHelper.getCaseManagementLocationWhenLegalAdvisorSdo(caseData);
             preferredCourt.map(RequestedCourt::getCaseLocation)
                     .ifPresent(location -> {
                         updatedData.caseManagementLocation(location);
