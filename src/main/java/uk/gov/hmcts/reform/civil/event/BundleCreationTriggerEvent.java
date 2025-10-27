@@ -6,4 +6,5 @@ import lombok.Value;
 public class BundleCreationTriggerEvent {
 
     Long caseId;
+    String accessToken;
 }
