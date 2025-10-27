@@ -60,7 +60,8 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
     @Override
     public SealedClaimResponseFormForSpec getTemplateData(CaseData caseData, String authorisation) {
         log.info("GetTemplateData for case ID {}", caseData.getCcdCaseReference());
-        SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder = SealedClaimResponseFormForSpec.builder();
+        SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder =
+            SealedClaimResponseFormForSpec.builder();
 
         referenceNumberPopulator.populateReferenceNumberDetails(builder, caseData, authorisation);
         statementOfTruthPopulator.populateStatementOfTruthDetails(builder, caseData);
@@ -69,15 +70,13 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
         addRepaymentPlanDetails(builder, caseData);
         handleRespondents(builder, caseData);
 
-        Optional.ofNullable(caseData.getSolicitorReferences())
-            .ifPresent(builder::solicitorReferences);
+        Optional.ofNullable(caseData.getSolicitorReferences()).ifPresent(builder::solicitorReferences);
 
-        handleClaimResponse(builder, caseData);
+        handleClaimResponse(builder, caseData);      // sets defendantResponse/submittedOn
+        mapWhyDisputeTheClaim(builder, caseData);    // <— missing before; fixes failing test
 
         handleTimeline(builder, caseData);
-
         handleDefenceResponseDocument(builder, caseData);
-
         handlePayments(caseData, builder);
 
         return builder.build();
@@ -94,20 +93,15 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
                 .ifPresent(builder::respondentRepresentativeOrganisationName);
         } else {
             Representative respondent1Representative = representativeService.getRespondent1Representative(caseData);
-            builder.respondent1(getSpecifiedParty(
-                caseData.getRespondent1(),
-                respondent1Representative
-            ));
+            builder.respondent1(getSpecifiedParty(caseData.getRespondent1(), respondent1Representative));
             Optional.ofNullable(respondent1Representative)
                 .map(Representative::getOrganisationName)
                 .ifPresent(builder::respondentRepresentativeOrganisationName);
             Optional.ofNullable(caseData.getRespondent2()).ifPresent(
-                respondent2 ->
-                    builder.respondent2(getSpecifiedParty(
-                        respondent2,
-                        representativeService.getRespondent2Representative(
-                            caseData)
-                    )));
+                respondent2 -> builder.respondent2(
+                    getSpecifiedParty(respondent2, representativeService.getRespondent2Representative(caseData))
+                )
+            );
         }
     }
 
@@ -130,11 +124,32 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
         }
     }
 
+    /**
+     * Explicitly map the free-text “why dispute” field expected by the Docmosis DTO.
+     * Tests expect:
+     * - 1v1 → caseData.detailsOfWhyDoesYouDisputeTheClaim
+     * - 1v2 latest is respondent2 → detailsOfWhyDoesYouDisputeTheClaim2
+     * - 1v2 latest is respondent1 → detailsOfWhyDoesYouDisputeTheClaim
+     */
+    private void mapWhyDisputeTheClaim(SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder,
+                                       CaseData caseData) {
+        String why;
+        if (caseData.getRespondent2() != null && isRespondent2(caseData)) {
+            // respondent 2 answered last
+            why = caseData.getDetailsOfWhyDoesYouDisputeTheClaim2();
+        } else {
+            // single defendant or respondent 1 is the latest
+            why = caseData.getDetailsOfWhyDoesYouDisputeTheClaim();
+        }
+        builder.whyDisputeTheClaim(why);
+    }
+
     private void handleTimeline(SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder, CaseData caseData) {
         if (caseData.getSpecResponseTimelineDocumentFiles() != null) {
             builder.timelineUploaded(true)
-                .specResponseTimelineDocumentFiles(caseData.getSpecResponseTimelineDocumentFiles()
-                                                       .getDocumentFileName());
+                .specResponseTimelineDocumentFiles(
+                    caseData.getSpecResponseTimelineDocumentFiles().getDocumentFileName()
+                );
         } else {
             builder.timelineUploaded(false)
                 .timeline(getTimeLine(caseData));
@@ -144,10 +159,12 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
     private void handleDefenceResponseDocument(SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder, CaseData caseData) {
         if (caseData.getRespondent1SpecDefenceResponseDocument() != null && !isRespondent2(caseData)) {
             builder.respondent1SpecDefenceResponseDocument(
-                caseData.getRespondent1SpecDefenceResponseDocument().getFile().getDocumentFileName());
+                caseData.getRespondent1SpecDefenceResponseDocument().getFile().getDocumentFileName()
+            );
         } else if (caseData.getRespondent2SpecDefenceResponseDocument() != null && isRespondent2(caseData)) {
             builder.respondent1SpecDefenceResponseDocument(
-                caseData.getRespondent2SpecDefenceResponseDocument().getFile().getDocumentFileName());
+                caseData.getRespondent2SpecDefenceResponseDocument().getFile().getDocumentFileName()
+            );
         }
     }
 
@@ -155,8 +172,8 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
         Stream.of(caseData.getRespondToClaim(), caseData.getRespondToAdmittedClaim())
             .filter(Objects::nonNull)
             .findFirst()
-            .ifPresent(response -> builder.poundsPaid(MonetaryConversions
-                                                          .penniesToPounds(response.getHowMuchWasPaid()).toString())
+            .ifPresent(response -> builder
+                .poundsPaid(MonetaryConversions.penniesToPounds(response.getHowMuchWasPaid()).toString())
                 .paymentDate(response.getWhenWasThisAmountPaid())
                 .paymentMethod(getPaymentMethod(response)));
     }
@@ -220,28 +237,18 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
             .mediationUnavailableDatesList(unavailableDatesList);
     }
 
-    /**
-     * We pass through this method twice, once for each defendant. Each time
-     * we have to set the defendant who just answered.
-     *
-     * @param caseData a case data 1v2 with different solicitors and at least one of the defendants
-     *                 has responded
-     * @return which should be the defendant in the sealed claim form
-     */
     private SpecifiedParty getDefendant1v2ds(CaseData caseData) {
         if (caseData.getRespondent1ResponseDate() == null
             || (caseData.getRespondent2ResponseDate() != null
             && caseData.getRespondent2ResponseDate().isAfter(caseData.getRespondent1ResponseDate()))) {
             return getSpecifiedParty(
                 caseData.getRespondent2(),
-                representativeService.getRespondent2Representative(
-                    caseData)
+                representativeService.getRespondent2Representative(caseData)
             );
         } else {
             return getSpecifiedParty(
                 caseData.getRespondent1(),
-                representativeService.getRespondent1Representative(
-                    caseData)
+                representativeService.getRespondent1Representative(caseData)
             );
         }
     }
@@ -291,129 +298,105 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
     }
 
     private String getRespondent1MediationFirstName(CaseData caseData) {
-
         String mediationFirstname = caseData.getRespondent1().getPartyName();
         if (caseData.getResp1MediationContactInfo() != null
             && caseData.getResp1MediationContactInfo().getFirstName() != null) {
             mediationFirstname = caseData.getResp1MediationContactInfo().getFirstName();
         }
-
         return mediationFirstname;
     }
 
     private String getRespondent1MediationLastName(CaseData caseData) {
-
         String mediationLastName = caseData.getRespondent1().getPartyName();
         if (caseData.getResp1MediationContactInfo() != null
             && caseData.getResp1MediationContactInfo().getLastName() != null) {
             mediationLastName = caseData.getResp1MediationContactInfo().getLastName();
         }
-
         return mediationLastName;
     }
 
     private String getRespondent1MediationContactNumber(CaseData caseData) {
-
         String mediationContactNumber = caseData.getRespondent1().getPartyPhone();
         if (caseData.getResp1MediationContactInfo() != null
             && caseData.getResp1MediationContactInfo().getTelephoneNumber() != null) {
             mediationContactNumber = caseData.getResp1MediationContactInfo().getTelephoneNumber();
         }
-
         return mediationContactNumber;
     }
 
     private String getRespondent1MediationEmail(CaseData caseData) {
-
         String mediationEmail = caseData.getRespondent1().getPartyEmail();
         if (caseData.getResp1MediationContactInfo() != null
             && caseData.getResp1MediationContactInfo().getEmailAddress() != null) {
             mediationEmail = caseData.getResp1MediationContactInfo().getEmailAddress();
         }
-
         return mediationEmail;
     }
 
     private boolean checkRespondent1MediationHasUnavailabilityDates(CaseData caseData) {
         return caseData.getResp1MediationAvailability() != null
             && caseData.getResp1MediationAvailability().getIsMediationUnavailablityExists() != null
-            && caseData.getResp1MediationAvailability().getIsMediationUnavailablityExists().equals(
-            YesOrNo.YES);
+            && caseData.getResp1MediationAvailability().getIsMediationUnavailablityExists().equals(YesOrNo.YES);
     }
 
     private List<Element<UnavailableDate>> getRespondent1FromDateUnavailableList(CaseData caseData) {
         List<Element<UnavailableDate>> datesUnavailableList = null;
         if (caseData.getResp1MediationAvailability() != null
             && caseData.getResp1MediationAvailability().getIsMediationUnavailablityExists() != null
-            && caseData.getResp1MediationAvailability().getIsMediationUnavailablityExists().equals(
-            YesOrNo.YES)) {
-
+            && caseData.getResp1MediationAvailability().getIsMediationUnavailablityExists().equals(YesOrNo.YES)) {
             datesUnavailableList = caseData.getResp1MediationAvailability().getUnavailableDatesForMediation();
-
         }
         return datesUnavailableList;
     }
 
     private String getRespondent2MediationFirstName(CaseData caseData) {
-
         String mediationFirstname = caseData.getRespondent2().getPartyName();
         if (caseData.getResp2MediationContactInfo() != null
             && caseData.getResp2MediationContactInfo().getFirstName() != null) {
             mediationFirstname = caseData.getResp2MediationContactInfo().getFirstName();
         }
-
         return mediationFirstname;
     }
 
     private String getRespondent2MediationLastName(CaseData caseData) {
-
         String mediationLastName = caseData.getRespondent2().getPartyName();
         if (caseData.getResp2MediationContactInfo() != null
             && caseData.getResp2MediationContactInfo().getLastName() != null) {
             mediationLastName = caseData.getResp2MediationContactInfo().getLastName();
         }
-
         return mediationLastName;
     }
 
     private String getRespondent2MediationContactNumber(CaseData caseData) {
-
         String mediationContactNumber = caseData.getRespondent2().getPartyPhone();
         if (caseData.getResp2MediationContactInfo() != null
             && caseData.getResp2MediationContactInfo().getTelephoneNumber() != null) {
             mediationContactNumber = caseData.getResp2MediationContactInfo().getTelephoneNumber();
         }
-
         return mediationContactNumber;
     }
 
     private String getRespondent2MediationEmail(CaseData caseData) {
-
         String mediationEmail = caseData.getRespondent2().getPartyEmail();
         if (caseData.getResp2MediationContactInfo() != null
             && caseData.getResp2MediationContactInfo().getEmailAddress() != null) {
             mediationEmail = caseData.getResp2MediationContactInfo().getEmailAddress();
         }
-
         return mediationEmail;
     }
 
     private boolean checkRespondent2MediationHasUnavailabilityDates(CaseData caseData) {
         return caseData.getResp2MediationAvailability() != null
             && caseData.getResp2MediationAvailability().getIsMediationUnavailablityExists() != null
-            && caseData.getResp2MediationAvailability().getIsMediationUnavailablityExists().equals(
-            YesOrNo.YES);
+            && caseData.getResp2MediationAvailability().getIsMediationUnavailablityExists().equals(YesOrNo.YES);
     }
 
     private List<Element<UnavailableDate>> getRespondent2FromDateUnavailableList(CaseData caseData) {
         List<Element<UnavailableDate>> datesUnavailableList = null;
         if (caseData.getResp2MediationAvailability() != null
             && caseData.getResp2MediationAvailability().getIsMediationUnavailablityExists() != null
-            && caseData.getResp2MediationAvailability().getIsMediationUnavailablityExists().equals(
-            YesOrNo.YES)) {
-
+            && caseData.getResp2MediationAvailability().getIsMediationUnavailablityExists().equals(YesOrNo.YES)) {
             datesUnavailableList = caseData.getResp2MediationAvailability().getUnavailableDatesForMediation();
-
         }
         return datesUnavailableList;
     }
@@ -421,9 +404,9 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
     public CaseDocument generate(CaseData caseData, String authorization) {
         SealedClaimResponseFormForSpec templateData = getTemplateData(caseData, authorization);
         DocmosisTemplates docmosisTemplate = getTemplate(caseData);
+
         DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
-            templateData,
-            docmosisTemplate
+            templateData, docmosisTemplate
         );
         String fileName = String.format(docmosisTemplate.getDocumentTitle(), caseData.getLegacyCaseReference());
 
@@ -435,15 +418,14 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
 
     private DocmosisTemplates getTemplate(CaseData caseData) {
         if (caseData.getRespondent2() != null && YesOrNo.YES.equals(caseData.getRespondentResponseIsSame())) {
-            // always return the LR admission bulk template when respondent 2 is present and responses match
+            // when respondent 2 is present and the responses match use 1v2 LR admission bulk
             return DEFENDANT_RESPONSE_SPEC_SEALED_1V2_LR_ADMISSION_BULK;
         }
-        // otherwise fall back to the single‑party template
+        // otherwise use the 1v1 LR admission bulk template
         return getDocmosisTemplateForSingleParty();
     }
 
     private DocmosisTemplates getDocmosisTemplateForSingleParty() {
-        // always return the LR admission bulk template for 1‑v‑1
         return DEFENDANT_RESPONSE_SPEC_SEALED_1V1_INSTALLMENTS_LR_ADMISSION_BULK;
     }
 }
