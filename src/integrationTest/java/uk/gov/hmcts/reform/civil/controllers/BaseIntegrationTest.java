@@ -80,7 +80,7 @@ public abstract class BaseIntegrationTest {
     protected static final String s2sToken = "s2s AuthToken";
     @MockBean
     private ServiceAuthorisationApi serviceAuthorisationApi;
-    @MockBean
+    @MockBean (name = "userService")
     protected UserService userService;
     @MockBean
     protected Authentication authentication;
