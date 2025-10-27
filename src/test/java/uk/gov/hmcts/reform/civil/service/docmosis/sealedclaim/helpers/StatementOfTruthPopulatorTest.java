@@ -6,7 +6,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.SealedClaimResponseFormForSpec;
@@ -37,7 +36,6 @@ public class StatementOfTruthPopulatorTest {
     void shouldPopulateDetailsForRespondent1() {
         StatementOfTruth respondent1StatementOfTruth = StatementOfTruth.builder().name("Respondent 1").build();
         Respondent1DQ respondent1DQ = Respondent1DQ.builder()
-            .respondent1DQRequestedCourt(RequestedCourt.builder().build())
             .respondent1DQStatementOfTruth(respondent1StatementOfTruth)
             .build();
 
@@ -127,28 +125,6 @@ public class StatementOfTruthPopulatorTest {
 
         SealedClaimResponseFormForSpec form = builder.build();
         Assertions.assertTrue(form.isCheckCarmToggle());
-        verify(featureToggleService).isCarmEnabledForCase(caseData);
-    }
-
-    @Test
-    void shouldHandleCarmFeatureToggleDisabled() {
-        Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQRequestedCourt(RequestedCourt.builder().build()).build();
-        CaseData caseData = CaseData.builder()
-            .respondent1DQ(respondent1DQ)
-            .responseClaimMediationSpecRequired(YesOrNo.YES)
-            .build();
-
-        SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder = SealedClaimResponseFormForSpec.builder();
-
-        given(featureToggleService.isCarmEnabledForCase(caseData)).willReturn(false);
-        given(featureToggleService.isPinInPostEnabled()).willReturn(false);
-
-        statementOfTruthPopulator.populateStatementOfTruthDetails(builder, caseData);
-
-        SealedClaimResponseFormForSpec form = builder.build();
-        Assertions.assertFalse(form.isCheckCarmToggle());
-        Assertions.assertEquals(YesOrNo.YES,
-                                form.getMediation());
         verify(featureToggleService).isCarmEnabledForCase(caseData);
     }
 }

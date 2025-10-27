@@ -17,7 +17,6 @@ import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSp
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class DefaultJudgmentRoboticsNotifierTest {
@@ -37,31 +36,15 @@ class DefaultJudgmentRoboticsNotifierTest {
     DefaultJudgmentRoboticsNotifier defaultJudgmentRoboticsNotifier;
 
     @Test
-    void shouldNotifyDefaultJudgementLip_whenFeatureToggleOn() {
+    void shouldNotifyDefaultJudgementLip_whenCaseSpec() {
         CaseData data = CaseData.builder()
             .caseAccessCategory(CaseCategory.SPEC_CLAIM)
             .respondent1Represented(YesOrNo.NO)
             .build();
-
-        when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
 
         defaultJudgmentRoboticsNotifier.sendNotifications(data, false, "auth");
 
         verify(roboticsNotificationService).notifyJudgementLip(any(), any());
-    }
-
-    @Test
-    void shouldNotNotifyDefaultJudgementLip_whenFeatureToggleOff() {
-        CaseData data = CaseData.builder()
-            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-            .respondent1Represented(YesOrNo.NO)
-            .build();
-
-        when(featureToggleService.isPinInPostEnabled()).thenReturn(false);
-
-        defaultJudgmentRoboticsNotifier.sendNotifications(data, false, "auth");
-
-        verify(roboticsNotificationService).notifyRobotics(any(), anyBoolean(), any());
     }
 
     @Test

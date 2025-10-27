@@ -25,8 +25,8 @@ import java.util.Map;
 
 import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -60,16 +60,15 @@ class UpdatePaymentStatusServiceTest {
         caseData = caseData.toBuilder()
             .ccdState(CASE_PROGRESSION)
             .businessProcess(BusinessProcess.builder()
-                                 .status(BusinessProcessStatus.READY)
-                                 .camundaEvent(BUSINESS_PROCESS)
-                                 .build())
+                .status(BusinessProcessStatus.READY)
+                .camundaEvent(BUSINESS_PROCESS)
+                .build())
             .applicant1Represented(YesOrNo.NO)
             .respondent1Represented(YesOrNo.NO)
             .hearingFeePaymentDetails(null)
             .build();
         CaseDetails caseDetails = buildCaseDetails(caseData);
 
-        when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
         when(coreCaseDataService.startUpdate(any(), any())).thenReturn(startEventResponse(
             caseDetails,
@@ -79,7 +78,6 @@ class UpdatePaymentStatusServiceTest {
 
         updatePaymentStatusService.updatePaymentStatus(FeeType.HEARING, String.valueOf(CASE_ID), getCardPaymentStatusResponse());
 
-        verify(coreCaseDataService, times(1)).getCase(Long.valueOf(CASE_ID));
         verify(coreCaseDataService).startUpdate(String.valueOf(CASE_ID), CITIZEN_HEARING_FEE_PAYMENT);
         verify(coreCaseDataService).submitUpdate(any(), any());
 
@@ -92,16 +90,15 @@ class UpdatePaymentStatusServiceTest {
         caseData = caseData.toBuilder()
             .ccdState(CASE_PROGRESSION)
             .businessProcess(BusinessProcess.builder()
-                                 .status(BusinessProcessStatus.READY)
-                                 .camundaEvent(BUSINESS_PROCESS)
-                                 .build())
+                .status(BusinessProcessStatus.READY)
+                .camundaEvent(BUSINESS_PROCESS)
+                .build())
             .applicant1Represented(YesOrNo.NO)
             .respondent1Represented(YesOrNo.NO)
             .hearingFeePaymentDetails(null)
             .build();
         CaseDetails caseDetails = buildCaseDetails(caseData);
 
-        when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
         when(coreCaseDataService.startUpdate(any(), any())).thenReturn(startEventResponse(
             caseDetails,
@@ -111,7 +108,6 @@ class UpdatePaymentStatusServiceTest {
 
         updatePaymentStatusService.updatePaymentStatus(FeeType.CLAIMISSUED, String.valueOf(CASE_ID), getCardPaymentStatusResponse());
 
-        verify(coreCaseDataService, times(1)).getCase(Long.valueOf(CASE_ID));
         verify(coreCaseDataService).startUpdate(String.valueOf(CASE_ID), CITIZEN_CLAIM_ISSUE_PAYMENT);
         verify(coreCaseDataService).submitUpdate(any(), any());
 
@@ -123,14 +119,12 @@ class UpdatePaymentStatusServiceTest {
         String caseReference = "123456";
         CardPaymentStatusResponse cardPaymentStatusResponse = mock(CardPaymentStatusResponse.class);
 
-        when(coreCaseDataService.getCase(Long.valueOf(caseReference))).thenThrow(new RuntimeException("Database error"));
+        when(coreCaseDataService.startUpdate(anyString(), any(CaseEvent.class))).thenThrow(new RuntimeException("Database error"));
 
         CaseDataUpdateException exception = assertThrows(
             CaseDataUpdateException.class,
             () -> updatePaymentStatusService.updatePaymentStatus(feeType, caseReference, cardPaymentStatusResponse)
         );
-
-        verify(coreCaseDataService).getCase(Long.valueOf(caseReference));
 
         verifyNoInteractions(caseDetailsConverter);
     }
@@ -138,7 +132,8 @@ class UpdatePaymentStatusServiceTest {
     private CaseDetails buildCaseDetails(CaseData caseData) {
         return CaseDetails.builder()
             .data(objectMapper.convertValue(caseData,
-                                            new TypeReference<Map<String, Object>>() {}))
+                new TypeReference<Map<String, Object>>() {
+                }))
             .id(Long.valueOf(CASE_ID)).build();
     }
 

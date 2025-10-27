@@ -72,7 +72,7 @@ public class SendHearingToLiPCallbackHandler extends CallbackHandler {
         } else {
             sendHearingBulkPrintService.sendHearingToLIP(
                 callbackParams.getParams().get(BEARER_TOKEN).toString(), caseData, task,
-                featureToggleService.isHmcForLipEnabled() && sendWelshHearingToLip(task, caseData)
+                sendWelshHearingToLip(task, caseData)
             );
         }
         return AboutToStartOrSubmitCallbackResponse.builder()

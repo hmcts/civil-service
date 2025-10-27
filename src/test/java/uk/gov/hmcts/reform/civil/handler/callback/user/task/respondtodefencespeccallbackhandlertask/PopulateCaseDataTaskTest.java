@@ -71,7 +71,7 @@ class PopulateCaseDataTaskTest {
         objectMapper.registerModule(new JavaTimeModule());
         task = new PopulateCaseDataTask(locationRefDataService, objectMapper,
                                         courtLocationUtils, featureToggleService,
-                                        paymentDateService, responseOneVOneShowTagService, deadlineCalculatorService);
+                                        paymentDateService, responseOneVOneShowTagService);
     }
 
     @Test
@@ -89,8 +89,7 @@ class PopulateCaseDataTaskTest {
             .build();
 
         when(featureToggleService.isCarmEnabledForCase(any(CaseData.class))).thenReturn(true);
-        when(paymentDateService.getPaymentDateAdmittedClaim(any())).thenReturn(LocalDate.EPOCH);
-        when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+        when(paymentDateService.getFormattedPaymentDate(any())).thenReturn(LocalDate.EPOCH.toString());
 
         CallbackParams params = callbackParams(caseData).toBuilder()
             .version(CallbackVersion.V_2)
@@ -102,7 +101,6 @@ class PopulateCaseDataTaskTest {
         assertNotNull(response);
         assertEquals(YES, getCaseData(response).getShowCarmFields());
         assertEquals(CaseCategory.SPEC_CLAIM, getCaseData(response).getCaseAccessCategory());
-        verify(featureToggleService, times(2)).isPinInPostEnabled();
         verify(featureToggleService, times(1)).isCarmEnabledForCase(any(CaseData.class));
 
     }
@@ -120,7 +118,6 @@ class PopulateCaseDataTaskTest {
             .build();
 
         when(featureToggleService.isCarmEnabledForCase(any(CaseData.class))).thenReturn(false);
-        when(featureToggleService.isPinInPostEnabled()).thenReturn(false);
 
         CallbackParams params = callbackParams(caseData).toBuilder()
             .version(CallbackVersion.V_1)
@@ -132,8 +129,6 @@ class PopulateCaseDataTaskTest {
         assertNotNull(response);
         assertEquals(NO, getCaseData(response).getShowCarmFields());
         assertEquals(CaseCategory.SPEC_CLAIM, getCaseData(response).getCaseAccessCategory());
-        verify(featureToggleService, times(1)).isPinInPostEnabled();
-
     }
 
     private CaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {

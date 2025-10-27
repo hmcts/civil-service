@@ -773,7 +773,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
             .isEqualTo(STRING_NUM_CONSTANT);
 
         assertThat(result.getGeneralApplications().get(0).getValue()
-                       .getGeneralAppRespondentSolicitors().size()).isEqualTo(4);
+                       .getGeneralAppRespondentSolicitors().size()).isEqualTo(2);
 
         assertThat(result.getGeneralApplications().get(0).getValue().getLocationName())
             .isEqualTo("site name of CNBC");
@@ -800,7 +800,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
             .isEqualTo(STRING_NUM_CONSTANT);
 
         assertThat(result.getGeneralApplications().get(0).getValue()
-                       .getGeneralAppRespondentSolicitors().size()).isEqualTo(4);
+                       .getGeneralAppRespondentSolicitors().size()).isEqualTo(2);
 
         assertThat(result.getGeneralApplications().get(0).getValue().getLocationName())
             .isEqualTo("site name of CNBC");
@@ -1134,7 +1134,6 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
             .build()).build();
         data.getGeneralAppHearingDetails().getHearingPreferredLocation().setValue(null);
         when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPostSdo(), true));
-        when(featureToggleService.isCoSCEnabled()).thenReturn(true);
         CaseData result = service.buildCaseData(data.toBuilder(), data, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
@@ -1157,7 +1156,6 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
                                 .build()).build();
         data.getGeneralAppHearingDetails().getHearingPreferredLocation().setValue(null);
         when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPostSdo(), true));
-        when(featureToggleService.isCoSCEnabled()).thenReturn(true);
         CaseData result = service.buildCaseData(data.toBuilder(), data, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
