@@ -68,7 +68,7 @@ public class UpdateApplicantExpertsTask extends MigrationTask<CaseReference> {
             .build();
     }
 
-    /** Update Applicant1DQ experts */
+    /** Update Applicant1DQ expert. */
     private Applicant1DQ updateApplicant1DQExperts(Applicant1DQ dq, UnaryOperator<Expert> transformer) {
         if (dq == null || dq.getApplicant1DQExperts() == null) {
             return dq;
@@ -83,7 +83,7 @@ public class UpdateApplicantExpertsTask extends MigrationTask<CaseReference> {
             .build();
     }
 
-    /** Update Applicant2DQ experts */
+    /** Update Applicant2DQ experts. */
     private Applicant2DQ updateApplicant2DQExperts(Applicant2DQ dq, UnaryOperator<Expert> transformer) {
         if (dq == null || dq.getApplicant2DQExperts() == null) {
             return dq;
@@ -98,7 +98,7 @@ public class UpdateApplicantExpertsTask extends MigrationTask<CaseReference> {
             .build();
     }
 
-    /** Update a list of elements using a UnaryOperator */
+    /** Update a list of elements using a UnaryOperator. */
     private <T> List<Element<T>> updateElements(List<Element<T>> elements, UnaryOperator<T> transformer) {
         return Optional.ofNullable(elements)
             .orElse(Collections.emptyList())
@@ -110,7 +110,7 @@ public class UpdateApplicantExpertsTask extends MigrationTask<CaseReference> {
             .toList();
     }
 
-    /** Return "TBC" if null */
+    /** Return "TBC" if null. */
     private String defaultIfNull(String value) {
         return value == null ? "TBC" : value;
     }
