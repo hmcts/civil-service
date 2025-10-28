@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.dq.Experts;
+import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
 import java.util.Collections;
 import java.util.List;
@@ -46,11 +47,13 @@ public class UpdateApplicantExpertsTask extends MigrationTask<CaseReference> {
         UnaryOperator<PartyFlagStructure> updatePartyFlag = expert -> expert.toBuilder()
             .firstName(defaultIfNull(expert.getFirstName()))
             .lastName(defaultIfNull(expert.getLastName()))
+            .partyID(updatePartyId(expert.getPartyID()))
             .build();
 
         UnaryOperator<Expert> updateExpert = expert -> expert.toBuilder()
             .firstName(defaultIfNull(expert.getFirstName()))
             .lastName(defaultIfNull(expert.getLastName()))
+            .partyID(updatePartyId(expert.getPartyID()))
             .build();
 
         // Update applicant experts
@@ -113,5 +116,9 @@ public class UpdateApplicantExpertsTask extends MigrationTask<CaseReference> {
     /** Return "TBC" if null. */
     private String defaultIfNull(String value) {
         return value == null ? "TBC" : value;
+    }
+
+    private String updatePartyId(String value) {
+        return value == null ? PartyUtils.createPartyId() : value;
     }
 }
