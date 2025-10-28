@@ -62,8 +62,6 @@ import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.mapU
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.updatePartyDQExperts;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.updatePartyDQWitnesses;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populatePartyIndividuals;
-import static uk.gov.hmcts.reform.civil.utils.PersistDataUtils.persistFlagsForLitigationFriendParties;
-import static uk.gov.hmcts.reform.civil.utils.PersistDataUtils.persistFlagsForParties;
 
 @Component
 @Slf4j
@@ -93,11 +91,6 @@ public class SubmitChangesTask {
     public CallbackResponse submitChanges(CaseData caseData, CaseDetails caseDetailsBefore, String authToken) {
         CaseData.CaseDataBuilder builder = caseData.toBuilder();
         log.info("Submit changes for case ID {}", caseData.getCcdCaseReference());
-        CaseData oldCaseData = caseDetailsConverter.toCaseData(caseDetailsBefore);
-
-        // persist party flags (ccd issue)
-        persistFlagsForParties(oldCaseData, caseData, builder);
-        persistFlagsForLitigationFriendParties(oldCaseData, caseData, builder);
 
         String partyChosenId = caseData.getUpdateDetailsForm().getPartyChosenId();
 
