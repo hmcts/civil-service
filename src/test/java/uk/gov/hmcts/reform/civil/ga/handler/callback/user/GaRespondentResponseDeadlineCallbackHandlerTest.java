@@ -35,15 +35,15 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESPONDENT_RESPONSE_D
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
-    RespondentResponseDeadlineCallbackHandler.class,
+    GaRespondentResponseDeadlineCallbackHandler.class,
     DashboardApiClient.class,
     JacksonAutoConfiguration.class,
     ValidationAutoConfiguration.class
 })
-public class RespondentResponseDeadlineCallbackHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
+public class GaRespondentResponseDeadlineCallbackHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
 
     @Autowired
-    private RespondentResponseDeadlineCallbackHandler handler;
+    private GaRespondentResponseDeadlineCallbackHandler handler;
     @MockBean
     private GaDashboardNotificationsParamsMapper mapper;
     @MockBean

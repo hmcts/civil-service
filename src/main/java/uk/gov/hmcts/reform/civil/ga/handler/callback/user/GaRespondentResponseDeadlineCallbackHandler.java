@@ -28,7 +28,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESPONDENT_RESPONSE_D
 
 @Service
 @RequiredArgsConstructor
-public class RespondentResponseDeadlineCallbackHandler extends CallbackHandler implements GeneralApplicationCallbackHandler {
+public class GaRespondentResponseDeadlineCallbackHandler extends CallbackHandler implements GeneralApplicationCallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(RESPONDENT_RESPONSE_DEADLINE_CHECK);
     protected final GaDashboardNotificationsParamsMapper mapper;
