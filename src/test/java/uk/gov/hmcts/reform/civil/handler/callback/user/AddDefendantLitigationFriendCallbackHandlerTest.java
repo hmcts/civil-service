@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.testsupport.mockito.MockitoBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -63,7 +63,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 })
 class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-    @MockBean
+    @MockitoBean
     private Time time;
 
     @Autowired
@@ -72,18 +72,18 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
     @Autowired
     private ExitSurveyContentService exitSurveyContentService;
 
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
 
-    @MockBean
+    @MockitoBean
     private CaseFlagsInitialiser caseFlagInitialiser;
 
-    @MockBean
+    @MockitoBean
     private CoreCaseUserService coreCaseUserService;
 
     @Autowired
     private UserService userService;
-    @MockBean
+    @MockitoBean
     private CoreCaseDataService coreCaseDataService;
 
     @Nested

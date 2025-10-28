@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.defendant;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.testsupport.mockito.MockitoBean;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -27,7 +27,7 @@ public class ClaimIssuedScenarioTest extends DashboardBaseIntegrationTest {
         = "/dashboard/notifications/{ccd-case-identifier}/role/{role-type}";
     private static final String GET_TASKS_ITEMS_URL = "/dashboard/taskList/{ccd-case-identifier}/role/{role-type}";
 
-    @MockBean
+    @MockitoBean
     private OffsetDateTime time;
 
     @Test

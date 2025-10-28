@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.civil.service;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.testsupport.mockito.MockitoBean;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
@@ -33,13 +33,13 @@ class LocationServiceTest {
     @Autowired
     private LocationService service;
 
-    @MockBean
+    @MockitoBean
     private CoreCaseEventDataService coreCaseEventDataService;
 
-    @MockBean
+    @MockitoBean
     private LocationReferenceDataService locationRefDataService;
 
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
 
     private static final Respondent1DQ respondent1DQ =

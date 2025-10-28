@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.testsupport.mockito.MockitoBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
@@ -65,19 +65,19 @@ class JudgmentByDeterminationDocGeneratorTest {
         .documentName("Judgment_by_determination_defendant.pdf")
         .documentType(DocumentType.JUDGMENT_BY_DETERMINATION_DEFENDANT)
         .build();
-    @MockBean
+    @MockitoBean
     private SecuredDocumentManagementService documentManagementService;
 
-    @MockBean
+    @MockitoBean
     private DocumentGeneratorService documentGeneratorService;
 
     @Autowired
     private JudgmentByDeterminationDocGenerator generator;
 
-    @MockBean
+    @MockitoBean
     private OrganisationService organisationService;
 
-    @MockBean
+    @MockitoBean
     private AssignCategoryId assignCategoryId;
 
     @Test

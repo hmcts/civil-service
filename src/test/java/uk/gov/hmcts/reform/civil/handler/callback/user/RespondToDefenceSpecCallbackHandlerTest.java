@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.testsupport.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -214,49 +214,49 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Autowired
     private FrcDocumentsUtils frcDocumentsUtils;
 
-    @MockBean
+    @MockitoBean
     private UnavailableDateValidator unavailableDateValidator;
 
-    @MockBean
+    @MockitoBean
     private Time time;
 
-    @MockBean
+    @MockitoBean
     private CaseDetailsConverter caseDetailsConverter;
 
-    @MockBean
+    @MockitoBean
     private CourtLocationUtils courtLocationUtils;
 
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
 
-    @MockBean
+    @MockitoBean
     private LocationReferenceDataService locationRefDataService;
 
-    @MockBean
+    @MockitoBean
     private DQResponseDocumentUtils dqResponseDocumentUtils;
 
     @Autowired
     private AssignCategoryId assignCategoryId;
 
-    @MockBean
+    @MockitoBean
     private CaseFlagsInitialiser caseFlagsInitialiser;
-    @MockBean
+    @MockitoBean
     private RespondentMediationService respondentMediationService;
-    @MockBean
+    @MockitoBean
     private DeadlinesCalculator deadlinesCalculator;
-    @MockBean
+    @MockitoBean
     private WorkingDayIndicator workingDayIndicator;
-    @MockBean
+    @MockitoBean
     private DeadlineExtensionCalculatorService deadlineCalculatorService;
-    @MockBean
+    @MockitoBean
     private  FlowStateAllowedEventService flowStateAllowedEventService;
-    @MockBean
+    @MockitoBean
     private  DirectionsQuestionnairePreparer directionsQuestionnairePreparer;
     @Autowired
     private RoboticsAddressMapper addressMapper;
     @Autowired
     private AddressLinesMapper linesMapper;
-    @MockBean
+    @MockitoBean
     private UpdateWaCourtLocationsService updateWaCourtLocationsService;
     @Autowired
     private InterestCalculator interestCalculator;
@@ -2186,11 +2186,11 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Nested
         class ConfTextLRBulkAdmission {
 
-            @MockBean
+            @MockitoBean
             private ClaimUrlsConfiguration claimUrlsConfiguration;
-            @MockBean
+            @MockitoBean
             private AboutToSubmitRespondToDefenceTask aboutToSubmitRespondToDefenceTask;
-            @MockBean
+            @MockitoBean
             private PopulateCaseDataTask populateCaseDataTask;
 
             private BuildConfirmationTask buildConfirmationTask;

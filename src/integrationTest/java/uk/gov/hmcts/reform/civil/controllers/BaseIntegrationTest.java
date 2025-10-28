@@ -7,7 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.testsupport.mockito.MockitoBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
@@ -78,22 +78,22 @@ public abstract class BaseIntegrationTest {
         .build();
 
     protected static final String s2sToken = "s2s AuthToken";
-    @MockBean
+    @MockitoBean
     private ServiceAuthorisationApi serviceAuthorisationApi;
-    @MockBean (name = "userService")
+    @MockitoBean (name = "userService")
     protected UserService userService;
-    @MockBean
+    @MockitoBean
     protected Authentication authentication;
-    @MockBean
+    @MockitoBean
     protected SecurityContext securityContext;
-    @MockBean
+    @MockitoBean
     protected JwtDecoder jwtDecoder;
-    @MockBean
+    @MockitoBean
     public AuthorisationService authorisationService;
-    @MockBean
+    @MockitoBean
     public IdamApi idamApi;
 
-    @MockBean
+    @MockitoBean
     public RequestAuthorizer<User> userRequestAuthorizerMock;
 
     @Autowired
