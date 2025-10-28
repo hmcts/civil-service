@@ -40,8 +40,6 @@ class UpdatePartyWitnessTaskTest {
         assertThrows(IllegalArgumentException.class, () -> task.migrateCaseData(caseData, caseRef));
     }
 
-    // ---- PARTY FLAG WITNESSES ----
-
     @Test
     void shouldUpdateApplicantWitnessesWithTBCWhenNamesAreNull() {
         PartyFlagStructure witness1 = PartyFlagStructure.builder().firstName(null).lastName(null).build();

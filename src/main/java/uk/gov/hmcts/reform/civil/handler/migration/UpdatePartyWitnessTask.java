@@ -116,7 +116,6 @@ public class UpdatePartyWitnessTask extends MigrationTask<CaseReference> {
             .build();
     }
 
-
     private Respondent2DQ updateRespondent2DQWitness(Respondent2DQ dq, UnaryOperator<Witness> transformer) {
         if (dq == null || dq.getRespondent2DQWitnesses() == null) {
             return dq;

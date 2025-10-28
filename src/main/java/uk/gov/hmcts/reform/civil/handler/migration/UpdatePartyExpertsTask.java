@@ -116,7 +116,6 @@ public class UpdatePartyExpertsTask extends MigrationTask<CaseReference> {
             .build();
     }
 
-
     private Respondent2DQ updateRespondent2DQExperts(Respondent2DQ dq, UnaryOperator<Expert> transformer) {
         if (dq == null || dq.getRespondent2DQExperts() == null) {
             return dq;
