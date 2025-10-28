@@ -11,23 +11,19 @@ import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
-import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.UnaryOperator;
+
+import static uk.gov.hmcts.reform.civil.handler.migration.PartyDataMigrationUtils.defaultIfNull;
+import static uk.gov.hmcts.reform.civil.handler.migration.PartyDataMigrationUtils.generatePartyIdIfNull;
+import static uk.gov.hmcts.reform.civil.handler.migration.PartyDataMigrationUtils.updateElements;
 
 @Component
 public class UpdatePartyWitnessTask extends MigrationTask<CaseReference> {
 
     public UpdatePartyWitnessTask() {
         super(CaseReference.class);
-    }
-
-    @Override
-    protected String getEventSummary() {
-        return "Update case party witness via migration task";
     }
 
     @Override
@@ -38,6 +34,11 @@ public class UpdatePartyWitnessTask extends MigrationTask<CaseReference> {
     @Override
     protected String getTaskName() {
         return "UpdatePartyWitnessTask";
+    }
+
+    @Override
+    protected String getEventSummary() {
+        return "Update case party witness via migration task";
     }
 
     @Override
@@ -87,7 +88,9 @@ public class UpdatePartyWitnessTask extends MigrationTask<CaseReference> {
             .build();
     }
 
-    /** Update Applicant1DQ witness. */
+    /**
+     * Update Applicant1DQ witness.
+     */
     private Applicant1DQ updateApplicant1DQWitness(Applicant1DQ dq, UnaryOperator<Witness> transformer) {
         if (dq == null || dq.getApplicant1DQWitnesses() == null) {
             return dq;
@@ -130,7 +133,9 @@ public class UpdatePartyWitnessTask extends MigrationTask<CaseReference> {
             .build();
     }
 
-    /** Update Applicant2DQ Witnesses. */
+    /**
+     * Update Applicant2DQ Witnesses.
+     */
     private Applicant2DQ updateApplicant2DQWitness(Applicant2DQ dq, UnaryOperator<Witness> transformer) {
         if (dq == null || dq.getApplicant2DQWitnesses() == null) {
             return dq;
@@ -143,26 +148,5 @@ public class UpdatePartyWitnessTask extends MigrationTask<CaseReference> {
         return dq.toBuilder()
             .applicant2DQWitnesses(updatedWitness)
             .build();
-    }
-
-    /** Update a list of elements using a UnaryOperator. */
-    private <T> List<Element<T>> updateElements(List<Element<T>> elements, UnaryOperator<T> transformer) {
-        return Optional.ofNullable(elements)
-            .orElse(Collections.emptyList())
-            .stream()
-            .map(element -> Element.<T>builder()
-                .id(element.getId())
-                .value(transformer.apply(element.getValue()))
-                .build())
-            .toList();
-    }
-
-    /** Return "TBC" if null. */
-    private String defaultIfNull(String value) {
-        return value == null ? "TBC" : value;
-    }
-
-    private String generatePartyIdIfNull(String value) {
-        return value == null ? PartyUtils.createPartyId() : value;
     }
 }

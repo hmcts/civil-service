@@ -11,12 +11,13 @@ import uk.gov.hmcts.reform.civil.model.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.dq.Experts;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
-import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.UnaryOperator;
+
+import static uk.gov.hmcts.reform.civil.handler.migration.PartyDataMigrationUtils.defaultIfNull;
+import static uk.gov.hmcts.reform.civil.handler.migration.PartyDataMigrationUtils.generatePartyIdIfNull;
+import static uk.gov.hmcts.reform.civil.handler.migration.PartyDataMigrationUtils.updateElements;
 
 @Component
 public class UpdatePartyExpertsTask extends MigrationTask<CaseReference> {
@@ -30,14 +31,15 @@ public class UpdatePartyExpertsTask extends MigrationTask<CaseReference> {
         return "Update case party experts via migration task";
     }
 
-    @Override
-    protected String getEventDescription() {
-        return "This task UpdatePartyExpertsTask updates experts on the case";
-    }
 
     @Override
     protected String getTaskName() {
         return "UpdatePartyExpertsTask";
+    }
+
+    @Override
+    protected String getEventDescription() {
+        return "This task UpdatePartyExpertsTask updates experts on the case";
     }
 
     @Override
@@ -143,26 +145,5 @@ public class UpdatePartyExpertsTask extends MigrationTask<CaseReference> {
         return dq.toBuilder()
             .applicant2DQExperts(updatedExperts)
             .build();
-    }
-
-    /** Update a list of elements using a UnaryOperator. */
-    private <T> List<Element<T>> updateElements(List<Element<T>> elements, UnaryOperator<T> transformer) {
-        return Optional.ofNullable(elements)
-            .orElse(Collections.emptyList())
-            .stream()
-            .map(element -> Element.<T>builder()
-                .id(element.getId())
-                .value(transformer.apply(element.getValue()))
-                .build())
-            .toList();
-    }
-
-    /** Return "TBC" if null. */
-    private String defaultIfNull(String value) {
-        return value == null ? "TBC" : value;
-    }
-
-    private String generatePartyIdIfNull(String value) {
-        return value == null ? PartyUtils.createPartyId() : value;
     }
 }
