@@ -10,82 +10,20 @@ import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.dq.Experts;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class UpdateApplicantExpertsTaskTest {
-
-    private UpdateApplicantExpertsTask task;
+class UpdatePartyExpertsTaskTest {
+    private UpdatePartyExpertsTask task;
 
     @BeforeEach
     void setUp() {
-        task = new UpdateApplicantExpertsTask();
-    }
-
-    @Test
-    void shouldUpdateApplicantExpertsWithTBCWhenNamesAreNull() {
-        PartyFlagStructure expert1 = PartyFlagStructure.builder().firstName(null).lastName(null).build();
-        PartyFlagStructure expert2 = PartyFlagStructure.builder().firstName("John").lastName(null).build();
-
-        CaseData caseData = CaseData.builder()
-            .applicantExperts(List.of(
-                Element.<PartyFlagStructure>builder().value(expert1).build(),
-                Element.<PartyFlagStructure>builder().value(expert2).build()
-            ))
-            .build();
-
-        CaseReference caseRef = CaseReference.builder().caseReference("12345").build();
-
-        CaseData updatedCaseData = task.migrateCaseData(caseData, caseRef);
-
-        List<Element<PartyFlagStructure>> updatedExperts = updatedCaseData.getApplicantExperts();
-
-        assertThat(updatedExperts).hasSize(2);
-        assertThat(updatedExperts.get(0).getValue().getFirstName()).isEqualTo("TBC");
-        assertThat(updatedExperts.get(0).getValue().getLastName()).isEqualTo("TBC");
-        assertThat(updatedExperts.get(1).getValue().getFirstName()).isEqualTo("John");
-        assertThat(updatedExperts.get(1).getValue().getLastName()).isEqualTo("TBC");
-    }
-
-    @Test
-    void shouldUpdateApplicant1DQExpertsWithTBCWhenNamesAreNull() {
-        // Build DQ Experts
-        Expert dqExpert1 = Expert.builder().firstName(null).lastName(null).build();
-        Expert dqExpert2 = Expert.builder().firstName("Jane").lastName(null).build();
-
-        List<Element<Expert>> dqExpertElements = List.of(
-            Element.<Expert>builder().value(dqExpert1).build(),
-            Element.<Expert>builder().value(dqExpert2).build()
-        );
-
-        Experts applicant1DQExperts = Experts.builder()
-            .details(dqExpertElements)
-            .build();
-
-        Applicant1DQ applicant1DQ = Applicant1DQ.builder()
-            .applicant1DQExperts(applicant1DQExperts)
-            .build();
-
-        CaseData caseData = CaseData.builder()
-            .applicant1DQ(applicant1DQ)
-            .build();
-
-        CaseReference caseRef = CaseReference.builder().caseReference("12345").build();
-
-        CaseData updatedCaseData = task.migrateCaseData(caseData, caseRef);
-
-        List<Element<Expert>> updatedDQExperts = updatedCaseData.getApplicant1DQ()
-            .getApplicant1DQExperts()
-            .getDetails();
-
-        assertThat(updatedDQExperts).hasSize(2);
-        assertThat(updatedDQExperts.get(0).getValue().getFirstName()).isEqualTo("TBC");
-        assertThat(updatedDQExperts.get(0).getValue().getLastName()).isEqualTo("TBC");
-        assertThat(updatedDQExperts.get(1).getValue().getFirstName()).isEqualTo("Jane");
-        assertThat(updatedDQExperts.get(1).getValue().getLastName()).isEqualTo("TBC");
+        task = new UpdatePartyExpertsTask();
     }
 
     @Test
@@ -102,76 +40,94 @@ class UpdateApplicantExpertsTaskTest {
     }
 
     @Test
-    void shouldUpdateApplicant2DQExpertsWithTBCWhenNamesAreNull() {
-        // Build DQ Experts
-        Expert dqExpert1 = Expert.builder().firstName(null).lastName(null).build();
-        Expert dqExpert2 = Expert.builder().firstName("Alice").lastName(null).build();
+    void shouldUpdateApplicantExpertsWithTBCWhenNamesAreNull() {
+        PartyFlagStructure expert1 = PartyFlagStructure.builder().firstName(null).lastName(null).build();
+        PartyFlagStructure expert2 = PartyFlagStructure.builder().firstName("John").lastName(null).build();
+
+        CaseData caseData = CaseData.builder()
+            .applicantExperts(List.of(
+                Element.<PartyFlagStructure>builder().value(expert1).build(),
+                Element.<PartyFlagStructure>builder().value(expert2).build()
+            ))
+            .build();
+
+        CaseReference caseRef = CaseReference.builder().caseReference("12345").build();
+
+        CaseData updated = task.migrateCaseData(caseData, caseRef);
+
+        List<Element<PartyFlagStructure>> experts = updated.getApplicantExperts();
+        assertThat(experts).hasSize(2);
+        assertThat(experts.get(0).getValue().getFirstName()).isEqualTo("TBC");
+        assertThat(experts.get(0).getValue().getLastName()).isEqualTo("TBC");
+        assertThat(experts.get(1).getValue().getFirstName()).isEqualTo("John");
+        assertThat(experts.get(1).getValue().getLastName()).isEqualTo("TBC");
+    }
+
+    @Test
+    void shouldUpdateRespondent1ExpertsWithTBCWhenNamesAreNull() {
+        PartyFlagStructure expert = PartyFlagStructure.builder().firstName(null).lastName("Smith").build();
+
+        CaseData caseData = CaseData.builder()
+            .respondent1Experts(List.of(Element.<PartyFlagStructure>builder().value(expert).build()))
+            .build();
+
+        CaseReference ref = CaseReference.builder().caseReference("123").build();
+
+        CaseData updated = task.migrateCaseData(caseData, ref);
+
+        assertThat(updated.getRespondent1Experts()).hasSize(1);
+        assertThat(updated.getRespondent1Experts().get(0).getValue().getFirstName()).isEqualTo("TBC");
+        assertThat(updated.getRespondent1Experts().get(0).getValue().getLastName()).isEqualTo("Smith");
+    }
+
+    @Test
+    void shouldUpdateRespondent2ExpertsWithTBCWhenNamesAreNull() {
+        PartyFlagStructure expert = PartyFlagStructure.builder().firstName("Bob").lastName(null).build();
+
+        CaseData caseData = CaseData.builder()
+            .respondent2Experts(List.of(Element.<PartyFlagStructure>builder().value(expert).build()))
+            .build();
+
+        CaseReference ref = CaseReference.builder().caseReference("123").build();
+
+        CaseData updated = task.migrateCaseData(caseData, ref);
+
+        assertThat(updated.getRespondent2Experts()).hasSize(1);
+        assertThat(updated.getRespondent2Experts().get(0).getValue().getFirstName()).isEqualTo("Bob");
+        assertThat(updated.getRespondent2Experts().get(0).getValue().getLastName()).isEqualTo("TBC");
+    }
+
+    @Test
+    void shouldUpdateDQExpertsWithTBCForApplicantsAndRespondents() {
+        Expert expert1 = Expert.builder().firstName(null).lastName("Doe").build();
+        Expert expert2 = Expert.builder().firstName("Jane").lastName(null).build();
 
         List<Element<Expert>> dqExpertElements = List.of(
-            Element.<Expert>builder().value(dqExpert1).build(),
-            Element.<Expert>builder().value(dqExpert2).build()
+            Element.<Expert>builder().value(expert1).build(),
+            Element.<Expert>builder().value(expert2).build()
         );
-
-        Experts applicant2DQExperts = Experts.builder()
-            .details(dqExpertElements)
-            .build();
-
-        Applicant2DQ applicant2DQ = Applicant2DQ.builder()
-            .applicant2DQExperts(applicant2DQExperts)
-            .build();
+        Experts dqExperts = Experts.builder().details(dqExpertElements).build();
 
         CaseData caseData = CaseData.builder()
-            .applicant2DQ(applicant2DQ)
+            .applicant1DQ(Applicant1DQ.builder().applicant1DQExperts(dqExperts).build())
+            .applicant2DQ(Applicant2DQ.builder().applicant2DQExperts(dqExperts).build())
+            .respondent1DQ(Respondent1DQ.builder().respondent1DQExperts(dqExperts).build())
+            .respondent2DQ(Respondent2DQ.builder().respondent2DQExperts(dqExperts).build())
             .build();
 
-        CaseReference caseRef = CaseReference.builder().caseReference("12345").build();
+        CaseReference ref = CaseReference.builder().caseReference("999").build();
 
-        CaseData updatedCaseData = task.migrateCaseData(caseData, caseRef);
+        CaseData updated = task.migrateCaseData(caseData, ref);
 
-        List<Element<Expert>> updatedDQExperts = updatedCaseData.getApplicant2DQ()
-            .getApplicant2DQExperts()
-            .getDetails();
+        // Verify Applicant 1
+        List<Element<Expert>> applicant1Experts = updated.getApplicant1DQ().getApplicant1DQExperts().getDetails();
+        assertThat(applicant1Experts.get(0).getValue().getFirstName()).isEqualTo("TBC");
+        assertThat(applicant1Experts.get(1).getValue().getLastName()).isEqualTo("TBC");
 
-        assertThat(updatedDQExperts).hasSize(2);
-        assertThat(updatedDQExperts.get(0).getValue().getFirstName()).isEqualTo("TBC");
-        assertThat(updatedDQExperts.get(0).getValue().getLastName()).isEqualTo("TBC");
-        assertThat(updatedDQExperts.get(1).getValue().getFirstName()).isEqualTo("Alice");
-        assertThat(updatedDQExperts.get(1).getValue().getLastName()).isEqualTo("TBC");
-    }
-
-    @Test
-    void shouldNotChangeNamesIfTheyAreNotNull() {
-        PartyFlagStructure expert = PartyFlagStructure.builder().firstName("Bob").lastName("Smith").build();
-
-        CaseData caseData = CaseData.builder()
-            .applicantExperts(List.of(Element.<PartyFlagStructure>builder().value(expert).build()))
-            .build();
-
-        CaseReference caseRef = CaseReference.builder().caseReference("12345").build();
-
-        CaseData updatedCaseData = task.migrateCaseData(caseData, caseRef);
-
-        Element<PartyFlagStructure> updatedExpert = updatedCaseData.getApplicantExperts().get(0);
-
-        assertThat(updatedExpert.getValue().getFirstName()).isEqualTo("Bob");
-        assertThat(updatedExpert.getValue().getLastName()).isEqualTo("Smith");
-    }
-
-    @Test
-    void shouldHandleNullListsGracefully() {
-        CaseData caseData = CaseData.builder()
-            .applicantExperts(null)
-            .applicant1DQ(null)
-            .applicant2DQ(null)
-            .build();
-
-        CaseReference caseRef = CaseReference.builder().caseReference("12345").build();
-
-        CaseData updatedCaseData = task.migrateCaseData(caseData, caseRef);
-
-        assertThat(updatedCaseData.getApplicantExperts()).isEmpty();
-        assertThat(updatedCaseData.getApplicant1DQ()).isNull();
-        assertThat(updatedCaseData.getApplicant2DQ()).isNull();
+        // Verify Respondent 1
+        List<Element<Expert>> respondent1Experts = updated.getRespondent1DQ().getRespondent1DQExperts().getDetails();
+        assertThat(respondent1Experts.get(0).getValue().getFirstName()).isEqualTo("TBC");
+        assertThat(respondent1Experts.get(1).getValue().getLastName()).isEqualTo("TBC");
     }
 
     @Test
@@ -186,23 +142,12 @@ class UpdateApplicantExpertsTaskTest {
             .applicantExperts(List.of(Element.<PartyFlagStructure>builder().value(expert).build()))
             .build();
 
-        CaseReference caseRef = CaseReference.builder().caseReference("12345").build();
+        CaseReference ref = CaseReference.builder().caseReference("111").build();
 
-        CaseData updatedCaseData = task.migrateCaseData(caseData, caseRef);
+        CaseData updated = task.migrateCaseData(caseData, ref);
 
-        String updatedPartyId = updatedCaseData.getApplicantExperts().get(0).getValue().getPartyID();
-
-        assertThat(updatedPartyId)
-            .isNotNull()
-            .isNotBlank()
-            .isNotEqualTo(expert.getPartyID()); // Should be newly generated
-    }
-
-    @Test
-    void shouldReturnExpectedMetadataValues() {
-        assertThat(task.getTaskName()).isEqualTo("UpdateApplicantExpertsTask");
-        assertThat(task.getEventSummary()).contains("Update case applicant1 experts");
-        assertThat(task.getEventDescription()).contains("update applicant1 experts");
+        String newId = updated.getApplicantExperts().get(0).getValue().getPartyID();
+        assertThat(newId).isNotBlank().isNotEqualTo(expert.getPartyID());
     }
 
     @Test
@@ -217,11 +162,41 @@ class UpdateApplicantExpertsTaskTest {
             .applicantExperts(List.of(Element.<PartyFlagStructure>builder().value(expert).build()))
             .build();
 
+        CaseReference ref = CaseReference.builder().caseReference("12345").build();
+
+        CaseData updated = task.migrateCaseData(caseData, ref);
+
+        assertThat(updated.getApplicantExperts().get(0).getValue().getPartyID())
+            .isEqualTo("existing-id-123");
+    }
+
+    @Test
+    void shouldHandleNullListsGracefully() {
+        CaseData caseData = CaseData.builder()
+            .applicantExperts(null)
+            .respondent1Experts(null)
+            .respondent2Experts(null)
+            .applicant1DQ(null)
+            .applicant2DQ(null)
+            .respondent1DQ(null)
+            .respondent2DQ(null)
+            .build();
+
         CaseReference caseRef = CaseReference.builder().caseReference("12345").build();
 
-        CaseData updatedCaseData = task.migrateCaseData(caseData, caseRef);
+        CaseData updated = task.migrateCaseData(caseData, caseRef);
 
-        assertThat(updatedCaseData.getApplicantExperts().get(0).getValue().getPartyID())
-            .isEqualTo("existing-id-123");
+        assertThat(updated.getApplicantExperts()).isEmpty();
+        assertThat(updated.getRespondent1Experts()).isEmpty();
+        assertThat(updated.getRespondent2Experts()).isEmpty();
+        assertThat(updated.getApplicant1DQ()).isNull();
+        assertThat(updated.getRespondent1DQ()).isNull();
+    }
+
+    @Test
+    void shouldReturnExpectedMetadataValues() {
+        assertThat(task.getTaskName()).isEqualTo("UpdatePartyExpertsTask");
+        assertThat(task.getEventSummary()).contains("Update case party experts");
+        assertThat(task.getEventDescription()).contains("UpdatePartyExpertsTask updates experts");
     }
 }
