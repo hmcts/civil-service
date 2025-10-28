@@ -135,6 +135,9 @@ class NotifierTest {
                 "taskId",
                 Map.of("Errors", "[Failed to send email to respondentsolicitor@example.com : java.lang.Exception: Notification Service error null]")
             );
+        // also ensures we remember errors so SUBMITTED can display them in comments
+        verify(caseTaskTrackingService, times(1))
+            .rememberErrors(org.mockito.ArgumentMatchers.eq(CASE_ID.toString()), org.mockito.ArgumentMatchers.eq("taskId"), org.mockito.ArgumentMatchers.anyList());
         verify(emailGenerator, times(1)).getPartiesToNotify(caseData, taskId);
         verify(notificationService, times(3)).sendMail(anyString(), anyString(), anyMap(), anyString());
     }

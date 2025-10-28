@@ -1,15 +1,13 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
-import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
-import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
+import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -33,12 +31,10 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RECORD_NOTIFICATIONS;
 public class NotificationHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(NOTIFY_EVENT);
-    private static final String ATTEMPTED_PREFIX = "Attempted: ";
-    private static final String DELIMITER = " || Errors: ";
 
     private final NotifierFactory notifierFactory;
     private final CoreCaseDataService coreCaseDataService;
-    private final ObjectMapper objectMapper;
+    private final uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService caseTaskTrackingService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -62,72 +58,42 @@ public class NotificationHandler extends CallbackHandler {
         final CaseData caseData = callbackParams.getCaseData();
         final String taskId = caseData.getBusinessProcess().getActivityId();
         final Notifier notifier = notifierFactory.getNotifier(taskId);
-        final String summary = notifier.notifyParties(caseData, NOTIFY_EVENT.toString(), taskId);
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseData.toBuilder().notificationSummary(summary).build().toMap(objectMapper))
-            .build();
+        notifier.notifyParties(caseData, NOTIFY_EVENT.toString(), taskId);
+        return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
     private CallbackResponse recordNotifications(CallbackParams callbackParams) {
         final CaseData caseData = callbackParams.getCaseData();
-        final String caseId = caseData.getCcdCaseReference().toString();
-        StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId, RECORD_NOTIFICATIONS);
-        String fullSummary = caseData.getNotificationSummary();
-        CaseDataContent caseContent = getCaseContent(startEventResponse, fullSummary);
-        coreCaseDataService.submitUpdate(caseId, caseContent);
-        return SubmittedCallbackResponse.builder().build();
-    }
-
-    private CaseDataContent getCaseContent(StartEventResponse startEventResponse, String fullSummary) {
-        Map<String, Object> data = startEventResponse.getCaseDetails().getData();
-
-        data.put("notificationSummary", null);
-
-        String cleanSummary = extractAttempted(fullSummary);
-        String errors = extractErrors(fullSummary);
-
-        Event.EventBuilder eventBuilder = Event.builder()
-            .id(startEventResponse.getEventId())
-            .summary(cleanSummary);
-
-        if (errors != null && !errors.isEmpty()) {
-            eventBuilder.description("Errors: " + errors);
+        final Long ref = caseData.getCcdCaseReference();
+        if (ref == null) {
+            return AboutToStartOrSubmitCallbackResponse.builder().build();
         }
+        final String caseId = ref.toString();
+        try {
+            StartEventResponse startEvent = coreCaseDataService.startUpdate(caseId, RECORD_NOTIFICATIONS);
 
-        return CaseDataContent.builder()
-            .eventToken(startEventResponse.getToken())
-            .event(eventBuilder.build())
-            .data(data)
-            .build();
-    }
+            Map<String, Object> data = startEvent.getCaseDetails().getData();
 
-    private String extractAttempted(String combined) {
-        if (combined == null) {
-            return null;
+            String taskId = caseData.getBusinessProcess() != null
+                ? caseData.getBusinessProcess().getActivityId()
+                : null;
+            String summary = taskId;
+            String errors = taskId != null ? caseTaskTrackingService.consumeErrors(caseId, taskId) : null;
+
+            CaseDataContent content = CaseDataContent.builder()
+                .eventToken(startEvent.getToken())
+                .event(Event.builder()
+                           .id(startEvent.getEventId())
+                           .summary(summary)
+                           .description(errors != null && !errors.isBlank() ? "Errors: " + errors : null)
+                           .build())
+                .data(data)
+                .build();
+
+            coreCaseDataService.submitUpdate(caseId, content);
+        } catch (Exception e) {
+            log.warn("Record notifications event failed for case {}: {}", caseId, e.getMessage());
         }
-
-        int delimiterPos = combined.indexOf(DELIMITER);
-        String left = (delimiterPos >= 0) ? combined.substring(0, delimiterPos) : combined;
-
-        if (left.startsWith(ATTEMPTED_PREFIX)) {
-            return left.substring(ATTEMPTED_PREFIX.length());
-        }
-
-        return left;
-    }
-
-    private String extractErrors(String combined) {
-        if (combined == null) {
-            return null;
-        }
-
-        int delimiterPos = combined.indexOf(DELIMITER);
-        if (delimiterPos < 0) {
-            return null;
-        }
-
-        String right = combined.substring(delimiterPos + DELIMITER.length());
-        return !right.isBlank() ? right : null;
+        return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 }

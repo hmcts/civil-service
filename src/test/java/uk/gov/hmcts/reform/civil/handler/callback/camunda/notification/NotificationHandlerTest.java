@@ -1,10 +1,8 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -21,19 +19,16 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import org.mockito.ArgumentCaptor;
+
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_EVENT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RECORD_NOTIFICATIONS;
 
 @ExtendWith(MockitoExtension.class)
 class NotificationHandlerTest extends BaseCallbackHandlerTest {
@@ -49,7 +44,7 @@ class NotificationHandlerTest extends BaseCallbackHandlerTest {
     CoreCaseDataService coreCaseDataService;
 
     @Mock
-    ObjectMapper objectMapper;
+    CaseTaskTrackingService caseTaskTrackingService;
 
     @InjectMocks
     private NotificationHandler handler;
@@ -69,322 +64,37 @@ class NotificationHandlerTest extends BaseCallbackHandlerTest {
 
             verify(notifier).notifyParties(caseData, NOTIFY_EVENT.toString(), TASK_ID);
         }
-
-        @Test
-        void shouldRecordNotifications() {
-
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().businessProcess(
-                BusinessProcess.builder().activityId(TASK_ID).build()
-            ).notificationSummary("Summary of notifications").build();
-
-            StartEventResponse response = StartEventResponse.builder()
-                .caseDetails(CaseDetailsBuilder.builder().data(caseData).build()).eventId("RECORD_NOTIFICATIONS").token(
-                    "test").build();
-
-            when(coreCaseDataService.startUpdate(caseData.getCcdCaseReference().toString(), RECORD_NOTIFICATIONS))
-                .thenReturn(response);
-
-            CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
-
-            handler.handle(params);
-
-            verify(coreCaseDataService).startUpdate(any(), eq(RECORD_NOTIFICATIONS));
-            verify(coreCaseDataService).submitUpdate(any(), any());
-        }
     }
 
     @Nested
     class SubmittedCallback {
-
         @Test
-        void shouldClearNotificationSummaryAfterRecording() {
-            // Given
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDetailsNotified()
-                .businessProcess(BusinessProcess.builder().activityId(TASK_ID).build())
-                .notificationSummary("Attempted: NotifierA, NotifierB || Errors: Error1")
-                .build();
+        void shouldCreateRecordNotificationsEvent() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().businessProcess(
+                BusinessProcess.builder().activityId(TASK_ID).build()
+            ).build();
 
-            Map<String, Object> dataMap = new HashMap<>();
-            dataMap.put("notificationSummary", "Attempted: NotifierA, NotifierB || Errors: Error1");
-            dataMap.put("ccdCaseReference", caseData.getCcdCaseReference());
-
-            CaseDetails caseDetails = CaseDetailsBuilder.builder()
-                .data(caseData)
-                .build();
-            caseDetails.setData(dataMap);
-
-            StartEventResponse response = StartEventResponse.builder()
+            CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+            StartEventResponse start = StartEventResponse.builder()
                 .caseDetails(caseDetails)
                 .eventId("RECORD_NOTIFICATIONS")
-                .token("test")
+                .token("token")
                 .build();
 
-            when(coreCaseDataService.startUpdate(caseData.getCcdCaseReference().toString(), RECORD_NOTIFICATIONS))
-                .thenReturn(response);
+            when(coreCaseDataService.startUpdate(eq(caseData.getCcdCaseReference().toString()), any())).thenReturn(start);
+            when(caseTaskTrackingService.consumeErrors(caseData.getCcdCaseReference().toString(), TASK_ID))
+                .thenReturn("Failed to send email");
 
-            ArgumentCaptor<CaseDataContent> contentCaptor = ArgumentCaptor.forClass(CaseDataContent.class);
-
-            // When
-            CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED, caseData).build();
             handler.handle(params);
 
-            // Then
-            verify(coreCaseDataService).submitUpdate(any(), contentCaptor.capture());
-            CaseDataContent submittedContent = contentCaptor.getValue();
-
-            // CRITICAL ASSERTION: notificationSummary must be null
-            @SuppressWarnings("unchecked")
-            Map<String, Object> submittedData = (Map<String, Object>) submittedContent.getData();
-            assertThat(submittedData.get("notificationSummary")).isNull();
-        }
-
-        @Test
-        void shouldBuildEventWithSummaryOnly() {
-            // Given - notification summary without errors
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDetailsNotified()
-                .businessProcess(BusinessProcess.builder().activityId(TASK_ID).build())
-                .notificationSummary("Attempted: NotifierA, NotifierB")
-                .build();
-
-            Map<String, Object> dataMap = new HashMap<>();
-            dataMap.put("notificationSummary", "Attempted: NotifierA, NotifierB");
-
-            CaseDetails caseDetails = CaseDetailsBuilder.builder()
-                .data(caseData)
-                .build();
-            caseDetails.setData(dataMap);
-
-            StartEventResponse response = StartEventResponse.builder()
-                .caseDetails(caseDetails)
-                .eventId("RECORD_NOTIFICATIONS")
-                .token("test")
-                .build();
-
-            when(coreCaseDataService.startUpdate(caseData.getCcdCaseReference().toString(), RECORD_NOTIFICATIONS))
-                .thenReturn(response);
-
-            ArgumentCaptor<CaseDataContent> contentCaptor = ArgumentCaptor.forClass(CaseDataContent.class);
-
-            // When
-            CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
-            handler.handle(params);
-
-            // Then
-            verify(coreCaseDataService).submitUpdate(any(), contentCaptor.capture());
-            CaseDataContent submittedContent = contentCaptor.getValue();
-
-            // Event should have summary but no description
-            assertThat(submittedContent.getEvent().getSummary()).isEqualTo("NotifierA, NotifierB");
-            assertThat(submittedContent.getEvent().getDescription()).isNull();
-        }
-
-        @Test
-        void shouldBuildEventWithSummaryAndErrors() {
-            // Given - notification summary with errors
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDetailsNotified()
-                .businessProcess(BusinessProcess.builder().activityId(TASK_ID).build())
-                .notificationSummary("Attempted: NotifierA || Errors: Failed to send email")
-                .build();
-
-            Map<String, Object> dataMap = new HashMap<>();
-            dataMap.put("notificationSummary", "Attempted: NotifierA || Errors: Failed to send email");
-
-            CaseDetails caseDetails = CaseDetailsBuilder.builder()
-                .data(caseData)
-                .build();
-            caseDetails.setData(dataMap);
-
-            StartEventResponse response = StartEventResponse.builder()
-                .caseDetails(caseDetails)
-                .eventId("RECORD_NOTIFICATIONS")
-                .token("test")
-                .build();
-
-            when(coreCaseDataService.startUpdate(caseData.getCcdCaseReference().toString(), RECORD_NOTIFICATIONS))
-                .thenReturn(response);
-
-            ArgumentCaptor<CaseDataContent> contentCaptor = ArgumentCaptor.forClass(CaseDataContent.class);
-
-            // When
-            CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
-            handler.handle(params);
-
-            // Then
-            verify(coreCaseDataService).submitUpdate(any(), contentCaptor.capture());
-            CaseDataContent submittedContent = contentCaptor.getValue();
-
-            // Event should have summary and error description
-            assertThat(submittedContent.getEvent().getSummary()).isEqualTo("NotifierA");
-            assertThat(submittedContent.getEvent().getDescription()).isEqualTo("Errors: Failed to send email");
-        }
-
-        @Test
-        void shouldHandleNullNotificationSummary() {
-            // Given - null notification summary
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDetailsNotified()
-                .businessProcess(BusinessProcess.builder().activityId(TASK_ID).build())
-                .notificationSummary(null)
-                .build();
-
-            Map<String, Object> dataMap = new HashMap<>();
-            dataMap.put("notificationSummary", null);
-
-            CaseDetails caseDetails = CaseDetailsBuilder.builder()
-                .data(caseData)
-                .build();
-            caseDetails.setData(dataMap);
-
-            StartEventResponse response = StartEventResponse.builder()
-                .caseDetails(caseDetails)
-                .eventId("RECORD_NOTIFICATIONS")
-                .token("test")
-                .build();
-
-            when(coreCaseDataService.startUpdate(caseData.getCcdCaseReference().toString(), RECORD_NOTIFICATIONS))
-                .thenReturn(response);
-
-            ArgumentCaptor<CaseDataContent> contentCaptor = ArgumentCaptor.forClass(CaseDataContent.class);
-
-            // When
-            CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
-            handler.handle(params);
-
-            // Then
-            verify(coreCaseDataService).submitUpdate(any(), contentCaptor.capture());
-            CaseDataContent submittedContent = contentCaptor.getValue();
-
-            // Should handle null gracefully
-            assertThat(submittedContent.getEvent().getSummary()).isNull();
-            assertThat(submittedContent.getEvent().getDescription()).isNull();
-        }
-
-        @Test
-        void shouldHandleSummaryWithoutAttemptedPrefix() {
-            // Given - summary without "Attempted: " prefix
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDetailsNotified()
-                .businessProcess(BusinessProcess.builder().activityId(TASK_ID).build())
-                .notificationSummary("NotifierA, NotifierB")
-                .build();
-
-            Map<String, Object> dataMap = new HashMap<>();
-            dataMap.put("notificationSummary", "NotifierA, NotifierB");
-
-            CaseDetails caseDetails = CaseDetailsBuilder.builder()
-                .data(caseData)
-                .build();
-            caseDetails.setData(dataMap);
-
-            StartEventResponse response = StartEventResponse.builder()
-                .caseDetails(caseDetails)
-                .eventId("RECORD_NOTIFICATIONS")
-                .token("test")
-                .build();
-
-            when(coreCaseDataService.startUpdate(caseData.getCcdCaseReference().toString(), RECORD_NOTIFICATIONS))
-                .thenReturn(response);
-
-            ArgumentCaptor<CaseDataContent> contentCaptor = ArgumentCaptor.forClass(CaseDataContent.class);
-
-            // When
-            CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
-            handler.handle(params);
-
-            // Then
-            verify(coreCaseDataService).submitUpdate(any(), contentCaptor.capture());
-            CaseDataContent submittedContent = contentCaptor.getValue();
-
-            // Should use the summary as-is without prefix
-            assertThat(submittedContent.getEvent().getSummary()).isEqualTo("NotifierA, NotifierB");
-        }
-
-        @Test
-        void shouldHandleComplexNotificationSummaryWithMultipleErrors() {
-            // Given - complex summary with multiple notifiers and errors
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDetailsNotified()
-                .businessProcess(BusinessProcess.builder().activityId(TASK_ID).build())
-                .notificationSummary("Attempted: NotifierA, NotifierB, NotifierC || Errors: Error1, Error2, Error3")
-                .build();
-
-            Map<String, Object> dataMap = new HashMap<>();
-            dataMap.put(
-                "notificationSummary",
-                "Attempted: NotifierA, NotifierB, NotifierC || Errors: Error1, Error2, Error3"
-            );
-
-            CaseDetails caseDetails = CaseDetailsBuilder.builder()
-                .data(caseData)
-                .build();
-            caseDetails.setData(dataMap);
-
-            StartEventResponse response = StartEventResponse.builder()
-                .caseDetails(caseDetails)
-                .eventId("RECORD_NOTIFICATIONS")
-                .token("test")
-                .build();
-
-            when(coreCaseDataService.startUpdate(caseData.getCcdCaseReference().toString(), RECORD_NOTIFICATIONS))
-                .thenReturn(response);
-
-            ArgumentCaptor<CaseDataContent> contentCaptor = ArgumentCaptor.forClass(CaseDataContent.class);
-
-            // When
-            CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
-            handler.handle(params);
-
-            // Then
-            verify(coreCaseDataService).submitUpdate(any(), contentCaptor.capture());
-            CaseDataContent submittedContent = contentCaptor.getValue();
-
-            // Should correctly parse complex summary
-            assertThat(submittedContent.getEvent().getSummary()).isEqualTo("NotifierA, NotifierB, NotifierC");
-            assertThat(submittedContent.getEvent().getDescription()).isEqualTo("Errors: Error1, Error2, Error3");
-            @SuppressWarnings("unchecked")
-            Map<String, Object> submittedData = (Map<String, Object>) submittedContent.getData();
-            assertThat(submittedData.get("notificationSummary")).isNull();
-        }
-
-        @Test
-        void shouldHandleEmptyErrorsSection() {
-            // Given - errors delimiter present but errors section is empty/blank
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDetailsNotified()
-                .businessProcess(BusinessProcess.builder().activityId(TASK_ID).build())
-                .notificationSummary("Attempted: NotifierA || Errors: ")
-                .build();
-
-            Map<String, Object> dataMap = new HashMap<>();
-            dataMap.put("notificationSummary", "Attempted: NotifierA || Errors: ");
-
-            CaseDetails caseDetails = CaseDetailsBuilder.builder()
-                .data(caseData)
-                .build();
-            caseDetails.setData(dataMap);
-
-            StartEventResponse response = StartEventResponse.builder()
-                .caseDetails(caseDetails)
-                .eventId("RECORD_NOTIFICATIONS")
-                .token("test")
-                .build();
-
-            when(coreCaseDataService.startUpdate(caseData.getCcdCaseReference().toString(), RECORD_NOTIFICATIONS))
-                .thenReturn(response);
-
-            ArgumentCaptor<CaseDataContent> contentCaptor = ArgumentCaptor.forClass(CaseDataContent.class);
-
-            CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
-            handler.handle(params);
-
-            verify(coreCaseDataService).submitUpdate(any(), contentCaptor.capture());
-            CaseDataContent submittedContent = contentCaptor.getValue();
-
-            assertThat(submittedContent.getEvent().getSummary()).isEqualTo("NotifierA");
-            assertThat(submittedContent.getEvent().getDescription()).isNull();
+            verify(coreCaseDataService).startUpdate(eq(caseData.getCcdCaseReference().toString()), any());
+            ArgumentCaptor<CaseDataContent> captor = ArgumentCaptor.forClass(CaseDataContent.class);
+            verify(coreCaseDataService).submitUpdate(eq(caseData.getCcdCaseReference().toString()), captor.capture());
+            CaseDataContent submitted = captor.getValue();
+            // summary equals activity id; description prefixed with Errors:
+            org.assertj.core.api.Assertions.assertThat(submitted.getEvent().getSummary()).isEqualTo(TASK_ID);
+            org.assertj.core.api.Assertions.assertThat(submitted.getEvent().getDescription()).isEqualTo("Errors: Failed to send email");
         }
     }
 }

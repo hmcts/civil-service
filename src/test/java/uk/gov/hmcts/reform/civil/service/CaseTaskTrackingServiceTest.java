@@ -10,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.eq;
@@ -65,5 +66,20 @@ public class CaseTaskTrackingServiceTest {
         assertEquals(eventType, capturedProperties.get("eventType"));
         assertEquals("someValue", capturedProperties.get("someKey"));
         assertEquals("anotherValue", capturedProperties.get("anotherKey"));
+    }
+
+    @Test
+    void rememberAndConsumeErrors_roundTrip() {
+        String caseId = "333";
+        String taskId = "NotifyTask";
+        List<String> errors = List.of("e1", "e2");
+
+        caseTaskTrackingService.rememberErrors(caseId, taskId, errors);
+        String consumed = caseTaskTrackingService.consumeErrors(caseId, taskId);
+        assertEquals("e1 | e2", consumed);
+
+        // ensure consuming again returns null (cleared)
+        String again = caseTaskTrackingService.consumeErrors(caseId, taskId);
+        org.assertj.core.api.Assertions.assertThat(again).isNull();
     }
 }
