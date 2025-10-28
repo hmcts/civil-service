@@ -121,7 +121,6 @@ public class AcknowledgeOfServiceCallbackHandler extends CallbackHandler impleme
         LocalDateTime newResponseDate = deadlinesCalculator.plus14DaysAt4pmDeadline(responseDeadline);
         var updatedRespondent1 = caseData.getRespondent1().toBuilder()
             .primaryAddress(caseData.getRespondent1Copy().getPrimaryAddress())
-            .flags(caseData.getRespondent1Copy().getFlags())
             .build();
 
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder()
@@ -140,7 +139,6 @@ public class AcknowledgeOfServiceCallbackHandler extends CallbackHandler impleme
             && ofNullable(caseData.getRespondent2Copy()).isPresent()) {
             var updatedRespondent2 = caseData.getRespondent2().toBuilder()
                 .primaryAddress(caseData.getRespondent2Copy().getPrimaryAddress())
-                .flags(caseData.getRespondent2Copy().getFlags())
                 .build();
             caseDataBuilder.respondent2(updatedRespondent2).respondent2Copy(null);
             caseDataBuilder.respondent2DetailsForClaimDetailsTab(updatedRespondent2.toBuilder().flags(null).build());
