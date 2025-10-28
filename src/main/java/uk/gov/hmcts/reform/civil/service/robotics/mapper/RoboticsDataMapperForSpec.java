@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.prd.model.ContactInformation;
 import uk.gov.hmcts.reform.civil.prd.model.DxAddress;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsPartyLookup;
 import uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
@@ -39,12 +40,8 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISMISSED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.APPLICANT2_ID;
-import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.APPLICANT_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.APPLICANT_SOLICITOR_ID;
-import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT2_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT2_SOLICITOR_ID;
-import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT_SOLICITOR_ID;
 
 /**
@@ -60,6 +57,7 @@ public class RoboticsDataMapperForSpec {
     private final EventHistoryMapper eventHistoryMapper;
     private final OrganisationService organisationService;
     private final FeatureToggleService featureToggleService;
+    private final RoboticsPartyLookup partyLookup;
 
     public RoboticsCaseDataSpec toRoboticsCaseData(CaseData caseData, String authToken) {
         log.info("Preparing Robotics data for spec caseId {}", caseData.getCcdCaseReference());
@@ -138,7 +136,7 @@ public class RoboticsDataMapperForSpec {
             .contactEmailAddress(solicitorEmail.orElse(null))
             .reference(ofNullable(caseData.getSolicitorReferences())
                 .map(SolicitorReferences::getRespondentSolicitor1Reference)
-                .map(s -> s.substring(0, Math.min(s.length(), 24)))
+                .map(partyLookup::truncateReference)
                 .orElse(null)
             );
         organisationId
@@ -167,7 +165,7 @@ public class RoboticsDataMapperForSpec {
             .organisationId(organisationId.orElse(null))
             .reference(ofNullable(caseData.getSolicitorReferences())
                 .map(SolicitorReferences::getRespondentSolicitor2Reference)
-                .map(s -> s.substring(0, Math.min(s.length(), 24)))
+                .map(partyLookup::truncateReference)
                 .orElse(null)
             );
 
@@ -239,7 +237,7 @@ public class RoboticsDataMapperForSpec {
             .contactEmailAddress(caseData.getApplicantSolicitor1UserDetails().getEmail())
             .reference(ofNullable(caseData.getSolicitorReferences())
                 .map(SolicitorReferences::getApplicantSolicitor1Reference)
-                .map(s -> s.substring(0, Math.min(s.length(), 24)))
+                .map(partyLookup::truncateReference)
                 .orElse(null)
             );
 
@@ -261,7 +259,7 @@ public class RoboticsDataMapperForSpec {
                 caseData.getApplicant1LitigationFriend(),
                 caseData.getApplicant1OrganisationPolicy(),
                 "Claimant",
-                APPLICANT_ID,
+                partyLookup.applicantId(0),
                 APPLICANT_SOLICITOR_ID,
                 dateOfService
             ),
@@ -270,7 +268,7 @@ public class RoboticsDataMapperForSpec {
                 caseData.getRespondent1LitigationFriend(),
                 caseData.getRespondent1OrganisationPolicy(),
                 "Defendant",
-                RESPONDENT_ID,
+                partyLookup.respondentId(0),
                 respondent1SolicitorId,
                 dateOfService
             )
@@ -282,7 +280,7 @@ public class RoboticsDataMapperForSpec {
                 caseData.getApplicant2LitigationFriend(),
                 caseData.getApplicant2OrganisationPolicy(),
                 "Claimant",
-                APPLICANT2_ID,
+                partyLookup.applicantId(1),
                 APPLICANT_SOLICITOR_ID,
                 dateOfService
             ));
@@ -302,7 +300,7 @@ public class RoboticsDataMapperForSpec {
                 caseData.getRespondent2LitigationFriend(),
                 caseData.getRespondent2OrganisationPolicy(),
                 "Defendant",
-                RESPONDENT2_ID,
+                partyLookup.respondentId(1),
                 respondent2SolicitorId,
                 dateOfService
             ));

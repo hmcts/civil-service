@@ -41,6 +41,10 @@ import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.flowstate.TransitionsTestConfiguration;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
+import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextFormatter;
+import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsPartyLookup;
+import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenerator;
+import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsTimelineHelper;
 import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
 import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 
@@ -65,10 +69,14 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
     TransitionsTestConfiguration.class,
     EventHistorySequencer.class,
     EventHistoryMapper.class,
+    RoboticsTimelineHelper.class,
+    RoboticsEventTextFormatter.class,
+    RoboticsSequenceGenerator.class,
     RoboticsDataMapper.class,
     RoboticsAddressMapper.class,
     AddressLinesMapper.class,
-    OrganisationService.class
+    OrganisationService.class,
+    RoboticsPartyLookup.class
 })
 @ExtendWith(SpringExtension.class)
 class RoboticsDataMapperTest {
