@@ -103,7 +103,7 @@ allprojects {
       dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib', version: '1.9.25'
       dependency group: 'org.jetbrains.kotlin', name: 'kotlin-reflect', version: '1.9.25'
 
-      dependency group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.12.0'
+      dependency group: 'com.squareup.okhttp3', name: 'okhttp', version: '5.2.1'
 
       //Solves CVE-2023-34034
       dependency group: 'org.springframework.security', name: 'spring-security-crypto', version: '6.5.2'
