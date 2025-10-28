@@ -84,14 +84,14 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
         LocalDate whenWillThisAmountBePaid =
             Optional.ofNullable(caseData.getRespondToClaimAdmitPartLRspec()).map(RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid).orElse(
                 null);
-        final boolean judgementAllowed =
+        final boolean judgementNotAllowed =
             caseData.isJudgementDateNotPermitted()
                 || (featureToggleService.isJudgmentOnlineLive()
                 && whenWillThisAmountBePaid != null
                 && caseData.isDateAfterToday(whenWillThisAmountBePaid)
                 && caseData.isPartAdmitPayImmediatelyClaimSpec());
 
-        if (judgementAllowed) {
+        if (judgementNotAllowed) {
             log.info("Case {} is not eligible for Request Judgment By Admission until {}", caseData.getCcdCaseReference(), whenWillThisAmountBePaid);
             errors.add(format(NOT_VALID_DJ_BY_ADMISSION, whenWillThisAmountBePaid != null ? caseData.getFormattedJudgementPermittedDate(whenWillThisAmountBePaid) : null));
         }
