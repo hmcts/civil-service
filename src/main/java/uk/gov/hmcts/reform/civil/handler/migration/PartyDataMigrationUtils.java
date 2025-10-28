@@ -10,7 +10,9 @@ import java.util.function.UnaryOperator;
 
 public final class PartyDataMigrationUtils {
 
-    private PartyDataMigrationUtils() {}
+    private PartyDataMigrationUtils() {
+
+    }
 
     public static String defaultIfNull(String value) {
         return value == null ? "TBC" : value;

@@ -31,7 +31,6 @@ public class UpdatePartyExpertsTask extends MigrationTask<CaseReference> {
         return "Update case party experts via migration task";
     }
 
-
     @Override
     protected String getTaskName() {
         return "UpdatePartyExpertsTask";
