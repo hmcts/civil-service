@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection;
+import uk.gov.hmcts.reform.civil.ga.enums.dq.GaFinalOrderSelection;
 import uk.gov.hmcts.reform.civil.ga.enums.welshenhancements.PreTranslationGaDocumentType;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -698,7 +698,7 @@ public class UploadTranslatedDocumentServiceTest {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
             .translatedDocuments(translatedDocuments)
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.FINAL_ORDER_DOC)
-            .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+            .finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
             .build();
         // When
         String caseEvent = String.valueOf(uploadTranslatedDocumentService.getBusinessProcessEvent(caseData));
@@ -752,7 +752,7 @@ public class UploadTranslatedDocumentServiceTest {
         translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
             .translatedDocuments(translatedDocuments)
-            .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+            .finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.GENERAL_ORDER_DOC)
             .build();
         // When

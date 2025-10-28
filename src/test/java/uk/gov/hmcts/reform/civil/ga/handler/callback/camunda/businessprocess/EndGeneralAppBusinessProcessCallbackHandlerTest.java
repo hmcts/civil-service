@@ -21,9 +21,9 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection;
 import uk.gov.hmcts.reform.civil.enums.dq.GAHearingType;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
+import uk.gov.hmcts.reform.civil.ga.enums.dq.GaFinalOrderSelection;
 import uk.gov.hmcts.reform.civil.ga.handler.GeneralApplicationBaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
@@ -1176,8 +1176,8 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
         }
 
         @ParameterizedTest
-        @EnumSource(value = FinalOrderSelection.class)
-        void shouldChangeTheStateToOrderMadeAfterFinalOrder(FinalOrderSelection selection) {
+        @EnumSource(value = GaFinalOrderSelection.class)
+        void shouldChangeTheStateToOrderMadeAfterFinalOrder(GaFinalOrderSelection selection) {
             when(coreCaseDataService.startUpdate(any(), any())).thenReturn(getStartEventResponse(NO, YES));
             when(coreCaseDataService.caseDataContentFromStartEventResponse(any(), anyMap())).thenCallRealMethod();
             when(caseDetailsConverter.toGeneralApplicationCaseData(getCallbackParams(NO, YES).getRequest().getCaseDetails()))
@@ -1240,7 +1240,7 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
             when(coreCaseDataService.caseDataContentFromStartEventResponse(any(), anyMap())).thenCallRealMethod();
             when(caseDetailsConverter.toGeneralApplicationCaseData(getCallbackParams(NO, YES).getRequest().getCaseDetails()))
                     .thenReturn(getSampleGeneralApplicationCaseDataAfterOrderMade(NO,
-                            YES, FinalOrderSelection.ASSISTED_ORDER,
+                            YES, GaFinalOrderSelection.ASSISTED_ORDER,
                             AssistedOrderFurtherHearingDetails.builder().build()));
             when(caseDetailsConverter.toGeneralApplicationCaseData(getStartEventResponse(NO, YES).getCaseDetails()))
                     .thenReturn(getParentCaseDataBeforeUpdate(NO, YES));
@@ -1482,7 +1482,7 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
         private GeneralApplicationCaseData getSampleGeneralApplicationCaseDataAfterOrderMade(
                 YesOrNo isConsented,
                 YesOrNo isTobeNotified,
-                FinalOrderSelection selection,
+                GaFinalOrderSelection selection,
                 AssistedOrderFurtherHearingDetails hearingDetails) {
             return GeneralApplicationCaseDataBuilder.builder().buildCaseDateBaseOnGeneralApplication(
                             getGeneralApplication(isConsented, isTobeNotified))
