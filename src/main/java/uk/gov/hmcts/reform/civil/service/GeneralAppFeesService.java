@@ -7,6 +7,7 @@ import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.civil.client.FeesApiClient;
 import uk.gov.hmcts.reform.civil.config.GeneralAppFeesConfiguration;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.FeeLookupResponseDto;
@@ -203,6 +204,20 @@ public class GeneralAppFeesService {
             && Boolean.TRUE.equals(respondentAgreed)
             && hearingScheduledDate != null
             && hearingScheduledDate.isAfter(LocalDate.now().plusDays(FREE_GA_DAYS));
+    }
+
+    public boolean isFreeApplication(final GeneralApplicationCaseData caseData) {
+        if (caseData.getGeneralAppType().getTypes().size() == 1
+            && caseData.getGeneralAppType().getTypes()
+            .contains(GeneralApplicationTypes.ADJOURN_HEARING)
+            && caseData.getGeneralAppRespondentAgreement() != null
+            && YES.equals(caseData.getGeneralAppRespondentAgreement().getHasAgreed())
+            && caseData.getGeneralAppHearingDate() != null
+            && caseData.getGeneralAppHearingDate().getHearingScheduledDate() != null) {
+            return caseData.getGeneralAppHearingDate().getHearingScheduledDate()
+                .isAfter(LocalDate.now().plusDays(FREE_GA_DAYS));
+        }
+        return false;
     }
 
     private Fee buildFeeDto(FeeLookupResponseDto feeLookupResponseDto) {
