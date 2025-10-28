@@ -173,4 +173,55 @@ class UpdateApplicantExpertsTaskTest {
         assertThat(updatedCaseData.getApplicant1DQ()).isNull();
         assertThat(updatedCaseData.getApplicant2DQ()).isNull();
     }
+
+    @Test
+    void shouldAssignNewPartyIdWhenMissing() {
+        PartyFlagStructure expert = PartyFlagStructure.builder()
+            .firstName("Test")
+            .lastName("User")
+            .partyID(null)
+            .build();
+
+        CaseData caseData = CaseData.builder()
+            .applicantExperts(List.of(Element.<PartyFlagStructure>builder().value(expert).build()))
+            .build();
+
+        CaseReference caseRef = CaseReference.builder().caseReference("12345").build();
+
+        CaseData updatedCaseData = task.migrateCaseData(caseData, caseRef);
+
+        String updatedPartyId = updatedCaseData.getApplicantExperts().get(0).getValue().getPartyID();
+
+        assertThat(updatedPartyId)
+            .isNotNull()
+            .isNotBlank()
+            .isNotEqualTo(expert.getPartyID()); // Should be newly generated
+    }
+
+    @Test
+    void shouldReturnExpectedMetadataValues() {
+        assertThat(task.getTaskName()).isEqualTo("UpdateApplicantExpertsTask");
+        assertThat(task.getEventSummary()).contains("Update case applicant1 experts");
+        assertThat(task.getEventDescription()).contains("update applicant1 experts");
+    }
+
+    @Test
+    void shouldNotChangePartyIdIfAlreadyPresent() {
+        PartyFlagStructure expert = PartyFlagStructure.builder()
+            .firstName("John")
+            .lastName("Doe")
+            .partyID("existing-id-123")
+            .build();
+
+        CaseData caseData = CaseData.builder()
+            .applicantExperts(List.of(Element.<PartyFlagStructure>builder().value(expert).build()))
+            .build();
+
+        CaseReference caseRef = CaseReference.builder().caseReference("12345").build();
+
+        CaseData updatedCaseData = task.migrateCaseData(caseData, caseRef);
+
+        assertThat(updatedCaseData.getApplicantExperts().get(0).getValue().getPartyID())
+            .isEqualTo("existing-id-123");
+    }
 }
