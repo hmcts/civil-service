@@ -92,7 +92,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
                 && caseData.isPartAdmitPayImmediatelyClaimSpec());
 
         if (judgementAllowed) {
-            log.info("Case {} is not eligible for Request Judgment By Admission until {}", caseData.getLegacyCaseReference(), whenWillThisAmountBePaid);
+            log.info("Case {} is not eligible for Request Judgment By Admission until {}", caseData.getCcdCaseReference(), whenWillThisAmountBePaid);
             errors.add(format(NOT_VALID_DJ_BY_ADMISSION, whenWillThisAmountBePaid != null ? caseData.getFormattedJudgementPermittedDate(whenWillThisAmountBePaid) : null));
         }
 
