@@ -3,7 +3,7 @@ ARG APP_INSIGHTS_AGENT_VERSION=3.7.3
 
 # Application image
 
-FROM hmctspublic.azurecr.io/base/java:25-distroless
+FROM hmctspublic.azurecr.io/imported/distroless/java25
 
 # Change to non-root privilege
 USER hmcts
