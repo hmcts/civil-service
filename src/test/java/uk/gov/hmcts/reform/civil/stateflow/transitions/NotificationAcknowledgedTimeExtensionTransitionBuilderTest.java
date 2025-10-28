@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -52,6 +53,38 @@ public class NotificationAcknowledgedTimeExtensionTransitionBuilderTest {
         assertTransition(result.get(4), "MAIN.NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION", "MAIN.TAKEN_OFFLINE_BY_STAFF");
         assertTransition(result.get(5), "MAIN.NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION", "MAIN.PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA");
         assertTransition(result.get(6), "MAIN.NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION", "MAIN.TAKEN_OFFLINE_SDO_NOT_DRAWN");
+    }
+
+    @Test
+    void shouldTransitionToAwaitingResponsesFullDefence_whenCaseNotTakenOfflineAfterNotificationAckTimeExtension() {
+        Transition awaitingFullDefence = result.get(1);
+
+        CaseData baseCaseData = CaseDataBuilder.builder()
+            .atStateNotificationAcknowledgedTimeExtension_1v2DS()
+            .build();
+
+        CaseData caseData = baseCaseData.toBuilder()
+            .respondent1ClaimResponseType(RespondentResponseType.FULL_DEFENCE)
+            .takenOfflineByStaffDate(null)
+            .build();
+
+        assertTrue(awaitingFullDefence.getCondition().test(caseData));
+    }
+
+    @Test
+    void shouldNotTransitionToAwaitingResponsesFullDefence_whenCaseTakenOfflineAfterNotificationAckTimeExtension() {
+        Transition awaitingFullDefence = result.get(1);
+
+        CaseData baseCaseData = CaseDataBuilder.builder()
+            .atStateNotificationAcknowledgedTimeExtension_1v2DS()
+            .build();
+
+        CaseData caseData = baseCaseData.toBuilder()
+            .respondent1ClaimResponseType(RespondentResponseType.FULL_DEFENCE)
+            .takenOfflineByStaffDate(LocalDateTime.now())
+            .build();
+
+        assertFalse(awaitingFullDefence.getCondition().test(caseData));
     }
 
     @Test
