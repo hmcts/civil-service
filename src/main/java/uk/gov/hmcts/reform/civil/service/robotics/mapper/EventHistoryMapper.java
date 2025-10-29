@@ -111,9 +111,6 @@ public class EventHistoryMapper {
                     case FULL_DEFENCE:
                         buildRespondentFullDefence(builder, caseData);
                         break;
-                    case FULL_ADMISSION:
-                        buildRespondentFullAdmission(builder, caseData);
-                        break;
                     case PART_ADMISSION:
                         buildRespondentPartAdmission(builder, caseData);
                         break;
@@ -566,46 +563,6 @@ public class EventHistoryMapper {
                                       .build());
         }
 
-    }
-
-    private void buildRespondentFullAdmission(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        String miscText;
-        if (defendant1ResponseExists.test(caseData)) {
-            miscText = prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
-            builder.receiptOfAdmission(Event.builder()
-                                           .eventSequence(prepareEventSequence(builder.build()))
-                                           .eventCode(RECEIPT_OF_ADMISSION.getCode())
-                                           .dateReceived(caseData.getRespondent1ResponseDate())
-                                           .litigiousPartyID(RESPONDENT_ID)
-                                           .build()
-            );
-            buildRespondentResponseText(builder, caseData, miscText, caseData.getRespondent1ResponseDate());
-            buildMiscellaneousForRespondentResponseLipVSLr(builder, caseData);
-            if (defendant1v2SameSolicitorSameResponse.test(caseData)) {
-                LocalDateTime respondent2ResponseDate = null != caseData.getRespondent2ResponseDate()
-                    ? caseData.getRespondent2ResponseDate() : caseData.getRespondent1ResponseDate();
-                miscText = prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
-                builder.receiptOfAdmission(Event.builder()
-                                               .eventSequence(prepareEventSequence(builder.build()))
-                                               .eventCode(RECEIPT_OF_ADMISSION.getCode())
-                                               .dateReceived(respondent2ResponseDate)
-                                               .litigiousPartyID(RESPONDENT2_ID)
-                                               .build()
-                );
-                buildRespondentResponseText(builder, caseData, miscText, respondent2ResponseDate);
-            }
-        }
-        if (defendant2ResponseExists.test(caseData)) {
-            miscText = prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
-            builder.receiptOfAdmission(Event.builder()
-                                           .eventSequence(prepareEventSequence(builder.build()))
-                                           .eventCode(RECEIPT_OF_ADMISSION.getCode())
-                                           .dateReceived(caseData.getRespondent2ResponseDate())
-                                           .litigiousPartyID(RESPONDENT2_ID)
-                                           .build()
-            );
-            buildRespondentResponseText(builder, caseData, miscText, caseData.getRespondent2ResponseDate());
-        }
     }
 
     private void buildRespondentPartAdmission(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
