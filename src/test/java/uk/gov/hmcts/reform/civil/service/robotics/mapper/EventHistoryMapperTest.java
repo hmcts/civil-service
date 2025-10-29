@@ -73,6 +73,7 @@ import uk.gov.hmcts.reform.civil.service.robotics.strategy.AcknowledgementOfServ
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.BreathingSpaceEventContributor;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.CaseProceedsInCasemanContributor;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.CaseQueriesContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.CaseNotesContributor;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.ClaimDetailsNotifiedEventContributor;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.ClaimDismissedPastDeadlineContributor;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.ClaimDismissedPastNotificationsContributor;
@@ -86,10 +87,12 @@ import uk.gov.hmcts.reform.civil.service.robotics.strategy.DefendantNoCDeadlineC
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.MediationEventContributor;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.EventHistoryContributor;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.RespondentLitigationFriendContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.SdoNotDrawnContributor;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.TakenOfflineAfterClaimDetailsNotifiedContributor;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.TakenOfflineAfterClaimNotifiedContributor;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.TakenOfflinePastApplicantResponseContributor;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.TakenOfflineByStaffEventContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.TakenOfflineSpecDefendantNocContributor;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.UnregisteredDefendantContributor;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.UnrepresentedAndUnregisteredDefendantContributor;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.UnrepresentedDefendantContributor;
@@ -176,6 +179,8 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     TakenOfflinePastApplicantResponseContributor.class,
     BreathingSpaceEventContributor.class,
     TakenOfflineByStaffEventContributor.class,
+    TakenOfflineSpecDefendantNocContributor.class,
+    SdoNotDrawnContributor.class,
     DefaultJudgmentEventContributor.class,
     GeneralApplicationStrikeOutContributor.class,
     ClaimantResponseContributor.class,
@@ -183,6 +188,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     CaseProceedsInCasemanContributor.class,
     DefendantNoCDeadlineContributor.class,
     MediationEventContributor.class,
+    CaseNotesContributor.class,
     RoboticsManualOfflineSupport.class
 })
 class EventHistoryMapperTest {

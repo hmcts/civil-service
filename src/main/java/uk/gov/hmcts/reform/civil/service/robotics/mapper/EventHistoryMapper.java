@@ -5,13 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
-import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -21,14 +18,9 @@ import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
-import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.DQ;
-import uk.gov.hmcts.reform.civil.model.dq.FileDirectionsQuestionnaire;
-import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
-import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
-import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideOrderType;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideReason;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.SetAsideApplicantTypeForRPA;
@@ -39,14 +31,12 @@ import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
-import uk.gov.hmcts.reform.civil.stateflow.model.State;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextFormatter;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsPartyLookup;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenerator;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsTimelineHelper;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.EventHistoryContributor;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
-import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -57,15 +47,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.IntStream;
 
 import static java.lang.String.format;
 import static java.math.BigDecimal.ZERO;
 import static java.util.Optional.ofNullable;
-import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.left;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
-import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISCONTINUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISMISSED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
@@ -74,20 +61,10 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_L
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENCE;
-import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREGISTERED;
-import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREPRESENTED;
-import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.getDefendantNames;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.PROCEEDS_IN_HERITAGE;
-import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.STRIKE_OUT;
-import static uk.gov.hmcts.reform.civil.model.robotics.EventType.ACKNOWLEDGEMENT_OF_SERVICE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.CERTIFICATE_OF_SATISFACTION_OR_CANCELLATION;
-import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFAULT_JUDGMENT_GRANTED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFENCE_FILED;
-import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFENCE_STRUCK_OUT;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DIRECTIONS_QUESTIONNAIRE_FILED;
-import static uk.gov.hmcts.reform.civil.model.robotics.EventType.GENERAL_FORM_OF_APPLICATION;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.INTERLOCUTORY_JUDGMENT_GRANTED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.JUDGEMENT_BY_ADMISSION;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MISCELLANEOUS;
@@ -95,18 +72,14 @@ import static uk.gov.hmcts.reform.civil.model.robotics.EventType.RECEIPT_OF_ADMI
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.RECEIPT_OF_PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.SET_ASIDE_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.STATES_PAID;
-import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.APPLICANT2_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.APPLICANT_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT2_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT_ID;
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getResponseTypeForRespondent;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getResponseTypeForRespondentSpec;
-import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1ExtensionExists;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1ResponseExists;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1v2SameSolicitorSameResponse;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2DivergentResponseExists;
-import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2ExtensionExists;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2ResponseExists;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsDirectionsQuestionnaireSupport;
 
@@ -189,21 +162,14 @@ public class EventHistoryMapper {
                     case TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED:
                     case TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE:
                         break;
-                    case TAKEN_OFFLINE_SDO_NOT_DRAWN:
-                        buildSDONotDrawn(builder, caseData);
-                        break;
                     case PART_ADMIT_REJECT_REPAYMENT, FULL_ADMIT_REJECT_REPAYMENT:
                         buildSpecAdmitRejectRepayment(builder, caseData);
-                        break;
-                    case TAKEN_OFFLINE_SPEC_DEFENDANT_NOC, TAKEN_OFFLINE_SPEC_DEFENDANT_NOC_AFTER_JBA:
-                        buildTakenOfflineDueToDefendantNoc(builder, caseData);
                         break;
                     default:
                         break;
                 }
             });
 
-        buildCaseNotesEvents(builder, caseData);
         eventHistoryContributors.stream()
             .filter(contributor -> contributor.supports(caseData))
             .forEach(contributor -> contributor.contribute(builder, caseData, authToken));
@@ -691,38 +657,6 @@ public class EventHistoryMapper {
         return defaultText;
     }
 
-    private void buildCaseNotesEvents(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        if (isNotEmpty(caseData.getCaseNotes())) {
-            buildMiscellaneousCaseNotesEvent(builder, caseData);
-        }
-
-    }
-
-    private void buildMiscellaneousCaseNotesEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        List<Event> events = unwrapElements(caseData.getCaseNotes())
-            .stream()
-            .map(caseNote ->
-                     Event.builder()
-                         .eventSequence(prepareEventSequence(builder.build()))
-                         .eventCode(MISCELLANEOUS.getCode())
-                         .dateReceived(caseNote.getCreatedOn())
-                         .eventDetailsText(left((format(
-                             "case note added: %s",
-                             caseNote.getNote() != null
-                                 ? caseNote.getNote().replaceAll("\\s+", " ") : ""
-                         )), 250))
-                         .eventDetails(EventDetails.builder()
-                                           .miscText(left((format(
-                                               "case note added: %s",
-                                               caseNote.getNote() != null
-                                                   ? caseNote.getNote().replaceAll("\\s+", " ") : ""
-                                           )), 250))
-                                           .build())
-                         .build())
-            .toList();
-        builder.miscellaneous(events);
-    }
-
     private int prepareEventSequence(EventHistory history) {
         return sequenceGenerator.nextSequence(history);
     }
@@ -1113,25 +1047,6 @@ public class EventHistoryMapper {
         }
     }
 
-    private void buildSDONotDrawn(EventHistory.EventHistoryBuilder builder,
-                                  CaseData caseData) {
-        String miscText = left(textFormatter.caseProceedOffline(
-            "Judge / Legal Advisor did not draw a Direction's Order: " + caseData.getReasonNotSuitableSDO().getInput()
-        ), 250);
-
-        LocalDateTime eventDate = caseData.getUnsuitableSDODate();
-        builder.miscellaneous(
-            Event.builder()
-                .eventSequence(prepareEventSequence(builder.build()))
-                .eventCode(MISCELLANEOUS.getCode())
-                .dateReceived(eventDate)
-                .eventDetailsText(miscText)
-                .eventDetails(EventDetails.builder()
-                                  .miscText(miscText)
-                                  .build())
-                .build());
-    }
-
     private void buildMiscellaneousIJEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         Boolean grantedFlag = caseData.getRespondent2() != null
             && caseData.getDefendantDetails() != null
@@ -1230,19 +1145,6 @@ public class EventHistoryMapper {
                     false
                 ));
         }
-    }
-
-    private void buildTakenOfflineDueToDefendantNoc(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        builder.miscellaneous(
-            Event.builder()
-                .eventSequence(prepareEventSequence(builder.build()))
-                .eventCode(MISCELLANEOUS.getCode())
-                .dateReceived(caseData.getTakenOfflineDate())
-                .eventDetailsText(textFormatter.noticeOfChangeFiled())
-                .eventDetails(EventDetails.builder()
-                                  .miscText(textFormatter.noticeOfChangeFiled())
-                                  .build())
-                .build());
     }
 
     private LocalDateTime setApplicant1ResponseDate(CaseData caseData) {
