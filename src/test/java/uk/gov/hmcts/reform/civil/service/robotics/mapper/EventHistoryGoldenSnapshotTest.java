@@ -31,6 +31,27 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.flowstate.TransitionsTestConfiguration;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.support.CaseDataNormalizer;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.AcknowledgementOfServiceContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.BreathingSpaceEventContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.CaseProceedsInCasemanContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.CaseQueriesContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.ClaimDetailsNotifiedEventContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.ClaimDismissedPastDeadlineContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.ClaimDismissedPastNotificationsContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.ClaimIssuedEventContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.ClaimNotifiedEventContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.DefaultJudgmentEventContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.DefendantNoCDeadlineContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.MediationEventContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.RespondentLitigationFriendContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.TakenOfflineAfterClaimDetailsNotifiedContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.TakenOfflineAfterClaimNotifiedContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.TakenOfflinePastApplicantResponseContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.TakenOfflineByStaffEventContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.UnregisteredDefendantContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.UnrepresentedAndUnregisteredDefendantContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.UnrepresentedDefendantContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsManualOfflineSupport;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextFormatter;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsPartyLookup;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenerator;
@@ -67,7 +88,28 @@ import static org.mockito.Mockito.when;
     RoboticsTimelineHelper.class,
     RoboticsEventTextFormatter.class,
     RoboticsPartyLookup.class,
-    RoboticsSequenceGenerator.class
+    RoboticsSequenceGenerator.class,
+    ClaimIssuedEventContributor.class,
+    ClaimDetailsNotifiedEventContributor.class,
+    ClaimNotifiedEventContributor.class,
+    BreathingSpaceEventContributor.class,
+    ClaimDismissedPastNotificationsContributor.class,
+    ClaimDismissedPastDeadlineContributor.class,
+    AcknowledgementOfServiceContributor.class,
+    RespondentLitigationFriendContributor.class,
+    CaseQueriesContributor.class,
+    UnrepresentedDefendantContributor.class,
+    UnregisteredDefendantContributor.class,
+    UnrepresentedAndUnregisteredDefendantContributor.class,
+    TakenOfflineAfterClaimDetailsNotifiedContributor.class,
+    TakenOfflineAfterClaimNotifiedContributor.class,
+    TakenOfflinePastApplicantResponseContributor.class,
+    TakenOfflineByStaffEventContributor.class,
+    DefaultJudgmentEventContributor.class,
+    CaseProceedsInCasemanContributor.class,
+    DefendantNoCDeadlineContributor.class,
+    MediationEventContributor.class,
+    RoboticsManualOfflineSupport.class
 })
 class EventHistoryGoldenSnapshotTest {
 

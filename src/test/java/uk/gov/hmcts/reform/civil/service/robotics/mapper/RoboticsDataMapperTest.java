@@ -41,6 +41,13 @@ import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.flowstate.TransitionsTestConfiguration;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.BreathingSpaceEventContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.CaseProceedsInCasemanContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.DefaultJudgmentEventContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.DefendantNoCDeadlineContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.MediationEventContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.TakenOfflineByStaffEventContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsManualOfflineSupport;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextFormatter;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsPartyLookup;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenerator;
@@ -72,6 +79,13 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
     RoboticsTimelineHelper.class,
     RoboticsEventTextFormatter.class,
     RoboticsSequenceGenerator.class,
+    BreathingSpaceEventContributor.class,
+    TakenOfflineByStaffEventContributor.class,
+    DefaultJudgmentEventContributor.class,
+    CaseProceedsInCasemanContributor.class,
+    DefendantNoCDeadlineContributor.class,
+    MediationEventContributor.class,
+    RoboticsManualOfflineSupport.class,
     RoboticsDataMapper.class,
     RoboticsAddressMapper.class,
     AddressLinesMapper.class,

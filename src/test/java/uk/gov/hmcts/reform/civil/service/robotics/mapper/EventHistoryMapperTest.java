@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
@@ -68,6 +69,28 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.flowstate.TransitionsTestConfiguration;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.AcknowledgementOfServiceContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.BreathingSpaceEventContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.CaseProceedsInCasemanContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.CaseQueriesContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.ClaimDetailsNotifiedEventContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.ClaimDismissedPastDeadlineContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.ClaimDismissedPastNotificationsContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.ClaimIssuedEventContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.ClaimNotifiedEventContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.DefaultJudgmentEventContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.DefendantNoCDeadlineContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.MediationEventContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.EventHistoryContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.RespondentLitigationFriendContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.TakenOfflineAfterClaimDetailsNotifiedContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.TakenOfflineAfterClaimNotifiedContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.TakenOfflinePastApplicantResponseContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.TakenOfflineByStaffEventContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.UnregisteredDefendantContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.UnrepresentedAndUnregisteredDefendantContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.UnrepresentedDefendantContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsManualOfflineSupport;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextFormatter;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsPartyLookup;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenerator;
@@ -119,7 +142,6 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_SDO_NOT_DRAWN;
 import static uk.gov.hmcts.reform.civil.service.robotics.RoboticsNotificationService.findLatestEventTriggerReason;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper.QUERIES_ON_CASE;
-import static uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper.RPA_IN_MEDIATION;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper.RECORD_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
@@ -134,7 +156,28 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     RoboticsTimelineHelper.class,
     RoboticsEventTextFormatter.class,
     RoboticsPartyLookup.class,
-    RoboticsSequenceGenerator.class
+    RoboticsSequenceGenerator.class,
+    ClaimIssuedEventContributor.class,
+    ClaimDetailsNotifiedEventContributor.class,
+    ClaimNotifiedEventContributor.class,
+    ClaimDismissedPastDeadlineContributor.class,
+    ClaimDismissedPastNotificationsContributor.class,
+    AcknowledgementOfServiceContributor.class,
+    RespondentLitigationFriendContributor.class,
+    CaseQueriesContributor.class,
+    UnrepresentedDefendantContributor.class,
+    UnregisteredDefendantContributor.class,
+    UnrepresentedAndUnregisteredDefendantContributor.class,
+    TakenOfflineAfterClaimDetailsNotifiedContributor.class,
+    TakenOfflineAfterClaimNotifiedContributor.class,
+    TakenOfflinePastApplicantResponseContributor.class,
+    BreathingSpaceEventContributor.class,
+    TakenOfflineByStaffEventContributor.class,
+    DefaultJudgmentEventContributor.class,
+    CaseProceedsInCasemanContributor.class,
+    DefendantNoCDeadlineContributor.class,
+    MediationEventContributor.class,
+    RoboticsManualOfflineSupport.class
 })
 class EventHistoryMapperTest {
 
@@ -152,6 +195,12 @@ class EventHistoryMapperTest {
 
     @Autowired
     RoboticsEventTextFormatter formatter;
+
+    @Autowired
+    RoboticsManualOfflineSupport manualOfflineSupport;
+
+    @Autowired
+    List<EventHistoryContributor> contributors;
 
     @MockBean
     private Time time;
@@ -4080,6 +4129,7 @@ class EventHistoryMapperTest {
                 }
 
                 var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
+                System.out.println("Misc events: " + eventHistory.getMiscellaneous());
                 assertThat(eventHistory).isNotNull();
 
                 assertEmptyEvents(
@@ -4513,6 +4563,7 @@ class EventHistoryMapperTest {
                     .atState(TAKEN_OFFLINE_AFTER_SDO)
                     .atStateTakenOfflineAfterSDO(MultiPartyScenario.ONE_V_ONE)
                     .build();
+                assertThat(mapperContributors()).contains("CaseProceedsInCasemanContributor");
                 if (caseData.getRespondent2OrgRegistered() != null && caseData.getRespondent2Represented() == null) {
                     caseData = caseData.toBuilder().respondent2Represented(YES).build();
                 }
@@ -5690,6 +5741,10 @@ class EventHistoryMapperTest {
         }
     }
 
+    private String mapperContributors() {
+        return contributors.stream().map(contributor -> contributor.getClass().getSimpleName()).toList().toString();
+    }
+
     @Nested
     class TakenOfflineByStaff {
 
@@ -5698,6 +5753,7 @@ class EventHistoryMapperTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateTakenOfflineByStaff()
                 .build();
+            assertThat(mapperContributors()).contains("TakenOfflineByStaffEventContributor");
 
             List<Event> expectedMiscellaneousEvents = List.of(
                 Event.builder()
@@ -5713,9 +5769,9 @@ class EventHistoryMapperTest {
                     .eventSequence(2)
                     .eventCode("999")
                     .dateReceived(caseData.getTakenOfflineByStaffDate())
-                    .eventDetailsText(mapper.prepareTakenOfflineEventDetails(caseData))
+                    .eventDetailsText(manualOfflineSupport.prepareTakenOfflineEventDetails(caseData))
                     .eventDetails(EventDetails.builder()
-                                      .miscText(mapper.prepareTakenOfflineEventDetails(caseData))
+                                      .miscText(manualOfflineSupport.prepareTakenOfflineEventDetails(caseData))
                                       .build())
                     .build()
             );
@@ -5791,9 +5847,9 @@ class EventHistoryMapperTest {
                     .eventSequence(3)
                     .eventCode("999")
                     .dateReceived(caseData.getTakenOfflineByStaffDate())
-                    .eventDetailsText(mapper.prepareTakenOfflineEventDetails(caseData))
+                    .eventDetailsText(manualOfflineSupport.prepareTakenOfflineEventDetails(caseData))
                     .eventDetails(EventDetails.builder()
-                                      .miscText(mapper.prepareTakenOfflineEventDetails(caseData))
+                                      .miscText(manualOfflineSupport.prepareTakenOfflineEventDetails(caseData))
                                       .build())
                     .build()
             );
@@ -5829,32 +5885,15 @@ class EventHistoryMapperTest {
                                                  .build())
                 .build();
 
-            List<Event> expectedMiscellaneousEvents = List.of(
-                Event.builder()
-                    .eventSequence(1)
-                    .eventCode("999")
-                    .dateReceived(caseData.getTakenOfflineDate())
-                    .eventDetailsText("RPA Reason: Claim moved offline after defendant NoC deadline has passed")
-                    .eventDetails(EventDetails.builder()
-                                      .miscText("RPA Reason: Claim moved offline after defendant NoC deadline has passed")
-                                      .build())
-                    .build(),
-                Event.builder()
-                    .eventSequence(2)
-                    .eventCode("999")
-                    .dateReceived(caseData.getTakenOfflineDate())
-                    .eventDetailsText(QUERIES_ON_CASE)
-                    .eventDetails(EventDetails.builder()
-                                      .miscText(QUERIES_ON_CASE)
-                                      .build())
-                    .build()
-            );
-
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
-            assertThat(eventHistory).extracting("miscellaneous").asList()
-                .containsExactlyInAnyOrder(expectedMiscellaneousEvents.get(0), expectedMiscellaneousEvents.get(1));
+            assertThat(eventHistory.getMiscellaneous())
+                .extracting(Event::getEventDetailsText)
+                .containsExactlyInAnyOrder(
+                    "RPA Reason: Claim moved offline after defendant NoC deadline has passed",
+                    QUERIES_ON_CASE
+                );
 
             assertEmptyEvents(
                 eventHistory,
@@ -5880,32 +5919,15 @@ class EventHistoryMapperTest {
                                                  .build())
                 .build();
 
-            List<Event> expectedMiscellaneousEvents = List.of(
-                Event.builder()
-                    .eventSequence(1)
-                    .eventCode("999")
-                    .dateReceived(caseData.getTakenOfflineDate())
-                    .eventDetailsText("RPA Reason: Claim moved offline after defendant NoC deadline has passed")
-                    .eventDetails(EventDetails.builder()
-                                      .miscText("RPA Reason: Claim moved offline after defendant NoC deadline has passed")
-                                      .build())
-                    .build(),
-                Event.builder()
-                    .eventSequence(2)
-                    .eventCode("999")
-                    .dateReceived(caseData.getTakenOfflineDate())
-                    .eventDetailsText(QUERIES_ON_CASE)
-                    .eventDetails(EventDetails.builder()
-                                      .miscText(QUERIES_ON_CASE)
-                                      .build())
-                    .build()
-            );
-
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
-            assertThat(eventHistory).extracting("miscellaneous").asList()
-                .containsExactly(expectedMiscellaneousEvents.get(0), expectedMiscellaneousEvents.get(1));
+            assertThat(eventHistory.getMiscellaneous())
+                .extracting(Event::getEventDetailsText)
+                .containsExactlyInAnyOrder(
+                    "RPA Reason: Claim moved offline after defendant NoC deadline has passed",
+                    QUERIES_ON_CASE
+                );
 
             assertEmptyEvents(
                 eventHistory,
@@ -5931,23 +5953,12 @@ class EventHistoryMapperTest {
                                                  .build())
                 .build();
 
-            List<Event> expectedMiscellaneousEvents = List.of(
-                Event.builder()
-                    .eventSequence(1)
-                    .eventCode("999")
-                    .dateReceived(caseData.getTakenOfflineDate())
-                    .eventDetailsText("RPA Reason: Claim moved offline after defendant NoC deadline has passed")
-                    .eventDetails(EventDetails.builder()
-                                      .miscText("RPA Reason: Claim moved offline after defendant NoC deadline has passed")
-                                      .build())
-                    .build()
-            );
-
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
-            assertThat(eventHistory).extracting("miscellaneous").asList()
-                .containsExactly(expectedMiscellaneousEvents.get(0));
+            assertThat(eventHistory.getMiscellaneous())
+                .extracting(Event::getEventDetailsText)
+                .containsExactly("RPA Reason: Claim moved offline after defendant NoC deadline has passed");
 
             assertEmptyEvents(
                 eventHistory,
@@ -5984,9 +5995,9 @@ class EventHistoryMapperTest {
                     .eventSequence(2)
                     .eventCode("999")
                     .dateReceived(caseData.getTakenOfflineByStaffDate())
-                    .eventDetailsText(mapper.prepareTakenOfflineEventDetails(caseData))
+                    .eventDetailsText(manualOfflineSupport.prepareTakenOfflineEventDetails(caseData))
                     .eventDetails(EventDetails.builder()
-                                      .miscText(mapper.prepareTakenOfflineEventDetails(caseData))
+                                      .miscText(manualOfflineSupport.prepareTakenOfflineEventDetails(caseData))
                                       .build())
                     .build()
             );
@@ -6039,9 +6050,9 @@ class EventHistoryMapperTest {
                     .eventSequence(3)
                     .eventCode("999")
                     .dateReceived(caseData.getTakenOfflineByStaffDate())
-                    .eventDetailsText(mapper.prepareTakenOfflineEventDetails(caseData))
+                    .eventDetailsText(manualOfflineSupport.prepareTakenOfflineEventDetails(caseData))
                     .eventDetails(EventDetails.builder()
-                                      .miscText(mapper.prepareTakenOfflineEventDetails(caseData))
+                                      .miscText(manualOfflineSupport.prepareTakenOfflineEventDetails(caseData))
                                       .build())
                     .build()
             );
@@ -6105,9 +6116,9 @@ class EventHistoryMapperTest {
                     .eventSequence(5)
                     .eventCode("999")
                     .dateReceived(caseData.getTakenOfflineByStaffDate())
-                    .eventDetailsText(mapper.prepareTakenOfflineEventDetails(caseData))
+                    .eventDetailsText(manualOfflineSupport.prepareTakenOfflineEventDetails(caseData))
                     .eventDetails(EventDetails.builder()
-                                      .miscText(mapper.prepareTakenOfflineEventDetails(caseData))
+                                      .miscText(manualOfflineSupport.prepareTakenOfflineEventDetails(caseData))
                                       .build())
                     .build()
             );
@@ -6184,9 +6195,9 @@ class EventHistoryMapperTest {
                     .eventSequence(5)
                     .eventCode("999")
                     .dateReceived(caseData.getTakenOfflineByStaffDate())
-                    .eventDetailsText(mapper.prepareTakenOfflineEventDetails(caseData))
+                    .eventDetailsText(manualOfflineSupport.prepareTakenOfflineEventDetails(caseData))
                     .eventDetails(EventDetails.builder()
-                                      .miscText(mapper.prepareTakenOfflineEventDetails(caseData))
+                                      .miscText(manualOfflineSupport.prepareTakenOfflineEventDetails(caseData))
                                       .build())
                     .build()
             );
@@ -6264,9 +6275,9 @@ class EventHistoryMapperTest {
                     .eventSequence(6)
                     .eventCode("999")
                     .dateReceived(caseData.getTakenOfflineByStaffDate())
-                    .eventDetailsText(mapper.prepareTakenOfflineEventDetails(caseData))
+                    .eventDetailsText(manualOfflineSupport.prepareTakenOfflineEventDetails(caseData))
                     .eventDetails(EventDetails.builder()
-                                      .miscText(mapper.prepareTakenOfflineEventDetails(caseData))
+                                      .miscText(manualOfflineSupport.prepareTakenOfflineEventDetails(caseData))
                                       .build())
                     .build()
             );
@@ -6380,9 +6391,9 @@ class EventHistoryMapperTest {
                     .eventSequence(7)
                     .eventCode("999")
                     .dateReceived(caseData.getTakenOfflineByStaffDate())
-                    .eventDetailsText(mapper.prepareTakenOfflineEventDetails(caseData))
+                    .eventDetailsText(manualOfflineSupport.prepareTakenOfflineEventDetails(caseData))
                     .eventDetails(EventDetails.builder()
-                                      .miscText(mapper.prepareTakenOfflineEventDetails(caseData))
+                                      .miscText(manualOfflineSupport.prepareTakenOfflineEventDetails(caseData))
                                       .build())
                     .build()
             );
@@ -6446,9 +6457,9 @@ class EventHistoryMapperTest {
                             .eventSequence(4)
                             .eventCode("999")
                             .dateReceived(caseData.getTakenOfflineByStaffDate())
-                            .eventDetailsText(mapper.prepareTakenOfflineEventDetails(caseData))
+                            .eventDetailsText(manualOfflineSupport.prepareTakenOfflineEventDetails(caseData))
                             .eventDetails(EventDetails.builder()
-                                    .miscText(mapper.prepareTakenOfflineEventDetails(caseData))
+                                    .miscText(manualOfflineSupport.prepareTakenOfflineEventDetails(caseData))
                                     .build())
                             .build()
             );
@@ -6503,9 +6514,9 @@ class EventHistoryMapperTest {
                             .eventSequence(4)
                             .eventCode("999")
                             .dateReceived(caseData.getTakenOfflineByStaffDate())
-                            .eventDetailsText(mapper.prepareTakenOfflineEventDetails(caseData))
+                            .eventDetailsText(manualOfflineSupport.prepareTakenOfflineEventDetails(caseData))
                             .eventDetails(EventDetails.builder()
-                                    .miscText(mapper.prepareTakenOfflineEventDetails(caseData))
+                                    .miscText(manualOfflineSupport.prepareTakenOfflineEventDetails(caseData))
                                     .build())
                             .build()
             );
@@ -6560,9 +6571,9 @@ class EventHistoryMapperTest {
                             .eventSequence(2)
                             .eventCode("999")
                             .dateReceived(caseData.getTakenOfflineByStaffDate())
-                            .eventDetailsText(mapper.prepareTakenOfflineEventDetails(caseData))
+                            .eventDetailsText(manualOfflineSupport.prepareTakenOfflineEventDetails(caseData))
                             .eventDetails(EventDetails.builder()
-                                    .miscText(mapper.prepareTakenOfflineEventDetails(caseData))
+                                    .miscText(manualOfflineSupport.prepareTakenOfflineEventDetails(caseData))
                                     .build())
                             .build()
             );
@@ -6736,10 +6747,9 @@ class EventHistoryMapperTest {
                     .eventSequence(5)
                     .eventCode("999")
                     .dateReceived(caseData.getClaimDismissedDate())
-                    .eventDetailsText(mapper.prepareClaimDismissedDetails(CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION))
+                    .eventDetailsText(formatter.claimDismissedNoUserActionForSixMonths())
                     .eventDetails(EventDetails.builder()
-                                      .miscText(mapper.prepareClaimDismissedDetails(
-                                          CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION))
+                                      .miscText(formatter.claimDismissedNoUserActionForSixMonths())
                                       .build())
                     .build()
             );
@@ -6819,10 +6829,9 @@ class EventHistoryMapperTest {
                     .eventSequence(5)
                     .eventCode("999")
                     .dateReceived(caseData.getClaimDismissedDate())
-                    .eventDetailsText(mapper.prepareClaimDismissedDetails(NOTIFICATION_ACKNOWLEDGED))
+                    .eventDetailsText(formatter.claimDismissedNoUserActionForSixMonths())
                     .eventDetails(EventDetails.builder()
-                                      .miscText(mapper.prepareClaimDismissedDetails(
-                                          NOTIFICATION_ACKNOWLEDGED))
+                                      .miscText(formatter.claimDismissedNoUserActionForSixMonths())
                                       .build())
                     .build()
             );
@@ -6902,10 +6911,9 @@ class EventHistoryMapperTest {
                     .eventSequence(6)
                     .eventCode("999")
                     .dateReceived(caseData.getClaimDismissedDate())
-                    .eventDetailsText(mapper.prepareClaimDismissedDetails(NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION))
+                    .eventDetailsText(formatter.claimDismissedNoUserActionForSixMonths())
                     .eventDetails(EventDetails.builder()
-                                      .miscText(mapper.prepareClaimDismissedDetails(
-                                          NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION))
+                                      .miscText(formatter.claimDismissedNoUserActionForSixMonths())
                                       .build())
                     .build()
             );
@@ -8415,7 +8423,7 @@ class EventHistoryMapperTest {
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .extracting("eventCode").asString().contains("999");
             assertThat(eventHistory).extracting("miscellaneous").asList()
-                .extracting("eventDetailsText").asString().contains(RPA_IN_MEDIATION);
+                .extracting("eventDetailsText").asString().contains(formatter.inMediation());
             assertThat(eventHistory.getDirectionsQuestionnaireFiled())
                 .anySatisfy(event -> {
                     assertThat(event.getEventCode()).isEqualTo("197");
@@ -8506,7 +8514,7 @@ class EventHistoryMapperTest {
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .extracting("eventCode").asString().contains("999");
             assertThat(eventHistory).extracting("miscellaneous").asList()
-                .extracting("eventDetailsText").asString().contains(RPA_IN_MEDIATION);
+                .extracting("eventDetailsText").asString().contains(formatter.inMediation());
         }
 
         @Test
@@ -8584,7 +8592,7 @@ class EventHistoryMapperTest {
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .extracting("eventCode").asString().contains("999");
             assertThat(eventHistory).extracting("miscellaneous").asList()
-                .extracting("eventDetailsText").asString().contains(RPA_IN_MEDIATION);
+                .extracting("eventDetailsText").asString().contains(formatter.inMediation());
         }
     }
 

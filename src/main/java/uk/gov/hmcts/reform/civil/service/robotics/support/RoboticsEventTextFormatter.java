@@ -142,6 +142,14 @@ public class RoboticsEventTextFormatter {
         return "RPA Reason:Multitrack Unspec going offline.";
     }
 
+    public String caseProceedsInCaseman() {
+        return withRpaPrefix("Case Proceeds in Caseman.");
+    }
+
+    public String inMediation() {
+        return "IN MEDIATION";
+    }
+
     public String unrepresentedDefendant(String prefix, String defendantName) {
         return formatRpa("%sUnrepresented defendant: %s", prefix, defendantName);
     }
