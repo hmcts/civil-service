@@ -86,6 +86,7 @@ import uk.gov.hmcts.reform.civil.service.robotics.strategy.DefaultJudgmentEventC
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.DefendantNoCDeadlineContributor;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.MediationEventContributor;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.EventHistoryContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.RespondentCounterClaimContributor;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.RespondentLitigationFriendContributor;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.SdoNotDrawnContributor;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.JudgmentByAdmissionContributor;
@@ -105,6 +106,7 @@ import uk.gov.hmcts.reform.civil.service.robotics.strategy.UnrepresentedDefendan
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsManualOfflineSupport;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextFormatter;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsPartyLookup;
+import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsRespondentResponseSupport;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenerator;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsTimelineHelper;
 import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
@@ -167,6 +169,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     EventHistoryMapper.class,
     RoboticsTimelineHelper.class,
     RoboticsEventTextFormatter.class,
+    RoboticsRespondentResponseSupport.class,
     RoboticsPartyLookup.class,
     RoboticsSequenceGenerator.class,
     ClaimIssuedEventContributor.class,
@@ -201,6 +204,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     MediationEventContributor.class,
     CaseNotesContributor.class,
     SpecRejectRepaymentPlanContributor.class,
+    RespondentCounterClaimContributor.class,
     RoboticsManualOfflineSupport.class
 })
 class EventHistoryMapperTest {

@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextFormatter;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenerator;
+import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsRespondentResponseSupport;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsTimelineHelper;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.EventHistoryContributor;
 
@@ -75,6 +76,7 @@ public class EventHistoryMapper {
     private final RoboticsTimelineHelper timelineHelper;
     private final RoboticsEventTextFormatter textFormatter;
     private final RoboticsSequenceGenerator sequenceGenerator;
+    private final RoboticsRespondentResponseSupport respondentResponseSupport;
     private final List<EventHistoryContributor> eventHistoryContributors;
     public static final String BS_REF = "Breathing space reference";
     public static final String BS_START_DT = "actual start date";
@@ -114,9 +116,6 @@ public class EventHistoryMapper {
                         break;
                     case PART_ADMISSION:
                         buildRespondentPartAdmission(builder, caseData);
-                        break;
-                    case COUNTER_CLAIM:
-                        buildRespondentCounterClaim(builder, caseData);
                         break;
                     // AWAITING_RESPONSES states would only happen in 1v2 diff sol after 1 defendant responses.
                     // These states will not show in the history mapper after the second defendant response.
@@ -360,59 +359,7 @@ public class EventHistoryMapper {
     }
 
     public String prepareRespondentResponseText(CaseData caseData, Party respondent, boolean isRespondent1) {
-        MultiPartyScenario scenario = getMultiPartyScenario(caseData);
-        String defaultText = "";
-        if (scenario.equals(ONE_V_ONE) || scenario.equals(TWO_V_ONE)) {
-            if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-                var responseTypeForSpec = scenario.equals(TWO_V_ONE)
-                    ? (YES.equals(caseData.getDefendantSingleResponseToBothClaimants())
-                    ? caseData.getRespondent1ClaimResponseTypeForSpec()
-                    : caseData.getClaimant1ClaimResponseTypeForSpec())
-                    : caseData.getRespondent1ClaimResponseTypeForSpec();
-
-                switch (responseTypeForSpec) {
-                    case COUNTER_CLAIM:
-                        defaultText = textFormatter.defendantRejectsAndCounterClaims();
-                        break;
-                    case FULL_ADMISSION:
-                        defaultText = textFormatter.defendantFullyAdmits();
-                        break;
-                    case PART_ADMISSION:
-                        defaultText = textFormatter.defendantPartialAdmission();
-                        break;
-                    default:
-                        break;
-                }
-            } else {
-                switch (caseData.getRespondent1ClaimResponseType()) {
-                    case COUNTER_CLAIM:
-                        defaultText = textFormatter.defendantRejectsAndCounterClaims();
-                        break;
-                    case FULL_ADMISSION:
-                        defaultText = textFormatter.defendantFullyAdmits();
-                        break;
-                    case PART_ADMISSION:
-                        defaultText = textFormatter.defendantPartialAdmission();
-                        break;
-                    default:
-                        break;
-                }
-            }
-        } else {
-            String paginatedMessage = "";
-            if (scenario.equals(ONE_V_TWO_ONE_LEGAL_REP)) {
-                paginatedMessage = getPaginatedMessageFor1v2SameSolicitor(caseData, isRespondent1);
-            }
-            defaultText = textFormatter.formatRpa(
-                "%sDefendant: %s has responded: %s",
-                paginatedMessage,
-                respondent.getPartyName(),
-                SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
-                    ? getResponseTypeForRespondentSpec(caseData, respondent)
-                    : getResponseTypeForRespondent(caseData, respondent)
-            );
-        }
-        return defaultText;
+        return respondentResponseSupport.prepareRespondentResponseText(caseData, respondent, isRespondent1);
     }
 
     private int prepareEventSequence(EventHistory history) {
@@ -594,17 +541,7 @@ public class EventHistoryMapper {
     }
 
     private String getPaginatedMessageFor1v2SameSolicitor(CaseData caseData, boolean isRespondent1) {
-        int index = 1;
-        LocalDateTime respondent1ResponseDate = caseData.getRespondent1ResponseDate();
-        LocalDateTime respondent2ResponseDate = caseData.getRespondent2ResponseDate();
-        if (respondent1ResponseDate != null && respondent2ResponseDate != null) {
-            index = isRespondent1 ? 1 : 2;
-        }
-        return format(
-            "[%d of 2 - %s] ",
-            index,
-            timelineHelper.now().toLocalDate().toString()
-        );
+        return respondentResponseSupport.getPaginatedMessageFor1v2SameSolicitor(caseData, isRespondent1);
     }
 
     public String evaluateRespondent2IntentionType(CaseData caseData) {
@@ -761,48 +698,6 @@ public class EventHistoryMapper {
                 ));
         }
         builder.clearDirectionsQuestionnaireFiled().directionsQuestionnaireFiled(directionsQuestionnaireFiledEvents);
-    }
-
-    private void buildRespondentCounterClaim(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        String miscText;
-        if (defendant1ResponseExists.test(caseData)) {
-            miscText = prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
-            builder.miscellaneous(Event.builder()
-                                .eventSequence(prepareEventSequence(builder.build()))
-                                .eventCode(MISCELLANEOUS.getCode())
-                                .dateReceived(caseData.getRespondent1ResponseDate())
-                                .eventDetailsText(miscText)
-                                .eventDetails(EventDetails.builder()
-                                                  .miscText(miscText)
-                                                  .build())
-                                .build());
-            if (defendant1v2SameSolicitorSameResponse.test(caseData)) {
-                LocalDateTime respondent2ResponseDate = null != caseData.getRespondent2ResponseDate()
-                    ? caseData.getRespondent2ResponseDate() : caseData.getRespondent1ResponseDate();
-                miscText = prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
-                builder.miscellaneous(Event.builder()
-                                    .eventSequence(prepareEventSequence(builder.build()))
-                                    .eventCode(MISCELLANEOUS.getCode())
-                                    .dateReceived(respondent2ResponseDate)
-                                    .eventDetailsText(miscText)
-                                    .eventDetails(EventDetails.builder()
-                                                      .miscText(miscText)
-                                                      .build())
-                                    .build());
-            }
-        }
-        if (defendant2ResponseExists.test(caseData)) {
-            miscText = prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
-            builder.miscellaneous(Event.builder()
-                                .eventSequence(prepareEventSequence(builder.build()))
-                                .eventCode(MISCELLANEOUS.getCode())
-                                .dateReceived(caseData.getRespondent2ResponseDate())
-                                .eventDetailsText(miscText)
-                                .eventDetails(EventDetails.builder()
-                                                  .miscText(miscText)
-                                                  .build())
-                                .build());
-        }
     }
 
     private void buildLrVLipFullDefenceEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData,

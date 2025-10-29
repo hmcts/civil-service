@@ -47,6 +47,7 @@ import uk.gov.hmcts.reform.civil.service.robotics.strategy.DefaultJudgmentEventC
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.DefendantNoCDeadlineContributor;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.MediationEventContributor;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.RespondentLitigationFriendContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.RespondentCounterClaimContributor;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.TakenOfflineAfterClaimDetailsNotifiedContributor;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.TakenOfflineAfterClaimNotifiedContributor;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.TakenOfflinePastApplicantResponseContributor;
@@ -54,9 +55,11 @@ import uk.gov.hmcts.reform.civil.service.robotics.strategy.TakenOfflineByStaffEv
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.UnregisteredDefendantContributor;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.UnrepresentedAndUnregisteredDefendantContributor;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.UnrepresentedDefendantContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.SpecRejectRepaymentPlanContributor;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsManualOfflineSupport;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextFormatter;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsPartyLookup;
+import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsRespondentResponseSupport;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenerator;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsTimelineHelper;
 import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
@@ -91,6 +94,7 @@ import static org.mockito.Mockito.when;
     RoboticsTimelineHelper.class,
     RoboticsEventTextFormatter.class,
     RoboticsPartyLookup.class,
+    RoboticsRespondentResponseSupport.class,
     RoboticsSequenceGenerator.class,
     ClaimIssuedEventContributor.class,
     ClaimDetailsNotifiedEventContributor.class,
@@ -115,6 +119,8 @@ import static org.mockito.Mockito.when;
     CaseProceedsInCasemanContributor.class,
     DefendantNoCDeadlineContributor.class,
     MediationEventContributor.class,
+    RespondentCounterClaimContributor.class,
+    SpecRejectRepaymentPlanContributor.class,
     RoboticsManualOfflineSupport.class
 })
 class EventHistoryGoldenSnapshotTest {
