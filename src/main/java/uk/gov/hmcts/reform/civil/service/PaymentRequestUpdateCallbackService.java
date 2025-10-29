@@ -164,6 +164,7 @@ public class PaymentRequestUpdateCallbackService {
             return switch (feeType) {
                 case HEARING -> CITIZEN_HEARING_FEE_PAYMENT;
                 case CLAIMISSUED -> CITIZEN_CLAIM_ISSUE_PAYMENT;
+                default -> throw new IllegalArgumentException("Unsupported fee type for LiP event: " + feeType);
             };
         } else {
             return switch (feeType) {
@@ -171,6 +172,7 @@ public class PaymentRequestUpdateCallbackService {
                 case CLAIMISSUED -> caseData.getCaseAccessCategory() == CaseCategory.SPEC_CLAIM
                         ? CREATE_CLAIM_SPEC_AFTER_PAYMENT
                         : CREATE_CLAIM_AFTER_PAYMENT;
+                default -> throw new IllegalArgumentException("Unsupported fee type for event: " + feeType);
             };
         }
     }
@@ -208,6 +210,7 @@ public class PaymentRequestUpdateCallbackService {
         return switch (feeType) {
             case HEARING -> caseData.getHearingFeePaymentDetails();
             case CLAIMISSUED -> caseData.getClaimIssuedPaymentDetails();
+            default -> throw new IllegalArgumentException("Unsupported fee type for payment details: " + feeType);
         };
     }
 
@@ -215,6 +218,7 @@ public class PaymentRequestUpdateCallbackService {
         return switch (feeType) {
             case HEARING -> caseData.toBuilder().hearingFeePaymentDetails(paymentDetails).build();
             case CLAIMISSUED -> caseData.toBuilder().claimIssuedPaymentDetails(paymentDetails).build();
+            default -> throw new IllegalArgumentException("Unsupported fee type for case update: " + feeType);
         };
     }
 
