@@ -85,7 +85,8 @@ public class NotificationHandler extends CallbackHandler {
                 .event(Event.builder()
                            .id(startEvent.getEventId())
                            .summary(summary)
-                           .description(errors != null && !errors.isBlank() ? "Errors: " + errors : null)
+                           // Place raw error text into the event comments (description) without any prefix
+                           .description(errors != null && !errors.isBlank() ? errors : null)
                            .build())
                 .data(data)
                 .build();
