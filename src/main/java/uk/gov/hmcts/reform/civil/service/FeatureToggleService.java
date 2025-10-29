@@ -48,10 +48,6 @@ public class FeatureToggleService {
                 );
     }
 
-    public boolean isCaseProgressionEnabled() {
-        return featureToggleApi.isFeatureEnabled("cui-case-progression");
-    }
-
     public boolean isJudgmentOnlineLive() {
         return featureToggleApi.isFeatureEnabled("isJudgmentOnlineLive");
     }
@@ -108,8 +104,7 @@ public class FeatureToggleService {
 
     public boolean isCaseProgressionEnabledAndLocationWhiteListed(String location) {
         return location != null
-            && featureToggleApi.isFeatureEnabledForLocation("case-progression-location-whitelist", location, true)
-            && isCaseProgressionEnabled();
+            && featureToggleApi.isFeatureEnabledForLocation("case-progression-location-whitelist", location, true);
     }
 
     public boolean isGaForLipsEnabledAndLocationWhiteListed(String location) {

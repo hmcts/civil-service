@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
@@ -40,16 +39,12 @@ class BundleUpdatedDefendantNotificationHandlerTest extends BaseCallbackHandlerT
     private DashboardScenariosService dashboardScenariosService;
     @Mock
     private DashboardNotificationsParamsMapper mapper;
-    @Mock
-    private FeatureToggleService toggleService;
 
     @Nested
     class AboutToSubmitCallback {
 
         @Test
         void shouldRecordScenario_whenRespondentNotRepresented() {
-            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
-
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
                 .respondent1Represented(YesOrNo.NO)
                 .build();
@@ -73,8 +68,6 @@ class BundleUpdatedDefendantNotificationHandlerTest extends BaseCallbackHandlerT
 
         @Test
         void shouldRecordScenarioTrialReady_whenRespondentNotRepresented() {
-            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
-
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
                 .respondent1Represented(YesOrNo.NO)
                 .drawDirectionsOrderRequired(YesOrNo.YES)
@@ -100,9 +93,6 @@ class BundleUpdatedDefendantNotificationHandlerTest extends BaseCallbackHandlerT
 
         @Test
         void shouldNotRecordScenario_whenRespondentRepresented() {
-
-            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
-
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
                 .respondent1Represented(YesOrNo.YES)
                 .build();

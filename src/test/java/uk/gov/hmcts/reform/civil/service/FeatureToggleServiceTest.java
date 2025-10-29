@@ -127,15 +127,6 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenCaseProgressionEnabled(Boolean toggleStat) {
-        var caseFileKey = "cui-case-progression";
-        givenToggle(caseFileKey, toggleStat);
-
-        assertThat(featureToggleService.isCaseProgressionEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsJudgmentOnlineLive(Boolean toggleStat) {
         var isJudgmentOnlineLiveKey = "isJudgmentOnlineLive";
         givenToggle(isJudgmentOnlineLiveKey, toggleStat);
@@ -234,7 +225,6 @@ class FeatureToggleServiceTest {
                 location,
                 true
             )).thenReturn(isFeatureEnabled);
-            when(featureToggleService.isCaseProgressionEnabled()).thenReturn(isFeatureEnabled);
         }
 
         boolean result = featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(location);

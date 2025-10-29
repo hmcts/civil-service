@@ -63,18 +63,6 @@ class HearingScheduledDefendantNotificationHandlerTest extends BaseCallbackHandl
     }
 
     @Test
-    void shouldNotCallRecordScenario_whenCaseProgressionIsDisabled() {
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(false);
-
-        CallbackParams callbackParams = CallbackParamsBuilder.builder()
-            .of(ABOUT_TO_SUBMIT, CaseData.builder().build())
-            .build();
-
-        handler.handle(callbackParams);
-        verifyNoInteractions(dashboardScenariosService);
-    }
-
-    @Test
     void shouldReturnCorrectCamundaActivityId_whenInvoked() {
         assertThat(handler.camundaActivityId(
             CallbackParamsBuilder.builder()
@@ -90,7 +78,6 @@ class HearingScheduledDefendantNotificationHandlerTest extends BaseCallbackHandl
         List<LocationRefData> locations = new ArrayList<>();
         locations.add(LocationRefData.builder().siteName("Name").courtAddress("Loc").postcode("1").build());
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(locations);
 
         DynamicListElement location = DynamicListElement.builder().label("Name - Loc - 1").build();
@@ -120,7 +107,6 @@ class HearingScheduledDefendantNotificationHandlerTest extends BaseCallbackHandl
     void doNotCreateDashboardNotifications() {
         List<LocationRefData> locations = new ArrayList<>();
         locations.add(LocationRefData.builder().siteName("Name").courtAddress("Loc").postcode("1").build());
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(locations);
 
         DynamicListElement location = DynamicListElement.builder().label("Name - Loc - 1").build();

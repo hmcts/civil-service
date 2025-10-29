@@ -728,7 +728,6 @@ class CaseEventTaskHandlerTest {
                 return Map.ofEntries(Map.entry("TWO_RESPONDENT_REPRESENTATIVES", true),
                              Map.entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                              Map.entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                             Map.entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
                              Map.entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                              Map.entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
                              Map.entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
@@ -741,7 +740,6 @@ class CaseEventTaskHandlerTest {
                 || state.equals(PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT)) {
                 return Map.ofEntries(Map.entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                                      Map.entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                                     Map.entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
                                      Map.entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                                      Map.entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
                                      Map.entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
@@ -756,7 +754,6 @@ class CaseEventTaskHandlerTest {
                 || state.equals(FULL_DEFENCE_NOT_PROCEED)) {
                 return Map.ofEntries(Map.entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                                      Map.entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                                     Map.entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
                                      Map.entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                                      Map.entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
                                      Map.entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
@@ -769,7 +766,6 @@ class CaseEventTaskHandlerTest {
                 || state.equals(NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION)) {
                 return Map.ofEntries(Map.entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                                      Map.entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                                     Map.entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
                                      Map.entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                                      Map.entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
                                      Map.entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
@@ -782,7 +778,6 @@ class CaseEventTaskHandlerTest {
             } else if (state.equals(FULL_DEFENCE_PROCEED)) {
                 return Map.ofEntries(Map.entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                                      Map.entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                                     Map.entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
                                      Map.entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                                      Map.entry(FlowFlag.MINTI_ENABLED.name(), false),
                                      Map.entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
@@ -796,7 +791,6 @@ class CaseEventTaskHandlerTest {
             }
             Map<String, Boolean> expectedFlags = new HashMap<>();
             expectedFlags.put(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false);
-            expectedFlags.put(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false);
             expectedFlags.put(FlowFlag.BULK_CLAIM_ENABLED.name(), false);
             expectedFlags.put(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false);
             expectedFlags.put(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false);
