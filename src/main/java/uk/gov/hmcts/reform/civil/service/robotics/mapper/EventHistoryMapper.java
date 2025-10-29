@@ -112,7 +112,6 @@ public class EventHistoryMapper {
                         buildRespondentFullDefence(builder, caseData);
                         break;
                     case PART_ADMISSION:
-                        buildRespondentPartAdmission(builder, caseData);
                         break;
                     // AWAITING_RESPONSES states would only happen in 1v2 diff sol after 1 defendant responses.
                     // These states will not show in the history mapper after the second defendant response.
@@ -550,113 +549,6 @@ public class EventHistoryMapper {
             : null;
     }
 
-    private void buildRespondentResponseText(EventHistory.EventHistoryBuilder builder, CaseData caseData, String miscText, LocalDateTime respondentResponseDate) {
-        if (!SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            builder.miscellaneous(Event.builder()
-                                      .eventSequence(prepareEventSequence(builder.build()))
-                                      .eventCode(MISCELLANEOUS.getCode())
-                                      .dateReceived(respondentResponseDate)
-                                      .eventDetailsText(miscText)
-                                      .eventDetails(EventDetails.builder()
-                                                        .miscText(miscText)
-                                                        .build())
-                                      .build());
-        }
-
-    }
-
-    private void buildRespondentPartAdmission(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        String miscText;
-        List<Event> directionsQuestionnaireFiledEvents = new ArrayList<>();
-        if (defendant1ResponseExists.test(caseData)) {
-            final Party respondent1 = caseData.getRespondent1();
-            miscText = prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
-            LocalDateTime respondent1ResponseDate = caseData.getRespondent1ResponseDate();
-            buildMiscellaneousForRespondentResponseLipVSLr(builder, caseData);
-            Respondent1DQ respondent1DQ = caseData.getRespondent1DQ();
-            if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
-                && Objects.nonNull(caseData.getSpecDefenceAdmittedRequired())
-                && caseData.getSpecDefenceAdmittedRequired().equals(YES)) {
-                builder.statesPaid(buildDefenceFiledEvent(
-                    builder,
-                    respondent1ResponseDate,
-                    RESPONDENT_ID,
-                    true
-                ));
-            } else {
-                builder.receiptOfPartAdmission(
-                    Event.builder()
-                        .eventSequence(prepareEventSequence(builder.build()))
-                        .eventCode(RECEIPT_OF_PART_ADMISSION.getCode())
-                        .dateReceived(caseData.getRespondent1ResponseDate())
-                        .litigiousPartyID(RESPONDENT_ID)
-                        .build()
-                );
-            }
-
-            buildRespondentResponseText(builder, caseData, miscText, respondent1ResponseDate);
-
-            directionsQuestionnaireFiledEvents.add(
-                buildDirectionsQuestionnaireFiledEvent(builder, caseData,
-                                                       respondent1ResponseDate,
-                                                       RESPONDENT_ID,
-                                                       respondent1DQ,
-                                                       respondent1,
-                                                       true
-                ));
-            if (defendant1v2SameSolicitorSameResponse.test(caseData)) {
-                final Party respondent2 = caseData.getRespondent2();
-                final Respondent1DQ respondent2DQ = caseData.getRespondent1DQ();
-                LocalDateTime respondent2ResponseDate = null != caseData.getRespondent2ResponseDate()
-                    ? caseData.getRespondent2ResponseDate() : caseData.getRespondent1ResponseDate();
-                miscText = prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
-                builder.receiptOfPartAdmission(
-                    Event.builder()
-                        .eventSequence(prepareEventSequence(builder.build()))
-                        .eventCode(RECEIPT_OF_PART_ADMISSION.getCode())
-                        .dateReceived(respondent2ResponseDate)
-                        .litigiousPartyID(RESPONDENT2_ID)
-                        .build()
-                );
-                buildRespondentResponseText(builder, caseData, miscText, respondent2ResponseDate);
-                directionsQuestionnaireFiledEvents.add(
-                    buildDirectionsQuestionnaireFiledEvent(builder, caseData,
-                                                           respondent2ResponseDate,
-                                                           RESPONDENT2_ID,
-                                                           respondent2DQ,
-                                                           respondent2,
-                                                           true
-                    ));
-            }
-        }
-        if (defendant2ResponseExists.test(caseData)) {
-            miscText = prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
-            Party respondent2 = caseData.getRespondent2();
-            Respondent2DQ respondent2DQ = caseData.getRespondent2DQ();
-            LocalDateTime respondent2ResponseDate = caseData.getRespondent2ResponseDate();
-            builder.receiptOfPartAdmission(
-                Event.builder()
-                    .eventSequence(prepareEventSequence(builder.build()))
-                    .eventCode(RECEIPT_OF_PART_ADMISSION.getCode())
-                    .dateReceived(caseData.getRespondent2ResponseDate())
-                    .litigiousPartyID(RESPONDENT2_ID)
-                    .build()
-            );
-
-            buildRespondentResponseText(builder, caseData, miscText, respondent2ResponseDate);
-
-            directionsQuestionnaireFiledEvents.add(
-                buildDirectionsQuestionnaireFiledEvent(builder, caseData,
-                                                       respondent2ResponseDate,
-                                                       RESPONDENT2_ID,
-                                                       respondent2DQ,
-                                                       respondent2,
-                                                       false
-                ));
-        }
-        builder.clearDirectionsQuestionnaireFiled().directionsQuestionnaireFiled(directionsQuestionnaireFiledEvents);
-    }
-
     private void buildLrVLipFullDefenceEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData,
                                              List<Event> defenceFiledEvents, List<Event> statesPaidEvents) {
         LocalDateTime respondent1ResponseDate = caseData.getRespondent1ResponseDate();
@@ -676,22 +568,6 @@ public class EventHistoryMapper {
                     RESPONDENT_ID,
                     false
                 ));
-        }
-    }
-
-    private void buildMiscellaneousForRespondentResponseLipVSLr(EventHistory.EventHistoryBuilder builder,
-                                                                CaseData caseData) {
-        if (caseData.isLipvLROneVOne()) {
-            builder.miscellaneous(
-                Event.builder()
-                    .eventSequence(prepareEventSequence(builder.build()))
-                    .eventCode(MISCELLANEOUS.getCode())
-                    .dateReceived(timelineHelper.now())
-                .eventDetailsText(textFormatter.lipVsLrFullOrPartAdmissionReceived())
-                    .eventDetails(EventDetails.builder()
-                                      .miscText(textFormatter.lipVsLrFullOrPartAdmissionReceived())
-                                      .build())
-                    .build());
         }
     }
 

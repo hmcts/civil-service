@@ -86,8 +86,9 @@ import uk.gov.hmcts.reform.civil.service.robotics.strategy.DefaultJudgmentEventC
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.DefendantNoCDeadlineContributor;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.MediationEventContributor;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.EventHistoryContributor;
-import uk.gov.hmcts.reform.civil.service.robotics.strategy.RespondentCounterClaimContributor;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.RespondentFullAdmissionContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.RespondentPartAdmissionContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.RespondentCounterClaimContributor;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.RespondentLitigationFriendContributor;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.SdoNotDrawnContributor;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.JudgmentByAdmissionContributor;
@@ -206,6 +207,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     CaseNotesContributor.class,
     SpecRejectRepaymentPlanContributor.class,
     RespondentFullAdmissionContributor.class,
+    RespondentPartAdmissionContributor.class,
     RespondentCounterClaimContributor.class,
     RoboticsManualOfflineSupport.class
 })
