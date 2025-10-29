@@ -1,6 +1,11 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.automatedhearingnotice;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -21,9 +26,12 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UpdateHmcPartiesNotifiedHandler extends CallbackHandler {
+
+    private ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
     private static final List<CaseEvent> EVENTS = List.of(
         CaseEvent.UPDATE_PARTIES_NOTIFIED_HMC
@@ -61,9 +69,33 @@ public class UpdateHmcPartiesNotifiedHandler extends CallbackHandler {
                              .build())
             .build();
 
-        hearingsService.updatePartiesNotifiedResponse(callbackParams.getParams().get(BEARER_TOKEN).toString(),
-                                                      camundaVariables.getHearingId(), camundaVariables.getRequestVersion().intValue(),
-                                                      camundaVariables.getResponseDateTime(), partiesNotified);
+        Long ccdCaseReference = caseData.getCcdCaseReference();
+        String hearingId = camundaVariables.getHearingId();
+
+        try {
+            log.info("Request payload {}, for caseId {} and hearingId {}",
+                     mapper.writeValueAsString(partiesNotified), ccdCaseReference, hearingId);
+
+            ResponseEntity<?> responseEntity = hearingsService.updatePartiesNotifiedResponse(
+                callbackParams.getParams().get(BEARER_TOKEN).toString(),
+                hearingId, camundaVariables.getRequestVersion().intValue(),
+                camundaVariables.getResponseDateTime(), partiesNotified
+            );
+
+            if (responseEntity == null) {
+                log.error("Null response received from HearingsService for caseId {}, hearingId {}", ccdCaseReference, hearingId);
+            } else if (!responseEntity.getStatusCode().is2xxSuccessful()) {
+                log.info("Non-success status from HearingsService for caseId {}, hearingId {}: {} error [{}]",
+                         ccdCaseReference, hearingId, responseEntity.getStatusCode(), responseEntity.getBody());
+            } else {
+                log.info("Successfully updated parties notified for caseId {}, hearingId {} with status {}",
+                         ccdCaseReference, hearingId, responseEntity.getStatusCode());
+            }
+        } catch (org.springframework.web.client.RestClientException | JsonProcessingException ex) {
+            log.error("Failed to call HearingsService.updatePartiesNotifiedResponse for caseId {}, hearingId {}: {}",
+                      ccdCaseReference, hearingId, ex.getMessage(), ex);
+            return AboutToStartOrSubmitCallbackResponse.builder().build();
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
