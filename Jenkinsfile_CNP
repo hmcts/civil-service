@@ -93,6 +93,10 @@ def secrets = [
 env.PACT_BROKER_FULL_URL = 'https://pact-broker.platform.hmcts.net'
 env.EM_CCD_ORCHESTRATOR_URL = 'http://em-ccd-orchestrator-aat.service.core-compute-aat.internal'
 
+def checkForRunAllFunctionalTests(branch_name) {
+  return new GithubAPI(this).getLabelsbyPattern(branch_name, "runAllFunctionalTests").contains("runAllFunctionalTests")
+}
+
 def checkForEnableHelmLabel(branch_name) {
   return new GithubAPI(this).getLabelsbyPattern(branch_name, "pr-values: enableHelm").contains("pr-values: enableHelm")
 }
@@ -173,7 +177,11 @@ withPipeline(type, product, component) {
   }
 
   before('functionalTest:preview') {
-    copyPrevFailedAndNotExecutedTestFilesJson();
+    if(checkForRunAllFunctionalTests(env.BRANCH_NAME)) {
+      env.RUN_ALL_FUNCTIONAL_TESTS = true
+    } else {
+      copyPrevFailedAndNotExecutedTestFilesJson();
+    }
   }
 
   afterAlways('functionalTest:preview') {
