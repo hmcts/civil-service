@@ -88,6 +88,11 @@ import uk.gov.hmcts.reform.civil.service.robotics.strategy.MediationEventContrib
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.EventHistoryContributor;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.RespondentLitigationFriendContributor;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.SdoNotDrawnContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.JudgmentByAdmissionContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.CertificateOfSatisfactionOrCancellationContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.SetAsideJudgmentContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.InterlocutoryJudgmentContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.SummaryJudgmentContributor;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.TakenOfflineAfterClaimDetailsNotifiedContributor;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.TakenOfflineAfterClaimNotifiedContributor;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.TakenOfflinePastApplicantResponseContributor;
@@ -181,6 +186,11 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     TakenOfflineByStaffEventContributor.class,
     TakenOfflineSpecDefendantNocContributor.class,
     SdoNotDrawnContributor.class,
+    InterlocutoryJudgmentContributor.class,
+    SummaryJudgmentContributor.class,
+    JudgmentByAdmissionContributor.class,
+    SetAsideJudgmentContributor.class,
+    CertificateOfSatisfactionOrCancellationContributor.class,
     DefaultJudgmentEventContributor.class,
     GeneralApplicationStrikeOutContributor.class,
     ClaimantResponseContributor.class,
@@ -9193,59 +9203,6 @@ class EventHistoryMapperTest {
                     .asList().containsExactly(expectedEvent);
             }
         }
-    }
-
-    @Test
-    void shouldCalculateAmountOfJudgmentForAdmission_WithInterest() {
-        // Arrange
-        CaseData caseData = mock(CaseData.class);
-        CCJPaymentDetails ccjPaymentDetails = mock(CCJPaymentDetails.class);
-        when(caseData.getCcjPaymentDetails()).thenReturn(ccjPaymentDetails);
-        when(ccjPaymentDetails.getCcjJudgmentAmountClaimAmount()).thenReturn(BigDecimal.valueOf(1000));
-        when(caseData.getTotalInterest()).thenReturn(BigDecimal.valueOf(200));
-        when(caseData.isLipvLipOneVOne()).thenReturn(false);
-
-        // Act
-        BigDecimal result = mapper.getAmountOfJudgmentForAdmission(caseData);
-
-        // Assert
-        assertEquals(BigDecimal.valueOf(1200).setScale(2), result);
-    }
-
-    @Test
-    void shouldCalculateAmountOfJudgmentForAdmission_LipVLipScenario() {
-        // Arrange
-        CaseData caseData = mock(CaseData.class);
-        CCJPaymentDetails ccjPaymentDetails = mock(CCJPaymentDetails.class);
-        when(caseData.getCcjPaymentDetails()).thenReturn(ccjPaymentDetails);
-        when(ccjPaymentDetails.getCcjJudgmentAmountClaimAmount()).thenReturn(BigDecimal.valueOf(1000));
-        when(ccjPaymentDetails.getCcjJudgmentLipInterest()).thenReturn(BigDecimal.valueOf(150));
-        when(caseData.isLipvLipOneVOne()).thenReturn(true);
-        when(caseData.isPartAdmitClaimSpec()).thenReturn(false);
-
-        // Act
-        BigDecimal result = mapper.getAmountOfJudgmentForAdmission(caseData);
-
-        // Assert
-        assertEquals(BigDecimal.valueOf(1150).setScale(2), result);
-    }
-
-    @Test
-    void shouldCalculateAmountOfJudgmentWithoutInterestForPartAdmission_LipVLipScenario() {
-        // Arrange
-        CaseData caseData = mock(CaseData.class);
-        CCJPaymentDetails ccjPaymentDetails = mock(CCJPaymentDetails.class);
-        when(caseData.getCcjPaymentDetails()).thenReturn(ccjPaymentDetails);
-        when(ccjPaymentDetails.getCcjJudgmentAmountClaimAmount()).thenReturn(BigDecimal.valueOf(1000));
-        when(ccjPaymentDetails.getCcjJudgmentLipInterest()).thenReturn(BigDecimal.valueOf(150));
-        when(caseData.isLipvLipOneVOne()).thenReturn(true);
-        when(caseData.isPartAdmitClaimSpec()).thenReturn(true);
-
-        // Act
-        BigDecimal result = mapper.getAmountOfJudgmentForAdmission(caseData);
-
-        // Assert
-        assertEquals(BigDecimal.valueOf(1000).setScale(2), result);
     }
 
     @Nested
