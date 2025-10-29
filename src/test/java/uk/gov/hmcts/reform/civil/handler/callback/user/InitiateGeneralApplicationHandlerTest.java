@@ -1144,7 +1144,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSetAddPbaNumbers_whenCalledAndOrgExistsInPrd() {
-            given(feesService.getFeeForGA(any()))
+            given(feesService.getFeeForGA(any(CaseData.class)))
                     .willReturn(Fee.builder().code(FEE_CODE).calculatedAmountInPence(fee108)
                             .version(FEE_VERSION).build());
             CaseData caseData = CaseDataBuilder.builder().ccdCaseReference(1234L).atStateClaimDraft().build();
@@ -1157,7 +1157,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotResultInErrors_whenCalledAndOrgDoesNotExistInPrd() {
-            given(feesService.getFeeForGA(any()))
+            given(feesService.getFeeForGA(any(CaseData.class)))
                     .willReturn(Fee.builder()
                             .code(FEE_CODE)
                             .calculatedAmountInPence(fee108)
@@ -1176,7 +1176,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnNoError_whenNoOrgDetailsObtained() {
-            given(feesService.getFeeForGA(any()))
+            given(feesService.getFeeForGA(any(CaseData.class)))
                     .willReturn(Fee.builder()
                             .code(FEE_CODE)
                             .calculatedAmountInPence(fee108)
@@ -1192,7 +1192,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSet108Fees_whenApplicationIsConsented() {
-            given(feesService.getFeeForGA(any()))
+            given(feesService.getFeeForGA(any(CaseData.class)))
                     .willReturn(Fee.builder()
                             .code(FEE_CODE)
                             .calculatedAmountInPence(fee108)
@@ -1210,7 +1210,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSet108Fees_whenApplicationIsUnConsentedWithoutNotice() {
-            given(feesService.getFeeForGA(any()))
+            given(feesService.getFeeForGA(any(CaseData.class)))
                     .willReturn(Fee.builder()
                             .code(FEE_CODE)
                             .calculatedAmountInPence(fee108)
@@ -1228,7 +1228,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSet275Fees_whenApplicationIsUnConsentedWithNotice() {
-            given(feesService.getFeeForGA(any()))
+            given(feesService.getFeeForGA(any(CaseData.class)))
                     .willReturn(Fee.builder()
                             .code(FEE_CODE)
                             .calculatedAmountInPence(fee275)
@@ -1246,7 +1246,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSet275Fees_whenVaryApplicationIsUnConsented() {
-            given(feesService.getFeeForGA(any()))
+            given(feesService.getFeeForGA(any(CaseData.class)))
                     .willReturn(Fee.builder()
                             .code(FEE_CODE)
                             .calculatedAmountInPence(fee275)
@@ -1271,7 +1271,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldSet275Fees_whenVaryApplicationIsUnConsentedCoscEnabled() {
             //Add cosc tests
-            given(feesService.getFeeForGA(any()))
+            given(feesService.getFeeForGA(any(CaseData.class)))
                 .willReturn(Fee.builder()
                                 .code(FEE_CODE)
                                 .calculatedAmountInPence(fee275)
@@ -1301,7 +1301,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSet14Fees_whenApplicationIsVaryOrder() {
-            given(feesService.getFeeForGA(any()))
+            given(feesService.getFeeForGA(any(CaseData.class)))
                 .willReturn(Fee.builder()
                                 .code(FEE_CODE)
                                 .calculatedAmountInPence(fee14)
@@ -1323,7 +1323,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSet14Fees_whenApplicationIsVaryOrderCoscEnabled() {
-            given(feesService.getFeeForGA(any()))
+            given(feesService.getFeeForGA(any(CaseData.class)))
                 .willReturn(Fee.builder()
                                 .code(FEE_CODE)
                                 .calculatedAmountInPence(fee14)
@@ -1350,7 +1350,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSet14Fees_whenApplicationIsVaryOrderWithMultipleTypes() {
-            given(feesService.getFeeForGA(any()))
+            given(feesService.getFeeForGA(any(CaseData.class)))
                 .willReturn(Fee.builder()
                                 .code(FEE_CODE)
                                 .calculatedAmountInPence(fee14).build());
@@ -1372,7 +1372,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSet14Fees_whenApplicationIsVaryOrderWithMultipleTypesCoscEnabled() {
-            given(feesService.getFeeForGA(any()))
+            given(feesService.getFeeForGA(any(CaseData.class)))
                 .willReturn(Fee.builder()
                                 .code(FEE_CODE)
                                 .calculatedAmountInPence(fee14).build());
@@ -1430,7 +1430,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         void shouldSetAppropriateFees_whenFeesAreUnsetByCCD() {
             CaseData caseData = GeneralApplicationDetailsBuilder.builder()
                     .getTestCaseData(CaseData.builder().build());
-            when(feesService.getFeeForGA(any())).thenReturn(feeFromFeeService);
+            when(feesService.getFeeForGA(any(CaseData.class))).thenReturn(feeFromFeeService);
             when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
                     .email(APPLICANT_EMAIL_ID_CONSTANT)
                     .build());
@@ -1494,7 +1494,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
             CaseData caseData = GeneralApplicationDetailsBuilder.builder()
                 .getTestCaseDataWithEmptyPreferredLocation(CaseData.builder().ccdCaseReference(1234L).build());
-            when(feesService.getFeeForGA(any())).thenReturn(feeFromFeeService);
+            when(feesService.getFeeForGA(any(CaseData.class))).thenReturn(feeFromFeeService);
             when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
                                                                         .email(APPLICANT_EMAIL_ID_CONSTANT)
                                                                         .build());

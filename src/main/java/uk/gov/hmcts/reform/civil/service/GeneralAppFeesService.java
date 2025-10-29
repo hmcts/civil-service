@@ -92,6 +92,15 @@ public class GeneralAppFeesService {
         );
     }
 
+    public Fee getFeeForGA(GeneralApplicationCaseData caseData) {
+        return getFeeForGA(
+            caseData.getGeneralAppType().getTypes(),
+            getRespondentAgreed(caseData),
+            getInformOtherParty(caseData),
+            getHearingDate(caseData)
+        );
+    }
+
     public Fee getFeeForGA(GeneralApplication generalApplication, LocalDate hearingScheduledDate) {
         return getFeeForGA(
             generalApplication.getGeneralAppType().getTypes(),
@@ -148,7 +157,7 @@ public class GeneralAppFeesService {
         return result;
     }
 
-    protected Fee getFeeForGA(String keyword, String event, String service) {
+    public Fee getFeeForGA(String keyword, String event, String service) {
         if (Objects.isNull(event)) {
             event = feesConfiguration.getEvent();
         }
@@ -239,6 +248,13 @@ public class GeneralAppFeesService {
             .orElse(null);
     }
 
+    protected Boolean getRespondentAgreed(GeneralApplicationCaseData caseData) {
+        return Optional.ofNullable(caseData.getGeneralAppRespondentAgreement())
+            .map(GARespondentOrderAgreement::getHasAgreed)
+            .map(hasAgreed -> hasAgreed == YES)
+            .orElse(null);
+    }
+
     protected Boolean getRespondentAgreed(GeneralApplication generalApplication) {
         return Optional.ofNullable(generalApplication.getGeneralAppRespondentAgreement())
             .map(GARespondentOrderAgreement::getHasAgreed)
@@ -253,6 +269,13 @@ public class GeneralAppFeesService {
             .orElse(null);
     }
 
+    protected Boolean getInformOtherParty(GeneralApplicationCaseData caseData) {
+        return Optional.ofNullable(caseData.getGeneralAppInformOtherParty())
+            .map(GAInformOtherParty::getIsWithNotice)
+            .map(isWithNotice -> isWithNotice == YES)
+            .orElse(null);
+    }
+
     protected Boolean getInformOtherParty(GeneralApplication generalApplication) {
         return Optional.ofNullable(generalApplication.getGeneralAppInformOtherParty())
             .map(GAInformOtherParty::getIsWithNotice)
@@ -261,6 +284,12 @@ public class GeneralAppFeesService {
     }
 
     protected LocalDate getHearingDate(CaseData caseData) {
+        return Optional.ofNullable(caseData.getGeneralAppHearingDate())
+            .map(GAHearingDateGAspec::getHearingScheduledDate)
+            .orElse(null);
+    }
+
+    protected LocalDate getHearingDate(GeneralApplicationCaseData caseData) {
         return Optional.ofNullable(caseData.getGeneralAppHearingDate())
             .map(GAHearingDateGAspec::getHearingScheduledDate)
             .orElse(null);
