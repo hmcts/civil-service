@@ -39,7 +39,10 @@ import uk.gov.hmcts.reform.civil.service.robotics.strategy.ClaimDetailsNotifiedE
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.ClaimDismissedPastDeadlineContributor;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.ClaimDismissedPastNotificationsContributor;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.ClaimIssuedEventContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.GeneralApplicationStrikeOutContributor;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.ClaimNotifiedEventContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.ClaimantResponseContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.ConsentExtensionEventContributor;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.DefaultJudgmentEventContributor;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.DefendantNoCDeadlineContributor;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.MediationEventContributor;
@@ -106,6 +109,9 @@ import static org.mockito.Mockito.when;
     TakenOfflinePastApplicantResponseContributor.class,
     TakenOfflineByStaffEventContributor.class,
     DefaultJudgmentEventContributor.class,
+    ConsentExtensionEventContributor.class,
+    GeneralApplicationStrikeOutContributor.class,
+    ClaimantResponseContributor.class,
     CaseProceedsInCasemanContributor.class,
     DefendantNoCDeadlineContributor.class,
     MediationEventContributor.class,
