@@ -92,9 +92,9 @@ class NotificationHandlerTest extends BaseCallbackHandlerTest {
             ArgumentCaptor<CaseDataContent> captor = ArgumentCaptor.forClass(CaseDataContent.class);
             verify(coreCaseDataService).submitUpdate(eq(caseData.getCcdCaseReference().toString()), captor.capture());
             CaseDataContent submitted = captor.getValue();
-            // summary equals activity id; description prefixed with Errors:
+            // summary equals activity id; description contains raw error text (no prefix)
             org.assertj.core.api.Assertions.assertThat(submitted.getEvent().getSummary()).isEqualTo(TASK_ID);
-            org.assertj.core.api.Assertions.assertThat(submitted.getEvent().getDescription()).isEqualTo("Errors: Failed to send email");
+            org.assertj.core.api.Assertions.assertThat(submitted.getEvent().getDescription()).isEqualTo("Failed to send email");
         }
     }
 }
