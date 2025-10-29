@@ -193,7 +193,7 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
             caseData.getCcdCaseReference().toString(),
             "CLAIMANT"
         );
-        if (getFeatureToggleService().isGaForLipsEnabledAndLocationWhiteListed(caseData
+        if (getFeatureToggleService().isLocationWhiteListed(caseData
                                                                                    .getCaseManagementLocation()
                                                                                    .getBaseLocation())
             || getFeatureToggleService().isCuiGaNroEnabled()) {

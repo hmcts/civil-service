@@ -154,9 +154,9 @@ public class InitiateGeneralApplicationService {
     }
 
     private boolean isLipCase(CaseData caseData, CaseAssignmentUserRolesResource userRoles) {
-        log.info("Checking isLipCase for case: {} and application feature is enabled {}", caseData.getCcdCaseReference(), featureToggleService.isGaForLipsEnabled());
-        if (featureToggleService.isGaForLipsEnabled() && (caseData.isRespondent1LiP() || caseData.isRespondent2LiP()
-            || caseData.isApplicantNotRepresented())) {
+        log.info("Checking isLipCase for case: {}", caseData.getCcdCaseReference());
+        if (caseData.isRespondent1LiP() || caseData.isRespondent2LiP()
+            || caseData.isApplicantNotRepresented()) {
 
             for (String lipRole : lipCaseRole) {
                 if (userRoles.getCaseAssignmentUserRoles() != null && userRoles.getCaseAssignmentUserRoles().size() > 1
@@ -311,7 +311,7 @@ public class InitiateGeneralApplicationService {
     }
 
     private void setCaseManagementLocation(CaseData caseData, String authToken, GeneralApplication.GeneralApplicationBuilder applicationBuilder) {
-        if (featureToggleService.isGaForLipsEnabled() && caseContainsLiP(caseData) && hasSDOBeenMade(caseData)) {
+        if (caseContainsLiP(caseData) && hasSDOBeenMade(caseData)) {
             setLocationDetails(caseData, authToken, applicationBuilder);
         } else {
             setDefaultLocation(caseData, authToken, applicationBuilder);
@@ -388,11 +388,9 @@ public class InitiateGeneralApplicationService {
     }
 
     private void setFeatureToggles(CaseData caseData, GeneralApplication.GeneralApplicationBuilder applicationBuilder) {
-        if (featureToggleService.isGaForLipsEnabled()) {
-            applicationBuilder.isGaApplicantLip(NO).isGaRespondentOneLip(NO).isGaRespondentTwoLip(NO);
-            if (caseData.isRespondent1LiP() || caseData.isRespondent2LiP() || caseData.isApplicantNotRepresented()) {
-                applicationBuilder.generalAppSubmittedDateGAspec(time.now());
-            }
+        applicationBuilder.isGaApplicantLip(NO).isGaRespondentOneLip(NO).isGaRespondentTwoLip(NO);
+        if (caseData.isRespondent1LiP() || caseData.isRespondent2LiP() || caseData.isApplicantNotRepresented()) {
+            applicationBuilder.generalAppSubmittedDateGAspec(time.now());
         }
         if (caseData.getGeneralAppType().getTypes().contains(GeneralApplicationTypes.CONFIRM_CCJ_DEBT_PAID)) {
             if (Objects.nonNull(caseData.getCertOfSC().getDebtPaymentEvidence()) && Objects.nonNull(caseData.getCertOfSC().getDebtPaymentEvidence().getDebtPaymentOption())) {
