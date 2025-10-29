@@ -22,6 +22,9 @@ import uk.gov.hmcts.reform.civil.model.robotics.NoticeOfChange;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseDataSpec;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
+import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsCaseDataSupport;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsPartyLookup;
 
 import java.math.BigDecimal;
@@ -38,8 +41,6 @@ class RoboticsDataMapperForSpecTest {
     private RoboticsDataMapperForSpec mapper;
 
     @Mock
-    private RoboticsAddressMapper addressMapper;
-    @Mock
     private EventHistoryMapper eventHistoryMapper;
     @Mock
     private OrganisationService organisationService;
@@ -47,6 +48,9 @@ class RoboticsDataMapperForSpecTest {
     private FeatureToggleService featureToggleService;
     @Spy
     private RoboticsPartyLookup partyLookup = new RoboticsPartyLookup();
+    @Spy
+    private RoboticsCaseDataSupport caseDataSupport =
+        new RoboticsCaseDataSupport(new RoboticsAddressMapper(new AddressLinesMapper()), partyLookup);
     private static final String BEARER_TOKEN = "Bearer Token";
 
     @Test

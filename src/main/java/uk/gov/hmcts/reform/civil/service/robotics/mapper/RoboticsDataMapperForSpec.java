@@ -3,36 +3,26 @@ package uk.gov.hmcts.reform.civil.service.robotics.mapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.ccd.model.Organisation;
-import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
-import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.LitigationFriend;
-import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.robotics.CaseHeader;
 import uk.gov.hmcts.reform.civil.model.robotics.ClaimDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.LitigiousParty;
-import uk.gov.hmcts.reform.civil.model.robotics.RoboticsAddresses;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseDataSpec;
 import uk.gov.hmcts.reform.civil.model.robotics.Solicitor;
-import uk.gov.hmcts.reform.civil.prd.model.ContactInformation;
-import uk.gov.hmcts.reform.civil.prd.model.DxAddress;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsCaseDataSupport;
+import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsCaseDataSupport.SolicitorData;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsPartyLookup;
 import uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil;
-import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
 
-import static io.jsonwebtoken.lang.Collections.isEmpty;
 import static java.time.format.DateTimeFormatter.ISO_DATE;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
@@ -53,7 +43,7 @@ import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.
 @RequiredArgsConstructor
 public class RoboticsDataMapperForSpec {
 
-    private final RoboticsAddressMapper addressMapper;
+    private final RoboticsCaseDataSupport caseDataSupport;
     private final EventHistoryMapper eventHistoryMapper;
     private final OrganisationService organisationService;
     private final FeatureToggleService featureToggleService;
@@ -118,134 +108,75 @@ public class RoboticsDataMapperForSpec {
     }
 
     private Solicitor buildRespondentSolicitor(CaseData caseData) {
-        Solicitor.SolicitorBuilder<?, ?> solicitorBuilder = Solicitor.builder();
-        Optional<String> organisationId = getOrganisationId(caseData.getRespondent1OrganisationPolicy());
-        var organisationDetails = ofNullable(
-            caseData.getRespondentSolicitor1OrganisationDetails()
-        );
+        Optional<String> organisationId = caseDataSupport.organisationId(caseData.getRespondent1OrganisationPolicy());
+        var organisationDetails = ofNullable(caseData.getRespondentSolicitor1OrganisationDetails());
         if (organisationId.isEmpty() && organisationDetails.isEmpty()) {
             return null;
         }
-        var solicitorEmail = ofNullable(
-            caseData.getRespondentSolicitor1EmailAddress()
+        var solicitorEmail = ofNullable(caseData.getRespondentSolicitor1EmailAddress());
+        return caseDataSupport.buildSolicitor(
+            SolicitorData.builder()
+                .id(RoboticsDataUtil.RESPONDENT_SOLICITOR_ID)
+                .isPayee(false)
+                .organisationId(organisationId.orElse(null))
+                .contactEmailAddress(solicitorEmail.orElse(null))
+                .reference(ofNullable(caseData.getSolicitorReferences())
+                    .map(SolicitorReferences::getRespondentSolicitor1Reference)
+                    .orElse(null))
+                .serviceAddress(caseData.getSpecRespondentCorrespondenceAddressdetails())
+                .organisation(organisationId
+                    .flatMap(organisationService::findOrganisationById)
+                    .orElse(null))
+                .organisationDetails(organisationDetails.orElse(null))
+                .build()
         );
-        solicitorBuilder
-            .id(RoboticsDataUtil.RESPONDENT_SOLICITOR_ID)
-            .isPayee(false)
-            .organisationId(organisationId.orElse(null))
-            .contactEmailAddress(solicitorEmail.orElse(null))
-            .reference(ofNullable(caseData.getSolicitorReferences())
-                .map(SolicitorReferences::getRespondentSolicitor1Reference)
-                .map(partyLookup::truncateReference)
-                .orElse(null)
-            );
-        organisationId
-            .flatMap(organisationService::findOrganisationById)
-            .ifPresent(buildOrganisation(solicitorBuilder,
-                caseData.getSpecRespondentCorrespondenceAddressdetails()));
-
-        organisationDetails.ifPresent(buildOrganisationDetails(solicitorBuilder));
-
-        return solicitorBuilder.build();
     }
 
     private Solicitor buildRespondent2Solicitor(CaseData caseData) {
-        Solicitor.SolicitorBuilder<?, ?> solicitorBuilder = Solicitor.builder();
-        Optional<String> organisationId = getOrganisationId(caseData.getRespondent2OrganisationPolicy());
+        Optional<String> organisationId = caseDataSupport.organisationId(caseData.getRespondent2OrganisationPolicy());
 
-        var organisationDetails = ofNullable(
-            caseData.getRespondentSolicitor2OrganisationDetails()
-        );
+        var organisationDetails = ofNullable(caseData.getRespondentSolicitor2OrganisationDetails());
         if (organisationId.isEmpty() && organisationDetails.isEmpty()) {
             return null;
         }
-        solicitorBuilder
-            .id(RoboticsDataUtil.RESPONDENT2_SOLICITOR_ID)
-            .isPayee(false)
-            .organisationId(organisationId.orElse(null))
-            .reference(ofNullable(caseData.getSolicitorReferences())
-                .map(SolicitorReferences::getRespondentSolicitor2Reference)
-                .map(partyLookup::truncateReference)
-                .orElse(null)
-            );
-
-        organisationId
-            .flatMap(organisationService::findOrganisationById)
-            .ifPresent(buildOrganisation(solicitorBuilder,
-                caseData.getSpecRespondent2CorrespondenceAddressdetails()));
-
-        organisationDetails.ifPresent(buildOrganisationDetails(solicitorBuilder));
-
-        return solicitorBuilder.build();
-    }
-
-    private Consumer<uk.gov.hmcts.reform.civil.prd.model.Organisation> buildOrganisation(
-        Solicitor.SolicitorBuilder<?, ?> solicitorBuilder, Address providedServiceAddress
-    ) {
-        return organisation -> {
-            List<ContactInformation> contactInformation = organisation.getContactInformation();
-            solicitorBuilder
-                .name(organisation.getName())
-                .addresses(fromProvidedAddress(contactInformation, providedServiceAddress))
-                .contactDX(getContactDX(contactInformation));
-        };
-    }
-
-    private RoboticsAddresses fromProvidedAddress(List<ContactInformation> contactInformation, Address provided) {
-        return Optional.ofNullable(provided)
-            .map(address -> addressMapper.toRoboticsAddresses(provided))
-            .orElse(addressMapper.toRoboticsAddresses(contactInformation));
-    }
-
-    private String getContactDX(List<ContactInformation> contactInformation) {
-        if (isEmpty(contactInformation)) {
-            return null;
-        }
-        List<DxAddress> dxAddresses = contactInformation.get(0).getDxAddress();
-        return isEmpty(dxAddresses) ? null : dxAddresses.get(0).getDxNumber();
-    }
-
-    private Optional<String> getOrganisationId(OrganisationPolicy respondent1OrganisationPolicy) {
-        return ofNullable(respondent1OrganisationPolicy)
-            .map(OrganisationPolicy::getOrganisation)
-            .map(Organisation::getOrganisationID);
-    }
-
-    private Consumer<SolicitorOrganisationDetails> buildOrganisationDetails(
-        Solicitor.SolicitorBuilder<?, ?> solicitorBuilder
-    ) {
-        return organisationDetails ->
-            solicitorBuilder
-                .name(organisationDetails.getOrganisationName())
-                .contactTelephoneNumber(organisationDetails.getPhoneNumber())
-                .contactFaxNumber(organisationDetails.getFax())
-                .contactDX(organisationDetails.getDx())
-                .contactEmailAddress(organisationDetails.getEmail())
-                .addresses(addressMapper.toRoboticsAddresses(organisationDetails.getAddress()));
+        return caseDataSupport.buildSolicitor(
+            SolicitorData.builder()
+                .id(RoboticsDataUtil.RESPONDENT2_SOLICITOR_ID)
+                .isPayee(false)
+                .organisationId(organisationId.orElse(null))
+                .reference(ofNullable(caseData.getSolicitorReferences())
+                    .map(SolicitorReferences::getRespondentSolicitor2Reference)
+                    .orElse(null))
+                .serviceAddress(caseData.getSpecRespondent2CorrespondenceAddressdetails())
+                .organisation(organisationId
+                    .flatMap(organisationService::findOrganisationById)
+                    .orElse(null))
+                .organisationDetails(organisationDetails.orElse(null))
+                .build()
+        );
     }
 
     private Solicitor buildApplicantSolicitor(CaseData caseData) {
-        if (featureToggleService.isLipVLipEnabled() && (caseData.isLipvLipOneVOne() || NO.equals(caseData.getApplicant1Represented()))) {
+        if (featureToggleService.isLipVLipEnabled()
+            && (caseData.isLipvLipOneVOne() || NO.equals(caseData.getApplicant1Represented()))) {
             return null;
         }
-        Optional<String> organisationId = getOrganisationId(caseData.getApplicant1OrganisationPolicy());
-        var providedServiceAddress = caseData.getSpecApplicantCorrespondenceAddressdetails();
-        Solicitor.SolicitorBuilder<?, ?> solicitorBuilder = Solicitor.builder()
-            .id(RoboticsDataUtil.APPLICANT_SOLICITOR_ID)
-            .isPayee(true)
-            .organisationId(organisationId.orElse(null))
-            .contactEmailAddress(caseData.getApplicantSolicitor1UserDetails().getEmail())
-            .reference(ofNullable(caseData.getSolicitorReferences())
-                .map(SolicitorReferences::getApplicantSolicitor1Reference)
-                .map(partyLookup::truncateReference)
-                .orElse(null)
-            );
-
-        organisationId
-            .flatMap(organisationService::findOrganisationById)
-            .ifPresent(buildOrganisation(solicitorBuilder, providedServiceAddress));
-
-        return solicitorBuilder.build();
+        Optional<String> organisationId = caseDataSupport.organisationId(caseData.getApplicant1OrganisationPolicy());
+        return caseDataSupport.buildSolicitor(
+            SolicitorData.builder()
+                .id(RoboticsDataUtil.APPLICANT_SOLICITOR_ID)
+                .isPayee(true)
+                .organisationId(organisationId.orElse(null))
+                .contactEmailAddress(caseData.getApplicantSolicitor1UserDetails().getEmail())
+                .reference(ofNullable(caseData.getSolicitorReferences())
+                    .map(SolicitorReferences::getApplicantSolicitor1Reference)
+                    .orElse(null))
+                .serviceAddress(caseData.getSpecApplicantCorrespondenceAddressdetails())
+                .organisation(organisationId
+                    .flatMap(organisationService::findOrganisationById)
+                    .orElse(null))
+                .build()
+        );
     }
 
     private List<LitigiousParty> buildLitigiousParties(CaseData caseData) {
@@ -254,80 +185,53 @@ public class RoboticsDataMapperForSpec {
             ? RESPONDENT_SOLICITOR_ID : null;
 
         var respondentParties = new ArrayList<>(List.of(
-            buildLitigiousParty(
+            caseDataSupport.buildLitigiousParty(
                 caseData.getApplicant1(),
                 caseData.getApplicant1LitigationFriend(),
-                caseData.getApplicant1OrganisationPolicy(),
                 "Claimant",
                 partyLookup.applicantId(0),
                 APPLICANT_SOLICITOR_ID,
+                caseDataSupport.organisationId(caseData.getApplicant1OrganisationPolicy()).orElse(null),
                 dateOfService
             ),
-            buildLitigiousParty(
+            caseDataSupport.buildLitigiousParty(
                 caseData.getRespondent1(),
                 caseData.getRespondent1LitigationFriend(),
-                caseData.getRespondent1OrganisationPolicy(),
                 "Defendant",
                 partyLookup.respondentId(0),
                 respondent1SolicitorId,
+                caseDataSupport.organisationId(caseData.getRespondent1OrganisationPolicy()).orElse(null),
                 dateOfService
             )
         ));
 
         if (caseData.getApplicant2() != null) {
-            respondentParties.add(buildLitigiousParty(
+            respondentParties.add(caseDataSupport.buildLitigiousParty(
                 caseData.getApplicant2(),
                 caseData.getApplicant2LitigationFriend(),
-                caseData.getApplicant2OrganisationPolicy(),
                 "Claimant",
                 partyLookup.applicantId(1),
                 APPLICANT_SOLICITOR_ID,
+                caseDataSupport.organisationId(caseData.getApplicant2OrganisationPolicy()).orElse(null),
                 dateOfService
             ));
         }
 
         if (caseData.getRespondent2() != null) {
-            String respondent2SolicitorId = null;
-            if (caseData.getSpecRespondent2Represented() == YES
-                && caseData.getRespondent2SameLegalRepresentative() == YES) {
-                respondent2SolicitorId = RESPONDENT_SOLICITOR_ID;
-            } else if (caseData.getSpecRespondent2Represented() == YES
-                && caseData.getRespondent2SameLegalRepresentative() == NO) {
-                respondent2SolicitorId = RESPONDENT2_SOLICITOR_ID;
-            }
-            respondentParties.add(buildLitigiousParty(
+            String respondent2SolicitorId = caseDataSupport.resolveRespondentSolicitorId(
+                caseData.getSpecRespondent2Represented(),
+                caseData.getRespondent2SameLegalRepresentative()
+            );
+            respondentParties.add(caseDataSupport.buildLitigiousParty(
                 caseData.getRespondent2(),
                 caseData.getRespondent2LitigationFriend(),
-                caseData.getRespondent2OrganisationPolicy(),
                 "Defendant",
                 partyLookup.respondentId(1),
                 respondent2SolicitorId,
+                caseDataSupport.organisationId(caseData.getRespondent2OrganisationPolicy()).orElse(null),
                 dateOfService
             ));
         }
         return respondentParties;
-    }
-
-    private LitigiousParty buildLitigiousParty(
-        Party party,
-        LitigationFriend litigationFriend,
-        OrganisationPolicy organisationPolicy,
-        String type,
-        String id,
-        String solicitorId,
-        LocalDate dateOfService
-    ) {
-        return LitigiousParty.builder()
-            .id(id)
-            .solicitorID(solicitorId)
-            .type(type)
-            .name(PartyUtils.getLitigiousPartyName(party, litigationFriend))
-            .dateOfBirth(PartyUtils.getDateOfBirth(party).map(d -> d.format(ISO_DATE)).orElse(null))
-            .addresses(addressMapper.toRoboticsAddresses(party.getPrimaryAddress()))
-            .solicitorOrganisationID(getOrganisationId(organisationPolicy).orElse(null))
-            .dateOfService(ofNullable(dateOfService)
-                .map(d -> d.format(ISO_DATE))
-                .orElse(null))
-            .build();
     }
 }

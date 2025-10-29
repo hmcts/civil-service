@@ -51,6 +51,8 @@ import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsManualOfflineS
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextFormatter;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsPartyLookup;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenerator;
+import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsCaseDataSupport;
+import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsRespondentResponseSupport;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsTimelineHelper;
 import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
 import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
@@ -86,11 +88,13 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
     DefendantNoCDeadlineContributor.class,
     MediationEventContributor.class,
     RoboticsManualOfflineSupport.class,
+    RoboticsRespondentResponseSupport.class,
     RoboticsDataMapper.class,
     RoboticsAddressMapper.class,
     AddressLinesMapper.class,
     OrganisationService.class,
-    RoboticsPartyLookup.class
+    RoboticsPartyLookup.class,
+    RoboticsCaseDataSupport.class
 })
 @ExtendWith(SpringExtension.class)
 class RoboticsDataMapperTest {
