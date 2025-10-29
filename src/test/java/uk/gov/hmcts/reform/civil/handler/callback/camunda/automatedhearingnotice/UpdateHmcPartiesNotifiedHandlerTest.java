@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.automatedhearingnotice;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -28,6 +30,7 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 
@@ -42,6 +45,9 @@ class UpdateHmcPartiesNotifiedHandlerTest extends BaseCallbackHandlerTest {
 
     @Mock
     private HearingsService hearingsService;
+
+    @Mock
+    private ObjectMapper mapper;
 
     private CallbackParams buildCallbackParams(CaseData caseData) {
         return CallbackParams.builder()
@@ -66,7 +72,7 @@ class UpdateHmcPartiesNotifiedHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Test
-    void shouldSuccessfullyUpdatePartiesNotified_whenServiceReturns200() {
+    void shouldSuccessfullyUpdatePartiesNotified_whenServiceReturns200() throws JsonProcessingException {
         // Given
         CaseData caseData = CaseData.builder().ccdCaseReference(12345L).build().toBuilder()
             .businessProcess(BusinessProcess.builder().processInstanceId("").build())
@@ -77,23 +83,26 @@ class UpdateHmcPartiesNotifiedHandlerTest extends BaseCallbackHandlerTest {
         when(hearingNoticeCamundaService.getProcessVariables(any())).thenReturn(camundaVars);
         when(hearingsService.updatePartiesNotifiedResponse(anyString(), anyString(), anyInt(), any(), any(PartiesNotified.class)))
             .thenReturn(new ResponseEntity<>(HttpStatus.OK));
+        when(mapper.writeValueAsString(any())).thenReturn("{}");
 
         // When
         var response = handler.handle(params);
 
         // Then
         assertNotNull(response);
+        verify(mapper).writeValueAsString(any(PartiesNotified.class));
         verify(hearingsService).updatePartiesNotifiedResponse(eq("BEARER_TOKEN"), eq("HER1234"), anyInt(), any(), any(PartiesNotified.class));
     }
 
     @Test
-    void shouldLogWarning_whenServiceReturnsNon2xx() {
+    void shouldLogWarning_whenServiceReturnsNon2xx() throws JsonProcessingException {
         CaseData caseData = CaseData.builder().ccdCaseReference(12345L).build().toBuilder()
             .businessProcess(BusinessProcess.builder().processInstanceId("").build())
             .build();
         CallbackParams params = buildCallbackParams(caseData);
         HearingNoticeVariables camundaVars = sampleCamundaVars();
 
+        when(mapper.writeValueAsString(any())).thenReturn("{}");
         when(hearingNoticeCamundaService.getProcessVariables(any())).thenReturn(camundaVars);
         when(hearingsService.updatePartiesNotifiedResponse(anyString(), anyString(), anyInt(), any(), any()))
             .thenReturn(new ResponseEntity<>("Error", HttpStatus.BAD_REQUEST));
@@ -101,17 +110,19 @@ class UpdateHmcPartiesNotifiedHandlerTest extends BaseCallbackHandlerTest {
         var response = handler.handle(params);
 
         assertNotNull(response);
+        verify(mapper).writeValueAsString(any(PartiesNotified.class));
         verify(hearingsService).updatePartiesNotifiedResponse(eq("BEARER_TOKEN"), eq("HER1234"), anyInt(), any(), any(PartiesNotified.class));
     }
 
     @Test
-    void shouldHandleNullResponseGracefully() {
+    void shouldHandleNullResponseGracefully() throws JsonProcessingException {
         CaseData caseData = CaseData.builder().ccdCaseReference(12345L).build().toBuilder()
             .businessProcess(BusinessProcess.builder().processInstanceId("").build())
             .build();
         CallbackParams params = buildCallbackParams(caseData);
         HearingNoticeVariables camundaVars = sampleCamundaVars();
 
+        when(mapper.writeValueAsString(any())).thenReturn("{}");
         when(hearingNoticeCamundaService.getProcessVariables(any())).thenReturn(camundaVars);
         when(hearingsService.updatePartiesNotifiedResponse(anyString(), anyString(), anyInt(), any(), any()))
             .thenReturn(null);
@@ -138,5 +149,23 @@ class UpdateHmcPartiesNotifiedHandlerTest extends BaseCallbackHandlerTest {
 
         assertNotNull(response);
         verify(hearingsService).updatePartiesNotifiedResponse(anyString(), anyString(), anyInt(), any(), any());
+    }
+
+    @Test
+    void shouldCatchJsonProcessingException() throws Exception {
+        CaseData caseData = CaseData.builder().ccdCaseReference(12345L).build().toBuilder()
+            .businessProcess(BusinessProcess.builder().processInstanceId("").build())
+            .build();
+        CallbackParams params = buildCallbackParams(caseData);
+        HearingNoticeVariables camundaVars = sampleCamundaVars();
+
+        when(hearingNoticeCamundaService.getProcessVariables(any())).thenReturn(camundaVars);
+        when(mapper.writeValueAsString(any())).thenThrow(new JsonProcessingException("Cannot serialize") {});
+
+        var response = handler.handle(params);
+
+        assertNotNull(response);
+        verify(mapper).writeValueAsString(any(PartiesNotified.class));
+        verifyNoInteractions(hearingsService);
     }
 }

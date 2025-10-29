@@ -1,5 +1,8 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.automatedhearingnotice;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +30,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 @Service
 @RequiredArgsConstructor
 public class UpdateHmcPartiesNotifiedHandler extends CallbackHandler {
+
+    private ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
     private static final List<CaseEvent> EVENTS = List.of(
         CaseEvent.UPDATE_PARTIES_NOTIFIED_HMC
@@ -68,6 +73,9 @@ public class UpdateHmcPartiesNotifiedHandler extends CallbackHandler {
         String hearingId = camundaVariables.getHearingId();
 
         try {
+            log.info("Request payload {}, for caseId {} and hearingId {}",
+                     mapper.writeValueAsString(partiesNotified), ccdCaseReference, hearingId);
+
             ResponseEntity<?> responseEntity = hearingsService.updatePartiesNotifiedResponse(
                 callbackParams.getParams().get(BEARER_TOKEN).toString(),
                 hearingId, camundaVariables.getRequestVersion().intValue(),
@@ -83,7 +91,7 @@ public class UpdateHmcPartiesNotifiedHandler extends CallbackHandler {
                 log.info("Successfully updated parties notified for caseId {}, hearingId {} with status {}",
                          ccdCaseReference, hearingId, responseEntity.getStatusCode());
             }
-        } catch (org.springframework.web.client.RestClientException ex) {
+        } catch (org.springframework.web.client.RestClientException | JsonProcessingException ex) {
             log.error("Failed to call HearingsService.updatePartiesNotifiedResponse for caseId {}, hearingId {}: {}",
                       ccdCaseReference, hearingId, ex.getMessage(), ex);
             return AboutToStartOrSubmitCallbackResponse.builder().build();
