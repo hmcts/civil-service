@@ -93,6 +93,7 @@ import uk.gov.hmcts.reform.civil.service.robotics.strategy.CertificateOfSatisfac
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.SetAsideJudgmentContributor;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.InterlocutoryJudgmentContributor;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.SummaryJudgmentContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.SpecRejectRepaymentPlanContributor;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.TakenOfflineAfterClaimDetailsNotifiedContributor;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.TakenOfflineAfterClaimNotifiedContributor;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.TakenOfflinePastApplicantResponseContributor;
@@ -199,6 +200,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     DefendantNoCDeadlineContributor.class,
     MediationEventContributor.class,
     CaseNotesContributor.class,
+    SpecRejectRepaymentPlanContributor.class,
     RoboticsManualOfflineSupport.class
 })
 class EventHistoryMapperTest {

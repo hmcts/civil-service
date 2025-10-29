@@ -2,8 +2,6 @@ package uk.gov.hmcts.reform.civil.service.robotics.mapper;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
@@ -11,9 +9,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
-import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.model.dq.DQ;
@@ -31,7 +27,6 @@ import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsTimelineHelper
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.EventHistoryContributor;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -43,9 +38,6 @@ import java.util.Set;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import static java.lang.String.format;
-import static java.math.BigDecimal.ZERO;
-import static java.util.Optional.ofNullable;
-import static org.apache.commons.lang3.StringUtils.left;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISCONTINUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISMISSED;
@@ -149,9 +141,6 @@ public class EventHistoryMapper {
                     case CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE:
                     case TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED:
                     case TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE:
-                        break;
-                    case PART_ADMIT_REJECT_REPAYMENT, FULL_ADMIT_REJECT_REPAYMENT:
-                        buildSpecAdmitRejectRepayment(builder, caseData);
                         break;
                     default:
                         break;
@@ -816,23 +805,6 @@ public class EventHistoryMapper {
         }
     }
 
-    private void buildSpecAdmitRejectRepayment(EventHistory.EventHistoryBuilder builder,
-                                               CaseData caseData) {
-
-        if (caseData.hasApplicantRejectedRepaymentPlan()) {
-            builder.miscellaneous(
-                Event.builder()
-                    .eventSequence(prepareEventSequence(builder.build()))
-                    .eventCode(MISCELLANEOUS.getCode())
-                    .dateReceived(setApplicant1ResponseDate(caseData))
-                    .eventDetailsText(textFormatter.manualDeterminationRequired())
-                    .eventDetails(EventDetails.builder()
-                                      .miscText(textFormatter.manualDeterminationRequired())
-                                      .build())
-                    .build());
-        }
-    }
-
     private void buildLrVLipFullDefenceEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData,
                                              List<Event> defenceFiledEvents, List<Event> statesPaidEvents) {
         LocalDateTime respondent1ResponseDate = caseData.getRespondent1ResponseDate();
@@ -853,11 +825,6 @@ public class EventHistoryMapper {
                     false
                 ));
         }
-    }
-
-    private LocalDateTime setApplicant1ResponseDate(CaseData caseData) {
-        LocalDateTime applicant1ResponseDate = caseData.getApplicant1ResponseDate();
-        return timelineHelper.ensurePresentOrNow(applicant1ResponseDate);
     }
 
     private void buildMiscellaneousForRespondentResponseLipVSLr(EventHistory.EventHistoryBuilder builder,
