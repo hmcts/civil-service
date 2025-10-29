@@ -56,12 +56,12 @@ class UpdateHmcPartiesNotifiedHandlerTest extends BaseCallbackHandlerTest {
                             .requestVersion(10L)
                             .responseDateTime(LocalDateTime.of(2022, 10, 10, 15, 15))
                             .build());
-        when(hearingsService.updatePartiesNotifiedResponse(anyString(), anyString(), anyInt(), any(), any()))
-            .thenReturn(new ResponseEntity<>("Ok", HttpStatus.ACCEPTED));
     }
 
     @Test
     void shouldReturnExpectedCallbackResponseOnAboutToSubmit() {
+        when(hearingsService.updatePartiesNotifiedResponse(anyString(), anyString(), anyInt(), any(), any()))
+            .thenReturn(new ResponseEntity<>("Ok", HttpStatus.ACCEPTED));
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
             .businessProcess(BusinessProcess.builder().processInstanceId("").build())
             .build();
@@ -85,4 +85,57 @@ class UpdateHmcPartiesNotifiedHandlerTest extends BaseCallbackHandlerTest {
         verify(hearingsService).updatePartiesNotifiedResponse("BEARER_TOKEN", "HER1234", 10, receivedDate, partiesNotified);
     }
 
+    @Test
+    void shouldReturnExpectedCallbackResponseOnAboutToSubmitV1() {
+        when(hearingsService.updatePartiesNotifiedResponse(anyString(), anyString(), anyInt(), any(), any()))
+            .thenReturn(null);
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            .businessProcess(BusinessProcess.builder().processInstanceId("").build())
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        LocalDateTime receivedDate = LocalDateTime.of(2022, 10, 10, 15, 15);
+        List<HearingDay> hearingDays = List.of(HearingDay.builder()
+                                                   .hearingStartDateTime(LocalDateTime.of(2023, 1, 1, 0, 0, 0))
+                                                   .hearingEndDateTime(LocalDateTime.of(2023, 1, 1, 12, 0, 0))
+                                                   .build());
+        PartiesNotified partiesNotified = PartiesNotified.builder()
+            .serviceData(PartiesNotifiedServiceData.builder()
+                             .days(hearingDays)
+                             .hearingNoticeGenerated(true)
+                             .hearingLocation("12345")
+                             .build())
+            .build();
+
+        handler.handle(params);
+
+        verify(hearingsService).updatePartiesNotifiedResponse("BEARER_TOKEN", "HER1234", 10, receivedDate, partiesNotified);
+    }
+
+    @Test
+    void shouldNotReturnExpectedCallbackResponseOnAboutToSubmitWhenHearingsServiceReturns400() {
+        when(hearingsService.updatePartiesNotifiedResponse(anyString(), anyString(), anyInt(), any(), any()))
+            .thenReturn(new ResponseEntity<>("Bad Request", HttpStatus.BAD_REQUEST));
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            .businessProcess(BusinessProcess.builder().processInstanceId("").build())
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        LocalDateTime receivedDate = LocalDateTime.of(2022, 10, 10, 15, 15);
+        List<HearingDay> hearingDays = List.of(HearingDay.builder()
+                                                   .hearingStartDateTime(LocalDateTime.of(2023, 1, 1, 0, 0, 0))
+                                                   .hearingEndDateTime(LocalDateTime.of(2023, 1, 1, 12, 0, 0))
+                                                   .build());
+        PartiesNotified partiesNotified = PartiesNotified.builder()
+            .serviceData(PartiesNotifiedServiceData.builder()
+                             .days(hearingDays)
+                             .hearingNoticeGenerated(true)
+                             .hearingLocation("12345")
+                             .build())
+            .build();
+
+        handler.handle(params);
+
+        verify(hearingsService).updatePartiesNotifiedResponse("BEARER_TOKEN", "HER1234", 10, receivedDate, partiesNotified);
+    }
 }
