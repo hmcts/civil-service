@@ -1,0 +1,8 @@
+{
+  "name": "Notice.AAA6.ClaimantIntent.ClaimSettledEvent.Claimant",
+  "role": "CLAIMANT",
+  "titleEn": "The claim is settled",
+  "titleCy": "Mae’r hawliad wedi’i setlo",
+  "descriptionEn": "<p class=\"govuk-body\">You have confirmed that the claim against ${respondent1PartyName} was settled on ${applicant1ClaimSettledDateEn}.</p><p class=\"govuk-body\">The defendant has 19 days from the date of settlement to notify the court of any objection.</p>",
+  "descriptionCy": "<p class=\"govuk-body\">You have confirmed that the claim against ${respondent1PartyName} was settled on ${applicant1ClaimSettledDateEn}.</p><p class=\"govuk-body\">The defendant has 19 days from the date of settlement to notify the court of any objection.</p>"
+}

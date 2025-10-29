@@ -1,0 +1,8 @@
+{
+  "name": "Notice.AAA6.DefResponse.BilingualFlagSet.Claimant",
+  "role": "CLAIMANT",
+  "titleEn": "The defendant's response is being translated",
+  "titleCy": "Mae ymateb y diffynnydd yn cael ei gyfieithu",
+  "descriptionEn": "<p class=\"govuk-body\">The defendant has chosen to respond to the claim in Welsh. Their response is paused for translation into English. We will send it to you when it has been translated.</p>",
+  "descriptionCy": "<p class=\"govuk-body\">Mae'r diffynnydd wedi dewis ymateb i'r cais yn Gymraeg. Mae ei ymateb yn cael ei gyfieithu i'r Saesneg. Byddwn yn ei anfon atoch pan fydd wedi’i gyfieithu.</p>"
+}

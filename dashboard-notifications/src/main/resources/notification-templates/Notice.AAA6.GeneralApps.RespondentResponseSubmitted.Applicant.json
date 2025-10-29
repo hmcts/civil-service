@@ -1,0 +1,8 @@
+{
+  "name": "Notice.AAA6.GeneralApps.RespondentResponseSubmitted.Applicant",
+  "role": "APPLICANT",
+  "titleEn": "Application is being processed",
+  "titleCy": "Cais yn cael ei brosesu",
+  "descriptionEn": "<p class=\"govuk-body\"> A judge will consider the application. </p><p class=\"govuk-body\"> You’ll receive an update with information about next steps.</p>",
+  "descriptionCy": "<p class=\"govuk-body\"> Bydd barnwr yn ystyried y cais. </p><p class=\"govuk-body\">Fe gewch ddiweddariad gyda gwybodaeth am y camau nesaf.</p>"
+}

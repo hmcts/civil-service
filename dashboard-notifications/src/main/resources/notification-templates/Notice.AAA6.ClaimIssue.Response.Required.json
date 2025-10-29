@@ -1,0 +1,9 @@
+{
+  "name": "Notice.AAA6.ClaimIssue.Response.Required",
+  "role": "DEFENDANT",
+  "titleEn": "You haven't responded to the claim",
+  "titleCy": "Nid ydych wedi ymateb i'r hawliad",
+  "descriptionEn": "<p class=\"govuk-body\">You need to respond before ${defaultRespondTime} on ${respondent1ResponseDeadlineEn}. There are {daysLeftToRespond} days remaining.</p><p class=\"govuk-body\"><a href=\"{RESPONSE_TASK_LIST_URL}\"  rel=\"noopener noreferrer\" class=\"govuk-link\">Respond to the claim</a></p>",
+  "descriptionCy": "<p class=\"govuk-body\">Mae angen i chi ymateb cyn ${defaultRespondTime} ar ${respondent1ResponseDeadlineCy}. Mae yna {daysLeftToRespond} diwrnod yn weddill.</p><p class=\"govuk-body\"><a href=\"{RESPONSE_TASK_LIST_URL}\"  rel=\"noopener noreferrer\" class=\"govuk-link\">Ymateb i'r hawliad</a></p>",
+  "deadlineParam": "respondent1ResponseDeadline"
+}

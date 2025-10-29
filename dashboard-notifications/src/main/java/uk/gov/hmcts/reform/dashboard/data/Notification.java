@@ -46,7 +46,7 @@ public class Notification {
             .titleCy(dashboardNotificationsEntity.getTitleCy())
             .descriptionEn(dashboardNotificationsEntity.getDescriptionEn())
             .descriptionCy(dashboardNotificationsEntity.getDescriptionCy())
-            .timeToLive(dashboardNotificationsEntity.getDashboardNotificationsTemplates().getTimeToLive())
+            .timeToLive(dashboardNotificationsEntity.getTimeToLive())
             .params(dashboardNotificationsEntity.getParams())
             .createdAt(dashboardNotificationsEntity.getCreatedAt())
             .deadline(dashboardNotificationsEntity.getDeadline());

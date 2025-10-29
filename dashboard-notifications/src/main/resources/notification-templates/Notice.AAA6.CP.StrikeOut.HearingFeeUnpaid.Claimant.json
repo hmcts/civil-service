@@ -1,0 +1,8 @@
+{
+  "name": "Notice.AAA6.CP.StrikeOut.HearingFeeUnpaid.Claimant",
+  "role": "CLAIMANT",
+  "titleEn": "The claim has been struck out",
+  "titleCy": "Mae'r hawliad wedi cael ei ddileu",
+  "descriptionEn": "<p class=\"govuk-body\">This is because the hearing fee was not paid by ${hearingDueDateEn} as stated in the <a href=\"{VIEW_HEARING_NOTICE}\" rel=\"noopener noreferrer\" target=\"_blank\" class=\"govuk-link\">hearing notice</a>.</p>",
+  "descriptionCy": "<p class=\"govuk-body\">Y rheswm am hyn yw na thalwyd ffi'r gwrandawiad erbyn ${hearingDueDateCy} fel y nodir yn yr <a href=\"{VIEW_HEARING_NOTICE}\" rel=\"noopener noreferrer\" target=\"_blank\" class=\"govuk-link\">hysbysiad o wrandawiad</a>.</p>"
+}

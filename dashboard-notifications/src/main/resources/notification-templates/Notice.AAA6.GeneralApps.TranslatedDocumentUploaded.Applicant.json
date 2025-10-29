@@ -1,0 +1,8 @@
+{
+  "name": "Notice.AAA6.GeneralApps.TranslatedDocumentUploaded.Applicant",
+  "role": "APPLICANT",
+  "titleEn": "Translated document for the application is now available",
+  "titleCy": "Mae’r ddogfen a gyfieithwyd ar gyfer y cais bellach ar gael",
+  "descriptionEn": "<p class=\"govuk-body\"><a href=\"{GA_VIEW_APPLICATION_URL}\" class=\"govuk-link\">View translated application documents.</a></p>",
+  "descriptionCy": "<p class=\"govuk-body\"><a href=\"{GA_VIEW_APPLICATION_URL}\" class=\"govuk-link\">Gweld dogfennau’r cais a gyfieithwyd.</a></p>"
+}

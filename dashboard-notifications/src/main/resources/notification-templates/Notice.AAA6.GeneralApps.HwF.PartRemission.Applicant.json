@@ -1,0 +1,8 @@
+{
+  "name": "Notice.AAA6.GeneralApps.HwF.PartRemission.Applicant",
+  "role": "APPLICANT",
+  "titleEn": "Your help with fees application has been reviewed",
+  "titleCy": "Mae eich cais am help i dalu ffioedd wedi cael ei adolygu",
+  "descriptionEn": "<p class=\"govuk-body\">You’ll get help with the ${applicationFeeTypeEn} fee. ${remissionAmount} will be covered by fee remission.</p><p class=\"govuk-body\">To progress your application, you must  still pay the remaining fee of ${outstandingFeeInPounds}.</p><p class=\"govuk-body\">You can pay by phone by calling {civilMoneyClaimsTelephone}.</p>",
+  "descriptionCy": "<p class=\"govuk-body\">Byddwch yn cael help gyda’r ffi ${applicationFeeTypeCy}. Bydd ${remissionAmount} o’r ffi yn cael ei ddileu.</p><p class=\"govuk-body\">I symud eich cais yn ei flaen, rhaid i chi dalu’r ffi sy’n weddill sef ${outstandingFeeInPounds}.</p><p class=\"govuk-body\">Gallwch dalu dros y ffôn drwy ffonio {civilMoneyClaimsTelephone}.</p>"
+}

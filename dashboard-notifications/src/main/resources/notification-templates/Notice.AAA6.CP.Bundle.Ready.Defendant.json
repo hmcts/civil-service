@@ -1,0 +1,9 @@
+{
+  "name": "Notice.AAA6.CP.Bundle.Ready.Defendant",
+  "role": "DEFENDANT",
+  "titleEn": "The bundle is ready to view",
+  "titleCy": "Mae'r bwndel yn barod i'w weld",
+  "descriptionEn": "<p class=\"govuk-body\">The bundle contains all the documents that will be referred to at the hearing. <a href=\"{VIEW_BUNDLE_REDIRECT}\" class=\"govuk-link\">Review the bundle</a> to ensure that the information is accurate.</p>",
+  "descriptionCy": "<p class=\"govuk-body\">Mae'r bwndel yn cynnwys yr holl ddogfennau y cyfeirir atynt yn y gwrandawiad. <a href=\"{VIEW_BUNDLE_REDIRECT}\" class=\"govuk-link\">Adolygwch y bwndel</a> i sicrhau bod yr wybodaeth yn gywir.</p>",
+  "timeToLive": "Session"
+}

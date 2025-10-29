@@ -4,25 +4,30 @@ import java.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.entities.DashboardNotificationsEntity;
-import uk.gov.hmcts.reform.dashboard.entities.NotificationTemplateEntity;
 import uk.gov.hmcts.reform.dashboard.entities.ScenarioEntity;
 import uk.gov.hmcts.reform.dashboard.entities.TaskItemTemplateEntity;
 import uk.gov.hmcts.reform.dashboard.entities.TaskListEntity;
-import uk.gov.hmcts.reform.dashboard.repositories.NotificationTemplateRepository;
 import uk.gov.hmcts.reform.dashboard.repositories.ScenarioRepository;
 import uk.gov.hmcts.reform.dashboard.repositories.TaskItemTemplateRepository;
+import uk.gov.hmcts.reform.dashboard.templates.NotificationTemplateCatalog;
+import uk.gov.hmcts.reform.dashboard.templates.NotificationTemplateDefinition;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -35,7 +40,7 @@ class DashboardScenariosServiceTest {
     @Mock
     private ScenarioRepository scenarioRepository;
     @Mock
-    private NotificationTemplateRepository notificationTemplateRepository;
+    private NotificationTemplateCatalog notificationTemplateCatalog;
     @Mock
     private DashboardNotificationService dashboardNotificationService;
     @Mock
@@ -47,26 +52,26 @@ class DashboardScenariosServiceTest {
     void setup() {
         dashboardScenariosService = new DashboardScenariosService(
             scenarioRepository,
-            notificationTemplateRepository,
+            notificationTemplateCatalog,
             dashboardNotificationService,
             taskListService,
             taskItemTemplateRepository
         );
 
-        when(scenarioRepository.findByName(SCENARIO_ISSUE_CLAIM_START))
+        lenient().when(scenarioRepository.findByName(SCENARIO_ISSUE_CLAIM_START))
             .thenReturn(Optional.of(ScenarioEntity.builder()
                                         .id(1L)
                                         .name(SCENARIO_ISSUE_CLAIM_START)
                                         .notificationsToCreate(
                                             Map.of(
                                                 NOTIFICATION_ISSUE_CLAIM_START,
-                                                new String[]{"url, status, helpText, animal, target"}
+                                                new String[]{"url", "status", "helpText", "animal", "target", "deadlineParam"}
                                             ))
                                         .notificationsToDelete(new String[]{NOTIFICATION_DRAFT_CLAIM_START})
                                         .build()));
 
-        when(notificationTemplateRepository.findByName(NOTIFICATION_ISSUE_CLAIM_START))
-            .thenReturn(Optional.of(NotificationTemplateEntity.builder()
+        lenient().when(notificationTemplateCatalog.findByName(NOTIFICATION_ISSUE_CLAIM_START))
+            .thenReturn(Optional.of(NotificationTemplateDefinition.builder()
                                         .name(NOTIFICATION_ISSUE_CLAIM_START)
                                         .role("claimant")
                                         .titleEn("The ${animal} jumped over the ${target}.")
@@ -74,21 +79,19 @@ class DashboardScenariosServiceTest {
                                         .titleCy("The ${animal} jumped over the ${target}.")
                                         .descriptionCy("The ${animal} jumped over the ${target}.")
                                         .deadlineParam("deadlineParam")
-                                        .id(2L)
                                         .build()));
 
-        when(notificationTemplateRepository.findByName(NOTIFICATION_DRAFT_CLAIM_START))
-            .thenReturn(Optional.of(NotificationTemplateEntity.builder()
+        lenient().when(notificationTemplateCatalog.findByName(NOTIFICATION_DRAFT_CLAIM_START))
+            .thenReturn(Optional.of(NotificationTemplateDefinition.builder()
                                         .name(NOTIFICATION_DRAFT_CLAIM_START)
                                         .role("claimant")
                                         .titleEn("The ${animal} jumped over the ${target}.")
                                         .descriptionEn("The ${animal} jumped over the ${target}.")
                                         .titleCy("The ${animal} jumped over the ${target}.")
                                         .descriptionCy("The ${animal} jumped over the ${target}.")
-                                        .id(1L)
                                         .build()));
 
-        when(taskItemTemplateRepository.findByScenarioName(SCENARIO_ISSUE_CLAIM_START))
+        lenient().when(taskItemTemplateRepository.findByScenarioName(SCENARIO_ISSUE_CLAIM_START))
             .thenReturn(List.of(TaskItemTemplateEntity.builder()
                                     .taskStatusSequence(new int[]{1, 2})
                                     .scenarioName(SCENARIO_ISSUE_CLAIM_START)
@@ -101,13 +104,14 @@ class DashboardScenariosServiceTest {
                                     .taskNameCy("Pay hearing fee")
                                     .build()));
 
-        when(dashboardNotificationService.deleteByNameAndReferenceAndCitizenRole(
+        lenient().when(dashboardNotificationService.deleteByNameAndReferenceAndCitizenRole(
             NOTIFICATION_DRAFT_CLAIM_START, "ccd-case-id", "claimant"))
             .thenReturn(1);
     }
 
     @Test
     void shouldRecordScenario() {
+        LocalDateTime deadline = LocalDateTime.of(2025, 1, 2, 10, 15);
         dashboardScenariosService.recordScenarios(
             "Auth-token",
             SCENARIO_ISSUE_CLAIM_START,
@@ -124,17 +128,28 @@ class DashboardScenariosServiceTest {
                 "target",
                 "Safari",
                 "deadlineParam",
-                LocalDateTime.now()
+                deadline
 
             )))
         );
 
         verify(scenarioRepository).findByName(SCENARIO_ISSUE_CLAIM_START);
-        verify(notificationTemplateRepository).findByName(NOTIFICATION_ISSUE_CLAIM_START);
+        verify(notificationTemplateCatalog).findByName(NOTIFICATION_ISSUE_CLAIM_START);
         verify(taskItemTemplateRepository).findByScenarioName(SCENARIO_ISSUE_CLAIM_START);
-        verify(notificationTemplateRepository).findByName(NOTIFICATION_DRAFT_CLAIM_START);
-        verify(dashboardNotificationService).saveOrUpdate(any(DashboardNotificationsEntity.class));
-        verify(taskListService).saveOrUpdate(any(TaskListEntity.class));
+        verify(notificationTemplateCatalog).findByName(NOTIFICATION_DRAFT_CLAIM_START);
+        ArgumentCaptor<DashboardNotificationsEntity> notificationCaptor = ArgumentCaptor.forClass(DashboardNotificationsEntity.class);
+        verify(dashboardNotificationService).saveOrUpdate(notificationCaptor.capture());
+        DashboardNotificationsEntity savedNotification = notificationCaptor.getValue();
+        assertThat(savedNotification.getTitleEn()).isEqualTo("The Tiger jumped over the Safari.");
+        assertThat(savedNotification.getDescriptionEn()).isEqualTo("The Tiger jumped over the Safari.");
+        assertThat(savedNotification.getDeadline()).isEqualTo(deadline);
+        assertThat(savedNotification.getParams()).containsEntry("helpText", "Should be helpful!");
+
+        ArgumentCaptor<TaskListEntity> taskCaptor = ArgumentCaptor.forClass(TaskListEntity.class);
+        verify(taskListService).saveOrUpdate(taskCaptor.capture());
+        TaskListEntity savedTask = taskCaptor.getValue();
+        assertThat(savedTask.getTaskNameEn()).isEqualTo("Pay hearing fee");
+        assertThat(savedTask.getHintTextEn()).contains("http://testUrl");
         verify(dashboardNotificationService).deleteByNameAndReferenceAndCitizenRole(
             NOTIFICATION_DRAFT_CLAIM_START,
             "ccd-case-id",
@@ -165,16 +180,69 @@ class DashboardScenariosServiceTest {
         );
 
         verify(scenarioRepository).findByName(SCENARIO_ISSUE_CLAIM_START);
-        verify(notificationTemplateRepository).findByName(NOTIFICATION_ISSUE_CLAIM_START);
+        verify(notificationTemplateCatalog).findByName(NOTIFICATION_ISSUE_CLAIM_START);
         verify(taskItemTemplateRepository).findByScenarioName(SCENARIO_ISSUE_CLAIM_START);
-        verify(notificationTemplateRepository).findByName(NOTIFICATION_DRAFT_CLAIM_START);
-        verify(dashboardNotificationService).saveOrUpdate(any(DashboardNotificationsEntity.class));
+        verify(notificationTemplateCatalog).findByName(NOTIFICATION_DRAFT_CLAIM_START);
+        ArgumentCaptor<DashboardNotificationsEntity> notificationCaptor = ArgumentCaptor.forClass(DashboardNotificationsEntity.class);
+        verify(dashboardNotificationService).saveOrUpdate(notificationCaptor.capture());
+        assertThat(notificationCaptor.getValue().getDeadline()).isNull();
         verify(taskListService).saveOrUpdate(any(TaskListEntity.class));
         verify(dashboardNotificationService).deleteByNameAndReferenceAndCitizenRole(
             NOTIFICATION_DRAFT_CLAIM_START,
             "ccd-case-id",
             "claimant"
         );
+    }
+
+    @Test
+    void shouldSkipTemplatesMarkedForDeletion() {
+        String scenarioName = "scenario.marked.for.deletion";
+        ScenarioEntity scenario = ScenarioEntity.builder()
+            .name(scenarioName)
+            .notificationsToCreate(Map.of("template.to.skip", new String[]{"animal"}))
+            .notificationsToDelete(new String[0])
+            .build();
+        when(scenarioRepository.findByName(scenarioName)).thenReturn(Optional.of(scenario));
+        when(notificationTemplateCatalog.findByName("template.to.skip"))
+            .thenReturn(Optional.of(NotificationTemplateDefinition.builder()
+                                        .name("template.to.skip")
+                                        .markedForDeletion(true)
+                                        .build()));
+        when(taskItemTemplateRepository.findByScenarioName(scenarioName)).thenReturn(List.of());
+
+        dashboardScenariosService.recordScenarios(
+            "token",
+            scenarioName,
+            "case-id",
+            new ScenarioRequestParams(new HashMap<>(Map.of("animal", "Tiger")))
+        );
+
+        verify(notificationTemplateCatalog).findByName("template.to.skip");
+        verifyNoInteractions(dashboardNotificationService);
+        verify(taskListService, never()).saveOrUpdate(any());
+    }
+
+    @Test
+    void shouldDeleteNotificationsWithoutRoleWhenTemplateMissing() {
+        String scenarioName = "scenario.delete.missing";
+        ScenarioEntity scenario = ScenarioEntity.builder()
+            .name(scenarioName)
+            .notificationsToCreate(Map.of())
+            .notificationsToDelete(new String[]{"template.missing"})
+            .build();
+        when(scenarioRepository.findByName(scenarioName)).thenReturn(Optional.of(scenario));
+        when(notificationTemplateCatalog.findByName("template.missing")).thenReturn(Optional.empty());
+        when(taskItemTemplateRepository.findByScenarioName(scenarioName)).thenReturn(List.of());
+
+        dashboardScenariosService.recordScenarios(
+            "token",
+            scenarioName,
+            "case-id",
+            new ScenarioRequestParams(new HashMap<>())
+        );
+
+        verify(notificationTemplateCatalog).findByName("template.missing");
+        verify(dashboardNotificationService).deleteByNameAndReference("template.missing", "case-id");
     }
 
 }

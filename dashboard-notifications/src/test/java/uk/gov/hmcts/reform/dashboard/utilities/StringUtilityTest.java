@@ -7,16 +7,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 class StringUtilityTest {
 
     @Test
-    void shouldRemoveAnchorFromText() {
-        String input = "<a href=\"somewhere\">Link name</A >";
+    void shouldRemoveAnchorsFromHtml() {
+        String input = "<a href=\"#\">Link</a> with <a class=\"text\">content</a>";
 
-        assertThat(StringUtility.removeAnchor(input)).isEqualTo("Link name");
+        String result = StringUtility.removeAnchor(input);
+
+        assertThat(result).isEqualTo("Link with content");
     }
 
     @Test
-    void shouldRemoveMultipleAnchorFromText() {
-        String input = "<a href=\"somewhere\">Link name</A > is a test for <a href=\"somewhere\">Multiple</A >";
-
-        assertThat(StringUtility.removeAnchor(input)).isEqualTo("Link name is a test for Multiple");
+    void shouldReturnOriginalWhenTextIsBlank() {
+        assertThat(StringUtility.removeAnchor("   ")).isEqualTo("   ");
+        assertThat(StringUtility.removeAnchor(null)).isNull();
     }
 }

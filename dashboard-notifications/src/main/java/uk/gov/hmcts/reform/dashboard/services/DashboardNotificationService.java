@@ -70,16 +70,17 @@ public class DashboardNotificationService {
     public DashboardNotificationsEntity saveOrUpdate(DashboardNotificationsEntity notification) {
 
         DashboardNotificationsEntity updated = notification;
-        if (nonNull(notification.getDashboardNotificationsTemplates())) {
-            log.info("Query for dashboard notifications using notification reference= {}, citizenRole = {}, templateId = {}",
+        if (nonNull(notification.getName())) {
+            log.info("Query for dashboard notifications using notification reference= {}, citizenRole = {}, templateName = {}",
                 notification.getReference(),
                 notification.getCitizenRole(),
-                notification.getDashboardNotificationsTemplates().getId()
+                notification.getName()
             );
             List<DashboardNotificationsEntity> existingNotification = dashboardNotificationsRepository
-                .findByReferenceAndCitizenRoleAndDashboardNotificationsTemplatesId(
-                    notification.getReference(), notification.getCitizenRole(),
-                    notification.getDashboardNotificationsTemplates().getId()
+                .findByReferenceAndCitizenRoleAndName(
+                    notification.getReference(),
+                    notification.getCitizenRole(),
+                    notification.getName()
                 );
 
             log.info("Found {} dashboard notifications in database for reference {}",
@@ -130,6 +131,10 @@ public class DashboardNotificationService {
 
     public int deleteByNameAndReferenceAndCitizenRole(String name, String reference, String citizenRole) {
         return dashboardNotificationsRepository.deleteByNameAndReferenceAndCitizenRole(name, reference, citizenRole);
+    }
+
+    public int deleteByNameAndReference(String name, String reference) {
+        return dashboardNotificationsRepository.deleteByNameAndReference(name, reference);
     }
 
     public void deleteByReferenceAndCitizenRole(String reference, String citizenRole) {

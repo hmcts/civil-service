@@ -1,0 +1,9 @@
+{
+  "name": "notification.hearing.fee.payment.required",
+  "role": "claimant",
+  "titleEn": "Pay the hearing fee",
+  "titleCy": "Pay the hearing fee",
+  "descriptionEn": "Pay the hearing fee. <a href=#>Click here</a>",
+  "descriptionCy": "Pay the hearing fee. <a href=#>Click here</a>",
+  "timeToLive": "singout"
+}
