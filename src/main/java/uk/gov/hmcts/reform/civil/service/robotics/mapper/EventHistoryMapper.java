@@ -38,7 +38,6 @@ import java.util.Set;
 
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
-import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISCONTINUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISMISSED;
@@ -109,7 +108,6 @@ public class EventHistoryMapper {
                     case NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION, CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION:
                         break;
                     case FULL_DEFENCE:
-                        buildRespondentFullDefence(builder, caseData);
                         break;
                     case PART_ADMISSION:
                         break;
@@ -374,113 +372,6 @@ public class EventHistoryMapper {
         return RoboticsDirectionsQuestionnaireSupport.getPreferredCourtCode(dq);
     }
 
-    private void buildRespondentFullDefence(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        List<Event> defenceFiledEvents = new ArrayList<>();
-        List<Event> statesPaidEvents = new ArrayList<>();
-        List<Event> directionsQuestionnaireFiledEvents = new ArrayList<>();
-        boolean isRespondent1;
-        if (defendant1ResponseExists.test(caseData)) {
-            isRespondent1 = true;
-            Party respondent1 = caseData.getRespondent1();
-            Respondent1DQ respondent1DQ = caseData.getRespondent1DQ();
-            LocalDateTime respondent1ResponseDate = caseData.getRespondent1ResponseDate();
-
-            if (caseData.isLRvLipOneVOne() || caseData.isLipvLipOneVOne()) {
-                buildLrVLipFullDefenceEvent(builder, caseData, defenceFiledEvents, statesPaidEvents);
-            } else {
-                if (isAllPaid(caseData.getTotalClaimAmount(), caseData.getRespondToClaim())) {
-                    statesPaidEvents.add(buildDefenceFiledEvent(
-                        builder,
-                        respondent1ResponseDate,
-                        RESPONDENT_ID,
-                        true
-                    ));
-                } else {
-                    defenceFiledEvents.add(
-                        buildDefenceFiledEvent(
-                            builder,
-                            respondent1ResponseDate,
-                            RESPONDENT_ID,
-                            false
-                        ));
-                }
-            }
-            directionsQuestionnaireFiledEvents.add(
-                buildDirectionsQuestionnaireFiledEvent(builder, caseData,
-                                                       respondent1ResponseDate,
-                                                       RESPONDENT_ID,
-                                                       respondent1DQ,
-                                                       respondent1,
-                                                       isRespondent1
-                ));
-            if (defendant1v2SameSolicitorSameResponse.test(caseData)) {
-                Party respondent2 = caseData.getRespondent2();
-                Respondent1DQ respondent2DQ = caseData.getRespondent1DQ();
-                LocalDateTime respondent2ResponseDate = null != caseData.getRespondent2ResponseDate()
-                    ? caseData.getRespondent2ResponseDate() : caseData.getRespondent1ResponseDate();
-
-                if (isAllPaid(caseData.getTotalClaimAmount(), caseData.getRespondToClaim())) {
-                    statesPaidEvents.add(buildDefenceFiledEvent(
-                        builder,
-                        respondent1ResponseDate,
-                        RESPONDENT2_ID,
-                        true
-                    ));
-                }
-                defenceFiledEvents.add(
-                    buildDefenceFiledEvent(
-                        builder,
-                        respondent2ResponseDate,
-                        RESPONDENT2_ID,
-                        false
-                    ));
-                directionsQuestionnaireFiledEvents.add(
-                    buildDirectionsQuestionnaireFiledEvent(builder, caseData,
-                                                           respondent2ResponseDate,
-                                                           RESPONDENT2_ID,
-                                                           respondent2DQ,
-                                                           respondent2,
-                                                           isRespondent1
-                    ));
-            }
-        }
-        if (defendant2ResponseExists.test(caseData)) {
-            isRespondent1 = false;
-            Party respondent2 = caseData.getRespondent2();
-            Respondent2DQ respondent2DQ = caseData.getRespondent2DQ();
-            LocalDateTime respondent2ResponseDate = caseData.getRespondent2ResponseDate();
-
-            if (isAllPaid(caseData.getTotalClaimAmount(), caseData.getRespondToClaim2())) {
-                statesPaidEvents.add(
-                    buildDefenceFiledEvent(
-                        builder,
-                        respondent2ResponseDate,
-                        RESPONDENT2_ID,
-                        true
-                    ));
-            } else {
-                defenceFiledEvents.add(
-                    buildDefenceFiledEvent(
-                        builder,
-                        respondent2ResponseDate,
-                        RESPONDENT2_ID,
-                        false
-                    ));
-            }
-            directionsQuestionnaireFiledEvents.add(
-                buildDirectionsQuestionnaireFiledEvent(builder, caseData,
-                                                       respondent2ResponseDate,
-                                                       RESPONDENT2_ID,
-                                                       respondent2DQ,
-                                                       respondent2,
-                                                       isRespondent1
-                ));
-        }
-        builder.defenceFiled(defenceFiledEvents);
-        builder.statesPaid(statesPaidEvents);
-        builder.clearDirectionsQuestionnaireFiled().directionsQuestionnaireFiled(directionsQuestionnaireFiledEvents);
-    }
-
     private Event buildDirectionsQuestionnaireFiledEvent(EventHistory.EventHistoryBuilder builder,
                                                          CaseData caseData,
                                                          LocalDateTime respondentResponseDate,
@@ -520,20 +411,7 @@ public class EventHistoryMapper {
     }
 
     public String prepareFullDefenceEventText(DQ dq, CaseData caseData, boolean isRespondent1, Party respondent) {
-        MultiPartyScenario scenario = getMultiPartyScenario(caseData);
-        String paginatedMessage = "";
-        if (scenario.equals(ONE_V_TWO_ONE_LEGAL_REP)) {
-            paginatedMessage = getPaginatedMessageFor1v2SameSolicitor(caseData, isRespondent1);
-        }
-        return (format(
-            "%sDefendant: %s has responded: %s; "
-                + "preferredCourtCode: %s; stayClaim: %s",
-            paginatedMessage,
-            respondent.getPartyName(),
-            getResponseTypeForRespondent(caseData, respondent),
-            getPreferredCourtCode(dq),
-            isStayClaim(dq)
-        ));
+        return respondentResponseSupport.prepareFullDefenceEventText(dq, caseData, isRespondent1, respondent);
     }
 
     private String getPaginatedMessageFor1v2SameSolicitor(CaseData caseData, boolean isRespondent1) {
@@ -547,28 +425,6 @@ public class EventHistoryMapper {
         return caseData.getRespondent1ClaimResponseIntentionType() != null
             ? caseData.getRespondent1ClaimResponseIntentionType().getLabel()
             : null;
-    }
-
-    private void buildLrVLipFullDefenceEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData,
-                                             List<Event> defenceFiledEvents, List<Event> statesPaidEvents) {
-        LocalDateTime respondent1ResponseDate = caseData.getRespondent1ResponseDate();
-
-        if (caseData.hasDefendantPaidTheAmountClaimed()) {
-            statesPaidEvents.add(buildDefenceFiledEvent(
-                builder,
-                respondent1ResponseDate,
-                RESPONDENT_ID,
-                true
-            ));
-        } else {
-            defenceFiledEvents.add(
-                buildDefenceFiledEvent(
-                    builder,
-                    respondent1ResponseDate,
-                    RESPONDENT_ID,
-                    false
-                ));
-        }
     }
 
 }

@@ -48,6 +48,7 @@ import uk.gov.hmcts.reform.civil.service.robotics.strategy.DefendantNoCDeadlineC
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.MediationEventContributor;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.RespondentLitigationFriendContributor;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.RespondentFullAdmissionContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.RespondentFullDefenceContributor;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.RespondentPartAdmissionContributor;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.RespondentCounterClaimContributor;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.TakenOfflineAfterClaimDetailsNotifiedContributor;
@@ -121,6 +122,7 @@ import static org.mockito.Mockito.when;
     CaseProceedsInCasemanContributor.class,
     DefendantNoCDeadlineContributor.class,
     MediationEventContributor.class,
+    RespondentFullDefenceContributor.class,
     RespondentFullAdmissionContributor.class,
     RespondentPartAdmissionContributor.class,
     RespondentCounterClaimContributor.class,
