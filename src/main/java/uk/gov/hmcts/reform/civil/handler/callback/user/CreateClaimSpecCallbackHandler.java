@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaim.Validate
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CorrectEmail;
+import uk.gov.hmcts.reform.civil.model.FlightDelayDetails;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
@@ -48,6 +49,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 
 import static java.lang.String.format;
@@ -403,16 +405,34 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             .build();
     }
 
-    private CallbackResponse validateCorrespondenceRespondentAddress(CallbackParams callbackParams,
-                                                                     Function<CaseData, YesOrNo> required,
-                                                                     Function<CaseData, Address> address) {
+    private CallbackResponse validateCorrespondenceRespondentAddress(
+        CallbackParams callbackParams,
+        Function<CaseData, YesOrNo> required,
+        Function<CaseData, Address> addressExtractor
+    ) {
         CaseData caseData = callbackParams.getCaseData();
+
+        // Build updated case data
+        CaseData updatedCaseData = caseData.toBuilder()
+            .flightDelayDetails(getAirlineListTask.getFlightDelayDetails(caseData))
+            .build();
+
+        List<String> errors = null;
+
+        // Perform postcode validation only if required
         if (YES.equals(required.apply(caseData))) {
-            return validatePostCode(address.apply(caseData).getPostCode());
-        } else {
-            return AboutToStartOrSubmitCallbackResponse.builder()
-                .build();
+            String postCode = Optional.ofNullable(addressExtractor.apply(caseData))
+                .map(Address::getPostCode)
+                .orElse(null);
+
+            errors = postcodeValidator.validate(postCode);
         }
+
+        // Always return case data, errors only if present
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(updatedCaseData.toMap(objectMapper))
+            .errors(errors)
+            .build();
     }
 
     private CallbackResponse validateCorrespondenceApplicantAddress(CallbackParams callbackParams) {
