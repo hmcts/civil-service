@@ -11,7 +11,9 @@ import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.config.PrdAdminUserConfiguration;
@@ -75,10 +77,10 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
         TransitionsTestConfiguration.class,
         EventHistorySequencer.class,
         EventHistoryMapper.class,
-        RoboticsDataMapper.class,
         RoboticsAddressMapper.class,
         AddressLinesMapper.class,
-        OrganisationService.class
+        OrganisationService.class,
+        RoboticsNotificationServiceTest.RoboticsTestConfiguration.class
     },
     properties = {
         "sendgrid.api-key:some-key",
@@ -90,6 +92,15 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
     }
 )
 class RoboticsNotificationServiceTest {
+
+    @TestConfiguration
+    @ComponentScan(basePackageClasses = {
+        uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper.class,
+        uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsCaseDataSupport.class,
+        uk.gov.hmcts.reform.civil.service.robotics.strategy.EventHistoryContributor.class
+    })
+    static class RoboticsTestConfiguration {
+    }
 
     @Autowired
     RoboticsNotificationService service;
