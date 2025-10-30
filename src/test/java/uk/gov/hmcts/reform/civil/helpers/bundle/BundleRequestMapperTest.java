@@ -13,12 +13,14 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.caseprogression.BundleFileNameList;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.TypeOfDocDocumentaryEvidenceOfTrial;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.DocumentWithRegex;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
 import uk.gov.hmcts.reform.civil.model.bundle.BundleCreateRequest;
+import uk.gov.hmcts.reform.civil.model.bundle.BundlingRequestDocument;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
@@ -340,6 +342,211 @@ class BundleRequestMapperTest {
         assertEquals("testFileName 12/12/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getDefendant2CostsBudgets().get(0).getValue().getDocumentFileName());
 
+    }
+
+    @Test
+    void shouldIncludeDefenceFromSpecResponseDocument() {
+        CaseDocument defenceDocument = CaseDocument.builder()
+            .documentType(DocumentType.DEFENDANT_DEFENCE)
+            .createdBy("Civil")
+            .createdDatetime(LocalDateTime.of(2024, 1, 1, 10, 30))
+            .documentLink(Document.builder()
+                              .documentBinaryUrl(TEST_URL)
+                              .documentUrl(TEST_URL)
+                              .documentFileName(TEST_FILE_NAME)
+                              .categoryID("defendant1DefenseDirectionsQuestionnaire")
+                              .build())
+            .build();
+
+        CaseData caseData = CaseData.builder()
+            .ccdCaseReference(12345L)
+            .respondent1ClaimResponseDocumentSpec(defenceDocument)
+            .applicant1(Party.builder()
+                            .type(Party.Type.INDIVIDUAL)
+                            .individualLastName("Applicant")
+                            .build())
+            .respondent1(Party.builder()
+                             .type(Party.Type.INDIVIDUAL)
+                             .individualLastName("Respondent")
+                             .build())
+            .hearingDate(LocalDate.of(2024, 2, 10))
+            .submittedDate(LocalDateTime.of(2024, 1, 2, 9, 0))
+            .build();
+
+        given(featureToggleService.isCaseProgressionEnabled()).willReturn(false);
+        given(featureToggleService.isAmendBundleEnabled()).willReturn(false);
+
+        BundleCreateRequest bundleCreateRequest = bundleRequestMapper.mapCaseDataToBundleCreateRequest(
+            caseData,
+            "sample.yaml",
+            "test",
+            "test"
+        );
+
+        assertNotNull(bundleCreateRequest);
+        List<Element<BundlingRequestDocument>> statementsOfCaseDocuments =
+            bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments();
+        assertEquals(1, statementsOfCaseDocuments.size());
+        assertEquals("DF 1 Defence 01/01/2024",
+                     statementsOfCaseDocuments.get(0).getValue().getDocumentFileName());
+        assertEquals(BundleFileNameList.DEFENCE.getDisplayName(),
+                     statementsOfCaseDocuments.get(0).getValue().getDocumentType());
+    }
+
+    @Test
+    void shouldLabelSecondDefendantDefenceBasedOnCreatedBy() {
+        CaseDocument defenceDocument = CaseDocument.builder()
+            .documentType(DocumentType.DEFENDANT_DEFENCE)
+            .createdBy("Defendant 2")
+            .createdDatetime(LocalDateTime.of(2024, 1, 5, 9, 30))
+            .documentLink(Document.builder()
+                              .documentBinaryUrl(TEST_URL)
+                              .documentUrl(TEST_URL)
+                              .documentFileName(TEST_FILE_NAME)
+                              .build())
+            .build();
+
+        CaseData caseData = baseCaseDataBuilder()
+            .defendantResponseDocuments(List.of(ElementUtils.element(defenceDocument)))
+            .build();
+
+        given(featureToggleService.isCaseProgressionEnabled()).willReturn(false);
+        given(featureToggleService.isAmendBundleEnabled()).willReturn(false);
+
+        BundleCreateRequest bundleCreateRequest = bundleRequestMapper.mapCaseDataToBundleCreateRequest(
+            caseData, "sample.yaml", "test", "test");
+
+        List<Element<BundlingRequestDocument>> statementsOfCaseDocuments =
+            bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments();
+        assertEquals(1, statementsOfCaseDocuments.size());
+        assertEquals("DF 2 Defence 05/01/2024",
+                     statementsOfCaseDocuments.get(0).getValue().getDocumentFileName());
+        assertEquals(BundleFileNameList.DEFENCE.getDisplayName(),
+                     statementsOfCaseDocuments.get(0).getValue().getDocumentType());
+    }
+
+    @Test
+    void shouldInferSecondDefendantFromCategoryWhenCreatedByMissing() {
+        CaseDocument defenceDocument = CaseDocument.builder()
+            .documentType(DocumentType.DEFENDANT_DEFENCE)
+            .createdDatetime(LocalDateTime.of(2024, 1, 7, 10, 0))
+            .documentLink(Document.builder()
+                              .documentBinaryUrl(TEST_URL)
+                              .documentUrl(TEST_URL)
+                              .documentFileName(TEST_FILE_NAME)
+                              .categoryID("respondent2-defence")
+                              .build())
+            .build();
+
+        CaseData caseData = baseCaseDataBuilder()
+            .systemGeneratedCaseDocuments(List.of(ElementUtils.element(defenceDocument)))
+            .build();
+
+        given(featureToggleService.isCaseProgressionEnabled()).willReturn(false);
+        given(featureToggleService.isAmendBundleEnabled()).willReturn(false);
+
+        BundleCreateRequest bundleCreateRequest = bundleRequestMapper.mapCaseDataToBundleCreateRequest(
+            caseData, "sample.yaml", "test", "test");
+
+        List<Element<BundlingRequestDocument>> statementsOfCaseDocuments =
+            bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments();
+        assertEquals(1, statementsOfCaseDocuments.size());
+        assertEquals("DF 2 Defence 07/01/2024",
+                     statementsOfCaseDocuments.get(0).getValue().getDocumentFileName());
+        assertEquals(BundleFileNameList.DEFENCE.getDisplayName(),
+                     statementsOfCaseDocuments.get(0).getValue().getDocumentType());
+    }
+
+    @Test
+    void shouldFallbackToSubmittedDateWhenDefenceMissingCreatedDatetime() {
+        CaseDocument defenceDocument = CaseDocument.builder()
+            .documentType(DocumentType.DEFENDANT_DEFENCE)
+            .documentLink(Document.builder()
+                              .documentBinaryUrl(TEST_URL)
+                              .documentUrl(TEST_URL)
+                              .documentFileName(TEST_FILE_NAME)
+                              .build())
+            .createdBy("Civil")
+            .build();
+
+        CaseData caseData = baseCaseDataBuilder()
+            .duplicateClaimantDefendantResponseDocs(List.of(ElementUtils.element(defenceDocument)))
+            .submittedDate(LocalDateTime.of(2024, 1, 2, 11, 15))
+            .build();
+
+        given(featureToggleService.isCaseProgressionEnabled()).willReturn(false);
+        given(featureToggleService.isAmendBundleEnabled()).willReturn(false);
+
+        BundleCreateRequest bundleCreateRequest = bundleRequestMapper.mapCaseDataToBundleCreateRequest(
+            caseData, "sample.yaml", "test", "test");
+
+        List<Element<BundlingRequestDocument>> statementsOfCaseDocuments =
+            bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments();
+        assertEquals(1, statementsOfCaseDocuments.size());
+        assertEquals("DF 1 Defence 02/01/2024",
+                     statementsOfCaseDocuments.get(0).getValue().getDocumentFileName());
+    }
+
+    @Test
+    void shouldFallbackToHearingDateWhenSubmittedDateMissing() {
+        CaseDocument defenceDocument = CaseDocument.builder()
+            .documentType(DocumentType.DEFENDANT_DEFENCE)
+            .documentLink(Document.builder()
+                              .documentBinaryUrl(TEST_URL)
+                              .documentUrl(TEST_URL)
+                              .documentFileName(TEST_FILE_NAME)
+                              .build())
+            .createdBy("Defendant")
+            .build();
+
+        CaseData caseData = baseCaseDataBuilder()
+            .hearingDate(LocalDate.of(2024, 4, 15))
+            .defendantResponseDocuments(List.of(ElementUtils.element(defenceDocument)))
+            .build();
+
+        given(featureToggleService.isCaseProgressionEnabled()).willReturn(false);
+        given(featureToggleService.isAmendBundleEnabled()).willReturn(false);
+
+        BundleCreateRequest bundleCreateRequest = bundleRequestMapper.mapCaseDataToBundleCreateRequest(
+            caseData, "sample.yaml", "test", "test");
+
+        List<Element<BundlingRequestDocument>> statementsOfCaseDocuments =
+            bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments();
+        assertEquals(1, statementsOfCaseDocuments.size());
+        assertEquals("DF 1 Defence 15/04/2024",
+                     statementsOfCaseDocuments.get(0).getValue().getDocumentFileName());
+    }
+
+    @Test
+    void shouldIncludeClaimantReplyDocument() {
+        CaseDocument claimantReply = CaseDocument.builder()
+            .documentType(DocumentType.CLAIMANT_DEFENCE)
+            .createdBy("Claimant")
+            .createdDatetime(LocalDateTime.of(2024, 1, 6, 8, 45))
+            .documentLink(Document.builder()
+                              .documentBinaryUrl(TEST_URL)
+                              .documentUrl(TEST_URL)
+                              .documentFileName(TEST_FILE_NAME)
+                              .build())
+            .build();
+
+        CaseData caseData = baseCaseDataBuilder()
+            .claimantResponseDocuments(List.of(ElementUtils.element(claimantReply)))
+            .build();
+
+        given(featureToggleService.isCaseProgressionEnabled()).willReturn(false);
+        given(featureToggleService.isAmendBundleEnabled()).willReturn(false);
+
+        BundleCreateRequest bundleCreateRequest = bundleRequestMapper.mapCaseDataToBundleCreateRequest(
+            caseData, "sample.yaml", "test", "test");
+
+        List<Element<BundlingRequestDocument>> statementsOfCaseDocuments =
+            bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments();
+        assertEquals(1, statementsOfCaseDocuments.size());
+        assertEquals("CL's reply 06/01/2024",
+                     statementsOfCaseDocuments.get(0).getValue().getDocumentFileName());
+        assertEquals(BundleFileNameList.CL_REPLY.getDisplayName(),
+                     statementsOfCaseDocuments.get(0).getValue().getDocumentType());
     }
 
     @Test
@@ -666,6 +873,20 @@ class BundleRequestMapperTest {
                                                        .documentIssuedDate(LocalDate.of(2023, 1, 12))
                                                        .build()));
         return otherEvidenceDocs;
+    }
+
+    private CaseData.CaseDataBuilder<?, ?> baseCaseDataBuilder() {
+        return CaseData.builder()
+            .ccdCaseReference(12345L)
+            .applicant1(Party.builder()
+                            .type(Party.Type.INDIVIDUAL)
+                            .individualLastName("Applicant")
+                            .build())
+            .respondent1(Party.builder()
+                             .type(Party.Type.INDIVIDUAL)
+                             .individualLastName("Respondent")
+                             .build())
+            .hearingDate(LocalDate.of(2024, 2, 10));
     }
 
     private List<Element<UploadEvidenceDocumentType>> setupOtherEvidenceDocs(String witnessOptionName) {
