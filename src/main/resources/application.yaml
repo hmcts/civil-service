@@ -123,6 +123,7 @@ genApp:
     keywords:
       withNotice: GAOnNotice
       consentedOrWithoutNotice: GeneralAppWithoutNotice
+      uncloakFee: HACFOOnNotice
       appnToVaryOrSuspend: AppnToVaryOrSuspend
       certificateOfSatisfaction: CoS
   lrd:
