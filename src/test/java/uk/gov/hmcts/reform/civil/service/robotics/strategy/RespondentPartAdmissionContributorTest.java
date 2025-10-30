@@ -42,7 +42,6 @@ class RespondentPartAdmissionContributorTest {
     private StateFlow stateFlow;
 
     private RoboticsEventTextFormatter formatter;
-    private RoboticsTimelineHelper timelineHelper;
     private RoboticsRespondentResponseSupport respondentResponseSupport;
     private RespondentPartAdmissionContributor contributor;
 
@@ -50,12 +49,12 @@ class RespondentPartAdmissionContributorTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         formatter = new RoboticsEventTextFormatter();
-        timelineHelper = new RoboticsTimelineHelper(() -> NOW);
+        RoboticsTimelineHelper timelineHelper = new RoboticsTimelineHelper(() -> NOW);
         respondentResponseSupport = new RoboticsRespondentResponseSupport(formatter, timelineHelper);
         contributor = new RespondentPartAdmissionContributor(
             sequenceGenerator,
             respondentResponseSupport,
-            timelineHelper,
+                timelineHelper,
             formatter,
             stateFlowEngine
         );
