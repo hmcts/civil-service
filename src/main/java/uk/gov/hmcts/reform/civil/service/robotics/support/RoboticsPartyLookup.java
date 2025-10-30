@@ -20,15 +20,15 @@ public class RoboticsPartyLookup {
         RoboticsDataUtil.RESPONDENT2_ID
     );
 
-        public String applicantId(int index) {
+    public String applicantId(int index) {
         return lookup(APPLICANT_IDS, index, "applicant");
     }
 
-        public String respondentId(int index) {
+    public String respondentId(int index) {
         return lookup(RESPONDENT_IDS, index, "respondent");
     }
 
-        public String truncateReference(String reference) {
+    public String truncateReference(String reference) {
         if (reference == null) {
             return null;
         }

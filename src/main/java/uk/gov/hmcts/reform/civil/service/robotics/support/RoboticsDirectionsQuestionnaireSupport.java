@@ -21,6 +21,10 @@ import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.
 
 public final class RoboticsDirectionsQuestionnaireSupport {
 
+    private RoboticsDirectionsQuestionnaireSupport() {
+        // utility class
+    }
+
     public static List<ClaimantResponseDetails> prepareApplicantsDetails(CaseData caseData) {
         List<ClaimantResponseDetails> applicantsDetails = new ArrayList<>();
         if (getMultiPartyScenario(caseData).equals(TWO_V_ONE)) {

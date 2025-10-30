@@ -20,7 +20,7 @@ public class RoboticsTimelineHelper {
 
     private final Time time;
 
-        public LocalDateTime ensurePresentOrNow(LocalDateTime candidate) {
+    public LocalDateTime ensurePresentOrNow(LocalDateTime candidate) {
         LocalDateTime now = time.now();
         if (candidate == null || candidate.isBefore(now)) {
             return now;
@@ -28,19 +28,19 @@ public class RoboticsTimelineHelper {
         return candidate;
     }
 
-        public <T> T withFallback(T candidate, Supplier<T> fallbackSupplier) {
+    public <T> T withFallback(T candidate, Supplier<T> fallbackSupplier) {
         return Objects.requireNonNullElseGet(candidate, fallbackSupplier);
     }
 
-        public String toIsoDate(LocalDate date) {
+    public String toIsoDate(LocalDate date) {
         return date == null ? null : date.format(ISO_DATE);
     }
 
-        public String toIsoDateTime(LocalDateTime dateTime) {
+    public String toIsoDateTime(LocalDateTime dateTime) {
         return dateTime == null ? null : dateTime.format(ISO_DATE_TIME.withLocale(Locale.UK));
     }
 
-        public LocalDateTime now() {
+    public LocalDateTime now() {
         return time.now();
     }
 }

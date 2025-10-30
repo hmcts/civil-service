@@ -9,7 +9,7 @@ import java.util.List;
 @Component
 public class RoboticsSequenceGenerator {
 
-        public int nextSequence(EventHistory history) {
+    public int nextSequence(EventHistory history) {
         if (history == null) {
             return 1;
         }

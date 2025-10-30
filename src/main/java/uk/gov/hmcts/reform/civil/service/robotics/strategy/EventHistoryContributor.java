@@ -5,7 +5,7 @@ import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 
 public interface EventHistoryContributor {
 
-        boolean supports(CaseData caseData);
+    boolean supports(CaseData caseData);
 
-        void contribute(EventHistory.EventHistoryBuilder builder, CaseData caseData, String authToken);
+    void contribute(EventHistory.EventHistoryBuilder builder, CaseData caseData, String authToken);
 }

@@ -10,19 +10,19 @@ public class RoboticsEventTextFormatter {
 
     private static final String RPA_PREFIX = "RPA Reason: ";
 
-        public String withRpaPrefix(String message) {
+    public String withRpaPrefix(String message) {
         if (message == null) {
             return null;
         }
         return RPA_PREFIX + message;
     }
 
-        public String format(String template, Object... args) {
+    public String format(String template, Object... args) {
         Objects.requireNonNull(template, "template must not be null");
         return String.format(Locale.UK, template, args);
     }
 
-        public String formatRpa(String template, Object... args) {
+    public String formatRpa(String template, Object... args) {
         return withRpaPrefix(format(template, args));
     }
 
