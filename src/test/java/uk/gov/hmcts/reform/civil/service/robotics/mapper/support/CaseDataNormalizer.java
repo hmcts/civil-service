@@ -32,13 +32,13 @@ public final class CaseDataNormalizer {
             return null;
         }
 
-        LocalDateTime base = baseDate.atTime(12, 0);
-        LocalDateTime day1 = base.plusDays(1);
-        LocalDateTime day2 = base.plusDays(2);
-        LocalDateTime day3 = base.plusDays(3);
-        LocalDateTime day4 = base.plusDays(4);
-        LocalDateTime day5 = base.plusDays(5);
-        LocalDateTime day6 = base.plusDays(6);
+        final LocalDateTime base = baseDate.atTime(12, 0);
+        final LocalDateTime day1 = base.plusDays(1);
+        final LocalDateTime day2 = base.plusDays(2);
+        final LocalDateTime day3 = base.plusDays(3);
+        final LocalDateTime day4 = base.plusDays(4);
+        final LocalDateTime day5 = base.plusDays(5);
+        final LocalDateTime day6 = base.plusDays(6);
 
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
 

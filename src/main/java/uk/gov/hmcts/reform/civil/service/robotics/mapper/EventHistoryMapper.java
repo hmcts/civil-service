@@ -8,8 +8,6 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.dq.DQ;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
-import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
-import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsRespondentResponseSupport;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.EventHistoryContributor;
 
@@ -22,7 +20,6 @@ import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsDirectionsQues
 @Slf4j
 public class EventHistoryMapper {
 
-    private final IStateFlowEngine stateFlowEngine;
     private final EventHistorySequencer eventHistorySequencer;
     private final RoboticsRespondentResponseSupport respondentResponseSupport;
     private final List<EventHistoryContributor> eventHistoryContributors;
@@ -36,51 +33,6 @@ public class EventHistoryMapper {
     public EventHistory buildEvents(CaseData caseData, String authToken) {
         EventHistory.EventHistoryBuilder builder = EventHistory.builder()
             .directionsQuestionnaireFiled(List.of(Event.builder().build()));
-
-        stateFlowEngine.evaluate(caseData).getStateHistory()
-            .forEach(state -> {
-                FlowState.Main flowState = (FlowState.Main) FlowState.fromFullName(state.getName());
-                switch (flowState) {
-                    case TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT:
-                    case TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT:
-                    case TAKEN_OFFLINE_UNREGISTERED_DEFENDANT:
-                        break;
-                    case NOTIFICATION_ACKNOWLEDGED:
-                        break;
-                    case NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION, CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION:
-                        break;
-                    case FULL_DEFENCE:
-                        break;
-                    case PART_ADMISSION:
-                        break;
-                    // AWAITING_RESPONSES states would only happen in 1v2 diff sol after 1 defendant responses.
-                    // These states will not show in the history mapper after the second defendant response.
-                    // It can share the same RPA builder as DIVERGENT_RESPOND state because it builds events according
-                    // to defendant response
-                    // DIVERGENT_RESPOND states would only happen in 1v2 diff sol after both defendant responds.
-                    case AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED:
-                    case AWAITING_RESPONSES_FULL_ADMIT_RECEIVED:
-                    case AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED:
-                    case DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE:
-                    case DIVERGENT_RESPOND_GO_OFFLINE:
-                        break;
-                    case FULL_DEFENCE_NOT_PROCEED:
-                        break;
-                    case FULL_DEFENCE_PROCEED:
-                        break;
-                    case TAKEN_OFFLINE_BY_STAFF:
-                        break;
-                    case CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE:
-                        break;
-                    case CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE:
-                    case CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE:
-                    case TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED:
-                    case TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE:
-                        break;
-                    default:
-                        break;
-                }
-            });
 
         eventHistoryContributors.stream()
             .filter(contributor -> contributor.supports(caseData))

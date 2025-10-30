@@ -4,7 +4,6 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil;
 
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Reusable helper for litigious party identifiers and solicitor reference normalisation.
