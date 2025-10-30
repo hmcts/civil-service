@@ -62,16 +62,16 @@ class DefaultJudgmentEventContributorTest {
     @Test
     void contributesDefaultJudgmentEventsAndMisc() {
         LocalDate baseDate = LocalDate.of(2024, 1, 1);
-        CaseData caseData = CaseDataNormalizer.normalise(
-            CaseDataBuilder.builder().getDefaultJudgment1v1Case(),
-            baseDate
-        );
-
         LocalDateTime now = baseDate.atTime(9, 0);
         when(timelineHelper.now()).thenReturn(now);
         when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
         when(sequenceGenerator.nextSequence(any())).thenReturn(1, 2);
         when(partyLookup.respondentId(0)).thenReturn("002");
+
+        CaseData caseData = CaseDataNormalizer.normalise(
+            CaseDataBuilder.builder().getDefaultJudgment1v1Case(),
+            baseDate
+        );
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
         contributor.contribute(builder, caseData, null);
@@ -89,14 +89,14 @@ class DefaultJudgmentEventContributorTest {
     @Test
     void grantedFlagEmitsRequestedMessageOnly() {
         LocalDate baseDate = LocalDate.of(2024, 1, 1);
+        when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
+        when(sequenceGenerator.nextSequence(any())).thenReturn(1);
+        when(timelineHelper.now()).thenReturn(baseDate.atTime(10, 0));
+
         CaseData caseData = CaseDataNormalizer.normalise(
             CaseDataBuilder.builder().getDefaultJudgment1v2DivergentCase(),
             baseDate
         );
-
-        when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
-        when(sequenceGenerator.nextSequence(any())).thenReturn(1);
-        when(timelineHelper.now()).thenReturn(baseDate.atTime(10, 0));
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
         contributor.contribute(builder, caseData, null);
@@ -111,15 +111,15 @@ class DefaultJudgmentEventContributorTest {
     @Test
     void joLiveFeedUsesRecordJudgmentMessage() {
         LocalDate baseDate = LocalDate.of(2024, 1, 1);
-        CaseData caseData = CaseDataNormalizer.normalise(
-            CaseDataBuilder.builder().getDefaultJudgment1v1Case(),
-            baseDate
-        );
-
         when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
         when(sequenceGenerator.nextSequence(any())).thenReturn(1, 2);
         when(timelineHelper.now()).thenReturn(baseDate.atTime(12, 0));
         when(partyLookup.respondentId(0)).thenReturn("002");
+
+        CaseData caseData = CaseDataNormalizer.normalise(
+            CaseDataBuilder.builder().getDefaultJudgment1v1Case(),
+            baseDate
+        );
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
         contributor.contribute(builder, caseData, null);

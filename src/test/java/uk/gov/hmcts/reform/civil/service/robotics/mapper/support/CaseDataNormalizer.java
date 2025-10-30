@@ -32,14 +32,7 @@ public final class CaseDataNormalizer {
             return null;
         }
 
-        final LocalDateTime base = baseDate.atTime(12, 0);
-        final LocalDateTime day1 = base.plusDays(1);
-        final LocalDateTime day2 = base.plusDays(2);
-        final LocalDateTime day3 = base.plusDays(3);
-        final LocalDateTime day4 = base.plusDays(4);
-        final LocalDateTime day5 = base.plusDays(5);
-        final LocalDateTime day6 = base.plusDays(6);
-
+        LocalDateTime base = baseDate.atTime(12, 0);
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
 
         if (caseData.getSubmittedDate() != null) {
@@ -51,12 +44,16 @@ public final class CaseDataNormalizer {
         if (caseData.getIssueDate() != null) {
             builder.issueDate(baseDate);
         }
+
+        LocalDateTime day1 = base.plusDays(1);
         if (caseData.getClaimNotificationDate() != null) {
             builder.claimNotificationDate(day1);
         }
         if (caseData.getClaimNotificationDeadline() != null) {
             builder.claimNotificationDeadline(day1.plusHours(6));
         }
+
+        LocalDateTime day2 = base.plusDays(2);
         if (caseData.getClaimDetailsNotificationDate() != null) {
             builder.claimDetailsNotificationDate(day2);
         }
@@ -69,6 +66,20 @@ public final class CaseDataNormalizer {
         if (caseData.getRespondent2AcknowledgeNotificationDate() != null) {
             builder.respondent2AcknowledgeNotificationDate(day2.plusHours(4));
         }
+        if (caseData.getAddLegalRepDeadlineRes1() != null) {
+            builder.addLegalRepDeadlineRes1(day2.plusHours(8));
+        }
+        if (caseData.getAddLegalRepDeadlineRes2() != null) {
+            builder.addLegalRepDeadlineRes2(day2.plusHours(10));
+        }
+        if (caseData.getRespondent1TimeExtensionDate() != null) {
+            builder.respondent1TimeExtensionDate(day2.plusHours(12));
+        }
+        if (caseData.getRespondent2TimeExtensionDate() != null) {
+            builder.respondent2TimeExtensionDate(day2.plusHours(14));
+        }
+
+        LocalDateTime day3 = base.plusDays(3);
         if (caseData.getRespondent1ResponseDeadline() != null) {
             builder.respondent1ResponseDeadline(day3);
         }
@@ -81,6 +92,8 @@ public final class CaseDataNormalizer {
         if (caseData.getRespondent2ResponseDate() != null) {
             builder.respondent2ResponseDate(day3.plusHours(3));
         }
+
+        LocalDateTime day4 = base.plusDays(4);
         if (caseData.getApplicant1ResponseDeadline() != null) {
             builder.applicant1ResponseDeadline(day4);
         }
@@ -90,29 +103,21 @@ public final class CaseDataNormalizer {
         if (caseData.getApplicant2ResponseDate() != null) {
             builder.applicant2ResponseDate(day4.plusHours(3));
         }
+
+        LocalDateTime day5 = base.plusDays(5);
         if (caseData.getTakenOfflineDate() != null) {
             builder.takenOfflineDate(day5);
         }
         if (caseData.getTakenOfflineByStaffDate() != null) {
             builder.takenOfflineByStaffDate(day5.plusHours(1));
         }
+
+        LocalDateTime day6 = base.plusDays(6);
         if (caseData.getClaimDismissedDate() != null) {
             builder.claimDismissedDate(day6);
         }
         if (caseData.getCaseDismissedHearingFeeDueDate() != null) {
             builder.caseDismissedHearingFeeDueDate(day6.plusHours(1));
-        }
-        if (caseData.getAddLegalRepDeadlineRes1() != null) {
-            builder.addLegalRepDeadlineRes1(day2.plusHours(8));
-        }
-        if (caseData.getAddLegalRepDeadlineRes2() != null) {
-            builder.addLegalRepDeadlineRes2(day2.plusHours(10));
-        }
-        if (caseData.getRespondent1TimeExtensionDate() != null) {
-            builder.respondent1TimeExtensionDate(day2.plusHours(12));
-        }
-        if (caseData.getRespondent2TimeExtensionDate() != null) {
-            builder.respondent2TimeExtensionDate(day2.plusHours(14));
         }
 
         builder.claimProceedsInCaseman(normaliseClaimProceeds(caseData.getClaimProceedsInCaseman(), baseDate.plusDays(5)));

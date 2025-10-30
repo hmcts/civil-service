@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenera
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -83,7 +82,6 @@ class SdoNotDrawnContributorTest {
         CaseData base = CaseDataBuilder.builder()
             .atStateTakenOfflineSDONotDrawn(MultiPartyScenario.ONE_V_ONE)
             .build();
-        LocalDateTime eventDate = base.getUnsuitableSDODate();
         CaseData caseData = base.toBuilder()
             .reasonNotSuitableSDO(base.getReasonNotSuitableSDO().toBuilder().input("No SDO drawn").build())
             .build();
@@ -99,7 +97,7 @@ class SdoNotDrawnContributorTest {
         String expected = new RoboticsEventTextFormatter()
             .caseProceedOffline("Judge / Legal Advisor did not draw a Direction's Order: No SDO drawn");
         assertThat(history.getMiscellaneous().get(0).getEventDetailsText()).isEqualTo(expected);
-        assertThat(history.getMiscellaneous().get(0).getDateReceived()).isEqualTo(eventDate);
+        assertThat(history.getMiscellaneous().get(0).getDateReceived()).isEqualTo(base.getUnsuitableSDODate());
     }
 
     @Test
