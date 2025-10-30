@@ -20,17 +20,23 @@ public abstract class Notifier extends BaseNotifier {
                        PartiesEmailGenerator partiesNotifier) {
         super(notificationService);
         this.caseTaskTrackingService = caseTaskTrackingService;
-        this.partiesNotifier = partiesNotifier;
+        this.partiesNotifier         = partiesNotifier;
     }
 
     public void notifyParties(CaseData caseData, String eventId, String taskId) {
-        log.info("Notifying parties for case ID: {} and eventId: {} and taskId: {} ", caseData.getCcdCaseReference(), eventId, taskId);
+        log.info(
+            "Notifying parties for case ID: {} and eventId: {} and taskId: {} ",
+            caseData.getCcdCaseReference(),
+            eventId,
+            taskId
+        );
         final Set<EmailDTO> partiesToEmail = partiesNotifier.getPartiesToNotify(caseData, taskId);
         final List<String> errors = sendNotification(partiesToEmail);
         if (!errors.isEmpty()) {
             final HashMap<String, String> additionalProperties = new HashMap<>();
             additionalProperties.put("Errors", errors.toString());
             trackErrors(caseData.getCcdCaseReference(), eventId, taskId, additionalProperties);
+            caseTaskTrackingService.rememberErrors(String.valueOf(caseData.getCcdCaseReference()), taskId, errors);
         }
     }
 
