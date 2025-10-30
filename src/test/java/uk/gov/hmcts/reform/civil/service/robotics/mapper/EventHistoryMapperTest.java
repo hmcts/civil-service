@@ -117,6 +117,7 @@ import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -1578,7 +1579,6 @@ class EventHistoryMapperTest {
                                           .build())
                         .build()
                 );
-            List<Event> expectedMiscellaneousEvents = List.of();
 
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
             assertThat(eventHistory).isNotNull();
@@ -2640,20 +2640,6 @@ class EventHistoryMapperTest {
                     .respondent2Represented(YES)
                     .build();
             }
-            List<Event> expectedDefenceAndCounterClaim = List.of(
-                Event.builder()
-                    .eventSequence(4)
-                    .eventCode("52")
-                    .dateReceived(caseData.getRespondent1ResponseDate())
-                    .litigiousPartyID("002")
-                    .build(),
-                Event.builder()
-                    .eventSequence(6)
-                    .eventCode("52")
-                    .dateReceived(caseData.getRespondent2ResponseDate())
-                    .litigiousPartyID("003")
-                    .build()
-            );
             String respondent1MiscText =
                 mapper.prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
             String respondent2MiscText =
@@ -2741,20 +2727,6 @@ class EventHistoryMapperTest {
                     .build();
             }
 
-            List<Event> expectedDefenceAndCounterClaim = List.of(
-                Event.builder()
-                    .eventSequence(4)
-                    .eventCode("52")
-                    .dateReceived(caseData.getRespondent1ResponseDate())
-                    .litigiousPartyID("002")
-                    .build(),
-                Event.builder()
-                    .eventSequence(5)
-                    .eventCode("52")
-                    .dateReceived(caseData.getRespondent2ResponseDate())
-                    .litigiousPartyID("003")
-                    .build()
-            );
             String respondent1MiscText =
                 mapper.prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
             String respondent2MiscText =
@@ -3282,8 +3254,6 @@ class EventHistoryMapperTest {
                     .respondent2Represented(YES)
                     .build();
             }
-            String respondent1MiscText =
-                mapper.prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
             String respondent2MiscText =
                 mapper.prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
 
@@ -3353,8 +3323,6 @@ class EventHistoryMapperTest {
                     .respondent2Represented(YesOrNo.YES)
                     .build();
             }
-            String respondent1MiscText =
-                mapper.prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
             String respondent2MiscText =
                 mapper.prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
 
@@ -3522,8 +3490,6 @@ class EventHistoryMapperTest {
             }
             String respondent1MiscText =
                 mapper.prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
-            String respondent2MiscText =
-                mapper.prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
 
             Event expectedReceiptOfAdmission = Event.builder()
                 .eventSequence(4)
@@ -3737,8 +3703,6 @@ class EventHistoryMapperTest {
             }
             String respondent1MiscText =
                 mapper.prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
-            String respondent2MiscText =
-                mapper.prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
 
             Event expectedReceiptOfAdmission = Event.builder()
                 .eventSequence(5)
@@ -3851,8 +3815,6 @@ class EventHistoryMapperTest {
             }
             String respondent1MiscText =
                 mapper.prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
-            String respondent2MiscText =
-                mapper.prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
 
             Event expectedReceiptOfAdmission = Event.builder()
                 .eventSequence(3)
@@ -5258,6 +5220,7 @@ class EventHistoryMapperTest {
                                      expectedMiscEvents.get(3), expectedMiscEvents.get(4));
             }
 
+            @Test
             void shouldPrepareMiscellaneousEvents_whenClaimantProceedsWithOnlySecondDefendantSDO() {
 
                 String expectedMiscText1 = "RPA Reason: [1 of 2 - 2020-08-01] "
@@ -5280,6 +5243,15 @@ class EventHistoryMapperTest {
                     Event.builder()
                         .eventSequence(3)
                         .eventCode("999")
+                        .dateReceived(caseData.getIssueDate().atStartOfDay())
+                        .eventDetailsText("Claim issued in CCD.")
+                        .eventDetails(EventDetails.builder()
+                                          .miscText("Claim issued in CCD.")
+                                          .build())
+                        .build(),
+                    Event.builder()
+                        .eventSequence(4)
+                        .eventCode("999")
                         .dateReceived(caseData.getClaimNotificationDate())
                         .eventDetailsText("Claimant has notified defendant.")
                         .eventDetails(EventDetails.builder()
@@ -5287,7 +5259,16 @@ class EventHistoryMapperTest {
                                           .build())
                         .build(),
                     Event.builder()
-                        .eventSequence(9)
+                        .eventSequence(5)
+                        .eventCode("999")
+                        .dateReceived(caseData.getClaimDetailsNotificationDate())
+                        .eventDetailsText("Claim details notified.")
+                        .eventDetails(EventDetails.builder()
+                                          .miscText("Claim details notified.")
+                                          .build())
+                        .build(),
+                    Event.builder()
+                        .eventSequence(10)
                         .eventCode("999")
                         .dateReceived(caseData.getApplicant1ResponseDate())
                         .eventDetailsText(expectedMiscText1)
@@ -5296,7 +5277,7 @@ class EventHistoryMapperTest {
                                           .build())
                         .build(),
                     Event.builder()
-                        .eventSequence(10)
+                        .eventSequence(11)
                         .eventCode("999")
                         .dateReceived(caseData.getApplicant1ResponseDate())
                         .eventDetailsText(expectedMiscText2)
@@ -5309,7 +5290,8 @@ class EventHistoryMapperTest {
                 var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
                 assertThat(eventHistory).extracting("miscellaneous").asInstanceOf(list(Object.class))
                     .containsExactly(expectedMiscEvents.get(0), expectedMiscEvents.get(1),
-                                     expectedMiscEvents.get(2)
+                                     expectedMiscEvents.get(2), expectedMiscEvents.get(3),
+                                     expectedMiscEvents.get(4)
                 );
             }
         }
@@ -5699,13 +5681,13 @@ class EventHistoryMapperTest {
                     .atStateApplicant2RespondToDefenceAndProceed_2v1()
                     .build();
                 Event expectedDefenceFiled = Event.builder()
-                    .eventSequence(3)
+                    .eventSequence(5)
                     .eventCode("50")
                     .dateReceived(caseData.getRespondent1ResponseDate())
                     .litigiousPartyID("002")
                     .build();
                 Event expectedRespondentDQ = Event.builder()
-                    .eventSequence(4)
+                    .eventSequence(6)
                     .eventCode("197")
                     .dateReceived(caseData.getRespondent1ResponseDate())
                     .litigiousPartyID("002")
@@ -5720,7 +5702,7 @@ class EventHistoryMapperTest {
                                       .build())
                     .build();
                 Event expectedApplicant2DQ = Event.builder()
-                    .eventSequence(6)
+                    .eventSequence(7)
                     .eventCode("197")
                     .dateReceived(caseData.getApplicant2ResponseDate())
                     .litigiousPartyID("004")
@@ -5744,6 +5726,15 @@ class EventHistoryMapperTest {
                     Event.builder()
                         .eventSequence(1)
                         .eventCode("999")
+                        .dateReceived(caseData.getIssueDate().atStartOfDay())
+                        .eventDetailsText("Claim issued in CCD.")
+                        .eventDetails(EventDetails.builder()
+                                          .miscText("Claim issued in CCD.")
+                                          .build())
+                        .build(),
+                    Event.builder()
+                        .eventSequence(2)
+                        .eventCode("999")
                         .dateReceived(caseData.getClaimNotificationDate())
                         .eventDetailsText("Claimant has notified defendant.")
                         .eventDetails(EventDetails.builder()
@@ -5751,7 +5742,16 @@ class EventHistoryMapperTest {
                                           .build())
                         .build(),
                     Event.builder()
-                        .eventSequence(7)
+                        .eventSequence(3)
+                        .eventCode("999")
+                        .dateReceived(caseData.getClaimDetailsNotificationDate())
+                        .eventDetailsText("Claim details notified.")
+                        .eventDetails(EventDetails.builder()
+                                          .miscText("Claim details notified.")
+                                          .build())
+                        .build(),
+                    Event.builder()
+                        .eventSequence(8)
                         .eventCode("999")
                         .dateReceived(caseData.getApplicant1ResponseDate())
                         .eventDetailsText(expectedMiscText1)
@@ -5760,7 +5760,7 @@ class EventHistoryMapperTest {
                                           .build())
                         .build(),
                     Event.builder()
-                        .eventSequence(8)
+                        .eventSequence(9)
                         .eventCode("999")
                         .dateReceived(caseData.getApplicant2ResponseDate())
                         .eventDetailsText(expectedMiscText2)
@@ -5768,6 +5768,27 @@ class EventHistoryMapperTest {
                                           .miscText(expectedMiscText2)
                                           .build())
                         .build()
+                );
+
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
+
+                assertThat(eventHistory).isNotNull();
+                assertThat(eventHistory).extracting("defenceFiled").asInstanceOf(list(Object.class))
+                    .containsExactly(expectedDefenceFiled);
+                assertThat(eventHistory).extracting("directionsQuestionnaireFiled").asInstanceOf(list(Object.class))
+                    .containsExactlyInAnyOrder(expectedRespondentDQ, expectedApplicant2DQ);
+                assertThat(eventHistory).extracting("miscellaneous").asInstanceOf(list(Object.class))
+                    .containsExactly(expectedMiscEvents.get(0), expectedMiscEvents.get(1),
+                                     expectedMiscEvents.get(2), expectedMiscEvents.get(3),
+                                     expectedMiscEvents.get(4));
+                assertThat(eventHistory).extracting("acknowledgementOfServiceReceived")
+                    .asInstanceOf(list(Object.class)).isNotEmpty();
+
+                assertEmptyEvents(
+                    eventHistory,
+                    "receiptOfAdmission",
+                    "receiptOfPartAdmission",
+                    "consentExtensionFilingDefence"
                 );
             }
         }
@@ -7710,8 +7731,6 @@ class EventHistoryMapperTest {
                 .addEnterBreathingSpace()
                 .build();
 
-            LocalDateTime currentTime = LocalDateTime.now();
-
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
@@ -7730,8 +7749,6 @@ class EventHistoryMapperTest {
                 .addLiftBreathingSpace()
                 .build();
 
-            LocalDateTime currentTime = LocalDateTime.now();
-
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
@@ -7748,8 +7765,6 @@ class EventHistoryMapperTest {
                 .atState(FlowState.Main.CLAIM_ISSUED)
                 .addEnterMentalHealthBreathingSpace()
                 .build();
-
-            LocalDateTime currentTime = LocalDateTime.now();
 
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
@@ -7768,8 +7783,6 @@ class EventHistoryMapperTest {
                 .addLiftMentalBreathingSpace()
                 .build();
 
-            LocalDateTime currentTime = LocalDateTime.now();
-
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
@@ -7786,8 +7799,6 @@ class EventHistoryMapperTest {
                 .atState(FlowState.Main.CLAIM_ISSUED)
                 .addEnterBreathingSpaceWithoutOptionalData()
                 .build();
-
-            LocalDateTime currentTime = LocalDateTime.now();
 
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
@@ -7807,8 +7818,6 @@ class EventHistoryMapperTest {
                 .addLiftBreathingSpaceWithoutOptionalData()
                 .build();
 
-            LocalDateTime currentTime = LocalDateTime.now();
-
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
@@ -7825,8 +7834,6 @@ class EventHistoryMapperTest {
                 .atState(FlowState.Main.CLAIM_ISSUED)
                 .addEnterMentalHealthBreathingSpaceNoOptionalData()
                 .build();
-
-            LocalDateTime currentTime = LocalDateTime.now();
 
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
@@ -7845,8 +7852,6 @@ class EventHistoryMapperTest {
                 .addLiftMentalBreathingSpace()
                 .build();
 
-            LocalDateTime currentTime = LocalDateTime.now();
-
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
@@ -7863,8 +7868,6 @@ class EventHistoryMapperTest {
                 .atState(FlowState.Main.CLAIM_ISSUED)
                 .addEnterBreathingSpaceWithOnlyReferenceInfo()
                 .build();
-
-            LocalDateTime currentTime = LocalDateTime.now();
 
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
@@ -7890,8 +7893,6 @@ class EventHistoryMapperTest {
                 .respondentSolicitor1AgreedDeadlineExtension(extensionDateRespondent1)
                 .respondent1TimeExtensionDate(datetime)
                 .build();
-
-            LocalDateTime currentTime = LocalDateTime.now();
 
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
@@ -7963,13 +7964,26 @@ class EventHistoryMapperTest {
                 .addRespondent2(YES)
                 .paymentTypeSelection(DJPaymentTypeSelection.REPAYMENT_PLAN)
                 .repaymentSummaryObject(
-                    "The judgment will order dsfsdf ffdg to pay £1072.00, "
-                        + "including the claim fee and interest,"
-                        + " if applicable, as shown:\n### Claim amount \n"
-                        + " £1000.00\n ### Fixed cost amount"
-                        + " \n£102.00\n### Claim fee amount \n £70.00\n ## "
-                        + "Subtotal \n £1172.00\n\n ### Amount"
-                        + " already paid \n£100.00\n ## Total still owed \n £1072.00")
+                        """
+                                The judgment will order dsfsdf ffdg to pay £1072.00, \
+                                including the claim fee and interest,\
+                                 if applicable, as shown:
+                                ### Claim amount\s
+                                 £1000.00
+                                 ### Fixed cost amount\
+                                \s
+                                £102.00
+                                ### Claim fee amount\s
+                                 £70.00
+                                 ## \
+                                Subtotal\s
+                                 £1172.00
+                                
+                                 ### Amount\
+                                 already paid\s
+                                £100.00
+                                 ## Total still owed\s
+                                 £1072.00""")
                 .respondent2SameLegalRepresentative(YES)
                 .hearingSupportRequirementsDJ(HearingSupportRequirementsDJ.builder().build())
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
@@ -7994,13 +8008,26 @@ class EventHistoryMapperTest {
                 .addRespondent2(YES)
                 .paymentTypeSelection(DJPaymentTypeSelection.REPAYMENT_PLAN)
                 .repaymentSummaryObject(
-                    "The judgment will order dsfsdf ffdg to pay £1072.00, "
-                        + "including the claim fee and interest,"
-                        + " if applicable, as shown:\n### Claim amount \n"
-                        + " £1000.00\n ### Fixed cost amount"
-                        + " \n£102.00\n### Claim fee amount \n £70.00\n ## "
-                        + "Subtotal \n £1172.00\n\n ### Amount"
-                        + " already paid \n£100.00\n ## Total still owed \n £1072.00")
+                        """
+                                The judgment will order dsfsdf ffdg to pay £1072.00, \
+                                including the claim fee and interest,\
+                                 if applicable, as shown:
+                                ### Claim amount\s
+                                 £1000.00
+                                 ### Fixed cost amount\
+                                \s
+                                £102.00
+                                ### Claim fee amount\s
+                                 £70.00
+                                 ## \
+                                Subtotal\s
+                                 £1172.00
+                                
+                                 ### Amount\
+                                 already paid\s
+                                £100.00
+                                 ## Total still owed\s
+                                 £1072.00""")
                 .respondent2SameLegalRepresentative(YES)
                 .hearingSupportRequirementsDJ(HearingSupportRequirementsDJ.builder().build())
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
@@ -8032,13 +8059,26 @@ class EventHistoryMapperTest {
                 .addRespondent2(YES)
                 .paymentTypeSelection(DJPaymentTypeSelection.REPAYMENT_PLAN)
                 .repaymentSummaryObject(
-                    "The judgment will order dsfsdf ffdg to pay £1072.00, "
-                        + "including the claim fee and interest,"
-                        + " if applicable, as shown:\n### Claim amount \n"
-                        + " £1000.00\n ### Fixed cost amount"
-                        + " \n£102.00\n### Claim fee amount \n £70.00\n ## "
-                        + "Subtotal \n £1172.00\n\n ### Amount"
-                        + " already paid \n£100.00\n ## Total still owed \n £1072.00")
+                        """
+                                The judgment will order dsfsdf ffdg to pay £1072.00, \
+                                including the claim fee and interest,\
+                                 if applicable, as shown:
+                                ### Claim amount\s
+                                 £1000.00
+                                 ### Fixed cost amount\
+                                \s
+                                £102.00
+                                ### Claim fee amount\s
+                                 £70.00
+                                 ## \
+                                Subtotal\s
+                                 £1172.00
+                                
+                                 ### Amount\
+                                 already paid\s
+                                £100.00
+                                 ## Total still owed\s
+                                 £1072.00""")
                 .respondent2SameLegalRepresentative(YES)
                 .joDJCreatedDate(LocalDateTime.now())
                 .hearingSupportRequirementsDJ(HearingSupportRequirementsDJ.builder().build())
@@ -8074,13 +8114,26 @@ class EventHistoryMapperTest {
                 .paymentTypeSelection(DJPaymentTypeSelection.REPAYMENT_PLAN)
                 .joDJCreatedDate(LocalDateTime.now())
                 .repaymentSummaryObject(
-                    "The judgment will order dsfsdf ffdg to pay £1072.00, "
-                        + "including the claim fee and interest,"
-                        + " if applicable, as shown:\n### Claim amount \n"
-                        + " £1000.00\n ### Fixed cost amount"
-                        + " \n£102.00\n### Claim fee amount \n £70.00\n ## "
-                        + "Subtotal \n £1172.00\n\n ### Amount"
-                        + " already paid \n£100.00\n ## Total still owed \n £1072.00")
+                        """
+                                The judgment will order dsfsdf ffdg to pay £1072.00, \
+                                including the claim fee and interest,\
+                                 if applicable, as shown:
+                                ### Claim amount\s
+                                 £1000.00
+                                 ### Fixed cost amount\
+                                \s
+                                £102.00
+                                ### Claim fee amount\s
+                                 £70.00
+                                 ## \
+                                Subtotal\s
+                                 £1172.00
+                                
+                                 ### Amount\
+                                 already paid\s
+                                £100.00
+                                 ## Total still owed\s
+                                 £1072.00""")
                 .respondent2SameLegalRepresentative(YES)
                 .hearingSupportRequirementsDJ(HearingSupportRequirementsDJ.builder().build())
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
@@ -8115,13 +8168,26 @@ class EventHistoryMapperTest {
                 .paymentTypeSelection(DJPaymentTypeSelection.REPAYMENT_PLAN)
                 .joDJCreatedDate(LocalDateTime.now())
                 .repaymentSummaryObject(
-                    "The judgment will order dsfsdf ffdg to pay £1072.00, "
-                        + "including the claim fee and interest,"
-                        + " if applicable, as shown:\n### Claim amount \n"
-                        + " £1000.00\n ### Fixed cost amount"
-                        + " \n£102.00\n### Claim fee amount \n £70.00\n ## "
-                        + "Subtotal \n £1172.00\n\n ### Amount"
-                        + " already paid \n£100.00\n ## Total still owed \n £1072.00")
+                        """
+                                The judgment will order dsfsdf ffdg to pay £1072.00, \
+                                including the claim fee and interest,\
+                                 if applicable, as shown:
+                                ### Claim amount\s
+                                 £1000.00
+                                 ### Fixed cost amount\
+                                \s
+                                £102.00
+                                ### Claim fee amount\s
+                                 £70.00
+                                 ## \
+                                Subtotal\s
+                                 £1172.00
+                                
+                                 ### Amount\
+                                 already paid\s
+                                £100.00
+                                 ## Total still owed\s
+                                 £1072.00""")
                 .respondent2SameLegalRepresentative(YES)
                 .hearingSupportRequirementsDJ(HearingSupportRequirementsDJ.builder().build())
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
@@ -8642,7 +8708,7 @@ class EventHistoryMapperTest {
                 .extracting("installmentPeriod").contains("MTH");
             assertThat(eventHistory).extracting("judgmentByAdmission").asInstanceOf(list(Object.class))
                 .extracting("eventDetails").asInstanceOf(list(Object.class))
-                .extracting("installmentAmount").contains(BigDecimal.valueOf(100).setScale(2));
+                .extracting("installmentAmount").contains(BigDecimal.valueOf(100).setScale(2, RoundingMode.UNNECESSARY));
             assertThat(eventHistory).extracting("miscellaneous").asInstanceOf(list(Object.class))
                 .extracting("eventCode").asString().contains("999");
             assertThat(eventHistory).extracting("miscellaneous").asInstanceOf(list(Object.class))
@@ -8972,7 +9038,6 @@ class EventHistoryMapperTest {
         LocalDate markPaidInFullDate = LocalDate.of(2024, 1, 1);
         LocalDate defendantFinalPaymentDate = LocalDate.of(2024, 1, 4);
         LocalDateTime markPaidInFullIssueDate = LocalDateTime.of(2024, 1, 2,  9, 0, 0);
-        LocalDateTime schedulerDeadline = LocalDateTime.of(2024, 2, 2,  16, 0, 0);
         LocalDateTime joDefendantMarkedPaidInFullIssueDate = LocalDateTime.of(2024, 1, 3, 16, 0, 0);
         CaseDocument caseDocument = CaseDocument.builder()
             .documentType(DocumentType.CERTIFICATE_OF_DEBT_PAYMENT)
