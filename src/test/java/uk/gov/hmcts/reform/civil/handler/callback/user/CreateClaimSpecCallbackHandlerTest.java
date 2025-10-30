@@ -1929,7 +1929,7 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 // Then
                 assertThat(response).isNotNull();
-                assertThat(response.getData()).isNull();
+                assertThat(response.getData()).isNotNull();
                 assertThat(response.getErrors()).isNull();
             }
 
@@ -1951,7 +1951,7 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 // Then
                 assertThat(response).isNotNull();
-                assertThat(response.getData()).isNull();
+                assertThat(response.getData()).isNotNull();
                 assertThat(response.getErrors()).isNotNull();
                 assertEquals(0, response.getErrors().size());
             }
@@ -1975,7 +1975,7 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 // Then
                 assertThat(response).isNotNull();
-                assertThat(response.getData()).isNull();
+                assertThat(response.getData()).isNotNull();
                 assertThat(response.getErrors()).isNotNull();
                 assertEquals(1, response.getErrors().size());
                 assertEquals("Please enter Postcode", response.getErrors().get(0));

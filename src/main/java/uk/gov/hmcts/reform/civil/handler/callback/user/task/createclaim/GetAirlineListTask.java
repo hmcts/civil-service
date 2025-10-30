@@ -31,12 +31,13 @@ public class GetAirlineListTask {
 
     public CallbackResponse getAirlineList(CaseData caseData) {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-
-        DynamicList airlineDropdownList = createAirlineDropdownList();
-        FlightDelayDetails flightDelayDetails = buildFlightDelayDetails(airlineDropdownList);
-        caseDataBuilder.flightDelayDetails(flightDelayDetails);
-
+        caseDataBuilder.flightDelayDetails(getFlightDelayDetails(caseData));
         return buildCallbackResponse(caseDataBuilder);
+    }
+
+    public FlightDelayDetails getFlightDelayDetails(CaseData caseData) {
+        DynamicList airlineDropdownList = createAirlineDropdownList();
+        return buildFlightDelayDetails(airlineDropdownList);
     }
 
     private DynamicList createAirlineDropdownList() {
