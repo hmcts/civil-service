@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.ga.model;
+package uk.gov.hmcts.reform.civil.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;

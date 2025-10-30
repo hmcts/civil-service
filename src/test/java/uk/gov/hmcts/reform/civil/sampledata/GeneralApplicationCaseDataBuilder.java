@@ -19,7 +19,7 @@ import uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeMakeAnOrderOption;
 import uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeRequestMoreInfoOption;
 import uk.gov.hmcts.reform.civil.ga.enums.dq.GaFinalOrderSelection;
 import uk.gov.hmcts.reform.civil.ga.enums.hearing.HearingApplicationDetails;
-import uk.gov.hmcts.reform.civil.ga.model.GeneralAppParentCaseLink;
+import uk.gov.hmcts.reform.civil.model.GeneralAppParentCaseLink;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationParty;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAApproveConsentOrder;

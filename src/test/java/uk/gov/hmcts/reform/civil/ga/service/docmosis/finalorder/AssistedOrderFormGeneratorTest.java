@@ -22,7 +22,7 @@ import uk.gov.hmcts.reform.civil.ga.enums.dq.HeardFromRepresentationTypes;
 import uk.gov.hmcts.reform.civil.ga.enums.dq.LengthOfHearing;
 import uk.gov.hmcts.reform.civil.ga.enums.dq.OrderMadeOnTypes;
 import uk.gov.hmcts.reform.civil.ga.enums.dq.PermissionToAppealTypes;
-import uk.gov.hmcts.reform.civil.ga.model.GeneralAppParentCaseLink;
+import uk.gov.hmcts.reform.civil.model.GeneralAppParentCaseLink;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.model.docmosis.AssistedOrderForm;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.HearingLength;

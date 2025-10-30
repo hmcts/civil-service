@@ -20,7 +20,7 @@ import uk.gov.hmcts.reform.civil.ga.enums.dq.ClaimantRepresentationType;
 import uk.gov.hmcts.reform.civil.ga.enums.dq.DefendantRepresentationType;
 import uk.gov.hmcts.reform.civil.ga.enums.dq.GaFinalOrderSelection;
 import uk.gov.hmcts.reform.civil.ga.handler.GeneralApplicationBaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.ga.model.GeneralAppParentCaseLink;
+import uk.gov.hmcts.reform.civil.model.GeneralAppParentCaseLink;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.finalorder.AppealTypeChoiceList;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.finalorder.AppealTypeChoices;
