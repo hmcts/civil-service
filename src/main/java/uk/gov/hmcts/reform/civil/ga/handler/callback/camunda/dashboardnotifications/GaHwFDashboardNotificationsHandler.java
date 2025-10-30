@@ -23,13 +23,13 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPS_HWF_REJECTED_APPLICANT;
 
 @Service
-public class HwFDashboardNotificationsHandler extends GaDashboardCallbackHandler {
+public class GaHwFDashboardNotificationsHandler extends GaDashboardCallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(APPLICANT_LIP_HWF_DASHBOARD_NOTIFICATION);
 
-    public HwFDashboardNotificationsHandler(DashboardApiClient dashboardApiClient,
-                                            GaDashboardNotificationsParamsMapper mapper,
-                                            FeatureToggleService featureToggleService) {
+    public GaHwFDashboardNotificationsHandler(DashboardApiClient dashboardApiClient,
+                                              GaDashboardNotificationsParamsMapper mapper,
+                                              FeatureToggleService featureToggleService) {
         super(dashboardApiClient, mapper, featureToggleService);
     }
 
