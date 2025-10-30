@@ -7,12 +7,12 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.ga.handler.tasks.EndGeneralApplicationBusinessProcessTaskHandler;
 
 @Component
-public class EndBusinessProcessExternalTaskListener {
+public class GaEndBusinessProcessExternalTaskListener {
 
     private static final String TOPIC = "END_BUSINESS_PROCESS_GASPEC";
 
     @Autowired
-    private EndBusinessProcessExternalTaskListener(
+    private GaEndBusinessProcessExternalTaskListener(
             EndGeneralApplicationBusinessProcessTaskHandler handler,
             ExternalTaskClient client) {
         TopicSubscriptionBuilder subscriptionBuilder = client.subscribe(TOPIC);

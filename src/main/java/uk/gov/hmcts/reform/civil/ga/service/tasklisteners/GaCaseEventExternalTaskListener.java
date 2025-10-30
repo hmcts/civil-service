@@ -7,12 +7,12 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.ga.handler.tasks.GaCaseEventTaskHandler;
 
 @Component
-public class CaseEventExternalTaskListener {
+public class GaCaseEventExternalTaskListener {
 
     private static final String TOPIC = "processCaseEventGASpec";
 
     @Autowired
-    private CaseEventExternalTaskListener(GaCaseEventTaskHandler caseEventTaskHandler, ExternalTaskClient client) {
+    private GaCaseEventExternalTaskListener(GaCaseEventTaskHandler caseEventTaskHandler, ExternalTaskClient client) {
         TopicSubscriptionBuilder subscriptionBuilder = client.subscribe(TOPIC);
         subscriptionBuilder.handler(caseEventTaskHandler).open();
     }
