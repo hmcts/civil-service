@@ -41,12 +41,12 @@ import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.flowstate.TransitionsTestConfiguration;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
-import uk.gov.hmcts.reform.civil.service.robotics.strategy.BreathingSpaceEventContributor;
-import uk.gov.hmcts.reform.civil.service.robotics.strategy.CaseProceedsInCasemanContributor;
-import uk.gov.hmcts.reform.civil.service.robotics.strategy.DefaultJudgmentEventContributor;
-import uk.gov.hmcts.reform.civil.service.robotics.strategy.DefendantNoCDeadlineContributor;
-import uk.gov.hmcts.reform.civil.service.robotics.strategy.MediationEventContributor;
-import uk.gov.hmcts.reform.civil.service.robotics.strategy.TakenOfflineByStaffEventContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.BreathingSpaceEventStrategy;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.CaseProceedsInCasemanStrategy;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.DefaultJudgmentEventStrategy;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.DefendantNoCDeadlineStrategy;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.MediationEventStrategy;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.TakenOfflineByStaffEventStrategy;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsManualOfflineSupport;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextFormatter;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsPartyLookup;
@@ -81,12 +81,12 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
     RoboticsTimelineHelper.class,
     RoboticsEventTextFormatter.class,
     RoboticsSequenceGenerator.class,
-    BreathingSpaceEventContributor.class,
-    TakenOfflineByStaffEventContributor.class,
-    DefaultJudgmentEventContributor.class,
-    CaseProceedsInCasemanContributor.class,
-    DefendantNoCDeadlineContributor.class,
-    MediationEventContributor.class,
+    BreathingSpaceEventStrategy.class,
+    TakenOfflineByStaffEventStrategy.class,
+    DefaultJudgmentEventStrategy.class,
+    CaseProceedsInCasemanStrategy.class,
+    DefendantNoCDeadlineStrategy.class,
+    MediationEventStrategy.class,
     RoboticsManualOfflineSupport.class,
     RoboticsRespondentResponseSupport.class,
     RoboticsDataMapper.class,

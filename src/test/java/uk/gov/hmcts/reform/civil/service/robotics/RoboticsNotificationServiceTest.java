@@ -97,7 +97,7 @@ class RoboticsNotificationServiceTest {
     @ComponentScan(basePackageClasses = {
         uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper.class,
         uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsCaseDataSupport.class,
-        uk.gov.hmcts.reform.civil.service.robotics.strategy.EventHistoryContributor.class
+        uk.gov.hmcts.reform.civil.service.robotics.strategy.EventHistoryStrategy.class
     })
     static class RoboticsTestConfiguration {
     }

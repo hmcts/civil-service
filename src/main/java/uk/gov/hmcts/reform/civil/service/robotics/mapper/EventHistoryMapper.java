@@ -9,7 +9,7 @@ import uk.gov.hmcts.reform.civil.model.dq.DQ;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsRespondentResponseSupport;
-import uk.gov.hmcts.reform.civil.service.robotics.strategy.EventHistoryContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.EventHistoryStrategy;
 
 import java.util.List;
 
@@ -22,7 +22,7 @@ public class EventHistoryMapper {
 
     private final EventHistorySequencer eventHistorySequencer;
     private final RoboticsRespondentResponseSupport respondentResponseSupport;
-    private final List<EventHistoryContributor> eventHistoryContributors;
+    private final List<EventHistoryStrategy> eventHistoryStrategies;
     public static final String RECORD_JUDGMENT = "Judgment recorded.";
     public static final String QUERIES_ON_CASE = "There has been a query on this case";
 
@@ -34,9 +34,9 @@ public class EventHistoryMapper {
         EventHistory.EventHistoryBuilder builder = EventHistory.builder()
             .directionsQuestionnaireFiled(List.of(Event.builder().build()));
 
-        eventHistoryContributors.stream()
-            .filter(contributor -> contributor.supports(caseData))
-            .forEach(contributor -> contributor.contribute(builder, caseData, authToken));
+        eventHistoryStrategies.stream()
+            .filter(strategy -> strategy.supports(caseData))
+            .forEach(strategy -> strategy.contribute(builder, caseData, authToken));
         EventHistory eventHistory = eventHistorySequencer.sortEvents(builder.build());
         log.info("Event history: {}", eventHistory);
         return eventHistory;

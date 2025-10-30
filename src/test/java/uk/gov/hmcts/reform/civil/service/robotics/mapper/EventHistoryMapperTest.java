@@ -68,44 +68,44 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.flowstate.TransitionsTestConfiguration;
-import uk.gov.hmcts.reform.civil.service.robotics.strategy.AcknowledgementOfServiceContributor;
-import uk.gov.hmcts.reform.civil.service.robotics.strategy.BreathingSpaceEventContributor;
-import uk.gov.hmcts.reform.civil.service.robotics.strategy.CaseNotesContributor;
-import uk.gov.hmcts.reform.civil.service.robotics.strategy.CaseProceedsInCasemanContributor;
-import uk.gov.hmcts.reform.civil.service.robotics.strategy.CaseQueriesContributor;
-import uk.gov.hmcts.reform.civil.service.robotics.strategy.CertificateOfSatisfactionOrCancellationContributor;
-import uk.gov.hmcts.reform.civil.service.robotics.strategy.ClaimDetailsNotifiedEventContributor;
-import uk.gov.hmcts.reform.civil.service.robotics.strategy.ClaimDismissedPastDeadlineContributor;
-import uk.gov.hmcts.reform.civil.service.robotics.strategy.ClaimDismissedPastNotificationsContributor;
-import uk.gov.hmcts.reform.civil.service.robotics.strategy.ClaimIssuedEventContributor;
-import uk.gov.hmcts.reform.civil.service.robotics.strategy.ClaimNotifiedEventContributor;
-import uk.gov.hmcts.reform.civil.service.robotics.strategy.ClaimantResponseContributor;
-import uk.gov.hmcts.reform.civil.service.robotics.strategy.ConsentExtensionEventContributor;
-import uk.gov.hmcts.reform.civil.service.robotics.strategy.DefaultJudgmentEventContributor;
-import uk.gov.hmcts.reform.civil.service.robotics.strategy.DefendantNoCDeadlineContributor;
-import uk.gov.hmcts.reform.civil.service.robotics.strategy.EventHistoryContributor;
-import uk.gov.hmcts.reform.civil.service.robotics.strategy.GeneralApplicationStrikeOutContributor;
-import uk.gov.hmcts.reform.civil.service.robotics.strategy.InterlocutoryJudgmentContributor;
-import uk.gov.hmcts.reform.civil.service.robotics.strategy.JudgmentByAdmissionContributor;
-import uk.gov.hmcts.reform.civil.service.robotics.strategy.MediationEventContributor;
-import uk.gov.hmcts.reform.civil.service.robotics.strategy.RespondentCounterClaimContributor;
-import uk.gov.hmcts.reform.civil.service.robotics.strategy.RespondentDivergentResponseContributor;
-import uk.gov.hmcts.reform.civil.service.robotics.strategy.RespondentFullAdmissionContributor;
-import uk.gov.hmcts.reform.civil.service.robotics.strategy.RespondentFullDefenceContributor;
-import uk.gov.hmcts.reform.civil.service.robotics.strategy.RespondentLitigationFriendContributor;
-import uk.gov.hmcts.reform.civil.service.robotics.strategy.RespondentPartAdmissionContributor;
-import uk.gov.hmcts.reform.civil.service.robotics.strategy.SdoNotDrawnContributor;
-import uk.gov.hmcts.reform.civil.service.robotics.strategy.SetAsideJudgmentContributor;
-import uk.gov.hmcts.reform.civil.service.robotics.strategy.SpecRejectRepaymentPlanContributor;
-import uk.gov.hmcts.reform.civil.service.robotics.strategy.SummaryJudgmentContributor;
-import uk.gov.hmcts.reform.civil.service.robotics.strategy.TakenOfflineAfterClaimDetailsNotifiedContributor;
-import uk.gov.hmcts.reform.civil.service.robotics.strategy.TakenOfflineAfterClaimNotifiedContributor;
-import uk.gov.hmcts.reform.civil.service.robotics.strategy.TakenOfflineByStaffEventContributor;
-import uk.gov.hmcts.reform.civil.service.robotics.strategy.TakenOfflinePastApplicantResponseContributor;
-import uk.gov.hmcts.reform.civil.service.robotics.strategy.TakenOfflineSpecDefendantNocContributor;
-import uk.gov.hmcts.reform.civil.service.robotics.strategy.UnregisteredDefendantContributor;
-import uk.gov.hmcts.reform.civil.service.robotics.strategy.UnrepresentedAndUnregisteredDefendantContributor;
-import uk.gov.hmcts.reform.civil.service.robotics.strategy.UnrepresentedDefendantContributor;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.AcknowledgementOfServiceStrategy;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.BreathingSpaceEventStrategy;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.CaseNotesStrategy;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.CaseProceedsInCasemanStrategy;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.CaseQueriesStrategy;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.CertificateOfSatisfactionOrCancellationStrategy;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.ClaimDetailsNotifiedEventStrategy;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.ClaimDismissedPastDeadlineStrategy;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.ClaimDismissedPastNotificationsStrategy;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.ClaimIssuedEventStrategy;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.ClaimNotifiedEventStrategy;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.ClaimantResponseStrategy;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.ConsentExtensionEventStrategy;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.DefaultJudgmentEventStrategy;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.DefendantNoCDeadlineStrategy;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.GeneralApplicationStrikeOutStrategy;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.InterlocutoryJudgmentStrategy;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.JudgmentByAdmissionStrategy;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.MediationEventStrategy;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.RespondentCounterClaimStrategy;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.RespondentDivergentResponseStrategy;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.RespondentFullAdmissionStrategy;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.RespondentFullDefenceStrategy;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.RespondentLitigationFriendStrategy;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.RespondentPartAdmissionStrategy;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.SdoNotDrawnStrategy;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.SetAsideJudgmentStrategy;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.SpecRejectRepaymentPlanStrategy;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.SummaryJudgmentStrategy;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.TakenOfflineAfterClaimDetailsNotifiedStrategy;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.TakenOfflineAfterClaimNotifiedStrategy;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.TakenOfflineByStaffEventStrategy;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.TakenOfflinePastApplicantResponseStrategy;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.TakenOfflineSpecDefendantNocStrategy;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.UnregisteredDefendantStrategy;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.UnrepresentedAndUnregisteredDefendantStrategy;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.UnrepresentedDefendantStrategy;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.EventHistoryStrategy;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextFormatter;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsManualOfflineSupport;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsPartyLookup;
@@ -173,43 +173,43 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     RoboticsRespondentResponseSupport.class,
     RoboticsPartyLookup.class,
     RoboticsSequenceGenerator.class,
-    ClaimIssuedEventContributor.class,
-    ClaimDetailsNotifiedEventContributor.class,
-    ClaimNotifiedEventContributor.class,
-    ClaimDismissedPastDeadlineContributor.class,
-    ClaimDismissedPastNotificationsContributor.class,
-    AcknowledgementOfServiceContributor.class,
-    RespondentLitigationFriendContributor.class,
-    CaseQueriesContributor.class,
-    UnrepresentedDefendantContributor.class,
-    UnregisteredDefendantContributor.class,
-    UnrepresentedAndUnregisteredDefendantContributor.class,
-    TakenOfflineAfterClaimDetailsNotifiedContributor.class,
-    TakenOfflineAfterClaimNotifiedContributor.class,
-    TakenOfflinePastApplicantResponseContributor.class,
-    BreathingSpaceEventContributor.class,
-    TakenOfflineByStaffEventContributor.class,
-    TakenOfflineSpecDefendantNocContributor.class,
-    SdoNotDrawnContributor.class,
-    InterlocutoryJudgmentContributor.class,
-    SummaryJudgmentContributor.class,
-    JudgmentByAdmissionContributor.class,
-    SetAsideJudgmentContributor.class,
-    CertificateOfSatisfactionOrCancellationContributor.class,
-    DefaultJudgmentEventContributor.class,
-    GeneralApplicationStrikeOutContributor.class,
-    ClaimantResponseContributor.class,
-    ConsentExtensionEventContributor.class,
-    CaseProceedsInCasemanContributor.class,
-    DefendantNoCDeadlineContributor.class,
-    MediationEventContributor.class,
-    CaseNotesContributor.class,
-    SpecRejectRepaymentPlanContributor.class,
-    RespondentDivergentResponseContributor.class,
-    RespondentFullDefenceContributor.class,
-    RespondentFullAdmissionContributor.class,
-    RespondentPartAdmissionContributor.class,
-    RespondentCounterClaimContributor.class,
+    ClaimIssuedEventStrategy.class,
+    ClaimDetailsNotifiedEventStrategy.class,
+    ClaimNotifiedEventStrategy.class,
+    ClaimDismissedPastDeadlineStrategy.class,
+    ClaimDismissedPastNotificationsStrategy.class,
+    AcknowledgementOfServiceStrategy.class,
+    RespondentLitigationFriendStrategy.class,
+    CaseQueriesStrategy.class,
+    UnrepresentedDefendantStrategy.class,
+    UnregisteredDefendantStrategy.class,
+    UnrepresentedAndUnregisteredDefendantStrategy.class,
+    TakenOfflineAfterClaimDetailsNotifiedStrategy.class,
+    TakenOfflineAfterClaimNotifiedStrategy.class,
+    TakenOfflinePastApplicantResponseStrategy.class,
+    BreathingSpaceEventStrategy.class,
+    TakenOfflineByStaffEventStrategy.class,
+    TakenOfflineSpecDefendantNocStrategy.class,
+    SdoNotDrawnStrategy.class,
+    InterlocutoryJudgmentStrategy.class,
+    SummaryJudgmentStrategy.class,
+    JudgmentByAdmissionStrategy.class,
+    SetAsideJudgmentStrategy.class,
+    CertificateOfSatisfactionOrCancellationStrategy.class,
+    DefaultJudgmentEventStrategy.class,
+    GeneralApplicationStrikeOutStrategy.class,
+    ClaimantResponseStrategy.class,
+    ConsentExtensionEventStrategy.class,
+    CaseProceedsInCasemanStrategy.class,
+    DefendantNoCDeadlineStrategy.class,
+    MediationEventStrategy.class,
+    CaseNotesStrategy.class,
+    SpecRejectRepaymentPlanStrategy.class,
+    RespondentDivergentResponseStrategy.class,
+    RespondentFullDefenceStrategy.class,
+    RespondentFullAdmissionStrategy.class,
+    RespondentPartAdmissionStrategy.class,
+    RespondentCounterClaimStrategy.class,
     RoboticsManualOfflineSupport.class
 })
 class EventHistoryMapperTest {
@@ -233,7 +233,7 @@ class EventHistoryMapperTest {
     RoboticsManualOfflineSupport manualOfflineSupport;
 
     @Autowired
-    List<EventHistoryContributor> contributors;
+    List<EventHistoryStrategy> strategies;
 
     @MockBean
     private Time time;
@@ -4557,7 +4557,7 @@ class EventHistoryMapperTest {
                     .atState(TAKEN_OFFLINE_AFTER_SDO)
                     .atStateTakenOfflineAfterSDO(MultiPartyScenario.ONE_V_ONE)
                     .build();
-                assertThat(mapperContributors()).contains("CaseProceedsInCasemanContributor");
+                assertThat(mapperStrategies()).contains("CaseProceedsInCasemanStrategy");
                 if (caseData.getRespondent2OrgRegistered() != null && caseData.getRespondent2Represented() == null) {
                     caseData = caseData.toBuilder().respondent2Represented(YES).build();
                 }
@@ -5794,8 +5794,8 @@ class EventHistoryMapperTest {
         }
     }
 
-    private String mapperContributors() {
-        return contributors.stream().map(contributor -> contributor.getClass().getSimpleName()).toList().toString();
+    private String mapperStrategies() {
+        return strategies.stream().map(strategy -> strategy.getClass().getSimpleName()).toList().toString();
     }
 
     @Nested
@@ -5806,7 +5806,7 @@ class EventHistoryMapperTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateTakenOfflineByStaff()
                 .build();
-            assertThat(mapperContributors()).contains("TakenOfflineByStaffEventContributor");
+            assertThat(mapperStrategies()).contains("TakenOfflineByStaffEventStrategy");
 
             List<Event> expectedMiscellaneousEvents = List.of(
                 Event.builder()
