@@ -37,7 +37,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPS_HWF_REJECTED_APPLICANT;
 
 @ExtendWith(MockitoExtension.class)
-public class HwFDashboardNotificationsHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
+public class GaHwFDashboardNotificationsHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
 
     @Mock
     private DashboardApiClient dashboardApiClient;
@@ -46,7 +46,7 @@ public class HwFDashboardNotificationsHandlerTest extends GeneralApplicationBase
     @Mock
     private FeatureToggleService featureToggleService;
     @InjectMocks
-    private HwFDashboardNotificationsHandler handler;
+    private GaHwFDashboardNotificationsHandler handler;
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
