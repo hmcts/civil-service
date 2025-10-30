@@ -15,9 +15,6 @@ import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenera
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
-/**
- * Emits the offline marker when only one respondent was notified and the case moves offline.
- */
 @Component
 @Order(8)
 @RequiredArgsConstructor

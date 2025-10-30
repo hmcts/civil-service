@@ -33,10 +33,6 @@ import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MISCELLANEOUS;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.APPLICANT_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT_ID;
 
-/**
- * Emits the CCJ judgment-by-admission events (misc marker + detailed payload)
- * formerly built directly inside the mapper.
- */
 @Component
 @Order(94)
 @RequiredArgsConstructor

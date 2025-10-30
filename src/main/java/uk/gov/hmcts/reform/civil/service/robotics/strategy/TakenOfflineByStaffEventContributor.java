@@ -15,9 +15,6 @@ import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenera
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
-/**
- * Emits the manual “taken offline by staff” event once a case has been moved to Caseman.
- */
 @Component
 @Order(30)
 @RequiredArgsConstructor

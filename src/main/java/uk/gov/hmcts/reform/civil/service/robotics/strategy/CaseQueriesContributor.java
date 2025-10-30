@@ -20,9 +20,6 @@ import java.util.Set;
 
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper.QUERIES_ON_CASE;
 
-/**
- * Emits the public/private query management miscellaneous event when a case is offline and has queries.
- */
 @Component
 @Order(80)
 @RequiredArgsConstructor

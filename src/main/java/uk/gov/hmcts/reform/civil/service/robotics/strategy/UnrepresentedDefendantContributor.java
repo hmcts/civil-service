@@ -24,9 +24,6 @@ import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREPRESENTED;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.getDefendantNames;
 
-/**
- * Emits the “unrepresented defendant” robotics events when a case is taken offline.
- */
 @Component
 @Order(90)
 @RequiredArgsConstructor

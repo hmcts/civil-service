@@ -24,9 +24,6 @@ import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREGISTERED;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.getDefendantNames;
 
-/**
- * Emits the “unregistered defendant solicitor firm” events once the case is taken offline.
- */
 @Component
 @Order(91)
 @RequiredArgsConstructor

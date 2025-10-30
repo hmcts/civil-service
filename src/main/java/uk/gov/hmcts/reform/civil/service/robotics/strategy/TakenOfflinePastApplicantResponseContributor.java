@@ -15,9 +15,6 @@ import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenera
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
-/**
- * Emits the offline event when the applicant misses their response deadline.
- */
 @Component
 @Order(10)
 @RequiredArgsConstructor

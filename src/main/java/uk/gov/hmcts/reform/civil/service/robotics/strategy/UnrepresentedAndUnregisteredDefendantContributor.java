@@ -24,9 +24,6 @@ import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenari
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREPRESENTED;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.getDefendantNames;
 
-/**
- * Emits the paired unrepresented/unregistered events when both conditions apply.
- */
 @Component
 @Order(92)
 @RequiredArgsConstructor

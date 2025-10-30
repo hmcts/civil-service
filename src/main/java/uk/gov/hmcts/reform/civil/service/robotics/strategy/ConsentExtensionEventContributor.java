@@ -28,9 +28,6 @@ import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1ExtensionExists;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2ExtensionExists;
 
-/**
- * Emits consent-extension events when respondents have agreed deadline extensions.
- */
 @Component
 @Order(25)
 @RequiredArgsConstructor

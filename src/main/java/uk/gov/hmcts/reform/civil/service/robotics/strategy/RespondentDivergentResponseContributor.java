@@ -44,9 +44,6 @@ import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1ResponseExists;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2DivergentResponseExists;
 
-/**
- * Emits respondent response events when defendants give different answers or go offline in 1v2 scenarios.
- */
 @Component
 @Order(45)
 @RequiredArgsConstructor

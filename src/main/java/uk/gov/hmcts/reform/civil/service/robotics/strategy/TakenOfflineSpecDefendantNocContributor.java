@@ -15,9 +15,6 @@ import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenera
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
-/**
- * Emits the notice-of-change offline marker when a spec defendant NoC moves the case offline.
- */
 @Component
 @Order(32)
 @RequiredArgsConstructor

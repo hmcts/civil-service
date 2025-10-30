@@ -14,9 +14,6 @@ import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextForma
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenerator;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsTimelineHelper;
 
-/**
- * Emits the summary-judgment miscellaneous event that was previously built inside the mapper.
- */
 @Component
 @Order(35)
 @RequiredArgsConstructor

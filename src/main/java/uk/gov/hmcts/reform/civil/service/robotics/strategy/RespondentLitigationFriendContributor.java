@@ -14,9 +14,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Adds miscellaneous events when litigation friends are created for either respondent.
- */
 @Component
 @Order(60)
 @RequiredArgsConstructor

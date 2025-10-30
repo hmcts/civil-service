@@ -17,9 +17,6 @@ import java.util.List;
 import static org.apache.commons.lang3.StringUtils.left;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 
-/**
- * Emits miscellaneous case-note events for any notes recorded against the case.
- */
 @Component
 @Order(85)
 @RequiredArgsConstructor

@@ -14,9 +14,6 @@ import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenera
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
-/**
- * Emits the claim-issued event for cases that have reached the corresponding flow state.
- */
 @Component
 @Order(5)
 @RequiredArgsConstructor

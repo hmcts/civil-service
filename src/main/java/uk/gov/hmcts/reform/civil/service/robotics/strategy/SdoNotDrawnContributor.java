@@ -17,9 +17,6 @@ import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
 import static org.apache.commons.lang3.StringUtils.left;
 
-/**
- * Emits the SDO-not-drawn offline event when the case enters the corresponding flow state.
- */
 @Component
 @Order(33)
 @RequiredArgsConstructor

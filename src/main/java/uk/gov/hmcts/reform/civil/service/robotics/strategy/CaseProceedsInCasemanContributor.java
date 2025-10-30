@@ -12,9 +12,6 @@ import uk.gov.hmcts.reform.civil.model.robotics.EventType;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextFormatter;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenerator;
 
-/**
- * Emits the “Case proceeds in Caseman” offline marker when an SDO order has taken the claim offline.
- */
 @Component
 @Order(50)
 @RequiredArgsConstructor

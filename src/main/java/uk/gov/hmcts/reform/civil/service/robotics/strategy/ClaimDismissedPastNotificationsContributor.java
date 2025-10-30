@@ -20,9 +20,6 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * Emits claim-dismissed notifications for the notification/detail deadlines.
- */
 @Component
 @Order(11)
 @RequiredArgsConstructor

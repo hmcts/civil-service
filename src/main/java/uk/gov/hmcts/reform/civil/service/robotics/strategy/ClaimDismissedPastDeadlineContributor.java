@@ -17,9 +17,6 @@ import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
 import java.util.List;
 
-/**
- * Emits the claim dismissed event that depends on the previous state in the flow.
- */
 @Component
 @Order(70)
 @RequiredArgsConstructor

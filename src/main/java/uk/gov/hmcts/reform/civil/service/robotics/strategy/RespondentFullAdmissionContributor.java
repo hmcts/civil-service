@@ -27,9 +27,6 @@ import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1ResponseE
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1v2SameSolicitorSameResponse;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2ResponseExists;
 
-/**
- * Emits receipt-of-admission and accompanying miscellaneous events for respondent full-admission paths.
- */
 @Component
 @Order(44)
 @RequiredArgsConstructor

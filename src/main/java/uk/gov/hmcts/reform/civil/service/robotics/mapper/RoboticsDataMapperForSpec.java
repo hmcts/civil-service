@@ -33,10 +33,6 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.APPLICANT_SOLICITOR_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT_SOLICITOR_ID;
 
-/**
- * This class is skeleton to be refined after we have final version of RPA Json structure
- * and it's mapping with CaseData.
- */
 @Slf4j
 @Service
 @RequiredArgsConstructor

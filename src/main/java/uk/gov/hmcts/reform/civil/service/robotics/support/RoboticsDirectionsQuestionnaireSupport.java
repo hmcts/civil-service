@@ -19,15 +19,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.APPLICANT2_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.APPLICANT_ID;
 
-/**
- * Shared helper for preparing applicant direction questionnaire details so mapper strategies
- * avoid duplicating the multi-party branching logic.
- */
 public final class RoboticsDirectionsQuestionnaireSupport {
-
-    private RoboticsDirectionsQuestionnaireSupport() {
-        // utility class
-    }
 
     public static List<ClaimantResponseDetails> prepareApplicantsDetails(CaseData caseData) {
         List<ClaimantResponseDetails> applicantsDetails = new ArrayList<>();

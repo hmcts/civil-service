@@ -14,10 +14,6 @@ import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsPartyLookup;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenerator;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsTimelineHelper;
 
-/**
- * Emits interlocutory judgment granted events when the case has a judicial referral with
- * hearing support requirements and applies to both respondents.
- */
 @Component
 @Order(34)
 @RequiredArgsConstructor

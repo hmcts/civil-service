@@ -15,9 +15,6 @@ import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenera
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
-/**
- * Emits the offline marker once claim details were notified but the claim then moved offline.
- */
 @Component
 @Order(9)
 @RequiredArgsConstructor

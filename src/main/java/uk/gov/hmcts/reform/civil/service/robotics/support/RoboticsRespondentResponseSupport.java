@@ -25,9 +25,6 @@ import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsDirecti
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getResponseTypeForRespondent;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getResponseTypeForRespondentSpec;
 
-/**
- * Shared helpers for respondent-response narrative text to keep contributors and the mapper in sync.
- */
 @Component
 @RequiredArgsConstructor
 public class RoboticsRespondentResponseSupport {

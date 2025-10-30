@@ -16,10 +16,6 @@ import java.time.LocalDateTime;
 
 import static java.util.Objects.requireNonNull;
 
-/**
- * Emits a miscellaneous robotics event when a defendant has missed the notice-of-change
- * deadline and the case moved offline as a result.
- */
 @Component
 @Order(40)
 @RequiredArgsConstructor

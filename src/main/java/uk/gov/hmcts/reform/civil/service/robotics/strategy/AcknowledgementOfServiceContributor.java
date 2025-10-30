@@ -24,9 +24,6 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
-/**
- * Emits acknowledgement-of-service events for the various multi-party scenarios.
- */
 @Component
 @Order(30)
 @RequiredArgsConstructor

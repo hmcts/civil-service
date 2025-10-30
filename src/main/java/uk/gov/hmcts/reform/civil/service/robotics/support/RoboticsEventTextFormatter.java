@@ -5,36 +5,24 @@ import org.springframework.stereotype.Component;
 import java.util.Locale;
 import java.util.Objects;
 
-/**
- * Consolidates repeated text templating for robotics events (RPA reason strings, claimant intentions, etc.).
- */
 @Component
 public class RoboticsEventTextFormatter {
 
     private static final String RPA_PREFIX = "RPA Reason: ";
 
-    /**
-     * Adds the standard RPA prefix to the supplied message. Null messages remain null.
-     */
-    public String withRpaPrefix(String message) {
+        public String withRpaPrefix(String message) {
         if (message == null) {
             return null;
         }
         return RPA_PREFIX + message;
     }
 
-    /**
-     * Formats the template with {@link Locale#UK} to guarantee stable decimal and date separators.
-     */
-    public String format(String template, Object... args) {
+        public String format(String template, Object... args) {
         Objects.requireNonNull(template, "template must not be null");
         return String.format(Locale.UK, template, args);
     }
 
-    /**
-     * Convenience wrapper for {@link #withRpaPrefix(String)} combined with {@link #format(String, Object...)}.
-     */
-    public String formatRpa(String template, Object... args) {
+        public String formatRpa(String template, Object... args) {
         return withRpaPrefix(format(template, args));
     }
 

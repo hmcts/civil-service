@@ -11,10 +11,6 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.function.Supplier;
 
-/**
- * Centralises date/time helpers used across robotics mappers so we rely on the shared {@link Time} source
- * and avoid repeated fallback logic.
- */
 @RequiredArgsConstructor
 @Component
 public class RoboticsTimelineHelper {
@@ -24,11 +20,7 @@ public class RoboticsTimelineHelper {
 
     private final Time time;
 
-    /**
-     * Returns the provided timestamp if it exists and is not before {@link Time#now()},
-     * otherwise falls back to {@link Time#now()}.
-     */
-    public LocalDateTime ensurePresentOrNow(LocalDateTime candidate) {
+        public LocalDateTime ensurePresentOrNow(LocalDateTime candidate) {
         LocalDateTime now = time.now();
         if (candidate == null || candidate.isBefore(now)) {
             return now;
@@ -36,31 +28,19 @@ public class RoboticsTimelineHelper {
         return candidate;
     }
 
-    /**
-     * Returns the candidate if non-null, otherwise calls the supplied fallback.
-     */
-    public <T> T withFallback(T candidate, Supplier<T> fallbackSupplier) {
+        public <T> T withFallback(T candidate, Supplier<T> fallbackSupplier) {
         return Objects.requireNonNullElseGet(candidate, fallbackSupplier);
     }
 
-    /**
-     * Formats a {@link LocalDate} using ISO-8601 (yyyy-MM-dd), returning {@code null} when the date is null.
-     */
-    public String toIsoDate(LocalDate date) {
+        public String toIsoDate(LocalDate date) {
         return date == null ? null : date.format(ISO_DATE);
     }
 
-    /**
-     * Formats a {@link LocalDateTime} using ISO-8601, returning {@code null} when the value is null.
-     */
-    public String toIsoDateTime(LocalDateTime dateTime) {
+        public String toIsoDateTime(LocalDateTime dateTime) {
         return dateTime == null ? null : dateTime.format(ISO_DATE_TIME.withLocale(Locale.UK));
     }
 
-    /**
-     * Exposes {@link Time#now()} so callers avoid coupling to the {@code Time} bean directly.
-     */
-    public LocalDateTime now() {
+        public LocalDateTime now() {
         return time.now();
     }
 }

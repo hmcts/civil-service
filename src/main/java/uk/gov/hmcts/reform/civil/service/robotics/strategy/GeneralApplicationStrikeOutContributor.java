@@ -27,10 +27,6 @@ import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.PROCEED
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFENCE_STRUCK_OUT;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.GENERAL_FORM_OF_APPLICATION;
 
-/**
- * Emits general application strike-out events (general form + defence struck out) when a strike-out
- * order has been granted and recorded in the GA collections.
- */
 @Component
 @Order(35)
 @RequiredArgsConstructor

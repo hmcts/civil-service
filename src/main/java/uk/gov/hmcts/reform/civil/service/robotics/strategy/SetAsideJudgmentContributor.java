@@ -22,10 +22,6 @@ import java.util.List;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT2_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT_ID;
 
-/**
- * Emits set-aside judgment events when JO live feed is active and the case records
- * a set-aside decision.
- */
 @Component
 @Order(95)
 @RequiredArgsConstructor

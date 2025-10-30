@@ -40,9 +40,6 @@ import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1ResponseE
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1v2SameSolicitorSameResponse;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2ResponseExists;
 
-/**
- * Emits receipt/defence events and accompanying DQ/miscellaneous entries for respondent part-admission paths.
- */
 @Component
 @Order(43)
 @RequiredArgsConstructor

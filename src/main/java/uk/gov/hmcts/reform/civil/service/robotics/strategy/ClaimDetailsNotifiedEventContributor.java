@@ -14,9 +14,6 @@ import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenera
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
-/**
- * Emits the “Claim details notified.” event when the case enters the CLAIM_DETAILS_NOTIFIED state.
- */
 @Component
 @Order(7)
 @RequiredArgsConstructor

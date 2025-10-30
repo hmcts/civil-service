@@ -26,10 +26,6 @@ import java.util.Optional;
 
 import static java.time.format.DateTimeFormatter.ISO_DATE;
 
-/**
- * Shared helpers for building robotics case-level structures that were previously duplicated
- * across the spec and unspec data mappers.
- */
 @Component
 @RequiredArgsConstructor
 public class RoboticsCaseDataSupport {

@@ -14,9 +14,6 @@ import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.left;
 import static java.time.format.DateTimeFormatter.ISO_DATE;
 
-/**
- * Shared helpers for manual “taken offline” robotics messages.
- */
 @Component
 @RequiredArgsConstructor
 public class RoboticsManualOfflineSupport {

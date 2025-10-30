@@ -14,9 +14,6 @@ import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenera
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
-/**
- * Emits the “Claimant has notified defendant.” event when the claim enters the CLAIM_NOTIFIED state.
- */
 @Component
 @Order(6)
 @RequiredArgsConstructor

@@ -6,17 +6,10 @@ import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 
 import java.util.List;
 
-/**
- * Utility responsible for computing the next robotics event sequence number from an existing history.
- * Extracted so sequencing rules are shared between {@code EventHistoryMapper} and any strategy classes.
- */
 @Component
 public class RoboticsSequenceGenerator {
 
-    /**
-     * Returns the next event sequence id based on the highest sequence presently stored in the supplied history.
-     */
-    public int nextSequence(EventHistory history) {
+        public int nextSequence(EventHistory history) {
         if (history == null) {
             return 1;
         }

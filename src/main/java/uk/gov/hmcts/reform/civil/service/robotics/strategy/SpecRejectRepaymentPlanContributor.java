@@ -16,9 +16,6 @@ import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsTimelineHelper
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
-/**
- * Emits a manual-determination-needed miscellaneous event when a spec claimant rejects a repayment plan.
- */
 @Component
 @Order(46)
 @RequiredArgsConstructor

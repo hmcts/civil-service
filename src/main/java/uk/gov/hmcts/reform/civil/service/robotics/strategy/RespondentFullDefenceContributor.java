@@ -40,9 +40,6 @@ import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1ResponseE
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1v2SameSolicitorSameResponse;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2ResponseExists;
 
-/**
- * Emits defence/states-paid and DQ events for respondent full-defence paths.
- */
 @Component
 @Order(42)
 @RequiredArgsConstructor

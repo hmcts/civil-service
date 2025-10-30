@@ -18,10 +18,6 @@ import java.time.LocalDateTime;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.APPLICANT_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT_ID;
 
-/**
- * Emits certificate of satisfaction/cancellation events when JO live feed is active
- * and the case records a COSC outcome.
- */
 @Component
 @Order(96)
 @RequiredArgsConstructor

@@ -21,9 +21,6 @@ import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1ResponseE
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1v2SameSolicitorSameResponse;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2ResponseExists;
 
-/**
- * Emits the miscellaneous counter-claim narratives when defendants choose the counter-claim path.
- */
 @Component
 @Order(47)
 @RequiredArgsConstructor

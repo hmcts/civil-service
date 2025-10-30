@@ -38,9 +38,6 @@ import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsDirecti
 import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsDirectionsQuestionnaireSupport.prepareApplicantsDetails;
 import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsDirectionsQuestionnaireSupport.prepareEventDetailsText;
 
-/**
- * Emits claimant-response events once a full-defence case proceeds (or not) following the claimant response.
- */
 @Component
 @Order(45)
 @RequiredArgsConstructor

@@ -5,9 +5,6 @@ import uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil;
 
 import java.util.List;
 
-/**
- * Reusable helper for litigious party identifiers and solicitor reference normalisation.
- */
 @Component
 public class RoboticsPartyLookup {
 
@@ -23,24 +20,15 @@ public class RoboticsPartyLookup {
         RoboticsDataUtil.RESPONDENT2_ID
     );
 
-    /**
-     * Returns the applicant litigious party identifier for the supplied zero-based index.
-     */
-    public String applicantId(int index) {
+        public String applicantId(int index) {
         return lookup(APPLICANT_IDS, index, "applicant");
     }
 
-    /**
-     * Returns the respondent litigious party identifier for the supplied zero-based index.
-     */
-    public String respondentId(int index) {
+        public String respondentId(int index) {
         return lookup(RESPONDENT_IDS, index, "respondent");
     }
 
-    /**
-     * Truncates solicitor references to the robotics 24-character limit, preserving {@code null}.
-     */
-    public String truncateReference(String reference) {
+        public String truncateReference(String reference) {
         if (reference == null) {
             return null;
         }
