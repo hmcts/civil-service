@@ -121,7 +121,7 @@ public class GaServiceRequestCUICallbackHandlerTest extends GeneralApplicationBa
         @Test
         void shouldHandleException_whenServiceRequestFails() {
             //GIVEN
-            params =  params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_CUI_GENERAL_APP, ABOUT_TO_SUBMIT);
+            params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_CUI_GENERAL_APP, ABOUT_TO_SUBMIT);
             when(paymentsService.createServiceRequest(any(), any()))
                 .thenThrow(FeignException.class);
             //WHEN
