@@ -19,12 +19,37 @@ public class TelemetryClientConfiguration {
     ) {
         TelemetryConfiguration configuration = TelemetryConfiguration.createDefault();
 
-        if (StringUtils.hasText(connectionString)) {
-            configuration.setConnectionString(connectionString);
-        } else if (StringUtils.hasText(instrumentationKey)) {
-            configuration.setInstrumentationKey(instrumentationKey);
+        String trimmedConnectionString = StringUtils.trimWhitespace(connectionString);
+        String trimmedInstrumentationKey = StringUtils.trimWhitespace(instrumentationKey);
+
+        if (isRealConnectionString(trimmedConnectionString)) {
+            configuration.setConnectionString(trimmedConnectionString);
+        } else if (isRealInstrumentationKey(trimmedInstrumentationKey)) {
+            configuration.setInstrumentationKey(trimmedInstrumentationKey);
         }
 
         return new TelemetryClient(configuration);
+    }
+
+    private boolean isRealConnectionString(String value) {
+        if (!StringUtils.hasText(value)) {
+            return false;
+        }
+        String lowerCase = value.toLowerCase();
+        if ("dummy".equals(lowerCase)) {
+            return false;
+        }
+        return lowerCase.contains("instrumentationkey=") || lowerCase.contains("ingestionendpoint=");
+    }
+
+    private boolean isRealInstrumentationKey(String value) {
+        if (!StringUtils.hasText(value)) {
+            return false;
+        }
+        String lowerCase = value.toLowerCase();
+        if (lowerCase.equals("00000000-0000-0000-0000-000000000000")) {
+            return false;
+        }
+        return true;
     }
 }
