@@ -1,0 +1,3 @@
+flow-state:
+  event-whitelist:
+    - NOT_AN_EVENT  # invalid event should cause context binding failure

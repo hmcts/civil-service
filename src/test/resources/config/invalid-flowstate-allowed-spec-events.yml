@@ -1,0 +1,4 @@
+flow-state:
+  allowed-events-spec:
+    MAIN.DRAFT:
+      - NOT_AN_EVENT  # invalid event should cause context binding failure
