@@ -6,10 +6,10 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.ga.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.ga.service.GaDashboardNotificationsParamsMapper;
 
 import java.util.Collections;
@@ -27,7 +27,7 @@ public class TaskListForRespondentUpdateHandler extends TaskListUpdateHandler {
 
     public TaskListForRespondentUpdateHandler(DashboardApiClient dashboardApiClient,
                                               GaDashboardNotificationsParamsMapper mapper,
-                                              CoreCaseDataService coreCaseDataService,
+                                              GaCoreCaseDataService coreCaseDataService,
                                               CaseDetailsConverter caseDetailsConverter,
                                               FeatureToggleService featureToggleService) {
         super(dashboardApiClient, mapper, coreCaseDataService, caseDetailsConverter, featureToggleService);

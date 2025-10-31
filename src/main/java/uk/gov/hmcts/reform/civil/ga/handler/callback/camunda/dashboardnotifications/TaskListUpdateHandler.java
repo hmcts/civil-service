@@ -5,9 +5,9 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.ga.callback.GaDashboardCallbackHandler;
 import uk.gov.hmcts.reform.civil.ga.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
 import uk.gov.hmcts.reform.civil.ga.service.GaDashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.List;
@@ -30,7 +30,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.RESPOND_TO_JUDGE_WRITTEN
 
 public abstract class TaskListUpdateHandler extends GaDashboardCallbackHandler {
 
-    private final CoreCaseDataService coreCaseDataService;
+    private final GaCoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
 
     public static final List<String> APPLICANT_ACTION_NEEDED_GA_STATES = Stream.of(
@@ -71,7 +71,7 @@ public abstract class TaskListUpdateHandler extends GaDashboardCallbackHandler {
 
     public TaskListUpdateHandler(DashboardApiClient dashboardApiClient,
                                  GaDashboardNotificationsParamsMapper mapper,
-                                 CoreCaseDataService coreCaseDataService,
+                                 GaCoreCaseDataService coreCaseDataService,
                                  CaseDetailsConverter caseDetailsConverter,
                                  FeatureToggleService featureToggleService) {
         super(dashboardApiClient, mapper, featureToggleService);
