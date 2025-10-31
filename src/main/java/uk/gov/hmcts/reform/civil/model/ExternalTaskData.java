@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.camunda.bpm.engine.variable.VariableMap;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 
 import java.util.Optional;
 
@@ -15,7 +16,8 @@ import java.util.Optional;
 public class ExternalTaskData {
 
     private CaseData caseData;
-    private CaseData generalApplicationCaseData;
+    private CaseData generalApplicationData;
+    private GeneralApplicationCaseData generalApplicationCaseData;
     private VariableMap variables;
 
     public Optional<CaseData> caseData() {
@@ -23,6 +25,10 @@ public class ExternalTaskData {
     }
 
     public Optional<CaseData> generalApplicationData() {
+        return Optional.ofNullable(generalApplicationData);
+    }
+
+    public Optional<GeneralApplicationCaseData> generalApplicationCaseData() {
         return Optional.ofNullable(generalApplicationCaseData);
     }
 

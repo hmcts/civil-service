@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.callback;
 
 import lombok.extern.slf4j.Slf4j;
-
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
@@ -56,16 +55,20 @@ public abstract class CallbackHandler {
         }
 
         String lastExecutedActivityId = businessProcess.getActivityId();
-        log.info("Last executed activity id was: {} and current activity id for this request is: {}",
-                 lastExecutedActivityId, currentActivityId
+        log.info(
+            "Last executed activity id was: {} and current activity id for this request is: {}",
+            lastExecutedActivityId, currentActivityId
         );
 
         return businessProcess != null && currentActivityId.contains(lastExecutedActivityId);
     }
 
-    public void register(Map<String, CallbackHandler> handlers) {
+    public void register(Map<String, CallbackHandler> handlers, CaseTypeHandlerKeyFactory caseTypeHandlerKeyFactory) {
         handledEvents().forEach(
-            handledEvent -> handlers.put(handledEvent.name(), this));
+            handledEvent -> {
+                final String handleEventKey = caseTypeHandlerKeyFactory.createHandlerKey(this, handledEvent);
+                handlers.put(handleEventKey, this);
+            });
     }
 
     public CallbackResponse handle(CallbackParams callbackParams) {

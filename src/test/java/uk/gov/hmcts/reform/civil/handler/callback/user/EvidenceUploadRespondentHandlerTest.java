@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.callback.CaseTypeHandlerKeyFactory;
 import uk.gov.hmcts.reform.civil.config.RespondentEvidenceHandlerTestConfiguration;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
@@ -1221,9 +1222,10 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     void whenRegisterCalledThenReturnEvidenceUploadCaseEvent() {
         // Given
         Map<String, CallbackHandler> registerTarget = new HashMap<>();
+        CaseTypeHandlerKeyFactory factory = new CaseTypeHandlerKeyFactory();
 
         // When
-        handler.register(registerTarget);
+        handler.register(registerTarget, factory);
 
         // Then
         assertThat(registerTarget).containsExactly(entry(EVIDENCE_UPLOAD_RESPONDENT.name(), handler));

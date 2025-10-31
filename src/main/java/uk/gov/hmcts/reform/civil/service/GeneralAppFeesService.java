@@ -7,6 +7,7 @@ import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.civil.client.FeesApiClient;
 import uk.gov.hmcts.reform.civil.config.GeneralAppFeesConfiguration;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.FeeLookupResponseDto;
@@ -31,7 +32,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 public class GeneralAppFeesService {
 
     private static final BigDecimal PENCE_PER_POUND = BigDecimal.valueOf(100);
-    private static final int FREE_GA_DAYS = 14;
+    protected static final int FREE_GA_DAYS = 14;
 
     private final FeesApiClient feesApiClient;
     private final GeneralAppFeesConfiguration feesConfiguration;
@@ -68,7 +69,30 @@ public class GeneralAppFeesService {
         return getFeeForGA(applicationTypes, withConsent, withNotice, hearingDate);
     }
 
+    public boolean isFreeGa(GeneralApplication application) {
+        if (application.getGeneralAppType().getTypes().size() == 1
+            && application.getGeneralAppType().getTypes()
+            .contains(GeneralApplicationTypes.ADJOURN_HEARING)
+            && application.getGeneralAppRespondentAgreement() != null
+            && YES.equals(application.getGeneralAppRespondentAgreement().getHasAgreed())
+            && application.getGeneralAppHearingDate() != null
+            && application.getGeneralAppHearingDate().getHearingScheduledDate() != null) {
+            return application.getGeneralAppHearingDate().getHearingScheduledDate()
+                .isAfter(LocalDate.now().plusDays(GeneralAppFeesService.FREE_GA_DAYS));
+        }
+        return false;
+    }
+
     public Fee getFeeForGA(CaseData caseData) {
+        return getFeeForGA(
+            caseData.getGeneralAppType().getTypes(),
+            getRespondentAgreed(caseData),
+            getInformOtherParty(caseData),
+            getHearingDate(caseData)
+        );
+    }
+
+    public Fee getFeeForGA(GeneralApplicationCaseData caseData) {
         return getFeeForGA(
             caseData.getGeneralAppType().getTypes(),
             getRespondentAgreed(caseData),
@@ -133,7 +157,7 @@ public class GeneralAppFeesService {
         return result;
     }
 
-    protected Fee getFeeForGA(String keyword, String event, String service) {
+    public Fee getFeeForGA(String keyword, String event, String service) {
         if (Objects.isNull(event)) {
             event = feesConfiguration.getEvent();
         }
@@ -191,6 +215,20 @@ public class GeneralAppFeesService {
             && hearingScheduledDate.isAfter(LocalDate.now().plusDays(FREE_GA_DAYS));
     }
 
+    public boolean isFreeApplication(final GeneralApplicationCaseData caseData) {
+        if (caseData.getGeneralAppType().getTypes().size() == 1
+            && caseData.getGeneralAppType().getTypes()
+            .contains(GeneralApplicationTypes.ADJOURN_HEARING)
+            && caseData.getGeneralAppRespondentAgreement() != null
+            && YES.equals(caseData.getGeneralAppRespondentAgreement().getHasAgreed())
+            && caseData.getGeneralAppHearingDate() != null
+            && caseData.getGeneralAppHearingDate().getHearingScheduledDate() != null) {
+            return caseData.getGeneralAppHearingDate().getHearingScheduledDate()
+                .isAfter(LocalDate.now().plusDays(FREE_GA_DAYS));
+        }
+        return false;
+    }
+
     private Fee buildFeeDto(FeeLookupResponseDto feeLookupResponseDto) {
         BigDecimal calculatedAmount = feeLookupResponseDto.getFeeAmount()
             .multiply(PENCE_PER_POUND)
@@ -204,6 +242,13 @@ public class GeneralAppFeesService {
     }
 
     protected Boolean getRespondentAgreed(CaseData caseData) {
+        return Optional.ofNullable(caseData.getGeneralAppRespondentAgreement())
+            .map(GARespondentOrderAgreement::getHasAgreed)
+            .map(hasAgreed -> hasAgreed == YES)
+            .orElse(null);
+    }
+
+    protected Boolean getRespondentAgreed(GeneralApplicationCaseData caseData) {
         return Optional.ofNullable(caseData.getGeneralAppRespondentAgreement())
             .map(GARespondentOrderAgreement::getHasAgreed)
             .map(hasAgreed -> hasAgreed == YES)
@@ -224,6 +269,13 @@ public class GeneralAppFeesService {
             .orElse(null);
     }
 
+    protected Boolean getInformOtherParty(GeneralApplicationCaseData caseData) {
+        return Optional.ofNullable(caseData.getGeneralAppInformOtherParty())
+            .map(GAInformOtherParty::getIsWithNotice)
+            .map(isWithNotice -> isWithNotice == YES)
+            .orElse(null);
+    }
+
     protected Boolean getInformOtherParty(GeneralApplication generalApplication) {
         return Optional.ofNullable(generalApplication.getGeneralAppInformOtherParty())
             .map(GAInformOtherParty::getIsWithNotice)
@@ -232,6 +284,12 @@ public class GeneralAppFeesService {
     }
 
     protected LocalDate getHearingDate(CaseData caseData) {
+        return Optional.ofNullable(caseData.getGeneralAppHearingDate())
+            .map(GAHearingDateGAspec::getHearingScheduledDate)
+            .orElse(null);
+    }
+
+    protected LocalDate getHearingDate(GeneralApplicationCaseData caseData) {
         return Optional.ofNullable(caseData.getGeneralAppHearingDate())
             .map(GAHearingDateGAspec::getHearingScheduledDate)
             .orElse(null);
