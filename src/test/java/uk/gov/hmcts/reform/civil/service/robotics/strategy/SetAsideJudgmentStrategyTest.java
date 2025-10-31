@@ -113,4 +113,30 @@ class SetAsideJudgmentStrategyTest {
         assertThat(history.getSetAsideJudgment())
             .allSatisfy(event -> assertThat(event.getEventDetails().getApplicant()).isEqualTo("PROPER OFFICER"));
     }
+
+    @Test
+    void contributeUsesDefenceDateWhenOrderAfterDefence() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .buildJudmentOnlineCaseDataWithPaymentByInstalment()
+            .toBuilder()
+            .joSetAsideReason(JudgmentSetAsideReason.JUDGE_ORDER)
+            .joSetAsideOrderType(JudgmentSetAsideOrderType.ORDER_AFTER_DEFENCE)
+            .joSetAsideOrderDate(LocalDate.of(2024, 6, 10))
+            .joSetAsideDefenceReceivedDate(LocalDate.of(2024, 5, 20))
+            .joSetAsideCreatedDate(LocalDateTime.of(2024, 6, 11, 12, 0))
+            .build();
+
+        when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
+        when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(33);
+
+        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        strategy.contribute(builder, caseData, null);
+
+        EventHistory history = builder.build();
+        assertThat(history.getSetAsideJudgment()).singleElement().satisfies(event -> {
+            assertThat(event.getEventDetails().getApplicant()).isEqualTo("PARTY AGAINST");
+            assertThat(event.getEventDetails().getApplicationDate()).isEqualTo(LocalDate.of(2024, 5, 20));
+            assertThat(event.getEventDetails().getResultDate()).isEqualTo(LocalDate.of(2024, 6, 10));
+        });
+    }
 }

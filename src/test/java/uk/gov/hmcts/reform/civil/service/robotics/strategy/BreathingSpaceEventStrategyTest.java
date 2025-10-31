@@ -157,4 +157,65 @@ class BreathingSpaceEventStrategyTest {
         assertThat(event.getEventDetailsText())
             .isEqualTo("Breathing space reference REF-200, actual start date " + fallback);
     }
+
+    @Test
+    void addsMentalHealthEnterAndLiftWhenLiftPresent() {
+        LocalDate start = LocalDate.of(2024, 6, 1);
+        LocalDate end = LocalDate.of(2024, 6, 30);
+        LocalDateTime fallbackEnter = LocalDateTime.of(2024, 6, 1, 8, 0);
+        LocalDateTime fallbackLift = LocalDateTime.of(2024, 6, 30, 8, 0);
+        when(timelineHelper.now()).thenReturn(fallbackEnter, fallbackLift);
+        when(sequenceGenerator.nextSequence(any())).thenReturn(11, 12);
+
+        CaseData caseData = CaseData.builder()
+            .breathing(BreathingSpaceInfo.builder()
+                .enter(BreathingSpaceEnterInfo.builder()
+                    .type(BreathingSpaceType.MENTAL_HEALTH)
+                    .reference("MH-REF")
+                    .start(start)
+                    .build())
+                .lift(BreathingSpaceLiftInfo.builder()
+                    .expectedEnd(end)
+                    .build())
+                .build())
+            .build();
+
+        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        strategy.contribute(builder, caseData, null);
+
+        EventHistory history = builder.build();
+        assertThat(history.getBreathingSpaceMentalHealthEntered()).hasSize(1);
+        assertThat(history.getBreathingSpaceMentalHealthLifted()).hasSize(1);
+        assertThat(history.getBreathingSpaceMentalHealthLifted().get(0).getEventDetailsText())
+            .isEqualTo("Breathing space reference MH-REF, actual end date " + end);
+    }
+
+    @Test
+    void usesFallbackWhenEndDateMissing() {
+        LocalDate start = LocalDate.of(2024, 7, 10);
+        LocalDateTime fallbackEnter = LocalDateTime.of(2024, 7, 10, 9, 0);
+        LocalDateTime fallbackLift = LocalDateTime.of(2024, 7, 10, 9, 0);
+        when(timelineHelper.now()).thenReturn(fallbackEnter, fallbackLift);
+        when(sequenceGenerator.nextSequence(any())).thenReturn(14, 15);
+
+        CaseData caseData = CaseData.builder()
+            .breathing(BreathingSpaceInfo.builder()
+                .enter(BreathingSpaceEnterInfo.builder()
+                    .type(BreathingSpaceType.STANDARD)
+                    .reference("REF-NO-END")
+                    .start(start)
+                    .build())
+                .lift(BreathingSpaceLiftInfo.builder().build())
+                .build())
+            .build();
+
+        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        strategy.contribute(builder, caseData, null);
+
+        EventHistory history = builder.build();
+        assertThat(history.getBreathingSpaceEntered()).hasSize(1);
+        assertThat(history.getBreathingSpaceLifted()).hasSize(1);
+        assertThat(history.getBreathingSpaceLifted().get(0).getEventDetailsText())
+            .isEqualTo("Breathing space reference REF-NO-END, ");
+    }
 }

@@ -6,8 +6,10 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
@@ -22,6 +24,8 @@ import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsTimelineHelper
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -176,6 +180,98 @@ class RespondentDivergentResponseStrategyTest {
         assertThat(history.getDirectionsQuestionnaireFiled())
             .extracting(Event::getEventSequence)
             .containsExactly(23);
+    }
+
+    @Test
+    void shouldAddStatesPaidWhenRespondentPaysInFull() {
+        when(stateFlow.getStateHistory()).thenReturn(List.of(
+            State.from(FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName())
+        ));
+        when(stateFlow.getState()).thenReturn(
+            State.from(FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName())
+        );
+        when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(30, 31);
+
+        BigDecimal claimAmount = BigDecimal.valueOf(1000);
+        CaseData caseData = createUnspecDivergentCase().toBuilder()
+            .totalClaimAmount(claimAmount)
+            .respondToClaim(RespondToClaim.builder()
+                .howMuchWasPaid(claimAmount.multiply(BigDecimal.valueOf(100)))
+                .whenWasThisAmountPaid(LocalDate.now())
+                .build())
+            .respondent1ClaimResponseType(RespondentResponseType.FULL_DEFENCE)
+            .build();
+
+        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        strategy.contribute(builder, caseData, null);
+
+        EventHistory history = builder.build();
+        assertThat(history.getStatesPaid()).hasSize(1);
+        assertThat(history.getDefenceFiled()).isNullOrEmpty();
+    }
+
+    @Test
+    void shouldNotAddMiscForSpecFullDefenceWhenGoingOffline() {
+        when(stateFlow.getStateHistory()).thenReturn(List.of(
+            State.from(FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName()),
+            State.from(FlowState.Main.DIVERGENT_RESPOND_GO_OFFLINE.fullName())
+        ));
+        when(stateFlow.getState()).thenReturn(
+            State.from(FlowState.Main.DIVERGENT_RESPOND_GO_OFFLINE.fullName())
+        );
+        when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(40, 41);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .respondent1DQ()
+            .setClaimTypeToSpecClaim()
+            .respondent1(PartyBuilder.builder().individual().build())
+            .build()
+            .toBuilder()
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+            .respondent1ResponseDate(NOW)
+            .build();
+
+        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        strategy.contribute(builder, caseData, null);
+
+        EventHistory history = builder.build();
+        assertThat(history.getMiscellaneous()).isNullOrEmpty();
+        assertThat(history.getDirectionsQuestionnaireFiled()).hasSize(1);
+    }
+
+    @Test
+    void shouldUseRespondent1ResponseDateWhenSameSolicitor() {
+        when(stateFlow.getStateHistory()).thenReturn(List.of(
+            State.from(FlowState.Main.DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE.fullName())
+        ));
+        when(stateFlow.getState()).thenReturn(
+            State.from(FlowState.Main.DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE.fullName())
+        );
+        when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(50, 51, 52, 53);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atState1v2SameSolicitorDivergentResponse(RespondentResponseType.FULL_DEFENCE, RespondentResponseType.PART_ADMISSION)
+            .build()
+            .toBuilder()
+            .respondent1(PartyBuilder.builder().individual().build())
+            .respondent2(PartyBuilder.builder().individual().build())
+            .respondent1ResponseDate(NOW)
+            .respondent2ResponseDate(NOW.plusDays(5))
+            .respondent2SameLegalRepresentative(YesOrNo.YES)
+            .sameSolicitorSameResponse(YesOrNo.YES)
+            .build();
+
+        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        strategy.contribute(builder, caseData, null);
+
+        EventHistory history = builder.build();
+        LocalDateTime expectedDate = caseData.getRespondent1ResponseDate();
+        assertThat(history.getDirectionsQuestionnaireFiled())
+            .extracting(Event::getDateReceived)
+            .contains(expectedDate);
+        assertThat(history.getMiscellaneous())
+            .extracting(Event::getDateReceived)
+            .contains(expectedDate);
     }
 
     private CaseData createUnspecDivergentCase() {

@@ -114,4 +114,38 @@ class ClaimDismissedPastNotificationsStrategyTest {
         assertThat(history.getMiscellaneous().get(1).getEventDetailsText())
             .isEqualTo("RPA Reason: Claim dismissed. Claimant hasn't notified defendant of the claim details within the allowed 2 weeks.");
     }
+
+    @Test
+    void supportsReturnsFalseWhenNoRelevantState() {
+        when(stateFlow.getStateHistory()).thenReturn(
+            List.of(State.from(FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE.fullName()))
+        );
+
+        CaseData caseData = CaseData.builder()
+            .claimDismissedDate(LocalDateTime.of(2024, 2, 6, 9, 0))
+            .build();
+
+        assertThat(strategy.supports(caseData)).isFalse();
+    }
+
+    @Test
+    void contributeUsesNextSequenceForMultipleEvents() {
+        when(sequenceGenerator.nextSequence(any())).thenReturn(100, 101, 102);
+        when(stateFlow.getStateHistory()).thenReturn(
+            List.of(
+                State.from(FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE.fullName()),
+                State.from(FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE.fullName())
+            )
+        );
+        CaseData caseData = CaseData.builder()
+            .claimDismissedDate(LocalDateTime.of(2024, 3, 3, 10, 0))
+            .build();
+
+        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        strategy.contribute(builder, caseData, null);
+
+        assertThat(builder.build().getMiscellaneous())
+            .extracting(e -> e.getEventSequence())
+            .containsExactly(100, 101);
+    }
 }

@@ -78,4 +78,22 @@ class RespondentLitigationFriendStrategyTest {
         assertThat(history.getMiscellaneous().get(1).getEventDetailsText())
             .isEqualTo("Litigation friend added for respondent: Resp Two");
     }
+
+    @Test
+    void contributeAddsEventOnlyForSecondRespondent() {
+        LocalDateTime r2Date = LocalDateTime.of(2024, 3, 10, 10, 30);
+        CaseData caseData = CaseData.builder()
+            .respondent2LitigationFriendCreatedDate(r2Date)
+            .respondent2(Party.builder().type(Party.Type.COMPANY).companyName("Resp Two Ltd").build())
+            .build();
+
+        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        strategy.contribute(builder, caseData, null);
+
+        EventHistory history = builder.build();
+        assertThat(history.getMiscellaneous()).hasSize(1);
+        assertThat(history.getMiscellaneous().get(0).getDateReceived()).isEqualTo(r2Date);
+        assertThat(history.getMiscellaneous().get(0).getEventDetailsText())
+            .isEqualTo("Litigation friend added for respondent: Resp Two Ltd");
+    }
 }

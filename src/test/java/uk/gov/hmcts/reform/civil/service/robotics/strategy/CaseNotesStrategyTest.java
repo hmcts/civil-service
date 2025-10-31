@@ -6,6 +6,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CaseNote;
+import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.model.robotics.EventType;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -92,5 +93,38 @@ class CaseNotesStrategyTest {
         assertThat(history.getMiscellaneous().get(1).getEventDetailsText())
             .isEqualTo("case note added: ");
         assertThat(history.getMiscellaneous().get(1).getDateReceived()).isEqualTo(createdOn.plusDays(1));
+    }
+
+    @Test
+    void contributeTrimsLongNotesToMaximumLength() {
+        String longNote = "x".repeat(300);
+        CaseNote note = CaseNote.builder()
+            .createdOn(LocalDateTime.now())
+            .note(longNote)
+            .build();
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .build()
+            .toBuilder()
+            .caseNotes(wrapElements(note))
+            .build();
+
+        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        strategy.contribute(builder, caseData, null);
+
+        String prefix = "case note added: ";
+        String expected = prefix + "x".repeat(250 - prefix.length());
+        assertThat(builder.build().getMiscellaneous().get(0).getEventDetailsText()).isEqualTo(expected);
+    }
+
+    @Test
+    void buildEventHandlesNullCaseNotes() throws Exception {
+        var method = CaseNotesStrategy.class.getDeclaredMethod("buildEvent", CaseNote.class);
+        method.setAccessible(true);
+
+        Event event = (Event) method.invoke(strategy, new Object[]{null});
+
+        assertThat(event.getEventDetailsText()).isEqualTo("case note added: ");
+        assertThat(event.getDateReceived()).isNull();
     }
 }

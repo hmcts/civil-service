@@ -176,4 +176,79 @@ class ClaimantResponseStrategyTest {
         assertThat(history.getDirectionsQuestionnaireFiled()).extracting(Event::getLitigiousPartyID)
             .contains(APPLICANT2_ID);
     }
+
+    @Test
+    void shouldAddSpecDirectionsQuestionnaireEvents() {
+        when(stateFlow.getStateHistory()).thenReturn(List.of(State.from(FlowState.Main.FULL_DEFENCE_PROCEED.fullName())));
+
+        LocalDateTime applicantResponse = LocalDateTime.of(2024, 6, 12, 9, 30);
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateApplicantRespondToDefenceAndProceed(ONE_V_ONE)
+            .setClaimTypeToSpecClaim()
+            .build()
+            .toBuilder()
+            .applicant1ResponseDate(applicantResponse)
+            .build();
+
+        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        strategy.contribute(builder, caseData, "token");
+
+        EventHistory history = builder.build();
+        assertThat(history.getDirectionsQuestionnaireFiled()).hasSize(1);
+        Event dqEvent = history.getDirectionsQuestionnaireFiled().get(0);
+        String expectedCourt = uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsDirectionsQuestionnaireSupport
+            .getPreferredCourtCode(caseData.getApplicant1DQ());
+        assertThat(dqEvent.getEventDetails().getPreferredCourtCode()).isEqualTo(expectedCourt);
+        assertThat(dqEvent.getEventDetailsText()).contains("preferredCourtCode");
+    }
+
+    @Test
+    void shouldUseMultipartyTextsWhenOnlyOneDefendantProceedsWithSameSolicitor() {
+        when(stateFlow.getStateHistory()).thenReturn(List.of(State.from(FlowState.Main.FULL_DEFENCE_PROCEED.fullName())));
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateApplicantRespondToDefenceAndProceedVsDefendant1Only_1v2()
+            .build()
+            .toBuilder()
+            .respondent2SameLegalRepresentative(YesOrNo.YES)
+            .addRespondent2(YesOrNo.YES)
+            .respondent2(uk.gov.hmcts.reform.civil.sampledata.PartyBuilder.builder().individual().build())
+            .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(YesOrNo.YES)
+            .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(YesOrNo.NO)
+            .applicant1ResponseDate(LocalDateTime.of(2024, 7, 1, 11, 0))
+            .allocatedTrack(AllocatedTrack.FAST_CLAIM)
+            .build();
+
+        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        strategy.contribute(builder, caseData, "token");
+
+        EventHistory history = builder.build();
+        assertThat(history.getMiscellaneous()).hasSize(2);
+        assertThat(history.getMiscellaneous())
+            .extracting(Event::getEventDetailsText)
+            .allSatisfy(text -> assertThat(text).contains("Claimant has provided intention"));
+        assertThat(history.getMiscellaneous())
+            .map(Event::getEventDetailsText)
+            .noneMatch(text -> text.contains("Multitrack"));
+    }
+
+    @Test
+    void shouldNotAddTakenOfflineWhenSmallClaimMediationOneVOne() {
+        when(stateFlow.getStateHistory()).thenReturn(List.of(State.from(FlowState.Main.FULL_DEFENCE_PROCEED.fullName())));
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateApplicantProceedAllMediation(ONE_V_ONE)
+            .build()
+            .toBuilder()
+            .applicant1ResponseDate(LocalDateTime.of(2024, 8, 15, 10, 0))
+            .build();
+
+        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        strategy.contribute(builder, caseData, "token");
+
+        EventHistory history = builder.build();
+        assertThat(history.getMiscellaneous()).hasSize(1);
+        assertThat(history.getMiscellaneous().get(0).getEventDetailsText())
+            .contains("Claimant proceeds");
+    }
 }

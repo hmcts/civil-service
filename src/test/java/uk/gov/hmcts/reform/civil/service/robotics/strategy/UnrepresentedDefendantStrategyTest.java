@@ -53,6 +53,8 @@ class UnrepresentedDefendantStrategyTest {
             .thenReturn("RPA Reason: [1 of 2 - 2024-02-12] Unrepresented defendant: Resp One");
         when(textFormatter.unrepresentedDefendant("[2 of 2 - 2024-02-12] ", "Resp Two"))
             .thenReturn("RPA Reason: [2 of 2 - 2024-02-12] Unrepresented defendant: Resp Two");
+        when(textFormatter.unrepresentedDefendant("", "Resp One"))
+            .thenReturn("RPA Reason: Unrepresented defendant: Resp One");
     }
 
     @Test
@@ -106,5 +108,37 @@ class UnrepresentedDefendantStrategyTest {
         assertThat(history.getMiscellaneous().get(1).getEventSequence()).isEqualTo(12);
         assertThat(history.getMiscellaneous().get(1).getEventDetailsText())
             .isEqualTo("RPA Reason: [2 of 2 - 2024-02-12] Unrepresented defendant: Resp Two");
+    }
+
+    @Test
+    void supportsReturnsFalseWhenNoUnrepresentedDefendants() {
+        CaseData caseData = CaseData.builder()
+            .submittedDate(LocalDateTime.now())
+            .respondent1(Party.builder().individualFirstName("Resp").individualLastName("One")
+                .type(Party.Type.INDIVIDUAL).build())
+            .respondent1Represented(YesOrNo.YES)
+            .build();
+
+        assertThat(strategy.supports(caseData)).isFalse();
+    }
+
+    @Test
+    void contributeAddsSingleEventWhenOnlyFirstUnrepresented() {
+        CaseData caseData = CaseData.builder()
+            .submittedDate(LocalDateTime.of(2024, 2, 10, 0, 0))
+            .respondent1(Party.builder().type(Party.Type.INDIVIDUAL)
+                .individualFirstName("Resp").individualLastName("One").build())
+            .respondent1Represented(YesOrNo.NO)
+            .respondent2(Party.builder().type(Party.Type.INDIVIDUAL)
+                .individualFirstName("Resp").individualLastName("Two").build())
+            .respondent2Represented(YesOrNo.YES)
+            .build();
+
+        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        strategy.contribute(builder, caseData, null);
+
+        EventHistory history = builder.build();
+        assertThat(history.getMiscellaneous()).hasSize(1);
+        assertThat(history.getMiscellaneous().get(0).getEventDetailsText()).isNotNull();
     }
 }
