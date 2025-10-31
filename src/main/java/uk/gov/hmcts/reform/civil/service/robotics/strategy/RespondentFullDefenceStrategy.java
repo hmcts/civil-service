@@ -75,116 +75,142 @@ public class RespondentFullDefenceStrategy implements EventHistoryStrategy {
             return;
         }
 
-        EventHistory existingHistory = builder.build();
-        List<Event> defenceEvents = new ArrayList<>(Optional.ofNullable(existingHistory.getDefenceFiled()).orElse(List.of()));
-        defenceEvents.removeIf(event -> event.getEventCode() == null);
+        EventBuckets buckets = initialiseBuckets(builder.build());
 
-        List<Event> statesPaidEvents = new ArrayList<>(Optional.ofNullable(existingHistory.getStatesPaid()).orElse(List.of()));
-        statesPaidEvents.removeIf(event -> event.getEventCode() == null);
+        processRespondent1(builder, caseData, buckets);
+        processRespondent2(builder, caseData, buckets);
 
-        List<Event> directionsQuestionnaireEvents = new ArrayList<>(
-            Optional.ofNullable(existingHistory.getDirectionsQuestionnaireFiled()).orElse(List.of())
+        builder.defenceFiled(buckets.defenceEvents);
+        builder.statesPaid(buckets.statesPaidEvents);
+        builder.clearDirectionsQuestionnaireFiled().directionsQuestionnaireFiled(buckets.directionsQuestionnaireEvents);
+    }
+
+    private EventBuckets initialiseBuckets(EventHistory history) {
+        List<Event> defenceEvents = sanitise(history.getDefenceFiled());
+        List<Event> statesPaidEvents = sanitise(history.getStatesPaid());
+        List<Event> directionsQuestionnaireEvents = sanitise(history.getDirectionsQuestionnaireFiled());
+        return new EventBuckets(defenceEvents, statesPaidEvents, directionsQuestionnaireEvents);
+    }
+
+    private List<Event> sanitise(List<Event> events) {
+        List<Event> result = new ArrayList<>(Optional.ofNullable(events).orElse(List.of()));
+        result.removeIf(event -> event.getEventCode() == null);
+        return result;
+    }
+
+    private void processRespondent1(EventHistory.EventHistoryBuilder builder,
+                                    CaseData caseData,
+                                    EventBuckets buckets) {
+        if (!defendant1ResponseExists.test(caseData)) {
+            return;
+        }
+
+        LocalDateTime responseDate = caseData.getRespondent1ResponseDate();
+        if (caseData.isLRvLipOneVOne() || caseData.isLipvLipOneVOne()) {
+            addLipVsLipFullDefenceEvent(builder, caseData, buckets, responseDate);
+        } else {
+            addDefenceOrStatesPaid(builder, caseData, buckets, responseDate, RESPONDENT_ID, caseData.getRespondToClaim());
+        }
+
+        Respondent1DQ respondent1DQ = caseData.getRespondent1DQ();
+        buckets.directionsQuestionnaireEvents.add(
+            createDirectionsQuestionnaireEvent(
+                builder,
+                caseData,
+                responseDate,
+                RESPONDENT_ID,
+                respondent1DQ,
+                caseData.getRespondent1(),
+                true
+            )
         );
-        directionsQuestionnaireEvents.removeIf(event -> event.getEventCode() == null);
 
-        if (defendant1ResponseExists.test(caseData)) {
-            LocalDateTime respondent1ResponseDate = caseData.getRespondent1ResponseDate();
+        if (defendant1v2SameSolicitorSameResponse.test(caseData)) {
+            handleSameSolicitorResponse(builder, caseData, buckets, responseDate, respondent1DQ);
+        }
+    }
 
-            if (caseData.isLRvLipOneVOne() || caseData.isLipvLipOneVOne()) {
-                addLipVsLipFullDefenceEvent(builder, caseData, defenceEvents, statesPaidEvents);
-            } else {
-                RespondToClaim respondToClaim = caseData.getRespondToClaim();
-                if (isAllPaid(caseData.getTotalClaimAmount(), respondToClaim)) {
-                    statesPaidEvents.add(createDefenceFiledEvent(builder, respondent1ResponseDate, RESPONDENT_ID, true));
-                } else {
-                    defenceEvents.add(createDefenceFiledEvent(builder, respondent1ResponseDate, RESPONDENT_ID, false));
-                }
-            }
-
-            Respondent1DQ respondent1DQ = caseData.getRespondent1DQ();
-            directionsQuestionnaireEvents.add(
-                createDirectionsQuestionnaireEvent(
-                    builder,
-                    caseData,
-                    respondent1ResponseDate,
-                    RESPONDENT_ID,
-                    respondent1DQ,
-                    caseData.getRespondent1(),
-                    true
-                )
-            );
-
-            if (defendant1v2SameSolicitorSameResponse.test(caseData)) {
-                LocalDateTime respondent2ResponseDate = caseData.getRespondent2ResponseDate() != null
-                    ? caseData.getRespondent2ResponseDate()
-                    : respondent1ResponseDate;
-
-                if (isAllPaid(caseData.getTotalClaimAmount(), caseData.getRespondToClaim())) {
-                    statesPaidEvents.add(createDefenceFiledEvent(builder, respondent1ResponseDate, RESPONDENT2_ID, true));
-                }
-                defenceEvents.add(createDefenceFiledEvent(builder, respondent2ResponseDate, RESPONDENT2_ID, false));
-
-                directionsQuestionnaireEvents.add(
-                    createDirectionsQuestionnaireEvent(
-                        builder,
-                        caseData,
-                        respondent2ResponseDate,
-                        RESPONDENT2_ID,
-                        respondent1DQ,
-                        caseData.getRespondent2(),
-                        true
-                    )
-                );
-            }
+    private void processRespondent2(EventHistory.EventHistoryBuilder builder,
+                                    CaseData caseData,
+                                    EventBuckets buckets) {
+        if (!defendant2ResponseExists.test(caseData)) {
+            return;
         }
 
-        if (defendant2ResponseExists.test(caseData)) {
-            LocalDateTime respondent2ResponseDate = caseData.getRespondent2ResponseDate();
-            RespondToClaim respondToClaim = caseData.getRespondToClaim2();
-            if (shouldUseRespondent1Response(caseData)) {
-                respondToClaim = caseData.getRespondToClaim();
-            }
+        LocalDateTime responseDate = caseData.getRespondent2ResponseDate();
+        RespondToClaim respondToClaim = shouldUseRespondent1Response(caseData)
+            ? caseData.getRespondToClaim()
+            : caseData.getRespondToClaim2();
 
-            if (isAllPaid(caseData.getTotalClaimAmount(), respondToClaim)) {
-                statesPaidEvents.add(createDefenceFiledEvent(builder, respondent2ResponseDate, RESPONDENT2_ID, true));
-            } else {
-                defenceEvents.add(createDefenceFiledEvent(builder, respondent2ResponseDate, RESPONDENT2_ID, false));
-            }
+        addDefenceOrStatesPaid(builder, caseData, buckets, responseDate, RESPONDENT2_ID, respondToClaim);
 
-            Respondent2DQ respondent2DQ = caseData.getRespondent2DQ();
-            directionsQuestionnaireEvents.add(
-                createDirectionsQuestionnaireEvent(
-                    builder,
-                    caseData,
-                    respondent2ResponseDate,
-                    RESPONDENT2_ID,
-                    respondent2DQ,
-                    caseData.getRespondent2(),
-                    false
-                )
-            );
+        Respondent2DQ respondent2DQ = caseData.getRespondent2DQ();
+        buckets.directionsQuestionnaireEvents.add(
+            createDirectionsQuestionnaireEvent(
+                builder,
+                caseData,
+                responseDate,
+                RESPONDENT2_ID,
+                respondent2DQ,
+                caseData.getRespondent2(),
+                false
+            )
+        );
+    }
+
+    private void addDefenceOrStatesPaid(EventHistory.EventHistoryBuilder builder,
+                                        CaseData caseData,
+                                        EventBuckets buckets,
+                                        LocalDateTime responseDate,
+                                        String partyId,
+                                        RespondToClaim respondToClaim) {
+        if (isAllPaid(caseData.getTotalClaimAmount(), respondToClaim)) {
+            buckets.statesPaidEvents.add(createDefenceFiledEvent(builder, responseDate, partyId, true));
+        } else {
+            buckets.defenceEvents.add(createDefenceFiledEvent(builder, responseDate, partyId, false));
         }
+    }
 
-        builder.defenceFiled(defenceEvents);
-        builder.statesPaid(statesPaidEvents);
-        builder.clearDirectionsQuestionnaireFiled().directionsQuestionnaireFiled(directionsQuestionnaireEvents);
+    private void addLipVsLipFullDefenceEvent(EventHistory.EventHistoryBuilder builder,
+                                             CaseData caseData,
+                                             EventBuckets buckets,
+                                             LocalDateTime respondent1ResponseDate) {
+        if (caseData.hasDefendantPaidTheAmountClaimed()) {
+            buckets.statesPaidEvents.add(createDefenceFiledEvent(builder, respondent1ResponseDate, RESPONDENT_ID, true));
+        } else {
+            buckets.defenceEvents.add(createDefenceFiledEvent(builder, respondent1ResponseDate, RESPONDENT_ID, false));
+        }
+    }
+
+    private void handleSameSolicitorResponse(EventHistory.EventHistoryBuilder builder,
+                                             CaseData caseData,
+                                             EventBuckets buckets,
+                                             LocalDateTime respondent1ResponseDate,
+                                             Respondent1DQ respondent1DQ) {
+        LocalDateTime respondent2ResponseDate = Optional.ofNullable(caseData.getRespondent2ResponseDate())
+            .orElse(respondent1ResponseDate);
+
+        if (isAllPaid(caseData.getTotalClaimAmount(), caseData.getRespondToClaim())) {
+            buckets.statesPaidEvents.add(createDefenceFiledEvent(builder, respondent1ResponseDate, RESPONDENT2_ID, true));
+        }
+        buckets.defenceEvents.add(createDefenceFiledEvent(builder, respondent2ResponseDate, RESPONDENT2_ID, false));
+
+        buckets.directionsQuestionnaireEvents.add(
+            createDirectionsQuestionnaireEvent(
+                builder,
+                caseData,
+                respondent2ResponseDate,
+                RESPONDENT2_ID,
+                respondent1DQ,
+                caseData.getRespondent2(),
+                true
+            )
+        );
     }
 
     private boolean shouldUseRespondent1Response(CaseData caseData) {
         return ONE_V_TWO_ONE_LEGAL_REP.equals(getMultiPartyScenario(caseData))
             && caseData.getSameSolicitorSameResponse() == YES;
-    }
-
-    private void addLipVsLipFullDefenceEvent(EventHistory.EventHistoryBuilder builder,
-                                             CaseData caseData,
-                                             List<Event> defenceEvents,
-                                             List<Event> statesPaidEvents) {
-        LocalDateTime respondent1ResponseDate = caseData.getRespondent1ResponseDate();
-        if (caseData.hasDefendantPaidTheAmountClaimed()) {
-            statesPaidEvents.add(createDefenceFiledEvent(builder, respondent1ResponseDate, RESPONDENT_ID, true));
-        } else {
-            defenceEvents.add(createDefenceFiledEvent(builder, respondent1ResponseDate, RESPONDENT_ID, false));
-        }
     }
 
     private Event createDefenceFiledEvent(EventHistory.EventHistoryBuilder builder,
@@ -229,4 +255,19 @@ public class RespondentFullDefenceStrategy implements EventHistoryStrategy {
                 .map(paid -> MonetaryConversions.penniesToPounds(paid).compareTo(totalClaimAmount) >= 0)
                 .orElse(false);
     }
+
+    private static final class EventBuckets {
+        private final List<Event> defenceEvents;
+        private final List<Event> statesPaidEvents;
+        private final List<Event> directionsQuestionnaireEvents;
+
+        private EventBuckets(List<Event> defenceEvents,
+                             List<Event> statesPaidEvents,
+                             List<Event> directionsQuestionnaireEvents) {
+            this.defenceEvents = defenceEvents;
+            this.statesPaidEvents = statesPaidEvents;
+            this.directionsQuestionnaireEvents = directionsQuestionnaireEvents;
+        }
+    }
+
 }

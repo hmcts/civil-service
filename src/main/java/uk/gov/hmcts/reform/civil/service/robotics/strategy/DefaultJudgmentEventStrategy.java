@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsTimelineHelper
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -79,14 +80,13 @@ public class DefaultJudgmentEventStrategy implements EventHistoryStrategy {
             : textFormatter.withRpaPrefix("Default Judgment granted and claim moved offline.");
 
         String text = grantedFlag ? requested : granted;
-        Event event = Event.builder()
+        builder.miscellaneous(Event.builder()
             .eventSequence(sequenceGenerator.nextSequence(builder.build()))
             .eventCode(MISCELLANEOUS.getCode())
             .dateReceived(getDateOfDjCreated(caseData))
             .eventDetailsText(text)
             .eventDetails(EventDetails.builder().miscText(text).build())
-            .build();
-        builder.miscellaneous(event);
+            .build());
     }
 
     private Event createDefaultJudgmentEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData, String litigiousPartyId) {
@@ -101,7 +101,6 @@ public class DefaultJudgmentEventStrategy implements EventHistoryStrategy {
 
         DJPaymentTypeSelection paymentType = caseData.getPaymentTypeSelection();
         boolean immediate = DJPaymentTypeSelection.IMMEDIATELY.equals(paymentType);
-        boolean repaymentPlan = DJPaymentTypeSelection.REPAYMENT_PLAN.equals(paymentType);
         LocalDateTime dateOfDjCreated = getDateOfDjCreated(caseData);
         LocalDateTime paymentInFullDate = computePaymentInFullDate(caseData);
 
@@ -110,13 +109,11 @@ public class DefaultJudgmentEventStrategy implements EventHistoryStrategy {
             : JudgmentsOnlineHelper.getFixedCostsOfJudgmentForDJ(caseData)
             .add(JudgmentsOnlineHelper.getClaimFeeOfJudgmentForDJ(caseData));
 
-        BigDecimal installmentAmount = repaymentPlan && caseData.getRepaymentSuggestion() != null
-            ? MonetaryConversions.penniesToPounds(new BigDecimal(caseData.getRepaymentSuggestion())).setScale(2)
-            : ZERO;
+        BigDecimal installmentAmount = getInstallmentAmount(caseData);
 
         boolean jointJudgment = caseData.getRespondent2() != null;
 
-        Event event = Event.builder()
+        return Event.builder()
             .eventSequence(sequenceGenerator.nextSequence(builder.build()))
             .eventCode(DEFAULT_JUDGMENT_GRANTED.getCode())
             .dateReceived(dateOfDjCreated)
@@ -124,7 +121,7 @@ public class DefaultJudgmentEventStrategy implements EventHistoryStrategy {
             .eventDetailsText("")
             .eventDetails(EventDetails.builder()
                 .miscText("")
-                .amountOfJudgment(amountClaimedWithInterest.setScale(2))
+                .amountOfJudgment(amountClaimedWithInterest.setScale(2, RoundingMode.HALF_UP))
                 .amountOfCosts(amountOfCosts)
                 .amountPaidBeforeJudgment(caseData.getPartialPayment() == YES ? partialPaymentPounds : ZERO)
                 .isJudgmentForthwith(immediate)
@@ -137,8 +134,6 @@ public class DefaultJudgmentEventStrategy implements EventHistoryStrategy {
                 .judgmentToBeRegistered(false)
                 .build())
             .build();
-
-        return event;
     }
 
     private boolean hasMultipleDefendants(CaseData caseData) {
@@ -178,7 +173,7 @@ public class DefaultJudgmentEventStrategy implements EventHistoryStrategy {
             : caseData.isPayByInstallment();
 
         if (!payByInstallment) {
-            return null;
+            return ZERO;
         }
 
         Optional<RepaymentPlanLRspec> plan = ofNullable(caseData.getRespondent1RepaymentPlan());
@@ -188,7 +183,7 @@ public class DefaultJudgmentEventStrategy implements EventHistoryStrategy {
 
         return MonetaryConversions.penniesToPounds(
             Optional.ofNullable(amount)
-                .map(value -> value.setScale(2))
+                .map(value -> value.setScale(2, RoundingMode.HALF_UP))
                 .orElse(ZERO)
         );
     }
@@ -200,7 +195,6 @@ public class DefaultJudgmentEventStrategy implements EventHistoryStrategy {
                 case ONCE_ONE_WEEK -> "WK";
                 case ONCE_TWO_WEEKS -> "FOR";
                 case ONCE_ONE_MONTH -> "MTH";
-                default -> null;
             };
         } else if (data.getPaymentTypeSelection() == DJPaymentTypeSelection.IMMEDIATELY) {
             return "FW";

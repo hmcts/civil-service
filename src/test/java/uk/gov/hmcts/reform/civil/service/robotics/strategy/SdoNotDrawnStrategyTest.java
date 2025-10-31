@@ -114,6 +114,6 @@ class SdoNotDrawnStrategyTest {
         strategy.contribute(builder, caseData, null);
 
         String message = builder.build().getMiscellaneous().get(0).getEventDetailsText();
-        assertThat(message.length()).isEqualTo(250);
+        assertThat(message).hasSize(250);
     }
 }

@@ -16,10 +16,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
-import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.COUNTER_CLAIM;
-import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
-import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsDirectionsQuestionnaireSupport.getPreferredCourtCode;
 import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsDirectionsQuestionnaireSupport.isStayClaim;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getResponseTypeForRespondent;
@@ -34,58 +31,60 @@ public class RoboticsRespondentResponseSupport {
 
     public String prepareRespondentResponseText(CaseData caseData, Party respondent, boolean isRespondent1) {
         MultiPartyScenario scenario = getMultiPartyScenario(caseData);
-        String defaultText = "";
         if (scenario.equals(ONE_V_ONE) || scenario.equals(TWO_V_ONE)) {
-            if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-                RespondentResponseTypeSpec responseTypeForSpec = scenario.equals(TWO_V_ONE)
-                    ? (YesOrNo.YES.equals(caseData.getDefendantSingleResponseToBothClaimants())
-                    ? caseData.getRespondent1ClaimResponseTypeForSpec()
-                    : caseData.getClaimant1ClaimResponseTypeForSpec())
-                    : caseData.getRespondent1ClaimResponseTypeForSpec();
-
-                switch (responseTypeForSpec) {
-                    case COUNTER_CLAIM:
-                        defaultText = textFormatter.defendantRejectsAndCounterClaims();
-                        break;
-                    case FULL_ADMISSION:
-                        defaultText = textFormatter.defendantFullyAdmits();
-                        break;
-                    case PART_ADMISSION:
-                        defaultText = textFormatter.defendantPartialAdmission();
-                        break;
-                    default:
-                        break;
-                }
-            } else if (caseData.getRespondent1ClaimResponseType() != null) {
-                switch (caseData.getRespondent1ClaimResponseType()) {
-                    case COUNTER_CLAIM:
-                        defaultText = textFormatter.defendantRejectsAndCounterClaims();
-                        break;
-                    case FULL_ADMISSION:
-                        defaultText = textFormatter.defendantFullyAdmits();
-                        break;
-                    case PART_ADMISSION:
-                        defaultText = textFormatter.defendantPartialAdmission();
-                        break;
-                    default:
-                        break;
-                }
-            }
-        } else {
-            String paginatedMessage = "";
-            if (scenario.equals(ONE_V_TWO_ONE_LEGAL_REP)) {
-                paginatedMessage = getPaginatedMessageFor1v2SameSolicitor(caseData, isRespondent1);
-            }
-            defaultText = textFormatter.formatRpa(
-                "%sDefendant: %s has responded: %s",
-                paginatedMessage,
-                respondent.getPartyName(),
-                SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
-                    ? getResponseTypeForRespondentSpec(caseData, respondent)
-                    : getResponseTypeForRespondent(caseData, respondent)
-            );
+            return buildSingleOrTwoVOneResponseText(caseData);
         }
-        return defaultText;
+
+        String paginatedMessage = scenario.equals(ONE_V_TWO_ONE_LEGAL_REP)
+            ? getPaginatedMessageFor1v2SameSolicitor(caseData, isRespondent1)
+            : "";
+
+        return textFormatter.formatRpa(
+            "%sDefendant: %s has responded: %s",
+            paginatedMessage,
+            respondent.getPartyName(),
+            SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+                ? getResponseTypeForRespondentSpec(caseData, respondent)
+                : getResponseTypeForRespondent(caseData, respondent)
+        );
+    }
+
+    private String buildSingleOrTwoVOneResponseText(CaseData caseData) {
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            RespondentResponseTypeSpec responseType = resolveSpecResponseType(caseData);
+            if (responseType != null) {
+                return switch (responseType) {
+                    case COUNTER_CLAIM -> textFormatter.defendantRejectsAndCounterClaims();
+                    case FULL_ADMISSION -> textFormatter.defendantFullyAdmits();
+                    case PART_ADMISSION -> textFormatter.defendantPartialAdmission();
+                    default -> "";
+                };
+            }
+        }
+
+        if (caseData.getRespondent1ClaimResponseType() == null) {
+            return "";
+        }
+
+        return switch (caseData.getRespondent1ClaimResponseType()) {
+            case COUNTER_CLAIM -> textFormatter.defendantRejectsAndCounterClaims();
+            case FULL_ADMISSION -> textFormatter.defendantFullyAdmits();
+            case PART_ADMISSION -> textFormatter.defendantPartialAdmission();
+            default -> "";
+        };
+    }
+
+    private RespondentResponseTypeSpec resolveSpecResponseType(CaseData caseData) {
+        MultiPartyScenario scenario = getMultiPartyScenario(caseData);
+        if (!scenario.equals(TWO_V_ONE)) {
+            return caseData.getRespondent1ClaimResponseTypeForSpec();
+        }
+
+        YesOrNo singleResponse = caseData.getDefendantSingleResponseToBothClaimants();
+        if (YesOrNo.YES.equals(singleResponse)) {
+            return caseData.getRespondent1ClaimResponseTypeForSpec();
+        }
+        return caseData.getClaimant1ClaimResponseTypeForSpec();
     }
 
     public String prepareFullDefenceEventText(DQ dq, CaseData caseData, boolean isRespondent1, Party respondent) {

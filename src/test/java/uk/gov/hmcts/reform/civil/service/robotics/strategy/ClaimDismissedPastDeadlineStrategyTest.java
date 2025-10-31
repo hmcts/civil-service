@@ -94,8 +94,9 @@ class ClaimDismissedPastDeadlineStrategyTest {
         CaseData caseData = CaseData.builder()
             .claimDismissedDate(LocalDateTime.now())
             .build();
+        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
 
-        assertThatThrownBy(() -> strategy.contribute(EventHistory.builder(), caseData, null))
+        assertThatThrownBy(() -> strategy.contribute(builder, caseData, null))
             .isInstanceOf(IllegalStateException.class);
     }
 }

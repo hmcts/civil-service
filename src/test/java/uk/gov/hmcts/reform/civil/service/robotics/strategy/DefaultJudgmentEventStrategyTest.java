@@ -7,7 +7,6 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.service.robotics.mapper.support.CaseDataNormalizer;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextFormatter;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsPartyLookup;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenerator;
@@ -68,10 +67,7 @@ class DefaultJudgmentEventStrategyTest {
         when(sequenceGenerator.nextSequence(any())).thenReturn(1, 2);
         when(partyLookup.respondentId(0)).thenReturn("002");
 
-        CaseData caseData = CaseDataNormalizer.normalise(
-            CaseDataBuilder.builder().getDefaultJudgment1v1Case(),
-            baseDate
-        );
+        CaseData caseData = CaseDataBuilder.builder().getDefaultJudgment1v1Case();
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
         strategy.contribute(builder, caseData, null);
@@ -93,10 +89,7 @@ class DefaultJudgmentEventStrategyTest {
         when(sequenceGenerator.nextSequence(any())).thenReturn(1);
         when(timelineHelper.now()).thenReturn(baseDate.atTime(10, 0));
 
-        CaseData caseData = CaseDataNormalizer.normalise(
-            CaseDataBuilder.builder().getDefaultJudgment1v2DivergentCase(),
-            baseDate
-        );
+        CaseData caseData = CaseDataBuilder.builder().getDefaultJudgment1v2DivergentCase();
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
         strategy.contribute(builder, caseData, null);
@@ -116,10 +109,7 @@ class DefaultJudgmentEventStrategyTest {
         when(timelineHelper.now()).thenReturn(baseDate.atTime(12, 0));
         when(partyLookup.respondentId(0)).thenReturn("002");
 
-        CaseData caseData = CaseDataNormalizer.normalise(
-            CaseDataBuilder.builder().getDefaultJudgment1v1Case(),
-            baseDate
-        );
+        CaseData caseData = CaseDataBuilder.builder().getDefaultJudgment1v1Case();
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
         strategy.contribute(builder, caseData, null);

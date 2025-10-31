@@ -19,7 +19,6 @@ import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyList;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.STRIKE_OUT;
@@ -61,7 +60,7 @@ public class GeneralApplicationStrikeOutStrategy implements EventHistoryStrategy
                 .eventDetailsText(STRIKE_OUT_TEXT)
                 .eventDetails(EventDetails.builder().miscText(STRIKE_OUT_TEXT).build())
                 .build())
-            .collect(Collectors.toList()));
+            .toList());
 
         builder.defenceStruckOut(applications.stream()
             .map(app -> Event.builder()
@@ -70,7 +69,7 @@ public class GeneralApplicationStrikeOutStrategy implements EventHistoryStrategy
                 .dateReceived(app.getValue().getGeneralAppSubmittedDateGAspec())
                 .litigiousPartyID(app.getValue().getLitigiousPartyID())
                 .build())
-            .collect(Collectors.toList()));
+            .toList());
     }
 
     private List<Element<GeneralApplication>> getStrikeOutApplications(CaseData caseData) {
@@ -81,7 +80,7 @@ public class GeneralApplicationStrikeOutStrategy implements EventHistoryStrategy
         return caseData.getGeneralApplications().stream()
             .filter(element -> isStrikeOutApplication(element.getValue()))
             .filter(element -> hasJudgeDecision(caseData, element.getValue()))
-            .collect(Collectors.toList());
+            .toList();
     }
 
     private boolean isStrikeOutApplication(GeneralApplication application) {

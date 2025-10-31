@@ -7,8 +7,6 @@ import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.dq.DQ;
-import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
-import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
@@ -24,6 +22,7 @@ import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.List;
 
 import static java.lang.String.format;
@@ -76,44 +75,37 @@ public class RespondentPartAdmissionStrategy implements EventHistoryStrategy {
             return;
         }
 
-        List<Event> directionsQuestionnaireEvents = new ArrayList<>();
-        EventHistory existingHistory = builder.build();
-        List<Event> existingDirectionsQuestionnaireEvents = new ArrayList<>(
-            existingHistory.getDirectionsQuestionnaireFiled() != null
-                ? existingHistory.getDirectionsQuestionnaireFiled()
-                : List.of()
+        List<Event> directionsQuestionnaireEvents = new ArrayList<>(
+            Optional.ofNullable(builder.build().getDirectionsQuestionnaireFiled()).orElse(List.of())
         );
-        existingDirectionsQuestionnaireEvents.removeIf(event -> event.getEventCode() == null);
+        directionsQuestionnaireEvents.removeIf(event -> event.getEventCode() == null);
 
         if (defendant1ResponseExists.test(caseData)) {
-            LocalDateTime respondent1ResponseDate = caseData.getRespondent1ResponseDate();
             addLipVsLrMisc(builder, caseData);
 
             if (useStatesPaid(caseData)) {
-                builder.statesPaid(addStatesPaidEvent(builder, respondent1ResponseDate, RESPONDENT_ID));
+                builder.statesPaid(addStatesPaidEvent(builder, caseData.getRespondent1ResponseDate(), RESPONDENT_ID));
             } else {
-                builder.receiptOfPartAdmission(addReceiptOfPartAdmissionEvent(builder, respondent1ResponseDate, RESPONDENT_ID));
+                builder.receiptOfPartAdmission(addReceiptOfPartAdmissionEvent(builder, caseData.getRespondent1ResponseDate(), RESPONDENT_ID));
             }
 
-            addRespondentMisc(builder, caseData, caseData.getRespondent1(), true, respondent1ResponseDate);
+            addRespondentMisc(builder, caseData, caseData.getRespondent1(), true, caseData.getRespondent1ResponseDate());
 
-            Respondent1DQ respondent1DQ = caseData.getRespondent1DQ();
             directionsQuestionnaireEvents.add(
                 addDirectionsQuestionnaireFiledEvent(
                     builder,
                     caseData,
-                    respondent1ResponseDate,
+                    caseData.getRespondent1ResponseDate(),
                     RESPONDENT_ID,
-                    respondent1DQ,
+                    caseData.getRespondent1DQ(),
                     caseData.getRespondent1(),
                     true
                 )
             );
 
             if (defendant1v2SameSolicitorSameResponse.test(caseData)) {
-                LocalDateTime respondent2ResponseDate = caseData.getRespondent2ResponseDate() != null
-                    ? caseData.getRespondent2ResponseDate()
-                    : respondent1ResponseDate;
+                LocalDateTime respondent2ResponseDate = Optional.ofNullable(caseData.getRespondent2ResponseDate())
+                    .orElse(caseData.getRespondent1ResponseDate());
                 builder.receiptOfPartAdmission(addReceiptOfPartAdmissionEvent(builder, respondent2ResponseDate, RESPONDENT2_ID));
                 addRespondentMisc(builder, caseData, caseData.getRespondent2(), false, respondent2ResponseDate);
 
@@ -123,7 +115,7 @@ public class RespondentPartAdmissionStrategy implements EventHistoryStrategy {
                         caseData,
                         respondent2ResponseDate,
                         RESPONDENT2_ID,
-                        respondent1DQ,
+                        caseData.getRespondent1DQ(),
                         caseData.getRespondent2(),
                         true
                     )
@@ -132,26 +124,23 @@ public class RespondentPartAdmissionStrategy implements EventHistoryStrategy {
         }
 
         if (defendant2ResponseExists.test(caseData)) {
-            LocalDateTime respondent2ResponseDate = caseData.getRespondent2ResponseDate();
-            builder.receiptOfPartAdmission(addReceiptOfPartAdmissionEvent(builder, respondent2ResponseDate, RESPONDENT2_ID));
-            addRespondentMisc(builder, caseData, caseData.getRespondent2(), false, respondent2ResponseDate);
+            builder.receiptOfPartAdmission(addReceiptOfPartAdmissionEvent(builder, caseData.getRespondent2ResponseDate(), RESPONDENT2_ID));
+            addRespondentMisc(builder, caseData, caseData.getRespondent2(), false, caseData.getRespondent2ResponseDate());
 
-            Respondent2DQ respondent2DQ = caseData.getRespondent2DQ();
             directionsQuestionnaireEvents.add(
                 addDirectionsQuestionnaireFiledEvent(
                     builder,
                     caseData,
-                    respondent2ResponseDate,
+                    caseData.getRespondent2ResponseDate(),
                     RESPONDENT2_ID,
-                    respondent2DQ,
+                    caseData.getRespondent2DQ(),
                     caseData.getRespondent2(),
                     false
                 )
             );
         }
 
-        existingDirectionsQuestionnaireEvents.addAll(directionsQuestionnaireEvents);
-        builder.clearDirectionsQuestionnaireFiled().directionsQuestionnaireFiled(existingDirectionsQuestionnaireEvents);
+        builder.clearDirectionsQuestionnaireFiled().directionsQuestionnaireFiled(directionsQuestionnaireEvents);
     }
 
     private boolean useStatesPaid(CaseData caseData) {

@@ -47,6 +47,9 @@ public class ClaimantResponseStrategy implements EventHistoryStrategy {
         FlowState.Main.FULL_DEFENCE_PROCEED,
         FlowState.Main.FULL_DEFENCE_NOT_PROCEED
     );
+    private static final String PROCEED_INTENTION = "proceed";
+    private static final String NOT_PROCEED_INTENTION = "not proceed";
+    private static final String CLAIMANTS_PROCEED_TEXT = "Claimants proceed.";
 
     private final IStateFlowEngine stateFlowEngine;
     private final RoboticsSequenceGenerator sequenceGenerator;
@@ -99,49 +102,49 @@ public class ClaimantResponseStrategy implements EventHistoryStrategy {
 
         switch (scenario) {
             case ONE_V_ONE:
-                if (isSmallClaimMediation(claimType, track, respondent1Mediation, applicant1Mediation)) {
-                    builder.miscellaneous(prepareMiscEvents(builder, caseData, multipartyTexts));
-                } else {
-                    builder.miscellaneous(prepareMiscEvents(builder, caseData, List.of(textFormatter.claimantProceeds())));
-                    addTakenOfflineForMultitrack(builder, caseData);
-                }
+                boolean useMultipartyTexts = isSmallClaimMediation(claimType, track, respondent1Mediation, applicant1Mediation);
+                handleProceedScenario(builder, caseData, useMultipartyTexts, multipartyTexts,
+                                      List.of(textFormatter.claimantProceeds()));
                 break;
             case ONE_V_TWO_ONE_LEGAL_REP:
                 YesOrNo proceedResp1 = caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2();
                 YesOrNo proceedResp2 = caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2();
-                if (isAnyNo(proceedResp1, proceedResp2)
-                    || isSmallClaimMediation(claimType, track, respondent1Mediation, applicant1Mediation)) {
-                    builder.miscellaneous(prepareMiscEvents(builder, caseData, multipartyTexts));
-                } else {
-                    builder.miscellaneous(prepareMiscEvents(builder, caseData, List.of(textFormatter.claimantProceeds())));
-                    addTakenOfflineForMultitrack(builder, caseData);
-                }
+                boolean useMultiSameSolicitor = isAnyNo(proceedResp1, proceedResp2)
+                    || isSmallClaimMediation(claimType, track, respondent1Mediation, applicant1Mediation);
+                handleProceedScenario(builder, caseData, useMultiSameSolicitor, multipartyTexts,
+                                      List.of(textFormatter.claimantProceeds()));
                 break;
             case ONE_V_TWO_TWO_LEGAL_REP:
                 YesOrNo proceedRespOne = caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2();
                 YesOrNo proceedRespTwo = caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2();
-                if (isAnyNo(proceedRespOne, proceedRespTwo)
-                    || isSmallClaimMediation(claimType, track, respondent1Mediation, applicant1Mediation, respondent2Mediation)) {
-                    builder.miscellaneous(prepareMiscEvents(builder, caseData, multipartyTexts));
-                } else {
-                    builder.miscellaneous(prepareMiscEvents(builder, caseData, List.of(textFormatter.claimantProceeds())));
-                    addTakenOfflineForMultitrack(builder, caseData);
-                }
+                boolean useMultiTwoSolicitors = isAnyNo(proceedRespOne, proceedRespTwo)
+                    || isSmallClaimMediation(claimType, track, respondent1Mediation, applicant1Mediation, respondent2Mediation);
+                handleProceedScenario(builder, caseData, useMultiTwoSolicitors, multipartyTexts,
+                                      List.of(textFormatter.claimantProceeds()));
                 break;
             case TWO_V_ONE:
                 YesOrNo applicant1Proceeds = caseData.getApplicant1ProceedWithClaimMultiParty2v1();
                 YesOrNo applicant2Proceeds = caseData.getApplicant2ProceedWithClaimMultiParty2v1();
-                if (isAnyNo(applicant1Proceeds, applicant2Proceeds)
-                    || isSmallClaimMediation(claimType, track, respondent1Mediation, applicant1Mediation, applicant2Mediation)) {
-                    builder.miscellaneous(prepareMiscEvents(builder, caseData, multipartyTexts));
-                } else {
-                    builder.miscellaneous(prepareMiscEvents(builder, caseData, List.of("Claimants proceed.")));
-                    addTakenOfflineForMultitrack(builder, caseData);
-                }
+                boolean useMultiTwoApplicants = isAnyNo(applicant1Proceeds, applicant2Proceeds)
+                    || isSmallClaimMediation(claimType, track, respondent1Mediation, applicant1Mediation, applicant2Mediation);
+                handleProceedScenario(builder, caseData, useMultiTwoApplicants, multipartyTexts,
+                                      List.of(CLAIMANTS_PROCEED_TEXT));
                 break;
             default:
-                builder.miscellaneous(prepareMiscEvents(builder, caseData, List.of(textFormatter.claimantProceeds())));
-                addTakenOfflineForMultitrack(builder, caseData);
+                handleProceedScenario(builder, caseData, false, multipartyTexts,
+                                      List.of(textFormatter.claimantProceeds()));
+        }
+    }
+
+    private void handleProceedScenario(EventHistory.EventHistoryBuilder builder,
+                                       CaseData caseData,
+                                       boolean useMultipartyTexts,
+                                       List<String> multipartyTexts,
+                                       List<String> proceedTexts) {
+        List<String> textsToApply = useMultipartyTexts ? multipartyTexts : proceedTexts;
+        builder.miscellaneous(prepareMiscEvents(builder, caseData, textsToApply));
+        if (!useMultipartyTexts) {
+            addTakenOfflineForMultitrack(builder, caseData);
         }
     }
 
@@ -211,16 +214,16 @@ public class ClaimantResponseStrategy implements EventHistoryStrategy {
                     "[1 of 2 - %s] Claimant has provided intention: %s against defendant: %s",
                     dateStamp,
                     YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
-                        ? "proceed"
-                        : "not proceed",
+                        ? PROCEED_INTENTION
+                        : NOT_PROCEED_INTENTION,
                     caseData.getRespondent1().getPartyName()
                 ));
                 texts.add(textFormatter.formatRpa(
                     "[2 of 2 - %s] Claimant has provided intention: %s against defendant: %s",
                     dateStamp,
                     YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2())
-                        ? "proceed"
-                        : "not proceed",
+                        ? PROCEED_INTENTION
+                        : NOT_PROCEED_INTENTION,
                     caseData.getRespondent2().getPartyName()
                 ));
             }
@@ -236,13 +239,13 @@ public class ClaimantResponseStrategy implements EventHistoryStrategy {
                     "[1 of 2 - %s] Claimant: %s has provided intention: %s",
                     dateStamp,
                     caseData.getApplicant1().getPartyName(),
-                    YES.equals(app1Proceeds) ? "proceed" : "not proceed"
+                    YES.equals(app1Proceeds) ? PROCEED_INTENTION : NOT_PROCEED_INTENTION
                 ));
                 texts.add(textFormatter.formatRpa(
                     "[2 of 2 - %s] Claimant: %s has provided intention: %s",
                     dateStamp,
                     caseData.getApplicant2().getPartyName(),
-                    YES.equals(app2Proceeds) ? "proceed" : "not proceed"
+                    YES.equals(app2Proceeds) ? PROCEED_INTENTION : NOT_PROCEED_INTENTION
                 ));
             }
             default -> texts.add(textFormatter.claimantProceeds());
