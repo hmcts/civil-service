@@ -6,6 +6,14 @@ def versions = [
   lombok             : '1.18.26'
 ]
 
+java {
+  sourceCompatibility = JavaVersion.VERSION_17
+  targetCompatibility = JavaVersion.VERSION_17
+  toolchain {
+    languageVersion = JavaLanguageVersion.of(17)
+  }
+}
+
 ext.libraries = [
   junit5: [
     "org.junit.jupiter:junit-jupiter-api:${versions.junit}",
