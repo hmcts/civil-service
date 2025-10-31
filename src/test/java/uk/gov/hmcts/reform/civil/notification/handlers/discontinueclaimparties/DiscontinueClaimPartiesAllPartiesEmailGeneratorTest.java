@@ -23,6 +23,9 @@ class DiscontinueClaimPartiesAllPartiesEmailGeneratorTest {
     @Mock
     private DiscontinueClaimPartiesRespSolTwoEmailDTOGenerator discontinueClaimPartiesRespSolTwoEmailDTOGenerator;
 
+    @Mock
+    private DiscontinueClaimPartiesValidationFailureAppSolOneEmailDTOGenerator discontinueClaimPartiesValidationFailureAppSolOneEmailDTOGenerator;
+
     @InjectMocks
     private DiscontinueClaimPartiesAllPartiesEmailGenerator emailGenerator;
 
