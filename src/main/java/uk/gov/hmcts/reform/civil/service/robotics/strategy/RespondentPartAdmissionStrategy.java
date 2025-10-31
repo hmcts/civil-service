@@ -74,14 +74,13 @@ public class RespondentPartAdmissionStrategy implements EventHistoryStrategy {
             return;
         }
 
-        List<Event> existingDirectionsQuestionnaires = Optional.ofNullable(builder.build().getDirectionsQuestionnaireFiled())
+        EventHistory existingHistory = builder.build();
+        builder.clearDirectionsQuestionnaireFiled();
+        Optional.ofNullable(existingHistory.getDirectionsQuestionnaireFiled())
             .orElse(List.of())
             .stream()
             .filter(event -> event.getEventCode() != null)
-            .toList();
-
-        builder.clearDirectionsQuestionnaireFiled();
-        existingDirectionsQuestionnaires.forEach(builder::directionsQuestionnaire);
+            .forEach(builder::directionsQuestionnaire);
 
         if (defendant1ResponseExists.test(caseData)) {
             addLipVsLrMisc(builder, caseData);
@@ -105,13 +104,14 @@ public class RespondentPartAdmissionStrategy implements EventHistoryStrategy {
             ));
 
             if (defendant1v2SameSolicitorSameResponse.test(caseData)) {
-                builder.receiptOfPartAdmission(addReceiptOfPartAdmissionEvent(builder, resolveRespondent2ResponseDate(caseData), RESPONDENT2_ID));
-                addRespondentMisc(builder, caseData, caseData.getRespondent2(), false, resolveRespondent2ResponseDate(caseData));
+                LocalDateTime respondent2ResponseDate = resolveRespondent2ResponseDate(caseData);
+                builder.receiptOfPartAdmission(addReceiptOfPartAdmissionEvent(builder, respondent2ResponseDate, RESPONDENT2_ID));
+                addRespondentMisc(builder, caseData, caseData.getRespondent2(), false, respondent2ResponseDate);
 
                 builder.directionsQuestionnaire(addDirectionsQuestionnaireFiledEvent(
                     builder,
                     caseData,
-                    resolveRespondent2ResponseDate(caseData),
+                    respondent2ResponseDate,
                     RESPONDENT2_ID,
                     caseData.getRespondent1DQ(),
                     caseData.getRespondent2(),
@@ -233,24 +233,26 @@ public class RespondentPartAdmissionStrategy implements EventHistoryStrategy {
                                             Party respondent,
                                             boolean isRespondent1,
                                             LocalDateTime responseDate) {
-        String text = respondentResponseSupport.prepareRespondentResponseText(caseData, respondent, isRespondent1);
         return Event.builder()
             .eventSequence(sequenceGenerator.nextSequence(builder.build()))
             .eventCode(EventType.MISCELLANEOUS.getCode())
             .dateReceived(responseDate)
-            .eventDetailsText(text)
-            .eventDetails(EventDetails.builder().miscText(text).build())
+            .eventDetailsText(respondentResponseSupport.prepareRespondentResponseText(caseData, respondent, isRespondent1))
+            .eventDetails(EventDetails.builder()
+                .miscText(respondentResponseSupport.prepareRespondentResponseText(caseData, respondent, isRespondent1))
+                .build())
             .build();
     }
 
     private Event createLipVsLrMiscEvent(EventHistory.EventHistoryBuilder builder) {
-        String text = textFormatter.lipVsLrFullOrPartAdmissionReceived();
         return Event.builder()
             .eventSequence(sequenceGenerator.nextSequence(builder.build()))
             .eventCode(EventType.MISCELLANEOUS.getCode())
             .dateReceived(timelineHelper.now())
-            .eventDetailsText(text)
-            .eventDetails(EventDetails.builder().miscText(text).build())
+            .eventDetailsText(textFormatter.lipVsLrFullOrPartAdmissionReceived())
+            .eventDetails(EventDetails.builder()
+                .miscText(textFormatter.lipVsLrFullOrPartAdmissionReceived())
+                .build())
             .build();
     }
 }
