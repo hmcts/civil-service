@@ -232,7 +232,7 @@ public class PaymentsService {
     private CreateServiceRequestDTO buildServiceRequest(GeneralApplicationCaseData caseData) {
         GAPbaDetails generalAppPBADetails = caseData.getGeneralAppPBADetails();
         FeeDto feeResponse = generalAppPBADetails.getFee().toFeeDto();
-        String siteId = caseData.getGeneralAppSuperClaimType().equals(SPEC_CLAIM)
+        String siteId = caseData.getGeneralAppSuperClaimType().equals(SPEC_CLAIM.name())
             ? paymentsConfiguration.getSpecSiteId() : paymentsConfiguration.getSiteId();
 
         return CreateServiceRequestDTO.builder()
