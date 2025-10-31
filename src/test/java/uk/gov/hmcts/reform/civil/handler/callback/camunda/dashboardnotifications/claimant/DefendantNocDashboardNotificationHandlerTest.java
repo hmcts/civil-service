@@ -31,6 +31,7 @@ import java.util.HashMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -88,6 +89,23 @@ class DefendantNocDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
         }
 
         @Test
+        void shouldDoNothingWhenLipVLipToggleDisabled() {
+            when(toggleService.isLipVLipEnabled()).thenReturn(false);
+
+            CaseData caseData = CaseData.builder()
+                .ccdCaseReference(12345L)
+                .build();
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_NOC.name()).build()
+            ).build();
+
+            handler.handle(params);
+
+            verifyNoInteractions(dashboardScenariosService, dashboardNotificationService, mapper);
+        }
+
+        @Test
         void shouldRecordScenarioWhenTrialReadyApplicantIsNullAndFastTrack() {
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
@@ -127,13 +145,14 @@ class DefendantNocDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
         void shouldRecordScenarioWhenHearingFeePaymentStatusIsNotPaid() {
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
-            CaseData caseData = CaseData.builder()
-                .ccdCaseReference(123455L)
-                .build();
+            CaseData caseData = CaseData.builder().ccdCaseReference(123455L).build();
 
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_NOC.name()).build()
-            ).build();
+            CallbackParams params = CallbackParamsBuilder.builder()
+                .of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder()
+                             .eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_NOC.name())
+                             .build())
+                .build();
 
             handler.handle(params);
 
@@ -338,7 +357,6 @@ class DefendantNocDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
         @Test
         void shouldRecordDefendantNocMovesOfflineScenarioWhenDefendantNocOnlineAndActiveJO() {
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-            when(toggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
             when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
             when(toggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
 
