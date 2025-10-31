@@ -6,6 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
@@ -145,7 +146,7 @@ class ClaimDismissedPastNotificationsStrategyTest {
         strategy.contribute(builder, caseData, null);
 
         assertThat(builder.build().getMiscellaneous())
-            .extracting(e -> e.getEventSequence())
+            .extracting(Event::getEventSequence)
             .containsExactly(100, 101);
     }
 }
