@@ -19,7 +19,7 @@ public class HwFFeeTypeUtil {
     private HwFFeeTypeUtil() {
     }
 
-    public static GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder updateHwfDetails(GeneralApplicationCaseData caseData) {
+    public static GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> updateHwfDetails(GeneralApplicationCaseData caseData) {
         GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         if (Objects.nonNull(caseData.getGeneralAppHelpWithFees())) {
             if (caseData.getCcdState().equals(CaseState.APPLICATION_ADD_PAYMENT)) {
@@ -103,7 +103,7 @@ public class HwFFeeTypeUtil {
     }
 
     public static GeneralApplicationCaseData updateHwfReferenceNumber(GeneralApplicationCaseData caseData) {
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder updatedData = caseData.toBuilder();
+        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
 
         if (Objects.nonNull(caseData.getFeePaymentOutcomeDetails())
                 && caseData.getFeePaymentOutcomeDetails().getHwfNumberAvailable() == YesOrNo.YES) {
@@ -117,7 +117,7 @@ public class HwFFeeTypeUtil {
         return updatedData.build();
     }
 
-    private static void clearHwfReferenceProperties(GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder caseDataBuilder) {
+    private static void clearHwfReferenceProperties(GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder) {
         GeneralApplicationCaseData caseData = caseDataBuilder.build();
         caseDataBuilder.feePaymentOutcomeDetails(caseData.getFeePaymentOutcomeDetails().toBuilder()
                 .hwfNumberAvailable(null)
