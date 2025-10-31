@@ -6,9 +6,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
 import uk.gov.hmcts.reform.civil.utils.HearingFeeUtils;
@@ -107,6 +110,26 @@ public class PaymentsService {
         }
     }
 
+    public void validateRequestGa(GeneralApplicationCaseData caseData) {
+        String error = null;
+        GAPbaDetails generalAppPBADetails = caseData.getGeneralAppPBADetails();
+        if (generalAppPBADetails == null) {
+            error = "PBA details not received.";
+        } else if (generalAppPBADetails.getFee() == null
+            || generalAppPBADetails.getFee().getCalculatedAmountInPence() == null
+            || isBlank(generalAppPBADetails.getFee().getVersion())
+            || isBlank(generalAppPBADetails.getFee().getCode())) {
+            error = "Fees are not set correctly.";
+        }
+        if (caseData.getGeneralAppApplnSolicitor() == null
+            || (caseData.getIsGaApplicantLip() != YesOrNo.YES && isBlank(caseData.getGeneralAppApplnSolicitor().getOrganisationIdentifier()))) {
+            error = "Applicant's organization details not received.";
+        }
+        if (!isBlank(error)) {
+            throw new InvalidPaymentRequestException(error);
+        }
+    }
+
     private PBAServiceRequestDTO buildPbaPaymentRequestBulkClaim(CaseData caseData) {
         SRPbaDetails serviceRequestPBADetails = null;
         FeeDto srFee = null;
@@ -156,6 +179,10 @@ public class PaymentsService {
         return paymentsClient.createServiceRequest(authToken, paymentRequest);
     }
 
+    public PaymentServiceResponse createServiceRequestGa(GeneralApplicationCaseData caseData, String authToken) {
+        return paymentsClient.createServiceRequest(authToken, buildServiceRequest(caseData));
+    }
+
     private CreateServiceRequestDTO buildServiceRequest(CaseData caseData) {
         String siteId = null;
 
@@ -200,6 +227,27 @@ public class PaymentsService {
         } else {
             throw new RuntimeException("Invalid Case State" + caseData.getCcdCaseReference());
         }
+    }
+
+    private CreateServiceRequestDTO buildServiceRequest(GeneralApplicationCaseData caseData) {
+        GAPbaDetails generalAppPBADetails = caseData.getGeneralAppPBADetails();
+        FeeDto feeResponse = generalAppPBADetails.getFee().toFeeDto();
+        String siteId = caseData.getGeneralAppSuperClaimType().equals(SPEC_CLAIM)
+            ? paymentsConfiguration.getSpecSiteId() : paymentsConfiguration.getSiteId();
+
+        return CreateServiceRequestDTO.builder()
+            .callBackUrl(callBackUrl)
+            .casePaymentRequest(CasePaymentRequestDto.builder()
+                                    .action(PAYMENT_ACTION)
+                                    .responsibleParty(caseData.getApplicantPartyName()).build())
+            .caseReference(caseData.getCcdCaseReference().toString())
+            .ccdCaseNumber(caseData.getCcdCaseReference().toString())
+            .fees(new FeeDto[] { (FeeDto.builder()
+                .calculatedAmount(feeResponse.getCalculatedAmount())
+                .code(feeResponse.getCode())
+                .version(feeResponse.getVersion())
+                .volume(1).build())})
+            .hmctsOrgId(siteId).build();
     }
 }
 
