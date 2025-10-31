@@ -5,11 +5,13 @@ ARG APP_INSIGHTS_AGENT_VERSION=3.7.3
 
 FROM hmctspublic.azurecr.io/imported/distroless/java25
 
+WORKDIR /opt/app
+
 # Change to non-root privilege
 USER hmcts
 
-COPY lib/applicationinsights.json /opt/app/
-COPY build/libs/civil-service.jar /opt/app/
+COPY lib/applicationinsights.json ./
+COPY build/libs/civil-service.jar ./
 
 EXPOSE 4000
 CMD [ "civil-service.jar" ]
