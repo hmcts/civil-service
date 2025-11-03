@@ -52,7 +52,7 @@ public class CaseProceedOfflineClaimantScenarioTest extends DashboardBaseIntegra
         doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "CLAIMANT")
             .andExpectAll(
                 status().is(HttpStatus.OK.value()),
-                jsonPath("$[0].reference").value(caseId.toString()),
+                jsonPath("$[0].reference").value(caseId),
                 jsonPath("$[0].taskNameEn").value("Contact the court to request a change to my case"),
                 jsonPath("$[0].currentStatusEn").value("Inactive")
 
