@@ -486,6 +486,10 @@ public class BundleRequestMapper {
             .stream()
             .filter(element -> isDefenceOrClaimantReply(element.getValue()))
             .forEach(documents::add);
+        Stream.of(caseData.getRespondent1GeneratedResponseDocument(), caseData.getRespondent2GeneratedResponseDocument())
+            .filter(Objects::nonNull)
+            .map(ElementUtils::element)
+            .forEach(documents::add);
         Stream.of(caseData.getRespondent1ClaimResponseDocumentSpec(), caseData.getRespondent2ClaimResponseDocumentSpec())
             .filter(Objects::nonNull)
             .map(ElementUtils::element)

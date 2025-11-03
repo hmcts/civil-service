@@ -394,6 +394,59 @@ class BundleRequestMapperTest {
     }
 
     @Test
+    void shouldIncludeDefenceFromGeneratedResponseDocuments() {
+        CaseDocument respondent1GeneratedDefence = CaseDocument.builder()
+            .documentType(DocumentType.DEFENDANT_DEFENCE)
+            .createdBy("Respondent 1")
+            .createdDatetime(LocalDateTime.of(2024, 1, 10, 9, 0))
+            .documentLink(Document.builder()
+                              .documentBinaryUrl(TEST_URL)
+                              .documentUrl(TEST_URL)
+                              .documentFileName(TEST_FILE_NAME)
+                              .build())
+            .build();
+
+        CaseDocument respondent2GeneratedDefence = CaseDocument.builder()
+            .documentType(DocumentType.DEFENDANT_DEFENCE)
+            .createdBy("Respondent 2")
+            .createdDatetime(LocalDateTime.of(2024, 1, 11, 9, 30))
+            .documentLink(Document.builder()
+                              .documentBinaryUrl(TEST_URL)
+                              .documentUrl(TEST_URL)
+                              .documentFileName(TEST_FILE_NAME)
+                              .build())
+            .build();
+
+        CaseData caseData = baseCaseDataBuilder()
+            .respondent1GeneratedResponseDocument(respondent1GeneratedDefence)
+            .respondent2GeneratedResponseDocument(respondent2GeneratedDefence)
+            .build();
+
+        given(featureToggleService.isCaseProgressionEnabled()).willReturn(false);
+        given(featureToggleService.isAmendBundleEnabled()).willReturn(false);
+
+        BundleCreateRequest bundleCreateRequest = bundleRequestMapper.mapCaseDataToBundleCreateRequest(
+            caseData,
+            "sample.yaml",
+            "test",
+            "test"
+        );
+
+        List<Element<BundlingRequestDocument>> statementsOfCaseDocuments =
+            bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments();
+
+        assertEquals(2, statementsOfCaseDocuments.size());
+        assertEquals("DF 1 Defence 10/01/2024",
+                     statementsOfCaseDocuments.get(0).getValue().getDocumentFileName());
+        assertEquals(BundleFileNameList.DEFENCE.getDisplayName(),
+                     statementsOfCaseDocuments.get(0).getValue().getDocumentType());
+        assertEquals("DF 2 Defence 11/01/2024",
+                     statementsOfCaseDocuments.get(1).getValue().getDocumentFileName());
+        assertEquals(BundleFileNameList.DEFENCE.getDisplayName(),
+                     statementsOfCaseDocuments.get(1).getValue().getDocumentType());
+    }
+
+    @Test
     void shouldLabelSecondDefendantDefenceBasedOnCreatedBy() {
         CaseDocument defenceDocument = CaseDocument.builder()
             .documentType(DocumentType.DEFENDANT_DEFENCE)
