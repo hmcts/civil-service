@@ -131,7 +131,7 @@ class ClaimSettledDashboardNotificationHandlerTest  extends BaseCallbackHandlerT
             scenarioParams.put("applicant1ClaimSettledDateCy", caseData.getApplicant1ClaimSettleDate());
 
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-            when(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).thenReturn(true);
+            when(featureToggleService.isLocationWhiteListed(any())).thenReturn(true);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FOR_CLAIM_SETTLED_FOR_CLAIMANT1.name()).build()
@@ -170,7 +170,7 @@ class ClaimSettledDashboardNotificationHandlerTest  extends BaseCallbackHandlerT
             scenarioParams.put("applicant1ClaimSettledDateCy", caseData.getApplicant1ClaimSettleDate());
 
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-            when(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).thenReturn(false);
+            when(featureToggleService.isLocationWhiteListed(any())).thenReturn(false);
             when(featureToggleService.isCuiGaNroEnabled()).thenReturn(true);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(

@@ -48,15 +48,6 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsGAForLipInvoked(Boolean toggleStat) {
-        var caseFlagsKey = "GaForLips";
-        givenToggle(caseFlagsKey, toggleStat);
-
-        assertThat(featureToggleService.isGaForLipsEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsAmendBundleEnabledInvoked(Boolean toggleStat) {
         var caseFlagsKey = "amend-bundle-enabled";
         givenToggle(caseFlagsKey, toggleStat);
@@ -117,10 +108,9 @@ class FeatureToggleServiceTest {
                 location,
                 false
             )).thenReturn(isFeatureEnabled);
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(isFeatureEnabled);
         }
 
-        boolean result = featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(location);
+        boolean result = featureToggleService.isLocationWhiteListed(location);
 
         assertEquals(expected, result);
     }
