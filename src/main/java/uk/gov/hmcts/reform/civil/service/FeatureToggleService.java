@@ -69,10 +69,6 @@ public class FeatureToggleService {
                                                         epoch, false);
     }
 
-    public boolean isGaForLipsEnabled() {
-        return featureToggleApi.isFeatureEnabled("GaForLips");
-    }
-
     public boolean isMultiOrIntermediateTrackEnabled(CaseData caseData) {
         ZoneId zoneId = ZoneId.systemDefault();
         long epoch;
@@ -112,10 +108,9 @@ public class FeatureToggleService {
             && isCaseProgressionEnabled();
     }
 
-    public boolean isGaForLipsEnabledAndLocationWhiteListed(String location) {
+    public boolean isLocationWhiteListed(String location) {
         return location != null
-            && featureToggleApi.isFeatureEnabledForLocation("ea-courts-whitelisted-for-ga-lips", location, false)
-            && isGaForLipsEnabled();
+            && featureToggleApi.isFeatureEnabledForLocation("ea-courts-whitelisted-for-ga-lips", location, false);
     }
 
     public boolean isJOLiveFeedActive() {
