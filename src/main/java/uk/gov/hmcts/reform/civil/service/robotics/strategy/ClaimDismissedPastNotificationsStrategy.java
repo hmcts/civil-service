@@ -69,9 +69,13 @@ public class ClaimDismissedPastNotificationsStrategy implements EventHistoryStra
         stateFlow.getStateHistory().stream()
             .map(State::getName)
             .map(FlowState::fromFullName)
-            .filter(MESSAGE_RESOLVERS::containsKey)
+            .filter(FlowState.Main.class::isInstance)
             .map(FlowState.Main.class::cast)
-            .forEach(matched::add);
+            .forEach(state -> {
+                if (MESSAGE_RESOLVERS.get(state) != null) {
+                    matched.add(state);
+                }
+            });
         return matched;
     }
 

@@ -4,10 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.robotics.Event;
-import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
-import uk.gov.hmcts.reform.civil.model.robotics.EventType;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextFormatter;
@@ -20,9 +17,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.IntStream;
 
-import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREPRESENTED;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.getDefendantNames;
+import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildEnumeratedMiscEvent;
 
 @Component
 @Order(90)
@@ -38,7 +35,7 @@ public class UnrepresentedDefendantStrategy implements EventHistoryStrategy {
     public boolean supports(CaseData caseData) {
         return caseData != null
             && caseData.getSubmittedDate() != null
-            && hasState(caseData, FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT)
+            && hasState(caseData)
             && !getDefendantNames(UNREPRESENTED, caseData).isEmpty();
     }
 
@@ -52,35 +49,23 @@ public class UnrepresentedDefendantStrategy implements EventHistoryStrategy {
         LocalDateTime submittedDate = caseData.getSubmittedDate();
 
         IntStream.range(0, defendantNames.size())
-            .mapToObj(index -> buildEvent(builder, defendantNames, submittedDate, index))
+            .mapToObj(index -> buildEnumeratedMiscEvent(
+                builder,
+                sequenceGenerator,
+                timelineHelper,
+                submittedDate,
+                index,
+                defendantNames.size(),
+                defendantNames.get(index),
+                textFormatter::unrepresentedDefendant
+            ))
             .forEach(builder::miscellaneous);
     }
 
-    private Event buildEvent(EventHistory.EventHistoryBuilder builder,
-                             List<String> defendantNames,
-                             LocalDateTime submittedDate,
-                             int index) {
-        String prefix = defendantNames.size() > 1
-            ? format("[%d of %d - %s] ",
-                index + 1,
-                defendantNames.size(),
-                timelineHelper.now().toLocalDate())
-            : "";
-        String details = textFormatter.unrepresentedDefendant(prefix, defendantNames.get(index));
-
-        return Event.builder()
-            .eventSequence(sequenceGenerator.nextSequence(builder.build()))
-            .eventCode(EventType.MISCELLANEOUS.getCode())
-            .dateReceived(submittedDate)
-            .eventDetailsText(details)
-            .eventDetails(EventDetails.builder().miscText(details).build())
-            .build();
-    }
-
-    private boolean hasState(CaseData caseData, FlowState.Main target) {
+    private boolean hasState(CaseData caseData) {
         StateFlow flow = stateFlowEngine.evaluate(caseData);
         return flow.getStateHistory().stream()
             .map(State::getName)
-            .anyMatch(target.fullName()::equals);
+            .anyMatch(FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT.fullName()::equals);
     }
 }

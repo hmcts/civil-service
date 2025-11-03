@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.service.robotics.mapper.ClaimFeeUtility;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -97,7 +98,7 @@ public class JudgmentByAdmissionStrategy implements EventHistoryStrategy {
             .amountOfCosts(amountOfCosts)
             .amountPaidBeforeJudgment(ccjPaymentDetails
                 .map(CCJPaymentDetails::getCcjPaymentPaidSomeAmountInPounds)
-                .map(amountPaid -> amountPaid.setScale(2)).orElse(ZERO))
+                .map(amountPaid -> amountPaid.setScale(2, RoundingMode.HALF_UP)).orElse(ZERO))
             .isJudgmentForthwith(hasCourtDecisionInFavourOfClaimant(caseData)
                 ? caseData.applicant1SuggestedPayImmediately()
                 : caseData.isPayImmediately())
@@ -118,7 +119,7 @@ public class JudgmentByAdmissionStrategy implements EventHistoryStrategy {
             .orElse(ZERO);
         BigDecimal claimFee = ccjPaymentDetails
             .map(CCJPaymentDetails::getCcjJudgmentAmountClaimFee)
-            .map(amount -> amount.setScale(2))
+            .map(amount -> amount.setScale(2, RoundingMode.HALF_UP))
             .orElse(ZERO);
 
         if (caseData.isApplicantLipOneVOne() && featureToggleService.isLipVLipEnabled()) {
@@ -136,7 +137,7 @@ public class JudgmentByAdmissionStrategy implements EventHistoryStrategy {
         BigDecimal interest = caseData.isLipvLipOneVOne() && !caseData.isPartAdmitClaimSpec()
             ? ccjPaymentDetails.map(CCJPaymentDetails::getCcjJudgmentLipInterest).orElse(ZERO)
             : ofNullable(caseData.getTotalInterest()).orElse(ZERO);
-        return base.add(interest).setScale(2);
+        return base.add(interest).setScale(2, RoundingMode.HALF_UP);
     }
 
     private LocalDateTime resolveJudgmentDate(CaseData caseData) {
@@ -180,7 +181,7 @@ public class JudgmentByAdmissionStrategy implements EventHistoryStrategy {
                 .orElse(ZERO);
 
         return MonetaryConversions.penniesToPounds(
-            ofNullable(repaymentAmount).map(amount -> amount.setScale(2)).orElse(ZERO)
+            ofNullable(repaymentAmount).map(amount -> amount.setScale(2, RoundingMode.HALF_UP)).orElse(ZERO)
         );
     }
 

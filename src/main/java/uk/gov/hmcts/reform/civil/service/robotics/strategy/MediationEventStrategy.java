@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsTimelineHelper
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.IntStream;
 
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsDirectionsQuestionnaireSupport.prepareApplicantsDetails;
@@ -45,8 +44,7 @@ public class MediationEventStrategy implements EventHistoryStrategy {
 
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             List<ClaimantResponseDetails> applicantDetails = prepareApplicantsDetails(caseData);
-            List<Event> dqEvents = IntStream.range(0, applicantDetails.size())
-                .mapToObj(index -> buildApplicantDirectionsQuestionnaireEvent(builder, caseData, applicantDetails.get(index)))
+            List<Event> dqEvents = applicantDetails.stream().map(applicantDetail -> buildApplicantDirectionsQuestionnaireEvent(builder, caseData, applicantDetail))
                 .toList();
             builder.directionsQuestionnaireFiled(dqEvents);
         }

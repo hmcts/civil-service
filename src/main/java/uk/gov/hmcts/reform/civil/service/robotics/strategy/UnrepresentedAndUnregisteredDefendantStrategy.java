@@ -38,7 +38,7 @@ public class UnrepresentedAndUnregisteredDefendantStrategy implements EventHisto
     public boolean supports(CaseData caseData) {
         return caseData != null
             && caseData.getSubmittedDate() != null
-            && hasState(caseData, FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT)
+            && hasState(caseData)
             && !getDefendantNames(UNREPRESENTED, caseData).isEmpty()
             && !getDefendantNames(UNREGISTERED, caseData).isEmpty();
     }
@@ -87,10 +87,10 @@ public class UnrepresentedAndUnregisteredDefendantStrategy implements EventHisto
         );
     }
 
-    private boolean hasState(CaseData caseData, FlowState.Main target) {
+    private boolean hasState(CaseData caseData) {
         StateFlow flow = stateFlowEngine.evaluate(caseData);
         return flow.getStateHistory().stream()
             .map(State::getName)
-            .anyMatch(target.fullName()::equals);
+            .anyMatch(FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT.fullName()::equals);
     }
 }

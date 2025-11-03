@@ -28,10 +28,9 @@ import java.util.Optional;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFENCE_FILED;
-import static uk.gov.hmcts.reform.civil.model.robotics.EventType.STATES_PAID;
 import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsDirectionsQuestionnaireSupport.getPreferredCourtCode;
 import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildDirectionsQuestionnaireEvent;
+import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildDefenceOrStatesPaidEvent;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT2_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT_ID;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1ResponseExists;
@@ -163,9 +162,9 @@ public class RespondentFullDefenceStrategy implements EventHistoryStrategy {
                                         String partyId,
                                         RespondToClaim respondToClaim) {
         if (isAllPaid(caseData.getTotalClaimAmount(), respondToClaim)) {
-            buckets.statesPaidEvents.add(createDefenceFiledEvent(builder, responseDate, partyId, true));
+            buckets.statesPaidEvents.add(buildDefenceOrStatesPaidEvent(builder, sequenceGenerator, responseDate, partyId, true));
         } else {
-            buckets.defenceEvents.add(createDefenceFiledEvent(builder, responseDate, partyId, false));
+            buckets.defenceEvents.add(buildDefenceOrStatesPaidEvent(builder, sequenceGenerator, responseDate, partyId, false));
         }
     }
 
@@ -174,9 +173,9 @@ public class RespondentFullDefenceStrategy implements EventHistoryStrategy {
                                              EventBuckets buckets,
                                              LocalDateTime respondent1ResponseDate) {
         if (caseData.hasDefendantPaidTheAmountClaimed()) {
-            buckets.statesPaidEvents.add(createDefenceFiledEvent(builder, respondent1ResponseDate, RESPONDENT_ID, true));
+            buckets.statesPaidEvents.add(buildDefenceOrStatesPaidEvent(builder, sequenceGenerator, respondent1ResponseDate, RESPONDENT_ID, true));
         } else {
-            buckets.defenceEvents.add(createDefenceFiledEvent(builder, respondent1ResponseDate, RESPONDENT_ID, false));
+            buckets.defenceEvents.add(buildDefenceOrStatesPaidEvent(builder, sequenceGenerator, respondent1ResponseDate, RESPONDENT_ID, false));
         }
     }
 
@@ -189,9 +188,9 @@ public class RespondentFullDefenceStrategy implements EventHistoryStrategy {
             .orElse(respondent1ResponseDate);
 
         if (isAllPaid(caseData.getTotalClaimAmount(), caseData.getRespondToClaim())) {
-            buckets.statesPaidEvents.add(createDefenceFiledEvent(builder, respondent1ResponseDate, RESPONDENT2_ID, true));
+            buckets.statesPaidEvents.add(buildDefenceOrStatesPaidEvent(builder, sequenceGenerator, respondent1ResponseDate, RESPONDENT2_ID, true));
         }
-        buckets.defenceEvents.add(createDefenceFiledEvent(builder, respondent2ResponseDate, RESPONDENT2_ID, false));
+        buckets.defenceEvents.add(buildDefenceOrStatesPaidEvent(builder, sequenceGenerator, respondent2ResponseDate, RESPONDENT2_ID, false));
 
         buckets.directionsQuestionnaireEvents.add(
             createDirectionsQuestionnaireEvent(
@@ -209,18 +208,6 @@ public class RespondentFullDefenceStrategy implements EventHistoryStrategy {
     private boolean shouldUseRespondent1Response(CaseData caseData) {
         return ONE_V_TWO_ONE_LEGAL_REP.equals(getMultiPartyScenario(caseData))
             && caseData.getSameSolicitorSameResponse() == YES;
-    }
-
-    private Event createDefenceFiledEvent(EventHistory.EventHistoryBuilder builder,
-                                          LocalDateTime responseDate,
-                                          String partyId,
-                                          boolean statesPaid) {
-        return Event.builder()
-            .eventSequence(sequenceGenerator.nextSequence(builder.build()))
-            .eventCode(statesPaid ? STATES_PAID.getCode() : DEFENCE_FILED.getCode())
-            .dateReceived(responseDate)
-            .litigiousPartyID(partyId)
-            .build();
     }
 
     private Event createDirectionsQuestionnaireEvent(EventHistory.EventHistoryBuilder builder,
@@ -249,18 +236,7 @@ public class RespondentFullDefenceStrategy implements EventHistoryStrategy {
                 .orElse(false);
     }
 
-    private static final class EventBuckets {
-        private final List<Event> defenceEvents;
-        private final List<Event> statesPaidEvents;
-        private final List<Event> directionsQuestionnaireEvents;
-
-        private EventBuckets(List<Event> defenceEvents,
-                             List<Event> statesPaidEvents,
-                             List<Event> directionsQuestionnaireEvents) {
-            this.defenceEvents = defenceEvents;
-            this.statesPaidEvents = statesPaidEvents;
-            this.directionsQuestionnaireEvents = directionsQuestionnaireEvents;
-        }
+    private record EventBuckets(List<Event> defenceEvents, List<Event> statesPaidEvents, List<Event> directionsQuestionnaireEvents) {
     }
 
 }

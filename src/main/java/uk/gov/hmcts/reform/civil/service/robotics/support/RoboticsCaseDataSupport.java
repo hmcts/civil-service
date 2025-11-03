@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.robotics.support;
 
 import lombok.Builder;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
@@ -58,16 +57,16 @@ public class RoboticsCaseDataSupport {
 
     public Solicitor buildSolicitor(SolicitorData solicitorData) {
         Solicitor.SolicitorBuilder<?, ?> builder = Solicitor.builder()
-            .id(solicitorData.getId())
+            .id(solicitorData.id())
             .isPayee(solicitorData.isPayee())
-            .organisationId(solicitorData.getOrganisationId())
-            .contactEmailAddress(solicitorData.getContactEmailAddress())
-            .reference(partyLookup.truncateReference(solicitorData.getReference()));
+            .organisationId(solicitorData.organisationId())
+            .contactEmailAddress(solicitorData.contactEmailAddress())
+            .reference(partyLookup.truncateReference(solicitorData.reference()));
 
-        Optional.ofNullable(solicitorData.getOrganisation())
-            .ifPresent(org -> applyOrganisation(builder, org, solicitorData.getServiceAddress()));
+        Optional.ofNullable(solicitorData.organisation())
+            .ifPresent(org -> applyOrganisation(builder, org, solicitorData.serviceAddress()));
 
-        Optional.ofNullable(solicitorData.getOrganisationDetails())
+        Optional.ofNullable(solicitorData.organisationDetails())
             .ifPresent(details -> applyOrganisationDetails(builder, details));
 
         return builder.build();
@@ -142,16 +141,15 @@ public class RoboticsCaseDataSupport {
         return null;
     }
 
-    @Getter
     @Builder
-    public static class SolicitorData {
-        private final String id;
-        private final boolean isPayee;
-        private final String organisationId;
-        private final String contactEmailAddress;
-        private final String reference;
-        private final Address serviceAddress;
-        private final uk.gov.hmcts.reform.civil.prd.model.Organisation organisation;
-        private final SolicitorOrganisationDetails organisationDetails;
-    }
+    public record SolicitorData(
+        String id,
+        boolean isPayee,
+        String organisationId,
+        String contactEmailAddress,
+        String reference,
+        Address serviceAddress,
+        uk.gov.hmcts.reform.civil.prd.model.Organisation organisation,
+        SolicitorOrganisationDetails organisationDetails
+    ) { }
 }

@@ -46,16 +46,14 @@ class RespondentFullDefenceStrategyTest {
     @Mock
     private StateFlow stateFlow;
 
-    private RoboticsEventTextFormatter formatter;
-    private RoboticsTimelineHelper timelineHelper;
     private RoboticsRespondentResponseSupport respondentResponseSupport;
     private RespondentFullDefenceStrategy strategy;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        formatter = new RoboticsEventTextFormatter();
-        timelineHelper = new RoboticsTimelineHelper(() -> NOW);
+        RoboticsEventTextFormatter formatter = new RoboticsEventTextFormatter();
+        RoboticsTimelineHelper timelineHelper = new RoboticsTimelineHelper(() -> NOW);
         respondentResponseSupport = new RoboticsRespondentResponseSupport(formatter, timelineHelper);
         strategy = new RespondentFullDefenceStrategy(sequenceGenerator, respondentResponseSupport, stateFlowEngine);
 
