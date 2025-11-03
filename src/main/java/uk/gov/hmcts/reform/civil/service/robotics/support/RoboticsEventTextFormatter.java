@@ -174,10 +174,6 @@ public class RoboticsEventTextFormatter {
         return formatRpa("%sUnregistered defendant solicitor firm: %s", prefix, defendantName);
     }
 
-    public String unrepresentedAndUnregistered(int index, String date, String body) {
-        return formatRpa("[%d of 2 - %s] %s", index, date, body);
-    }
-
     public String unrepresentedAndUnregisteredCombined(String prefix, String body) {
         return formatRpa("%s%s", prefix, body);
     }
