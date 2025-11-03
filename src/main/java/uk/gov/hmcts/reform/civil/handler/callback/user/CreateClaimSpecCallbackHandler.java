@@ -179,7 +179,6 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             )
             .put(callbackKey(MID, "validate-spec-defendant-legal-rep-email"), this::validateRespondentRepEmail)
             .put(callbackKey(MID, "validate-spec-defendant2-legal-rep-email"), this::validateSpecRespondent2RepEmail)
-            .put(callbackKey(MID, "get-airline-list"), this::getAirlineList)
             .put(callbackKey(MID, "validateFlightDelayDate"), this::validateFlightDelayDate)
             .build();
     }
@@ -524,10 +523,6 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(validateEmailService.validate(caseData.getRespondentSolicitor2EmailAddress()))
             .build();
-    }
-
-    private CallbackResponse getAirlineList(CallbackParams callbackParams) {
-        return getAirlineListTask.getAirlineList(callbackParams.getCaseData());
     }
 
     private CallbackResponse validateFlightDelayDate(CallbackParams callbackParams) {
