@@ -10,9 +10,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimantResponseDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
-import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
-import uk.gov.hmcts.reform.civil.model.robotics.EventType;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextFormatter;
@@ -34,9 +32,10 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartySc
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsDirectionsQuestionnaireSupport.getPreferredCourtCode;
-import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsDirectionsQuestionnaireSupport.isStayClaim;
 import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsDirectionsQuestionnaireSupport.prepareApplicantsDetails;
 import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsDirectionsQuestionnaireSupport.prepareEventDetailsText;
+import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildDirectionsQuestionnaireEvent;
+import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildMiscEvent;
 
 @Component
 @Order(45)
@@ -155,18 +154,15 @@ public class ClaimantResponseStrategy implements EventHistoryStrategy {
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             String preferredCourt = getPreferredCourtCode(caseData.getApplicant1DQ());
             List<Event> dqEvents = claimantDetails.stream()
-                .map(detail -> Event.builder()
-                    .eventSequence(sequenceGenerator.nextSequence(builder.build()))
-                    .eventCode(EventType.DIRECTIONS_QUESTIONNAIRE_FILED.getCode())
-                    .dateReceived(detail.getResponseDate())
-                    .litigiousPartyID(detail.getLitigiousPartyID())
-                    .eventDetails(EventDetails.builder()
-                        .stayClaim(isStayClaim(detail.getDq()))
-                        .preferredCourtCode(preferredCourt)
-                        .preferredCourtName("")
-                        .build())
-                    .eventDetailsText(prepareEventDetailsText(detail.getDq(), preferredCourt))
-                    .build())
+                .map(detail -> buildDirectionsQuestionnaireEvent(
+                    builder,
+                    sequenceGenerator,
+                    detail.getResponseDate(),
+                    detail.getLitigiousPartyID(),
+                    detail.getDq(),
+                    preferredCourt,
+                    prepareEventDetailsText(detail.getDq(), preferredCourt)
+                ))
                 .toList();
             builder.directionsQuestionnaireFiled(dqEvents);
             return;
@@ -174,18 +170,15 @@ public class ClaimantResponseStrategy implements EventHistoryStrategy {
 
         String preferredCourt = locationRefDataUtil.getPreferredCourtData(caseData, authToken, true);
         List<Event> dqEvents = claimantDetails.stream()
-            .map(detail -> Event.builder()
-                .eventSequence(sequenceGenerator.nextSequence(builder.build()))
-                .eventCode(EventType.DIRECTIONS_QUESTIONNAIRE_FILED.getCode())
-                .dateReceived(detail.getResponseDate())
-                .litigiousPartyID(detail.getLitigiousPartyID())
-                .eventDetails(EventDetails.builder()
-                    .stayClaim(isStayClaim(detail.getDq()))
-                    .preferredCourtCode(preferredCourt)
-                    .preferredCourtName("")
-                    .build())
-                .eventDetailsText(prepareEventDetailsText(detail.getDq(), preferredCourt))
-                .build())
+            .map(detail -> buildDirectionsQuestionnaireEvent(
+                builder,
+                sequenceGenerator,
+                detail.getResponseDate(),
+                detail.getLitigiousPartyID(),
+                detail.getDq(),
+                preferredCourt,
+                prepareEventDetailsText(detail.getDq(), preferredCourt)
+            ))
             .toList();
         builder.directionsQuestionnaireFiled(dqEvents);
     }
@@ -195,13 +188,12 @@ public class ClaimantResponseStrategy implements EventHistoryStrategy {
             ? textFormatter.claimantsIntendNotToProceed()
             : textFormatter.claimantIntendsNotToProceed();
 
-        builder.miscellaneous(Event.builder()
-            .eventSequence(sequenceGenerator.nextSequence(builder.build()))
-            .eventCode(EventType.MISCELLANEOUS.getCode())
-            .dateReceived(timelineHelper.ensurePresentOrNow(caseData.getApplicant1ResponseDate()))
-            .eventDetailsText(message)
-            .eventDetails(EventDetails.builder().miscText(message).build())
-            .build());
+        builder.miscellaneous(buildMiscEvent(
+            builder,
+            sequenceGenerator,
+            message,
+            timelineHelper.ensurePresentOrNow(caseData.getApplicant1ResponseDate())
+        ));
     }
 
     private List<String> prepareMultipartyTexts(CaseData caseData) {
@@ -259,26 +251,19 @@ public class ClaimantResponseStrategy implements EventHistoryStrategy {
                                           List<String> texts) {
         LocalDateTime defaultDate = timelineHelper.ensurePresentOrNow(caseData.getApplicant1ResponseDate());
         return texts.stream()
-            .map(text -> Event.builder()
-                .eventSequence(sequenceGenerator.nextSequence(builder.build()))
-                .eventCode(EventType.MISCELLANEOUS.getCode())
-                .dateReceived(defaultDate)
-                .eventDetailsText(text)
-                .eventDetails(EventDetails.builder().miscText(text).build())
-                .build())
+            .map(text -> buildMiscEvent(builder, sequenceGenerator, text, defaultDate))
             .toList();
     }
 
     private void addTakenOfflineForMultitrack(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         if (AllocatedTrack.MULTI_CLAIM.equals(caseData.getAllocatedTrack())) {
             String message = textFormatter.multitrackUnspecOffline();
-            builder.miscellaneous(Event.builder()
-                .eventSequence(sequenceGenerator.nextSequence(builder.build()))
-                .eventCode(EventType.MISCELLANEOUS.getCode())
-                .dateReceived(timelineHelper.ensurePresentOrNow(caseData.getApplicant1ResponseDate()))
-                .eventDetailsText(message)
-                .eventDetails(EventDetails.builder().miscText(message).build())
-                .build());
+            builder.miscellaneous(buildMiscEvent(
+                builder,
+                sequenceGenerator,
+                message,
+                timelineHelper.ensurePresentOrNow(caseData.getApplicant1ResponseDate())
+            ));
         }
     }
 

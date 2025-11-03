@@ -117,4 +117,17 @@ public class RoboticsRespondentResponseSupport {
             timelineHelper.now().toLocalDate().toString()
         );
     }
+
+    public LocalDateTime resolveRespondent2ResponseDate(CaseData caseData) {
+        if (caseData == null) {
+            return null;
+        }
+        MultiPartyScenario scenario = getMultiPartyScenario(caseData);
+        if (scenario.equals(ONE_V_TWO_ONE_LEGAL_REP)) {
+            return caseData.getRespondent1ResponseDate();
+        }
+        return caseData.getRespondent2ResponseDate() != null
+            ? caseData.getRespondent2ResponseDate()
+            : caseData.getRespondent1ResponseDate();
+    }
 }

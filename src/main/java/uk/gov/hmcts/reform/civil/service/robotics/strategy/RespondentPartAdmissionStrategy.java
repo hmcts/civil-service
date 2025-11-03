@@ -8,7 +8,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.dq.DQ;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
-import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.model.robotics.EventType;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
@@ -31,6 +30,8 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartySc
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsDirectionsQuestionnaireSupport.getPreferredCourtCode;
 import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsDirectionsQuestionnaireSupport.isStayClaim;
+import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildDirectionsQuestionnaireEvent;
+import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildMiscEvent;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT2_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT_ID;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getResponseTypeForRespondent;
@@ -93,20 +94,21 @@ public class RespondentPartAdmissionStrategy implements EventHistoryStrategy {
 
             addRespondentMisc(builder, caseData, caseData.getRespondent1(), true, caseData.getRespondent1ResponseDate());
 
-            builder.directionsQuestionnaire(addDirectionsQuestionnaireFiledEvent(
+            builder.directionsQuestionnaire(buildDirectionsQuestionnaireEvent(
                 builder,
-                caseData,
+                sequenceGenerator,
                 caseData.getRespondent1ResponseDate(),
                 RESPONDENT_ID,
                 caseData.getRespondent1DQ(),
-                caseData.getRespondent1(),
-                true
+                getPreferredCourtCode(caseData.getRespondent1DQ()),
+                prepareEventDetailsText(caseData, caseData.getRespondent1DQ(), caseData.getRespondent1(), true)
             ));
 
             if (defendant1v2SameSolicitorSameResponse.test(caseData)) {
+                LocalDateTime respondent2ResponseDate = respondentResponseSupport.resolveRespondent2ResponseDate(caseData);
                 builder.receiptOfPartAdmission(addReceiptOfPartAdmissionEvent(
                     builder,
-                    resolveRespondent2ResponseDate(caseData),
+                    respondent2ResponseDate,
                     RESPONDENT2_ID
                 ));
                 addRespondentMisc(
@@ -114,16 +116,16 @@ public class RespondentPartAdmissionStrategy implements EventHistoryStrategy {
                     caseData,
                     caseData.getRespondent2(),
                     false,
-                    resolveRespondent2ResponseDate(caseData)
+                    respondent2ResponseDate
                 );
-                builder.directionsQuestionnaire(addDirectionsQuestionnaireFiledEvent(
+                builder.directionsQuestionnaire(buildDirectionsQuestionnaireEvent(
                     builder,
-                    caseData,
-                    resolveRespondent2ResponseDate(caseData),
+                    sequenceGenerator,
+                    respondent2ResponseDate,
                     RESPONDENT2_ID,
                     caseData.getRespondent1DQ(),
-                    caseData.getRespondent2(),
-                    true
+                    getPreferredCourtCode(caseData.getRespondent1DQ()),
+                    prepareEventDetailsText(caseData, caseData.getRespondent1DQ(), caseData.getRespondent2(), true)
                 ));
             }
         }
@@ -132,14 +134,14 @@ public class RespondentPartAdmissionStrategy implements EventHistoryStrategy {
             builder.receiptOfPartAdmission(addReceiptOfPartAdmissionEvent(builder, caseData.getRespondent2ResponseDate(), RESPONDENT2_ID));
             addRespondentMisc(builder, caseData, caseData.getRespondent2(), false, caseData.getRespondent2ResponseDate());
 
-            builder.directionsQuestionnaire(addDirectionsQuestionnaireFiledEvent(
+            builder.directionsQuestionnaire(buildDirectionsQuestionnaireEvent(
                 builder,
-                caseData,
+                sequenceGenerator,
                 caseData.getRespondent2ResponseDate(),
                 RESPONDENT2_ID,
                 caseData.getRespondent2DQ(),
-                caseData.getRespondent2(),
-                false
+                getPreferredCourtCode(caseData.getRespondent2DQ()),
+                prepareEventDetailsText(caseData, caseData.getRespondent2DQ(), caseData.getRespondent2(), false)
             ));
         }
     }
@@ -179,7 +181,12 @@ public class RespondentPartAdmissionStrategy implements EventHistoryStrategy {
             return;
         }
 
-        builder.miscellaneous(createRespondentMiscEvent(builder, caseData, respondent, isRespondent1, responseDate));
+        builder.miscellaneous(buildMiscEvent(
+            builder,
+            sequenceGenerator,
+            respondentResponseSupport.prepareRespondentResponseText(caseData, respondent, isRespondent1),
+            responseDate
+        ));
     }
 
     private void addLipVsLrMisc(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
@@ -187,33 +194,12 @@ public class RespondentPartAdmissionStrategy implements EventHistoryStrategy {
             return;
         }
 
-        builder.miscellaneous(createLipVsLrMiscEvent(builder));
-    }
-
-    private Event addDirectionsQuestionnaireFiledEvent(EventHistory.EventHistoryBuilder builder,
-                                                       CaseData caseData,
-                                                       LocalDateTime responseDate,
-                                                       String partyId,
-                                                       DQ dq,
-                                                       Party respondent,
-                                                       boolean isRespondent1) {
-        return Event.builder()
-            .eventSequence(sequenceGenerator.nextSequence(builder.build()))
-            .eventCode(EventType.DIRECTIONS_QUESTIONNAIRE_FILED.getCode())
-            .dateReceived(responseDate)
-            .litigiousPartyID(partyId)
-            .eventDetailsText(prepareEventDetailsText(caseData, respondent, dq, isRespondent1))
-            .eventDetails(EventDetails.builder()
-                .stayClaim(isStayClaim(dq))
-                .preferredCourtCode(getPreferredCourtCode(dq))
-                .preferredCourtName("")
-                .build())
-            .build();
+        builder.miscellaneous(buildMiscEvent(builder, sequenceGenerator, textFormatter.lipVsLrFullOrPartAdmissionReceived(), timelineHelper.now()));
     }
 
     private String prepareEventDetailsText(CaseData caseData,
-                                           Party respondent,
                                            DQ dq,
+                                           Party respondent,
                                            boolean isRespondent1) {
         String paginatedMessage = "";
         MultiPartyScenario scenario = getMultiPartyScenario(caseData);
@@ -229,38 +215,5 @@ public class RespondentPartAdmissionStrategy implements EventHistoryStrategy {
             getPreferredCourtCode(dq),
             isStayClaim(dq)
         );
-    }
-
-    private LocalDateTime resolveRespondent2ResponseDate(CaseData caseData) {
-        return Optional.ofNullable(caseData.getRespondent2ResponseDate())
-            .orElse(caseData.getRespondent1ResponseDate());
-    }
-
-    private Event createRespondentMiscEvent(EventHistory.EventHistoryBuilder builder,
-                                            CaseData caseData,
-                                            Party respondent,
-                                            boolean isRespondent1,
-                                            LocalDateTime responseDate) {
-        return Event.builder()
-            .eventSequence(sequenceGenerator.nextSequence(builder.build()))
-            .eventCode(EventType.MISCELLANEOUS.getCode())
-            .dateReceived(responseDate)
-            .eventDetailsText(respondentResponseSupport.prepareRespondentResponseText(caseData, respondent, isRespondent1))
-            .eventDetails(EventDetails.builder()
-                .miscText(respondentResponseSupport.prepareRespondentResponseText(caseData, respondent, isRespondent1))
-                .build())
-            .build();
-    }
-
-    private Event createLipVsLrMiscEvent(EventHistory.EventHistoryBuilder builder) {
-        return Event.builder()
-            .eventSequence(sequenceGenerator.nextSequence(builder.build()))
-            .eventCode(EventType.MISCELLANEOUS.getCode())
-            .dateReceived(timelineHelper.now())
-            .eventDetailsText(textFormatter.lipVsLrFullOrPartAdmissionReceived())
-            .eventDetails(EventDetails.builder()
-                .miscText(textFormatter.lipVsLrFullOrPartAdmissionReceived())
-                .build())
-            .build();
     }
 }

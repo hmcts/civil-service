@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.civil.model.dq.DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
-import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
@@ -30,10 +29,9 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_L
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFENCE_FILED;
-import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DIRECTIONS_QUESTIONNAIRE_FILED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.STATES_PAID;
 import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsDirectionsQuestionnaireSupport.getPreferredCourtCode;
-import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsDirectionsQuestionnaireSupport.isStayClaim;
+import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildDirectionsQuestionnaireEvent;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT2_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT_ID;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1ResponseExists;
@@ -232,20 +230,15 @@ public class RespondentFullDefenceStrategy implements EventHistoryStrategy {
                                                      DQ respondentDQ,
                                                      Party respondent,
                                                      boolean isRespondent1) {
-        return Event.builder()
-            .eventSequence(sequenceGenerator.nextSequence(builder.build()))
-            .eventCode(DIRECTIONS_QUESTIONNAIRE_FILED.getCode())
-            .dateReceived(responseDate)
-            .litigiousPartyID(partyId)
-            .eventDetailsText(
-                respondentResponseSupport.prepareFullDefenceEventText(respondentDQ, caseData, isRespondent1, respondent)
-            )
-            .eventDetails(EventDetails.builder()
-                              .stayClaim(isStayClaim(respondentDQ))
-                              .preferredCourtCode(getPreferredCourtCode(respondentDQ))
-                              .preferredCourtName("")
-                              .build())
-            .build();
+        return buildDirectionsQuestionnaireEvent(
+            builder,
+            sequenceGenerator,
+            responseDate,
+            partyId,
+            respondentDQ,
+            getPreferredCourtCode(respondentDQ),
+            respondentResponseSupport.prepareFullDefenceEventText(respondentDQ, caseData, isRespondent1, respondent)
+        );
     }
 
     private boolean isAllPaid(BigDecimal totalClaimAmount, RespondToClaim respondToClaim) {

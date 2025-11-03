@@ -5,12 +5,11 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.robotics.Event;
-import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
-import uk.gov.hmcts.reform.civil.model.robotics.EventType;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextFormatter;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenerator;
+
+import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildMiscEvent;
 
 @Component
 @Order(50)
@@ -40,14 +39,6 @@ public class CaseProceedsInCasemanStrategy implements EventHistoryStrategy {
             return;
         }
         String message = textFormatter.caseProceedsInCaseman();
-        builder.miscellaneous(
-            Event.builder()
-                .eventSequence(sequenceGenerator.nextSequence(builder.build()))
-                .eventCode(EventType.MISCELLANEOUS.getCode())
-                .dateReceived(caseData.getTakenOfflineDate())
-                .eventDetailsText(message)
-                .eventDetails(EventDetails.builder().miscText(message).build())
-                .build()
-        );
+        builder.miscellaneous(buildMiscEvent(builder, sequenceGenerator, message, caseData.getTakenOfflineDate()));
     }
 }

@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
-import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.model.robotics.EventType;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
@@ -23,6 +22,7 @@ import java.time.LocalDateTime;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT2_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT_ID;
+import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildMiscEvent;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1ResponseExists;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1v2SameSolicitorSameResponse;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2ResponseExists;
@@ -95,13 +95,7 @@ public class RespondentFullAdmissionStrategy implements EventHistoryStrategy {
         }
 
         String message = respondentResponseSupport.prepareRespondentResponseText(caseData, respondent, isRespondent1);
-        builder.miscellaneous(Event.builder()
-            .eventSequence(sequenceGenerator.nextSequence(builder.build()))
-            .eventCode(EventType.MISCELLANEOUS.getCode())
-            .dateReceived(responseDate)
-            .eventDetailsText(message)
-            .eventDetails(EventDetails.builder().miscText(message).build())
-            .build());
+        builder.miscellaneous(buildMiscEvent(builder, sequenceGenerator, message, responseDate));
     }
 
     private void addLipVsLrMisc(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
@@ -110,13 +104,7 @@ public class RespondentFullAdmissionStrategy implements EventHistoryStrategy {
         }
 
         String message = textFormatter.lipVsLrFullOrPartAdmissionReceived();
-        builder.miscellaneous(Event.builder()
-            .eventSequence(sequenceGenerator.nextSequence(builder.build()))
-            .eventCode(EventType.MISCELLANEOUS.getCode())
-            .dateReceived(timelineHelper.now())
-            .eventDetailsText(message)
-            .eventDetails(EventDetails.builder().miscText(message).build())
-            .build());
+        builder.miscellaneous(buildMiscEvent(builder, sequenceGenerator, message, timelineHelper.now()));
     }
 
     private boolean hasFullAdmissionState(CaseData caseData) {

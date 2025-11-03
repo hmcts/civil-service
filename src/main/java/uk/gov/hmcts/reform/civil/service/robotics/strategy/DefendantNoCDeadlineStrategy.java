@@ -5,16 +5,14 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.robotics.Event;
-import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
-import uk.gov.hmcts.reform.civil.model.robotics.EventType;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextFormatter;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenerator;
 
 import java.time.LocalDateTime;
 
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildMiscEvent;
 
 @Component
 @Order(40)
@@ -38,15 +36,7 @@ public class DefendantNoCDeadlineStrategy implements EventHistoryStrategy {
         }
         LocalDateTime takenOfflineDate = requireNonNull(caseData.getTakenOfflineDate());
         String details = textFormatter.claimMovedOfflineAfterNocDeadline();
-        builder.miscellaneous(
-            Event.builder()
-                .eventSequence(sequenceGenerator.nextSequence(builder.build()))
-                .eventCode(EventType.MISCELLANEOUS.getCode())
-                .dateReceived(takenOfflineDate)
-                .eventDetailsText(details)
-                .eventDetails(EventDetails.builder().miscText(details).build())
-                .build()
-        );
+        builder.miscellaneous(buildMiscEvent(builder, sequenceGenerator, details, takenOfflineDate));
     }
 
     private boolean hasNoCDeadlinePassed(CaseData caseData, LocalDateTime takenOfflineDate) {

@@ -4,10 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.robotics.Event;
-import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
-import uk.gov.hmcts.reform.civil.model.robotics.EventType;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextFormatter;
@@ -19,6 +16,8 @@ import java.util.EnumMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+
+import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildMiscEvent;
 
 @Component
 @Order(11)
@@ -61,15 +60,7 @@ public class ClaimDismissedPastNotificationsStrategy implements EventHistoryStra
 
     private void emitDismissedEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData, FlowState.Main state) {
         String message = MESSAGE_RESOLVERS.get(state).resolve(textFormatter);
-        builder.miscellaneous(
-            Event.builder()
-                .eventSequence(sequenceGenerator.nextSequence(builder.build()))
-                .eventCode(EventType.MISCELLANEOUS.getCode())
-                .dateReceived(caseData.getClaimDismissedDate())
-                .eventDetailsText(message)
-                .eventDetails(EventDetails.builder().miscText(message).build())
-                .build()
-        );
+        builder.miscellaneous(buildMiscEvent(builder, sequenceGenerator, message, caseData.getClaimDismissedDate()));
     }
 
     private Set<FlowState.Main> orderedMatchedStates(CaseData caseData) {

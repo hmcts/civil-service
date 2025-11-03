@@ -32,8 +32,8 @@ import static java.math.BigDecimal.ZERO;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFAULT_JUDGMENT_GRANTED;
-import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MISCELLANEOUS;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper.RECORD_JUDGMENT;
+import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildMiscEvent;
 
 @Component
 @Order(20)
@@ -80,13 +80,7 @@ public class DefaultJudgmentEventStrategy implements EventHistoryStrategy {
             : textFormatter.defaultJudgmentGrantedOffline();
 
         String text = grantedFlag ? requested : granted;
-        builder.miscellaneous(Event.builder()
-            .eventSequence(sequenceGenerator.nextSequence(builder.build()))
-            .eventCode(MISCELLANEOUS.getCode())
-            .dateReceived(getDateOfDjCreated(caseData))
-            .eventDetailsText(text)
-            .eventDetails(EventDetails.builder().miscText(text).build())
-            .build());
+        builder.miscellaneous(buildMiscEvent(builder, sequenceGenerator, text, getDateOfDjCreated(caseData)));
     }
 
     private Event createDefaultJudgmentEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData, String litigiousPartyId) {

@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.dq.DQ;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
-import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
@@ -32,13 +31,12 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartySc
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFENCE_FILED;
-import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DIRECTIONS_QUESTIONNAIRE_FILED;
-import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MISCELLANEOUS;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.RECEIPT_OF_ADMISSION;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.RECEIPT_OF_PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.STATES_PAID;
 import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsDirectionsQuestionnaireSupport.getPreferredCourtCode;
-import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsDirectionsQuestionnaireSupport.isStayClaim;
+import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildDirectionsQuestionnaireEvent;
+import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildMiscEvent;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT2_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT_ID;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1ResponseExists;
@@ -94,7 +92,7 @@ public class RespondentDivergentResponseStrategy implements EventHistoryStrategy
         boolean goingOffline = OFFLINE_STATES.contains(stateFlow.getState().getName());
 
         LocalDateTime respondent1ResponseDate = caseData.getRespondent1ResponseDate();
-        LocalDateTime respondent2ResponseDate = resolveRespondent2ResponseDate(caseData);
+        LocalDateTime respondent2ResponseDate = respondentResponseSupport.resolveRespondent2ResponseDate(caseData);
 
         if (defendant1ResponseExists.test(caseData)) {
             if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
@@ -141,13 +139,6 @@ public class RespondentDivergentResponseStrategy implements EventHistoryStrategy
                 addMiscellaneous(builder, caseData, caseData.getRespondent2(), false, respondent2ResponseDate);
             }
         }
-    }
-
-    private LocalDateTime resolveRespondent2ResponseDate(CaseData caseData) {
-        if (ONE_V_TWO_ONE_LEGAL_REP == getMultiPartyScenario(caseData)) {
-            return caseData.getRespondent1ResponseDate();
-        }
-        return caseData.getRespondent2ResponseDate();
     }
 
     private RespondentResponseTypeSpec resolveRespondent1SpecResponse(CaseData caseData) {
@@ -269,20 +260,15 @@ public class RespondentDivergentResponseStrategy implements EventHistoryStrategy
                                                      DQ respondentDQ,
                                                      Party respondent,
                                                      boolean isRespondent1) {
-        return Event.builder()
-            .eventSequence(sequenceGenerator.nextSequence(builder.build()))
-            .eventCode(DIRECTIONS_QUESTIONNAIRE_FILED.getCode())
-            .dateReceived(responseDate)
-            .litigiousPartyID(respondentId)
-            .eventDetailsText(
-                respondentResponseSupport.prepareFullDefenceEventText(respondentDQ, caseData, isRespondent1, respondent)
-            )
-            .eventDetails(EventDetails.builder()
-                              .stayClaim(isStayClaim(respondentDQ))
-                              .preferredCourtCode(getPreferredCourtCode(respondentDQ))
-                              .preferredCourtName("")
-                              .build())
-            .build();
+        return buildDirectionsQuestionnaireEvent(
+            builder,
+            sequenceGenerator,
+            responseDate,
+            respondentId,
+            respondentDQ,
+            getPreferredCourtCode(respondentDQ),
+            respondentResponseSupport.prepareFullDefenceEventText(respondentDQ, caseData, isRespondent1, respondent)
+        );
     }
 
     private void addReceiptOfPartAdmission(EventHistory.EventHistoryBuilder builder,
@@ -327,12 +313,6 @@ public class RespondentDivergentResponseStrategy implements EventHistoryStrategy
                                   boolean isRespondent1,
                                   LocalDateTime responseDate) {
         String message = respondentResponseSupport.prepareRespondentResponseText(caseData, respondent, isRespondent1);
-        builder.miscellaneous(Event.builder()
-            .eventSequence(sequenceGenerator.nextSequence(builder.build()))
-            .eventCode(MISCELLANEOUS.getCode())
-            .dateReceived(responseDate)
-            .eventDetailsText(message)
-            .eventDetails(EventDetails.builder().miscText(message).build())
-            .build());
+        builder.miscellaneous(buildMiscEvent(builder, sequenceGenerator, message, responseDate));
     }
 }

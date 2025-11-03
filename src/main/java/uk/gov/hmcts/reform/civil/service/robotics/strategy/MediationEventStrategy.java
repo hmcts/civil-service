@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimantResponseDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
-import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsDirectionsQuestionnaireSupport;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextFormatter;
@@ -18,9 +17,9 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
-import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DIRECTIONS_QUESTIONNAIRE_FILED;
-import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MISCELLANEOUS;
 import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsDirectionsQuestionnaireSupport.prepareApplicantsDetails;
+import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildDirectionsQuestionnaireEvent;
+import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildMiscEvent;
 
 @Component
 @Order(30)
@@ -47,43 +46,35 @@ public class MediationEventStrategy implements EventHistoryStrategy {
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             List<ClaimantResponseDetails> applicantDetails = prepareApplicantsDetails(caseData);
             List<Event> dqEvents = IntStream.range(0, applicantDetails.size())
-                .mapToObj(index -> buildDirectionsQuestionnaireEvent(builder, caseData, applicantDetails.get(index)))
+                .mapToObj(index -> buildApplicantDirectionsQuestionnaireEvent(builder, caseData, applicantDetails.get(index)))
                 .toList();
             builder.directionsQuestionnaireFiled(dqEvents);
         }
 
-        builder.miscellaneous(
-            Event.builder()
-                .eventSequence(sequenceGenerator.nextSequence(builder.build()))
-                .eventCode(MISCELLANEOUS.getCode())
-                .dateReceived(resolveApplicantResponseDate(caseData))
-                .eventDetailsText(textFormatter.inMediation())
-                .eventDetails(EventDetails.builder()
-                                  .miscText(textFormatter.inMediation())
-                                  .build())
-                .build()
-        );
+        builder.miscellaneous(buildMiscEvent(
+            builder,
+            sequenceGenerator,
+            textFormatter.inMediation(),
+            resolveApplicantResponseDate(caseData)
+        ));
     }
 
-    private Event buildDirectionsQuestionnaireEvent(EventHistory.EventHistoryBuilder builder,
-                                                    CaseData caseData,
-                                                    ClaimantResponseDetails claimantDetails) {
+    private Event buildApplicantDirectionsQuestionnaireEvent(EventHistory.EventHistoryBuilder builder,
+                                                             CaseData caseData,
+                                                             ClaimantResponseDetails claimantDetails) {
         String preferredCourtCode = RoboticsDirectionsQuestionnaireSupport.getPreferredCourtCode(caseData.getApplicant1DQ());
-        return Event.builder()
-            .eventSequence(sequenceGenerator.nextSequence(builder.build()))
-            .eventCode(DIRECTIONS_QUESTIONNAIRE_FILED.getCode())
-            .dateReceived(claimantDetails.getResponseDate())
-            .litigiousPartyID(claimantDetails.getLitigiousPartyID())
-            .eventDetails(EventDetails.builder()
-                              .stayClaim(RoboticsDirectionsQuestionnaireSupport.isStayClaim(claimantDetails.getDq()))
-                              .preferredCourtCode(preferredCourtCode)
-                              .preferredCourtName("")
-                              .build())
-            .eventDetailsText(RoboticsDirectionsQuestionnaireSupport.prepareEventDetailsText(
+        return buildDirectionsQuestionnaireEvent(
+            builder,
+            sequenceGenerator,
+            claimantDetails.getResponseDate(),
+            claimantDetails.getLitigiousPartyID(),
+            claimantDetails.getDq(),
+            preferredCourtCode,
+            RoboticsDirectionsQuestionnaireSupport.prepareEventDetailsText(
                 claimantDetails.getDq(),
                 preferredCourtCode
-            ))
-            .build();
+            )
+        );
     }
 
     private LocalDateTime resolveApplicantResponseDate(CaseData caseData) {
