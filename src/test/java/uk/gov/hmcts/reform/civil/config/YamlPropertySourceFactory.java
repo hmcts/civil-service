@@ -11,6 +11,7 @@ import java.util.Properties;
 
 @SuppressWarnings("ALL")
 public class YamlPropertySourceFactory implements PropertySourceFactory {
+
     @Override
     public PropertySource<?> createPropertySource(String name, EncodedResource resource) throws IOException {
         YamlPropertiesFactoryBean factory = new YamlPropertiesFactoryBean();
