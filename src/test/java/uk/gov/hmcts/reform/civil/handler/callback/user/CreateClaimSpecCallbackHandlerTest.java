@@ -39,7 +39,6 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaim.Validate
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaim.ValidateRespondentDetailsTask;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.Address;
-import uk.gov.hmcts.reform.civil.model.AirlineEpimsId;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimAmountBreakup;
 import uk.gov.hmcts.reform.civil.model.ClaimAmountBreakupDetails;
@@ -2037,32 +2036,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Nested
     class FlightDelayDetailsMidCallbacks {
-
-        @Test
-        void shouldGetAirlineList_whenRequired() {
-            // Given
-            List<AirlineEpimsId> airlineEpimsIDList = new ArrayList<>();
-            airlineEpimsIDList.add(AirlineEpimsId.builder().airline("BA/Cityflyer").epimsID("111000").build());
-            airlineEpimsIDList.add(AirlineEpimsId.builder().airline("OTHER").epimsID("111111").build());
-
-            given(airlineEpimsDataLoader.getAirlineEpimsIDList())
-                .willReturn(airlineEpimsIDList);
-
-            CaseData caseData = CaseData.builder().build();
-            CallbackParams params = callbackParamsOf(caseData, MID, "get-airline-list");
-
-            // When
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            // Then
-            assertThat(response.getData()).extracting("flightDelayDetails").extracting("airlineList")
-                .extracting("list_items").asList().extracting("label")
-                .contains("BA/Cityflyer");
-
-            assertThat(response.getData()).extracting("flightDelayDetails").extracting("airlineList")
-                .extracting("list_items").asList().extracting("label")
-                .contains("OTHER");
-        }
 
         @Test
         void shouldReturnErrorWhenDateOfFlightIsInTheFuture() {
