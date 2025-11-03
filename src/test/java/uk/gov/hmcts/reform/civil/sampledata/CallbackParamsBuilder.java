@@ -19,7 +19,7 @@ public class CallbackParamsBuilder {
     private String pageId;
     private CaseData caseData;
     private BaseCaseData baseCaseData;
-    private boolean isGeneralApplicationCase;
+    private boolean isGeneralApplicationCase = false;
 
     public static CallbackParamsBuilder builder() {
         return new CallbackParamsBuilder();
