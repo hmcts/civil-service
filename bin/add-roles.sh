@@ -35,6 +35,7 @@
 ./bin/utils/ccd-add-role.sh "citizen"
 ./bin/utils/ccd-add-role.sh "caseworker-civil-citizen-ui-pcqextractor"
 ./bin/utils/ccd-add-role.sh "judge"
+./bin/utils/ccd-add-role.sh "caseworker-civil-judge"
 ./bin/utils/ccd-add-role.sh "hearing-centre-admin"
 ./bin/utils/ccd-add-role.sh "national-business-centre"
 ./bin/utils/ccd-add-role.sh "hearing-centre-team-leader"
