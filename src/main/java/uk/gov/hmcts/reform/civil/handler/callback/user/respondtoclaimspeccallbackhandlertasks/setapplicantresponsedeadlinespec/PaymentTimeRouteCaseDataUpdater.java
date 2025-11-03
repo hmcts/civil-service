@@ -23,7 +23,7 @@ public class PaymentTimeRouteCaseDataUpdater implements SetApplicantResponseDead
     private final DeadlineExtensionCalculatorService deadlineCalculatorService;
 
     @Override
-    public void update(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
+    public void update(CaseData caseData) {
         log.info("Updating PaymentTimeRouteCaseData for caseId: {}", caseData.getCcdCaseReference());
 
         if (IMMEDIATELY.equals(caseData.getDefenceAdmitPartPaymentTimeRouteRequired())
@@ -35,7 +35,7 @@ public class PaymentTimeRouteCaseDataUpdater implements SetApplicantResponseDead
             RespondToClaimAdmitPartLRspec admitPartLRspec = RespondToClaimAdmitPartLRspec.builder()
                     .whenWillThisAmountBePaid(whenBePaid)
                     .build();
-            updatedData.respondToClaimAdmitPartLRspec(admitPartLRspec);
+            caseData.setRespondToClaimAdmitPartLRspec(admitPartLRspec);
         } else {
             log.info("Defence admit part payment time route is not IMMEDIATELY for caseId: {}", caseData.getCcdCaseReference());
         }
@@ -47,4 +47,5 @@ public class PaymentTimeRouteCaseDataUpdater implements SetApplicantResponseDead
             || FULL_ADMISSION.equals(
             caseData.getRespondent2ClaimResponseTypeForSpec());
     }
+
 }

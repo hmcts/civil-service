@@ -81,8 +81,10 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
     private final Optional<UpdateWaCourtLocationsService> updateWaCourtLocationsService;
     private final RequestedCourtForClaimDetailsTab requestedCourtForClaimDetailsTab;
     private final PaymentDateService paymentDateService;
-    @Value("${court-location.specified-claim.epimms-id}") String cnbcEpimsId;
-    @Value("${court-location.specified-claim.region-id}") String cnbcRegionId;
+    @Value("${court-location.specified-claim.epimms-id}")
+    String cnbcEpimsId;
+    @Value("${court-location.specified-claim.region-id}")
+    String cnbcRegionId;
 
     public CallbackResponse execute(CallbackParams callbackParams) {
 
@@ -90,25 +92,31 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
         CaseData caseData = persistPartyAddress(oldCaseData, callbackParams.getCaseData());
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder().applicant1ResponseDate(time.now());
 
-        persistFlagsForParties(oldCaseData, caseData, builder);
+        persistFlagsForParties(oldCaseData, caseData);
         setResponseDocumentNull(builder);
         updateCaselocationDetails(callbackParams, caseData, builder);
         updateApplicant1DQ(callbackParams, caseData, builder);
         assignApplicant1DQExpertsIfPresent(caseData, builder);
         assignApplicant2DQExpertsIfPresent(caseData, builder);
 
-        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(builder);
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(caseData);
 
-        addEventAndDateAddedToApplicantExperts(builder);
-        addEventAndDateAddedToApplicantWitnesses(builder);
-        populateDQPartyIds(builder);
+        addEventAndDateAddedToApplicantExperts(caseData);
+        addEventAndDateAddedToApplicantWitnesses(caseData);
+        populateDQPartyIds(caseData);
 
-        caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE_SPEC, builder);
-        moveClaimToMediation(callbackParams, caseData, builder);
+        caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE_SPEC, caseData);
+        moveClaimToMediation(callbackParams, caseData);
 
         String nextState = putCaseStateInJudicialReferral(caseData);
         BusinessProcess businessProcess = BusinessProcess.ready(CLAIMANT_RESPONSE_SPEC);
-        nextState = determineNextState.determineNextState(caseData, callbackParams, builder, nextState, businessProcess);
+        nextState = determineNextState.determineNextState(
+            caseData,
+            callbackParams,
+            builder,
+            nextState,
+            businessProcess
+        );
 
         is1v1RespondImmediately(caseData, builder);
 
@@ -128,18 +136,18 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
 
             updateWaCourtLocationsService.ifPresent(service -> service.updateCourtListingWALocations(
                 callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
-                builder
+                caseData
             ));
         }
 
-        requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabApplicantSpec(callbackParams, builder);
+        requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabApplicantSpec(callbackParams, caseData);
         builder.nextDeadline(null);
         builder.previousCCDState(caseData.getCcdState());
         if (isDefendantPartAdmitPayImmediatelyAccepted(caseData)) {
             LocalDate whenBePaid = paymentDateService.calculatePaymentDeadline();
             builder.whenToBePaidText(whenBePaid.format(DATE_FORMATTER));
             builder.respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
-                                                              .whenWillThisAmountBePaid(whenBePaid).build());
+                                                      .whenWillThisAmountBePaid(whenBePaid).build());
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -148,7 +156,7 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
             .build();
     }
 
-    private void moveClaimToMediation(CallbackParams callbackParams, CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder) {
+    private void moveClaimToMediation(CallbackParams callbackParams, CaseData caseData) {
         if ((V_2.equals(callbackParams.getVersion())
             && featureToggleService.isPinInPostEnabled()
             && isOneVOne(caseData)
@@ -156,7 +164,7 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
             || (featureToggleService.isCarmEnabledForCase(caseData)
             && SMALL_CLAIM.name().equals(caseData.getResponseClaimTrack())
             && caseData.hasApplicantProceededWithClaim())) {
-            builder.claimMovedToMediationOn(LocalDate.now());
+            caseData.setClaimMovedToMediationOn(LocalDate.now());
             log.info("Moved Claim to mediation for Case : {}", caseData.getCcdCaseReference());
         }
     }
@@ -224,7 +232,13 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
 
             if (notTransferredOnline(caseData) && (!isFlightDelayAndSmallClaim(caseData)
                 || isFlightDelaySmallClaimAndOther(caseData))) {
-                updateDQCourtLocations(callbackParams, caseData, builder, dq, isFlightDelaySmallClaimAndOther(caseData));
+                updateDQCourtLocations(
+                    callbackParams,
+                    caseData,
+                    builder,
+                    dq,
+                    isFlightDelaySmallClaimAndOther(caseData)
+                );
             }
 
             var smallClaimWitnesses = builder.build().getApplicant1DQWitnessesSmallClaim();
@@ -252,7 +266,11 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
         }
 
         if (log.isDebugEnabled()) {
-            log.debug("Case management location for {} is {}", caseData.getLegacyCaseReference(), builder.build().getCaseManagementLocation());
+            log.debug(
+                "Case management location for {} is {}",
+                caseData.getLegacyCaseReference(),
+                builder.build().getCaseManagementLocation()
+            );
         }
     }
 
@@ -265,7 +283,10 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
 
     private String putCaseStateInJudicialReferral(CaseData caseData) {
         if (caseData.isRespondentResponseFullDefence()
-            && JudicialReferralUtils.shouldMoveToJudicialReferral(caseData, featureToggleService.isMultiOrIntermediateTrackEnabled(caseData))) {
+            && JudicialReferralUtils.shouldMoveToJudicialReferral(
+            caseData,
+            featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)
+        )) {
             return CaseState.JUDICIAL_REFERRAL.name();
         }
         return null;
@@ -282,7 +303,7 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
         } else if (!isFlightDelayAndSmallClaim(caseData)) {
             locationHelper.getCaseManagementLocation(caseData)
                 .ifPresent(requestedCourt -> locationHelper.updateCaseManagementLocation(
-                    builder,
+                    caseData,
                     requestedCourt,
                     () -> locationRefDataService.getCourtLocationsForDefaultJudgments(callbackParams.getParams().get(
                         CallbackParams.Params.BEARER_TOKEN).toString())
@@ -293,7 +314,7 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
     private boolean isFlightDelayAndSmallClaim(CaseData caseData) {
         return (caseData.getIsFlightDelayClaim() != null
             && caseData.getIsFlightDelayClaim().equals(YES)
-            &&  SMALL_CLAIM.name().equals(caseData.getResponseClaimTrack()));
+            && SMALL_CLAIM.name().equals(caseData.getResponseClaimTrack()));
     }
 
     private boolean isFlightDelaySmallClaimAndAirline(CaseData caseData) {
@@ -320,13 +341,17 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
         }
 
         newCourt.ifPresent(requestedCourt -> locationHelper.updateCaseManagementLocation(
-            builder,
+            caseData,
             requestedCourt,
             () -> locationRefDataService.getCourtLocationsForDefaultJudgments(
                 callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString())
         ));
         if (log.isDebugEnabled()) {
-            log.debug("Case management location for {} is {}", caseData.getLegacyCaseReference(), builder.build().getCaseManagementLocation());
+            log.debug(
+                "Case management location for {} is {}",
+                caseData.getLegacyCaseReference(),
+                builder.build().getCaseManagementLocation()
+            );
         }
     }
 

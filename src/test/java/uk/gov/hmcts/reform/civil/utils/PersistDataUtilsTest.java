@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL;
+import static uk.gov.hmcts.reform.civil.utils.PersistDataUtils.persistFlagsForParties;
 
 class PersistDataUtilsTest {
 
@@ -29,18 +30,17 @@ class PersistDataUtilsTest {
             .withRespondent1Flags()
             .withRespondent2Flags().build();
 
-        CaseData.CaseDataBuilder builder = caseData.toBuilder();
+        // Fixed: The method modifies caseData in place using setters, no return value
+        persistFlagsForParties(oldCaseData, caseData);
 
-        PersistDataUtils.persistFlagsForParties(oldCaseData, caseData, builder);
-        CaseData results = builder.build();
-        assertThat(results.getApplicant1().getFlags()).isNotNull();
-        assertThat(results.getApplicant1().getFlags().getRoleOnCase()).isEqualTo("Claimant 1");
-        assertThat(results.getApplicant2().getFlags()).isNotNull();
-        assertThat(results.getApplicant2().getFlags().getRoleOnCase()).isEqualTo("Claimant 2");
-        assertThat(results.getRespondent1().getFlags()).isNotNull();
-        assertThat(results.getRespondent1().getFlags().getRoleOnCase()).isEqualTo("Defendant 1");
-        assertThat(results.getRespondent2().getFlags()).isNotNull();
-        assertThat(results.getRespondent2().getFlags().getRoleOnCase()).isEqualTo("Defendant 2");
+        assertThat(caseData.getApplicant1().getFlags()).isNotNull();
+        assertThat(caseData.getApplicant1().getFlags().getRoleOnCase()).isEqualTo("Claimant 1");
+        assertThat(caseData.getApplicant2().getFlags()).isNotNull();
+        assertThat(caseData.getApplicant2().getFlags().getRoleOnCase()).isEqualTo("Claimant 2");
+        assertThat(caseData.getRespondent1().getFlags()).isNotNull();
+        assertThat(caseData.getRespondent1().getFlags().getRoleOnCase()).isEqualTo("Defendant 1");
+        assertThat(caseData.getRespondent2().getFlags()).isNotNull();
+        assertThat(caseData.getRespondent2().getFlags().getRoleOnCase()).isEqualTo("Defendant 2");
     }
 
     @Test
@@ -57,14 +57,13 @@ class PersistDataUtilsTest {
             .withRespondent1Flags()
             .build();
 
-        CaseData.CaseDataBuilder builder = caseData.toBuilder();
+        // Fixed: The method modifies caseData in place using setters, no return value
+        persistFlagsForParties(oldCaseData, caseData);
 
-        PersistDataUtils.persistFlagsForParties(oldCaseData, caseData, builder);
-        CaseData results = builder.build();
-        assertThat(results.getApplicant1().getFlags()).isNotNull();
-        assertThat(results.getApplicant1().getFlags().getRoleOnCase()).isEqualTo("Claimant 1");
-        assertThat(results.getRespondent1().getFlags()).isNotNull();
-        assertThat(results.getRespondent1().getFlags().getRoleOnCase()).isEqualTo("Defendant 1");
+        assertThat(caseData.getApplicant1().getFlags()).isNotNull();
+        assertThat(caseData.getApplicant1().getFlags().getRoleOnCase()).isEqualTo("Claimant 1");
+        assertThat(caseData.getRespondent1().getFlags()).isNotNull();
+        assertThat(caseData.getRespondent1().getFlags().getRoleOnCase()).isEqualTo("Defendant 1");
     }
 
     @Test

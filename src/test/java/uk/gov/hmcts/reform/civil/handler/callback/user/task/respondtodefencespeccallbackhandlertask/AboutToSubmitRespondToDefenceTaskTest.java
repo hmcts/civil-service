@@ -222,6 +222,7 @@ class AboutToSubmitRespondToDefenceTaskTest {
             .applicant1DQWithExperts()
             .applicant1DQWithWitnesses()
             .atState(FULL_DEFENCE_PROCEED)
+            .applicant1ResponseDate(LocalDateTime.now())
             .build();
 
         AboutToStartOrSubmitCallbackResponse response =
@@ -240,6 +241,7 @@ class AboutToSubmitRespondToDefenceTaskTest {
             .applicant1DQWithExperts()
             .applicant1DQWithWitnesses()
             .atState(FULL_DEFENCE_PROCEED)
+            .applicant1ResponseDate(LocalDateTime.now())
             .build();
 
         AboutToStartOrSubmitCallbackResponse response =
@@ -266,6 +268,7 @@ class AboutToSubmitRespondToDefenceTaskTest {
             .applicant1DQWithExperts()
             .applicant1DQWithWitnesses()
             .atState(FULL_DEFENCE_PROCEED)
+            .applicant1ResponseDate(LocalDateTime.now())
             .build();
 
         AboutToStartOrSubmitCallbackResponse response =
@@ -313,6 +316,7 @@ class AboutToSubmitRespondToDefenceTaskTest {
             .applicant1Represented(YES)
             .applicant1(PartyBuilder.builder().individual().build())
             .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
+            .applicant1ResponseDate(LocalDateTime.now())
             .build();
 
         AboutToStartOrSubmitCallbackResponse response =
@@ -329,6 +333,7 @@ class AboutToSubmitRespondToDefenceTaskTest {
             .applicant1DQWithWitnesses()
             .atState(FULL_DEFENCE_PROCEED)
             .nextDeadline(LocalDate.now())
+            .applicant1ResponseDate(LocalDateTime.now())
             .build();
 
         AboutToStartOrSubmitCallbackResponse response =
@@ -356,6 +361,7 @@ class AboutToSubmitRespondToDefenceTaskTest {
             .applicant1(PartyBuilder.builder().individual().build())
             .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
             .applicant1AcceptPartAdmitPaymentPlanSpec(YES)
+            .applicant1ResponseDate(LocalDateTime.now())
             .build();
 
         AboutToStartOrSubmitCallbackResponse response =
@@ -383,4 +389,3 @@ class AboutToSubmitRespondToDefenceTaskTest {
             .build();
     }
 }
-

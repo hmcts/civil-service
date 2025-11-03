@@ -151,7 +151,7 @@ public class SubmitClaimTask {
 
         OrgPolicyUtils.addMissingOrgPolicies(dataBuilder);
 
-        caseFlagInitialiser.initialiseCaseFlags(CREATE_CLAIM_SPEC, dataBuilder);
+        caseFlagInitialiser.initialiseCaseFlags(CREATE_CLAIM_SPEC, caseData);
 
         defaultInterestClaimUntil(caseData, dataBuilder);
 

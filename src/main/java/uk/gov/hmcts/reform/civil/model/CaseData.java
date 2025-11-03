@@ -173,24 +173,24 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<GeneralApplicationsDetails>> gaDetailsTranslationCollection;
     private final List<Element<GADetailsRespondentSol>> respondentSolGaAppDetails;
     private final List<Element<GADetailsRespondentSol>> respondentSolTwoGaAppDetails;
-    private final SolicitorReferences solicitorReferences;
-    private final SolicitorReferences solicitorReferencesCopy;
-    private final String respondentSolicitor2Reference;
+    private  SolicitorReferences solicitorReferences;
+    private  SolicitorReferences solicitorReferencesCopy;
+    private  String respondentSolicitor2Reference;
     private final CourtLocation courtLocation;
-    private final Party applicant1;
-    private final Party applicant2;
+    private  Party applicant1;
+    private  Party applicant2;
     private final CorrectEmail applicantSolicitor1CheckEmail;
     private final IdamUserDetails applicantSolicitor1UserDetails;
     private final YesOrNo addApplicant2;
-    private final YesOrNo addRespondent2;
-    private final YesOrNo respondent2SameLegalRepresentative;
-    private final Party respondent1;
-    private final Party respondent1Copy;
-    private final Party respondent2;
-    private final Party respondent2Copy;
-    private final Party respondent1DetailsForClaimDetailsTab;
-    private final Party respondent2DetailsForClaimDetailsTab;
-    private final YesOrNo respondent1Represented;
+    private YesOrNo addRespondent2;
+    private YesOrNo respondent2SameLegalRepresentative;
+    private  Party respondent1;
+    private  Party respondent1Copy;
+    private Party respondent2;
+    private Party respondent2Copy;
+    private Party respondent1DetailsForClaimDetailsTab;
+    private Party respondent2DetailsForClaimDetailsTab;
+    private YesOrNo respondent1Represented;
     private final YesOrNo respondent2Represented;
     private final YesOrNo respondent1OrgRegistered;
     private final YesOrNo respondent2OrgRegistered;
@@ -206,18 +206,18 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final ClaimTypeUnspec claimTypeUnSpec;
     private final ClaimType claimType;
     private HelpWithFees generalAppHelpWithFees;
-    private final HelpWithFeesDetails claimIssuedHwfDetails;
-    private final HelpWithFeesDetails hearingHwfDetails;
+    private  HelpWithFeesDetails claimIssuedHwfDetails;
+    private  HelpWithFeesDetails hearingHwfDetails;
     private final FeeType hwfFeeType;
     private final SuperClaimType superClaimType;
     private final String claimTypeOther;
     private final PersonalInjuryType personalInjuryType;
     private final String personalInjuryTypeOther;
     private final StatementOfTruth applicantSolicitor1ClaimStatementOfTruth;
-    private final StatementOfTruth uiStatementOfTruth;
+    private StatementOfTruth uiStatementOfTruth;
     private final StatementOfTruth respondent1LiPStatementOfTruth;
     private final String legacyCaseReference;
-    private final AllocatedTrack allocatedTrack;
+    private AllocatedTrack allocatedTrack;
     private final PaymentDetails paymentDetails;
     private final PaymentDetails claimIssuedPaymentDetails;
     private final PaymentDetails hearingFeePaymentDetails;
@@ -248,7 +248,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final YesOrNo specApplicantCorrespondenceAddressRequired;
     private final Address specApplicantCorrespondenceAddressdetails;
     private final YesOrNo specRespondentCorrespondenceAddressRequired;
-    private final Address specRespondentCorrespondenceAddressdetails;
+    private Address specRespondentCorrespondenceAddressdetails;
     private final YesOrNo specAoSRespondent2HomeAddressRequired;
     private final Address specAoSRespondent2HomeAddressDetails;
 
@@ -261,37 +261,38 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     private final YesOrNo respondentResponseIsSame;
     private final YesOrNo defendantSingleResponseToBothClaimants;
-    private final RespondentResponseType respondent1ClaimResponseType;
-    private final RespondentResponseType respondent2ClaimResponseType;
-    private final RespondentResponseType respondent1ClaimResponseTypeToApplicant2;
-    private final ResponseDocument respondent1ClaimResponseDocument;
-    private final ResponseDocument respondent2ClaimResponseDocument;
-    private final ResponseDocument respondentSharedClaimResponseDocument;
-    private final CaseDocument respondent1GeneratedResponseDocument;
+    private RespondentResponseType respondent1ClaimResponseType;
+    private RespondentResponseType respondent2ClaimResponseType;
+    private RespondentResponseType respondent1ClaimResponseTypeToApplicant2;
+    private  ResponseDocument respondent1ClaimResponseDocument;
+    private  ResponseDocument respondent2ClaimResponseDocument;
+    private  ResponseDocument respondentSharedClaimResponseDocument;
+    private  CaseDocument respondent1GeneratedResponseDocument;
     private final CaseDocument respondent2GeneratedResponseDocument;
-    private final LocalDate claimMovedToMediationOn;
+    private LocalDate claimMovedToMediationOn;
+    private CaseDocument respondent1ClaimResponseDocumentSpec;
 
     @Builder.Default
-    private final List<Element<CaseDocument>> defendantResponseDocuments = new ArrayList<>();
+    private List<Element<CaseDocument>> defendantResponseDocuments = new ArrayList<>();
 
-    private final YesOrNo applicant1ProceedWithClaim;
+    private  YesOrNo applicant1ProceedWithClaim;
     private final YesOrNo applicant1ProceedWithClaimMultiParty2v1;
     private final YesOrNo applicant2ProceedWithClaimMultiParty2v1;
     private final YesOrNo applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2;
     private final YesOrNo applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2;
     private final YesOrNo applicant1ProceedWithClaimRespondent2;
-    private final ResponseDocument applicant1DefenceResponseDocument;
+    private ResponseDocument applicant1DefenceResponseDocument;
     private final ResponseDocument claimantDefenceResDocToDefendant2;
 
     @Builder.Default
-    private final List<Element<CaseDocument>> claimantResponseDocuments = new ArrayList<>();
+    private List<Element<CaseDocument>> claimantResponseDocuments = new ArrayList<>();
 
     @Builder.Default
     private final List<Element<CaseDocument>> duplicateSystemGeneratedCaseDocs = new ArrayList<>();
 
     @Builder.Default
     @JsonProperty("duplicateClaimantDefResponseDocs")
-    private final List<Element<CaseDocument>> duplicateClaimantDefendantResponseDocs = new ArrayList<>();
+    private List<Element<CaseDocument>> duplicateClaimantDefendantResponseDocs = new ArrayList<>();
 
     private final List<ClaimAmountBreakup> claimAmountBreakup;
     private final List<TimelineOfEvents> timelineOfEvents;
@@ -315,11 +316,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String interestFromSpecificDateDescription;
     private final String calculatedInterest;
     private final String specRespondentSolicitor1EmailAddress;
-    private final YesOrNo specAoSApplicantCorrespondenceAddressRequired;
-    private final Address specAoSApplicantCorrespondenceAddressdetails;
+    private YesOrNo specAoSApplicantCorrespondenceAddressRequired;
+    private Address specAoSApplicantCorrespondenceAddressdetails;
     private final YesOrNo specAoSRespondentCorrespondenceAddressRequired;
-    private final Address specAoSRespondentCorrespondenceAddressdetails;
-    private final YesOrNo specRespondent1Represented;
+    private Address specAoSRespondentCorrespondenceAddressdetails;
+    private YesOrNo specRespondent1Represented;
     private final YesOrNo specRespondent2Represented;
     private final List<TimelineOfEvents> specResponseTimelineOfEvents;
     private final List<TimelineOfEvents> specResponseTimelineOfEvents2;
@@ -331,8 +332,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String detailsOfWhyDoesYouDisputeTheClaim;
     private final String detailsOfWhyDoesYouDisputeTheClaim2;
 
-    private final ResponseDocument respondent1SpecDefenceResponseDocument;
-    private final ResponseDocument respondent2SpecDefenceResponseDocument;
+    private  ResponseDocument respondent1SpecDefenceResponseDocument;
+    private  ResponseDocument respondent2SpecDefenceResponseDocument;
+    private DefendantPinToPostLRspec respondent1PinToPostLRspec;
 
     private final YesOrNo bundleError;
     private final String bundleEvent;
@@ -356,14 +358,14 @@ public class CaseData extends CaseDataParent implements MappableObject {
         }
     }
 
-    private final RespondentResponseTypeSpec respondent1ClaimResponseTypeForSpec;
-    private final RespondentResponseTypeSpec respondent2ClaimResponseTypeForSpec;
+    private RespondentResponseTypeSpec respondent1ClaimResponseTypeForSpec;
+    private RespondentResponseTypeSpec respondent2ClaimResponseTypeForSpec;
     private final RespondentResponseTypeSpec claimant1ClaimResponseTypeForSpec;
     private final RespondentResponseTypeSpec claimant2ClaimResponseTypeForSpec;
     private final RespondentResponseTypeSpecPaidStatus respondent1ClaimResponsePaymentAdmissionForSpec;
-    private final RespondentResponsePartAdmissionPaymentTimeLRspec defenceAdmitPartPaymentTimeRouteRequired;
+    private RespondentResponsePartAdmissionPaymentTimeLRspec defenceAdmitPartPaymentTimeRouteRequired;
     private final String defenceRouteRequired;
-    private final String responseClaimTrack;
+    private  String responseClaimTrack;
     private final RespondToClaim respondToClaim;
     private final RespondToClaim respondToAdmittedClaim;
     /**
@@ -379,7 +381,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final YesOrNo specDefenceFullAdmittedRequired;
     private final PaymentUponCourtOrder respondent1CourtOrderPayment;
     private final RepaymentPlanLRspec respondent1RepaymentPlan;
-    private final RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec;
+    private RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec;
     private final UnemployedComplexTypeLRspec respondToClaimAdmitPartUnemployedLRspec;
     private final Respondent1EmployerDetailsLRspec responseClaimAdmitPartEmployer;
     private final String responseToClaimAdmitPartWhyNotPayLRspec;
@@ -387,7 +389,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final YesOrNo responseClaimMediationSpecRequired;
     private final SmallClaimMedicalLRspec applicant1ClaimMediationSpecRequired;
     private final YesOrNo defenceAdmitPartEmploymentTypeRequired;
-    private final YesOrNo responseClaimExpertSpecRequired;
+    private YesOrNo responseClaimExpertSpecRequired;
     private final YesOrNo applicant1ClaimExpertSpecRequired;
     private final String responseClaimWitnesses;
     private final String applicant1ClaimWitnesses;
@@ -417,19 +419,19 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @Valid
     private final CloseClaim discontinueClaim;
 
-    private final BusinessProcess businessProcess;
+    private  BusinessProcess businessProcess;
 
     @JsonUnwrapped
-    private final Respondent1DQ respondent1DQ;
+    private  Respondent1DQ respondent1DQ;
 
     @JsonUnwrapped
-    private final Respondent2DQ respondent2DQ;
+    private  Respondent2DQ respondent2DQ;
 
     @JsonUnwrapped
-    private final Applicant1DQ applicant1DQ;
+    private  Applicant1DQ applicant1DQ;
 
     @JsonUnwrapped
-    private final Applicant2DQ applicant2DQ;
+    private  Applicant2DQ applicant2DQ;
 
     public boolean hasNoOngoingBusinessProcess() {
         return businessProcess == null
@@ -438,14 +440,14 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     private final LitigationFriend genericLitigationFriend;
-    private final LitigationFriend respondent1LitigationFriend;
-    private final LitigationFriend respondent2LitigationFriend;
+    private LitigationFriend respondent1LitigationFriend;
+    private LitigationFriend respondent2LitigationFriend;
 
     private final YesOrNo applicant1LitigationFriendRequired;
-    private final LitigationFriend applicant1LitigationFriend;
+    private LitigationFriend applicant1LitigationFriend;
 
     private final YesOrNo applicant2LitigationFriendRequired;
-    private final LitigationFriend applicant2LitigationFriend;
+    private LitigationFriend applicant2LitigationFriend;
 
     private final DynamicList defendantSolicitorNotifyClaimOptions;
     private final DynamicList defendantSolicitorNotifyClaimDetailsOptions;
@@ -460,7 +462,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final YesOrNo applicantSolicitor1PbaAccountsIsEmpty;
     private MultiPartyResponseTypeFlags multiPartyResponseTypeFlags;
     private YesOrNo applicantsProceedIntention;
-    private final MultiPartyScenario claimantResponseScenarioFlag;
+    private  MultiPartyScenario claimantResponseScenarioFlag;
     private YesOrNo claimantResponseDocumentToDefendant2Flag;
     private YesOrNo claimant2ResponseFlag;
     private RespondentResponseTypeSpec atLeastOneClaimResponseTypeForSpecIsFullDefence;
@@ -482,20 +484,21 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final LocalDateTime claimNotificationDate;
     private final LocalDateTime claimDetailsNotificationDeadline;
     private final LocalDateTime claimDetailsNotificationDate;
-    private final LocalDateTime respondent1ResponseDeadline;
+    private LocalDateTime respondent1ResponseDeadline;
     private final LocalDateTime respondent2ResponseDeadline;
     private final LocalDateTime addLegalRepDeadlineRes1;
     private final LocalDateTime addLegalRepDeadlineRes2;
-    private final LocalDateTime claimDismissedDeadline;
+    private LocalDateTime claimDismissedDeadline;
+    private  LocalDate nextDeadline;
     private final LocalDateTime respondent1TimeExtensionDate;
     private final LocalDateTime respondent2TimeExtensionDate;
     private final LocalDateTime respondent1AcknowledgeNotificationDate;
     private final LocalDateTime respondent2AcknowledgeNotificationDate;
-    private final LocalDateTime respondent1ResponseDate;
-    private final LocalDateTime respondent2ResponseDate;
-    private final LocalDateTime applicant1ResponseDeadline;
-    private final LocalDateTime applicant1ResponseDate;
-    private final LocalDateTime applicant2ResponseDate;
+    private  LocalDateTime respondent1ResponseDate;
+    private  LocalDateTime respondent2ResponseDate;
+    private  LocalDateTime applicant1ResponseDeadline;
+    private  LocalDateTime applicant1ResponseDate;
+    private  LocalDateTime applicant2ResponseDate;
     private final LocalDateTime takenOfflineDate;
     private final LocalDateTime takenOfflineByStaffDate;
     private final LocalDateTime unsuitableSDODate;
@@ -504,7 +507,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String claimAmountBreakupSummaryObject;
     private final LocalDateTime respondent1LitigationFriendDate;
     private final LocalDateTime respondent2LitigationFriendDate;
-    private final LocalDateTime respondent1RespondToSettlementAgreementDeadline;
+    private LocalDateTime respondent1RespondToSettlementAgreementDeadline;
     private final YesOrNo respondent1ResponseDeadlineChecked;
     private final String paymentTypePBA;
     private final String paymentTypePBASpec;
@@ -521,10 +524,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String detailsOfDirection;
 
     private final HearingSupportRequirementsDJ hearingSupportRequirementsDJ;
-    private final CaseLocationCivil caseManagementLocation;
+    private CaseLocationCivil caseManagementLocation;
     private final CaseManagementCategory caseManagementCategory;
-    private final String locationName;
-    private final DynamicList defendantDetailsSpec;
+    private String locationName;
+    private DynamicList defendantDetailsSpec;
     private final DynamicList defendantDetails;
     private final String bothDefendants;
     private final String bothDefendantsSpec;
@@ -537,9 +540,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String repaymentSuggestion;
     private final String currentDatebox;
     private final LocalDate repaymentDate;
-    private final String caseNameHmctsInternal;
-    private final String caseNamePublic;
-    private final YesOrNo ccjJudgmentAmountShowInterest;
+    private String caseNameHmctsInternal;
+    private String caseNamePublic;
+    private YesOrNo ccjJudgmentAmountShowInterest;
     private final YesOrNo claimFixedCostsExist;
     private final YesOrNo partAdmit1v1Defendant;
 
@@ -548,7 +551,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     private final String hearingSelection;
 
-    private final YesOrNo isRespondent1;
+    private YesOrNo isRespondent1;
     private final YesOrNo isRespondent2;
     private final YesOrNo isApplicant1;
     private final YesOrNo disabilityPremiumPayments;
@@ -559,7 +562,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String currentDefendantName;
 
     @JsonUnwrapped
-    private final BreathingSpaceInfo breathing;
+    private BreathingSpaceInfo breathing;
     private final String applicantVRespondentText;
 
     private YesOrNo setRequestDJDamagesFlagForWA;
@@ -633,7 +636,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     private final ChangeLanguagePreference changeLanguagePreference;
     private final PreferredLanguage claimantLanguagePreferenceDisplay;
-    private final PreferredLanguage defendantLanguagePreferenceDisplay;
+    private  PreferredLanguage defendantLanguagePreferenceDisplay;
 
     @Builder.Default
     private final List<Element<CaseDocument>> queryDocuments = new ArrayList<>();

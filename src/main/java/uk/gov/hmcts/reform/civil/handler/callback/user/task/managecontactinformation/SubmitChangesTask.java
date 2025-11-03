@@ -96,7 +96,7 @@ public class SubmitChangesTask {
         CaseData oldCaseData = caseDetailsConverter.toCaseData(caseDetailsBefore);
 
         // persist party flags (ccd issue)
-        persistFlagsForParties(oldCaseData, caseData, builder);
+        persistFlagsForParties(oldCaseData, caseData);
         persistFlagsForLitigationFriendParties(oldCaseData, caseData, builder);
 
         String partyChosenId = caseData.getUpdateDetailsForm().getPartyChosenId();
@@ -114,7 +114,7 @@ public class SubmitChangesTask {
         }
 
         // last step before clearing update details form
-        caseFlagsInitialiser.initialiseCaseFlags(MANAGE_CONTACT_INFORMATION, builder);
+        caseFlagsInitialiser.initialiseCaseFlags(MANAGE_CONTACT_INFORMATION, caseData);
 
         // clear updateDetailsForm
         builder.updateDetailsForm(UpdateDetailsForm.builder().manageContactDetailsEventUsed(YES).build());

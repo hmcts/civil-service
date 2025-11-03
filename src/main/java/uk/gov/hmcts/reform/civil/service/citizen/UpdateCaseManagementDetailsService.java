@@ -48,9 +48,10 @@ public class UpdateCaseManagementDetailsService {
         if (caseData.getIsFlightDelayClaim() == YesOrNo.YES && caseData.isSmallClaim()) {
             updateFlightDelayCaseManagementLocation(caseData, builder, availableLocations);
         } else {
+            CaseData finalCaseData = caseData;
             locationHelper.getCaseManagementLocation(caseData)
                 .ifPresent(requestedCourt -> locationHelper.updateCaseManagementLocation(
-                    builder,
+                    finalCaseData,
                     requestedCourt,
                     () -> locationRefDataService.getCourtLocationsForDefaultJudgments(callbackParams.getParams().get(
                         CallbackParams.Params.BEARER_TOKEN).toString())
@@ -112,11 +113,11 @@ public class UpdateCaseManagementDetailsService {
                         .build())));
     }
 
-    public void updateRespondent1RequestedCourtDetails(CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder, List<LocationRefData> availableLocations) {
+    public void updateRespondent1RequestedCourtDetails(CaseData caseData, List<LocationRefData> availableLocations) {
         if (caseData.isRespondent1LiP()) {
             Optional.ofNullable(caseData.getRespondent1DQ())
                 .ifPresent(dq -> Optional.ofNullable(dq.getRespondent1DQRequestedCourt())
-                    .ifPresent(requestedCourt -> builder.respondent1DQ(
+                    .ifPresent(requestedCourt -> caseData.setRespondent1DQ(
                         dq.toBuilder().respondent1DQRequestedCourt(correctCaseLocation(requestedCourt, availableLocations))
                             .build())));
         }

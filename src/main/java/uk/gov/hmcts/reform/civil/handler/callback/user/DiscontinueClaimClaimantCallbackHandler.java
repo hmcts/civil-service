@@ -205,7 +205,7 @@ public class DiscontinueClaimClaimantCallbackHandler extends CallbackHandler {
         CaseData oldCaseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetailsBefore());
 
         // persist party flags (ccd issue)
-        persistFlagsForParties(oldCaseData, caseData, caseDataBuilder);
+        persistFlagsForParties(oldCaseData, caseData);
 
         caseDataBuilder.businessProcess(BusinessProcess.ready(DISCONTINUE_CLAIM_CLAIMANT));
         if (MultiPartyScenario.isTwoVOne(caseData)) {

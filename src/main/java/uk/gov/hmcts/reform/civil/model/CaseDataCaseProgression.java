@@ -304,7 +304,7 @@ public class CaseDataCaseProgression extends CaseDataCaseSdo implements Mappable
 
     private final String respondent1DocumentURL;
     private final String respondent2DocumentURL;
-    private final String respondent2DocumentGeneration;
+    private String respondent2DocumentGeneration;
     private final String hearingHelpFeesReferenceNumber;
 
     private final String hearingLocationCourtName;

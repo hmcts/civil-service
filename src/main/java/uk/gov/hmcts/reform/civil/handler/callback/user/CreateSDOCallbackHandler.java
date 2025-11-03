@@ -1588,7 +1588,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
             updateWaCourtLocationsService.ifPresent(service -> service.updateCourtListingWALocations(
                 callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
-                dataBuilder
+                caseData
             ));
         }
 

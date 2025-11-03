@@ -145,17 +145,16 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
 
         updateCcjRequestPaymentDetails(builder, caseData);
         updateLanguagePreference(builder, caseData);
-        populateDQPartyIds(builder);
-        addEventAndDateAddedToApplicantExperts(builder);
-        addEventAndDateAddedToApplicantWitnesses(builder);
+        populateDQPartyIds(caseData);
+        addEventAndDateAddedToApplicantExperts(caseData);
+        addEventAndDateAddedToApplicantWitnesses(caseData);
 
-        caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE_CUI, builder);
+        caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE_CUI, caseData);
 
-        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(builder);
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(caseData);
 
         if (featureToggleService.isJudgmentOnlineLive() && JudgmentAdmissionUtils.getLIPJudgmentAdmission(caseData)) {
-            CaseData updatedCaseData = builder.build();
-            JudgmentDetails activeJudgmentDetails = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(updatedCaseData);
+            JudgmentDetails activeJudgmentDetails = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData);
             builder
                 .activeJudgment(activeJudgmentDetails)
                 .joIsLiveJudgmentExists(YES)
@@ -165,7 +164,7 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
                     true
                 ));
         }
-        requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabApplicant(callbackParams, builder);
+        requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabApplicant(callbackParams, caseData);
 
         if ((AllocatedTrack.MULTI_CLAIM.name().equals(caseData.getResponseClaimTrack())
             || AllocatedTrack.INTERMEDIATE_CLAIM.name().equals(caseData.getResponseClaimTrack()))

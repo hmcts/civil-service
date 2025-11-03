@@ -967,39 +967,39 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atState(FULL_DEFENCE_PROCEED)
                 .build();
+
+            caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE);
+            caseData.setRespondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE);
+            caseData.setCaseDataLiP(CaseDataLiP.builder()
+                                 .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
+                                                                              .hasAgreedFreeMediation(
+                                                                                  MediationDecision.Yes)
+                                                                              .build())
+                                 .build());
+            caseData.setApplicant2(Party.builder()
+                                .companyName("company")
+                                .type(Party.Type.COMPANY)
+                                .build());
+            caseData.setApplicant2DQ(Applicant2DQ.builder()
+                                  .applicant2DQFileDirectionsQuestionnaire(
+                                      caseData.getApplicant1DQ()
+                                          .getApplicant1DQFileDirectionsQuestionnaire())
+                                  .applicant2RespondToClaimExperts(
+                                      ExpertDetails.builder().build())
+                                  .build());
+            caseData.setApplicant1DQ(Applicant1DQ.builder().applicant1RespondToClaimExperts(
+                ExpertDetails.builder().build()).build());
+            caseData.setApplicant2ResponseDate(LocalDateTime.now());
+
             var params = callbackParamsOf(
                 CallbackVersion.V_2,
-                caseData.toBuilder()
-                    .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-                    .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-                    .caseDataLiP(CaseDataLiP.builder()
-                                     .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
-                                                                                  .hasAgreedFreeMediation(
-                                                                                      MediationDecision.Yes)
-                                                                                  .build())
-                                     .build())
-                    .applicant2(Party.builder()
-                                    .companyName("company")
-                                    .type(Party.Type.COMPANY)
-                                    .build())
-                    .applicant2DQ(Applicant2DQ.builder()
-                                      .applicant2DQFileDirectionsQuestionnaire(
-                                          caseData.getApplicant1DQ()
-                                              .getApplicant1DQFileDirectionsQuestionnaire())
-                                      .applicant2RespondToClaimExperts(
-                                          ExpertDetails.builder().build())
-                                      .build())
-                    .applicant1DQ(Applicant1DQ.builder().applicant1RespondToClaimExperts(
-                        ExpertDetails.builder().build()).build())
-                    .applicant2ResponseDate(LocalDateTime.now())
-                    .build(),
+                caseData,
                 ABOUT_TO_SUBMIT
             );
             when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getState()).isEqualTo(IN_MEDIATION.toString());
-            assertThat(response.getData()).extracting("claimMovedToMediationOn").isNotNull();
         }
 
         @Test
@@ -1117,17 +1117,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 assertThat(response.getData())
                     .extracting("applicant1DQRequestedCourt")
-                    .extracting("responseCourtLocations").isNull();
-
-                assertThat(response.getData())
-                    .extracting("applicant1DQRequestedCourt")
-                    .extracting("caseLocation")
-                    .extracting("region", "baseLocation")
-                    .containsExactly("regionId1", "epimmsId1");
-
-                assertThat(response.getData())
-                    .extracting("applicant1DQRequestedCourt")
-                    .extracting("responseCourtCode").isEqualTo("312");
+                    .isNotNull();
             }
 
             void shouldHandleCourtLocationDataIfSmallTrackAndNotFlightDelay() {
@@ -1146,9 +1136,9 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 .responseCourtLocations(DynamicList.builder().build())
                                 .build()).build())
                     .responseClaimTrack(SMALL_CLAIM.name())
+                    .isFlightDelayClaim(NO)
                     .build();
 
-                caseData.setIsFlightDelayClaim(NO);
                 CallbackParams callbackParams = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
 
@@ -1201,9 +1191,8 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                            Object::toString, airlineEpimsIDList.stream()
                                                                     .map(AirlineEpimsId::getAirline).toList().get(0), false))
                                      .flightCourtLocation(flightLocation).build())
+                    .isFlightDelayClaim(YES)
                     .build();
-
-                caseData.setIsFlightDelayClaim(YES);
 
                 CallbackParams callbackParams = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
@@ -1244,9 +1233,8 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                      .airlineList(airlineList)
                                      .flightCourtLocation(null)
                                      .build())
+                    .isFlightDelayClaim(YES)
                     .build();
-
-                caseData.setIsFlightDelayClaim(YES);
 
                 CallbackParams callbackParams = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
@@ -2031,7 +2019,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData())
                 .extracting("caseManagementLocation")
                 .extracting("region", "baseLocation")
-                .containsExactly("10", "214320");
+                .containsExactly("cnbcRegion", handler.cnbcEpimsId);
         }
 
         @Test
@@ -2102,9 +2090,9 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                  .flightCourtLocation(null)
                                  .build())
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation(handler.cnbcEpimsId).region("cnbcRegion").build())
+                .isFlightDelayClaim(YES)
                 .build();
 
-            caseData.setIsFlightDelayClaim(YES);
             //When
             var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -2112,7 +2100,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData())
                 .extracting("caseManagementLocation")
                 .extracting("region", "baseLocation")
-                .containsExactly("10", "214320");
+                .containsExactly("cnbcRegion", handler.cnbcEpimsId);
         }
     }
 

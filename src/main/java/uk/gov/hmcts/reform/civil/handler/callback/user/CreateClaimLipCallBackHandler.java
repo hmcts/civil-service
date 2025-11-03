@@ -103,7 +103,7 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
             caseDataBuilder.businessProcess(BusinessProcess.ready(CREATE_LIP_CLAIM));
             caseDataBuilder.respondent1DetailsForClaimDetailsTab(caseDataBuilder.build().getRespondent1().toBuilder().flags(
                 null).build());
-            caseFlagsInitialiser.initialiseCaseFlags(CREATE_LIP_CLAIM, caseDataBuilder);
+            caseFlagsInitialiser.initialiseCaseFlags(CREATE_LIP_CLAIM, caseData);
         }
         setUpHelpWithFees(caseDataBuilder);
         addOrginsationPoliciesforClaimantLip(caseDataBuilder);

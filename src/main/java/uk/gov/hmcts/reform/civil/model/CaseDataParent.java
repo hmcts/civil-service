@@ -221,10 +221,10 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
 
     private final LocalDate nextDeadline;
     private final String allPartyNames;
-    private final String caseListDisplayDefendantSolicitorReferences;
+    private String caseListDisplayDefendantSolicitorReferences;
     private final String unassignedCaseListDisplayOrganisationReferences;
     private final YesOrNo specAoSRespondent2CorrespondenceAddressRequired;
-    private final Address specAoSRespondent2CorrespondenceAddressdetails;
+    private Address specAoSRespondent2CorrespondenceAddressdetails;
     private final String defenceRouteRequired2;
 
     private final YesOrNo showHowToAddTimeLinePage;
@@ -247,12 +247,12 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     private final List<TimelineOfEvents> specResponseTimelineOfEvents2;
     private final String responseClaimMediationSpecLabelRes2;
     private final YesOrNo responseClaimMediationSpec2Required;
-    private final YesOrNo responseClaimExpertSpecRequired2;
-    private final YesOrNo responseClaimCourtLocation2Required;
+    private YesOrNo responseClaimExpertSpecRequired2;
+    private YesOrNo responseClaimCourtLocation2Required;
     private final String responseClaimWitnesses2;
     private final String smallClaimHearingInterpreterDescription2;
     private final String additionalInformationForJudge2;
-    private final RespondentResponsePartAdmissionPaymentTimeLRspec defenceAdmitPartPaymentTimeRouteRequired2;
+    private RespondentResponsePartAdmissionPaymentTimeLRspec defenceAdmitPartPaymentTimeRouteRequired2;
     private final RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec2;
     private final YesOrNo defenceAdmitPartEmploymentType2Required;
     private final List<EmploymentTypeCheckboxFixedListLRspec> respondToClaimAdmitPartEmploymentTypeLRspec2;
@@ -280,7 +280,7 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     private final BigDecimal partAdmitPaidValuePounds;
 
     @JsonProperty("CaseAccessCategory")
-    private final CaseCategory caseAccessCategory;
+    private  CaseCategory caseAccessCategory;
 
     private final ChangeOrganisationRequest changeOrganisationRequestField;
     private final ChangeOfRepresentation changeOfRepresentation;
@@ -293,7 +293,7 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     private final NextHearingDetails nextHearingDetails;
 
     private final String respondent1EmailAddress;
-    private final YesOrNo applicant1Represented;
+    private YesOrNo applicant1Represented;
     private final YesOrNo anyRepresented;
 
     /**
@@ -304,8 +304,8 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     private final YesOrNo applicant1FullDefenceConfirmAmountPaidSpec;
     private final YesOrNo applicant1PartAdmitConfirmAmountPaidSpec;
     private final YesOrNo applicant1PartAdmitIntentionToSettleClaimSpec;
-    private final YesOrNo applicant1AcceptFullAdmitPaymentPlanSpec;
-    private final YesOrNo applicant1AcceptPartAdmitPaymentPlanSpec;
+    private YesOrNo applicant1AcceptFullAdmitPaymentPlanSpec;
+    private YesOrNo applicant1AcceptPartAdmitPaymentPlanSpec;
     private final CaseDocument respondent1ClaimResponseDocumentSpec;
     private final CaseDocument respondent2ClaimResponseDocumentSpec;
     private final String respondent1PaymentDateToStringSpec;
@@ -317,11 +317,11 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     private final LocalDate applicant1SuggestPayImmediatelyPaymentDateForDefendantSpec;
     private final String currentDateboxDefendantSpec;
     @JsonUnwrapped
-    private final CCJPaymentDetails ccjPaymentDetails;
-    private final PaymentType applicant1RepaymentOptionForDefendantSpec;
+    private  CCJPaymentDetails ccjPaymentDetails;
+    private  PaymentType applicant1RepaymentOptionForDefendantSpec;
 
     @JsonUnwrapped
-    private final CaseDataLiP caseDataLiP;
+    private CaseDataLiP caseDataLiP;
     private final HelpWithFeesMoreInformation helpWithFeesMoreInformationClaimIssue;
     private final HelpWithFeesMoreInformation helpWithFeesMoreInformationHearing;
     private final HelpWithFeesForTab claimIssuedHwfForTab;
@@ -351,21 +351,21 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
 
     //Top level structure objects used for Hearings + Case Flags
     private final Flags caseFlags;
-    private final List<Element<PartyFlagStructure>> applicantExperts;
-    private final List<Element<PartyFlagStructure>> respondent1Experts;
-    private final List<Element<PartyFlagStructure>> respondent2Experts;
-    private final List<Element<PartyFlagStructure>> applicantWitnesses;
-    private final List<Element<PartyFlagStructure>> respondent1Witnesses;
-    private final List<Element<PartyFlagStructure>> respondent2Witnesses;
+    private List<Element<PartyFlagStructure>> applicantExperts;
+    private List<Element<PartyFlagStructure>> respondent1Experts;
+    private List<Element<PartyFlagStructure>> respondent2Experts;
+    private List<Element<PartyFlagStructure>> applicantWitnesses;
+    private List<Element<PartyFlagStructure>> respondent1Witnesses;
+    private List<Element<PartyFlagStructure>> respondent2Witnesses;
     //Individuals attending from parties that are Org/Company
-    private final List<Element<PartyFlagStructure>> applicant1OrgIndividuals;
-    private final List<Element<PartyFlagStructure>> applicant2OrgIndividuals;
-    private final List<Element<PartyFlagStructure>> respondent1OrgIndividuals;
-    private final List<Element<PartyFlagStructure>> respondent2OrgIndividuals;
+    private  List<Element<PartyFlagStructure>> applicant1OrgIndividuals;
+    private  List<Element<PartyFlagStructure>> applicant2OrgIndividuals;
+    private  List<Element<PartyFlagStructure>> respondent1OrgIndividuals;
+    private  List<Element<PartyFlagStructure>> respondent2OrgIndividuals;
     //Individuals attending from Legal Representative Firms
-    private final List<Element<PartyFlagStructure>> applicant1LRIndividuals;
-    private final List<Element<PartyFlagStructure>> respondent1LRIndividuals;
-    private final List<Element<PartyFlagStructure>> respondent2LRIndividuals;
+    private  List<Element<PartyFlagStructure>> applicant1LRIndividuals;
+    private  List<Element<PartyFlagStructure>> respondent1LRIndividuals;
+    private  List<Element<PartyFlagStructure>> respondent2LRIndividuals;
 
     private List<DisposalAndTrialHearingDJToggle> disposalHearingDisclosureOfDocumentsDJToggle;
     private List<DisposalAndTrialHearingDJToggle> disposalHearingWitnessOfFactDJToggle;
@@ -441,8 +441,8 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     private final List<Element<Document>> gaRespDocRespondentSol;
     private final List<Element<Document>> gaRespDocRespondentSolTwo;
 
-    private final Address specRespondent2CorrespondenceAddressdetails;
-    private final YesOrNo specRespondent2CorrespondenceAddressRequired;
+    private Address specRespondent2CorrespondenceAddressdetails;
+    private YesOrNo specRespondent2CorrespondenceAddressRequired;
 
     private List<Element<UnavailableDate>> applicant1UnavailableDatesForTab;
     private List<Element<UnavailableDate>> applicant2UnavailableDatesForTab;

@@ -537,7 +537,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
         dataBuilder.caseNamePublic(CaseNameUtils.buildCaseName(caseData));
 
-        caseFlagInitialiser.initialiseCaseFlags(CREATE_CLAIM, dataBuilder);
+        caseFlagInitialiser.initialiseCaseFlags(CREATE_CLAIM, caseData);
 
         dataBuilder.ccdState(CaseState.PENDING_CASE_ISSUED);
 

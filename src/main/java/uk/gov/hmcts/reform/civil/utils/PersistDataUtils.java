@@ -9,20 +9,20 @@ public class PersistDataUtils {
         //NO-OP
     }
 
-    public static void persistFlagsForParties(CaseData oldCaseData, CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder) {
+    public static void persistFlagsForParties(CaseData oldCaseData, CaseData caseData) {
         // persist respondent flags (ccd issue)
         var updatedRespondent1 = caseData.getRespondent1().toBuilder()
             .flags(oldCaseData.getRespondent1().getFlags())
             .build();
 
-        builder.respondent1(updatedRespondent1);
+        caseData.setRespondent1(updatedRespondent1);
 
         // persist applicant flags (ccd issue)
         var updatedApplicant1 = caseData.getApplicant1().toBuilder()
             .flags(oldCaseData.getApplicant1().getFlags())
             .build();
 
-        builder.applicant1(updatedApplicant1);
+        caseData.setApplicant1(updatedApplicant1);
 
         // if present, persist the 2nd respondent flags in the same fashion as above, i.e ignore for 1v1
         if (ofNullable(caseData.getRespondent2()).isPresent()
@@ -31,7 +31,7 @@ public class PersistDataUtils {
                 .flags(oldCaseData.getRespondent2().getFlags())
                 .build();
 
-            builder.respondent2(updatedRespondent2);
+            caseData.setRespondent2(updatedRespondent2);
         }
 
         // if present, persist the 2nd applicant flags in the same fashion as above, i.e ignore for 1v1
@@ -41,7 +41,7 @@ public class PersistDataUtils {
                 .flags(oldCaseData.getApplicant2().getFlags())
                 .build();
 
-            builder.applicant2(updatedApplicant2);
+            caseData.setApplicant2(updatedApplicant2);
         }
     }
 

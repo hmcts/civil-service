@@ -132,7 +132,7 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
                         .orElse(currentDateTime));
         }
 
-        caseFlagsInitialiser.initialiseCaseFlags(ADD_DEFENDANT_LITIGATION_FRIEND, caseDataUpdated);
+        caseFlagsInitialiser.initialiseCaseFlags(ADD_DEFENDANT_LITIGATION_FRIEND, caseData);
         caseDataUpdated.isRespondent1(null);
 
         populateWithPartyIds(caseDataUpdated);

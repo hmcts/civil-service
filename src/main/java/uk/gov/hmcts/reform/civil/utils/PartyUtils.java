@@ -449,13 +449,11 @@ public class PartyUtils {
             .build() : null;
     }
 
-    public static void populateDQPartyIds(CaseData.CaseDataBuilder builder) {
-        CaseData caseData = builder.build();
-        builder
-            .applicant1DQ(appendWithNewPartyIds(caseData.getApplicant1DQ()))
-            .applicant2DQ(appendWithNewPartyIds(caseData.getApplicant2DQ()))
-            .respondent1DQ(appendWithNewPartyIds(caseData.getRespondent1DQ()))
-            .respondent2DQ(appendWithNewPartyIds(caseData.getRespondent2DQ()));
+    public static void populateDQPartyIds(CaseData caseData) {
+        caseData.setApplicant1DQ(appendWithNewPartyIds(caseData.getApplicant1DQ()));
+        caseData.setApplicant2DQ(appendWithNewPartyIds(caseData.getApplicant2DQ()));
+        caseData.setRespondent1DQ(appendWithNewPartyIds(caseData.getRespondent1DQ()));
+        caseData.setRespondent2DQ(appendWithNewPartyIds(caseData.getRespondent2DQ()));
     }
 
     @SuppressWarnings("unchecked")

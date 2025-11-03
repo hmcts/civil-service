@@ -16,7 +16,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 public class Respondent2ExpertsCaseDataUpdater implements ExpertsAndWitnessesCaseDataUpdater {
 
     @Override
-    public void update(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
+    public CaseData update(CaseData caseData) {
         log.info("Updating Respondent2ExpertsCaseData for caseId: {}", caseData.getCcdCaseReference());
 
         if (caseData.getRespondent2DQ() != null) {
@@ -24,8 +24,8 @@ public class Respondent2ExpertsCaseDataUpdater implements ExpertsAndWitnessesCas
                     && caseData.getRespondent2DQ().getSmallClaimExperts() != null) {
                 log.debug("Setting respondent2DQExperts with expert details for caseId: {}", caseData.getCcdCaseReference());
                 Expert expert = fromSmallClaimExpertDetails(caseData.getRespondent2DQ().getSmallClaimExperts());
-                updatedData.respondent2DQ(
-                        updatedData.build().getRespondent2DQ().toBuilder()
+                caseData.setRespondent2DQ(
+                        caseData.getRespondent2DQ().toBuilder()
                                 .respondent2DQExperts(Experts.builder()
                                         .expertRequired(caseData.getResponseClaimExpertSpecRequired2())
                                         .details(wrapElements(expert))
@@ -33,13 +33,14 @@ public class Respondent2ExpertsCaseDataUpdater implements ExpertsAndWitnessesCas
                                 .build());
             } else if (NO.equals(caseData.getResponseClaimExpertSpecRequired2())) {
                 log.debug("Setting respondent2DQExperts with expertRequired as NO for caseId: {}", caseData.getCcdCaseReference());
-                updatedData.respondent2DQ(
-                        updatedData.build().getRespondent2DQ().toBuilder()
+                caseData.setRespondent2DQ(
+                        caseData.getRespondent2DQ().toBuilder()
                                 .respondent2DQExperts(Experts.builder()
                                         .expertRequired(caseData.getResponseClaimExpertSpecRequired2())
                                         .build())
                                 .build());
             }
         }
+        return caseData;
     }
 }

@@ -9,15 +9,16 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 public class Respondent1WitnessesCaseDataUpdater implements ExpertsAndWitnessesCaseDataUpdater {
 
     @Override
-    public void update(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
+    public CaseData update(CaseData caseData) {
         log.info("Updating Respondent1WitnessesCaseData for caseId: {}", caseData.getCcdCaseReference());
 
         if (caseData.getRespondent1DQWitnessesSmallClaim() != null) {
             log.debug("Setting respondent1DQWitnesses with small claim witnesses for caseId: {}", caseData.getCcdCaseReference());
-            updatedData.respondent1DQ(
-                    updatedData.build().getRespondent1DQ().toBuilder()
+            caseData.setRespondent1DQ(
+                    caseData.getRespondent1DQ().toBuilder()
                             .respondent1DQWitnesses(caseData.getRespondent1DQWitnessesSmallClaim())
                             .build());
         }
+        return caseData;
     }
 }

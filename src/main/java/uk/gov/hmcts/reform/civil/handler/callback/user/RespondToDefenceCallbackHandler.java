@@ -92,7 +92,8 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
     private final AssignCategoryId assignCategoryId;
     private final CaseDetailsConverter caseDetailsConverter;
     private final FrcDocumentsUtils frcDocumentsUtils;
-    @Value("${court-location.unspecified-claim.epimms-id}") String ccmccEpimsId;
+    @Value("${court-location.unspecified-claim.epimms-id}")
+    String ccmccEpimsId;
     private final Optional<UpdateWaCourtLocationsService> updateWaCourtLocationsService;
     private final RequestedCourtForClaimDetailsTab requestedCourtForClaimDetailsTab;
 
@@ -117,36 +118,34 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
     private CallbackResponse populateClaimantResponseScenarioFlag(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder updatedData = caseData.toBuilder();
 
-        updatedData.claimantResponseScenarioFlag(getMultiPartyScenario(caseData))
-            .caseAccessCategory(CaseCategory.UNSPEC_CLAIM);
-        updatedData.featureToggleWA(toggleConfiguration.getFeatureToggle());
+        caseData.setClaimantResponseScenarioFlag(getMultiPartyScenario(caseData));
+        caseData.setCaseAccessCategory(CaseCategory.UNSPEC_CLAIM);
+        caseData.setFeatureToggleWA(toggleConfiguration.getFeatureToggle());
 
         // add document from defendant response documents, to placeholder field for preview during event.
         caseData.getDefendantResponseDocuments().forEach(document -> {
             if (document.getValue().getDocumentType().equals(DocumentType.DEFENDANT_DEFENCE)
                 && document.getValue().getCreatedBy().equals("Defendant")) {
-                updatedData.respondent1ClaimResponseDocument(ResponseDocument.builder()
+                caseData.setRespondent1ClaimResponseDocument(ResponseDocument.builder()
                                                                  .file(document.getValue().getDocumentLink())
                                                                  .build());
             }
             if (document.getValue().getDocumentType().equals(DocumentType.DEFENDANT_DEFENCE)
                 && document.getValue().getCreatedBy().equals("Defendant 2")) {
-                updatedData.respondent2ClaimResponseDocument(ResponseDocument.builder()
+                caseData.setRespondent2ClaimResponseDocument(ResponseDocument.builder()
                                                                  .file(document.getValue().getDocumentLink())
                                                                  .build());
             }
             if ((getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP)) {
-                updatedData.respondentSharedClaimResponseDocument(ResponseDocument.builder()
+                caseData.setRespondentSharedClaimResponseDocument(ResponseDocument.builder()
                                                                       .file(document.getValue().getDocumentLink())
                                                                       .build());
             }
-        }
-        );
+        });
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedData.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
@@ -225,89 +224,90 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         CaseData caseData = callbackParams.getCaseData();
         CaseData oldCaseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetailsBefore());
         LocalDateTime currentTime = time.now();
-
-        CaseData.CaseDataBuilder builder = caseData.toBuilder()
-            .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE))
-            .applicant1ResponseDate(currentTime);
+        caseData.setBusinessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE));
+        caseData.setApplicant1ResponseDate(currentTime);
 
         // persist party flags (ccd issue)
-        persistFlagsForParties(oldCaseData, caseData, builder);
+        persistFlagsForParties(oldCaseData, caseData);
 
         log.debug(
             "Case management location for {} is {}",
             caseData.getLegacyCaseReference(),
-            builder.build().getCaseManagementLocation()
+            caseData.getCaseManagementLocation()
         );
 
         // When a case has been transferred, we do not update the location using claimant/defendant preferred location logic
         if (notTransferredOnline(caseData)) {
-            updateCaseManagementLocation(callbackParams, builder);
+            updateCaseManagementLocation(callbackParams, caseData);
         }
 
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
         if (multiPartyScenario == TWO_V_ONE) {
-            builder.applicant2ResponseDate(currentTime);
+            caseData.setApplicant2ResponseDate(currentTime);
         }
 
         if (anyApplicantDecidesToProceedWithClaim(caseData)) {
             // moving statement of truth value to correct field, this was not possible in mid event.
             StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
 
-            updateApplicants(caseData, builder, statementOfTruth, callbackParams);
+            updateApplicants(caseData, statementOfTruth, callbackParams);
 
             // resetting statement of truth to make sure it's empty the next time it appears in the UI.
-            builder.uiStatementOfTruth(StatementOfTruth.builder().build());
+            caseData.setUiStatementOfTruth(StatementOfTruth.builder().build());
         }
 
-        assembleResponseDocuments(caseData, builder);
+        assembleResponseDocuments(caseData);
         frcDocumentsUtils.assembleClaimantsFRCDocuments(caseData);
-        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(builder);
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(caseData);
 
-        addEventAndDateAddedToApplicantExperts(builder);
-        addEventAndDateAddedToApplicantWitnesses(builder);
-        populateDQPartyIds(builder);
+        addEventAndDateAddedToApplicantExperts(caseData);
+        addEventAndDateAddedToApplicantWitnesses(caseData);
+        populateDQPartyIds(caseData);
 
-        caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE, builder);
+        caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE, caseData);
 
         if (multiPartyScenario == ONE_V_TWO_ONE_LEGAL_REP) {
-            builder.respondentSharedClaimResponseDocument(null);
+            caseData.setRespondentSharedClaimResponseDocument(null);
         }
 
         //Set to null because there are no more deadlines
-        builder.nextDeadline(null);
+        caseData.setNextDeadline(null);
 
         // null/delete the document used for preview, otherwise it will show as duplicate within case file view
         // and documents are added to claimantUploads, if we do not remove/null the original,
-        builder.applicant1DefenceResponseDocument(null);
-        builder.respondent1ClaimResponseDocument(null);
-        builder.respondentSharedClaimResponseDocument(null);
+        caseData.setApplicant1DefenceResponseDocument(null);
+        caseData.setRespondent1ClaimResponseDocument(null);
+        caseData.setRespondentSharedClaimResponseDocument(null);
         if (caseData.getApplicant1DQ() != null
-            && builder.build().getApplicant1DQ() != null) {
-            builder.applicant1DQ(builder.build().getApplicant1DQ().toBuilder().applicant1DQDraftDirections(null).build());
+            && caseData.getApplicant1DQ() != null) {
+            caseData.setApplicant1DQ(caseData.getApplicant1DQ().toBuilder().applicant1DQDraftDirections(null).build());
         }
         if (caseData.getApplicant2DQ() != null
-            && builder.build().getApplicant2DQ() != null) {
-            builder.applicant2DQ(builder.build().getApplicant2DQ().toBuilder().applicant2DQDraftDirections(null).build());
+            && caseData.getApplicant2DQ() != null) {
+            caseData.setApplicant2DQ(caseData.getApplicant2DQ().toBuilder().applicant2DQDraftDirections(null).build());
         }
 
         if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
             updateWaCourtLocationsService.ifPresent(service -> service.updateCourtListingWALocations(
                 callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
-                builder
+                caseData
             ));
         }
 
-        requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabApplicant(callbackParams, builder);
+        requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabApplicant(callbackParams, caseData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(builder.build().toMap(objectMapper))
-            .state((JudicialReferralUtils.shouldMoveToJudicialReferral(caseData, featureToggleService.isMultiOrIntermediateTrackEnabled(caseData))
+            .data(caseData.toMap(objectMapper))
+            .state((JudicialReferralUtils.shouldMoveToJudicialReferral(
+                caseData,
+                featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)
+            )
                 ? CaseState.JUDICIAL_REFERRAL
                 : CaseState.PROCEEDS_IN_HERITAGE_SYSTEM).name())
             .build();
     }
 
-    private void updateApplicants(CaseData caseData, CaseData.CaseDataBuilder builder, StatementOfTruth statementOfTruth,
+    private void updateApplicants(CaseData caseData, StatementOfTruth statementOfTruth,
                                   CallbackParams callbackParams) {
         if (caseData.getApplicant1DQ() != null
             && caseData.getApplicant1DQ().getApplicant1DQFileDirectionsQuestionnaire() != null) {
@@ -324,7 +324,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
                     .responseCourtCode(responseCourtCode)
                     .build());
 
-            builder.applicant1DQ(applicant1DQBuilder.build());
+            caseData.setApplicant1DQ(applicant1DQBuilder.build());
         }
 
         if (caseData.getApplicant2DQ() != null
@@ -333,56 +333,63 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
                 .applicant2DQStatementOfTruth(statementOfTruth)
                 .build();
 
-            builder.applicant2DQ(dq);
+            caseData.setApplicant2DQ(dq);
         }
     }
 
-    private void updateCaseManagementLocation(CallbackParams callbackParams, CaseData.CaseDataBuilder<?, ?> builder) {
-        CaseData caseData = callbackParams.getCaseData();
+    private void updateCaseManagementLocation(CallbackParams callbackParams, CaseData caseData) {
         Optional<RequestedCourt> preferredCourt = locationHelper.getCaseManagementLocation(caseData);
         preferredCourt.map(RequestedCourt::getCaseLocation)
-            .ifPresent(builder::caseManagementLocation);
+            .ifPresent(caseData::setCaseManagementLocation);
 
         locationHelper.getCaseManagementLocation(caseData)
             .ifPresent(requestedCourt -> locationHelper.updateCaseManagementLocation(
-                builder,
+                caseData,
                 requestedCourt,
                 () -> locationRefDataService.getCourtLocationsForDefaultJudgments(callbackParams.getParams().get(
                     CallbackParams.Params.BEARER_TOKEN).toString())
             ));
 
         if (log.isDebugEnabled()) {
-            log.debug("Case management location for {} is {}", caseData.getLegacyCaseReference(), builder.build().getCaseManagementLocation());
+            log.debug(
+                "Case management location for {} is {}",
+                caseData.getLegacyCaseReference(),
+                caseData.getCaseManagementLocation()
+            );
         }
     }
 
     static final String CLAIMANT = "Claimant";
 
-    private void assembleResponseDocuments(CaseData caseData, CaseData.CaseDataBuilder updatedCaseData) {
+    private void assembleResponseDocuments(CaseData caseData) {
         List<Element<CaseDocument>> claimantUploads = new ArrayList<>();
         Optional.ofNullable(caseData.getApplicant1DefenceResponseDocument())
             .map(ResponseDocument::getFile).ifPresent(claimDocument -> claimantUploads.add(
-                buildElemCaseDocument(claimDocument, CLAIMANT,
-                                      updatedCaseData.build().getApplicant1ResponseDate(), DocumentType.CLAIMANT_DEFENCE
+                buildElemCaseDocument(
+                    claimDocument, CLAIMANT,
+                    caseData.getApplicant1ResponseDate(), DocumentType.CLAIMANT_DEFENCE
                 )));
         Optional.ofNullable(caseData.getClaimantDefenceResDocToDefendant2())
             .map(ResponseDocument::getFile).ifPresent(claimDocument -> claimantUploads.add(
-                buildElemCaseDocument(claimDocument, CLAIMANT,
-                                      updatedCaseData.build().getApplicant1ResponseDate(), DocumentType.CLAIMANT_DEFENCE
+                buildElemCaseDocument(
+                    claimDocument, CLAIMANT,
+                    caseData.getApplicant1ResponseDate(), DocumentType.CLAIMANT_DEFENCE
                 )));
         Optional.ofNullable(caseData.getApplicant1DQ())
             .map(Applicant1DQ::getApplicant1DQDraftDirections)
             .ifPresent(document -> claimantUploads.add(
-                buildElemCaseDocument(document, CLAIMANT,
-                                      updatedCaseData.build().getApplicant1ResponseDate(),
-                                      DocumentType.CLAIMANT_DRAFT_DIRECTIONS
+                buildElemCaseDocument(
+                    document, CLAIMANT,
+                    caseData.getApplicant1ResponseDate(),
+                    DocumentType.CLAIMANT_DRAFT_DIRECTIONS
                 )));
         Optional.ofNullable(caseData.getApplicant2DQ())
             .map(Applicant2DQ::getApplicant2DQDraftDirections)
             .ifPresent(document -> claimantUploads.add(
-                buildElemCaseDocument(document, CLAIMANT,
-                                      updatedCaseData.build().getApplicant2ResponseDate(),
-                                      DocumentType.CLAIMANT_DRAFT_DIRECTIONS
+                buildElemCaseDocument(
+                    document, CLAIMANT,
+                    caseData.getApplicant2ResponseDate(),
+                    DocumentType.CLAIMANT_DRAFT_DIRECTIONS
                 )));
         List<Element<CaseDocument>> duplicateClaimantDefendantResponseDocs = caseData.getDuplicateClaimantDefendantResponseDocs();
         if (!claimantUploads.isEmpty()) {
@@ -392,12 +399,12 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
                 DocCategory.APP1_DQ.getValue()
             );
             List<Element<CaseDocument>> copy = assignCategoryId.copyCaseDocumentListWithCategoryId(
-                    claimantUploads, DocCategory.DQ_APP1.getValue());
+                claimantUploads, DocCategory.DQ_APP1.getValue());
             if (Objects.nonNull(copy)) {
                 duplicateClaimantDefendantResponseDocs.addAll(copy);
             }
-            updatedCaseData.claimantResponseDocuments(claimantUploads);
-            updatedCaseData.duplicateClaimantDefendantResponseDocs(copy);
+            caseData.setClaimantResponseDocuments(claimantUploads);
+            caseData.setDuplicateClaimantDefendantResponseDocs(copy);
         }
     }
 
