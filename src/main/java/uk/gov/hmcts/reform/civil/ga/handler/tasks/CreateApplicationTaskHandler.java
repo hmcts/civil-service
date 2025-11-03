@@ -96,13 +96,14 @@ public class CreateApplicationTaskHandler extends BaseExternalTaskHandler {
                                                                   startEventResponse,
                                                                   caseData.toMap(mapper)));
         return ExternalTaskData.builder()
-            .generalApplicationCaseData(parentCaseData)
+            .sourceGeneralApplicationCaseData(parentCaseData)
+            .updateGeneralApplicationCaseData(generalAppCaseData)
             .build();
     }
 
     private GeneralApplicationCaseData withoutNoticeNoConsent(GeneralApplication generalApplication,
-                                            GeneralApplicationCaseData caseData,
-                                            GeneralApplicationCaseData generalAppCaseData) {
+                                                              GeneralApplicationCaseData caseData,
+                                                              GeneralApplicationCaseData generalAppCaseData) {
 
         /*
          * Add the case to applicant solicitor collection if parent claimant is applicant
@@ -112,8 +113,8 @@ public class CreateApplicationTaskHandler extends BaseExternalTaskHandler {
 
         if (generalApplication.getParentClaimantIsApplicant().equals(YES)) {
             applications = addApplication(
-                    buildApplication(generalApplication, generalAppCaseData),
-                    caseData.getClaimantGaAppDetails()
+                buildApplication(generalApplication, generalAppCaseData),
+                caseData.getClaimantGaAppDetails()
             );
         }
 
@@ -127,13 +128,13 @@ public class CreateApplicationTaskHandler extends BaseExternalTaskHandler {
         if (generalApplication.getGeneralAppApplnSolicitor() != null
             && generalApplication.getGeneralAppApplnSolicitor().getOrganisationIdentifier() != null
             && generalApplication.getGeneralAppApplnSolicitor().getOrganisationIdentifier()
-                .equals(getRespondent1SolicitorOrgId(caseData))) {
+            .equals(getRespondent1SolicitorOrgId(caseData))) {
 
             GADetailsRespondentSol gaDetailsRespondentSol = buildRespApplication(generalApplication, generalAppCaseData);
 
             if (gaDetailsRespondentSol != null) {
                 respondentSpecficGADetails = addRespApplication(
-                        gaDetailsRespondentSol, caseData.getRespondentSolGaAppDetails());
+                    gaDetailsRespondentSol, caseData.getRespondentSolGaAppDetails());
             }
         }
 
@@ -144,43 +145,41 @@ public class CreateApplicationTaskHandler extends BaseExternalTaskHandler {
         var respondentTwoSpecficGADetails =
             ofNullable(caseData.getRespondentSolTwoGaAppDetails()).orElse(newArrayList());
         if (generalApplication.getGeneralAppApplnSolicitor() != null
-                && featureToggleService.isGaForLipsEnabled()
-                && generalApplication.getParentClaimantIsApplicant().equals(NO)
-                && Objects.nonNull(generalApplication.getIsGaApplicantLip())
-                && generalApplication.getIsGaApplicantLip().equals(YES)) {
+            && featureToggleService.isGaForLipsEnabled()
+            && generalApplication.getParentClaimantIsApplicant().equals(NO)
+            && Objects.nonNull(generalApplication.getIsGaApplicantLip())
+            && generalApplication.getIsGaApplicantLip().equals(YES)) {
 
             GADetailsRespondentSol gaDetailsRespondentSol = buildRespApplication(generalApplication, generalAppCaseData);
 
             if (gaDetailsRespondentSol != null) {
                 respondentSpecficGADetails = addRespApplication(
-                        gaDetailsRespondentSol, caseData.getRespondentSolGaAppDetails());
+                    gaDetailsRespondentSol, caseData.getRespondentSolGaAppDetails());
             }
         }
 
         /*
          * Add the GA in respondent two collection if he/she initiate without notice application.
          * */
-        if (generalApplication.getIsMultiParty().equals(YES) && caseData.getAddApplicant2().equals(NO)
-                && caseData.getRespondent2SameLegalRepresentative().equals(NO)
-                && generalApplication.getGeneralAppApplnSolicitor().getOrganisationIdentifier()
-                .equals(getRespondent2SolicitorOrgId(caseData))) {
+        if (YES.equals(generalApplication.getIsMultiParty()) && NO.equals(caseData.getAddApplicant2())
+            && NO.equals(caseData.getRespondent2SameLegalRepresentative())
+            && generalApplication.getGeneralAppApplnSolicitor().getOrganisationIdentifier()
+            .equals(getRespondent2SolicitorOrgId(caseData))) {
 
             GADetailsRespondentSol gaDetailsRespondentSolTwo = buildRespApplication(
-                    generalApplication, generalAppCaseData);
+                generalApplication, generalAppCaseData);
 
             if (gaDetailsRespondentSolTwo != null) {
                 respondentTwoSpecficGADetails = addRespApplication(
-                        gaDetailsRespondentSolTwo, caseData.getRespondentSolTwoGaAppDetails());
+                    gaDetailsRespondentSolTwo, caseData.getRespondentSolTwoGaAppDetails());
             }
         }
 
-        var data = caseData.toBuilder()
+        return caseData.toBuilder()
             .claimantGaAppDetails(applications)
             .respondentSolGaAppDetails(respondentSpecficGADetails)
             .respondentSolTwoGaAppDetails(respondentTwoSpecficGADetails)
             .build();
-
-        return data;
     }
 
     private GeneralApplicationsDetails buildApplication(GeneralApplication generalApplication,
@@ -270,8 +269,8 @@ public class CreateApplicationTaskHandler extends BaseExternalTaskHandler {
         map.put("applicationTypes", String.join(", ", getTypesString(generalApplication)));
         map.put("parentCaseReference", caseId);
         List<Element<CaseDocument>> addlDoc =
-                DocUploadUtils.prepareDocuments(generalApplication.getGeneralAppEvidenceDocument(),
-                        DocUploadUtils.APPLICANT, CaseEvent.INITIATE_GENERAL_APPLICATION);
+            DocUploadUtils.prepareDocuments(generalApplication.getGeneralAppEvidenceDocument(),
+                                            DocUploadUtils.APPLICANT, CaseEvent.INITIATE_GENERAL_APPLICATION);
         if (Objects.nonNull(addlDoc)) {
             map.put("gaAddlDoc", addlDoc);
             map.put("gaAddlDocStaff", addlDoc);
@@ -297,7 +296,7 @@ public class CreateApplicationTaskHandler extends BaseExternalTaskHandler {
 
     private String getTypesString(final GeneralApplication generalApplication) {
         List<String> types = generalApplication.getGeneralAppType()
-                .getTypes().stream().map(GeneralApplicationTypes::getDisplayedValue).toList();
+            .getTypes().stream().map(GeneralApplicationTypes::getDisplayedValue).toList();
         return String.join(", ", types);
     }
 
@@ -335,7 +334,7 @@ public class CreateApplicationTaskHandler extends BaseExternalTaskHandler {
 
     @Override
     public VariableMap getVariableMap(ExternalTaskData externalTaskData) {
-        var data = externalTaskData.generalApplicationCaseData().orElseThrow();
+        var data = externalTaskData.sourceGeneralApplicationCaseData().orElseThrow();
         VariableMap variables = Variables.createVariables();
         var stateFlow = stateFlowEngine.evaluate(data);
         var stateFlowName = stateFlow.getState().getName();
@@ -344,7 +343,7 @@ public class CreateApplicationTaskHandler extends BaseExternalTaskHandler {
         variables.putValue(FLOW_FLAGS, stateFlowFlags);
         log.debug("State flow evaluation completed with {} state and {} flags",
                   stateFlowName, stateFlowFlags);
-        var generalAppCaseData = externalTaskData.getGeneralApplicationData();
+        var generalAppCaseData = externalTaskData.getUpdateGeneralApplicationCaseData();
         if (generalAppCaseData != null && generalAppCaseData.getCcdCaseReference() != null) {
             variables.putValue(GENERAL_APPLICATION_CASE_ID, generalAppCaseData.getCcdCaseReference());
             log.info("Added general application case ID to variables: {}", generalAppCaseData.getCcdCaseReference());

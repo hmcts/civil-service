@@ -80,7 +80,7 @@ public class WaitCivilDocUpdatedTaskHandler extends BaseExternalTaskHandler {
 
             CaseDataContent caseDataContent = gaCaseDataContent(startEventResponse, gaCaseData);
             var caseData = coreCaseDataService.submitGaUpdate(caseId, caseDataContent);
-            return ExternalTaskData.builder().generalApplicationCaseData(caseData).build();
+            return ExternalTaskData.builder().sourceGeneralApplicationCaseData(caseData).build();
         }
         return ExternalTaskData.builder().build();
     }

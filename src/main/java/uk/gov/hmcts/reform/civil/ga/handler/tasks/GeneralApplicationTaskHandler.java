@@ -50,12 +50,12 @@ public class GeneralApplicationTaskHandler extends BaseExternalTaskHandler {
 
         var caseData = coreCaseDataService.submitGaUpdate(generalApplicationCaseId, caseDataContent);
 
-        return ExternalTaskData.builder().generalApplicationCaseData(caseData).build();
+        return ExternalTaskData.builder().sourceGeneralApplicationCaseData(caseData).build();
     }
 
     @Override
     public VariableMap getVariableMap(ExternalTaskData externalTaskData) {
-        var data = externalTaskData.generalApplicationCaseData().orElseThrow();
+        var data = externalTaskData.sourceGeneralApplicationCaseData().orElseThrow();
         VariableMap variables = Variables.createVariables();
         var stateFlow = stateFlowEngine.evaluate(data);
         variables.putValue(FLOW_STATE, stateFlow.getState().getName());

@@ -2,29 +2,44 @@ package uk.gov.hmcts.reform.civil.sampledata;
 
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.ga.enums.GAJudicialHearingType;
+import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.ga.enums.dq.FinalOrderShowToggle;
+import uk.gov.hmcts.reform.civil.ga.enums.dq.GAByCourtsInitiativeGAspec;
+import uk.gov.hmcts.reform.civil.enums.dq.GAHearingDuration;
+import uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeMakeAnOrderOption;
+import uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeRequestMoreInfoOption;
+import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
+import uk.gov.hmcts.reform.civil.enums.caseprogression.OrderOnCourtsList;
+import uk.gov.hmcts.reform.civil.ga.enums.dq.GaFinalOrderSelection;
+import uk.gov.hmcts.reform.civil.ga.enums.hearing.HearingApplicationDetails;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationParty;
+import uk.gov.hmcts.reform.civil.model.Address;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
+import uk.gov.hmcts.reform.civil.model.genapplication.CaseLink;
+import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.model.GeneralAppParentCaseLink;
+import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
+import uk.gov.hmcts.reform.civil.model.PaymentDetails;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
-import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
-import uk.gov.hmcts.reform.civil.enums.CaseState;
-import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.enums.caseprogression.OrderOnCourtsList;
-import uk.gov.hmcts.reform.civil.enums.dq.GAHearingDuration;
-import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
-import uk.gov.hmcts.reform.civil.ga.enums.GAJudicialHearingType;
-import uk.gov.hmcts.reform.civil.ga.enums.dq.FinalOrderShowToggle;
-import uk.gov.hmcts.reform.civil.ga.enums.dq.GAByCourtsInitiativeGAspec;
-import uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeMakeAnOrderOption;
-import uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeRequestMoreInfoOption;
-import uk.gov.hmcts.reform.civil.ga.enums.dq.GaFinalOrderSelection;
-import uk.gov.hmcts.reform.civil.ga.enums.hearing.HearingApplicationDetails;
-import uk.gov.hmcts.reform.civil.model.GeneralAppParentCaseLink;
-import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
-import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationParty;
+import uk.gov.hmcts.reform.civil.model.caseprogression.FreeFormOrderValues;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAApproveConsentOrder;
+import uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil;
+import uk.gov.hmcts.reform.civil.model.genapplication.GADetailsRespondentSol;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDateGAspec;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAHearingNoticeApplication;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAHearingNoticeDetail;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudgesHearingListGAspec;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudicialDecision;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudicialMakeAnOrder;
@@ -32,21 +47,6 @@ import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudicialRequestMoreIn
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudicialWrittenRepresentations;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAMakeApplicationAvailableCheck;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAOrderCourtOwnInitiativeGAspec;
-import uk.gov.hmcts.reform.civil.model.Address;
-import uk.gov.hmcts.reform.civil.model.BusinessProcess;
-import uk.gov.hmcts.reform.civil.model.Fee;
-import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
-import uk.gov.hmcts.reform.civil.model.PaymentDetails;
-import uk.gov.hmcts.reform.civil.model.caseprogression.FreeFormOrderValues;
-import uk.gov.hmcts.reform.civil.model.common.DynamicList;
-import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
-import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.model.genapplication.CaseLink;
-import uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
-import uk.gov.hmcts.reform.civil.model.genapplication.GADetailsRespondentSol;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDateGAspec;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GASolicitorDetailsGAspec;
@@ -59,6 +59,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -71,9 +72,6 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.LISTING_FOR_A_HEARING;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_APPLICATION_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.ADJOURN_HEARING;
-import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.EXTEND_TIME;
-import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeDecisionOption.FREE_FORM_ORDER;
 import static uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeDecisionOption.LIST_FOR_A_HEARING;
 import static uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeDecisionOption.MAKE_AN_ORDER;
@@ -84,6 +82,9 @@ import static uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeMakeAnOrderOption.GIV
 import static uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeRequestMoreInfoOption.REQUEST_MORE_INFORMATION;
 import static uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeWrittenRepresentationsOptions.CONCURRENT_REPRESENTATIONS;
 import static uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeWrittenRepresentationsOptions.SEQUENTIAL_REPRESENTATIONS;
+import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.ADJOURN_HEARING;
+import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.EXTEND_TIME;
+import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
@@ -102,8 +103,14 @@ public class GeneralApplicationCaseDataBuilder {
     public static final LocalDateTime NOTIFICATION_DEADLINE = LocalDate.now().atStartOfDay().plusDays(1);
     public static final BigDecimal FAST_TRACK_CLAIM_AMOUNT = BigDecimal.valueOf(10000);
     public static final String CUSTOMER_REFERENCE = "12345";
-    public static final String STRING_CONSTANT = "this is a string";
+
     private static final String JUDGES_DECISION = "MAKE_DECISION";
+    List<DynamicListElement> listItems = singletonList(DynamicListElement.builder()
+                                                           .code("code").label("label").build());
+
+    DynamicListElement selectedLocation = DynamicListElement
+        .builder().label("sitename - location name - D12 8997").build();
+
     private static final String HEARING_SCHEDULED = "HEARING_SCHEDULED_GA";
     private static final Fee FEE108 = Fee.builder().calculatedAmountInPence(
         BigDecimal.valueOf(10800)).code("FEE0443").version("1").build();
@@ -111,23 +118,13 @@ public class GeneralApplicationCaseDataBuilder {
         BigDecimal.valueOf(1400)).code("FEE0458").version("2").build();
     private static final Fee FEE275 = Fee.builder().calculatedAmountInPence(
         BigDecimal.valueOf(27500)).code("FEE0442").version("1").build();
+    public static final String STRING_CONSTANT = "this is a string";
     private static final String DUMMY_EMAIL = "hmcts.civil@gmail.com";
+
     private static final String JUDICIAL_REQUEST_MORE_INFO_RECITAL_TEXT = "<Title> <Name> \n"
         + "Upon reviewing the application made and upon considering the information "
         + "provided by the parties, the court requests more information from the applicant.";
-    private static final Long CASE_REFERENCE = 111111L;
-    public final CaseDocument pdfDocument = CaseDocument.builder()
-        .createdBy("John")
-        .documentName("documentName")
-        .documentSize(0L)
-        .documentType(DocumentType.GENERAL_APPLICATION_DRAFT)
-        .createdDatetime(LocalDateTime.now())
-        .documentLink(Document.builder()
-                          .documentUrl("fake-url")
-                          .documentFileName("file-name")
-                          .documentBinaryUrl("binary-url")
-                          .build())
-        .build();
+
     // Create Claim
     protected Long ccdCaseReference;
     protected String legacyCaseReference;
@@ -160,29 +157,23 @@ public class GeneralApplicationCaseDataBuilder {
     protected String defendant1PartyName;
     protected YesOrNo isGaApplicantLip;
     protected YesOrNo isGaRespondentTwoLip;
+    private YesOrNo isMultiParty;
     protected YesOrNo addApplicant2;
     protected List<Element<GASolicitorDetailsGAspec>> generalAppRespondentSolicitors;
     protected GAMakeApplicationAvailableCheck makeAppVisibleToRespondents;
     //General Application
     protected LocalDate submittedOn;
+    private GeneralAppParentCaseLink generalAppParentCaseLink;
+    private YesOrNo parentClaimantIsApplicant;
+    private static final Long CASE_REFERENCE = 111111L;
     protected GAJudicialMakeAnOrder judicialMakeAnOrder;
     protected GAApplicationType generalAppType;
-    protected GAApproveConsentOrder approveConsentOrder;
+    protected GAApproveConsentOrder  approveConsentOrder;
+    private  CaseLocationCivil caseManagementLocation;
+
     protected GeneralApplicationParty respondent1;
     protected GeneralApplicationParty applicant1;
     protected String emailPartyReference;
-    List<DynamicListElement> listItems = singletonList(DynamicListElement.builder()
-                                                           .code("code").label("label").build());
-    DynamicListElement selectedLocation = DynamicListElement
-        .builder().label("sitename - location name - D12 8997").build();
-    private YesOrNo isMultiParty;
-    private GeneralAppParentCaseLink generalAppParentCaseLink;
-    private YesOrNo parentClaimantIsApplicant;
-    private CaseLocationCivil caseManagementLocation;
-
-    public static GeneralApplicationCaseDataBuilder builder() {
-        return new GeneralApplicationCaseDataBuilder();
-    }
 
     public GeneralApplicationCaseDataBuilder emailPartyReference(String emailPartyReference) {
         this.emailPartyReference = emailPartyReference;
@@ -225,7 +216,7 @@ public class GeneralApplicationCaseDataBuilder {
     }
 
     public GeneralApplicationCaseDataBuilder generalAppRespondentSolicitors(List<Element<GASolicitorDetailsGAspec>>
-                                                                                generalAppRespondentSolicitors) {
+                                                              generalAppRespondentSolicitors) {
         this.generalAppRespondentSolicitors = generalAppRespondentSolicitors;
         return this;
     }
@@ -241,25 +232,25 @@ public class GeneralApplicationCaseDataBuilder {
     }
 
     public GeneralApplicationCaseDataBuilder generalApplicationsDetails(List<Element<GeneralApplicationsDetails>>
-                                                                            generalApplicationsDetails) {
+                                                          generalApplicationsDetails) {
         this.claimantGaAppDetails = generalApplicationsDetails;
         return this;
     }
 
     public GeneralApplicationCaseDataBuilder gaDetailsRespondentSol(List<Element<GADetailsRespondentSol>>
-                                                                        gaDetailsRespondentSol) {
+                                                      gaDetailsRespondentSol) {
         this.respondentSolGaAppDetails = gaDetailsRespondentSol;
         return this;
     }
 
     public GeneralApplicationCaseDataBuilder gaDetailsRespondentSolTwo(List<Element<GADetailsRespondentSol>>
-                                                                           gaDetailsRespondentSolTwo) {
+                                                         gaDetailsRespondentSolTwo) {
         this.respondentSolTwoGaAppDetails = gaDetailsRespondentSolTwo;
         return this;
     }
 
     public GeneralApplicationCaseDataBuilder gaDetailsMasterCollection(List<Element<GeneralApplicationsDetails>>
-                                                                           gaDetailsMasterCollection) {
+                                                         gaDetailsMasterCollection) {
         this.gaDetailsMasterCollection = gaDetailsMasterCollection;
         return this;
     }
@@ -384,6 +375,10 @@ public class GeneralApplicationCaseDataBuilder {
         return this;
     }
 
+    public static GeneralApplicationCaseDataBuilder builder() {
+        return new GeneralApplicationCaseDataBuilder();
+    }
+
     public GeneralApplicationCaseDataBuilder judicialDecisionRequestMoreInfo(GAJudicialRequestMoreInfo judicialDecisionRequestMoreInfo) {
         this.judicialDecisionRequestMoreInfo = judicialDecisionRequestMoreInfo;
         return this;
@@ -454,7 +449,7 @@ public class GeneralApplicationCaseDataBuilder {
     }
 
     public GeneralApplicationCaseData buildMakePaymentsCaseData() {
-        Organisation orgId = Organisation.builder()
+        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
             .organisationID("OrgId").build();
 
         return build().toBuilder()
@@ -479,7 +474,7 @@ public class GeneralApplicationCaseDataBuilder {
     }
 
     public GeneralApplicationCaseData buildPaymentFailureCaseData() {
-        Organisation orgId = Organisation.builder()
+        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
             .organisationID("OrgId").build();
 
         return build().toBuilder()
@@ -512,9 +507,9 @@ public class GeneralApplicationCaseDataBuilder {
     }
 
     public GeneralApplicationCaseData withNoticeCaseData() {
-        Organisation orgId = Organisation.builder()
+        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
             .organisationID("OrgId").build();
-        List<GeneralApplicationTypes> types = List.of(VARY_PAYMENT_TERMS_OF_JUDGMENT);
+        List<GeneralApplicationTypes> types = Arrays.asList(VARY_PAYMENT_TERMS_OF_JUDGMENT);
         return build().toBuilder()
             .generalAppType(GAApplicationType.builder().types(types).build())
             .ccdCaseReference(1644495739087775L)
@@ -526,10 +521,8 @@ public class GeneralApplicationCaseDataBuilder {
                                                .hasAgreed(YES).build())
             .generalAppPBADetails(
                 GAPbaDetails.builder()
-                    .paymentSuccessfulDate(LocalDateTime.of(
-                        LocalDate.of(2020, 1, 1),
-                        LocalTime.of(12, 0, 0)
-                    ))
+                    .paymentSuccessfulDate(LocalDateTime.of(LocalDate.of(2020, 1, 1),
+                                                            LocalTime.of(12, 0, 0)))
                     .paymentDetails(PaymentDetails.builder()
                                         .status(PaymentStatus.SUCCESS)
                                         .reference("RC-1658-4258-2679-9795")
@@ -548,7 +541,7 @@ public class GeneralApplicationCaseDataBuilder {
     }
 
     public GeneralApplicationCaseData withoutNoticeCaseData() {
-        Organisation orgId = Organisation.builder()
+        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
             .organisationID("OrgId").build();
 
         return build().toBuilder()
@@ -562,10 +555,8 @@ public class GeneralApplicationCaseDataBuilder {
                                                .hasAgreed(NO).build())
             .generalAppPBADetails(
                 GAPbaDetails.builder()
-                    .paymentSuccessfulDate(LocalDateTime.of(
-                        LocalDate.of(2020, 1, 1),
-                        LocalTime.of(12, 0, 0)
-                    ))
+                    .paymentSuccessfulDate(LocalDateTime.of(LocalDate.of(2020, 1, 1),
+                                                            LocalTime.of(12, 0, 0)))
                     .paymentDetails(PaymentDetails.builder()
                                         .status(PaymentStatus.SUCCESS)
                                         .reference("RC-1658-4258-2679-9795")
@@ -583,8 +574,21 @@ public class GeneralApplicationCaseDataBuilder {
             .build();
     }
 
+    public final CaseDocument pdfDocument = CaseDocument.builder()
+        .createdBy("John")
+        .documentName("documentName")
+        .documentSize(0L)
+        .documentType(DocumentType.GENERAL_APPLICATION_DRAFT)
+        .createdDatetime(LocalDateTime.now())
+        .documentLink(Document.builder()
+                          .documentUrl("fake-url")
+                          .documentFileName("file-name")
+                          .documentBinaryUrl("binary-url")
+                          .build())
+        .build();
+
     public GeneralApplicationCaseData withNoticeDraftAppCaseData() {
-        Organisation orgId = Organisation.builder()
+        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
             .organisationID("OrgId").build();
         String uid = "f000aa01-0451-4000-b000-000000000111";
         String uid1 = "f000aa01-0451-4000-b000-000000000000";
@@ -604,10 +608,8 @@ public class GeneralApplicationCaseDataBuilder {
                                                .hasAgreed(YES).build())
             .generalAppPBADetails(
                 GAPbaDetails.builder()
-                    .paymentSuccessfulDate(LocalDateTime.of(
-                        LocalDate.of(2020, 1, 1),
-                        LocalTime.of(12, 0, 0)
-                    ))
+                    .paymentSuccessfulDate(LocalDateTime.of(LocalDate.of(2020, 1, 1),
+                                                            LocalTime.of(12, 0, 0)))
                     .paymentDetails(PaymentDetails.builder()
                                         .status(PaymentStatus.SUCCESS)
                                         .reference("RC-1658-4258-2679-9795")
@@ -626,7 +628,7 @@ public class GeneralApplicationCaseDataBuilder {
     }
 
     public GeneralApplicationCaseData buildPaymentSuccessfulCaseData() {
-        Organisation orgId = Organisation.builder()
+        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
             .organisationID("OrgId").build();
 
         return build().toBuilder()
@@ -636,10 +638,8 @@ public class GeneralApplicationCaseDataBuilder {
             .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
             .generalAppPBADetails(
                 GAPbaDetails.builder()
-                    .paymentSuccessfulDate(LocalDateTime.of(
-                        LocalDate.of(2020, 1, 1),
-                        LocalTime.of(12, 0, 0)
-                    ))
+                    .paymentSuccessfulDate(LocalDateTime.of(LocalDate.of(2020, 1, 1),
+                                                            LocalTime.of(12, 0, 0)))
                     .paymentDetails(PaymentDetails.builder()
                                         .status(PaymentStatus.SUCCESS)
                                         .reference("RC-1658-4258-2679-9795")
@@ -731,7 +731,7 @@ public class GeneralApplicationCaseDataBuilder {
 
     public GeneralApplicationCaseData buildFeeValidationCaseData(Fee fee, boolean isConsented, boolean isWithNotice) {
 
-        Organisation orgId = Organisation.builder()
+        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
             .organisationID("OrgId").build();
 
         GAInformOtherParty gaInformOtherParty = null;

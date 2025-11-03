@@ -17,7 +17,8 @@ public class ExternalTaskData {
 
     private CaseData caseData;
     private CaseData generalApplicationData;
-    private GeneralApplicationCaseData generalApplicationCaseData;
+    private GeneralApplicationCaseData sourceGeneralApplicationCaseData;
+    private GeneralApplicationCaseData updateGeneralApplicationCaseData;
     private VariableMap variables;
 
     public Optional<CaseData> caseData() {
@@ -28,8 +29,12 @@ public class ExternalTaskData {
         return Optional.ofNullable(generalApplicationData);
     }
 
-    public Optional<GeneralApplicationCaseData> generalApplicationCaseData() {
-        return Optional.ofNullable(generalApplicationCaseData);
+    public Optional<GeneralApplicationCaseData> sourceGeneralApplicationCaseData() {
+        return Optional.ofNullable(sourceGeneralApplicationCaseData);
+    }
+
+    public Optional<GeneralApplicationCaseData> updateGeneralApplicationCaseData() {
+        return Optional.ofNullable(updateGeneralApplicationCaseData);
     }
 
     public Optional<VariableMap> variables() {

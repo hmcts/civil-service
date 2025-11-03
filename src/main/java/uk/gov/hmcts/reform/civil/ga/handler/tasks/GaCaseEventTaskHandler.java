@@ -44,12 +44,12 @@ public class GaCaseEventTaskHandler extends BaseExternalTaskHandler {
             .activityId(externalTask.getActivityId()).build();
         CaseDataContent caseDataContent = caseDataContent(startEventResponse, businessProcess);
         var data = coreCaseDataService.submitUpdate(caseId, caseDataContent);
-        return ExternalTaskData.builder().generalApplicationCaseData(data).build();
+        return ExternalTaskData.builder().sourceGeneralApplicationCaseData(data).build();
     }
 
     @Override
     public VariableMap getVariableMap(ExternalTaskData externalTaskData) {
-        var data = externalTaskData.generalApplicationCaseData().orElseThrow();
+        var data = externalTaskData.sourceGeneralApplicationCaseData().orElseThrow();
         VariableMap variables = Variables.createVariables();
         var stateFlow = stateFlowEngine.evaluate(data);
         var stateFlowName = stateFlow.getState().getName();
