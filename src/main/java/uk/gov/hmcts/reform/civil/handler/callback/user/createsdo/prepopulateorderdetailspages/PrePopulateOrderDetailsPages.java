@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.createsdo.SmallClaimsPopu
 import uk.gov.hmcts.reform.civil.handler.callback.user.createsdo.disposalhearing.DisposalHearingPopulator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.createsdo.fasttrack.FastTrackPopulator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.createsdo.orderdetailspages.OrderDetailsPagesCaseFieldBuilder;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createsdo.orderdetailspages.ResetFieldsForReconsiderationFieldBuilder;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.CaseTask;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -60,6 +61,7 @@ public class PrePopulateOrderDetailsPages implements CaseTask {
     private final BigDecimal ccmccAmount;
     private final String ccmccEpimsId;
     private final List<OrderDetailsPagesCaseFieldBuilder> orderDetailsPagesCaseFieldBuilders;
+    private final List<OrderDetailsPagesCaseFieldBuilder> reconsiderationOnlyBuilders;
 
     public PrePopulateOrderDetailsPages(ObjectMapper objectMapper, LocationReferenceDataService locationRefDataService,
                                         FeatureToggleService featureToggleService,
@@ -81,7 +83,12 @@ public class PrePopulateOrderDetailsPages implements CaseTask {
         this.prePopulateSdoR2AndNihlFields = prePopulateSdoR2AndNihlFields;
         this.ccmccAmount = ccmccAmount;
         this.ccmccEpimsId = ccmccEpimsId;
-        this.orderDetailsPagesCaseFieldBuilders = orderDetailsPagesCaseFieldBuilders;
+        this.orderDetailsPagesCaseFieldBuilders = orderDetailsPagesCaseFieldBuilders.stream()
+                .filter(builder -> !(builder instanceof ResetFieldsForReconsiderationFieldBuilder))
+                .toList();
+        this.reconsiderationOnlyBuilders = orderDetailsPagesCaseFieldBuilders.stream()
+                .filter(ResetFieldsForReconsiderationFieldBuilder.class::isInstance)
+                .toList();
     }
 
     public CallbackResponse execute(CallbackParams callbackParams) {
@@ -146,11 +153,13 @@ public class PrePopulateOrderDetailsPages implements CaseTask {
 
     private void handleSdoR2FeaturesIfNeeded(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData, CallbackParams callbackParams,
                                              Optional<RequestedCourt> preferredCourt, DynamicList hearingMethodList, List<LocationRefData> locationRefDataList) {
-        if (CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
+        boolean isReconsideration = CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
                 && DecisionOnRequestReconsiderationOptions.CREATE_SDO.equals(
-                caseData.getDecisionOnRequestReconsiderationOptions())) {
+                caseData.getDecisionOnRequestReconsiderationOptions());
+
+        if (isReconsideration) {
             log.debug("Resetting fields for reconsideration for caseId: {}", updatedData.build().getCcdCaseReference());
-            orderDetailsPagesCaseFieldBuilders.forEach(builder -> builder.build(updatedData));
+            reconsiderationOnlyBuilders.forEach(builder -> builder.build(updatedData));
         }
 
         orderDetailsPagesCaseFieldBuilders.forEach(builder -> builder.build(updatedData));
