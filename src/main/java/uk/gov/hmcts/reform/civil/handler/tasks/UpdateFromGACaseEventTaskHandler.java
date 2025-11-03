@@ -259,7 +259,7 @@ public class UpdateFromGACaseEventTaskHandler extends BaseExternalTaskHandler {
                     civilDocs.add(gaDoc);
                 }
             }
-        } else if (featureToggleService.isGaForLipsEnabled() && (civilCaseData.isRespondent1LiP() || civilCaseData.isRespondent2LiP()
+        } else if ((civilCaseData.isRespondent1LiP() || civilCaseData.isRespondent2LiP()
             || civilCaseData.isApplicantNotRepresented()) && (gaDocs != null && (fromGaList.equals("gaDraftDocument")))) {
 
             checkDraftDocumentsInMainCase(civilDocs, gaDocs);
