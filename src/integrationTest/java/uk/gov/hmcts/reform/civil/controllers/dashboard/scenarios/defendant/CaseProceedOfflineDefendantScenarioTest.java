@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.dashboard.data.TaskStatus;
 
-import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -55,7 +54,9 @@ public class CaseProceedOfflineDefendantScenarioTest extends DashboardBaseIntegr
         doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "DEFENDANT")
             .andExpectAll(
                 status().is(HttpStatus.OK.value()),
-                jsonPath("$", hasSize(0))
+                jsonPath("$[0].reference").value(caseId.toString()),
+                jsonPath("$[0].taskNameEn").value("Contact the court to request a change to my case"),
+                jsonPath("$[0].currentStatusEn").value("Inactive")
             );
     }
 
