@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 
 import java.util.List;
@@ -10,7 +9,6 @@ import java.util.Map;
 import java.util.Optional;
 
 @Data
-@Component
 @ConfigurationProperties(prefix = "flow-state")
 public class FlowStateAllowedEventsConfig {
 
