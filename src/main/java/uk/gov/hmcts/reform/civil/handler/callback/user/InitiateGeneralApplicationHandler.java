@@ -132,15 +132,14 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
 
         if (initiateGeneralApplicationService.caseContainsLiP(caseData)) {
-            if (!featureToggleService.isGaForLipsEnabled()
-                || (caseData.isRespondentResponseBilingual() && !featureToggleService.isGaForWelshEnabled() && !caseData.isLipvLROneVOne()
+            if ((caseData.isRespondentResponseBilingual() && !featureToggleService.isGaForWelshEnabled() && !caseData.isLipvLROneVOne()
                 && !(caseEvent == INITIATE_GENERAL_APPLICATION_COSC))) {
                 errors.add(LR_VS_LIP);
             } else if (featureToggleService.isDefendantNoCOnlineForCase(caseData) && caseData.isLipvLROneVOne()
                 && caseData.isClaimantBilingual() && !featureToggleService.isGaForWelshEnabled()) {
                 errors.add(LR_VS_LIP);
             } else if (
-                !(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation()
+                !(featureToggleService.isLocationWhiteListed(caseData.getCaseManagementLocation()
                                                                                     .getBaseLocation()))
                     && !(featureToggleService.isCuiGaNroEnabled())) {
                 errors.add(NOT_IN_EA_REGION);

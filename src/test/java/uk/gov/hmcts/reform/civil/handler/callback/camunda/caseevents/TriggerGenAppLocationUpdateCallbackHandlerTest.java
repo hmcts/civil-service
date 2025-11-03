@@ -71,7 +71,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
             mapper.registerModule(new JavaTimeModule());
             handler = new TriggerGenAppLocationUpdateCallbackHandler(helperService, featureToggleService, mapper);
 
-            when(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).thenReturn(true);
+            when(featureToggleService.isLocationWhiteListed(any())).thenReturn(true);
         }
 
         @Test
@@ -135,7 +135,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
                                                        true, true,
                                                        getOriginalStatusOfGeneralApplication()
                 );
-            when(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).thenReturn(false);
+            when(featureToggleService.isLocationWhiteListed(any())).thenReturn(false);
             when(helperService.updateApplicationLocationDetailsInClaim(any(), any())).thenReturn(caseData);
             CallbackParams params = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, caseData)
@@ -161,7 +161,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
                                                        true, true,
                                                        getOriginalStatusOfGeneralApplication()
                 );
-            when(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).thenReturn(false);
+            when(featureToggleService.isLocationWhiteListed(any())).thenReturn(false);
             when(helperService.updateApplicationLocationDetailsInClaim(any(), any())).thenReturn(caseData);
             CallbackParams params = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, caseData)
@@ -192,7 +192,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
                                                                    .region("2").build())
                 .generalApplications(gaApplications)
                 .build();
-            when(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).thenReturn(false);
+            when(featureToggleService.isLocationWhiteListed(any())).thenReturn(false);
             when(featureToggleService.isCuiGaNroEnabled()).thenReturn(false);
             when(helperService.updateApplicationLocationDetailsInClaim(any(), any())).thenReturn(caseData);
             CallbackParams params = CallbackParamsBuilder.builder()
@@ -226,7 +226,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
                                             .region("2").build())
                 .generalApplications(gaApplications)
                 .build();
-            when(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).thenReturn(false);
+            when(featureToggleService.isLocationWhiteListed(any())).thenReturn(false);
             when(featureToggleService.isCuiGaNroEnabled()).thenReturn(true);
             when(helperService.updateApplicationLocationDetailsInClaim(any(), any())).thenReturn(caseData);
             CallbackParams params = CallbackParamsBuilder.builder()
@@ -279,7 +279,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
                 CaseLocationCivil.builder().baseLocation("00000")
                     .region("2").build()).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            when(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).thenReturn(false);
+            when(featureToggleService.isLocationWhiteListed(any())).thenReturn(false);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getErrors()).isNull();
