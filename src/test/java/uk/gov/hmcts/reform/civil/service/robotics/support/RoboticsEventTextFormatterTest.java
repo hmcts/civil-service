@@ -46,6 +46,8 @@ class RoboticsEventTextFormatterTest {
             formatter.judgmentByAdmissionOffline(),
             formatter.onlyOneRespondentNotified(),
             formatter.claimantProceeds(),
+            formatter.defaultJudgmentRequestedOffline(),
+            formatter.defaultJudgmentGrantedOffline(),
             formatter.lipVsLrFullOrPartAdmissionReceived(),
             formatter.defendantFullyAdmits(),
             formatter.defendantPartialAdmission(),
@@ -55,14 +57,21 @@ class RoboticsEventTextFormatterTest {
             formatter.unregisteredDefendantSolicitorFirms(),
             formatter.unrepresentedAndUnregisteredDefendantSolicitorFirm(),
             formatter.claimantsProceed(),
+            formatter.claimantIntendsNotToProceed(),
             formatter.claimantsIntendNotToProceed(),
             formatter.onlyOneDefendantNotified(),
             formatter.caseTakenOfflineByStaff(),
             formatter.notSuitableForSdo(),
             formatter.judgementByAdmissionRequested(),
             formatter.claimDismissedAfterNoApplicantResponse(),
+            formatter.claimMovedOfflineAfterApplicantResponseDeadline(),
+            formatter.claimMovedOfflineAfterNocDeadline(),
             formatter.noDefendantSolicitorAppointed(),
-            formatter.multitrackUnspecOffline()
+            formatter.multitrackUnspecOffline(),
+            formatter.caseProceedsInCaseman(),
+            formatter.summaryJudgmentRequested(),
+            formatter.summaryJudgmentGranted(),
+            formatter.noticeOfChangeFiled()
         );
 
         var expected = List.of(
@@ -74,6 +83,8 @@ class RoboticsEventTextFormatterTest {
             "RPA Reason: Judgment by Admission requested and claim moved offline.",
             "RPA Reason: Only one of the respondent is notified.",
             "RPA Reason: Claimant proceeds.",
+            "RPA Reason: Default Judgment requested and claim moved offline.",
+            "RPA Reason: Default Judgment granted and claim moved offline.",
             "RPA Reason: LiP vs LR - full/part admission received.",
             "RPA Reason: Defendant fully admits.",
             "RPA Reason: Defendant partial admission.",
@@ -83,14 +94,21 @@ class RoboticsEventTextFormatterTest {
             "RPA Reason: Unregistered defendant solicitor firm(s).",
             "RPA Reason: Unrepresented defendant and unregistered defendant solicitor firm",
             "RPA Reason: Claimant(s) proceeds.",
-            "RPA Reason: Claimant(s) intends not to proceed.",
+            "RPA Reason: Claimant intends not to proceed.",
+            "RPA Reason: Claimants intend not to proceed.",
             "RPA Reason: Only one of the defendants is notified.",
             "RPA Reason: Case taken offline by staff.",
             "RPA Reason: Not suitable for SDO.",
             "RPA Reason: Judgement by Admission requested and claim moved offline.",
             "RPA Reason: Claim dismissed after no response from applicant past response deadline.",
+            "RPA Reason: Claim moved offline after no response from applicant past response deadline.",
+            "RPA Reason: Claim moved offline after defendant NoC deadline has passed",
             "RPA Reason: No Defendant Solicitor appointed.",
-            "RPA Reason:Multitrack Unspec going offline."
+            "RPA Reason:Multitrack Unspec going offline.",
+            "RPA Reason: Case Proceeds in Caseman.",
+            "RPA Reason: Summary judgment requested and referred to judge.",
+            "RPA Reason: Summary judgment granted and referred to judge.",
+            "RPA Reason: Notice of Change filed."
         );
 
         assertThat(actual)

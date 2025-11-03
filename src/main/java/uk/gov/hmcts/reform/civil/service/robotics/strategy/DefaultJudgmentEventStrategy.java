@@ -74,10 +74,10 @@ public class DefaultJudgmentEventStrategy implements EventHistoryStrategy {
     }
 
     private void addMiscellaneousEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData, boolean grantedFlag) {
-        String requested = textFormatter.withRpaPrefix("Default Judgment requested and claim moved offline.");
+        String requested = textFormatter.defaultJudgmentRequestedOffline();
         String granted = featureToggleService.isJOLiveFeedActive()
             ? RECORD_JUDGMENT
-            : textFormatter.withRpaPrefix("Default Judgment granted and claim moved offline.");
+            : textFormatter.defaultJudgmentGrantedOffline();
 
         String text = grantedFlag ? requested : granted;
         builder.miscellaneous(Event.builder()

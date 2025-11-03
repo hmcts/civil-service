@@ -62,6 +62,14 @@ public class RoboticsEventTextFormatter {
         return withRpaPrefix("Claimant proceeds.");
     }
 
+    public String defaultJudgmentRequestedOffline() {
+        return withRpaPrefix("Default Judgment requested and claim moved offline.");
+    }
+
+    public String defaultJudgmentGrantedOffline() {
+        return withRpaPrefix("Default Judgment granted and claim moved offline.");
+    }
+
     public String lipVsLrFullOrPartAdmissionReceived() {
         return withRpaPrefix("LiP vs LR - full/part admission received.");
     }
@@ -98,8 +106,12 @@ public class RoboticsEventTextFormatter {
         return withRpaPrefix("Claimant(s) proceeds.");
     }
 
+    public String claimantIntendsNotToProceed() {
+        return withRpaPrefix("Claimant intends not to proceed.");
+    }
+
     public String claimantsIntendNotToProceed() {
-        return withRpaPrefix("Claimant(s) intends not to proceed.");
+        return withRpaPrefix("Claimants intend not to proceed.");
     }
 
     public String onlyOneDefendantNotified() {
@@ -122,6 +134,14 @@ public class RoboticsEventTextFormatter {
         return withRpaPrefix("Claim dismissed after no response from applicant past response deadline.");
     }
 
+    public String claimMovedOfflineAfterApplicantResponseDeadline() {
+        return withRpaPrefix("Claim moved offline after no response from applicant past response deadline.");
+    }
+
+    public String claimMovedOfflineAfterNocDeadline() {
+        return withRpaPrefix("Claim moved offline after defendant NoC deadline has passed");
+    }
+
     public String noDefendantSolicitorAppointed() {
         return withRpaPrefix("No Defendant Solicitor appointed.");
     }
@@ -136,6 +156,14 @@ public class RoboticsEventTextFormatter {
 
     public String inMediation() {
         return "IN MEDIATION";
+    }
+
+    public String summaryJudgmentRequested() {
+        return withRpaPrefix("Summary judgment requested and referred to judge.");
+    }
+
+    public String summaryJudgmentGranted() {
+        return withRpaPrefix("Summary judgment granted and referred to judge.");
     }
 
     public String unrepresentedDefendant(String prefix, String defendantName) {
@@ -155,6 +183,6 @@ public class RoboticsEventTextFormatter {
     }
 
     public String noticeOfChangeFiled() {
-        return "RPA Reason : Notice of Change filed.";
+        return withRpaPrefix("Notice of Change filed.");
     }
 }

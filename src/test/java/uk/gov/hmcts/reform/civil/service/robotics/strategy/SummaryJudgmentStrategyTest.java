@@ -22,9 +22,6 @@ import static org.mockito.Mockito.when;
 
 class SummaryJudgmentStrategyTest {
 
-    private static final String REQUESTED = "Summary judgment requested and referred to judge.";
-    private static final String GRANTED = "Summary judgment granted and referred to judge.";
-
     @Mock
     private RoboticsSequenceGenerator sequenceGenerator;
 
@@ -72,7 +69,7 @@ class SummaryJudgmentStrategyTest {
         assertThat(history.getMiscellaneous().get(0).getEventSequence()).isEqualTo(42);
         assertThat(history.getMiscellaneous().get(0).getEventCode()).isEqualTo(EventType.MISCELLANEOUS.getCode());
         assertThat(history.getMiscellaneous().get(0).getDateReceived()).isEqualTo(now);
-        String expectedMessage = formatter.withRpaPrefix(GRANTED);
+        String expectedMessage = formatter.summaryJudgmentGranted();
         assertThat(history.getMiscellaneous().get(0).getEventDetailsText()).isEqualTo(expectedMessage);
     }
 
@@ -97,7 +94,7 @@ class SummaryJudgmentStrategyTest {
         assertThat(history.getMiscellaneous()).hasSize(1);
         assertThat(history.getMiscellaneous().get(0).getEventSequence()).isEqualTo(42);
         assertThat(history.getMiscellaneous().get(0).getEventCode()).isEqualTo(EventType.MISCELLANEOUS.getCode());
-        String expected = formatter.withRpaPrefix(REQUESTED);
+        String expected = formatter.summaryJudgmentRequested();
         assertThat(history.getMiscellaneous().get(0).getEventDetailsText()).isEqualTo(expected);
     }
 }

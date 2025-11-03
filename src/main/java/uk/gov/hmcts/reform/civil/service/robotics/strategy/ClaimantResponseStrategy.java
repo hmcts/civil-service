@@ -192,8 +192,8 @@ public class ClaimantResponseStrategy implements EventHistoryStrategy {
 
     private void addNotProceedEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         String message = getMultiPartyScenario(caseData).equals(TWO_V_ONE)
-            ? textFormatter.withRpaPrefix("Claimants intend not to proceed.")
-            : textFormatter.withRpaPrefix("Claimant intends not to proceed.");
+            ? textFormatter.claimantsIntendNotToProceed()
+            : textFormatter.claimantIntendsNotToProceed();
 
         builder.miscellaneous(Event.builder()
             .eventSequence(sequenceGenerator.nextSequence(builder.build()))

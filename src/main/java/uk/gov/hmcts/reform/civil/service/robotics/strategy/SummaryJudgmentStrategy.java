@@ -19,9 +19,6 @@ import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsTimelineHelper
 @RequiredArgsConstructor
 public class SummaryJudgmentStrategy implements EventHistoryStrategy {
 
-    private static final String REQUESTED_MESSAGE = "Summary judgment requested and referred to judge.";
-    private static final String GRANTED_MESSAGE = "Summary judgment granted and referred to judge.";
-
     private final RoboticsSequenceGenerator sequenceGenerator;
     private final RoboticsEventTextFormatter textFormatter;
     private final RoboticsTimelineHelper timelineHelper;
@@ -51,8 +48,7 @@ public class SummaryJudgmentStrategy implements EventHistoryStrategy {
 
     private String resolveMessage(CaseData caseData) {
         boolean requested = caseData.getRespondent2() != null && !selectedLabelStartsWithBoth(caseData);
-        String template = requested ? REQUESTED_MESSAGE : GRANTED_MESSAGE;
-        return textFormatter.withRpaPrefix(template);
+        return requested ? textFormatter.summaryJudgmentRequested() : textFormatter.summaryJudgmentGranted();
     }
 
     private boolean selectedLabelStartsWithBoth(CaseData caseData) {

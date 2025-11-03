@@ -149,7 +149,7 @@ public class CaseEventTaskHandler extends BaseExternalTaskHandler {
                     textFormatter.notSuitableForSdo();
                 case FULL_ADMIT_AGREE_REPAYMENT, PART_ADMIT_AGREE_REPAYMENT, FULL_ADMIT_JUDGMENT_ADMISSION ->
                     textFormatter.judgementByAdmissionRequested();
-                case SPEC_DEFENDANT_NOC -> textFormatter.withRpaPrefix("Notice of Change filed.");
+                case SPEC_DEFENDANT_NOC -> textFormatter.noticeOfChangeFiled();
                 default -> {
                     log.info("Unexpected flow state {}", flowState.fullName());
                     yield null;

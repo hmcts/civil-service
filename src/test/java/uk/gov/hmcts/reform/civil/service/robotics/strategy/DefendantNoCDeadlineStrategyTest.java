@@ -30,7 +30,7 @@ class DefendantNoCDeadlineStrategyTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        when(textFormatter.withRpaPrefix("Claim moved offline after defendant NoC deadline has passed"))
+        when(textFormatter.claimMovedOfflineAfterNocDeadline())
             .thenReturn("RPA Reason: Claim moved offline after defendant NoC deadline has passed");
     }
 

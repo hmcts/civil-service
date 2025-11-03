@@ -37,7 +37,7 @@ public class DefendantNoCDeadlineStrategy implements EventHistoryStrategy {
             return;
         }
         LocalDateTime takenOfflineDate = requireNonNull(caseData.getTakenOfflineDate());
-        String details = textFormatter.withRpaPrefix("Claim moved offline after defendant NoC deadline has passed");
+        String details = textFormatter.claimMovedOfflineAfterNocDeadline();
         builder.miscellaneous(
             Event.builder()
                 .eventSequence(sequenceGenerator.nextSequence(builder.build()))

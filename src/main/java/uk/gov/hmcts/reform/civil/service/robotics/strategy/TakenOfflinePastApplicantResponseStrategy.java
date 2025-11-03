@@ -37,7 +37,7 @@ public class TakenOfflinePastApplicantResponseStrategy implements EventHistorySt
             return;
         }
 
-        String message = textFormatter.withRpaPrefix("Claim moved offline after no response from applicant past response deadline.");
+        String message = textFormatter.claimMovedOfflineAfterApplicantResponseDeadline();
         builder.miscellaneous(
             Event.builder()
                 .eventSequence(sequenceGenerator.nextSequence(builder.build()))

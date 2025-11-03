@@ -42,7 +42,7 @@ class TakenOfflinePastApplicantResponseStrategyTest {
         when(stateFlow.getStateHistory()).thenReturn(
             List.of(State.from(FlowState.Main.TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE.fullName()))
         );
-        when(textFormatter.withRpaPrefix("Claim moved offline after no response from applicant past response deadline."))
+        when(textFormatter.claimMovedOfflineAfterApplicantResponseDeadline())
             .thenReturn("RPA Reason: Claim moved offline after no response from applicant past response deadline.");
     }
 

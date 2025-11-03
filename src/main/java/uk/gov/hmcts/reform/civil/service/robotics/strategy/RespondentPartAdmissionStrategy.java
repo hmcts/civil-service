@@ -74,10 +74,10 @@ public class RespondentPartAdmissionStrategy implements EventHistoryStrategy {
             return;
         }
 
-        EventHistory existingHistory = builder.build();
+        List<Event> existingDirections = Optional.ofNullable(builder.build().getDirectionsQuestionnaireFiled())
+            .orElse(List.of());
         builder.clearDirectionsQuestionnaireFiled();
-        Optional.ofNullable(existingHistory.getDirectionsQuestionnaireFiled())
-            .orElse(List.of())
+        existingDirections
             .stream()
             .filter(event -> event.getEventCode() != null)
             .forEach(builder::directionsQuestionnaire);
@@ -104,14 +104,22 @@ public class RespondentPartAdmissionStrategy implements EventHistoryStrategy {
             ));
 
             if (defendant1v2SameSolicitorSameResponse.test(caseData)) {
-                LocalDateTime respondent2ResponseDate = resolveRespondent2ResponseDate(caseData);
-                builder.receiptOfPartAdmission(addReceiptOfPartAdmissionEvent(builder, respondent2ResponseDate, RESPONDENT2_ID));
-                addRespondentMisc(builder, caseData, caseData.getRespondent2(), false, respondent2ResponseDate);
-
+                builder.receiptOfPartAdmission(addReceiptOfPartAdmissionEvent(
+                    builder,
+                    resolveRespondent2ResponseDate(caseData),
+                    RESPONDENT2_ID
+                ));
+                addRespondentMisc(
+                    builder,
+                    caseData,
+                    caseData.getRespondent2(),
+                    false,
+                    resolveRespondent2ResponseDate(caseData)
+                );
                 builder.directionsQuestionnaire(addDirectionsQuestionnaireFiledEvent(
                     builder,
                     caseData,
-                    respondent2ResponseDate,
+                    resolveRespondent2ResponseDate(caseData),
                     RESPONDENT2_ID,
                     caseData.getRespondent1DQ(),
                     caseData.getRespondent2(),
