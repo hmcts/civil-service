@@ -19,6 +19,7 @@ public class CallbackParamsBuilder {
     private String pageId;
     private CaseData caseData;
     private BaseCaseData baseCaseData;
+    private boolean isGeneralApplicationCase;
 
     public static CallbackParamsBuilder builder() {
         return new CallbackParamsBuilder();
@@ -80,6 +81,11 @@ public class CallbackParamsBuilder {
         return this;
     }
 
+    public CallbackParamsBuilder isGeneralApplicationCase(boolean isGeneralApplicationCase) {
+        this.isGeneralApplicationCase = isGeneralApplicationCase;
+        return this;
+    }
+
     public CallbackParams build() {
         return CallbackParams.builder()
             .type(type)
@@ -89,6 +95,7 @@ public class CallbackParamsBuilder {
             .pageId(pageId)
             .caseData(caseData)
             .baseCaseData(baseCaseData)
+            .isGeneralApplicationCase(isGeneralApplicationCase)
             .build();
     }
 }
