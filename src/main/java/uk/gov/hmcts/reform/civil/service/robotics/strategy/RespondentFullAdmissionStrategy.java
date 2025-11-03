@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT2_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT_ID;
-import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildMiscEvent;
+import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildLipVsLrMiscEvent;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1ResponseExists;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1v2SameSolicitorSameResponse;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2ResponseExists;
@@ -92,8 +92,7 @@ public class RespondentFullAdmissionStrategy implements EventHistoryStrategy {
             return;
         }
 
-        String message = respondentResponseSupport.prepareRespondentResponseText(caseData, respondent, isRespondent1);
-        builder.miscellaneous(buildMiscEvent(builder, sequenceGenerator, message, responseDate));
+        respondentResponseSupport.addRespondentMiscEvent(builder, sequenceGenerator, caseData, respondent, isRespondent1, responseDate);
     }
 
     private void addLipVsLrMisc(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
@@ -101,8 +100,7 @@ public class RespondentFullAdmissionStrategy implements EventHistoryStrategy {
             return;
         }
 
-        String message = textFormatter.lipVsLrFullOrPartAdmissionReceived();
-        builder.miscellaneous(buildMiscEvent(builder, sequenceGenerator, message, timelineHelper.now()));
+        builder.miscellaneous(buildLipVsLrMiscEvent(builder, sequenceGenerator, textFormatter, timelineHelper));
     }
 
     private boolean hasFullAdmissionState(CaseData caseData) {

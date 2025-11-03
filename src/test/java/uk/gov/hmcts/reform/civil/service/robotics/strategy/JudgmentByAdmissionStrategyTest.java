@@ -149,7 +149,7 @@ class JudgmentByAdmissionStrategyTest {
     }
 
     @Test
-    void shouldPopulateClaimantInstalmentDetailsWhenLipEnabled() {
+    void populatesClaimantInstalmentDetailsWhenLipEnabled() {
         when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(31, 32);
@@ -201,7 +201,7 @@ class JudgmentByAdmissionStrategyTest {
     }
 
     @Test
-    void shouldUseDefendantSetDateWhenJoActive() {
+    void usesDefendantSetDateWhenJoActive() {
         when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(41, 42);
@@ -238,7 +238,7 @@ class JudgmentByAdmissionStrategyTest {
     }
 
     @Test
-    void shouldReturnFwCodeWhenJoActiveAndImmediatePayment() {
+    void returnsFwCodeWhenJoActiveAndImmediatePayment() {
         when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(51, 52);

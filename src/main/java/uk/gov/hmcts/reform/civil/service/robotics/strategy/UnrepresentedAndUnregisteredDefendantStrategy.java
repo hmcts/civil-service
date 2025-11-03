@@ -68,7 +68,7 @@ public class UnrepresentedAndUnregisteredDefendantStrategy implements EventHisto
                 index,
                 bodies.size(),
                 bodies.get(index),
-                (prefix, body) -> textFormatter.formatRpa("%s%s", prefix, body)
+                textFormatter::unrepresentedAndUnregisteredCombined
             ))
             .forEach(builder::miscellaneous);
     }

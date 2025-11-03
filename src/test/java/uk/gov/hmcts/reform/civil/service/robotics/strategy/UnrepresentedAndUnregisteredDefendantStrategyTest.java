@@ -50,10 +50,10 @@ class UnrepresentedAndUnregisteredDefendantStrategyTest {
         );
         when(timelineHelper.now()).thenReturn(LocalDateTime.of(2024, 3, 2, 10, 0));
         when(sequenceGenerator.nextSequence(any())).thenReturn(31, 32);
-        when(textFormatter.formatRpa("%s%s", "[1 of 2 - 2024-03-02] ",
+        when(textFormatter.unrepresentedAndUnregisteredCombined("[1 of 2 - 2024-03-02] ",
             "Unrepresented defendant and unregistered defendant solicitor firm. Unrepresented defendant: Resp One"))
             .thenReturn("RPA Reason: [1 of 2 - 2024-03-02] Unrepresented defendant and unregistered defendant solicitor firm. Unrepresented defendant: Resp One");
-        when(textFormatter.formatRpa("%s%s", "[2 of 2 - 2024-03-02] ",
+        when(textFormatter.unrepresentedAndUnregisteredCombined("[2 of 2 - 2024-03-02] ",
             "Unrepresented defendant and unregistered defendant solicitor firm. Unregistered defendant solicitor firm: Firm One"))
             .thenReturn("RPA Reason: [2 of 2 - 2024-03-02] Unrepresented defendant and unregistered defendant solicitor firm. Unregistered defendant solicitor firm: Firm One");
     }

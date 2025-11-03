@@ -84,7 +84,7 @@ class ClaimantResponseStrategyTest {
     }
 
     @Test
-    void shouldAddProceedEventsForUnspecClaim() {
+    void addsProceedEventsForUnspecClaim() {
         when(stateFlow.getStateHistory()).thenReturn(List.of(State.from(FlowState.Main.FULL_DEFENCE_PROCEED.fullName())));
 
         LocalDateTime applicantResponse = LocalDateTime.of(2024, 3, 18, 9, 0);
@@ -110,7 +110,7 @@ class ClaimantResponseStrategyTest {
     }
 
     @Test
-    void shouldAddNotProceedEvent() {
+    void addsNotProceedEvent() {
         when(stateFlow.getStateHistory()).thenReturn(List.of(State.from(FlowState.Main.FULL_DEFENCE_NOT_PROCEED.fullName())));
 
         CaseData caseData = CaseDataBuilder.builder()
@@ -132,7 +132,7 @@ class ClaimantResponseStrategyTest {
     }
 
     @Test
-    void shouldAddMediationTextsForSmallClaimMediationScenario() {
+    void addsMediationTextsForSmallClaimMediationScenario() {
         when(stateFlow.getStateHistory()).thenReturn(List.of(State.from(FlowState.Main.FULL_DEFENCE_PROCEED.fullName())));
 
         CaseData caseData = CaseDataBuilder.builder()
@@ -152,7 +152,7 @@ class ClaimantResponseStrategyTest {
     }
 
     @Test
-    void shouldAddMixedMultipartyTextsWhenOnlySecondApplicantProceeds() {
+    void addsMixedMultipartyTextsWhenOnlySecondApplicantProceeds() {
         when(stateFlow.getStateHistory()).thenReturn(List.of(State.from(FlowState.Main.FULL_DEFENCE_PROCEED.fullName())));
 
         CaseData caseData = CaseDataBuilder.builder()
@@ -178,7 +178,7 @@ class ClaimantResponseStrategyTest {
     }
 
     @Test
-    void shouldAddSpecDirectionsQuestionnaireEvents() {
+    void addsSpecDirectionsQuestionnaireEvents() {
         when(stateFlow.getStateHistory()).thenReturn(List.of(State.from(FlowState.Main.FULL_DEFENCE_PROCEED.fullName())));
 
         LocalDateTime applicantResponse = LocalDateTime.of(2024, 6, 12, 9, 30);
@@ -203,7 +203,7 @@ class ClaimantResponseStrategyTest {
     }
 
     @Test
-    void shouldUseMultipartyTextsWhenOnlyOneDefendantProceedsWithSameSolicitor() {
+    void usesMultipartyTextsWhenOnlyOneDefendantProceedsWithSameSolicitor() {
         when(stateFlow.getStateHistory()).thenReturn(List.of(State.from(FlowState.Main.FULL_DEFENCE_PROCEED.fullName())));
 
         CaseData caseData = CaseDataBuilder.builder()
@@ -233,7 +233,7 @@ class ClaimantResponseStrategyTest {
     }
 
     @Test
-    void shouldNotAddTakenOfflineWhenSmallClaimMediationOneVOne() {
+    void doesNotAddTakenOfflineWhenSmallClaimMediationOneVOne() {
         when(stateFlow.getStateHistory()).thenReturn(List.of(State.from(FlowState.Main.FULL_DEFENCE_PROCEED.fullName())));
 
         CaseData caseData = CaseDataBuilder.builder()

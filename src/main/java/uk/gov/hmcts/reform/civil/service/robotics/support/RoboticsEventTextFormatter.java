@@ -178,6 +178,10 @@ public class RoboticsEventTextFormatter {
         return formatRpa("[%d of 2 - %s] %s", index, date, body);
     }
 
+    public String unrepresentedAndUnregisteredCombined(String prefix, String body) {
+        return formatRpa("%s%s", prefix, body);
+    }
+
     public String caseProceedOffline(String reason) {
         return formatRpa("Case proceeds offline. %s", reason);
     }

@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextForma
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsRespondentResponseSupport;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenerator;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsTimelineHelper;
+import uk.gov.hmcts.reform.civil.service.robotics.support.StrategyTestDataFactory;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
@@ -153,10 +154,7 @@ class RespondentPartAdmissionStrategyTest {
 
     @Test
     void contributeAddsEventsForBothRespondentsWithDifferentSolicitors() {
-        CaseDataBuilder builder = CaseDataBuilder.builder();
-        builder.respondent1DQ();
-        builder.respondent2DQ();
-        CaseData caseData = builder
+        CaseData caseData = StrategyTestDataFactory.unspecTwoDefendantSolicitorsCase()
             .multiPartyClaimTwoDefendantSolicitors()
             .atStateBothRespondentsSameResponse(RespondentResponseType.PART_ADMISSION)
             .build();

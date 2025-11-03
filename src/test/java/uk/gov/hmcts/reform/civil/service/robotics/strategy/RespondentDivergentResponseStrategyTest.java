@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextForma
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsRespondentResponseSupport;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenerator;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsTimelineHelper;
+import uk.gov.hmcts.reform.civil.service.robotics.support.StrategyTestDataFactory;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
@@ -183,7 +184,7 @@ class RespondentDivergentResponseStrategyTest {
     }
 
     @Test
-    void shouldAddStatesPaidWhenRespondentPaysInFull() {
+    void addsStatesPaidWhenRespondentPaysInFull() {
         when(stateFlow.getStateHistory()).thenReturn(List.of(
             State.from(FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName())
         ));
@@ -211,7 +212,7 @@ class RespondentDivergentResponseStrategyTest {
     }
 
     @Test
-    void shouldNotAddMiscForSpecFullDefenceWhenGoingOffline() {
+    void doesNotAddMiscForSpecFullDefenceWhenGoingOffline() {
         when(stateFlow.getStateHistory()).thenReturn(List.of(
             State.from(FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName()),
             State.from(FlowState.Main.DIVERGENT_RESPOND_GO_OFFLINE.fullName())
@@ -240,7 +241,7 @@ class RespondentDivergentResponseStrategyTest {
     }
 
     @Test
-    void shouldUseRespondent1ResponseDateWhenSameSolicitor() {
+    void usesRespondent1ResponseDateWhenSameSolicitor() {
         when(stateFlow.getStateHistory()).thenReturn(List.of(
             State.from(FlowState.Main.DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE.fullName())
         ));
@@ -275,13 +276,7 @@ class RespondentDivergentResponseStrategyTest {
     }
 
     private CaseData createUnspecDivergentCase() {
-        CaseDataBuilder builder = CaseDataBuilder.builder();
-        builder.respondent1DQ();
-        builder.respondent2DQ();
-        builder.multiPartyClaimTwoDefendantSolicitors();
-        builder.respondent1(PartyBuilder.builder().individual().build());
-        builder.respondent2(PartyBuilder.builder().individual().build());
-        return builder
+        return StrategyTestDataFactory.unspecTwoDefendantSolicitorsCase()
             .respondent1ClaimResponseType(RespondentResponseType.FULL_DEFENCE)
             .respondent2ClaimResponseType(RespondentResponseType.PART_ADMISSION)
             .respondent1ResponseDate(NOW)
@@ -290,11 +285,7 @@ class RespondentDivergentResponseStrategyTest {
     }
 
     private CaseData createSpecDivergentCase() {
-        CaseDataBuilder builder = CaseDataBuilder.builder();
-        builder.respondent1DQ();
-        builder.respondent2DQ();
-        builder.setClaimTypeToSpecClaim();
-        builder.multiPartyClaimTwoDefendantSolicitorsSpec();
+        CaseDataBuilder builder = StrategyTestDataFactory.specTwoDefendantSolicitorsCase();
         Party respondent1 = PartyBuilder.builder().individual().build();
         Party respondent2 = PartyBuilder.builder().individual().build();
         builder.respondent1(respondent1);

@@ -5,7 +5,6 @@ import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.model.robotics.EventType;
-
 import java.time.LocalDateTime;
 import java.util.function.BiFunction;
 
@@ -88,5 +87,24 @@ public final class RoboticsEventSupport {
             .eventDetailsText(details)
             .eventDetails(EventDetails.builder().miscText(details).build())
             .build();
+    }
+
+    public static Event buildLipVsLrMiscEvent(EventHistory.EventHistoryBuilder builder,
+                                              RoboticsSequenceGenerator sequenceGenerator,
+                                              RoboticsEventTextFormatter textFormatter,
+                                              RoboticsTimelineHelper timelineHelper) {
+        return buildMiscEvent(
+            builder,
+            sequenceGenerator,
+            textFormatter.lipVsLrFullOrPartAdmissionReceived(),
+            timelineHelper.now()
+        );
+    }
+
+    public static void addRespondentMiscEvent(EventHistory.EventHistoryBuilder builder,
+                                              RoboticsSequenceGenerator sequenceGenerator,
+                                              String message,
+                                              LocalDateTime dateReceived) {
+        builder.miscellaneous(buildMiscEvent(builder, sequenceGenerator, message, dateReceived));
     }
 }

@@ -117,17 +117,20 @@ class CaseNotesStrategyTest {
     }
 
     @Test
-    void buildPayloadHandlesNullCaseNotes() throws Exception {
-        var method = CaseNotesStrategy.class.getDeclaredMethod("buildPayload", CaseNote.class);
-        method.setAccessible(true);
+    void contributeHandlesNullCaseNoteFields() {
+        CaseNote emptyNote = CaseNote.builder().build();
+        CaseData caseData = CaseDataBuilder.builder()
+            .build()
+            .toBuilder()
+            .caseNotes(wrapElements(emptyNote))
+            .build();
 
-        Object payload = method.invoke(strategy, new Object[]{null});
-        var messageAccessor = payload.getClass().getDeclaredMethod("message");
-        var createdOnAccessor = payload.getClass().getDeclaredMethod("createdOn");
-        messageAccessor.setAccessible(true);
-        createdOnAccessor.setAccessible(true);
+        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        strategy.contribute(builder, caseData, null);
 
-        assertThat(messageAccessor.invoke(payload)).isEqualTo("case note added: ");
-        assertThat(createdOnAccessor.invoke(payload)).isNull();
+        EventHistory history = builder.build();
+        assertThat(history.getMiscellaneous()).hasSize(1);
+        assertThat(history.getMiscellaneous().get(0).getEventDetailsText()).isEqualTo("case note added: ");
+        assertThat(history.getMiscellaneous().get(0).getDateReceived()).isNull();
     }
 }

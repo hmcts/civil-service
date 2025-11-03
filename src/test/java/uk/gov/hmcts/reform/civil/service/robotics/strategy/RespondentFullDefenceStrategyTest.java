@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextForma
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsRespondentResponseSupport;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenerator;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsTimelineHelper;
+import uk.gov.hmcts.reform.civil.service.robotics.support.StrategyTestDataFactory;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
@@ -200,8 +201,7 @@ class RespondentFullDefenceStrategyTest {
 
     @Test
     void contributeHandlesDifferentSolicitorsForRespondents() {
-        CaseData caseData = CaseDataBuilder.builder()
-            .multiPartyClaimTwoDefendantSolicitors()
+        CaseData caseData = StrategyTestDataFactory.unspecTwoDefendantSolicitorsCase()
             .atStateBothRespondentsSameResponse(FULL_DEFENCE)
             .build();
 
@@ -222,8 +222,7 @@ class RespondentFullDefenceStrategyTest {
 
     @Test
     void contributeAddsStatesPaidForSecondRespondentWhenDifferentSolicitorsAndPaid() {
-        CaseData baseCase = CaseDataBuilder.builder()
-            .multiPartyClaimTwoDefendantSolicitors()
+        CaseData baseCase = StrategyTestDataFactory.unspecTwoDefendantSolicitorsCase()
             .atStateBothRespondentsSameResponse(FULL_DEFENCE)
             .build();
 

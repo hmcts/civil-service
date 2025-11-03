@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.dq.DQ;
+import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 
 import java.time.LocalDateTime;
 
@@ -129,5 +130,24 @@ public class RoboticsRespondentResponseSupport {
         return caseData.getRespondent2ResponseDate() != null
             ? caseData.getRespondent2ResponseDate()
             : caseData.getRespondent1ResponseDate();
+    }
+
+    public LocalDateTime resolveRespondent2ActualOrFallbackDate(CaseData caseData) {
+        if (caseData == null) {
+            return null;
+        }
+        return caseData.getRespondent2ResponseDate() != null
+            ? caseData.getRespondent2ResponseDate()
+            : caseData.getRespondent1ResponseDate();
+    }
+
+    public void addRespondentMiscEvent(EventHistory.EventHistoryBuilder builder,
+                                       RoboticsSequenceGenerator sequenceGenerator,
+                                       CaseData caseData,
+                                       Party respondent,
+                                       boolean isRespondent1,
+                                       LocalDateTime dateReceived) {
+        String message = prepareRespondentResponseText(caseData, respondent, isRespondent1);
+        RoboticsEventSupport.addRespondentMiscEvent(builder, sequenceGenerator, message, dateReceived);
     }
 }

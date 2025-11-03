@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextForma
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsRespondentResponseSupport;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenerator;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsTimelineHelper;
+import uk.gov.hmcts.reform.civil.service.robotics.support.StrategyTestDataFactory;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
@@ -124,8 +125,7 @@ class RespondentFullAdmissionStrategyTest {
 
     @Test
     void contributeAddsEventsForBothRespondents() {
-        CaseData caseData = CaseDataBuilder.builder()
-            .multiPartyClaimTwoDefendantSolicitors()
+        CaseData caseData = StrategyTestDataFactory.unspecTwoDefendantSolicitorsCase()
             .atStateBothRespondentsSameResponse(RespondentResponseType.FULL_ADMISSION)
             .build();
 

@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
 import java.time.LocalDateTime;
 
-import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildMiscEvent;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1ResponseExists;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1v2SameSolicitorSameResponse;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2ResponseExists;
@@ -41,39 +40,40 @@ public class RespondentCounterClaimStrategy implements EventHistoryStrategy {
             return;
         }
 
-        LocalDateTime resolvedRespondent2Date = respondentResponseSupport.resolveRespondent2ResponseDate(caseData);
-        LocalDateTime respondent2ResponseDate = caseData.getRespondent2ResponseDate() != null
-            ? caseData.getRespondent2ResponseDate()
-            : resolvedRespondent2Date;
+        LocalDateTime respondent2ResponseDate = respondentResponseSupport.resolveRespondent2ActualOrFallbackDate(caseData);
 
         if (defendant1ResponseExists.test(caseData)) {
-            LocalDateTime respondent1ResponseDate = caseData.getRespondent1ResponseDate();
-            addMiscellaneous(
+            respondentResponseSupport.addRespondentMiscEvent(
                 builder,
-                respondent1ResponseDate,
-                respondentResponseSupport.prepareRespondentResponseText(caseData, caseData.getRespondent1(), true)
+                sequenceGenerator,
+                caseData,
+                caseData.getRespondent1(),
+                true,
+                caseData.getRespondent1ResponseDate()
             );
 
             if (defendant1v2SameSolicitorSameResponse.test(caseData)) {
-                addMiscellaneous(
+                respondentResponseSupport.addRespondentMiscEvent(
                     builder,
-                    respondent2ResponseDate,
-                    respondentResponseSupport.prepareRespondentResponseText(caseData, caseData.getRespondent2(), false)
+                    sequenceGenerator,
+                    caseData,
+                    caseData.getRespondent2(),
+                    false,
+                    respondent2ResponseDate
                 );
             }
         }
 
         if (defendant2ResponseExists.test(caseData)) {
-            addMiscellaneous(
+            respondentResponseSupport.addRespondentMiscEvent(
                 builder,
-                respondent2ResponseDate,
-                respondentResponseSupport.prepareRespondentResponseText(caseData, caseData.getRespondent2(), false)
+                sequenceGenerator,
+                caseData,
+                caseData.getRespondent2(),
+                false,
+                respondent2ResponseDate
             );
         }
-    }
-
-    private void addMiscellaneous(EventHistory.EventHistoryBuilder builder, LocalDateTime date, String message) {
-        builder.miscellaneous(buildMiscEvent(builder, sequenceGenerator, message, date));
     }
 
     private boolean hasCounterClaimState(CaseData caseData) {

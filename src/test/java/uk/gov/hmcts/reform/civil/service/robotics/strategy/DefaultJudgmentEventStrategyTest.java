@@ -26,7 +26,7 @@ import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextForma
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsPartyLookup;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenerator;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsTimelineHelper;
-import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.robotics.support.StrategyTestDataFactory;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -71,7 +71,7 @@ class DefaultJudgmentEventStrategyTest {
 
     @Test
     void supportsReturnsTrueWhenDefendantDetailsPresent() {
-        CaseData caseData = CaseDataBuilder.builder().getDefaultJudgment1v1Case();
+        CaseData caseData = StrategyTestDataFactory.defaultJudgment1v1Case();
         assertThat(strategy.supports(caseData)).isTrue();
     }
 
@@ -84,7 +84,7 @@ class DefaultJudgmentEventStrategyTest {
         lenient().when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(1, 2);
         when(partyLookup.respondentId(0)).thenReturn("002");
 
-        CaseData caseData = CaseDataBuilder.builder().getDefaultJudgment1v1Case();
+        CaseData caseData = StrategyTestDataFactory.defaultJudgment1v1Case();
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
         strategy.contribute(builder, caseData, null);
@@ -106,7 +106,7 @@ class DefaultJudgmentEventStrategyTest {
         lenient().when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(1);
         when(timelineHelper.now()).thenReturn(baseDate.atTime(10, 0));
 
-        CaseData caseData = CaseDataBuilder.builder().getDefaultJudgment1v2DivergentCase();
+        CaseData caseData = StrategyTestDataFactory.defaultJudgment1v2Case();
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
         strategy.contribute(builder, caseData, null);
@@ -126,7 +126,7 @@ class DefaultJudgmentEventStrategyTest {
         when(timelineHelper.now()).thenReturn(baseDate.atTime(12, 0));
         when(partyLookup.respondentId(0)).thenReturn("002");
 
-        CaseData caseData = CaseDataBuilder.builder().getDefaultJudgment1v1Case();
+        CaseData caseData = StrategyTestDataFactory.defaultJudgment1v1Case();
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
         strategy.contribute(builder, caseData, null);
@@ -138,7 +138,7 @@ class DefaultJudgmentEventStrategyTest {
     }
 
     @Test
-    void shouldCreateDefaultJudgmentEventsForBothRespondentsWhenBothSelected() {
+    void createsDefaultJudgmentEventsForBothRespondentsWhenBothSelected() {
         LocalDateTime now = LocalDate.of(2024, 2, 10).atTime(15, 30);
         when(timelineHelper.now()).thenReturn(now);
         when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
@@ -146,9 +146,7 @@ class DefaultJudgmentEventStrategyTest {
         when(partyLookup.respondentId(0)).thenReturn("002");
         when(partyLookup.respondentId(1)).thenReturn("003");
 
-        CaseData caseData = CaseDataBuilder.builder()
-            .getDefaultJudgment1v2DivergentCase()
-            .toBuilder()
+        CaseData caseData = StrategyTestDataFactory.defaultJudgment1v2Builder()
             .defendantDetailsSpec(DynamicList.builder()
                 .value(DynamicListElement.builder()
                     .label("Both defendants")
@@ -173,7 +171,7 @@ class DefaultJudgmentEventStrategyTest {
     }
 
     @Test
-    void shouldPopulateInstallmentDetailsFromClaimantPlanWhenLipEnabled() {
+    void populatesInstallmentDetailsFromClaimantPlanWhenLipEnabled() {
         LocalDateTime now = LocalDate.of(2024, 3, 5).atTime(9, 15);
         when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
@@ -181,9 +179,7 @@ class DefaultJudgmentEventStrategyTest {
         when(timelineHelper.now()).thenReturn(now);
         when(partyLookup.respondentId(0)).thenReturn("002");
 
-        CaseData caseData = CaseDataBuilder.builder()
-            .getDefaultJudgment1v1Case()
-            .toBuilder()
+        CaseData caseData = StrategyTestDataFactory.defaultJudgment1v1Builder()
             .applicant1Represented(YesOrNo.NO)
             .caseDataLiP(CaseDataLiP.builder()
                 .applicant1LiPResponse(ClaimantLiPResponse.builder()
@@ -211,7 +207,7 @@ class DefaultJudgmentEventStrategyTest {
     }
 
     @Test
-    void shouldUseClaimantRequestedSetDateWhenCourtDecisionSupports() {
+    void usesClaimantRequestedSetDateWhenCourtDecisionSupports() {
         LocalDate requestedPaymentDate = LocalDate.of(2024, 6, 20);
         LocalDateTime now = LocalDate.of(2024, 4, 18).atTime(11, 0);
         when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
@@ -219,9 +215,7 @@ class DefaultJudgmentEventStrategyTest {
         when(timelineHelper.now()).thenReturn(now);
         when(partyLookup.respondentId(0)).thenReturn("002");
 
-        CaseData caseData = CaseDataBuilder.builder()
-            .getDefaultJudgment1v1Case()
-            .toBuilder()
+        CaseData caseData = StrategyTestDataFactory.defaultJudgment1v1Builder()
             .caseDataLiP(CaseDataLiP.builder()
                 .applicant1LiPResponse(ClaimantLiPResponse.builder()
                     .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)
@@ -243,7 +237,7 @@ class DefaultJudgmentEventStrategyTest {
     }
 
     @Test
-    void shouldUseApplicantImmediateDateWhenCourtDecisionSupports() {
+    void usesApplicantImmediateDateWhenCourtDecisionSupports() {
         LocalDate immediateDate = LocalDate.of(2024, 7, 10);
         LocalDateTime now = LocalDate.of(2024, 7, 1).atTime(8, 30);
         when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
@@ -251,9 +245,7 @@ class DefaultJudgmentEventStrategyTest {
         when(timelineHelper.now()).thenReturn(now);
         when(partyLookup.respondentId(0)).thenReturn("002");
 
-        CaseData caseData = CaseDataBuilder.builder()
-            .getDefaultJudgment1v1Case()
-            .toBuilder()
+        CaseData caseData = StrategyTestDataFactory.defaultJudgment1v1Builder()
             .caseDataLiP(CaseDataLiP.builder()
                 .applicant1LiPResponse(ClaimantLiPResponse.builder()
                     .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)
@@ -272,16 +264,14 @@ class DefaultJudgmentEventStrategyTest {
     }
 
     @Test
-    void shouldUseRespondentRepaymentPlanWhenCourtDecisionNotInFavour() {
+    void usesRespondentRepaymentPlanWhenCourtDecisionNotInFavour() {
         LocalDateTime now = LocalDate.of(2024, 8, 1).atTime(9, 0);
         when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
         lenient().when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(1, 2);
         when(timelineHelper.now()).thenReturn(now);
         when(partyLookup.respondentId(0)).thenReturn("002");
 
-        CaseData caseData = CaseDataBuilder.builder()
-            .getDefaultJudgment1v1Case()
-            .toBuilder()
+        CaseData caseData = StrategyTestDataFactory.defaultJudgment1v1Builder()
             .paymentTypeSelection(DJPaymentTypeSelection.REPAYMENT_PLAN)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
             .respondent1RepaymentPlan(RepaymentPlanLRspec.builder()
@@ -301,15 +291,13 @@ class DefaultJudgmentEventStrategyTest {
     }
 
     @Test
-    void shouldMapMonthlyRepaymentFrequencyToMth() {
+    void mapsMonthlyRepaymentFrequencyToMth() {
         LocalDateTime now = LocalDate.of(2024, 9, 1).atTime(10, 0);
         when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
         when(timelineHelper.now()).thenReturn(now);
         when(partyLookup.respondentId(0)).thenReturn("002");
 
-        CaseData caseData = CaseDataBuilder.builder()
-            .getDefaultJudgment1v1Case()
-            .toBuilder()
+        CaseData caseData = StrategyTestDataFactory.defaultJudgment1v1Builder()
             .caseDataLiP(CaseDataLiP.builder()
                 .applicant1LiPResponse(ClaimantLiPResponse.builder()
                     .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)
@@ -330,7 +318,7 @@ class DefaultJudgmentEventStrategyTest {
     }
 
     @Test
-    void shouldUseJoCreatedDateWhenFeedActiveAndDatePresent() {
+    void usesJoCreatedDateWhenFeedActiveAndDatePresent() {
         LocalDateTime jolDate = LocalDateTime.of(2024, 10, 5, 14, 45);
         LocalDateTime now = LocalDateTime.of(2024, 10, 6, 9, 0);
         when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
@@ -338,9 +326,7 @@ class DefaultJudgmentEventStrategyTest {
         when(timelineHelper.now()).thenReturn(now);
         when(partyLookup.respondentId(0)).thenReturn("002");
 
-        CaseData caseData = CaseDataBuilder.builder()
-            .getDefaultJudgment1v1Case()
-            .toBuilder()
+        CaseData caseData = StrategyTestDataFactory.defaultJudgment1v1Builder()
             .joDJCreatedDate(jolDate)
             .build();
 
