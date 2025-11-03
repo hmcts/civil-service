@@ -17,7 +17,6 @@ import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.GASolicitorDetailsGAspec;
-import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
 import java.util.HashMap;
 import java.util.List;
@@ -44,7 +43,7 @@ public class GeneralApplicationCreationNotificationService implements Notificati
     private final NotificationsProperties notificationProperties;
 
     private final CaseDetailsConverter caseDetailsConverter;
-    private final CoreCaseDataService coreCaseDataService;
+    private final GaCoreCaseDataService coreCaseDataService;
     private final GaForLipService gaForLipService;
 
     private final SolicitorEmailValidation solicitorEmailValidation;
@@ -74,13 +73,16 @@ public class GeneralApplicationCreationNotificationService implements Notificati
             List<Element<GASolicitorDetailsGAspec>> respondentSolicitor = updatedCaseData
                 .getGeneralAppRespondentSolicitors();
 
-            respondentSolicitor
-                .forEach((RS) ->
-                             sendNotificationToGeneralAppRespondent(updatedCaseData,
-                                                                    civilCaseData,
-                                                                    RS.getValue().getEmail(),
-                                     getTemplate(updatedCaseData, false, civilCaseData)
-                             ));
+            respondentSolicitor.forEach(rs -> {
+                if (rs != null && rs.getValue() != null && rs.getValue().getEmail() != null) {
+                    sendNotificationToGeneralAppRespondent(
+                        updatedCaseData,
+                        civilCaseData,
+                        rs.getValue().getEmail(),
+                        getTemplate(updatedCaseData, false, civilCaseData)
+                    );
+                }
+            });
         }
 
         /*
@@ -96,13 +98,16 @@ public class GeneralApplicationCreationNotificationService implements Notificati
             List<Element<GASolicitorDetailsGAspec>> respondentSolicitor = updatedCaseData
                 .getGeneralAppRespondentSolicitors();
 
-            respondentSolicitor
-                .forEach((RS) ->
-                             sendNotificationToGeneralAppRespondent(
-                                 updatedCaseData,
-                                 civilCaseData,
-                                 RS.getValue().getEmail(),
-                                 getTemplate(updatedCaseData, true, civilCaseData)));
+            respondentSolicitor.forEach(rs -> {
+                if (rs != null && rs.getValue() != null && rs.getValue().getEmail() != null) {
+                    sendNotificationToGeneralAppRespondent(
+                        updatedCaseData,
+                        civilCaseData,
+                        rs.getValue().getEmail(),
+                        getTemplate(updatedCaseData, true, civilCaseData)
+                    );
+                }
+            });
         }
 
         return caseData;

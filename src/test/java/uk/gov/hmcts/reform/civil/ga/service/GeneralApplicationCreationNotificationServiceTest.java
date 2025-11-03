@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.notification.NotificationDataGA;
@@ -33,7 +34,6 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GASolicitorDetailsGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
-import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -74,7 +74,7 @@ public class GeneralApplicationCreationNotificationServiceTest {
     private CaseDetailsConverter caseDetailsConverter;
 
     @MockBean
-    private CoreCaseDataService coreCaseDataService;
+    private GaCoreCaseDataService coreCaseDataService;
 
     @MockBean
     private NotificationsProperties notificationsProperties;
@@ -89,8 +89,8 @@ public class GeneralApplicationCreationNotificationServiceTest {
     private static final String PROCESS_INSTANCE_ID = "1";
     private static final String DUMMY_EMAIL = "hmcts.civil@gmail.com";
     private static final String PARTY_REFERENCE = "Claimant Reference: Not provided - Defendant Reference: Not provided";
-    private static final LocalDateTime DUMMY_DATE = LocalDateTime.of(2022, 02, 15, 12, 00, 00);
-    public static LocalDateTime NOTIFICATION_DEADLINE = LocalDateTime.of(2022, 02, 15, 12, 00, 00);
+    private static final LocalDateTime DUMMY_DATE = LocalDateTime.of(2022, 2, 15, 12, 0, 0);
+    public static LocalDateTime NOTIFICATION_DEADLINE = LocalDateTime.of(2022, 2, 15, 12, 0, 0);
 
     @Nested
     class AboutToSubmitCallback {
@@ -102,7 +102,7 @@ public class GeneralApplicationCreationNotificationServiceTest {
             when(notificationsProperties.getUrgentGeneralAppRespondentEmailTemplate())
                 .thenReturn("general-application-respondent-template-id");
             when(notificationsProperties.getLipGeneralAppRespondentEmailTemplate())
-                    .thenReturn("general-application-respondent-template-lip-id");
+                .thenReturn("general-application-respondent-template-lip-id");
             when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             when(notificationsProperties.getLipGeneralAppRespondentEmailTemplateInWelsh())
                 .thenReturn("general-application-respondent-welsh-template-lip-id");
@@ -135,13 +135,103 @@ public class GeneralApplicationCreationNotificationServiceTest {
         }
 
         @Test
+        void notificationShouldSendIfGa_Urgent_WithNoticeAndFreeFeeV2() {
+            GeneralApplicationCaseData caseData = getCaseData(true).toBuilder()
+                .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(YES).build())
+                .generalAppPBADetails(GAPbaDetails.builder().fee(Fee.builder().code("FREE").build()).build())
+                .generalAppRespondentSolicitors(List.of())
+                .build();
+
+            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().ccdState(CaseState.CASE_PROGRESSION).build());
+            when(solicitorEmailValidation
+                     .validateSolicitorEmail(any(), any()))
+                .thenReturn(caseData);
+            gaNotificationService.sendNotification(caseData);
+            verifyNoInteractions(notificationService);
+        }
+
+        @Test
+        void notificationShouldSendIfGa_Urgent_WithNoticeAndFreeFeeV2Null() {
+            GeneralApplicationCaseData caseData = getCaseData(true).toBuilder()
+                .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(YES).build())
+                .generalAppPBADetails(GAPbaDetails.builder().fee(Fee.builder().code("FREE").build()).build())
+                .generalAppRespondentSolicitors(null)
+                .build();
+
+            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().ccdState(CaseState.CASE_PROGRESSION).build());
+            when(solicitorEmailValidation
+                     .validateSolicitorEmail(any(), any()))
+                .thenReturn(caseData);
+            gaNotificationService.sendNotification(caseData);
+            verifyNoInteractions(notificationService);
+        }
+
+        @Test
+        void notificationShouldSendIfGa_Urgent_WithNoticeAndFreeFeeV2OneSolAvailable() {
+
+            List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
+
+            GASolicitorDetailsGAspec respondent1 = GASolicitorDetailsGAspec.builder().id("id")
+                .email(DUMMY_EMAIL).organisationIdentifier("2").forename("LipF").surname(Optional.of("LipS")).build();
+
+            GASolicitorDetailsGAspec respondent2 = GASolicitorDetailsGAspec.builder().id("id").build();
+
+            respondentSols.add(element(respondent1));
+            respondentSols.add(element(respondent2));
+
+            GeneralApplicationCaseData caseData = getCaseData(true).toBuilder()
+                .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(YES).build())
+                .generalAppPBADetails(GAPbaDetails.builder().fee(Fee.builder().code("FREE").build()).build())
+                .generalAppRespondentSolicitors(respondentSols)
+                .build();
+
+            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().ccdState(CaseState.CASE_PROGRESSION).build());
+            when(solicitorEmailValidation
+                     .validateSolicitorEmail(any(), any()))
+                .thenReturn(caseData);
+            gaNotificationService.sendNotification(caseData);
+            verify(notificationService).sendMail(
+                any(), any(), any(), any()
+            );
+        }
+
+        @Test
+        void notificationShouldSendIfGa_NonUrgent_WithNoticeAndFreeFeeV2OneSolAvailable() {
+
+            List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
+
+            GASolicitorDetailsGAspec respondent1 = GASolicitorDetailsGAspec.builder().id("id")
+                .email(DUMMY_EMAIL).organisationIdentifier("2").forename("LipF").surname(Optional.of("LipS")).build();
+
+            GASolicitorDetailsGAspec respondent2 = GASolicitorDetailsGAspec.builder().id("id").build();
+
+            respondentSols.add(element(respondent1));
+            respondentSols.add(element(respondent2));
+
+            GeneralApplicationCaseData caseData = getCaseData(true).toBuilder()
+                .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(NO).build())
+                .generalAppPBADetails(GAPbaDetails.builder().fee(Fee.builder().code("FREE").build()).build())
+                .generalAppRespondentSolicitors(respondentSols)
+                .build();
+
+            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().ccdState(CaseState.CASE_PROGRESSION).build());
+            when(solicitorEmailValidation
+                     .validateSolicitorEmail(any(), any()))
+                .thenReturn(caseData);
+            gaNotificationService.sendNotification(caseData);
+            verify(notificationService).sendMail(
+                any(), any(), any(), any()
+            );
+        }
+
+        @Test
         void notificationShouldSendIfGa_Urgent_WithNoticeAndFeePaid() {
             GeneralApplicationCaseData caseData = getCaseData(true).toBuilder()
                 .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(YES).build())
                 .generalAppPBADetails(GAPbaDetails.builder()
                                           .fee(Fee.builder().code("PAID").build())
                                           .paymentDetails(PaymentDetails.builder().status(
-                    PaymentStatus.SUCCESS).build()).build())
+                                              PaymentStatus.SUCCESS).build()).build())
                 .build();
             when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().ccdState(CaseState.CASE_PROGRESSION).build());
             when(solicitorEmailValidation
@@ -187,23 +277,23 @@ public class GeneralApplicationCreationNotificationServiceTest {
         @Test
         void notificationShouldSendIfGa_Lip_WithNoticeAndFeePaid_defendantLipIsGaRespondent() {
             GeneralApplicationCaseData caseData = getCaseData(true).toBuilder()
-                    .isGaRespondentOneLip(YES)
+                .isGaRespondentOneLip(YES)
                 .parentClaimantIsApplicant(YES)
                 .ccdCaseReference(CASE_REFERENCE)
                 .generalAppPBADetails(GAPbaDetails.builder()
-                            .fee(Fee.builder().code("PAID").build())
-                            .paymentDetails(PaymentDetails.builder().status(
-                                    PaymentStatus.SUCCESS).build()).build())
-                    .build();
+                                          .fee(Fee.builder().code("PAID").build())
+                                          .paymentDetails(PaymentDetails.builder().status(
+                                              PaymentStatus.SUCCESS).build()).build())
+                .build();
             when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
                                                                       + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
             when(solicitorEmailValidation
-                    .validateSolicitorEmail(any(), any()))
-                    .thenReturn(caseData);
+                     .validateSolicitorEmail(any(), any()))
+                .thenReturn(caseData);
             when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().build());
             gaNotificationService.sendNotification(caseData);
             verify(notificationService, times(2)).sendMail(
-                    any(), eq("general-application-respondent-template-lip-id"), argumentCaptor.capture(), any()
+                any(), eq("general-application-respondent-template-lip-id"), argumentCaptor.capture(), any()
             );
             assertThat(argumentCaptor.getValue().get("respondentName")).isEqualTo("DEF");
             assertThat(argumentCaptor.getValue().get("ClaimantvDefendant")).isEqualTo("CL v DEF");
@@ -278,7 +368,7 @@ public class GeneralApplicationCreationNotificationServiceTest {
                 .thenReturn(caseData);
             GeneralApplicationCaseData claimRespondentResponseLan = GeneralApplicationCaseData.builder().respondentBilingualLanguagePreference(YES)
                 .respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage(
-                Language.BOTH.toString()).build()).build();
+                    Language.BOTH.toString()).build()).build();
             when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(claimRespondentResponseLan);
             gaNotificationService.sendNotification(caseData);
             verify(notificationService, times(2)).sendMail(
@@ -354,8 +444,7 @@ public class GeneralApplicationCreationNotificationServiceTest {
             properties.put(NotificationDataGA.WELSH_PHONE_CONTACT, "Ffôn: 0300 303 5174");
             properties.put(NotificationDataGA.SPEC_CONTACT, "Email: contactocmc@justice.gov.uk");
             if (isLip) {
-                properties.put(
-                    NotificationDataGA.SPEC_UNSPEC_CONTACT, "Email for Specified Claims: contactocmc@justice.gov.uk "
+                properties.put(NotificationDataGA.SPEC_UNSPEC_CONTACT, "Email for Specified Claims: contactocmc@justice.gov.uk "
                     + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
             } else {
                 properties.put(NotificationDataGA.SPEC_UNSPEC_CONTACT, RAISE_QUERY_LR);
