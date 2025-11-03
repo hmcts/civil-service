@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.migration;
 
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
@@ -31,5 +32,15 @@ public final class PartyDataMigrationUtils {
                 .value(transformer.apply(element.getValue()))
                 .build())
             .toList();
+    }
+
+    private <T> T updateIfExists(T newValue, T existingValue) {
+        if (newValue == null) {
+            return existingValue;
+        }
+        if (newValue instanceof String str && str.isBlank()) {
+            return existingValue;
+        }
+        return newValue;
     }
 }
