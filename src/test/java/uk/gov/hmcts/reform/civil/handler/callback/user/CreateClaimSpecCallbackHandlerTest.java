@@ -154,28 +154,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     public static final String REFERENCE_NUMBER = "000MC001";
 
-    public static final String LIP_CONFIRMATION_SCREEN = "<br />Your claim will not be issued"
-        + " until payment is confirmed."
-        + " Once payment is confirmed you will receive an email. The claim will then progress offline."
-        + "%n%nTo continue the claim you need to send the <a href=\"%s\" target=\"_blank\">sealed claim form</a>, "
-        + "a <a href=\"%s\" target=\"_blank\">response pack</a> and any supporting documents to "
-        + "the defendant within 4 months. "
-        + "%n%nOnce you have served the claim, send the Certificate of Service and supporting documents to the County"
-        + " Court Claims Centre.";
-
-    public static final String SPEC_LIP_CONFIRMATION_SCREEN = "<br />When the payment is confirmed your claim will be issued "
-        + "and youll be notified by email. The claim will then progress offline."
-        + "%n%nOnce the claim has been issued, you will need to serve the claim upon the "
-        + "defendant which must include a response pack"
-        + "%n%nYou will need to send the following:<ul style=\"margin-bottom : 0px;\"> <li> <a href=\"%s\" target=\"_blank\">sealed claim form</a> "
-        +
-        "</li><li><a href=\"%s\" target=\"_blank\">response pack</a></li><ul style=\"list-style-type:circle\"><li><a href=\"%s\" target=\"_blank\">N9A</a></li>"
-        + "<li><a href=\"%s\" target=\"_blank\">N9B</a></li></ul><li>and any supporting documents</li></ul>"
-        + "to the defendant within 4 months."
-        + "%n%nFollowing this, you will need to file a Certificate of Service and supporting documents "
-        + "to : <a href=\"mailto:contactocmc@justice.gov.uk\">contactocmc@justice.gov.uk</a>. The Certificate of Service form can be found here:"
-        + "%n%n<ul><li><a href=\"%s\" target=\"_blank\">N215</a></li></ul>";
-
     private final Organisation bulkOrganisation = Organisation.builder()
         .paymentAccount(List.of("12345", "98765"))
         .build();
