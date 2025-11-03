@@ -4,15 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.robotics.Event;
-import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
-import uk.gov.hmcts.reform.civil.model.robotics.EventType;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenerator;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildMiscEvent;
 
 @Component
 @Order(60)
@@ -34,33 +29,21 @@ public class RespondentLitigationFriendStrategy implements EventHistoryStrategy 
             return;
         }
 
-        List<Event> events = new ArrayList<>();
         if (caseData.getRespondent1LitigationFriendCreatedDate() != null) {
-            events.add(createEvent(
+            builder.miscellaneous(buildMiscEvent(
                 builder,
-                caseData.getRespondent1LitigationFriendCreatedDate(),
-                caseData.getRespondent1().getPartyName()
+                sequenceGenerator,
+                "Litigation friend added for respondent: " + caseData.getRespondent1().getPartyName(),
+                caseData.getRespondent1LitigationFriendCreatedDate()
             ));
         }
         if (caseData.getRespondent2LitigationFriendCreatedDate() != null) {
-            events.add(createEvent(
+            builder.miscellaneous(buildMiscEvent(
                 builder,
-                caseData.getRespondent2LitigationFriendCreatedDate(),
-                caseData.getRespondent2().getPartyName()
+                sequenceGenerator,
+                "Litigation friend added for respondent: " + caseData.getRespondent2().getPartyName(),
+                caseData.getRespondent2LitigationFriendCreatedDate()
             ));
         }
-
-        events.forEach(builder::miscellaneous);
-    }
-
-    private Event createEvent(EventHistory.EventHistoryBuilder builder, LocalDateTime createdDate, String partyName) {
-        String message = "Litigation friend added for respondent: " + partyName;
-        return Event.builder()
-            .eventSequence(sequenceGenerator.nextSequence(builder.build()))
-            .eventCode(EventType.MISCELLANEOUS.getCode())
-            .dateReceived(createdDate)
-            .eventDetailsText(message)
-            .eventDetails(EventDetails.builder().miscText(message).build())
-            .build();
     }
 }

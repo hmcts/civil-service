@@ -6,7 +6,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CaseNote;
-import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.model.robotics.EventType;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -118,13 +117,17 @@ class CaseNotesStrategyTest {
     }
 
     @Test
-    void buildEventHandlesNullCaseNotes() throws Exception {
-        var method = CaseNotesStrategy.class.getDeclaredMethod("buildEvent", CaseNote.class);
+    void buildPayloadHandlesNullCaseNotes() throws Exception {
+        var method = CaseNotesStrategy.class.getDeclaredMethod("buildPayload", CaseNote.class);
         method.setAccessible(true);
 
-        Event event = (Event) method.invoke(strategy, new Object[]{null});
+        Object payload = method.invoke(strategy, new Object[]{null});
+        var messageAccessor = payload.getClass().getDeclaredMethod("message");
+        var createdOnAccessor = payload.getClass().getDeclaredMethod("createdOn");
+        messageAccessor.setAccessible(true);
+        createdOnAccessor.setAccessible(true);
 
-        assertThat(event.getEventDetailsText()).isEqualTo("case note added: ");
-        assertThat(event.getDateReceived()).isNull();
+        assertThat(messageAccessor.invoke(payload)).isEqualTo("case note added: ");
+        assertThat(createdOnAccessor.invoke(payload)).isNull();
     }
 }

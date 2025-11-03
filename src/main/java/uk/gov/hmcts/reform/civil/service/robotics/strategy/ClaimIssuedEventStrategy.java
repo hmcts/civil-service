@@ -4,15 +4,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.robotics.Event;
-import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
-import uk.gov.hmcts.reform.civil.model.robotics.EventType;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenerator;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
+
+import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildMiscEvent;
 
 @Component
 @Order(5)
@@ -37,15 +36,12 @@ public class ClaimIssuedEventStrategy implements EventHistoryStrategy {
             return;
         }
 
-        Event event = Event.builder()
-            .eventSequence(sequenceGenerator.nextSequence(builder.build()))
-            .eventCode(EventType.MISCELLANEOUS.getCode())
-            .dateReceived(caseData.getIssueDate().atStartOfDay())
-            .eventDetailsText(CLAIM_ISSUED_TEXT)
-            .eventDetails(EventDetails.builder().miscText(CLAIM_ISSUED_TEXT).build())
-            .build();
-
-        builder.miscellaneous(event);
+        builder.miscellaneous(buildMiscEvent(
+            builder,
+            sequenceGenerator,
+            CLAIM_ISSUED_TEXT,
+            caseData.getIssueDate().atStartOfDay()
+        ));
     }
 
     private boolean hasClaimIssuedState(CaseData caseData) {

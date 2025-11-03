@@ -5,10 +5,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
-import uk.gov.hmcts.reform.civil.model.robotics.Event;
-import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
-import uk.gov.hmcts.reform.civil.model.robotics.EventType;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenerator;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsTimelineHelper;
@@ -19,6 +16,7 @@ import java.util.EnumSet;
 import java.util.Set;
 
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper.QUERIES_ON_CASE;
+import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildMiscEvent;
 
 @Component
 @Order(80)
@@ -52,15 +50,12 @@ public class CaseQueriesStrategy implements EventHistoryStrategy {
             ? caseData.getTakenOfflineDate()
             : timelineHelper.now();
 
-        builder.miscellaneous(
-            Event.builder()
-                .eventSequence(sequenceGenerator.nextSequence(builder.build()))
-                .eventCode(EventType.MISCELLANEOUS.getCode())
-                .dateReceived(dateReceived)
-                .eventDetailsText(QUERIES_ON_CASE)
-                .eventDetails(EventDetails.builder().miscText(QUERIES_ON_CASE).build())
-                .build()
-        );
+        builder.miscellaneous(buildMiscEvent(
+            builder,
+            sequenceGenerator,
+            QUERIES_ON_CASE,
+            dateReceived
+        ));
     }
 
     private boolean hasActiveQueries(CaseData caseData) {

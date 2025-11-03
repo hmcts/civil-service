@@ -4,16 +4,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.robotics.Event;
-import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
-import uk.gov.hmcts.reform.civil.model.robotics.EventType;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsManualOfflineSupport;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenerator;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
+
+import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildMiscEvent;
 
 @Component
 @Order(30)
@@ -38,15 +37,12 @@ public class TakenOfflineByStaffEventStrategy implements EventHistoryStrategy {
         }
 
         String details = manualOfflineSupport.prepareTakenOfflineEventDetails(caseData);
-        builder.miscellaneous(
-            Event.builder()
-                .eventSequence(sequenceGenerator.nextSequence(builder.build()))
-                .eventCode(EventType.MISCELLANEOUS.getCode())
-                .dateReceived(caseData.getTakenOfflineByStaffDate())
-                .eventDetailsText(details)
-                .eventDetails(EventDetails.builder().miscText(details).build())
-                .build()
-        );
+        builder.miscellaneous(buildMiscEvent(
+            builder,
+            sequenceGenerator,
+            details,
+            caseData.getTakenOfflineByStaffDate()
+        ));
     }
 
     private boolean hasTakenOfflineByStaffState(CaseData caseData) {

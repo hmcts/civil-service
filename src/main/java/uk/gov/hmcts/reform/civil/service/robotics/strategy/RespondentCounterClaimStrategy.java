@@ -4,10 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.robotics.Event;
-import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
-import uk.gov.hmcts.reform.civil.model.robotics.EventType;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsRespondentResponseSupport;
@@ -17,6 +14,7 @@ import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
 import java.time.LocalDateTime;
 
+import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildMiscEvent;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1ResponseExists;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1v2SameSolicitorSameResponse;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2ResponseExists;
@@ -43,17 +41,20 @@ public class RespondentCounterClaimStrategy implements EventHistoryStrategy {
             return;
         }
 
+        LocalDateTime resolvedRespondent2Date = respondentResponseSupport.resolveRespondent2ResponseDate(caseData);
+        LocalDateTime respondent2ResponseDate = caseData.getRespondent2ResponseDate() != null
+            ? caseData.getRespondent2ResponseDate()
+            : resolvedRespondent2Date;
+
         if (defendant1ResponseExists.test(caseData)) {
+            LocalDateTime respondent1ResponseDate = caseData.getRespondent1ResponseDate();
             addMiscellaneous(
                 builder,
-                caseData.getRespondent1ResponseDate(),
+                respondent1ResponseDate,
                 respondentResponseSupport.prepareRespondentResponseText(caseData, caseData.getRespondent1(), true)
             );
 
             if (defendant1v2SameSolicitorSameResponse.test(caseData)) {
-                LocalDateTime respondent2ResponseDate = caseData.getRespondent2ResponseDate() != null
-                    ? caseData.getRespondent2ResponseDate()
-                    : caseData.getRespondent1ResponseDate();
                 addMiscellaneous(
                     builder,
                     respondent2ResponseDate,
@@ -65,20 +66,14 @@ public class RespondentCounterClaimStrategy implements EventHistoryStrategy {
         if (defendant2ResponseExists.test(caseData)) {
             addMiscellaneous(
                 builder,
-                caseData.getRespondent2ResponseDate(),
+                respondent2ResponseDate,
                 respondentResponseSupport.prepareRespondentResponseText(caseData, caseData.getRespondent2(), false)
             );
         }
     }
 
     private void addMiscellaneous(EventHistory.EventHistoryBuilder builder, LocalDateTime date, String message) {
-        builder.miscellaneous(Event.builder()
-            .eventSequence(sequenceGenerator.nextSequence(builder.build()))
-            .eventCode(EventType.MISCELLANEOUS.getCode())
-            .dateReceived(date)
-            .eventDetailsText(message)
-            .eventDetails(EventDetails.builder().miscText(message).build())
-            .build());
+        builder.miscellaneous(buildMiscEvent(builder, sequenceGenerator, message, date));
     }
 
     private boolean hasCounterClaimState(CaseData caseData) {
@@ -88,4 +83,3 @@ public class RespondentCounterClaimStrategy implements EventHistoryStrategy {
             .anyMatch(FlowState.Main.COUNTER_CLAIM.fullName()::equals);
     }
 }
-

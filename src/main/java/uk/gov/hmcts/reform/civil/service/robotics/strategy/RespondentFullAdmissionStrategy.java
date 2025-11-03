@@ -59,16 +59,14 @@ public class RespondentFullAdmissionStrategy implements EventHistoryStrategy {
             addLipVsLrMisc(builder, caseData);
 
             if (defendant1v2SameSolicitorSameResponse.test(caseData)) {
-                LocalDateTime respondent2ResponseDate = caseData.getRespondent2ResponseDate() != null
-                    ? caseData.getRespondent2ResponseDate()
-                    : respondent1ResponseDate;
+                LocalDateTime respondent2ResponseDate = respondentResponseSupport.resolveRespondent2ResponseDate(caseData);
                 addReceiptOfAdmission(builder, respondent2ResponseDate, RESPONDENT2_ID);
                 addMiscellaneous(builder, caseData, caseData.getRespondent2(), false, respondent2ResponseDate);
             }
         }
 
         if (defendant2ResponseExists.test(caseData)) {
-            LocalDateTime respondent2ResponseDate = caseData.getRespondent2ResponseDate();
+            LocalDateTime respondent2ResponseDate = respondentResponseSupport.resolveRespondent2ResponseDate(caseData);
             addReceiptOfAdmission(builder, respondent2ResponseDate, RESPONDENT2_ID);
             addMiscellaneous(builder, caseData, caseData.getRespondent2(), false, respondent2ResponseDate);
         }

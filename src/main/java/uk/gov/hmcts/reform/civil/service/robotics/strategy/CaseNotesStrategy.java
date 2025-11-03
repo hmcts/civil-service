@@ -5,16 +5,15 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CaseNote;
-import uk.gov.hmcts.reform.civil.model.robotics.Event;
-import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
-import uk.gov.hmcts.reform.civil.model.robotics.EventType;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextFormatter;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenerator;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.apache.commons.lang3.StringUtils.left;
+import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildMiscEvent;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 
 @Component
@@ -41,23 +40,19 @@ public class CaseNotesStrategy implements EventHistoryStrategy {
 
         List<CaseNote> notes = unwrapElements(caseData.getCaseNotes());
         notes.stream()
-            .map(this::buildEvent)
-            .forEach(event -> builder.miscellaneous(event.toBuilder()
-                .eventSequence(sequenceGenerator.nextSequence(builder.build()))
-                .build()));
+            .map(this::buildPayload)
+            .forEach(payload -> builder.miscellaneous(buildMiscEvent(
+                builder,
+                sequenceGenerator,
+                payload.message(),
+                payload.createdOn()
+            )));
     }
 
-    private Event buildEvent(CaseNote caseNote) {
+    private NotePayload buildPayload(CaseNote caseNote) {
         String note = caseNote != null ? normalise(caseNote.getNote()) : "";
         String eventText = left(textFormatter.format(CASE_NOTE_TEMPLATE, note), MAX_TEXT_LENGTH);
-        return Event.builder()
-            .eventCode(EventType.MISCELLANEOUS.getCode())
-            .dateReceived(caseNote != null ? caseNote.getCreatedOn() : null)
-            .eventDetailsText(eventText)
-            .eventDetails(EventDetails.builder()
-                .miscText(eventText)
-                .build())
-            .build();
+        return new NotePayload(eventText, caseNote != null ? caseNote.getCreatedOn() : null);
     }
 
     private String normalise(String note) {
@@ -66,4 +61,6 @@ public class CaseNotesStrategy implements EventHistoryStrategy {
         }
         return note.replaceAll("\\s+", " ");
     }
+
+    private record NotePayload(String message, LocalDateTime createdOn) { }
 }

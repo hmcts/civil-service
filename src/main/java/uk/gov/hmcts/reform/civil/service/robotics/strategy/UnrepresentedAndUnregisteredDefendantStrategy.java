@@ -4,10 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.robotics.Event;
-import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
-import uk.gov.hmcts.reform.civil.model.robotics.EventType;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextFormatter;
@@ -18,11 +15,13 @@ import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.IntStream;
 
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREGISTERED;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREPRESENTED;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.getDefendantNames;
+import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildEnumeratedMiscEvent;
 
 @Component
 @Order(92)
@@ -49,42 +48,29 @@ public class UnrepresentedAndUnregisteredDefendantStrategy implements EventHisto
             return;
         }
 
-        String dateToken = timelineHelper.now().toLocalDate().toString();
         List<String> unrepresented = getDefendantNames(UNREPRESENTED, caseData);
         List<String> unregistered = getDefendantNames(UNREGISTERED, caseData);
         LocalDateTime submittedDate = caseData.getSubmittedDate();
 
-        String unrepresentedText = textFormatter.unrepresentedAndUnregistered(
-            1,
-            dateToken,
+        List<String> bodies = List.of(
             format("Unrepresented defendant and unregistered defendant solicitor firm. Unrepresented defendant: %s",
-                unrepresented.get(0))
-        );
-        String unregisteredText = textFormatter.unrepresentedAndUnregistered(
-            2,
-            dateToken,
+                unrepresented.get(0)),
             format("Unrepresented defendant and unregistered defendant solicitor firm. Unregistered defendant solicitor firm: %s",
                 unregistered.get(0))
         );
 
-        builder.miscellaneous(
-            Event.builder()
-                .eventSequence(sequenceGenerator.nextSequence(builder.build()))
-                .eventCode(EventType.MISCELLANEOUS.getCode())
-                .dateReceived(submittedDate)
-                .eventDetailsText(unrepresentedText)
-                .eventDetails(EventDetails.builder().miscText(unrepresentedText).build())
-                .build()
-        );
-        builder.miscellaneous(
-            Event.builder()
-                .eventSequence(sequenceGenerator.nextSequence(builder.build()))
-                .eventCode(EventType.MISCELLANEOUS.getCode())
-                .dateReceived(submittedDate)
-                .eventDetailsText(unregisteredText)
-                .eventDetails(EventDetails.builder().miscText(unregisteredText).build())
-                .build()
-        );
+        IntStream.range(0, bodies.size())
+            .mapToObj(index -> buildEnumeratedMiscEvent(
+                builder,
+                sequenceGenerator,
+                timelineHelper,
+                submittedDate,
+                index,
+                bodies.size(),
+                bodies.get(index),
+                (prefix, body) -> textFormatter.formatRpa("%s%s", prefix, body)
+            ))
+            .forEach(builder::miscellaneous);
     }
 
     private boolean hasState(CaseData caseData) {

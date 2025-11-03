@@ -4,10 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.robotics.Event;
-import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
-import uk.gov.hmcts.reform.civil.model.robotics.EventType;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextFormatter;
@@ -16,6 +13,7 @@ import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
 import static org.apache.commons.lang3.StringUtils.left;
+import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildMiscEvent;
 
 @Component
 @Order(33)
@@ -49,13 +47,12 @@ public class SdoNotDrawnStrategy implements EventHistoryStrategy {
             MAX_TEXT_LENGTH
         );
 
-        builder.miscellaneous(Event.builder()
-            .eventSequence(sequenceGenerator.nextSequence(builder.build()))
-            .eventCode(EventType.MISCELLANEOUS.getCode())
-            .dateReceived(caseData.getUnsuitableSDODate())
-            .eventDetailsText(message)
-            .eventDetails(EventDetails.builder().miscText(message).build())
-            .build());
+        builder.miscellaneous(buildMiscEvent(
+            builder,
+            sequenceGenerator,
+            message,
+            caseData.getUnsuitableSDODate()
+        ));
     }
 
     private boolean hasSdoNotDrawnState(CaseData caseData) {
