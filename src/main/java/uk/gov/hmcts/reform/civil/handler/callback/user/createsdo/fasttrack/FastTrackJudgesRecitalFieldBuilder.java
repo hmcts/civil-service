@@ -2,13 +2,12 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.createsdo.fasttrack;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.handler.callback.user.createsdo.SdoCaseFieldBuilder;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackJudgesRecital;
 
 @Slf4j
 @Component
-public class FastTrackJudgesRecitalFieldBuilder implements SdoCaseFieldBuilder {
+public class FastTrackJudgesRecitalFieldBuilder implements FastTrackCaseFieldBuilder {
 
     @Override
     public void build(CaseData.CaseDataBuilder<?, ?> updatedData) {

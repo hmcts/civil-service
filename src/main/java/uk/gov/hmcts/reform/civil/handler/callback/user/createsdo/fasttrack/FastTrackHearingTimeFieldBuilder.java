@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.createsdo.fasttrack;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.sdo.DateToShowToggle;
-import uk.gov.hmcts.reform.civil.handler.callback.user.createsdo.SdoCaseFieldBuilder;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
 
@@ -12,7 +11,7 @@ import java.util.List;
 
 @Slf4j
 @Component
-public class FastTrackHearingTimeFieldBuilder implements SdoCaseFieldBuilder {
+public class FastTrackHearingTimeFieldBuilder implements FastTrackCaseFieldBuilder {
 
     private final List<DateToShowToggle> dateToShowTrue = List.of(DateToShowToggle.SHOW);
 

@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createsdo.fasttrack.FastTrackCaseFieldBuilder;
 import uk.gov.hmcts.reform.civil.handler.callback.user.createsdo.fasttrack.FastTrackPopulator;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
@@ -18,7 +19,7 @@ import static org.mockito.Mockito.verify;
 class FastTrackPopulatorTest {
 
     @Mock
-    private List<SdoCaseFieldBuilder> fastTrackBuilders;
+    private List<FastTrackCaseFieldBuilder> fastTrackBuilders;
 
     @InjectMocks
     private FastTrackPopulator fastTrackPopulator;

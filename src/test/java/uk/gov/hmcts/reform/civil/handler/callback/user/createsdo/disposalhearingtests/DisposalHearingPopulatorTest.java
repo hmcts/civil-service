@@ -6,7 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.civil.handler.callback.user.createsdo.SdoCaseFieldBuilder;
+import uk.gov.hmcts.reform.civil.handler.callback.user.createsdo.disposalhearing.DisposalHearingCaseFieldBuilder;
 import uk.gov.hmcts.reform.civil.handler.callback.user.createsdo.disposalhearing.DisposalHearingPopulator;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class DisposalHearingPopulatorTest {
 
     @Mock
-    private List<SdoCaseFieldBuilder> sdoCaseFieldBuilder;
+    private List<DisposalHearingCaseFieldBuilder> sdoCaseFieldBuilder;
 
     @InjectMocks
     private DisposalHearingPopulator disposalHearingPopulator;

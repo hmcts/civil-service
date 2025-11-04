@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.enums.sdo.AddOrRemoveToggle;
-import uk.gov.hmcts.reform.civil.handler.callback.user.createsdo.SdoCaseFieldBuilder;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackCreditHire;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2FastTrackCreditHire;
@@ -17,7 +16,7 @@ import java.util.List;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class FastTrackCreditHireFieldBuilder implements SdoCaseFieldBuilder {
+public class FastTrackCreditHireFieldBuilder implements FastTrackCaseFieldBuilder {
 
     static final String WITNESS_STATEMENT_STRING = "This witness statement is limited to 10 pages per party, including any appendices.";
     static final String LATER_THAN_FOUR_PM_STRING = "later than 4pm on";

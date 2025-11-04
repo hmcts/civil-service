@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.createsdo.fasttrack;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackTrialBundleType;
-import uk.gov.hmcts.reform.civil.handler.callback.user.createsdo.SdoCaseFieldBuilder;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackTrial;
 
@@ -12,7 +11,7 @@ import java.util.Collections;
 
 @Slf4j
 @Component
-public class FastTrackTrialFieldBuilder implements SdoCaseFieldBuilder {
+public class FastTrackTrialFieldBuilder implements FastTrackCaseFieldBuilder {
 
     @Override
     public void build(CaseData.CaseDataBuilder<?, ?> updatedData) {

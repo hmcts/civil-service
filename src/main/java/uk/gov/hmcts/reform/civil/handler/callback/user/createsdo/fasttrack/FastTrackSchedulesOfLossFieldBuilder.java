@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
-import uk.gov.hmcts.reform.civil.handler.callback.user.createsdo.SdoCaseFieldBuilder;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackSchedulesOfLoss;
 
@@ -13,7 +12,7 @@ import java.time.LocalDate;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class FastTrackSchedulesOfLossFieldBuilder implements SdoCaseFieldBuilder {
+public class FastTrackSchedulesOfLossFieldBuilder implements FastTrackCaseFieldBuilder {
 
     private final WorkingDayIndicator workingDayIndicator;
 

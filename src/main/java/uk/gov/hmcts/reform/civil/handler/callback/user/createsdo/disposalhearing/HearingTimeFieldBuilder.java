@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.createsdo.disposalhearin
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.handler.callback.user.createsdo.SdoCaseFieldBuilder;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingTime;
 
@@ -10,7 +9,7 @@ import java.time.LocalDate;
 
 @Slf4j
 @Component
-public class HearingTimeFieldBuilder implements SdoCaseFieldBuilder {
+public class HearingTimeFieldBuilder implements DisposalHearingCaseFieldBuilder {
 
     @Override
     public void build(CaseData.CaseDataBuilder<?, ?> updatedData) {

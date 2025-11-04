@@ -2,13 +2,12 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.createsdo.disposalhearin
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.handler.callback.user.createsdo.SdoCaseFieldBuilder;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
 
 @Slf4j
 @Component
-public class HearingBundleFieldBuilder implements SdoCaseFieldBuilder {
+public class HearingBundleFieldBuilder implements DisposalHearingCaseFieldBuilder {
 
     @Override
     public void build(CaseData.CaseDataBuilder<?, ?> updatedData) {

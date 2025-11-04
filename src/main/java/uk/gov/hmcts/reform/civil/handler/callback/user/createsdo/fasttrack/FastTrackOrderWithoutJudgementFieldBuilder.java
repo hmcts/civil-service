@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.createsdo.fasttrack;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.handler.callback.user.createsdo.SdoCaseFieldBuilder;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackOrderWithoutJudgement;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
@@ -15,7 +14,7 @@ import java.util.Locale;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class FastTrackOrderWithoutJudgementFieldBuilder implements SdoCaseFieldBuilder {
+public class FastTrackOrderWithoutJudgementFieldBuilder implements FastTrackCaseFieldBuilder {
 
     private final DeadlinesCalculator deadlinesCalculator;
 

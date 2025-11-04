@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.createsdo.disposalhearin
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.handler.callback.user.createsdo.SdoCaseFieldBuilder;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingJudgementDeductionValue;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackJudgementDeductionValue;
@@ -18,7 +17,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class DisposalHearingPopulator {
 
-    private final List<SdoCaseFieldBuilder> disposalHearingBuilders;
+    private final List<DisposalHearingCaseFieldBuilder> disposalHearingBuilders;
 
     public void setDisposalHearingFields(CaseData.CaseDataBuilder<?, ?> updatedData, CaseData caseData) {
         log.info("Setting disposal hearing fields for caseId: {}", caseData.getCcdCaseReference());
