@@ -250,8 +250,7 @@ public class ParentCaseUpdateHelper {
         if (generalAppCaseData.getParentClaimantIsApplicant().equals(YES)) {
             return CLAIMANT_ROLE;
         }
-        if (featureToggleService.isGaForLipsEnabled()
-            && generalAppCaseData.getIsGaApplicantLip() == YES) {
+        if (generalAppCaseData.getIsGaApplicantLip() == YES) {
             return RESPONDENTSOL_ROLE;
         }
         String creatorId = generalAppCaseData.getGeneralAppApplnSolicitor().getOrganisationIdentifier();

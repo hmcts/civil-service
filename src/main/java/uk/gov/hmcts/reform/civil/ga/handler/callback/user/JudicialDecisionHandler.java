@@ -55,7 +55,6 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
@@ -227,7 +226,6 @@ public class JudicialDecisionHandler extends CallbackHandler implements GeneralA
     private final GaForLipService gaForLipService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final CoreCaseDataService coreCaseDataService;
-    private final FeatureToggleService featureToggleService;
 
     public static String getAllPartyNames(GeneralApplicationCaseData caseData) {
         return format(
@@ -521,7 +519,7 @@ public class JudicialDecisionHandler extends CallbackHandler implements GeneralA
         if (caseData.getGeneralAppType() == null) {
             return false;
         }
-        List<GeneralApplicationTypes> validGATypes = Arrays.asList(STAY_THE_CLAIM);
+        List<GeneralApplicationTypes> validGATypes = List.of(STAY_THE_CLAIM);
         return caseData.getGeneralAppType().getTypes().stream().anyMatch(validGATypes::contains);
     }
 
@@ -532,7 +530,7 @@ public class JudicialDecisionHandler extends CallbackHandler implements GeneralA
         if (caseData.getGeneralAppType() == null) {
             return false;
         }
-        List<GeneralApplicationTypes> validGATypes = Arrays.asList(UNLESS_ORDER);
+        List<GeneralApplicationTypes> validGATypes = List.of(UNLESS_ORDER);
         return caseData.getGeneralAppType().getTypes().stream().anyMatch(validGATypes::contains);
     }
 
@@ -598,7 +596,7 @@ public class JudicialDecisionHandler extends CallbackHandler implements GeneralA
             caseDataBuilder
                 .judicialDecisionMakeOrder(makeAnOrderBuilder(caseData, callbackParams).build());
 
-            CaseDocument judgeDecision = null;
+            CaseDocument judgeDecision;
             if (judicialDecisionMakeOrder.getOrderText() != null
                 && judicialDecisionMakeOrder.getMakeAnOrder().equals(APPROVE_OR_EDIT)) {
                 judgeDecision = generalOrderGenerator.generate(
@@ -711,9 +709,9 @@ public class JudicialDecisionHandler extends CallbackHandler implements GeneralA
                                                               LocalDateTime.now(),
                                                               21
                                                           )).build());
-        if (featureToggleService.isGaForLipsEnabled()) {
-            caseDataBuilder.bilingualHint(setBilingualHint(caseData));
-        }
+
+        caseDataBuilder.bilingualHint(setBilingualHint(caseData));
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .errors(errors)
@@ -721,9 +719,6 @@ public class JudicialDecisionHandler extends CallbackHandler implements GeneralA
     }
 
     private YesOrNo setBilingualHint(GeneralApplicationCaseData caseData) {
-        GeneralApplicationCaseData civilCaseData = caseDetailsConverter
-            .toGeneralApplicationCaseData(coreCaseDataService
-                                              .getCase(Long.parseLong(caseData.getGeneralAppParentCaseLink().getCaseReference())));
         if (Objects.nonNull(caseData.getJudicialDecision())) {
             switch (caseData.getJudicialDecision().getDecision()) {
                 case LIST_FOR_A_HEARING:
@@ -781,7 +776,7 @@ public class JudicialDecisionHandler extends CallbackHandler implements GeneralA
         caseDataBuilder
             .judicialDecisionRequestMoreInfo(gaJudicialRequestMoreInfoBuilder.build());
 
-        CaseDocument judgeDecision = null;
+        CaseDocument judgeDecision;
 
         /*
          * Generate Request More Information preview Doc if it's without notice application and Request More Info
@@ -913,9 +908,8 @@ public class JudicialDecisionHandler extends CallbackHandler implements GeneralA
                                                    .judgeHearingSupportReqText1(null)
                                                    .build());
         }
-        if (featureToggleService.isGaForLipsEnabled()) {
-            dataBuilder.bilingualHint(null);
-        }
+
+        dataBuilder.bilingualHint(null);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
             .build();
@@ -1030,7 +1024,7 @@ public class JudicialDecisionHandler extends CallbackHandler implements GeneralA
 
         GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
-        CaseDocument judgeDecision = null;
+        CaseDocument judgeDecision;
 
         if (caseData.getJudicialDecisionMakeAnOrderForWrittenRepresentations() != null
             && caseData.getJudicialDecisionMakeAnOrderForWrittenRepresentations()
@@ -1137,7 +1131,7 @@ public class JudicialDecisionHandler extends CallbackHandler implements GeneralA
         List<String> errors = ofNullable(validateCourtsInitiativeDatesForHearing(caseData))
             .orElse(Collections.emptyList());
 
-        CaseDocument judgeDecision = null;
+        CaseDocument judgeDecision;
         if (caseData.getJudicialListForHearing() != null) {
             judgeDecision = hearingOrderGenerator.generate(
                 caseDataBuilder.build(),
@@ -1183,9 +1177,7 @@ public class JudicialDecisionHandler extends CallbackHandler implements GeneralA
 
         if (caseData.getJudicialListForHearing().getJudicialSupportRequirement() != null) {
             caseData.getJudicialListForHearing().getJudicialSupportRequirement()
-                .forEach(sr -> {
-                    supportReq.add(sr.getDisplayedValue());
-                });
+                .forEach(sr -> supportReq.add(sr.getDisplayedValue()));
 
             return format(
                 JUDICIAL_HEARING_REQ, supportReq);
@@ -1296,7 +1288,7 @@ public class JudicialDecisionHandler extends CallbackHandler implements GeneralA
                 hearingTimeEst += format(APPLICANT_ESTIMATES, applicantHearingDuration.getDisplayedValue());
             }
             if (respondentHearingDuration != null) {
-                hearingTimeEst += ((hearingTimeEst.length() > 0 ? ". " : StringUtils.EMPTY)
+                hearingTimeEst += ((!hearingTimeEst.isEmpty() ? ". " : StringUtils.EMPTY)
                     + format(RESPONDENT_ESTIMATES, respondentHearingDuration.getDisplayedValue()));
             }
             return hearingTimeEst + (hearingTimeEst.contains(".") ? "." : StringUtils.EMPTY);
@@ -1317,11 +1309,11 @@ public class JudicialDecisionHandler extends CallbackHandler implements GeneralA
                 hearingTimeEst += format(APPLICANT_ESTIMATES, applicantHearingDuration.getDisplayedValue());
             }
             if (respondent1HearingDuration != null) {
-                hearingTimeEst += ((hearingTimeEst.length() > 0 ? ". " : StringUtils.EMPTY)
+                hearingTimeEst += ((!hearingTimeEst.isEmpty() ? ". " : StringUtils.EMPTY)
                     + format(RESPONDENT1_ESTIMATES, respondent1HearingDuration.getDisplayedValue()));
             }
             if (respondent2HearingDuration != null) {
-                hearingTimeEst += ((hearingTimeEst.length() > 0 ? ". " : StringUtils.EMPTY)
+                hearingTimeEst += ((!hearingTimeEst.isEmpty() ? ". " : StringUtils.EMPTY)
                     + format(RESPONDENT2_ESTIMATES, respondent2HearingDuration.getDisplayedValue()));
             }
             return hearingTimeEst + (hearingTimeEst.contains(".") ? "." : StringUtils.EMPTY);
@@ -1687,7 +1679,7 @@ public class JudicialDecisionHandler extends CallbackHandler implements GeneralA
         Optional<Element<GARespondentResponse>> responseElementOptional2 = Optional.empty();
 
         if (caseData.getGeneralAppRespondentSolicitors() != null
-            && caseData.getGeneralAppRespondentSolicitors().size() > 0) {
+            && !caseData.getGeneralAppRespondentSolicitors().isEmpty()) {
             log.info(
                 "General app respondent has more than 0 solicitor(s) for caseId: {}",
                 caseData.getCcdCaseReference()

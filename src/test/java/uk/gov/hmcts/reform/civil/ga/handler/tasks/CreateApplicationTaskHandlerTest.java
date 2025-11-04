@@ -274,8 +274,6 @@ public class CreateApplicationTaskHandlerTest {
 
         @Test
         void shouldAddApplicantSolListForWithoutNoticeAppln() {
-            when(featureToggleService.isGaForLipsEnabled())
-                .thenReturn(true);
             GeneralApplication generalApplication =
                 getGeneralApplication("applicant", YES, NO, NO, NO, NO, null);
             GeneralApplicationCaseData data = buildData(generalApplication, NO, NO, false);
@@ -357,8 +355,6 @@ public class CreateApplicationTaskHandlerTest {
 
         @Test
         void shouldAddRespondentOneSolListForWithoutNoticeAppln1v1Scenario() {
-            when(featureToggleService.isGaForLipsEnabled())
-                .thenReturn(true);
             GeneralApplication generalApplication =
                 getGeneralApplication("respondent1", NO, NO, NO, NO, NO, null);
             GeneralApplicationCaseData data = buildData(generalApplication, NO, NO, false);
@@ -396,8 +392,6 @@ public class CreateApplicationTaskHandlerTest {
 
         @Test
         void shouldAddRespondentOneSolListForWithNoticeAppln1v1LipScenario() {
-            when(featureToggleService.isGaForLipsEnabled())
-                    .thenReturn(true);
             GeneralApplication generalApplication =
                     getGeneralApplication(null, NO, YES, NO, NO, YES, null)
                     .toBuilder().isGaApplicantLip(YES).build();

@@ -64,7 +64,6 @@ public class GaHwFDashboardNotificationsHandlerTest extends GeneralApplicationBa
 
         @Test
         void shouldRecordClaimantScenarioApplicationFee_whenInvoked() {
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
             caseData = caseData.toBuilder()
                 .hwfFeeType(FeeType.APPLICATION)
@@ -93,7 +92,6 @@ public class GaHwFDashboardNotificationsHandlerTest extends GeneralApplicationBa
 
         @Test
         void shouldRecordClaimantScenarioAdditionalApplicationFee_whenInvoked() {
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
             caseData = caseData.toBuilder()
                 .hwfFeeType(FeeType.ADDITIONAL)
@@ -122,7 +120,6 @@ public class GaHwFDashboardNotificationsHandlerTest extends GeneralApplicationBa
 
         @Test
         void shouldRecordClaimantScenarioApplicationFee_whenPartialRemissionInvoked() {
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
             caseData = caseData.toBuilder()
                 .hwfFeeType(FeeType.APPLICATION)
@@ -151,7 +148,6 @@ public class GaHwFDashboardNotificationsHandlerTest extends GeneralApplicationBa
 
         @Test
         void shouldRecordApplicantScenarioAdditionalApplicationFee_MoreInfo_whenInvoked() {
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
             caseData = caseData.toBuilder()
                 .hwfFeeType(FeeType.ADDITIONAL)
@@ -180,7 +176,6 @@ public class GaHwFDashboardNotificationsHandlerTest extends GeneralApplicationBa
 
         @Test
         void shouldRecordApplicantScenarioApplicationFee_InvalidHwfRef_whenInvoked() {
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
             caseData = caseData.toBuilder()
                 .hwfFeeType(FeeType.APPLICATION)
@@ -205,7 +200,6 @@ public class GaHwFDashboardNotificationsHandlerTest extends GeneralApplicationBa
 
         @Test
         void shouldRecordApplicantScenarioAdditionalApplicationFee_InvalidHwfRef_whenInvoked() {
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
             caseData = caseData.toBuilder()
                 .hwfFeeType(FeeType.ADDITIONAL)

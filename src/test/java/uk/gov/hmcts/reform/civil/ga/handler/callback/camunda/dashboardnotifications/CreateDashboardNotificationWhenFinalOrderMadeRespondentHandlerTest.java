@@ -57,7 +57,6 @@ class CreateDashboardNotificationWhenFinalOrderMadeRespondentHandlerTest extends
 
         @Test
         void shouldRecordApplicationSubmittedScenario_whenInvoked() {
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
             caseData = caseData.toBuilder().parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaApplicantLip(YesOrNo.YES)
@@ -80,7 +79,6 @@ class CreateDashboardNotificationWhenFinalOrderMadeRespondentHandlerTest extends
 
         @Test
         void shouldNotRecordApplicationSubmittedScenario_whenInvoked() {
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().withoutNoticeCaseData();
             caseData = caseData.toBuilder().parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaApplicantLip(YesOrNo.YES)

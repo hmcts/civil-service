@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.utils.JudicialDecisionNotificationUtil;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.Objects;
 
@@ -16,10 +15,8 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 @Service
 public class GaForLipService {
 
-    private final FeatureToggleService featureToggleService;
-
     public boolean isGaForLip(GeneralApplicationCaseData caseData) {
-        return featureToggleService.isGaForLipsEnabled() && (Objects.nonNull(caseData.getIsGaApplicantLip())
+        return (Objects.nonNull(caseData.getIsGaApplicantLip())
             && caseData.getIsGaApplicantLip().equals(YES))
             || (Objects.nonNull(caseData.getIsGaRespondentOneLip())
             && caseData.getIsGaRespondentOneLip().equals(YES))
@@ -29,34 +26,26 @@ public class GaForLipService {
     }
 
     public boolean isLipApp(GeneralApplicationCaseData caseData) {
-        return featureToggleService.isGaForLipsEnabled()
-            && Objects.nonNull(caseData.getIsGaApplicantLip())
+        return Objects.nonNull(caseData.getIsGaApplicantLip())
             && caseData.getIsGaApplicantLip().equals(YES);
     }
 
     public boolean isLipResp(GeneralApplicationCaseData caseData) {
-        return featureToggleService.isGaForLipsEnabled()
-            && Objects.nonNull(caseData.getIsGaRespondentOneLip())
+        return Objects.nonNull(caseData.getIsGaRespondentOneLip())
             && caseData.getIsGaRespondentOneLip().equals(YES);
     }
 
     public boolean anyWelsh(GeneralApplicationCaseData caseData) {
-        if (featureToggleService.isGaForLipsEnabled()) {
-            return caseData.isApplicantBilingual()
-                || caseData.isRespondentBilingual();
-        }
-        return false;
+        return caseData.isApplicantBilingual()
+            || caseData.isRespondentBilingual();
     }
 
     public boolean anyWelshNotice(GeneralApplicationCaseData caseData) {
-        if (featureToggleService.isGaForLipsEnabled()) {
-            if (!JudicialDecisionNotificationUtil.isWithNotice(caseData)) {
-                return caseData.isApplicantBilingual();
-            }
-            return caseData.isApplicantBilingual()
-                || caseData.isRespondentBilingual();
+        if (!JudicialDecisionNotificationUtil.isWithNotice(caseData)) {
+            return caseData.isApplicantBilingual();
         }
-        return false;
+        return caseData.isApplicantBilingual()
+            || caseData.isRespondentBilingual();
     }
 
     public String getApplicant1Email(GeneralApplicationCaseData civilCaseData) {

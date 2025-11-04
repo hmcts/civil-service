@@ -41,7 +41,6 @@ import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
@@ -79,9 +78,9 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
         + "this order was made, you may apply to set aside, vary, or stay the order."
         + " Any such application must be made by 4pm on";
     private static final String ORDERED_TEXT = "order test";
-    private static LocalDate localDatePlus7days = LocalDate.now().plusDays(7);
-    private static LocalDate localDatePlus14days = LocalDate.now().plusDays(14);
-    private static LocalDate localDatePlus21days = LocalDate.now().plusDays(21);
+    private static final LocalDate localDatePlus7days = LocalDate.now().plusDays(7);
+    private static final LocalDate localDatePlus14days = LocalDate.now().plusDays(14);
+    private static final LocalDate localDatePlus21days = LocalDate.now().plusDays(21);
     @Autowired
     private JudicialFinalDecisionHandler handler;
     @MockBean
@@ -100,14 +99,11 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
     private CaseDetailsConverter caseDetailsConverter;
     @MockBean
     private CoreCaseDataService coreCaseDataService;
-    @MockBean
-    private FeatureToggleService featureToggleService;
 
     @BeforeEach
     void setUp() {
         when(coreCaseDataService.getCase(any())).thenReturn(CaseDetails.builder().build());
         when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().build());
-        when(featureToggleService.isGaForLipsEnabled()).thenReturn(false);
         when(deadlinesCalculator
                  .getJudicialOrderDeadlineDate(any(LocalDateTime.class), eq(7)))
             .thenReturn(localDatePlus7days);

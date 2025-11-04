@@ -20,7 +20,6 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudicialDecision;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudicialMakeAnOrder;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudicialRequestMoreInfo;
@@ -83,9 +82,6 @@ class GAJudgeRevisitTaskHandlerTest {
     private DocUploadDashboardNotificationService dashboardNotificationService;
     @MockBean
     private GaForLipService gaForLipService;
-
-    @MockBean
-    private FeatureToggleService featureToggleService;
 
     @Autowired
     private GAJudgeRevisitTaskHandler gaJudgeRevisitTaskHandler;
@@ -204,7 +200,6 @@ class GAJudgeRevisitTaskHandlerTest {
             Map.of("generalAppConsentOrder", "maybe")).state(AWAITING_WRITTEN_REPRESENTATIONS.toString())
             .build();
 
-        when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
         when(caseStateSearchService.getGeneralApplications(AWAITING_WRITTEN_REPRESENTATIONS))
             .thenReturn(Set.of(caseDetailsWrittenRepresentation, caseDetailsWrittenRepresentationC));
 
@@ -405,7 +400,6 @@ class GAJudgeRevisitTaskHandlerTest {
 
     @Test
     void shouldEmitBusinessProcessEvent_whenWrittenRepConcurrentDateIsToday() {
-        when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
         when(caseStateSearchService.getGeneralApplications(AWAITING_WRITTEN_REPRESENTATIONS))
             .thenReturn(Set.of(caseDetailsWrittenRepresentationC));
 
@@ -429,7 +423,6 @@ class GAJudgeRevisitTaskHandlerTest {
                 .writtenConcurrentRepresentationsBy(LocalDate.now().minusDays(1))
                 .build())).state(AWAITING_WRITTEN_REPRESENTATIONS.toString()).build();
 
-        when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
         when(caseStateSearchService.getGeneralApplications(AWAITING_WRITTEN_REPRESENTATIONS))
             .thenReturn(Set.of(caseDetailsWrittenRepresentationConWithPastDate));
 
@@ -467,7 +460,6 @@ class GAJudgeRevisitTaskHandlerTest {
 
     @Test
     void shouldEmitBusinessProcessEvent_whenWrittenRepSequentialDateIsToday_LipCase() {
-        when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
         when(caseStateSearchService.getGeneralApplications(AWAITING_WRITTEN_REPRESENTATIONS))
             .thenReturn(Set.of(caseDetailsWrittenRepresentationS));
         when(gaForLipService.isGaForLip(any(GeneralApplicationCaseData.class))).thenReturn(true);
@@ -510,7 +502,6 @@ class GAJudgeRevisitTaskHandlerTest {
     @Test
     void shouldEmitBusinessProcessEvent_whenWrittenRepSequentialDateIsPast() {
         when(gaForLipService.isGaForLip(any(GeneralApplicationCaseData.class))).thenReturn(true);
-        when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
         when(coreCaseDataService.getSystemUpdateUserToken()).thenReturn("userToken");
         CaseDetails caseDetailsWrittenRepresentationSeqWithPastDate = caseDetailsWrittenRepresentationS.toBuilder()
             .data(Map.of(
@@ -608,7 +599,6 @@ class GAJudgeRevisitTaskHandlerTest {
     void shouldEmitBusinessProcessEvent_whenRequestForInformationDateIsPast_whenLipCase() {
 
         when(gaForLipService.isGaForLip(any(GeneralApplicationCaseData.class))).thenReturn(true);
-        when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
         when(coreCaseDataService.getSystemUpdateUserToken()).thenReturn("userToken");
         CaseDetails caseDetailRequestForInformationWithPastDate = caseDetailRequestForInformation.toBuilder().data(
             Map.of("judicialDecision", GAJudicialDecision.builder().decision(REQUEST_MORE_INFO).build(),
@@ -656,21 +646,6 @@ class GAJudgeRevisitTaskHandlerTest {
         verifyNoMoreInteractions(coreCaseDataService);
         verify(externalTaskService).complete(any(), any());
 
-    }
-
-    @Test
-    void shouldNotEmitNotificationEvents_whenGAForLipsDisabled() {
-        when(featureToggleService.isGaForLipsEnabled()).thenReturn(false);
-        when(caseStateSearchService.getGeneralApplications(AWAITING_WRITTEN_REPRESENTATIONS))
-            .thenReturn(Set.of(caseDetailsWrittenRepresentationS));
-
-        gaJudgeRevisitTaskHandler.execute(externalTask, externalTaskService);
-
-        verify(caseStateSearchService).getGeneralApplications(AWAITING_WRITTEN_REPRESENTATIONS);
-        verify(coreCaseDataService)
-            .triggerEvent(3L, CHANGE_STATE_TO_ADDITIONAL_RESPONSE_TIME_EXPIRED);
-        verifyNoMoreInteractions(coreCaseDataService);
-        verify(externalTaskService).complete(any(), any());
     }
 
     @Test

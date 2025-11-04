@@ -33,7 +33,6 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FOR_GA_APPLICANT;
@@ -83,7 +82,6 @@ public class ApplicationIssuedFeeRequiredHandlerTest extends GeneralApplicationB
                 .build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -118,7 +116,6 @@ public class ApplicationIssuedFeeRequiredHandlerTest extends GeneralApplicationB
                 .build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
             when(generalAppFeesService.isFreeApplication(any())).thenReturn(true);
 
@@ -135,30 +132,5 @@ public class ApplicationIssuedFeeRequiredHandlerTest extends GeneralApplicationB
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }
-
-        @Test
-        void shouldNotRecordApplicationIssueFeeRequiredScenarioWhenGaFlagIsDisable() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-            caseData = caseData.toBuilder()
-                .parentCaseReference(caseData.getCcdCaseReference().toString())
-                .isGaApplicantLip(YesOrNo.YES)
-                .parentClaimantIsApplicant(YesOrNo.YES)
-                .generalAppPBADetails(GAPbaDetails.builder()
-                                          .fee(Fee.builder()
-                                                   .calculatedAmountInPence(new BigDecimal(100000))
-                                                   .build())
-                                          .build())
-                .build();
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(false);
-
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FOR_GA_APPLICANT.name())
-                    .build()
-            ).build();
-
-            handler.handle(params);
-            verifyNoInteractions(dashboardApiClient);
-        }
-
     }
 }

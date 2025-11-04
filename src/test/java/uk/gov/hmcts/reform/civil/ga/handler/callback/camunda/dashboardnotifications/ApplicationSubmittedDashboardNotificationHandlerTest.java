@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.ga.handler.GeneralApplicationBaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
 import uk.gov.hmcts.reform.civil.model.citizenui.FeePaymentOutcomeDetails;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.HelpWithFeesDetails;
@@ -43,8 +42,6 @@ class ApplicationSubmittedDashboardNotificationHandlerTest extends GeneralApplic
     private DashboardApiClient dashboardApiClient;
     @Mock
     private GaDashboardNotificationsParamsMapper mapper;
-    @Mock
-    private FeatureToggleService featureToggleService;
     @InjectMocks
     private ApplicationSubmittedDashboardNotificationHandler handler;
 
@@ -58,7 +55,6 @@ class ApplicationSubmittedDashboardNotificationHandlerTest extends GeneralApplic
 
         @Test
         void shouldRecordApplicationSubmittedScenario_whenInvoked() {
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
             caseData = caseData.toBuilder().parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaApplicantLip(YesOrNo.YES)
@@ -81,7 +77,6 @@ class ApplicationSubmittedDashboardNotificationHandlerTest extends GeneralApplic
 
         @Test
         void shouldRecordWhenLipApplicationIsFeePaid() {
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
                 .ccdCaseReference(123456L)
                 .feePaymentOutcomeDetails(FeePaymentOutcomeDetails
@@ -111,7 +106,6 @@ class ApplicationSubmittedDashboardNotificationHandlerTest extends GeneralApplic
 
         @Test
         void shouldRecordWhenLipApplicationIsFeePaidThroughCard() {
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
                 .ccdCaseReference(123456L)
                 .generalAppHelpWithFees(
@@ -137,7 +131,6 @@ class ApplicationSubmittedDashboardNotificationHandlerTest extends GeneralApplic
 
         @Test
         void shouldRecordWhenLipApplicationIsFeePaidFullRemission() {
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
                 .ccdCaseReference(123456L)
                 .feePaymentOutcomeDetails(FeePaymentOutcomeDetails
@@ -172,7 +165,6 @@ class ApplicationSubmittedDashboardNotificationHandlerTest extends GeneralApplic
 
         @Test
         void shouldRecordWhenLipApplicationIsFeePaidNoRemission() {
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
                 .ccdCaseReference(123456L)
                 .feePaymentOutcomeDetails(FeePaymentOutcomeDetails
@@ -207,7 +199,6 @@ class ApplicationSubmittedDashboardNotificationHandlerTest extends GeneralApplic
 
         @Test
         void shouldRecordWhenLipApplicationIsFeePaidFeePaymentOutCome() {
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
                 .ccdCaseReference(123456L)
                 .feePaymentOutcomeDetails(FeePaymentOutcomeDetails

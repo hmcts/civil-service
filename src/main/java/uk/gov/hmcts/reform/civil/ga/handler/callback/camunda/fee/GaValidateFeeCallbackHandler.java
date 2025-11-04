@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.ga.callback.GeneralApplicationCallbackHandler;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
 import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
@@ -36,7 +35,6 @@ public class GaValidateFeeCallbackHandler extends CallbackHandler implements Gen
     private static final String TASK_ID = "GeneralApplicationValidateFee";
 
     private final GeneralAppFeesService feeService;
-    private final FeatureToggleService featureToggleService;
     private final GaForLipService gaForLipService;
 
     @Override
@@ -60,7 +58,7 @@ public class GaValidateFeeCallbackHandler extends CallbackHandler implements Gen
         var caseData = (GeneralApplicationCaseData) callbackParams.getBaseCaseData();
         List<String> errors = new ArrayList<>();
 
-        if (!featureToggleService.isGaForLipsEnabled() && !gaForLipService.isGaForLip(caseData)) {
+        if (!gaForLipService.isGaForLip(caseData)) {
             Fee feeForGA = feeService.getFeeForGA(caseData);
             errors = compareFees(caseData, feeForGA);
         }

@@ -25,7 +25,6 @@ import java.util.HashMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_APPLICATION_SUBMITTED_DASHBOARD_NOTIFICATION_FOR_RESPONDENT;
@@ -70,7 +69,6 @@ public class CreateRespondentDashboardNotificationForApplicationSubmittedHandler
                 .build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -99,7 +97,6 @@ public class CreateRespondentDashboardNotificationForApplicationSubmittedHandler
                 .build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -128,7 +125,6 @@ public class CreateRespondentDashboardNotificationForApplicationSubmittedHandler
                 .build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -157,7 +153,6 @@ public class CreateRespondentDashboardNotificationForApplicationSubmittedHandler
                 .build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -172,27 +167,6 @@ public class CreateRespondentDashboardNotificationForApplicationSubmittedHandler
                 "BEARER_TOKEN",
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
-        }
-
-        @Test
-        void shouldNotRecordScenarioWhenGALipsToggleIsDisableInvoked() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-            caseData = caseData.toBuilder()
-                .parentCaseReference(caseData.getCcdCaseReference().toString())
-                .isGaApplicantLip(YesOrNo.YES)
-                .parentClaimantIsApplicant(YesOrNo.YES)
-                .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(YesOrNo.NO).build())
-                .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.YES).build())
-                .build();
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(false);
-
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(CREATE_APPLICATION_SUBMITTED_DASHBOARD_NOTIFICATION_FOR_RESPONDENT.name())
-                    .build()
-            ).build();
-
-            handler.handle(params);
-            verifyNoInteractions(dashboardApiClient);
         }
     }
 }

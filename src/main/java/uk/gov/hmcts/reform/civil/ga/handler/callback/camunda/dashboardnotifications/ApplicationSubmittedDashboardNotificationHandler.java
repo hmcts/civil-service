@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.ga.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.ga.callback.GeneralApplicationCallbackHandler;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.ga.service.GaDashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
@@ -34,15 +33,12 @@ public class ApplicationSubmittedDashboardNotificationHandler extends CallbackHa
 
     protected final DashboardApiClient dashboardApiClient;
     protected final GaDashboardNotificationsParamsMapper mapper;
-    protected final FeatureToggleService featureToggleService;
 
     private static final List<CaseEvent> EVENTS = List.of(CaseEvent.UPDATE_GA_DASHBOARD_NOTIFICATION);
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return featureToggleService.isGaForLipsEnabled()
-            ? Map.of(callbackKey(ABOUT_TO_SUBMIT), this::configureDashboardScenario)
-            : Map.of(callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse);
+        return Map.of(callbackKey(ABOUT_TO_SUBMIT), this::configureDashboardScenario);
     }
 
     @Override

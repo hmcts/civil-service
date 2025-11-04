@@ -68,7 +68,6 @@ public class ApplicationIssuedRespondentDashboardNotificationHandlerTest extends
                 .build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             when(generalAppFeesService.isFreeApplication(caseData)).thenReturn(true);
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
@@ -96,7 +95,6 @@ public class ApplicationIssuedRespondentDashboardNotificationHandlerTest extends
                 .build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             when(generalAppFeesService.isFreeApplication(caseData)).thenReturn(false);
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 

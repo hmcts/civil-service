@@ -74,7 +74,6 @@ public class TaskListForClaimantUpdateHandlerTest extends GeneralApplicationBase
         @Test
         void shouldRecordClaimantScenarioActionNeeded_whenInvoked_claimantIsApplicant() {
             CaseDetails caseDetails = CaseDetails.builder().build();
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
             caseData = caseData.toBuilder()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
@@ -110,7 +109,6 @@ public class TaskListForClaimantUpdateHandlerTest extends GeneralApplicationBase
         @Test
         void shouldRecordClaimantScenarioInProgress_whenInvoked_claimantIsApplicant() {
             CaseDetails caseDetails = CaseDetails.builder().build();
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
             caseData = caseData.toBuilder()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
@@ -146,7 +144,6 @@ public class TaskListForClaimantUpdateHandlerTest extends GeneralApplicationBase
         @Test
         void shouldRecordClaimantScenarioAvailable_whenInvoked_claimantIsApplicant() {
             CaseDetails caseDetails = CaseDetails.builder().build();
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
             caseData = caseData.toBuilder()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
@@ -182,7 +179,6 @@ public class TaskListForClaimantUpdateHandlerTest extends GeneralApplicationBase
         @Test
         void shouldRecordClaimantScenarioActionNeeded_whenInvoked_defendantIsApplicant() {
             CaseDetails caseDetails = CaseDetails.builder().build();
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
             caseData = caseData.toBuilder()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
@@ -218,7 +214,6 @@ public class TaskListForClaimantUpdateHandlerTest extends GeneralApplicationBase
         @Test
         void shouldRecordClaimantScenarioInProgress_whenInvoked_defendantIsApplicant() {
             CaseDetails caseDetails = CaseDetails.builder().build();
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
             caseData = caseData.toBuilder()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
@@ -254,7 +249,6 @@ public class TaskListForClaimantUpdateHandlerTest extends GeneralApplicationBase
         @Test
         void shouldRecordClaimantScenarioAvailable_whenInvoked_defendantIsApplicant() {
             CaseDetails caseDetails = CaseDetails.builder().build();
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
             caseData = caseData.toBuilder()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
@@ -290,7 +284,6 @@ public class TaskListForClaimantUpdateHandlerTest extends GeneralApplicationBase
         @Test
         void shouldNotRecordClaimantScenario_whenClaimantNotLiP() {
             CaseDetails caseDetails = CaseDetails.builder().build();
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
             caseData = caseData.toBuilder()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())

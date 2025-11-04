@@ -219,7 +219,6 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             when(gaForLipService.isLipApp(any(GeneralApplicationCaseData.class))).thenReturn(true);
             when(gaForLipService.isLipResp(any(GeneralApplicationCaseData.class))).thenReturn(true);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -256,7 +255,6 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
                 .isGaRespondentOneLip(YesOrNo.YES)
                 .build();
 
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             when(gaForLipService.isLipApp(any(GeneralApplicationCaseData.class))).thenReturn(true);
             when(gaForLipService.isLipResp(any(GeneralApplicationCaseData.class))).thenReturn(true);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -318,7 +316,6 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
                 .isGaRespondentOneLip(YesOrNo.YES)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             when(gaForLipService.isLipApp(any(GeneralApplicationCaseData.class))).thenReturn(true);
             when(gaForLipService.isLipResp(any(GeneralApplicationCaseData.class))).thenReturn(true);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -340,7 +337,6 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
                 .applicantBilingualLanguagePreference(YesOrNo.YES)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
             when(gaForLipService.isLipApp(any(GeneralApplicationCaseData.class))).thenReturn(true);
             when(gaForLipService.isLipResp(any(GeneralApplicationCaseData.class))).thenReturn(true);
@@ -381,7 +377,6 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
                 .isGaRespondentOneLip(YesOrNo.YES)
                 .build();
 
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             when(gaForLipService.isLipApp(any(GeneralApplicationCaseData.class))).thenReturn(true);
             when(gaForLipService.isLipResp(any(GeneralApplicationCaseData.class))).thenReturn(true);
 
@@ -443,7 +438,6 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             when(gaForLipService.isLipApp(any(GeneralApplicationCaseData.class))).thenReturn(true);
             when(gaForLipService.isLipResp(any(GeneralApplicationCaseData.class))).thenReturn(true);
 
@@ -466,7 +460,6 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
                 .isGaRespondentOneLip(YesOrNo.YES)
                 .build();
 
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             when(gaForLipService.isLipApp(any(GeneralApplicationCaseData.class))).thenReturn(true);
             when(gaForLipService.isLipResp(any(GeneralApplicationCaseData.class))).thenReturn(true);
             when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
@@ -532,7 +525,6 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
                 .isGaRespondentOneLip(YesOrNo.YES)
                 .build();
 
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             when(gaForLipService.isLipApp(any(GeneralApplicationCaseData.class))).thenReturn(true);
             when(gaForLipService.isLipResp(any(GeneralApplicationCaseData.class))).thenReturn(true);
             when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
@@ -597,7 +589,6 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
                 .isGaRespondentOneLip(YesOrNo.YES)
                 .build();
 
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             when(gaForLipService.isLipApp(any(GeneralApplicationCaseData.class))).thenReturn(true);
             when(gaForLipService.isLipResp(any(GeneralApplicationCaseData.class))).thenReturn(true);
 
@@ -643,7 +634,6 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
                 .isGaRespondentOneLip(YesOrNo.YES)
                 .build();
 
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             when(gaForLipService.isLipApp(any(GeneralApplicationCaseData.class))).thenReturn(true);
             when(gaForLipService.isLipResp(any(GeneralApplicationCaseData.class))).thenReturn(true);
 
@@ -763,7 +753,6 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
                 .isGaApplicantLip(YesOrNo.YES)
                 .applicantBilingualLanguagePreference(YesOrNo.YES)
                 .build();
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
             when(gaForLipService.isLipApp(any(GeneralApplicationCaseData.class))).thenReturn(true);
             when(gaForLipService.isLipResp(any(GeneralApplicationCaseData.class))).thenReturn(true);
@@ -868,7 +857,6 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
                 .applicantBilingualLanguagePreference(YesOrNo.YES)
                 .build();
 
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
             when(gaForLipService.isLipApp(any(GeneralApplicationCaseData.class))).thenReturn(true);
             when(gaForLipService.isLipResp(any(GeneralApplicationCaseData.class))).thenReturn(true);
@@ -892,7 +880,6 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
                 .respondentBilingualLanguagePreference(YesOrNo.YES)
                 .build();
 
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
             when(gaForLipService.isLipApp(any(GeneralApplicationCaseData.class))).thenReturn(true);
             when(gaForLipService.isLipResp(any(GeneralApplicationCaseData.class))).thenReturn(true);
@@ -916,7 +903,6 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
                 .respondentBilingualLanguagePreference(YesOrNo.YES)
                 .build();
 
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
             when(gaForLipService.isLipApp(any(GeneralApplicationCaseData.class))).thenReturn(true);
             when(gaForLipService.isLipResp(any(GeneralApplicationCaseData.class))).thenReturn(true);

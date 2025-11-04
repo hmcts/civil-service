@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.ga.callback.GeneralApplicationCallbackHandler;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
@@ -48,7 +47,6 @@ public class PaymentServiceRequestHandler extends CallbackHandler implements Gen
     private final PaymentsService paymentsService;
     private final GeneralAppFeesService feeService;
     private final GaForLipService gaForLipService;
-    private final FeatureToggleService featureToggleService;
     private final ObjectMapper objectMapper;
     private final Time time;
 
@@ -126,7 +124,7 @@ public class PaymentServiceRequestHandler extends CallbackHandler implements Gen
     }
 
     protected boolean isFreeGaLip(GeneralApplicationCaseData caseData) {
-        return (featureToggleService.isGaForLipsEnabled() && gaForLipService.isGaForLip(caseData)
+        return (gaForLipService.isGaForLip(caseData)
             && Objects.nonNull(caseData.getGeneralAppPBADetails())
             && Objects.nonNull(caseData.getGeneralAppPBADetails().getFee())
             && (FREE_KEYWORD.equalsIgnoreCase(caseData.getGeneralAppPBADetails().getFee().getCode())));

@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
 import uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.ga.service.DocUploadDashboardNotificationService;
 import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
@@ -46,8 +45,6 @@ public class GAJudgeRevisitTaskHandler extends BaseExternalTaskHandler {
     private final GaForLipService gaForLipService;
     private final DocUploadDashboardNotificationService dashboardNotificationService;
 
-    private final FeatureToggleService featureToggleService;
-
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
         Set<CaseDetails> writtenRepresentationCases = caseStateSearchService
@@ -55,16 +52,12 @@ public class GAJudgeRevisitTaskHandler extends BaseExternalTaskHandler {
         List<CaseDetails> claimantNotificationCases = filterForClaimantWrittenRepExpired(writtenRepresentationCases);
         log.info("Job '{}' found {} written representation case(s) with claimant deadline expired {}",
                  externalTask.getTopicName(), claimantNotificationCases.size(), claimantNotificationCases.stream().map(CaseDetails::getId).sorted().toList());
-        if (featureToggleService.isGaForLipsEnabled()) {
-            claimantNotificationCases.forEach(this::fireEventForDeleteClaimantNotification);
-        }
+        claimantNotificationCases.forEach(this::fireEventForDeleteClaimantNotification);
 
         List<CaseDetails> defendantNotificationCases = filterForDefendantWrittenRepExpired(writtenRepresentationCases);
         log.info("Job '{}' found {} written representation case(s) with defendant deadline expired {}",
                  externalTask.getTopicName(), defendantNotificationCases.size(), defendantNotificationCases.stream().map(CaseDetails::getId).sorted().toList());
-        if (featureToggleService.isGaForLipsEnabled()) {
-            defendantNotificationCases.forEach(this::fireEventForDeleteDefendantNotification);
-        }
+        defendantNotificationCases.forEach(this::fireEventForDeleteDefendantNotification);
 
         // Change state for all cases where both deadlines have passed
         claimantNotificationCases.stream().filter(defendantNotificationCases::contains)
@@ -78,16 +71,12 @@ public class GAJudgeRevisitTaskHandler extends BaseExternalTaskHandler {
                  externalTask.getTopicName(), directionOrderCases.size(), directionOrderCases.stream().map(CaseDetails::getId).sorted().toList());
         directionOrderCases.forEach(this::fireEventForStateChange);
 
-        if (featureToggleService.isGaForLipsEnabled()) {
-            directionOrderCases.forEach(this::fireEventForUpdatingTaskList);
-        }
+        directionOrderCases.forEach(this::fireEventForUpdatingTaskList);
         List<CaseDetails> requestForInformationCases = getRequestForInformationCaseReadyToJudgeRevisit();
         log.info("Job '{}' found {} request for information case(s) {}",
                  externalTask.getTopicName(), requestForInformationCases.size(), requestForInformationCases.stream().map(CaseDetails::getId).sorted().toList());
         requestForInformationCases.forEach(this::fireEventForStateChange);
-        if (featureToggleService.isGaForLipsEnabled()) {
-            requestForInformationCases.forEach(this::fireEventForUpdatingTaskList);
-        }
+        requestForInformationCases.forEach(this::fireEventForUpdatingTaskList);
         return ExternalTaskData.builder().build();
     }
 

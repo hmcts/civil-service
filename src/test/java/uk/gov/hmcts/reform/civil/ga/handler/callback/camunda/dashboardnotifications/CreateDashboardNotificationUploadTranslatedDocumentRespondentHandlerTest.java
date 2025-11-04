@@ -56,7 +56,6 @@ public class CreateDashboardNotificationUploadTranslatedDocumentRespondentHandle
 
         @Test
         void shouldRecordTranslatedDocUploadedScenario_whenInvoked() {
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
             caseData = caseData.toBuilder().parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaRespondentOneLip(YesOrNo.YES)
@@ -78,7 +77,6 @@ public class CreateDashboardNotificationUploadTranslatedDocumentRespondentHandle
 
         @Test
         void shouldNotRecordTranslatedDocUploadedScenario_ifNotWithNotice() {
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withoutNoticeCaseData();
             caseData = caseData.toBuilder().parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaRespondentOneLip(YesOrNo.YES)

@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.ga.handler.callback.user;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +21,6 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
 
 import java.math.BigDecimal;
@@ -65,8 +63,6 @@ class GaInitiateGeneralApplicationHandlerTest extends GeneralApplicationBaseCall
     private GaInitiateGeneralApplicationHandler handler;
     @MockBean
     private GeneralAppFeesService generalAppFeesService;
-    @MockBean
-    private FeatureToggleService featureToggleService;
 
     private GeneralApplicationCaseData getEmptyTestCase(GeneralApplicationCaseData caseData) {
         return caseData.toBuilder()
@@ -143,39 +139,10 @@ class GaInitiateGeneralApplicationHandlerTest extends GeneralApplicationBaseCall
 
     @Nested
     class SubmittedCallback {
-        @BeforeEach
-        void setup() {
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(false);
-        }
 
         @Test
         void handleEventsReturnsTheExpectedCallbackEvent() {
             assertThat(handler.handledEvents()).contains(INITIATE_GENERAL_APPLICATION);
-        }
-
-        @Test
-        void shouldReturnExpectedSubmittedCallbackResponse_whenRespondentsDoesNotHaveRepresentation() {
-            GeneralApplicationCaseData caseData = getReadyTestCaseData(
-                GeneralApplicationCaseDataBuilder.builder().ccdCaseReference(CASE_ID).build(), true);
-            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
-            GeneralApplication genapp = caseData.getGeneralApplications().get(0).getValue();
-            when(generalAppFeesService.isFreeGa(any())).thenReturn(false);
-            String body = format(
-                confirmationBodyBasedOnToggle(false),
-                genapp.getGeneralAppPBADetails().getFee().toPounds(),
-                format("/cases/case-details/%s#Applications", CASE_ID)
-            );
-
-            var response = (SubmittedCallbackResponse) handler.handle(params);
-            assertThat(response).isNotNull();
-            assertThat(response).usingRecursiveComparison().isEqualTo(
-                SubmittedCallbackResponse.builder()
-                    .confirmationHeader(
-                        "# You have submitted an application")
-                    .confirmationBody(body)
-                    .build());
-            assertThat(response).isNotNull();
-            assertThat(response.getConfirmationBody()).isEqualTo(body);
         }
 
         @Test
@@ -185,7 +152,6 @@ class GaInitiateGeneralApplicationHandlerTest extends GeneralApplicationBaseCall
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
             GeneralApplication genapp = caseData.getGeneralApplications().get(0).getValue();
             when(generalAppFeesService.isFreeGa(any())).thenReturn(false);
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             String body = format(
                 confirmationBodyBasedOnToggle(true),
                 genapp.getGeneralAppPBADetails().getFee().toPounds(),

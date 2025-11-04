@@ -38,7 +38,6 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
@@ -98,7 +97,6 @@ public class JudicialFinalDecisionHandler extends CallbackHandler implements Gen
     private final GaForLipService gaForLipService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final CoreCaseDataService coreCaseDataService;
-    private final FeatureToggleService featureToggleService;
 
     public static String getAllPartyNames(GeneralApplicationCaseData caseData) {
         return format(
@@ -180,12 +178,8 @@ public class JudicialFinalDecisionHandler extends CallbackHandler implements Gen
             .caseNameHmctsInternal(getAllPartyNames(caseData));
         UserInfo userDetails = idamClient.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
         caseDataBuilder.judgeTitle(IdamUserUtils.getIdamUserFullName(userDetails));
-        GeneralApplicationCaseData civilCaseData = caseDetailsConverter
-            .toGeneralApplicationCaseData(coreCaseDataService
-                                              .getCase(Long.parseLong(caseData.getGeneralAppParentCaseLink().getCaseReference())));
-        if (featureToggleService.isGaForLipsEnabled()) {
-            caseDataBuilder.bilingualHint(gaForLipService.anyWelshNotice(caseData) ? YES : NO);
-        }
+        caseDataBuilder.bilingualHint(gaForLipService.anyWelshNotice(caseData) ? YES : NO);
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
@@ -331,11 +325,10 @@ public class JudicialFinalDecisionHandler extends CallbackHandler implements Gen
     private CallbackResponse setFinalDecisionBusinessProcess(CallbackParams callbackParams) {
         GeneralApplicationCaseData caseData = (GeneralApplicationCaseData) callbackParams.getBaseCaseData();
         GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        if (featureToggleService.isGaForLipsEnabled()) {
-            log.info("General app for LiP is enabled for caseId: {}", caseData.getCcdCaseReference());
-            caseDataBuilder.bilingualHint(null);
-        }
+        log.info("General app for LiP is enabled for caseId: {}", caseData.getCcdCaseReference());
+        caseDataBuilder.bilingualHint(null);
         caseDataBuilder.businessProcess(BusinessProcess.ready(GENERATE_DIRECTIONS_ORDER)).build();
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();

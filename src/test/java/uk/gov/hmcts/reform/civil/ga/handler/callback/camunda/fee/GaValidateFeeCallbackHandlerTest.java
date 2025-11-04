@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.ga.handler.GeneralApplicationBaseCallbackHandle
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
@@ -39,8 +38,6 @@ class GaValidateFeeCallbackHandlerTest extends GeneralApplicationBaseCallbackHan
     @MockBean
     private GeneralAppFeesService feesService;
     @MockBean
-    private FeatureToggleService featureToggleService;
-    @MockBean
     private GaForLipService gaForLipService;
     @Autowired
     private GaValidateFeeCallbackHandler handler;
@@ -64,7 +61,6 @@ class GaValidateFeeCallbackHandlerTest extends GeneralApplicationBaseCallbackHan
 
         @BeforeEach
         public void beforeEach() {
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(false);
             when(gaForLipService.isGaForLip(any())).thenReturn(false);
         }
 
@@ -154,7 +150,6 @@ class GaValidateFeeCallbackHandlerTest extends GeneralApplicationBaseCallbackHan
 
         @Test
         void shouldReturnNoErrors_whenLipCaseData() {
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             when(gaForLipService.isGaForLip(any())).thenReturn(true);
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().gaPbaDetails(GAPbaDetails.builder().build()).build();
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -164,19 +159,5 @@ class GaValidateFeeCallbackHandlerTest extends GeneralApplicationBaseCallbackHan
             verifyNoInteractions(feesService);
             assertThat(response.getErrors()).isEmpty();
         }
-
-        @Test
-        void shouldReturnNoErrors_whenCaseDataFeatureToggleEnabled() {
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
-            when(gaForLipService.isGaForLip(any())).thenReturn(false);
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().gaPbaDetails(GAPbaDetails.builder().build()).build();
-            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            verifyNoInteractions(feesService);
-            assertThat(response.getErrors()).isEmpty();
-        }
-
     }
 }

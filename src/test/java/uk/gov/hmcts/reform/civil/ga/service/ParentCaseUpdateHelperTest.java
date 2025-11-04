@@ -248,7 +248,6 @@ class ParentCaseUpdateHelperTest {
             .isNull();
 
         role = "RespondentLip";
-        when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
         assertThat(parentCaseUpdateHelper
                        .findGaCreator(
                            getVaryMainCaseData(role),

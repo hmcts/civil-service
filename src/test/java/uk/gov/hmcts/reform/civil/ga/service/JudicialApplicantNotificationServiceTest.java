@@ -43,6 +43,7 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -122,12 +123,11 @@ class JudicialApplicantNotificationServiceTest {
     private static final String LIP_APPLN_WELSH_TEMPLATE = "ga-judicial-notification-applicant-welsh-template-lip-id";
     private static final String JUDGES_DECISION = "MAKE_DECISION";
     private static final String PARTY_REFERENCE = "Claimant Reference: Not provided - Defendant Reference: Not provided";
-    private LocalDateTime responseDate = LocalDateTime.now();
-    private LocalDateTime deadline = LocalDateTime.now().plusDays(5);
+    private final LocalDateTime responseDate = LocalDateTime.now();
+    private final LocalDateTime deadline = LocalDateTime.now().plusDays(5);
 
     @BeforeEach
     void setup() {
-        when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
         when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().ccdState(CaseState.CASE_PROGRESSION).build());
         when(notificationsProperties.getWrittenRepConcurrentRepresentationRespondentEmailTemplate())
             .thenReturn(SAMPLE_TEMPLATE);
@@ -760,7 +760,7 @@ class JudicialApplicantNotificationServiceTest {
             customProp.put(NotificationDataGA.CASE_REFERENCE, CASE_REFERENCE.toString());
             customProp.put(NotificationDataGA.GENAPP_REFERENCE, CASE_REFERENCE.toString());
             customProp.put(NotificationDataGA.GA_APPLICATION_TYPE, GeneralApplicationTypes.SUMMARY_JUDGEMENT.getDisplayedValue());
-            customProp.put(NotificationDataGA.PARTY_REFERENCE, PARTY_REFERENCE.toString());
+            customProp.put(NotificationDataGA.PARTY_REFERENCE, PARTY_REFERENCE);
             customProp.put(NotificationDataGA.WELSH_CONTACT, "E-bost: ymholiadaucymraeg@justice.gov.uk");
             customProp.put(NotificationDataGA.WELSH_HMCTS_SIGNATURE, "Hawliadau am Arian yn y Llys Sifil Ar-lein \n Gwasanaeth Llysoedd a Thribiwnlysoedd EF");
             customProp.put(NotificationDataGA.WELSH_OPENING_HOURS, "Dydd Llun i ddydd Iau, 9am – 5pm, dydd Gwener, 9am – 4.30pm");
@@ -781,7 +781,7 @@ class JudicialApplicantNotificationServiceTest {
             customProp.put(NotificationDataGA.GENAPP_REFERENCE, CASE_REFERENCE.toString());
             customProp.put(NotificationDataGA.GA_APPLICATION_TYPE,
                            GeneralApplicationTypes.VARY_ORDER.getDisplayedValue());
-            customProp.put(NotificationDataGA.PARTY_REFERENCE, PARTY_REFERENCE.toString());
+            customProp.put(NotificationDataGA.PARTY_REFERENCE, PARTY_REFERENCE);
             customProp.put(NotificationDataGA.WELSH_CONTACT, "E-bost: ymholiadaucymraeg@justice.gov.uk");
             customProp.put(NotificationDataGA.WELSH_HMCTS_SIGNATURE, "Hawliadau am Arian yn y Llys Sifil Ar-lein \n Gwasanaeth Llysoedd a Thribiwnlysoedd EF");
             customProp.put(NotificationDataGA.WELSH_OPENING_HOURS, "Dydd Llun i ddydd Iau, 9am – 5pm, dydd Gwener, 9am – 4.30pm");
@@ -851,10 +851,10 @@ class JudicialApplicantNotificationServiceTest {
         }
 
         private List<Element<GASolicitorDetailsGAspec>> respondentSolicitors() {
-            return Arrays.asList(element(GASolicitorDetailsGAspec.builder().id(ID)
-                                             .forename("respondent")
-                                             .surname(Optional.of("solicitor"))
-                                             .email(DUMMY_EMAIL).organisationIdentifier(ORG_ID).build()));
+            return Collections.singletonList(element(GASolicitorDetailsGAspec.builder().id(ID)
+                                                         .forename("respondent")
+                                                         .surname(Optional.of("solicitor"))
+                                                         .email(DUMMY_EMAIL).organisationIdentifier(ORG_ID).build()));
         }
     }
 
@@ -2378,7 +2378,7 @@ class JudicialApplicantNotificationServiceTest {
             GeneralApplicationCaseData caseData = caseDataForJudicialRequestForInformationOfApplication(
                 NO, YES, NO, NO, NO, REQUEST_MORE_INFORMATION).toBuilder()
                 .isMultiParty(NO)
-                .generalAppRespondentSolicitors(Arrays.asList()).build();
+                .generalAppRespondentSolicitors(List.of()).build();
 
             when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().ccdState(CaseState.CASE_PROGRESSION).build());
             when(solicitorEmailValidation.validateSolicitorEmail(any(), any()))
@@ -2436,7 +2436,6 @@ class JudicialApplicantNotificationServiceTest {
 
         @Test
         void shouldSendAdditionalPaymentNotification_Lip_UncloakedApplication_BeforeAdditionalPaymentMade_WhenDefendantMakes_Claim() {
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             when(gaForLipService.isLipResp(any())).thenReturn(true);
             when(gaForLipService.isGaForLip(any())).thenReturn(true);
             when(gaForLipService.isLipApp(any())).thenReturn(true);
@@ -2571,7 +2570,7 @@ class JudicialApplicantNotificationServiceTest {
             NotificationDataGA.CASE_REFERENCE, CASE_REFERENCE.toString(),
             NotificationDataGA.GENAPP_REFERENCE, CASE_REFERENCE.toString(),
             NotificationDataGA.GA_APPLICATION_TYPE, GeneralApplicationTypes.STAY_THE_CLAIM.getDisplayedValue(),
-            NotificationDataGA.PARTY_REFERENCE, PARTY_REFERENCE.toString()
+            NotificationDataGA.PARTY_REFERENCE, PARTY_REFERENCE
         ));
         properties.put(NotificationDataGA.WELSH_CONTACT, "E-bost: ymholiadaucymraeg@justice.gov.uk");
         properties.put(NotificationDataGA.WELSH_HMCTS_SIGNATURE, "Hawliadau am Arian yn y Llys Sifil Ar-lein \n Gwasanaeth Llysoedd a Thribiwnlysoedd EF");
@@ -2598,10 +2597,10 @@ class JudicialApplicantNotificationServiceTest {
     }
 
     private List<Element<GASolicitorDetailsGAspec>> lipRespondent() {
-        return Arrays.asList(element(GASolicitorDetailsGAspec.builder().id(ID)
-                                         .forename("respondent")
-                                         .surname(Optional.of("lip"))
-                                         .email(DUMMY_EMAIL).build()));
+        return Collections.singletonList(element(GASolicitorDetailsGAspec.builder().id(ID)
+                                                     .forename("respondent")
+                                                     .surname(Optional.of("lip"))
+                                                     .email(DUMMY_EMAIL).build()));
     }
 
     private PaymentDetails buildAdditionalPaymentSuccessData() {

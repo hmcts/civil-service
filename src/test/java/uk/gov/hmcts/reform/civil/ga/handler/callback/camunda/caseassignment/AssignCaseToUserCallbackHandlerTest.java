@@ -29,7 +29,6 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GASolicitorDetailsGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.ga.service.AssignCaseToRespondentSolHelper;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
 import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
 import uk.gov.hmcts.reform.civil.ga.service.roleassignment.RolesAndAccessAssignmentService;
@@ -46,7 +45,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.APPLICANTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.CLAIMANT;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
@@ -77,9 +75,6 @@ public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseC
 
     @Autowired
     private ObjectMapper objectMapper;
-
-    @MockBean
-    private FeatureToggleService featureToggleService;
 
     @MockBean
     private RolesAndAccessAssignmentService rolesAndAccessAssignmentService;
@@ -158,28 +153,12 @@ public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseC
 
         @Test
         void shouldThrowExceptionIfSolicitorsAreNull() {
-            Exception exception = assertThrows(Exception.class, () -> {
-                assignCaseToUserHandler.handle(getCaseDateWithNoSolicitor(SPEC_CLAIM));
-            });
+            Exception exception = assertThrows(Exception.class, () ->
+                assignCaseToUserHandler.handle(getCaseDateWithNoSolicitor(SPEC_CLAIM)));
             String expectedMessage = "java.lang.NullPointerException";
             String actualMessage = exception.toString();
             assertTrue(actualMessage.contains(expectedMessage));
         }
-    }
-
-    private List<CaseAssignmentUserRole> getCaseAssignedApplicantUserRoles() {
-        return List.of(
-                CaseAssignmentUserRole.builder().caseDataId("1").userId(STRING_NUM_CONSTANT)
-                        .caseRole(APPLICANTSOLICITORONE.getFormattedName()).build(),
-                CaseAssignmentUserRole.builder().caseDataId("1").userId("2")
-                        .caseRole(APPLICANTSOLICITORONE.getFormattedName()).build(),
-                CaseAssignmentUserRole.builder().caseDataId("1").userId("3")
-                        .caseRole(RESPONDENTSOLICITORONE.getFormattedName()).build(),
-                CaseAssignmentUserRole.builder().caseDataId("1").userId("4")
-                        .caseRole(RESPONDENTSOLICITORONE.getFormattedName()).build(),
-                CaseAssignmentUserRole.builder().caseDataId("1").userId("5")
-                        .caseRole(APPLICANTSOLICITORONE.getFormattedName()).build()
-        );
     }
 
     @Nested
@@ -267,7 +246,6 @@ public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseC
                     .email("test@gmail.com").build();
 
             respondentSols.add(element(respondent1));
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
 
             GeneralApplication.GeneralApplicationBuilder builder = GeneralApplication.builder();
             builder.generalAppType(GAApplicationType.builder()
@@ -450,7 +428,6 @@ public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseC
     class AssignRolesSpecCaseLipResp {
         @BeforeEach
         void setup() {
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
 
             GASolicitorDetailsGAspec respondent1 = GASolicitorDetailsGAspec.builder().id("id")
@@ -500,7 +477,7 @@ public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseC
 
         @Test
         void shouldNotCallAssignCase() {
-            var response = (AboutToStartOrSubmitCallbackResponse) assignCaseToUserHandler.handle(params);
+            assignCaseToUserHandler.handle(params);
             verify(coreCaseUserService, times(0)).assignCase(
                     any(),
                     any(),
@@ -511,7 +488,6 @@ public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseC
 
         @Test
         void shouldHaveDefendantRole() {
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             var response = (AboutToStartOrSubmitCallbackResponse) assignCaseToUserHandler.handle(params);
             assertThat(response.getData().get("respondent1OrganisationPolicy"))
                     .extracting("OrgPolicyCaseAssignedRole").isEqualTo("[DEFENDANT]");
@@ -522,7 +498,6 @@ public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseC
     class AssignRolesSpecCaseLipApp {
         @BeforeEach
         void setup() {
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
 
             GASolicitorDetailsGAspec respondent1 = GASolicitorDetailsGAspec.builder().id("id")
@@ -887,46 +862,6 @@ public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseC
                 generalApplication.getGeneralAppApplnSolicitor().getId(),
                 "Org1",
                 CaseRole.APPLICANTSOLICITORONE
-        );
-    }
-
-    private void verifyRespondentSolicitorOneRoles() {
-        verify(coreCaseUserService).assignCase(
-                CASE_ID.toString(),
-                generalApplication.getGeneralAppRespondentSolicitors()
-                        .get(RESPONDENT_ONE).getValue().getId(),
-                "org2",
-                CaseRole.RESPONDENTSOLICITORONE
-        );
-    }
-
-    private void verifyRespondentSolicitorTwoRoles() {
-        verify(coreCaseUserService).assignCase(
-                CASE_ID.toString(),
-                generalApplication.getGeneralAppRespondentSolicitors()
-                        .get(RESPONDENT_ONE).getValue().getId(),
-                "org2",
-                CaseRole.RESPONDENTSOLICITORTWO
-        );
-    }
-
-    private void verifyRespondentSolicitorOneSpecRoles() {
-        verify(coreCaseUserService).assignCase(
-                CASE_ID.toString(),
-                generalApplication.getGeneralAppRespondentSolicitors()
-                        .get(RESPONDENT_TWO).getValue().getId(),
-                "org2",
-                CaseRole.RESPONDENTSOLICITORONE
-        );
-    }
-
-    private void verifyRespondentSolicitorTwoSpecRoles() {
-        verify(coreCaseUserService).assignCase(
-                CASE_ID.toString(),
-                generalApplication.getGeneralAppRespondentSolicitors()
-                        .get(RESPONDENT_TWO).getValue().getId(),
-                "org2",
-                CaseRole.RESPONDENTSOLICITORTWO
         );
     }
 

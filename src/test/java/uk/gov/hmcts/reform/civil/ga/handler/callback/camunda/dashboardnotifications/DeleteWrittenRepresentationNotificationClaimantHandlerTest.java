@@ -72,7 +72,6 @@ public class DeleteWrittenRepresentationNotificationClaimantHandlerTest extends 
                 .parentClaimantIsApplicant(YesOrNo.YES)
                 .build();
             HashMap<String, Object> scenarioParams = new HashMap<>();
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -100,7 +99,6 @@ public class DeleteWrittenRepresentationNotificationClaimantHandlerTest extends 
                                                                           .writtenOption(CONCURRENT_REPRESENTATIONS).build())
                 .build();
             HashMap<String, Object> scenarioParams = new HashMap<>();
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -133,7 +131,6 @@ public class DeleteWrittenRepresentationNotificationClaimantHandlerTest extends 
                                                                           .writtenSequentailRepresentationsBy(LocalDate.now().plusDays(1)).build())
                 .build();
             HashMap<String, Object> scenarioParams = new HashMap<>();
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -167,7 +164,6 @@ public class DeleteWrittenRepresentationNotificationClaimantHandlerTest extends 
                                                                           .writtenSequentailRepresentationsBy(LocalDate.now().plusDays(1)).build())
                 .build();
             HashMap<String, Object> scenarioParams = new HashMap<>();
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -201,7 +197,6 @@ public class DeleteWrittenRepresentationNotificationClaimantHandlerTest extends 
                                                                           .writtenSequentailRepresentationsBy(LocalDate.now().plusDays(1)).build())
                 .build();
             HashMap<String, Object> scenarioParams = new HashMap<>();
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -212,25 +207,5 @@ public class DeleteWrittenRepresentationNotificationClaimantHandlerTest extends 
             handler.handle(params);
             verifyNoInteractions(dashboardApiClient);
         }
-
-        @Test
-        void shouldNotRecordDeleteWrittenRepsRequiredScenarioWhenGaFlagIsDisabled() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-            caseData = caseData.toBuilder()
-                .parentCaseReference(caseData.getCcdCaseReference().toString())
-                .isGaApplicantLip(YesOrNo.YES)
-                .parentClaimantIsApplicant(YesOrNo.YES)
-                .build();
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(false);
-
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(DELETE_CLAIMANT_WRITTEN_REPS_NOTIFICATION.name())
-                    .build()
-            ).build();
-
-            handler.handle(params);
-            verifyNoInteractions(dashboardApiClient);
-        }
-
     }
 }

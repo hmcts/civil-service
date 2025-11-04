@@ -17,7 +17,6 @@ import uk.gov.hmcts.reform.civil.ga.handler.GeneralApplicationBaseCallbackHandle
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
@@ -57,8 +56,6 @@ class PaymentServiceRequestHandlerTest extends GeneralApplicationBaseCallbackHan
 
     @MockBean
     private Time time;
-    @MockBean
-    private FeatureToggleService featureToggleService;
 
     @MockBean
     private GaForLipService gaForLipService;
@@ -76,7 +73,6 @@ class PaymentServiceRequestHandlerTest extends GeneralApplicationBaseCallbackHan
     @BeforeEach
     public void setup() {
         caseData = GeneralApplicationCaseDataBuilder.builder().buildMakePaymentsCaseData();
-        when(featureToggleService.isGaForLipsEnabled()).thenReturn(false);
         when(gaForLipService.isGaForLip(any())).thenReturn(false);
 
         when(time.now()).thenReturn(LocalDateTime.of(2020, 1, 1, 12, 0, 0));
@@ -130,7 +126,6 @@ class PaymentServiceRequestHandlerTest extends GeneralApplicationBaseCallbackHan
 
         @Test
         void shouldNotMakePaymentServiceRequest_shouldAddFreePaymentDetails_for_Lip_whenInvoked() {
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             when(gaForLipService.isGaForLip(any())).thenReturn(true);
             when(paymentsService.createServiceRequestGa(any(), any()))
                 .thenReturn(PaymentServiceResponse.builder()
@@ -165,7 +160,7 @@ class PaymentServiceRequestHandlerTest extends GeneralApplicationBaseCallbackHan
         @Test
         void shouldNotMakePaymentServiceRequest_ifHelpWithFees_whenInvoked() {
             when(paymentsService.createServiceRequestGa(any(), any()))
-                .thenReturn(paymentServiceResponse.builder()
+                .thenReturn(PaymentServiceResponse.builder()
                                 .serviceRequestReference(FREE_PAYMENT_REFERENCE).build());
             when(generalAppFeesService.isFreeApplication(any())).thenReturn(false);
             caseData = caseData.toBuilder().generalAppHelpWithFees(HelpWithFees.builder()
@@ -205,7 +200,6 @@ class PaymentServiceRequestHandlerTest extends GeneralApplicationBaseCallbackHan
 
         @Test
         void shouldReturnFreeLipGa_True() {
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             when(gaForLipService.isGaForLip(any())).thenReturn(true);
             caseData = caseData.toBuilder().generalAppPBADetails(GAPbaDetails.builder()
                                                                      .fee(Fee.builder().code("FREE").build()).build()).build();
@@ -214,7 +208,6 @@ class PaymentServiceRequestHandlerTest extends GeneralApplicationBaseCallbackHan
 
         @Test
         void shouldReturnFreeLipGa_whenPbaDetailsAreNull_false() {
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             when(gaForLipService.isGaForLip(any())).thenReturn(true);
             caseData = caseData.toBuilder().build();
             assertThat(handler.isFreeGaLip(caseData)).isFalse();
@@ -222,7 +215,6 @@ class PaymentServiceRequestHandlerTest extends GeneralApplicationBaseCallbackHan
 
         @Test
         void shouldReturnFreeLipGa_whenFeeDetailsAreNull_false() {
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             when(gaForLipService.isGaForLip(any())).thenReturn(true);
             caseData = caseData.toBuilder().generalAppPBADetails(GAPbaDetails.builder()
                                                                   .build()).build();
@@ -231,7 +223,6 @@ class PaymentServiceRequestHandlerTest extends GeneralApplicationBaseCallbackHan
 
         @Test
         void shouldReturnFreeLipGa_whenFeeCodeIsNotFree_false() {
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             when(gaForLipService.isGaForLip(any())).thenReturn(true);
             caseData = caseData.toBuilder().generalAppPBADetails(GAPbaDetails.builder()
                                                                      .fee(Fee.builder().code("1").build()).build())

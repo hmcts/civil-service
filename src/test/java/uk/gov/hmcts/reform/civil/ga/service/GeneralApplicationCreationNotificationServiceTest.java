@@ -22,7 +22,6 @@ import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.GeneralAppParentCaseLink;
@@ -34,6 +33,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GASolicitorDetailsGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -103,7 +103,7 @@ public class GeneralApplicationCreationNotificationServiceTest {
                 .thenReturn("general-application-respondent-template-id");
             when(notificationsProperties.getLipGeneralAppRespondentEmailTemplate())
                 .thenReturn("general-application-respondent-template-lip-id");
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
+            //when(gaForLipService.isLipResp(any(GeneralApplicationCaseData.class))).thenReturn(true);
             when(notificationsProperties.getLipGeneralAppRespondentEmailTemplateInWelsh())
                 .thenReturn("general-application-respondent-welsh-template-lip-id");
             when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
@@ -325,7 +325,7 @@ public class GeneralApplicationCreationNotificationServiceTest {
         }
 
         @Test
-        void notificationSendShouldContainSolicitorEmailReferenceifAdded() {
+        void notificationSendShouldContainSolicitorEmailReferenceIfAdded() {
             GeneralApplicationCaseData caseData = getCaseData(true).toBuilder()
                 .emailPartyReference("Claimant Reference: ABC limited - Defendant Reference: Defendant Ltd")
                 .isGaRespondentOneLip(YES)
@@ -341,11 +341,10 @@ public class GeneralApplicationCreationNotificationServiceTest {
                      .validateSolicitorEmail(any(), any()))
                 .thenReturn(caseData);
             when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().build());
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(false);
 
             gaNotificationService.sendNotification(caseData);
             verify(notificationService, times(2)).sendMail(
-                any(), eq("general-application-respondent-template-id"), argumentCaptor.capture(), any()
+                any(), eq("general-application-respondent-template-lip-id"), argumentCaptor.capture(), any()
             );
             assertThat(argumentCaptor.getValue().get("partyReferences"))
                 .isEqualTo("Claimant Reference: ABC limited - Defendant Reference: Defendant Ltd");

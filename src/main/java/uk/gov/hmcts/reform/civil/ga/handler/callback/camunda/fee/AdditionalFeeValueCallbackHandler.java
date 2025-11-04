@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.civil.config.GeneralAppFeesConfiguration;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.ga.callback.GeneralApplicationCallbackHandler;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
@@ -40,7 +39,6 @@ public class AdditionalFeeValueCallbackHandler extends CallbackHandler implement
     private final GeneralAppFeesConfiguration feesConfiguration;
     private final JudicialDecisionHelper judicialDecisionHelper;
     private final ObjectMapper objectMapper;
-    private final FeatureToggleService featureToggleService;
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
@@ -72,7 +70,7 @@ public class AdditionalFeeValueCallbackHandler extends CallbackHandler implement
                 .toBuilder().fee(feeForGA).build();
             GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> builder = caseData.toBuilder();
             builder.generalAppPBADetails(generalAppPBADetails);
-            if (featureToggleService.isGaForLipsEnabled() && caseData.getIsGaApplicantLip() == YesOrNo.YES) {
+            if (caseData.getIsGaApplicantLip() == YesOrNo.YES) {
                 builder.applicationFeeAmountInPence(applicationFee);
             }
             caseData = builder.build();

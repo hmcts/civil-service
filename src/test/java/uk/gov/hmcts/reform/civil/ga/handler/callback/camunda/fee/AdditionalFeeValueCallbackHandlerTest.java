@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.civil.ga.handler.GeneralApplicationBaseCallbackHandle
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
 import uk.gov.hmcts.reform.civil.ga.service.JudicialDecisionHelper;
@@ -57,8 +56,6 @@ class AdditionalFeeValueCallbackHandlerTest extends GeneralApplicationBaseCallba
     private ObjectMapper objectMapper;
     @MockBean
     JudicialDecisionHelper judicialDecisionHelper;
-    @MockBean
-    FeatureToggleService featureToggleService;
 
     @BeforeEach
     void setup() {
@@ -123,7 +120,6 @@ class AdditionalFeeValueCallbackHandlerTest extends GeneralApplicationBaseCallba
 
     @Test
     void shouldSetAppplicationFeeAmount_WhenApplicationUncloaked() {
-        when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
         when(generalAppFeesService.getFeeForGA(any(), any(), any()))
             .thenReturn(Fee.builder().calculatedAmountInPence(
                 TEST_FEE_AMOUNT_POUNDS_167).code(TEST_FEE_CODE).version(VERSION).build());

@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
 import uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.genapplication.CaseLink;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -50,7 +49,6 @@ public class CreateApplicationTaskHandler extends BaseExternalTaskHandler {
     private static final List<String> BILINGUAL_TYPES = Arrays.asList("BOTH", "WELSH");
     private final GaCoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
-    private final FeatureToggleService featureToggleService;
     private final ObjectMapper mapper;
     private final GaStateFlowEngine stateFlowEngine;
 
@@ -145,7 +143,6 @@ public class CreateApplicationTaskHandler extends BaseExternalTaskHandler {
         var respondentTwoSpecficGADetails =
             ofNullable(caseData.getRespondentSolTwoGaAppDetails()).orElse(newArrayList());
         if (generalApplication.getGeneralAppApplnSolicitor() != null
-            && featureToggleService.isGaForLipsEnabled()
             && generalApplication.getParentClaimantIsApplicant().equals(NO)
             && Objects.nonNull(generalApplication.getIsGaApplicantLip())
             && generalApplication.getIsGaApplicantLip().equals(YES)) {
@@ -194,11 +191,10 @@ public class CreateApplicationTaskHandler extends BaseExternalTaskHandler {
                 generalAppCaseData.getCcdCaseReference())).build())
             .caseState(PENDING_APPLICATION_ISSUED.getDisplayedValue())
             .build();
-        if (featureToggleService.isGaForLipsEnabled()) {
-            gaDetails = gaDetails.toBuilder()
-                .parentClaimantIsApplicant(generalApplication.getParentClaimantIsApplicant())
-                .build();
-        }
+
+        gaDetails = gaDetails.toBuilder()
+            .parentClaimantIsApplicant(generalApplication.getParentClaimantIsApplicant())
+            .build();
         return gaDetails;
     }
 
@@ -215,11 +211,10 @@ public class CreateApplicationTaskHandler extends BaseExternalTaskHandler {
                 generalAppCaseData.getCcdCaseReference())).build())
             .caseState(PENDING_APPLICATION_ISSUED.getDisplayedValue())
             .build();
-        if (featureToggleService.isGaForLipsEnabled()) {
-            gaRespondentDetails = gaRespondentDetails.toBuilder()
-                .parentClaimantIsApplicant(generalApplication.getParentClaimantIsApplicant())
-                .build();
-        }
+
+        gaRespondentDetails = gaRespondentDetails.toBuilder()
+            .parentClaimantIsApplicant(generalApplication.getParentClaimantIsApplicant())
+            .build();
         return gaRespondentDetails;
     }
 
