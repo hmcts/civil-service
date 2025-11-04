@@ -42,11 +42,10 @@ allprojects {
   apply plugin: 'com.github.ben-manes.versions'
 
   java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_25
+    targetCompatibility = JavaVersion.VERSION_25
     toolchain {
       languageVersion = JavaLanguageVersion.of(25)
-      vendor = JvmVendorSpec.ADOPTIUM
     }
   }
 
