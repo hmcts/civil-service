@@ -103,7 +103,7 @@ allprojects {
       dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib', version: '1.9.25'
       dependency group: 'org.jetbrains.kotlin', name: 'kotlin-reflect', version: '1.9.25'
 
-      dependency group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.12.0'
+      dependency group: 'com.squareup.okhttp3', name: 'okhttp', version: '5.2.1'
 
       //Solves CVE-2023-34034
       dependency group: 'org.springframework.security', name: 'spring-security-crypto', version: '6.5.2'
@@ -138,7 +138,7 @@ allprojects {
     }
     imports {
       mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2021.0.9'
-      mavenBom "com.azure.spring:spring-cloud-azure-dependencies:5.22.0"
+      mavenBom "com.azure.spring:spring-cloud-azure-dependencies:5.23.0"
     }
   }
 
@@ -391,7 +391,7 @@ dependencies {
   implementation group: 'org.springframework.security', name: 'spring-security-oauth2-client', version: versions.springSecurity
   implementation group: 'org.springframework.security', name: 'spring-security-oauth2-jose', version: versions.springSecurity
   implementation group: 'org.springframework.security', name: 'spring-security-oauth2-core', version: versions.springSecurity
-  implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.48'
+  implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '10.5'
   implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.12.6'
   implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '2.1.2'
   implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.25.1'
@@ -419,8 +419,8 @@ dependencies {
 
   implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '6.3.0'
 
-  implementation group: 'com.azure', name: 'azure-core', version: '1.55.5'
-  implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.17.12'
+  implementation group: 'com.azure', name: 'azure-core', version: '1.57.0'
+  implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.17.16'
 
   implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: versions.pdfbox
   implementation group: 'org.apache.pdfbox', name: 'pdfbox-io', version: versions.pdfbox

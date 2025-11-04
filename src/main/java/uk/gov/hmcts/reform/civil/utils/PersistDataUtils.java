@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.utils;
 
 import uk.gov.hmcts.reform.civil.model.CaseData;
+
 import static java.util.Optional.ofNullable;
 
 public class PersistDataUtils {

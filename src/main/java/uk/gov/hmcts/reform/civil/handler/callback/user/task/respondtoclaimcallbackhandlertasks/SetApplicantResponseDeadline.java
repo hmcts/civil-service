@@ -214,7 +214,6 @@ public class SetApplicantResponseDeadline implements CaseTask {
 
         Party updatedRespondent1 = caseData.getRespondent1().toBuilder()
             .primaryAddress(caseData.getRespondent1Copy().getPrimaryAddress())
-            .flags(caseData.getRespondent1Copy().getFlags())
             .build();
 
         caseData.setRespondent1(updatedRespondent1);
@@ -224,7 +223,6 @@ public class SetApplicantResponseDeadline implements CaseTask {
             && ofNullable(caseData.getRespondent2Copy()).isPresent()) {
             Party updatedRespondent2 = caseData.getRespondent2().toBuilder()
                 .primaryAddress(caseData.getRespondent2Copy().getPrimaryAddress())
-                .flags(caseData.getRespondent2Copy().getFlags())
                 .build();
 
             caseData.setRespondent2(updatedRespondent2);

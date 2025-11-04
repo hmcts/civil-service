@@ -28,10 +28,6 @@ public class FeatureToggleService {
         return this.featureToggleApi.isFeatureEnabled("bulk_claim_enabled");
     }
 
-    public boolean isPinInPostEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("pin-in-post");
-    }
-
     public boolean isRPAEmailEnabled() {
         return this.featureToggleApi.isFeatureEnabled("enable-rpa-emails");
     }
@@ -50,10 +46,6 @@ public class FeatureToggleService {
                     locationEpimms,
                     true
                 );
-    }
-
-    public boolean isTransferOnlineCaseEnabled() {
-        return featureToggleApi.isFeatureEnabled("isTransferOnlineCaseEnabled");
     }
 
     public boolean isCaseProgressionEnabled() {

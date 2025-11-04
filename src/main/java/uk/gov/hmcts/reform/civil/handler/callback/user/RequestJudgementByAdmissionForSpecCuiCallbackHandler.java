@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -46,6 +47,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends CallbackHandler {
 
     private static final String NOT_VALID_DJ_BY_ADMISSION = "The Claim is not eligible for Request Judgment By Admission until %s.";
@@ -78,24 +80,19 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
 
         var caseData = callbackParams.getCaseData();
         ArrayList<String> errors = new ArrayList<>();
-        if (caseData.isJudgementDateNotPermitted()) {
-            errors.add(format(
-                NOT_VALID_DJ_BY_ADMISSION,
-                caseData.setUpJudgementFormattedPermittedDate(caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid())
-            ));
-        } else {
-            LocalDate whenWillThisAmountBePaid =
-                Optional.ofNullable(caseData.getRespondToClaimAdmitPartLRspec()).map(RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid).orElse(
-                    null);
-            if (featureToggleService.isJudgmentOnlineLive()
+        LocalDate whenWillThisAmountBePaid =
+            Optional.ofNullable(caseData.getRespondToClaimAdmitPartLRspec()).map(RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid).orElse(
+                null);
+        final boolean judgementNotAllowed =
+            caseData.isJudgementDateNotPermitted()
+                || (featureToggleService.isJudgmentOnlineLive()
                 && whenWillThisAmountBePaid != null
                 && caseData.isDateAfterToday(whenWillThisAmountBePaid)
-                && caseData.isPartAdmitPayImmediatelyClaimSpec()) {
-                errors.add(format(
-                    NOT_VALID_DJ_BY_ADMISSION,
-                    caseData.getFormattedJudgementPermittedDate(whenWillThisAmountBePaid)
-                ));
-            }
+                && caseData.isPartAdmitPayImmediatelyClaimSpec());
+
+        if (judgementNotAllowed) {
+            log.info("Case {} is not eligible for Request Judgment By Admission until {}", caseData.getCcdCaseReference(), whenWillThisAmountBePaid);
+            errors.add(format(NOT_VALID_DJ_BY_ADMISSION, whenWillThisAmountBePaid != null ? caseData.getFormattedJudgementPermittedDate(whenWillThisAmountBePaid) : null));
         }
 
         if (judgementService.isLrPayImmediatelyPlan(caseData)) {
@@ -116,7 +113,6 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
             .build();
-
     }
 
     private CallbackResponse validateAmountPaid(CallbackParams callbackParams) {

@@ -158,7 +158,6 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
 
     private void moveClaimToMediation(CallbackParams callbackParams, CaseData caseData) {
         if ((V_2.equals(callbackParams.getVersion())
-            && featureToggleService.isPinInPostEnabled()
             && isOneVOne(caseData)
             && caseData.hasClaimantAgreedToFreeMediation())
             || (featureToggleService.isCarmEnabledForCase(caseData)

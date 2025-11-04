@@ -248,7 +248,6 @@ class DJRespondentReceivedNotificationHandlerTest {
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             //send Received email
-            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
                 .respondent1Represented(null)
                 .respondent1(PartyBuilder.builder().company().build())
@@ -338,7 +337,6 @@ class DJRespondentReceivedNotificationHandlerTest {
     @Test
     void shouldReturn_whenInvokedAnd1v1AndLRvLiP_NoEmail() {
         //send Received email
-        when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
             .respondent1Represented(null)
             .respondent1(PartyBuilder.builder().company().partyEmail(null).build())
