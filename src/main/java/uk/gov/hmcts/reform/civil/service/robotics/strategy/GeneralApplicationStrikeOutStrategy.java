@@ -78,6 +78,8 @@ public class GeneralApplicationStrikeOutStrategy implements EventHistoryStrategy
         }
 
         return caseData.getGeneralApplications().stream()
+            .filter(element -> element != null && element.getValue() != null)
+            .filter(element -> element.getValue().getCaseLink() != null)
             .filter(element -> isStrikeOutApplication(element.getValue()))
             .filter(element -> hasJudgeDecision(caseData, element.getValue()))
             .toList();
