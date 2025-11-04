@@ -158,7 +158,7 @@ withPipeline(type, product, component) {
         ./bin/load-wiremock-mappings.sh
         ./bin/pull-latest-camunda-files.sh ${camundaBranch}
         ./bin/pull-latest-dmn-files.sh ${dmnBranch}
-        ./bin/pull-latest-ccd-files.sh ${getCivilCcdDefinitionBranch()}
+        ./bin/pull-latest-civil-ccd-files.sh ${getCivilCcdDefinitionBranch()}
         ./bin/pull-latest-gen-apps-ccd-files.sh ${getGenAppsCcdDefinitionBranch()}
         ./bin/import-ccd-definition.sh "-e *-prod.json,*HNL-nonprod.json,AuthorisationCaseType-shuttered.json"
         ./bin/import-gen-apps-ccd-definition.sh "-e *-nonprod.json"
@@ -204,7 +204,7 @@ withPipeline(type, product, component) {
       ./bin/add-roles.sh
       ./bin/pull-latest-camunda-files.sh ${camundaBranch}
       ./bin/pull-latest-dmn-files.sh ${dmnBranch}
-      ./bin/pull-latest-ccd-files.sh ${getCivilCcdDefinitionBranch()}
+      ./bin/pull-latest-civil-ccd-files.sh ${getCivilCcdDefinitionBranch()}
       ./bin/pull-latest-gen-apps-ccd-files.sh ${getGenAppsCcdDefinitionBranch()}
       ./bin/import-ccd-definition.sh "-e *-nonprod.json,*COS-nonprod.json,AuthorisationCaseType-shuttered.json"
       ./bin/import-gen-apps-ccd-definition.sh "-e *-nonprod.json"
