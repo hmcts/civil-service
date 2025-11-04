@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.flowstate;
 
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.flowstate.legacy.LegacyFlowDelegate;
 
 import java.util.function.Predicate;
 
@@ -10,22 +11,52 @@ public class FlowLipPredicate {
 
     }
 
-    public static final Predicate<CaseData> isLipCase = CaseData::isLipvLipOneVOne;
+    /**
+     * @deprecated use {@link LegacyFlowDelegate#isLipCase}
+     */
+    @Deprecated
+    public static final Predicate<CaseData> isLipCase = LegacyFlowDelegate.isLipCase;
 
-    public static final Predicate<CaseData> agreedToMediation = CaseData::hasClaimantAgreedToFreeMediation;
+    /**
+     * @deprecated use {@link LegacyFlowDelegate#agreedToMediation}
+     */
+    @Deprecated
+    public static final Predicate<CaseData> agreedToMediation = LegacyFlowDelegate.agreedToMediation;
 
-    public static final Predicate<CaseData> isTranslatedDocumentUploaded = CaseData::isTranslatedDocumentUploaded;
+    /**
+     * @deprecated use {@link LegacyFlowDelegate#isTranslatedDocumentUploaded}
+     */
+    @Deprecated
+    public static final Predicate<CaseData> isTranslatedDocumentUploaded = LegacyFlowDelegate.isTranslatedDocumentUploaded;
 
-    public static final Predicate<CaseData> ccjRequestJudgmentByAdmission =
-        CaseData::isCcjRequestJudgmentByAdmission;
+    /**
+     * @deprecated use {@link LegacyFlowDelegate#ccjRequestJudgmentByAdmission}
+     */
+    @Deprecated
+    public static final Predicate<CaseData> ccjRequestJudgmentByAdmission = LegacyFlowDelegate.ccjRequestJudgmentByAdmission;
 
-    public static final Predicate<CaseData> isRespondentSignSettlementAgreement =
-        CaseData::isRespondentRespondedToSettlementAgreement;
+    /**
+     * @deprecated use {@link LegacyFlowDelegate#isRespondentSignSettlementAgreement}
+     */
+    @Deprecated
+    public static final Predicate<CaseData> isRespondentSignSettlementAgreement = LegacyFlowDelegate.isRespondentSignSettlementAgreement;
 
-    public static final Predicate<CaseData> nocSubmittedForLiPDefendantBeforeOffline = CaseData::nocApplyForLiPDefendantBeforeOffline;
+    /**
+     * @deprecated use {@link LegacyFlowDelegate#nocSubmittedForLiPDefendantBeforeOffline}
+     */
+    @Deprecated
+    public static final Predicate<CaseData> nocSubmittedForLiPDefendantBeforeOffline = LegacyFlowDelegate.nocSubmittedForLiPDefendantBeforeOffline;
 
-    public static final Predicate<CaseData> nocSubmittedForLiPDefendant = CaseData::nocApplyForLiPDefendant;
+    /**
+     * @deprecated use {@link LegacyFlowDelegate#nocSubmittedForLiPDefendant}
+     */
+    @Deprecated
+    public static final Predicate<CaseData> nocSubmittedForLiPDefendant = LegacyFlowDelegate.nocSubmittedForLiPDefendant;
 
-    public  static final Predicate<CaseData> isContainsLip = CaseData::isLipCase;
+    /**
+     * @deprecated use {@link LegacyFlowDelegate#isContainsLip}
+     */
+    @Deprecated
+    public static final Predicate<CaseData> isContainsLip = LegacyFlowDelegate.isContainsLip; //TODO: No usage ?
 
 }
