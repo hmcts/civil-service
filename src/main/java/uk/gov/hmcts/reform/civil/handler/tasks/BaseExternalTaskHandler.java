@@ -75,10 +75,13 @@ public abstract class BaseExternalTaskHandler implements ExternalTaskHandler {
     protected void completeTask(ExternalTask externalTask, ExternalTaskService externalTaskService, ExternalTaskData data) throws CompleteTaskException {
         String topicName = externalTask.getTopicName();
         String processInstanceId = externalTask.getProcessInstanceId();
+        log.info("Trying to complete external task '{}' finished with processInstanceId '{}'",
+                 topicName, processInstanceId
+        );
 
         try {
             externalTaskService.complete(externalTask, getVariableMap(data));
-            log.info("External task '{}' finished with processInstanceId '{}'",
+            log.info("External task '{}' completed with processInstanceId '{}'",
                      topicName, processInstanceId
             );
         } catch (Exception e) {
