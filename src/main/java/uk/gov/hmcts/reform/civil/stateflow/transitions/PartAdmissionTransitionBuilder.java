@@ -73,16 +73,18 @@ public class PartAdmissionTransitionBuilder extends MidTransitionBuilder {
                 flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), isRespondentResponseLangIsBilingual.test(c));
             }, transitions)
             .moveTo(PART_ADMIT_NOT_PROCEED, transitions).onlyWhen(fullDefenceNotProceed, transitions)
-            .moveTo(PART_ADMIT_PAY_IMMEDIATELY, transitions).onlyWhen(partAdmitPayImmediately, transitions)
+                  .moveTo(PART_ADMIT_PAY_IMMEDIATELY, transitions).onlyWhen(partAdmitPayImmediately, transitions)
             .moveTo(PART_ADMIT_AGREE_SETTLE, transitions).onlyWhen(agreePartAdmitSettle, transitions)
-            .moveTo(PART_ADMIT_AGREE_REPAYMENT, transitions).onlyWhen(acceptRepaymentPlan, transitions)
+                .moveTo(PART_ADMIT_AGREE_REPAYMENT, transitions).onlyWhen(acceptRepaymentPlan, transitions)
             .set((c, flags) -> flags.put(FlowFlag.LIP_JUDGMENT_ADMISSION.name(), JudgmentAdmissionUtils.getLIPJudgmentAdmission(c)), transitions)
-            .moveTo(PART_ADMIT_REJECT_REPAYMENT, transitions).onlyWhen(rejectRepaymentPlan, transitions)
+                .moveTo(PART_ADMIT_REJECT_REPAYMENT, transitions).onlyWhen(rejectRepaymentPlan, transitions)
             .set((c, flags) -> flags.put(FlowFlag.LIP_JUDGMENT_ADMISSION.name(), JudgmentAdmissionUtils.getLIPJudgmentAdmission(c)), transitions)
             .moveTo(TAKEN_OFFLINE_BY_STAFF, transitions).onlyWhen(takenOfflineByStaffAfterDefendantResponse, transitions)
             .moveTo(PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA, transitions)
             .onlyWhen(applicantOutOfTimeNotBeingTakenOffline, transitions);
     }
+
+    public static final Predicate<CaseData> partAdmitProceed = CaseData::isPartAdmitPayImmediatelyAccepted;
 
     public static final Predicate<CaseData> agreePartAdmitSettle = CaseData::isPartAdmitClaimSettled;
 
