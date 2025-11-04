@@ -33,6 +33,14 @@ def versions = [
 ]
 
 allprojects {
+  apply plugin: 'java'
+  apply plugin: 'jacoco'
+  apply plugin: 'checkstyle'
+  apply plugin: 'io.spring.dependency-management'
+  apply plugin: 'org.springframework.boot'
+  apply plugin: 'org.owasp.dependencycheck'
+  apply plugin: 'com.github.ben-manes.versions'
+
   sourceCompatibility = JavaVersion.VERSION_25
   targetCompatibility = JavaVersion.VERSION_25
 
@@ -42,14 +50,6 @@ allprojects {
       vendor = JvmVendorSpec.ADOPTIUM
     }
   }
-
-  apply plugin: 'java'
-  apply plugin: 'jacoco'
-  apply plugin: 'checkstyle'
-  apply plugin: 'io.spring.dependency-management'
-  apply plugin: 'org.springframework.boot'
-  apply plugin: 'org.owasp.dependencycheck'
-  apply plugin: 'com.github.ben-manes.versions'
 
   checkstyle {
     maxWarnings = 0
