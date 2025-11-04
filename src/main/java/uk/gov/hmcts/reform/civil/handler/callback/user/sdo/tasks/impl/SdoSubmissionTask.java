@@ -7,8 +7,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.SdoLifecycleSta
 import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.SdoTaskContext;
 import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.SdoTaskResult;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.sdo.SdoFeatureToggleService;
-import uk.gov.hmcts.reform.civil.service.sdo.SdoLocationService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoSubmissionService;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 
@@ -16,15 +15,14 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TO
 @RequiredArgsConstructor
 public class SdoSubmissionTask implements SdoCallbackTask {
 
-    private final SdoFeatureToggleService featureToggleService;
-    private final SdoLocationService sdoLocationService;
+    private final SdoSubmissionService submissionService;
 
     @Override
     public SdoTaskResult execute(SdoTaskContext context) {
         CaseData caseData = context.caseData();
         String authToken = context.callbackParams().getParams().get(BEARER_TOKEN).toString();
-        sdoLocationService.updateWaLocationsIfRequired(caseData, caseData.toBuilder(), authToken);
-        return SdoTaskResult.empty(caseData);
+        CaseData updatedCaseData = submissionService.prepareSubmission(caseData, authToken);
+        return SdoTaskResult.empty(updatedCaseData);
     }
 
     @Override

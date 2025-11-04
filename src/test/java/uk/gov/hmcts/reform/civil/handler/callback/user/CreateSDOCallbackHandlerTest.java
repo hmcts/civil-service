@@ -47,7 +47,9 @@ import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2TimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallTrack;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.pipeline.SdoCallbackPipeline;
+import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.impl.SdoConfirmationTask;
 import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.impl.SdoDocumentTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.impl.SdoSubmissionTask;
 import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.impl.SdoValidationTask;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
@@ -106,6 +108,9 @@ import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataServ
 import uk.gov.hmcts.reform.civil.service.sdo.SdoCaseClassificationService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoDocumentService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoLocationService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoNarrativeService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoSubmissionService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoFeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoValidationService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingSubChannel;
@@ -186,14 +191,9 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate.FIVE_HOURS;
 import static uk.gov.hmcts.reform.civil.enums.sdo.TrialOnRadioOptions.OPEN_DATE;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.CONFIRMATION_HEADER;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.CONFIRMATION_SUMMARY_1v1;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.CONFIRMATION_SUMMARY_1v2;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.CONFIRMATION_SUMMARY_2v1;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.ERROR_MESSAGE_DATE_MUST_BE_IN_THE_FUTURE;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.ERROR_MESSAGE_NUMBER_CANNOT_BE_LESS_THAN_ZERO;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.ERROR_MINTI_DISPOSAL_NOT_ALLOWED;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.FEEDBACK_LINK;
 
 @SpringBootTest(classes = {
     CreateSDOCallbackHandler.class,
@@ -208,11 +208,16 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackH
     AssignCategoryId.class,
     SdoLocationService.class,
     SdoCaseClassificationService.class,
+    SdoFeatureToggleService.class,
+    SdoNarrativeService.class,
     SdoValidationService.class,
     SdoDocumentService.class,
+    SdoSubmissionService.class,
     SdoCallbackPipeline.class,
     SdoValidationTask.class,
-    SdoDocumentTask.class},
+    SdoDocumentTask.class,
+    SdoSubmissionTask.class,
+    SdoConfirmationTask.class},
     properties = {"reference.database.enabled=false"})
 public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -3110,22 +3115,17 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Nested
     class SubmittedCallback {
+
+        private final SdoNarrativeService narrativeService = new SdoNarrativeService();
+
         @Test
         void shouldReturnExpectedSubmittedCallbackResponse_1v1() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
-            String header = format(
-                CONFIRMATION_HEADER,
-                REFERENCE_NUMBER
-            );
-
-            String body = format(
-                CONFIRMATION_SUMMARY_1v1,
-                "Mr. John Rambo",
-                "Mr. Sole Trader"
-            ) + format(FEEDBACK_LINK, "Feedback: Please provide judicial feedback");
+            String header = narrativeService.buildConfirmationHeader(caseData);
+            String body = narrativeService.buildConfirmationBody(caseData);
 
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
@@ -3143,17 +3143,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
-            String header = format(
-                CONFIRMATION_HEADER,
-                REFERENCE_NUMBER
-            );
-
-            String body = format(
-                CONFIRMATION_SUMMARY_1v2,
-                "Mr. John Rambo",
-                "Mr. Sole Trader",
-                "Mr. John Rambo"
-            ) + format(FEEDBACK_LINK, "Feedback: Please provide judicial feedback");
+            String header = narrativeService.buildConfirmationHeader(caseData);
+            String body = narrativeService.buildConfirmationBody(caseData);
 
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
@@ -3171,17 +3162,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
-            String header = format(
-                CONFIRMATION_HEADER,
-                REFERENCE_NUMBER
-            );
-
-            String body = format(
-                CONFIRMATION_SUMMARY_2v1,
-                "Mr. John Rambo",
-                "Mr. Jason Rambo",
-                "Mr. Sole Trader"
-            ) + format(FEEDBACK_LINK, "Feedback: Please provide judicial feedback");
+            String header = narrativeService.buildConfirmationHeader(caseData);
+            String body = narrativeService.buildConfirmationBody(caseData);
 
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()

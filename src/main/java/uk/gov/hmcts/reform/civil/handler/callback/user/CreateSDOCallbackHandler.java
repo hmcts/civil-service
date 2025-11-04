@@ -17,7 +17,6 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantFastTrack;
 import uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantSmallClaim;
 import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
@@ -46,13 +45,10 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.SdoLifecycleSta
 import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.SdoTaskContext;
 import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.SdoTaskResult;
 import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
-import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.SmallClaimsMediation;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
-import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingDisclosureOfDocuments;
@@ -150,7 +146,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -162,15 +157,10 @@ import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantSmallClaim.REST
 import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantSmallClaim.RESTRICT_NUMBER_PAGES_TEXT2;
 import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantSmallClaim.RESTRICT_WITNESS_TEXT;
 import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantSmallClaim.WITNESS_DESCRIPTION_TEXT;
-import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
-import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
-import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle.SHOW;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
-import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getHearingNotes;
 
 @Slf4j
 @Service
@@ -181,27 +171,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     private static final String HEARING_CHANNEL = "HearingChannel";
     private static final String SPEC_SERVICE_ID = "AAA6";
     private static final String UNSPEC_SERVICE_ID = "AAA7";
-    public static final String CONFIRMATION_HEADER = "# Your order has been issued"
-        + "%n## Claim number: %s";
-    public static final String CONFIRMATION_SUMMARY_1v1 = "<br/>The Directions Order has been sent to:"
-        + "<br/>%n%n<strong>Claimant 1</strong>%n"
-        + "<br/>%s"
-        + "<br/>%n%n<strong>Defendant 1</strong>%n"
-        + "<br/>%s";
-    public static final String CONFIRMATION_SUMMARY_2v1 = "<br/>The Directions Order has been sent to:"
-        + "<br/>%n%n<strong>Claimant 1</strong>%n"
-        + "<br/>%s"
-        + "<br/>%n%n<strong>Claimant 2</strong>%n"
-        + "<br/>%s"
-        + "<br/>%n%n<strong>Defendant 1</strong>%n"
-        + "<br/>%s";
-    public static final String CONFIRMATION_SUMMARY_1v2 = "<br/>The Directions Order has been sent to:"
-        + "<br/>%n%n<strong>Claimant 1</strong>%n"
-        + "<br/>%s"
-        + "<br/>%n%n<strong>Defendant 1</strong>%n"
-        + "<br/>%s"
-        + "<br/>%n%n<strong>Defendant 2</strong>%n"
-        + "<br/>%s";
     private static final String UPON_CONSIDERING =
         "Upon considering the claim form, particulars of claim, statements of case and Directions questionnaires";
     public static final String HEARING_TIME_TEXT_AFTER =
@@ -210,8 +179,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             + "claimant fails to pay the fee or obtain a fee exemption by that time the claim will be "
             + "struck without further order.";
 
-    public static final String FEEDBACK_LINK = "<p>%s"
-        + " <a href='https://www.smartsurvey.co.uk/s/QKJTVU//' target=_blank>here</a></p>";
 
     public static final String ERROR_MESSAGE_DATE_MUST_BE_IN_THE_FUTURE = "Date must be in the future";
     public static final String ERROR_MESSAGE_NUMBER_CANNOT_BE_LESS_THAN_ZERO = "The number entered cannot be less than zero";
@@ -1293,189 +1260,47 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse submitSDO(CallbackParams callbackParams) {
-        CaseData.CaseDataBuilder<?, ?> dataBuilder = getSharedData(callbackParams);
-
         CaseData caseData = callbackParams.getCaseData();
+        SdoTaskContext submissionContext = new SdoTaskContext(caseData, callbackParams, SdoLifecycleStage.SUBMISSION);
+        SdoTaskResult submissionResult = sdoCallbackPipeline.run(submissionContext, SdoLifecycleStage.SUBMISSION);
 
-        CaseDocument document = caseData.getSdoOrderDocument();
-        if (document != null) {
-            if (featureToggleService.isWelshEnabledForMainCase()
-                && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
-                List<Element<CaseDocument>> sdoDocuments = callbackParams.getCaseData()
-                    .getPreTranslationDocuments();
-                sdoDocuments.add(element(document));
-                dataBuilder.preTranslationDocuments(sdoDocuments);
-            } else {
-                List<Element<CaseDocument>> generatedDocuments = callbackParams.getCaseData()
-                    .getSystemGeneratedCaseDocuments();
-                generatedDocuments.add(element(document));
-                dataBuilder.systemGeneratedCaseDocuments(generatedDocuments);
-            }
-        }
-        // null/remove preview SDO document, otherwise it will show as duplicate within case file view
-        dataBuilder.sdoOrderDocument(null);
-
-        dataBuilder.hearingNotes(getHearingNotes(caseData));
-        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            // LiP check ensures LiP cases will not automatically get whitelisted, and instead will have their own ea court check.
-            boolean isLipCase = (caseData.isApplicantLiP() || caseData.isRespondent1LiP() || caseData.isRespondent2LiP());
-            if (featureToggleService.isWelshEnabledForMainCase()) {
-                dataBuilder.eaCourtLocation(YES);
-            } else {
-                if (!isLipCase) {
-                    log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
-                    dataBuilder.eaCourtLocation(YES);
-                } else {
-                    boolean isLipCaseEaCourt = isLipCaseWithProgressionEnabledAndCourtWhiteListed(caseData);
-                    dataBuilder.eaCourtLocation(isLipCaseEaCourt ? YesOrNo.YES : YesOrNo.NO);
-                }
-            }
+        List<String> submissionErrors = submissionResult.errors() == null
+            ? Collections.emptyList()
+            : submissionResult.errors();
+        if (!submissionErrors.isEmpty()) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(submissionErrors)
+                .build();
         }
 
-        dataBuilder.disposalHearingMethodInPerson(deleteLocationList(
-            caseData.getDisposalHearingMethodInPerson()));
-        dataBuilder.fastTrackMethodInPerson(deleteLocationList(
-            caseData.getFastTrackMethodInPerson()));
-        dataBuilder.smallClaimsMethodInPerson(deleteLocationList(
-            caseData.getSmallClaimsMethodInPerson()));
-        if (SdoHelper.isSDOR2ScreenForDRHSmallClaim(caseData)
-            && caseData.getSdoR2SmallClaimsHearing() != null) {
-            dataBuilder.sdoR2SmallClaimsHearing(updateHearingAfterDeletingLocationList(caseData.getSdoR2SmallClaimsHearing()));
-        }
-        setClaimsTrackBasedOnJudgeSelection(dataBuilder, caseData);
+        CaseData updatedCaseData = submissionResult.updatedCaseData() != null
+            ? submissionResult.updatedCaseData()
+            : caseData;
 
-        // Avoid location lists (listItems) from being saved in caseData, just save the selected values
-        if (caseData.getSdoR2Trial() != null) {
-            SdoR2Trial sdoR2Trial = caseData.getSdoR2Trial();
-            if (caseData.getSdoR2Trial().getHearingCourtLocationList() != null) {
-                sdoR2Trial.setHearingCourtLocationList(DynamicList.builder().value(
-                    caseData.getSdoR2Trial().getHearingCourtLocationList().getValue()).build());
-            }
-            if (caseData.getSdoR2Trial().getAltHearingCourtLocationList() != null) {
-                sdoR2Trial.setAltHearingCourtLocationList(DynamicList.builder().value(
-                    caseData.getSdoR2Trial().getAltHearingCourtLocationList().getValue()).build());
-            }
-            dataBuilder.sdoR2Trial(sdoR2Trial);
-        }
-
-        if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
+        if (featureToggleService.isMultiOrIntermediateTrackEnabled(updatedCaseData)) {
+            CaseData.CaseDataBuilder<?, ?> waUpdateBuilder = updatedCaseData.toBuilder();
             updateWaCourtLocationsService.ifPresent(service -> service.updateCourtListingWALocations(
-                callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
-                dataBuilder
+                callbackParams.getParams().get(BEARER_TOKEN).toString(),
+                waUpdateBuilder
             ));
+            updatedCaseData = waUpdateBuilder.build();
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(dataBuilder.build().toMap(objectMapper))
+            .data(updatedCaseData.toMap(objectMapper))
             .build();
-    }
-
-    private boolean isLipCaseWithProgressionEnabledAndCourtWhiteListed(CaseData caseData) {
-        return (caseData.isLipvLipOneVOne() || caseData.isLRvLipOneVOne()
-            || (caseData.isLipvLROneVOne() && featureToggleService.isDefendantNoCOnlineForCase(caseData)))
-            && featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation());
-    }
-
-    private SdoR2SmallClaimsHearing updateHearingAfterDeletingLocationList(SdoR2SmallClaimsHearing sdoR2SmallClaimsHearing) {
-        SdoR2SmallClaimsHearing updatedSdoR2SmallClaimsHearing = sdoR2SmallClaimsHearing;
-        if (sdoR2SmallClaimsHearing.getHearingCourtLocationList() != null) {
-            updatedSdoR2SmallClaimsHearing.setHearingCourtLocationList(deleteLocationList(sdoR2SmallClaimsHearing.getHearingCourtLocationList()));
-        }
-        if (sdoR2SmallClaimsHearing.getAltHearingCourtLocationList() != null) {
-            updatedSdoR2SmallClaimsHearing.setAltHearingCourtLocationList(deleteLocationList(sdoR2SmallClaimsHearing.getAltHearingCourtLocationList()));
-        }
-        return updatedSdoR2SmallClaimsHearing;
-    }
-
-    // During SDO the claim track can change based on judges selection. In this case we want to update claims track
-    // to this decision, or maintain it, if it was not changed.
-    private void setClaimsTrackBasedOnJudgeSelection(CaseData.CaseDataBuilder<?, ?> dataBuilder, CaseData caseData) {
-        CaseCategory caseAccessCategory = caseData.getCaseAccessCategory();
-        switch (caseAccessCategory) {
-            case UNSPEC_CLAIM:// unspec use allocatedTrack to hold claims track value
-                if (SdoHelper.isSmallClaimsTrack(caseData)) {
-                    dataBuilder.allocatedTrack(SMALL_CLAIM);
-                } else if (SdoHelper.isFastTrack(caseData)) {
-                    dataBuilder.allocatedTrack(FAST_CLAIM);
-                }
-                break;
-            case SPEC_CLAIM:// spec claims use responseClaimTrack to hold claims track value
-                if (SdoHelper.isSmallClaimsTrack(caseData)) {
-                    dataBuilder.responseClaimTrack(SMALL_CLAIM.name());
-                } else if (SdoHelper.isFastTrack(caseData)) {
-                    dataBuilder.responseClaimTrack(FAST_CLAIM.name());
-                }
-                break;
-            default:
-                break;
-        }
-    }
-
-    private boolean sdoSubmittedPreCPForLiPCase(CaseData caseData) {
-        return !featureToggleService.isCaseProgressionEnabled()
-            && (caseData.isRespondent1LiP() || caseData.isRespondent2LiP() || caseData.isApplicantNotRepresented());
-    }
-
-    private DynamicList deleteLocationList(DynamicList list) {
-        if (list == null) {
-            return null;
-        }
-        return DynamicList.builder().value(list.getValue()).build();
-    }
-
-    private CaseData.CaseDataBuilder<?, ?> getSharedData(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> dataBuilder = caseData.toBuilder();
-
-        dataBuilder.businessProcess(BusinessProcess.ready(CREATE_SDO));
-
-        return dataBuilder;
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        SdoTaskContext confirmationContext = new SdoTaskContext(caseData, callbackParams, SdoLifecycleStage.CONFIRMATION);
+        SdoTaskResult confirmationResult = sdoCallbackPipeline.run(confirmationContext, SdoLifecycleStage.CONFIRMATION);
 
-        return SubmittedCallbackResponse.builder()
-            .confirmationHeader(getHeader(caseData))
-            .confirmationBody(getBody(caseData))
-            .build();
-    }
-
-    private String getHeader(CaseData caseData) {
-        return format(
-            CONFIRMATION_HEADER,
-            caseData.getLegacyCaseReference()
-        );
-    }
-
-    private String getBody(CaseData caseData) {
-        String applicant1Name = caseData.getApplicant1().getPartyName();
-        String respondent1Name = caseData.getRespondent1().getPartyName();
-        Party applicant2 = caseData.getApplicant2();
-        Party respondent2 = caseData.getRespondent2();
-
-        String initialBody = format(
-            CONFIRMATION_SUMMARY_1v1,
-            applicant1Name,
-            respondent1Name
-        );
-
-        if (applicant2 != null) {
-            initialBody = format(
-                CONFIRMATION_SUMMARY_2v1,
-                applicant1Name,
-                applicant2.getPartyName(),
-                respondent1Name
-            );
-        } else if (respondent2 != null) {
-            initialBody = format(
-                CONFIRMATION_SUMMARY_1v2,
-                applicant1Name,
-                respondent1Name,
-                respondent2.getPartyName()
-            );
+        if (confirmationResult.submittedCallbackResponse() != null) {
+            return confirmationResult.submittedCallbackResponse();
         }
-        return initialBody + format(FEEDBACK_LINK, "Feedback: Please provide judicial feedback");
+
+        return SubmittedCallbackResponse.builder().build();
     }
 
     private void setCheckList(
