@@ -14,7 +14,7 @@ cd ..
 
 #Copy ccd definition files  to civil-ccd-def which contains ccd def files
 cp -r ./${ccdRepoName}/ga-ccd-definition .
-#mv ./${ccdRepoName}/e2e ./gen-apps-e2e
+mv ./${ccdRepoName}/e2e ./gen-apps-e2e
 #cp -r ./${ccdRepoName}/package.json ./${directoryName}
 #cp -r ./${ccdRepoName}/yarn.lock ./${directoryName}
 #cp -r ./${ccdRepoName}/codecept.conf.js ./${directoryName}

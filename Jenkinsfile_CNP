@@ -147,6 +147,7 @@ withPipeline(type, product, component) {
   before('smoketest:preview') {
     env.URL = "https://civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.CIVIL_SERVICE_URL = "https://civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+    env.CIVIL_GENERAL_APPLICATIONS_URL = "https://civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.WIREMOCK_URL = "https://wiremock-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
 
     retry(3) {
@@ -166,7 +167,6 @@ withPipeline(type, product, component) {
 
     yarnBuilder.yarn('yarn-update')
     yarnBuilder.yarn('install-dependencies')
-    env.CIVIL_GENERAL_APPLICATIONS_URL = "https://ga-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.IDAM_API_URL = "https://idam-api.aat.platform.hmcts.net"
     env.SERVICE_AUTH_PROVIDER_API_BASE_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
     env.CCD_DATA_STORE_URL = "https://ccd-data-store-api-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
@@ -212,6 +212,7 @@ withPipeline(type, product, component) {
     """
     env.URL = "https://civil-service-staging.aat.platform.hmcts.net"
     env.CIVIL_SERVICE_URL = "https://civil-service-staging.aat.platform.hmcts.net"
+    env.CIVIL_GENERAL_APPLICATIONS_URL = "https://civil-service-staging.aat.platform.hmcts.net"
     env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
     env.IDAM_API_URL = "https://idam-api.aat.platform.hmcts.net"
     env.SERVICE_AUTH_PROVIDER_API_BASE_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
