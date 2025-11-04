@@ -46,6 +46,9 @@ import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2PhysicalTrialBundleOp
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2TimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallTrack;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.pipeline.SdoCallbackPipeline;
+import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.impl.SdoDocumentTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.impl.SdoValidationTask;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
@@ -206,7 +209,10 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackH
     SdoLocationService.class,
     SdoCaseClassificationService.class,
     SdoValidationService.class,
-    SdoDocumentService.class},
+    SdoDocumentService.class,
+    SdoCallbackPipeline.class,
+    SdoValidationTask.class,
+    SdoDocumentTask.class},
     properties = {"reference.database.enabled=false"})
 public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -240,7 +246,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     private SdoValidationService sdoValidationService;
 
     @Autowired
-    private SdoDocumentService sdoDocumentService;
+    private SdoCallbackPipeline sdoCallbackPipeline;
 
     @MockBean
     protected LocationReferenceDataService locationRefDataService;
@@ -1341,8 +1347,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         handler = new CreateSDOCallbackHandler(objectMapper, workingDayIndicator,
                                                deadlinesCalculator, sdoGeneratorService, featureToggleService, locationHelper,
-                                                       assignCategoryId, sdoLocationService, sdoValidationService, sdoDocumentService,
-                                                       categoryService, Optional.empty());
+                                               assignCategoryId, sdoLocationService, sdoValidationService,
+                                               sdoCallbackPipeline, categoryService, Optional.empty());
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
             .caseManagementLocation(CaseLocationCivil.builder().baseLocation("123456").build())

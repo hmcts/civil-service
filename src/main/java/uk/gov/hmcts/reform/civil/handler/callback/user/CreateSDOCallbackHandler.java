@@ -41,6 +41,10 @@ import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2TimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.TrialOnRadioOptions;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
+import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.pipeline.SdoCallbackPipeline;
+import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.SdoLifecycleStage;
+import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.SdoTaskContext;
+import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.SdoTaskResult;
 import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -131,7 +135,6 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.camunda.UpdateWaCourtLocationsService;
 import uk.gov.hmcts.reform.civil.service.docmosis.sdo.SdoGeneratorService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoLocationService;
-import uk.gov.hmcts.reform.civil.service.sdo.SdoDocumentService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoValidationService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.HearingMethodUtils;
@@ -224,7 +227,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     private final AssignCategoryId assignCategoryId;
     private final SdoLocationService sdoLocationService;
     private final SdoValidationService sdoValidationService;
-    private final SdoDocumentService sdoDocumentService;
+    private final SdoCallbackPipeline sdoCallbackPipeline;
     private final CategoryService categoryService;
     private final List<DateToShowToggle> dateToShowTrue = List.of(DateToShowToggle.SHOW);
     private final List<IncludeInOrderToggle> includeInOrderToggle = List.of(IncludeInOrderToggle.INCLUDE);
@@ -264,7 +267,34 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     // it is only ever called once.
     // Then any changes to fields in ccd will persist in ccd regardless of backwards or forwards page navigation.
     private CallbackResponse prePopulateOrderDetailsPages(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
+        CaseData originalCaseData = callbackParams.getCaseData();
+        SdoTaskContext prePopulateContext = new SdoTaskContext(
+            originalCaseData,
+            callbackParams,
+            SdoLifecycleStage.PRE_POPULATE
+        );
+        SdoTaskResult prePopulateResult = sdoCallbackPipeline.run(prePopulateContext, SdoLifecycleStage.PRE_POPULATE);
+        List<String> prePopulateErrors = prePopulateResult.errors() == null
+            ? Collections.emptyList()
+            : prePopulateResult.errors();
+        CaseData caseData = prePopulateResult.updatedCaseData() != null
+            ? prePopulateResult.updatedCaseData()
+            : originalCaseData;
+
+        if (!prePopulateErrors.isEmpty()) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(prePopulateErrors)
+                .data(caseData.toMap(objectMapper))
+                .build();
+        }
+
+        if (isMultiOrIntermediateTrackClaim(caseData)) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(List.of(ERROR_MINTI_DISPOSAL_NOT_ALLOWED))
+                .data(caseData.toMap(objectMapper))
+                .build();
+        }
+
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
         updatedData
@@ -1181,25 +1211,46 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     private CallbackResponse generateSdoOrder(CallbackParams callbackParams) {
         log.info("generateSdoOrder ccdCaseReference: {} legacyCaseReference: {}",
                  callbackParams.getCaseData().getCcdCaseReference(), callbackParams.getCaseData().getLegacyCaseReference());
-        CaseData caseData = V_1.equals(callbackParams.getVersion())
+
+        CaseData initialCaseData = V_1.equals(callbackParams.getVersion())
             ? mapHearingMethodFields(callbackParams.getCaseData())
             : callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
 
-        List<String> errors = sdoValidationService.validate(caseData);
+        SdoTaskContext validationContext = new SdoTaskContext(initialCaseData, callbackParams, SdoLifecycleStage.MID_EVENT);
+        SdoTaskResult validationResult = sdoCallbackPipeline.run(validationContext, SdoLifecycleStage.MID_EVENT);
 
-        if (errors.isEmpty()) {
-            String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-            sdoDocumentService.generateSdoDocument(caseData, authToken)
-                .ifPresent(document -> {
-                    updatedData.sdoOrderDocument(document);
-                    sdoDocumentService.assignCategory(document, "caseManagementOrders");
-                });
+        List<String> validationErrors = validationResult.errors() == null
+            ? Collections.emptyList()
+            : validationResult.errors();
+        CaseData caseDataAfterValidation = validationResult.updatedCaseData() != null
+            ? validationResult.updatedCaseData()
+            : initialCaseData;
+
+        if (!validationErrors.isEmpty()) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(validationErrors)
+                .data(caseDataAfterValidation.toMap(objectMapper))
+                .build();
         }
 
+        SdoTaskContext documentContext = new SdoTaskContext(
+            caseDataAfterValidation,
+            callbackParams,
+            SdoLifecycleStage.DOCUMENT_GENERATION
+        );
+        SdoTaskResult documentResult = sdoCallbackPipeline.run(documentContext, SdoLifecycleStage.DOCUMENT_GENERATION);
+
+        CaseData finalCaseData = documentResult.updatedCaseData() != null
+            ? documentResult.updatedCaseData()
+            : caseDataAfterValidation;
+
+        List<String> documentErrors = documentResult.errors() == null
+            ? Collections.emptyList()
+            : documentResult.errors();
+
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(errors)
-            .data(updatedData.build().toMap(objectMapper))
+            .errors(documentErrors)
+            .data(finalCaseData.toMap(objectMapper))
             .build();
     }
 
