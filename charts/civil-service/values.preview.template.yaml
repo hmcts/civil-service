@@ -249,6 +249,14 @@ ccd:
       disableKeyVaults: true
       ingressHost: ccd-definition-store-${SERVICE_FQDN}
 
+  draft-store-service:
+    java:
+      disableKeyVaults: true
+
+  rpe-service-auth-provider:
+    java:
+      disableKeyVaults: true
+
   postgresql:
     persistence:
       enabled: false
