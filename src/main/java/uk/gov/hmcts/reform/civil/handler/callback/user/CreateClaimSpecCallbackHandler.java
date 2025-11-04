@@ -410,14 +410,13 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     ) {
         CaseData caseData = callbackParams.getCaseData();
 
-        // Build updated case data
+        // Add flight delay airline list needed for next screens
         CaseData updatedCaseData = caseData.toBuilder()
             .flightDelayDetails(getAirlineListTask.getFlightDelayDetails(caseData))
             .build();
 
         List<String> errors = null;
 
-        // Perform postcode validation only if required
         if (YES.equals(required.apply(caseData))) {
             String postCode = Optional.ofNullable(addressExtractor.apply(caseData))
                 .map(Address::getPostCode)
@@ -426,7 +425,6 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             errors = postcodeValidator.validate(postCode);
         }
 
-        // Always return case data, errors only if present
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.toMap(objectMapper))
             .errors(errors)
