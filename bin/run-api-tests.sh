@@ -49,18 +49,18 @@ run_functional_test_groups() {
 run_functional_tests() {
   echo "Running all functional tests on ${ENVIRONMENT} env"
   if [ "$ENVIRONMENT" = "aat" ]; then
-    cd civil-e2e
+    cd civil-ccd-definition
     yarn install
     yarn test:api-prod
-    cd ../gen-apps-e2e
+    cd ../civil-general-apps-ccd-definition
     yarn install
-    yarn test:api-nonprod
+    yarn test:api
     cd ..
   elif [ -z "$PR_FT_GROUPS" ]; then
-    cd civil-e2e
+    cd civil-ccd-definition
     yarn install
     yarn test:api-nonprod
-    cd ../gen-apps-e2e
+    cd ../civil-general-apps-ccd-definition
     yarn install
     yarn test:api-nonprod
     cd ..

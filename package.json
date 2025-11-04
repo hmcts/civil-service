@@ -1,0 +1,4 @@
+{
+  "private": true,
+  "workspaces": ["civil-ccd-definition", "civil-ga-ccd-definition"]
+}

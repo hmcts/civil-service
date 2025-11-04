@@ -14,11 +14,11 @@ cd ..
 
 #Copy ccd definition files  to civil-ccd-def which contains ccd def files
 cp -r ./${ccdRepoName}/ga-ccd-definition .
-mkdir -p ${directoryName}/e2e && mv ./${ccdRepoName}/e2e ./${directoryName}/e2e
-#cp -r ./${ccdRepoName}/e2e ./${directoryName}/gen-apps-e2e
+mkdir -p ${directoryName}/e2e && mv ./${ccdRepoName}/e2e ./${directoryName}
 cp -r ./${ccdRepoName}/package.json ./${directoryName}
 cp -r ./${ccdRepoName}/yarn.lock ./${directoryName}
 cp -r ./${ccdRepoName}/codecept.conf.js ./${directoryName}
 cp -r ./${ccdRepoName}/saucelabs.conf.js ./${directoryName}
 echo *
 rm -rf ./${ccdRepoName}
+mv ./${directoryName} ./${ccdRepoName}
