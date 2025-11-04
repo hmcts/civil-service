@@ -1,9 +1,11 @@
 package uk.gov.hmcts.reform.civil.service.flowstate;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.config.FlowStateAllowedEventsConfig;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
@@ -23,6 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
     SimpleStateFlowEngine.class,
     SimpleStateFlowBuilder.class,
     TransitionsTestConfiguration.class,
+    FlowStateAllowedEventsConfig.class,
     FlowStateAllowedEventService.class
 })
 class AllowedEventsParityTest {
@@ -31,11 +34,14 @@ class AllowedEventsParityTest {
     @MockBean
     private FeatureToggleService toggleService;
 
+    @Autowired
+    private FlowStateAllowedEventsConfig flowStateAllowedEventsConfig;
+
     @SuppressWarnings("unchecked")
-    private static Map<String, List<CaseEvent>> readStaticMap(String fieldName) throws Exception {
-        Field f = FlowStateAllowedEventService.class.getDeclaredField(fieldName);
+    private Map<String, List<CaseEvent>> readStaticMap(String fieldName) throws Exception {
+        Field f = FlowStateAllowedEventsConfig.class.getDeclaredField(fieldName);
         f.setAccessible(true);
-        return (Map<String, List<CaseEvent>>) f.get(null);
+        return (Map<String, List<CaseEvent>>) f.get(flowStateAllowedEventsConfig);
     }
 
     private static List<CaseEvent> toList(CaseEvent[] array) {
@@ -44,7 +50,7 @@ class AllowedEventsParityTest {
 
     @Test
     void unspecMap_has_full_parity_with_provider_matrix() throws Exception {
-        Map<String, List<CaseEvent>> prod = readStaticMap("ALLOWED_EVENTS_ON_FLOW_STATE");
+        Map<String, List<CaseEvent>> prod = readStaticMap("allowedEvents");
 
         FlowStateAllowedEventServiceTest.GetAllowedCaseEventForFlowStateArguments provider =
             new FlowStateAllowedEventServiceTest.GetAllowedCaseEventForFlowStateArguments();
@@ -82,7 +88,7 @@ class AllowedEventsParityTest {
 
     @Test
     void specMap_has_full_parity_with_provider_matrix() throws Exception {
-        Map<String, List<CaseEvent>> prod = readStaticMap("ALLOWED_EVENTS_ON_FLOW_STATE_SPEC");
+        Map<String, List<CaseEvent>> prod = readStaticMap("allowedEventsSpec");
 
         FlowStateAllowedEventServiceTest.GetAllowedCaseEventForFlowStateArgumentsSpec provider =
             new FlowStateAllowedEventServiceTest.GetAllowedCaseEventForFlowStateArgumentsSpec();

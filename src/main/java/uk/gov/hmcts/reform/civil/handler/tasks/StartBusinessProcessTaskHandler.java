@@ -59,13 +59,12 @@ public class StartBusinessProcessTaskHandler extends BaseExternalTaskHandler {
             case READY, DISPATCHED:
                 return updateBusinessProcess(caseId, externalTask, startEventResponse, businessProcess);
             case STARTED:
-                if (businessProcess.hasSameProcessInstanceId(externalTask.getProcessInstanceId())) {
-                    log.error("----------------CAMUNDA SAME PROCESS ID ERROR -START------------------");
-                    log.error("CAMUNDAERROR CaseId ({}) CaseEvent ({}) LegacyCaseReference ({}) AllocatedTrack ({})"
-                              + "externalTaskProcessInstanceId({}) businessProcessInstanceId({})", caseId,
-                              caseEvent, data.getLegacyCaseReference(), data.getAllocatedTrack(),
-                              externalTask.getProcessInstanceId(), businessProcess.getProcessInstanceId());
-                    log.error("----------------CAMUNDA SAME PROCESS ID ERROR -END------------------");
+                if (!businessProcess.hasSameProcessInstanceId(externalTask.getProcessInstanceId())) {
+                    log.error("Duplicated attempt to Start a business process -  CaseId ({}) CaseEvent ({}) " +
+                                  "LegacyCaseReference ({}) AllocatedTrack ({})"
+                        + "externalTaskProcessInstanceId({}) businessProcessInstanceId({})", caseId,
+                        caseEvent, data.getLegacyCaseReference(), data.getAllocatedTrack(),
+                        externalTask.getProcessInstanceId(), businessProcess.getProcessInstanceId());
                     throw new BpmnError("ABORT");
                 }
                 return data;
