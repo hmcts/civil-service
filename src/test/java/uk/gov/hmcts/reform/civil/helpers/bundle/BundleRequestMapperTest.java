@@ -36,6 +36,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
@@ -340,6 +341,46 @@ class BundleRequestMapperTest {
         assertEquals("testFileName 12/12/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getDefendant2CostsBudgets().get(0).getValue().getDocumentFileName());
 
+    }
+
+    @Test
+    void shouldIncludeDefendantDefenceWhenOnlyInSystemGeneratedDocs() {
+        given(featureToggleService.isCaseProgressionEnabled()).willReturn(false);
+        given(featureToggleService.isAmendBundleEnabled()).willReturn(false);
+
+        CaseDocument defendantDefence = CaseDocument.builder()
+            .documentType(DocumentType.DEFENDANT_DEFENCE)
+            .createdBy("Defendant")
+            .documentLink(Document.builder()
+                             .documentUrl(TEST_URL)
+                             .documentBinaryUrl(TEST_URL)
+                             .documentFileName(TEST_FILE_NAME)
+                             .build())
+            .createdDatetime(LocalDateTime.of(2023, 2, 10, 2, 2, 2))
+            .build();
+
+        CaseData caseData = CaseData.builder()
+            .ccdCaseReference(12345L)
+            .applicant1(Party.builder().type(Party.Type.COMPANY).partyName("Claimant Ltd").build())
+            .respondent1(Party.builder().type(Party.Type.COMPANY).partyName("Defendant Ltd").build())
+            .hearingDate(LocalDate.now())
+            .submittedDate(LocalDateTime.of(2023, 2, 10, 2, 2, 2))
+            .systemGeneratedCaseDocuments(ElementUtils.wrapElements(defendantDefence))
+            .build();
+
+        BundleCreateRequest bundleCreateRequest = bundleRequestMapper.mapCaseDataToBundleCreateRequest(
+            caseData,
+            "sample.yaml",
+            "JUR",
+            "CASE"
+        );
+
+        assertTrue(
+            bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments()
+                .stream()
+                .anyMatch(doc -> DocumentType.DEFENDANT_DEFENCE.name().equals(doc.getValue().getDocumentType())),
+            "Defendant defence document should be included when only present in system generated docs"
+        );
     }
 
     @Test
