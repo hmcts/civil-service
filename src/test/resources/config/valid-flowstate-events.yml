@@ -1,0 +1,22 @@
+flow-state:
+  event-whitelist:
+    - SEND_AND_REPLY
+    - ADD_CASE_NOTE
+    - REMOVE_DOCUMENT
+  allowed-events:
+    MAIN.DRAFT:
+      - CREATE_CLAIM
+      - migrateCase
+    MAIN.CLAIM_SUBMITTED:
+      - INITIATE_GENERAL_APPLICATION
+      - migrateCase
+  allowed-events-spec:
+    MAIN.DRAFT:
+      - CREATE_CLAIM
+      - CREATE_LIP_CLAIM
+      - migrateCase
+    MAIN.SPEC_DRAFT:
+      - CREATE_CLAIM_SPEC
+      - CREATE_LIP_CLAIM
+      - migrateCase
+
