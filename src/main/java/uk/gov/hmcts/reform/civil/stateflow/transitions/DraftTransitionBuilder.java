@@ -208,10 +208,6 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
         return featureToggleService.isDashboardEnabledForCase(caseData) && caseContainsLiP.test(caseData);
     }
 
-    public boolean switchTheGAFlagIfLipExists(CaseData caseData) {
-        return (caseData.isLipCase());
-    }
-
     private Boolean getMainClaimCcdState(CaseData caseData) {
         return caseData.getCcdState() == CaseState.AWAITING_APPLICANT_INTENTION;
     }
