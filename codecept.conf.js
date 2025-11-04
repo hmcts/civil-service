@@ -19,6 +19,11 @@ const ccdPipelineTests = [
       './e2e/tests/ui_tests/hearings/*_test.js',
       './e2e/tests/ui_tests/query_management/*_test.js',
       './e2e/tests/api_tests/lrspec_cui/*_test.js',
+      "./gen-apps-e2e/tests/ui_tests/cp_tests/**/*_test.js",
+      "./gen-apps-e2e/tests/ui_tests/multiparty-ga-tests/**/*_test.js",
+      "./gen-apps-e2e/tests/ui_tests/wa_tests/**/*_test.js",
+      "./gen-apps-e2e/tests/ui_tests/*_test.js",
+      "./gen-apps-e2e/tests/api*/**/*_test.js",
     ];
 
 const civilServiceAndCamundaTests = [
@@ -39,6 +44,8 @@ const civilServiceAndCamundaTests = [
   './e2e/tests/api_tests/settle-discontinue/*_test.js',
   './e2e/tests/api_tests/automated_hearing_notice/*_test.js',
   './e2e/tests/api_tests/caseworkerEvents/*_test.js',
+  "./gen-apps-e2e/tests/ui_tests/*_test.js",
+  "./gen-apps-e2e/tests/api*/**/*_test.js",
 ];
 
 const getTests = () => {
