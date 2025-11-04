@@ -10,9 +10,8 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
-import uk.gov.hmcts.reform.civil.service.flowstate.FlowStateAllowedEventService;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
+import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 
 import java.util.List;
 
@@ -28,7 +27,6 @@ public class NoOngoingBusinessProcessAspect {
     public static final String ERROR_MESSAGE = "There is a technical issue causing a delay. "
         + "You do not need to do anything. Please come back later.";
 
-    private final FlowStateAllowedEventService flowStateAllowedEventService;
     private final IStateFlowEngine stateFlowEngine;
 
     @Around("execution(* *(*)) && @annotation(NoOngoingBusinessProcess) && args(callbackParams))")
@@ -47,8 +45,8 @@ public class NoOngoingBusinessProcessAspect {
             return joinPoint.proceed();
         }
         StringBuilder stateHistoryBuilder = new StringBuilder();
-        FlowState flowState = flowStateAllowedEventService.getFlowState(caseData);
-        stateFlowEngine.evaluate(caseData).getStateHistory().forEach(s -> {
+        StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+        stateFlow.getStateHistory().forEach(s -> {
             stateHistoryBuilder.append(s.getName());
             stateHistoryBuilder.append(", ");
         });
@@ -57,7 +55,7 @@ public class NoOngoingBusinessProcessAspect {
                 + "stateFlowHistory: %s",
             caseEvent.name(),
             caseData.getCcdCaseReference(),
-            flowState, stateHistoryBuilder.toString()
+            stateFlow.getState().getName(), stateHistoryBuilder
         ));
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(List.of(ERROR_MESSAGE))

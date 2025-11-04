@@ -26,6 +26,8 @@ import java.util.function.Predicate;
  */
 public class LegacyFlowDelegate {
 
+    //TODO: sortt out naming conventions in straggle
+
     private LegacyFlowDelegate() {
         // Utility class
     }
@@ -68,7 +70,6 @@ public class LegacyFlowDelegate {
     public static final Predicate<CaseData> fullDefenceProceed = ClaimantIntentionPredicates.fullDefenceProceed;
     public static final Predicate<CaseData> fullDefenceNotProceed = ClaimantIntentionPredicates.fullDefenceNotProceed;
 
-    // New delegates extracted from FlowPredicate
     public static final Predicate<CaseData> paymentSuccessful = PaymentPredicates.paymentSuccessful;
     public static final Predicate<CaseData> claimIssued = ClaimMilestonePredicates.claimIssued;
     public static final Predicate<CaseData> claimDetailsNotifiedTimeExtension = ClaimMilestonePredicates.claimDetailsNotifiedTimeExtension;
@@ -96,6 +97,5 @@ public class LegacyFlowDelegate {
 
     public static final Predicate<CaseData> caseContainsLiP = LipPredicates.caseContainsLiP; //TODO: rename
 
-    // Response flag delegates
     public static final Predicate<CaseData> isOneVOneResponseFlagSpec = ResponseFlagPredicates.isOneVOneResponseFlagSpec;
 }

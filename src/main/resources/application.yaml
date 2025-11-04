@@ -631,6 +631,11 @@ docStore:
     removal:
       enabled: ${DOCSTORE_DOC_REMOVAL_ENABLED:false}
 
+# Dev feature flag - pos shadow instead
+feature:
+  allowed-events-orchestrator:
+    enabled: true
+
 ---
 
 spring:

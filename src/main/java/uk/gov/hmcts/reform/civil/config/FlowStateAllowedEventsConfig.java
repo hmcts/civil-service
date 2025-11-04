@@ -11,6 +11,7 @@ import java.util.Optional;
 @Data
 @ConfigurationProperties(prefix = "flow-state")
 public class FlowStateAllowedEventsConfig {
+    //TODO: replace with scenarios & remove legacy code
 
     private List<CaseEvent> eventWhitelist;
     private Map<String, List<CaseEvent>> allowedEvents;

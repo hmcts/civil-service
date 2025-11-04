@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.config.AllowedEventsConfig;
 import uk.gov.hmcts.reform.civil.config.FlowStateAllowedEventsConfig;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -26,7 +27,8 @@ import static org.assertj.core.api.Assertions.assertThat;
     SimpleStateFlowBuilder.class,
     TransitionsTestConfiguration.class,
     FlowStateAllowedEventsConfig.class,
-    FlowStateAllowedEventService.class
+    FlowStateAllowedEventService.class,
+    AllowedEventsConfig.class
 })
 class AllowedEventsParityTest {
 

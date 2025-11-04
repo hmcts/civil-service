@@ -15,6 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.config.AllowedEventsConfig;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -210,8 +211,9 @@ import uk.gov.hmcts.reform.civil.config.FlowStateAllowedEventsConfig;
     SimpleStateFlowBuilder.class,
     TransitionsTestConfiguration.class,
     FlowStateAllowedEventsConfig.class,
-    FlowStateAllowedEventService.class
-})
+    FlowStateAllowedEventService.class,
+    AllowedEventsConfig.class},
+    properties = "feature.allowed-events-orchestrator.enabled=false")
 class FlowStateAllowedEventServiceTest {
 
     @Autowired

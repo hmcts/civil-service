@@ -19,7 +19,8 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
-import uk.gov.hmcts.reform.civil.service.flowstate.FlowStateAllowedEventService;
+import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
+import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.utils.JudicialReferralUtils;
 
 import java.util.Collections;
@@ -54,7 +55,7 @@ public class DetermineNextState extends CallbackHandler {
     private final ObjectMapper objectMapper;
     private final FeatureToggleService featureToggleService;
     private final JudgmentByAdmissionOnlineMapper judgmentByAdmissionOnlineMapper;
-    private final FlowStateAllowedEventService flowStateAllowedEventService;
+    private final IStateFlowEngine stateFlowEngine;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -240,11 +241,16 @@ public class DetermineNextState extends CallbackHandler {
     }
 
     public boolean translationRequiredInFlowState(CaseData caseData) {
-        FlowState flowState = flowStateAllowedEventService.getFlowState(caseData);
+        FlowState flowState = getFlowState(caseData);
         return flowState.equals(FULL_DEFENCE_PROCEED)
             || flowState.equals(PART_ADMIT_NOT_SETTLED_NO_MEDIATION)
             || flowState.equals(FULL_ADMIT_PROCEED)
             || flowState.equals(PART_ADMIT_PROCEED)
             || flowState.equals(IN_MEDIATION);
+    }
+
+    public FlowState getFlowState(CaseData caseData) {
+        StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+        return FlowState.fromFullName(stateFlow.getState().getName());
     }
 }
