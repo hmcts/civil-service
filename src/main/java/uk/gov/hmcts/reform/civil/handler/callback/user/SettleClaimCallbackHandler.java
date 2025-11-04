@@ -64,7 +64,7 @@ public class SettleClaimCallbackHandler extends CallbackHandler {
     private CallbackResponse inactivateTaskListAndBuildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        if (caseData.isApplicantLiP() && !featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation())) {
+        if (caseData.isApplicantLiP() && !featureToggleService.isLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation())) {
             taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate(
                 caseData.getCcdCaseReference().toString(),
                 CLAIMANT,
@@ -72,7 +72,7 @@ public class SettleClaimCallbackHandler extends CallbackHandler {
             );
         }
 
-        if (caseData.isRespondent1LiP() && !featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation())) {
+        if (caseData.isRespondent1LiP() && !featureToggleService.isLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation())) {
             taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate(
                 caseData.getCcdCaseReference().toString(),
                 DEFENDANT,
