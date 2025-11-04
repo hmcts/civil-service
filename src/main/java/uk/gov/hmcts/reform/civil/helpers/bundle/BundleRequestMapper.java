@@ -423,7 +423,8 @@ public class BundleRequestMapper {
         List<Element<CaseDocument>> sortedDefendantDefenceAndClaimantReply =
             bundleDocumentsRetrieval.getSortedDefendantDefenceAndClaimantReply(clAndDfDocList);
         sortedDefendantDefenceAndClaimantReply.forEach(caseDocumentElement -> {
-            String docType = caseDocumentElement.getValue().getDocumentType().equals(DocumentType.DEFENDANT_DEFENCE)
+            DocumentType documentType = caseDocumentElement.getValue().getDocumentType();
+            String docTitleTemplate = documentType.equals(DocumentType.DEFENDANT_DEFENCE)
                 ? BundleFileNameList.DEFENCE.getDisplayName() : BundleFileNameList.CL_REPLY.getDisplayName();
             String party;
             if (caseDocumentElement.getValue().getCreatedBy().equalsIgnoreCase("Defendant")) {
@@ -433,13 +434,13 @@ public class BundleRequestMapper {
             } else {
                 party = "";
             }
-            String docName = generateDocName(docType, party, null,
+            String docName = generateDocName(docTitleTemplate, party, null,
                                              caseDocumentElement.getValue().getCreatedDatetime().toLocalDate()
             );
             bundlingRequestDocuments.add(buildBundlingRequestDoc(
                 docName,
                 caseDocumentElement.getValue().getDocumentLink(),
-                docType
+                documentType.name()
             ));
         });
         Arrays.stream(PartyType.values()).toList().forEach(partyType ->
