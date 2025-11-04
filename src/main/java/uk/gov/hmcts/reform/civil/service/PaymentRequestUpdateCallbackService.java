@@ -57,7 +57,7 @@ public class PaymentRequestUpdateCallbackService {
         }
 
         Long caseId = Long.valueOf(dto.getCcdCaseNumber());
-        log.info("Fetching case details for caseId {}", caseId);
+        log.info("Fetching case details for caseId{}", caseId);
         log.debug("ServiceRequestUpdateDto: {}", dto);
 
         CaseDetails caseDetails = coreCaseDataService.getCase(caseId);
