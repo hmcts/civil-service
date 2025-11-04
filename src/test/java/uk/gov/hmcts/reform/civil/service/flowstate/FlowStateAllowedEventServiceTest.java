@@ -201,12 +201,15 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT;
 
+import uk.gov.hmcts.reform.civil.config.FlowStateAllowedEventsConfig;
+
 @SpringBootTest(classes = {
     JacksonAutoConfiguration.class,
     CaseDetailsConverter.class,
     SimpleStateFlowEngine.class,
     SimpleStateFlowBuilder.class,
     TransitionsTestConfiguration.class,
+    FlowStateAllowedEventsConfig.class,
     FlowStateAllowedEventService.class
 })
 class FlowStateAllowedEventServiceTest {
@@ -2850,6 +2853,27 @@ class FlowStateAllowedEventServiceTest {
                     .atStateAwaitingCaseDetailsNotification().build();
             assertThat(flowStateAllowedEventService.isAllowed(caseDetails, REMOVE_DOCUMENT))
                 .isTrue();
+        }
+    }
+
+    @Nested
+    class ServiceEdgeCases {
+
+        @Test
+        void shouldReturnEmptyList_whenUnknownStateProvided() {
+            assertThat(flowStateAllowedEventService.getAllowedEvents("MAIN.NOT_PRESENT")).isEmpty();
+            assertThat(flowStateAllowedEventService.getAllowedEvents("INVALID.STATE")).isEmpty();
+        }
+
+        @Test
+        void shouldReturnFalse_whenEventCheckedAgainstUnknownState() {
+            assertThat(flowStateAllowedEventService.isAllowedOnState("MAIN.NOT_PRESENT", CREATE_CLAIM)).isFalse();
+            assertThat(flowStateAllowedEventService.isAllowedOnState("INVALID.STATE", CREATE_CLAIM)).isFalse();
+        }
+
+        @Test
+        void shouldReturnEmptyStates_whenCaseEventNotPresentInYaml() {
+            assertThat(flowStateAllowedEventService.getAllowedStates(CaseEvent.CONTACT_INFORMATION_UPDATED)).isEmpty();
         }
     }
 }

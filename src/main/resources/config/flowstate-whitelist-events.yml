@@ -1,0 +1,14 @@
+flow-state:
+  event-whitelist:
+    - migrateCase
+    - NOTIFY_HEARING_PARTIES
+    - MANAGE_CONTACT_INFORMATION
+    - CASE_PROCEEDS_IN_CASEMAN
+    - UpdateNextHearingInfo
+    - UPDATE_NEXT_HEARING_DETAILS
+    - DISPATCH_BUSINESS_PROCESS
+    - SEND_AND_REPLY
+    - queryManagementRaiseQuery
+    - queryManagementRespondQuery
+    - ADD_CASE_NOTE
+    - REMOVE_DOCUMENT
