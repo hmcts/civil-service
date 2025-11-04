@@ -16,7 +16,7 @@ public class DjValidationTask implements SdoCallbackTask {
 
     @Override
     public SdoTaskResult execute(SdoTaskContext context) {
-        return SdoTaskResult.withErrors(context.caseData(), sdoValidationService.validateSdo(context.caseData()));
+        return SdoTaskResult.withErrors(context.caseData(), sdoValidationService.validate(context.caseData()));
     }
 
     @Override

@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.service.sdo;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -13,10 +12,10 @@ import uk.gov.hmcts.reform.civil.service.camunda.UpdateWaCourtLocationsService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.DynamicListUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicListElement.dynamicElementFromCode;
 
 @Service
@@ -27,13 +26,13 @@ public class SdoLocationService {
     private final LocationHelper locationHelper;
     private final Optional<UpdateWaCourtLocationsService> updateWaCourtLocationsService;
 
-    public DynamicList buildLocationList(CallbackParams callbackParams, RequestedCourt preferredCourt) {
-        return buildLocationList(callbackParams, preferredCourt, false);
+    public List<LocationRefData> fetchHearingLocations(String authToken) {
+        return locationReferenceDataService.getHearingCourtLocations(authToken);
     }
 
-    public DynamicList buildLocationList(CallbackParams callbackParams, RequestedCourt preferredCourt, boolean includeAllCourts) {
-        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        List<LocationRefData> locations = locationReferenceDataService.getCourtLocationsForDefaultJudgments(authToken);
+    public DynamicList buildLocationList(RequestedCourt preferredCourt,
+                                         boolean includeAllCourts,
+                                         List<LocationRefData> locations) {
         Optional<LocationRefData> matchingLocation = Optional.ofNullable(preferredCourt)
             .flatMap(requestedCourt -> locationHelper.getMatching(locations, preferredCourt));
 
@@ -55,6 +54,23 @@ public class SdoLocationService {
                 null,
                 true
             ));
+    }
+
+    public DynamicList buildCourtLocationForSdoR2(RequestedCourt preferredCourt,
+                                                  List<LocationRefData> locations) {
+        Optional<LocationRefData> matchingLocation = Optional.ofNullable(preferredCourt)
+            .flatMap(requestedCourt -> locationHelper.getMatching(locations, preferredCourt));
+
+        List<DynamicListElement> withOther = new ArrayList<>();
+
+        matchingLocation.ifPresent(location -> withOther.add(dynamicElementFromCode(
+            location.getEpimmsId(),
+            LocationReferenceDataService.getDisplayEntry(location)
+        )));
+
+        withOther.add(dynamicElementFromCode("OTHER_LOCATION", "Other location"));
+
+        return DynamicList.fromDynamicListElementList(withOther);
     }
 
     public DynamicList trimListItems(DynamicList list) {

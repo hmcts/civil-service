@@ -100,6 +100,10 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.camunda.UpdateWaCourtLocationsService;
 import uk.gov.hmcts.reform.civil.service.docmosis.sdo.SdoGeneratorService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoCaseClassificationService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoDocumentService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoLocationService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoValidationService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingSubChannel;
 
@@ -198,7 +202,11 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackH
     DeadlinesCalculator.class,
     ValidationAutoConfiguration.class,
     LocationHelper.class,
-    AssignCategoryId.class},
+    AssignCategoryId.class,
+    SdoLocationService.class,
+    SdoCaseClassificationService.class,
+    SdoValidationService.class,
+    SdoDocumentService.class},
     properties = {"reference.database.enabled=false"})
 public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -224,6 +232,15 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private SdoLocationService sdoLocationService;
+
+    @Autowired
+    private SdoValidationService sdoValidationService;
+
+    @Autowired
+    private SdoDocumentService sdoDocumentService;
 
     @MockBean
     protected LocationReferenceDataService locationRefDataService;
@@ -1322,10 +1339,10 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     void shouldNotCallUpdateWaCourtLocationsServiceWhenNotPresent_AndMintiEnabled() {
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
 
-        handler = new CreateSDOCallbackHandler(objectMapper, locationRefDataService, workingDayIndicator,
+        handler = new CreateSDOCallbackHandler(objectMapper, workingDayIndicator,
                                                deadlinesCalculator, sdoGeneratorService, featureToggleService, locationHelper,
-                                                        assignCategoryId, categoryService,
-                                                        Optional.empty());
+                                                       assignCategoryId, sdoLocationService, sdoValidationService, sdoDocumentService,
+                                                       categoryService, Optional.empty());
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
             .caseManagementLocation(CaseLocationCivil.builder().baseLocation("123456").build())
