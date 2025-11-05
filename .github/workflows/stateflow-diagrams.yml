@@ -31,10 +31,10 @@ jobs:
 
       - name: Render diagrams
         run: |
-          npx mmdc -i docs/draft_flow.mmd -o docs/draft_flow.svg
-          npx mmdc -i docs/issue_flow.mmd -o docs/issue_flow.svg
-          npx mmdc -i docs/response_flow.mmd -o docs/response_flow.svg
-          npx mmdc -i docs/post_response.mmd -o docs/post_response.svg
+          npx mmdc -i docs/draft_flow.mmd -o docs/draft_flow.svg --puppeteerConfigFile docs/stateflow/puppeteer-config.json
+          npx mmdc -i docs/issue_flow.mmd -o docs/issue_flow.svg --puppeteerConfigFile docs/stateflow/puppeteer-config.json
+          npx mmdc -i docs/response_flow.mmd -o docs/response_flow.svg --puppeteerConfigFile docs/stateflow/puppeteer-config.json
+          npx mmdc -i docs/post_response.mmd -o docs/post_response.svg --puppeteerConfigFile docs/stateflow/puppeteer-config.json
 
       - name: Commit updates
         run: |
