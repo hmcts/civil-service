@@ -1,4 +1,5 @@
 {
   "private": true,
-  "workspaces": ["civil-ccd-definition", "civil-ga-ccd-definition"]
+  "workspaces": ["civil-ccd-definition", "civil-ga-ccd-definition"],
+  "packageManager": "yarn@3.8.5"
 }
