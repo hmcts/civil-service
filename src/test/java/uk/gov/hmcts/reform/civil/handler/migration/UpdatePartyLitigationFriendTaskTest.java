@@ -16,7 +16,7 @@ class UpdatePartyLitigationFriendTaskTest {
 
     @BeforeEach
     void setUp() {
-        task = new UpdatePartyLitigationFriendTask(LitigationFriendCaseReference.class);
+        task = new UpdatePartyLitigationFriendTask();
     }
 
     @Test

@@ -30,8 +30,8 @@ public class UpdatePartyLitigationFriendTask extends MigrationTask<LitigationFri
             return builder.build();
         };
 
-    protected UpdatePartyLitigationFriendTask(Class<LitigationFriendCaseReference> type) {
-        super(type);
+    protected UpdatePartyLitigationFriendTask() {
+        super(LitigationFriendCaseReference.class);
     }
 
     @Override
