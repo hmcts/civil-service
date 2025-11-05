@@ -6,6 +6,7 @@ import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -125,13 +126,11 @@ public class CaseReferenceCsvLoader {
     }
 
     private Object getCellValue(Cell cell) {
-        return switch (cell.getCellType()) {
-            case STRING -> cell.getStringCellValue();
-            case NUMERIC -> cell.getNumericCellValue();
-            case BOOLEAN -> cell.getBooleanCellValue();
-            case FORMULA -> cell.getCellFormula();
-            default -> null;
-        };
+        if (cell.getCellType() == CellType.STRING) {
+            return cell.getStringCellValue();
+        } else {
+            return null;
+        }
     }
 
     public static SecretKey getKeyFromString(String key) throws Exception {
