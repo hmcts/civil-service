@@ -5,9 +5,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.SdoLifecycleStage;
-import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.SdoTaskContext;
-import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.SdoTaskResult;
+import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderLifecycleStage;
+import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskContext;
+import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskResult;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoFeatureToggleService;
@@ -41,9 +41,10 @@ class SdoPrePopulateTaskTest {
         CallbackParams params = CallbackParams.builder()
             .params(Map.of(BEARER_TOKEN, "token"))
             .build();
-        SdoTaskContext context = new SdoTaskContext(caseData, params, SdoLifecycleStage.PRE_POPULATE);
+        DirectionsOrderTaskContext context =
+            new DirectionsOrderTaskContext(caseData, params, DirectionsOrderLifecycleStage.PRE_POPULATE);
 
-        SdoTaskResult result = task.execute(context);
+        DirectionsOrderTaskResult result = task.execute(context);
 
         assertThat(result.updatedCaseData()).isEqualTo(caseData);
         assertThat(result.errors()).isEmpty();
@@ -61,11 +62,12 @@ class SdoPrePopulateTaskTest {
         CallbackParams params = CallbackParams.builder()
             .params(Map.of(BEARER_TOKEN, "token"))
             .build();
-        SdoTaskContext context = new SdoTaskContext(caseData, params, SdoLifecycleStage.PRE_POPULATE);
+        DirectionsOrderTaskContext context =
+            new DirectionsOrderTaskContext(caseData, params, DirectionsOrderLifecycleStage.PRE_POPULATE);
 
         SdoPrePopulateTask task = new SdoPrePopulateTask(featureToggleService, prePopulateService);
 
-        SdoTaskResult result = task.execute(context);
+        DirectionsOrderTaskResult result = task.execute(context);
 
         assertThat(result.errors()).containsExactly(ERROR_MINTI_DISPOSAL_NOT_ALLOWED);
         verify(prePopulateService, never()).prePopulate(any());
@@ -75,7 +77,7 @@ class SdoPrePopulateTaskTest {
     void shouldSupportPrePopulateStageOnly() {
         SdoPrePopulateTask task = new SdoPrePopulateTask(featureToggleService, prePopulateService);
 
-        assertThat(task.supports(SdoLifecycleStage.PRE_POPULATE)).isTrue();
-        assertThat(task.supports(SdoLifecycleStage.MID_EVENT)).isFalse();
-    }
+        assertThat(task.supports(DirectionsOrderLifecycleStage.PRE_POPULATE)).isTrue();
+        assertThat(task.supports(DirectionsOrderLifecycleStage.MID_EVENT)).isFalse();
+}
 }

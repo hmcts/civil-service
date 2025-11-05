@@ -27,7 +27,7 @@ import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2PhysicalTrialBundleOptions;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2TimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.TrialOnRadioOptions;
-import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.SdoTaskContext;
+import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskContext;
 import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
@@ -173,7 +173,7 @@ public class SdoPrePopulateService {
     @Value("${court-location.unspecified-claim.epimms-id}")
     String ccmccEpimsId;
 
-    public CaseData prePopulate(SdoTaskContext context) {
+    public CaseData prePopulate(DirectionsOrderTaskContext context) {
         CaseData caseData = context.caseData();
         CallbackParams callbackParams = context.callbackParams();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();

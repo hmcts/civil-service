@@ -2,29 +2,40 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.dj.tasks.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.SdoCallbackTask;
-import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.SdoLifecycleStage;
-import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.SdoTaskContext;
-import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.SdoTaskResult;
-import uk.gov.hmcts.reform.civil.service.dj.DjDirectionOrderService;
-import uk.gov.hmcts.reform.civil.service.sdo.SdoFeatureToggleService;
-import uk.gov.hmcts.reform.civil.service.sdo.SdoLocationService;
+import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderCallbackTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderLifecycleStage;
+import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskContext;
+import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskResult;
+import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskSupport;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderParticipantService;
+
+import java.util.Collections;
+
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STANDARD_DIRECTION_ORDER_DJ;
 
 @Component
 @RequiredArgsConstructor
-public class DjPrePopulateTask implements SdoCallbackTask {
+public class DjPrePopulateTask implements DirectionsOrderCallbackTask {
 
-    private final DjDirectionOrderService djDirectionOrderService;
-    private final SdoFeatureToggleService sdoFeatureToggleService;
-    private final SdoLocationService sdoLocationService;
+    private final DirectionsOrderParticipantService participantService;
 
     @Override
-    public SdoTaskResult execute(SdoTaskContext context) {
-        return SdoTaskResult.empty(context.caseData());
+    public DirectionsOrderTaskResult execute(DirectionsOrderTaskContext context) {
+        CaseData caseData = context.caseData();
+        CaseData updated = caseData.toBuilder()
+            .applicantVRespondentText(participantService.buildApplicantVRespondentText(caseData))
+            .build();
+        return new DirectionsOrderTaskResult(updated, Collections.emptyList(), null);
     }
 
     @Override
-    public boolean supports(SdoLifecycleStage stage) {
-        return SdoLifecycleStage.PRE_POPULATE == stage;
+    public boolean supports(DirectionsOrderLifecycleStage stage) {
+        return DirectionsOrderLifecycleStage.PRE_POPULATE == stage;
+    }
+
+    @Override
+    public boolean appliesTo(DirectionsOrderTaskContext context) {
+        return DirectionsOrderTaskSupport.supportsEvent(context, STANDARD_DIRECTION_ORDER_DJ);
     }
 }

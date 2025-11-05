@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.civil.service.sdo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
-import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.SdoTaskContext;
+import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskContext;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.HearingMethod;
@@ -26,7 +26,7 @@ public class SdoOrderDetailsService {
 
     private final SdoCaseClassificationService caseClassificationService;
 
-    public CaseData updateOrderDetails(SdoTaskContext context) {
+    public CaseData updateOrderDetails(DirectionsOrderTaskContext context) {
         CaseData caseData = context.caseData();
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
 

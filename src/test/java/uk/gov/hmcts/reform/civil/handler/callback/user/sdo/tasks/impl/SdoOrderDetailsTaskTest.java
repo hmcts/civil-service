@@ -8,9 +8,9 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
-import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.SdoLifecycleStage;
-import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.SdoTaskContext;
-import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.SdoTaskResult;
+import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderLifecycleStage;
+import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskContext;
+import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskResult;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoFeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoOrderDetailsService;
@@ -48,11 +48,12 @@ class SdoOrderDetailsTaskTest {
         CallbackParams params = CallbackParams.builder()
             .params(Map.of(BEARER_TOKEN, "token"))
             .build();
-        SdoTaskContext context = new SdoTaskContext(caseData, params, SdoLifecycleStage.ORDER_DETAILS);
+        DirectionsOrderTaskContext context =
+            new DirectionsOrderTaskContext(caseData, params, DirectionsOrderLifecycleStage.ORDER_DETAILS);
 
         SdoOrderDetailsTask task = new SdoOrderDetailsTask(featureToggleService, orderDetailsService);
 
-        SdoTaskResult result = task.execute(context);
+        DirectionsOrderTaskResult result = task.execute(context);
 
         assertThat(result.errors()).isEqualTo(List.of(ERROR_MINTI_DISPOSAL_NOT_ALLOWED));
         assertThat(result.updatedCaseData()).isEqualTo(caseData);
@@ -70,11 +71,12 @@ class SdoOrderDetailsTaskTest {
         CallbackParams params = CallbackParams.builder()
             .params(Collections.emptyMap())
             .build();
-        SdoTaskContext context = new SdoTaskContext(original, params, SdoLifecycleStage.ORDER_DETAILS);
+        DirectionsOrderTaskContext context =
+            new DirectionsOrderTaskContext(original, params, DirectionsOrderLifecycleStage.ORDER_DETAILS);
 
         SdoOrderDetailsTask task = new SdoOrderDetailsTask(featureToggleService, orderDetailsService);
 
-        SdoTaskResult result = task.execute(context);
+        DirectionsOrderTaskResult result = task.execute(context);
 
         assertThat(result.errors()).isEmpty();
         assertThat(result.updatedCaseData()).isEqualTo(updated);
@@ -85,7 +87,7 @@ class SdoOrderDetailsTaskTest {
     void shouldSupportOrderDetailsStageOnly() {
         SdoOrderDetailsTask task = new SdoOrderDetailsTask(featureToggleService, orderDetailsService);
 
-        assertThat(task.supports(SdoLifecycleStage.ORDER_DETAILS)).isTrue();
-        assertThat(task.supports(SdoLifecycleStage.MID_EVENT)).isFalse();
-    }
+        assertThat(task.supports(DirectionsOrderLifecycleStage.ORDER_DETAILS)).isTrue();
+        assertThat(task.supports(DirectionsOrderLifecycleStage.MID_EVENT)).isFalse();
+}
 }

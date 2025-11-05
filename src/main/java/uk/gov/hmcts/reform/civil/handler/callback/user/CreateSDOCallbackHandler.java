@@ -12,10 +12,10 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.pipeline.SdoCallbackPipeline;
-import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.SdoLifecycleStage;
-import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.SdoTaskContext;
-import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.SdoTaskResult;
+import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.pipeline.DirectionsOrderCallbackPipeline;
+import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderLifecycleStage;
+import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskContext;
+import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskResult;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.camunda.UpdateWaCourtLocationsService;
@@ -46,7 +46,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
     private final ObjectMapper objectMapper;
     private final FeatureToggleService featureToggleService;
-    private final SdoCallbackPipeline sdoCallbackPipeline;
+    private final DirectionsOrderCallbackPipeline directionsOrderCallbackPipeline;
     private final Optional<UpdateWaCourtLocationsService> updateWaCourtLocationsService;
 
     @Override
@@ -77,7 +77,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     // Then any changes to fields in ccd will persist in ccd regardless of backwards or forwards page navigation.
     private CallbackResponse prePopulateOrderDetailsPages(CallbackParams callbackParams) {
         CaseData originalCaseData = callbackParams.getCaseData();
-        SdoTaskResult prePopulateResult = runStage(originalCaseData, callbackParams, SdoLifecycleStage.PRE_POPULATE);
+        DirectionsOrderTaskResult prePopulateResult =
+            runStage(originalCaseData, callbackParams, DirectionsOrderLifecycleStage.PRE_POPULATE);
         List<String> prePopulateErrors = extractErrors(prePopulateResult);
         CaseData caseData = updatedCaseData(prePopulateResult, originalCaseData);
 
@@ -86,7 +87,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
     private CallbackResponse setOrderDetailsFlags(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        SdoTaskResult taskResult = runStage(caseData, callbackParams, SdoLifecycleStage.ORDER_DETAILS);
+        DirectionsOrderTaskResult taskResult =
+            runStage(caseData, callbackParams, DirectionsOrderLifecycleStage.ORDER_DETAILS);
         List<String> errors = extractErrors(taskResult);
         CaseData updatedCaseData = updatedCaseData(taskResult, caseData);
 
@@ -98,7 +100,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                  callbackParams.getCaseData().getCcdCaseReference(), callbackParams.getCaseData().getLegacyCaseReference());
 
         CaseData originalCaseData = callbackParams.getCaseData();
-        SdoTaskResult orderDetailsResult = runStage(originalCaseData, callbackParams, SdoLifecycleStage.ORDER_DETAILS);
+        DirectionsOrderTaskResult orderDetailsResult =
+            runStage(originalCaseData, callbackParams, DirectionsOrderLifecycleStage.ORDER_DETAILS);
 
         List<String> orderDetailsErrors = extractErrors(orderDetailsResult);
         CaseData caseDataAfterOrderDetails = updatedCaseData(orderDetailsResult, originalCaseData);
@@ -107,7 +110,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             return buildResponse(caseDataAfterOrderDetails, orderDetailsErrors);
         }
 
-        SdoTaskResult validationResult = runStage(caseDataAfterOrderDetails, callbackParams, SdoLifecycleStage.MID_EVENT);
+        DirectionsOrderTaskResult validationResult =
+            runStage(caseDataAfterOrderDetails, callbackParams, DirectionsOrderLifecycleStage.MID_EVENT);
 
         List<String> validationErrors = extractErrors(validationResult);
         CaseData caseDataAfterValidation = updatedCaseData(validationResult, caseDataAfterOrderDetails);
@@ -116,7 +120,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             return buildResponse(caseDataAfterValidation, validationErrors);
         }
 
-        SdoTaskResult documentResult = runStage(caseDataAfterValidation, callbackParams, SdoLifecycleStage.DOCUMENT_GENERATION);
+        DirectionsOrderTaskResult documentResult =
+            runStage(caseDataAfterValidation, callbackParams, DirectionsOrderLifecycleStage.DOCUMENT_GENERATION);
 
         CaseData finalCaseData = updatedCaseData(documentResult, caseDataAfterValidation);
 
@@ -127,7 +132,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
     private CallbackResponse submitSDO(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        SdoTaskResult submissionResult = runStage(caseData, callbackParams, SdoLifecycleStage.SUBMISSION);
+        DirectionsOrderTaskResult submissionResult =
+            runStage(caseData, callbackParams, DirectionsOrderLifecycleStage.SUBMISSION);
 
         List<String> submissionErrors = extractErrors(submissionResult);
         if (!submissionErrors.isEmpty()) {
@@ -154,7 +160,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        SdoTaskResult confirmationResult = runStage(caseData, callbackParams, SdoLifecycleStage.CONFIRMATION);
+        DirectionsOrderTaskResult confirmationResult =
+            runStage(caseData, callbackParams, DirectionsOrderLifecycleStage.CONFIRMATION);
 
         if (confirmationResult.submittedCallbackResponse() != null) {
             return confirmationResult.submittedCallbackResponse();
@@ -163,15 +170,22 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         return SubmittedCallbackResponse.builder().build();
     }
 
-    private SdoTaskResult runStage(CaseData caseData, CallbackParams callbackParams, SdoLifecycleStage stage) {
-        return sdoCallbackPipeline.run(new SdoTaskContext(caseData, callbackParams, stage), stage);
+    private DirectionsOrderTaskResult runStage(
+        CaseData caseData,
+        CallbackParams callbackParams,
+        DirectionsOrderLifecycleStage stage
+    ) {
+        return directionsOrderCallbackPipeline.run(
+            new DirectionsOrderTaskContext(caseData, callbackParams, stage),
+            stage
+        );
     }
 
-    private List<String> extractErrors(SdoTaskResult result) {
+    private List<String> extractErrors(DirectionsOrderTaskResult result) {
         return result.errors() == null ? Collections.emptyList() : result.errors();
     }
 
-    private CaseData updatedCaseData(SdoTaskResult result, CaseData fallback) {
+    private CaseData updatedCaseData(DirectionsOrderTaskResult result, CaseData fallback) {
         return result.updatedCaseData() != null ? result.updatedCaseData() : fallback;
     }
 

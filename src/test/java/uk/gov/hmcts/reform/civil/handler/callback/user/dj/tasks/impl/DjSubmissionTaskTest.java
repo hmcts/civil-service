@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.impl;
+package uk.gov.hmcts.reform.civil.handler.callback.user.dj.tasks.impl;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -9,7 +9,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.Dir
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskContext;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskResult;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.sdo.SdoSubmissionService;
+import uk.gov.hmcts.reform.civil.service.dj.DjSubmissionService;
 
 import java.util.Map;
 
@@ -19,18 +19,18 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 
 @ExtendWith(MockitoExtension.class)
-class SdoSubmissionTaskTest {
+class DjSubmissionTaskTest {
 
     private static final String AUTH_TOKEN = "auth-token";
 
     @Mock
-    private SdoSubmissionService submissionService;
+    private DjSubmissionService submissionService;
 
     @Test
     void shouldDelegateSubmissionToService() {
-        SdoSubmissionTask task = new SdoSubmissionTask(submissionService);
-        CaseData caseData = CaseData.builder().ccdCaseReference(123L).build();
-        CaseData updatedCaseData = CaseData.builder().ccdCaseReference(456L).build();
+        DjSubmissionTask task = new DjSubmissionTask(submissionService);
+        CaseData caseData = CaseData.builder().ccdCaseReference(1L).build();
+        CaseData updatedCaseData = CaseData.builder().ccdCaseReference(2L).build();
         when(submissionService.prepareSubmission(caseData, AUTH_TOKEN)).thenReturn(updatedCaseData);
 
         CallbackParams params = CallbackParams.builder()
@@ -48,9 +48,9 @@ class SdoSubmissionTaskTest {
 
     @Test
     void shouldSupportSubmissionStageOnly() {
-        SdoSubmissionTask task = new SdoSubmissionTask(submissionService);
+        DjSubmissionTask task = new DjSubmissionTask(submissionService);
 
         assertThat(task.supports(DirectionsOrderLifecycleStage.SUBMISSION)).isTrue();
         assertThat(task.supports(DirectionsOrderLifecycleStage.MID_EVENT)).isFalse();
-}
+    }
 }

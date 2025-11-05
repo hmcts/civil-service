@@ -10,8 +10,8 @@ import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.SdoLifecycleStage;
-import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.SdoTaskContext;
+import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderLifecycleStage;
+import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskContext;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
@@ -100,7 +100,7 @@ class SdoPrePopulateServiceTest {
         when(featureToggleService.isCarmEnabled(any(CaseData.class))).thenReturn(true);
 
         CaseData caseData = baseCaseData();
-        SdoTaskContext context = buildContext(caseData);
+        DirectionsOrderTaskContext context = buildContext(caseData);
 
         CaseData result = service.prePopulate(context);
 
@@ -116,7 +116,7 @@ class SdoPrePopulateServiceTest {
         when(featureToggleService.isCarmEnabled(any(CaseData.class))).thenReturn(false);
 
         CaseData caseData = baseCaseData();
-        SdoTaskContext context = buildContext(caseData);
+        DirectionsOrderTaskContext context = buildContext(caseData);
 
         CaseData result = service.prePopulate(context);
 
@@ -129,7 +129,7 @@ class SdoPrePopulateServiceTest {
         when(featureToggleService.isWelshJourneyEnabled(any(CaseData.class))).thenReturn(true);
 
         CaseData caseData = baseCaseData();
-        SdoTaskContext context = buildContext(caseData);
+        DirectionsOrderTaskContext context = buildContext(caseData);
 
         CaseData result = service.prePopulate(context);
 
@@ -142,19 +142,19 @@ class SdoPrePopulateServiceTest {
         when(featureToggleService.isWelshJourneyEnabled(any(CaseData.class))).thenReturn(false);
 
         CaseData caseData = baseCaseData();
-        SdoTaskContext context = buildContext(caseData);
+        DirectionsOrderTaskContext context = buildContext(caseData);
 
         CaseData result = service.prePopulate(context);
 
         assertThat(result.getSmallClaimsMediationSectionStatement()).isNotNull();
     }
 
-    private SdoTaskContext buildContext(CaseData caseData) {
+    private DirectionsOrderTaskContext buildContext(CaseData caseData) {
         CallbackParams params = CallbackParams.builder()
             .caseData(caseData)
             .params(Map.of(BEARER_TOKEN, AUTH_TOKEN))
             .build();
-        return new SdoTaskContext(caseData, params, SdoLifecycleStage.PRE_POPULATE);
+        return new DirectionsOrderTaskContext(caseData, params, DirectionsOrderLifecycleStage.PRE_POPULATE);
     }
 
     private CaseData baseCaseData() {

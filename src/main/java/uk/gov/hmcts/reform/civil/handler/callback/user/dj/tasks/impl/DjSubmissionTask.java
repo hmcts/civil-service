@@ -2,34 +2,35 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.dj.tasks.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.SdoCallbackTask;
-import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.SdoLifecycleStage;
-import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.SdoTaskContext;
-import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.SdoTaskResult;
-import uk.gov.hmcts.reform.civil.service.sdo.SdoFeatureToggleService;
-import uk.gov.hmcts.reform.civil.service.sdo.SdoLocationService;
+import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderCallbackTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderLifecycleStage;
+import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskContext;
+import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskResult;
+import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskSupport;
+import uk.gov.hmcts.reform.civil.service.dj.DjSubmissionService;
 
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STANDARD_DIRECTION_ORDER_DJ;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 
 @Component
 @RequiredArgsConstructor
-public class DjSubmissionTask implements SdoCallbackTask {
+public class DjSubmissionTask implements DirectionsOrderCallbackTask {
 
-    private final SdoFeatureToggleService featureToggleService;
-    private final SdoLocationService sdoLocationService;
+    private final DjSubmissionService submissionService;
 
     @Override
-    public SdoTaskResult execute(SdoTaskContext context) {
-        sdoLocationService.updateWaLocationsIfRequired(
-            context.caseData(),
-            context.caseData().toBuilder(),
-            context.callbackParams().getParams().get(BEARER_TOKEN).toString()
-        );
-        return SdoTaskResult.empty(context.caseData());
+    public DirectionsOrderTaskResult execute(DirectionsOrderTaskContext context) {
+        String authToken = context.callbackParams().getParams().get(BEARER_TOKEN).toString();
+        return DirectionsOrderTaskResult.empty(submissionService.prepareSubmission(context.caseData(), authToken));
     }
 
     @Override
-    public boolean supports(SdoLifecycleStage stage) {
-        return SdoLifecycleStage.SUBMISSION == stage;
+    public boolean supports(DirectionsOrderLifecycleStage stage) {
+        return DirectionsOrderLifecycleStage.SUBMISSION == stage;
+    }
+
+    @Override
+    public boolean appliesTo(DirectionsOrderTaskContext context) {
+        return DirectionsOrderTaskSupport.supportsEvent(context, STANDARD_DIRECTION_ORDER_DJ);
     }
 }

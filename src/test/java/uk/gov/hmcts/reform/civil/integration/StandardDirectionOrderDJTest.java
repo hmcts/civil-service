@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -27,6 +26,13 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.HearingMethod;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.handler.callback.user.StandardDirectionOrderDJ;
+import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.pipeline.DirectionsOrderCallbackPipeline;
+import uk.gov.hmcts.reform.civil.handler.callback.user.dj.tasks.impl.DjPrePopulateTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.dj.tasks.impl.DjOrderDetailsTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.dj.tasks.impl.DjValidationTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.dj.tasks.impl.DjDocumentTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.dj.tasks.impl.DjSubmissionTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.dj.tasks.impl.DjConfirmationTask;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -40,9 +46,17 @@ import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.dj.DjOrderDetailsService;
+import uk.gov.hmcts.reform.civil.service.dj.DjValidationService;
+import uk.gov.hmcts.reform.civil.service.dj.DjDocumentService;
+import uk.gov.hmcts.reform.civil.service.dj.DjNarrativeService;
+import uk.gov.hmcts.reform.civil.service.dj.DjSubmissionService;
+import uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderParticipantService;
 import uk.gov.hmcts.reform.civil.service.camunda.UpdateWaCourtLocationsService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoLocationService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoFeatureToggleService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
@@ -83,7 +97,22 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
     StandardDirectionOrderDJ.class,
     JacksonAutoConfiguration.class,
     AssignCategoryId.class,
-    LocationHelper.class
+    LocationHelper.class,
+    DirectionsOrderCallbackPipeline.class,
+    DjPrePopulateTask.class,
+    DjOrderDetailsTask.class,
+    DjValidationTask.class,
+    DjDocumentTask.class,
+    DjSubmissionTask.class,
+    DjConfirmationTask.class,
+    DjOrderDetailsService.class,
+    DjValidationService.class,
+    DjDocumentService.class,
+    DjNarrativeService.class,
+    DjSubmissionService.class,
+    SdoLocationService.class,
+    SdoFeatureToggleService.class,
+    DirectionsOrderParticipantService.class
 })
 
 public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
@@ -92,14 +121,10 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
     private final ObjectMapper mapper = new ObjectMapper();
     @Autowired
     private StandardDirectionOrderDJ handler;
-    @Autowired
-    private AssignCategoryId assignCategoryId;
     @MockBean
     private DefaultJudgmentOrderFormGenerator defaultJudgmentOrderFormGenerator;
     @MockBean
     private LocationReferenceDataService locationRefDataService;
-    @MockBean
-    private UserDetails userDetails;
     @MockBean
     private WorkingDayIndicator workingDayIndicator;
     @MockBean
@@ -110,8 +135,6 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
     private CategoryService categoryService;
     @MockBean
     private UpdateWaCourtLocationsService updateWaCourtLocationsService;
-    @Mock
-    private LocationHelper locationHelper;
 
     @Nested
     class AboutToStartCallback {
@@ -902,6 +925,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             }
         }
         CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+            .caseAccessCategory(SPEC_CLAIM)
             .caseManagementLocation(CaseLocationCivil.builder()
                                         .region("2")
                                         .baseLocation("111")
@@ -915,17 +939,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                                                      .build(), ABOUT_TO_SUBMIT);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
-        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            boolean isLipCase = caseData.isApplicantLiP() || caseData.isRespondent1LiP() || caseData.isRespondent2LiP();
-            if (!isLipCase) {
-                assertEquals(YES, eaCourtLocation);
-            } else {
-                boolean isLipCaseEaCourt = handler.isLipCaseWithProgressionEnabledAndCourtWhiteListed(caseData);
-                assertEquals(isLipCaseEaCourt ? YesOrNo.YES : YesOrNo.NO, eaCourtLocation);
-            }
-        } else {
-            assertNull(responseCaseData.getEaCourtLocation());
-        }
+        assertEquals(eaCourtLocation, responseCaseData.getEaCourtLocation());
     }
 
     @ParameterizedTest
@@ -954,6 +968,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(isCPAndWhitelisted);
         }
         CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+            .caseAccessCategory(SPEC_CLAIM)
             .caseManagementLocation(CaseLocationCivil.builder()
                                         .region("2")
                                         .baseLocation("111")
@@ -968,17 +983,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
 
-        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            boolean isLipCase = caseData.isApplicantLiP() || caseData.isRespondent1LiP() || caseData.isRespondent2LiP();
-            if (!isLipCase) {
-                assertEquals(YES, eaCourtLocation);
-            } else {
-                boolean isLipCaseEaCourt = handler.isLipCaseWithProgressionEnabledAndCourtWhiteListed(caseData);
-                assertEquals(isLipCaseEaCourt ? YesOrNo.YES : YesOrNo.NO, eaCourtLocation);
-            }
-        } else {
-            assertNull(responseCaseData.getEaCourtLocation());
-        }
+        assertEquals(eaCourtLocation, responseCaseData.getEaCourtLocation());
     }
 
     @Test
@@ -1071,12 +1076,8 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
     }
 
     @Test
-    void shouldNotCallUpdateWaCourtLocationsServiceWhenNotPresent_AndMintiEnabled() {
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
-
-        handler = new StandardDirectionOrderDJ(mapper, defaultJudgmentOrderFormGenerator, locationRefDataService, featureToggleService,
-                                               userService, assignCategoryId, categoryService, locationHelper,
-                                               Optional.empty(), deadlinesCalculator, workingDayIndicator);
+    void shouldNotCallUpdateWaCourtLocationsServiceWhenMintiDisabled() {
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(false);
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
             .caseManagementLocation(CaseLocationCivil.builder().baseLocation("123456").build())
@@ -1123,4 +1124,3 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
         }
     }
 }
-

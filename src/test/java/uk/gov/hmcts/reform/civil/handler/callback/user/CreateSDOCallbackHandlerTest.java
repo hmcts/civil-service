@@ -50,7 +50,7 @@ import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2TimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.TrialOnRadioOptions;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.pipeline.SdoCallbackPipeline;
+import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.pipeline.DirectionsOrderCallbackPipeline;
 import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.impl.SdoOrderDetailsTask;
 import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.impl.SdoPrePopulateTask;
 import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.impl.SdoConfirmationTask;
@@ -243,7 +243,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackH
     SdoValidationService.class,
     SdoDocumentService.class,
     SdoSubmissionService.class,
-    SdoCallbackPipeline.class,
+    DirectionsOrderCallbackPipeline.class,
     SdoPrePopulateTask.class,
     SdoOrderDetailsTask.class,
     SdoValidationTask.class,
@@ -274,7 +274,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     private ObjectMapper objectMapper;
 
     @Autowired
-    private SdoCallbackPipeline sdoCallbackPipeline;
+    private DirectionsOrderCallbackPipeline directionsOrderCallbackPipeline;
 
     @MockBean
     protected LocationReferenceDataService locationRefDataService;
@@ -1349,7 +1349,12 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     void shouldNotCallUpdateWaCourtLocationsServiceWhenNotPresent_AndMintiEnabled() {
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
 
-        handler = new CreateSDOCallbackHandler(objectMapper, featureToggleService, sdoCallbackPipeline, Optional.empty());
+        handler = new CreateSDOCallbackHandler(
+            objectMapper,
+            featureToggleService,
+            directionsOrderCallbackPipeline,
+            Optional.empty()
+        );
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
             .caseManagementLocation(CaseLocationCivil.builder().baseLocation("123456").build())

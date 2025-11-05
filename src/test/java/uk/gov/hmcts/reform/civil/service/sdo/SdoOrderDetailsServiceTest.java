@@ -12,8 +12,8 @@ import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.HearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
-import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.SdoLifecycleStage;
-import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.SdoTaskContext;
+import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderLifecycleStage;
+import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskContext;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
@@ -197,12 +197,12 @@ class SdoOrderDetailsServiceTest {
         assertThat(result.getSmallClaimsMethod()).isEqualTo(SmallClaimsMethod.smallClaimsMethodVideoConferenceHearing);
     }
 
-    private SdoTaskContext orderDetailsContext(CaseData caseData, CallbackVersion version) {
+    private DirectionsOrderTaskContext orderDetailsContext(CaseData caseData, CallbackVersion version) {
         CallbackParams params = CallbackParams.builder()
             .params(Collections.emptyMap())
             .version(version)
             .build();
 
-        return new SdoTaskContext(caseData, params, SdoLifecycleStage.ORDER_DETAILS);
+        return new DirectionsOrderTaskContext(caseData, params, DirectionsOrderLifecycleStage.ORDER_DETAILS);
     }
 }

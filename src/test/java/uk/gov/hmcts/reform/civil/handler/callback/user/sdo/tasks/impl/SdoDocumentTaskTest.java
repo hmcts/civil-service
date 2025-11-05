@@ -7,9 +7,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
-import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.SdoLifecycleStage;
-import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.SdoTaskContext;
-import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.SdoTaskResult;
+import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderLifecycleStage;
+import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskContext;
+import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskResult;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoDocumentService;
 
@@ -41,11 +41,12 @@ class SdoDocumentTaskTest {
             .params(Map.of(BEARER_TOKEN, AUTH_TOKEN))
             .type(CallbackType.MID)
             .build();
-        SdoTaskContext context = new SdoTaskContext(caseData, params, SdoLifecycleStage.DOCUMENT_GENERATION);
+        DirectionsOrderTaskContext context =
+            new DirectionsOrderTaskContext(caseData, params, DirectionsOrderLifecycleStage.DOCUMENT_GENERATION);
 
         when(sdoDocumentService.generateSdoDocument(caseData, AUTH_TOKEN)).thenReturn(Optional.of(document));
 
-        SdoTaskResult result = task.execute(context);
+        DirectionsOrderTaskResult result = task.execute(context);
 
         assertThat(result.updatedCaseData()).isNotSameAs(caseData);
         assertThat(result.errors()).isEmpty();
@@ -61,11 +62,12 @@ class SdoDocumentTaskTest {
         CallbackParams params = CallbackParams.builder()
             .params(Map.of(BEARER_TOKEN, AUTH_TOKEN))
             .build();
-        SdoTaskContext context = new SdoTaskContext(caseData, params, SdoLifecycleStage.DOCUMENT_GENERATION);
+        DirectionsOrderTaskContext context =
+            new DirectionsOrderTaskContext(caseData, params, DirectionsOrderLifecycleStage.DOCUMENT_GENERATION);
 
         when(sdoDocumentService.generateSdoDocument(caseData, AUTH_TOKEN)).thenReturn(Optional.empty());
 
-        SdoTaskResult result = task.execute(context);
+        DirectionsOrderTaskResult result = task.execute(context);
 
         verify(sdoDocumentService).generateSdoDocument(caseData, AUTH_TOKEN);
         verify(sdoDocumentService, never()).assignCategory(any(), anyString());
@@ -77,7 +79,7 @@ class SdoDocumentTaskTest {
     void shouldSupportDocumentGenerationStageOnly() {
         SdoDocumentTask task = new SdoDocumentTask(sdoDocumentService);
 
-        assertThat(task.supports(SdoLifecycleStage.DOCUMENT_GENERATION)).isTrue();
-        assertThat(task.supports(SdoLifecycleStage.PRE_POPULATE)).isFalse();
-    }
+        assertThat(task.supports(DirectionsOrderLifecycleStage.DOCUMENT_GENERATION)).isTrue();
+        assertThat(task.supports(DirectionsOrderLifecycleStage.PRE_POPULATE)).isFalse();
+}
 }

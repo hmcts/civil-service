@@ -76,7 +76,6 @@ public class SdoSubmissionService {
         if (featureToggleService.isWelshEnabledForMainCase()) {
             builder.eaCourtLocation(YesOrNo.YES);
         } else if (!isLipCase) {
-            log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
             builder.eaCourtLocation(YesOrNo.YES);
         } else {
             boolean isWhitelisted = isLipCaseWithProgressionEnabledAndCourtWhiteListed(caseData);

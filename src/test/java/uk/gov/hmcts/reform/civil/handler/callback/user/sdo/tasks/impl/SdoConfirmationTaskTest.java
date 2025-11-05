@@ -5,9 +5,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.SdoLifecycleStage;
-import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.SdoTaskContext;
-import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.SdoTaskResult;
+import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderLifecycleStage;
+import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskContext;
+import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskResult;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoNarrativeService;
 
@@ -34,12 +34,13 @@ class SdoConfirmationTaskTest {
         CallbackParams params = CallbackParams.builder()
             .params(Map.of(BEARER_TOKEN, "token"))
             .build();
-        SdoTaskContext context = new SdoTaskContext(caseData, params, SdoLifecycleStage.CONFIRMATION);
+        DirectionsOrderTaskContext context =
+            new DirectionsOrderTaskContext(caseData, params, DirectionsOrderLifecycleStage.CONFIRMATION);
 
         when(narrativeService.buildConfirmationHeader(caseData)).thenReturn(HEADER);
         when(narrativeService.buildConfirmationBody(caseData)).thenReturn(BODY);
 
-        SdoTaskResult result = task.execute(context);
+        DirectionsOrderTaskResult result = task.execute(context);
 
         assertThat(result.submittedCallbackResponse()).isNotNull();
         assertThat(result.submittedCallbackResponse().getConfirmationHeader()).isEqualTo(HEADER);
@@ -52,8 +53,7 @@ class SdoConfirmationTaskTest {
     void shouldSupportConfirmationStageOnly() {
         SdoConfirmationTask task = new SdoConfirmationTask(narrativeService);
 
-        assertThat(task.supports(SdoLifecycleStage.CONFIRMATION)).isTrue();
-        assertThat(task.supports(SdoLifecycleStage.SUBMISSION)).isFalse();
-    }
+        assertThat(task.supports(DirectionsOrderLifecycleStage.CONFIRMATION)).isTrue();
+        assertThat(task.supports(DirectionsOrderLifecycleStage.SUBMISSION)).isFalse();
 }
-
+}

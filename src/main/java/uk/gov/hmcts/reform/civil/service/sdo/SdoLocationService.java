@@ -30,6 +30,10 @@ public class SdoLocationService {
         return locationReferenceDataService.getHearingCourtLocations(authToken);
     }
 
+    public List<LocationRefData> fetchDefaultJudgmentLocations(String authToken) {
+        return locationReferenceDataService.getCourtLocationsForDefaultJudgments(authToken);
+    }
+
     public DynamicList buildLocationList(RequestedCourt preferredCourt,
                                          boolean includeAllCourts,
                                          List<LocationRefData> locations) {
