@@ -98,7 +98,6 @@ class SdoPrePopulateServiceTest {
     @Test
     void shouldSetCarmFlagAndBuildLocationLists() {
         when(featureToggleService.isCarmEnabled(any(CaseData.class))).thenReturn(true);
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
 
         CaseData caseData = baseCaseData();
         SdoTaskContext context = buildContext(caseData);
@@ -115,7 +114,6 @@ class SdoPrePopulateServiceTest {
     @Test
     void shouldClearCarmFlagWhenToggleDisabled() {
         when(featureToggleService.isCarmEnabled(any(CaseData.class))).thenReturn(false);
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
 
         CaseData caseData = baseCaseData();
         SdoTaskContext context = buildContext(caseData);
@@ -123,6 +121,32 @@ class SdoPrePopulateServiceTest {
         CaseData result = service.prePopulate(context);
 
         assertThat(result.getShowCarmFields()).isEqualTo(YesOrNo.NO);
+    }
+
+    @Test
+    void shouldSetWelshHintWhenWelshJourneyEnabled() {
+        when(featureToggleService.isCarmEnabled(any(CaseData.class))).thenReturn(false);
+        when(featureToggleService.isWelshJourneyEnabled(any(CaseData.class))).thenReturn(true);
+
+        CaseData caseData = baseCaseData();
+        SdoTaskContext context = buildContext(caseData);
+
+        CaseData result = service.prePopulate(context);
+
+        assertThat(result.getBilingualHint()).isEqualTo(YesOrNo.YES);
+    }
+
+    @Test
+    void shouldPopulateMediationSectionWhenCarmEnabled() {
+        when(featureToggleService.isCarmEnabled(any(CaseData.class))).thenReturn(true);
+        when(featureToggleService.isWelshJourneyEnabled(any(CaseData.class))).thenReturn(false);
+
+        CaseData caseData = baseCaseData();
+        SdoTaskContext context = buildContext(caseData);
+
+        CaseData result = service.prePopulate(context);
+
+        assertThat(result.getSmallClaimsMediationSectionStatement()).isNotNull();
     }
 
     private SdoTaskContext buildContext(CaseData caseData) {

@@ -166,6 +166,7 @@ public class SdoPrePopulateService {
     static final String witnessStatementString = "This witness statement is limited to 10 pages per party, including any appendices.";
     static final String laterThanFourPmString = "later than 4pm on";
     static final String claimantEvidenceString = "and the claimant's evidence in reply if so advised to be uploaded by 4pm on";
+    static final String partiesLiaseString = "The parties are to liaise and use reasonable endeavours to agree the basic hire rate no ";
 
     @Value("${genApp.lrd.ccmcc.amountPounds}")
     BigDecimal ccmccAmount;
@@ -177,54 +178,153 @@ public class SdoPrePopulateService {
         CallbackParams callbackParams = context.callbackParams();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
+
+        initialiseTrackDefaults(updatedData);
+        applyFeatureFlags(caseData, updatedData);
+
+        Optional<RequestedCourt> preferredCourt = updateCaseManagementLocationIfLegalAdvisorSdo(updatedData, caseData);
+
+        DynamicList hearingMethodList = getDynamicHearingMethodList(callbackParams, caseData);
+        applyVersionSpecificHearingDefaults(callbackParams, updatedData, hearingMethodList);
+
+        List<LocationRefData> locationRefDataList = populateHearingLocations(preferredCourt, authToken, updatedData);
+
+        List<OrderDetailsPagesSectionsToggle> checkList = List.of(SHOW);
+        setCheckList(updatedData, checkList);
+        updateDeductionValue(caseData, updatedData);
+
+        populateDisposalOrderDetails(updatedData);
+        populateFastTrackOrderDetails(updatedData);
+        populateSmallClaimsOrderDetails(caseData, updatedData, checkList);
+
+        updateExpertEvidenceFields(updatedData);
+        updateDisclosureOfDocumentFields(updatedData);
+        populateDRHFields(callbackParams, updatedData, preferredCourt, hearingMethodList, locationRefDataList);
+        prePopulateNihlFields(updatedData, hearingMethodList, preferredCourt, locationRefDataList);
+
+        List<IncludeInOrderToggle> localIncludeInOrderToggle = List.of(IncludeInOrderToggle.INCLUDE);
+        setCheckListNihl(updatedData, localIncludeInOrderToggle);
+        updatedData.sdoR2FastTrackUseOfWelshLanguage(SdoR2WelshLanguageUsage.builder().description(
+            SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION).build());
+        updatedData.sdoR2SmallClaimsUseOfWelshLanguage(SdoR2WelshLanguageUsage.builder().description(
+            SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION).build());
+        updatedData.sdoR2DisposalHearingUseOfWelshLanguage(SdoR2WelshLanguageUsage.builder().description(
+            SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION).build());
+        return updatedData.build();
+    }
+
+    private void setCheckList(
+        CaseData.CaseDataBuilder<?, ?> updatedData,
+        List<OrderDetailsPagesSectionsToggle> checkList
+    ) {
+        updatedData.fastTrackAltDisputeResolutionToggle(checkList);
+        updatedData.fastTrackVariationOfDirectionsToggle(checkList);
+        updatedData.fastTrackSettlementToggle(checkList);
+        updatedData.fastTrackDisclosureOfDocumentsToggle(checkList);
+        updatedData.fastTrackWitnessOfFactToggle(checkList);
+        updatedData.fastTrackSchedulesOfLossToggle(checkList);
+        updatedData.fastTrackCostsToggle(checkList);
+        updatedData.fastTrackTrialToggle(checkList);
+        updatedData.fastTrackTrialBundleToggle(checkList);
+        updatedData.fastTrackMethodToggle(checkList);
+        updatedData.disposalHearingDisclosureOfDocumentsToggle(checkList);
+        updatedData.disposalHearingWitnessOfFactToggle(checkList);
+        updatedData.disposalHearingMedicalEvidenceToggle(checkList);
+        updatedData.disposalHearingQuestionsToExpertsToggle(checkList);
+        updatedData.disposalHearingSchedulesOfLossToggle(checkList);
+        updatedData.disposalHearingFinalDisposalHearingToggle(checkList);
+        updatedData.disposalHearingMethodToggle(checkList);
+        updatedData.disposalHearingBundleToggle(checkList);
+        updatedData.disposalHearingClaimSettlingToggle(checkList);
+        updatedData.disposalHearingCostsToggle(checkList);
+        updatedData.smallClaimsHearingToggle(checkList);
+        updatedData.smallClaimsMethodToggle(checkList);
+        updatedData.smallClaimsDocumentsToggle(checkList);
+        updatedData.smallClaimsWitnessStatementToggle(checkList);
+        updatedData.smallClaimsFlightDelayToggle(checkList);
+
+        if (sdoFeatureToggleService.isCarmEnabled(updatedData.build())) {
+            updatedData.smallClaimsMediationSectionToggle(checkList);
+        }
+    }
+
+    private void initialiseTrackDefaults(CaseData.CaseDataBuilder<?, ?> updatedData) {
         updatedData
             .smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodInPerson)
             .fastTrackMethod(FastTrackMethod.fastTrackMethodInPerson);
+    }
 
+    private void applyFeatureFlags(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
         if (sdoFeatureToggleService.isCarmEnabled(caseData)) {
             updatedData.showCarmFields(YES);
         } else {
             updatedData.showCarmFields(NO);
         }
 
-        if (sdoFeatureToggleService.isWelshEnabledForMainCase()
-            && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
+        if (sdoFeatureToggleService.isWelshJourneyEnabled(caseData)) {
             updatedData.bilingualHint(YesOrNo.YES);
         }
+    }
 
-        /**
-         * Update case management location to preferred logic and return preferred location when legal advisor SDO,
-         * otherwise return preferred location only.
-         */
-        Optional<RequestedCourt> preferredCourt = updateCaseManagementLocationIfLegalAdvisorSdo(updatedData, caseData);
-
-        DynamicList hearingMethodList = getDynamicHearingMethodList(callbackParams, caseData);
-
+    private void applyVersionSpecificHearingDefaults(CallbackParams callbackParams,
+                                                     CaseData.CaseDataBuilder<?, ?> updatedData,
+                                                     DynamicList hearingMethodList) {
         if (V_1.equals(callbackParams.getVersion())) {
-            DynamicListElement hearingMethodInPerson = hearingMethodList.getListItems().stream().filter(elem -> elem.getLabel()
-                .equals(HearingMethod.IN_PERSON.getLabel())).findFirst().orElse(null);
+            DynamicListElement hearingMethodInPerson = hearingMethodList.getListItems().stream()
+                .filter(elem -> elem.getLabel().equals(HearingMethod.IN_PERSON.getLabel()))
+                .findFirst()
+                .orElse(null);
             hearingMethodList.setValue(hearingMethodInPerson);
             updatedData.hearingMethodValuesFastTrack(hearingMethodList);
             updatedData.hearingMethodValuesDisposalHearing(hearingMethodList);
             updatedData.hearingMethodValuesSmallClaims(hearingMethodList);
         }
+    }
 
+    private List<LocationRefData> populateHearingLocations(Optional<RequestedCourt> preferredCourt,
+                                                           String authToken,
+                                                           CaseData.CaseDataBuilder<?, ?> updatedData) {
         List<LocationRefData> locationRefDataList = sdoLocationService.fetchHearingLocations(authToken);
-        DynamicList locationsList = sdoLocationService.buildLocationList(preferredCourt.orElse(null), false, locationRefDataList);
+        DynamicList locationsList = sdoLocationService.buildLocationList(
+            preferredCourt.orElse(null), false, locationRefDataList);
         updatedData.disposalHearingMethodInPerson(locationsList);
         updatedData.fastTrackMethodInPerson(locationsList);
         updatedData.smallClaimsMethodInPerson(locationsList);
+        return locationRefDataList;
+    }
 
-        List<OrderDetailsPagesSectionsToggle> checkList = List.of(SHOW);
-        setCheckList(updatedData, checkList);
+    private void setCheckListNihl(
+        CaseData.CaseDataBuilder<?, ?> updatedData,
+        List<IncludeInOrderToggle> includeInOrderToggle
+    ) {
+        updatedData.sdoAltDisputeResolution(SdoR2FastTrackAltDisputeResolution.builder().includeInOrderToggle(
+            includeInOrderToggle).build());
+        updatedData.sdoVariationOfDirections(SdoR2VariationOfDirections.builder().includeInOrderToggle(
+            includeInOrderToggle).build());
+        updatedData.sdoR2Settlement(SdoR2Settlement.builder().includeInOrderToggle(includeInOrderToggle).build());
+        updatedData.sdoR2DisclosureOfDocumentsToggle(includeInOrderToggle).build();
+        updatedData.sdoR2SeparatorWitnessesOfFactToggle(includeInOrderToggle).build();
+        updatedData.sdoR2SeparatorExpertEvidenceToggle(includeInOrderToggle).build();
+        updatedData.sdoR2SeparatorAddendumReportToggle(includeInOrderToggle).build();
+        updatedData.sdoR2SeparatorFurtherAudiogramToggle(includeInOrderToggle).build();
+        updatedData.sdoR2SeparatorQuestionsClaimantExpertToggle(includeInOrderToggle).build();
+        updatedData.sdoR2SeparatorPermissionToRelyOnExpertToggle(includeInOrderToggle);
+        updatedData.sdoR2SeparatorEvidenceAcousticEngineerToggle(includeInOrderToggle);
+        updatedData.sdoR2SeparatorQuestionsToEntExpertToggle(includeInOrderToggle);
+        updatedData.sdoR2ScheduleOfLossToggle(includeInOrderToggle);
+        updatedData.sdoR2SeparatorUploadOfDocumentsToggle(includeInOrderToggle);
+        updatedData.sdoR2TrialToggle(includeInOrderToggle);
+        if (sdoFeatureToggleService.isCarmEnabled(updatedData.build())) {
+            updatedData.sdoR2SmallClaimsMediationSectionToggle(includeInOrderToggle);
+        }
+    }
 
+    private void populateDisposalOrderDetails(CaseData.CaseDataBuilder<?, ?> updatedData) {
         DisposalHearingJudgesRecital tempDisposalHearingJudgesRecital = DisposalHearingJudgesRecital.builder()
             .input(UPON_CONSIDERING)
             .build();
 
         updatedData.disposalHearingJudgesRecital(tempDisposalHearingJudgesRecital).build();
-
-        updateDeductionValue(caseData, updatedData);
 
         DisposalHearingDisclosureOfDocuments tempDisposalHearingDisclosureOfDocuments =
             DisposalHearingDisclosureOfDocuments.builder()
@@ -291,8 +391,6 @@ public class SdoPrePopulateService {
 
         updatedData.disposalHearingFinalDisposalHearing(tempDisposalHearingFinalDisposalHearing).build();
 
-        // updated Hearing time field copy of the above field, leaving above field in as requested to not break
-        // existing cases
         DisposalHearingHearingTime tempDisposalHearingHearingTime =
             DisposalHearingHearingTime.builder()
                 .input(
@@ -328,7 +426,9 @@ public class SdoPrePopulateService {
             .build();
 
         updatedData.disposalHearingNotes(tempDisposalHearingNotes).build();
+    }
 
+    private void populateFastTrackOrderDetails(CaseData.CaseDataBuilder<?, ?> updatedData) {
         FastTrackJudgesRecital tempFastTrackJudgesRecital = FastTrackJudgesRecital.builder()
             .input("Upon considering the statements of case and the information provided by the parties,")
             .build();
@@ -441,7 +541,6 @@ public class SdoPrePopulateService {
                         + "to the pages in that bundle.")
             .build();
 
-        String partiesLiaseString = "The parties are to liaise and use reasonable endeavours to agree the basic hire rate no ";
         updatedData.fastTrackClinicalNegligence(tempFastTrackClinicalNegligence).build();
 
         List<AddOrRemoveToggle> addOrRemoveToggleList = List.of(AddOrRemoveToggle.ADD);
@@ -469,11 +568,10 @@ public class SdoPrePopulateService {
                         + "     i) 3 months after cessation of hire\n"
                         + "     ii) the repair or replacement of the claimant's vehicle\n"
                         + "c) Evidence of any loan, overdraft or other credit facilities available to the claimant.")
-            .input5("If the parties fail to agree rates subject to liability and/or other issues pursuant to the "
-                        + "paragraph above, each party may rely upon written evidence by way of witness statement of "
-                        + "one witness to provide evidence of basic hire rates available within the claimant's "
-                        + "geographical location, from a mainstream supplier, or a local reputable supplier if none "
-                        + "is available.")
+            .input5("If the parties fail to agree basic hire rates pursuant to the paragraph above, "
+                        + "each party may rely upon written evidence by way of witness statement of one witness to"
+                        + " provide evidence of basic hire rates available within the claimant's geographical location,"
+                        + " from a mainstream supplier, or a local reputable supplier if none is available.")
             .input6("The defendant's evidence is to be uploaded to the Digital Portal by 4pm on")
             .date3(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)))
             .input7(claimantEvidenceString)
@@ -484,41 +582,6 @@ public class SdoPrePopulateService {
             .build();
 
         updatedData.sdoR2FastTrackCreditHire(tempSdoR2FastTrackCreditHire).build();
-
-        FastTrackCreditHire tempFastTrackCreditHire = FastTrackCreditHire.builder()
-            .input1("If impecuniosity is alleged by the claimant and not admitted by the defendant, the claimant's "
-                        + "disclosure as ordered earlier in this Order must include:\n"
-                        + "a) Evidence of all income from all sources for a period of 3 months prior to the "
-                        + "commencement of hire until the earlier of:\n "
-                        + "     i) 3 months after cessation of hire\n"
-                        + "     ii) the repair or replacement of the claimant's vehicle\n"
-                        + "b) Copies of all bank, credit card, and saving account statements for a period of 3 months "
-                        + "prior to the commencement of hire until the earlier of:\n"
-                        + "     i) 3 months after cessation of hire\n"
-                        + "     ii) the repair or replacement of the claimant's vehicle\n"
-                        + "c) Evidence of any loan, overdraft or other credit facilities available to the claimant.")
-            .input2("The claimant must upload to the Digital Portal a witness statement addressing\n"
-                        + "a) the need to hire a replacement vehicle; and\n"
-                        + "b) impecuniosity")
-            .date1(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(4)))
-            .input3("A failure to comply with the paragraph above will result in the claimant being debarred from "
-                        + "asserting need or relying on impecuniosity as the case may be at the final hearing, "
-                        + "save with permission of the Trial Judge.")
-            .input4(partiesLiaseString + laterThanFourPmString)
-            .date2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(6)))
-            .input5("If the parties fail to agree rates subject to liability and/or other issues pursuant to the "
-                        + "paragraph above, each party may rely upon written evidence by way of witness statement of "
-                        + "one witness to provide evidence of basic hire rates available within the claimant's "
-                        + "geographical location, from a mainstream supplier, or a local reputable supplier if none "
-                        + "is available.")
-            .input6("The defendant's evidence is to be uploaded to the Digital Portal by 4pm on")
-            .date3(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)))
-            .input7(claimantEvidenceString)
-            .date4(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(10)))
-            .input8(witnessStatementString)
-            .build();
-
-        updatedData.fastTrackCreditHire(tempFastTrackCreditHire).build();
 
         FastTrackHousingDisrepair tempFastTrackHousingDisrepair = FastTrackHousingDisrepair.builder()
             .input1("The claimant must prepare a Scott Schedule of the items in disrepair.")
@@ -561,7 +624,11 @@ public class SdoPrePopulateService {
             .build();
 
         updatedData.fastTrackRoadTrafficAccident(tempFastTrackRoadTrafficAccident).build();
+    }
 
+    private void populateSmallClaimsOrderDetails(CaseData caseData,
+                                                 CaseData.CaseDataBuilder<?, ?> updatedData,
+                                                 List<OrderDetailsPagesSectionsToggle> checkList) {
         SmallClaimsJudgesRecital tempSmallClaimsJudgesRecital = SmallClaimsJudgesRecital.builder()
             .input("Upon considering the statements of case and the information provided by the parties,")
             .build();
@@ -692,7 +759,6 @@ public class SdoPrePopulateService {
 
         updatedData.smallClaimsRoadTrafficAccident(tempSmallClaimsRoadTrafficAccident).build();
 
-        //This the flow after request for reconsideration
         if (CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
             && DecisionOnRequestReconsiderationOptions.CREATE_SDO.equals(caseData.getDecisionOnRequestReconsiderationOptions())) {
             updatedData.drawDirectionsOrderRequired(null);
@@ -720,81 +786,6 @@ public class SdoPrePopulateService {
             updatedData.sdoR2SmallClaimsWitnessStatementsToggle(null);
             updatedData.sdoR2SmallClaimsPPIToggle(null);
             updatedData.sdoR2SmallClaimsUploadDocToggle(null);
-        }
-
-        updateExpertEvidenceFields(updatedData);
-        updateDisclosureOfDocumentFields(updatedData);
-        populateDRHFields(callbackParams, updatedData, preferredCourt, hearingMethodList, locationRefDataList);
-        prePopulateNihlFields(updatedData, hearingMethodList, preferredCourt, locationRefDataList);
-        List<IncludeInOrderToggle> localIncludeInOrderToggle = List.of(IncludeInOrderToggle.INCLUDE);
-        setCheckListNihl(updatedData, localIncludeInOrderToggle);
-        updatedData.sdoR2FastTrackUseOfWelshLanguage(SdoR2WelshLanguageUsage.builder().description(
-            SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION).build());
-        updatedData.sdoR2SmallClaimsUseOfWelshLanguage(SdoR2WelshLanguageUsage.builder().description(
-            SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION).build());
-        updatedData.sdoR2DisposalHearingUseOfWelshLanguage(SdoR2WelshLanguageUsage.builder().description(
-            SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION).build());
-        return updatedData.build();
-    }
-
-    private void setCheckList(
-        CaseData.CaseDataBuilder<?, ?> updatedData,
-        List<OrderDetailsPagesSectionsToggle> checkList
-    ) {
-        updatedData.fastTrackAltDisputeResolutionToggle(checkList);
-        updatedData.fastTrackVariationOfDirectionsToggle(checkList);
-        updatedData.fastTrackSettlementToggle(checkList);
-        updatedData.fastTrackDisclosureOfDocumentsToggle(checkList);
-        updatedData.fastTrackWitnessOfFactToggle(checkList);
-        updatedData.fastTrackSchedulesOfLossToggle(checkList);
-        updatedData.fastTrackCostsToggle(checkList);
-        updatedData.fastTrackTrialToggle(checkList);
-        updatedData.fastTrackTrialBundleToggle(checkList);
-        updatedData.fastTrackMethodToggle(checkList);
-        updatedData.disposalHearingDisclosureOfDocumentsToggle(checkList);
-        updatedData.disposalHearingWitnessOfFactToggle(checkList);
-        updatedData.disposalHearingMedicalEvidenceToggle(checkList);
-        updatedData.disposalHearingQuestionsToExpertsToggle(checkList);
-        updatedData.disposalHearingSchedulesOfLossToggle(checkList);
-        updatedData.disposalHearingFinalDisposalHearingToggle(checkList);
-        updatedData.disposalHearingMethodToggle(checkList);
-        updatedData.disposalHearingBundleToggle(checkList);
-        updatedData.disposalHearingClaimSettlingToggle(checkList);
-        updatedData.disposalHearingCostsToggle(checkList);
-        updatedData.smallClaimsHearingToggle(checkList);
-        updatedData.smallClaimsMethodToggle(checkList);
-        updatedData.smallClaimsDocumentsToggle(checkList);
-        updatedData.smallClaimsWitnessStatementToggle(checkList);
-        updatedData.smallClaimsFlightDelayToggle(checkList);
-
-        if (sdoFeatureToggleService.isCarmEnabled(updatedData.build())) {
-            updatedData.smallClaimsMediationSectionToggle(checkList);
-        }
-    }
-
-    private void setCheckListNihl(
-        CaseData.CaseDataBuilder<?, ?> updatedData,
-        List<IncludeInOrderToggle> includeInOrderToggle
-    ) {
-        updatedData.sdoAltDisputeResolution(SdoR2FastTrackAltDisputeResolution.builder().includeInOrderToggle(
-            includeInOrderToggle).build());
-        updatedData.sdoVariationOfDirections(SdoR2VariationOfDirections.builder().includeInOrderToggle(
-            includeInOrderToggle).build());
-        updatedData.sdoR2Settlement(SdoR2Settlement.builder().includeInOrderToggle(includeInOrderToggle).build());
-        updatedData.sdoR2DisclosureOfDocumentsToggle(includeInOrderToggle).build();
-        updatedData.sdoR2SeparatorWitnessesOfFactToggle(includeInOrderToggle).build();
-        updatedData.sdoR2SeparatorExpertEvidenceToggle(includeInOrderToggle).build();
-        updatedData.sdoR2SeparatorAddendumReportToggle(includeInOrderToggle).build();
-        updatedData.sdoR2SeparatorFurtherAudiogramToggle(includeInOrderToggle).build();
-        updatedData.sdoR2SeparatorQuestionsClaimantExpertToggle(includeInOrderToggle).build();
-        updatedData.sdoR2SeparatorPermissionToRelyOnExpertToggle(includeInOrderToggle);
-        updatedData.sdoR2SeparatorEvidenceAcousticEngineerToggle(includeInOrderToggle);
-        updatedData.sdoR2SeparatorQuestionsToEntExpertToggle(includeInOrderToggle);
-        updatedData.sdoR2ScheduleOfLossToggle(includeInOrderToggle);
-        updatedData.sdoR2SeparatorUploadOfDocumentsToggle(includeInOrderToggle);
-        updatedData.sdoR2TrialToggle(includeInOrderToggle);
-        if (sdoFeatureToggleService.isCarmEnabled(updatedData.build())) {
-            updatedData.sdoR2SmallClaimsMediationSectionToggle(includeInOrderToggle);
         }
     }
 

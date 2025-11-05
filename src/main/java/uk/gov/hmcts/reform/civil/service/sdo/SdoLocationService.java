@@ -61,16 +61,24 @@ public class SdoLocationService {
         Optional<LocationRefData> matchingLocation = Optional.ofNullable(preferredCourt)
             .flatMap(requestedCourt -> locationHelper.getMatching(locations, preferredCourt));
 
-        List<DynamicListElement> withOther = new ArrayList<>();
+        List<DynamicListElement> options = new ArrayList<>();
+        DynamicListElement selected = matchingLocation
+            .map(location -> dynamicElementFromCode(
+                location.getEpimmsId(),
+                LocationReferenceDataService.getDisplayEntry(location)
+            ))
+            .orElse(null);
 
-        matchingLocation.ifPresent(location -> withOther.add(dynamicElementFromCode(
-            location.getEpimmsId(),
-            LocationReferenceDataService.getDisplayEntry(location)
-        )));
+        if (selected != null) {
+            options.add(selected);
+        }
 
-        withOther.add(dynamicElementFromCode("OTHER_LOCATION", "Other location"));
+        options.add(dynamicElementFromCode("OTHER_LOCATION", "Other location"));
 
-        return DynamicList.fromDynamicListElementList(withOther);
+        return DynamicList.builder()
+            .listItems(options)
+            .value(selected != null ? selected : DynamicListElement.EMPTY)
+            .build();
     }
 
     public DynamicList trimListItems(DynamicList list) {

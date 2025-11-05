@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.SdoTaskContext;
 import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.SdoTaskResult;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoFeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoPrePopulateService;
 
 import java.util.Collections;
 import java.util.List;
@@ -20,6 +21,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackH
 public class SdoPrePopulateTask implements SdoCallbackTask {
 
     private final SdoFeatureToggleService sdoFeatureToggleService;
+    private final SdoPrePopulateService sdoPrePopulateService;
 
     @Override
     public SdoTaskResult execute(SdoTaskContext context) {
@@ -29,7 +31,9 @@ public class SdoPrePopulateTask implements SdoCallbackTask {
             return SdoTaskResult.withErrors(caseData, List.of(ERROR_MINTI_DISPOSAL_NOT_ALLOWED));
         }
 
-        return new SdoTaskResult(caseData, Collections.emptyList(), null);
+        CaseData updatedCaseData = sdoPrePopulateService.prePopulate(context);
+
+        return new SdoTaskResult(updatedCaseData, Collections.emptyList(), null);
     }
 
     @Override
