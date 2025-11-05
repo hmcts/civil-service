@@ -96,6 +96,6 @@ class UpdatePartyLitigationFriendTaskTest {
             () -> task.migrateCaseData(caseData, caseRef)
         );
 
-        assertEquals("Failed to set updated litigation friend in CaseData", ex.getMessage());
+        assertEquals("Failed to determine Party to update", ex.getMessage());
     }
 }

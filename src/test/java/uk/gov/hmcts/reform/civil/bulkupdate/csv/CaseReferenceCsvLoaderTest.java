@@ -16,6 +16,17 @@ class CaseReferenceCsvLoaderTest {
 
     CaseReferenceCsvLoader caseReferenceCsvLoader = new CaseReferenceCsvLoader();
 
+    static class TestExcelCaseReference extends CaseReference implements ExcelMappable {
+        public String caseId;
+        public String description;
+
+        @Override
+        public void fromExcelRow(java.util.Map<String, Object> rowValues) {
+            this.caseId = rowValues.get("caseId").toString();
+            this.description = rowValues.get("description").toString();
+        }
+    }
+
     @Test
     void shouldLoadCaseRefsCsvFile() {
         List<CaseReference> caseReferences = caseReferenceCsvLoader.loadCaseReferenceList(CaseReference.class, "caserefs-test.csv");
@@ -85,17 +96,6 @@ class CaseReferenceCsvLoaderTest {
 
     @Test
     void shouldLoadFromExcelBytes() throws Exception {
-        // Dummy Excel-mappable CaseReference
-        class TestExcelCaseReference extends CaseReference implements ExcelMappable {
-            public String caseId;
-            public String description;
-
-            @Override
-            public void fromExcelRow(java.util.Map<String, Object> rowValues) {
-                this.caseId = rowValues.get("caseId").toString();
-                this.description = rowValues.get("description").toString();
-            }
-        }
 
         // Create an in-memory Excel file
         try (org.apache.poi.xssf.usermodel.XSSFWorkbook workbook = new org.apache.poi.xssf.usermodel.XSSFWorkbook()) {
