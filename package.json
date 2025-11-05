@@ -5,7 +5,6 @@
     "civil-ga-ccd-definition"
   ],
   "scripts": {
-    "yarn-update": "yarn set version 3.x",
     "install-dependencies": "/usr/bin/yarn install --immutable --silent"
   },
   "packageManager": "yarn@3.8.5"
