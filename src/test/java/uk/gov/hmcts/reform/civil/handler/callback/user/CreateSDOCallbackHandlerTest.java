@@ -1803,7 +1803,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(dynamicList.getValue()).isNotNull()
                 .extracting("label").isEqualTo(LocationReferenceDataService.getDisplayEntry(shouldBeSelected.get()));
 
-            assertThat(response.getData()).extracting("showCarmFields").isEqualTo("Yes");
+            assertThat(data.getShowCarmFields()).isEqualTo(YesOrNo.YES);
 
             assertThat(response.getData()).extracting("fastTrackAltDisputeResolutionToggle").isNotNull();
             assertThat(response.getData()).extracting("fastTrackVariationOfDirectionsToggle").isNotNull();
@@ -2242,11 +2242,11 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertThat(response.getData()).doesNotHaveToString("smallClaimsMediationSectionToggle");
+            CaseData data = objectMapper.convertValue(response.getData(), CaseData.class);
 
-            assertThat(response.getData()).doesNotHaveToString("smallClaimsMediationSectionStatement");
-
-            assertThat(response.getData()).extracting("showCarmFields").isEqualTo("No");
+            assertThat(data.getSmallClaimsMediationSectionToggle()).isNull();
+            assertThat(data.getSmallClaimsMediationSectionStatement()).isNull();
+            assertThat(data.getShowCarmFields()).isEqualTo(YesOrNo.NO);
         }
 
         @Test
@@ -2359,7 +2359,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             CaseData data = objectMapper.convertValue(response.getData(), CaseData.class);
 
-            assertThat(response.getData()).extracting("showCarmFields").isEqualTo("Yes");
+            assertThat(data.getShowCarmFields()).isEqualTo(YesOrNo.YES);
 
             assertThat(data.getSdoR2SmallClaimsJudgesRecital().getInput()).isEqualTo(SdoR2UiConstantSmallClaim.JUDGE_RECITAL);
             assertThat(data.getSdoR2SmallClaimsPPI().getPpiDate()).isEqualTo(LocalDate.now().plusDays(21));
@@ -2421,9 +2421,10 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertThat(response.getData()).doesNotHaveToString("sdoR2SmallClaimsMediationSectionStatement");
+            CaseData data = objectMapper.convertValue(response.getData(), CaseData.class);
 
-            assertThat(response.getData()).extracting("showCarmFields").isEqualTo("No");
+            assertThat(data.getSdoR2SmallClaimsMediationSectionStatement()).isNull();
+            assertThat(data.getShowCarmFields()).isEqualTo(YesOrNo.NO);
         }
 
         @Test
