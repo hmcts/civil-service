@@ -21,6 +21,7 @@ cp -r ./${ccdRepoName}/package.json ./${directoryName}
 cp -r ./${ccdRepoName}/yarn.lock ./${directoryName}
 cp -r ./${ccdRepoName}/codecept.conf.js ./${directoryName}
 cp -r ./${ccdRepoName}/saucelabs.conf.js ./${directoryName}
+cp -r ./${ccdRepoName}/playwright.config.ts ./${directoryName}
 echo *
 rm -rf ./${ccdRepoName}
 mv ./${directoryName} ./${ccdRepoName}

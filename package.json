@@ -1,6 +1,10 @@
 {
   "private": true,
-  "workspaces": ["civil-ccd-definition", "civil-ga-ccd-definition"],
+  "workspaces": [
+    "civil-service",
+    "civil-ccd-definition",
+    "civil-ga-ccd-definition"
+  ],
   "name": "civil-service",
   "version": "0.0.1",
   "description": "Civil e2e tests",
@@ -17,7 +21,6 @@
     "allure-playwright": "2.4.0",
     "chai": "^4.3.4",
     "codeceptjs": "^3.5.11",
-    "custom-eslint-plugin": "file:plugins/custom-eslint-plugins",
     "deep-equal-in-any-order": "^1.0.28",
     "dotenv": "^16.4.5",
     "eslint": "^9.11.0",
@@ -50,4 +53,3 @@
   },
   "packageManager": "yarn@3.8.5"
 }
-
