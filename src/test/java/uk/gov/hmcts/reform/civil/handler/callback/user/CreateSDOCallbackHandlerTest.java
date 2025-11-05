@@ -13,6 +13,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -50,6 +51,7 @@ import uk.gov.hmcts.reform.civil.enums.sdo.SmallTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.TrialOnRadioOptions;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.pipeline.SdoCallbackPipeline;
+import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.impl.SdoOrderDetailsTask;
 import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.impl.SdoPrePopulateTask;
 import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.impl.SdoConfirmationTask;
 import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.impl.SdoDocumentTask;
@@ -132,6 +134,7 @@ import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataServ
 import uk.gov.hmcts.reform.civil.service.sdo.SdoCaseClassificationService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoDocumentService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoLocationService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoOrderDetailsService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoPrePopulateService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoNarrativeService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoSubmissionService;
@@ -234,6 +237,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackH
     SdoLocationService.class,
     SdoCaseClassificationService.class,
     SdoFeatureToggleService.class,
+    SdoOrderDetailsService.class,
     SdoPrePopulateService.class,
     SdoNarrativeService.class,
     SdoValidationService.class,
@@ -241,6 +245,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackH
     SdoSubmissionService.class,
     SdoCallbackPipeline.class,
     SdoPrePopulateTask.class,
+    SdoOrderDetailsTask.class,
     SdoValidationTask.class,
     SdoDocumentTask.class,
     SdoSubmissionTask.class,
@@ -266,16 +271,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     private CreateSDOCallbackHandler handler;
 
     @Autowired
-    private AssignCategoryId assignCategoryId;
-
-    @Autowired
     private ObjectMapper objectMapper;
-
-    @Autowired
-    private SdoLocationService sdoLocationService;
-
-    @Autowired
-    private SdoValidationService sdoValidationService;
 
     @Autowired
     private SdoCallbackPipeline sdoCallbackPipeline;
@@ -298,11 +294,11 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     @MockBean
     private CategoryService categoryService;
 
-    @Mock
-    private LocationHelper locationHelper;
-
     @MockBean
     private UpdateWaCourtLocationsService updateWaCourtLocationsService;
+
+    @Value("${court-location.unspecified-claim.epimms-id}")
+    private String ccmccEpimsId;
 
     @Nested
     class AboutToStartCallback extends LocationRefSampleDataBuilder {
@@ -1025,7 +1021,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldUpdateCaseManagementLocation_whenUnder1000SpecCcmcc() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build().toBuilder()
                 .caseAccessCategory(SPEC_CLAIM)
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation(handler.ccmccEpimsId).region(
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation(ccmccEpimsId).region(
                     "ccmcRegion").build())
                 .totalClaimAmount(BigDecimal.valueOf(999))
                 .claimsTrack(ClaimsTrack.smallClaimsTrack)
@@ -1353,10 +1349,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     void shouldNotCallUpdateWaCourtLocationsServiceWhenNotPresent_AndMintiEnabled() {
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
 
-        handler = new CreateSDOCallbackHandler(objectMapper, workingDayIndicator,
-                                               deadlinesCalculator, sdoGeneratorService, featureToggleService, locationHelper,
-                                               assignCategoryId, sdoLocationService, sdoValidationService,
-                                               sdoCallbackPipeline, categoryService, Optional.empty());
+        handler = new CreateSDOCallbackHandler(objectMapper, featureToggleService, sdoCallbackPipeline, Optional.empty());
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
             .caseManagementLocation(CaseLocationCivil.builder().baseLocation("123456").build())
@@ -2432,11 +2425,10 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            YesOrNo setSmallClaimsFlag = toYesOrNo(response.getData().get("setSmallClaimsFlag"));
-            YesOrNo setFastTrackFlag = toYesOrNo(response.getData().get("setFastTrackFlag"));
+            CaseData updated = objectMapper.convertValue(response.getData(), CaseData.class);
 
-            assertThat(setSmallClaimsFlag).isEqualTo(YesOrNo.NO);
-            assertThat(setFastTrackFlag).isEqualTo(YesOrNo.NO);
+            assertThat(updated.getSetSmallClaimsFlag()).isEqualTo(YesOrNo.NO);
+            assertThat(updated.getSetFastTrackFlag()).isEqualTo(YesOrNo.NO);
         }
 
         @Test
@@ -2453,11 +2445,10 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            YesOrNo setSmallClaimsFlag = toYesOrNo(response.getData().get("setSmallClaimsFlag"));
-            YesOrNo setFastTrackFlag = toYesOrNo(response.getData().get("setFastTrackFlag"));
+            CaseData updated = objectMapper.convertValue(response.getData(), CaseData.class);
 
-            assertThat(setSmallClaimsFlag).isEqualTo(YesOrNo.YES);
-            assertThat(setFastTrackFlag).isEqualTo(YesOrNo.NO);
+            assertThat(updated.getSetSmallClaimsFlag()).isEqualTo(YesOrNo.YES);
+            assertThat(updated.getSetFastTrackFlag()).isEqualTo(YesOrNo.NO);
         }
 
         @Test
@@ -2474,11 +2465,10 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            YesOrNo setSmallClaimsFlag = toYesOrNo(response.getData().get("setSmallClaimsFlag"));
-            YesOrNo setFastTrackFlag = toYesOrNo(response.getData().get("setFastTrackFlag"));
+            CaseData updated = objectMapper.convertValue(response.getData(), CaseData.class);
 
-            assertThat(setSmallClaimsFlag).isEqualTo(YesOrNo.YES);
-            assertThat(setFastTrackFlag).isEqualTo(YesOrNo.NO);
+            assertThat(updated.getSetSmallClaimsFlag()).isEqualTo(YesOrNo.YES);
+            assertThat(updated.getSetFastTrackFlag()).isEqualTo(YesOrNo.NO);
         }
 
         @Test
@@ -2496,11 +2486,10 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            YesOrNo setSmallClaimsFlag = toYesOrNo(response.getData().get("setSmallClaimsFlag"));
-            YesOrNo setFastTrackFlag = toYesOrNo(response.getData().get("setFastTrackFlag"));
+            CaseData updated = objectMapper.convertValue(response.getData(), CaseData.class);
 
-            assertThat(setSmallClaimsFlag).isEqualTo(YesOrNo.NO);
-            assertThat(setFastTrackFlag).isEqualTo(YesOrNo.YES);
+            assertThat(updated.getSetSmallClaimsFlag()).isEqualTo(YesOrNo.NO);
+            assertThat(updated.getSetFastTrackFlag()).isEqualTo(YesOrNo.YES);
         }
 
         @Test
@@ -2520,11 +2509,10 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            YesOrNo setSmallClaimsFlag = toYesOrNo(response.getData().get("setSmallClaimsFlag"));
-            YesOrNo setFastTrackFlag = toYesOrNo(response.getData().get("setFastTrackFlag"));
+            CaseData updated = objectMapper.convertValue(response.getData(), CaseData.class);
 
-            assertThat(setSmallClaimsFlag).isEqualTo(YesOrNo.NO);
-            assertThat(setFastTrackFlag).isEqualTo(YesOrNo.YES);
+            assertThat(updated.getSetSmallClaimsFlag()).isEqualTo(YesOrNo.NO);
+            assertThat(updated.getSetFastTrackFlag()).isEqualTo(YesOrNo.YES);
         }
 
         @Test
@@ -2549,13 +2537,11 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            YesOrNo setSmallClaimsFlag = toYesOrNo(response.getData().get("setSmallClaimsFlag"));
-            YesOrNo setFastTrackFlag = toYesOrNo(response.getData().get("setFastTrackFlag"));
-            YesOrNo isSdoR2NewScreen = toYesOrNo(response.getData().get("isSdoR2NewScreen"));
+            CaseData updated = objectMapper.convertValue(response.getData(), CaseData.class);
 
-            assertThat(setSmallClaimsFlag).isEqualTo(YesOrNo.NO);
-            assertThat(setFastTrackFlag).isEqualTo(YesOrNo.YES);
-            assertThat(isSdoR2NewScreen).isEqualTo(YesOrNo.YES);
+            assertThat(updated.getSetSmallClaimsFlag()).isEqualTo(YesOrNo.NO);
+            assertThat(updated.getSetFastTrackFlag()).isEqualTo(YesOrNo.YES);
+            assertThat(updated.getIsSdoR2NewScreen()).isEqualTo(YesOrNo.YES);
         }
 
         @Test
@@ -2577,13 +2563,11 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            YesOrNo setSmallClaimsFlag = toYesOrNo(response.getData().get("setSmallClaimsFlag"));
-            YesOrNo setFastTrackFlag = toYesOrNo(response.getData().get("setFastTrackFlag"));
-            YesOrNo isSdoR2NewScreen = toYesOrNo(response.getData().get("isSdoR2NewScreen"));
+            CaseData updated = objectMapper.convertValue(response.getData(), CaseData.class);
 
-            assertThat(setSmallClaimsFlag).isEqualTo(YesOrNo.NO);
-            assertThat(setFastTrackFlag).isEqualTo(YesOrNo.YES);
-            assertThat(isSdoR2NewScreen).isEqualTo(YesOrNo.YES);
+            assertThat(updated.getSetSmallClaimsFlag()).isEqualTo(YesOrNo.NO);
+            assertThat(updated.getSetFastTrackFlag()).isEqualTo(YesOrNo.YES);
+            assertThat(updated.getIsSdoR2NewScreen()).isEqualTo(YesOrNo.YES);
         }
 
         @Test
@@ -2601,13 +2585,11 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            YesOrNo setSmallClaimsFlag = toYesOrNo(response.getData().get("setSmallClaimsFlag"));
-            YesOrNo setFastTrackFlag = toYesOrNo(response.getData().get("setFastTrackFlag"));
-            YesOrNo isSdoR2NewScreen = toYesOrNo(response.getData().get("isSdoR2NewScreen"));
+            CaseData updated = objectMapper.convertValue(response.getData(), CaseData.class);
 
-            assertThat(setSmallClaimsFlag).isEqualTo(YesOrNo.YES);
-            assertThat(setFastTrackFlag).isEqualTo(YesOrNo.NO);
-            assertThat(isSdoR2NewScreen).isEqualTo(YesOrNo.YES);
+            assertThat(updated.getSetSmallClaimsFlag()).isEqualTo(YesOrNo.YES);
+            assertThat(updated.getSetFastTrackFlag()).isEqualTo(YesOrNo.NO);
+            assertThat(updated.getIsSdoR2NewScreen()).isEqualTo(YesOrNo.YES);
         }
 
         @Test
@@ -2625,13 +2607,11 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            YesOrNo setSmallClaimsFlag = toYesOrNo(response.getData().get("setSmallClaimsFlag"));
-            YesOrNo setFastTrackFlag = toYesOrNo(response.getData().get("setFastTrackFlag"));
-            YesOrNo isSdoR2NewScreen = toYesOrNo(response.getData().get("isSdoR2NewScreen"));
+            CaseData updated = objectMapper.convertValue(response.getData(), CaseData.class);
 
-            assertThat(setSmallClaimsFlag).isEqualTo(YesOrNo.YES);
-            assertThat(setFastTrackFlag).isEqualTo(YesOrNo.NO);
-            assertThat(isSdoR2NewScreen).isEqualTo(YesOrNo.YES);
+            assertThat(updated.getSetSmallClaimsFlag()).isEqualTo(YesOrNo.YES);
+            assertThat(updated.getSetFastTrackFlag()).isEqualTo(YesOrNo.NO);
+            assertThat(updated.getIsSdoR2NewScreen()).isEqualTo(YesOrNo.YES);
         }
     }
 
