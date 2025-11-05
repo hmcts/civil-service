@@ -7,7 +7,7 @@ def versions = [
 ]
 
 def springBootVersion = '3.5.1'
-def springCloudVersion = '2025.0.1'
+def springCloudVersion = '2025.0.0'
 
 java {
   sourceCompatibility = JavaVersion.VERSION_25
