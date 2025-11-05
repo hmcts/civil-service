@@ -116,7 +116,7 @@ class ClaimSettledDefendantDashboardNotificationHandlerTest extends BaseCallback
 
         @Test
         void shouldRecordScenarioWhenQmLrIsOnEaCourt_whenInvoked() {
-            when(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).thenReturn(true);
+            when(featureToggleService.isLocationWhiteListed(any())).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimSubmittedSmallClaim()
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation("test").region(

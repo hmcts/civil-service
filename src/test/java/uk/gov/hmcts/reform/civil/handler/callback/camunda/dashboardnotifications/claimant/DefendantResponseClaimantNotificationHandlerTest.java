@@ -259,7 +259,6 @@ class DefendantResponseClaimantNotificationHandlerTest extends BaseCallbackHandl
 
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
             when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceSpec().build()
                 .toBuilder()
                 .legacyCaseReference("reference")
@@ -533,7 +532,6 @@ class DefendantResponseClaimantNotificationHandlerTest extends BaseCallbackHandl
         HashMap<String, Object> params = new HashMap<>();
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
             .toBuilder()
