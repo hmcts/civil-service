@@ -5,7 +5,7 @@
     "civil-ga-ccd-definition"
   ],
   "scripts": {
-    "enable-corepack": "corepack enable",
+    "enable-corepack": "/usr/bin/corepack enable",
     "install-dependencies": "/usr/bin/yarn install --immutable --silent"
   },
   "packageManager": "yarn@3.8.5"
