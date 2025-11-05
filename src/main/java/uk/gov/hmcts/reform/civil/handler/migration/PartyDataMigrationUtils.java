@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.migration;
 
-import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
