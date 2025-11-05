@@ -52,7 +52,7 @@ run_functional_tests() {
     cd civil-ccd-definition
     yarn install
     yarn test:api-prod
-    cd ../civil-general-apps-ccd-definition
+    cd ../civil-ga-ccd-definition
     yarn install
     yarn test:api
     cd ..
@@ -60,7 +60,7 @@ run_functional_tests() {
     cd civil-ccd-definition
     yarn install
     yarn test:api-nonprod
-    cd ../civil-general-apps-ccd-definition
+    cd ../civil-ga-ccd-definition
     yarn install
     yarn test:api-nonprod
     cd ..
