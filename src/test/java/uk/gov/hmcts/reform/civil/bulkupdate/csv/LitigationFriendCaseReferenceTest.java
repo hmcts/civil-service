@@ -42,6 +42,7 @@ class LitigationFriendCaseReferenceTest {
         caseReference.fromExcelRow(rowValues);
 
         assertThat(caseReference.getDataObject()).isEqualTo(friend);
+        assertThat(caseReference.getLitigationFriend()).isEqualTo(friend);
         assertThat(caseReference.isApplicant1()).isTrue();
         assertThat(caseReference.isApplicant2()).isFalse();
         assertThat(caseReference.isRespondent1()).isFalse();
@@ -62,6 +63,7 @@ class LitigationFriendCaseReferenceTest {
         caseReference.fromExcelRow(rowValues);
 
         assertThat(caseReference.getDataObject()).isEqualTo(friend);
+        assertThat(caseReference.getLitigationFriend()).isEqualTo(friend);
         assertThat(caseReference.isApplicant2()).isTrue();
         assertThat(caseReference.isApplicant1()).isFalse();
         assertThat(caseReference.isRespondent1()).isFalse();
@@ -82,6 +84,7 @@ class LitigationFriendCaseReferenceTest {
         caseReference.fromExcelRow(rowValues);
 
         assertThat(caseReference.getDataObject()).isEqualTo(friend);
+        assertThat(caseReference.getLitigationFriend()).isEqualTo(friend);
         assertThat(caseReference.isRespondent1()).isTrue();
         assertThat(caseReference.isApplicant1()).isFalse();
         assertThat(caseReference.isApplicant2()).isFalse();
@@ -102,6 +105,8 @@ class LitigationFriendCaseReferenceTest {
         caseReference.fromExcelRow(rowValues);
 
         assertThat(caseReference.getDataObject()).isEqualTo(friend);
+        assertThat(caseReference.getLitigationFriend()).isEqualTo(friend);
+        assertThat(caseReference.getLitigationFriend()).isEqualTo(friend);
         assertThat(caseReference.isRespondent2()).isTrue();
         assertThat(caseReference.isApplicant1()).isFalse();
         assertThat(caseReference.isApplicant2()).isFalse();
@@ -118,22 +123,10 @@ class LitigationFriendCaseReferenceTest {
 
         assertThat(caseReference.getCaseReference()).isEqualTo("\"CASE-999\"");
         assertThat(caseReference.getDataObject()).isNull();
+        assertThat(caseReference.getLitigationFriend()).isNull();
         assertThat(caseReference.isApplicant1()).isFalse();
         assertThat(caseReference.isApplicant2()).isFalse();
         assertThat(caseReference.isRespondent1()).isFalse();
         assertThat(caseReference.isRespondent2()).isFalse();
-    }
-
-    @Test
-    void setDataObject_shouldUpdateLitigationFriend() {
-        LitigationFriend friend = LitigationFriend.builder()
-            .firstName("John")
-            .lastName("Doe")
-            .build();
-
-        caseReference.setDataObject(friend);
-
-        assertThat(caseReference.getDataObject()).isEqualTo(friend);
-        assertThat(caseReference.getLitigationFriend()).isEqualTo(friend);
     }
 }

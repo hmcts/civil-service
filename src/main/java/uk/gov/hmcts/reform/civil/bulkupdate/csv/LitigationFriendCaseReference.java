@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 
+import java.util.Map;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 @SuperBuilder
 @Data
@@ -29,12 +31,8 @@ public class LitigationFriendCaseReference extends AbstractCaseReferenceWithRole
     }
 
     @Override
-    public LitigationFriend getDataObject() {
-        return dataObject;
-    }
-
-    @Override
-    public void setDataObject(LitigationFriend litigationFriend) {
-        this.dataObject = litigationFriend;
+    public void fromExcelRow(Map<String, Object> rowValues) throws Exception {
+        super.fromExcelRow(rowValues); // sets dataObject
+        this.litigationFriend = this.dataObject;  // sync CSV field
     }
 }

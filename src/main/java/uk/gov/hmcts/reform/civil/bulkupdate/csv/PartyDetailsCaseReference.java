@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import uk.gov.hmcts.reform.civil.model.Party;
 
+import java.util.Map;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 @SuperBuilder
 @Data
@@ -29,12 +31,8 @@ public class PartyDetailsCaseReference extends AbstractCaseReferenceWithRole<Par
     }
 
     @Override
-    public Party getDataObject() {
-        return dataObject;
-    }
-
-    @Override
-    public void setDataObject(Party party) {
-        this.dataObject = party;
+    public void fromExcelRow(Map<String, Object> rowValues) throws Exception {
+        super.fromExcelRow(rowValues); // sets dataObject
+        this.party = this.dataObject;  // sync CSV field
     }
 }
