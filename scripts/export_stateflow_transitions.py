@@ -393,18 +393,45 @@ def save_mermaid(transitions: Sequence[Dict], glossary: Dict[str, str]):
         if not edges:
             continue
 
+        branch_states = []
+        if slug == "draft_flow":
+            adjusted = []
+            target_alias = bridge_out_alias.get("CLAIM_SUBMITTED")
+            counter = 0
+            for src_alias, dst_alias, label in edges:
+                if dst_alias == target_alias and src_alias in states:
+                    alias = f"{src_alias}_PATH_{counter}"
+                    counter += 1
+                    branch_label = label
+                    if src_alias == 'SPEC_DRAFT' and label:
+                        branch_label = f"SPEC: {label}"
+                    branch_states.append((alias, branch_label))
+                    adjusted.append((src_alias, alias, ""))
+                    adjusted.append((alias, dst_alias, "Always"))
+                else:
+                    adjusted.append((src_alias, dst_alias, label))
+            edges = adjusted
+
         lines = ['stateDiagram-v2', f"  %% {info['title']}"]
 
         for state, label in bridge_in.items():
             alias = bridge_in_alias[state]
             lines.append(f'  state "{label}" as {alias}')
 
+        for alias, label in branch_states:
+            label_text = label if label else 'Condition'
+            display = label_text.replace('"', '\"')
+            lines.append(f'  state "{display}" as {alias}')
+
         for state, label in bridge_out.items():
             alias = bridge_out_alias[state]
             lines.append(f'  state "{label}" as {alias}')
 
         for src, dst, label in edges:
-            lines.append(f"  {src} --> {dst} : {label}")
+            line = f"  {src} --> {dst}"
+            if label:
+                line += f" : {label}"
+            lines.append(line)
 
         (MERMAID_DIR / f"{slug}.mmd").write_text("\n".join(lines))
 

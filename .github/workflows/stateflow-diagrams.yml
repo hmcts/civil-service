@@ -5,7 +5,7 @@ on:
     paths:
       - 'src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/**'
       - 'scripts/export_stateflow_transitions.py'
-      - 'predicate_descriptions.json'
+      - 'docs/stateflow/predicate_descriptions.json'
   workflow_dispatch: {}
 
 jobs:
