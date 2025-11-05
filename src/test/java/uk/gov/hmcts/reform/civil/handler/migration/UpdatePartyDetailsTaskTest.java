@@ -65,8 +65,10 @@ class UpdatePartyDetailsTaskTest {
             case "applicant2" -> caseDataBuilder.applicant2(existing);
             case "respondent1" -> caseDataBuilder.respondent1(existing);
             case "respondent2" -> caseDataBuilder.respondent2(existing);
+            default -> {
+
+            }
         }
-        CaseData caseData = caseDataBuilder.build();
 
         Party updates = switch (scenario.partyType) {
             case INDIVIDUAL -> Party.builder()
@@ -94,8 +96,12 @@ class UpdatePartyDetailsTaskTest {
             case "applicant2" -> ref.setApplicant2(true);
             case "respondent1" -> ref.setRespondent1(true);
             case "respondent2" -> ref.setRespondent2(true);
+            default -> {
+
+            }
         }
 
+        CaseData caseData = caseDataBuilder.build();
         CaseData result = task.migrateCaseData(caseData, ref);
         Party updated = switch (scenario.roleField) {
             case "applicant1" -> result.getApplicant1();
@@ -118,6 +124,9 @@ class UpdatePartyDetailsTaskTest {
             }
             case COMPANY -> assertEquals("NewCompany", updated.getCompanyName());
             case ORGANISATION -> assertEquals("NewOrg", updated.getOrganisationName());
+            default -> {
+
+            }
         }
     }
 
