@@ -77,6 +77,7 @@ public abstract class AbstractCaseReferenceWithRole<T> extends CaseReference imp
             case APPLICANT2 -> this.isApplicant2 = true;
             case RESPONDENT1 -> this.isRespondent1 = true;
             case RESPONDENT2 -> this.isRespondent2 = true;
+            default -> throw new IllegalArgumentException("Unknown role: " + role);
         }
     }
 
