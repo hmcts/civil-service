@@ -123,4 +123,17 @@ class LitigationFriendCaseReferenceTest {
         assertThat(caseReference.isRespondent1()).isFalse();
         assertThat(caseReference.isRespondent2()).isFalse();
     }
+
+    @Test
+    void setDataObject_shouldUpdateLitigationFriend() {
+        LitigationFriend friend = LitigationFriend.builder()
+            .firstName("John")
+            .lastName("Doe")
+            .build();
+
+        caseReference.setDataObject(friend);
+
+        assertThat(caseReference.getDataObject()).isEqualTo(friend);
+        assertThat(caseReference.getLitigationFriend()).isEqualTo(friend);
+    }
 }

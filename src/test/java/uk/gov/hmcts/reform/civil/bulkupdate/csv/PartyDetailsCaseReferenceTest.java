@@ -120,4 +120,20 @@ class PartyDetailsCaseReferenceTest {
         assertThat(caseReference.isRespondent1()).isFalse();
         assertThat(caseReference.isRespondent2()).isFalse();
     }
+
+    @Test
+    void setDataObject_shouldUpdateParty() {
+        Party party = Party.builder()
+            .individualFirstName("Jane")
+            .individualLastName("Doe")
+            .type(Party.Type.INDIVIDUAL)
+            .build();
+
+        PartyDetailsCaseReference caseReference = new PartyDetailsCaseReference();
+
+        caseReference.setDataObject(party);
+
+        assertThat(caseReference.getDataObject()).isEqualTo(party);
+        assertThat(caseReference.getParty()).isEqualTo(party);
+    }
 }

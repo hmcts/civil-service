@@ -81,4 +81,21 @@ class UpdatePartyLitigationFriendTaskTest {
 
         assertEquals("Failed to determine Party to update", ex.getMessage());
     }
+
+    @Test
+    void migrateCaseData_shouldThrow_whenNoPartyFlagsSet() {
+        CaseData caseData = CaseData.builder().build();
+        LitigationFriend updatedLF = LitigationFriend.builder().firstName("X").build();
+
+        LitigationFriendCaseReference caseRef = new LitigationFriendCaseReference();
+        caseRef.setCaseReference("9999");
+        caseRef.setLitigationFriend(updatedLF);
+
+        RuntimeException ex = assertThrows(
+            RuntimeException.class,
+            () -> task.migrateCaseData(caseData, caseRef)
+        );
+
+        assertEquals("Failed to set updated litigation friend in CaseData", ex.getMessage());
+    }
 }

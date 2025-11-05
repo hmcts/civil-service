@@ -82,4 +82,43 @@ class CaseReferenceCsvLoaderTest {
 
         Assertions.assertThat(caseReferences).isEmpty();
     }
+
+    @Test
+    void shouldLoadFromExcelBytes() throws Exception {
+        // Dummy Excel-mappable CaseReference
+        class TestExcelCaseReference extends CaseReference implements ExcelMappable {
+            public String caseId;
+            public String description;
+
+            @Override
+            public void fromExcelRow(java.util.Map<String, Object> rowValues) {
+                this.caseId = rowValues.get("caseId").toString();
+                this.description = rowValues.get("description").toString();
+            }
+        }
+
+        // Create an in-memory Excel file
+        try (org.apache.poi.xssf.usermodel.XSSFWorkbook workbook = new org.apache.poi.xssf.usermodel.XSSFWorkbook()) {
+            var sheet = workbook.createSheet();
+            var header = sheet.createRow(0);
+            header.createCell(0).setCellValue("caseId");
+            header.createCell(1).setCellValue("description");
+
+            var row = sheet.createRow(1);
+            row.createCell(0).setCellValue("12345");
+            row.createCell(1).setCellValue("Test Case");
+
+            java.io.ByteArrayOutputStream bos = new java.io.ByteArrayOutputStream();
+            workbook.write(bos);
+            byte[] excelBytes = bos.toByteArray();
+
+            List<TestExcelCaseReference> list =
+                caseReferenceCsvLoader.loadFromExcelBytes(TestExcelCaseReference.class, excelBytes);
+
+            assertNotNull(list);
+            assertEquals(1, list.size());
+            assertEquals("12345", list.get(0).caseId);
+            assertEquals("Test Case", list.get(0).description);
+        }
+    }
 }
