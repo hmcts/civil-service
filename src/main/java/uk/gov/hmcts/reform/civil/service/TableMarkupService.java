@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -10,8 +11,6 @@ import java.util.List;
 import java.util.Map;
 
 import static java.util.Optional.ofNullable;
-import static org.apache.logging.log4j.util.Strings.isNotBlank;
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -35,7 +34,7 @@ public class TableMarkupService {
     private void addRowToTable(List<String> lines,
                                       String label,
                                       String value) {
-        if (isNotBlank(value)) {
+        if (StringUtils.isNotBlank(value)) {
             lines.add(TABLE_ROW_BEGIN);
             lines.add(TABLE_ROW_DATA_BEGIN + TABLE_ROW_LABEL + label + SPAN_END);
             lines.add(TABLE_ROW_DATA_END);
