@@ -50,18 +50,18 @@ run_functional_tests() {
   echo "Running all functional tests on ${ENVIRONMENT} env"
   if [ "$ENVIRONMENT" = "aat" ]; then
     cd civil-ccd-definition
-    yarn install
+    yarn install --immutable --silent
     yarn test:api-prod
     cd ../civil-ga-ccd-definition
-    yarn install
+    yarn install --immutable --silent
     yarn test:api
     cd ..
   elif [ -z "$PR_FT_GROUPS" ]; then
     cd civil-ccd-definition
-    yarn install
+    yarn install --immutable --silent
     yarn test:api-nonprod
     cd ../civil-ga-ccd-definition
-    yarn install
+    yarn install --immutable --silent
     yarn test:api-nonprod
     cd ..
   else
