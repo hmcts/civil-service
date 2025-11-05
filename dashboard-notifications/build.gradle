@@ -6,6 +6,9 @@ def versions = [
   lombok        : '1.18.40'
 ]
 
+def springBootVersion = '3.5.1'
+def springCloudVersion = '2025.0.1'
+
 java {
   sourceCompatibility = JavaVersion.VERSION_17
   targetCompatibility = JavaVersion.VERSION_17
@@ -25,6 +28,9 @@ ext.libraries = [
 ]
 
 dependencies {
+  implementation platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
+  implementation platform("org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}")
+
   implementation 'org.springframework.boot:spring-boot-starter-web'
   implementation group: 'jakarta.inject', name: 'jakarta.inject-api', version: '2.0.1'
   implementation group: 'jakarta.validation', name: 'jakarta.validation-api', version: '3.1.0'
@@ -35,9 +41,9 @@ dependencies {
   implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '2.1.2'
 
   runtimeOnly 'org.postgresql:postgresql:42.7.7'
-  compileOnly 'org.projectlombok:lombok'
+  compileOnly "org.projectlombok:lombok:${versions.lombok}"
   developmentOnly 'org.springframework.boot:spring-boot-devtools'
-  annotationProcessor 'org.projectlombok:lombok'
+  annotationProcessor "org.projectlombok:lombok:${versions.lombok}"
   testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.11.0'
   testImplementation libraries.junit5
   testImplementation 'org.springframework.boot:spring-boot-starter-test'

@@ -14,8 +14,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
-import static org.apache.logging.log4j.util.Strings.concat;
-import static org.apache.logging.log4j.util.Strings.isNotBlank;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -188,10 +188,7 @@ public class LocationReferenceDataService {
      * @return string to serve as label
      */
     public static String getDisplayEntry(LocationRefData location) {
-        return concat(
-            concat(concat(location.getSiteName(), " - "), concat(location.getCourtAddress(), " - ")),
-            location.getPostcode()
-        );
+        return formatLocationLabel(location.getSiteName(), location.getCourtAddress(), location.getPostcode());
     }
 
     /**
@@ -201,12 +198,16 @@ public class LocationReferenceDataService {
      * @return string to serve as label
      */
     public static String getDisplayEntryWelsh(LocationRefData location) {
-        return concat(
-            concat(concat(
-                isNotBlank(location.getWelshSiteName()) ? location.getWelshSiteName() : location.getSiteName(),
-                          " - "), concat(location.getCourtAddress(), " - ")),
-            location.getPostcode()
-        );
+        String siteName = StringUtils.isNotBlank(location.getWelshSiteName())
+            ? location.getWelshSiteName()
+            : location.getSiteName();
+        return formatLocationLabel(siteName, location.getCourtAddress(), location.getPostcode());
+    }
+
+    private static String formatLocationLabel(String siteName, String courtAddress, String postcode) {
+        return Stream.of(siteName, courtAddress, postcode)
+            .map(StringUtils::defaultString)
+            .collect(Collectors.joining(" - "));
     }
 
     public LocationRefData getCourtLocation(String authToken, String threeDigitCode) {
