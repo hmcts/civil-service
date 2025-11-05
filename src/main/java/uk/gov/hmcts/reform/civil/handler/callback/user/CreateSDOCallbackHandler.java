@@ -51,7 +51,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return new ImmutableMap.Builder<String, Callback>()
+        return ImmutableMap.<String, Callback>builder()
             .put(callbackKey(ABOUT_TO_START), this::prePopulateOrderDetailsPages)
             .put(callbackKey(V_1, ABOUT_TO_START), this::prePopulateOrderDetailsPages)
             .put(callbackKey(MID, "order-details-navigation"), this::setOrderDetailsFlags)
@@ -81,15 +81,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         List<String> prePopulateErrors = extractErrors(prePopulateResult);
         CaseData caseData = updatedCaseData(prePopulateResult, originalCaseData);
 
-        AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder responseBuilder =
-            AboutToStartOrSubmitCallbackResponse.builder()
-                .data(caseData.toMap(objectMapper));
-
-        if (!prePopulateErrors.isEmpty()) {
-            responseBuilder.errors(prePopulateErrors);
-        }
-
-        return responseBuilder.build();
+        return buildResponse(caseData, prePopulateErrors);
     }
 
     private CallbackResponse setOrderDetailsFlags(CallbackParams callbackParams) {
@@ -98,15 +90,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         List<String> errors = extractErrors(taskResult);
         CaseData updatedCaseData = updatedCaseData(taskResult, caseData);
 
-        AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder responseBuilder =
-            AboutToStartOrSubmitCallbackResponse.builder()
-                .data(updatedCaseData.toMap(objectMapper));
-
-        if (!errors.isEmpty()) {
-            responseBuilder.errors(errors);
-        }
-
-        return responseBuilder.build();
+        return buildResponse(updatedCaseData, errors);
     }
 
     private CallbackResponse generateSdoOrder(CallbackParams callbackParams) {
@@ -120,10 +104,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         CaseData caseDataAfterOrderDetails = updatedCaseData(orderDetailsResult, originalCaseData);
 
         if (!orderDetailsErrors.isEmpty()) {
-            return AboutToStartOrSubmitCallbackResponse.builder()
-                .errors(orderDetailsErrors)
-                .data(caseDataAfterOrderDetails.toMap(objectMapper))
-                .build();
+            return buildResponse(caseDataAfterOrderDetails, orderDetailsErrors);
         }
 
         SdoTaskResult validationResult = runStage(caseDataAfterOrderDetails, callbackParams, SdoLifecycleStage.MID_EVENT);
@@ -132,10 +113,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         CaseData caseDataAfterValidation = updatedCaseData(validationResult, caseDataAfterOrderDetails);
 
         if (!validationErrors.isEmpty()) {
-            return AboutToStartOrSubmitCallbackResponse.builder()
-                .errors(validationErrors)
-                .data(caseDataAfterValidation.toMap(objectMapper))
-                .build();
+            return buildResponse(caseDataAfterValidation, validationErrors);
         }
 
         SdoTaskResult documentResult = runStage(caseDataAfterValidation, callbackParams, SdoLifecycleStage.DOCUMENT_GENERATION);
@@ -144,10 +122,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         List<String> documentErrors = extractErrors(documentResult);
 
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(documentErrors)
-            .data(finalCaseData.toMap(objectMapper))
-            .build();
+        return buildResponse(finalCaseData, documentErrors);
     }
 
     private CallbackResponse submitSDO(CallbackParams callbackParams) {
@@ -198,6 +173,16 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
     private CaseData updatedCaseData(SdoTaskResult result, CaseData fallback) {
         return result.updatedCaseData() != null ? result.updatedCaseData() : fallback;
+    }
+
+    private AboutToStartOrSubmitCallbackResponse buildResponse(CaseData data, List<String> errors) {
+        List<String> safeErrors = errors == null ? Collections.emptyList() : errors;
+        AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder builder =
+            AboutToStartOrSubmitCallbackResponse.builder()
+                .data(data.toMap(objectMapper))
+                .errors(safeErrors);
+
+        return builder.build();
     }
 
 }
