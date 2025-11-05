@@ -6,7 +6,14 @@
   ],
   "scripts": {
     "yarn-update": "yarn set version 3.8.5",
-    "install-dependencies": "/usr/bin/yarn install --immutable --silent"
+    "install-dependencies": "/usr/bin/yarn install --immutable --silent",
+    "install-dependencies-civil": "cd civil-ccd-definition && yarn install --immutable --silent && cd ..",
+    "install-dependencies-ga": "cd civil-ga-ccd-definition && yarn install --immutable --silent && cd ..",
+    "test:smoke": "yarn test:smoke-civil",
+    "test:smoke-civil": "cd civil-ccd-definition && yarn test:smoke && cd ..",
+    "test:smoke-ga": "cd civil-ga-ccd-definition && yarn test:ga-smoke && cd ..",
+    "test:api-prod": "cd civil-ccd-definition && yarn test:api-prod && cd ..",
+    "test:api-nonprod": "cd civil-ccd-definition && yarn test:api-nonprod && cd .."
   },
   "packageManager": "yarn@3.8.5"
 }
