@@ -1,0 +1,15 @@
+stateDiagram-v2
+  %% Draft to Submission
+  state "CLAIM_SUBMITTED (continues in Issue flow)" as DRAFT_FLOW_OUT_0
+  DRAFT --> DRAFT_FLOW_OUT_0 : Single defendant representative covers all parties.\nOR 1v1 claim w…
+  DRAFT --> DRAFT_FLOW_OUT_0 : Two defendants, both represented by registered organisations.\nOR T…
+  DRAFT --> DRAFT_FLOW_OUT_0 : Only defendant is unrepresented.
+  DRAFT --> DRAFT_FLOW_OUT_0 : Defendant 1 is unrepresented
+  DRAFT --> DRAFT_FLOW_OUT_0 : Defendant 2 is unrepresented
+  DRAFT --> DRAFT_FLOW_OUT_0 : Defendant 1 is unrepresented
+  SPEC_DRAFT --> DRAFT_FLOW_OUT_0 : Single defendant representative covers all parties.\nOR 1v1 claim w…
+  SPEC_DRAFT --> DRAFT_FLOW_OUT_0 : Two defendants, both represented by registered organisations.\nOR T…
+  SPEC_DRAFT --> DRAFT_FLOW_OUT_0 : Only defendant is unrepresented.
+  SPEC_DRAFT --> DRAFT_FLOW_OUT_0 : Defendant 1 is unrepresented
+  SPEC_DRAFT --> DRAFT_FLOW_OUT_0 : Defendant 2 is unrepresented
+  SPEC_DRAFT --> DRAFT_FLOW_OUT_0 : Defendant 1 is unrepresented
