@@ -14,16 +14,27 @@ import uk.gov.hmcts.reform.civil.model.Party;
 @SuperBuilder
 @Data
 @EqualsAndHashCode(callSuper = true)
-@JsonPropertyOrder(value = {"caseReference"})
+@JsonPropertyOrder({"caseReference"})
 @AllArgsConstructor
 @NoArgsConstructor
 @SuppressWarnings("java:S1700")
-public class PartyDetailsCaseReference extends CaseReference {
+public class PartyDetailsCaseReference extends AbstractCaseReferenceWithRole<Party> {
 
     @JsonProperty
     private Party party;
-    private boolean isApplicant1;
-    private boolean isApplicant2;
-    private boolean isRespondent1;
-    private boolean isRespondent2;
+
+    @Override
+    protected Class<Party> getObjectType() {
+        return Party.class;
+    }
+
+    @Override
+    public Party getDataObject() {
+        return dataObject;
+    }
+
+    @Override
+    public void setDataObject(Party party) {
+        this.dataObject = party;
+    }
 }
