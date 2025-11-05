@@ -2,7 +2,7 @@
 
 ccdRepoName="civil-general-apps-ccd-definition"
 branchName=$1
-directoryName="gen-apps-test"
+directoryName="civil-ga-ccd-definition"
 
 #Checkout specific branch of CCD definitions
 git clone https://github.com/hmcts/${ccdRepoName}.git
@@ -21,4 +21,3 @@ cp -r ./${ccdRepoName}/codecept.conf.js ./${directoryName}
 cp -r ./${ccdRepoName}/saucelabs.conf.js ./${directoryName}
 echo *
 rm -rf ./${ccdRepoName}
-mv ./${directoryName} ./${ccdRepoName}
