@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.controllers.testingsupport.model.TestCamundaProcess;
 import uk.gov.hmcts.reform.civil.event.BundleCreationTriggerEvent;
 import uk.gov.hmcts.reform.civil.event.HearingFeePaidEvent;
@@ -34,9 +35,12 @@ import uk.gov.hmcts.reform.civil.handler.tasks.ClaimDismissedHandler;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.hearingvalues.ServiceHearingValuesModel;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.civil.service.hearings.HearingValuesService;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.judgments.CjesMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper;
@@ -64,12 +68,15 @@ public class TestingSupportController {
     private final RoboticsDataMapper roboticsDataMapper;
     private final RoboticsDataMapperForSpec roboticsSpecDataMapper;
     private final CjesMapper cjesMapper;
+    private final HearingValuesService hearingValuesService;
 
     private final ClaimDismissedHandler claimDismissedHandler;
     private final HearingFeePaidEventHandler hearingFeePaidHandler;
     private final HearingFeeUnpaidEventHandler hearingFeeUnpaidHandler;
     private final TrialReadyNotificationEventHandler trialReadyNotificationHandler;
     private final BundleCreationTriggerEventHandler bundleCreationTriggerEventHandler;
+    private final SystemUpdateUserConfiguration systemUserConfig;
+    private final UserService userService;
 
     private static final String BEARER_TOKEN = "Bearer Token";
     private static final String SUCCESS = "success";
@@ -164,6 +171,14 @@ public class TestingSupportController {
     public String getRPAJsonInformationForSpecCaseData(
         @RequestBody CaseData caseData) throws JsonProcessingException {
         return roboticsSpecDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
+    }
+
+    @PostMapping(
+        value = "/testing-support/hearingValues",
+        produces = "application/json")
+    public ServiceHearingValuesModel getHearingValues(
+        @RequestBody CaseData caseData) {
+        return hearingValuesService.getValues(caseData, getSystemUserToken());
     }
 
     @PostMapping(
@@ -267,5 +282,9 @@ public class TestingSupportController {
         ResponseEntity<List<HistoricProcessInstanceDto>> response =
                 camundaRestEngineClient.getProcessInstances(processInstanceId, definitionKey, variables);
         return new ResponseEntity<>(response.getBody(), response.getStatusCode());
+    }
+
+    private String getSystemUserToken() {
+        return userService.getAccessToken(systemUserConfig.getUserName(), systemUserConfig.getPassword());
     }
 }
