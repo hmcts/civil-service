@@ -32,6 +32,7 @@ import uk.gov.hmcts.reform.civil.handler.event.HearingFeeUnpaidEventHandler;
 import uk.gov.hmcts.reform.civil.handler.event.TrialReadyNotificationEventHandler;
 import uk.gov.hmcts.reform.civil.handler.tasks.ClaimDismissedHandler;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.model.BaseCaseData;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
@@ -200,9 +201,9 @@ public class TestingSupportController {
     }
 
     @GetMapping("/testing-support/case/{caseId}")
-    public ResponseEntity<CaseData> getCaseData(@PathVariable("caseId") Long caseId) {
+    public ResponseEntity<BaseCaseData> getCaseData(@PathVariable("caseId") Long caseId) {
 
-        CaseData caseData = caseDetailsConverter.toCaseData(coreCaseDataService.getCase(caseId));
+        BaseCaseData caseData = caseDetailsConverter.toBaseCaseData(coreCaseDataService.getCase(caseId));
         return new ResponseEntity<>(caseData, HttpStatus.OK);
     }
 
