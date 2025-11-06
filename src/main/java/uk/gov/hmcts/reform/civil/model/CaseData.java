@@ -302,6 +302,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private BigDecimal totalInterest;
     private BigDecimal totalClaimAmountPlusInterestAdmitPart;
     private BigDecimal totalClaimAmountPlusInterest;
+    private BigDecimal defaultJudgementOverallTotal;
     private String totalClaimAmountPlusInterestAdmitPartString;
     private String totalClaimAmountPlusInterestString;
     private final YesOrNo claimInterest;
@@ -977,14 +978,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
             || (isDateAfterToday(firstRepaymentDate) && hasDoneSettlementAgreementInTime)
             || (isDateAfterToday(whenWillThisAmountBePaid) && isFullAdmitPayImmediatelyClaimSpec());
 
-    }
-
-    @JsonIgnore
-    public String setUpJudgementFormattedPermittedDate(LocalDate extendedRespondent1ResponseDate) {
-        if (isJudgementDateNotPermitted()) {
-            return getFormattedJudgementPermittedDate(extendedRespondent1ResponseDate);
-        }
-        return null;
     }
 
     @JsonIgnore

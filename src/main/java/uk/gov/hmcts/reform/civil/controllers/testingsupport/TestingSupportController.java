@@ -23,13 +23,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.controllers.testingsupport.model.TestCamundaProcess;
+import uk.gov.hmcts.reform.civil.event.BundleCreationTriggerEvent;
 import uk.gov.hmcts.reform.civil.event.HearingFeePaidEvent;
 import uk.gov.hmcts.reform.civil.event.HearingFeeUnpaidEvent;
 import uk.gov.hmcts.reform.civil.event.TrialReadyNotificationEvent;
+import uk.gov.hmcts.reform.civil.handler.event.BundleCreationTriggerEventHandler;
 import uk.gov.hmcts.reform.civil.handler.event.HearingFeePaidEventHandler;
 import uk.gov.hmcts.reform.civil.handler.event.HearingFeeUnpaidEventHandler;
-import uk.gov.hmcts.reform.civil.event.BundleCreationTriggerEvent;
-import uk.gov.hmcts.reform.civil.handler.event.BundleCreationTriggerEventHandler;
 import uk.gov.hmcts.reform.civil.handler.event.TrialReadyNotificationEventHandler;
 import uk.gov.hmcts.reform.civil.handler.tasks.ClaimDismissedHandler;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -193,7 +193,7 @@ public class TestingSupportController {
     @GetMapping("/testing-support/{caseId}/trigger-trial-bundle")
     public ResponseEntity<String> getTrialBundleEvent(@PathVariable("caseId") Long caseId) {
         String responseMsg = SUCCESS;
-        var event = new BundleCreationTriggerEvent(caseId);
+        var event = new BundleCreationTriggerEvent(caseId, BEARER_TOKEN);
         try {
             bundleCreationTriggerEventHandler.sendBundleCreationTrigger(event);
         } catch (Exception e) {

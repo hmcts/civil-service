@@ -48,10 +48,6 @@ public class FeatureToggleService {
                 );
     }
 
-    public boolean isTransferOnlineCaseEnabled() {
-        return featureToggleApi.isFeatureEnabled("isTransferOnlineCaseEnabled");
-    }
-
     public boolean isCaseProgressionEnabled() {
         return featureToggleApi.isFeatureEnabled("cui-case-progression");
     }
@@ -71,10 +67,6 @@ public class FeatureToggleService {
         return isSpecClaim
             && featureToggleApi.isFeatureEnabledForDate("cam-enabled-for-case",
                                                         epoch, false);
-    }
-
-    public boolean isGaForLipsEnabled() {
-        return featureToggleApi.isFeatureEnabled("GaForLips");
     }
 
     public boolean isMultiOrIntermediateTrackEnabled(CaseData caseData) {
@@ -116,10 +108,9 @@ public class FeatureToggleService {
             && isCaseProgressionEnabled();
     }
 
-    public boolean isGaForLipsEnabledAndLocationWhiteListed(String location) {
+    public boolean isLocationWhiteListed(String location) {
         return location != null
-            && featureToggleApi.isFeatureEnabledForLocation("ea-courts-whitelisted-for-ga-lips", location, false)
-            && isGaForLipsEnabled();
+            && featureToggleApi.isFeatureEnabledForLocation("ea-courts-whitelisted-for-ga-lips", location, false);
     }
 
     public boolean isJOLiveFeedActive() {
