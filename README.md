@@ -13,10 +13,17 @@ Civil CCD Callback Service.
 
 Visual snapshots of the automated journey logic are generated from the live StateFlow configuration. The diagrams below update automatically via the `Refresh StateFlow diagrams` GitHub Action after any change to the transition builders.
 
-- ![Draft to Submission](docs/draft_flow.svg)
-- ![Claim Issue & Notification](docs/issue_flow.svg)
-- ![Defence Waiting & Divergence](docs/response_flow.svg)
-- ![Post-Response Outcomes & Settlement](docs/post_response.svg)
+#### Draft to Submission
+![Draft to Submission](docs/draft_flow.svg)
+
+#### Claim Issue & Notification
+![Claim Issue & Notification](docs/issue_flow.svg)
+
+#### Defence Waiting & Divergence
+![Defence Waiting & Divergence](docs/response_flow.svg)
+
+#### Post-Response Outcomes & Settlement
+![Post-Response Outcomes & Settlement](docs/post_response.svg)
 
 Each image links to an SVG whose source (`docs/*.mmd`) is produced by `python3 scripts/export_stateflow_transitions.py`. If you need the narrative in text form, see `docs/stateflow_transition_catalogue.md` or the structured `docs/stateflow/transition_catalogue.json`.
 
