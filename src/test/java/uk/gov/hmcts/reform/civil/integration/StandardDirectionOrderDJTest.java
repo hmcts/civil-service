@@ -54,6 +54,7 @@ import uk.gov.hmcts.reform.civil.service.dj.DjSubmissionService;
 import uk.gov.hmcts.reform.civil.service.dj.DjLocationAndToggleService;
 import uk.gov.hmcts.reform.civil.service.dj.DjDisposalDirectionsService;
 import uk.gov.hmcts.reform.civil.service.dj.DjSpecialistDirectionsService;
+import uk.gov.hmcts.reform.civil.service.dj.DjWelshLanguageService;
 import uk.gov.hmcts.reform.civil.service.dj.DjTrialDirectionsService;
 import uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderParticipantService;
 import uk.gov.hmcts.reform.civil.service.camunda.UpdateWaCourtLocationsService;
@@ -112,6 +113,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
     DjLocationAndToggleService.class,
     DjDisposalDirectionsService.class,
     DjSpecialistDirectionsService.class,
+    DjWelshLanguageService.class,
     DjTrialDirectionsService.class,
     DjOrderDetailsService.class,
     DjValidationService.class,

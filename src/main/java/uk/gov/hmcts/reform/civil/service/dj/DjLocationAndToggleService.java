@@ -3,7 +3,9 @@ package uk.gov.hmcts.reform.civil.service.dj;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
+import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalAndTrialHearingDJToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.HearingMethod;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskContext;
@@ -57,6 +59,46 @@ public class DjLocationAndToggleService {
         }
 
         return builder.build();
+    }
+
+    public CaseData applyHearingSelections(CaseData caseData, CallbackVersion version) {
+        if (!V_1.equals(version)) {
+            return caseData;
+        }
+
+        CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
+
+        if (caseData.getHearingMethodValuesDisposalHearingDJ() != null
+            && caseData.getHearingMethodValuesDisposalHearingDJ().getValue() != null) {
+            String label = caseData.getHearingMethodValuesDisposalHearingDJ().getValue().getLabel();
+            applyDisposalSelection(updatedData, label);
+        } else if (caseData.getHearingMethodValuesTrialHearingDJ() != null
+            && caseData.getHearingMethodValuesTrialHearingDJ().getValue() != null) {
+            String label = caseData.getHearingMethodValuesTrialHearingDJ().getValue().getLabel();
+            applyTrialSelection(updatedData, label);
+        }
+
+        return updatedData.build();
+    }
+
+    private void applyDisposalSelection(CaseData.CaseDataBuilder<?, ?> builder, String label) {
+        if (HearingMethod.IN_PERSON.getLabel().equals(label)) {
+            builder.disposalHearingMethodDJ(DisposalHearingMethodDJ.disposalHearingMethodInPerson);
+        } else if (HearingMethod.VIDEO.getLabel().equals(label)) {
+            builder.disposalHearingMethodDJ(DisposalHearingMethodDJ.disposalHearingMethodVideoConferenceHearing);
+        } else if (HearingMethod.TELEPHONE.getLabel().equals(label)) {
+            builder.disposalHearingMethodDJ(DisposalHearingMethodDJ.disposalHearingMethodTelephoneHearing);
+        }
+    }
+
+    private void applyTrialSelection(CaseData.CaseDataBuilder<?, ?> builder, String label) {
+        if (HearingMethod.IN_PERSON.getLabel().equals(label)) {
+            builder.trialHearingMethodDJ(DisposalHearingMethodDJ.disposalHearingMethodInPerson);
+        } else if (HearingMethod.VIDEO.getLabel().equals(label)) {
+            builder.trialHearingMethodDJ(DisposalHearingMethodDJ.disposalHearingMethodVideoConferenceHearing);
+        } else if (HearingMethod.TELEPHONE.getLabel().equals(label)) {
+            builder.trialHearingMethodDJ(DisposalHearingMethodDJ.disposalHearingMethodTelephoneHearing);
+        }
     }
 
     private CaseData applyToggleDefaults(CaseData caseData) {

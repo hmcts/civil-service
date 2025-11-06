@@ -36,7 +36,8 @@ class DjDisposalDirectionsServiceTest {
 
     @BeforeEach
     void setUp() {
-        service = new DjDisposalDirectionsService(workingDayIndicator, deadlinesCalculator);
+        DjWelshLanguageService welshLanguageService = new DjWelshLanguageService();
+        service = new DjDisposalDirectionsService(workingDayIndicator, deadlinesCalculator, welshLanguageService);
 
         when(workingDayIndicator.getNextWorkingDay(any(LocalDate.class)))
             .thenAnswer(invocation -> invocation.getArgument(0, LocalDate.class));

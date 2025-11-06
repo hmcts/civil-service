@@ -15,15 +15,10 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingSchedulesO
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingWitnessOfFactDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingOrderMadeWithoutHearingDJ;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WelshLanguageUsage;
 import uk.gov.hmcts.reform.civil.enums.sdo.DateToShowToggle;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.Locale;
-
-import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +26,7 @@ public class DjDisposalDirectionsService {
 
     private final WorkingDayIndicator workingDayIndicator;
     private final DeadlinesCalculator deadlinesCalculator;
+    private final DjWelshLanguageService welshLanguageService;
 
     public void populateDisposalDirections(CaseData.CaseDataBuilder<?, ?> caseDataBuilder, String judgeNameTitle) {
         caseDataBuilder
@@ -156,22 +152,15 @@ public class DjDisposalDirectionsService {
 
         // copy of disposalHearingNotesDJ field to update order made without hearing field without breaking
         // existing cases
-        caseDataBuilder.disposalHearingOrderMadeWithoutHearingDJ(DisposalHearingOrderMadeWithoutHearingDJ
-                                                                     .builder().input(String.format(
-                "This order has been made without a hearing. "
-                    + "Each party has the right to apply to have this Order "
-                    + "set aside or varied. Any such application must "
-                    + "be received by the Court "
-                    + "(together with the appropriate fee) by 4pm on %s.",
-                deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5)
-                    .format(DateTimeFormatter
-                                .ofPattern("dd MMMM yyyy", Locale.ENGLISH))
-            ))
-                                                                     .build());
-        
+        LocalDate orderDeadline = deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5);
+        caseDataBuilder.disposalHearingOrderMadeWithoutHearingDJ(
+            DisposalHearingOrderMadeWithoutHearingDJ
+                .builder()
+                .input(welshLanguageService.buildOrderMadeWithoutHearingText(orderDeadline))
+                .build()
+        );
 
         caseDataBuilder.sdoR2DisposalHearingWelshLanguageDJ(
-            SdoR2WelshLanguageUsage.builder()
-                .description(WELSH_LANG_DESCRIPTION).build());
+            welshLanguageService.buildWelshUsage());
     }
 }

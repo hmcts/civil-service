@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalAndTrialHearingDJToggle;
+import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
 import uk.gov.hmcts.reform.civil.enums.sdo.HearingMethod;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderLifecycleStage;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskContext;
@@ -147,6 +148,51 @@ class DjLocationAndToggleServiceTest {
             .containsExactly(DisposalAndTrialHearingDJToggle.SHOW);
         assertThat(result.getDisposalHearingDisclosureOfDocumentsDJToggle()).isNull();
         assertThat(result.getTrialHearingMethodInPersonDJ().getValue().getCode()).isEqualTo("456");
+    }
+
+    @Test
+    void shouldApplyDisposalHearingSelectionWhenVersionV1() {
+        DynamicList disposalList = DynamicList.builder()
+            .value(DynamicListElement.builder()
+                .label(HearingMethod.TELEPHONE.getLabel())
+                .code("TEL")
+                .build())
+            .build();
+        CaseData caseData = CaseData.builder()
+            .hearingMethodValuesDisposalHearingDJ(disposalList)
+            .build();
+
+        CaseData result = service.applyHearingSelections(caseData, V_1);
+
+        assertThat(result.getDisposalHearingMethodDJ())
+            .isEqualTo(DisposalHearingMethodDJ.disposalHearingMethodTelephoneHearing);
+    }
+
+    @Test
+    void shouldApplyTrialHearingSelectionWhenDisposalNotPresent() {
+        DynamicList trialList = DynamicList.builder()
+            .value(DynamicListElement.builder()
+                .label(HearingMethod.VIDEO.getLabel())
+                .code("VID")
+                .build())
+            .build();
+        CaseData caseData = CaseData.builder()
+            .hearingMethodValuesTrialHearingDJ(trialList)
+            .build();
+
+        CaseData result = service.applyHearingSelections(caseData, V_1);
+
+        assertThat(result.getTrialHearingMethodDJ())
+            .isEqualTo(DisposalHearingMethodDJ.disposalHearingMethodVideoConferenceHearing);
+    }
+
+    @Test
+    void shouldReturnOriginalCaseDataWhenVersionIsNotV1() {
+        CaseData caseData = CaseData.builder().build();
+
+        CaseData result = service.applyHearingSelections(caseData, V_2);
+
+        assertThat(result).isSameAs(caseData);
     }
 
     private DirectionsOrderTaskContext buildContext(CaseData caseData, CallbackVersion version) {

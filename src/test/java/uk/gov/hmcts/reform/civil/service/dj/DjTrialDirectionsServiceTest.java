@@ -43,10 +43,12 @@ class DjTrialDirectionsServiceTest {
     void setUp() {
         DjSpecialistDirectionsService specialistDirectionsService =
             new DjSpecialistDirectionsService(workingDayIndicator);
+        DjWelshLanguageService welshLanguageService = new DjWelshLanguageService();
         service = new DjTrialDirectionsService(
             workingDayIndicator,
             deadlinesCalculator,
-            specialistDirectionsService
+            specialistDirectionsService,
+            welshLanguageService
         );
 
         when(workingDayIndicator.getNextWorkingDay(any(LocalDate.class)))

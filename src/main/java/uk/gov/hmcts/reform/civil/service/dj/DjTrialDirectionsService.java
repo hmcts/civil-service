@@ -11,17 +11,12 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingNotes;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingSchedulesOfLoss;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingTrial;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingWitnessOfFact;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WelshLanguageUsage;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialOrderMadeWithoutHearingDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Locale;
-
-import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +25,7 @@ public class DjTrialDirectionsService {
     private final WorkingDayIndicator workingDayIndicator;
     private final DeadlinesCalculator deadlinesCalculator;
     private final DjSpecialistDirectionsService specialistDirectionsService;
+    private final DjWelshLanguageService welshLanguageService;
 
     public void populateTrialDirections(CaseData.CaseDataBuilder<?, ?> caseDataBuilder, String judgeNameTitle) {
         caseDataBuilder
@@ -131,22 +127,11 @@ public class DjTrialDirectionsService {
                                                .date2(LocalDate.now().plusWeeks(30))
                                                .build());
 
-        caseDataBuilder.trialOrderMadeWithoutHearingDJ(TrialOrderMadeWithoutHearingDJ.builder()
-                                                           .input(String.format(
-                                                               "This order has been made without a hearing. "
-                                                                   + "Each party has the right to apply to have this Order "
-                                                                   + "set aside or varied. Any such application must be "
-                                                                   + "received by the Court "
-                                                                   + "(together with the appropriate fee) by 4pm on %s.",
-                                                               deadlinesCalculator
-                                                                   .plusWorkingDays(LocalDate.now(), 5)
-                                                                   .format(DateTimeFormatter
-                                                                               .ofPattern(
-                                                                                   "dd MMMM yyyy",
-                                                                                   Locale.ENGLISH
-                                                                               ))
-                                                           ))
-                                                           .build());
+        LocalDate trialOrderDeadline = deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5);
+        caseDataBuilder.trialOrderMadeWithoutHearingDJ(
+            TrialOrderMadeWithoutHearingDJ.builder()
+                .input(welshLanguageService.buildOrderMadeWithoutHearingText(trialOrderDeadline))
+                .build());
 
         caseDataBuilder.trialHearingNotesDJ(TrialHearingNotes
                                                 .builder()
@@ -161,8 +146,7 @@ public class DjTrialDirectionsService {
         specialistDirectionsService.populateSpecialistDirections(caseDataBuilder);
 
         caseDataBuilder.sdoR2TrialWelshLanguageDJ(
-            SdoR2WelshLanguageUsage.builder()
-                .description(WELSH_LANG_DESCRIPTION).build());
+            welshLanguageService.buildWelshUsage());
 
         updateDisclosureOfDocumentFields(caseDataBuilder);
     }
