@@ -51,6 +51,10 @@ import uk.gov.hmcts.reform.civil.service.dj.DjValidationService;
 import uk.gov.hmcts.reform.civil.service.dj.DjDocumentService;
 import uk.gov.hmcts.reform.civil.service.dj.DjNarrativeService;
 import uk.gov.hmcts.reform.civil.service.dj.DjSubmissionService;
+import uk.gov.hmcts.reform.civil.service.dj.DjLocationAndToggleService;
+import uk.gov.hmcts.reform.civil.service.dj.DjDisposalDirectionsService;
+import uk.gov.hmcts.reform.civil.service.dj.DjSpecialistDirectionsService;
+import uk.gov.hmcts.reform.civil.service.dj.DjTrialDirectionsService;
 import uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderParticipantService;
 import uk.gov.hmcts.reform.civil.service.camunda.UpdateWaCourtLocationsService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator;
@@ -105,6 +109,10 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
     DjDocumentTask.class,
     DjSubmissionTask.class,
     DjConfirmationTask.class,
+    DjLocationAndToggleService.class,
+    DjDisposalDirectionsService.class,
+    DjSpecialistDirectionsService.class,
+    DjTrialDirectionsService.class,
     DjOrderDetailsService.class,
     DjValidationService.class,
     DjDocumentService.class,
