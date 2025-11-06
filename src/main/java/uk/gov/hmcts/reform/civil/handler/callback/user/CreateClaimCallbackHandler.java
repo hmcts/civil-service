@@ -539,6 +539,15 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
         caseFlagInitialiser.initialiseCaseFlags(CREATE_CLAIM, caseData);
 
+        // Transfer the updated party fields with flags from caseData back to dataBuilder
+        // since initialiseCaseFlags modifies caseData directly using setters
+        dataBuilder.applicant1(caseData.getApplicant1());
+        dataBuilder.applicant2(caseData.getApplicant2());
+        dataBuilder.respondent1(caseData.getRespondent1());
+        dataBuilder.respondent2(caseData.getRespondent2());
+        dataBuilder.applicant1LitigationFriend(caseData.getApplicant1LitigationFriend());
+        dataBuilder.applicant2LitigationFriend(caseData.getApplicant2LitigationFriend());
+
         dataBuilder.ccdState(CaseState.PENDING_CASE_ISSUED);
 
         dataBuilder.anyRepresented(YES);
