@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import lombok.Builder;
 import lombok.Data;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -28,4 +29,9 @@ public class LitigationFriend {
     private final Address primaryAddress;
     private final List<Element<DocumentWithRegex>> certificateOfSuitability;
     private final Flags flags;
+
+    @JsonPOJOBuilder(withPrefix = "")
+    public static class LitigationFriendBuilder {
+
+    }
 }
