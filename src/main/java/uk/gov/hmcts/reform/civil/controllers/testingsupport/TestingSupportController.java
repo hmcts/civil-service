@@ -48,6 +48,7 @@ import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 
 import java.util.List;
 
+import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.STARTED;
 
 @Tag(name = "Testing Support Controller")
@@ -193,7 +194,7 @@ public class TestingSupportController {
     @GetMapping("/testing-support/{caseId}/trigger-trial-bundle")
     public ResponseEntity<String> getTrialBundleEvent(@PathVariable("caseId") Long caseId) {
         String responseMsg = SUCCESS;
-        var event = new BundleCreationTriggerEvent(caseId, BEARER_TOKEN);
+        var event = new BundleCreationTriggerEvent(caseId, BEARER_TOKEN.toString());
         try {
             bundleCreationTriggerEventHandler.sendBundleCreationTrigger(event);
         } catch (Exception e) {
