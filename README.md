@@ -19,7 +19,7 @@ Visual snapshots of the automated journey logic are generated from the live Stat
 #### Claim Issue & Notification
 ![Claim Issue & Notification](docs/issue_flow.svg)
 
-#### Defence Waiting & Divergence
+#### Awaiting Defence & Divergence
 ![Defence Waiting & Divergence](docs/response_flow.svg)
 
 #### Post-Response Outcomes & Settlement
