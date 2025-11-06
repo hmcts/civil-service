@@ -40,7 +40,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return new ImmutableMap.Builder<String, Callback>()
+        return ImmutableMap.<String, Callback>builder()
             .put(callbackKey(ABOUT_TO_START), this::initiateSDO)
             .put(callbackKey(MID, "trial-disposal-screen"), this::populateDisposalTrialScreen)
             .put(callbackKey(V_1, MID, "trial-disposal-screen"), this::populateDisposalTrialScreen)
