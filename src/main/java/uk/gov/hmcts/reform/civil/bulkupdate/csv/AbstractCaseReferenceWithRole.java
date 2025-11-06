@@ -63,7 +63,9 @@ public abstract class AbstractCaseReferenceWithRole<T> extends CaseReference imp
         if (getObjectType().isInstance(value)) {
             this.dataObject = getObjectType().cast(value);
         } else {
-            String json = mapper.writeValueAsString(value);
+            String json = (value instanceof String strValue)
+                ? strValue // already JSON
+                : mapper.writeValueAsString(value);
             this.dataObject = mapper.readValue(json, getObjectType());
         }
 
