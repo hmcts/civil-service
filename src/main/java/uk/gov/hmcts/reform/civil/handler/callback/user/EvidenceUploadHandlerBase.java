@@ -215,7 +215,8 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
     }
 
     @SuppressWarnings("java:S107")
-    CallbackResponse validateValuesParty(List<Element<UploadEvidenceDocumentType>> uploadEvidenceDocumentType,
+    CallbackResponse validateValuesParty(CallbackParams callbackParams,
+                                         List<Element<UploadEvidenceDocumentType>> uploadEvidenceDocumentType,
                                          List<Element<UploadEvidenceWitness>> uploadEvidenceWitness1,
                                          List<Element<UploadEvidenceWitness>> uploadEvidenceWitness2,
                                          List<Element<UploadEvidenceWitness>> uploadEvidenceWitness3,
@@ -275,11 +276,28 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
             "Invalid date: \"Documentary evidence for trial\" "
                 + "date entered must not be in the future (10).");
 
-        checkDateCorrectnessFuture(errors, bundleEvidence, date -> date.getValue()
-                .getDocumentIssuedDate(),
-            "Invalid date: \"Bundle Hearing date\" "
-                + "date entered must not be in the past (11).");
-
+        CaseData caseDataBefore = callbackParams.getCaseDataBefore();
+        List<Element<UploadEvidenceDocumentType>> bundleEvidence1 = caseDataBefore.getBundleEvidence();
+        if (bundleEvidence1 == null) {
+            checkDateCorrectnessFuture(
+                errors, bundleEvidence, date -> date.getValue()
+                    .getDocumentIssuedDate(),
+                "Invalid date: \"Bundle Hearing date\" "
+                    + "date entered must not be in the past (11)."
+            );
+        }
+        if (bundleEvidence1 != null && !bundleEvidence1.isEmpty() && bundleEvidence != null
+            && !bundleEvidence.isEmpty() && bundleEvidence1.size() != bundleEvidence.size()) {
+            //get the Latest bundle and perform validation
+            List<Element<UploadEvidenceDocumentType>> latestBundle = new ArrayList<>(bundleEvidence);
+            latestBundle.removeAll(bundleEvidence1);
+            checkDateCorrectnessFuture(
+                errors, latestBundle, date -> date.getValue()
+                    .getDocumentIssuedDate(),
+                "Invalid date: \"Bundle Hearing date\" "
+                    + "date entered must not be in the past (11)."
+            );
+        }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .build();
