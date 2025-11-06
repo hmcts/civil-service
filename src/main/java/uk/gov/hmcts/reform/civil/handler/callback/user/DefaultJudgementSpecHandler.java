@@ -85,7 +85,6 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     private final FeatureToggleService toggleService;
     private final DefaultJudgmentOnlineMapper djOnlineMapper;
     private final CaseDetailsConverter caseDetailsConverter;
-    BigDecimal theOverallTotal;
     private final Time time;
     private final FeatureToggleService featureToggleService;
     private final DeadlinesCalculator deadlinesCalculator;
@@ -316,12 +315,12 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             if (caseDataBuilder.build().getShowDJFixedCostsScreen() == null
                 || YesOrNo.NO.equals(caseDataBuilder.build().getShowDJFixedCostsScreen())) {
                 // calculate repayment breakdown
-                StringBuilder repaymentBreakdown = buildRepaymentBreakdown(
+                RepaymentSummary repaymentSummary = buildRepaymentBreakdown(
                     caseData,
                     callbackParams
                 );
-
-                caseDataBuilder.repaymentSummaryObject(repaymentBreakdown.toString());
+                caseDataBuilder.defaultJudgementOverallTotal(repaymentSummary.overallTotal);
+                caseDataBuilder.repaymentSummaryObject(repaymentSummary.repaymentBreakdown);
             }
         }
 
@@ -353,19 +352,19 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
 
-        StringBuilder repaymentBreakdown = buildRepaymentBreakdown(
+        RepaymentSummary repaymentBreakdown = buildRepaymentBreakdown(
             caseData,
             callbackParams
         );
-
-        caseDataBuilder.repaymentSummaryObject(repaymentBreakdown.toString());
+        caseDataBuilder.defaultJudgementOverallTotal(repaymentBreakdown.overallTotal);
+        caseDataBuilder.repaymentSummaryObject(repaymentBreakdown.repaymentBreakdown);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
 
     @NotNull
-    private StringBuilder buildRepaymentBreakdown(CaseData caseData, CallbackParams callbackParams) {
+    private RepaymentSummary buildRepaymentBreakdown(CaseData caseData, CallbackParams callbackParams) {
         BigDecimal interest = interestCalculator.calculateInterest(caseData);
         Fee claimfee = caseData.getClaimFee();
         BigDecimal claimFeePounds = JudgmentsOnlineHelper.getClaimFeePounds(caseData, claimfee);
@@ -375,7 +374,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         //calculate the relevant total, total claim value + interest if any, claim fee for case,
         // and subtract any partial payment
         BigDecimal subTotal = getSubTotal(caseData, interest, claimFeePounds, fixedCost);
-        theOverallTotal = calculateOverallTotal(partialPaymentPounds, subTotal);
+        BigDecimal theOverallTotal = calculateOverallTotal(partialPaymentPounds, subTotal);
         //creates  the text on the page, based on calculated values
         StringBuilder repaymentBreakdown = new StringBuilder();
         if (caseData.isLRvLipOneVOne()
@@ -425,7 +424,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             interest,
             repaymentBreakdown
         );
-        return repaymentBreakdown;
+        return new RepaymentSummary(repaymentBreakdown.toString(), theOverallTotal);
     }
 
     private BigDecimal getFixedCosts(CaseData caseData, InterestCalculator interestCalculator) {
@@ -468,13 +467,13 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
 
     private CallbackResponse overallTotalAndDate(CallbackParams callbackParams) {
 
-        var caseData = callbackParams.getCaseData();
+        CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         //Set the hint date for repayment to be 30 days in the future
         String formattedDeadline = formatLocalDateTime(LocalDateTime.now().plusDays(30), DATE);
         caseDataBuilder.currentDatebox(formattedDeadline);
         //set the calculated repayment owed
-        caseDataBuilder.repaymentDue(theOverallTotal.toString());
+        caseDataBuilder.repaymentDue(caseData.getDefaultJudgementOverallTotal().toString());
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
@@ -544,17 +543,20 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         return subTotal.subtract(partialPaymentPounds);
     }
 
-    private BigDecimal calculateJudgmentAmountForFixedCosts(CaseData caseData) {
-        BigDecimal interest = interestCalculator.calculateInterest(caseData);
-
-        BigDecimal subTotal = caseData.getTotalClaimAmount().add(interest);
-        BigDecimal partialPaymentPounds = getPartialPayment(caseData);
-        return calculateOverallTotal(partialPaymentPounds, subTotal);
-    }
-
     private String getPartNameForLabel(String name) {
         return name;
     }
+
+    class RepaymentSummary {
+        private final String repaymentBreakdown;
+        private final BigDecimal overallTotal;
+
+        RepaymentSummary(String repaymentBreakdown, BigDecimal overallTotal) {
+            this.repaymentBreakdown = repaymentBreakdown;
+            this.overallTotal = overallTotal;
+        }
+    }
+
 }
 
 
