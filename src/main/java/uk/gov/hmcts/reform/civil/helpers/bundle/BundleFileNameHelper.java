@@ -15,7 +15,7 @@ public class BundleFileNameHelper {
     private BundleFileNameHelper() {
     }
 
-    protected static List<Element<UploadEvidenceWitness>> getWitnessDocsByPartyAndDocType(PartyType partyType,
+    public static List<Element<UploadEvidenceWitness>> getWitnessDocsByPartyAndDocType(PartyType partyType,
         EvidenceUploadType evidenceUploadFiles, CaseData caseData) {
         switch (evidenceUploadFiles) {
             case WITNESS_STATEMENT : {
@@ -58,7 +58,7 @@ public class BundleFileNameHelper {
         }
     }
 
-    protected static List<Element<UploadEvidenceExpert>> getExpertDocsByPartyAndDocType(
+    public static List<Element<UploadEvidenceExpert>> getExpertDocsByPartyAndDocType(
         PartyType partyType,
         EvidenceUploadType evidenceUploadFiles, CaseData caseData) {
         switch (evidenceUploadFiles) {
@@ -114,7 +114,7 @@ public class BundleFileNameHelper {
         }
     }
 
-    protected static List<Element<UploadEvidenceDocumentType>> getEvidenceUploadDocsByPartyAndDocType(
+    public static List<Element<UploadEvidenceDocumentType>> getEvidenceUploadDocsByPartyAndDocType(
         PartyType partyType,
         EvidenceUploadType evidenceUploadFiles, CaseData caseData) {
         switch (evidenceUploadFiles) {
