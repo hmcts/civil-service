@@ -1,5 +1,8 @@
 package uk.gov.hmcts.reform.civil.helpers.bundle;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
@@ -10,6 +13,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.DocumentWithRegex;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
+import uk.gov.hmcts.reform.civil.model.bundle.BundleCreateRequest;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
@@ -23,6 +27,9 @@ import java.util.Arrays;
 import java.util.List;
 
 public class BundleTestUtil {
+
+    private BundleTestUtil() {
+    }
 
     private static final String TEST_URL = "url";
     private static final String TEST_FILE_TYPE = "Email";
@@ -116,7 +123,7 @@ public class BundleTestUtil {
             .build();
     }
 
-    public CaseData getCaseDataNoCategoryId() {
+    public static CaseData getCaseDataNoCategoryId() {
         return CaseData.builder().ccdCaseReference(1L)
             .documentWitnessStatement(getWitnessDocsCategoryId())
             .documentWitnessStatementApp2(getWitnessDocsCategoryId())
@@ -345,7 +352,7 @@ public class BundleTestUtil {
         return witnessEvidenceDocs;
     }
 
-    private List<Element<UploadEvidenceWitness>> getWitnessDocsCategoryId() {
+    private static List<Element<UploadEvidenceWitness>> getWitnessDocsCategoryId() {
         List<String> witnessNames = new ArrayList<>(Arrays.asList("cl1Fname", "df1Fname", "cl2Fname", "df2Fname", "FirstName LastName"));
         List<Element<UploadEvidenceWitness>> witnessEvidenceDocs = new ArrayList<>();
         witnessNames.forEach(witnessName -> witnessEvidenceDocs.add(ElementUtils.element(UploadEvidenceWitness
@@ -489,4 +496,165 @@ public class BundleTestUtil {
         return systemGeneratedCaseDocuments;
     }
 
+    public static void assertTrialDocumentFileNames(final BundleCreateRequest bundleCreateRequest) {
+        assertEquals("CL 1 Case summary 12/12/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getTrialDocuments().get(0).getValue().getDocumentFileName());
+        assertEquals("CL 2 Case summary 12/12/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getTrialDocuments().get(1).getValue().getDocumentFileName());
+        assertEquals("DF 1 Case summary 12/12/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getTrialDocuments().get(2).getValue().getDocumentFileName());
+        assertEquals("DF 2 Case summary 12/12/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getTrialDocuments().get(3).getValue().getDocumentFileName());
+        assertEquals("CL 1 Chronology 12/01/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getTrialDocuments().get(4).getValue().getDocumentFileName());
+        assertEquals("CL 2 Chronology 12/01/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getTrialDocuments().get(5).getValue().getDocumentFileName());
+        assertEquals("DF 1 Chronology 12/01/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getTrialDocuments().get(6).getValue().getDocumentFileName());
+        assertEquals("DF 2 Chronology 12/01/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getTrialDocuments().get(7).getValue().getDocumentFileName());
+        assertEquals("CL 1 Trial Timetable 12/01/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getTrialDocuments().get(8).getValue().getDocumentFileName());
+        assertEquals("CL 2 Trial Timetable 12/01/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getTrialDocuments().get(9).getValue().getDocumentFileName());
+        assertEquals("DF 1 Trial Timetable 12/01/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getTrialDocuments().get(10).getValue().getDocumentFileName());
+        assertEquals("DF 2 Trial Timetable 12/01/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getTrialDocuments().get(11).getValue().getDocumentFileName());
+    }
+
+    public static void assertStatementsOfCaseDocuments(final BundleCreateRequest bundleCreateRequest) {
+        assertEquals("Claim Form 10/02/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments().get(0).getValue().getDocumentFileName());
+        assertEquals("Particulars Of Claim 10/02/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments().get(1).getValue().getDocumentFileName());
+        assertEquals("Medical Report 10/02/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments().get(2).getValue().getDocumentFileName());
+        assertEquals("Schedule Of Loss 10/02/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments().get(3).getValue().getDocumentFileName());
+        assertEquals("Certificate Of Suitability 10/02/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments().get(4).getValue().getDocumentFileName());
+        assertEquals("Other 10/02/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments().get(5).getValue().getDocumentFileName());
+        assertEquals("DF 1 Defence 10/02/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments().get(6).getValue().getDocumentFileName());
+        assertEquals("CL's reply 10/02/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments().get(7).getValue().getDocumentFileName());
+        assertEquals("CL 1 reply to part 18 request 12/01/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments().get(8).getValue().getDocumentFileName());
+        assertEquals("CL 2 reply to part 18 request 12/01/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments().get(9).getValue().getDocumentFileName());
+        assertEquals("DF 1 reply to part 18 request 12/01/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments().get(10).getValue().getDocumentFileName());
+        assertEquals("DF 2 reply to part 18 request 12/01/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments().get(11).getValue().getDocumentFileName());
+    }
+
+    public static void assertDirectionsQuestionnaires(final boolean caseProgressionCuiEnabled, final BundleCreateRequest bundleCreateRequest) {
+        assertEquals("CL 1 Directions Questionnaire 10/02/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(0).getValue().getDocumentFileName());
+        assertEquals("DF 1 Directions Questionnaire 10/02/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(1).getValue().getDocumentFileName());
+        if (caseProgressionCuiEnabled) {
+            assertEquals("DF 1 Directions Questionnaire 12/03/2023",
+                         bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(2).getValue().getDocumentFileName());
+        }
+        assertEquals("DF 2 Directions Questionnaire 10/02/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(
+                         caseProgressionCuiEnabled ? 3 : 2).getValue().getDocumentFileName());
+        assertEquals("DF 2 Directions Questionnaire 11/02/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(
+                         caseProgressionCuiEnabled ? 4 : 3).getValue().getDocumentFileName());
+        assertEquals("DF 2 Directions Questionnaire 10/03/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(
+                         caseProgressionCuiEnabled ? 5 : 4).getValue().getDocumentFileName());
+        assertEquals("Directions Questionnaire 10/02/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(
+                         caseProgressionCuiEnabled ? 6 : 5).getValue().getDocumentFileName());
+    }
+
+    public static void assertDirectionsQuestionnaires(final BundleCreateRequest bundleCreateRequest) {
+        assertEquals("Directions Questionnaire 10/02/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(0).getValue().getDocumentFileName());
+        assertEquals("Directions Questionnaire 10/03/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(1).getValue().getDocumentFileName());
+        assertEquals("Directions Questionnaire 11/04/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(2).getValue().getDocumentFileName());
+        assertEquals("Directions Questionnaire 10/05/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(3).getValue().getDocumentFileName());
+        assertEquals("Directions Questionnaire 10/06/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(4).getValue().getDocumentFileName());
+    }
+
+    public static void assertOrdersDocuments(final BundleCreateRequest bundleCreateRequest) {
+        assertEquals("Directions Order 10/02/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getOrdersDocuments().get(0).getValue().getDocumentFileName());
+        assertEquals("Order 10/02/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getOrdersDocuments().get(1).getValue().getDocumentFileName());
+        assertEquals("Order 10/02/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getOrdersDocuments().get(2).getValue().getDocumentFileName());
+    }
+
+    public static void assertJointStatementOfExperts(final BundleCreateRequest bundleCreateRequest) {
+        assertEquals("Joint statement of experts expert5 Test1 Test2 12/01/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getJointStatementOfExperts().get(0).getValue().getDocumentFileName());
+    }
+
+    public static void assertCostsBudgets(final BundleCreateRequest bundleCreateRequest) {
+        assertEquals("testFileName 12/12/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getClaimant1CostsBudgets().get(0).getValue().getDocumentFileName());
+        assertEquals("testFileName 12/12/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getClaimant2CostsBudgets().get(0).getValue().getDocumentFileName());
+        assertEquals("testFileName 12/12/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDefendant1CostsBudgets().get(0).getValue().getDocumentFileName());
+        assertEquals("testFileName 12/12/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDefendant2CostsBudgets().get(0).getValue().getDocumentFileName());
+    }
+
+    public static void assertExpertEvidences(final BundleCreateRequest bundleCreateRequest) {
+        assertEquals("Expert Evidence expert1 Test 12/01/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getClaimant1ExpertEvidence().get(0).getValue().getDocumentFileName());
+        assertEquals("Questions to expert1 12/01/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getClaimant1ExpertEvidence().get(1).getValue().getDocumentFileName());
+        assertEquals("Replies from expert1 12/01/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getClaimant1ExpertEvidence().get(2).getValue().getDocumentFileName());
+        assertEquals("Questions to Other expert 12/01/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getClaimant1ExpertEvidence().get(3).getValue().getDocumentFileName());
+        assertEquals("Expert Evidence expert2 Test 12/01/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getClaimant2ExpertEvidence().get(0).getValue().getDocumentFileName());
+        assertEquals("Expert Evidence expert3 Test 12/01/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDefendant1ExpertEvidence().get(0).getValue().getDocumentFileName());
+        assertEquals("Expert Evidence expert4 Test 12/01/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDefendant2ExpertEvidence().get(0).getValue().getDocumentFileName());
+    }
+
+    public static void assertWitnessStatements(final BundleCreateRequest bundleCreateRequest) {
+        assertEquals("CL 1 - Statement 10/02/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getClaimant1WitnessStatements().get(0).getValue().getDocumentFileName());
+        assertEquals("CL 2 - Statement 12/02/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getClaimant2WitnessStatements().get(0).getValue().getDocumentFileName());
+        assertEquals("DF 1 - Statement 11/02/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDefendant1WitnessStatements().get(0).getValue().getDocumentFileName());
+        assertEquals("DF 2 - Statement 13/02/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDefendant2WitnessStatements().get(0).getValue().getDocumentFileName());
+        assertEquals("Witness Statement cl2Fname 1 12/02/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getClaimant1WitnessStatements().get(1).getValue().getDocumentFileName());
+    }
+
+    public static void assertDisclosedDocuments(final BundleCreateRequest bundleCreateRequest) {
+        assertEquals("testFileName",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getClaimant1DisclosedDocuments().get(0).getValue().getDocumentFileName());
+        assertEquals("testFileName",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getClaimant2DisclosedDocuments().get(0).getValue().getDocumentFileName());
+        assertEquals("testFileName",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDefendant1DisclosedDocuments().get(0).getValue().getDocumentFileName());
+        assertEquals("testFileName",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDefendant2DisclosedDocuments().get(0).getValue().getDocumentFileName());
+    }
+
+    public static void assertBundleCreateRequestIsValid(BundleCreateRequest result) {
+        assertNotNull(result, "BundleCreateRequest should not be null");
+        assertNotNull(result.getCaseDetails(), "CaseDetails should not be null");
+        assertNotNull(result.getCaseDetails().getCaseData(), "CaseData should not be null");
+    }
 }
