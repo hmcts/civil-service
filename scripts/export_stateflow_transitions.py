@@ -37,24 +37,31 @@ PHASE_DEFINITIONS = {
             "PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC",
             "PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT","PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT",
             "CLAIM_ISSUED","CLAIM_NOTIFIED","CLAIM_DETAILS_NOTIFIED","CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION",
-            "CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE",
-            "CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE",
-            "CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE",
             "PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA",
             "PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA",
             "PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA",
-            "TAKEN_OFFLINE_BY_STAFF","TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED",
-            "TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED","TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT",
-            "TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT","TAKEN_OFFLINE_UNREGISTERED_DEFENDANT",
-            "TAKEN_OFFLINE_BY_SYSTEM","SPEC_DEFENDANT_NOC"
+            "CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE",
+            "CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE",
+            "CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE",
+            "SPEC_DEFENDANT_NOC"
         },
         "bridge_in": {},
         "bridge_out": {
             "NOTIFICATION_ACKNOWLEDGED": "NOTIFICATION_ACKNOWLEDGED (continues in Defence flow)",
             "TAKEN_OFFLINE_SPEC_DEFENDANT_NOC": "TAKEN_OFFLINE_SPEC_DEFENDANT_NOC (continues in Post-response flow)",
-            "CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE": "CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE (terminal)",
-            "CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE": "CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE (terminal)",
-            "CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE": "CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE (terminal)"
+            "TAKEN_OFFLINE_BY_STAFF": "TAKEN_OFFLINE_BY_STAFF (continues in Post-response flow)",
+            "TAKEN_OFFLINE_BY_SYSTEM": "TAKEN_OFFLINE_BY_SYSTEM (continues in Post-response flow)",
+            "TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED": "TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED (continues in Post-response flow)",
+            "TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED": "TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED (continues in Post-response flow)",
+            "TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT": "TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT (continues in Post-response flow)",
+            "TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT": "TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT (continues in Post-response flow)",
+            "TAKEN_OFFLINE_UNREGISTERED_DEFENDANT": "TAKEN_OFFLINE_UNREGISTERED_DEFENDANT (continues in Post-response flow)",
+            "FULL_DEFENCE": "FULL_DEFENCE (continues in Defence flow)",
+            "FULL_ADMISSION": "FULL_ADMISSION (continues in Defence flow)",
+            "PART_ADMISSION": "PART_ADMISSION (continues in Defence flow)",
+            "COUNTER_CLAIM": "COUNTER_CLAIM (continues in Defence flow)",
+            "DIVERGENT_RESPOND_GO_OFFLINE": "DIVERGENT_RESPOND_GO_OFFLINE (continues in Defence flow)",
+            "DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE": "DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE (continues in Defence flow)"
         }
     },
     "response_flow": {
@@ -77,9 +84,7 @@ PHASE_DEFINITIONS = {
             "COUNTER_CLAIM": "COUNTER_CLAIM (continues in Post-response flow)",
             "TAKEN_OFFLINE_BY_STAFF": "TAKEN_OFFLINE_BY_STAFF (continues in Post-response flow)",
             "TAKEN_OFFLINE_SDO_NOT_DRAWN": "TAKEN_OFFLINE_SDO_NOT_DRAWN (continues in Post-response flow)",
-            "PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA": "PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA (continues in Post-response flow)",
-            "DIVERGENT_RESPOND_GO_OFFLINE": "DIVERGENT_RESPOND_GO_OFFLINE (continues in Post-response flow)",
-            "DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE": "DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE (continues in Post-response flow)"
+            "PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA": "PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA (continues in Post-response flow)"
         }
     },
     "post_response": {
@@ -99,10 +104,7 @@ PHASE_DEFINITIONS = {
         },
         "bridge_in": {
             "NOTIFICATION_ACKNOWLEDGED": "NOTIFICATION_ACKNOWLEDGED (from Defence flow)",
-            "NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION": "NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION (from Defence flow)",
-            "ALL_RESPONSES_RECEIVED": "ALL_RESPONSES_RECEIVED (from Defence flow)",
-            "DIVERGENT_RESPOND_GO_OFFLINE": "DIVERGENT_RESPOND_GO_OFFLINE (from Defence flow)",
-            "DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE": "DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE (from Defence flow)"
+            "NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION": "NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION (from Defence flow)"
         },
         "bridge_out": {}
     }
@@ -415,8 +417,17 @@ def save_mermaid(transitions: Sequence[Dict], glossary: Dict[str, str]):
 
         state_aliases = set(states or [])
         edge_sources = {src for src, _, _ in edges}
+        edge_nodes = edge_sources | {dst for _, dst, _ in edges}
         def mark_terminal(label: str, alias: str) -> str:
-            return f"{label} 🔚" if alias not in edge_sources else label
+            if alias in edge_sources:
+                return label
+            text = label or ''
+            lower = text.lower()
+            if 'terminal' in lower:
+                return f"{label} 🔚"
+            if 'continues' in lower:
+                return label
+            return f"{label} 🔚" if label else '🔚'
 
         lines = ['stateDiagram-v2', f"  %% {info['title']}"]
 
@@ -440,6 +451,11 @@ def save_mermaid(transitions: Sequence[Dict], glossary: Dict[str, str]):
             if label:
                 line += f" : {label}"
             lines.append(line)
+
+        if states:
+            terminal_states = (state_aliases & edge_nodes) - edge_sources
+            for alias in sorted(terminal_states):
+                lines.append(f'  note right of {alias} : 🔚 Terminal state')
 
         (MERMAID_DIR / f"{slug}.mmd").write_text("\n".join(lines))
 

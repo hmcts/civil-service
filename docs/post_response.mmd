@@ -2,15 +2,6 @@ stateDiagram-v2
   %% Post-Response Outcomes & Settlement
   state "NOTIFICATION_ACKNOWLEDGED (from Defence flow)" as POST_RESPONSE_IN_0
   state "NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION (from Defence flow)" as POST_RESPONSE_IN_1
-  state "ALL_RESPONSES_RECEIVED (from Defence flow)" as POST_RESPONSE_IN_2
-  state "DIVERGENT_RESPOND_GO_OFFLINE (from Defence flow) 🔚" as POST_RESPONSE_IN_3
-  state "DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE (from Defence flow) 🔚" as POST_RESPONSE_IN_4
-  POST_RESPONSE_IN_2 --> FULL_DEFENCE : Latest defence is a full defence unspecified.
-  POST_RESPONSE_IN_2 --> FULL_DEFENCE : Latest defence is a full defence in SPEC.
-  POST_RESPONSE_IN_2 --> FULL_ADMISSION : Latest defence is a full admission unspecified
-  POST_RESPONSE_IN_2 --> PART_ADMISSION : Latest defence is a part admission unspecified
-  POST_RESPONSE_IN_2 --> COUNTER_CLAIM : Latest defence is a counter claim unspecified journey
-  POST_RESPONSE_IN_2 --> TAKEN_OFFLINE_BY_STAFF : Staff took the case offline after claim details were notified and b…
   FULL_ADMIT_JUDGMENT_ADMISSION --> TAKEN_OFFLINE_BY_STAFF : HMCTS staff have manually taken the case offline.
   FULL_ADMIT_PAY_IMMEDIATELY --> TAKEN_OFFLINE_BY_STAFF : HMCTS staff have manually taken the case offline
   FULL_ADMIT_PAY_IMMEDIATELY --> FULL_ADMIT_JUDGMENT_ADMISSION : Applicant has requested a CCJ by admission
@@ -71,3 +62,15 @@ stateDiagram-v2
   PART_ADMISSION --> PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA : Claimant response deadline has passed with no response and staff ha…
   PART_ADMIT_AGREE_REPAYMENT --> SIGN_SETTLEMENT_AGREEMENT : Defendant has signed the digital settlement agreement.
   SIGN_SETTLEMENT_AGREEMENT --> FULL_ADMIT_JUDGMENT_ADMISSION : Applicant has requested a CCJ by admission.
+  note right of CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE : 🔚 Terminal state
+  note right of FULL_ADMIT_NOT_PROCEED : 🔚 Terminal state
+  note right of FULL_ADMIT_PROCEED : 🔚 Terminal state
+  note right of FULL_DEFENCE_NOT_PROCEED : 🔚 Terminal state
+  note right of IN_HEARING_READINESS : 🔚 Terminal state
+  note right of PART_ADMIT_NOT_PROCEED : 🔚 Terminal state
+  note right of PART_ADMIT_PROCEED : 🔚 Terminal state
+  note right of PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA : 🔚 Terminal state
+  note right of TAKEN_OFFLINE_AFTER_SDO : 🔚 Terminal state
+  note right of TAKEN_OFFLINE_BY_STAFF : 🔚 Terminal state
+  note right of TAKEN_OFFLINE_SDO_NOT_DRAWN : 🔚 Terminal state
+  note right of TAKEN_OFFLINE_SPEC_DEFENDANT_NOC_AFTER_JBA : 🔚 Terminal state
