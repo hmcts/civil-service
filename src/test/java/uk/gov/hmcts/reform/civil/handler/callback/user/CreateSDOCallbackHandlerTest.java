@@ -11,7 +11,6 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentMatchers;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
@@ -20,7 +19,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
-import uk.gov.hmcts.reform.civil.bankholidays.NonWorkingDaysCollection;
 import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
@@ -58,7 +56,6 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.impl.SdoDocumen
 import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.impl.SdoSubmissionTask;
 import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.impl.SdoValidationTask;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -146,15 +143,12 @@ import uk.gov.hmcts.reform.hmc.model.hearing.HearingSubChannel;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Stream;
 
-import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -217,8 +211,6 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate.FIVE_HOURS;
-import static uk.gov.hmcts.reform.civil.enums.sdo.TrialOnRadioOptions.OPEN_DATE;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.ERROR_MESSAGE_DATE_MUST_BE_IN_THE_FUTURE;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.ERROR_MESSAGE_NUMBER_CANNOT_BE_LESS_THAN_ZERO;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.ERROR_MINTI_DISPOSAL_NOT_ALLOWED;
@@ -287,9 +279,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private SdoGeneratorService sdoGeneratorService;
-
-    @MockBean
-    private NonWorkingDaysCollection nonWorkingDaysCollection;
 
     @MockBean
     private CategoryService categoryService;
@@ -733,7 +722,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPopulateDefaultFieldsForNihl() {
-            List<FastTrack> fastTrackList = new ArrayList<FastTrack>();
+            List<FastTrack> fastTrackList = new ArrayList<>();
             fastTrackList.add(FastTrack.fastClaimNoiseInducedHearingLoss);
 
             String preSelectedCourt = "214320";
@@ -1112,26 +1101,21 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     class AboutToSubmitCallback {
 
         private CallbackParams params;
-        private CaseData caseData;
-        private String userId;
-
-        private static final String EMAIL = "example@email.com";
         private final LocalDateTime submittedDate = LocalDateTime.now();
 
         @BeforeEach
         void setup() {
             List<String> items = List.of("label 1", "label 2", "label 3");
             DynamicList localOptions = DynamicList.fromList(items, Object::toString, items.get(0), false);
-            caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
-                .build().toBuilder()
-                .disposalHearingMethodInPerson(localOptions)
-                .fastTrackMethodInPerson(localOptions)
-                .smallClaimsMethodInPerson(localOptions)
-                .setFastTrackFlag(YES)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                    .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
+                    .build().toBuilder()
+                    .disposalHearingMethodInPerson(localOptions)
+                    .fastTrackMethodInPerson(localOptions)
+                    .smallClaimsMethodInPerson(localOptions)
+                    .setFastTrackFlag(YES)
+                    .build();
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            userId = UUID.randomUUID().toString();
 
             given(time.now()).willReturn(submittedDate);
 
@@ -1158,16 +1142,10 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Nested
     class AboutToSubmitCallbackVariableCase {
-
-        private String userId;
-
-        private static final String EMAIL = "example@email.com";
         private final LocalDateTime submittedDate = LocalDateTime.now();
 
         @BeforeEach
         void setup() {
-            userId = UUID.randomUUID().toString();
-
             given(time.now()).willReturn(submittedDate);
         }
 
@@ -1198,16 +1176,10 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Nested
     class AboutToSubmitCallbackWelshParty {
-
-        private String userId;
-
-        private static final String EMAIL = "example@email.com";
         private final LocalDateTime submittedDate = LocalDateTime.now();
 
         @BeforeEach
         void setup() {
-            userId = UUID.randomUUID().toString();
-
             given(time.now()).willReturn(submittedDate);
             when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         }
@@ -1361,8 +1333,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+        handler.handle(params);
 
         verifyNoInteractions(updateWaCourtLocationsService);
     }
@@ -1376,8 +1347,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+        handler.handle(params);
 
         verify(updateWaCourtLocationsService).updateCourtListingWALocations(any(), any());
     }
@@ -1745,23 +1715,19 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Nested
     class MidEventPrePopulateOrderDetailsPagesCallback extends LocationRefSampleDataBuilder {
-        private LocalDate newDate;
         private LocalDate nextWorkingDayDate;
-        private LocalDateTime localDateTime;
 
         @BeforeEach
         void setup() {
-            newDate = LocalDate.of(2020, 1, 15);
+            LocalDate newDate = LocalDate.of(2020, 1, 15);
             nextWorkingDayDate = LocalDate.of(2023, 12, 15);
-            localDateTime = LocalDateTime.of(2020, 1, 1, 12, 0, 0);
+            LocalDateTime localDateTime = LocalDateTime.of(2020, 1, 1, 12, 0, 0);
             when(time.now()).thenReturn(localDateTime);
             when(workingDayIndicator.getNextWorkingDay(any(LocalDate.class))).thenReturn(nextWorkingDayDate);
             when(deadlinesCalculator.plusWorkingDays(any(LocalDate.class), anyInt())).thenReturn(newDate);
             when(deadlinesCalculator.getOrderSetAsideOrVariedApplicationDeadline(ArgumentMatchers.any(LocalDateTime.class))).thenReturn(
-                newDate);
+                    newDate);
         }
-
-        private final LocalDate date = LocalDate.of(2020, 1, 15);
 
         @Test
         void shouldPrePopulateOrderDetailsPages() {
@@ -1812,15 +1778,18 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             List<OrderDetailsPagesSectionsToggle> expectedToggle = List.of(OrderDetailsPagesSectionsToggle.SHOW);
             List<OrderDetailsPagesSectionsToggle> fastTrackAdrToggle = objectMapper.convertValue(
                 response.getData().get("fastTrackAltDisputeResolutionToggle"),
-                new TypeReference<List<OrderDetailsPagesSectionsToggle>>() {}
+                    new TypeReference<>() {
+                    }
             );
             List<OrderDetailsPagesSectionsToggle> disposalDocsToggle = objectMapper.convertValue(
                 response.getData().get("disposalHearingDisclosureOfDocumentsToggle"),
-                new TypeReference<List<OrderDetailsPagesSectionsToggle>>() {}
+                    new TypeReference<>() {
+                    }
             );
             List<OrderDetailsPagesSectionsToggle> smallClaimsHearingToggle = objectMapper.convertValue(
                 response.getData().get("smallClaimsHearingToggle"),
-                new TypeReference<List<OrderDetailsPagesSectionsToggle>>() {}
+                    new TypeReference<>() {
+                    }
             );
 
             assertThat(fastTrackAdrToggle).isEqualTo(expectedToggle);
@@ -1941,18 +1910,20 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(flightDelay).isNotNull();
             assertThat(flightDelay.getRelatedClaimsInput())
-                .isEqualTo("In the event that the Claimant(s) or Defendant(s) are aware if other \n"
-                               + "claims relating to the same flight they must notify the court \n"
-                               + "where the claim is being managed within 14 days of receipt of \n"
-                               + "this Order providing all relevant details of those claims including \n"
-                               + "case number(s), hearing date(s) and copy final substantive order(s) \n"
-                               + "if any, to assist the Court with ongoing case management which may \n"
-                               + "include the cases being heard together.");
+                .isEqualTo("""
+                        In the event that the Claimant(s) or Defendant(s) are aware if other\s
+                        claims relating to the same flight they must notify the court\s
+                        where the claim is being managed within 14 days of receipt of\s
+                        this Order providing all relevant details of those claims including\s
+                        case number(s), hearing date(s) and copy final substantive order(s)\s
+                        if any, to assist the Court with ongoing case management which may\s
+                        include the cases being heard together.""");
             assertThat(flightDelay.getLegalDocumentsInput())
-                .isEqualTo("Any arguments as to the law to be applied to this claim, together with \n"
-                               + "copies of legal authorities or precedents relied on, shall be uploaded \n"
-                               + "to the Digital Portal not later than 3 full working days before the \n"
-                               + "final hearing date.");
+                .isEqualTo("""
+                        Any arguments as to the law to be applied to this claim, together with\s
+                        copies of legal authorities or precedents relied on, shall be uploaded\s
+                        to the Digital Portal not later than 3 full working days before the\s
+                        final hearing date.""");
 
         }
 
@@ -2204,19 +2175,23 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             List<IncludeInOrderToggle> uploadDocToggle = objectMapper.convertValue(
                 response.getData().get("sdoR2SmallClaimsUploadDocToggle"),
-                new TypeReference<List<IncludeInOrderToggle>>() {}
+                    new TypeReference<>() {
+                    }
             );
             List<IncludeInOrderToggle> hearingToggle = objectMapper.convertValue(
                 response.getData().get("sdoR2SmallClaimsHearingToggle"),
-                new TypeReference<List<IncludeInOrderToggle>>() {}
+                    new TypeReference<>() {
+                    }
             );
             List<IncludeInOrderToggle> witnessToggle = objectMapper.convertValue(
                 response.getData().get("sdoR2SmallClaimsWitnessStatementsToggle"),
-                new TypeReference<List<IncludeInOrderToggle>>() {}
+                    new TypeReference<>() {
+                    }
             );
             List<IncludeInOrderToggle> mediationToggle = objectMapper.convertValue(
                 response.getData().get("sdoR2SmallClaimsMediationSectionToggle"),
-                new TypeReference<List<IncludeInOrderToggle>>() {}
+                    new TypeReference<>() {
+                    }
             );
 
             assertThat(uploadDocToggle).containsExactly(IncludeInOrderToggle.INCLUDE);
@@ -2523,7 +2498,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void fastTRackSdoR2NihlPathTwo() {
 
-            List<FastTrack> fastTrackList = new ArrayList<FastTrack>();
+            List<FastTrack> fastTrackList = new ArrayList<>();
             fastTrackList.add(FastTrack.fastClaimBuildingDispute);
             fastTrackList.add(FastTrack.fastClaimNoiseInducedHearingLoss);
 
@@ -2551,7 +2526,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void fastTrackFlagSetToYesNihlPathOne() {
-            List<FastTrack> fastTrackList = new ArrayList<FastTrack>();
+            List<FastTrack> fastTrackList = new ArrayList<>();
             fastTrackList.add(FastTrack.fastClaimBuildingDispute);
             fastTrackList.add(FastTrack.fastClaimNoiseInducedHearingLoss);
 
@@ -2767,7 +2742,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldGenerateAndSaveSdoOrder_whenNihl() {
-            List<FastTrack> fastTrackList = new ArrayList<FastTrack>();
+            List<FastTrack> fastTrackList = new ArrayList<>();
             fastTrackList.add(FastTrack.fastClaimNoiseInducedHearingLoss);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
@@ -2793,7 +2768,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         @ParameterizedTest
         @ValueSource(booleans = {true, false})
         void shouldValidateFieldsForNihl(boolean valid) {
-            List<FastTrack> fastTrackList = new ArrayList<FastTrack>();
+            List<FastTrack> fastTrackList = new ArrayList<>();
             fastTrackList.add(FastTrack.fastClaimNoiseInducedHearingLoss);
 
             LocalDate testDate = valid ? LocalDate.now().plusDays(1) : LocalDate.now();

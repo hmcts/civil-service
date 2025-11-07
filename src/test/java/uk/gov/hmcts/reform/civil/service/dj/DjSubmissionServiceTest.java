@@ -5,13 +5,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.mockito.Captor;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoFeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoLocationService;
@@ -26,7 +27,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STANDARD_DIRECTION_ORDER_DJ;
-import static uk.gov.hmcts.reform.civil.documentmanagement.model.Document.builder;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getHearingNotes;
 
@@ -42,6 +42,9 @@ class DjSubmissionServiceTest {
     @Mock
     private SdoLocationService sdoLocationService;
 
+    @Captor
+    ArgumentCaptor<CaseData.CaseDataBuilder<?, ?>> caseDataBuilderCaptor;
+
     private DjSubmissionService service;
 
     @BeforeEach
@@ -53,12 +56,12 @@ class DjSubmissionServiceTest {
     void shouldRemovePreviewDocumentAndAssignCategories() {
         uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument caseDocument =
             uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument.builder()
-                .documentLink(builder().documentUrl("url").build())
+                .documentLink(Document.builder().documentUrl("url").build())
                 .build();
 
         CaseData caseData = CaseData.builder()
             .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-            .orderSDODocumentDJ(builder().documentUrl("url").build())
+            .orderSDODocumentDJ(Document.builder().documentUrl("url").build())
             .orderSDODocumentDJCollection(List.of(element(caseDocument)))
             .build();
 
@@ -124,10 +127,9 @@ class DjSubmissionServiceTest {
 
         service.prepareSubmission(caseData, AUTH_TOKEN);
 
-        ArgumentCaptor<CaseData.CaseDataBuilder<?, ?>> captor =
-            ArgumentCaptor.forClass(CaseData.CaseDataBuilder.class);
-        verify(sdoLocationService).updateWaLocationsIfRequired(eq(caseData), captor.capture(), eq(AUTH_TOKEN));
-        assertThat(captor.getValue()).isNotNull();
+        verify(sdoLocationService)
+            .updateWaLocationsIfRequired(eq(caseData), caseDataBuilderCaptor.capture(), eq(AUTH_TOKEN));
+        assertThat(caseDataBuilderCaptor.getValue()).isNotNull();
     }
 
     @Test

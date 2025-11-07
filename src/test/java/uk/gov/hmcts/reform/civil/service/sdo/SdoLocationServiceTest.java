@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.mockito.Captor;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -40,6 +41,9 @@ class SdoLocationServiceTest {
     @Mock
     private UpdateWaCourtLocationsService updateWaCourtLocationsService;
 
+    @Captor
+    private ArgumentCaptor<CaseData.CaseDataBuilder<?, ?>> caseDataBuilderCaptor;
+
     private SdoLocationService service;
 
     @BeforeEach
@@ -60,6 +64,17 @@ class SdoLocationServiceTest {
 
         assertThat(result).isEqualTo(locations);
         verify(locationReferenceDataService).getHearingCourtLocations(AUTH_TOKEN);
+    }
+
+    @Test
+    void shouldFetchDefaultJudgmentLocations() {
+        List<LocationRefData> locations = List.of(LocationRefData.builder().epimmsId("456").build());
+        when(locationReferenceDataService.getCourtLocationsForDefaultJudgments(AUTH_TOKEN)).thenReturn(locations);
+
+        List<LocationRefData> result = service.fetchDefaultJudgmentLocations(AUTH_TOKEN);
+
+        assertThat(result).isEqualTo(locations);
+        verify(locationReferenceDataService).getCourtLocationsForDefaultJudgments(AUTH_TOKEN);
     }
 
     @Test
@@ -144,9 +159,9 @@ class SdoLocationServiceTest {
 
         service.updateWaLocationsIfRequired(caseData, builder, AUTH_TOKEN);
 
-        ArgumentCaptor<CaseData.CaseDataBuilder<?, ?>> captor = ArgumentCaptor.forClass(CaseData.CaseDataBuilder.class);
-        verify(updateWaCourtLocationsService).updateCourtListingWALocations(eq(AUTH_TOKEN), captor.capture());
-        assertThat(captor.getValue()).isNotNull();
+        verify(updateWaCourtLocationsService)
+            .updateCourtListingWALocations(eq(AUTH_TOKEN), caseDataBuilderCaptor.capture());
+        assertThat(caseDataBuilderCaptor.getValue()).isNotNull();
     }
 
     @Test

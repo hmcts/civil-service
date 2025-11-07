@@ -17,7 +17,6 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
-import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
@@ -83,11 +82,11 @@ class SdoPrePopulateServiceTest {
         when(deadlinesCalculator.getOrderSetAsideOrVariedApplicationDeadline(any(LocalDateTime.class)))
             .thenAnswer(invocation -> invocation.getArgument(0, LocalDateTime.class).toLocalDate());
         lenient().when(locationService.fetchHearingLocations(anyString())).thenReturn(Collections.emptyList());
-        lenient().when(locationService.buildLocationList(ArgumentMatchers.nullable(RequestedCourt.class), anyBoolean(), ArgumentMatchers.<LocationRefData>anyList()))
+        lenient().when(locationService.buildLocationList(ArgumentMatchers.nullable(RequestedCourt.class), anyBoolean(), ArgumentMatchers.anyList()))
             .thenAnswer(invocation -> dynamicList("loc", "Location"));
-        lenient().when(locationService.buildCourtLocationForSdoR2(ArgumentMatchers.nullable(RequestedCourt.class), ArgumentMatchers.<LocationRefData>anyList()))
+        lenient().when(locationService.buildCourtLocationForSdoR2(ArgumentMatchers.nullable(RequestedCourt.class), ArgumentMatchers.anyList()))
             .thenAnswer(invocation -> dynamicList("court", "Court"));
-        lenient().when(locationService.buildAlternativeCourtLocations(ArgumentMatchers.<LocationRefData>anyList()))
+        lenient().when(locationService.buildAlternativeCourtLocations(ArgumentMatchers.anyList()))
             .thenAnswer(invocation -> dynamicList("alt", "Alt Court"));
         when(categoryService.findCategoryByCategoryIdAndServiceId(anyString(), anyString(), anyString()))
             .thenReturn(Optional.empty());

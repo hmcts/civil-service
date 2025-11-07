@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingJudgesRecital
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WelshLanguageUsage;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialOrderMadeWithoutHearingDJ;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
-import uk.gov.hmcts.reform.civil.service.dj.DjSpecialistDirectionsService;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;

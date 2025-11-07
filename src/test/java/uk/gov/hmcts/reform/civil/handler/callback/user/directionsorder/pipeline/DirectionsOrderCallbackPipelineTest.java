@@ -53,14 +53,15 @@ class DirectionsOrderCallbackPipelineTest {
         CaseData applicableResult = CaseData.builder().legacyCaseReference("applicable").build();
 
         DirectionsOrderCallbackTask applicableTask = new StubTask(DirectionsOrderLifecycleStage.PRE_POPULATE, applicableResult, List.of(), true);
-        DirectionsOrderCallbackTask ignoredTask = new StubTask(DirectionsOrderLifecycleStage.PRE_POPULATE, CaseData.builder().legacyCaseReference("ignored").build(), List.of("error"), false);
+        DirectionsOrderCallbackTask ignoredTask = new StubTask(DirectionsOrderLifecycleStage.PRE_POPULATE, CaseData.builder().legacyCaseReference("ignored").build(), List.of(
+                "error"), false);
 
         DirectionsOrderCallbackPipeline pipeline = new DirectionsOrderCallbackPipeline(List.of(applicableTask, ignoredTask));
         CallbackRequest request = CallbackRequest.builder().eventId("EVENT").build();
         DirectionsOrderTaskContext context = new DirectionsOrderTaskContext(
-            initial,
-            CallbackParams.builder().request(request).build(),
-            DirectionsOrderLifecycleStage.PRE_POPULATE
+                initial,
+                CallbackParams.builder().request(request).build(),
+                DirectionsOrderLifecycleStage.PRE_POPULATE
         );
 
         DirectionsOrderTaskResult result = pipeline.run(context, DirectionsOrderLifecycleStage.PRE_POPULATE);
@@ -69,21 +70,9 @@ class DirectionsOrderCallbackPipelineTest {
         assertThat(result.errors()).isEmpty();
     }
 
-    private static class StubTask implements DirectionsOrderCallbackTask {
-        private final DirectionsOrderLifecycleStage stage;
-        private final CaseData caseData;
-        private final List<String> errors;
-        private final boolean applies;
-
+    private record StubTask(DirectionsOrderLifecycleStage stage, CaseData caseData, List<String> errors, boolean applies) implements DirectionsOrderCallbackTask {
         StubTask(DirectionsOrderLifecycleStage stage, CaseData caseData, List<String> errors) {
             this(stage, caseData, errors, true);
-        }
-
-        StubTask(DirectionsOrderLifecycleStage stage, CaseData caseData, List<String> errors, boolean applies) {
-            this.stage = stage;
-            this.caseData = caseData;
-            this.errors = errors;
-            this.applies = applies;
         }
 
         @Override

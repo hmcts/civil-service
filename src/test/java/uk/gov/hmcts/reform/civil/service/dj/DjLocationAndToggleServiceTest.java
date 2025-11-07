@@ -195,6 +195,85 @@ class DjLocationAndToggleServiceTest {
         assertThat(result).isSameAs(caseData);
     }
 
+    @Test
+    void shouldApplyInPersonSelectionForDisposalHearing() {
+        DynamicList disposalList = DynamicList.builder()
+            .value(DynamicListElement.builder()
+                       .label(HearingMethod.IN_PERSON.getLabel())
+                       .code("INP")
+                       .build())
+            .build();
+        CaseData caseData = CaseData.builder()
+            .hearingMethodValuesDisposalHearingDJ(disposalList)
+            .build();
+
+        CaseData result = service.applyHearingSelections(caseData, V_1);
+
+        assertThat(result.getDisposalHearingMethodDJ())
+            .isEqualTo(DisposalHearingMethodDJ.disposalHearingMethodInPerson);
+    }
+
+    @Test
+    void shouldApplyTelephoneSelectionForTrialHearingWhenDisposalNotProvided() {
+        DynamicList trialList = DynamicList.builder()
+            .value(DynamicListElement.builder()
+                       .label(HearingMethod.TELEPHONE.getLabel())
+                       .code("TEL")
+                       .build())
+            .build();
+        CaseData caseData = CaseData.builder()
+            .hearingMethodValuesTrialHearingDJ(trialList)
+            .build();
+
+        CaseData result = service.applyHearingSelections(caseData, V_1);
+
+        assertThat(result.getTrialHearingMethodDJ())
+            .isEqualTo(DisposalHearingMethodDJ.disposalHearingMethodTelephoneHearing);
+    }
+
+    @Test
+    void shouldReturnCaseDataWhenSelectionsAbsent() {
+        CaseData caseData = CaseData.builder().build();
+
+        CaseData result = service.applyHearingSelections(caseData, V_1);
+
+        assertThat(result).isEqualTo(caseData);
+    }
+
+    @Test
+    void shouldLeaveDisposalSelectionUnsetWhenLabelNotRecognised() {
+        DynamicList disposalList = DynamicList.builder()
+            .value(DynamicListElement.builder()
+                       .label("Other option")
+                       .code("OTHER")
+                       .build())
+            .build();
+        CaseData caseData = CaseData.builder()
+            .hearingMethodValuesDisposalHearingDJ(disposalList)
+            .build();
+
+        CaseData result = service.applyHearingSelections(caseData, V_1);
+
+        assertThat(result.getDisposalHearingMethodDJ()).isNull();
+    }
+
+    @Test
+    void shouldLeaveTrialSelectionUnsetWhenLabelNotRecognised() {
+        DynamicList trialList = DynamicList.builder()
+            .value(DynamicListElement.builder()
+                       .label("Other option")
+                       .code("OTHER")
+                       .build())
+            .build();
+        CaseData caseData = CaseData.builder()
+            .hearingMethodValuesTrialHearingDJ(trialList)
+            .build();
+
+        CaseData result = service.applyHearingSelections(caseData, V_1);
+
+        assertThat(result.getTrialHearingMethodDJ()).isNull();
+    }
+
     private DirectionsOrderTaskContext buildContext(CaseData caseData, CallbackVersion version) {
         CallbackParams params = CallbackParamsBuilder.builder()
             .of(CallbackType.ABOUT_TO_START, caseData)
