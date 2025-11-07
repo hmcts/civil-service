@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.service.GaEventEmitterService;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
@@ -32,32 +33,24 @@ public class EventEmitterAspect {
 
     private final EventEmitterService eventEmitterService;
     private final GaEventEmitterService gaEventEmitterService;
+    private final CaseDetailsConverter caseDetailsConverter;
 
     @Around("execution(* *(*)) && @annotation(EventEmitter) && args(callbackParams))")
     public Object emitBusinessProcessEvent(ProceedingJoinPoint joinPoint, CallbackParams callbackParams)
         throws Throwable {
 
-        String eventId = callbackParams.getRequest().getEventId();
-
-        if (Objects.equals(eventId, INITIATE_GENERAL_APPLICATION.name())) {
-            log.info(format(
-                "INITIATE_GENERAL_APPLICATION caseId: %s, type: %s",
-                Optional.ofNullable(callbackParams.getCaseData()).map(CaseData::getCcdCaseReference).orElse(null),
-                callbackParams.getType()
-            ));
-        }
-
         if (callbackParams.getType() == SUBMITTED) {
-
-            log.info(format(
-                "EventEmitterAspect caseId: %s, type: %s, isGeneralApplicationCase: %s",
-                Optional.ofNullable(callbackParams.getCaseData()).map(CaseData::getCcdCaseReference).orElse(null),
-                callbackParams.getType(),
-                callbackParams.isGeneralApplicationCase()
-            ));
-
             if (callbackParams.isGeneralApplicationCase()) {
-                processGeneralApplicationBusinessProcessEvent(callbackParams);
+                GeneralApplicationCaseData caseData = (GeneralApplicationCaseData) callbackParams.getBaseCaseData();
+                processGeneralApplicationBusinessProcessEvent(caseData);
+            } else if (Objects.equals(callbackParams.getRequest().getEventId(), INITIATE_GENERAL_APPLICATION.name())) {
+                GeneralApplicationCaseData caseData = caseDetailsConverter.toGeneralApplicationCaseData(
+                    callbackParams.getRequest().getCaseDetails());
+                log.info(format(
+                    "Emit business process event for INITIATE_GENERAL_APPLICATION submitted callback for caseId: %d",
+                    caseData.getCcdCaseReference()
+                ));
+                processGeneralApplicationBusinessProcessEvent(caseData);
             } else {
                 CaseData caseData = callbackParams.getCaseData();
                 var businessProcess = caseData.getBusinessProcess();
@@ -75,8 +68,7 @@ public class EventEmitterAspect {
         return joinPoint.proceed();
     }
 
-    private void processGeneralApplicationBusinessProcessEvent(CallbackParams callbackParams) {
-        GeneralApplicationCaseData caseData = (GeneralApplicationCaseData) callbackParams.getBaseCaseData();
+    private void processGeneralApplicationBusinessProcessEvent(GeneralApplicationCaseData caseData) {
         var caseId = caseData.getCcdCaseReference();
         log.info("Callback type is SUBMITTED for caseId: {}", caseId);
         List<Element<GeneralApplication>> generalApplications = caseData.getGeneralApplications();

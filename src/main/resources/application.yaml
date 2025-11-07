@@ -627,6 +627,13 @@ azure:
       username: ${HMC_HEARINGS_TOPIC_POLICY_NAME:}
       password: ${HMC_HEARINGS_TOPIC_ACCESS_KEY:}
       enabled: ${HMC_HEARINGS_SUBSCRIPTION_ENABLED:false}
+    ccd-events-topic:
+      connection-string: ${CCD_EVENTS_TOPIC_CONNECTION_STRING:dummy}
+      topic-name: ${CCD_EVENTS_TOPIC_NAME:ccd-case-events-aat}
+      civil-ccd-events-subscription-name: ${CCD_EVENTS_SUBSCRIPTION_NAME:civil-ccd-case-events-sub-aat}
+      retry-duration: ${CCD_EVENTS_SUBSCRIPTION_RETRY_DURATION:60}
+      threads: ${CCD_EVENTS_SERVICE_BUS_CONCURRENT_SESSIONS:1}
+      enabled: ${CCD_EVENTS_SUBSCRIPTION_ENABLED:false}
     application-insights:
       instrumentation-key: ${APPINSIGHTS_INSTRUMENTATIONKEY:00000000-0000-0000-0000-000000000000}
 
@@ -677,10 +684,6 @@ spring:
     username: ${CMC_DB_USERNAME:ccd}
     password: ${CMC_DB_PASSWORD:ccd}
     url: jdbc:postgresql://${CMC_DB_HOST:localhost}:${CMC_DB_PORT:5050}/${CMC_DB_NAME:cmc}
-
-print:
-  service:
-    enabled: false
 
 fees:
   api:
@@ -803,10 +806,6 @@ spring:
 management:
   endpoints:
     enabled-by-default: false
-
-print:
-  service:
-    enabled: true
 
 cmc-claim-store:
   api:
