@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @Slf4j
@@ -93,12 +94,53 @@ public class GeneralAppFeesService {
     }
 
     public Fee getFeeForGA(GeneralApplicationCaseData caseData) {
-        return getFeeForGA(
-            caseData.getGeneralAppType().getTypes(),
-            getRespondentAgreed(caseData),
-            getInformOtherParty(caseData),
-            getHearingDate(caseData)
-        );
+        Fee result = Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(Integer.MAX_VALUE)).build();
+        int typeSize = caseData.getGeneralAppType().getTypes().size();
+        if (CollectionUtils.containsAny(caseData.getGeneralAppType().getTypes(), VARY_TYPES)) {
+            //only minus 1 as VARY_PAYMENT_TERMS_OF_JUDGMENT can't be multi selected
+            typeSize--;
+            result = getFeeForGA(feesConfiguration.getAppnToVaryOrSuspend(), "miscellaneous", "other");
+        }
+        if (typeSize > 0
+            && CollectionUtils.containsAny(caseData.getGeneralAppType().getTypes(), SD_CONSENT_TYPES)) {
+            typeSize--;
+            Fee sdConsentFeeForGA = getFeeForGA(feesConfiguration.getConsentedOrWithoutNoticeKeyword(), null, null);
+            if (sdConsentFeeForGA.getCalculatedAmountInPence()
+                .compareTo(result.getCalculatedAmountInPence()) < 0) {
+                result = sdConsentFeeForGA;
+            }
+        }
+        if (typeSize > 0
+            && CollectionUtils.containsAny(caseData.getGeneralAppType().getTypes(), SET_ASIDE)
+            && caseData.getGeneralAppRespondentAgreement() != null
+            && NO.equals(caseData.getGeneralAppRespondentAgreement().getHasAgreed())) {
+            String feeKeyword;
+            if (caseData.getGeneralAppInformOtherParty() != null
+                && NO.equals(caseData.getGeneralAppInformOtherParty().getIsWithNotice())) {
+                feeKeyword = feesConfiguration.getConsentedOrWithoutNoticeKeyword();
+            } else {
+                feeKeyword = feesConfiguration.getWithNoticeKeyword();
+            }
+            typeSize--;
+            Fee setAsideFeeForGA = getFeeForGA(feeKeyword, null, null);
+            if (setAsideFeeForGA.getCalculatedAmountInPence()
+                .compareTo(result.getCalculatedAmountInPence()) < 0) {
+                result = setAsideFeeForGA;
+            }
+        }
+        if (isUpdateCoScGATypeSize(typeSize, caseData.getGeneralAppType().getTypes())) {
+            typeSize--;
+            Fee certOfSatisfactionOrCancel = getFeeForGA(feesConfiguration.getCertificateOfSatisfaction(), "miscellaneous", "other");
+            result = getCoScFeeResult(result, certOfSatisfactionOrCancel);
+        }
+        if (typeSize > 0) {
+            Fee defaultFee = getDefaultFee(caseData);
+            if (defaultFee.getCalculatedAmountInPence()
+                .compareTo(result.getCalculatedAmountInPence()) < 0) {
+                result = defaultFee;
+            }
+        }
+        return result;
     }
 
     public Fee getFeeForGA(GeneralApplication generalApplication, LocalDate hearingScheduledDate) {
@@ -197,11 +239,29 @@ public class GeneralAppFeesService {
         }
     }
 
+    private Fee getDefaultFee(GeneralApplicationCaseData caseData) {
+        if (isFreeApplication(caseData)) {
+            return FREE_FEE;
+        } else {
+            return getFeeForGA(getFeeRegisterKeyword(caseData), null, null);
+        }
+    }
+
     protected String getFeeRegisterKeyword(Boolean respondentAgreed, Boolean informOtherParty) {
         boolean isNotified = respondentAgreed != null
             && !respondentAgreed
             && informOtherParty != null
             && informOtherParty;
+        return isNotified
+            ? feesConfiguration.getWithNoticeKeyword()
+            : feesConfiguration.getConsentedOrWithoutNoticeKeyword();
+    }
+
+    protected String getFeeRegisterKeyword(GeneralApplicationCaseData caseData) {
+        boolean isNotified = caseData.getGeneralAppRespondentAgreement() != null
+            && NO.equals(caseData.getGeneralAppRespondentAgreement().getHasAgreed())
+            && caseData.getGeneralAppInformOtherParty() != null
+            && YES.equals(caseData.getGeneralAppInformOtherParty().getIsWithNotice());
         return isNotified
             ? feesConfiguration.getWithNoticeKeyword()
             : feesConfiguration.getConsentedOrWithoutNoticeKeyword();
