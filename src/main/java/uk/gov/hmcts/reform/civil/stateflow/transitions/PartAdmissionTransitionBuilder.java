@@ -54,10 +54,7 @@ public class PartAdmissionTransitionBuilder extends MidTransitionBuilder {
                                                             .and(not(partAdmitPayImmediately))
                                                             .and(not(acceptRepaymentPlan))
                                                             .and(not(rejectRepaymentPlan)), transitions)
-            .moveTo(IN_MEDIATION, transitions).onlyWhen(isClaimantNotSettlePartAdmitClaim
-                                                            .and(agreedToMediation.negate())
-                                                            .and(isCarmApplicableCase.or(isCarmApplicableLipCase))
-                                                            .and(not(takenOfflineByStaff)), transitions)
+            .moveTo(IN_MEDIATION, transitions).onlyWhen(carmMediation, transitions)
             .moveTo(PART_ADMIT_NOT_SETTLED_NO_MEDIATION, transitions)
             .onlyWhen(isClaimantNotSettlePartAdmitClaim.and(not(agreedToMediation)).and(not(isCarmApplicableCase))
                           .and(not(isCarmApplicableLipCase))
@@ -68,7 +65,7 @@ public class PartAdmissionTransitionBuilder extends MidTransitionBuilder {
                     JudicialReferralUtils.shouldMoveToJudicialReferral(c, featureToggleService.isMultiOrIntermediateTrackEnabled(c)));
                 flags.put(FlowFlag.MINTI_ENABLED.name(), featureToggleService.isMultiOrIntermediateTrackEnabled(c));
             }, transitions)
-            .moveTo(PART_ADMIT_PROCEED, transitions).onlyWhen(fullDefenceProceed, transitions)
+            .moveTo(PART_ADMIT_PROCEED, transitions).onlyWhen(partAdmitProceed, transitions)
             .set((c, flags) -> {
                 flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), isRespondentResponseLangIsBilingual.test(c));
             }, transitions)
@@ -121,4 +118,12 @@ public class PartAdmissionTransitionBuilder extends MidTransitionBuilder {
             || caseData.getResp1MediationContactInfo() != null
             || caseData.getResp2MediationContactInfo() != null;
     }
+
+    public static final Predicate<CaseData> carmMediation = isClaimantNotSettlePartAdmitClaim
+        .and(agreedToMediation.negate())
+        .and(isCarmApplicableCase.or(isCarmApplicableLipCase))
+        .and(not(takenOfflineByStaff));
+
+    public static final Predicate<CaseData> partAdmitProceed =  not(carmMediation).and(fullDefenceProceed);
+
 }
