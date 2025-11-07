@@ -65,9 +65,6 @@ class StatementsOfCaseMapperTest {
 
         List<Element<BundlingRequestDocument>> result = mapper.map(caseData);
 
-        // 1 (claim form) + 5 (served docs) + 2 (def/claim replies) + 8 (2 types * 4 parties)
         assertEquals(16, result.size());
     }
 }
-
-

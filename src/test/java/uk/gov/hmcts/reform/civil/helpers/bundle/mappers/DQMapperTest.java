@@ -18,7 +18,6 @@ import java.util.List;
 import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleTestUtil.getCaseData;
 
@@ -42,15 +41,15 @@ class DQMapperTest {
         CaseData caseData = getCaseData();
 
         BundlingRequestDocument bundlingRequestDocument = BundlingRequestDocument.builder().documentFileName("f").documentType("t").build();
-        when(bundleDocumentsRetrieval.getDqByCategoryId(eq(caseData), eq(DocCategory.APP1_DQ.getValue()), eq(PartyType.CLAIMANT1)))
+        when(bundleDocumentsRetrieval.getDqByCategoryId(caseData, DocCategory.APP1_DQ.getValue(), PartyType.CLAIMANT1))
             .thenReturn(singletonList(bundlingRequestDocument));
-        when(bundleDocumentsRetrieval.getDqByCategoryId(eq(caseData), eq(DocCategory.DEF1_DEFENSE_DQ.getValue()), eq(PartyType.DEFENDANT1)))
+        when(bundleDocumentsRetrieval.getDqByCategoryId(caseData, DocCategory.DEF1_DEFENSE_DQ.getValue(), PartyType.DEFENDANT1))
             .thenReturn(singletonList(bundlingRequestDocument));
-        when(bundleDocumentsRetrieval.getDqByCategoryId(eq(caseData), eq(DocCategory.DEF2_DEFENSE_DQ.getValue()), eq(PartyType.DEFENDANT2)))
+        when(bundleDocumentsRetrieval.getDqByCategoryId(caseData, DocCategory.DEF2_DEFENSE_DQ.getValue(), PartyType.DEFENDANT2))
             .thenReturn(singletonList(bundlingRequestDocument));
 
         when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
-        when(bundleDocumentsRetrieval.getDqByCategoryId(eq(caseData), eq(DocCategory.DQ_DEF1.getValue()), eq(PartyType.DEFENDANT1)))
+        when(bundleDocumentsRetrieval.getDqByCategoryId(caseData, DocCategory.DQ_DEF1.getValue(), PartyType.DEFENDANT1))
             .thenReturn(singletonList(bundlingRequestDocument));
 
         when(systemGeneratedDocMapper.mapSystemGeneratedCaseDocument(any(), any()))
@@ -61,5 +60,3 @@ class DQMapperTest {
         assertEquals(5, result.size());
     }
 }
-
-

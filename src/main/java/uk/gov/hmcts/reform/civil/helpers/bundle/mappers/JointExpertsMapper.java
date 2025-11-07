@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.helpers.bundle.mappers;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
 import uk.gov.hmcts.reform.civil.enums.caseprogression.BundleFileNameList;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadType;
 import uk.gov.hmcts.reform.civil.helpers.bundle.BundleDocumentsRetrieval;
@@ -37,7 +38,9 @@ public class JointExpertsMapper {
                 BundleFileNameList.JOINT_STATEMENTS_OF_EXPERTS,
                 allJointExpertsNames
             ));
-            bundlingRequestDocuments.addAll(bundleDocumentsRetrieval.getAllOtherPartyQuestions(partyType, caseData,
+            bundlingRequestDocuments.addAll(bundleDocumentsRetrieval.getAllOtherPartyQuestions(
+                partyType,
+                caseData,
                 allJointExpertsNames
             ));
             bundlingRequestDocuments.addAll(bundleDocumentsRetrieval.getAllExpertReports(
@@ -52,5 +55,3 @@ public class JointExpertsMapper {
         return ElementUtils.wrapElements(bundlingRequestDocuments);
     }
 }
-
-

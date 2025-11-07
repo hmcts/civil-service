@@ -17,5 +17,3 @@ public class FilenameGenerator {
             + DateFormatHelper.formatLocalDate(caseData.getHearingDate(), "ddMMyyyy");
     }
 }
-
-

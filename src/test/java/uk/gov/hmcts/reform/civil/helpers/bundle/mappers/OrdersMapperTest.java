@@ -40,9 +40,6 @@ class OrdersMapperTest {
 
         List<Element<BundlingRequestDocument>> result = mapper.map(caseData);
 
-        // DEFAULT_JUDGMENT_SDO_ORDER (1) + SDO_ORDER (1) + general order (1) + dismissal order (1) = 4
         assertEquals(4, result.size());
     }
 }
-
-

@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.civil.enums.caseprogression.BundleFileNameList.CASE_SUMMARY_FILE_DISPLAY_NAME;
 import static uk.gov.hmcts.reform.civil.enums.caseprogression.BundleFileNameList.CHRONOLOGY_FILE_DISPLAY_NAME;
@@ -33,7 +32,7 @@ public class TrialDocumentsMapper {
     public List<Element<BundlingRequestDocument>> map(CaseData caseData) {
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
 
-        Arrays.stream(PartyType.values()).collect(Collectors.toList()).forEach(partyType ->
+        Arrays.stream(PartyType.values()).toList().forEach(partyType ->
             bundlingRequestDocuments.addAll(
                 conversionToBundleRequestDocs.covertEvidenceUploadTypeToBundleRequestDocs(
                     getEvidenceUploadDocsByPartyAndDocType(partyType, EvidenceUploadType.CASE_SUMMARY, caseData),
@@ -42,7 +41,7 @@ public class TrialDocumentsMapper {
                     partyType
                 )));
 
-        Arrays.stream(PartyType.values()).collect(Collectors.toList()).forEach(partyType ->
+        Arrays.stream(PartyType.values()).toList().forEach(partyType ->
             bundlingRequestDocuments.addAll(
                 conversionToBundleRequestDocs.covertEvidenceUploadTypeToBundleRequestDocs(
                     bundleDocumentsRetrieval.getDocumentaryEvidenceByType(
@@ -55,7 +54,7 @@ public class TrialDocumentsMapper {
                     partyType
                 )));
 
-        Arrays.stream(PartyType.values()).collect(Collectors.toList()).forEach(partyType ->
+        Arrays.stream(PartyType.values()).toList().forEach(partyType ->
             bundlingRequestDocuments.addAll(
                 conversionToBundleRequestDocs.covertEvidenceUploadTypeToBundleRequestDocs(
                     bundleDocumentsRetrieval.getDocumentaryEvidenceByType(
@@ -68,7 +67,7 @@ public class TrialDocumentsMapper {
                     partyType
                 )));
 
-        Arrays.stream(PartyType.values()).collect(Collectors.toList()).forEach(partyType ->
+        Arrays.stream(PartyType.values()).toList().forEach(partyType ->
             bundlingRequestDocuments.addAll(
                 conversionToBundleRequestDocs.covertEvidenceUploadTypeToBundleRequestDocs(
                     getEvidenceUploadDocsByPartyAndDocType(partyType, EvidenceUploadType.SKELETON_ARGUMENT, caseData),
@@ -80,5 +79,3 @@ public class TrialDocumentsMapper {
         return wrapElements(bundlingRequestDocuments);
     }
 }
-
-

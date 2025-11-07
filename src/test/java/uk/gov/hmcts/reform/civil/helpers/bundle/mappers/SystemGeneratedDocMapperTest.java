@@ -31,6 +31,3 @@ class SystemGeneratedDocMapperTest {
         assertEquals(1, output.size());
     }
 }
-
-
-

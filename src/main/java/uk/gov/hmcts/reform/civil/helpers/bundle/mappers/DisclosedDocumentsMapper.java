@@ -28,9 +28,9 @@ public class DisclosedDocumentsMapper {
     private final ConversionToBundleRequestDocs conversionToBundleRequestDocs;
 
     public List<Element<BundlingRequestDocument>> map(CaseData caseData, PartyType partyType) {
-        List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
-        bundlingRequestDocuments.addAll(conversionToBundleRequestDocs.covertEvidenceUploadTypeToBundleRequestDocs(
-            getEvidenceUploadDocsByPartyAndDocType(partyType,
+        List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>(conversionToBundleRequestDocs.covertEvidenceUploadTypeToBundleRequestDocs(
+            getEvidenceUploadDocsByPartyAndDocType(
+                partyType,
                 EvidenceUploadType.DOCUMENTS_FOR_DISCLOSURE, caseData
             ),
             DOC_FILE_NAME,
@@ -56,5 +56,3 @@ public class DisclosedDocumentsMapper {
         return wrapElements(bundlingRequestDocuments);
     }
 }
-
-

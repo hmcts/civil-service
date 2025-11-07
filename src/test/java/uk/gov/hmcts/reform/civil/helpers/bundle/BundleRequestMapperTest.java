@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.helpers.bundle;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -134,7 +133,7 @@ class BundleRequestMapperTest {
                                                                                                        "test", "test"
         );
         // Then: hasApplicant2 and hasRespondant2 should return false
-        assertEquals(false, bundleCreateRequest.getCaseDetails().getCaseData().isHasApplicant2());
-        assertEquals(false, bundleCreateRequest.getCaseDetails().getCaseData().isHasRespondant2());
+        assertFalse(bundleCreateRequest.getCaseDetails().getCaseData().isHasApplicant2());
+        assertFalse(bundleCreateRequest.getCaseDetails().getCaseData().isHasRespondant2());
     }
 }

@@ -42,5 +42,3 @@ class CostsBudgetsMapperTest {
         assertEquals(1, result.size());
     }
 }
-
-

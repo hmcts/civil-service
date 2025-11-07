@@ -48,9 +48,6 @@ class JointExpertsMapperTest {
 
         List<Element<BundlingRequestDocument>> result = mapper.map(caseData);
 
-        // 4 parties * 3 lists added = 12
         assertEquals(12, result.size());
     }
 }
-
-

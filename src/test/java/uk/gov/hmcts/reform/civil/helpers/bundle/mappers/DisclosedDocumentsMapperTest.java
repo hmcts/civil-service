@@ -73,5 +73,3 @@ class DisclosedDocumentsMapperTest {
         assertEquals(2, result.size());
     }
 }
-
-

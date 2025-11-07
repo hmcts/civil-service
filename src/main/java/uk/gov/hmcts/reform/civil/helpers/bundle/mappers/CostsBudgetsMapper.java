@@ -24,8 +24,7 @@ public class CostsBudgetsMapper {
     private final ConversionToBundleRequestDocs conversionToBundleRequestDocs;
 
     public List<Element<BundlingRequestDocument>> map(CaseData caseData, PartyType partyType) {
-        List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
-        bundlingRequestDocuments.addAll(conversionToBundleRequestDocs.covertEvidenceUploadTypeToBundleRequestDocs(
+        List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>(conversionToBundleRequestDocs.covertEvidenceUploadTypeToBundleRequestDocs(
             getEvidenceUploadDocsByPartyAndDocType(
                 partyType,
                 EvidenceUploadType.COSTS,

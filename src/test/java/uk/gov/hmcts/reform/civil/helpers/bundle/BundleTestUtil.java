@@ -287,15 +287,13 @@ public class BundleTestUtil {
 
     private static List<Element<UploadEvidenceDocumentType>> getDocumentEvidenceForTrial() {
         List<Element<UploadEvidenceDocumentType>> otherEvidenceDocs = new ArrayList<>();
-        Arrays.stream(TypeOfDocDocumentaryEvidenceOfTrial.values()).toList().forEach(type -> {
-            otherEvidenceDocs.add(ElementUtils.element(UploadEvidenceDocumentType
-                                                           .builder()
-                                                           .documentUpload(Document.builder().documentBinaryUrl(TEST_URL)
-                                                                               .documentFileName(TEST_FILE_NAME).categoryID("").build())
-                                                           .typeOfDocument(type.getDisplayNames().get(0))
-                                                           .documentIssuedDate(LocalDate.of(2023, 1, 12))
-                                                           .build()));
-        });
+        Arrays.stream(TypeOfDocDocumentaryEvidenceOfTrial.values()).toList().forEach(type -> otherEvidenceDocs.add(ElementUtils.element(UploadEvidenceDocumentType
+                                                       .builder()
+                                                       .documentUpload(Document.builder().documentBinaryUrl(TEST_URL)
+                                                                           .documentFileName(TEST_FILE_NAME).categoryID("").build())
+                                                       .typeOfDocument(type.getDisplayNames().get(0))
+                                                       .documentIssuedDate(LocalDate.of(2023, 1, 12))
+                                                       .build())));
         otherEvidenceDocs.add(ElementUtils.element(UploadEvidenceDocumentType
                                                        .builder()
                                                        .documentUpload(Document.builder().documentBinaryUrl(TEST_URL)
@@ -336,34 +334,28 @@ public class BundleTestUtil {
     private static List<Element<UploadEvidenceWitness>> getWitnessDocs() {
         List<String> witnessNames = new ArrayList<>(Arrays.asList("cl1Fname", "df1Fname", "cl2Fname", "df2Fname", "FirstName LastName"));
         List<Element<UploadEvidenceWitness>> witnessEvidenceDocs = new ArrayList<>();
-        LocalDateTime createdDateTime = LocalDateTime.of(2023, 12, 12, 8, 8, 5);
-        witnessNames.forEach(witnessName -> {
-            witnessEvidenceDocs.add(ElementUtils.element(UploadEvidenceWitness
-                                                             .builder()
-                                                             .witnessOptionDocument(Document.builder().documentBinaryUrl(
-                                                                     TEST_URL)
-                                                                                        .documentFileName(TEST_FILE_NAME).build())
-                                                             .witnessOptionName(witnessName)
-                                                             .witnessOptionUploadDate(LocalDate.of(2023, 2, 10).plusDays(witnessNames.indexOf(witnessName)))
-                                                             .createdDatetime(LocalDateTime.of(2023, 12, 12, 8, 8, 5)).build()));
-        });
+        witnessNames.forEach(witnessName -> witnessEvidenceDocs.add(ElementUtils.element(UploadEvidenceWitness
+                                                         .builder()
+                                                         .witnessOptionDocument(Document.builder().documentBinaryUrl(
+                                                                 TEST_URL)
+                                                                                    .documentFileName(TEST_FILE_NAME).build())
+                                                         .witnessOptionName(witnessName)
+                                                         .witnessOptionUploadDate(LocalDate.of(2023, 2, 10).plusDays(witnessNames.indexOf(witnessName)))
+                                                         .createdDatetime(LocalDateTime.of(2023, 12, 12, 8, 8, 5)).build())));
         return witnessEvidenceDocs;
     }
 
     private List<Element<UploadEvidenceWitness>> getWitnessDocsCategoryId() {
         List<String> witnessNames = new ArrayList<>(Arrays.asList("cl1Fname", "df1Fname", "cl2Fname", "df2Fname", "FirstName LastName"));
         List<Element<UploadEvidenceWitness>> witnessEvidenceDocs = new ArrayList<>();
-        LocalDateTime createdDateTime = LocalDateTime.of(2023, 12, 12, 8, 8, 5);
-        witnessNames.forEach(witnessName -> {
-            witnessEvidenceDocs.add(ElementUtils.element(UploadEvidenceWitness
-                                                             .builder()
-                                                             .witnessOptionDocument(Document.builder().documentBinaryUrl(
-                                                                     TEST_URL)
-                                                                                        .documentFileName(TEST_FILE_NAME).categoryID("").build())
-                                                             .witnessOptionName(witnessName)
-                                                             .witnessOptionUploadDate(LocalDate.of(2023, 2, 10).plusDays(witnessNames.indexOf(witnessName)))
-                                                             .createdDatetime(LocalDateTime.of(2023, 12, 12, 8, 8, 5)).build()));
-        });
+        witnessNames.forEach(witnessName -> witnessEvidenceDocs.add(ElementUtils.element(UploadEvidenceWitness
+                                                         .builder()
+                                                         .witnessOptionDocument(Document.builder().documentBinaryUrl(
+                                                                 TEST_URL)
+                                                                                    .documentFileName(TEST_FILE_NAME).categoryID("").build())
+                                                         .witnessOptionName(witnessName)
+                                                         .witnessOptionUploadDate(LocalDate.of(2023, 2, 10).plusDays(witnessNames.indexOf(witnessName)))
+                                                         .createdDatetime(LocalDateTime.of(2023, 12, 12, 8, 8, 5)).build())));
         return witnessEvidenceDocs;
     }
 
@@ -395,51 +387,6 @@ public class BundleTestUtil {
                 .documentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
                 .documentLink(Document.builder().documentUrl(TEST_URL)
                                   .documentFileName("FOUR").build())
-                .createdDatetime(LocalDateTime.of(2023, 5, 10, 2,
-                                                  2, 2)).build();
-        CaseDocument caseDocumentDQDef23 =
-            CaseDocument.builder()
-                .documentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
-                .documentLink(Document.builder().documentUrl(TEST_URL)
-                                  .documentFileName("FIVE").build())
-                .createdDatetime(LocalDateTime.of(2023, 6, 10, 2,
-                                                  2, 2)).build();
-        systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDQDef1));
-        systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDQApp1));
-        systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDQDef22));
-        systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDQDef21));
-        systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDQDef23));
-        return systemGeneratedCaseDocuments;
-    }
-
-    private List<Element<CaseDocument>> setupSystemGeneratedCaseDocsUnbundledFolderId() {
-        List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
-        CaseDocument caseDocumentDQDef1 =
-            CaseDocument.builder()
-                .documentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
-                .documentLink(Document.builder().documentUrl(TEST_URL)
-                                  .documentFileName("ONE").categoryID("UnbundledFolder").build())
-                .createdDatetime(LocalDateTime.of(2023, 2, 10, 2,
-                                                  2, 2)).build();
-        CaseDocument caseDocumentDQApp1 =
-            CaseDocument.builder()
-                .documentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
-                .documentLink(Document.builder().documentUrl(TEST_URL)
-                                  .documentFileName("TWO").categoryID("UnbundledFolder").build())
-                .createdDatetime(LocalDateTime.of(2023, 3, 10, 2,
-                                                  2, 2)).build();
-        CaseDocument caseDocumentDQDef22 =
-            CaseDocument.builder()
-                .documentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
-                .documentLink(Document.builder().documentUrl(TEST_URL)
-                                  .documentFileName("THREE").categoryID("UnbundledFolder").build())
-                .createdDatetime(LocalDateTime.of(2023, 4, 11, 2,
-                                                  2, 2)).build();
-        CaseDocument caseDocumentDQDef21 =
-            CaseDocument.builder()
-                .documentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
-                .documentLink(Document.builder().documentUrl(TEST_URL)
-                                  .documentFileName("FOUR").categoryID("UnbundledFolder").build())
                 .createdDatetime(LocalDateTime.of(2023, 5, 10, 2,
                                                   2, 2)).build();
         CaseDocument caseDocumentDQDef23 =

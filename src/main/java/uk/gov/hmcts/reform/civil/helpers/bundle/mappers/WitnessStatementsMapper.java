@@ -100,5 +100,3 @@ public class WitnessStatementsMapper {
         return wrapElements(bundlingRequestDocuments);
     }
 }
-
-

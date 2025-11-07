@@ -90,5 +90,3 @@ class ExpertEvidenceMapperTest {
         assertEquals(5, result.size());
     }
 }
-
-

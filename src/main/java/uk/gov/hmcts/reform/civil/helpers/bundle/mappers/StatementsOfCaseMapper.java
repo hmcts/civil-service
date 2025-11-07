@@ -45,7 +45,7 @@ public class StatementsOfCaseMapper {
                     .equals(DocumentType.SEALED_CLAIM)
                     && null != caseDocumentElement.getValue().getDocumentLink().getCategoryID()
                     && caseDocumentElement.getValue().getDocumentLink().getCategoryID().equals("detailsOfClaim"))
-                .collect(Collectors.toList()),
+                .collect(Collectors.toCollection(ArrayList::new)),
             BundleFileNameList.CLAIM_FORM.getDisplayName()
         ));
 
@@ -167,5 +167,3 @@ public class StatementsOfCaseMapper {
         return bundlingRequestDocuments;
     }
 }
-
-

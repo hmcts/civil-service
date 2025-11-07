@@ -115,5 +115,3 @@ class WitnessStatementsMapperTest {
         assertEquals(6, result.size());
     }
 }
-
-

@@ -67,5 +67,3 @@ public class ExpertEvidenceMapper {
         return wrapElements(bundlingRequestDocuments);
     }
 }
-
-

@@ -47,7 +47,7 @@ public class DQMapper {
                 .filter(caseDocumentElement -> caseDocumentElement.getValue().getDocumentType()
                     .equals(DocumentType.DIRECTIONS_QUESTIONNAIRE)
                     && caseDocumentElement.getValue().getDocumentLink().getCategoryID() == null)
-                .collect(Collectors.toList());
+                .collect(Collectors.toCollection(ArrayList::new));
         bundlingRequestDocuments.addAll(systemGeneratedDocMapper.mapSystemGeneratedCaseDocument(
             dqNoCategory,
             uk.gov.hmcts.reform.civil.enums.caseprogression.BundleFileNameList
@@ -57,5 +57,3 @@ public class DQMapper {
         return wrapElements(bundlingRequestDocuments);
     }
 }
-
-

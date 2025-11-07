@@ -52,5 +52,3 @@ class TrialDocumentsMapperTest {
         assertEquals(16, result.size());
     }
 }
-
-
