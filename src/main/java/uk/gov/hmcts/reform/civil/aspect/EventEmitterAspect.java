@@ -43,7 +43,7 @@ public class EventEmitterAspect {
                 var businessProcess = caseData.getBusinessProcess();
                 var camundaEvent = businessProcess.getCamundaEvent();
                 var caseId = caseData.getCcdCaseReference();
-                if(Objects.equals(businessProcess.getCamundaEvent(), "INITIATE_GENERAL_APPLICATION")) {
+                if (Objects.equals(businessProcess.getCamundaEvent(), "INITIATE_GENERAL_APPLICATION")) {
                     log.info(format(
                         "**** Camunda event: %s, submitted callback: %d, business process status: %s",
                         camundaEvent, caseId, businessProcess.getStatus()
