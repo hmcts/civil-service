@@ -12,7 +12,7 @@ stateDiagram-v2
   state "SPEC: Defendant 1 is unrepresented" as SPEC_DRAFT_PATH_9
   state "SPEC: Defendant 2 is unrepresented" as SPEC_DRAFT_PATH_10
   state "SPEC: Defendant 1 is unrepresented" as SPEC_DRAFT_PATH_11
-  state "CLAIM_SUBMITTED (continues in Issue flow)" as DRAFT_FLOW_OUT_0
+  state "CLAIM_SUBMITTED (continues in Issue flow) 🔚" as DRAFT_FLOW_OUT_0
   DRAFT --> DRAFT_PATH_0
   DRAFT_PATH_0 --> DRAFT_FLOW_OUT_0 : Always
   DRAFT --> DRAFT_PATH_1
@@ -37,4 +37,3 @@ stateDiagram-v2
   SPEC_DRAFT_PATH_10 --> DRAFT_FLOW_OUT_0 : Always
   SPEC_DRAFT --> SPEC_DRAFT_PATH_11
   SPEC_DRAFT_PATH_11 --> DRAFT_FLOW_OUT_0 : Always
-  DRAFT_FLOW_OUT_0 --> [*] : terminal

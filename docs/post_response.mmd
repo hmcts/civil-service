@@ -3,8 +3,8 @@ stateDiagram-v2
   state "NOTIFICATION_ACKNOWLEDGED (from Defence flow)" as POST_RESPONSE_IN_0
   state "NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION (from Defence flow)" as POST_RESPONSE_IN_1
   state "ALL_RESPONSES_RECEIVED (from Defence flow)" as POST_RESPONSE_IN_2
-  state "DIVERGENT_RESPOND_GO_OFFLINE (from Defence flow)" as POST_RESPONSE_IN_3
-  state "DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE (from Defence flow)" as POST_RESPONSE_IN_4
+  state "DIVERGENT_RESPOND_GO_OFFLINE (from Defence flow) 🔚" as POST_RESPONSE_IN_3
+  state "DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE (from Defence flow) 🔚" as POST_RESPONSE_IN_4
   POST_RESPONSE_IN_2 --> FULL_DEFENCE : Latest defence is a full defence unspecified.
   POST_RESPONSE_IN_2 --> FULL_DEFENCE : Latest defence is a full defence in SPEC.
   POST_RESPONSE_IN_2 --> FULL_ADMISSION : Latest defence is a full admission unspecified
@@ -71,20 +71,3 @@ stateDiagram-v2
   PART_ADMISSION --> PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA : Claimant response deadline has passed with no response and staff ha…
   PART_ADMIT_AGREE_REPAYMENT --> SIGN_SETTLEMENT_AGREEMENT : Defendant has signed the digital settlement agreement.
   SIGN_SETTLEMENT_AGREEMENT --> FULL_ADMIT_JUDGMENT_ADMISSION : Applicant has requested a CCJ by admission.
-  CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE --> [*] : terminal
-  COUNTER_CLAIM --> [*] : terminal
-  FULL_ADMIT_AGREE_SETTLE --> [*] : terminal
-  FULL_ADMIT_NOT_PROCEED --> [*] : terminal
-  FULL_ADMIT_PROCEED --> [*] : terminal
-  FULL_DEFENCE_NOT_PROCEED --> [*] : terminal
-  IN_HEARING_READINESS --> [*] : terminal
-  PART_ADMIT_NOT_PROCEED --> [*] : terminal
-  PART_ADMIT_PROCEED --> [*] : terminal
-  PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA --> [*] : terminal
-  TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED --> [*] : terminal
-  TAKEN_OFFLINE_AFTER_SDO --> [*] : terminal
-  TAKEN_OFFLINE_BY_STAFF --> [*] : terminal
-  TAKEN_OFFLINE_BY_SYSTEM --> [*] : terminal
-  TAKEN_OFFLINE_SDO_NOT_DRAWN --> [*] : terminal
-  TAKEN_OFFLINE_SPEC_DEFENDANT_NOC --> [*] : terminal
-  TAKEN_OFFLINE_SPEC_DEFENDANT_NOC_AFTER_JBA --> [*] : terminal

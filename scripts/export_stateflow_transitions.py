@@ -415,35 +415,31 @@ def save_mermaid(transitions: Sequence[Dict], glossary: Dict[str, str]):
 
         state_aliases = set(states or [])
         edge_sources = {src for src, _, _ in edges}
-        terminal_nodes = {alias for alias in state_aliases if alias not in edge_sources}
-        bridge_terminal_nodes = {alias for alias in bridge_out_nodes if alias not in edge_sources}
+        def mark_terminal(label: str, alias: str) -> str:
+            return f"{label} 🔚" if alias not in edge_sources else label
 
         lines = ['stateDiagram-v2', f"  %% {info['title']}"]
 
         for state, label in bridge_in.items():
             alias = bridge_in_alias[state]
-            lines.append(f'  state "{label}" as {alias}')
+            display = mark_terminal(label, alias)
+            lines.append(f'  state "{display}" as {alias}')
 
         for alias, label in branch_states:
             label_text = label if label else 'Condition'
-            display = label_text.replace('"', '\"')
+            display = mark_terminal(label_text, alias).replace('"', '\"')
             lines.append(f'  state "{display}" as {alias}')
 
         for state, label in bridge_out.items():
             alias = bridge_out_alias[state]
-            lines.append(f'  state "{label}" as {alias}')
+            display = mark_terminal(label, alias)
+            lines.append(f'  state "{display}" as {alias}')
 
         for src, dst, label in edges:
             line = f"  {src} --> {dst}"
             if label:
                 line += f" : {label}"
             lines.append(line)
-
-        for alias in sorted(terminal_nodes):
-            lines.append(f"  {alias} --> [*] : terminal")
-
-        for alias in sorted(bridge_terminal_nodes):
-            lines.append(f"  {alias} --> [*] : terminal")
 
         (MERMAID_DIR / f"{slug}.mmd").write_text("\n".join(lines))
 

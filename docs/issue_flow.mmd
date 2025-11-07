@@ -1,10 +1,10 @@
 stateDiagram-v2
   %% Claim Issue & Notification (spec + unspec)
-  state "NOTIFICATION_ACKNOWLEDGED (continues in Defence flow)" as ISSUE_FLOW_OUT_0
-  state "TAKEN_OFFLINE_SPEC_DEFENDANT_NOC (continues in Post-response flow)" as ISSUE_FLOW_OUT_1
-  state "CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE (terminal)" as ISSUE_FLOW_OUT_2
-  state "CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE (terminal)" as ISSUE_FLOW_OUT_3
-  state "CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE (terminal)" as ISSUE_FLOW_OUT_4
+  state "NOTIFICATION_ACKNOWLEDGED (continues in Defence flow) 🔚" as ISSUE_FLOW_OUT_0
+  state "TAKEN_OFFLINE_SPEC_DEFENDANT_NOC (continues in Post-response flow) 🔚" as ISSUE_FLOW_OUT_1
+  state "CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE (terminal) 🔚" as ISSUE_FLOW_OUT_2
+  state "CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE (terminal) 🔚" as ISSUE_FLOW_OUT_3
+  state "CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE (terminal) 🔚" as ISSUE_FLOW_OUT_4
   CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION --> ISSUE_FLOW_OUT_0 : At least one defendant has acknowledged service per scenario rules.
   CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION --> TAKEN_OFFLINE_BY_STAFF : Staff took the case offline after claim details were notified while…
   CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION --> PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA : Claim details notification deadline expired while an extension appl…
@@ -46,17 +46,3 @@ stateDiagram-v2
   PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT --> TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT : System automatically took the case offline for example because of r…
   PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT --> TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT : System automatically took the case offline for example because of r…
   SPEC_DEFENDANT_NOC --> ISSUE_FLOW_OUT_1 : not Defendant Notice of Change online feature flag is active for th…
-  CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE --> [*] : terminal
-  CLAIM_ISSUED_PAYMENT_FAILED --> [*] : terminal
-  TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED --> [*] : terminal
-  TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED --> [*] : terminal
-  TAKEN_OFFLINE_BY_STAFF --> [*] : terminal
-  TAKEN_OFFLINE_BY_SYSTEM --> [*] : terminal
-  TAKEN_OFFLINE_UNREGISTERED_DEFENDANT --> [*] : terminal
-  TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT --> [*] : terminal
-  TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT --> [*] : terminal
-  ISSUE_FLOW_OUT_0 --> [*] : terminal
-  ISSUE_FLOW_OUT_1 --> [*] : terminal
-  ISSUE_FLOW_OUT_2 --> [*] : terminal
-  ISSUE_FLOW_OUT_3 --> [*] : terminal
-  ISSUE_FLOW_OUT_4 --> [*] : terminal

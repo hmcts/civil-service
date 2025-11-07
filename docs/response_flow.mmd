@@ -2,15 +2,15 @@ stateDiagram-v2
   %% Defence Waiting & Divergence
   state "CLAIM_DETAILS_NOTIFIED (from Issue flow)" as RESPONSE_FLOW_IN_0
   state "CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION (from Issue flow)" as RESPONSE_FLOW_IN_1
-  state "FULL_DEFENCE (continues in Post-response flow)" as RESPONSE_FLOW_OUT_0
-  state "FULL_ADMISSION (continues in Post-response flow)" as RESPONSE_FLOW_OUT_1
-  state "PART_ADMISSION (continues in Post-response flow)" as RESPONSE_FLOW_OUT_2
-  state "COUNTER_CLAIM (continues in Post-response flow)" as RESPONSE_FLOW_OUT_3
-  state "TAKEN_OFFLINE_BY_STAFF (continues in Post-response flow)" as RESPONSE_FLOW_OUT_4
-  state "TAKEN_OFFLINE_SDO_NOT_DRAWN (continues in Post-response flow)" as RESPONSE_FLOW_OUT_5
-  state "PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA (continues in Post-response flow)" as RESPONSE_FLOW_OUT_6
-  state "DIVERGENT_RESPOND_GO_OFFLINE (continues in Post-response flow)" as RESPONSE_FLOW_OUT_7
-  state "DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE (continues in Post-response flow)" as RESPONSE_FLOW_OUT_8
+  state "FULL_DEFENCE (continues in Post-response flow) 🔚" as RESPONSE_FLOW_OUT_0
+  state "FULL_ADMISSION (continues in Post-response flow) 🔚" as RESPONSE_FLOW_OUT_1
+  state "PART_ADMISSION (continues in Post-response flow) 🔚" as RESPONSE_FLOW_OUT_2
+  state "COUNTER_CLAIM (continues in Post-response flow) 🔚" as RESPONSE_FLOW_OUT_3
+  state "TAKEN_OFFLINE_BY_STAFF (continues in Post-response flow) 🔚" as RESPONSE_FLOW_OUT_4
+  state "TAKEN_OFFLINE_SDO_NOT_DRAWN (continues in Post-response flow) 🔚" as RESPONSE_FLOW_OUT_5
+  state "PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA (continues in Post-response flow) 🔚" as RESPONSE_FLOW_OUT_6
+  state "DIVERGENT_RESPOND_GO_OFFLINE (continues in Post-response flow) 🔚" as RESPONSE_FLOW_OUT_7
+  state "DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE (continues in Post-response flow) 🔚" as RESPONSE_FLOW_OUT_8
   ALL_RESPONSES_RECEIVED --> RESPONSE_FLOW_OUT_0 : Latest defence is a full defence unspecified.
   ALL_RESPONSES_RECEIVED --> RESPONSE_FLOW_OUT_0 : Latest defence is a full defence in SPEC.
   ALL_RESPONSES_RECEIVED --> RESPONSE_FLOW_OUT_1 : Latest defence is a full admission unspecified
@@ -66,14 +66,3 @@ stateDiagram-v2
   RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL --> RESPONSE_FLOW_OUT_2 : Latest defence is a part admission in SPEC
   RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL --> RESPONSE_FLOW_OUT_1 : Latest defence is a full admission in SPEC
   RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL --> RESPONSE_FLOW_OUT_3 : Latest defence is a counter claim for SPEC
-  DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE --> [*] : terminal
-  DIVERGENT_RESPOND_GO_OFFLINE --> [*] : terminal
-  RESPONSE_FLOW_OUT_0 --> [*] : terminal
-  RESPONSE_FLOW_OUT_1 --> [*] : terminal
-  RESPONSE_FLOW_OUT_2 --> [*] : terminal
-  RESPONSE_FLOW_OUT_3 --> [*] : terminal
-  RESPONSE_FLOW_OUT_4 --> [*] : terminal
-  RESPONSE_FLOW_OUT_5 --> [*] : terminal
-  RESPONSE_FLOW_OUT_6 --> [*] : terminal
-  RESPONSE_FLOW_OUT_7 --> [*] : terminal
-  RESPONSE_FLOW_OUT_8 --> [*] : terminal
