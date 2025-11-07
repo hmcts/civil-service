@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.service.EventEmitterService;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import static java.lang.String.format;
@@ -42,6 +43,12 @@ public class EventEmitterAspect {
                 var businessProcess = caseData.getBusinessProcess();
                 var camundaEvent = businessProcess.getCamundaEvent();
                 var caseId = caseData.getCcdCaseReference();
+                if(Objects.equals(businessProcess.getCamundaEvent(), "INITIATE_GENERAL_APPLICATION")) {
+                    log.info(format(
+                        "**** Camunda event: %s, submitted callback: %d, business process status: %s",
+                        camundaEvent, caseId, businessProcess.getStatus()
+                    ));
+                }
                 if (businessProcess != null && businessProcess.getStatus() == READY) {
                     log.info(format(
                         "Emitting %s camunda event for case through submitted callback: %d",
