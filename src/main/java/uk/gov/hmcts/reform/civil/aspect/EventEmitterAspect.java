@@ -53,15 +53,17 @@ public class EventEmitterAspect {
                 processGeneralApplicationBusinessProcessEvent(caseData);
             } else {
                 CaseData caseData = callbackParams.getCaseData();
-                var businessProcess = caseData.getBusinessProcess();
-                var camundaEvent = businessProcess.getCamundaEvent();
                 var caseId = caseData.getCcdCaseReference();
+                var businessProcess = caseData.getBusinessProcess();
                 if (businessProcess != null && businessProcess.getStatus() == READY) {
+                    var camundaEvent = businessProcess.getCamundaEvent();
                     log.info(format(
                         "Emitting %s camunda event for case through submitted callback: %d",
                         camundaEvent, caseId
                     ));
                     eventEmitterService.emitBusinessProcessCamundaEvent(caseData, false);
+                } else {
+                    log.info(format("No business process with status of READY found for caseId: %d", caseId));
                 }
             }
         }

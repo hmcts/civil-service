@@ -9,23 +9,29 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.service.GaEventEmitterService;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.EventEmitterService;
 
 import java.util.List;
 
 import static org.assertj.core.util.Lists.newArrayList;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MAKE_DECISION;
@@ -46,6 +52,9 @@ class EventEmitterAspectTest {
 
     @Mock
     private GaEventEmitterService gaEventEmitterService;
+
+    @Mock
+    private CaseDetailsConverter caseDetailsConverter;
 
     @ParameterizedTest
     @EnumSource(value = CallbackType.class, mode = EnumSource.Mode.EXCLUDE, names = {"SUBMITTED"})
@@ -174,6 +183,41 @@ class EventEmitterAspectTest {
         aspect.emitBusinessProcessEvent(proceedingJoinPoint, callbackParams);
 
         verify(gaEventEmitterService).emitBusinessProcessCamundaGAEvent(caseData, false);
+        verify(proceedingJoinPoint).proceed();
+    }
+
+    @SneakyThrows
+    @Test
+    void shouldEmitBusinessProcessCamundaEvent_whenCallbackIsSubmittedAndEventIsInitiateGeneralApplication() {
+        final Long caseId = 1L;
+        final GeneralApplication generalApplication = GeneralApplication.builder()
+            .businessProcess(BusinessProcess.ready(INITIATE_GENERAL_APPLICATION))
+            .build();
+        final List<Element<GeneralApplication>> newApplication = newArrayList();
+        newApplication.add(element(generalApplication));
+        final GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            .generalApplications(newApplication)
+            .ccdCaseReference(caseId)
+            .build();
+        final CaseDetails caseDetails = CaseDetailsBuilder.builder()
+            .id(caseId)
+            .data(caseData)
+            .build();
+        final CallbackParams callbackParams = CallbackParamsBuilder.builder()
+            .of(SUBMITTED, caseDetails)
+            .request(CallbackRequest.builder()
+                         .caseDetails(caseDetails)
+                         .eventId(INITIATE_GENERAL_APPLICATION.name())
+                         .build())
+            .isGeneralApplicationCase(false)
+            .build();
+
+        when(caseDetailsConverter.toGeneralApplicationCaseData(eq(caseDetails))).thenReturn(caseData);
+
+        aspect.emitBusinessProcessEvent(proceedingJoinPoint, callbackParams);
+
+        verify(caseDetailsConverter).toGeneralApplicationCaseData(eq(caseDetails));
+        verify(gaEventEmitterService).emitBusinessProcessCamundaEvent(caseId, generalApplication, false);
         verify(proceedingJoinPoint).proceed();
     }
 
