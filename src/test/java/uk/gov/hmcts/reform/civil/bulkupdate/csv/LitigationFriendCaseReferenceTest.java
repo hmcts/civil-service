@@ -25,7 +25,7 @@ class LitigationFriendCaseReferenceTest {
 
         caseReference.fromExcelRow(rowValues);
 
-        assertThat(caseReference.getCaseReference()).isEqualTo("\"CASE-123\"");
+        assertThat(caseReference.getCaseReference()).isEqualTo("CASE-123");
     }
 
     @Test
@@ -121,7 +121,7 @@ class LitigationFriendCaseReferenceTest {
 
         caseReference.fromExcelRow(rowValues);
 
-        assertThat(caseReference.getCaseReference()).isEqualTo("\"CASE-999\"");
+        assertThat(caseReference.getCaseReference()).isEqualTo("CASE-999");
         assertThat(caseReference.getDataObject()).isNull();
         assertThat(caseReference.getLitigationFriend()).isNull();
         assertThat(caseReference.isApplicant1()).isFalse();
