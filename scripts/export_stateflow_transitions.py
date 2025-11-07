@@ -359,6 +359,7 @@ def save_mermaid(transitions: Sequence[Dict], glossary: Dict[str, str]):
 
         bridge_in_alias = {state: f"{slug.upper()}_IN_{idx}" for idx, state in enumerate(bridge_in)}
         bridge_out_alias = {state: f"{slug.upper()}_OUT_{idx}" for idx, state in enumerate(bridge_out)}
+        bridge_out_nodes = set(bridge_out_alias.values())
 
         edges = []
         for item in transitions:
@@ -415,6 +416,7 @@ def save_mermaid(transitions: Sequence[Dict], glossary: Dict[str, str]):
         state_aliases = set(states or [])
         edge_sources = {src for src, _, _ in edges}
         terminal_nodes = {alias for alias in state_aliases if alias not in edge_sources}
+        bridge_terminal_nodes = {alias for alias in bridge_out_nodes if alias not in edge_sources}
 
         lines = ['stateDiagram-v2', f"  %% {info['title']}"]
 
@@ -438,6 +440,9 @@ def save_mermaid(transitions: Sequence[Dict], glossary: Dict[str, str]):
             lines.append(line)
 
         for alias in sorted(terminal_nodes):
+            lines.append(f"  {alias} --> [*] : terminal")
+
+        for alias in sorted(bridge_terminal_nodes):
             lines.append(f"  {alias} --> [*] : terminal")
 
         (MERMAID_DIR / f"{slug}.mmd").write_text("\n".join(lines))
