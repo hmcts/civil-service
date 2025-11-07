@@ -38,7 +38,8 @@ public abstract class AbstractCaseReferenceWithRole<T> extends CaseReference imp
     @Override
     public void fromExcelRow(Map<String, Object> rowValues) throws Exception {
         if (rowValues.containsKey("caseReference")) {
-            setCaseReference(mapper.writeValueAsString(rowValues.get("caseReference")));
+            Object value = rowValues.get("caseReference");
+            setCaseReference(value != null ? value.toString() : null);
         }
 
         for (var entry : rowValues.entrySet()) {

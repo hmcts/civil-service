@@ -36,7 +36,7 @@ class AbstractCaseReferenceWithRoleTest {
 
         caseReference.fromExcelRow(rowValues);
 
-        assertThat(caseReference.getCaseReference()).isEqualTo("\"CASE-999\"");
+        assertThat(caseReference.getCaseReference()).isEqualTo("CASE-999");
     }
 
     @Test
@@ -115,7 +115,7 @@ class AbstractCaseReferenceWithRoleTest {
 
         caseReference.fromExcelRow(rowValues);
 
-        assertThat(caseReference.getCaseReference()).isEqualTo("\"CASE-101\"");
+        assertThat(caseReference.getCaseReference()).isEqualTo("CASE-101");
         assertThat(caseReference.getDataObject()).isNull();
         assertThat(caseReference.isApplicant1()).isFalse();
         assertThat(caseReference.isApplicant2()).isFalse();
