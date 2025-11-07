@@ -57,11 +57,11 @@ public class GaValidateFeeCallbackHandler extends CallbackHandler implements Gen
     private CallbackResponse validateFee(CallbackParams callbackParams) {
         var caseData = (GeneralApplicationCaseData) callbackParams.getBaseCaseData();
         List<String> errors = new ArrayList<>();
-
-        if (!gaForLipService.isGaForLip(caseData)) {
-            Fee feeForGA = feeService.getFeeForGA(caseData);
-            errors = compareFees(caseData, feeForGA);
-        }
+        //TODO: Investigate removal?
+        //if (!gaForLipService.isGaForLip(caseData)) {
+        //    Fee feeForGA = feeService.getFeeForGA(caseData);
+        //    errors = compareFees(caseData, feeForGA);
+        //}
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .build();

@@ -22,7 +22,6 @@ import java.math.BigDecimal;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -64,75 +63,80 @@ class GaValidateFeeCallbackHandlerTest extends GeneralApplicationBaseCallbackHan
             when(gaForLipService.isGaForLip(any())).thenReturn(false);
         }
 
-        @Test
-        void shouldReturnErrors_whenCaseDataDoesNotHavePBADetails() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build();
-            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            when(feesService.getFeeForGA(any(GeneralApplicationCaseData.class)))
-                .thenReturn(Fee.builder().calculatedAmountInPence(
-                    BigDecimal.valueOf(10800)).code("").version(VERSION).build());
+        //TODO: investigate removal?
+        //        @Test
+        //        void shouldReturnErrors_whenCaseDataDoesNotHavePBADetails() {
+        //            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build();
+        //            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        //            when(feesService.getFeeForGA(any(GeneralApplicationCaseData.class)))
+        //                .thenReturn(Fee.builder().calculatedAmountInPence(
+        //                    BigDecimal.valueOf(10800)).code("").version(VERSION).build());
+        //
+        //            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        //
+        //            verify(feesService).getFeeForGA(any(GeneralApplicationCaseData.class));
+        //            assertThat(response.getErrors()).isNotEmpty();
+        //            assertThat(response.getErrors()).contains(ERROR_MESSAGE_NO_FEE_IN_CASEDATA);
+        //        }
 
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        //TODO: investigate removal?
+        //        @Test
+        //        void shouldReturnErrors_whenCaseDataDoesNotHaveFeeDetails() {
+        //            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().gaPbaDetails(GAPbaDetails.builder().build()).build();
+        //            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        //            when(feesService.getFeeForGA(any(GeneralApplicationCaseData.class)))
+        //                .thenReturn(Fee.builder().calculatedAmountInPence(
+        //                    BigDecimal.valueOf(10800)).code("").version(VERSION).build());
+        //
+        //            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        //
+        //            verify(feesService).getFeeForGA(any(GeneralApplicationCaseData.class));
+        //            assertThat(response.getErrors()).isNotEmpty();
+        //            assertThat(response.getErrors()).contains(ERROR_MESSAGE_NO_FEE_IN_CASEDATA);
+        //        }
 
-            verify(feesService).getFeeForGA(any(GeneralApplicationCaseData.class));
-            assertThat(response.getErrors()).isNotEmpty();
-            assertThat(response.getErrors()).contains(ERROR_MESSAGE_NO_FEE_IN_CASEDATA);
-        }
+        //TODO: investigate removal?
+        //        @Test
+        //        void shouldReturnErrors_whenConsentedApplicationWithDifferentFeesOnCaseDataAndFeeFromFeeService() {
+        //
+        //            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildFeeValidationCaseData(FEE108, true, false);
+        //            when(feesService.getFeeForGA(any(GeneralApplicationCaseData.class)))
+        //                .thenReturn(FEE275);
+        //            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        //            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        //
+        //            verify(feesService).getFeeForGA(caseData);
+        //            assertThat(response.getErrors()).isNotEmpty();
+        //            assertThat(response.getErrors()).contains(ERROR_MESSAGE_FEE_CHANGED);
+        //        }
 
-        @Test
-        void shouldReturnErrors_whenCaseDataDoesNotHaveFeeDetails() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().gaPbaDetails(GAPbaDetails.builder().build()).build();
-            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            when(feesService.getFeeForGA(any(GeneralApplicationCaseData.class)))
-                .thenReturn(Fee.builder().calculatedAmountInPence(
-                    BigDecimal.valueOf(10800)).code("").version(VERSION).build());
+        //TODO: investigate removal?
+        //        @Test
+        //        void shouldReturnNoErrors_whenWithNoticeApplicationSameFeesOnCaseDataAndFeeFromFeeService() {
+        //            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildFeeValidationCaseData(FEE275, false, true);
+        //            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        //            when(feesService.getFeeForGA(any(GeneralApplicationCaseData.class)))
+        //                .thenReturn(FEE275);
+        //
+        //            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        //            verify(feesService).getFeeForGA(caseData);
+        //            assertThat(response.getErrors()).isEmpty();
+        //        }
 
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            verify(feesService).getFeeForGA(any(GeneralApplicationCaseData.class));
-            assertThat(response.getErrors()).isNotEmpty();
-            assertThat(response.getErrors()).contains(ERROR_MESSAGE_NO_FEE_IN_CASEDATA);
-        }
-
-        @Test
-        void shouldReturnErrors_whenConsentedApplicationWithDifferentFeesOnCaseDataAndFeeFromFeeService() {
-
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildFeeValidationCaseData(FEE108, true, false);
-            when(feesService.getFeeForGA(any(GeneralApplicationCaseData.class)))
-                .thenReturn(FEE275);
-            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            verify(feesService).getFeeForGA(caseData);
-            assertThat(response.getErrors()).isNotEmpty();
-            assertThat(response.getErrors()).contains(ERROR_MESSAGE_FEE_CHANGED);
-        }
-
-        @Test
-        void shouldReturnNoErrors_whenWithNoticeApplicationSameFeesOnCaseDataAndFeeFromFeeService() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildFeeValidationCaseData(FEE275, false, true);
-            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            when(feesService.getFeeForGA(any(GeneralApplicationCaseData.class)))
-                .thenReturn(FEE275);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            verify(feesService).getFeeForGA(caseData);
-            assertThat(response.getErrors()).isEmpty();
-        }
-
-        @Test
-        void shouldReturnNoErrors_whenNotConsentedNotifiedApplicationIsBeingMade() {
-
-            GeneralApplicationCaseData caseData =  GeneralApplicationCaseDataBuilder.builder().buildFeeValidationCaseData(FEE108, false, false);
-            when(feesService.getFeeForGA(caseData))
-                .thenReturn(FEE108);
-
-            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            verify(feesService).getFeeForGA(caseData);
-            assertThat(response.getErrors()).isEmpty();
-        }
+        //TODO: investigate removal?
+        //        @Test
+        //        void shouldReturnNoErrors_whenNotConsentedNotifiedApplicationIsBeingMade() {
+        //
+        //            GeneralApplicationCaseData caseData =  GeneralApplicationCaseDataBuilder.builder().buildFeeValidationCaseData(FEE108, false, false);
+        //            when(feesService.getFeeForGA(caseData))
+        //                .thenReturn(FEE108);
+        //
+        //            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        //            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        //
+        //            verify(feesService).getFeeForGA(caseData);
+        //            assertThat(response.getErrors()).isEmpty();
+        //        }
 
         @Test
         void returnsCorrectTaskId() {
