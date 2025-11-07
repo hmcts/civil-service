@@ -412,6 +412,10 @@ def save_mermaid(transitions: Sequence[Dict], glossary: Dict[str, str]):
                     adjusted.append((src_alias, dst_alias, label))
             edges = adjusted
 
+        state_aliases = set(states or [])
+        edge_sources = {src for src, _, _ in edges}
+        terminal_nodes = {alias for alias in state_aliases if alias not in edge_sources}
+
         lines = ['stateDiagram-v2', f"  %% {info['title']}"]
 
         for state, label in bridge_in.items():
@@ -432,6 +436,9 @@ def save_mermaid(transitions: Sequence[Dict], glossary: Dict[str, str]):
             if label:
                 line += f" : {label}"
             lines.append(line)
+
+        for alias in sorted(terminal_nodes):
+            lines.append(f"  {alias} --> [*] : terminal")
 
         (MERMAID_DIR / f"{slug}.mmd").write_text("\n".join(lines))
 
