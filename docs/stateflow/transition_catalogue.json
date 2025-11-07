@@ -1290,6 +1290,75 @@
     ]
   },
   {
+    "from": "NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION",
+    "to": "ALL_RESPONSES_RECEIVED",
+    "guard_raw": "notificationAcknowledged.and(respondentTimeExtension).and(allResponsesReceived).and( claimDismissalOutOfTime.negate()) .and(takenOfflineByStaff.negate())",
+    "guard_text": "((((At least one defendant has acknowledged service (per scenario rules).) AND (A defendant has obtained a time extension to respond.)) AND (Every required defendant response has been received)) AND (NOT (claimDismissalOutOfTime))) AND (NOT (HMCTS staff have manually taken the case offline.))",
+    "tags": [
+      "unspec"
+    ]
+  },
+  {
+    "from": "NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION",
+    "to": "AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED",
+    "guard_raw": "notificationAcknowledged.and(respondentTimeExtension) .and(awaitingResponsesFullDefenceReceived) .and(not(caseDismissedAfterClaimAcknowledgedExtension)) .and(not(takenOfflineByStaffAfterNotificationAcknowledgedTimeExtension))",
+    "guard_text": "((((At least one defendant has acknowledged service (per scenario rules).) AND (A defendant has obtained a time extension to respond.)) AND (In a 1v2 two-solicitor case only one defendant has provided a full defence and the other is yet to respond.)) AND (NOT (Claim was acknowledged, an extension applied, and the dismissal deadline passed without response or staff action.))) AND (NOT (Staff took the case offline after acknowledgement while a time extension was in play.))",
+    "tags": [
+      "multi-party",
+      "unspec"
+    ]
+  },
+  {
+    "from": "NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION",
+    "to": "AWAITING_RESPONSES_FULL_ADMIT_RECEIVED",
+    "guard_raw": "notificationAcknowledged.and(respondentTimeExtension) .and(awaitingResponsesFullAdmitReceived)",
+    "guard_text": "((At least one defendant has acknowledged service (per scenario rules).) AND (A defendant has obtained a time extension to respond.)) AND (In a 1v2 two-solicitor case only one defendant has responded with a full admission and the second is outstanding.)",
+    "tags": [
+      "multi-party",
+      "unspec"
+    ]
+  },
+  {
+    "from": "NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION",
+    "to": "AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED",
+    "guard_raw": "notificationAcknowledged.and(respondentTimeExtension) .and(awaitingResponsesNonFullDefenceOrFullAdmitReceived)",
+    "guard_text": "((At least one defendant has acknowledged service (per scenario rules).) AND (A defendant has obtained a time extension to respond.)) AND (In a 1v2 two-solicitor case a single defendant has responded with something other than full defence/admission while the co-defendant is outstanding.)",
+    "tags": [
+      "multi-party",
+      "unspec"
+    ]
+  },
+  {
+    "from": "NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION",
+    "to": "TAKEN_OFFLINE_BY_STAFF",
+    "guard_raw": "takenOfflineByStaffAfterNotificationAcknowledgedTimeExtension",
+    "guard_text": "Staff took the case offline after acknowledgement while a time extension was in play.",
+    "tags": [
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION",
+    "to": "PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA",
+    "guard_raw": "caseDismissedAfterClaimAcknowledgedExtension",
+    "guard_text": "Claim was acknowledged, an extension applied, and the dismissal deadline passed without response or staff action.",
+    "tags": [
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
+    "from": "NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION",
+    "to": "TAKEN_OFFLINE_SDO_NOT_DRAWN",
+    "guard_raw": "takenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension",
+    "guard_text": "Case marked not suitable for SDO and taken offline after acknowledgement while an extension applied.",
+    "tags": [
+      "offline/timeout",
+      "unspec"
+    ]
+  },
+  {
     "from": "NOTIFICATION_ACKNOWLEDGED",
     "to": "NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION",
     "guard_raw": "notificationAcknowledged.and(respondentTimeExtension)",

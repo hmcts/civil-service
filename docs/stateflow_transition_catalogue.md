@@ -238,6 +238,17 @@ Generated from builder definitions. Guards appear as business-facing conditions.
 | TAKEN_OFFLINE_BY_STAFF | Staff took the case offline after service acknowledgement and before defence/extension. | offline/timeout, unspec |
 | TAKEN_OFFLINE_SDO_NOT_DRAWN | Case marked not suitable for SDO and taken offline after service acknowledgement. | offline/timeout, unspec |
 
+## NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION
+| To state | Business condition | Scenario tags |
+| --- | --- | --- |
+| ALL_RESPONSES_RECEIVED | ((((At least one defendant has acknowledged service (per scenario rules).) AND (A defendant has obtained a time extension to respond.)) AND (Every required defendant response has been received)) AND (NOT (claimDismissalOutOfTime))) AND (NOT (HMCTS staff have manually taken the case offline.)) | unspec |
+| AWAITING_RESPONSES_FULL_ADMIT_RECEIVED | ((At least one defendant has acknowledged service (per scenario rules).) AND (A defendant has obtained a time extension to respond.)) AND (In a 1v2 two-solicitor case only one defendant has responded with a full admission and the second is outstanding.) | multi-party, unspec |
+| AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED | ((((At least one defendant has acknowledged service (per scenario rules).) AND (A defendant has obtained a time extension to respond.)) AND (In a 1v2 two-solicitor case only one defendant has provided a full defence and the other is yet to respond.)) AND (NOT (Claim was acknowledged, an extension applied, and the dismissal deadline passed without response or staff action.))) AND (NOT (Staff took the case offline after acknowledgement while a time extension was in play.)) | multi-party, unspec |
+| AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED | ((At least one defendant has acknowledged service (per scenario rules).) AND (A defendant has obtained a time extension to respond.)) AND (In a 1v2 two-solicitor case a single defendant has responded with something other than full defence/admission while the co-defendant is outstanding.) | multi-party, unspec |
+| PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA | Claim was acknowledged, an extension applied, and the dismissal deadline passed without response or staff action. | offline/timeout, unspec |
+| TAKEN_OFFLINE_BY_STAFF | Staff took the case offline after acknowledgement while a time extension was in play. | offline/timeout, unspec |
+| TAKEN_OFFLINE_SDO_NOT_DRAWN | Case marked not suitable for SDO and taken offline after acknowledgement while an extension applied. | offline/timeout, unspec |
+
 ## PART_ADMISSION
 | To state | Business condition | Scenario tags |
 | --- | --- | --- |

@@ -804,6 +804,48 @@
     "guard": "takenOfflineSDONotDrawn"
   },
   {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/NotificationAcknowledgedTimeExtensionTransitionBuilder.java",
+    "from_state": "NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION",
+    "to_state": "ALL_RESPONSES_RECEIVED",
+    "guard": "notificationAcknowledged.and(respondentTimeExtension).and(allResponsesReceived).and( claimDismissalOutOfTime.negate()) .and(takenOfflineByStaff.negate())"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/NotificationAcknowledgedTimeExtensionTransitionBuilder.java",
+    "from_state": "NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION",
+    "to_state": "AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED",
+    "guard": "notificationAcknowledged.and(respondentTimeExtension) .and(awaitingResponsesFullDefenceReceived) .and(not(caseDismissedAfterClaimAcknowledgedExtension)) .and(not(takenOfflineByStaffAfterNotificationAcknowledgedTimeExtension))"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/NotificationAcknowledgedTimeExtensionTransitionBuilder.java",
+    "from_state": "NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION",
+    "to_state": "AWAITING_RESPONSES_FULL_ADMIT_RECEIVED",
+    "guard": "notificationAcknowledged.and(respondentTimeExtension) .and(awaitingResponsesFullAdmitReceived)"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/NotificationAcknowledgedTimeExtensionTransitionBuilder.java",
+    "from_state": "NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION",
+    "to_state": "AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED",
+    "guard": "notificationAcknowledged.and(respondentTimeExtension) .and(awaitingResponsesNonFullDefenceOrFullAdmitReceived)"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/NotificationAcknowledgedTimeExtensionTransitionBuilder.java",
+    "from_state": "NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION",
+    "to_state": "TAKEN_OFFLINE_BY_STAFF",
+    "guard": "takenOfflineByStaffAfterNotificationAcknowledgedTimeExtension"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/NotificationAcknowledgedTimeExtensionTransitionBuilder.java",
+    "from_state": "NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION",
+    "to_state": "PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA",
+    "guard": "caseDismissedAfterClaimAcknowledgedExtension"
+  },
+  {
+    "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/NotificationAcknowledgedTimeExtensionTransitionBuilder.java",
+    "from_state": "NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION",
+    "to_state": "TAKEN_OFFLINE_SDO_NOT_DRAWN",
+    "guard": "takenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension"
+  },
+  {
     "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/NotificationAcknowledgedTransitionBuilder.java",
     "from_state": "NOTIFICATION_ACKNOWLEDGED",
     "to_state": "NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION",

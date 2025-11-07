@@ -118,7 +118,7 @@ def _load_text(path: Path) -> str:
 
 
 def _extract_from_state(text: str) -> Optional[str]:
-    match = re.search(r'super\(FlowState\.Main\.([A-Z0-9_]+)', text)
+    match = re.search(r'super\((?:FlowState\.Main\.)?([A-Z0-9_]+)', text)
     return match.group(1) if match else None
 
 
