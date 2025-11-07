@@ -21,9 +21,11 @@ import uk.gov.hmcts.reform.civil.service.flowstate.FlowStateAllowedEventService;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 
 import java.util.List;
+import java.util.Objects;
 
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
 
 @Slf4j
 @Aspect
@@ -55,6 +57,15 @@ public class EventAllowedAspect {
         }
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
         CaseDetails caseDetails = callbackParams.getRequest().getCaseDetails();
+        String eventId = callbackParams.getRequest().getEventId();
+
+        if (Objects.equals(eventId, INITIATE_GENERAL_APPLICATION.name())) {
+            log.info(format(
+                "INITIATE_GENERAL_APPLICATION caseId: %s, type: %s",
+                callbackParams.getCaseData().getCcdCaseReference(),
+                callbackParams.getType()
+            ));
+        }
 
         if (flowStateAllowedEventService.isAllowed(caseDetails, caseEvent)
             || gaFlowStateAllowedEventService.isAllowed(caseDetails, caseEvent)) {

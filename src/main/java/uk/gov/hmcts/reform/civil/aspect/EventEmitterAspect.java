@@ -21,6 +21,7 @@ import java.util.Optional;
 
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.READY;
 
 @Slf4j
@@ -35,7 +36,26 @@ public class EventEmitterAspect {
     @Around("execution(* *(*)) && @annotation(EventEmitter) && args(callbackParams))")
     public Object emitBusinessProcessEvent(ProceedingJoinPoint joinPoint, CallbackParams callbackParams)
         throws Throwable {
+
+        String eventId = callbackParams.getRequest().getEventId();
+
+        if (Objects.equals(eventId, INITIATE_GENERAL_APPLICATION.name())) {
+            log.info(format(
+                "INITIATE_GENERAL_APPLICATION caseId: %s, type: %s",
+                Optional.ofNullable(callbackParams.getCaseData()).map(CaseData::getCcdCaseReference).orElse(null),
+                callbackParams.getType()
+            ));
+        }
+
         if (callbackParams.getType() == SUBMITTED) {
+
+            log.info(format(
+                "EventEmitterAspect caseId: %s, type: %s, isGeneralApplicationCase: %s",
+                Optional.ofNullable(callbackParams.getCaseData()).map(CaseData::getCcdCaseReference).orElse(null),
+                callbackParams.getType(),
+                callbackParams.isGeneralApplicationCase()
+            ));
+
             if (callbackParams.isGeneralApplicationCase()) {
                 processGeneralApplicationBusinessProcessEvent(callbackParams);
             } else {
@@ -43,12 +63,6 @@ public class EventEmitterAspect {
                 var businessProcess = caseData.getBusinessProcess();
                 var camundaEvent = businessProcess.getCamundaEvent();
                 var caseId = caseData.getCcdCaseReference();
-                if (Objects.equals(businessProcess.getCamundaEvent(), "INITIATE_GENERAL_APPLICATION")) {
-                    log.info(format(
-                        "**** Camunda event: %s, submitted callback: %d, business process status: %s",
-                        camundaEvent, caseId, businessProcess.getStatus()
-                    ));
-                }
                 if (businessProcess != null && businessProcess.getStatus() == READY) {
                     log.info(format(
                         "Emitting %s camunda event for case through submitted callback: %d",
@@ -74,6 +88,7 @@ public class EventEmitterAspect {
                     && app.getValue().getBusinessProcess().getProcessInstanceId() == null).findFirst();
             if (generalApplicationElementOptional.isPresent()) {
                 GeneralApplication generalApplicationElement = generalApplicationElementOptional.get().getValue();
+                log.info("Emitting business process GA event for general application element from caseId: {}", caseId);
                 gaEventEmitterService.emitBusinessProcessCamundaEvent(caseId, generalApplicationElement, false);
             }
         } else {
