@@ -685,6 +685,10 @@ spring:
     password: ${CMC_DB_PASSWORD:ccd}
     url: jdbc:postgresql://${CMC_DB_HOST:localhost}:${CMC_DB_PORT:5050}/${CMC_DB_NAME:cmc}
 
+print:
+  service:
+    enabled: false
+
 fees:
   api:
     url: ${FEES_API_URL:http://localhost:8765}
@@ -806,6 +810,10 @@ spring:
 management:
   endpoints:
     enabled-by-default: false
+
+print:
+  service:
+    enabled: true
 
 cmc-claim-store:
   api:
