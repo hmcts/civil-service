@@ -457,17 +457,15 @@ public class PartyUtils {
     }
 
     @SuppressWarnings("unchecked")
-    public static void populateWithPartyIds(CaseData.CaseDataBuilder builder) {
-        CaseData caseData = builder.build();
-        builder
-            .applicant1(appendWithNewPartyId(caseData.getApplicant1()))
-            .applicant2(appendWithNewPartyId(caseData.getApplicant2()))
-            .respondent1(appendWithNewPartyId(caseData.getRespondent1()))
-            .respondent2(appendWithNewPartyId(caseData.getRespondent2()))
-            .applicant1LitigationFriend(appendWithNewPartyId(caseData.getApplicant1LitigationFriend()))
-            .applicant2LitigationFriend(appendWithNewPartyId(caseData.getApplicant2LitigationFriend()))
-            .respondent1LitigationFriend(appendWithNewPartyId(caseData.getRespondent1LitigationFriend()))
-            .respondent2LitigationFriend(appendWithNewPartyId(caseData.getRespondent2LitigationFriend()));
+    public static void populateWithPartyIds(CaseData caseData) {
+        caseData.setApplicant1(appendWithNewPartyId(caseData.getApplicant1()));
+        caseData.setApplicant2(appendWithNewPartyId(caseData.getApplicant2()));
+        caseData.setRespondent1(appendWithNewPartyId(caseData.getRespondent1()));
+        caseData.setRespondent2(appendWithNewPartyId(caseData.getRespondent2()));
+        caseData.setApplicant1LitigationFriend(appendWithNewPartyId(caseData.getApplicant1LitigationFriend()));
+        caseData.setApplicant2LitigationFriend(appendWithNewPartyId(caseData.getApplicant2LitigationFriend()));
+        caseData.setRespondent1LitigationFriend(appendWithNewPartyId(caseData.getRespondent1LitigationFriend()));
+        caseData.setRespondent2LitigationFriend(appendWithNewPartyId(caseData.getRespondent2LitigationFriend()));
     }
 
     @SuppressWarnings("unchecked")

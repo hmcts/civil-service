@@ -111,7 +111,7 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
         caseDataBuilder.caseNamePublic(buildCaseName(caseData));
         caseDataBuilder
             .allPartyNames(getAllPartyNames(caseData));
-        populateWithPartyIds(caseDataBuilder);
+        populateWithPartyIds(caseData);
 
         caseDataBuilder.anyRepresented(NO);
 
@@ -149,7 +149,7 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
                                                   .build());
         }
 
-        OrgPolicyUtils.addMissingOrgPolicies(caseDataBuilder);
+        OrgPolicyUtils.addMissingOrgPolicies(caseData);
     }
 
     private void setUpHelpWithFees(CaseData.CaseDataBuilder caseDataBuilder) {

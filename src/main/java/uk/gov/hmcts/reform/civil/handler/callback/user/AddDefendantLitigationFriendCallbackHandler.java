@@ -135,7 +135,7 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
         caseFlagsInitialiser.initialiseCaseFlags(ADD_DEFENDANT_LITIGATION_FRIEND, caseData);
         caseDataUpdated.isRespondent1(null);
 
-        populateWithPartyIds(caseDataUpdated);
+        populateWithPartyIds(caseData);
 
         caseDataUpdated.caseNameHmctsInternal(CaseNameUtils.buildCaseName(caseDataUpdated.build()));
         caseDataUpdated.caseNamePublic(CaseNameUtils.buildCaseName(caseDataUpdated.build()));

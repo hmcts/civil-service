@@ -149,7 +149,7 @@ public class SubmitClaimTask {
         dataBuilder.caseManagementCategory(
             CaseManagementCategory.builder().value(civil).list_items(itemList).build());
 
-        OrgPolicyUtils.addMissingOrgPolicies(dataBuilder);
+        OrgPolicyUtils.addMissingOrgPolicies(caseData);
 
         caseFlagInitialiser.initialiseCaseFlags(CREATE_CLAIM_SPEC, caseData);
 
@@ -201,7 +201,7 @@ public class SubmitClaimTask {
             .allPartyNames(getAllPartyNames(caseData))
             .caseListDisplayDefendantSolicitorReferences(getAllDefendantSolicitorReferencesSpec(caseData));
 
-        populateWithPartyIds(dataBuilder);
+        populateWithPartyIds(caseData);
 
         dataBuilder.anyRepresented(YES);
 

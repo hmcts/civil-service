@@ -252,10 +252,11 @@ class PartyUtilsTest {
 
         @Test
         void shouldReturnReferences_when1v2DiffSolicitorAndOnlyClaimantRefAndSol2RefAvailable() {
-            CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-                .solicitorReferences(SolicitorReferences.builder().applicantSolicitor1Reference("App One").build())
-                .respondentSolicitor2Reference("Def Two")
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setSolicitorReferences(
+                SolicitorReferences.builder().applicantSolicitor1Reference("App One").build()
+            );
+            caseData.setRespondentSolicitor2Reference("Def Two");
 
             String partyReferences = PartyUtils.buildPartiesReferences(caseData);
 
@@ -264,9 +265,8 @@ class PartyUtilsTest {
 
         @Test
         void shouldReturnReferences_when1v2DiffSolicitorCase() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-                .respondentSolicitor2Reference("defendant sol 2")
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            caseData.setRespondentSolicitor2Reference("defendant sol 2");
 
             String partyReferences = PartyUtils.buildPartiesReferences(caseData);
 
@@ -280,10 +280,11 @@ class PartyUtilsTest {
         @Test
         void shouldReturnRespondentReference2_when1v2DiffSolicitorCase() {
 
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-                .solicitorReferences(SolicitorReferences.builder()
-                                         .respondentSolicitor2Reference("defendant sol 2").build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            caseData.setSolicitorReferences(
+                SolicitorReferences.builder()
+                    .respondentSolicitor2Reference("defendant sol 2").build()
+            );
 
             String respondentReference = PartyUtils.buildRespondentReference(caseData, true);
 
@@ -296,10 +297,11 @@ class PartyUtilsTest {
         @Test
         void shouldReturnRespondentReference1_when1v2DiffSolicitorCase() {
 
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-                .solicitorReferences(SolicitorReferences.builder()
-                                         .respondentSolicitor1Reference("defendant sol 1").build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            caseData.setSolicitorReferences(
+                SolicitorReferences.builder()
+                    .respondentSolicitor1Reference("defendant sol 1").build()
+            );
 
             String respondentReference = PartyUtils.buildRespondentReference(caseData, false);
 
@@ -312,10 +314,11 @@ class PartyUtilsTest {
         @Test
         void shouldReturnApplicantReference1_when1v2DiffSolicitorCase() {
 
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-                .solicitorReferences(SolicitorReferences.builder()
-                                         .applicantSolicitor1Reference("applicant sol").build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            caseData.setSolicitorReferences(
+                SolicitorReferences.builder()
+                    .applicantSolicitor1Reference("applicant sol").build()
+            );
 
             String respondentReference = PartyUtils.buildClaimantReferenceOnly(caseData);
 
@@ -705,7 +708,17 @@ class PartyUtilsTest {
                 .respondent1LitigationFriend(LitigationFriend.builder().firstName("mock litfriend 2").build())
                 .respondent2LitigationFriend(LitigationFriend.builder().firstName("mock litfriend 3").build());
 
-            PartyUtils.populateWithPartyIds(builder);
+            CaseData caseData = builder.build();
+            PartyUtils.populateWithPartyIds(caseData);
+
+            // Update the builder with the modified values
+            builder.applicant1(caseData.getApplicant1());
+            builder.applicant2(caseData.getApplicant2());
+            builder.respondent1(caseData.getRespondent1());
+            builder.respondent2(caseData.getRespondent2());
+            builder.applicant1LitigationFriend(caseData.getApplicant1LitigationFriend());
+            builder.respondent1LitigationFriend(caseData.getRespondent1LitigationFriend());
+            builder.respondent2LitigationFriend(caseData.getRespondent2LitigationFriend());
             CaseData actual = builder.build();
 
             assertNotNull(actual.getApplicant1().getPartyID());
@@ -725,7 +738,17 @@ class PartyUtilsTest {
                 .applicant1LitigationFriend(LitigationFriend.builder().firstName("mock litfriend 1").build())
                 .respondent1LitigationFriend(LitigationFriend.builder().firstName("mock litfriend 2").build());
 
-            PartyUtils.populateWithPartyIds(builder);
+            CaseData caseData = builder.build();
+            PartyUtils.populateWithPartyIds(caseData);
+
+            // Update the builder with the modified values
+            builder.applicant1(caseData.getApplicant1());
+            builder.applicant2(caseData.getApplicant2());
+            builder.respondent1(caseData.getRespondent1());
+            builder.respondent2(caseData.getRespondent2());
+            builder.applicant1LitigationFriend(caseData.getApplicant1LitigationFriend());
+            builder.respondent1LitigationFriend(caseData.getRespondent1LitigationFriend());
+            builder.respondent2LitigationFriend(caseData.getRespondent2LitigationFriend());
             CaseData actual = builder.build();
 
             assertNull(actual.getApplicant2());

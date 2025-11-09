@@ -138,8 +138,8 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     private final String hearingDurationTextRespondent1;
     private final String hearingDurationTextRespondent2;
     //workaround for showing cases in unassigned case list
-    private final String respondent1OrganisationIDCopy;
-    private final String respondent2OrganisationIDCopy;
+    private String respondent1OrganisationIDCopy;
+    private String respondent2OrganisationIDCopy;
 
     @JsonUnwrapped
     private final Mediation mediation;
@@ -220,9 +220,9 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     private SdoR2FastTrackCreditHire sdoR2FastTrackCreditHire;
 
     private final LocalDate nextDeadline;
-    private final String allPartyNames;
+    private String allPartyNames;
     private String caseListDisplayDefendantSolicitorReferences;
-    private final String unassignedCaseListDisplayOrganisationReferences;
+    private String unassignedCaseListDisplayOrganisationReferences;
     private final YesOrNo specAoSRespondent2CorrespondenceAddressRequired;
     private Address specAoSRespondent2CorrespondenceAddressdetails;
     private final String defenceRouteRequired2;
@@ -294,7 +294,7 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
 
     private final String respondent1EmailAddress;
     private YesOrNo applicant1Represented;
-    private final YesOrNo anyRepresented;
+    private YesOrNo anyRepresented;
 
     /**
      * Adding for LR ITP Update.
@@ -344,8 +344,8 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
      */
     private final CertificateOfService cosNotifyClaimDetails1;
     private final CertificateOfService cosNotifyClaimDetails2;
-    private final YesOrNo defendant1LIPAtClaimIssued;
-    private final YesOrNo defendant2LIPAtClaimIssued;
+    private YesOrNo defendant1LIPAtClaimIssued;
+    private YesOrNo defendant2LIPAtClaimIssued;
     private final CertificateOfService cosNotifyClaimDefendant1;
     private final CertificateOfService cosNotifyClaimDefendant2;
 

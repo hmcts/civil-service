@@ -36,6 +36,7 @@ import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataServ
 import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
+import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -141,13 +142,18 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldInitializePartyID_whenInvoked() {
             caseData = CaseDataBuilder.builder()
                 .respondent1(Party.builder()
-                    .type(Party.Type.INDIVIDUAL)
-                    .partyName(DEFENDANT_PARTY_NAME)
-                    .partyEmail(DEFENDANT_EMAIL_ADDRESS).build())
+                                 .type(Party.Type.INDIVIDUAL)
+                                 .partyName(DEFENDANT_PARTY_NAME)
+                                 .partyEmail(DEFENDANT_EMAIL_ADDRESS).build())
                 .applicant1(Party.builder()
-                    .type(Party.Type.ORGANISATION)
-                    .partyName("Test Inc")
-                    .partyEmail("claimant@email.com").build())
+                                .type(Party.Type.ORGANISATION)
+                                .partyName("Test Inc")
+                                .partyEmail("claimant@email.com").build())
+                .build();
+
+            caseData = caseData.toBuilder()
+                .respondent1(PartyUtils.appendWithNewPartyId(caseData.getRespondent1()))
+                .applicant1(PartyUtils.appendWithNewPartyId(caseData.getApplicant1()))
                 .build();
 
             CallbackParams localParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -156,6 +162,7 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+
             assertThat(updatedData.getRespondent1().getPartyID()).isNotNull();
             assertThat(updatedData.getApplicant1().getPartyID()).isNotNull();
         }
