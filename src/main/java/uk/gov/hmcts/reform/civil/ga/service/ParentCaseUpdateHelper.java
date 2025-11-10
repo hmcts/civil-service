@@ -188,7 +188,7 @@ public class ParentCaseUpdateHelper {
                 .filter(app -> app.getValue().getCaseLink() != null && app.getValue().getCaseLink().getCaseReference().equals(
                     applicationId))
                 .findAny()
-                .orElseThrow(IllegalArgumentException::new)
+                .orElseThrow(() -> new IllegalArgumentException("Civil general application not found for parent case id: " + parentCaseId))
                 .getValue();
 
             civilGeneralApplications =
