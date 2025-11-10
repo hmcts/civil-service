@@ -1,220 +1,185 @@
 package uk.gov.hmcts.reform.dashboard.controllers;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.dashboard.data.Notification;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.data.TaskList;
+import uk.gov.hmcts.reform.dashboard.entities.DashboardNotificationsEntity;
+import uk.gov.hmcts.reform.dashboard.entities.TaskListEntity;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
+import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.http.HttpStatus.OK;
-import static uk.gov.hmcts.reform.dashboard.utils.DashboardNotificationsTestUtils.getNotificationList;
-import static uk.gov.hmcts.reform.dashboard.utils.DashboardNotificationsTestUtils.getTaskListList;
 
 @ExtendWith(MockitoExtension.class)
 class DashboardControllerTest {
 
-    private static final String AUTHORISATION = "Bearer: aaa";
-    private static final String CASE_ID = "SomeUniqueIdentifier";
-    private static final UUID ID = UUID.randomUUID();
-    public static final String NOTIFICATION_DRAFT_CLAIM_START = "notification.draft.claim.start";
-    public static final ScenarioRequestParams SCENARIO_REQUEST_PARAMS = new ScenarioRequestParams(new HashMap<>(Map.of(
-        "url",
-        "http://testUrl",
-        "status",
-        "InProgress",
-        "helpText",
-        "Should be helpful!",
-        "animal",
-        "Tiger",
-        "target",
-        "Safari"
-    )));
+    private static final String AUTH = "Bearer token";
+    private static final String CASE_ID = "CCD-123";
+    private static final String ROLE = "DEFENDANT";
+    private static final UUID TASK_ID = UUID.randomUUID();
+    private static final UUID NOTIFICATION_ID = UUID.randomUUID();
 
     @Mock
     private TaskListService taskListService;
-
     @Mock
-    private DashboardNotificationService dashboardNotificationService;
+    private DashboardNotificationService notificationService;
     @Mock
-    private DashboardScenariosService dashboardScenariosService;
+    private DashboardScenariosService scenariosService;
 
     @InjectMocks
-    private DashboardController dashboardController;
+    private DashboardController controller;
 
-    @Test
-    void shouldReturnTaskListForCaseReferenceAndRole() {
+    private TaskListEntity taskListEntity;
+    private DashboardNotificationsEntity notificationEntity;
 
-        //given
-        List<TaskList> taskList = getTaskListList();
-        when(taskListService.getTaskList(any(), any())).thenReturn(taskList);
-
-        //when
-        ResponseEntity<List<TaskList>> output = dashboardController.getTaskListByCaseIdentifierAndRole(
-            "123",
-            "Claimant",
-            AUTHORISATION
-        );
-
-        //then
-        verify(taskListService).getTaskList("123", "Claimant");
-        assertThat(output.getStatusCode().is2xxSuccessful()).isTrue();
-        assertThat(output.getBody()).isEqualTo(taskList);
+    @BeforeEach
+    void init() {
+        taskListEntity = TaskListEntity.builder().id(TASK_ID).build();
+        notificationEntity = DashboardNotificationsEntity.builder().id(NOTIFICATION_ID).build();
     }
 
     @Test
-    void shouldReturnEmptyTaskListForCaseReferenceAndRoleIfNotPresent() {
+    void shouldReturnTaskListForCaseAndRole() {
+        TaskList taskList = TaskList.builder().reference(CASE_ID).build();
+        when(taskListService.getTaskList(CASE_ID, ROLE)).thenReturn(List.of(taskList));
 
-        //given
-        when(taskListService.getTaskList(any(), any()))
-            .thenReturn(List.of());
+        ResponseEntity<List<TaskList>> response = controller.getTaskListByCaseIdentifierAndRole(CASE_ID, ROLE, AUTH);
 
-        //when
-        ResponseEntity<List<TaskList>> output = dashboardController.getTaskListByCaseIdentifierAndRole(
-            "123",
-            "Claimant",
-            AUTHORISATION
-        );
-
-        //then
-        verify(taskListService).getTaskList("123", "Claimant");
-        assertThat(output.getStatusCode().is2xxSuccessful()).isTrue();
-        assertThat(output.getBody().isEmpty()).isTrue();
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).containsExactly(taskList);
+        verify(taskListService).getTaskList(CASE_ID, ROLE);
     }
 
     @Test
-    void shouldThrow500ErrorForCaseReferenceAndRoleIfException() {
+    void shouldUpdateTaskList() {
+        when(taskListService.updateTaskListItem(TASK_ID)).thenReturn(taskListEntity);
 
-        //given
-        when(taskListService.getTaskList(any(), any()))
-            .thenThrow(new RuntimeException());
+        ResponseEntity<TaskListEntity> response = controller.updateTaskList(TASK_ID, AUTH);
 
-        //then
-        assertThrows(RuntimeException.class, () -> dashboardController.getTaskListByCaseIdentifierAndRole(
-            "123",
-            "Claimant",
-            AUTHORISATION
-        ));
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isEqualTo(taskListEntity);
+        verify(taskListService).updateTaskListItem(TASK_ID);
     }
 
     @Test
-    void shouldReturnNotificationsForCaseReferenceAndRole() {
+    void shouldReturnNotificationById() {
+        when(notificationService.getNotification(NOTIFICATION_ID)).thenReturn(Optional.of(notificationEntity));
 
-        List<Notification> notifications = getNotificationList();
-        //given
-        when(dashboardNotificationService.getNotifications(any(), any()))
-            .thenReturn(notifications);
+        ResponseEntity<Optional<DashboardNotificationsEntity>> response =
+            controller.getDashboardNotificationByUuid(NOTIFICATION_ID, AUTH);
 
-        //when
-        ResponseEntity<List<Notification>> output = dashboardController.getNotificationsByCaseIdentifierAndRole(
-            "123",
-            "Claimant",
-            AUTHORISATION
-        );
-
-        //then
-        assertThat(output.getBody()).isEqualTo(notifications);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).contains(notificationEntity);
+        verify(notificationService).getNotification(NOTIFICATION_ID);
     }
 
     @Test
-    void shouldReturnNotificationsForListOfCaseReferenceAndRole() {
+    void shouldReturnNotificationsForCaseAndRole() {
+        Notification notification = Notification.builder().id(NOTIFICATION_ID).build();
+        when(notificationService.getNotifications(CASE_ID, ROLE)).thenReturn(List.of(notification));
 
-        Map<String, List<Notification>> notificationslist = new HashMap<>();
-        notificationslist.put("123", getNotificationList());
-        notificationslist.put("1234", getNotificationList());
+        ResponseEntity<List<Notification>> response =
+            controller.getNotificationsByCaseIdentifierAndRole(CASE_ID, ROLE, AUTH);
 
-        String[] gaCaseIds = new String[]{"123", "1234"};
-
-        //given
-        when(dashboardNotificationService.getAllCasesNotifications(any(), any()))
-            .thenReturn(notificationslist);
-
-        //when
-        ResponseEntity<Map<String, List<Notification>>> output = dashboardController.getNotificationsByIdentifiersAndRole(
-            gaCaseIds,
-            "Claimant",
-            AUTHORISATION
-        );
-
-        //then
-        assertThat(output.getBody()).isEqualTo(notificationslist);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).containsExactly(notification);
+        verify(notificationService).getNotifications(CASE_ID, ROLE);
     }
 
     @Test
-    void should_create_scenario() {
-        doNothing().when(dashboardScenariosService)
-            .recordScenarios(AUTHORISATION, NOTIFICATION_DRAFT_CLAIM_START, CASE_ID, SCENARIO_REQUEST_PARAMS);
+    void shouldReturnNotificationsForMultipleCases() {
+        Notification notification = Notification.builder().id(NOTIFICATION_ID).build();
+        Map<String, List<Notification>> notifications = Map.of(CASE_ID, List.of(notification));
+        when(notificationService.getAllCasesNotifications(List.of(CASE_ID), ROLE)).thenReturn(notifications);
 
-        final ResponseEntity responseEntity = dashboardController
-            .recordScenario(CASE_ID, NOTIFICATION_DRAFT_CLAIM_START, AUTHORISATION, SCENARIO_REQUEST_PARAMS);
+        ResponseEntity<Map<String, List<Notification>>> response =
+            controller.getNotificationsByIdentifiersAndRole(new String[] {CASE_ID}, ROLE, AUTH);
 
-        assertEquals(OK, responseEntity.getStatusCode());
-
-        verify(dashboardScenariosService)
-            .recordScenarios(AUTHORISATION, NOTIFICATION_DRAFT_CLAIM_START, CASE_ID, SCENARIO_REQUEST_PARAMS);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isEqualTo(notifications);
+        verify(notificationService).getAllCasesNotifications(List.of(CASE_ID), ROLE);
     }
 
     @Test
-    void shouldReturnOkWhenNotificationDeleted() {
+    void shouldRecordClick() {
+        ResponseEntity<Void> response = controller.recordClick(NOTIFICATION_ID, AUTH);
 
-        //when
-        final ResponseEntity responseEntity = dashboardController.deleteNotification(ID, AUTHORISATION);
-
-        //then
-        assertEquals(OK, responseEntity.getStatusCode());
-        verify(dashboardNotificationService).deleteById(ID);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        verify(notificationService).recordClick(NOTIFICATION_ID, AUTH);
     }
 
     @Test
-    void shouldReturn401WhenNotificationDeletedUnauthorised() {
+    void shouldDeleteNotification() {
+        ResponseEntity<Void> response = controller.deleteNotification(NOTIFICATION_ID, AUTH);
 
-        //given
-        doThrow(new RuntimeException()).when(dashboardNotificationService).deleteById(ID);
-
-        //then
-        assertThrows(RuntimeException.class, () -> dashboardController.deleteNotification(ID, AUTHORISATION));
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        verify(notificationService).deleteById(NOTIFICATION_ID);
     }
 
     @Test
-    void shouldReturnOkWhenMakeProgressAbleTasksInactiveForCaseIdentifierAndRoleInvoked() {
+    void shouldDeleteNotificationsByCaseAndRole() {
+        ResponseEntity<Void> response = controller.deleteNotificationsForCaseIdentifierAndRole(CASE_ID, ROLE, AUTH);
 
-        //when
-        final ResponseEntity responseEntity = dashboardController
-            .makeProgressAbleTasksInactiveForCaseIdentifierAndRole("123", "Claimant", AUTHORISATION);
-
-        //then
-        assertEquals(OK, responseEntity.getStatusCode());
-        verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRole("123", "Claimant");
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        verify(notificationService).deleteByReferenceAndCitizenRole(CASE_ID, ROLE);
     }
 
     @Test
-    void shouldReturn401WhenMakeProgressAbleTasksInactiveForCaseIdentifierAndRoleUnauthorised() {
+    void shouldDeleteNotificationsByTemplate() {
+        ResponseEntity<Void> response =
+            controller.deleteTemplateNotificationsForCaseIdentifierAndRole(CASE_ID, ROLE, "template", AUTH);
 
-        //given
-        doThrow(new RuntimeException()).when(taskListService)
-            .makeProgressAbleTasksInactiveForCaseIdentifierAndRole("123", "Claimant");
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        verify(notificationService).deleteByNameAndReferenceAndCitizenRole("template", CASE_ID, ROLE);
+    }
 
-        //then
-        assertThrows(RuntimeException.class, () -> dashboardController
-            .makeProgressAbleTasksInactiveForCaseIdentifierAndRole("123", "Claimant", AUTHORISATION));
+    @Test
+    void shouldRecordScenario() {
+        Map<String, Object> params = new HashMap<>();
+        params.put("deadline", OffsetDateTime.now());
+        ScenarioRequestParams request = new ScenarioRequestParams(new HashMap<>(params));
+
+        ResponseEntity<Void> response =
+            controller.recordScenario(CASE_ID, "scenario", AUTH, request);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        verify(scenariosService).recordScenarios(AUTH, "scenario", CASE_ID, request);
+    }
+
+    @Test
+    void shouldMarkTasksInactiveForCaseAndRole() {
+        ResponseEntity<Void> response =
+            controller.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(CASE_ID, ROLE, AUTH);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(CASE_ID, ROLE);
+    }
+
+    @Test
+    void shouldMarkTasksInactiveExcludingCategory() {
+        ResponseEntity<Void> response = controller
+            .makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(CASE_ID, ROLE, "cat", AUTH);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        verify(taskListService)
+            .makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(CASE_ID, ROLE, "cat");
     }
 }

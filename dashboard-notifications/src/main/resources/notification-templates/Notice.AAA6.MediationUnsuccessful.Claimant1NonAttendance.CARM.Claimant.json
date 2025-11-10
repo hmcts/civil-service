@@ -1,0 +1,8 @@
+{
+  "name": "Notice.AAA6.MediationUnsuccessful.Claimant1NonAttendance.CARM.Claimant",
+  "role": "CLAIMANT",
+  "titleEn": "You did not attend mediation",
+  "titleCy": "Ni wnaethoch fynychu cyfryngu",
+  "descriptionEn": "<p class=\"govuk-body\">You did not attend your mediation appointment, and the judge may issue a penalty against you. Your case will now be reviewed by the court. <a href=\"{UPLOAD_MEDIATION_DOCUMENTS}\" class=\"govuk-link\">Explain why you did not attend your appointment</a></p>",
+  "descriptionCy": "<p class=\"govuk-body\">Ni wnaethoch fynychu eich apwyntiad cyfryngu, ac efallai y bydd y barnwr yn eich cosbi. Bydd yr achos hwn nawr yn cael ei adolygu gan y llys. <a href=\"{UPLOAD_MEDIATION_DOCUMENTS}\" class=\"govuk-link\">Esboniwch pam na wnaethoch chi fynychu eich apwyntiad</a></p>"
+}
