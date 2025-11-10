@@ -23,5 +23,5 @@ public class LitigationFriend {
     private final YesOrNo hasSameAddressAsLitigant;
     private final Address primaryAddress;
     private final List<Element<DocumentWithRegex>> certificateOfSuitability;
-    private final Flags flags;
+    private Flags flags;
 }

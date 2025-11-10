@@ -97,20 +97,32 @@ public class CaseFlagUtils {
     }
 
     public static Party updateParty(String roleOnCase, Party partyToUpdate) {
-        return partyToUpdate != null ? partyToUpdate.getFlags() != null ? partyToUpdate :
-            partyToUpdate.toBuilder().flags(createFlags(partyToUpdate.getPartyName(), roleOnCase)).build() : null;
+        if (partyToUpdate == null) {
+            return null;
+        }
+        if (partyToUpdate.getFlags() != null) {
+            return partyToUpdate;
+        }
+
+        partyToUpdate.setFlags(createFlags(partyToUpdate.getPartyName(), roleOnCase));
+        return partyToUpdate;
     }
 
     public static LitigationFriend updateLitFriend(String roleOnCase, LitigationFriend litFriendToUpdate) {
-        return litFriendToUpdate != null ? litFriendToUpdate.getFlags() != null ? litFriendToUpdate
-            : litFriendToUpdate.toBuilder().flags(createFlags(
-            // LitigationFriend was updated to split fullName into firstname and lastname for H&L ==================
-            // ToDo: Remove the use of fullName after H&L changes are default =====================================
-            litFriendToUpdate.getFullName() != null ? litFriendToUpdate.getFullName()
-                // ====================================================================================================
-                : formattedPartyNameForFlags(litFriendToUpdate.getFirstName(), litFriendToUpdate.getLastName()),
-            roleOnCase
-        )).build() : null;
+        if (litFriendToUpdate == null) {
+            return null;
+        }
+        if (litFriendToUpdate.getFlags() != null) {
+            return litFriendToUpdate;
+        }
+        // LitigationFriend was updated to split fullName into firstname and lastname for H&L ==================
+        // ToDo: Remove the use of fullName after H&L changes are default =====================================
+        String partyName = litFriendToUpdate.getFullName() != null ? litFriendToUpdate.getFullName()
+            // ====================================================================================================
+            : formattedPartyNameForFlags(litFriendToUpdate.getFirstName(), litFriendToUpdate.getLastName());
+
+        litFriendToUpdate.setFlags(createFlags(partyName, roleOnCase));
+        return litFriendToUpdate;
     }
 
     private static List<Element<PartyFlagStructure>> getTopLevelFieldForWitnessesWithFlagsStructure(
@@ -144,89 +156,102 @@ public class CaseFlagUtils {
     }
 
     public static void addRespondentDQPartiesFlagStructure(CaseData caseData) {
-        addRespondent1ExpertAndWitnessFlagsStructure(caseData);
-        if (ONE_V_TWO_TWO_LEGAL_REP.equals(getMultiPartyScenario(caseData)) || (
-            ONE_V_TWO_ONE_LEGAL_REP.equals(getMultiPartyScenario(caseData))
-                && NO.equals(caseData.getRespondentResponseIsSame())
-                && FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseType()))) {
-            addRespondent2ExpertAndWitnessFlagsStructure(caseData);
+        if (caseData.getRespondent1DQ() != null && caseData.getRespondent1DQ().getRespondent1DQExperts() != null) {
+            caseData.setRespondent1Experts(
+                getTopLevelFieldForExpertsWithFlagsStructure(
+                    unwrapElements(caseData.getRespondent1DQ().getRespondent1DQExperts().getDetails()),
+                    RESPONDENT_SOLICITOR_ONE_EXPERT
+                )
+            );
         }
-    }
-
-    private static void addRespondent2ExpertAndWitnessFlagsStructure(CaseData caseData) {
-        if (caseData.getRespondent2DQ() != null) {
-            List<Witness> respondent2Witnesses = new ArrayList<>();
-            if (caseData.getRespondent2DQ().getWitnesses() != null) {
-                respondent2Witnesses = unwrapElements(caseData.getRespondent2DQ().getWitnesses().getDetails());
-            }
-
-            List<Expert> respondent2Experts = new ArrayList<>();
-            if (caseData.getRespondent2DQ().getExperts() != null) {
-                respondent2Experts = unwrapElements(caseData.getRespondent2DQ().getExperts().getDetails());
-            }
-
-            caseData.setRespondent2Witnesses(getTopLevelFieldForWitnessesWithFlagsStructure(
-                respondent2Witnesses,
-                RESPONDENT_SOLICITOR_TWO_WITNESS
-            ));
-            caseData.setRespondent2Experts(getTopLevelFieldForExpertsWithFlagsStructure(
-                respondent2Experts,
-                RESPONDENT_SOLICITOR_TWO_EXPERT
-            ));
+        if (caseData.getRespondent1DQ() != null && caseData.getRespondent1DQ().getRespondent1DQWitnesses() != null) {
+            caseData.setRespondent1Witnesses(
+                getTopLevelFieldForWitnessesWithFlagsStructure(
+                    unwrapElements(caseData.getRespondent1DQ().getRespondent1DQWitnesses().getDetails()),
+                    RESPONDENT_SOLICITOR_ONE_WITNESS
+                )
+            );
         }
-    }
-
-    private static void addRespondent1ExpertAndWitnessFlagsStructure(CaseData caseData) {
-        if (caseData.getRespondent1DQ() != null) {
-            List<Witness> respondent1Witnesses = new ArrayList<>();
-            if (caseData.getRespondent1DQ().getWitnesses() != null) {
-                respondent1Witnesses = unwrapElements(caseData.getRespondent1DQ().getWitnesses().getDetails());
+        var multiPartyScenario = getMultiPartyScenario(caseData);
+        if ((multiPartyScenario.equals(ONE_V_TWO_ONE_LEGAL_REP)
+            || multiPartyScenario.equals(ONE_V_TWO_TWO_LEGAL_REP))
+            && (caseData.getRespondent2DQ() != null || caseData.getRespondent2() != null)) {
+            if (caseData.getRespondent2DQ() != null && caseData.getRespondent2DQ().getRespondent2DQExperts() != null) {
+                caseData.setRespondent2Experts(
+                    getTopLevelFieldForExpertsWithFlagsStructure(
+                        unwrapElements(caseData.getRespondent2DQ().getRespondent2DQExperts().getDetails()),
+                        RESPONDENT_SOLICITOR_TWO_EXPERT
+                    )
+                );
             }
-
-            List<Expert> respondent1Experts = new ArrayList<>();
-            if (caseData.getRespondent1DQ().getExperts() != null) {
-                respondent1Experts = unwrapElements(caseData.getRespondent1DQ().getExperts().getDetails());
+            if (caseData.getRespondent2DQ() != null && caseData.getRespondent2DQ().getRespondent2DQWitnesses() != null) {
+                caseData.setRespondent2Witnesses(
+                    getTopLevelFieldForWitnessesWithFlagsStructure(
+                        unwrapElements(caseData.getRespondent2DQ().getRespondent2DQWitnesses().getDetails()),
+                        RESPONDENT_SOLICITOR_TWO_WITNESS
+                    )
+                );
             }
-            caseData.setRespondent1Witnesses(getTopLevelFieldForWitnessesWithFlagsStructure(
-                respondent1Witnesses,
-                RESPONDENT_SOLICITOR_ONE_WITNESS
-            ));
-            caseData.setRespondent1Experts(getTopLevelFieldForExpertsWithFlagsStructure(
-                respondent1Experts,
-                RESPONDENT_SOLICITOR_ONE_EXPERT
-            ));
+        } else if ((multiPartyScenario.equals(ONE_V_TWO_TWO_LEGAL_REP))
+            && !FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseTypeForSpec())
+            && caseData.getRespondentResponseIsSame() != null
+            && caseData.getRespondentResponseIsSame().equals(NO)) {
+            if (caseData.getRespondent2DQ() != null && caseData.getRespondent2DQ().getRespondent2DQExperts() != null) {
+                caseData.setRespondent2Experts(
+                    getTopLevelFieldForExpertsWithFlagsStructure(
+                        unwrapElements(caseData.getRespondent2DQ().getRespondent2DQExperts().getDetails()),
+                        RESPONDENT_SOLICITOR_TWO_EXPERT
+                    )
+                );
+            }
+            if (caseData.getRespondent2DQ() != null && caseData.getRespondent2DQ().getRespondent2DQWitnesses() != null) {
+                caseData.setRespondent2Witnesses(
+                    getTopLevelFieldForWitnessesWithFlagsStructure(
+                        unwrapElements(caseData.getRespondent2DQ().getRespondent2DQWitnesses().getDetails()),
+                        RESPONDENT_SOLICITOR_TWO_WITNESS
+                    )
+                );
+            }
         }
     }
 
     public static void addApplicantExpertAndWitnessFlagsStructure(CaseData caseData) {
-        if (caseData.getApplicant1DQ() != null) {
-            List<Witness> applicant1Witnesses = new ArrayList<>();
-            if (caseData.getApplicant1DQ().getWitnesses() != null) {
-                applicant1Witnesses.addAll(unwrapElements(caseData.getApplicant1DQ().getWitnesses().getDetails()));
+        if (caseData.getApplicant1DQ() != null && caseData.getApplicant1DQ().getApplicant1DQExperts() != null) {
+            caseData.setApplicantExperts(
+                getTopLevelFieldForExpertsWithFlagsStructure(
+                    unwrapElements(caseData.getApplicant1DQ().getApplicant1DQExperts().getDetails()),
+                    APPLICANT_SOLICITOR_EXPERT
+                )
+            );
+        }
+        if (caseData.getApplicant1DQ() != null && caseData.getApplicant1DQ().getApplicant1DQWitnesses() != null) {
+            caseData.setApplicantWitnesses(
+                getTopLevelFieldForWitnessesWithFlagsStructure(
+                    unwrapElements(caseData.getApplicant1DQ().getApplicant1DQWitnesses().getDetails()),
+                    APPLICANT_SOLICITOR_WITNESS
+                )
+            );
+        }
+        var multiPartyScenario = getMultiPartyScenario(caseData);
+        if (multiPartyScenario.equals(TWO_V_ONE)) {
+            if (caseData.getApplicant2DQ() != null && caseData.getApplicant2DQ().getApplicant2DQExperts() != null) {
+                var expertsAppl1 = caseData.getApplicantExperts() == null ? new ArrayList<Element<PartyFlagStructure>>()
+                    : new ArrayList<>(caseData.getApplicantExperts());
+                expertsAppl1.addAll(getTopLevelFieldForExpertsWithFlagsStructure(
+                    unwrapElements(caseData.getApplicant2DQ().getApplicant2DQExperts().getDetails()),
+                    APPLICANT_SOLICITOR_EXPERT
+                ));
+                caseData.setApplicantExperts(expertsAppl1);
             }
-
-            List<Expert> applicant1Experts = new ArrayList<>();
-            if (caseData.getApplicant1DQ().getExperts() != null) {
-                applicant1Experts.addAll(unwrapElements(caseData.getApplicant1DQ().getExperts().getDetails()));
+            if (caseData.getApplicant2DQ() != null && caseData.getApplicant2DQ().getApplicant2DQWitnesses() != null) {
+                var witnessesAppl1 = caseData.getApplicantWitnesses() == null ? new ArrayList<Element<PartyFlagStructure>>()
+                    : new ArrayList<>(caseData.getApplicantWitnesses());
+                witnessesAppl1.addAll(getTopLevelFieldForWitnessesWithFlagsStructure(
+                    unwrapElements(caseData.getApplicant2DQ().getApplicant2DQWitnesses().getDetails()),
+                    APPLICANT_SOLICITOR_WITNESS
+                ));
+                caseData.setApplicantWitnesses(witnessesAppl1);
             }
-
-            if (getMultiPartyScenario(caseData) == TWO_V_ONE && caseData.getApplicant2DQ() != null) {
-                if (caseData.getApplicant2DQ().getWitnesses() != null) {
-                    applicant1Witnesses.addAll(unwrapElements(caseData.getApplicant2DQ().getWitnesses().getDetails()));
-                }
-                if (caseData.getApplicant2DQ().getExperts() != null) {
-                    applicant1Experts.addAll(unwrapElements(caseData.getApplicant2DQ().getExperts().getDetails()));
-                }
-            }
-
-            caseData.setApplicantWitnesses(getTopLevelFieldForWitnessesWithFlagsStructure(
-                applicant1Witnesses,
-                APPLICANT_SOLICITOR_WITNESS
-            ));
-            caseData.setApplicantExperts(getTopLevelFieldForExpertsWithFlagsStructure(
-                applicant1Experts,
-                APPLICANT_SOLICITOR_EXPERT
-            ));
         }
     }
 
@@ -367,16 +392,16 @@ public class CaseFlagUtils {
     }
 
     private static void updatePartyFlags(CaseData caseData, String partyChosen) {
-        if (CLAIMANT_ONE_ID.equals(partyChosen) && caseData.getApplicant1().getFlags() != null) {
+        if (CLAIMANT_ONE_ID.equals(partyChosen) && caseData.getApplicant1() != null && caseData.getApplicant1().getFlags() != null) {
             caseData.setApplicant1(updatePartyNameForFlags(caseData.getApplicant1()));
         }
-        if (CLAIMANT_TWO_ID.equals(partyChosen) && caseData.getApplicant2().getFlags() != null) {
+        if (CLAIMANT_TWO_ID.equals(partyChosen) && caseData.getApplicant2() != null && caseData.getApplicant2().getFlags() != null) {
             caseData.setApplicant2(updatePartyNameForFlags(caseData.getApplicant2()));
         }
-        if (DEFENDANT_ONE_ID.equals(partyChosen) && caseData.getRespondent1().getFlags() != null) {
+        if (DEFENDANT_ONE_ID.equals(partyChosen) && caseData.getRespondent1() != null && caseData.getRespondent1().getFlags() != null) {
             caseData.setRespondent1(updatePartyNameForFlags(caseData.getRespondent1()));
         }
-        if (DEFENDANT_TWO_ID.equals(partyChosen) && caseData.getRespondent2().getFlags() != null) {
+        if (DEFENDANT_TWO_ID.equals(partyChosen) && caseData.getRespondent2() != null && caseData.getRespondent2().getFlags() != null) {
             caseData.setRespondent2(updatePartyNameForFlags(caseData.getRespondent2()));
         }
     }
@@ -413,20 +438,20 @@ public class CaseFlagUtils {
     }
 
     private static Party updatePartyNameForFlags(Party party) {
-        return party.toBuilder().flags(party.getFlags().toBuilder()
-                                           .partyName(party.getPartyName())
-                                           .build()).build();
+        if (party != null && party.getFlags() != null) {
+            party.getFlags().setPartyName(party.getPartyName());
+        }
+        return party;
     }
 
     private static LitigationFriend updatePartyNameForLitigationFriendFlags(LitigationFriend litigationFriend) {
-        return litigationFriend.toBuilder()
-            .flags(litigationFriend.getFlags().toBuilder()
-                       .partyName(litigationFriend.getFullName() != null ? litigationFriend.getFullName()
-                                      : formattedPartyNameForFlags(
-                           litigationFriend.getFirstName(),
-                           litigationFriend.getLastName()
-                       ))
-                       .build()).build();
+        if (litigationFriend != null && litigationFriend.getFlags() != null) {
+            String partyName = litigationFriend.getFullName() != null
+                ? litigationFriend.getFullName()
+                : formattedPartyNameForFlags(litigationFriend.getFirstName(), litigationFriend.getLastName());
+            litigationFriend.getFlags().setPartyName(partyName);
+        }
+        return litigationFriend;
     }
 
     public static List<FlagDetail> getAllCaseFlags(CaseData caseData) {

@@ -350,7 +350,7 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     private final CertificateOfService cosNotifyClaimDefendant2;
 
     //Top level structure objects used for Hearings + Case Flags
-    private final Flags caseFlags;
+    private Flags caseFlags;
     private List<Element<PartyFlagStructure>> applicantExperts;
     private List<Element<PartyFlagStructure>> respondent1Experts;
     private List<Element<PartyFlagStructure>> respondent2Experts;
