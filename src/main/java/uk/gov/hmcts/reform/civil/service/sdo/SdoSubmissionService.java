@@ -42,6 +42,7 @@ public class SdoSubmissionService {
         updateSmallClaimsHearing(caseData, builder);
         updateClaimsTrack(caseData, builder);
         updateTrialLocations(caseData, builder);
+        updateWaLocations(caseData, builder, authToken);
 
         return builder.build();
     }
@@ -158,5 +159,12 @@ public class SdoSubmissionService {
             .ifPresent(trialBuilder::altHearingCourtLocationList);
 
         builder.sdoR2Trial(trialBuilder.build());
+    }
+
+    private void updateWaLocations(CaseData caseData, CaseDataBuilder<?, ?> builder, String authToken) {
+        if (!featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
+            return;
+        }
+        sdoLocationService.updateWaLocationsIfRequired(caseData, builder, authToken);
     }
 }

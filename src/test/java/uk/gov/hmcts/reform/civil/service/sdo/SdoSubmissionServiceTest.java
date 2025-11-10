@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service.sdo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -18,12 +19,16 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearing;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2Trial;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -186,6 +191,27 @@ class SdoSubmissionServiceTest {
         CaseData result = service.prepareSubmission(caseData, AUTH_TOKEN);
 
         assertThat(result.getResponseClaimTrack()).isEqualTo("FAST_CLAIM");
+    }
+
+    @Test
+    void shouldUpdateWaLocationsWhenFeatureEnabled() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(true);
+
+        service.prepareSubmission(caseData, AUTH_TOKEN);
+
+        ArgumentCaptor<CaseData.CaseDataBuilder<?, ?>> captor = ArgumentCaptor.forClass(CaseData.CaseDataBuilder.class);
+        verify(locationService).updateWaLocationsIfRequired(eq(caseData), captor.capture(), eq(AUTH_TOKEN));
+    }
+
+    @Test
+    void shouldNotUpdateWaLocationsWhenFeatureDisabled() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(false);
+
+        service.prepareSubmission(caseData, AUTH_TOKEN);
+
+        verify(locationService, never()).updateWaLocationsIfRequired(any(), any(), any());
     }
 
 }

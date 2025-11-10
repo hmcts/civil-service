@@ -38,6 +38,7 @@ class SdoOrderDetailsTaskTest {
     @Test
     void shouldReturnErrorWhenDisposalHearingNotAllowed() {
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+        when(featureToggleService.isMultiOrIntermediateTrackCase(any())).thenReturn(true);
 
         CaseData caseData = CaseData.builder()
             .allocatedTrack(AllocatedTrack.MULTI_CLAIM)
@@ -89,5 +90,5 @@ class SdoOrderDetailsTaskTest {
 
         assertThat(task.supports(DirectionsOrderLifecycleStage.ORDER_DETAILS)).isTrue();
         assertThat(task.supports(DirectionsOrderLifecycleStage.MID_EVENT)).isFalse();
-}
+    }
 }

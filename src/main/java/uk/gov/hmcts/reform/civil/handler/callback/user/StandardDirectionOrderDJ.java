@@ -12,6 +12,8 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.DirectionsOrderStageExecutionResult;
+import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.DirectionsOrderStageExecutor;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.pipeline.DirectionsOrderCallbackPipeline;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderLifecycleStage;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskContext;
@@ -37,6 +39,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = Collections.singletonList(STANDARD_DIRECTION_ORDER_DJ);
     private final ObjectMapper objectMapper;
     private final DirectionsOrderCallbackPipeline directionsOrderCallbackPipeline;
+    private final DirectionsOrderStageExecutor directionsOrderStageExecutor;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -119,30 +122,12 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
     }
 
     private CallbackResponse createOrderScreen(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
+        DirectionsOrderStageExecutionResult executionResult = directionsOrderStageExecutor.runOrderGenerationStages(
+            callbackParams.getCaseData(),
+            callbackParams
+        );
 
-        DirectionsOrderTaskResult orderDetailsResult =
-            runStage(caseData, callbackParams, DirectionsOrderLifecycleStage.ORDER_DETAILS);
-        CaseData caseDataAfterOrderDetails = updatedCaseData(orderDetailsResult, caseData);
-        List<String> orderDetailsErrors = extractErrors(orderDetailsResult);
-        if (!orderDetailsErrors.isEmpty()) {
-            return buildResponse(caseDataAfterOrderDetails, orderDetailsErrors);
-        }
-
-        DirectionsOrderTaskResult validationResult =
-            runStage(caseDataAfterOrderDetails, callbackParams, DirectionsOrderLifecycleStage.MID_EVENT);
-        CaseData caseDataAfterValidation = updatedCaseData(validationResult, caseDataAfterOrderDetails);
-        List<String> validationErrors = extractErrors(validationResult);
-        if (!validationErrors.isEmpty()) {
-            return buildResponse(caseDataAfterValidation, validationErrors);
-        }
-
-        DirectionsOrderTaskResult documentResult =
-            runStage(caseDataAfterValidation, callbackParams, DirectionsOrderLifecycleStage.DOCUMENT_GENERATION);
-        CaseData finalCaseData = updatedCaseData(documentResult, caseDataAfterValidation);
-        List<String> documentErrors = extractErrors(documentResult);
-
-        return buildResponse(finalCaseData, documentErrors);
+        return buildResponse(executionResult.caseData(), executionResult.errors());
     }
 
     private AboutToStartOrSubmitCallbackResponse buildResponse(CaseData data, List<String> errors) {

@@ -29,7 +29,7 @@ public class SdoPrePopulateTask implements DirectionsOrderCallbackTask {
     public DirectionsOrderTaskResult execute(DirectionsOrderTaskContext context) {
         CaseData caseData = context.caseData();
 
-        if (isMultiOrIntermediateTrack(caseData)) {
+        if (sdoFeatureToggleService.isMultiOrIntermediateTrackCase(caseData)) {
             return DirectionsOrderTaskResult.withErrors(caseData, List.of(ERROR_MINTI_DISPOSAL_NOT_ALLOWED));
         }
 
@@ -46,21 +46,5 @@ public class SdoPrePopulateTask implements DirectionsOrderCallbackTask {
     @Override
     public boolean appliesTo(DirectionsOrderTaskContext context) {
         return DirectionsOrderTaskSupport.supportsEvent(context, CREATE_SDO);
-    }
-
-    private boolean isMultiOrIntermediateTrack(CaseData caseData) {
-        if (!sdoFeatureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
-            return false;
-        }
-
-        AllocatedTrack allocatedTrack = caseData.getAllocatedTrack();
-        String responseClaimTrack = caseData.getResponseClaimTrack();
-
-        boolean isIntermediateTrack = AllocatedTrack.INTERMEDIATE_CLAIM.equals(allocatedTrack)
-            || AllocatedTrack.INTERMEDIATE_CLAIM.name().equals(responseClaimTrack);
-        boolean isMultiTrack = AllocatedTrack.MULTI_CLAIM.equals(allocatedTrack)
-            || AllocatedTrack.MULTI_CLAIM.name().equals(responseClaimTrack);
-
-        return isIntermediateTrack || isMultiTrack;
     }
 }

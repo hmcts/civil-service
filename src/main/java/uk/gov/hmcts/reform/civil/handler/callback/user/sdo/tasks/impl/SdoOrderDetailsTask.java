@@ -55,15 +55,9 @@ public class SdoOrderDetailsTask implements DirectionsOrderCallbackTask {
             return false;
         }
 
-        AllocatedTrack allocatedTrack = caseData.getAllocatedTrack();
-        String responseClaimTrack = caseData.getResponseClaimTrack();
+        boolean isMultiOrIntermediate = featureToggleService.isMultiOrIntermediateTrackCase(caseData);
 
-        boolean isIntermediateTrack = AllocatedTrack.INTERMEDIATE_CLAIM.equals(allocatedTrack)
-            || AllocatedTrack.INTERMEDIATE_CLAIM.name().equals(responseClaimTrack);
-        boolean isMultiTrack = AllocatedTrack.MULTI_CLAIM.equals(allocatedTrack)
-            || AllocatedTrack.MULTI_CLAIM.name().equals(responseClaimTrack);
-
-        return (isIntermediateTrack || isMultiTrack)
+        return isMultiOrIntermediate
             && OrderType.DISPOSAL.equals(caseData.getOrderType())
             && CaseState.JUDICIAL_REFERRAL.equals(caseData.getCcdState());
     }

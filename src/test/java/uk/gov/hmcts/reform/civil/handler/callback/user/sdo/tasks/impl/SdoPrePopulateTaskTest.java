@@ -33,7 +33,7 @@ class SdoPrePopulateTaskTest {
 
     @Test
     void shouldReturnExistingCaseDataDuringPrePopulate() {
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(false);
+        when(featureToggleService.isMultiOrIntermediateTrackCase(any())).thenReturn(false);
 
         SdoPrePopulateTask task = new SdoPrePopulateTask(featureToggleService, prePopulateService);
         CaseData caseData = CaseData.builder().build();
@@ -53,7 +53,7 @@ class SdoPrePopulateTaskTest {
 
     @Test
     void shouldReturnErrorWhenMultiTrackEnabled() {
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+        when(featureToggleService.isMultiOrIntermediateTrackCase(any())).thenReturn(true);
 
         CaseData caseData = CaseData.builder()
             .allocatedTrack(AllocatedTrack.MULTI_CLAIM)
@@ -79,5 +79,5 @@ class SdoPrePopulateTaskTest {
 
         assertThat(task.supports(DirectionsOrderLifecycleStage.PRE_POPULATE)).isTrue();
         assertThat(task.supports(DirectionsOrderLifecycleStage.MID_EVENT)).isFalse();
-}
+    }
 }

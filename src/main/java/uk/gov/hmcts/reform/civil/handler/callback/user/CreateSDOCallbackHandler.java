@@ -12,20 +12,19 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.DirectionsOrderStageExecutionResult;
+import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.DirectionsOrderStageExecutor;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.pipeline.DirectionsOrderCallbackPipeline;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderLifecycleStage;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskContext;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskResult;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.service.camunda.UpdateWaCourtLocationsService;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
-import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
@@ -47,7 +46,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     private final ObjectMapper objectMapper;
     private final FeatureToggleService featureToggleService;
     private final DirectionsOrderCallbackPipeline directionsOrderCallbackPipeline;
-    private final Optional<UpdateWaCourtLocationsService> updateWaCourtLocationsService;
+    private final DirectionsOrderStageExecutor directionsOrderStageExecutor;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -99,35 +98,12 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         log.info("generateSdoOrder ccdCaseReference: {} legacyCaseReference: {}",
                  callbackParams.getCaseData().getCcdCaseReference(), callbackParams.getCaseData().getLegacyCaseReference());
 
-        CaseData originalCaseData = callbackParams.getCaseData();
-        DirectionsOrderTaskResult orderDetailsResult =
-            runStage(originalCaseData, callbackParams, DirectionsOrderLifecycleStage.ORDER_DETAILS);
+        DirectionsOrderStageExecutionResult executionResult = directionsOrderStageExecutor.runOrderGenerationStages(
+            callbackParams.getCaseData(),
+            callbackParams
+        );
 
-        List<String> orderDetailsErrors = extractErrors(orderDetailsResult);
-        CaseData caseDataAfterOrderDetails = updatedCaseData(orderDetailsResult, originalCaseData);
-
-        if (!orderDetailsErrors.isEmpty()) {
-            return buildResponse(caseDataAfterOrderDetails, orderDetailsErrors);
-        }
-
-        DirectionsOrderTaskResult validationResult =
-            runStage(caseDataAfterOrderDetails, callbackParams, DirectionsOrderLifecycleStage.MID_EVENT);
-
-        List<String> validationErrors = extractErrors(validationResult);
-        CaseData caseDataAfterValidation = updatedCaseData(validationResult, caseDataAfterOrderDetails);
-
-        if (!validationErrors.isEmpty()) {
-            return buildResponse(caseDataAfterValidation, validationErrors);
-        }
-
-        DirectionsOrderTaskResult documentResult =
-            runStage(caseDataAfterValidation, callbackParams, DirectionsOrderLifecycleStage.DOCUMENT_GENERATION);
-
-        CaseData finalCaseData = updatedCaseData(documentResult, caseDataAfterValidation);
-
-        List<String> documentErrors = extractErrors(documentResult);
-
-        return buildResponse(finalCaseData, documentErrors);
+        return buildResponse(executionResult.caseData(), executionResult.errors());
     }
 
     private CallbackResponse submitSDO(CallbackParams callbackParams) {
@@ -142,19 +118,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                 .build();
         }
 
-        CaseData updatedCaseData = updatedCaseData(submissionResult, caseData);
-
-        if (featureToggleService.isMultiOrIntermediateTrackEnabled(updatedCaseData)) {
-            CaseData.CaseDataBuilder<?, ?> waUpdateBuilder = updatedCaseData.toBuilder();
-            updateWaCourtLocationsService.ifPresent(service -> service.updateCourtListingWALocations(
-                callbackParams.getParams().get(BEARER_TOKEN).toString(),
-                waUpdateBuilder
-            ));
-            updatedCaseData = waUpdateBuilder.build();
-        }
-
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseData.toMap(objectMapper))
+            .data(updatedCaseData(submissionResult, caseData).toMap(objectMapper))
             .build();
     }
 

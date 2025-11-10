@@ -48,6 +48,7 @@ import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2TimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.TrialOnRadioOptions;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.DirectionsOrderStageExecutor;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.pipeline.DirectionsOrderCallbackPipeline;
 import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.impl.SdoOrderDetailsTask;
 import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.impl.SdoPrePopulateTask;
@@ -236,6 +237,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackH
     SdoDocumentService.class,
     SdoSubmissionService.class,
     DirectionsOrderCallbackPipeline.class,
+    DirectionsOrderStageExecutor.class,
     SdoPrePopulateTask.class,
     SdoOrderDetailsTask.class,
     SdoValidationTask.class,
@@ -267,6 +269,9 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private DirectionsOrderCallbackPipeline directionsOrderCallbackPipeline;
+
+    @Autowired
+    private DirectionsOrderStageExecutor directionsOrderStageExecutor;
 
     @MockBean
     protected LocationReferenceDataService locationRefDataService;
@@ -1315,41 +1320,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         } else {
             assertThat(responseCaseData.getEaCourtLocation()).isNull();
         }
-    }
-
-    @Test
-    void shouldNotCallUpdateWaCourtLocationsServiceWhenNotPresent_AndMintiEnabled() {
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
-
-        handler = new CreateSDOCallbackHandler(
-            objectMapper,
-            featureToggleService,
-            directionsOrderCallbackPipeline,
-            Optional.empty()
-        );
-
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("123456").build())
-            .build();
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-        handler.handle(params);
-
-        verifyNoInteractions(updateWaCourtLocationsService);
-    }
-
-    @Test
-    void shouldCallUpdateWaCourtLocationsServiceWhenPresent_AndMintiEnabled() {
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
-
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("123456").build())
-            .build();
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-        handler.handle(params);
-
-        verify(updateWaCourtLocationsService).updateCourtListingWALocations(any(), any());
     }
 
     @Nested

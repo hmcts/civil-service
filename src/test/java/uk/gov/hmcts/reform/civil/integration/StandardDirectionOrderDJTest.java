@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.HearingMethod;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.handler.callback.user.StandardDirectionOrderDJ;
+import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.DirectionsOrderStageExecutor;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.pipeline.DirectionsOrderCallbackPipeline;
 import uk.gov.hmcts.reform.civil.handler.callback.user.dj.tasks.impl.DjPrePopulateTask;
 import uk.gov.hmcts.reform.civil.handler.callback.user.dj.tasks.impl.DjOrderDetailsTask;
@@ -104,6 +105,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
     AssignCategoryId.class,
     LocationHelper.class,
     DirectionsOrderCallbackPipeline.class,
+    DirectionsOrderStageExecutor.class,
     DjPrePopulateTask.class,
     DjOrderDetailsTask.class,
     DjValidationTask.class,
