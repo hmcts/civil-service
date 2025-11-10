@@ -1,0 +1,8 @@
+{
+  "name": "Notice.AAA6.ClaimantIntent.GoToHearing.Claimant",
+  "role": "CLAIMANT",
+  "titleEn": "Wait for the court to review the case",
+  "titleCy": "Aros i’r llys adolygu’r achos",
+  "descriptionEn": "<p class=\"govuk-body\">You have rejected ${respondent1PartyName}'s response. The case will be referred to a judge who will decide what should happen next.</p><p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\"  rel=\"noopener noreferrer\" class=\"govuk-link\">View the defendant's response</a></p>",
+  "descriptionCy": "<p class=\"govuk-body\">Rydych wedi gwrthod ymateb ${respondent1PartyName}. Bydd yr achos yn cael ei gyfeirio at farnwr a fydd yn penderfynu beth ddylai ddigwydd nesaf.</p><p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\"  rel=\"noopener noreferrer\" class=\"govuk-link\">Gweld ymateb y diffynnydd</a></p>"
+}
