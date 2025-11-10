@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class UpdatePartyLitigationFriendTaskTest {
@@ -121,37 +122,22 @@ class UpdatePartyLitigationFriendTaskTest {
     }
 
     @Test
-    void migrateCaseData_shouldThrow_whenLitigationFriendNotFound() {
+    void migrateCaseData_shouldCreateEmptyLitigationFriend_whenNoneExists() {
         CaseData caseData = CaseData.builder().build();
 
         LitigationFriendCaseReference caseRef = new LitigationFriendCaseReference();
         caseRef.setCaseReference("123");
         caseRef.setApplicant1(true);
+        caseRef.setLitigationFriend(LitigationFriend.builder()
+                                        .firstName("NewFirst")
+                                        .build());
 
-        RuntimeException ex = assertThrows(
-            RuntimeException.class,
-            () -> task.migrateCaseData(caseData, caseRef)
-        );
+        CaseData result = task.migrateCaseData(caseData, caseRef);
+        LitigationFriend resultLf = result.getApplicant1LitigationFriend();
 
-        assertEquals("Failed to determine Party to update", ex.getMessage());
-    }
-
-    @Test
-    void migrateCaseData_shouldThrow_whenNoPartyFlagsSet() {
-        LitigationFriend existing = LitigationFriend.builder().firstName("Old").build();
-        CaseData caseData = CaseData.builder().applicant1LitigationFriend(existing).build();
-
-        LitigationFriendCaseReference caseRef = new LitigationFriendCaseReference();
-        caseRef.setCaseReference("XYZ123");
-        caseRef.setLitigationFriend(LitigationFriend.builder().firstName("X").build());
-        // no party flags set
-
-        RuntimeException ex = assertThrows(
-            RuntimeException.class,
-            () -> task.migrateCaseData(caseData, caseRef)
-        );
-
-        assertEquals("Failed to determine Party to update", ex.getMessage());
+        assertEquals("NewFirst", resultLf.getFirstName());
+        // other fields should be null/default
+        assertEquals(null, resultLf.getLastName());
     }
 
     @Test
@@ -173,5 +159,45 @@ class UpdatePartyLitigationFriendTaskTest {
             "This task UpdatePartyLitigationFriendTask updates litigation friend on the case",
             task.getEventDescription()
         );
+    }
+
+    @Test
+    void migrateCaseData_shouldPreserveExistingFields_whenUpdateFieldsAreNull() {
+        LitigationFriend existing = LitigationFriend.builder()
+            .firstName("OldFirst")
+            .lastName("OldLast")
+            .build();
+
+        CaseData caseData = CaseData.builder()
+            .applicant1LitigationFriend(existing)
+            .build();
+
+        LitigationFriendCaseReference caseRef = new LitigationFriendCaseReference();
+        caseRef.setCaseReference("123");
+        caseRef.setApplicant1(true);
+        caseRef.setLitigationFriend(LitigationFriend.builder().build()); // all null fields
+
+        CaseData result = task.migrateCaseData(caseData, caseRef);
+        LitigationFriend resultLf = result.getApplicant1LitigationFriend();
+
+        assertEquals("OldFirst", resultLf.getFirstName());
+        assertEquals("OldLast", resultLf.getLastName());
+    }
+
+    @Test
+    void migrateCaseData_shouldGeneratePartyId_ifNull() {
+        LitigationFriend existing = LitigationFriend.builder().build();
+
+        CaseData caseData = CaseData.builder()
+            .applicant1LitigationFriend(existing)
+            .build();
+
+        LitigationFriendCaseReference caseRef = new LitigationFriendCaseReference();
+        caseRef.setCaseReference("123");
+        caseRef.setApplicant1(true);
+        caseRef.setLitigationFriend(LitigationFriend.builder().build());
+
+        CaseData result = task.migrateCaseData(caseData, caseRef);
+        assertNotNull(result.getApplicant1LitigationFriend().getPartyID());
     }
 }

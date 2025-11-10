@@ -8,6 +8,8 @@ import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import java.util.Optional;
 import java.util.function.BiFunction;
 
+import static uk.gov.hmcts.reform.civil.handler.migration.PartyDataMigrationUtils.generatePartyIdIfNull;
+
 @Component
 public class UpdatePartyLitigationFriendTask extends MigrationTask<LitigationFriendCaseReference> {
 
@@ -16,7 +18,11 @@ public class UpdatePartyLitigationFriendTask extends MigrationTask<LitigationFri
         (source, target) -> {
             LitigationFriend.LitigationFriendBuilder builder = target.toBuilder();
 
-            Optional.ofNullable(source.getPartyID()).ifPresent(builder::partyID);
+            String partyId = generatePartyIdIfNull(target.getPartyID());
+            if (partyId != null) {
+                builder.partyID(partyId);
+            }
+
             Optional.ofNullable(source.getFirstName()).ifPresent(builder::firstName);
             Optional.ofNullable(source.getLastName()).ifPresent(builder::lastName);
             Optional.ofNullable(source.getFullName()).ifPresent(builder::fullName);
@@ -68,7 +74,7 @@ public class UpdatePartyLitigationFriendTask extends MigrationTask<LitigationFri
 
     private LitigationFriend getLitigationFriend(CaseData caseData, LitigationFriendCaseReference ref) {
         return Optional.ofNullable(getLitigationFriendByParty(caseData, ref))
-            .orElseThrow(() -> new RuntimeException("Failed to determine Party to update"));
+            .orElseGet(() -> LitigationFriend.builder().build());
     }
 
     private LitigationFriend getLitigationFriendByParty(CaseData caseData, LitigationFriendCaseReference ref) {

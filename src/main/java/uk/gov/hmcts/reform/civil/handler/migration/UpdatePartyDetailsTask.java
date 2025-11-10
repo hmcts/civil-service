@@ -8,6 +8,8 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import java.util.Optional;
 import java.util.function.BiFunction;
 
+import static uk.gov.hmcts.reform.civil.handler.migration.PartyDataMigrationUtils.generatePartyIdIfNull;
+
 @Component
 public class UpdatePartyDetailsTask extends MigrationTask<PartyDetailsCaseReference> {
 
@@ -50,7 +52,7 @@ public class UpdatePartyDetailsTask extends MigrationTask<PartyDetailsCaseRefere
 
     private Party getParty(CaseData caseData, PartyDetailsCaseReference ref) {
         return Optional.ofNullable(getPartyByRole(caseData, ref))
-            .orElseThrow(() -> new RuntimeException("Failed to determine Party to update"));
+            .orElseGet(() -> Party.builder().build());
     }
 
     private Party getPartyByRole(CaseData caseData, PartyDetailsCaseReference ref) {
@@ -92,7 +94,7 @@ public class UpdatePartyDetailsTask extends MigrationTask<PartyDetailsCaseRefere
         Party.PartyBuilder builder = original.toBuilder();
 
         // Common fields
-        builder.partyID(updateIfExists(updates.getPartyID(), original.getPartyID()));
+        builder.partyID(generatePartyIdIfNull(original.getPartyID()));
         builder.primaryAddress(updateIfExists(updates.getPrimaryAddress(), original.getPrimaryAddress()));
         builder.partyEmail(updateIfExists(updates.getPartyEmail(), original.getPartyEmail()));
         builder.partyPhone(updateIfExists(updates.getPartyPhone(), original.getPartyPhone()));

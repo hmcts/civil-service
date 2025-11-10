@@ -141,17 +141,20 @@ class UpdatePartyDetailsTaskTest {
     }
 
     @Test
-    void migrateCaseData_shouldThrow_whenPartyRoleNotFound() {
+    void migrateCaseData_shouldCreateEmptyPartyWhenRoleNotFound() {
         CaseData caseData = CaseData.builder().build();
         PartyDetailsCaseReference ref = new PartyDetailsCaseReference();
         ref.setCaseReference("123");
-        ref.setParty(Party.builder().build());
+        ref.setParty(Party.builder().partyEmail("new@example.com").build());
+        // No applicant/respondent flags set
 
-        RuntimeException ex = assertThrows(
-            RuntimeException.class,
-            () -> task.migrateCaseData(caseData, ref)
-        );
-        assertEquals("Failed to determine Party to update", ex.getMessage());
+        CaseData result = task.migrateCaseData(caseData, ref);
+
+        // Because no role matched, none of the party fields should be updated
+        assertEquals(null, result.getApplicant1());
+        assertEquals(null, result.getApplicant2());
+        assertEquals(null, result.getRespondent1());
+        assertEquals(null, result.getRespondent2());
     }
 
     @Test
@@ -171,5 +174,26 @@ class UpdatePartyDetailsTaskTest {
 
         CaseData updatedCaseData = task.migrateCaseData(caseData, ref);
         assertSame(existing, updatedCaseData.getApplicant1());
+    }
+
+    @Test
+    void updateIfExists_shouldIgnoreBlankString() {
+        Party existing = Party.builder()
+            .partyEmail("old@example.com")
+            .build();
+
+        Party updates = Party.builder()
+            .partyEmail("   ")
+            .build();
+
+        PartyDetailsCaseReference ref = new PartyDetailsCaseReference();
+        ref.setCaseReference("123");
+        ref.setApplicant1(true);
+        ref.setParty(updates);
+
+        CaseData caseData = CaseData.builder().applicant1(existing).build();
+        CaseData result = task.migrateCaseData(caseData, ref);
+
+        assertEquals("old@example.com", result.getApplicant1().getPartyEmail());
     }
 }
