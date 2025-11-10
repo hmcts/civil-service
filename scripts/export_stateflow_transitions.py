@@ -352,7 +352,11 @@ def summarise_label(text: str) -> str:
     return text
 
 
-def save_mermaid(transitions: Sequence[Dict], glossary: Dict[str, str]):
+def save_mermaid(
+    transitions: Sequence[Dict],
+    glossary: Dict[str, str],
+    source_states: Set[str],
+):
     MERMAID_DIR.mkdir(exist_ok=True)
     for slug, info in PHASE_DEFINITIONS.items():
         states = info['states']
@@ -418,22 +422,22 @@ def save_mermaid(transitions: Sequence[Dict], glossary: Dict[str, str]):
         state_aliases = set(states or [])
         edge_sources = {src for src, _, _ in edges}
         edge_nodes = edge_sources | {dst for _, dst, _ in edges}
-        def mark_terminal(label: str, alias: str) -> str:
+        def mark_terminal(label: str, alias: str, state_name: Optional[str] = None) -> str:
             if alias in edge_sources:
+                return label
+            if state_name and state_name in source_states:
                 return label
             text = label or ''
             lower = text.lower()
             if 'terminal' in lower:
                 return f"{label} 🔚"
-            if 'continues' in lower:
-                return label
             return f"{label} 🔚" if label else '🔚'
 
         lines = ['stateDiagram-v2', f"  %% {info['title']}"]
 
         for state, label in bridge_in.items():
             alias = bridge_in_alias[state]
-            display = mark_terminal(label, alias)
+            display = mark_terminal(label, alias, state)
             lines.append(f'  state "{display}" as {alias}')
 
         for alias, label in branch_states:
@@ -443,7 +447,7 @@ def save_mermaid(transitions: Sequence[Dict], glossary: Dict[str, str]):
 
         for state, label in bridge_out.items():
             alias = bridge_out_alias[state]
-            display = mark_terminal(label, alias)
+            display = mark_terminal(label, alias, state)
             lines.append(f'  state "{display}" as {alias}')
 
         for src, dst, label in edges:
@@ -515,7 +519,8 @@ def main() -> None:
 
     CATALOGUE_JSON.write_text(json.dumps(catalogue, indent=2))
     save_markdown(catalogue)
-    save_mermaid(catalogue, glossary)
+    source_states = {row['from'] for row in catalogue}
+    save_mermaid(catalogue, glossary, source_states)
     print(f"Harvested {len(catalogue)} transitions across {len({c['from'] for c in catalogue})} states.")
     tag_summary = defaultdict(int)
     for item in catalogue:
