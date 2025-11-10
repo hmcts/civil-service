@@ -1,0 +1,8 @@
+{
+  "name": "Notice.AAA6.ClaimIssue.HWF.PhonePayment",
+  "role": "CLAIMANT",
+  "titleEn": "The claim fee has been paid",
+  "titleCy": "Mae ffi’r hawliad wedi cael ei thalu",
+  "descriptionEn": "<p class=\"govuk-body\">The claim fee has been paid in full.</p>",
+  "descriptionCy": "<p class=\"govuk-body\">Mae ffi’r hawliad wedi cael ei thalu’n llawn.</p>"
+}
