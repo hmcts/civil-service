@@ -1,20 +1,20 @@
 stateDiagram-v2
   %% Claim Issue & Notification (spec + unspec)
   state "NOTIFICATION_ACKNOWLEDGED (continues in Defence flow)" as ISSUE_FLOW_OUT_0
-  state "TAKEN_OFFLINE_SPEC_DEFENDANT_NOC (continues in Post-response flow)" as ISSUE_FLOW_OUT_1
-  state "TAKEN_OFFLINE_BY_STAFF (continues in Post-response flow)" as ISSUE_FLOW_OUT_2
-  state "TAKEN_OFFLINE_BY_SYSTEM (continues in Post-response flow)" as ISSUE_FLOW_OUT_3
-  state "TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED (continues in Post-response flow)" as ISSUE_FLOW_OUT_4
-  state "TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED (continues in Post-response flow)" as ISSUE_FLOW_OUT_5
-  state "TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT (continues in Post-response flow)" as ISSUE_FLOW_OUT_6
-  state "TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT (continues in Post-response flow)" as ISSUE_FLOW_OUT_7
-  state "TAKEN_OFFLINE_UNREGISTERED_DEFENDANT (continues in Post-response flow)" as ISSUE_FLOW_OUT_8
+  state "TAKEN_OFFLINE_SPEC_DEFENDANT_NOC (continues in Post-response flow) 🔚" as ISSUE_FLOW_OUT_1
+  state "TAKEN_OFFLINE_BY_STAFF (continues in Post-response flow) 🔚" as ISSUE_FLOW_OUT_2
+  state "TAKEN_OFFLINE_BY_SYSTEM (continues in Post-response flow) 🔚" as ISSUE_FLOW_OUT_3
+  state "TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED (continues in Post-response flow) 🔚" as ISSUE_FLOW_OUT_4
+  state "TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED (continues in Post-response flow) 🔚" as ISSUE_FLOW_OUT_5
+  state "TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT (continues in Post-response flow) 🔚" as ISSUE_FLOW_OUT_6
+  state "TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT (continues in Post-response flow) 🔚" as ISSUE_FLOW_OUT_7
+  state "TAKEN_OFFLINE_UNREGISTERED_DEFENDANT (continues in Post-response flow) 🔚" as ISSUE_FLOW_OUT_8
   state "FULL_DEFENCE (continues in Defence flow)" as ISSUE_FLOW_OUT_9
   state "FULL_ADMISSION (continues in Defence flow)" as ISSUE_FLOW_OUT_10
   state "PART_ADMISSION (continues in Defence flow)" as ISSUE_FLOW_OUT_11
-  state "COUNTER_CLAIM (continues in Defence flow)" as ISSUE_FLOW_OUT_12
-  state "DIVERGENT_RESPOND_GO_OFFLINE (continues in Defence flow)" as ISSUE_FLOW_OUT_13
-  state "DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE (continues in Defence flow)" as ISSUE_FLOW_OUT_14
+  state "COUNTER_CLAIM (continues in Defence flow) 🔚" as ISSUE_FLOW_OUT_12
+  state "DIVERGENT_RESPOND_GO_OFFLINE (continues in Defence flow) 🔚" as ISSUE_FLOW_OUT_13
+  state "DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE (continues in Defence flow) 🔚" as ISSUE_FLOW_OUT_14
   CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION --> ISSUE_FLOW_OUT_0 : At least one defendant has acknowledged service per scenario rules.
   CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION --> ISSUE_FLOW_OUT_2 : Staff took the case offline after claim details were notified while…
   CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION --> PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA : Claim details notification deadline expired while an extension appl…

@@ -5,9 +5,9 @@ stateDiagram-v2
   state "FULL_DEFENCE (continues in Post-response flow)" as RESPONSE_FLOW_OUT_0
   state "FULL_ADMISSION (continues in Post-response flow)" as RESPONSE_FLOW_OUT_1
   state "PART_ADMISSION (continues in Post-response flow)" as RESPONSE_FLOW_OUT_2
-  state "COUNTER_CLAIM (continues in Post-response flow)" as RESPONSE_FLOW_OUT_3
-  state "TAKEN_OFFLINE_BY_STAFF (continues in Post-response flow)" as RESPONSE_FLOW_OUT_4
-  state "TAKEN_OFFLINE_SDO_NOT_DRAWN (continues in Post-response flow)" as RESPONSE_FLOW_OUT_5
+  state "COUNTER_CLAIM (continues in Post-response flow) 🔚" as RESPONSE_FLOW_OUT_3
+  state "TAKEN_OFFLINE_BY_STAFF (continues in Post-response flow) 🔚" as RESPONSE_FLOW_OUT_4
+  state "TAKEN_OFFLINE_SDO_NOT_DRAWN (continues in Post-response flow) 🔚" as RESPONSE_FLOW_OUT_5
   state "PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA (continues in Post-response flow)" as RESPONSE_FLOW_OUT_6
   ALL_RESPONSES_RECEIVED --> RESPONSE_FLOW_OUT_0 : Latest defence is a full defence unspecified.
   ALL_RESPONSES_RECEIVED --> RESPONSE_FLOW_OUT_0 : Latest defence is a full defence in SPEC.
