@@ -74,6 +74,12 @@ import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoCaseClassificationService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoDisposalDirectionsService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoFastTrackDirectionsService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoR2SmallClaimsDirectionsService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoR2TrialDirectionsService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoSmallClaimsDirectionsService;
 import uk.gov.hmcts.reform.civil.utils.HearingMethodUtils;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
@@ -102,6 +108,12 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_S
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
     SdoGeneratorService.class,
+    SdoCaseClassificationService.class,
+    SdoDisposalDirectionsService.class,
+    SdoFastTrackDirectionsService.class,
+    SdoSmallClaimsDirectionsService.class,
+    SdoR2TrialDirectionsService.class,
+    SdoR2SmallClaimsDirectionsService.class,
     JacksonAutoConfiguration.class
 })
 public class SdoGeneratorServiceTest {
