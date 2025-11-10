@@ -1,0 +1,8 @@
+{
+  "name": "Notice.AAA6.DefResponse.FullDefence.FullDispute.Multi.Int.Fast.Defendant",
+  "role": "DEFENDANT",
+  "titleEn": "Response to the claim",
+  "titleCy": "Ymateb i’r hawliad",
+  "descriptionEn": "<p class=\"govuk-body\">You have rejected the claim. The court will contact you when they respond.</p><p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a></p>",
+  "descriptionCy": "<p class=\"govuk-body\">Rydych wedi gwrthod yr hawliad. Bydd y llys yn cysylltu â chi pan fyddant yn ymateb.</p><p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">Gweld eich ymateb</a></p>"
+}

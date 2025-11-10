@@ -1,0 +1,8 @@
+{
+  "name": "Notice.AAA6.GeneralApps.OtherPartyUploadedDocuments.Respondent",
+  "role": "RESPONDENT",
+  "titleEn": "The other parties have uploaded documents to the application",
+  "titleCy": "Mae’r partïon eraill wedi uwchlwytho dogfennau i’r cais",
+  "descriptionEn": "<p class=\"govuk-body\"><a href={GA_RESPONSE_VIEW_APPLICATION_URL} rel=\"noopener noreferrer\" class=\"govuk-link\">Review the uploaded documents.</a></p>",
+  "descriptionCy": "<p class=\"govuk-body\"><a href={GA_RESPONSE_VIEW_APPLICATION_URL} rel=\"noopener noreferrer\" class=\"govuk-link\">Adolygu’r dogfennau a uwchlwythwyd.</a></p>"
+}
