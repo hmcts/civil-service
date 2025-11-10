@@ -1,0 +1,8 @@
+{
+  "name": "Notice.AAA6.GeneralApps.HearingScheduled.Applicant",
+  "role": "APPLICANT",
+  "titleEn": "A hearing on the application has been scheduled",
+  "titleCy": "Mae gwrandawiad ar y cais wedi’i drefnu",
+  "descriptionEn": "<p class=\"govuk-body\">Your hearing has been scheduled for ${hearingNoticeApplicationDateEn} <a href=\"{GA_VIEW_APPLICATION_URL}\" class=\"govuk-link\"> View the hearing notice</a>.</p>",
+  "descriptionCy": "<p class=\"govuk-body\">Mae eich gwrandawiad wedi’i drefnu ar gyfer ${hearingNoticeApplicationDateCy} <a href=\"{GA_VIEW_APPLICATION_URL}\" class=\"govuk-link\"> Gweld yr hysbysiad o wrandawiad</a>.</p>"
+}

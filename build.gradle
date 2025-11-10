@@ -274,6 +274,14 @@ sonarqube {
   }
 }
 
+configure(subprojects.findAll { it.name == 'dashboard-notifications' }) {
+  sonarqube {
+    properties {
+      property "sonar.coverage.jacoco.xmlReportPaths", "${rootProject.buildDir}/reports/jacoco/test/jacocoTestReport.xml"
+    }
+  }
+}
+
 jacocoTestReport {
   executionData(test, integration)
   executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
@@ -289,6 +297,16 @@ jacocoTestReport {
 
 jacocoTestReport.dependsOn {
   subprojects*.test
+}
+
+jacocoTestReport.dependsOn subprojects.collect { project ->
+  project.tasks.findByName('jacocoTestReport')
+}.findAll { it != null }
+
+jacocoTestReport.dependsOn tasks.matching { it.name.startsWith('compile') || it.name.startsWith('process') }
+
+tasks.named('test') {
+  finalizedBy jacocoTestReport
 }
 
 ext.libraries = [
@@ -429,6 +447,9 @@ dependencies {
   implementation group: 'org.apache.pdfbox', name: 'pdfbox-io', version: versions.pdfbox
 
   implementation group: 'com.github.hmcts', name: 'auth-checker-lib', version: '2.1.5'
+
+  implementation 'org.apache.poi:poi:5.4.0'
+  implementation 'org.apache.poi:poi-ooxml:5.4.0'
 
   testImplementation group: 'org.apache.pdfbox', name: 'pdfbox-io', version: versions.pdfbox
   testImplementation group: 'org.apache.pdfbox', name: 'preflight', version: versions.pdfbox, withoutJunit4

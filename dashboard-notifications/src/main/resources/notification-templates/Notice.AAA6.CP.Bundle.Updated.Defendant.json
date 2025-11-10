@@ -1,0 +1,9 @@
+{
+  "name": "Notice.AAA6.CP.Bundle.Updated.Defendant",
+  "role": "DEFENDANT",
+  "titleEn": "The case bundle has been updated",
+  "titleCy": "Mae bwndel yr achos wedi'i ddiweddaru",
+  "descriptionEn": "<p class=\"govuk-body\">The case bundle was changed and re-uploaded on ${bundleRestitchedDateEn}. <a href=\"{VIEW_BUNDLE_REDIRECT}\" class=\"govuk-link\">Review the new bundle</a></p>",
+  "descriptionCy": "<p class=\"govuk-body\">Cafodd bwndel yr achos ei newid a'i ail-uwchlwytho ar ${bundleRestitchedDateCy}. <a href=\"{VIEW_BUNDLE_REDIRECT}\" class=\"govuk-link\">Adolygu’r bwndel newydd</a></p>",
+  "timeToLive": "Session"
+}
