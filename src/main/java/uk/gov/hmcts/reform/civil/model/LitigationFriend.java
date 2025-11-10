@@ -17,17 +17,17 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class LitigationFriend {
 
-    private final String partyID;
+    private String partyID;
 
     // CIV-5557 to be removed
-    private final String fullName;
-    private final String firstName;
-    private final String lastName;
-    private final String emailAddress;
-    private final String phoneNumber;
-    private final YesOrNo hasSameAddressAsLitigant;
-    private final Address primaryAddress;
-    private final List<Element<DocumentWithRegex>> certificateOfSuitability;
+    private String fullName;
+    private String firstName;
+    private String lastName;
+    private String emailAddress;
+    private String phoneNumber;
+    private YesOrNo hasSameAddressAsLitigant;
+    private Address primaryAddress;
+    private List<Element<DocumentWithRegex>> certificateOfSuitability;
     private Flags flags;
 
     @JsonPOJOBuilder(withPrefix = "")

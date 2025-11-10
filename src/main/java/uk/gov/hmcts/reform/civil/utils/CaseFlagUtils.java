@@ -103,9 +103,38 @@ public class CaseFlagUtils {
         if (partyToUpdate.getFlags() != null) {
             return partyToUpdate;
         }
+        // Create a new Party instance to avoid modifying the original
+        Party updatedParty = new Party();
+        // Copy all fields from the original party
+        copyPartyFields(partyToUpdate, updatedParty);
+        // Set the flags
+        updatedParty.setFlags(createFlags(partyToUpdate.getPartyName(), roleOnCase));
+        return updatedParty;
+    }
 
-        partyToUpdate.setFlags(createFlags(partyToUpdate.getPartyName(), roleOnCase));
-        return partyToUpdate;
+    private static void copyPartyFields(Party source, Party target) {
+        if (source == null || target == null) {
+            return;
+        }
+        target.setPartyID(source.getPartyID());
+        target.setType(source.getType());
+        target.setPartyName(source.getPartyName());
+        target.setIndividualTitle(source.getIndividualTitle());
+        target.setIndividualFirstName(source.getIndividualFirstName());
+        target.setIndividualLastName(source.getIndividualLastName());
+        target.setIndividualDateOfBirth(source.getIndividualDateOfBirth());
+        target.setCompanyName(source.getCompanyName());
+        target.setOrganisationName(source.getOrganisationName());
+        target.setSoleTraderTitle(source.getSoleTraderTitle());
+        target.setSoleTraderFirstName(source.getSoleTraderFirstName());
+        target.setSoleTraderLastName(source.getSoleTraderLastName());
+        target.setSoleTraderDateOfBirth(source.getSoleTraderDateOfBirth());
+        target.setSoleTraderTradingAs(source.getSoleTraderTradingAs());
+        target.setPartyEmail(source.getPartyEmail());
+        target.setPartyPhone(source.getPartyPhone());
+        target.setPrimaryAddress(source.getPrimaryAddress());
+        target.setUnavailableDates(source.getUnavailableDates());
+        target.setFlags(source.getFlags());
     }
 
     public static LitigationFriend updateLitFriend(String roleOnCase, LitigationFriend litFriendToUpdate) {
@@ -115,14 +144,35 @@ public class CaseFlagUtils {
         if (litFriendToUpdate.getFlags() != null) {
             return litFriendToUpdate;
         }
-        // LitigationFriend was updated to split fullName into firstname and lastname for H&L ==================
-        // ToDo: Remove the use of fullName after H&L changes are default =====================================
+
+        // Create a new LitigationFriend instance to avoid modifying the original
+        LitigationFriend updatedLitFriend = LitigationFriend.builder().build();
+        // Copy all fields from the original
+        copyLitigationFriendFields(litFriendToUpdate, updatedLitFriend);
+
+        // Determine party name
         String partyName = litFriendToUpdate.getFullName() != null ? litFriendToUpdate.getFullName()
-            // ====================================================================================================
             : formattedPartyNameForFlags(litFriendToUpdate.getFirstName(), litFriendToUpdate.getLastName());
 
-        litFriendToUpdate.setFlags(createFlags(partyName, roleOnCase));
-        return litFriendToUpdate;
+        // Set the flags
+        updatedLitFriend.setFlags(createFlags(partyName, roleOnCase));
+        return updatedLitFriend;
+    }
+
+    private static void copyLitigationFriendFields(LitigationFriend source, LitigationFriend target) {
+        if (source == null || target == null) {
+            return;
+        }
+        target.setPartyID(source.getPartyID());
+        target.setFullName(source.getFullName());
+        target.setFirstName(source.getFirstName());
+        target.setLastName(source.getLastName());
+        target.setEmailAddress(source.getEmailAddress());
+        target.setPhoneNumber(source.getPhoneNumber());
+        target.setHasSameAddressAsLitigant(source.getHasSameAddressAsLitigant());
+        target.setPrimaryAddress(source.getPrimaryAddress());
+        target.setCertificateOfSuitability(source.getCertificateOfSuitability());
+        target.setFlags(source.getFlags());
     }
 
     private static List<Element<PartyFlagStructure>> getTopLevelFieldForWitnessesWithFlagsStructure(
@@ -256,7 +306,15 @@ public class CaseFlagUtils {
     }
 
     public static void createOrUpdateFlags(CaseData caseData, OrganisationService organisationService) {
+        // Add null safety check for UpdateDetailsForm
+        if (caseData.getUpdateDetailsForm() == null) {
+            return;
+        }
         String partyChosen = caseData.getUpdateDetailsForm().getPartyChosenId();
+        if (partyChosen == null) {
+            return;
+        }
+
         // claimant/defendant
         updatePartyFlags(caseData, partyChosen);
         // litigation friend
@@ -273,64 +331,78 @@ public class CaseFlagUtils {
 
     private static void updateLRIndividualsFlags(CaseData caseData, String partyChosen, OrganisationService organisationService) {
         if ((CLAIMANT_ONE_LEGAL_REP_INDIVIDUALS_ID).equals(partyChosen)) {
-            String legalRepFirmName = getLegalRepFirmName(
-                caseData.getApplicant1OrganisationPolicy(),
-                organisationService,
-                APPLICANT_ONE
-            );
-            caseData.setApplicant1LRIndividuals(updatePartyNameForPartyFlagStructures(
-                caseData.getApplicant1LRIndividuals(),
-                legalRepFirmName
-            ));
+            if (caseData.getApplicant1OrganisationPolicy() != null) {
+                String legalRepFirmName = getLegalRepFirmName(
+                    caseData.getApplicant1OrganisationPolicy(),
+                    organisationService,
+                    APPLICANT_ONE
+                );
+                caseData.setApplicant1LRIndividuals(updatePartyNameForPartyFlagStructures(
+                    caseData.getApplicant1LRIndividuals(),
+                    legalRepFirmName
+                ));
+            }
         }
         if ((DEFENDANT_ONE_LEGAL_REP_INDIVIDUALS_ID).equals(partyChosen)) {
-            String legalRepFirmName = getLegalRepFirmName(
-                caseData.getRespondent1OrganisationPolicy(),
-                organisationService,
-                RESPONDENT_ONE
-            );
-            caseData.setRespondent1LRIndividuals(updatePartyNameForPartyFlagStructures(
-                caseData.getRespondent1LRIndividuals(),
-                legalRepFirmName
-            ));
+            if (caseData.getRespondent1OrganisationPolicy() != null) {
+                String legalRepFirmName = getLegalRepFirmName(
+                    caseData.getRespondent1OrganisationPolicy(),
+                    organisationService,
+                    RESPONDENT_ONE
+                );
+                caseData.setRespondent1LRIndividuals(updatePartyNameForPartyFlagStructures(
+                    caseData.getRespondent1LRIndividuals(),
+                    legalRepFirmName
+                ));
+            }
         }
         if ((DEFENDANT_TWO_LEGAL_REP_INDIVIDUALS_ID).equals(partyChosen)) {
-            String legalRepFirmName = getLegalRepFirmName(
-                caseData.getRespondent2OrganisationPolicy(),
-                organisationService,
-                RESPONDENT_TWO
-            );
-            caseData.setRespondent2LRIndividuals(updatePartyNameForPartyFlagStructures(
-                caseData.getRespondent2LRIndividuals(),
-                legalRepFirmName
-            ));
+            if (caseData.getRespondent2OrganisationPolicy() != null) {
+                String legalRepFirmName = getLegalRepFirmName(
+                    caseData.getRespondent2OrganisationPolicy(),
+                    organisationService,
+                    RESPONDENT_TWO
+                );
+                caseData.setRespondent2LRIndividuals(updatePartyNameForPartyFlagStructures(
+                    caseData.getRespondent2LRIndividuals(),
+                    legalRepFirmName
+                ));
+            }
         }
     }
 
     private static void updateOrgIndividualsFlags(CaseData caseData, String partyChosen) {
         if ((CLAIMANT_ONE_ORG_INDIVIDUALS_ID).equals(partyChosen)) {
-            caseData.setApplicant1OrgIndividuals(updatePartyNameForPartyFlagStructures(
-                caseData.getApplicant1OrgIndividuals(),
-                caseData.getApplicant1().getPartyName()
-            ));
+            if (caseData.getApplicant1() != null) {
+                caseData.setApplicant1OrgIndividuals(updatePartyNameForPartyFlagStructures(
+                    caseData.getApplicant1OrgIndividuals(),
+                    caseData.getApplicant1().getPartyName()
+                ));
+            }
         }
         if ((CLAIMANT_TWO_ORG_INDIVIDUALS_ID).equals(partyChosen)) {
-            caseData.setApplicant2OrgIndividuals(updatePartyNameForPartyFlagStructures(
-                caseData.getApplicant2OrgIndividuals(),
-                caseData.getApplicant2().getPartyName()
-            ));
+            if (caseData.getApplicant2() != null) {
+                caseData.setApplicant2OrgIndividuals(updatePartyNameForPartyFlagStructures(
+                    caseData.getApplicant2OrgIndividuals(),
+                    caseData.getApplicant2().getPartyName()
+                ));
+            }
         }
         if ((DEFENDANT_ONE_ORG_INDIVIDUALS_ID).equals(partyChosen)) {
-            caseData.setRespondent1OrgIndividuals(updatePartyNameForPartyFlagStructures(
-                caseData.getRespondent1OrgIndividuals(),
-                caseData.getRespondent1().getPartyName()
-            ));
+            if (caseData.getRespondent1() != null) {
+                caseData.setRespondent1OrgIndividuals(updatePartyNameForPartyFlagStructures(
+                    caseData.getRespondent1OrgIndividuals(),
+                    caseData.getRespondent1().getPartyName()
+                ));
+            }
         }
         if ((DEFENDANT_TWO_ORG_INDIVIDUALS_ID).equals(partyChosen)) {
-            caseData.setRespondent2OrgIndividuals(updatePartyNameForPartyFlagStructures(
-                caseData.getRespondent2OrgIndividuals(),
-                caseData.getRespondent2().getPartyName()
-            ));
+            if (caseData.getRespondent2() != null) {
+                caseData.setRespondent2OrgIndividuals(updatePartyNameForPartyFlagStructures(
+                    caseData.getRespondent2OrgIndividuals(),
+                    caseData.getRespondent2().getPartyName()
+                ));
+            }
         }
     }
 
@@ -513,6 +585,9 @@ public class CaseFlagUtils {
     private static String getLegalRepFirmName(OrganisationPolicy organisationPolicy,
                                               OrganisationService organisationService,
                                               String party) {
+        if (organisationPolicy == null || organisationPolicy.getOrganisation() == null) {
+            return String.format("legal representative for %s", party.toLowerCase());
+        }
         String organisationID = organisationPolicy.getOrganisation().getOrganisationID();
         return organisationService.findOrganisationById(organisationID)
             .map(Organisation::getName)
