@@ -130,6 +130,7 @@ java:
     auth:
       username: ${POSTGRES_USER}
       password: ${POSTGRES_PASSWORD}
+
 idam-pr:
   releaseNameOverride: ${SERVICE_NAME}-xui-idam-pr
   enabled: true
