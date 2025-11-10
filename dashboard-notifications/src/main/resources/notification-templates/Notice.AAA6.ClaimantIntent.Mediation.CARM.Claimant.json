@@ -1,0 +1,8 @@
+{
+  "name": "Notice.AAA6.ClaimantIntent.Mediation.CARM.Claimant",
+  "role": "CLAIMANT",
+  "titleEn": "Your claim is now going to mediation",
+  "titleCy": "Mae eich hawliad nawr yn mynd i gyfryngu",
+  "descriptionEn": "<p class=\"govuk-body\">Your claim is now going to mediation. You will be contacted within 28 days with details of your appointment. <br> If you do not attend your mediation appointment, the judge may issue a penalty.</p>",
+  "descriptionCy": "<p class=\"govuk-body\">Mae eich hawliad nawr yn mynd i gyfryngu. Byddwn yn cysylltu â chi o fewn 28 diwrnod gyda manylion am eich apwyntiad. <br> Os na fyddwch yn mynychu’ch apwyntiad cyfryngu, efallai y bydd y barnwr yn eich cosbi.</p>"
+}

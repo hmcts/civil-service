@@ -1,0 +1,9 @@
+{
+  "name": "Notice.AAA6.CP.Trial.Arrangements.Finalised.NotifyOtherParty.Claimant",
+  "role": "CLAIMANT",
+  "titleEn": "The other side has confirmed their trial arrangements",
+  "titleCy": "Mae'r parti arall wedi cadarnhau eu trefniadau treial",
+  "descriptionEn": "<p class=\"govuk-body\">You can <a href=\"{VIEW_ORDERS_AND_NOTICES_REDIRECT}\" class=\"govuk-link\">view the arrangements that they've confirmed</a>.</p>",
+  "descriptionCy": "<p class=\"govuk-body\">Gallwch <a href=\"{VIEW_ORDERS_AND_NOTICES_REDIRECT}\" class=\"govuk-link\">weld y trefniadau y maent wedi'u cadarnhau</a>.</p>",
+  "timeToLive": "Session"
+}

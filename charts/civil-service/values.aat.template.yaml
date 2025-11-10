@@ -112,56 +112,6 @@ idam-pr:
     XUI:
       - https://civil-service-xui-staging.aat.platform.hmcts.net/oauth2/callback
 
-civil-general-applications:
-  enabled: true
-  java:
-    releaseNameOverride: ${SERVICE_NAME}-ga
-    ingressHost: civil-service-ga-staging.aat.platform.hmcts.net
-    keyVaults:
-      civil:
-        resourceGroup: civil
-        secrets:
-          - name: civil-idam-client-secret
-            alias: idam.client.secret
-          - name: microservicekey-civil-service
-            alias: CIVIL_CLIENT_TOTP_SECRET
-          - name: system-update-user-username
-            alias: CIVIL_SYSTEM_UPDATE_USERNAME
-          - name: system-update-user-password
-            alias: CIVIL_SYSTEM_UPDATE_PASSWORD
-          - name: cross-access-user-username
-            alias: CIVIL_CROSS_ACCESS_USERNAME
-          - name: cross-access-user-password
-            alias: CIVIL_CROSS_ACCESS_PASSWORD
-          - name: prd-admin-user-username
-            alias: CIVIL_PRD_ADMIN_USERNAME
-          - name: prd-admin-user-password
-            alias: CIVIL_PRD_ADMIN_PASSWORD
-          - name: appinsights-instrumentation-key
-            alias: azure.application-insights.instrumentation-key
-          - name: docmosis-api-key
-            alias: docmosis.tornado.key
-          - name: gov-notify-api-key
-            alias: GOV_NOTIFY_API_KEY
-          - name: sendgrid-api-key
-            alias: SENDGRID_API_KEY
-          - name: robotics-notification-sender
-            alias: robotics.notification.sender
-          - name: robotics-notification-recipient
-            alias: robotics.notification.recipient
-          - name: launch-darkly-sdk-key
-            alias: LAUNCH_DARKLY_SDK_KEY
-          - name: robotics-notification-multipartyrecipient
-            alias: robotics.notification.multipartyrecipient
-      civil-gen-apps:
-        resourceGroup: civil
-        secrets:
-          - name: microservicekey-civil-general-applications
-            alias: idam.s2s-auth.totp_secret
-    environment:
-      LAUNCH_DARKLY_ENV: service-staging
-      PAY_CALLBACK_URL: https://civil-service-ga-staging.aat.platform.hmcts.net/service-request-update
-
 xui-webapp:
   enabled: true
   nodejs:
