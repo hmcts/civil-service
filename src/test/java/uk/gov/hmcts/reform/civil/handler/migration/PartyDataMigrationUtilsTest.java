@@ -70,4 +70,19 @@ class PartyDataMigrationUtilsTest {
         List<Element<String>> result = PartyDataMigrationUtils.updateElements(null, s -> s + "-updated");
         assertThat(result).isEmpty();
     }
+
+    @Test
+    void updateElements_shouldHandleTransformerReturningNull() {
+        Element<String> element = Element.<String>builder()
+            .id(UUID.randomUUID())
+            .value("X")
+            .build();
+        List<Element<String>> elements = List.of(element);
+
+        List<Element<String>> result = PartyDataMigrationUtils.updateElements(elements, s -> null);
+
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getValue()).isNull();
+        assertThat(result.get(0).getId()).isEqualTo(element.getId());
+    }
 }

@@ -1,0 +1,9 @@
+{
+  "name": "Notice.AAA6.ClaimantIntent.ClaimSettled.Defendant",
+  "role": "DEFENDANT",
+  "titleEn": "The claim is settled",
+  "titleCy": "Mae’r hawliad wedi’i setlo",
+  "descriptionEn": "<p class=\"govuk-body\">The claimant has confirmed that this case was settled on ${claimSettledDateEn}.</p><p class=\"govuk-body\">If you do not agree that the case is settled, please outline your objections in writing within 19 days of the settlement date, to the Civil National Business Centre using the email address at {cmcCourtEmailId}</p>",
+  "descriptionCy": "<p class=\"govuk-body\">The claimant has confirmed that this case was settled on ${claimSettledDateEn}.</p><p class=\"govuk-body\">If you do not agree that the case is settled, please outline your objections in writing within 19 days of the settlement date, to the Civil National Business Centre using the email address at {cmcCourtEmailId}</p>",
+  "deadlineParam": "claimSettledObjectionsDeadline"
+}

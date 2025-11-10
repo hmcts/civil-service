@@ -32,4 +32,14 @@ public final class PartyDataMigrationUtils {
                 .build())
             .toList();
     }
+
+    private <T> T updateIfExists(T newValue, T existingValue) {
+        if (newValue == null) {
+            return existingValue;
+        }
+        if (newValue instanceof String str && str.isBlank()) {
+            return existingValue;
+        }
+        return newValue;
+    }
 }
