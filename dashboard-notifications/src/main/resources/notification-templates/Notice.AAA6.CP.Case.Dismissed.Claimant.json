@@ -1,0 +1,9 @@
+{
+  "name": "Notice.AAA6.CP.Case.Dismissed.Claimant",
+  "role": "CLAIMANT",
+  "titleEn": "The case has been closed",
+  "titleCy": "Mae’r achos wedi’i gau",
+  "descriptionEn": "<p class=\"govuk-body\">The case has been closed as a result of a judge’s order.<br>You can view the case summary but not the case details. You cannot make any changes to a closed case.</p>",
+  "descriptionCy": "<p class=\"govuk-body\">Mae’r achos wedi’i gau o ganlyniad i orchymyn  barnwr.<br>Gallwch weld y crynodeb o’r achos ond nid manylion yr achos. Ni allwch wneud unrhyw newidiadau i achos sydd wedi cau.</p>",
+  "timeToLive": "Session"
+}

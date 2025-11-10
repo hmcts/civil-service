@@ -8,8 +8,6 @@ xui-webapp:
 camunda-bpm:
   enabled: false
 
-civil-general-applications:
-  enabled: false
 
 aac-manage-case-assignment:
   enabled: false

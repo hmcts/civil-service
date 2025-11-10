@@ -15,10 +15,12 @@ public interface DashboardNotificationsRepository extends CrudRepository<Dashboa
 
     List<DashboardNotificationsEntity> findByReferenceAndCitizenRole(String reference, String role);
 
-    List<DashboardNotificationsEntity> findByReferenceAndCitizenRoleAndDashboardNotificationsTemplatesId(
-        String reference, String role, Long templateId);
+    List<DashboardNotificationsEntity> findByReferenceAndCitizenRoleAndName(
+        String reference, String role, String name);
 
     int deleteByNameAndReferenceAndCitizenRole(String name, String reference, String role);
 
     int deleteByReferenceAndCitizenRole(String reference, String role);
+
+    int deleteByNameAndReference(String name, String reference);
 }
