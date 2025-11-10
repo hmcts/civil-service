@@ -11,7 +11,7 @@ plugins {
   id 'org.sonarqube' version '6.2.0.5505'
   id 'au.com.dius.pact' version '4.6.17'
   id "io.freefair.lombok" version "8.14"
-  id 'com.github.hmcts.rse-cft-lib' version '0.19.1810'
+  id 'com.github.hmcts.rse-cft-lib' version '0.19.1903'
   id "org.flywaydb.flyway" version "10.22.0"
   id 'maven-publish'
 }
@@ -34,6 +34,9 @@ def versions = [
 ]
 
 allprojects {
+  sourceCompatibility = JavaVersion.VERSION_17
+  targetCompatibility = JavaVersion.VERSION_17
+
   java {
     toolchain {
       languageVersion = JavaLanguageVersion.of(17)
@@ -271,6 +274,14 @@ sonarqube {
   }
 }
 
+configure(subprojects.findAll { it.name == 'dashboard-notifications' }) {
+  sonarqube {
+    properties {
+      property "sonar.coverage.jacoco.xmlReportPaths", "${rootProject.buildDir}/reports/jacoco/test/jacocoTestReport.xml"
+    }
+  }
+}
+
 jacocoTestReport {
   executionData(test, integration)
   executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
@@ -286,6 +297,16 @@ jacocoTestReport {
 
 jacocoTestReport.dependsOn {
   subprojects*.test
+}
+
+jacocoTestReport.dependsOn subprojects.collect { project ->
+  project.tasks.findByName('jacocoTestReport')
+}.findAll { it != null }
+
+jacocoTestReport.dependsOn tasks.matching { it.name.startsWith('compile') || it.name.startsWith('process') }
+
+tasks.named('test') {
+  finalizedBy jacocoTestReport
 }
 
 ext.libraries = [
@@ -426,6 +447,9 @@ dependencies {
   implementation group: 'org.apache.pdfbox', name: 'pdfbox-io', version: versions.pdfbox
 
   implementation group: 'com.github.hmcts', name: 'auth-checker-lib', version: '2.1.5'
+
+  implementation 'org.apache.poi:poi:5.4.0'
+  implementation 'org.apache.poi:poi-ooxml:5.4.0'
 
   testImplementation group: 'org.apache.pdfbox', name: 'pdfbox-io', version: versions.pdfbox
   testImplementation group: 'org.apache.pdfbox', name: 'preflight', version: versions.pdfbox, withoutJunit4
