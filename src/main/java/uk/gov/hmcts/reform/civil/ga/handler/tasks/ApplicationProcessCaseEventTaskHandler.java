@@ -44,12 +44,12 @@ public class ApplicationProcessCaseEventTaskHandler extends BaseExternalTaskHand
         CaseDataContent caseDataContent = caseDataContent(startEventResponse, businessProcess);
         var data = coreCaseDataService.submitGaUpdate(generalApplicationCaseId, caseDataContent);
         log.info("Successfully submitted update for caseId: {}", generalApplicationCaseId);
-        return ExternalTaskData.builder().sourceGeneralApplicationCaseData(data).build();
+        return ExternalTaskData.builder().parentCaseData(data).build();
     }
 
     @Override
     public VariableMap getVariableMap(ExternalTaskData externalTaskData) {
-        var caseData = externalTaskData.sourceGeneralApplicationCaseData().orElseThrow();
+        var caseData = externalTaskData.parentCaseData().orElseThrow();
         VariableMap variables = Variables.createVariables();
         var stateFlow = stateFlowEngine.evaluate(caseData);
         variables.putValue(FLOW_STATE, stateFlow.getState().getName());
