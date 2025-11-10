@@ -4,30 +4,30 @@ properties([
   pipelineTriggers([cron('H 17 * * 1-5')]),
   copyArtifactPermission('/HMCTS_a_to_c_Nightly/civil-service/*'),
   parameters([
-    choice(name: 'FORCE_GREEN_BUILD', choices: ['false', 'true'], 
+    choice(name: 'FORCE_GREEN_BUILD', choices: ['false', 'true'],
       description: 'Should force pipeline to go green by not running any functional tests'),
-    choice(name: 'RUN_PREV_FAILED_AND_NOT_EXECUTED_TEST_FILES', choices: ['false', 'true'], 
+    choice(name: 'RUN_PREV_FAILED_AND_NOT_EXECUTED_TEST_FILES', choices: ['false', 'true'],
       description: 'Runs the failed test files and test files that were not executed, contained within the \'testFilesReport.json\', from the latest previous pipeline run'),
-    choice(name: 'ENVIRONMENT', choices: ['aat', 'demo', 'preview'], 
+    choice(name: 'ENVIRONMENT', choices: ['aat', 'demo', 'preview'],
       description: 'Environment to test'),
-    choice(name: 'FRONTEND_URL', 
+    choice(name: 'FRONTEND_URL',
       choices: [
-                  'https://manage-case.aat.platform.hmcts.net', 
-                  'https://manage-case.demo.platform.hmcts.net', 
-                  'https://manage-case-int.demo.platform.hmcts.net', 
-                  'https://manage-case-int1.demo.platform.hmcts.net', 
+                  'https://manage-case.aat.platform.hmcts.net',
+                  'https://manage-case.demo.platform.hmcts.net',
+                  'https://manage-case-int.demo.platform.hmcts.net',
+                  'https://manage-case-int1.demo.platform.hmcts.net',
                   'https://manage-case-int2.demo.platform.hmcts.net',
                   'https://manage-case-wa-int.demo.platform.hmcts.net',
                   'https://manage-case-caa-assigned-case-view.demo.platform.hmcts.net'
                 ],
       description: 'The URL you want to run the full functional tests against'),
-    choice(name: 'IDAM_API_URL', choices: ['https://idam-api.aat.platform.hmcts.net', 'https://idam-api.demo.platform.hmcts.net'], 
+    choice(name: 'IDAM_API_URL', choices: ['https://idam-api.aat.platform.hmcts.net', 'https://idam-api.demo.platform.hmcts.net'],
       description: 'The URL of idam api'),
-    choice(name: 'DM_STORE_URL', choices: ['http://dm-store-aat.service.core-compute-aat.internal', 'http://dm-store-demo.service.core-compute-demo.internal'], 
+    choice(name: 'DM_STORE_URL', choices: ['http://dm-store-aat.service.core-compute-aat.internal', 'http://dm-store-demo.service.core-compute-demo.internal'],
       description: 'The URL of dm store'),
-    choice(name: 'SERVICE_AUTH_PROVIDER_API_BASE_URL', choices: ['http://rpe-service-auth-provider-aat.service.core-compute-aat.internal', 'http://rpe-service-auth-provider-demo.service.core-compute-demo.internal'], 
+    choice(name: 'SERVICE_AUTH_PROVIDER_API_BASE_URL', choices: ['http://rpe-service-auth-provider-aat.service.core-compute-aat.internal', 'http://rpe-service-auth-provider-demo.service.core-compute-demo.internal'],
       description: 'The URL of service auth provider'),
-    choice(name: 'CCD_DATA_STORE_URL', choices: ['http://ccd-data-store-api-aat.service.core-compute-aat.internal', 'http://ccd-data-store-api-demo.service.core-compute-demo.internal'], 
+    choice(name: 'CCD_DATA_STORE_URL', choices: ['http://ccd-data-store-api-aat.service.core-compute-aat.internal', 'http://ccd-data-store-api-demo.service.core-compute-demo.internal'],
       description: 'The URL of ccd data store'),
     choice(name: 'CIVIL_SERVICE_URL', choices: ['http://civil-service-aat.service.core-compute-aat.internal', 'http://civil-service-demo.service.core-compute-demo.internal'],
       description: 'The URL of civil service'),
@@ -122,7 +122,6 @@ withNightlyPipeline(type, product, component) {
       sh """
         ./bin/pull-latest-ccd-files.sh ${ccdBranch}
       """
-      yarnBuilder.yarn('yarn-update')
       yarnBuilder.yarn('install-dependencies')
     }
 
