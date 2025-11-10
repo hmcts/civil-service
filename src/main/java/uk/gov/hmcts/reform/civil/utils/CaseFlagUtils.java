@@ -134,7 +134,6 @@ public class CaseFlagUtils {
         target.setPartyPhone(source.getPartyPhone());
         target.setPrimaryAddress(source.getPrimaryAddress());
         target.setUnavailableDates(source.getUnavailableDates());
-        target.setFlags(source.getFlags());
     }
 
     public static LitigationFriend updateLitFriend(String roleOnCase, LitigationFriend litFriendToUpdate) {
@@ -172,7 +171,6 @@ public class CaseFlagUtils {
         target.setHasSameAddressAsLitigant(source.getHasSameAddressAsLitigant());
         target.setPrimaryAddress(source.getPrimaryAddress());
         target.setCertificateOfSuitability(source.getCertificateOfSuitability());
-        target.setFlags(source.getFlags());
     }
 
     private static List<Element<PartyFlagStructure>> getTopLevelFieldForWitnessesWithFlagsStructure(
