@@ -274,6 +274,14 @@ sonarqube {
   }
 }
 
+configure(subprojects.findAll { it.name == 'dashboard-notifications' }) {
+  sonarqube {
+    properties {
+      property "sonar.coverage.jacoco.xmlReportPaths", "${rootProject.buildDir}/reports/jacoco/test/jacocoTestReport.xml"
+    }
+  }
+}
+
 jacocoTestReport {
   executionData(test, integration)
   executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
@@ -289,6 +297,16 @@ jacocoTestReport {
 
 jacocoTestReport.dependsOn {
   subprojects*.test
+}
+
+jacocoTestReport.dependsOn subprojects.collect { project ->
+  project.tasks.findByName('jacocoTestReport')
+}.findAll { it != null }
+
+jacocoTestReport.dependsOn tasks.matching { it.name.startsWith('compile') || it.name.startsWith('process') }
+
+tasks.named('test') {
+  finalizedBy jacocoTestReport
 }
 
 ext.libraries = [

@@ -1,0 +1,8 @@
+{
+  "name": "Notice.AAA6.CP.HearingFee.Paid.Claimant",
+  "role": "CLAIMANT",
+  "titleEn": "The hearing fee has been paid",
+  "titleCy": "Mae ffi’r gwrandawiad wedi’i thalu",
+  "descriptionEn": "<p class=\"govuk-body\">The hearing fee has been paid in full.</p>",
+  "descriptionCy": "<p class=\"govuk-body\">Mae ffi’r gwrandawiad wedi’i thalu’n llawn.</p>"
+}
