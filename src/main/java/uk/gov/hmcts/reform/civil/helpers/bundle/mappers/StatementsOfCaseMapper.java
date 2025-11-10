@@ -1,7 +1,9 @@
 package uk.gov.hmcts.reform.civil.helpers.bundle.mappers;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleFileNameHelper.getEvidenceUploadDocsByPartyAndDocType;
+import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleUtils.buildBundlingRequestDoc;
+import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleUtils.generateDocName;
+
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
@@ -23,9 +25,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleUtils.buildBundlingRequestDoc;
-import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleUtils.generateDocName;
-import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleFileNameHelper.getEvidenceUploadDocsByPartyAndDocType;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -41,10 +42,10 @@ public class StatementsOfCaseMapper {
         // Claim form
         bundlingRequestDocuments.addAll(systemGeneratedDocMapper.mapSystemGeneratedCaseDocument(
             caseData.getSystemGeneratedCaseDocuments().stream()
-                .filter(caseDocumentElement -> caseDocumentElement.getValue().getDocumentType()
-                    .equals(DocumentType.SEALED_CLAIM)
+                .filter(caseDocumentElement -> DocumentType.SEALED_CLAIM
+                    .equals(caseDocumentElement.getValue().getDocumentType())
                     && null != caseDocumentElement.getValue().getDocumentLink().getCategoryID()
-                    && caseDocumentElement.getValue().getDocumentLink().getCategoryID().equals("detailsOfClaim"))
+                    && "detailsOfClaim".equals(caseDocumentElement.getValue().getDocumentLink().getCategoryID()))
                 .collect(Collectors.toCollection(ArrayList::new)),
             BundleFileNameList.CLAIM_FORM.getDisplayName()
         ));
@@ -58,12 +59,12 @@ public class StatementsOfCaseMapper {
         List<Element<CaseDocument>> sortedDefendantDefenceAndClaimantReply =
             bundleDocumentsRetrieval.getSortedDefendantDefenceAndClaimantReply(clAndDfDocList);
         sortedDefendantDefenceAndClaimantReply.forEach(caseDocumentElement -> {
-            String docType = caseDocumentElement.getValue().getDocumentType().equals(DocumentType.DEFENDANT_DEFENCE)
+            String docType = DocumentType.DEFENDANT_DEFENCE.equals(caseDocumentElement.getValue().getDocumentType())
                 ? BundleFileNameList.DEFENCE.getDisplayName() : BundleFileNameList.CL_REPLY.getDisplayName();
             String party;
-            if (caseDocumentElement.getValue().getCreatedBy().equalsIgnoreCase("Defendant")) {
+            if ("Defendant".equalsIgnoreCase(caseDocumentElement.getValue().getCreatedBy())) {
                 party = PartyType.DEFENDANT1.getDisplayName();
-            } else if (caseDocumentElement.getValue().getCreatedBy().equalsIgnoreCase("Defendant 2")) {
+            } else if ("Defendant 2".equalsIgnoreCase(caseDocumentElement.getValue().getCreatedBy())) {
                 party = PartyType.DEFENDANT2.getDisplayName();
             } else {
                 party = "";

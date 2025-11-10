@@ -1,24 +1,25 @@
 package uk.gov.hmcts.reform.civil.helpers.bundle;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
+import uk.gov.hmcts.reform.civil.helpers.bundle.mappers.CostsBudgetsMapper;
+import uk.gov.hmcts.reform.civil.helpers.bundle.mappers.DQMapper;
+import uk.gov.hmcts.reform.civil.helpers.bundle.mappers.DisclosedDocumentsMapper;
+import uk.gov.hmcts.reform.civil.helpers.bundle.mappers.ExpertEvidenceMapper;
+import uk.gov.hmcts.reform.civil.helpers.bundle.mappers.JointExpertsMapper;
+import uk.gov.hmcts.reform.civil.helpers.bundle.mappers.OrdersMapper;
+import uk.gov.hmcts.reform.civil.helpers.bundle.mappers.StatementsOfCaseMapper;
+import uk.gov.hmcts.reform.civil.helpers.bundle.mappers.TrialDocumentsMapper;
+import uk.gov.hmcts.reform.civil.helpers.bundle.mappers.WitnessStatementsMapper;
+import uk.gov.hmcts.reform.civil.helpers.bundle.util.FilenameGenerator;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.bundle.BundleCreateRequest;
 import uk.gov.hmcts.reform.civil.model.bundle.BundlingCaseData;
 import uk.gov.hmcts.reform.civil.model.bundle.BundlingCaseDetails;
-import uk.gov.hmcts.reform.civil.helpers.bundle.mappers.TrialDocumentsMapper;
-import uk.gov.hmcts.reform.civil.helpers.bundle.mappers.StatementsOfCaseMapper;
-import uk.gov.hmcts.reform.civil.helpers.bundle.mappers.WitnessStatementsMapper;
-import uk.gov.hmcts.reform.civil.helpers.bundle.mappers.ExpertEvidenceMapper;
-import uk.gov.hmcts.reform.civil.helpers.bundle.mappers.DisclosedDocumentsMapper;
-import uk.gov.hmcts.reform.civil.helpers.bundle.mappers.CostsBudgetsMapper;
-import uk.gov.hmcts.reform.civil.helpers.bundle.mappers.JointExpertsMapper;
-import uk.gov.hmcts.reform.civil.helpers.bundle.mappers.DQMapper;
-import uk.gov.hmcts.reform.civil.helpers.bundle.mappers.OrdersMapper;
-import uk.gov.hmcts.reform.civil.helpers.bundle.util.FilenameGenerator;
-import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
@@ -90,10 +91,10 @@ public class BundleRequestMapper {
     }
 
     private BundlingCaseData mapRespondent2Applicant2Details(BundlingCaseData bundlingCaseData, CaseData caseData) {
-        if (null != caseData.getAddApplicant2() && caseData.getAddApplicant2().equals(YesOrNo.YES)) {
+        if (null != caseData.getAddApplicant2() && YesOrNo.YES.equals(caseData.getAddApplicant2())) {
             bundlingCaseData.toBuilder().hasApplicant2(true);
         }
-        if (null != caseData.getAddRespondent2() && caseData.getAddRespondent2().equals(YesOrNo.YES)) {
+        if (null != caseData.getAddRespondent2() && YesOrNo.YES.equals(caseData.getAddRespondent2())) {
             bundlingCaseData.toBuilder().hasRespondant2(true);
         }
         if (null != caseData.getApplicant2()) {

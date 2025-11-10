@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.civil.helpers.bundle.mappers;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
+
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.helpers.bundle.BundleDocumentsRetrieval;
@@ -15,7 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -44,8 +45,8 @@ public class DQMapper {
         // No-category DQ
         List<uk.gov.hmcts.reform.civil.model.common.Element<uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument>> dqNoCategory =
             caseData.getSystemGeneratedCaseDocuments().stream()
-                .filter(caseDocumentElement -> caseDocumentElement.getValue().getDocumentType()
-                    .equals(DocumentType.DIRECTIONS_QUESTIONNAIRE)
+                .filter(caseDocumentElement -> DocumentType.DIRECTIONS_QUESTIONNAIRE
+                    .equals(caseDocumentElement.getValue().getDocumentType())
                     && caseDocumentElement.getValue().getDocumentLink().getCategoryID() == null)
                 .collect(Collectors.toCollection(ArrayList::new));
         bundlingRequestDocuments.addAll(systemGeneratedDocMapper.mapSystemGeneratedCaseDocument(
