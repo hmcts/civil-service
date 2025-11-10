@@ -33,7 +33,7 @@ public class EvidenceUploadRespondentHandler extends EvidenceUploadHandlerBase {
     CallbackResponse validateValues(CallbackParams callbackParams, CaseData caseData) {
         if (Objects.nonNull(caseData.getCaseTypeFlag())
             && caseData.getCaseTypeFlag().equals("RespondentTwoFields")) {
-            return validateValuesParty(callbackParams, caseData.getDocumentForDisclosureRes2(),
+            return validateValuesParty(caseData.getDocumentForDisclosureRes2(),
                 caseData.getDocumentWitnessStatementRes2(),
                 caseData.getDocumentWitnessSummaryRes2(),
                 caseData.getDocumentHearsayNoticeRes2(),
@@ -45,7 +45,7 @@ public class EvidenceUploadRespondentHandler extends EvidenceUploadHandlerBase {
                 caseData.getDocumentEvidenceForTrialRes2(),
                 caseData.getBundleEvidence());
         } else {
-            return validateValuesParty(callbackParams, caseData.getDocumentForDisclosureRes(),
+            return validateValuesParty(caseData.getDocumentForDisclosureRes(),
                 caseData.getDocumentWitnessStatementRes(),
                 caseData.getDocumentWitnessSummaryRes(),
                 caseData.getDocumentHearsayNoticeRes(),
