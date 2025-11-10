@@ -99,51 +99,58 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
         assignApplicant1DQExpertsIfPresent(caseData, builder);
         assignApplicant2DQExpertsIfPresent(caseData, builder);
 
-        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(caseData);
+        // Build intermediate caseData to apply mutations
+        CaseData intermediateCaseData = builder.build();
 
-        addEventAndDateAddedToApplicantExperts(caseData);
-        addEventAndDateAddedToApplicantWitnesses(caseData);
-        populateDQPartyIds(caseData);
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(intermediateCaseData);
 
-        caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE_SPEC, caseData);
-        moveClaimToMediation(callbackParams, caseData);
+        addEventAndDateAddedToApplicantExperts(intermediateCaseData);
+        addEventAndDateAddedToApplicantWitnesses(intermediateCaseData);
+        populateDQPartyIds(intermediateCaseData);
 
-        String nextState = putCaseStateInJudicialReferral(caseData);
+        caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE_SPEC, intermediateCaseData);
+        moveClaimToMediation(callbackParams, intermediateCaseData);
+
+        String nextState = putCaseStateInJudicialReferral(intermediateCaseData);
         BusinessProcess businessProcess = BusinessProcess.ready(CLAIMANT_RESPONSE_SPEC);
+
+        // Rebuild builder from mutated caseData
+        builder = intermediateCaseData.toBuilder();
+
         nextState = determineNextState.determineNextState(
-            caseData,
+            intermediateCaseData,
             callbackParams,
             builder,
             nextState,
             businessProcess
         );
 
-        is1v1RespondImmediately(caseData, builder);
+        is1v1RespondImmediately(intermediateCaseData, builder);
 
-        frcDocumentsUtils.assembleClaimantsFRCDocuments(caseData);
+        frcDocumentsUtils.assembleClaimantsFRCDocuments(intermediateCaseData);
 
         builder.claimantResponseDocuments(
             dqResponseDocumentUtils.buildClaimantResponseDocuments(builder.build()));
 
         clearTempDocuments(builder);
 
-        if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
-            if ((AllocatedTrack.MULTI_CLAIM.name().equals(caseData.getResponseClaimTrack())
-                || AllocatedTrack.INTERMEDIATE_CLAIM.name().equals(caseData.getResponseClaimTrack())
-                && caseData.isLipCase())) {
+        if (featureToggleService.isMultiOrIntermediateTrackEnabled(intermediateCaseData)) {
+            if ((AllocatedTrack.MULTI_CLAIM.name().equals(intermediateCaseData.getResponseClaimTrack())
+                || AllocatedTrack.INTERMEDIATE_CLAIM.name().equals(intermediateCaseData.getResponseClaimTrack())
+                && intermediateCaseData.isLipCase())) {
                 builder.isMintiLipCase(YES);
             }
 
             updateWaCourtLocationsService.ifPresent(service -> service.updateCourtListingWALocations(
                 callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
-                caseData
+                intermediateCaseData
             ));
         }
 
-        requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabApplicantSpec(callbackParams, caseData);
+        requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabApplicantSpec(callbackParams, intermediateCaseData);
         builder.nextDeadline(null);
-        builder.previousCCDState(caseData.getCcdState());
-        if (isDefendantPartAdmitPayImmediatelyAccepted(caseData)) {
+        builder.previousCCDState(intermediateCaseData.getCcdState());
+        if (isDefendantPartAdmitPayImmediatelyAccepted(intermediateCaseData)) {
             LocalDate whenBePaid = paymentDateService.calculatePaymentDeadline();
             builder.whenToBePaidText(whenBePaid.format(DATE_FORMATTER));
             builder.respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()

@@ -132,14 +132,20 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
                         .orElse(currentDateTime));
         }
 
-        caseFlagsInitialiser.initialiseCaseFlags(ADD_DEFENDANT_LITIGATION_FRIEND, caseData);
+        // Build intermediate caseData to apply mutations
+        CaseData intermediateCaseData = caseDataUpdated.build();
+
+        caseFlagsInitialiser.initialiseCaseFlags(ADD_DEFENDANT_LITIGATION_FRIEND, intermediateCaseData);
+        populateWithPartyIds(intermediateCaseData);
+        updateGaCaseName(intermediateCaseData);
+
+        // Rebuild builder from mutated caseData
+        caseDataUpdated = intermediateCaseData.toBuilder();
+
         caseDataUpdated.isRespondent1(null);
-
-        populateWithPartyIds(caseData);
-
         caseDataUpdated.caseNameHmctsInternal(CaseNameUtils.buildCaseName(caseDataUpdated.build()));
         caseDataUpdated.caseNamePublic(CaseNameUtils.buildCaseName(caseDataUpdated.build()));
-        updateGaCaseName(caseData);
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataUpdated.build().toMap(objectMapper))
             .build();

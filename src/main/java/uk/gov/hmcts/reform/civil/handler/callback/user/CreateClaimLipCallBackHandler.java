@@ -103,7 +103,15 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
             caseDataBuilder.businessProcess(BusinessProcess.ready(CREATE_LIP_CLAIM));
             caseDataBuilder.respondent1DetailsForClaimDetailsTab(caseDataBuilder.build().getRespondent1().toBuilder().flags(
                 null).build());
-            caseFlagsInitialiser.initialiseCaseFlags(CREATE_LIP_CLAIM, caseData);
+
+            // Build intermediate caseData to apply mutations
+            CaseData intermediateCaseData = caseDataBuilder.build();
+            caseFlagsInitialiser.initialiseCaseFlags(CREATE_LIP_CLAIM, intermediateCaseData);
+            populateWithPartyIds(intermediateCaseData);
+            OrgPolicyUtils.addMissingOrgPolicies(intermediateCaseData);
+
+            // Rebuild builder from mutated caseData
+            caseDataBuilder = intermediateCaseData.toBuilder();
         }
         setUpHelpWithFees(caseDataBuilder);
         addOrginsationPoliciesforClaimantLip(caseDataBuilder);
@@ -111,7 +119,6 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
         caseDataBuilder.caseNamePublic(buildCaseName(caseData));
         caseDataBuilder
             .allPartyNames(getAllPartyNames(caseData));
-        populateWithPartyIds(caseData);
 
         caseDataBuilder.anyRepresented(NO);
 

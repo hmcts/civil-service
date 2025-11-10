@@ -106,14 +106,20 @@ public class SubmitChangesTask {
             builder.caseNamePublic(buildCaseName(caseData));
         }
 
+        // Build intermediate caseData to apply mutations
+        CaseData intermediateCaseData = builder.build();
+
         // last step before clearing update details form
-        caseFlagsInitialiser.initialiseCaseFlags(MANAGE_CONTACT_INFORMATION, caseData);
+        caseFlagsInitialiser.initialiseCaseFlags(MANAGE_CONTACT_INFORMATION, intermediateCaseData);
+
+        // Rebuild builder from mutated caseData
+        builder = intermediateCaseData.toBuilder();
 
         // clear updateDetailsForm
         builder.updateDetailsForm(UpdateDetailsForm.builder().manageContactDetailsEventUsed(YES).build());
 
         // update claim details tab
-        updateClaimDetailsTab(caseData, builder);
+        updateClaimDetailsTab(intermediateCaseData, builder);
 
         CaseData current = caseDetailsConverter.toCaseData(caseDetailsBefore);
         ContactDetailsUpdatedEvent changesEvent = partyDetailsChangedUtil.buildChangesEvent(current, builder.build());
