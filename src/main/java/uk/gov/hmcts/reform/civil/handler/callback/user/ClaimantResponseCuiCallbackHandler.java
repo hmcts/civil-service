@@ -145,16 +145,25 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
 
         updateCcjRequestPaymentDetails(builder, caseData);
         updateLanguagePreference(builder, caseData);
-        populateDQPartyIds(caseData);
-        addEventAndDateAddedToApplicantExperts(caseData);
-        addEventAndDateAddedToApplicantWitnesses(caseData);
 
-        caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE_CUI, caseData);
+        // Build intermediate caseData to apply mutations
+        CaseData intermediateCaseData = builder.build();
 
-        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(caseData);
+        populateDQPartyIds(intermediateCaseData);
+        addEventAndDateAddedToApplicantExperts(intermediateCaseData);
+        addEventAndDateAddedToApplicantWitnesses(intermediateCaseData);
 
-        if (featureToggleService.isJudgmentOnlineLive() && JudgmentAdmissionUtils.getLIPJudgmentAdmission(caseData)) {
-            JudgmentDetails activeJudgmentDetails = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData);
+        caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE_CUI, intermediateCaseData);
+
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(intermediateCaseData);
+
+        requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabApplicant(callbackParams, intermediateCaseData);
+
+        // Rebuild builder from mutated caseData
+        builder = intermediateCaseData.toBuilder();
+
+        if (featureToggleService.isJudgmentOnlineLive() && JudgmentAdmissionUtils.getLIPJudgmentAdmission(intermediateCaseData)) {
+            JudgmentDetails activeJudgmentDetails = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(intermediateCaseData);
             builder
                 .activeJudgment(activeJudgmentDetails)
                 .joIsLiveJudgmentExists(YES)
@@ -164,11 +173,10 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
                     true
                 ));
         }
-        requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabApplicant(callbackParams, caseData);
 
-        if ((AllocatedTrack.MULTI_CLAIM.name().equals(caseData.getResponseClaimTrack())
-            || AllocatedTrack.INTERMEDIATE_CLAIM.name().equals(caseData.getResponseClaimTrack()))
-            && featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
+        if ((AllocatedTrack.MULTI_CLAIM.name().equals(intermediateCaseData.getResponseClaimTrack())
+            || AllocatedTrack.INTERMEDIATE_CLAIM.name().equals(intermediateCaseData.getResponseClaimTrack()))
+            && featureToggleService.isMultiOrIntermediateTrackEnabled(intermediateCaseData)) {
             builder.isMintiLipCase(YES);
         }
 
