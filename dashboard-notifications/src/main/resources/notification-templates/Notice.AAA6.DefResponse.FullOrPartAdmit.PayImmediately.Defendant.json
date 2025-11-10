@@ -1,0 +1,9 @@
+{
+  "name": "Notice.AAA6.DefResponse.FullOrPartAdmit.PayImmediately.Defendant",
+  "role": "DEFENDANT",
+  "titleEn": "Response to the claim",
+  "titleCy": "Ymateb i’r hawliad",
+  "descriptionEn": "${descriptionEn}",
+  "descriptionCy": "${descriptionCy}",
+  "deadlineParam": "respondent1AdmittedAmountPaymentDeadline"
+}

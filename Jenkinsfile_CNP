@@ -136,6 +136,10 @@ withPipeline(type, product, component) {
     loadVaultSecrets(secrets)
   }
 
+  afterAlways('test') {
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/build/reports/jacoco/**'
+  }
+
   before('smoketest:preview') {
     env.URL = "https://civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.CIVIL_SERVICE_URL = "https://civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"

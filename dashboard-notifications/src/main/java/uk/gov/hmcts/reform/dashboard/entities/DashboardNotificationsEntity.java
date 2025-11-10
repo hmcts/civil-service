@@ -8,8 +8,6 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
@@ -32,11 +30,6 @@ public class DashboardNotificationsEntity implements Serializable {
     @NotNull
     @Schema(name = "id")
     private UUID id;
-
-    @ManyToOne(cascade = CascadeType.DETACH)
-    @JoinColumn
-    @Schema(name = "dashboard_notifications_templates_id")
-    private NotificationTemplateEntity dashboardNotificationsTemplates;
 
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "dashboardNotification")
     @Schema(name = "notification_action_id")
@@ -83,4 +76,8 @@ public class DashboardNotificationsEntity implements Serializable {
 
     @Schema(name = "deadline")
     private LocalDateTime deadline;
+
+    @Column(name = "time_to_live")
+    @Schema(name = "time_to_live")
+    private String timeToLive;
 }
