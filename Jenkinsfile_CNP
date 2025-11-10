@@ -169,9 +169,8 @@ withPipeline(type, product, component) {
       """
     }
 
+    yarnBuilder.yarn('yarn-update')
     yarnBuilder.yarn('install-dependencies')
-    yarnBuilder.yarn('install-dependencies-civil')
-    yarnBuilder.yarn('install-dependencies-ga')
     env.IDAM_API_URL = "https://idam-api.aat.platform.hmcts.net"
     env.SERVICE_AUTH_PROVIDER_API_BASE_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
     env.CCD_DATA_STORE_URL = "https://ccd-data-store-api-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
@@ -224,9 +223,8 @@ withPipeline(type, product, component) {
     env.CCD_DATA_STORE_URL = "https://civil-service-data-store-staging-aat.service.core-compute-aat.internal"
     env.DM_STORE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
     env.AAC_API_URL = "https://civil-service-manage-case-assignment-staging.aat.platform.hmcts.net"
+    yarnBuilder.yarn('yarn-update')
     yarnBuilder.yarn('install-dependencies')
-    yarnBuilder.yarn('install-dependencies-civil')
-    yarnBuilder.yarn('install-dependencies-ga')
   }
 
   afterAlways('smoketest:aat') {
