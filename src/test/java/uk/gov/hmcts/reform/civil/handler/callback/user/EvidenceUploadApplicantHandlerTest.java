@@ -239,10 +239,12 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
         date.add(0, element(invoke(uploadEvidenceDate3.toBuilder(), dateField, time
             .toLocalDate().minusWeeks(1)).build()));
 
-        CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged()
-            .build().toBuilder(), collectionField, date)
+        CaseData caseDataBefore = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(), collectionField, List.of()).build();
+        CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(),
+                                   collectionField, date)
             .build();
-        CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+        CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
+                                                 PAGE_ID, Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"));
 
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -263,11 +265,12 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
         date.add(0, element(invoke(uploadEvidenceDate3.toBuilder(), dateField, time
             .toLocalDate()).build()));
 
-        CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged()
-            .build().toBuilder(), collectionField, date)
+        CaseData caseDataBefore = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(), collectionField, List.of()).build();
+        CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(),
+                                   collectionField, date)
             .build();
-        CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-
+        CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
+                                                 PAGE_ID, Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"));
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -291,10 +294,13 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
         date.add(0, element(invoke(uploadEvidenceDate3.toBuilder(), dateField, time
             .toLocalDate().plusWeeks(1)).build()));
 
-        CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged()
-            .build().toBuilder(), collectionField, date)
+        CaseData caseDataBefore = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(),
+                                         collectionField, List.of()).build();
+        CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(),
+                                   collectionField, date)
             .build();
-        CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+        CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
+                                                 PAGE_ID, Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"));
 
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -312,15 +318,84 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
         List<Element<UploadEvidenceDocumentType>> documentList = new ArrayList<>();
         documentList.add(Element.<UploadEvidenceDocumentType>builder().value(documentUpload).build());
 
+        CaseData caseDataBefore = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .bundleEvidence(documentList)
             .build();
-        CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+        CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
+                                                 PAGE_ID, Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"));
 
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         // Then
         assertThat(response.getErrors()).contains("Invalid date: \"Bundle Hearing date\" date entered must not be in the past (11).");
+    }
+
+    @Test
+    void shouldReturnError_whenBundleUploadDatePastAndNewBundleUploadedHasPastDate() {
+        var documentUpload = UploadEvidenceDocumentType.builder()
+            .documentIssuedDate(LocalDate.of(2022, 2, 10))
+            .bundleName("test")
+            .documentUpload(Document.builder().build()).build();
+        List<Element<UploadEvidenceDocumentType>> documentList = new ArrayList<>();
+        documentList.add(Element.<UploadEvidenceDocumentType>builder().value(documentUpload).build());
+
+        var documentUpload2 = UploadEvidenceDocumentType.builder()
+            .documentIssuedDate(LocalDate.of(2022, 2, 10))
+            .bundleName("test")
+            .documentUpload(Document.builder().build()).build();
+        List<Element<UploadEvidenceDocumentType>> documentList2 = new ArrayList<>();
+        documentList2.add(Element.<UploadEvidenceDocumentType>builder().value(documentUpload).build());
+        documentList2.add(Element.<UploadEvidenceDocumentType>builder().value(documentUpload2).build());
+
+        CaseData caseDataBefore = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .bundleEvidence(documentList)
+            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .bundleEvidence(documentList2)
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
+                                                 PAGE_ID, Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"));
+
+        // When
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        // Then
+        assertThat(response.getErrors()).contains("Invalid date: \"Bundle Hearing date\" date entered must not be in the past (11).");
+    }
+
+    @Test
+    void shouldNotReturnError_whenBundleUploadDatePastAndNewBundleUploadedHasNotPastDate() {
+        var documentUpload = UploadEvidenceDocumentType.builder()
+            .documentIssuedDate(LocalDate.of(2022, 2, 10))
+            .bundleName("test")
+            .documentUpload(Document.builder().build()).build();
+        List<Element<UploadEvidenceDocumentType>> documentList = new ArrayList<>();
+        documentList.add(Element.<UploadEvidenceDocumentType>builder().value(documentUpload).build());
+
+        var documentUpload2 = UploadEvidenceDocumentType.builder()
+            .documentIssuedDate(LocalDate.now().plusMonths(2L))
+            .bundleName("test")
+            .documentUpload(Document.builder().build()).build();
+        List<Element<UploadEvidenceDocumentType>> documentList2 = new ArrayList<>();
+        documentList2.add(Element.<UploadEvidenceDocumentType>builder().value(documentUpload).build());
+        documentList2.add(Element.<UploadEvidenceDocumentType>builder().value(documentUpload2).build());
+
+        CaseData caseDataBefore = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .bundleEvidence(documentList)
+            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .bundleEvidence(documentList2)
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
+                                                 PAGE_ID, Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"));
+
+        // When
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        // Then
+        assertThat(response.getErrors()).isEmpty();
     }
 
     @ParameterizedTest
@@ -346,7 +421,15 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
                                        .caseTypeFlag("ApplicantTwoFields")
                                        .build().toBuilder(), collectionField, date)
             .build();
-        CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+        CaseData caseDataBefore = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                                             .addApplicant2(YES)
+                                             .applicant1(PartyBuilder.builder().individual().build())
+                                             .applicant2(PartyBuilder.builder().individual().build())
+                                             .caseTypeFlag("ApplicantTwoFields")
+                                             .build().toBuilder(), collectionField, List.of())
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
+                                                 PAGE_ID, Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"));
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         // Then
@@ -366,11 +449,12 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
         date.add(0, element(invoke(uploadEvidenceDate.toBuilder(), dateField, time
             .toLocalDate().minusWeeks(1)).build()));
 
-        CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged()
-            .build().toBuilder(), collectionField, date)
+        CaseData caseDataBefore = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(), collectionField, List.of()).build();
+        CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(),
+                                   collectionField, date)
             .build();
-        CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-
+        CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
+                                                 PAGE_ID, Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"));
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -391,11 +475,12 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
         date.add(0, element(invoke(uploadEvidenceDate.toBuilder(), dateField, time
             .toLocalDate()).build()));
 
-        CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged()
-            .build().toBuilder(), collectionField, date)
+        CaseData caseDataBefore = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(), collectionField, List.of()).build();
+        CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(),
+                                   collectionField, date)
             .build();
-        CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-
+        CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
+                                                 PAGE_ID, Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"));
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -421,10 +506,12 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
         date.add(0, element(invoke(uploadEvidenceDate.toBuilder(), dateField, time
             .toLocalDate().plusWeeks(1)).build()));
 
+        CaseData caseDataBefore = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(), collectionField, List.of()).build();
         CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(),
-            collectionField, date)
+                                   collectionField, date)
             .build();
-        CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+        CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
+                                                 PAGE_ID, Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"));
 
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -458,8 +545,16 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
                                        .caseTypeFlag("ApplicantTwoFields"),
                                    collectionField, date)
             .build();
-        CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
+        CaseData caseDataBefore = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                                             .addApplicant2(YES)
+                                             .applicant1(PartyBuilder.builder().individual().build())
+                                             .applicant2(PartyBuilder.builder().individual().build())
+                                             .caseTypeFlag("ApplicantTwoFields"),
+                                         collectionField, List.of())
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
+                                                 PAGE_ID, Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"));
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -483,11 +578,12 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
         date.add(0, element(invoke(uploadEvidenceDate2.toBuilder(), dateField,
             time.toLocalDate().plusWeeks(1)).build()));
 
+        CaseData caseDataBefore = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(), collectionField, List.of()).build();
         CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(),
-            collectionField, date)
+                                   collectionField, date)
             .build();
-        CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-
+        CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
+                                                 PAGE_ID, Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"));
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -506,10 +602,12 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
         date.add(0, element(invoke(uploadEvidenceDate2.toBuilder(), dateField,
             time.toLocalDate()).build()));
 
+        CaseData caseDataBefore = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(), collectionField, List.of()).build();
         CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(),
-            collectionField, date)
+                                   collectionField, date)
             .build();
-        CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+        CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
+                                                 PAGE_ID, Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"));
 
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -529,11 +627,12 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
         date.add(0, element(invoke(uploadEvidenceDate2.toBuilder(), dateField,
             time.toLocalDate().minusWeeks(1)).build()));
 
+        CaseData caseDataBefore = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(), collectionField, List.of()).build();
         CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(),
             collectionField, date)
             .build();
-        CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-
+        CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
+                                                 PAGE_ID, Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"));
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -558,8 +657,12 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
         //dates above represent valid past dates, date below represents invalid future date.
         date.add(2, element(invoke(uploadEvidenceDate2.toBuilder(), dateField, time.toLocalDate().minusWeeks(1)).build()));
 
-        CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(), collectionField, date).build();
-        CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+        CaseData caseDataBefore = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(), collectionField, List.of()).build();
+        CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(),
+                                   collectionField, date)
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
+                                                 PAGE_ID, Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"));
 
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -590,8 +693,10 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
         //dates above represent valid past dates, date below represents invalid future date.
         date.add(2, element(invoke(uploadEvidenceDate.toBuilder(), dateField, time.toLocalDate().minusWeeks(1)).build()));
 
+        CaseData caseDataBefore = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(), collectionField, List.of()).build();
         CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(), collectionField, date).build();
-        CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+        CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
+                                                 PAGE_ID, Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"));
 
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
