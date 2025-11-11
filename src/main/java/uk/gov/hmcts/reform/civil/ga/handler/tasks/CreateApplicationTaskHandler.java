@@ -83,11 +83,14 @@ public class CreateApplicationTaskHandler extends BaseExternalTaskHandler {
                 generalAppCaseData = createGeneralApplicationCase(caseId, generalApplication, claimantBilingual, defendantBilingual);
                 log.info("General application case created with ID: {}", generalAppCaseData.getCcdCaseReference());
                 generalApplication = updateParentCaseGeneralApplication(variables, generalApplication, generalAppCaseData);
-
+                log.info("Update Parent Case General Application ID: {}", generalAppCaseData.getCcdCaseReference());
                 caseData = withoutNoticeNoConsent(generalApplication, caseData, generalAppCaseData);
-
+                log.info("Without Notice No Consent ID: {}", generalAppCaseData.getCcdCaseReference());
             }
         }
+
+        log.info("About to update parent case data ID {}", caseData.getCcdCaseReference());
+        log.info("About to update parent case data with {}", caseData.toMap(mapper));
 
         var parentCaseData = coreCaseDataService.submitUpdate(
             caseId,
@@ -96,6 +99,9 @@ public class CreateApplicationTaskHandler extends BaseExternalTaskHandler {
                 caseData.toMap(mapper)
             )
         );
+
+        log.info("Parent case data updated for case ID: {}", caseData.getCcdCaseReference());
+
         return ExternalTaskData.builder()
             .parentCaseData(parentCaseData)
             .updateGeneralApplicationCaseData(generalAppCaseData)
@@ -339,8 +345,8 @@ public class CreateApplicationTaskHandler extends BaseExternalTaskHandler {
         var stateFlowFlags = stateFlow.getFlags();
         variables.putValue(FLOW_STATE, stateFlowName);
         variables.putValue(FLOW_FLAGS, stateFlowFlags);
-        log.debug("State flow evaluation completed with {} state and {} flags",
-                  stateFlowName, stateFlowFlags);
+        log.info("State flow evaluation completed with {} state and {} flags for case ID: {}",
+                  stateFlowName, stateFlowFlags, data.getCcdCaseReference());
         var generalAppCaseData = externalTaskData.getUpdateGeneralApplicationCaseData();
         if (generalAppCaseData != null && generalAppCaseData.getCcdCaseReference() != null) {
             variables.putValue(GENERAL_APPLICATION_CASE_ID, generalAppCaseData.getCcdCaseReference());
