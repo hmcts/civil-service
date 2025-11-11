@@ -156,7 +156,7 @@ public class ParentCaseUpdateHelper {
          * e.g Main claim defendant initiate the GA without notice which should be hidden to main claim claimant
          * unless judge uncloak it
          *  */
-        List<Element<GeneralApplicationsDetails>> generalApplications = updateGaApplicationState(
+        final List<Element<GeneralApplicationsDetails>> generalApplications = updateGaApplicationState(
             caseData,
             newState,
             applicationId,
@@ -166,7 +166,7 @@ public class ParentCaseUpdateHelper {
         /*
          * Check if the application exists in the Judge List which matches the applicationId
          *  */
-        List<Element<GeneralApplicationsDetails>> gaDetailsMasterCollection = updateJudgeGaApplicationState(
+        final List<Element<GeneralApplicationsDetails>> gaDetailsMasterCollection = updateJudgeGaApplicationState(
             caseData,
             newState,
             applicationId
@@ -174,9 +174,7 @@ public class ParentCaseUpdateHelper {
         docVisibilityRoles[3] = "Staff";
 
         List<Element<GeneralApplication>> civilGeneralApplications = caseData.getGeneralApplications();
-
         log.info("Civil General Applications before for case ID: {}, {}", parentCaseId, civilGeneralApplications);
-
         if (generalAppCaseData.getCcdState().equals(PENDING_APPLICATION_ISSUED) && !isEmpty(civilGeneralApplications)) {
             List<Element<GeneralApplication>> generalApplicationsList = civilGeneralApplications.stream()
                 .filter(app -> app.getValue().getCaseLink() != null && !app.getValue().getCaseLink().getCaseReference().equals(
