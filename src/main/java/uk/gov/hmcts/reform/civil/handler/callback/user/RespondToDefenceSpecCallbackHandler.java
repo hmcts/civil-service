@@ -180,49 +180,47 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             .build();
     }
 
-    private void setApplicantDefenceResponseDocFlag(CaseData caseData, CaseData.CaseDataBuilder caseDataBuilder) {
-        caseDataBuilder.applicantDefenceResponseDocumentAndDQFlag(caseData.doesPartPaymentRejectedOrItsFullDefenceResponse());
+    private void setApplicantDefenceResponseDocFlag(CaseData caseData) {
+        caseData.setApplicantDefenceResponseDocumentAndDQFlag(caseData.doesPartPaymentRejectedOrItsFullDefenceResponse());
     }
 
     private CallbackResponse setApplicantRouteFlags(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
 
-        setApplicantDefenceResponseDocFlag(caseData, caseDataBuilder);
+        setApplicantDefenceResponseDocFlag(caseData);
         setApplicant1ProceedFlagToYes(caseData);
-        setMediationConditionFlag(caseData, caseDataBuilder);
+        setMediationConditionFlag(caseData);
 
         if (V_2.equals(callbackParams.getVersion()) && shouldVulnerabilityAppear(caseData)) {
-            setVulnerabilityFlag(caseData, caseDataBuilder);
+            setVulnerabilityFlag(caseData);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
-    private void setVulnerabilityFlag(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
+    private void setVulnerabilityFlag(CaseData caseData) {
         caseData.getShowConditionFlags().add(DefendantResponseShowTag.VULNERABILITY);
-        updatedCaseData.showConditionFlags(caseData.getShowConditionFlags());
+        caseData.setShowConditionFlags(caseData.getShowConditionFlags());
     }
 
-    private void setMediationConditionFlag(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
+    private void setMediationConditionFlag(CaseData caseData) {
         if (respondentMediationService.setMediationRequired(caseData) != null) {
             caseData.getShowConditionFlags().add(respondentMediationService.setMediationRequired(caseData));
-            updatedCaseData.showConditionFlags(caseData.getShowConditionFlags());
+            caseData.setShowConditionFlags(caseData.getShowConditionFlags());
         }
     }
 
     private CallbackResponse setMediationShowTag(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
 
-        setMediationConditionFlag(caseData, caseDataBuilder);
+        setMediationConditionFlag(caseData);
         setApplicant1ProceedFlagToYes(caseData);
-        setApplicantDefenceResponseDocFlag(caseData, caseDataBuilder);
+        setApplicantDefenceResponseDocFlag(caseData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
@@ -270,13 +268,12 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
         CaseData caseData = callbackParams.getCaseData();
 
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         //Set the hint date for repayment to be 30 days in the future
         String formattedDeadline = formatLocalDateTime(LocalDateTime.now().plusDays(30), DATE);
-        caseDataBuilder.currentDateboxDefendantSpec(formattedDeadline);
+        caseData.setCurrentDateboxDefendantSpec(formattedDeadline);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
@@ -315,7 +312,6 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
     private CallbackResponse validateAmountPaid(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder();
 
         if (caseData.getCcjPaymentDetails() != null
             && YES.equals(caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeOption())) {
@@ -325,33 +321,32 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         } else if (featureToggleService.isLrAdmissionBulkEnabled()
             && caseData.getFixedCosts() != null
             && NO.equals(caseData.getFixedCosts().getClaimFixedCosts())) {
-            updatedCaseData.ccjPaymentDetails(judgementService.buildJudgmentAmountSummaryDetails(caseData));
+            caseData.setCcjPaymentDetails(judgementService.buildJudgmentAmountSummaryDetails(caseData));
         }
 
         if (judgementService.isLrFullAdmitRepaymentPlan(caseData)
             || judgementService.isLRPartAdmitRepaymentPlan(caseData)) {
-            updatedCaseData.ccjJudgmentAmountShowInterest(NO);
+            caseData.setCcjJudgmentAmountShowInterest(NO);
             if (caseData.getFixedCosts() != null
                 && YES.equals(caseData.getFixedCosts().getClaimFixedCosts())) {
-                updatedCaseData.claimFixedCostsExist(YES);
+                caseData.setClaimFixedCostsExist(YES);
             }
         }
 
         List<String> errors = judgementService.validateAmountPaid(caseData);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
-            .data(errors.isEmpty() ? updatedCaseData.build().toMap(objectMapper) : null)
+            .data(errors.isEmpty() ? caseData.toMap(objectMapper) : null)
             .build();
     }
 
     private CallbackResponse buildJudgmentAmountSummaryDetails(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder();
 
-        updatedCaseData.ccjPaymentDetails(judgementService.buildJudgmentAmountSummaryDetails(caseData));
+        caseData.setCcjPaymentDetails(judgementService.buildJudgmentAmountSummaryDetails(caseData));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseData.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 }

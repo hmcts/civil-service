@@ -90,9 +90,14 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
 
         CaseData oldCaseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetailsBefore());
         CaseData caseData = persistPartyAddress(oldCaseData, callbackParams.getCaseData());
-        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder().applicant1ResponseDate(time.now());
 
+        // Apply all setter-based modifications first
         persistFlagsForParties(oldCaseData, caseData);
+        caseData.setApplicant1ResponseDate(time.now());
+
+        // Now create builder from the modified caseData
+        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
+
         setResponseDocumentNull(builder);
         updateCaselocationDetails(callbackParams, caseData, builder);
         updateApplicant1DQ(callbackParams, caseData, builder);

@@ -10,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.config.ToggleConfiguration;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.model.FlightDelayDetails;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
@@ -251,6 +252,8 @@ class SubmitClaimTaskTest {
         // When
         when(userService.getUserDetails("authToken")).thenReturn(UserDetails.builder().id("userId").build());
         when(specReferenceNumberRepository.getSpecReferenceNumber()).thenReturn("12345");
+        when(defendantPinToPostLRspecService.buildDefendantPinToPost())
+            .thenReturn(DefendantPinToPostLRspec.builder().accessCode("12345").build());
 
         submitClaimTask.submitClaim(matchedCase, "eventId", "authToken", NO, null);
 

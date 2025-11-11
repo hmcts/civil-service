@@ -268,7 +268,7 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     private final RespondentResponsePartAdmissionPaymentTimeLRspec defenceAdmitPartPaymentTimeRouteGeneric;
     private final List<EmploymentTypeCheckboxFixedListLRspec> respondToClaimAdmitPartEmploymentTypeLRspecGeneric;
     @Builder.Default
-    private final Set<DefendantResponseShowTag> showConditionFlags = new HashSet<>();
+    private Set<DefendantResponseShowTag> showConditionFlags = new HashSet<>();
 
     /**
      * money amount in pounds. Waiting here until we address the issue with CaseData having
@@ -315,7 +315,7 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     private final PaymentFrequencyClaimantResponseLRspec applicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec;
     private final LocalDate applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec;
     private final LocalDate applicant1SuggestPayImmediatelyPaymentDateForDefendantSpec;
-    private final String currentDateboxDefendantSpec;
+    private String currentDateboxDefendantSpec;
     @JsonUnwrapped
     private  CCJPaymentDetails ccjPaymentDetails;
     private  PaymentType applicant1RepaymentOptionForDefendantSpec;
@@ -326,7 +326,7 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     private final HelpWithFeesMoreInformation helpWithFeesMoreInformationHearing;
     private final HelpWithFeesForTab claimIssuedHwfForTab;
     private final HelpWithFeesForTab hearingHwfForTab;
-    private final YesOrNo applicantDefenceResponseDocumentAndDQFlag;
+    private YesOrNo applicantDefenceResponseDocumentAndDQFlag;
     private final String migrationId;
 
     @JsonIgnore

@@ -311,7 +311,7 @@ public class CaseDataCaseProgression extends CaseDataCaseSdo implements Mappable
     // bulk claims
     private final String bulkCustomerId;
     private final String sdtRequestIdFromSdt;
-    private final List<Element<String>> sdtRequestId;
+    private List<Element<String>> sdtRequestId;
 
     //Judgments Online
     private JudgmentRecordedReason joJudgmentRecordReason;

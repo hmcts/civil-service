@@ -191,7 +191,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private Party respondent1DetailsForClaimDetailsTab;
     private Party respondent2DetailsForClaimDetailsTab;
     private YesOrNo respondent1Represented;
-    private final YesOrNo respondent2Represented;
+    private YesOrNo respondent2Represented;
     private YesOrNo respondent1OrgRegistered;
     private YesOrNo respondent2OrgRegistered;
     private final String respondentSolicitor1EmailAddress;
@@ -226,7 +226,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private OrganisationPolicy respondent1OrganisationPolicy;
     private OrganisationPolicy respondent2OrganisationPolicy;
     private final SolicitorOrganisationDetails respondentSolicitor1OrganisationDetails;
-    private final SolicitorOrganisationDetails respondentSolicitor2OrganisationDetails;
+    private SolicitorOrganisationDetails respondentSolicitor2OrganisationDetails;
     private final YesOrNo applicantSolicitor1ServiceAddressRequired;
     private final Address applicantSolicitor1ServiceAddress;
     private final YesOrNo respondentSolicitor1ServiceAddressRequired;
@@ -307,12 +307,12 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private String totalClaimAmountPlusInterestAdmitPartString;
     private String totalClaimAmountPlusInterestString;
     private final YesOrNo claimInterest;
-    private final InterestClaimOptions interestClaimOptions;
+    private InterestClaimOptions interestClaimOptions;
     private final SameRateInterestSelection sameRateInterestSelection;
     private final BigDecimal breakDownInterestTotal;
     private final String breakDownInterestDescription;
     private final InterestClaimFromType interestClaimFrom;
-    private final InterestClaimUntilType interestClaimUntil;
+    private InterestClaimUntilType interestClaimUntil;
     private final LocalDate interestFromSpecificDate;
     private final String interestFromSpecificDateDescription;
     private final String calculatedInterest;
@@ -544,7 +544,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private String caseNameHmctsInternal;
     private String caseNamePublic;
     private YesOrNo ccjJudgmentAmountShowInterest;
-    private final YesOrNo claimFixedCostsExist;
+    private YesOrNo claimFixedCostsExist;
     private final YesOrNo partAdmit1v1Defendant;
 
     @Builder.Default

@@ -117,7 +117,6 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
     private CallbackResponse populateClaimantResponseScenarioFlag(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder updatedData = caseData.toBuilder();
 
         caseData.setClaimantResponseScenarioFlag(getMultiPartyScenario(caseData));
         caseData.setCaseAccessCategory(CaseCategory.UNSPEC_CLAIM);
@@ -167,16 +166,14 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
     private CallbackResponse setApplicantsProceedIntention(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
+        final MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
 
-        CaseData.CaseDataBuilder updatedData =
-            caseData.toBuilder()
-                .applicantsProceedIntention(NO)
-                .claimantResponseDocumentToDefendant2Flag(NO)
-                .claimant2ResponseFlag(NO);
+        caseData.setApplicantsProceedIntention(NO);
+        caseData.setClaimantResponseDocumentToDefendant2Flag(NO);
+        caseData.setClaimant2ResponseFlag(NO);
 
         if (anyApplicantDecidesToProceedWithClaim(caseData)) {
-            updatedData.applicantsProceedIntention(YES);
+            caseData.setApplicantsProceedIntention(YES);
         }
 
         if ((multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP
@@ -184,16 +181,16 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             || (multiPartyScenario == ONE_V_TWO_ONE_LEGAL_REP
             && YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2())
             && NO.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2()))) {
-            updatedData.claimantResponseDocumentToDefendant2Flag(YES);
+            caseData.setClaimantResponseDocumentToDefendant2Flag(YES);
         }
 
         if (multiPartyScenario == TWO_V_ONE && YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1())
             && NO.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())) {
-            updatedData.claimant2ResponseFlag(YES);
+            caseData.setClaimant2ResponseFlag(YES);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedData.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
