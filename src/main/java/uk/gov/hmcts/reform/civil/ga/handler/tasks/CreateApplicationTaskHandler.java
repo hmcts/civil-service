@@ -146,7 +146,6 @@ public class CreateApplicationTaskHandler extends BaseExternalTaskHandler {
         var respondentTwoSpecficGADetails =
             ofNullable(caseData.getRespondentSolTwoGaAppDetails()).orElse(newArrayList());
         if (generalApplication.getGeneralAppApplnSolicitor() != null
-            && true
             && generalApplication.getParentClaimantIsApplicant().equals(NO)
             && Objects.nonNull(generalApplication.getIsGaApplicantLip())
             && generalApplication.getIsGaApplicantLip().equals(YES)) {
@@ -195,12 +194,10 @@ public class CreateApplicationTaskHandler extends BaseExternalTaskHandler {
                 generalAppCaseData.getCcdCaseReference())).build())
             .caseState(PENDING_APPLICATION_ISSUED.getDisplayedValue())
             .build();
-        if (true) {
-            gaDetails = gaDetails.toBuilder()
-                .parentClaimantIsApplicant(generalApplication.getParentClaimantIsApplicant())
-                .build();
-        }
-        return gaDetails;
+
+        return gaDetails.toBuilder()
+            .parentClaimantIsApplicant(generalApplication.getParentClaimantIsApplicant())
+            .build();
     }
 
     private GADetailsRespondentSol buildRespApplication(GeneralApplication generalApplication,
@@ -216,12 +213,10 @@ public class CreateApplicationTaskHandler extends BaseExternalTaskHandler {
                 generalAppCaseData.getCcdCaseReference())).build())
             .caseState(PENDING_APPLICATION_ISSUED.getDisplayedValue())
             .build();
-        if (true) {
-            gaRespondentDetails = gaRespondentDetails.toBuilder()
-                .parentClaimantIsApplicant(generalApplication.getParentClaimantIsApplicant())
-                .build();
-        }
-        return gaRespondentDetails;
+
+        return gaRespondentDetails.toBuilder()
+            .parentClaimantIsApplicant(generalApplication.getParentClaimantIsApplicant())
+            .build();
     }
 
     private List<Element<GeneralApplicationsDetails>> addApplication(GeneralApplicationsDetails application,
