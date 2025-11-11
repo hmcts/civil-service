@@ -44,7 +44,7 @@ def getFunctionalTestsGroups() {
 def getFunctionalTestsType() {
   def githubApi = new GithubAPI(this)
   def labels = githubApi.getLabelsbyPattern(env.BRANCH_NAME, "general_apps_ft")
-  if (labels.size > 0) {
+  if (labels) {
     return "GENERAL_APPS_FT"
   } else {
     return "CIVIL_FT"
