@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoJourneyToggleService;
 import uk.gov.hmcts.reform.civil.utils.HearingMethodUtils;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
@@ -40,6 +41,7 @@ public class DjLocationAndToggleService {
     private final LocationReferenceDataService locationReferenceDataService;
     private final CategoryService categoryService;
     private final LocationHelper locationHelper;
+    private final SdoJourneyToggleService sdoJourneyToggleService;
 
     public CaseData prepareLocationsAndToggles(DirectionsOrderTaskContext context) {
         CallbackParams callbackParams = context.callbackParams();
@@ -47,13 +49,15 @@ public class DjLocationAndToggleService {
 
         CaseData toggledCaseData = applyToggleDefaults(caseData);
         CaseData.CaseDataBuilder<?, ?> builder = toggledCaseData.toBuilder();
+        sdoJourneyToggleService.applyJourneyFlags(caseData, builder);
+        CaseData journeyPrimedCaseData = builder.build();
 
-        DynamicList locationsList = buildLocationList(callbackParams, toggledCaseData);
+        DynamicList locationsList = buildLocationList(callbackParams, journeyPrimedCaseData);
         builder.disposalHearingMethodInPersonDJ(locationsList);
         builder.trialHearingMethodInPersonDJ(locationsList);
 
         if (V_1.equals(callbackParams.getVersion())) {
-            DynamicList hearingMethods = buildHearingMethods(callbackParams, toggledCaseData);
+            DynamicList hearingMethods = buildHearingMethods(callbackParams, journeyPrimedCaseData);
             builder.hearingMethodValuesDisposalHearingDJ(hearingMethods);
             builder.hearingMethodValuesTrialHearingDJ(hearingMethods);
         }

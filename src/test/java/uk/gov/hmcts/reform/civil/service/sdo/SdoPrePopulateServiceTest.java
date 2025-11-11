@@ -6,7 +6,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -20,6 +19,9 @@ import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoDeadlineService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoDrhFieldsService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoNihlFieldsService;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -44,8 +46,6 @@ class SdoPrePopulateServiceTest {
     private static final String AUTH_TOKEN = "auth-token";
 
     @Mock
-    private WorkingDayIndicator workingDayIndicator;
-    @Mock
     private DeadlinesCalculator deadlinesCalculator;
     @Mock
     private LocationHelper locationHelper;
@@ -57,21 +57,48 @@ class SdoPrePopulateServiceTest {
     private CategoryService categoryService;
 
     private SdoPrePopulateService service;
+    private SdoTrackDefaultsService trackDefaultsService;
+    private SdoHearingPreparationService hearingPreparationService;
+    private SdoDeadlineService deadlineService;
+    private SdoDrhFieldsService drhFieldsService;
+    private SdoNihlFieldsService nihlFieldsService;
 
     @BeforeEach
     void setUp() {
-        service = new SdoPrePopulateService(
-            workingDayIndicator,
-            deadlinesCalculator,
+        deadlineService = new SdoDeadlineService(deadlinesCalculator);
+        SdoJourneyToggleService journeyToggleService = new SdoJourneyToggleService(featureToggleService);
+        SdoDisposalOrderDefaultsService disposalOrderDefaultsService = new SdoDisposalOrderDefaultsService(deadlineService);
+        SdoFastTrackOrderDefaultsService fastTrackOrderDefaultsService = new SdoFastTrackOrderDefaultsService(deadlineService);
+        SdoSmallClaimsOrderDefaultsService smallClaimsOrderDefaultsService =
+            new SdoSmallClaimsOrderDefaultsService(deadlineService, journeyToggleService);
+
+        trackDefaultsService = new SdoTrackDefaultsService(
+            deadlineService,
+            journeyToggleService,
+            disposalOrderDefaultsService,
+            fastTrackOrderDefaultsService,
+            smallClaimsOrderDefaultsService
+        );
+        hearingPreparationService = new SdoHearingPreparationService(
             locationHelper,
             locationService,
-            featureToggleService,
             categoryService
         );
-        service.ccmccAmount = BigDecimal.valueOf(1000);
-        service.ccmccEpimsId = "EPIMS123";
+        hearingPreparationService.ccmccAmount = BigDecimal.valueOf(1000);
+        hearingPreparationService.ccmccEpimsId = "EPIMS123";
 
-        when(workingDayIndicator.getNextWorkingDay(any(LocalDate.class)))
+        drhFieldsService = new SdoDrhFieldsService(locationService, trackDefaultsService,
+            journeyToggleService, deadlineService);
+        nihlFieldsService = new SdoNihlFieldsService(locationService, deadlineService);
+
+        service = new SdoPrePopulateService(
+            trackDefaultsService,
+            hearingPreparationService,
+            drhFieldsService,
+            nihlFieldsService
+        );
+
+        when(deadlinesCalculator.calculateFirstWorkingDay(any(LocalDate.class)))
             .thenAnswer(invocation -> invocation.getArgument(0, LocalDate.class));
         when(deadlinesCalculator.plusWorkingDays(any(LocalDate.class), ArgumentMatchers.anyInt()))
             .thenAnswer(invocation -> {

@@ -66,8 +66,9 @@ import uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderParticip
 import uk.gov.hmcts.reform.civil.service.camunda.UpdateWaCourtLocationsService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
-import uk.gov.hmcts.reform.civil.service.sdo.SdoLocationService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoFeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoJourneyToggleService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoLocationService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
@@ -134,6 +135,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
     DjSubmissionService.class,
     SdoLocationService.class,
     SdoFeatureToggleService.class,
+    SdoJourneyToggleService.class,
     DirectionsOrderParticipantService.class
 })
 

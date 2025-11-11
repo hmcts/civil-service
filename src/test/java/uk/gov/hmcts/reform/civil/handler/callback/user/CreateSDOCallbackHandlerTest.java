@@ -130,14 +130,23 @@ import uk.gov.hmcts.reform.civil.service.camunda.UpdateWaCourtLocationsService;
 import uk.gov.hmcts.reform.civil.service.docmosis.sdo.SdoGeneratorService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoCaseClassificationService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoDeadlineService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoDocumentService;
-import uk.gov.hmcts.reform.civil.service.sdo.SdoLocationService;
-import uk.gov.hmcts.reform.civil.service.sdo.SdoOrderDetailsService;
-import uk.gov.hmcts.reform.civil.service.sdo.SdoPrePopulateService;
-import uk.gov.hmcts.reform.civil.service.sdo.SdoNarrativeService;
-import uk.gov.hmcts.reform.civil.service.sdo.SdoSubmissionService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoDisposalOrderDefaultsService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoDrhFieldsService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoFastTrackOrderDefaultsService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoFeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoHearingPreparationService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoJourneyToggleService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoLocationService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoNihlFieldsService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoOrderDetailsService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoNarrativeService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoPrePopulateService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoSubmissionService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoTrackDefaultsService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoValidationService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoSmallClaimsOrderDefaultsService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingSubChannel;
 
@@ -230,8 +239,17 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackH
     SdoLocationService.class,
     SdoCaseClassificationService.class,
     SdoFeatureToggleService.class,
+    SdoDeadlineService.class,
+    SdoJourneyToggleService.class,
+    SdoDisposalOrderDefaultsService.class,
+    SdoFastTrackOrderDefaultsService.class,
+    SdoSmallClaimsOrderDefaultsService.class,
+    SdoTrackDefaultsService.class,
     SdoOrderDetailsService.class,
     SdoPrePopulateService.class,
+    SdoHearingPreparationService.class,
+    SdoDrhFieldsService.class,
+    SdoNihlFieldsService.class,
     SdoNarrativeService.class,
     SdoValidationService.class,
     SdoDocumentService.class,
@@ -300,7 +318,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         void setup() {
             given(locationRefDataService.getHearingCourtLocations(any()))
                 .willReturn(getSampleCourLocationsRefObject());
-            when(workingDayIndicator.getNextWorkingDay(LocalDate.now())).thenReturn(LocalDate.now().plusDays(1));
+            when(deadlinesCalculator.calculateFirstWorkingDay(LocalDate.now())).thenReturn(LocalDate.now().plusDays(1));
             when(deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5))
                 .thenReturn(LocalDate.now().plusDays(5));
             when(deadlinesCalculator.getOrderSetAsideOrVariedApplicationDeadline(ArgumentMatchers.any(LocalDateTime.class)))
@@ -1693,7 +1711,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             nextWorkingDayDate = LocalDate.of(2023, 12, 15);
             LocalDateTime localDateTime = LocalDateTime.of(2020, 1, 1, 12, 0, 0);
             when(time.now()).thenReturn(localDateTime);
-            when(workingDayIndicator.getNextWorkingDay(any(LocalDate.class))).thenReturn(nextWorkingDayDate);
+            when(deadlinesCalculator.calculateFirstWorkingDay(any(LocalDate.class))).thenReturn(nextWorkingDayDate);
             when(deadlinesCalculator.plusWorkingDays(any(LocalDate.class), anyInt())).thenReturn(newDate);
             when(deadlinesCalculator.getOrderSetAsideOrVariedApplicationDeadline(ArgumentMatchers.any(LocalDateTime.class))).thenReturn(
                     newDate);

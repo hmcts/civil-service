@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalAndTrialHearingDJToggle;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
 import uk.gov.hmcts.reform.civil.enums.sdo.HearingMethod;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderLifecycleStage;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskContext;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -25,6 +26,8 @@ import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoFeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoJourneyToggleService;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 
 import java.util.List;
@@ -33,6 +36,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_2;
@@ -51,52 +55,28 @@ class DjLocationAndToggleServiceTest {
     private CategoryService categoryService;
     @Mock
     private LocationHelper locationHelper;
+    @Mock
+    private SdoFeatureToggleService sdoFeatureToggleService;
 
     private DjLocationAndToggleService service;
 
     @BeforeEach
     void setUp() {
-        service = new DjLocationAndToggleService(locationReferenceDataService, categoryService, locationHelper);
+        SdoJourneyToggleService journeyToggleService = new SdoJourneyToggleService(sdoFeatureToggleService);
+        service = new DjLocationAndToggleService(
+            locationReferenceDataService,
+            categoryService,
+            locationHelper,
+            journeyToggleService
+        );
+        lenient().when(sdoFeatureToggleService.isCarmEnabled(any())).thenReturn(false);
+        lenient().when(sdoFeatureToggleService.isWelshJourneyEnabled(any())).thenReturn(false);
     }
 
     @Test
     void shouldPrepareDisposalTogglesLocationsAndHearingList() {
-        LocationRefData location = LocationRefData.builder()
-            .epimmsId("123")
-            .siteName("Test Court")
-            .build();
-        List<LocationRefData> locations = List.of(location);
-
-        RequestedCourt requestedCourt = RequestedCourt.builder()
-            .caseLocation(CaseLocationCivil.builder().baseLocation("123").build())
-            .build();
-
-        when(locationReferenceDataService.getCourtLocationsForDefaultJudgments(AUTH_TOKEN)).thenReturn(locations);
-        when(locationHelper.getCaseManagementLocation(any())).thenReturn(Optional.of(requestedCourt));
-        when(locationHelper.getMatching(eq(locations), eq(requestedCourt))).thenReturn(Optional.of(location));
-
-        Category inPerson = Category.builder()
-            .categoryKey(HEARING_CHANNEL)
-            .key("INP")
-            .valueEn(HearingMethod.IN_PERSON.getLabel())
-            .activeFlag("Y")
-            .build();
-        Category telephone = Category.builder()
-            .categoryKey(HEARING_CHANNEL)
-            .key("TEL")
-            .valueEn(HearingMethod.TELEPHONE.getLabel())
-            .activeFlag("Y")
-            .build();
-        Category notInAttendance = Category.builder()
-            .categoryKey(HEARING_CHANNEL)
-            .key("NIA")
-            .valueEn(HearingMethod.NOT_IN_ATTENDANCE.getLabel())
-            .activeFlag("Y")
-            .build();
-        CategorySearchResult categorySearchResult =
-            CategorySearchResult.builder().categories(List.of(inPerson, telephone, notInAttendance)).build();
-        when(categoryService.findCategoryByCategoryIdAndServiceId(AUTH_TOKEN, HEARING_CHANNEL, SPEC_SERVICE_ID))
-            .thenReturn(Optional.of(categorySearchResult));
+        stubLocationMocks("123");
+        stubHearingCategories();
 
         CaseData caseData = CaseData.builder()
             .caseAccessCategory(CaseCategory.SPEC_CLAIM)
@@ -122,19 +102,7 @@ class DjLocationAndToggleServiceTest {
 
     @Test
     void shouldPrepareTrialTogglesWhenNotDisposal() {
-        LocationRefData location = LocationRefData.builder()
-            .epimmsId("456")
-            .siteName("Trial Court")
-            .build();
-        List<LocationRefData> locations = List.of(location);
-
-        RequestedCourt requestedCourt = RequestedCourt.builder()
-            .caseLocation(CaseLocationCivil.builder().baseLocation("456").build())
-            .build();
-
-        when(locationReferenceDataService.getCourtLocationsForDefaultJudgments(AUTH_TOKEN)).thenReturn(locations);
-        when(locationHelper.getCaseManagementLocation(any())).thenReturn(Optional.of(requestedCourt));
-        when(locationHelper.getMatching(eq(locations), eq(requestedCourt))).thenReturn(Optional.of(location));
+        stubLocationMocks("456");
         CaseData caseData = CaseData.builder()
             .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
             .caseManagementOrderSelection("TRIAL_HEARING")
@@ -193,6 +161,24 @@ class DjLocationAndToggleServiceTest {
         CaseData result = service.applyHearingSelections(caseData, V_2);
 
         assertThat(result).isSameAs(caseData);
+    }
+
+    @Test
+    void shouldApplyJourneyFlagsWhenFeaturesEnabled() {
+        when(sdoFeatureToggleService.isCarmEnabled(any())).thenReturn(true);
+        when(sdoFeatureToggleService.isWelshJourneyEnabled(any())).thenReturn(true);
+        stubLocationMocks("789");
+        stubHearingCategories();
+
+        CaseData caseData = CaseData.builder()
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+            .caseManagementOrderSelection(DISPOSAL_HEARING)
+            .build();
+
+        CaseData result = service.prepareLocationsAndToggles(buildContext(caseData, V_1));
+
+        assertThat(result.getShowCarmFields()).isEqualTo(YesOrNo.YES);
+        assertThat(result.getBilingualHint()).isEqualTo(YesOrNo.YES);
     }
 
     @Test
@@ -280,5 +266,46 @@ class DjLocationAndToggleServiceTest {
             .version(version)
             .build();
         return new DirectionsOrderTaskContext(caseData, params, DirectionsOrderLifecycleStage.ORDER_DETAILS);
+    }
+
+    private void stubHearingCategories() {
+        Category inPerson = Category.builder()
+            .categoryKey(HEARING_CHANNEL)
+            .key("INP")
+            .valueEn(HearingMethod.IN_PERSON.getLabel())
+            .activeFlag("Y")
+            .build();
+        Category telephone = Category.builder()
+            .categoryKey(HEARING_CHANNEL)
+            .key("TEL")
+            .valueEn(HearingMethod.TELEPHONE.getLabel())
+            .activeFlag("Y")
+            .build();
+        Category notInAttendance = Category.builder()
+            .categoryKey(HEARING_CHANNEL)
+            .key("NIA")
+            .valueEn(HearingMethod.NOT_IN_ATTENDANCE.getLabel())
+            .activeFlag("Y")
+            .build();
+        CategorySearchResult categorySearchResult =
+            CategorySearchResult.builder().categories(List.of(inPerson, telephone, notInAttendance)).build();
+        when(categoryService.findCategoryByCategoryIdAndServiceId(AUTH_TOKEN, HEARING_CHANNEL, SPEC_SERVICE_ID))
+            .thenReturn(Optional.of(categorySearchResult));
+    }
+
+    private void stubLocationMocks(String epimmsId) {
+        LocationRefData location = LocationRefData.builder()
+            .epimmsId(epimmsId)
+            .siteName("Court-" + epimmsId)
+            .build();
+        List<LocationRefData> locations = List.of(location);
+
+        RequestedCourt requestedCourt = RequestedCourt.builder()
+            .caseLocation(CaseLocationCivil.builder().baseLocation(epimmsId).build())
+            .build();
+
+        when(locationReferenceDataService.getCourtLocationsForDefaultJudgments(AUTH_TOKEN)).thenReturn(locations);
+        when(locationHelper.getCaseManagementLocation(any())).thenReturn(Optional.of(requestedCourt));
+        when(locationHelper.getMatching(eq(locations), eq(requestedCourt))).thenReturn(Optional.of(location));
     }
 }
