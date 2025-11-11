@@ -9,9 +9,7 @@ import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingJudgementDeductionValue;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackJudgementDeductionValue;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackPersonalInjury;
 import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2FastTrackAltDisputeResolution;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2Settlement;
@@ -26,11 +24,12 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class SdoTrackDefaultsService {
 
-    private final SdoDeadlineService sdoDeadlineService;
     private final SdoJourneyToggleService sdoJourneyToggleService;
     private final SdoDisposalOrderDefaultsService sdoDisposalOrderDefaultsService;
     private final SdoFastTrackOrderDefaultsService sdoFastTrackOrderDefaultsService;
     private final SdoSmallClaimsOrderDefaultsService sdoSmallClaimsOrderDefaultsService;
+    private final SdoExpertEvidenceFieldsService sdoExpertEvidenceFieldsService;
+    private final SdoDisclosureOfDocumentsFieldsService sdoDisclosureOfDocumentsFieldsService;
 
     private static final List<IncludeInOrderToggle> INCLUDE_IN_ORDER_TOGGLE = List.of(IncludeInOrderToggle.INCLUDE);
 
@@ -46,8 +45,8 @@ public class SdoTrackDefaultsService {
         sdoFastTrackOrderDefaultsService.populateFastTrackOrderDetails(updatedData);
         sdoSmallClaimsOrderDefaultsService.populateSmallClaimsOrderDetails(caseData, updatedData, checkList);
 
-        updateExpertEvidenceFields(updatedData);
-        updateDisclosureOfDocumentFields(updatedData);
+        sdoExpertEvidenceFieldsService.populateFastTrackExpertEvidence(updatedData);
+        sdoDisclosureOfDocumentsFieldsService.populateFastTrackDisclosureOfDocuments(updatedData);
     }
 
     public void applyR2Defaults(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
@@ -130,42 +129,6 @@ public class SdoTrackDefaultsService {
         updatedData.sdoR2TrialToggle(includeInOrderToggle);
         sdoJourneyToggleService.applyR2SmallClaimsMediation(caseData, updatedData, includeInOrderToggle);
     }
-
-
-    private void updateExpertEvidenceFields(CaseData.CaseDataBuilder<?, ?> updatedData) {
-        FastTrackPersonalInjury tempFastTrackPersonalInjury = FastTrackPersonalInjury.builder()
-            .input1("The Claimant has permission to rely upon the written expert evidence already uploaded to the"
-                        + " Digital Portal with the particulars of claim")
-            .input2("The Defendant(s) may ask questions of the Claimant's expert which must be sent to the expert " +
-                        "directly and uploaded to the Digital Portal by 4pm on")
-            .date2(sdoDeadlineService.nextWorkingDayFromNowDays(14))
-            .input3("The answers to the questions shall be answered by the Expert by")
-            .date3(sdoDeadlineService.nextWorkingDayFromNowDays(42))
-            .input4("and uploaded to the Digital Portal by the party who has asked the question by")
-            .date4(sdoDeadlineService.nextWorkingDayFromNowDays(49))
-            .build();
-
-        updatedData.fastTrackPersonalInjury(tempFastTrackPersonalInjury).build();
-    }
-
-
-    private void updateDisclosureOfDocumentFields(CaseData.CaseDataBuilder<?, ?> updatedData) {
-        FastTrackDisclosureOfDocuments tempFastTrackDisclosureOfDocuments = FastTrackDisclosureOfDocuments.builder()
-            .input1("Standard disclosure shall be provided by the parties by uploading to the Digital Portal their "
-                        + "list of documents by 4pm on")
-            .date1(sdoDeadlineService.nextWorkingDayFromNowWeeks(4))
-            .input2("Any request to inspect a document, or for a copy of a document, shall be made directly to "
-                        + "the other party by 4pm on")
-            .date2(sdoDeadlineService.nextWorkingDayFromNowWeeks(5))
-            .input3("Requests will be complied with within 7 days of the receipt of the request.")
-            .input4("Each party must upload to the Digital Portal copies of those documents on which they wish to"
-                        + " rely at trial by 4pm on")
-            .date3(sdoDeadlineService.nextWorkingDayFromNowWeeks(8))
-            .build();
-
-        updatedData.fastTrackDisclosureOfDocuments(tempFastTrackDisclosureOfDocuments).build();
-    }
-
 
     private void updateDeductionValue(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
         Optional.ofNullable(caseData.getDrawDirectionsOrder())

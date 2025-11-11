@@ -1,0 +1,49 @@
+package uk.gov.hmcts.reform.civil.service.sdo;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackDisclosureOfDocuments;
+
+import java.time.LocalDate;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
+class SdoDisclosureOfDocumentsFieldsServiceTest {
+
+    @Mock
+    private SdoDeadlineService deadlineService;
+
+    private SdoDisclosureOfDocumentsFieldsService service;
+
+    @BeforeEach
+    void setUp() {
+        service = new SdoDisclosureOfDocumentsFieldsService(deadlineService);
+    }
+
+    @Test
+    void shouldPopulateDisclosureFieldsWithExpectedDates() {
+        LocalDate date4Weeks = LocalDate.of(2024, 9, 1);
+        LocalDate date5Weeks = LocalDate.of(2024, 9, 8);
+        LocalDate date8Weeks = LocalDate.of(2024, 9, 29);
+        when(deadlineService.nextWorkingDayFromNowWeeks(eq(4))).thenReturn(date4Weeks);
+        when(deadlineService.nextWorkingDayFromNowWeeks(eq(5))).thenReturn(date5Weeks);
+        when(deadlineService.nextWorkingDayFromNowWeeks(eq(8))).thenReturn(date8Weeks);
+
+        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder().build().toBuilder();
+
+        service.populateFastTrackDisclosureOfDocuments(builder);
+
+        FastTrackDisclosureOfDocuments disclosure = builder.build().getFastTrackDisclosureOfDocuments();
+        assertThat(disclosure).isNotNull();
+        assertThat(disclosure.getDate1()).isEqualTo(date4Weeks);
+        assertThat(disclosure.getDate2()).isEqualTo(date5Weeks);
+        assertThat(disclosure.getDate3()).isEqualTo(date8Weeks);
+    }
+}

@@ -8,9 +8,8 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderLifecycleStage;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskContext;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskResult;
-import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.sdo.SdoFeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoDisposalGuardService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoPrePopulateService;
 
 import java.util.Map;
@@ -27,15 +26,15 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackH
 class SdoPrePopulateTaskTest {
 
     @Mock
-    private SdoFeatureToggleService featureToggleService;
+    private SdoDisposalGuardService disposalGuardService;
     @Mock
     private SdoPrePopulateService prePopulateService;
 
     @Test
     void shouldReturnExistingCaseDataDuringPrePopulate() {
-        when(featureToggleService.isMultiOrIntermediateTrackCase(any())).thenReturn(false);
+        when(disposalGuardService.shouldBlockPrePopulate(any())).thenReturn(false);
 
-        SdoPrePopulateTask task = new SdoPrePopulateTask(featureToggleService, prePopulateService);
+        SdoPrePopulateTask task = new SdoPrePopulateTask(disposalGuardService, prePopulateService);
         CaseData caseData = CaseData.builder().build();
         when(prePopulateService.prePopulate(any())).thenReturn(caseData);
         CallbackParams params = CallbackParams.builder()
@@ -53,11 +52,9 @@ class SdoPrePopulateTaskTest {
 
     @Test
     void shouldReturnErrorWhenMultiTrackEnabled() {
-        when(featureToggleService.isMultiOrIntermediateTrackCase(any())).thenReturn(true);
+        when(disposalGuardService.shouldBlockPrePopulate(any())).thenReturn(true);
 
-        CaseData caseData = CaseData.builder()
-            .allocatedTrack(AllocatedTrack.MULTI_CLAIM)
-            .build();
+        CaseData caseData = CaseData.builder().build();
 
         CallbackParams params = CallbackParams.builder()
             .params(Map.of(BEARER_TOKEN, "token"))
@@ -65,7 +62,7 @@ class SdoPrePopulateTaskTest {
         DirectionsOrderTaskContext context =
             new DirectionsOrderTaskContext(caseData, params, DirectionsOrderLifecycleStage.PRE_POPULATE);
 
-        SdoPrePopulateTask task = new SdoPrePopulateTask(featureToggleService, prePopulateService);
+        SdoPrePopulateTask task = new SdoPrePopulateTask(disposalGuardService, prePopulateService);
 
         DirectionsOrderTaskResult result = task.execute(context);
 
@@ -75,7 +72,7 @@ class SdoPrePopulateTaskTest {
 
     @Test
     void shouldSupportPrePopulateStageOnly() {
-        SdoPrePopulateTask task = new SdoPrePopulateTask(featureToggleService, prePopulateService);
+        SdoPrePopulateTask task = new SdoPrePopulateTask(disposalGuardService, prePopulateService);
 
         assertThat(task.supports(DirectionsOrderLifecycleStage.PRE_POPULATE)).isTrue();
         assertThat(task.supports(DirectionsOrderLifecycleStage.MID_EVENT)).isFalse();

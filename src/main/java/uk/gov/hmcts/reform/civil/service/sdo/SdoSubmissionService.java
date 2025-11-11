@@ -6,12 +6,12 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CaseData.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearing;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2Trial;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearing;
+import uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderCaseProgressionService;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
 import java.util.ArrayList;
@@ -29,6 +29,7 @@ public class SdoSubmissionService {
 
     private final SdoFeatureToggleService featureToggleService;
     private final SdoLocationService sdoLocationService;
+    private final DirectionsOrderCaseProgressionService directionsOrderCaseProgressionService;
     private final SdoCaseClassificationService caseClassificationService;
 
     public CaseData prepareSubmission(CaseData caseData, String authToken) {
@@ -37,12 +38,12 @@ public class SdoSubmissionService {
             .hearingNotes(getHearingNotes(caseData));
 
         moveGeneratedDocument(caseData, builder);
-        updateEaCourtLocation(caseData, builder);
+        directionsOrderCaseProgressionService.applyEaCourtLocation(caseData, builder);
         trimMethodLocations(caseData, builder);
         updateSmallClaimsHearing(caseData, builder);
         updateClaimsTrack(caseData, builder);
         updateTrialLocations(caseData, builder);
-        updateWaLocations(caseData, builder, authToken);
+        directionsOrderCaseProgressionService.updateWaLocationsIfEnabled(caseData, builder, authToken);
 
         return builder.build();
     }
@@ -66,29 +67,6 @@ public class SdoSubmissionService {
         }
 
         builder.sdoOrderDocument(null);
-    }
-
-    private void updateEaCourtLocation(CaseData caseData, CaseDataBuilder<?, ?> builder) {
-        if (!CaseCategory.SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            return;
-        }
-
-        boolean isLipCase = caseData.isApplicantLiP() || caseData.isRespondent1LiP() || caseData.isRespondent2LiP();
-        if (featureToggleService.isWelshEnabledForMainCase()) {
-            builder.eaCourtLocation(YesOrNo.YES);
-        } else if (!isLipCase) {
-            builder.eaCourtLocation(YesOrNo.YES);
-        } else {
-            boolean isWhitelisted = isLipCaseWithProgressionEnabledAndCourtWhiteListed(caseData);
-            builder.eaCourtLocation(isWhitelisted ? YesOrNo.YES : YesOrNo.NO);
-        }
-    }
-
-    private boolean isLipCaseWithProgressionEnabledAndCourtWhiteListed(CaseData caseData) {
-        return (caseData.isLipvLipOneVOne() || caseData.isLRvLipOneVOne()
-            || (caseData.isLipvLROneVOne() && featureToggleService.isDefendantNoCOnlineForCase(caseData)))
-            && featureToggleService
-            .isCaseProgressionEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation());
     }
 
     private void trimMethodLocations(CaseData caseData, CaseDataBuilder<?, ?> builder) {
@@ -161,10 +139,4 @@ public class SdoSubmissionService {
         builder.sdoR2Trial(trialBuilder.build());
     }
 
-    private void updateWaLocations(CaseData caseData, CaseDataBuilder<?, ?> builder, String authToken) {
-        if (!featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
-            return;
-        }
-        sdoLocationService.updateWaLocationsIfRequired(caseData, builder, authToken);
-    }
 }

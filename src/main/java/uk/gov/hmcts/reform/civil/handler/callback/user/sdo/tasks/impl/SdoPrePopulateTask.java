@@ -2,14 +2,13 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderCallbackTask;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderLifecycleStage;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskContext;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskResult;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskSupport;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.sdo.SdoFeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoDisposalGuardService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoPrePopulateService;
 
 import java.util.Collections;
@@ -22,14 +21,14 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackH
 @RequiredArgsConstructor
 public class SdoPrePopulateTask implements DirectionsOrderCallbackTask {
 
-    private final SdoFeatureToggleService sdoFeatureToggleService;
+    private final SdoDisposalGuardService sdoDisposalGuardService;
     private final SdoPrePopulateService sdoPrePopulateService;
 
     @Override
     public DirectionsOrderTaskResult execute(DirectionsOrderTaskContext context) {
         CaseData caseData = context.caseData();
 
-        if (sdoFeatureToggleService.isMultiOrIntermediateTrackCase(caseData)) {
+        if (sdoDisposalGuardService.shouldBlockPrePopulate(caseData)) {
             return DirectionsOrderTaskResult.withErrors(caseData, List.of(ERROR_MINTI_DISPOSAL_NOT_ALLOWED));
         }
 

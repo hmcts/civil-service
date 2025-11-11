@@ -31,6 +31,8 @@ class SdoTrackDefaultsServiceTest {
     private SdoDisposalOrderDefaultsService disposalOrderDefaultsService;
     private SdoFastTrackOrderDefaultsService fastTrackOrderDefaultsService;
     private SdoSmallClaimsOrderDefaultsService smallClaimsOrderDefaultsService;
+    private SdoExpertEvidenceFieldsService expertEvidenceFieldsService;
+    private SdoDisclosureOfDocumentsFieldsService disclosureOfDocumentsFieldsService;
 
     @BeforeEach
     void setUp() {
@@ -38,12 +40,15 @@ class SdoTrackDefaultsServiceTest {
         disposalOrderDefaultsService = new SdoDisposalOrderDefaultsService(deadlineService);
         fastTrackOrderDefaultsService = new SdoFastTrackOrderDefaultsService(deadlineService);
         smallClaimsOrderDefaultsService = new SdoSmallClaimsOrderDefaultsService(deadlineService, journeyToggleService);
+        expertEvidenceFieldsService = new SdoExpertEvidenceFieldsService(deadlineService);
+        disclosureOfDocumentsFieldsService = new SdoDisclosureOfDocumentsFieldsService(deadlineService);
         service = new SdoTrackDefaultsService(
-            deadlineService,
             journeyToggleService,
             disposalOrderDefaultsService,
             fastTrackOrderDefaultsService,
-            smallClaimsOrderDefaultsService
+            smallClaimsOrderDefaultsService,
+            expertEvidenceFieldsService,
+            disclosureOfDocumentsFieldsService
         );
 
         lenient().when(deadlineService.nextWorkingDayFromNowWeeks(anyInt()))

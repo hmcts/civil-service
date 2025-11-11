@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.service.sdo;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.IncludeInOrderToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
@@ -63,5 +64,45 @@ public class SdoJourneyToggleService {
                                                               .input(SMALL_CLAIMS_MEDIATION_TEXT)
                                                               .build());
         }
+    }
+
+    /**
+     * Determines whether EA court should be enabled for a SPEC claim, aligning the logic across
+     * SDO and DJ submission/notification paths. Returns {@code null} when the case category is not SPEC.
+     */
+    public YesOrNo resolveEaCourtLocation(CaseData caseData) {
+        if (!CaseCategory.SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            return null;
+        }
+
+        if (sdoFeatureToggleService.isWelshEnabledForMainCase()) {
+            return YesOrNo.YES;
+        }
+
+        boolean isLipCase = caseData.isApplicantLiP() || caseData.isRespondent1LiP() || caseData.isRespondent2LiP();
+        if (!isLipCase) {
+            return YesOrNo.YES;
+        }
+
+        return isLipCaseWithProgressionEnabledAndCourtWhiteListed(caseData) ? YesOrNo.YES : YesOrNo.NO;
+    }
+
+    private boolean isLipCaseWithProgressionEnabledAndCourtWhiteListed(CaseData caseData) {
+        boolean eligibleLipConfiguration = caseData.isLipvLipOneVOne()
+            || caseData.isLRvLipOneVOne()
+            || (caseData.isLipvLROneVOne() && sdoFeatureToggleService.isDefendantNoCOnlineForCase(caseData));
+
+        if (!eligibleLipConfiguration) {
+            return false;
+        }
+
+        if (caseData.getCaseManagementLocation() == null
+            || caseData.getCaseManagementLocation().getBaseLocation() == null) {
+            return false;
+        }
+
+        return sdoFeatureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(
+            caseData.getCaseManagementLocation().getBaseLocation()
+        );
     }
 }

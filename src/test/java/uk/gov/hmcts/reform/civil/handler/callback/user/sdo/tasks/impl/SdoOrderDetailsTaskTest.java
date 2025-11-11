@@ -5,14 +5,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
-import uk.gov.hmcts.reform.civil.enums.CaseState;
-import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderLifecycleStage;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskContext;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskResult;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.sdo.SdoFeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoDisposalGuardService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoOrderDetailsService;
 
 import java.util.Collections;
@@ -31,20 +28,15 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackH
 class SdoOrderDetailsTaskTest {
 
     @Mock
-    private SdoFeatureToggleService featureToggleService;
+    private SdoDisposalGuardService disposalGuardService;
     @Mock
     private SdoOrderDetailsService orderDetailsService;
 
     @Test
     void shouldReturnErrorWhenDisposalHearingNotAllowed() {
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
-        when(featureToggleService.isMultiOrIntermediateTrackCase(any())).thenReturn(true);
+        when(disposalGuardService.shouldBlockOrderDetails(any())).thenReturn(true);
 
-        CaseData caseData = CaseData.builder()
-            .allocatedTrack(AllocatedTrack.MULTI_CLAIM)
-            .orderType(OrderType.DISPOSAL)
-            .ccdState(CaseState.JUDICIAL_REFERRAL)
-            .build();
+        CaseData caseData = CaseData.builder().build();
 
         CallbackParams params = CallbackParams.builder()
             .params(Map.of(BEARER_TOKEN, "token"))
@@ -52,7 +44,7 @@ class SdoOrderDetailsTaskTest {
         DirectionsOrderTaskContext context =
             new DirectionsOrderTaskContext(caseData, params, DirectionsOrderLifecycleStage.ORDER_DETAILS);
 
-        SdoOrderDetailsTask task = new SdoOrderDetailsTask(featureToggleService, orderDetailsService);
+        SdoOrderDetailsTask task = new SdoOrderDetailsTask(disposalGuardService, orderDetailsService);
 
         DirectionsOrderTaskResult result = task.execute(context);
 
@@ -63,7 +55,7 @@ class SdoOrderDetailsTaskTest {
 
     @Test
     void shouldUpdateCaseDataWhenAllowed() {
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(false);
+        when(disposalGuardService.shouldBlockOrderDetails(any())).thenReturn(false);
 
         CaseData original = CaseData.builder().build();
         CaseData updated = CaseData.builder().legacyCaseReference("updated").build();
@@ -75,7 +67,7 @@ class SdoOrderDetailsTaskTest {
         DirectionsOrderTaskContext context =
             new DirectionsOrderTaskContext(original, params, DirectionsOrderLifecycleStage.ORDER_DETAILS);
 
-        SdoOrderDetailsTask task = new SdoOrderDetailsTask(featureToggleService, orderDetailsService);
+        SdoOrderDetailsTask task = new SdoOrderDetailsTask(disposalGuardService, orderDetailsService);
 
         DirectionsOrderTaskResult result = task.execute(context);
 
@@ -86,7 +78,7 @@ class SdoOrderDetailsTaskTest {
 
     @Test
     void shouldSupportOrderDetailsStageOnly() {
-        SdoOrderDetailsTask task = new SdoOrderDetailsTask(featureToggleService, orderDetailsService);
+        SdoOrderDetailsTask task = new SdoOrderDetailsTask(disposalGuardService, orderDetailsService);
 
         assertThat(task.supports(DirectionsOrderLifecycleStage.ORDER_DETAILS)).isTrue();
         assertThat(task.supports(DirectionsOrderLifecycleStage.MID_EVENT)).isFalse();

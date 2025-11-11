@@ -72,12 +72,17 @@ class SdoPrePopulateServiceTest {
         SdoSmallClaimsOrderDefaultsService smallClaimsOrderDefaultsService =
             new SdoSmallClaimsOrderDefaultsService(deadlineService, journeyToggleService);
 
+        SdoExpertEvidenceFieldsService expertEvidenceFieldsService = new SdoExpertEvidenceFieldsService(deadlineService);
+        SdoDisclosureOfDocumentsFieldsService disclosureOfDocumentsFieldsService =
+            new SdoDisclosureOfDocumentsFieldsService(deadlineService);
+
         trackDefaultsService = new SdoTrackDefaultsService(
-            deadlineService,
             journeyToggleService,
             disposalOrderDefaultsService,
             fastTrackOrderDefaultsService,
-            smallClaimsOrderDefaultsService
+            smallClaimsOrderDefaultsService,
+            expertEvidenceFieldsService,
+            disclosureOfDocumentsFieldsService
         );
         hearingPreparationService = new SdoHearingPreparationService(
             locationHelper,

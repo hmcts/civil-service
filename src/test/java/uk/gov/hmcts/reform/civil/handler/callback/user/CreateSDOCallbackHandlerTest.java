@@ -50,6 +50,7 @@ import uk.gov.hmcts.reform.civil.enums.sdo.TrialOnRadioOptions;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.DirectionsOrderStageExecutor;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.pipeline.DirectionsOrderCallbackPipeline;
+import uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderCaseProgressionService;
 import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.impl.SdoOrderDetailsTask;
 import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.impl.SdoPrePopulateTask;
 import uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.impl.SdoConfirmationTask;
@@ -130,9 +131,12 @@ import uk.gov.hmcts.reform.civil.service.camunda.UpdateWaCourtLocationsService;
 import uk.gov.hmcts.reform.civil.service.docmosis.sdo.SdoGeneratorService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoCaseClassificationService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoDisposalGuardService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoDeadlineService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoDocumentService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoDisposalOrderDefaultsService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoDisclosureOfDocumentsFieldsService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoExpertEvidenceFieldsService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoDrhFieldsService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoFastTrackOrderDefaultsService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoFeatureToggleService;
@@ -239,11 +243,15 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackH
     SdoLocationService.class,
     SdoCaseClassificationService.class,
     SdoFeatureToggleService.class,
+    DirectionsOrderCaseProgressionService.class,
     SdoDeadlineService.class,
     SdoJourneyToggleService.class,
+    SdoDisposalGuardService.class,
     SdoDisposalOrderDefaultsService.class,
     SdoFastTrackOrderDefaultsService.class,
     SdoSmallClaimsOrderDefaultsService.class,
+    SdoExpertEvidenceFieldsService.class,
+    SdoDisclosureOfDocumentsFieldsService.class,
     SdoTrackDefaultsService.class,
     SdoOrderDetailsService.class,
     SdoPrePopulateService.class,

@@ -62,7 +62,10 @@ import uk.gov.hmcts.reform.civil.service.dj.DjSpecialistDirectionsService;
 import uk.gov.hmcts.reform.civil.service.dj.DjSpecialistNarrativeService;
 import uk.gov.hmcts.reform.civil.service.dj.DjWelshLanguageService;
 import uk.gov.hmcts.reform.civil.service.dj.DjTrialDirectionsService;
+import uk.gov.hmcts.reform.civil.service.dj.DjTrialNarrativeService;
+import uk.gov.hmcts.reform.civil.service.dj.DjTrialDeadlineService;
 import uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderParticipantService;
+import uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderCaseProgressionService;
 import uk.gov.hmcts.reform.civil.service.camunda.UpdateWaCourtLocationsService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
@@ -127,6 +130,8 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
     DjSpecialistNarrativeService.class,
     DjSpecialistDeadlineService.class,
     DjWelshLanguageService.class,
+    DjTrialNarrativeService.class,
+    DjTrialDeadlineService.class,
     DjTrialDirectionsService.class,
     DjOrderDetailsService.class,
     DjValidationService.class,
@@ -136,6 +141,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
     SdoLocationService.class,
     SdoFeatureToggleService.class,
     SdoJourneyToggleService.class,
+    DirectionsOrderCaseProgressionService.class,
     DirectionsOrderParticipantService.class
 })
 

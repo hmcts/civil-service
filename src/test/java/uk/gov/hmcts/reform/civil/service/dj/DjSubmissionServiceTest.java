@@ -3,19 +3,16 @@ package uk.gov.hmcts.reform.civil.service.dj;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.Captor;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
-import uk.gov.hmcts.reform.civil.service.sdo.SdoFeatureToggleService;
-import uk.gov.hmcts.reform.civil.service.sdo.SdoLocationService;
+import uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderCaseProgressionService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.util.List;
@@ -23,9 +20,9 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STANDARD_DIRECTION_ORDER_DJ;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getHearingNotes;
@@ -38,18 +35,13 @@ class DjSubmissionServiceTest {
     @Mock
     private AssignCategoryId assignCategoryId;
     @Mock
-    private SdoFeatureToggleService featureToggleService;
-    @Mock
-    private SdoLocationService sdoLocationService;
-
-    @Captor
-    ArgumentCaptor<CaseData.CaseDataBuilder<?, ?>> caseDataBuilderCaptor;
+    private DirectionsOrderCaseProgressionService caseProgressionService;
 
     private DjSubmissionService service;
 
     @BeforeEach
     void setUp() {
-        service = new DjSubmissionService(assignCategoryId, featureToggleService, sdoLocationService);
+        service = new DjSubmissionService(assignCategoryId, caseProgressionService);
     }
 
     @Test
@@ -65,8 +57,6 @@ class DjSubmissionServiceTest {
             .orderSDODocumentDJCollection(List.of(element(caseDocument)))
             .build();
 
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(false);
-
         CaseData result = service.prepareSubmission(caseData, AUTH_TOKEN);
 
         assertThat(result.getOrderSDODocumentDJ()).isNull();
@@ -79,74 +69,40 @@ class DjSubmissionServiceTest {
             any(),
             eq("caseManagementOrders")
         );
-        verify(sdoLocationService, never()).updateWaLocationsIfRequired(any(), any(), any());
+        verify(caseProgressionService).applyEaCourtLocation(eq(caseData), any());
+        verify(caseProgressionService).updateWaLocationsIfEnabled(eq(caseData), any(), eq(AUTH_TOKEN));
     }
 
     @Test
-    void shouldSetEaCourtLocationYesForSpecNonLip() {
+    void shouldApplyHelperMutationsToResult() {
         CaseData caseData = CaseData.builder()
             .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-            .applicant1Represented(YesOrNo.YES)
-            .respondent1Represented(YesOrNo.YES)
-            .respondent2Represented(YesOrNo.YES)
-            .build();
-
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(false);
-
-        CaseData result = service.prepareSubmission(caseData, AUTH_TOKEN);
-
-        assertThat(result.getEaCourtLocation()).isEqualTo(YesOrNo.YES);
-    }
-
-    @Test
-    void shouldRespectWelshToggleForEaCourtLocation() {
-        CaseData caseData = CaseData.builder()
-            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-            .applicant1Represented(YesOrNo.NO)
-            .respondent1Represented(YesOrNo.NO)
             .caseManagementLocation(CaseLocationCivil.builder().baseLocation("110").build())
             .build();
 
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(false);
+        doAnswer(invocation -> {
+            CaseData.CaseDataBuilder<?, ?> builder = invocation.getArgument(1);
+            builder.eaCourtLocation(YesOrNo.YES);
+            return null;
+        }).when(caseProgressionService).applyEaCourtLocation(eq(caseData), any());
 
         CaseData result = service.prepareSubmission(caseData, AUTH_TOKEN);
 
         assertThat(result.getEaCourtLocation()).isEqualTo(YesOrNo.YES);
+        verify(caseProgressionService).updateWaLocationsIfEnabled(eq(caseData), any(), eq(AUTH_TOKEN));
     }
 
     @Test
-    void shouldCallWaUpdateWhenEnabled() {
+    void shouldDelegateWaUpdatesToHelperOnly() {
         CaseData caseData = CaseData.builder()
             .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
             .caseManagementLocation(CaseLocationCivil.builder().baseLocation("220").build())
             .build();
 
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(true);
-
         service.prepareSubmission(caseData, AUTH_TOKEN);
 
-        verify(sdoLocationService)
-            .updateWaLocationsIfRequired(eq(caseData), caseDataBuilderCaptor.capture(), eq(AUTH_TOKEN));
-        assertThat(caseDataBuilderCaptor.getValue()).isNotNull();
-    }
-
-    @Test
-    void shouldSetEaCourtLocationNoWhenLipAndNotWhitelisted() {
-        CaseData caseData = CaseData.builder()
-            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-            .applicant1Represented(YesOrNo.NO)
-            .respondent1Represented(YesOrNo.NO)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("330").build())
-            .build();
-
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
-        when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed("330")).thenReturn(false);
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(false);
-
-        CaseData result = service.prepareSubmission(caseData, AUTH_TOKEN);
-
-        assertThat(result.getEaCourtLocation()).isEqualTo(YesOrNo.NO);
+        verify(caseProgressionService).applyEaCourtLocation(eq(caseData), any());
+        verify(caseProgressionService).updateWaLocationsIfEnabled(eq(caseData), any(), eq(AUTH_TOKEN));
+        verifyNoMoreInteractions(caseProgressionService);
     }
 }

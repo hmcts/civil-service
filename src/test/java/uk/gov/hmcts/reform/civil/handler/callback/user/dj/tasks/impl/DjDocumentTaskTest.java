@@ -5,7 +5,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderLifecycleStage;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskContext;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskResult;
@@ -13,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.service.dj.DjDocumentService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoLocationService;
 
@@ -26,6 +29,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STANDARD_DIRECTION_ORDER_DJ;
 
 @ExtendWith(MockitoExtension.class)
 class DjDocumentTaskTest {
@@ -106,5 +110,27 @@ class DjDocumentTaskTest {
     void shouldSupportDocumentGenerationStageOnly() {
         assertThat(task.supports(DirectionsOrderLifecycleStage.DOCUMENT_GENERATION)).isTrue();
         assertThat(task.supports(DirectionsOrderLifecycleStage.ORDER_DETAILS)).isFalse();
+    }
+
+    @Test
+    void shouldOnlyApplyToStandardDirectionOrderEvent() {
+        CaseData caseData = CaseData.builder().build();
+        CallbackParams matching = CallbackParamsBuilder.builder()
+            .of(CallbackType.ABOUT_TO_SUBMIT, caseData)
+            .request(CallbackRequest.builder().eventId(STANDARD_DIRECTION_ORDER_DJ.name()).build())
+            .build();
+        DirectionsOrderTaskContext matchingContext =
+            new DirectionsOrderTaskContext(caseData, matching, DirectionsOrderLifecycleStage.DOCUMENT_GENERATION);
+
+        assertThat(task.appliesTo(matchingContext)).isTrue();
+
+        CallbackParams nonMatching = CallbackParamsBuilder.builder()
+            .of(CallbackType.ABOUT_TO_SUBMIT, caseData)
+            .request(CallbackRequest.builder().eventId("OTHER_EVENT").build())
+            .build();
+        DirectionsOrderTaskContext nonMatchingContext =
+            new DirectionsOrderTaskContext(caseData, nonMatching, DirectionsOrderLifecycleStage.DOCUMENT_GENERATION);
+
+        assertThat(task.appliesTo(nonMatchingContext)).isFalse();
     }
 }

@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.service.sdo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -16,10 +15,11 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearing;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2Trial;
-import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearing;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
+import uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderCaseProgressionService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +27,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -38,10 +38,10 @@ class SdoSubmissionServiceTest {
 
     @Mock
     private SdoFeatureToggleService featureToggleService;
-
     @Mock
     private SdoLocationService locationService;
-
+    @Mock
+    private DirectionsOrderCaseProgressionService caseProgressionService;
     @Mock
     private SdoCaseClassificationService classificationService;
 
@@ -49,7 +49,7 @@ class SdoSubmissionServiceTest {
 
     @BeforeEach
     void setUp() {
-        service = new SdoSubmissionService(featureToggleService, locationService, classificationService);
+        service = new SdoSubmissionService(featureToggleService, locationService, caseProgressionService, classificationService);
     }
 
     @Test
@@ -101,7 +101,7 @@ class SdoSubmissionServiceTest {
             .caseManagementLocation(CaseLocationCivil.builder().baseLocation("123").build())
             .build();
 
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
+        mockEaCourtMutation(caseData, YesOrNo.YES);
 
         CaseData result = service.prepareSubmission(caseData, AUTH_TOKEN);
 
@@ -117,7 +117,7 @@ class SdoSubmissionServiceTest {
             .caseManagementLocation(CaseLocationCivil.builder().baseLocation("123").build())
             .build();
 
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
+        mockEaCourtMutation(caseData, YesOrNo.NO);
 
         CaseData result = service.prepareSubmission(caseData, AUTH_TOKEN);
 
@@ -184,7 +184,6 @@ class SdoSubmissionServiceTest {
             .caseAccessCategory(CaseCategory.SPEC_CLAIM)
             .build();
 
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
         when(classificationService.isSmallClaimsTrack(caseData)).thenReturn(false);
         when(classificationService.isFastTrack(caseData)).thenReturn(true);
 
@@ -194,24 +193,20 @@ class SdoSubmissionServiceTest {
     }
 
     @Test
-    void shouldUpdateWaLocationsWhenFeatureEnabled() {
+    void shouldDelegateWaLocationsToHelper() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(true);
 
         service.prepareSubmission(caseData, AUTH_TOKEN);
 
-        ArgumentCaptor<CaseData.CaseDataBuilder<?, ?>> captor = ArgumentCaptor.forClass(CaseData.CaseDataBuilder.class);
-        verify(locationService).updateWaLocationsIfRequired(eq(caseData), captor.capture(), eq(AUTH_TOKEN));
+        verify(caseProgressionService).updateWaLocationsIfEnabled(eq(caseData), any(), eq(AUTH_TOKEN));
     }
 
-    @Test
-    void shouldNotUpdateWaLocationsWhenFeatureDisabled() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(false);
-
-        service.prepareSubmission(caseData, AUTH_TOKEN);
-
-        verify(locationService, never()).updateWaLocationsIfRequired(any(), any(), any());
+    private void mockEaCourtMutation(CaseData caseData, YesOrNo value) {
+        doAnswer(invocation -> {
+            CaseData.CaseDataBuilder<?, ?> builder = invocation.getArgument(1);
+            builder.eaCourtLocation(value);
+            return null;
+        }).when(caseProgressionService).applyEaCourtLocation(eq(caseData), any());
     }
 
 }
