@@ -4,9 +4,28 @@ Civil CCD Callback Service.
 
 ### Contents:
 
+- [StateFlow diagrams](#stateflow-diagrams)
 - [Building and deploying application](#building-and-deploying-the-application)
 - [Pact or contract testing](#pact-or-contract-testing)
 - [Adding Git Conventions](#adding-git-conventions)
+
+## StateFlow diagrams
+
+Visual snapshots of the automated journey logic are generated from the live StateFlow configuration. The diagrams below update automatically via the `Refresh StateFlow diagrams` GitHub Action after any change to the transition builders.
+
+#### Draft to Submission
+![Draft to Submission](docs/draft_flow.svg)
+
+#### Claim Issue & Notification
+![Claim Issue & Notification](docs/issue_flow.svg)
+
+#### Awaiting Defence & Divergence
+![Defence Waiting & Divergence](docs/response_flow.svg)
+
+#### Post-Response Outcomes & Settlement
+![Post-Response Outcomes & Settlement](docs/post_response.svg)
+
+Each image links to an SVG whose source (`docs/*.mmd`) is produced by `python3 scripts/export_stateflow_transitions.py`. If you need the narrative in text form, see `docs/stateflow_transition_catalogue.md` or the structured `docs/stateflow/transition_catalogue.json`.
 
 ## Building and deploying the application
 
