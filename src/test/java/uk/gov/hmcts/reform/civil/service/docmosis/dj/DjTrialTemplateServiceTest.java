@@ -30,21 +30,27 @@ class DjTrialTemplateServiceTest {
     private DocumentHearingLocationHelper locationHelper;
 
     private DjTrialTemplateService service;
-    private DjTemplateFieldService templateFieldService;
+    private DjAuthorisationFieldService authorisationFieldService;
+    private DjBundleFieldService bundleFieldService;
+    private DjDirectionsToggleService directionsToggleService;
     private DjPartyFieldService partyFieldService;
     private DjHearingMethodFieldService hearingMethodFieldService;
     private DjTrialTemplateFieldService trialTemplateFieldService;
 
     @BeforeEach
     void setUp() {
-        templateFieldService = new DjTemplateFieldService();
+        authorisationFieldService = new DjAuthorisationFieldService();
+        bundleFieldService = new DjBundleFieldService();
+        directionsToggleService = new DjDirectionsToggleService();
         partyFieldService = new DjPartyFieldService();
         hearingMethodFieldService = new DjHearingMethodFieldService();
         trialTemplateFieldService = new DjTrialTemplateFieldService();
         service = new DjTrialTemplateService(
             userService,
             locationHelper,
-            templateFieldService,
+            authorisationFieldService,
+            bundleFieldService,
+            directionsToggleService,
             partyFieldService,
             hearingMethodFieldService,
             trialTemplateFieldService

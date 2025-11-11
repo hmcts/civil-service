@@ -40,8 +40,10 @@ class DjTrialDirectionsServiceTest {
 
     @BeforeEach
     void setUp() {
+        DjSpecialistDeadlineService deadlineService = new DjSpecialistDeadlineService(workingDayIndicator);
+        DjSpecialistNarrativeService narrativeService = new DjSpecialistNarrativeService(deadlineService);
         DjSpecialistDirectionsService specialistDirectionsService =
-            new DjSpecialistDirectionsService(workingDayIndicator);
+            new DjSpecialistDirectionsService(narrativeService);
         DjWelshLanguageService welshLanguageService = new DjWelshLanguageService();
         service = new DjTrialDirectionsService(
             workingDayIndicator,

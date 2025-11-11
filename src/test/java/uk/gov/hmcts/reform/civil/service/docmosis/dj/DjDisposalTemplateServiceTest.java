@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
-import uk.gov.hmcts.reform.civil.service.docmosis.dj.DjTemplateFieldService;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.util.Collections;
@@ -32,21 +31,27 @@ class DjDisposalTemplateServiceTest {
 
     private DjDisposalTemplateService service;
 
-    private DjTemplateFieldService templateFieldService;
+    private DjAuthorisationFieldService authorisationFieldService;
+    private DjBundleFieldService bundleFieldService;
+    private DjDirectionsToggleService directionsToggleService;
     private DjPartyFieldService partyFieldService;
     private DjHearingMethodFieldService hearingMethodFieldService;
     private DjDisposalTemplateFieldService disposalTemplateFieldService;
 
     @BeforeEach
     void setUp() {
-        templateFieldService = new DjTemplateFieldService();
+        authorisationFieldService = new DjAuthorisationFieldService();
+        bundleFieldService = new DjBundleFieldService();
+        directionsToggleService = new DjDirectionsToggleService();
         partyFieldService = new DjPartyFieldService();
         hearingMethodFieldService = new DjHearingMethodFieldService();
         disposalTemplateFieldService = new DjDisposalTemplateFieldService();
         service = new DjDisposalTemplateService(
             userService,
             locationHelper,
-            templateFieldService,
+            authorisationFieldService,
+            bundleFieldService,
+            directionsToggleService,
             partyFieldService,
             hearingMethodFieldService,
             disposalTemplateFieldService

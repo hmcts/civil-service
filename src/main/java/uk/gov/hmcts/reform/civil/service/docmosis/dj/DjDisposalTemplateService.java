@@ -17,14 +17,16 @@ public class DjDisposalTemplateService {
 
     private final UserService userService;
     private final DocumentHearingLocationHelper locationHelper;
-    private final DjTemplateFieldService templateFieldService;
+    private final DjAuthorisationFieldService authorisationFieldService;
+    private final DjBundleFieldService bundleFieldService;
+    private final DjDirectionsToggleService directionsToggleService;
     private final DjPartyFieldService partyFieldService;
     private final DjHearingMethodFieldService hearingMethodFieldService;
     private final DjDisposalTemplateFieldService disposalTemplateFieldService;
 
     public DefaultJudgmentSDOOrderForm buildTemplate(CaseData caseData, String authorisation) {
         UserDetails userDetails = userService.getUserDetails(authorisation);
-        boolean writtenByJudge = templateFieldService.isJudge(userDetails);
+        boolean writtenByJudge = authorisationFieldService.isJudge(userDetails);
         String courtLocation = disposalTemplateFieldService.getCourtLocation(caseData);
 
         DefaultJudgmentSDOOrderForm.DefaultJudgmentSDOOrderFormBuilder builder = DefaultJudgmentSDOOrderForm.builder()
@@ -33,7 +35,7 @@ public class DjDisposalTemplateService {
             .caseNumber(caseData.getLegacyCaseReference())
             .disposalHearingBundleDJ(caseData.getDisposalHearingBundleDJ())
             .disposalHearingBundleDJAddSection(nonNull(caseData.getDisposalHearingBundleDJ()))
-            .typeBundleInfo(templateFieldService.buildBundleInfo(caseData))
+            .typeBundleInfo(bundleFieldService.buildBundleInfo(caseData))
             .disposalHearingDisclosureOfDocumentsDJ(caseData.getDisposalHearingDisclosureOfDocumentsDJ())
             .disposalHearingDisclosureOfDocumentsDJAddSection(
                 nonNull(caseData.getDisposalHearingDisclosureOfDocumentsDJ()))
@@ -56,16 +58,16 @@ public class DjDisposalTemplateService {
             .disposalHearingMedicalEvidenceDJ(caseData.getDisposalHearingMedicalEvidenceDJ())
             .disposalHearingMedicalEvidenceDJAddSection(nonNull(caseData.getDisposalHearingMedicalEvidenceDJ()))
             .disposalHearingNotesDJ(caseData.getDisposalHearingNotesDJ())
-            .hasNewDirections(templateFieldService.hasAdditionalDirections(caseData))
+            .hasNewDirections(directionsToggleService.hasAdditionalDirections(caseData))
             .disposalHearingAddNewDirectionsDJ(caseData.getDisposalHearingAddNewDirectionsDJ())
             .disposalHearingQuestionsToExpertsDJ(caseData.getDisposalHearingQuestionsToExpertsDJ())
             .disposalHearingQuestionsToExpertsDJAddSection(nonNull(caseData.getDisposalHearingQuestionsToExpertsDJ()))
             .disposalHearingSchedulesOfLossDJ(caseData.getDisposalHearingSchedulesOfLossDJ())
             .disposalHearingSchedulesOfLossDJAddSection(nonNull(caseData.getDisposalHearingSchedulesOfLossDJ()))
             .disposalHearingClaimSettlingAddSection(
-                templateFieldService.isToggleEnabled(caseData.getDisposalHearingClaimSettlingDJToggle()))
+                directionsToggleService.isToggleEnabled(caseData.getDisposalHearingClaimSettlingDJToggle()))
             .disposalHearingCostsAddSection(
-                templateFieldService.isToggleEnabled(caseData.getDisposalHearingCostsDJToggle()))
+                directionsToggleService.isToggleEnabled(caseData.getDisposalHearingCostsDJToggle()))
             .applicant(partyFieldService.hasApplicantPartyName(caseData)
                            ? caseData.getApplicant1().getPartyName().toUpperCase() : null)
             .respondent(partyFieldService.resolveRespondent(caseData).toUpperCase())
@@ -77,7 +79,7 @@ public class DjDisposalTemplateService {
 
         builder.hearingLocation(locationHelper.getHearingLocation(courtLocation, caseData, authorisation));
         builder.hasDisposalHearingWelshSectionDJ(
-            templateFieldService.isToggleEnabled(caseData.getSdoR2DisposalHearingUseOfWelshLangToggleDJ())
+            directionsToggleService.isToggleEnabled(caseData.getSdoR2DisposalHearingUseOfWelshLangToggleDJ())
         );
         builder.welshLanguageDescriptionDJ(
             caseData.getSdoR2DisposalHearingWelshLanguageDJ() != null

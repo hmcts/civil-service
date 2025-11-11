@@ -47,9 +47,11 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DJ_SD
     DjDisposalTemplateFieldService.class,
     DjTrialTemplateService.class,
     DjTrialTemplateFieldService.class,
+    DjAuthorisationFieldService.class,
+    DjBundleFieldService.class,
+    DjDirectionsToggleService.class,
     DjPartyFieldService.class,
     DjHearingMethodFieldService.class,
-    DjTemplateFieldService.class,
     JacksonAutoConfiguration.class
 })
 class DefaultJudgmentOrderFormGeneratorTest {

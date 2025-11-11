@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.service.docmosis.dj;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -17,6 +16,7 @@ import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.service.docmosis.dj.DjWelshTextService;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
 import java.math.BigDecimal;
@@ -37,11 +37,16 @@ class DefaultJudgmentFormBuilderTest {
     @Mock
     private OrganisationService organisationService;
 
-    @InjectMocks
     private DefaultJudgmentFormBuilder defaultJudgmentFormBuilder;
 
     @BeforeEach
     void setUp() {
+        defaultJudgmentFormBuilder = new DefaultJudgmentFormBuilder(
+            interestCalculator,
+            judgmentAmountsCalculator,
+            organisationService,
+            new DjWelshTextService()
+        );
 
         when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(Organisation.builder().name("org name")
             .contactInformation(Arrays.asList(ContactInformation.builder()

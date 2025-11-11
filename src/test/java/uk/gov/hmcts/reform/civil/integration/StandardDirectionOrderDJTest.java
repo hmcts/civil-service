@@ -47,6 +47,9 @@ import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.docmosis.dj.DjAuthorisationFieldService;
+import uk.gov.hmcts.reform.civil.service.docmosis.dj.DjBundleFieldService;
+import uk.gov.hmcts.reform.civil.service.docmosis.dj.DjDirectionsToggleService;
 import uk.gov.hmcts.reform.civil.service.dj.DjOrderDetailsService;
 import uk.gov.hmcts.reform.civil.service.dj.DjValidationService;
 import uk.gov.hmcts.reform.civil.service.dj.DjDocumentService;
@@ -54,7 +57,9 @@ import uk.gov.hmcts.reform.civil.service.dj.DjNarrativeService;
 import uk.gov.hmcts.reform.civil.service.dj.DjSubmissionService;
 import uk.gov.hmcts.reform.civil.service.dj.DjLocationAndToggleService;
 import uk.gov.hmcts.reform.civil.service.dj.DjDisposalDirectionsService;
+import uk.gov.hmcts.reform.civil.service.dj.DjSpecialistDeadlineService;
 import uk.gov.hmcts.reform.civil.service.dj.DjSpecialistDirectionsService;
+import uk.gov.hmcts.reform.civil.service.dj.DjSpecialistNarrativeService;
 import uk.gov.hmcts.reform.civil.service.dj.DjWelshLanguageService;
 import uk.gov.hmcts.reform.civil.service.dj.DjTrialDirectionsService;
 import uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderParticipantService;
@@ -113,8 +118,13 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
     DjSubmissionTask.class,
     DjConfirmationTask.class,
     DjLocationAndToggleService.class,
+    DjAuthorisationFieldService.class,
+    DjBundleFieldService.class,
+    DjDirectionsToggleService.class,
     DjDisposalDirectionsService.class,
     DjSpecialistDirectionsService.class,
+    DjSpecialistNarrativeService.class,
+    DjSpecialistDeadlineService.class,
     DjWelshLanguageService.class,
     DjTrialDirectionsService.class,
     DjOrderDetailsService.class,
