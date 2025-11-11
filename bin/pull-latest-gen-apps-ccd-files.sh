@@ -2,6 +2,7 @@
 
 ccdRepoName="civil-general-apps-ccd-definition"
 branchName=$1
+functionalTestType=$2
 directoryName="civil-ga-ccd-definition"
 
 #Checkout specific branch of CCD definitions
@@ -14,10 +15,12 @@ cd ..
 
 #Copy ccd definition files  to civil-ccd-def which contains ccd def files
 cp -r ./${ccdRepoName}/ga-ccd-definition .
-cp -r ./${ccdRepoName}/e2e .
-cp -r ./${ccdRepoName}/package.json .
-cp -r ./${ccdRepoName}/yarn.lock .
-cp -r ./${ccdRepoName}/codecept.conf.js .
-cp -r ./${ccdRepoName}/saucelabs.conf.js .
+if [functionalTestType = "GENERAL_APPS_FT"]; then
+  cp -r ./${ccdRepoName}/e2e .
+  cp -r ./${ccdRepoName}/package.json .
+  cp -r ./${ccdRepoName}/yarn.lock .
+  cp -r ./${ccdRepoName}/codecept.conf.js .
+  cp -r ./${ccdRepoName}/saucelabs.conf.js .
+fi
 echo *
 rm -rf ./${ccdRepoName}

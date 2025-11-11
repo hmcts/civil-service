@@ -2,6 +2,7 @@
 
 ccdRepoName="civil-ccd-definition"
 branchName=$1
+functionalTestType=$2
 directoryName="civil-test"
 
 #Checkout specific branch of CCD definitions
@@ -14,14 +15,17 @@ cd ..
 
 #Copy ccd definition files  to civil-ccd-def which contains ccd def files
 cp -r ./${ccdRepoName}/ccd-definition .
-#mkdir -p ${directoryName}/e2e && mv ./${ccdRepoName}/e2e ./${directoryName}
-#mkdir -p ${directoryName}/playwright-e2e && cp -r ./civil-ccd-definition/playwright-e2e ./${directoryName}
-#mkdir -p ${directoryName}/plugins && cp -r ./civil-ccd-definition/plugins ./${directoryName}
-#cp -r ./${ccdRepoName}/package.json ./${directoryName}
-#cp -r ./${ccdRepoName}/yarn.lock ./${directoryName}
-#cp -r ./${ccdRepoName}/codecept.conf.js ./${directoryName}
-#cp -r ./${ccdRepoName}/saucelabs.conf.js ./${directoryName}
-#cp -r ./${ccdRepoName}/playwright.config.ts ./${directoryName}
-#echo *
-#rm -rf ./${ccdRepoName}
-#mv ./${directoryName} ./${ccdRepoName}
+if [functionalTestType = "CIVIL_FT"]; then
+  cp -r ./civil-ccd-definition/e2e .
+  cp -r ./civil-ccd-definition/playwright-e2e .
+  cp -r ./civil-ccd-definition/plugins .
+  cp -r ./civil-ccd-definition/package.json .
+  cp -r ./civil-ccd-definition/yarn.lock .
+  cp -r ./civil-ccd-definition/.yarnrc.yml .
+  cp -r ./civil-ccd-definition/.yarn .
+  cp -r ./civil-ccd-definition/codecept.conf.js .
+  cp -r ./civil-ccd-definition/playwright.config.ts .
+  cp -r ./civil-ccd-definition/saucelabs.conf.js .
+fi
+echo *
+rm -rf ./${ccdRepoName}
