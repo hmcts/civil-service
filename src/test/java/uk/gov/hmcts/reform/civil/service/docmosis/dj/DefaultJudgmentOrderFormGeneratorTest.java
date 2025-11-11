@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.dj;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
@@ -13,16 +12,13 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.documentmanagement.SecuredDocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
-import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingBundleType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingBundleDJ;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.dj.DefaultJudgmentSDOOrderForm;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
@@ -31,7 +27,6 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
 import java.util.Collections;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -48,6 +43,13 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DJ_SD
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
     DefaultJudgmentOrderFormGenerator.class,
+    DjDisposalTemplateService.class,
+    DjDisposalTemplateFieldService.class,
+    DjTrialTemplateService.class,
+    DjTrialTemplateFieldService.class,
+    DjPartyFieldService.class,
+    DjHearingMethodFieldService.class,
+    DjTemplateFieldService.class,
     JacksonAutoConfiguration.class
 })
 class DefaultJudgmentOrderFormGeneratorTest {
@@ -70,9 +72,6 @@ class DefaultJudgmentOrderFormGeneratorTest {
 
     @MockBean
     private DocumentGeneratorService documentGeneratorService;
-
-    @MockBean
-    private FeatureToggleService featureToggleService;
 
     @MockBean
     private DocumentHearingLocationHelper documentHearingLocationHelper;
@@ -255,189 +254,6 @@ class DefaultJudgmentOrderFormGeneratorTest {
         assertThat(caseDocument).isNotNull();
         verify(documentManagementService)
             .uploadDocument(BEARER_TOKEN, new PDF(fileNameTrial, bytes, DEFAULT_JUDGMENT_SDO_ORDER));
-    }
-
-    @Nested
-    class GetDisposalHearingBundleTypeText {
-        @Test
-        void shouldReturnText_whenAllThreeTypesSelected() {
-            List<DisposalHearingBundleType> disposalHearingBundleTypes = List.of(
-                DisposalHearingBundleType.DOCUMENTS,
-                DisposalHearingBundleType.ELECTRONIC,
-                DisposalHearingBundleType.SUMMARY
-            );
-
-            DisposalHearingBundleDJ disposalHearingBundle = DisposalHearingBundleDJ.builder()
-                .input("test")
-                .type(disposalHearingBundleTypes)
-                .build();
-
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDraft()
-                .build()
-                .toBuilder()
-                .disposalHearingBundleDJ(disposalHearingBundle)
-                .build();
-
-            String expectedText = "an indexed bundle of documents, with each page clearly numbered"
-                + " / an electronic bundle of digital documents"
-                + " / a case summary containing no more than 500 words";
-
-            assertThat(DefaultJudgmentOrderFormGenerator.fillTypeBundleInfo(caseData)).isEqualTo(expectedText);
-        }
-
-        @Test
-        void shouldReturnText_whenDocumentsAndElectronicTypesSelected() {
-            List<DisposalHearingBundleType> disposalHearingBundleTypes = List.of(
-                DisposalHearingBundleType.DOCUMENTS,
-                DisposalHearingBundleType.ELECTRONIC
-            );
-
-            DisposalHearingBundleDJ disposalHearingBundle = DisposalHearingBundleDJ.builder()
-                .input("test")
-                .type(disposalHearingBundleTypes)
-                .build();
-
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDraft()
-                .build()
-                .toBuilder()
-                .disposalHearingBundleDJ(disposalHearingBundle)
-                .build();
-
-            String expectedText = "an indexed bundle of documents, with each page clearly numbered"
-                + " / an electronic bundle of digital documents";
-
-            assertThat(DefaultJudgmentOrderFormGenerator.fillTypeBundleInfo(caseData)).isEqualTo(expectedText);
-        }
-
-        @Test
-        void shouldReturnText_whenDocumentsAndSummaryTypesSelected() {
-            List<DisposalHearingBundleType> disposalHearingBundleTypes = List.of(
-                DisposalHearingBundleType.DOCUMENTS,
-                DisposalHearingBundleType.SUMMARY
-            );
-
-            DisposalHearingBundleDJ disposalHearingBundle = DisposalHearingBundleDJ.builder()
-                .input("test")
-                .type(disposalHearingBundleTypes)
-                .build();
-
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDraft()
-                .build()
-                .toBuilder()
-                .disposalHearingBundleDJ(disposalHearingBundle)
-                .build();
-
-            String expectedText = "an indexed bundle of documents, with each page clearly numbered"
-                + " / a case summary containing no more than 500 words";
-
-            assertThat(DefaultJudgmentOrderFormGenerator.fillTypeBundleInfo(caseData)).isEqualTo(expectedText);
-        }
-
-        @Test
-        void shouldReturnText_whenElectronicAndSummaryTypesSelected() {
-            List<DisposalHearingBundleType> disposalHearingBundleTypes = List.of(
-                DisposalHearingBundleType.ELECTRONIC,
-                DisposalHearingBundleType.SUMMARY
-            );
-
-            DisposalHearingBundleDJ disposalHearingBundle = DisposalHearingBundleDJ.builder()
-                .input("test")
-                .type(disposalHearingBundleTypes)
-                .build();
-
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDraft()
-                .build()
-                .toBuilder()
-                .disposalHearingBundleDJ(disposalHearingBundle)
-                .build();
-
-            String expectedText = "an electronic bundle of digital documents"
-                + " / a case summary containing no more than 500 words";
-
-            assertThat(DefaultJudgmentOrderFormGenerator.fillTypeBundleInfo(caseData)).isEqualTo(expectedText);
-        }
-
-        @Test
-        void shouldReturnText_whenOnlyDocumentsTypeSelected() {
-            List<DisposalHearingBundleType> disposalHearingBundleTypes = List.of(
-                DisposalHearingBundleType.DOCUMENTS
-            );
-
-            DisposalHearingBundleDJ disposalHearingBundle = DisposalHearingBundleDJ.builder()
-                .input("test")
-                .type(disposalHearingBundleTypes)
-                .build();
-
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDraft()
-                .build()
-                .toBuilder()
-                .disposalHearingBundleDJ(disposalHearingBundle)
-                .build();
-
-            String expectedText = "an indexed bundle of documents, with each page clearly numbered";
-
-            assertThat(DefaultJudgmentOrderFormGenerator.fillTypeBundleInfo(caseData)).isEqualTo(expectedText);
-        }
-
-        @Test
-        void shouldReturnText_whenOnlyElectronicTypeSelected() {
-            List<DisposalHearingBundleType> disposalHearingBundleTypes = List.of(
-                DisposalHearingBundleType.ELECTRONIC
-            );
-
-            DisposalHearingBundleDJ disposalHearingBundle = DisposalHearingBundleDJ.builder()
-                .input("test")
-                .type(disposalHearingBundleTypes)
-                .build();
-
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDraft()
-                .build()
-                .toBuilder()
-                .disposalHearingBundleDJ(disposalHearingBundle)
-                .build();
-
-            String expectedText = "an electronic bundle of digital documents";
-
-            assertThat(DefaultJudgmentOrderFormGenerator.fillTypeBundleInfo(caseData)).isEqualTo(expectedText);
-        }
-
-        @Test
-        void shouldReturnText_whenOnlySummaryTypeSelected() {
-            List<DisposalHearingBundleType> disposalHearingBundleTypes = List.of(
-                DisposalHearingBundleType.SUMMARY
-            );
-
-            DisposalHearingBundleDJ disposalHearingBundle = DisposalHearingBundleDJ.builder()
-                .input("test")
-                .type(disposalHearingBundleTypes)
-                .build();
-
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDraft()
-                .build()
-                .toBuilder()
-                .disposalHearingBundleDJ(disposalHearingBundle)
-                .build();
-
-            String expectedText = "a case summary containing no more than 500 words";
-
-            assertThat(DefaultJudgmentOrderFormGenerator.fillTypeBundleInfo(caseData)).isEqualTo(expectedText);
-        }
-
-        @Test
-        void shouldReturnEmptyString_whenNoTypesSelected() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDraft()
-                .build();
-
-            assertThat(DefaultJudgmentOrderFormGenerator.fillTypeBundleInfo(caseData)).isEqualTo("");
-        }
     }
 
 }

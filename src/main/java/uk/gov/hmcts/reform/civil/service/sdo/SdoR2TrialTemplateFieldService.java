@@ -15,7 +15,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WitnessOfFact;
 import java.util.Optional;
 
 @Service
-public class SdoR2TrialDirectionsService {
+public class SdoR2TrialTemplateFieldService {
 
     private static final String MINUTES = " minutes";
 

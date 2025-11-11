@@ -19,9 +19,9 @@ import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WitnessOfFact;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class SdoR2TrialDirectionsServiceTest {
+class SdoR2TrialTemplateFieldServiceTest {
 
-    private final SdoR2TrialDirectionsService service = new SdoR2TrialDirectionsService();
+    private final SdoR2TrialTemplateFieldService service = new SdoR2TrialTemplateFieldService();
 
     @Test
     void shouldReturnPrimaryHearingLocationWhenPresent() {

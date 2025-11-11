@@ -77,9 +77,12 @@ import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoCaseClassificationService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoDisposalDirectionsService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoFastTrackDirectionsService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoFastTrackTemplateFieldService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoR2SmallClaimsDirectionsService;
-import uk.gov.hmcts.reform.civil.service.sdo.SdoR2TrialDirectionsService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoNihlTemplateFieldService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoR2TrialTemplateFieldService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoSmallClaimsDirectionsService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoSmallClaimsTemplateFieldService;
 import uk.gov.hmcts.reform.civil.utils.HearingMethodUtils;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
@@ -111,8 +114,16 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_S
     SdoCaseClassificationService.class,
     SdoDisposalDirectionsService.class,
     SdoFastTrackDirectionsService.class,
+    SdoFastTrackTemplateFieldService.class,
+    SdoFastTrackTemplateService.class,
+    SdoNihlTemplateService.class,
+    SdoNihlTemplateFieldService.class,
+    SdoDisposalTemplateService.class,
     SdoSmallClaimsDirectionsService.class,
-    SdoR2TrialDirectionsService.class,
+    SdoSmallClaimsTemplateFieldService.class,
+    SdoSmallClaimsDrhTemplateService.class,
+    SdoSmallClaimsTemplateService.class,
+    SdoR2TrialTemplateFieldService.class,
     SdoR2SmallClaimsDirectionsService.class,
     JacksonAutoConfiguration.class
 })
