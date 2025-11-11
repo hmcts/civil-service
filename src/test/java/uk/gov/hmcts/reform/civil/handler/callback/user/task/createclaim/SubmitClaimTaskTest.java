@@ -230,7 +230,7 @@ class SubmitClaimTaskTest {
     @Test
     void shouldCallPinToPostOnlyIfCaseMatched() {
         // Given
-        CaseData matchedCase = CaseData.builder()
+        final CaseData matchedCase = CaseData.builder()
             .applicant1(Party.builder()
                             .individualFirstName("Clay")
                             .individualLastName("Mint")
@@ -243,7 +243,7 @@ class SubmitClaimTaskTest {
                              .partyName("John Doe")
                              .type(Party.Type.INDIVIDUAL)
                              .build())
-            .respondent1Represented(NO)
+            .specRespondent1Represented(NO)
             .addRespondent2(NO)
             .addApplicant2(NO)
             .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("test@gmail.com").build())
@@ -264,7 +264,7 @@ class SubmitClaimTaskTest {
     @Test
     void shouldNotCallPinToPostIfCaseNotMatched() {
         // Given
-        CaseData notMatchedCase = CaseData.builder()
+        final CaseData notMatchedCase = CaseData.builder()
             .applicant1(Party.builder()
                             .individualFirstName("Clay")
                             .individualLastName("Mint")
