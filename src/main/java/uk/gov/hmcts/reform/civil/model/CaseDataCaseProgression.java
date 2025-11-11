@@ -215,7 +215,6 @@ public class CaseDataCaseProgression extends CaseDataCaseSdo implements Mappable
     private OrderAfterHearingDate orderAfterHearingDate;
     private YesOrNo showOrderAfterHearingDatePage;
 
-    // judge  freeform orders
     private  FinalOrderSelection finalOrderSelection;
     private  String freeFormRecordedTextArea;
     private  String freeFormOrderedTextArea;
