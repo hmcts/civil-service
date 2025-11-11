@@ -21,6 +21,7 @@ if [ "$functionalTestType" = "GENERAL_APPS_FT" ]; then
   cp -r ./${ccdRepoName}/yarn.lock .
   cp -r ./${ccdRepoName}/codecept.conf.js .
   cp -r ./${ccdRepoName}/saucelabs.conf.js .
+  cp -r ./bin/yarn/.yarnrc.yml .
 fi
 echo *
 rm -rf ./${ccdRepoName}
