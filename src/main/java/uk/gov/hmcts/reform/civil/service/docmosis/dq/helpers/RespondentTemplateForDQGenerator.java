@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
+import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.util.Collections;
 import java.util.List;
@@ -205,7 +206,7 @@ public class RespondentTemplateForDQGenerator {
                 .fieldOfExpertise(expert.getFieldOfExpertise())
                 .whyRequired(expert.getWhyRequired())
                 .formattedCost(NumberFormat.getCurrencyInstance(Locale.UK)
-                                   .format(MonetaryConversions.penniesToPounds(expert.getEstimatedCost())))
+                                   .format(MonetaryConversions.penniesToPounds(expert.getEstimatedCost() == null ? new BigDecimal(0) : expert.getEstimatedCost())))
                 .build())
             .collect(toList());
     }
