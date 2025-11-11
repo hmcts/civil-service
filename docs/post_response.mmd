@@ -51,8 +51,8 @@ stateDiagram-v2
   PART_ADMIT_PAY_IMMEDIATELY --> TAKEN_OFFLINE_SPEC_DEFENDANT_NOC_AFTER_JBA : Defendant Notice of Change online feature flag is active for this case
   PART_ADMIT_REJECT_REPAYMENT --> TAKEN_OFFLINE_BY_STAFF : HMCTS staff have manually taken the case offline.
   PART_ADMISSION --> IN_MEDIATION : Claimant opted into free mediation
-  PART_ADMISSION --> IN_MEDIATION : Claimant indicates they will not settle after a part admission
-  PART_ADMISSION --> PART_ADMIT_PROCEED : Claimant elects to proceed against the defendants.
+  PART_ADMISSION --> IN_MEDIATION : carmMediation
+  PART_ADMISSION --> PART_ADMIT_PROCEED : partAdmitProceed
   PART_ADMISSION --> PART_ADMIT_NOT_PROCEED : Claimant indicates they do not wish to proceed against the defendants.
   PART_ADMISSION --> PART_ADMIT_PAY_IMMEDIATELY : Defendant offered to pay the part-admitted amount immediately and c…
   PART_ADMISSION --> PART_ADMIT_AGREE_SETTLE : Claimant confirms the part-admission offer settles the dispute.

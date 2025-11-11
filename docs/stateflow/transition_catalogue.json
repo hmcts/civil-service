@@ -1508,9 +1508,10 @@
   {
     "from": "PART_ADMISSION",
     "to": "IN_MEDIATION",
-    "guard_raw": "isClaimantNotSettlePartAdmitClaim .and(agreedToMediation.negate()) .and(isCarmApplicableCase.or(isCarmApplicableLipCase)) .and(not(takenOfflineByStaff))",
-    "guard_text": "(((Claimant indicates they will not settle after a part admission.) AND (NOT (Claimant opted into free mediation.))) AND ((Case meets CARM pilot criteria for represented parties in SPEC small claims.) OR (Case meets CARM pilot criteria for LiP participation in SPEC small claims.))) AND (NOT (HMCTS staff have manually taken the case offline.))",
+    "guard_raw": "carmMediation",
+    "guard_text": "carmMediation",
     "tags": [
+      "mediation",
       "unspec"
     ]
   },
@@ -1526,8 +1527,8 @@
   {
     "from": "PART_ADMISSION",
     "to": "PART_ADMIT_PROCEED",
-    "guard_raw": "fullDefenceProceed",
-    "guard_text": "Claimant elects to proceed against the defendant(s).",
+    "guard_raw": "partAdmitProceed",
+    "guard_text": "partAdmitProceed",
     "tags": [
       "unspec"
     ]

@@ -253,13 +253,13 @@ Generated from builder definitions. Guards appear as business-facing conditions.
 | To state | Business condition | Scenario tags |
 | --- | --- | --- |
 | IN_MEDIATION | ((((Claimant opted into free mediation.) AND (NOT (HMCTS staff have manually taken the case offline.))) AND (NOT (Defendant offered to pay the part-admitted amount immediately and claimant accepted.))) AND (NOT (Applicant accepts the defendant's repayment plan (for LiP 1v1 the case must remain online).))) AND (NOT (Applicant rejected the defendant’s repayment plan (and case remains online for LiP 1v1).)) | unspec |
-| IN_MEDIATION | (((Claimant indicates they will not settle after a part admission.) AND (NOT (Claimant opted into free mediation.))) AND ((Case meets CARM pilot criteria for represented parties in SPEC small claims.) OR (Case meets CARM pilot criteria for LiP participation in SPEC small claims.))) AND (NOT (HMCTS staff have manually taken the case offline.)) | unspec |
+| IN_MEDIATION | carmMediation | mediation, unspec |
 | PART_ADMIT_AGREE_REPAYMENT | Applicant accepts the defendant's repayment plan (for LiP 1v1 the case must remain online). | settlement/Judgment, unspec |
 | PART_ADMIT_AGREE_SETTLE | Claimant confirms the part-admission offer settles the dispute. | settlement/Judgment, unspec |
 | PART_ADMIT_NOT_PROCEED | Claimant indicates they do not wish to proceed against the defendant(s). | unspec |
 | PART_ADMIT_NOT_SETTLED_NO_MEDIATION | ((((Claimant indicates they will not settle after a part admission.) AND (NOT (Claimant opted into free mediation.))) AND (NOT (Case meets CARM pilot criteria for represented parties in SPEC small claims.))) AND (NOT (Case meets CARM pilot criteria for LiP participation in SPEC small claims.))) AND (NOT (HMCTS staff have manually taken the case offline.)) | unspec |
 | PART_ADMIT_PAY_IMMEDIATELY | Defendant offered to pay the part-admitted amount immediately and claimant accepted. | unspec |
-| PART_ADMIT_PROCEED | Claimant elects to proceed against the defendant(s). | unspec |
+| PART_ADMIT_PROCEED | partAdmitProceed | unspec |
 | PART_ADMIT_REJECT_REPAYMENT | Applicant rejected the defendant’s repayment plan (and case remains online for LiP 1v1). | settlement/Judgment, unspec |
 | PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA | Claimant response deadline has passed with no response and staff have not taken the case offline. | offline/timeout, unspec |
 | TAKEN_OFFLINE_BY_STAFF | Staff took the case offline after a defendant response and before claimant action. | offline/timeout, unspec |

@@ -939,7 +939,7 @@
     "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/PartAdmissionTransitionBuilder.java",
     "from_state": "PART_ADMISSION",
     "to_state": "IN_MEDIATION",
-    "guard": "isClaimantNotSettlePartAdmitClaim .and(agreedToMediation.negate()) .and(isCarmApplicableCase.or(isCarmApplicableLipCase)) .and(not(takenOfflineByStaff))"
+    "guard": "carmMediation"
   },
   {
     "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/PartAdmissionTransitionBuilder.java",
@@ -951,7 +951,7 @@
     "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/PartAdmissionTransitionBuilder.java",
     "from_state": "PART_ADMISSION",
     "to_state": "PART_ADMIT_PROCEED",
-    "guard": "fullDefenceProceed"
+    "guard": "partAdmitProceed"
   },
   {
     "file": "src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/PartAdmissionTransitionBuilder.java",
