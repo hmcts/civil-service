@@ -15,7 +15,7 @@ cd ..
 
 #Copy ccd definition files  to civil-ccd-def which contains ccd def files
 cp -r ./${ccdRepoName}/ga-ccd-definition .
-if [functionalTestType = "GENERAL_APPS_FT"]; then
+if [ "$functionalTestType" = "GENERAL_APPS_FT" ]; then
   cp -r ./${ccdRepoName}/e2e .
   cp -r ./${ccdRepoName}/package.json .
   cp -r ./${ccdRepoName}/yarn.lock .
