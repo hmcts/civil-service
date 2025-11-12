@@ -31,8 +31,9 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRTLStatus;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DirectionsQuestionnairePreparer;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
-import uk.gov.hmcts.reform.civil.service.flowstate.FlowStateAllowedEventService;
+import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
+import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
+import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -76,7 +77,7 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
     private JudgmentByAdmissionOnlineMapper judgmentByAdmissionOnlineMapper;
 
     @Mock
-    private FlowStateAllowedEventService flowStateAllowedEventService;
+    private IStateFlowEngine stateFlowEngine;
 
     @Mock
     private DirectionsQuestionnairePreparer directionsQuestionnairePreparer;
@@ -138,9 +139,12 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
         "NON_LIP, IN_MEDIATION, MAIN.FULL_DEFENCE_PROCEED"
     })
     void shouldPauseStateChangeDefendantLipAndRequiresTranslation(String lipCase, String expectedState, String flowState) {
-        FlowState flowStateTest = FlowState.fromFullName(flowState);
+        StateFlow mockStateFlow = mock(StateFlow.class);
+        State mockState = mock(uk.gov.hmcts.reform.civil.stateflow.model.State.class);
+        when(mockStateFlow.getState()).thenReturn(mockState);
+        when(mockState.getName()).thenReturn(flowState);
 
-        when(flowStateAllowedEventService.getFlowState(any())).thenReturn(flowStateTest);
+        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockStateFlow);
 
         CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
         CaseData caseData;
