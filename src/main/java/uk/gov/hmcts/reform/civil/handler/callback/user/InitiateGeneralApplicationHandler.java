@@ -379,7 +379,6 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        log.info("InitiateGeneralApplicationHandler.buildConfirmation case data: {}", caseData);
         Long ccdCaseReference = caseData.getCcdCaseReference();
         List<Element<GeneralApplication>> generalApplications = caseData.getGeneralApplications();
         String body = null;

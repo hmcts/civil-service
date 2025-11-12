@@ -174,7 +174,6 @@ public class ParentCaseUpdateHelper {
         docVisibilityRoles[3] = "Staff";
 
         List<Element<GeneralApplication>> civilGeneralApplications = caseData.getGeneralApplications();
-        log.info("Civil General Applications before for case ID: {}, {}", parentCaseId, civilGeneralApplications);
         if (generalAppCaseData.getCcdState().equals(PENDING_APPLICATION_ISSUED) && !isEmpty(civilGeneralApplications)) {
             List<Element<GeneralApplication>> generalApplicationsList = civilGeneralApplications.stream()
                 .filter(app -> app.getValue().getCaseLink() != null && !app.getValue().getCaseLink().getCaseReference().equals(
@@ -197,7 +196,6 @@ public class ParentCaseUpdateHelper {
                     buildGeneralApplication(generalApplication),
                     generalApplicationsList
                 );
-            log.info("Civil General Applications after for case ID: {}, {}", parentCaseId, civilGeneralApplications);
         }
 
         Map<String, Object> updateMap = getUpdatedCaseData(caseData, civilGeneralApplications, generalApplications,
