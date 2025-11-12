@@ -38,7 +38,8 @@ public class WitnessUtils {
         if (caseData.getRespondent1DQ() != null
             && caseData.getRespondent1DQ().getRespondent1DQWitnesses() != null
             && caseData.getRespondent1DQ().getRespondent1DQWitnesses().getDetails() != null
-            && !caseData.getRespondent1DQ().getRespondent1DQWitnesses().getDetails().isEmpty()) {
+            && !caseData.getRespondent1DQ().getRespondent1DQWitnesses().getDetails().isEmpty()
+            && caseData.getRespondent1ResponseDate() != null) {
             Witnesses respondent1DQWitnesses = caseData.getRespondent1DQ().getRespondent1DQWitnesses();
             Witnesses updatedRespondent1Witnesses = addEventAndDateToWitnesses(
                 respondent1DQWitnesses,
@@ -66,7 +67,8 @@ public class WitnessUtils {
         if (caseData.getRespondent2DQ() != null
             && caseData.getRespondent2DQ().getRespondent2DQWitnesses() != null
             && caseData.getRespondent2DQ().getRespondent2DQWitnesses().getDetails() != null
-            && !caseData.getRespondent2DQ().getRespondent2DQWitnesses().getDetails().isEmpty()) {
+            && !caseData.getRespondent2DQ().getRespondent2DQWitnesses().getDetails().isEmpty()
+            && caseData.getRespondent2ResponseDate() != null) {
             Witnesses respondent2DQWitnesses = caseData.getRespondent2DQ().getRespondent2DQWitnesses();
             Witnesses updatedRespondent2Witnesses = addEventAndDateToWitnesses(
                 respondent2DQWitnesses,
@@ -82,7 +84,8 @@ public class WitnessUtils {
         if (caseData.getApplicant1DQ() != null
             && caseData.getApplicant1DQ().getApplicant1DQWitnesses() != null
             && caseData.getApplicant1DQ().getApplicant1DQWitnesses().getDetails() != null
-            && !caseData.getApplicant1DQ().getApplicant1DQWitnesses().getDetails().isEmpty()) {
+            && !caseData.getApplicant1DQ().getApplicant1DQWitnesses().getDetails().isEmpty()
+            && caseData.getApplicant1ResponseDate() != null) {
             Witnesses applicant1DQWitnesses = caseData.getApplicant1DQ().getApplicant1DQWitnesses();
             Witnesses updatedApplicant1Witnesses = addEventAndDateToWitnesses(
                 applicant1DQWitnesses,
@@ -111,7 +114,8 @@ public class WitnessUtils {
         if (caseData.getApplicant2DQ() != null
             && caseData.getApplicant2DQ().getApplicant2DQWitnesses() != null
             && caseData.getApplicant2DQ().getApplicant2DQWitnesses().getDetails() != null
-            && !caseData.getApplicant2DQ().getApplicant2DQWitnesses().getDetails().isEmpty()) {
+            && !caseData.getApplicant2DQ().getApplicant2DQWitnesses().getDetails().isEmpty()
+            && caseData.getApplicant2ResponseDate() != null) {
             Witnesses applicant2DQWitnesses = caseData.getApplicant2DQ().getApplicant2DQWitnesses();
             Witnesses updatedApplicant2Witnesses = addEventAndDateToWitnesses(
                 applicant2DQWitnesses,

@@ -304,7 +304,9 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
     }
 
     public boolean notTransferredOnline(CaseData caseData) {
-        return caseData.getCaseManagementLocation().getBaseLocation().equals(cnbcEpimsId);
+        return caseData.getCaseManagementLocation() != null
+            && caseData.getCaseManagementLocation().getBaseLocation() != null
+            && caseData.getCaseManagementLocation().getBaseLocation().equals(cnbcEpimsId);
     }
 
     private void updateCaseManagementLocation(CallbackParams callbackParams, CaseData.CaseDataBuilder<?, ?> builder) {
