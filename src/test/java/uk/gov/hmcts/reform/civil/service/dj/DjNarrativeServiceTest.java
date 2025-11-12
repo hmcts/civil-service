@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.service.dj;
 
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;

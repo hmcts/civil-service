@@ -182,8 +182,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -979,8 +977,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(data.getSdoR2TrialToggle()).isEqualTo(includeToggle);
         }
 
-
-
         @Test
         void shouldPrePopulateUpdatedWitnessSectionsForSDOR2() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
@@ -1735,7 +1731,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @BeforeEach
         void setup() {
-            LocalDate newDate = LocalDate.of(2020, 1, 15);
+            final LocalDate newDate = LocalDate.of(2020, 1, 15);
             nextWorkingDayDate = LocalDate.of(2023, 12, 15);
             LocalDateTime localDateTime = LocalDateTime.of(2020, 1, 1, 12, 0, 0);
             when(time.now()).thenReturn(localDateTime);
@@ -3065,6 +3061,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             }
         }
     }
+
     private YesOrNo toYesOrNo(Object value) {
         if (value instanceof YesOrNo) {
             return (YesOrNo) value;

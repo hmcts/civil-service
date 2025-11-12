@@ -62,7 +62,6 @@ class SdoSubmissionServiceTest {
             .systemGeneratedCaseDocuments(generatedDocs)
             .build();
 
-
         CaseData result = service.prepareSubmission(caseData, AUTH_TOKEN);
 
         assertThat(result.getSystemGeneratedCaseDocuments()).hasSize(1);

@@ -52,5 +52,5 @@ class SdoSubmissionTaskTest {
 
         assertThat(task.supports(DirectionsOrderLifecycleStage.SUBMISSION)).isTrue();
         assertThat(task.supports(DirectionsOrderLifecycleStage.MID_EVENT)).isFalse();
-}
+    }
 }

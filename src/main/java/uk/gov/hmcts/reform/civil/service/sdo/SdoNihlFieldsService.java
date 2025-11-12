@@ -23,8 +23,6 @@ public class SdoNihlFieldsService {
                                    DynamicList hearingMethodList,
                                    Optional<RequestedCourt> preferredCourt,
                                    List<LocationRefData> locationRefDataList) {
-
-
         DynamicListElement hearingMethodInPerson = hearingMethodList.getListItems().stream().filter(elem -> elem.getLabel()
             .equals(HearingMethod.IN_PERSON.getLabel())).findFirst().orElse(null);
         hearingMethodList.setValue(hearingMethodInPerson);

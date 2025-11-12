@@ -55,7 +55,7 @@ public class SdoDrhFieldsService {
                                   Optional<RequestedCourt> preferredCourt,
                                   DynamicList hearingMethodList,
                                   List<LocationRefData> locationRefDataList) {
-        List<IncludeInOrderToggle> includeInOrderToggle = sdoTrackDefaultsService.defaultIncludeInOrderToggle();
+        final List<IncludeInOrderToggle> includeInOrderToggle = sdoTrackDefaultsService.defaultIncludeInOrderToggle();
         DynamicList courtList = sdoLocationService.buildCourtLocationForSdoR2(preferredCourt.orElse(null), locationRefDataList);
         courtList.setValue(courtList.getListItems().get(0));
 

@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.service.docmosis.dj;
 
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.enums.dj.CaseManagementOrderAdditional;
-import uk.gov.hmcts.reform.civil.enums.dj.DisposalAndTrialHearingDJToggle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingAddNewDirectionsDJ;

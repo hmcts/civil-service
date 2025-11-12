@@ -133,7 +133,8 @@ class SdoLocationServiceTest {
 
         DynamicList list = service.buildCourtLocationForSdoR2(requestedCourt, locations);
 
-        assertThat(list.getListItems()).extracting(DynamicListElement::getLabel)
+        assertThat(list.getListItems())
+            .extracting(DynamicListElement::getLabel)
             .containsExactly(
                 LocationReferenceDataService.getDisplayEntry(location),
                 "Other location"

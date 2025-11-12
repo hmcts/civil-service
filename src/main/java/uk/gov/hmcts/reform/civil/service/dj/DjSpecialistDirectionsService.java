@@ -3,10 +3,7 @@ package uk.gov.hmcts.reform.civil.service.dj;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialBuildingDispute;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialClinicalNegligence;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHousingDisrepair;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialPersonalInjury;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialRoadTrafficAccident;
 
 @Service

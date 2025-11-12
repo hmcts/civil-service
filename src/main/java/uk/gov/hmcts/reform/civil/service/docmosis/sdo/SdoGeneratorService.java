@@ -7,30 +7,14 @@ import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
-import uk.gov.hmcts.reform.civil.enums.sdo.AddOrRemoveToggle;
-import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingFinalDisposalHearingTimeEstimate;
-import uk.gov.hmcts.reform.civil.enums.sdo.FastTrack;
-import uk.gov.hmcts.reform.civil.enums.sdo.PhysicalTrialBundleOptions;
-import uk.gov.hmcts.reform.civil.enums.sdo.TrialOnRadioOptions;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.common.DynamicList;
-import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.sdo.SdoDocumentFormFast;
-import uk.gov.hmcts.reform.civil.model.docmosis.sdo.SdoDocumentFormFastNihl;
-import uk.gov.hmcts.reform.civil.model.docmosis.sdo.SdoDocumentFormSmall;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingTime;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
-import uk.gov.hmcts.reform.civil.service.docmosis.sdo.SdoDisposalTemplateService;
-import uk.gov.hmcts.reform.civil.service.docmosis.sdo.SdoFastTrackTemplateService;
-import uk.gov.hmcts.reform.civil.service.docmosis.sdo.SdoNihlTemplateService;
-import uk.gov.hmcts.reform.civil.service.docmosis.sdo.SdoSmallClaimsDrhTemplateService;
-import uk.gov.hmcts.reform.civil.service.docmosis.sdo.SdoSmallClaimsTemplateService;
-import uk.gov.hmcts.reform.civil.service.sdo.FastTrackVariable;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoCaseClassificationService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoDisposalDirectionsService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoFastTrackDirectionsService;
@@ -39,10 +23,6 @@ import uk.gov.hmcts.reform.civil.service.sdo.SdoSmallClaimsDirectionsService;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
-
-import static java.util.Objects.nonNull;
 
 @Slf4j
 @Service

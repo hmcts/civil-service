@@ -55,5 +55,5 @@ class SdoConfirmationTaskTest {
 
         assertThat(task.supports(DirectionsOrderLifecycleStage.CONFIRMATION)).isTrue();
         assertThat(task.supports(DirectionsOrderLifecycleStage.SUBMISSION)).isFalse();
-}
+    }
 }

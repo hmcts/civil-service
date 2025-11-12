@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.sdo;
 
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.DateToShowToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingBundleType;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingFinalDisposalHearingTimeEstimate;

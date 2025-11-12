@@ -63,7 +63,7 @@ class StandardDirectionOrderDJDefendantNotificationHandlerTest extends BaseCallb
             .toBuilder()
             .legacyCaseReference("000DC001")
             .build();
-        CallbackParams params = paramsForEvent(caseData, NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT.name());
+        final CallbackParams params = paramsForEvent(caseData, NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT.name());
         when(recipientService.shouldNotifyRespondent1(caseData)).thenReturn(true);
         when(recipientService.getRespondent1Email(caseData)).thenReturn("respondent1@example.com");
         Map<String, String> props = Map.of("legalOrgName", "Org1");
@@ -87,7 +87,7 @@ class StandardDirectionOrderDJDefendantNotificationHandlerTest extends BaseCallb
             .toBuilder()
             .legacyCaseReference("000DC001")
             .build();
-        CallbackParams params = paramsForEvent(caseData, NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT.name());
+        final CallbackParams params = paramsForEvent(caseData, NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT.name());
         when(recipientService.shouldNotifyRespondent1(caseData)).thenReturn(false);
 
         handler.handle(params);
@@ -104,7 +104,7 @@ class StandardDirectionOrderDJDefendantNotificationHandlerTest extends BaseCallb
             .toBuilder()
             .legacyCaseReference("000DC001")
             .build();
-        CallbackParams params = paramsForEvent(caseData, NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT2.name());
+        final CallbackParams params = paramsForEvent(caseData, NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT2.name());
         when(recipientService.shouldNotifyRespondent2(caseData)).thenReturn(true);
         when(recipientService.getRespondent2Email(caseData)).thenReturn("respondent2@example.com");
         Map<String, String> props = Map.of("legalOrgName", "Org2");
@@ -128,7 +128,7 @@ class StandardDirectionOrderDJDefendantNotificationHandlerTest extends BaseCallb
             .toBuilder()
             .legacyCaseReference("000DC001")
             .build();
-        CallbackParams params = paramsForEvent(caseData, NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT.name());
+        final CallbackParams params = paramsForEvent(caseData, NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT.name());
         when(recipientService.shouldNotifyRespondent1(caseData)).thenReturn(true);
         when(recipientService.getRespondent1Email(caseData)).thenReturn("respondent1@example.com");
         Map<String, String> props = Map.of("legalOrgName", "Org");

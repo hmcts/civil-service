@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.service.dj;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingNotes;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialOrderMadeWithoutHearingDJ;
 
 import java.time.LocalDate;

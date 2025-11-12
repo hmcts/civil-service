@@ -81,5 +81,5 @@ class SdoDocumentTaskTest {
 
         assertThat(task.supports(DirectionsOrderLifecycleStage.DOCUMENT_GENERATION)).isTrue();
         assertThat(task.supports(DirectionsOrderLifecycleStage.PRE_POPULATE)).isFalse();
-}
+    }
 }
