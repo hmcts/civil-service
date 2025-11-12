@@ -78,8 +78,6 @@ public class TestingSupportController {
     private final HearingFeeUnpaidEventHandler hearingFeeUnpaidHandler;
     private final TrialReadyNotificationEventHandler trialReadyNotificationHandler;
     private final BundleCreationTriggerEventHandler bundleCreationTriggerEventHandler;
-    private final SystemUpdateUserConfiguration systemUserConfig;
-    private final UserService userService;
 
     private static final String SUCCESS = "success";
     private static final String FAILED = "failed";
