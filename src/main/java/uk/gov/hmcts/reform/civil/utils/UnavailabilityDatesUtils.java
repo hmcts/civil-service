@@ -33,7 +33,8 @@ public class UnavailabilityDatesUtils {
 
     public static void rollUpUnavailabilityDatesForRespondent(CaseData caseData) {
         if (caseData.getRespondent1DQ() != null && caseData.getRespondent1DQ().getHearing() != null
-            && caseData.getRespondent1DQ().getHearing().getUnavailableDates() != null) {
+            && caseData.getRespondent1DQ().getHearing().getUnavailableDates() != null
+            && caseData.getRespondent1ResponseDate() != null) {
 
             List<Element<UnavailableDate>> respondent1DQUnavailableDates = caseData.getRespondent1DQ().getHearing()
                 .getUnavailableDates();
@@ -57,7 +58,8 @@ public class UnavailabilityDatesUtils {
             }
         }
         if (caseData.getRespondent2DQ() != null && caseData.getRespondent2DQ().getHearing() != null
-            && caseData.getRespondent2DQ().getHearing().getUnavailableDates() != null) {
+            && caseData.getRespondent2DQ().getHearing().getUnavailableDates() != null
+            && caseData.getRespondent2ResponseDate() != null) {
 
             List<Element<UnavailableDate>> respondent2DQUnavailableDates =
                 caseData.getRespondent2DQ().getHearing().getUnavailableDates();
@@ -76,7 +78,8 @@ public class UnavailabilityDatesUtils {
 
     public static void rollUpUnavailabilityDatesForApplicant(CaseData caseData) {
         if (caseData.getApplicant1DQ() != null && caseData.getApplicant1DQ().getHearing() != null
-            && caseData.getApplicant1DQ().getHearing().getUnavailableDates() != null) {
+            && caseData.getApplicant1DQ().getHearing().getUnavailableDates() != null
+            && caseData.getApplicant1ResponseDate() != null) {
 
             List<Element<UnavailableDate>> applicant1DQUnavailableDates =
                 caseData.getApplicant1DQ().getHearing().getUnavailableDates();
@@ -220,7 +223,7 @@ public class UnavailabilityDatesUtils {
         LocalDate dateAdded = null;
 
         // Claimant event
-        if (isClaimantIntentionEvent(caseData)) {
+        if (isClaimantIntentionEvent(caseData) && caseData.getApplicant1ResponseDate() != null) {
             eventAdded = CLAIMANT_INTENTION_EVENT;
             dateAdded = caseData.getApplicant1ResponseDate().toLocalDate();
             // DJ event
@@ -254,7 +257,8 @@ public class UnavailabilityDatesUtils {
         // No DJ check because only claimant solicitor can run DJ
         if (caseData.getRespondent1DQ() != null
             && caseData.getRespondent1DQ().getHearing() != null
-            && YES.equals(caseData.getRespondent1DQ().getHearing().getUnavailableDatesRequired())) {
+            && YES.equals(caseData.getRespondent1DQ().getHearing().getUnavailableDatesRequired())
+            && caseData.getRespondent1ResponseDate() != null) {
             eventAdded = DEFENDANT_RESPONSE_EVENT;
             dateAdded = caseData.getRespondent1ResponseDate().toLocalDate();
         }
@@ -277,7 +281,8 @@ public class UnavailabilityDatesUtils {
         // No DJ check because only claimant solicitor can run DJ
         if (caseData.getRespondent2DQ() != null
             && caseData.getRespondent2DQ().getHearing() != null
-            && YES.equals(caseData.getRespondent2DQ().getHearing().getUnavailableDatesRequired())) {
+            && YES.equals(caseData.getRespondent2DQ().getHearing().getUnavailableDatesRequired())
+            && caseData.getRespondent2ResponseDate() != null) {
             eventAdded = DEFENDANT_RESPONSE_EVENT;
             dateAdded = caseData.getRespondent2ResponseDate().toLocalDate();
         }
