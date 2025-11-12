@@ -97,7 +97,7 @@ class RoboticsNotificationServiceTest {
     RoboticsEmailConfiguration emailConfiguration;
     @Autowired
     RoboticsDataMapperForUnspec roboticsDataMapper;
-    @MockBean
+    @MockitoBean
     FeatureToggleService featureToggleService;
 
     @Captor
