@@ -77,8 +77,9 @@ class SdoPrePopulateServiceTest {
         );
         SdoFastTrackSpecialistDirectionsService fastTrackSpecialistDirectionsService =
             new SdoFastTrackSpecialistDirectionsService(deadlineService);
+        SdoFastTrackNarrativeService fastTrackNarrativeService = new SdoFastTrackNarrativeService(deadlineService);
         SdoFastTrackOrderDefaultsService fastTrackOrderDefaultsService =
-            new SdoFastTrackOrderDefaultsService(deadlineService, fastTrackSpecialistDirectionsService);
+            new SdoFastTrackOrderDefaultsService(fastTrackNarrativeService, fastTrackSpecialistDirectionsService);
         SdoSmallClaimsOrderDefaultsService smallClaimsOrderDefaultsService =
             new SdoSmallClaimsOrderDefaultsService(
                 new SdoSmallClaimsNarrativeService(deadlineService),
@@ -109,7 +110,7 @@ class SdoPrePopulateServiceTest {
 
         drhFieldsService = new SdoDrhFieldsService(locationService, trackDefaultsService,
             journeyToggleService, deadlineService);
-        nihlFieldsService = new SdoNihlFieldsService(locationService, deadlineService);
+        nihlFieldsService = new SdoNihlFieldsService(locationService, new SdoNihlOrderService(deadlineService));
 
         service = new SdoPrePopulateService(
             trackDefaultsService,

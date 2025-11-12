@@ -118,7 +118,11 @@ import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderS
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_STATEMENT_DEADLINE_DJ;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_STATEMENT_PROMPT_DJ;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_WITNESS_LIMIT_DJ;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.WITNESS_COUNT_LIMIT_NOTE_DJ;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.WITNESS_PAGE_LIMIT_PREFIX;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.WITNESS_PAGE_LIMIT_SUFFIX_DJ;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_BUNDLE_REQUIREMENT;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_FINAL_HEARING_LISTING_DJ;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_DOCUMENTS_EXCHANGE;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_SCHEDULE_CLAIMANT_SEND_DJ;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_SCHEDULE_COUNTER_SEND;
@@ -335,8 +339,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData())
                 .extracting("disposalHearingFinalDisposalHearingDJ").extracting("input")
-                .isEqualTo("This claim will be listed for final disposal "
-                                + "before a Judge on the first available date after");
+                .isEqualTo(DISPOSAL_FINAL_HEARING_LISTING_DJ);
             assertThat(response.getData()).extracting("disposalHearingFinalDisposalHearingDJ").extracting("date")
                 .isEqualTo(LocalDate.now().plusWeeks(16).toString());
 
@@ -385,14 +388,13 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("trialHearingWitnessOfFactDJ").extracting("input3")
                 .isEqualTo("3");
             assertThat(response.getData()).extracting("trialHearingWitnessOfFactDJ").extracting("input4")
-                .isEqualTo("For this limitation, a party is counted as witness.");
+                .isEqualTo(WITNESS_COUNT_LIMIT_NOTE_DJ);
             assertThat(response.getData()).extracting("trialHearingWitnessOfFactDJ").extracting("input5")
-                .isEqualTo("Each witness statement should be no more than");
+                .isEqualTo(WITNESS_PAGE_LIMIT_PREFIX);
             assertThat(response.getData()).extracting("trialHearingWitnessOfFactDJ").extracting("input6")
                 .isEqualTo("10");
             assertThat(response.getData()).extracting("trialHearingWitnessOfFactDJ").extracting("input7")
-                .isEqualTo("A4 pages. Statements should be double spaced "
-                               + "using a font size of 12.");
+                .isEqualTo(WITNESS_PAGE_LIMIT_SUFFIX_DJ);
             assertThat(response.getData()).extracting("trialHearingWitnessOfFactDJ").extracting("input8")
                 .isEqualTo("Witness statements shall be uploaded to the "
                                + "Digital Portal by 4pm on");
@@ -566,9 +568,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                     date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH))));
 
             assertThat(response.getData()).extracting("disposalHearingFinalDisposalHearingTimeDJ").extracting("input")
-                .isEqualTo("This claim will be listed for final "
-                               + "disposal before a Judge on the first "
-                               + "available date after");
+                .isEqualTo(DISPOSAL_FINAL_HEARING_LISTING_DJ);
 
             assertThat(response.getData()).extracting("disposalHearingFinalDisposalHearingTimeDJ").extracting("date")
                 .isEqualTo(LocalDate.now().plusWeeks(16).toString());

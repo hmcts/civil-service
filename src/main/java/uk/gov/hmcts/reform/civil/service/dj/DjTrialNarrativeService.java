@@ -29,6 +29,10 @@ import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderS
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.ORDER_WITHOUT_HEARING_RECEIVED_BY_COURT_LOWERCASE;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.SMALL_CLAIMS_WITNESS_DEADLINE;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.SMALL_CLAIMS_WITNESS_LATE_WARNING;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.TRIAL_WITNESS_STATEMENT_UPLOAD_NOTICE;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.WITNESS_COUNT_LIMIT_NOTE_DJ;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.WITNESS_PAGE_LIMIT_PREFIX;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.WITNESS_PAGE_LIMIT_SUFFIX_DJ;
 
 @Service
 @RequiredArgsConstructor
@@ -73,14 +77,13 @@ public class DjTrialNarrativeService {
 
     public TrialHearingWitnessOfFact buildWitnessOfFact() {
         return TrialHearingWitnessOfFact.builder()
-            .input1("Each party must upload to the Digital Portal copies of the statements of all witnesses "
-                        + "of fact on whom they intend to rely.")
+            .input1(TRIAL_WITNESS_STATEMENT_UPLOAD_NOTICE)
             .input2("3")
             .input3("3")
-            .input4("For this limitation, a party is counted as witness.")
-            .input5("Each witness statement should be no more than")
+            .input4(WITNESS_COUNT_LIMIT_NOTE_DJ)
+            .input5(WITNESS_PAGE_LIMIT_PREFIX)
             .input6("10")
-            .input7("A4 pages. Statements should be double spaced using a font size of 12.")
+            .input7(WITNESS_PAGE_LIMIT_SUFFIX_DJ)
             .input8(SMALL_CLAIMS_WITNESS_DEADLINE)
             .date1(deadlineService.nextWorkingDayInWeeks(8))
             .input9(SMALL_CLAIMS_WITNESS_LATE_WARNING)

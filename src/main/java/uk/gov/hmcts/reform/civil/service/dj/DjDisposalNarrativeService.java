@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearingTi
 
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_BUNDLE_REQUIREMENT;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_DOCUMENTS_EXCHANGE;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_FINAL_HEARING_LISTING_DJ;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_SCHEDULE_CLAIMANT_SEND_DJ;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_SCHEDULE_COUNTER_SEND;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_SCHEDULE_COUNTER_UPLOAD_DJ;
@@ -84,14 +85,14 @@ public class DjDisposalNarrativeService {
 
     public DisposalHearingFinalDisposalHearingDJ buildFinalDisposalHearing() {
         return DisposalHearingFinalDisposalHearingDJ.builder()
-            .input("This claim will be listed for final disposal before a Judge on the first available date after")
+            .input(DISPOSAL_FINAL_HEARING_LISTING_DJ)
             .date(deadlineService.weeksFromNow(16))
             .build();
     }
 
     public DisposalHearingFinalDisposalHearingTimeDJ buildFinalDisposalHearingTime() {
         return DisposalHearingFinalDisposalHearingTimeDJ.builder()
-            .input("This claim will be listed for final disposal before a Judge on the first available date after")
+            .input(DISPOSAL_FINAL_HEARING_LISTING_DJ)
             .date(deadlineService.weeksFromNow(16))
             .build();
     }

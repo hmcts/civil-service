@@ -22,6 +22,8 @@ import java.util.Locale;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_BUNDLE_REQUIREMENT;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_DOCUMENTS_EXCHANGE;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_DOCUMENTS_UPLOAD;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_FINAL_HEARING_LISTING_SDO;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_JUDGES_RECITAL_CLAIM_FORM;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_SCHEDULE_CLAIMANT_UPLOAD_SDO;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_SCHEDULE_COUNTER_SEND;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_SCHEDULE_COUNTER_UPLOAD_SDO;
@@ -37,8 +39,6 @@ import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderS
 @RequiredArgsConstructor
 public class SdoDisposalNarrativeService {
 
-    private static final String UPON_CONSIDERING =
-        "Upon considering the claim form, particulars of claim, statements of case and Directions questionnaires";
     private static final DateTimeFormatter DEADLINE_FORMATTER =
         DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH);
 
@@ -46,7 +46,7 @@ public class SdoDisposalNarrativeService {
 
     public void applyJudgesRecital(CaseData.CaseDataBuilder<?, ?> updatedData) {
         updatedData.disposalHearingJudgesRecital(DisposalHearingJudgesRecital.builder()
-                .input(UPON_CONSIDERING)
+                .input(DISPOSAL_JUDGES_RECITAL_CLAIM_FORM)
                 .build())
             .build();
     }
@@ -102,7 +102,7 @@ public class SdoDisposalNarrativeService {
 
     public void applyFinalDisposalHearing(CaseData.CaseDataBuilder<?, ?> updatedData) {
         updatedData.disposalHearingFinalDisposalHearing(DisposalHearingFinalDisposalHearing.builder()
-                .input("This claim will be listed for final disposal before a judge on the first available date after")
+                .input(DISPOSAL_FINAL_HEARING_LISTING_SDO)
                 .date(LocalDate.now().plusWeeks(16))
                 .build())
             .build();
@@ -110,7 +110,7 @@ public class SdoDisposalNarrativeService {
 
     public void applyHearingTime(CaseData.CaseDataBuilder<?, ?> updatedData) {
         updatedData.disposalHearingHearingTime(DisposalHearingHearingTime.builder()
-                .input("This claim will be listed for final disposal before a judge on the first available date after")
+                .input(DISPOSAL_FINAL_HEARING_LISTING_SDO)
                 .dateTo(LocalDate.now().plusWeeks(16))
                 .build())
             .build();

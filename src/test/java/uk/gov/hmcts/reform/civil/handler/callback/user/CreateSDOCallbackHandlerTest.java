@@ -140,6 +140,7 @@ import uk.gov.hmcts.reform.civil.service.sdo.SdoDisposalNarrativeService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoDisclosureOfDocumentsFieldsService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoExpertEvidenceFieldsService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoDrhFieldsService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoFastTrackNarrativeService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoFastTrackOrderDefaultsService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoFastTrackSpecialistDirectionsService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoFeatureToggleService;
@@ -154,11 +155,13 @@ import uk.gov.hmcts.reform.civil.service.sdo.SdoPrePopulateService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoSubmissionService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoTrackDefaultsService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoValidationService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoNihlOrderService;
 
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_DOCUMENTS_EXCHANGE;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FLIGHT_DELAY_LEGAL_ARGUMENTS_NOTICE;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FLIGHT_DELAY_RELATED_CLAIMS_NOTICE;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.PERSONAL_INJURY_PERMISSION_SDO;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.SMALL_CLAIMS_HEARING_LISTING_NOTICE;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoSmallClaimsOrderDefaultsService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoSmallClaimsNarrativeService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
@@ -260,6 +263,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackH
     SdoDisposalGuardService.class,
     SdoDisposalOrderDefaultsService.class,
     SdoDisposalNarrativeService.class,
+    SdoFastTrackNarrativeService.class,
     SdoFastTrackOrderDefaultsService.class,
     SdoFastTrackSpecialistDirectionsService.class,
     SdoSmallClaimsOrderDefaultsService.class,
@@ -272,6 +276,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackH
     SdoPrePopulateService.class,
     SdoHearingPreparationService.class,
     SdoDrhFieldsService.class,
+    SdoNihlOrderService.class,
     SdoNihlFieldsService.class,
     SdoNarrativeService.class,
     SdoValidationService.class,
@@ -1858,7 +1863,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 response.getData().get("smallClaimsHearing"),
                 SmallClaimsHearing.class
             );
-            assertThat(smallClaimsHearing.getInput1()).startsWith("The hearing of the claim will be on a date to be notified");
+            assertThat(smallClaimsHearing.getInput1()).isEqualTo(SMALL_CLAIMS_HEARING_LISTING_NOTICE);
 
             SmallClaimsDocuments smallClaimsDocuments = objectMapper.convertValue(
                 response.getData().get("smallClaimsDocuments"),

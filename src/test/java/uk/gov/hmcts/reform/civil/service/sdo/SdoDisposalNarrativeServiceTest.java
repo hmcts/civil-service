@@ -15,6 +15,7 @@ import static org.mockito.Mockito.lenient;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_BUNDLE_REQUIREMENT;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_DOCUMENTS_EXCHANGE;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_DOCUMENTS_UPLOAD;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_JUDGES_RECITAL_CLAIM_FORM;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_SCHEDULE_CLAIMANT_UPLOAD_SDO;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_SCHEDULE_COUNTER_SEND;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_SCHEDULE_COUNTER_UPLOAD_SDO;
@@ -68,6 +69,16 @@ class SdoDisposalNarrativeServiceTest {
             .isEqualTo(DISPOSAL_WITNESS_CPR32_7_DEADLINE);
         assertThat(result.getDisposalHearingWitnessOfFact().getInput6())
             .isEqualTo(DISPOSAL_WITNESS_TRIAL_NOTE_SDO);
+    }
+
+    @Test
+    void shouldPopulateJudgesRecitalUsingSharedConstant() {
+        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
+
+        service.applyJudgesRecital(builder);
+
+        assertThat(builder.build().getDisposalHearingJudgesRecital().getInput())
+            .isEqualTo(DISPOSAL_JUDGES_RECITAL_CLAIM_FORM);
     }
 
     @Test

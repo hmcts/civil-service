@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingDisclosureOfD
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingNotes;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingWitnessOfFact;
 
 import java.time.LocalDate;
 
@@ -16,6 +17,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FAST_TRACK_TRIAL_MANUAL_BUNDLE_GUIDANCE;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.SMALL_CLAIMS_WITNESS_LATE_WARNING;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.TRIAL_WITNESS_STATEMENT_UPLOAD_NOTICE;
 
 @ExtendWith(MockitoExtension.class)
 class DjTrialNarrativeServiceTest {
@@ -79,5 +82,17 @@ class DjTrialNarrativeServiceTest {
         TrialHearingNotes result = service.buildTrialHearingNotes();
 
         assertThat(result.getDate()).isEqualTo(oneWeek);
+    }
+
+    @Test
+    void shouldBuildWitnessOfFactWithSharedText() {
+        LocalDate eightWeeks = LocalDate.of(2025, 3, 1);
+        when(deadlineService.nextWorkingDayInWeeks(eq(8))).thenReturn(eightWeeks);
+
+        TrialHearingWitnessOfFact result = service.buildWitnessOfFact();
+
+        assertThat(result.getInput1()).isEqualTo(TRIAL_WITNESS_STATEMENT_UPLOAD_NOTICE);
+        assertThat(result.getInput9()).isEqualTo(SMALL_CLAIMS_WITNESS_LATE_WARNING);
+        assertThat(result.getDate1()).isEqualTo(eightWeeks);
     }
 }

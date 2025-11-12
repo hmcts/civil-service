@@ -24,8 +24,10 @@ import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantSmallClaim.REST
 import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantSmallClaim.WITNESS_DESCRIPTION_TEXT;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.JUDGES_RECITAL_STATEMENTS_OF_CASE_WITH_COMMA;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.SMALL_CLAIMS_DOCUMENTS_UPLOAD;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.SMALL_CLAIMS_DOCUMENTS_WARNING;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.SMALL_CLAIMS_HEARING_LISTING_NOTICE;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.SMALL_CLAIMS_WITNESS_STATEMENTS_UPLOAD;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_BASIC_RATE_EVIDENCE_WITH_LIABILITY;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_CLAIMANT_EVIDENCE_SDO;
@@ -49,7 +51,7 @@ public class SdoSmallClaimsNarrativeService {
 
     public void applyJudgesRecital(CaseData.CaseDataBuilder<?, ?> updatedData) {
         updatedData.smallClaimsJudgesRecital(SmallClaimsJudgesRecital.builder()
-                .input("Upon considering the statements of case and the information provided by the parties,")
+                .input(JUDGES_RECITAL_STATEMENTS_OF_CASE_WITH_COMMA)
                 .build())
             .build();
     }
@@ -119,8 +121,7 @@ public class SdoSmallClaimsNarrativeService {
 
     public void applyHearingSection(CaseData.CaseDataBuilder<?, ?> updatedData) {
         updatedData.smallClaimsHearing(SmallClaimsHearing.builder()
-                .input1("The hearing of the claim will be on a date to be notified to you by a separate notification. "
-                            + "The hearing will have a time estimate of")
+                .input1(SMALL_CLAIMS_HEARING_LISTING_NOTICE)
                 .input2(SMALL_CLAIMS_HEARING_FEE_WARNING)
                 .build())
             .build();

@@ -5,11 +5,38 @@ import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderS
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FAST_TRACK_SCHEDULE_CLAIMANT_UPLOAD;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FAST_TRACK_SCHEDULE_DEFENDANT_UPLOAD;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FAST_TRACK_SCHEDULE_FUTURE_LOSS_SDO;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.JUDGES_RECITAL_STATEMENTS_OF_CASE_WITH_PERIOD;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.NIHL_ADDENDUM_REPORT_PERMISSION;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.NIHL_APPLICATION_TO_RELY_DETAILS;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.NIHL_CLAIMANT_PERMISSION_TO_RELY;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.NIHL_DEFENDANT_MAY_ASK;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.NIHL_ENT_QUESTIONS_SHALL_BE_ANSWERED;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.NIHL_ENT_UPLOAD_WITHIN_SEVEN_DAYS;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.NIHL_ENT_WRITTEN_QUESTIONS;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.NIHL_ENT_WRITTEN_QUESTIONS_UPLOAD;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.NIHL_EVIDENCE_ACOUSTIC_ENGINEER;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.NIHL_EXPERT_REPORT;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.NIHL_EXPERT_REPORT_UPLOAD;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.NIHL_FURTHER_AUDIOGRAM_REQUEST;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.NIHL_FURTHER_AUDIOGRAM_SERVICE;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.NIHL_INSTRUCTION_OF_EXPERT;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.NIHL_INSTRUCTION_OF_EXPERT_FOLLOWUP;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.NIHL_JOINT_MEETING_OF_EXPERTS;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.NIHL_PERMISSION_TO_RELY_ON_EXPERT;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.NIHL_QUESTIONS_SHALL_BE_ANSWERED;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.NIHL_REPLIES;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.NIHL_REPLIES_UPLOAD;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.NIHL_SERVICE_OF_ORDER;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.NIHL_UPLOAD_OF_DOCUMENTS;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.NIHL_UPLOAD_WITHIN_SEVEN_DAYS;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.NIHL_UPLOAD_TO_DIGITAL_PORTAL;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.NIHL_WRITTEN_QUESTIONS;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.NIHL_WRITTEN_QUESTIONS_UPLOAD;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.SMALL_CLAIMS_WITNESS_DEADLINE;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.SMALL_CLAIMS_WITNESS_LATE_WARNING;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.WITNESS_COUNT_LIMIT_NOTE;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.WITNESS_PAGE_LIMIT_PREFIX;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.WITNESS_PAGE_LIMIT_SUFFIX;
 
 public final class SdoR2UiConstantFastTrack {
 
@@ -18,48 +45,34 @@ public final class SdoR2UiConstantFastTrack {
     }
 
     //SDO R2 NIHL default text
-    public static final String CLAIMANT_PERMISSION_TO_RELY = "The Claimant has permission to rely upon the written " +
-        "expert evidence already uploaded to the Digital Portal with the particulars of claim.";
+    public static final String CLAIMANT_PERMISSION_TO_RELY = NIHL_CLAIMANT_PERMISSION_TO_RELY;
     public static final String ADDENDUM_REPORT = NIHL_ADDENDUM_REPORT_PERMISSION;
     public static final String CLAIMANT_SHALL_UNDERGO = NIHL_FURTHER_AUDIOGRAM_REQUEST;
     public static final String SERVICE_REPORT = NIHL_FURTHER_AUDIOGRAM_SERVICE;
-    public static final String DEFENDANT_MAY_ASK = "The Defendant(s) may ask questions of the Claimant's " +
-        "expert which must be sent to the expert directly and uploaded to the Digital Portal by 4pm on";
-    public static final String QUESTIONS_SHALL_BE_ANSWERED = "The questions shall be answered by the expert by";
-    public static final String UPLOADED_TO_DIGITAL_PORTAL = "by the party asking within 7 days of receipt.";
-    public static final String APPLICATION_TO_RELY_DETAILS = "Any application by the Defendant for permission " +
-        "to rely on further expert medical evidence shall be made by 4pm on";
-    public static final String PERMISSION_TO_RELY_ON_EXPERT = "The Defendant has permission to rely on written " +
-        "expert evidence from a consultant ENT surgeon. Such report shall be uploaded to the Digital Portal by 4pm on";
-    public static final String JOINT_MEETING_OF_EXPERTS = "The experts instructed by each party shall discuss their " +
-        "reports and shall prepare a schedule of agreement and disagreement which shall be provided to the parties by 4pm on";
-    public static final String UPLOADED_TO_DIGITAL_PORTAL_7_DAYS = "by the Claimant within 7 days of receipt.";
-    public static final String EVIDENCE_ACOUSTIC_ENGINEER = "The parties have permission to rely on the jointly " +
-        "instructed written evidence of an expert acoustic engineer.";
-    public static final String INSTRUCTION_OF_EXPERT = "The expert shall be agreed and instructed by";
-    public static final String INSTRUCTION_OF_EXPERT_TA = "If no expert has been instructed by the date the Claimant " +
-        "must apply to court by 4pm the following day for further directions.";
-    public static final String EXPERT_REPORT = "The expert will report to the instructing parties by";
-    public static final String EXPERT_REPORT_DIGITAL_PORTAL = "by the Claimant within 7 days of receipt.";
-    public static final String WRITTEN_QUESTIONS = "Written questions may be posed by any party directly to the " +
-        "single jointly instructed expert by";
-    public static final String WRITTEN_QUESTIONS_DIGITAL_PORTAL = "by the same date.";
-    public static final String REPLIES = "send the answers to questions to the asking party by";
-    public static final String REPLIES_DIGITAL_PORTAL = "by that party within 7 days of receipt.";
-    public static final String SERVICE_OF_ORDER = "A copy of this order must be served on the expert by the " +
-        "Claimant with the expert's instructions.";
-    public static final String ENT_WRITTEN_QUESTIONS = "The parties may put written questions of an ENT " +
-        "engineering expert for whom permission has been given by 4pm on";
-    public static final String ENT_WRITTEN_QUESTIONS_DIG_PORTAL = "and shall upload the same to the Digital Portal " +
-        "by the same date.\nSuch questions shall be limited to issues arising from the single jointly instructed " +
-        "expert engineer's report and any answers to questions put to the engineer.";
-    public static final String ENT_QUESTIONS_SHALL_BE_ANSWERED = "Such questions shall be answered by the ENT expert by";
-    public static final String ENT_SHALL_BE_UPLOADED = "within 7 days of receipt.";
-    public static final String UPLOAD_OF_DOCUMENTS = "Each party must upload to the Digital Portal copies of those " +
-        "documents on which they wish to rely at trial 21 days before the hearing.";
+    public static final String DEFENDANT_MAY_ASK = NIHL_DEFENDANT_MAY_ASK;
+    public static final String QUESTIONS_SHALL_BE_ANSWERED = NIHL_QUESTIONS_SHALL_BE_ANSWERED;
+    public static final String UPLOADED_TO_DIGITAL_PORTAL = NIHL_UPLOAD_TO_DIGITAL_PORTAL;
+    public static final String APPLICATION_TO_RELY_DETAILS = NIHL_APPLICATION_TO_RELY_DETAILS;
+    public static final String PERMISSION_TO_RELY_ON_EXPERT = NIHL_PERMISSION_TO_RELY_ON_EXPERT;
+    public static final String JOINT_MEETING_OF_EXPERTS = NIHL_JOINT_MEETING_OF_EXPERTS;
+    public static final String UPLOADED_TO_DIGITAL_PORTAL_7_DAYS = NIHL_UPLOAD_WITHIN_SEVEN_DAYS;
+    public static final String EVIDENCE_ACOUSTIC_ENGINEER = NIHL_EVIDENCE_ACOUSTIC_ENGINEER;
+    public static final String INSTRUCTION_OF_EXPERT = NIHL_INSTRUCTION_OF_EXPERT;
+    public static final String INSTRUCTION_OF_EXPERT_TA = NIHL_INSTRUCTION_OF_EXPERT_FOLLOWUP;
+    public static final String EXPERT_REPORT = NIHL_EXPERT_REPORT;
+    public static final String EXPERT_REPORT_DIGITAL_PORTAL = NIHL_EXPERT_REPORT_UPLOAD;
+    public static final String WRITTEN_QUESTIONS = NIHL_WRITTEN_QUESTIONS;
+    public static final String WRITTEN_QUESTIONS_DIGITAL_PORTAL = NIHL_WRITTEN_QUESTIONS_UPLOAD;
+    public static final String REPLIES = NIHL_REPLIES;
+    public static final String REPLIES_DIGITAL_PORTAL = NIHL_REPLIES_UPLOAD;
+    public static final String SERVICE_OF_ORDER = NIHL_SERVICE_OF_ORDER;
+    public static final String ENT_WRITTEN_QUESTIONS = NIHL_ENT_WRITTEN_QUESTIONS;
+    public static final String ENT_WRITTEN_QUESTIONS_DIG_PORTAL = NIHL_ENT_WRITTEN_QUESTIONS_UPLOAD;
+    public static final String ENT_QUESTIONS_SHALL_BE_ANSWERED = NIHL_ENT_QUESTIONS_SHALL_BE_ANSWERED;
+    public static final String ENT_SHALL_BE_UPLOADED = NIHL_ENT_UPLOAD_WITHIN_SEVEN_DAYS;
+    public static final String UPLOAD_OF_DOCUMENTS = NIHL_UPLOAD_OF_DOCUMENTS;
     public static final String TRUE = "true";
-    public static final String JUDGE_RECITAL = "Upon considering the statements of case and the information provided" +
-        " by the parties.";
+    public static final String JUDGE_RECITAL = JUDGES_RECITAL_STATEMENTS_OF_CASE_WITH_PERIOD;
     public static final String STANDARD_DISCLOSURE = FAST_TRACK_DISCLOSURE_STANDARD_SDO;
     public static final String INSPECTION = FAST_TRACK_DISCLOSURE_INSPECTION;
     public static final String REQUEST_COMPILED_WITH = "within 7 days of receipt.";
@@ -72,10 +85,9 @@ public final class SdoR2UiConstantFastTrack {
     public static final String IMPORTANT_NOTES = "This Order has been made without hearing. Each party has the " +
         "right to apply to have this Order set aside or varied. Any such application must be received " +
         "by the Court (together with the appropriate fee) by 4pm on";
-    public static final String RESTRICT_WITNESS_TEXT = "For this limitation, a party is counted as a witness.";
-    public static final String RESTRICT_NUMBER_PAGES_TEXT1 = "Each witness statement should be no more than";
-    public static final String RESTRICT_NUMBER_PAGES_TEXT2 = "pages of A4 (including exhibits). Statements should" +
-        " be double spaced using a font size of 12.";
+    public static final String RESTRICT_WITNESS_TEXT = WITNESS_COUNT_LIMIT_NOTE;
+    public static final String RESTRICT_NUMBER_PAGES_TEXT1 = WITNESS_PAGE_LIMIT_PREFIX;
+    public static final String RESTRICT_NUMBER_PAGES_TEXT2 = WITNESS_PAGE_LIMIT_SUFFIX;
     public static final String PECUNIARY_LOSS = FAST_TRACK_SCHEDULE_FUTURE_LOSS_SDO;
     public static final String PHYSICAL_TRIAL_BUNDLE = "The Claimant's solicitor shall bring to the court, on the day of the hearing, a paper copy of the hearing bundle.";
 

@@ -431,6 +431,7 @@ public class SdoGeneratorServiceTest {
             );
         assertThat(form.getFastTrackDigitalPortalBundleWarning())
             .isEqualTo(FAST_TRACK_DIGITAL_PORTAL_BUNDLE_WARNING);
+        assertThat(form.isShowBundleInfo()).isTrue();
     }
 
     private CaseData fastTrackCasePopulatedBySpecialistService(CaseData baseCase) {

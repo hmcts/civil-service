@@ -7,33 +7,21 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class SdoFastTrackOrderDefaultsServiceTest {
 
     @Mock
-    private SdoDeadlineService deadlineService;
+    private SdoFastTrackNarrativeService fastTrackNarrativeService;
+    @Mock
+    private SdoFastTrackSpecialistDirectionsService specialistDirectionsService;
 
     private SdoFastTrackOrderDefaultsService service;
-    private SdoFastTrackSpecialistDirectionsService specialistDirectionsService;
 
     @BeforeEach
     void setUp() {
-        specialistDirectionsService = new SdoFastTrackSpecialistDirectionsService(deadlineService);
-        service = new SdoFastTrackOrderDefaultsService(deadlineService, specialistDirectionsService);
-        lenient().when(deadlineService.nextWorkingDayFromNowWeeks(anyInt()))
-            .thenAnswer(invocation -> LocalDate.of(2025, 3, 1).plusWeeks(invocation.getArgument(0, Integer.class)));
-        lenient().when(deadlineService.nextWorkingDayFromNowDays(anyInt()))
-            .thenAnswer(invocation -> LocalDate.of(2025, 4, 1).plusDays(invocation.getArgument(0, Integer.class)));
-        lenient().when(deadlineService.orderSetAsideOrVariedApplicationDeadline(any(LocalDateTime.class)))
-            .thenReturn(LocalDate.of(2025, 5, 1));
+        service = new SdoFastTrackOrderDefaultsService(fastTrackNarrativeService, specialistDirectionsService);
     }
 
     @Test
@@ -41,10 +29,8 @@ class SdoFastTrackOrderDefaultsServiceTest {
         CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
 
         service.populateFastTrackOrderDetails(builder);
-        CaseData result = builder.build();
 
-        assertThat(result.getFastTrackJudgesRecital()).isNotNull();
-        assertThat(result.getFastTrackTrial()).isNotNull();
-        assertThat(result.getSdoR2FastTrackWitnessOfFact()).isNotNull();
+        verify(fastTrackNarrativeService).populateFastTrackNarrative(builder);
+        verify(specialistDirectionsService).populateSpecialistDirections(builder);
     }
 }

@@ -10,6 +10,16 @@ public final class DirectionsOrderSpecialistTextLibrary {
         // utility
     }
 
+    /* Shared judges’ recital text */
+    private static final String JUDGES_RECITAL_STATEMENTS_OF_CASE_BASE =
+        "Upon considering the statements of case and the information provided by the parties";
+    public static final String JUDGES_RECITAL_STATEMENTS_OF_CASE_WITH_COMMA =
+        JUDGES_RECITAL_STATEMENTS_OF_CASE_BASE + ",";
+    public static final String JUDGES_RECITAL_STATEMENTS_OF_CASE_WITH_PERIOD =
+        JUDGES_RECITAL_STATEMENTS_OF_CASE_BASE + ".";
+    public static final String DISPOSAL_JUDGES_RECITAL_CLAIM_FORM =
+        "Upon considering the claim form, particulars of claim, statements of case and Directions questionnaires";
+
     /* Scott schedule: building disputes */
     public static final String BUILDING_SCHEDULE_INTRO_SDO =
         "The claimant must prepare a Scott Schedule of the defects, items of damage, "
@@ -215,6 +225,9 @@ public final class DirectionsOrderSpecialistTextLibrary {
             + "has permission to rely upon any associated "
             + "correspondence or updating report which is uploaded "
             + "to the Digital Portal by 4pm on";
+    public static final String PERSONAL_INJURY_DEFENDANT_QUESTIONS =
+        "The Defendant(s) may ask questions of the Claimant's expert which must be sent to the expert "
+            + "directly and uploaded to the Digital Portal by 4pm on";
     public static final String PERSONAL_INJURY_QUESTIONS =
         "Any questions which are to be addressed to an expert must be sent to the expert directly "
             + "and uploaded to the Digital Portal by 4pm on";
@@ -222,6 +235,8 @@ public final class DirectionsOrderSpecialistTextLibrary {
         "The answers to the questions shall be answered by the Expert by";
     public static final String PERSONAL_INJURY_UPLOAD =
         "and uploaded to the Digital Portal by";
+    public static final String PERSONAL_INJURY_UPLOAD_BY_ASKING_PARTY =
+        PERSONAL_INJURY_UPLOAD + " the party who has asked the question by";
 
     /* Road traffic accident */
     public static final String ROAD_TRAFFIC_ACCIDENT_UPLOAD_SDO =
@@ -257,6 +272,48 @@ public final class DirectionsOrderSpecialistTextLibrary {
             + "required hearing fee or submit a fully completed application for Help with Fees. \nIf the "
             + "claimant fails to pay the fee or obtain a fee exemption by that time the claim will be "
             + "struck without further order.";
+    public static final String SMALL_CLAIMS_HEARING_LISTING_NOTICE =
+        "The hearing of the claim will be on a date to be notified to you by a separate notification. "
+            + "The hearing will have a time estimate of";
+
+    /* Witness statement pagination text */
+    public static final String WITNESS_COUNT_LIMIT_NOTE =
+        "For this limitation, a party is counted as a witness.";
+    public static final String WITNESS_COUNT_LIMIT_NOTE_DJ =
+        "For this limitation, a party is counted as witness.";
+    public static final String WITNESS_PAGE_LIMIT_PREFIX =
+        "Each witness statement should be no more than";
+    public static final String WITNESS_PAGE_LIMIT_SUFFIX =
+        "pages of A4 (including exhibits). Statements should be double spaced using a font size of 12.";
+    public static final String WITNESS_PAGE_LIMIT_SUFFIX_DJ =
+        "A4 pages. Statements should be double spaced using a font size of 12.";
+
+    /* ADR / settlement guidance */
+    public static final String ALTERNATIVE_DISPUTE_RESOLUTION_PARAGRAPH =
+        "At all stages, the parties must consider settling this litigation by any means of Alternative "
+            + "Dispute Resolution. This includes round table conferences, early neutral evaluation, "
+            + "mediation and arbitration. Any party not engaging in any such means proposed by another "
+            + "must upload to the Digital Portal a witness statement giving reasons within 21 days of "
+            + "receipt of that proposal. That witness statement must not be shown to the trial judge "
+            + "until questions of costs arise.";
+    public static final String ALTERNATIVE_DISPUTE_RESOLUTION_LABEL =
+        "## Alternative dispute resolution \n" + ALTERNATIVE_DISPUTE_RESOLUTION_PARAGRAPH;
+    public static final String SETTLEMENT_DIGITAL_PORTAL_PARAGRAPH =
+        "Each party must inform the Court immediately if the case is settled whether or not it is then "
+            + "possible to upload to the Digital Portal a draft consent order to give effect to their "
+            + "agreement.";
+    public static final String SETTLEMENT_DIGITAL_PORTAL_LABEL =
+        "## Settlement \n" + SETTLEMENT_DIGITAL_PORTAL_PARAGRAPH;
+    public static final String CLAIM_SETTLING_CONSENT_ORDER_PARAGRAPH =
+        "Each party must inform the court immediately if the case is settled, whether or not it is "
+            + "then possible to file a draft consent order to give effect to their agreement.";
+    public static final String CLAIM_SETTLING_CONSENT_ORDER_LABEL =
+        "## Claim settling \n " + CLAIM_SETTLING_CONSENT_ORDER_PARAGRAPH;
+
+    /* Trial witnesses (DJ) */
+    public static final String TRIAL_WITNESS_STATEMENT_UPLOAD_NOTICE =
+        "Each party must upload to the Digital Portal copies of the statements of all witnesses of fact "
+            + "on whom they intend to rely.";
 
     /* NIHL-specific addendum / audiogram text */
     public static final String NIHL_ADDENDUM_REPORT_PERMISSION =
@@ -269,6 +326,61 @@ public final class DirectionsOrderSpecialistTextLibrary {
         "The further audiogram shall be arranged and paid for by the Defendant requesting it. The Defendant"
             + " shall serve a copy of the further audiogram on the Claimant and upload it to the Digital Portal"
             + " by 4pm on";
+    public static final String NIHL_CLAIMANT_PERMISSION_TO_RELY =
+        "The Claimant has permission to rely upon the written expert evidence already uploaded to the Digital Portal "
+            + "with the particulars of claim.";
+    public static final String NIHL_DEFENDANT_MAY_ASK =
+        "The Defendant(s) may ask questions of the Claimant's expert which must be sent to the expert directly and "
+            + "uploaded to the Digital Portal by 4pm on";
+    public static final String NIHL_QUESTIONS_SHALL_BE_ANSWERED =
+        "The questions shall be answered by the expert by";
+    public static final String NIHL_UPLOAD_TO_DIGITAL_PORTAL =
+        "by the party asking within 7 days of receipt.";
+    public static final String NIHL_APPLICATION_TO_RELY_DETAILS =
+        "Any application by the Defendant for permission to rely on further expert medical evidence shall be made by "
+            + "4pm on";
+    public static final String NIHL_PERMISSION_TO_RELY_ON_EXPERT =
+        "The Defendant has permission to rely on written expert evidence from a consultant ENT surgeon. Such report "
+            + "shall be uploaded to the Digital Portal by 4pm on";
+    public static final String NIHL_JOINT_MEETING_OF_EXPERTS =
+        "The experts instructed by each party shall discuss their reports and shall prepare a schedule of agreement "
+            + "and disagreement which shall be provided to the parties by 4pm on";
+    public static final String NIHL_UPLOAD_WITHIN_SEVEN_DAYS =
+        "by the Claimant within 7 days of receipt.";
+    public static final String NIHL_EVIDENCE_ACOUSTIC_ENGINEER =
+        "The parties have permission to rely on the jointly instructed written evidence of an expert acoustic engineer.";
+    public static final String NIHL_INSTRUCTION_OF_EXPERT =
+        "The expert shall be agreed and instructed by";
+    public static final String NIHL_INSTRUCTION_OF_EXPERT_FOLLOWUP =
+        "If no expert has been instructed by the date the Claimant must apply to court by 4pm the following day for "
+            + "further directions.";
+    public static final String NIHL_EXPERT_REPORT =
+        "The expert will report to the instructing parties by";
+    public static final String NIHL_EXPERT_REPORT_UPLOAD =
+        "by the Claimant within 7 days of receipt.";
+    public static final String NIHL_WRITTEN_QUESTIONS =
+        "Written questions may be posed by any party directly to the single jointly instructed expert by";
+    public static final String NIHL_WRITTEN_QUESTIONS_UPLOAD =
+        "by the same date.";
+    public static final String NIHL_REPLIES =
+        "send the answers to questions to the asking party by";
+    public static final String NIHL_REPLIES_UPLOAD =
+        "by that party within 7 days of receipt.";
+    public static final String NIHL_SERVICE_OF_ORDER =
+        "A copy of this order must be served on the expert by the Claimant with the expert's instructions.";
+    public static final String NIHL_ENT_WRITTEN_QUESTIONS =
+        "The parties may put written questions of an ENT engineering expert for whom permission has been given by 4pm on";
+    public static final String NIHL_ENT_WRITTEN_QUESTIONS_UPLOAD =
+        "and shall upload the same to the Digital Portal by the same date.\nSuch questions shall be limited to issues "
+            + "arising from the single jointly instructed expert engineer's report and any answers to questions put to "
+            + "the engineer.";
+    public static final String NIHL_ENT_QUESTIONS_SHALL_BE_ANSWERED =
+        "Such questions shall be answered by the ENT expert by";
+    public static final String NIHL_ENT_UPLOAD_WITHIN_SEVEN_DAYS =
+        "within 7 days of receipt.";
+    public static final String NIHL_UPLOAD_OF_DOCUMENTS =
+        "Each party must upload to the Digital Portal copies of those documents on which they wish to rely at trial "
+            + "21 days before the hearing.";
 
     /* Small claims: flight delay */
     public static final String FLIGHT_DELAY_RELATED_CLAIMS_NOTICE =
@@ -327,6 +439,10 @@ public final class DirectionsOrderSpecialistTextLibrary {
             + " case on periodical payments. then they must do so in the respective schedule and counter-schedule.";
     public static final String DISPOSAL_BUNDLE_REQUIREMENT =
         "At least 7 days before the disposal hearing, the claimant must file and serve";
+    public static final String DISPOSAL_FINAL_HEARING_LISTING_SDO =
+        "This claim will be listed for final disposal before a judge on the first available date after";
+    public static final String DISPOSAL_FINAL_HEARING_LISTING_DJ =
+        "This claim will be listed for final disposal before a Judge on the first available date after";
 
     /* Order made without a hearing */
     public static final String ORDER_WITHOUT_HEARING_RECEIVED_BY_COURT_NO_ARTICLE =

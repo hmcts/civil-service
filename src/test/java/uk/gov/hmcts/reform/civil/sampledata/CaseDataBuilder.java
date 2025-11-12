@@ -246,6 +246,8 @@ import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderS
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_PARTIES_LIAISE;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_STATEMENT_PROMPT_SDO;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_WITNESS_LIMIT_SDO;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_FINAL_HEARING_LISTING_DJ;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_FINAL_HEARING_LISTING_SDO;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FAST_TRACK_TRIAL_BUNDLE_NOTICE;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FAST_TRACK_TRIAL_MANUAL_BUNDLE_GUIDANCE;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FLIGHT_DELAY_LEGAL_ARGUMENTS_NOTICE;
@@ -2966,7 +2968,7 @@ public class CaseDataBuilder {
                     + "by 4pm on %s.", LocalDate.parse("2022-01-30")))
             .build();
         disposalHearingHearingTime = DisposalHearingHearingTime.builder()
-            .input("This claim will be listed for final disposal before a judge on the first available date after")
+            .input(DISPOSAL_FINAL_HEARING_LISTING_SDO)
             .time(FIFTEEN_MINUTES)
             .dateFrom(LocalDate.parse("2022-01-01"))
             .dateFrom(LocalDate.parse("2022-01-02"))
@@ -3172,9 +3174,7 @@ public class CaseDataBuilder {
             .build();
         disposalHearingFinalDisposalHearingDJ = DisposalHearingFinalDisposalHearingDJ
             .builder()
-            .input("This claim be listed for final "
-                + "disposal before a Judge on the first "
-                + "available date after.")
+            .input(DISPOSAL_FINAL_HEARING_LISTING_DJ)
             .date(LocalDate.now().plusWeeks(16))
             .time(DisposalHearingFinalDisposalHearingTimeEstimate.THIRTY_MINUTES)
             .build();
@@ -3184,9 +3184,7 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateClaimIssuedDisposalHearingInPersonDJ() {
         disposalHearingFinalDisposalHearingTimeDJ = DisposalHearingFinalDisposalHearingTimeDJ
             .builder()
-            .input("This claim be listed for final "
-                + "disposal before a Judge on the first "
-                + "available date after.")
+            .input(DISPOSAL_FINAL_HEARING_LISTING_DJ)
             .date(LocalDate.now().plusWeeks(16))
             .time(uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingFinalDisposalHearingTimeEstimate.THIRTY_MINUTES)
             .build();

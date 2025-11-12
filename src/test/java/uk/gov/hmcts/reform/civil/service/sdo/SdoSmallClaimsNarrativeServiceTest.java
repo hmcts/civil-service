@@ -17,10 +17,12 @@ import static org.mockito.Mockito.lenient;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FLIGHT_DELAY_LEGAL_ARGUMENTS_NOTICE;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FLIGHT_DELAY_RELATED_CLAIMS_NOTICE;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.ORDER_WITHOUT_HEARING_RECEIVED_BY_COURT_NO_ARTICLE;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.SMALL_CLAIMS_HEARING_LISTING_NOTICE;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.ROAD_TRAFFIC_ACCIDENT_SMALL_CLAIMS;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.SMALL_CLAIMS_DOCUMENTS_UPLOAD;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.SMALL_CLAIMS_DOCUMENTS_WARNING;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.SMALL_CLAIMS_WITNESS_STATEMENTS_UPLOAD;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.JUDGES_RECITAL_STATEMENTS_OF_CASE_WITH_COMMA;
 
 @ExtendWith(MockitoExtension.class)
 class SdoSmallClaimsNarrativeServiceTest {
@@ -50,7 +52,7 @@ class SdoSmallClaimsNarrativeServiceTest {
 
         CaseData result = builder.build();
         assertThat(result.getSmallClaimsJudgesRecital().getInput())
-            .isEqualTo("Upon considering the statements of case and the information provided by the parties,");
+            .isEqualTo(JUDGES_RECITAL_STATEMENTS_OF_CASE_WITH_COMMA);
         assertThat(result.getSmallClaimsDocuments().getInput1())
             .isEqualTo(SMALL_CLAIMS_DOCUMENTS_UPLOAD);
         assertThat(result.getSmallClaimsDocuments().getInput2())
@@ -99,6 +101,7 @@ class SdoSmallClaimsNarrativeServiceTest {
         assertThat(result.getSmallClaimsFlightDelay().getLegalDocumentsInput())
             .isEqualTo(FLIGHT_DELAY_LEGAL_ARGUMENTS_NOTICE);
         assertThat(result.getSmallClaimsHearing().getInput2()).isNotBlank();
+        assertThat(result.getSmallClaimsHearing().getInput1()).isEqualTo(SMALL_CLAIMS_HEARING_LISTING_NOTICE);
         assertThat(result.getSmallClaimsNotes().getInput())
             .startsWith(ORDER_WITHOUT_HEARING_RECEIVED_BY_COURT_NO_ARTICLE);
     }

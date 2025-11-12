@@ -13,6 +13,10 @@ import java.time.LocalDate;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.PERSONAL_INJURY_ANSWERS;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.PERSONAL_INJURY_DEFENDANT_QUESTIONS;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.PERSONAL_INJURY_PERMISSION_SDO;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.PERSONAL_INJURY_UPLOAD_BY_ASKING_PARTY;
 
 @ExtendWith(MockitoExtension.class)
 class SdoExpertEvidenceFieldsServiceTest {
@@ -45,5 +49,9 @@ class SdoExpertEvidenceFieldsServiceTest {
         assertThat(personalInjury.getDate2()).isEqualTo(date14);
         assertThat(personalInjury.getDate3()).isEqualTo(date42);
         assertThat(personalInjury.getDate4()).isEqualTo(date49);
+        assertThat(personalInjury.getInput1()).isEqualTo(PERSONAL_INJURY_PERMISSION_SDO);
+        assertThat(personalInjury.getInput2()).isEqualTo(PERSONAL_INJURY_DEFENDANT_QUESTIONS);
+        assertThat(personalInjury.getInput3()).isEqualTo(PERSONAL_INJURY_ANSWERS);
+        assertThat(personalInjury.getInput4()).isEqualTo(PERSONAL_INJURY_UPLOAD_BY_ASKING_PARTY);
     }
 }

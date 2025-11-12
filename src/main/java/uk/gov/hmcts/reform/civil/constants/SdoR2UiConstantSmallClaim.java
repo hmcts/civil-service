@@ -1,8 +1,12 @@
 package uk.gov.hmcts.reform.civil.constants;
 
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.JUDGES_RECITAL_STATEMENTS_OF_CASE_WITH_PERIOD;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.SMALL_CLAIMS_DOCUMENTS_UPLOAD;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.SMALL_CLAIMS_DOCUMENTS_WARNING;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.SMALL_CLAIMS_WITNESS_STATEMENTS_UPLOAD;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.WITNESS_COUNT_LIMIT_NOTE;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.WITNESS_PAGE_LIMIT_PREFIX;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.WITNESS_PAGE_LIMIT_SUFFIX;
 
 public final class SdoR2UiConstantSmallClaim {
 
@@ -10,7 +14,7 @@ public final class SdoR2UiConstantSmallClaim {
         //To satisfy sonarQube
     }
 
-    public static final String JUDGE_RECITAL = "Upon considering the statements of case and the information provided by the parties.";
+    public static final String JUDGE_RECITAL = JUDGES_RECITAL_STATEMENTS_OF_CASE_WITH_PERIOD;
     public static final String PPI_DESCRIPTION = """
         send to the Claimant(s):
         a) A schedule of the following amounts itemised by date;
@@ -52,10 +56,9 @@ public final class SdoR2UiConstantSmallClaim {
 
         A witness whose statement has been uploaded in accordance with the above must attend the hearing. If they do not attend,\
         it will be for the Court to decide how much reliance, if any, to place on their evidence.""";
-    public static final String RESTRICT_WITNESS_TEXT = "For this limitation, a party is counted as a witness.";
-    public static final String RESTRICT_NUMBER_PAGES_TEXT1 = "Each witness statement should be no more than";
-    public static final String RESTRICT_NUMBER_PAGES_TEXT2 = "pages of A4 (including exhibits). Statements should" +
-        " be double spaced using a font size of 12.";
+    public static final String RESTRICT_WITNESS_TEXT = WITNESS_COUNT_LIMIT_NOTE;
+    public static final String RESTRICT_NUMBER_PAGES_TEXT1 = WITNESS_PAGE_LIMIT_PREFIX;
+    public static final String RESTRICT_NUMBER_PAGES_TEXT2 = WITNESS_PAGE_LIMIT_SUFFIX;
     public static final String BUNDLE_TEXT = "The Claimant's solicitor shall bring to the court, on the day of the hearing, a paper copy of the hearing bundle.";
     public static final String IMP_NOTES_TEXT = "This order has been made without hearing. Each party has the right to apply to have this Order set aside or varied." +
         " Any such application must be received by the Court" +
