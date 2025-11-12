@@ -41,7 +41,7 @@ public class PaymentRequestUpdateCallbackService {
     private final ObjectMapper objectMapper;
 
     public void processCallback(ServiceRequestUpdateDto dto, String feeTypeStr) {
-        log.info("Processing callback for caseId {} with status{}",
+        log.info("Processing callback for caseId {} with status {}",
                 dto.getCcdCaseNumber(),
                 dto.getServiceRequestStatus());
 
