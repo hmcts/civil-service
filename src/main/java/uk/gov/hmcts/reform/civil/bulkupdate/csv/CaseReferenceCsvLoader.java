@@ -5,17 +5,27 @@ import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.springframework.stereotype.Component;
 
+import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.GCMParameterSpec;
@@ -67,6 +77,59 @@ public class CaseReferenceCsvLoader {
         } catch (Exception e) {
             log.error("Error occurred while loading object list from file " + fileName, e);
             return Collections.emptyList();
+        }
+    }
+
+    public <T extends CaseReference> List<T> loadFromExcelBytes(Class<T> clazz, byte[] fileBytes) {
+        List<T> list = new ArrayList<>();
+
+        try (Workbook workbook = WorkbookFactory.create(new ByteArrayInputStream(fileBytes))) {
+            Sheet sheet = workbook.getSheetAt(0);
+            Row headerRow = sheet.getRow(0);
+            int numCols = headerRow.getLastCellNum();
+
+            String[] headers = new String[numCols];
+            for (int i = 0; i < numCols; i++) {
+                Cell cell = headerRow.getCell(i);
+                headers[i] = (cell != null) ? cell.getStringCellValue() : "";
+            }
+
+            for (int r = 1; r <= sheet.getLastRowNum(); r++) {
+                Row row = sheet.getRow(r);
+                if (row == null) {
+                    continue;
+                }
+
+                Map<String, Object> rowValues = new HashMap<>();
+                for (int c = 0; c < numCols; c++) {
+                    Cell cell = row.getCell(c);
+                    if (cell == null) {
+                        continue;
+                    }
+
+                    rowValues.put(headers[c], getCellValue(cell));
+                }
+
+                T instance = clazz.getDeclaredConstructor().newInstance();
+                if (instance instanceof ExcelMappable mappable) {
+                    mappable.fromExcelRow(rowValues);
+                }
+
+                list.add(instance);
+            }
+
+        } catch (Exception e) {
+            log.error("Error occurred while loading object list from excel", e);
+        }
+
+        return list;
+    }
+
+    private Object getCellValue(Cell cell) {
+        if (cell.getCellType() == CellType.STRING) {
+            return cell.getStringCellValue();
+        } else {
+            return null;
         }
     }
 

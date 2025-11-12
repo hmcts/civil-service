@@ -44,12 +44,13 @@ import uk.gov.hmcts.reform.civil.service.hearings.HearingValuesService;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.judgments.CjesMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper;
-import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForUnspec;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSpec;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 
 import java.util.List;
 
+import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.STARTED;
 
 @Tag(name = "Testing Support Controller")
@@ -65,10 +66,12 @@ public class TestingSupportController {
     private final FeatureToggleService featureToggleService;
     private final IStateFlowEngine stateFlowEngine;
     private final EventHistoryMapper eventHistoryMapper;
-    private final RoboticsDataMapper roboticsDataMapper;
+    private final RoboticsDataMapperForUnspec roboticsDataMapper;
     private final RoboticsDataMapperForSpec roboticsSpecDataMapper;
     private final CjesMapper cjesMapper;
     private final HearingValuesService hearingValuesService;
+    private final SystemUpdateUserConfiguration systemUserConfig;
+    private final UserService userService;
 
     private final ClaimDismissedHandler claimDismissedHandler;
     private final HearingFeePaidEventHandler hearingFeePaidHandler;
@@ -78,7 +81,6 @@ public class TestingSupportController {
     private final SystemUpdateUserConfiguration systemUserConfig;
     private final UserService userService;
 
-    private static final String BEARER_TOKEN = "Bearer Token";
     private static final String SUCCESS = "success";
     private static final String FAILED = "failed";
 
@@ -162,7 +164,7 @@ public class TestingSupportController {
         produces = "application/json")
     public String getRPAJsonInformationForCaseData(
         @RequestBody CaseData caseData) throws JsonProcessingException {
-        return roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
+        return roboticsDataMapper.toRoboticsCaseData(caseData, getSystemUserToken()).toJsonString();
     }
 
     @PostMapping(
@@ -170,7 +172,7 @@ public class TestingSupportController {
         produces = "application/json")
     public String getRPAJsonInformationForSpecCaseData(
         @RequestBody CaseData caseData) throws JsonProcessingException {
-        return roboticsSpecDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
+        return roboticsSpecDataMapper.toRoboticsCaseData(caseData, getSystemUserToken()).toJsonString();
     }
 
     @PostMapping(
@@ -205,7 +207,7 @@ public class TestingSupportController {
     @GetMapping("/testing-support/{caseId}/trigger-trial-bundle")
     public ResponseEntity<String> getTrialBundleEvent(@PathVariable("caseId") Long caseId) {
         String responseMsg = SUCCESS;
-        var event = new BundleCreationTriggerEvent(caseId, BEARER_TOKEN);
+        var event = new BundleCreationTriggerEvent(caseId, BEARER_TOKEN.toString());
         try {
             bundleCreationTriggerEventHandler.sendBundleCreationTrigger(event);
         } catch (Exception e) {

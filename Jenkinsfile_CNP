@@ -136,6 +136,10 @@ withPipeline(type, product, component) {
     loadVaultSecrets(secrets)
   }
 
+  afterAlways('test') {
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/build/reports/jacoco/**'
+  }
+
   before('smoketest:preview') {
     env.URL = "https://civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.CIVIL_SERVICE_URL = "https://civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
@@ -154,7 +158,6 @@ withPipeline(type, product, component) {
       """
     }
 
-    yarnBuilder.yarn('yarn-update')
     yarnBuilder.yarn('install-dependencies')
     env.CIVIL_GENERAL_APPLICATIONS_URL = "https://ga-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.IDAM_API_URL = "https://idam-api.aat.platform.hmcts.net"
@@ -206,7 +209,6 @@ withPipeline(type, product, component) {
     env.CCD_DATA_STORE_URL = "https://civil-service-data-store-staging-aat.service.core-compute-aat.internal"
     env.DM_STORE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
     env.AAC_API_URL = "https://civil-service-manage-case-assignment-staging.aat.platform.hmcts.net"
-    yarnBuilder.yarn('yarn-update')
     yarnBuilder.yarn('install-dependencies')
   }
 

@@ -1,0 +1,9 @@
+{
+  "name": "Notice.AAA6.LiPQM.QueryRaisedByOtherParty.Defendant",
+  "role": "DEFENDANT",
+  "titleEn": "Important",
+  "titleCy": "Pwysig",
+  "descriptionEn": "<p class=\"govuk-body\">There has been a message sent on your case. <br> <a href=\"{QM_VIEW_MESSAGES_URL_CLICK}\" rel=\"noopener noreferrer\" class=\"govuk-link\">View your messages</a></p>",
+  "descriptionCy": "<p class=\"govuk-body\">Mae neges wedi’i hanfon ar eich achos. <br> <a href=\"{QM_VIEW_MESSAGES_URL_CLICK}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Gweld eich negeseuon</a></p>",
+  "timeToLive": "Click"
+}
