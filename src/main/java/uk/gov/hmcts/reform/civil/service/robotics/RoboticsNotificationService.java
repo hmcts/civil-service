@@ -18,7 +18,7 @@ import uk.gov.hmcts.reform.civil.sendgrid.SendGridClient;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.robotics.dto.RoboticsCaseDataDTO;
 import uk.gov.hmcts.reform.civil.service.robotics.exception.RoboticsDataException;
-import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForUnspec;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSpec;
 import uk.gov.hmcts.reform.civil.service.robotics.params.RoboticsEmailParams;
 
@@ -45,7 +45,7 @@ public class RoboticsNotificationService {
 
     private final SendGridClient sendGridClient;
     private final RoboticsEmailConfiguration roboticsEmailConfiguration;
-    private final RoboticsDataMapper roboticsDataMapper;
+    private final RoboticsDataMapperForUnspec roboticsDataMapper;
     private final RoboticsDataMapperForSpec roboticsDataMapperForSpec;
     private final FeatureToggleService toggleService;
 
