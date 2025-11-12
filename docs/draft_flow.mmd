@@ -1,0 +1,39 @@
+stateDiagram-v2
+  %% Draft to Submission
+  state "Single defendant representative covers all parties.\nOR 1v1 claim w…" as DRAFT_PATH_0
+  state "Two defendants, both represented by registered organisations.\nOR T…" as DRAFT_PATH_1
+  state "Only defendant is unrepresented." as DRAFT_PATH_2
+  state "Defendant 1 is unrepresented" as DRAFT_PATH_3
+  state "Defendant 2 is unrepresented" as DRAFT_PATH_4
+  state "Defendant 1 is unrepresented" as DRAFT_PATH_5
+  state "SPEC: Single defendant representative covers all parties.\nOR 1v1 claim w…" as SPEC_DRAFT_PATH_6
+  state "SPEC: Two defendants, both represented by registered organisations.\nOR T…" as SPEC_DRAFT_PATH_7
+  state "SPEC: Only defendant is unrepresented." as SPEC_DRAFT_PATH_8
+  state "SPEC: Defendant 1 is unrepresented" as SPEC_DRAFT_PATH_9
+  state "SPEC: Defendant 2 is unrepresented" as SPEC_DRAFT_PATH_10
+  state "SPEC: Defendant 1 is unrepresented" as SPEC_DRAFT_PATH_11
+  state "CLAIM_SUBMITTED (continues in Issue flow)" as DRAFT_FLOW_OUT_0
+  DRAFT --> DRAFT_PATH_0
+  DRAFT_PATH_0 --> DRAFT_FLOW_OUT_0 : Always
+  DRAFT --> DRAFT_PATH_1
+  DRAFT_PATH_1 --> DRAFT_FLOW_OUT_0 : Always
+  DRAFT --> DRAFT_PATH_2
+  DRAFT_PATH_2 --> DRAFT_FLOW_OUT_0 : Always
+  DRAFT --> DRAFT_PATH_3
+  DRAFT_PATH_3 --> DRAFT_FLOW_OUT_0 : Always
+  DRAFT --> DRAFT_PATH_4
+  DRAFT_PATH_4 --> DRAFT_FLOW_OUT_0 : Always
+  DRAFT --> DRAFT_PATH_5
+  DRAFT_PATH_5 --> DRAFT_FLOW_OUT_0 : Always
+  SPEC_DRAFT --> SPEC_DRAFT_PATH_6
+  SPEC_DRAFT_PATH_6 --> DRAFT_FLOW_OUT_0 : Always
+  SPEC_DRAFT --> SPEC_DRAFT_PATH_7
+  SPEC_DRAFT_PATH_7 --> DRAFT_FLOW_OUT_0 : Always
+  SPEC_DRAFT --> SPEC_DRAFT_PATH_8
+  SPEC_DRAFT_PATH_8 --> DRAFT_FLOW_OUT_0 : Always
+  SPEC_DRAFT --> SPEC_DRAFT_PATH_9
+  SPEC_DRAFT_PATH_9 --> DRAFT_FLOW_OUT_0 : Always
+  SPEC_DRAFT --> SPEC_DRAFT_PATH_10
+  SPEC_DRAFT_PATH_10 --> DRAFT_FLOW_OUT_0 : Always
+  SPEC_DRAFT --> SPEC_DRAFT_PATH_11
+  SPEC_DRAFT_PATH_11 --> DRAFT_FLOW_OUT_0 : Always
