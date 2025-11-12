@@ -5,11 +5,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import uk.gov.hmcts.reform.civil.config.FlowStateAllowedEventsConfig;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
+import uk.gov.hmcts.reform.civil.config.FlowStateAllowedEventsConfig;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -37,15 +37,15 @@ class AllowedEventsParityTest {
     @Autowired
     private FlowStateAllowedEventsConfig flowStateAllowedEventsConfig;
 
+    private static List<CaseEvent> toList(CaseEvent[] array) {
+        return Arrays.asList(array);
+    }
+
     @SuppressWarnings("unchecked")
     private Map<String, List<CaseEvent>> readStaticMap(String fieldName) throws Exception {
         Field f = FlowStateAllowedEventsConfig.class.getDeclaredField(fieldName);
         f.setAccessible(true);
         return (Map<String, List<CaseEvent>>) f.get(flowStateAllowedEventsConfig);
-    }
-
-    private static List<CaseEvent> toList(CaseEvent[] array) {
-        return Arrays.asList(array);
     }
 
     @Test
