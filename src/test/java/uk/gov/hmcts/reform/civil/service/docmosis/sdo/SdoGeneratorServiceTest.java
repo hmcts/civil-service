@@ -83,6 +83,7 @@ import uk.gov.hmcts.reform.civil.service.sdo.SdoNihlTemplateFieldService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoR2TrialTemplateFieldService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoSmallClaimsDirectionsService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoSmallClaimsTemplateFieldService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoMediationSectionService;
 import uk.gov.hmcts.reform.civil.utils.HearingMethodUtils;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
@@ -121,6 +122,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_S
     SdoDisposalTemplateService.class,
     SdoSmallClaimsDirectionsService.class,
     SdoSmallClaimsTemplateFieldService.class,
+    SdoMediationSectionService.class,
     SdoSmallClaimsDrhTemplateService.class,
     SdoSmallClaimsTemplateService.class,
     SdoR2TrialTemplateFieldService.class,

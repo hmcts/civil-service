@@ -26,11 +26,13 @@ class SdoSmallClaimsOrderDefaultsServiceTest {
     private SdoFeatureToggleService featureToggleService;
 
     private SdoSmallClaimsOrderDefaultsService service;
+    private SdoSmallClaimsNarrativeService narrativeService;
 
     @BeforeEach
     void setUp() {
         SdoJourneyToggleService journeyToggleService = new SdoJourneyToggleService(featureToggleService);
-        service = new SdoSmallClaimsOrderDefaultsService(deadlineService, journeyToggleService);
+        narrativeService = new SdoSmallClaimsNarrativeService(deadlineService);
+        service = new SdoSmallClaimsOrderDefaultsService(narrativeService, journeyToggleService);
 
         lenient().when(deadlineService.nextWorkingDayFromNowWeeks(anyInt()))
             .thenAnswer(invocation -> LocalDate.of(2025, 6, 1).plusWeeks(invocation.getArgument(0, Integer.class)));
@@ -54,5 +56,7 @@ class SdoSmallClaimsOrderDefaultsServiceTest {
         assertThat(result.getSmallClaimsDocuments()).isNotNull();
         assertThat(result.getSmallClaimsMediationSectionStatement()).isNotNull();
         assertThat(result.getSmallClaimsCreditHire()).isNotNull();
+        assertThat(result.getSmallClaimsFlightDelay()).isNotNull();
+        assertThat(result.getSmallClaimsNotes()).isNotNull();
     }
 }

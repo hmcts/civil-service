@@ -15,7 +15,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class SdoSmallClaimsTemplateFieldServiceTest {
 
-    private final SdoSmallClaimsTemplateFieldService service = new SdoSmallClaimsTemplateFieldService();
+    private final SdoMediationSectionService mediationSectionService = new SdoMediationSectionService();
+    private final SdoSmallClaimsTemplateFieldService service =
+        new SdoSmallClaimsTemplateFieldService(mediationSectionService);
 
     @Test
     void shouldFormatHearingTimeLabels() {

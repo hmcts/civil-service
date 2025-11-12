@@ -13,6 +13,8 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
+import uk.gov.hmcts.reform.civil.model.dmnacourttasklocation.TaskManagementLocationTab;
+import uk.gov.hmcts.reform.civil.model.dmnacourttasklocation.TaskManagementLocationTypes;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.camunda.UpdateWaCourtLocationsService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
@@ -198,5 +200,22 @@ class SdoLocationServiceTest {
         DynamicList list = service.buildAlternativeCourtLocations(List.of(location1, location2));
 
         assertThat(list.getListItems()).extracting(DynamicListElement::getCode).containsExactly("123", "456");
+    }
+
+    @Test
+    void shouldClearWaMetadataFieldsOnBuilder() {
+        CaseData caseData = CaseData.builder()
+            .taskManagementLocations(TaskManagementLocationTypes.builder().build())
+            .taskManagementLocationsTab(TaskManagementLocationTab.builder().build())
+            .caseManagementLocationTab(TaskManagementLocationTab.builder().build())
+            .build();
+
+        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
+        service.clearWaLocationMetadata(builder);
+
+        CaseData cleared = builder.build();
+        assertThat(cleared.getTaskManagementLocations()).isNull();
+        assertThat(cleared.getTaskManagementLocationsTab()).isNull();
+        assertThat(cleared.getCaseManagementLocationTab()).isNull();
     }
 }

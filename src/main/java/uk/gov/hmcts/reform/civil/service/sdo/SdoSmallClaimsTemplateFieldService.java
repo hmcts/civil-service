@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.sdo;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethodTelephoneHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethodVideoConferenceHearing;
@@ -17,10 +18,12 @@ import java.util.Optional;
  * and other narrative fields so builders remain orchestration-only.
  */
 @Service
+@RequiredArgsConstructor
 public class SdoSmallClaimsTemplateFieldService {
 
     private static final String MINUTES = " minutes";
     private static final String OTHER = "Other";
+    private final SdoMediationSectionService mediationSectionService;
 
     public String getHearingTimeLabel(CaseData caseData) {
         SmallClaimsHearing hearing = caseData.getSmallClaimsHearing();
@@ -55,24 +58,28 @@ public class SdoSmallClaimsTemplateFieldService {
     }
 
     public boolean showMediationSection(CaseData caseData, boolean carmEnabled) {
-        return caseData.getSmallClaimsMediationSectionStatement() != null
-            && getMediationText(caseData) != null
-            && carmEnabled;
+        return standardMediation(caseData, carmEnabled).show();
     }
 
     public String getMediationText(CaseData caseData) {
-        SmallClaimsMediation mediation = caseData.getSmallClaimsMediationSectionStatement();
-        return mediation != null ? mediation.getInput() : null;
+        return standardMediation(caseData, true).text();
     }
 
     public boolean showMediationSectionDrh(CaseData caseData, boolean carmEnabled) {
-        return caseData.getSdoR2SmallClaimsMediationSectionStatement() != null
-            && getMediationTextDrh(caseData) != null
-            && carmEnabled;
+        return drhMediation(caseData, carmEnabled).show();
     }
 
     public String getMediationTextDrh(CaseData caseData) {
+        return drhMediation(caseData, true).text();
+    }
+
+    private SdoMediationSectionService.MediationSection standardMediation(CaseData caseData, boolean carmEnabled) {
+        SmallClaimsMediation mediation = caseData.getSmallClaimsMediationSectionStatement();
+        return mediationSectionService.resolve(mediation, carmEnabled, SmallClaimsMediation::getInput);
+    }
+
+    private SdoMediationSectionService.MediationSection drhMediation(CaseData caseData, boolean carmEnabled) {
         SdoR2SmallClaimsMediation mediation = caseData.getSdoR2SmallClaimsMediationSectionStatement();
-        return mediation != null ? mediation.getInput() : null;
+        return mediationSectionService.resolve(mediation, carmEnabled, SdoR2SmallClaimsMediation::getInput);
     }
 }

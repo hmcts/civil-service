@@ -7,22 +7,35 @@ import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 
 import java.time.LocalDate;
 
+/**
+ * Centralises the working-day aware date maths shared across the DJ disposal, trial, and specialist
+ * direction builders so each collaborator can focus on narrative construction.
+ */
 @Service
 @RequiredArgsConstructor
-public class DjTrialDeadlineService {
+public class DjDeadlineService {
 
     private final WorkingDayIndicator workingDayIndicator;
     private final DeadlinesCalculator deadlinesCalculator;
 
     public LocalDate nextWorkingDayInWeeks(int weeks) {
-        return workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(weeks));
+        return nextWorkingDay(LocalDate.now().plusWeeks(weeks));
+    }
+
+    public LocalDate nextWorkingDayInDays(int days) {
+        return nextWorkingDay(LocalDate.now().plusDays(days));
+    }
+
+    public LocalDate nextWorkingDay(LocalDate date) {
+        return workingDayIndicator.getNextWorkingDay(date);
     }
 
     public LocalDate weeksFromNow(int weeks) {
         return LocalDate.now().plusWeeks(weeks);
     }
 
-    public LocalDate plusWorkingDays(int workingDays) {
+    public LocalDate workingDaysFromNow(int workingDays) {
         return deadlinesCalculator.plusWorkingDays(LocalDate.now(), workingDays);
     }
 }
+

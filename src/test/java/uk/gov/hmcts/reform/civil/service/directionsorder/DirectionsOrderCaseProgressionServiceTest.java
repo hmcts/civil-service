@@ -82,5 +82,33 @@ class DirectionsOrderCaseProgressionServiceTest {
         service.updateWaLocationsIfEnabled(caseData, builder, AUTH);
 
         verify(locationService, never()).updateWaLocationsIfRequired(any(), any(), any());
+        verify(locationService).clearWaLocationMetadata(builder);
+    }
+
+    @Test
+    void shouldApplyRoutingAndUpdateWaMetadata() {
+        CaseData caseData = CaseData.builder().build();
+        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
+        when(journeyToggleService.resolveEaCourtLocation(caseData)).thenReturn(YesOrNo.YES);
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(true);
+
+        service.applyCaseProgressionRouting(caseData, builder, AUTH);
+
+        ArgumentCaptor<CaseData.CaseDataBuilder<?, ?>> captor = ArgumentCaptor.forClass(CaseData.CaseDataBuilder.class);
+        verify(locationService).updateWaLocationsIfRequired(eq(caseData), captor.capture(), eq(AUTH));
+        assertThat(captor.getValue()).isSameAs(builder);
+        assertThat(builder.build().getEaCourtLocation()).isEqualTo(YesOrNo.YES);
+    }
+
+    @Test
+    void shouldClearWaMetadataWhenRoutingDisabled() {
+        CaseData caseData = CaseData.builder().build();
+        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(false);
+
+        service.applyCaseProgressionRouting(caseData, builder, AUTH);
+
+        verify(locationService).clearWaLocationMetadata(builder);
+        verify(locationService, never()).updateWaLocationsIfRequired(any(), any(), any());
     }
 }

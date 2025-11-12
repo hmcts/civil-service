@@ -38,12 +38,11 @@ public class SdoSubmissionService {
             .hearingNotes(getHearingNotes(caseData));
 
         moveGeneratedDocument(caseData, builder);
-        directionsOrderCaseProgressionService.applyEaCourtLocation(caseData, builder);
+        directionsOrderCaseProgressionService.applyCaseProgressionRouting(caseData, builder, authToken);
         trimMethodLocations(caseData, builder);
         updateSmallClaimsHearing(caseData, builder);
         updateClaimsTrack(caseData, builder);
         updateTrialLocations(caseData, builder);
-        directionsOrderCaseProgressionService.updateWaLocationsIfEnabled(caseData, builder, authToken);
 
         return builder.build();
     }

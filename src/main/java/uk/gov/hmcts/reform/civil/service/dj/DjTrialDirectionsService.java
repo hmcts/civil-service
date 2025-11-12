@@ -13,7 +13,7 @@ import java.time.LocalDate;
 public class DjTrialDirectionsService {
 
     private final DjTrialNarrativeService trialNarrativeService;
-    private final DjTrialDeadlineService trialDeadlineService;
+    private final DjDeadlineService trialDeadlineService;
     private final DjSpecialistDirectionsService specialistDirectionsService;
     private final DjWelshLanguageService welshLanguageService;
 
@@ -25,7 +25,7 @@ public class DjTrialDirectionsService {
         caseDataBuilder.trialHearingTrialDJ(trialNarrativeService.buildTrialHearingTrial());
         caseDataBuilder.trialHearingTimeDJ(trialNarrativeService.buildTrialHearingTime());
 
-        LocalDate trialOrderDeadline = trialDeadlineService.plusWorkingDays(5);
+        LocalDate trialOrderDeadline = trialDeadlineService.workingDaysFromNow(5);
         caseDataBuilder.trialOrderMadeWithoutHearingDJ(
             TrialOrderMadeWithoutHearingDJ.builder()
                 .input(welshLanguageService.buildOrderMadeWithoutHearingText(trialOrderDeadline))

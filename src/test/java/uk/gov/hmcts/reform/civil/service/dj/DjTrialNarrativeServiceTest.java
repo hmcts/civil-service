@@ -22,7 +22,7 @@ class DjTrialNarrativeServiceTest {
     private static final String JUDGE = "Recorder Blue";
 
     @Mock
-    private DjTrialDeadlineService deadlineService;
+    private DjDeadlineService deadlineService;
 
     private DjTrialNarrativeService service;
 

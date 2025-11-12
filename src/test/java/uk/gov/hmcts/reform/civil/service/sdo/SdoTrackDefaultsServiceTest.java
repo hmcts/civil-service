@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.IncludeInOrderToggle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2FastTrackAltDisputeResolution;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoFastTrackSpecialistDirectionsService;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -28,6 +29,8 @@ class SdoTrackDefaultsServiceTest {
 
     private SdoTrackDefaultsService service;
     private SdoJourneyToggleService journeyToggleService;
+    private SdoChecklistService checklistService;
+    private SdoJudgementDeductionService judgementDeductionService;
     private SdoDisposalOrderDefaultsService disposalOrderDefaultsService;
     private SdoFastTrackOrderDefaultsService fastTrackOrderDefaultsService;
     private SdoSmallClaimsOrderDefaultsService smallClaimsOrderDefaultsService;
@@ -37,18 +40,32 @@ class SdoTrackDefaultsServiceTest {
     @BeforeEach
     void setUp() {
         journeyToggleService = new SdoJourneyToggleService(featureToggleService);
-        disposalOrderDefaultsService = new SdoDisposalOrderDefaultsService(deadlineService);
-        fastTrackOrderDefaultsService = new SdoFastTrackOrderDefaultsService(deadlineService);
-        smallClaimsOrderDefaultsService = new SdoSmallClaimsOrderDefaultsService(deadlineService, journeyToggleService);
+        checklistService = new SdoChecklistService(journeyToggleService);
+        judgementDeductionService = new SdoJudgementDeductionService();
+        disposalOrderDefaultsService = new SdoDisposalOrderDefaultsService(
+            new SdoDisposalNarrativeService(deadlineService)
+        );
+        SdoFastTrackSpecialistDirectionsService specialistDirectionsService =
+            new SdoFastTrackSpecialistDirectionsService(deadlineService);
+        fastTrackOrderDefaultsService = new SdoFastTrackOrderDefaultsService(
+            deadlineService,
+            specialistDirectionsService
+        );
+        smallClaimsOrderDefaultsService = new SdoSmallClaimsOrderDefaultsService(
+            new SdoSmallClaimsNarrativeService(deadlineService),
+            journeyToggleService
+        );
         expertEvidenceFieldsService = new SdoExpertEvidenceFieldsService(deadlineService);
         disclosureOfDocumentsFieldsService = new SdoDisclosureOfDocumentsFieldsService(deadlineService);
         service = new SdoTrackDefaultsService(
             journeyToggleService,
+            checklistService,
             disposalOrderDefaultsService,
             fastTrackOrderDefaultsService,
             smallClaimsOrderDefaultsService,
             expertEvidenceFieldsService,
-            disclosureOfDocumentsFieldsService
+            disclosureOfDocumentsFieldsService,
+            judgementDeductionService
         );
 
         lenient().when(deadlineService.nextWorkingDayFromNowWeeks(anyInt()))

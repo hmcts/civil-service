@@ -50,6 +50,10 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DjAuthorisationFieldService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DjBundleFieldService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DjDirectionsToggleService;
+import uk.gov.hmcts.reform.civil.service.dj.DjCreditHireDirectionsService;
+import uk.gov.hmcts.reform.civil.service.dj.DjBuildingDisputeDirectionsService;
+import uk.gov.hmcts.reform.civil.service.dj.DjClinicalDirectionsService;
+import uk.gov.hmcts.reform.civil.service.dj.DjRoadTrafficAccidentDirectionsService;
 import uk.gov.hmcts.reform.civil.service.dj.DjOrderDetailsService;
 import uk.gov.hmcts.reform.civil.service.dj.DjValidationService;
 import uk.gov.hmcts.reform.civil.service.dj.DjDocumentService;
@@ -57,13 +61,13 @@ import uk.gov.hmcts.reform.civil.service.dj.DjNarrativeService;
 import uk.gov.hmcts.reform.civil.service.dj.DjSubmissionService;
 import uk.gov.hmcts.reform.civil.service.dj.DjLocationAndToggleService;
 import uk.gov.hmcts.reform.civil.service.dj.DjDisposalDirectionsService;
-import uk.gov.hmcts.reform.civil.service.dj.DjSpecialistDeadlineService;
+import uk.gov.hmcts.reform.civil.service.dj.DjDisposalNarrativeService;
+import uk.gov.hmcts.reform.civil.service.dj.DjDeadlineService;
 import uk.gov.hmcts.reform.civil.service.dj.DjSpecialistDirectionsService;
 import uk.gov.hmcts.reform.civil.service.dj.DjSpecialistNarrativeService;
 import uk.gov.hmcts.reform.civil.service.dj.DjWelshLanguageService;
 import uk.gov.hmcts.reform.civil.service.dj.DjTrialDirectionsService;
 import uk.gov.hmcts.reform.civil.service.dj.DjTrialNarrativeService;
-import uk.gov.hmcts.reform.civil.service.dj.DjTrialDeadlineService;
 import uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderParticipantService;
 import uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderCaseProgressionService;
 import uk.gov.hmcts.reform.civil.service.camunda.UpdateWaCourtLocationsService;
@@ -127,17 +131,21 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
     DjDirectionsToggleService.class,
     DjDisposalDirectionsService.class,
     DjSpecialistDirectionsService.class,
+    DjBuildingDisputeDirectionsService.class,
+    DjClinicalDirectionsService.class,
+    DjRoadTrafficAccidentDirectionsService.class,
     DjSpecialistNarrativeService.class,
-    DjSpecialistDeadlineService.class,
+    DjCreditHireDirectionsService.class,
     DjWelshLanguageService.class,
     DjTrialNarrativeService.class,
-    DjTrialDeadlineService.class,
+    DjDeadlineService.class,
     DjTrialDirectionsService.class,
     DjOrderDetailsService.class,
     DjValidationService.class,
     DjDocumentService.class,
     DjNarrativeService.class,
     DjSubmissionService.class,
+    DjDisposalNarrativeService.class,
     SdoLocationService.class,
     SdoFeatureToggleService.class,
     SdoJourneyToggleService.class,

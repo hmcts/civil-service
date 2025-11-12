@@ -69,8 +69,7 @@ class DjSubmissionServiceTest {
             any(),
             eq("caseManagementOrders")
         );
-        verify(caseProgressionService).applyEaCourtLocation(eq(caseData), any());
-        verify(caseProgressionService).updateWaLocationsIfEnabled(eq(caseData), any(), eq(AUTH_TOKEN));
+        verify(caseProgressionService).applyCaseProgressionRouting(eq(caseData), any(), eq(AUTH_TOKEN));
     }
 
     @Test
@@ -84,12 +83,12 @@ class DjSubmissionServiceTest {
             CaseData.CaseDataBuilder<?, ?> builder = invocation.getArgument(1);
             builder.eaCourtLocation(YesOrNo.YES);
             return null;
-        }).when(caseProgressionService).applyEaCourtLocation(eq(caseData), any());
+        }).when(caseProgressionService).applyCaseProgressionRouting(eq(caseData), any(), eq(AUTH_TOKEN));
 
         CaseData result = service.prepareSubmission(caseData, AUTH_TOKEN);
 
         assertThat(result.getEaCourtLocation()).isEqualTo(YesOrNo.YES);
-        verify(caseProgressionService).updateWaLocationsIfEnabled(eq(caseData), any(), eq(AUTH_TOKEN));
+        verify(caseProgressionService).applyCaseProgressionRouting(eq(caseData), any(), eq(AUTH_TOKEN));
     }
 
     @Test
@@ -101,8 +100,7 @@ class DjSubmissionServiceTest {
 
         service.prepareSubmission(caseData, AUTH_TOKEN);
 
-        verify(caseProgressionService).applyEaCourtLocation(eq(caseData), any());
-        verify(caseProgressionService).updateWaLocationsIfEnabled(eq(caseData), any(), eq(AUTH_TOKEN));
+        verify(caseProgressionService).applyCaseProgressionRouting(eq(caseData), any(), eq(AUTH_TOKEN));
         verifyNoMoreInteractions(caseProgressionService);
     }
 }

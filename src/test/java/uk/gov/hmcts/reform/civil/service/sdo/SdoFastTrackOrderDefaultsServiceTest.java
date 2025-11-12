@@ -22,10 +22,12 @@ class SdoFastTrackOrderDefaultsServiceTest {
     private SdoDeadlineService deadlineService;
 
     private SdoFastTrackOrderDefaultsService service;
+    private SdoFastTrackSpecialistDirectionsService specialistDirectionsService;
 
     @BeforeEach
     void setUp() {
-        service = new SdoFastTrackOrderDefaultsService(deadlineService);
+        specialistDirectionsService = new SdoFastTrackSpecialistDirectionsService(deadlineService);
+        service = new SdoFastTrackOrderDefaultsService(deadlineService, specialistDirectionsService);
         lenient().when(deadlineService.nextWorkingDayFromNowWeeks(anyInt()))
             .thenAnswer(invocation -> LocalDate.of(2025, 3, 1).plusWeeks(invocation.getArgument(0, Integer.class)));
         lenient().when(deadlineService.nextWorkingDayFromNowDays(anyInt()))

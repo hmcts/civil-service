@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.civil.enums.sdo.AddOrRemoveToggle;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.SdoDJR2TrialCreditHire;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialBuildingDispute;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHousingDisrepair;
@@ -13,65 +12,87 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialPersonalInjury;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialRoadTrafficAccident;
 
 import java.time.LocalDate;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class DjSpecialistNarrativeServiceTest {
 
     @Mock
-    private DjSpecialistDeadlineService deadlineService;
+    private DjBuildingDisputeDirectionsService buildingDisputeDirectionsService;
+    @Mock
+    private DjClinicalDirectionsService clinicalDirectionsService;
+    @Mock
+    private DjRoadTrafficAccidentDirectionsService roadTrafficAccidentDirectionsService;
+    @Mock
+    private DjCreditHireDirectionsService creditHireDirectionsService;
 
     private DjSpecialistNarrativeService service;
 
     @BeforeEach
     void setUp() {
-        service = new DjSpecialistNarrativeService(deadlineService);
-        when(deadlineService.nextWorkingDayInWeeks(anyInt()))
-            .thenAnswer(invocation -> LocalDate.of(2025, 1, 1)
-                .plusWeeks(invocation.getArgument(0, Integer.class)));
+        service = new DjSpecialistNarrativeService(
+            buildingDisputeDirectionsService,
+            clinicalDirectionsService,
+            roadTrafficAccidentDirectionsService,
+            creditHireDirectionsService
+        );
     }
 
     @Test
     void shouldBuildBuildingDisputeWithCalculatedDates() {
+        TrialBuildingDispute expected = TrialBuildingDispute.builder()
+            .date1(LocalDate.now())
+            .build();
+        when(buildingDisputeDirectionsService.buildTrialBuildingDispute()).thenReturn(expected);
+
         TrialBuildingDispute dispute = service.buildTrialBuildingDispute();
 
-        assertThat(dispute.getDate1()).isEqualTo(LocalDate.of(2025, 1, 1).plusWeeks(10));
-        assertThat(dispute.getDate2()).isEqualTo(LocalDate.of(2025, 1, 1).plusWeeks(12));
-        assertThat(dispute.getInput1()).contains("Scott Schedule");
-        verify(deadlineService).nextWorkingDayInWeeks(10);
-        verify(deadlineService).nextWorkingDayInWeeks(12);
+        assertThat(dispute).isSameAs(expected);
+        verify(buildingDisputeDirectionsService).buildTrialBuildingDispute();
     }
 
     @Test
     void shouldBuildCreditHireDirectionsWithToggles() {
+        SdoDJR2TrialCreditHire expected = SdoDJR2TrialCreditHire.builder().build();
+        when(creditHireDirectionsService.buildCreditHireDirections()).thenReturn(expected);
+
         SdoDJR2TrialCreditHire creditHire = service.buildCreditHireDirections();
 
-        assertThat(creditHire.getDetailsShowToggle()).isEqualTo(List.of(AddOrRemoveToggle.ADD));
-        assertThat(creditHire.getDate3()).isEqualTo(LocalDate.of(2025, 1, 1).plusWeeks(12));
-        assertThat(creditHire.getDate4()).isEqualTo(LocalDate.of(2025, 1, 1).plusWeeks(14));
-        assertThat(creditHire.getSdoDJR2TrialCreditHireDetails().getDate1())
-            .isEqualTo(LocalDate.of(2025, 1, 1).plusWeeks(8));
+        assertThat(creditHire).isSameAs(expected);
+        verify(creditHireDirectionsService).buildCreditHireDirections();
+        verifyNoMoreInteractions(creditHireDirectionsService);
     }
 
     @Test
     void shouldBuildPersonalInjuryDirections() {
+        TrialPersonalInjury expected = TrialPersonalInjury.builder().date2(LocalDate.now()).build();
+        when(clinicalDirectionsService.buildTrialPersonalInjury()).thenReturn(expected);
+
         TrialPersonalInjury personalInjury = service.buildTrialPersonalInjury();
 
-        assertThat(personalInjury.getDate2()).isEqualTo(LocalDate.of(2025, 1, 1).plusWeeks(8));
-        assertThat(personalInjury.getInput1()).contains("expert evidence");
+        assertThat(personalInjury).isSameAs(expected);
+        verify(clinicalDirectionsService).buildTrialPersonalInjury();
     }
 
     @Test
     void shouldBuildRtaAndHousingDisrepairDirections() {
+        TrialRoadTrafficAccident expectedRta = TrialRoadTrafficAccident.builder().build();
+        TrialHousingDisrepair expectedHousing = TrialHousingDisrepair.builder().build();
+        when(roadTrafficAccidentDirectionsService.buildTrialRoadTrafficAccident()).thenReturn(expectedRta);
+        when(buildingDisputeDirectionsService.buildTrialHousingDisrepair()).thenReturn(expectedHousing);
+
         TrialRoadTrafficAccident rta = service.buildTrialRoadTrafficAccident();
         TrialHousingDisrepair housing = service.buildTrialHousingDisrepair();
 
-        assertThat(rta.getDate1()).isEqualTo(LocalDate.of(2025, 1, 1).plusWeeks(4));
-        assertThat(housing.getDate2()).isEqualTo(LocalDate.of(2025, 1, 1).plusWeeks(12));
+        assertThat(rta).isSameAs(expectedRta);
+        assertThat(housing).isSameAs(expectedHousing);
+        verify(roadTrafficAccidentDirectionsService).buildTrialRoadTrafficAccident();
+        verify(buildingDisputeDirectionsService).buildTrialHousingDisrepair();
     }
 }

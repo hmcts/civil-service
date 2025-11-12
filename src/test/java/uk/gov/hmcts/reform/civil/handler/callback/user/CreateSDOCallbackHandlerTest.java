@@ -131,17 +131,21 @@ import uk.gov.hmcts.reform.civil.service.camunda.UpdateWaCourtLocationsService;
 import uk.gov.hmcts.reform.civil.service.docmosis.sdo.SdoGeneratorService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoCaseClassificationService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoChecklistService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoDisposalGuardService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoDeadlineService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoDocumentService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoDisposalOrderDefaultsService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoDisposalNarrativeService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoDisclosureOfDocumentsFieldsService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoExpertEvidenceFieldsService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoDrhFieldsService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoFastTrackOrderDefaultsService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoFastTrackSpecialistDirectionsService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoFeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoHearingPreparationService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoJourneyToggleService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoJudgementDeductionService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoLocationService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoNihlFieldsService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoOrderDetailsService;
@@ -151,6 +155,7 @@ import uk.gov.hmcts.reform.civil.service.sdo.SdoSubmissionService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoTrackDefaultsService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoValidationService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoSmallClaimsOrderDefaultsService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoSmallClaimsNarrativeService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingSubChannel;
 
@@ -246,12 +251,17 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackH
     DirectionsOrderCaseProgressionService.class,
     SdoDeadlineService.class,
     SdoJourneyToggleService.class,
+    SdoChecklistService.class,
     SdoDisposalGuardService.class,
     SdoDisposalOrderDefaultsService.class,
+    SdoDisposalNarrativeService.class,
     SdoFastTrackOrderDefaultsService.class,
+    SdoFastTrackSpecialistDirectionsService.class,
     SdoSmallClaimsOrderDefaultsService.class,
+    SdoSmallClaimsNarrativeService.class,
     SdoExpertEvidenceFieldsService.class,
     SdoDisclosureOfDocumentsFieldsService.class,
+    SdoJudgementDeductionService.class,
     SdoTrackDefaultsService.class,
     SdoOrderDetailsService.class,
     SdoPrePopulateService.class,

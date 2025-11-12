@@ -19,8 +19,11 @@ import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoChecklistService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoDeadlineService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoDrhFieldsService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoFastTrackSpecialistDirectionsService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoJudgementDeductionService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoNihlFieldsService;
 
 import java.math.BigDecimal;
@@ -67,10 +70,20 @@ class SdoPrePopulateServiceTest {
     void setUp() {
         deadlineService = new SdoDeadlineService(deadlinesCalculator);
         SdoJourneyToggleService journeyToggleService = new SdoJourneyToggleService(featureToggleService);
-        SdoDisposalOrderDefaultsService disposalOrderDefaultsService = new SdoDisposalOrderDefaultsService(deadlineService);
-        SdoFastTrackOrderDefaultsService fastTrackOrderDefaultsService = new SdoFastTrackOrderDefaultsService(deadlineService);
+        SdoChecklistService checklistService = new SdoChecklistService(journeyToggleService);
+        SdoJudgementDeductionService judgementDeductionService = new SdoJudgementDeductionService();
+        SdoDisposalOrderDefaultsService disposalOrderDefaultsService = new SdoDisposalOrderDefaultsService(
+            new SdoDisposalNarrativeService(deadlineService)
+        );
+        SdoFastTrackSpecialistDirectionsService fastTrackSpecialistDirectionsService =
+            new SdoFastTrackSpecialistDirectionsService(deadlineService);
+        SdoFastTrackOrderDefaultsService fastTrackOrderDefaultsService =
+            new SdoFastTrackOrderDefaultsService(deadlineService, fastTrackSpecialistDirectionsService);
         SdoSmallClaimsOrderDefaultsService smallClaimsOrderDefaultsService =
-            new SdoSmallClaimsOrderDefaultsService(deadlineService, journeyToggleService);
+            new SdoSmallClaimsOrderDefaultsService(
+                new SdoSmallClaimsNarrativeService(deadlineService),
+                journeyToggleService
+            );
 
         SdoExpertEvidenceFieldsService expertEvidenceFieldsService = new SdoExpertEvidenceFieldsService(deadlineService);
         SdoDisclosureOfDocumentsFieldsService disclosureOfDocumentsFieldsService =
@@ -78,11 +91,13 @@ class SdoPrePopulateServiceTest {
 
         trackDefaultsService = new SdoTrackDefaultsService(
             journeyToggleService,
+            checklistService,
             disposalOrderDefaultsService,
             fastTrackOrderDefaultsService,
             smallClaimsOrderDefaultsService,
             expertEvidenceFieldsService,
-            disclosureOfDocumentsFieldsService
+            disclosureOfDocumentsFieldsService,
+            judgementDeductionService
         );
         hearingPreparationService = new SdoHearingPreparationService(
             locationHelper,

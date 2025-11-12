@@ -19,7 +19,7 @@ public class DjTrialNarrativeService {
 
     private static final List<DateToShowToggle> DATE_TO_SHOW = List.of(DateToShowToggle.SHOW);
 
-    private final DjTrialDeadlineService deadlineService;
+    private final DjDeadlineService deadlineService;
 
     public TrialHearingJudgesRecital buildJudgesRecital(String judgeNameTitle) {
         return TrialHearingJudgesRecital.builder()

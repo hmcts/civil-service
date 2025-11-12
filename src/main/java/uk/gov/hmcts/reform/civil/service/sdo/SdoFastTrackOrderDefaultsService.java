@@ -6,21 +6,13 @@ import uk.gov.hmcts.reform.civil.enums.sdo.AddOrRemoveToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.DateToShowToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackTrialBundleType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackBuildingDispute;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackClinicalNegligence;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackCreditHire;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHousingDisrepair;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackNotes;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackOrderWithoutJudgement;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackPersonalInjury;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackRoadTrafficAccident;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackSchedulesOfLoss;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackTrial;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2FastTrackCreditHire;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2FastTrackCreditHireDetails;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictNoOfPagesDetails;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictNoOfWitnessDetails;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictPages;
@@ -41,11 +33,6 @@ import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantFastTrack.RESTR
 import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantFastTrack.RESTRICT_WITNESS_TEXT;
 import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantFastTrack.STATEMENT_WITNESS;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
-import static uk.gov.hmcts.reform.civil.service.sdo.SdoTrackOrderText.CLAIMANT_EVIDENCE_TEXT;
-import static uk.gov.hmcts.reform.civil.service.sdo.SdoTrackOrderText.LATER_THAN_FOUR_PM_TEXT;
-import static uk.gov.hmcts.reform.civil.service.sdo.SdoTrackOrderText.PARTIES_LIASE_TEXT;
-import static uk.gov.hmcts.reform.civil.service.sdo.SdoTrackOrderText.WITNESS_STATEMENT;
-
 @Service
 @RequiredArgsConstructor
 public class SdoFastTrackOrderDefaultsService {
@@ -53,6 +40,7 @@ public class SdoFastTrackOrderDefaultsService {
     private static final List<DateToShowToggle> DATE_TO_SHOW_TRUE = List.of(DateToShowToggle.SHOW);
 
     private final SdoDeadlineService sdoDeadlineService;
+    private final SdoFastTrackSpecialistDirectionsService specialistDirectionsService;
 
     public void populateFastTrackOrderDetails(CaseData.CaseDataBuilder<?, ?> updatedData) {
         FastTrackJudgesRecital tempFastTrackJudgesRecital = FastTrackJudgesRecital.builder()
@@ -133,123 +121,7 @@ public class SdoFastTrackOrderDefaultsService {
             .build();
 
         updatedData.fastTrackOrderWithoutJudgement(tempFastTrackOrderWithoutJudgement);
-
-        FastTrackBuildingDispute tempFastTrackBuildingDispute = FastTrackBuildingDispute.builder()
-            .input1("The claimant must prepare a Scott Schedule of the defects, items of damage, "
-                        + "or any other relevant matters")
-            .input2("The columns should be headed:\n"
-                        + "  •  Item\n"
-                        + "  •  Alleged defect\n"
-                        + "  •  Claimant’s costing\n"
-                        + "  •  Defendant’s response\n"
-                        + "  •  Defendant’s costing\n"
-                        + "  •  Reserved for Judge’s use")
-            .input3("The claimant must upload to the Digital Portal the Scott Schedule with the relevant columns"
-                        + " completed by 4pm on")
-            .date1(sdoDeadlineService.nextWorkingDayFromNowWeeks(10))
-            .input4("The defendant must upload to the Digital Portal an amended version of the Scott Schedule "
-                        + "with the relevant columns in response completed by 4pm on")
-            .date2(sdoDeadlineService.nextWorkingDayFromNowWeeks(12))
-            .build();
-
-        updatedData.fastTrackBuildingDispute(tempFastTrackBuildingDispute).build();
-
-        FastTrackClinicalNegligence tempFastTrackClinicalNegligence = FastTrackClinicalNegligence.builder()
-            .input1("Documents should be retained as follows:")
-            .input2("a) The parties must retain all electronically stored documents relating to the issues in this "
-                        + "claim.")
-            .input3("b) the defendant must retain the original clinical notes relating to the issues in this claim. "
-                        + "The defendant must give facilities for inspection by the claimant, the claimant's legal "
-                        + "advisers and experts of these original notes on 7 days written notice.")
-            .input4("c) Legible copies of the medical and educational records of the claimant "
-                        + "are to be placed in a separate paginated bundle by the claimant's "
-                        + "solicitors and kept up to date. All references to medical notes are to be made by reference "
-                        + "to the pages in that bundle.")
-            .build();
-
-        updatedData.fastTrackClinicalNegligence(tempFastTrackClinicalNegligence).build();
-
-        List<AddOrRemoveToggle> addOrRemoveToggleList = List.of(AddOrRemoveToggle.ADD);
-        SdoR2FastTrackCreditHireDetails tempSdoR2FastTrackCreditHireDetails = SdoR2FastTrackCreditHireDetails.builder()
-            .input2("The claimant must upload to the Digital Portal a witness statement addressing\n"
-                        + "a) the need to hire a replacement vehicle; and\n"
-                        + "b) impecuniosity")
-            .date1(sdoDeadlineService.nextWorkingDayFromNowWeeks(4))
-            .input3("A failure to comply with the paragraph above will result in the claimant being debarred from "
-                        + "asserting need or relying on impecuniosity as the case may be at the final hearing, "
-                        + "save with permission of the Trial Judge.")
-            .input4(PARTIES_LIASE_TEXT + LATER_THAN_FOUR_PM_TEXT)
-            .date2(sdoDeadlineService.nextWorkingDayFromNowWeeks(6))
-            .build();
-
-        SdoR2FastTrackCreditHire tempSdoR2FastTrackCreditHire = SdoR2FastTrackCreditHire.builder()
-            .input1("If impecuniosity is alleged by the claimant and not admitted by the defendant, the claimant's "
-                        + "disclosure as ordered earlier in this Order must include:\n"
-                        + "a) Evidence of all income from all sources for a period of 3 months prior to the "
-                        + "commencement of hire until the earlier of:\n "
-                        + "     i) 3 months after cessation of hire\n"
-                        + "     ii) the repair or replacement of the claimant's vehicle\n"
-                        + "b) Copies of all bank, credit card, and saving account statements for a period of 3 months "
-                        + "prior to the commencement of hire until the earlier of:\n"
-                        + "     i) 3 months after cessation of hire\n"
-                        + "     ii) the repair or replacement of the claimant's vehicle\n"
-                        + "c) Evidence of any loan, overdraft or other credit facilities available to the claimant.")
-            .input5("If the parties fail to agree basic hire rates pursuant to the paragraph above, "
-                        + "each party may rely upon written evidence by way of witness statement of one witness to"
-                        + " provide evidence of basic hire rates available within the claimant's geographical location,"
-                        + " from a mainstream supplier, or a local reputable supplier if none is available.")
-            .input6("The defendant's evidence is to be uploaded to the Digital Portal by 4pm on")
-            .date3(sdoDeadlineService.nextWorkingDayFromNowWeeks(8))
-            .input7(CLAIMANT_EVIDENCE_TEXT)
-            .date4(sdoDeadlineService.nextWorkingDayFromNowWeeks(10))
-            .input8(WITNESS_STATEMENT)
-            .detailsShowToggle(addOrRemoveToggleList)
-            .sdoR2FastTrackCreditHireDetails(tempSdoR2FastTrackCreditHireDetails)
-            .build();
-
-        updatedData.sdoR2FastTrackCreditHire(tempSdoR2FastTrackCreditHire).build();
-
-        FastTrackHousingDisrepair tempFastTrackHousingDisrepair = FastTrackHousingDisrepair.builder()
-            .input1("The claimant must prepare a Scott Schedule of the items in disrepair.")
-            .input2("The columns should be headed:\n"
-                        + "  •  Item\n"
-                        + "  •  Alleged disrepair\n"
-                        + "  •  Defendant’s response\n"
-                        + "  •  Reserved for Judge’s use")
-            .input3("The claimant must upload to the Digital Portal the Scott Schedule with the relevant "
-                        + "columns completed by 4pm on")
-            .date1(sdoDeadlineService.nextWorkingDayFromNowWeeks(10))
-            .input4("The defendant must upload to the Digital Portal the amended Scott Schedule with the "
-                        + "relevant columns in response completed by 4pm on")
-            .date2(sdoDeadlineService.nextWorkingDayFromNowWeeks(12))
-            .build();
-
-        updatedData.fastTrackHousingDisrepair(tempFastTrackHousingDisrepair).build();
-
-        FastTrackPersonalInjury tempFastTrackPersonalInjury = FastTrackPersonalInjury.builder()
-            .input1("The claimant has permission to rely upon the written expert evidence already uploaded to "
-                        + "the Digital Portal with the particulars of claim and in addition has permission to rely upon"
-                        + " any associated correspondence or updating report which is uploaded to the Digital Portal by"
-                        + " 4pm on")
-            .date1(sdoDeadlineService.nextWorkingDayFromNowWeeks(4))
-            .input2("Any questions which are to be addressed to an expert must be sent to the expert directly "
-                        + "and uploaded to the Digital Portal by 4pm on")
-            .date2(sdoDeadlineService.nextWorkingDayFromNowWeeks(4))
-            .input3("The answers to the questions shall be answered by the Expert by")
-            .date3(sdoDeadlineService.nextWorkingDayFromNowWeeks(8))
-            .input4("and uploaded to the Digital Portal by")
-            .date4(sdoDeadlineService.nextWorkingDayFromNowWeeks(8))
-            .build();
-
-        updatedData.fastTrackPersonalInjury(tempFastTrackPersonalInjury).build();
-
-        FastTrackRoadTrafficAccident tempFastTrackRoadTrafficAccident = FastTrackRoadTrafficAccident.builder()
-            .input("Photographs and/or a plan of the accident location shall be prepared and agreed by the "
-                       + "parties and uploaded to the Digital Portal by 4pm on")
-            .date(sdoDeadlineService.nextWorkingDayFromNowWeeks(8))
-            .build();
-
-        updatedData.fastTrackRoadTrafficAccident(tempFastTrackRoadTrafficAccident).build();
+        specialistDirectionsService.populateSpecialistDirections(updatedData);
     }
 
     private SdoR2WitnessOfFact getSdoR2WitnessOfFact() {

@@ -1,0 +1,89 @@
+package uk.gov.hmcts.reform.civil.service.sdo;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
+
+import java.time.LocalDate;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.lenient;
+
+@ExtendWith(MockitoExtension.class)
+class SdoSmallClaimsNarrativeServiceTest {
+
+    @Mock
+    private SdoDeadlineService deadlineService;
+
+    private SdoSmallClaimsNarrativeService service;
+
+    @BeforeEach
+    void setUp() {
+        service = new SdoSmallClaimsNarrativeService(deadlineService);
+        lenient().when(deadlineService.nextWorkingDayFromNowWeeks(anyInt()))
+            .thenAnswer(invocation -> LocalDate.of(2025, 3, 1)
+                .plusWeeks(invocation.getArgument(0, Integer.class)));
+        lenient().when(deadlineService.workingDaysFromNow(anyInt()))
+            .thenAnswer(invocation -> LocalDate.of(2025, 5, 1)
+                .plusDays(invocation.getArgument(0, Integer.class)));
+    }
+
+    @Test
+    void shouldPopulateJudgesRecitalAndDocuments() {
+        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
+
+        service.applyJudgesRecital(builder);
+        service.applyDocumentDirections(builder);
+
+        CaseData result = builder.build();
+        assertThat(result.getSmallClaimsJudgesRecital().getInput())
+            .isEqualTo("Upon considering the statements of case and the information provided by the parties,");
+        assertThat(result.getSmallClaimsDocuments().getInput1())
+            .contains("Each party must upload to the Digital Portal copies of all documents");
+    }
+
+    @Test
+    void shouldPopulateWitnessStatementsAndCreditHire() {
+        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
+
+        service.applyWitnessStatements(builder);
+        service.applyCreditHire(builder);
+
+        CaseData result = builder.build();
+        assertThat(result.getSdoR2SmallClaimsWitnessStatementOther().getSdoR2SmallClaimsRestrictWitness()
+                       .getNoOfWitnessClaimant()).isEqualTo(2);
+        assertThat(result.getSmallClaimsCreditHire().getDate4())
+            .isEqualTo(LocalDate.of(2025, 3, 1).plusWeeks(10));
+    }
+
+    @Test
+    void shouldPopulateRoadTrafficAccident() {
+        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
+
+        service.applyRoadTrafficAccident(builder);
+
+        assertThat(builder.build().getSmallClaimsRoadTrafficAccident().getInput())
+            .contains("Photographs and/or a plan of the accident location");
+    }
+
+    @Test
+    void shouldPopulateFlightDelayHearingAndNotes() {
+        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
+
+        service.applyFlightDelaySection(builder, List.of(OrderDetailsPagesSectionsToggle.SHOW));
+        service.applyHearingSection(builder);
+        service.applyNotesSection(builder);
+
+        CaseData result = builder.build();
+        assertThat(result.getSmallClaimsFlightDelay().getSmallClaimsFlightDelayToggle())
+            .containsExactly(OrderDetailsPagesSectionsToggle.SHOW);
+        assertThat(result.getSmallClaimsHearing().getInput2()).isNotBlank();
+        assertThat(result.getSmallClaimsNotes().getInput()).contains("This order has been made without hearing.");
+    }
+}

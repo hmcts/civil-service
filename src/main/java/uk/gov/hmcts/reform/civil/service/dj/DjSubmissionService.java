@@ -27,8 +27,7 @@ public class DjSubmissionService {
 
         removePreviewDocument(caseData, builder);
         assignDocumentCategories(caseData);
-        directionsOrderCaseProgressionService.applyEaCourtLocation(caseData, builder);
-        directionsOrderCaseProgressionService.updateWaLocationsIfEnabled(caseData, builder, authToken);
+        directionsOrderCaseProgressionService.applyCaseProgressionRouting(caseData, builder, authToken);
 
         return builder.build();
     }

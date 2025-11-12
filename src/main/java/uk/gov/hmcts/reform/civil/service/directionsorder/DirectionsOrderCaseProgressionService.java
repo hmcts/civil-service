@@ -27,10 +27,18 @@ public class DirectionsOrderCaseProgressionService {
         }
     }
 
+    public void applyCaseProgressionRouting(CaseData caseData,
+                                            CaseData.CaseDataBuilder<?, ?> builder,
+                                            String authToken) {
+        applyEaCourtLocation(caseData, builder);
+        updateWaLocationsIfEnabled(caseData, builder, authToken);
+    }
+
     public void updateWaLocationsIfEnabled(CaseData caseData,
                                            CaseData.CaseDataBuilder<?, ?> builder,
                                            String authToken) {
         if (!featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
+            sdoLocationService.clearWaLocationMetadata(builder);
             return;
         }
         sdoLocationService.updateWaLocationsIfRequired(caseData, builder, authToken);

@@ -20,10 +20,12 @@ class SdoDisposalOrderDefaultsServiceTest {
     private SdoDeadlineService deadlineService;
 
     private SdoDisposalOrderDefaultsService service;
+    private SdoDisposalNarrativeService sdoDisposalNarrativeService;
 
     @BeforeEach
     void setUp() {
-        service = new SdoDisposalOrderDefaultsService(deadlineService);
+        sdoDisposalNarrativeService = new SdoDisposalNarrativeService(deadlineService);
+        service = new SdoDisposalOrderDefaultsService(sdoDisposalNarrativeService);
         lenient().when(deadlineService.nextWorkingDayFromNowWeeks(anyInt()))
             .thenAnswer(invocation -> LocalDate.of(2025, 1, 1).plusWeeks(invocation.getArgument(0, Integer.class)));
         lenient().when(deadlineService.workingDaysFromNow(anyInt()))

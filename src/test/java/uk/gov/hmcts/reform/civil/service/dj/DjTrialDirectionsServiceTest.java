@@ -15,6 +15,10 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingJudgesRecital
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WelshLanguageUsage;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialOrderMadeWithoutHearingDJ;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
+import uk.gov.hmcts.reform.civil.service.dj.DjCreditHireDirectionsService;
+import uk.gov.hmcts.reform.civil.service.dj.DjBuildingDisputeDirectionsService;
+import uk.gov.hmcts.reform.civil.service.dj.DjClinicalDirectionsService;
+import uk.gov.hmcts.reform.civil.service.dj.DjRoadTrafficAccidentDirectionsService;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -40,16 +44,26 @@ class DjTrialDirectionsServiceTest {
 
     @BeforeEach
     void setUp() {
-        DjTrialDeadlineService trialDeadlineService = new DjTrialDeadlineService(workingDayIndicator, deadlinesCalculator);
-        DjTrialNarrativeService trialNarrativeService = new DjTrialNarrativeService(trialDeadlineService);
-        DjSpecialistDeadlineService deadlineService = new DjSpecialistDeadlineService(workingDayIndicator);
-        DjSpecialistNarrativeService narrativeService = new DjSpecialistNarrativeService(deadlineService);
+        DjDeadlineService djDeadlineService = new DjDeadlineService(workingDayIndicator, deadlinesCalculator);
+        DjTrialNarrativeService trialNarrativeService = new DjTrialNarrativeService(djDeadlineService);
+        DjCreditHireDirectionsService creditHireDirectionsService = new DjCreditHireDirectionsService(djDeadlineService);
+        DjBuildingDisputeDirectionsService buildingDisputeDirectionsService =
+            new DjBuildingDisputeDirectionsService(djDeadlineService);
+        DjClinicalDirectionsService clinicalDirectionsService = new DjClinicalDirectionsService(djDeadlineService);
+        DjRoadTrafficAccidentDirectionsService roadTrafficAccidentDirectionsService =
+            new DjRoadTrafficAccidentDirectionsService(djDeadlineService);
+        DjSpecialistNarrativeService narrativeService = new DjSpecialistNarrativeService(
+            buildingDisputeDirectionsService,
+            clinicalDirectionsService,
+            roadTrafficAccidentDirectionsService,
+            creditHireDirectionsService
+        );
         DjSpecialistDirectionsService specialistDirectionsService =
             new DjSpecialistDirectionsService(narrativeService);
         DjWelshLanguageService welshLanguageService = new DjWelshLanguageService();
         service = new DjTrialDirectionsService(
             trialNarrativeService,
-            trialDeadlineService,
+            djDeadlineService,
             specialistDirectionsService,
             welshLanguageService
         );

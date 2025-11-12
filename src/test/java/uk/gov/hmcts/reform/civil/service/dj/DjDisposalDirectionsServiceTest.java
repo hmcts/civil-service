@@ -33,11 +33,14 @@ class DjDisposalDirectionsServiceTest {
     private DeadlinesCalculator deadlinesCalculator;
 
     private DjDisposalDirectionsService service;
+    private DjDisposalNarrativeService disposalNarrativeService;
 
     @BeforeEach
     void setUp() {
         DjWelshLanguageService welshLanguageService = new DjWelshLanguageService();
-        service = new DjDisposalDirectionsService(workingDayIndicator, deadlinesCalculator, welshLanguageService);
+        DjDeadlineService deadlineService = new DjDeadlineService(workingDayIndicator, deadlinesCalculator);
+        disposalNarrativeService = new DjDisposalNarrativeService(deadlineService);
+        service = new DjDisposalDirectionsService(deadlineService, welshLanguageService, disposalNarrativeService);
 
         when(workingDayIndicator.getNextWorkingDay(any(LocalDate.class)))
             .thenAnswer(invocation -> invocation.getArgument(0, LocalDate.class));

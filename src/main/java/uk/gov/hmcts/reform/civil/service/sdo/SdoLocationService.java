@@ -93,6 +93,12 @@ public class SdoLocationService {
         updateWaCourtLocationsService.ifPresent(service -> service.updateCourtListingWALocations(authToken, builder));
     }
 
+    public void clearWaLocationMetadata(CaseData.CaseDataBuilder<?, ?> builder) {
+        builder.taskManagementLocations(null)
+            .taskManagementLocationsTab(null)
+            .caseManagementLocationTab(null);
+    }
+
     public DynamicList buildAlternativeCourtLocations(List<LocationRefData> locations) {
         List<DynamicListElement> options = locations.stream()
             .map(location -> dynamicElementFromCode(location.getEpimmsId(), LocationReferenceDataService.getDisplayEntry(location)))
