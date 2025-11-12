@@ -30,15 +30,31 @@ public class DirectionsOrderCaseProgressionService {
     public void applyCaseProgressionRouting(CaseData caseData,
                                             CaseData.CaseDataBuilder<?, ?> builder,
                                             String authToken) {
+        applyCaseProgressionRouting(caseData, builder, authToken, true);
+    }
+
+    public void applyCaseProgressionRouting(CaseData caseData,
+                                            CaseData.CaseDataBuilder<?, ?> builder,
+                                            String authToken,
+                                            boolean clearWaMetadataWhenDisabled) {
         applyEaCourtLocation(caseData, builder);
-        updateWaLocationsIfEnabled(caseData, builder, authToken);
+        updateWaLocationsIfEnabled(caseData, builder, authToken, clearWaMetadataWhenDisabled);
     }
 
     public void updateWaLocationsIfEnabled(CaseData caseData,
                                            CaseData.CaseDataBuilder<?, ?> builder,
                                            String authToken) {
+        updateWaLocationsIfEnabled(caseData, builder, authToken, true);
+    }
+
+    public void updateWaLocationsIfEnabled(CaseData caseData,
+                                           CaseData.CaseDataBuilder<?, ?> builder,
+                                           String authToken,
+                                           boolean clearWaMetadataWhenDisabled) {
         if (!featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
-            sdoLocationService.clearWaLocationMetadata(builder);
+            if (clearWaMetadataWhenDisabled) {
+                sdoLocationService.clearWaLocationMetadata(builder);
+            }
             return;
         }
         sdoLocationService.updateWaLocationsIfRequired(caseData, builder, authToken);

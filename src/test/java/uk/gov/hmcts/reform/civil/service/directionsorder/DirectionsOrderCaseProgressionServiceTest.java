@@ -86,6 +86,18 @@ class DirectionsOrderCaseProgressionServiceTest {
     }
 
     @Test
+    void shouldLeaveWaMetadataWhenFeatureDisabledAndClearFlagFalse() {
+        CaseData caseData = CaseData.builder().build();
+        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(false);
+
+        service.updateWaLocationsIfEnabled(caseData, builder, AUTH, false);
+
+        verify(locationService, never()).clearWaLocationMetadata(builder);
+        verify(locationService, never()).updateWaLocationsIfRequired(any(), any(), any());
+    }
+
+    @Test
     void shouldApplyRoutingAndUpdateWaMetadata() {
         CaseData caseData = CaseData.builder().build();
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
@@ -109,6 +121,18 @@ class DirectionsOrderCaseProgressionServiceTest {
         service.applyCaseProgressionRouting(caseData, builder, AUTH);
 
         verify(locationService).clearWaLocationMetadata(builder);
+        verify(locationService, never()).updateWaLocationsIfRequired(any(), any(), any());
+    }
+
+    @Test
+    void shouldKeepWaMetadataWhenRoutingDisabledAndClearFlagFalse() {
+        CaseData caseData = CaseData.builder().build();
+        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(false);
+
+        service.applyCaseProgressionRouting(caseData, builder, AUTH, false);
+
+        verify(locationService, never()).clearWaLocationMetadata(builder);
         verify(locationService, never()).updateWaLocationsIfRequired(any(), any(), any());
     }
 }

@@ -27,7 +27,12 @@ public class DjSubmissionService {
 
         removePreviewDocument(caseData, builder);
         assignDocumentCategories(caseData);
-        directionsOrderCaseProgressionService.applyCaseProgressionRouting(caseData, builder, authToken);
+        directionsOrderCaseProgressionService.applyCaseProgressionRouting(
+            caseData,
+            builder,
+            authToken,
+            false
+        );
 
         return builder.build();
     }
