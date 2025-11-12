@@ -14,6 +14,15 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_BASIC_RATE_EVIDENCE_WITH_LIABILITY_DJ;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_CLAIMANT_EVIDENCE_DJ;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_DEFENDANT_UPLOAD_DJ;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_DISCLOSURE_DJ;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_NON_COMPLIANCE_DJ;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_PARTIES_LIAISE;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_STATEMENT_DEADLINE_DJ;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_STATEMENT_PROMPT_DJ;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_WITNESS_LIMIT_DJ;
 
 @ExtendWith(MockitoExtension.class)
 class DjCreditHireDirectionsServiceTest {
@@ -40,5 +49,18 @@ class DjCreditHireDirectionsServiceTest {
         assertThat(result.getDate4()).isEqualTo(LocalDate.of(2025, 2, 1).plusWeeks(14));
         assertThat(result.getSdoDJR2TrialCreditHireDetails().getDate1())
             .isEqualTo(LocalDate.of(2025, 2, 1).plusWeeks(8));
+        assertThat(result.getInput1()).isEqualTo(CREDIT_HIRE_DISCLOSURE_DJ);
+        assertThat(result.getInput6())
+            .isEqualTo(CREDIT_HIRE_BASIC_RATE_EVIDENCE_WITH_LIABILITY_DJ + " " + CREDIT_HIRE_DEFENDANT_UPLOAD_DJ);
+        assertThat(result.getInput7()).isEqualTo(CREDIT_HIRE_CLAIMANT_EVIDENCE_DJ);
+        assertThat(result.getInput8()).isEqualTo(CREDIT_HIRE_WITNESS_LIMIT_DJ);
+        assertThat(result.getSdoDJR2TrialCreditHireDetails().getInput2())
+            .isEqualTo(CREDIT_HIRE_STATEMENT_PROMPT_DJ);
+        assertThat(result.getSdoDJR2TrialCreditHireDetails().getInput3())
+            .isEqualTo(CREDIT_HIRE_STATEMENT_DEADLINE_DJ);
+        assertThat(result.getSdoDJR2TrialCreditHireDetails().getInput4())
+            .isEqualTo(CREDIT_HIRE_NON_COMPLIANCE_DJ);
+        assertThat(result.getSdoDJR2TrialCreditHireDetails().getInput5())
+            .isEqualTo(CREDIT_HIRE_PARTIES_LIAISE);
     }
 }

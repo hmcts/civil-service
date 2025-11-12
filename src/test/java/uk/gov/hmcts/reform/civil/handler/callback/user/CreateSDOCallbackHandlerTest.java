@@ -154,6 +154,11 @@ import uk.gov.hmcts.reform.civil.service.sdo.SdoPrePopulateService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoSubmissionService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoTrackDefaultsService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoValidationService;
+
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_DOCUMENTS_EXCHANGE;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FLIGHT_DELAY_LEGAL_ARGUMENTS_NOTICE;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FLIGHT_DELAY_RELATED_CLAIMS_NOTICE;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.PERSONAL_INJURY_PERMISSION_SDO;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoSmallClaimsOrderDefaultsService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoSmallClaimsNarrativeService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
@@ -1806,7 +1811,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 response.getData().get("disposalHearingDisclosureOfDocuments"),
                 DisposalHearingDisclosureOfDocuments.class
             );
-            assertThat(disposalDocs.getInput1()).isEqualTo("The parties shall serve on each other copies of the documents upon which reliance is to be placed at the disposal hearing by 4pm on");
+            assertThat(disposalDocs.getInput1()).isEqualTo(DISPOSAL_DOCUMENTS_EXCHANGE);
             assertThat(disposalDocs.getDate1()).isEqualTo(nextWorkingDayDate);
 
             FastTrackTrial fastTrackTrial = objectMapper.convertValue(
@@ -1841,7 +1846,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 response.getData().get("fastTrackPersonalInjury"),
                 FastTrackPersonalInjury.class
             );
-            assertThat(personalInjury.getInput1()).startsWith("The Claimant has permission to rely upon the written expert evidence");
+            assertThat(personalInjury.getInput1()).isEqualTo(PERSONAL_INJURY_PERMISSION_SDO);
 
             FastTrackRoadTrafficAccident fastTrackRoadTrafficAccident = objectMapper.convertValue(
                 response.getData().get("fastTrackRoadTrafficAccident"),
@@ -1915,21 +1920,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             );
 
             assertThat(flightDelay).isNotNull();
-            assertThat(flightDelay.getRelatedClaimsInput())
-                .isEqualTo("""
-                        In the event that the Claimant(s) or Defendant(s) are aware if other\s
-                        claims relating to the same flight they must notify the court\s
-                        where the claim is being managed within 14 days of receipt of\s
-                        this Order providing all relevant details of those claims including\s
-                        case number(s), hearing date(s) and copy final substantive order(s)\s
-                        if any, to assist the Court with ongoing case management which may\s
-                        include the cases being heard together.""");
-            assertThat(flightDelay.getLegalDocumentsInput())
-                .isEqualTo("""
-                        Any arguments as to the law to be applied to this claim, together with\s
-                        copies of legal authorities or precedents relied on, shall be uploaded\s
-                        to the Digital Portal not later than 3 full working days before the\s
-                        final hearing date.""");
+            assertThat(flightDelay.getRelatedClaimsInput()).isEqualTo(FLIGHT_DELAY_RELATED_CLAIMS_NOTICE);
+            assertThat(flightDelay.getLegalDocumentsInput()).isEqualTo(FLIGHT_DELAY_LEGAL_ARGUMENTS_NOTICE);
 
         }
 
@@ -1958,10 +1950,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             );
 
             assertThat(personalInjury).isNotNull();
-            assertThat(personalInjury.getInput1())
-                .isEqualTo(
-                    "The Claimant has permission to rely upon the written expert evidence already uploaded to the"
-                        + " Digital Portal with the particulars of claim");
+            assertThat(personalInjury.getInput1()).isEqualTo(PERSONAL_INJURY_PERMISSION_SDO);
             assertThat(personalInjury.getDate1()).isNull();
             assertThat(personalInjury.getInput2())
                 .isEqualTo("The Defendant(s) may ask questions of the Claimant's " +

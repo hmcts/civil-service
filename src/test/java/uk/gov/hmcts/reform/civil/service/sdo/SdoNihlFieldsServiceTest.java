@@ -22,6 +22,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantFastTrack.PERMISSION_TO_RELY_ON_EXPERT;
+import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantFastTrack.SCHEDULE_OF_LOSS_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantFastTrack.SCHEDULE_OF_LOSS_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantFastTrack.STANDARD_DISCLOSURE;
 
 @ExtendWith(MockitoExtension.class)
 class SdoNihlFieldsServiceTest {
@@ -58,6 +62,24 @@ class SdoNihlFieldsServiceTest {
         assertThat(result.getSdoFastTrackJudgesRecital()).isNotNull();
         assertThat(result.getSdoR2Trial()).isNotNull();
         assertThat(result.getSdoR2NihlUseOfWelshLanguage()).isNotNull();
+    }
+
+    @Test
+    void shouldPopulateSharedTextFromLibrary() {
+        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder().build().toBuilder();
+
+        service.populateNihlFields(builder,
+            hearingMethodList(),
+            Optional.of(RequestedCourt.builder().build()),
+            Collections.emptyList());
+
+        CaseData result = builder.build();
+
+        assertThat(result.getSdoR2DisclosureOfDocuments().getStandardDisclosureTxt()).isEqualTo(STANDARD_DISCLOSURE);
+        assertThat(result.getSdoR2ScheduleOfLoss().getSdoR2ScheduleOfLossClaimantText()).isEqualTo(SCHEDULE_OF_LOSS_CLAIMANT);
+        assertThat(result.getSdoR2ScheduleOfLoss().getSdoR2ScheduleOfLossDefendantText()).isEqualTo(SCHEDULE_OF_LOSS_DEFENDANT);
+        assertThat(result.getSdoR2PermissionToRelyOnExpert().getSdoPermissionToRelyOnExpertTxt())
+            .isEqualTo(PERMISSION_TO_RELY_ON_EXPERT);
     }
 
     private DynamicList hearingMethodList() {

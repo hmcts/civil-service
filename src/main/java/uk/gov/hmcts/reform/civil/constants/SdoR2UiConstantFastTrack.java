@@ -1,5 +1,16 @@
 package uk.gov.hmcts.reform.civil.constants;
 
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FAST_TRACK_DISCLOSURE_INSPECTION;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FAST_TRACK_DISCLOSURE_STANDARD_SDO;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FAST_TRACK_SCHEDULE_CLAIMANT_UPLOAD;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FAST_TRACK_SCHEDULE_DEFENDANT_UPLOAD;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FAST_TRACK_SCHEDULE_FUTURE_LOSS_SDO;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.NIHL_ADDENDUM_REPORT_PERMISSION;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.NIHL_FURTHER_AUDIOGRAM_REQUEST;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.NIHL_FURTHER_AUDIOGRAM_SERVICE;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.SMALL_CLAIMS_WITNESS_DEADLINE;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.SMALL_CLAIMS_WITNESS_LATE_WARNING;
+
 public final class SdoR2UiConstantFastTrack {
 
     private SdoR2UiConstantFastTrack() {
@@ -9,13 +20,9 @@ public final class SdoR2UiConstantFastTrack {
     //SDO R2 NIHL default text
     public static final String CLAIMANT_PERMISSION_TO_RELY = "The Claimant has permission to rely upon the written " +
         "expert evidence already uploaded to the Digital Portal with the particulars of claim.";
-    public static final String ADDENDUM_REPORT = "The Claimant has permission to rely upon an addendum report from" +
-        " their expert ENT surgeon which must be uploaded to the Digital Portal by 4pm on";
-    public static final String CLAIMANT_SHALL_UNDERGO = "The Claimant shall undergo a single further audiogram at the" +
-        " written request of any Defendant. Such request to be made no later than 4pm on";
-    public static final String SERVICE_REPORT = "The further audiogram shall be arranged and paid for by the " +
-        "Defendant requesting it. The Defendant shall serve a copy of the further audiogram on the Claimant and " +
-        "upload it to the Digital Portal by 4pm on";
+    public static final String ADDENDUM_REPORT = NIHL_ADDENDUM_REPORT_PERMISSION;
+    public static final String CLAIMANT_SHALL_UNDERGO = NIHL_FURTHER_AUDIOGRAM_REQUEST;
+    public static final String SERVICE_REPORT = NIHL_FURTHER_AUDIOGRAM_SERVICE;
     public static final String DEFENDANT_MAY_ASK = "The Defendant(s) may ask questions of the Claimant's " +
         "expert which must be sent to the expert directly and uploaded to the Digital Portal by 4pm on";
     public static final String QUESTIONS_SHALL_BE_ANSWERED = "The questions shall be answered by the expert by";
@@ -53,20 +60,15 @@ public final class SdoR2UiConstantFastTrack {
     public static final String TRUE = "true";
     public static final String JUDGE_RECITAL = "Upon considering the statements of case and the information provided" +
         " by the parties.";
-    public static final String STANDARD_DISCLOSURE =  "Standard disclosure shall be provided by the parties by" +
-        " uploading to the Digital Portal their list of documents by 4pm on";
-    public static final String INSPECTION = "Any request to inspect a document, or for a copy of a document, shall" +
-        " be made directly to the other party by 4pm on";
+    public static final String STANDARD_DISCLOSURE = FAST_TRACK_DISCLOSURE_STANDARD_SDO;
+    public static final String INSPECTION = FAST_TRACK_DISCLOSURE_INSPECTION;
     public static final String REQUEST_COMPILED_WITH = "within 7 days of receipt.";
     public static final String STATEMENT_WITNESS = "Each party must upload to the Digital Portal copies of the" +
         " statements of all witnesses of fact on whom they intend to rely.";
-    public static final String DEADLINE = "Witness statements shall be uploaded to the Digital Portal by 4pm on";
-    public static final String DEADLINE_EVIDENCE = "Evidence will not be permitted at trial from a witness whose " +
-        "statement has not been uploaded in accordance with the Order, except with permission from the Court.";
-    public static final String SCHEDULE_OF_LOSS_CLAIMANT = "The Claimant must upload to the Digital Portal an" +
-        " up-to-date schedule of loss by 4pm on";
-    public static final String SCHEDULE_OF_LOSS_DEFENDANT = "In the event of a challenge to the updated schedule of " +
-        "loss, a defendant shall upload to the Digital Portal a counter-schedule by 4pm on";
+    public static final String DEADLINE = SMALL_CLAIMS_WITNESS_DEADLINE;
+    public static final String DEADLINE_EVIDENCE = SMALL_CLAIMS_WITNESS_LATE_WARNING;
+    public static final String SCHEDULE_OF_LOSS_CLAIMANT = FAST_TRACK_SCHEDULE_CLAIMANT_UPLOAD;
+    public static final String SCHEDULE_OF_LOSS_DEFENDANT = FAST_TRACK_SCHEDULE_DEFENDANT_UPLOAD;
     public static final String IMPORTANT_NOTES = "This Order has been made without hearing. Each party has the " +
         "right to apply to have this Order set aside or varied. Any such application must be received " +
         "by the Court (together with the appropriate fee) by 4pm on";
@@ -74,8 +76,7 @@ public final class SdoR2UiConstantFastTrack {
     public static final String RESTRICT_NUMBER_PAGES_TEXT1 = "Each witness statement should be no more than";
     public static final String RESTRICT_NUMBER_PAGES_TEXT2 = "pages of A4 (including exhibits). Statements should" +
         " be double spaced using a font size of 12.";
-    public static final String PECUNIARY_LOSS = "If there is a claim for future pecuniary loss and the parties have " +
-        "not already set out their case on periodical payments, they must do so in the respective schedule and counter-schedule.";
+    public static final String PECUNIARY_LOSS = FAST_TRACK_SCHEDULE_FUTURE_LOSS_SDO;
     public static final String PHYSICAL_TRIAL_BUNDLE = "The Claimant's solicitor shall bring to the court, on the day of the hearing, a paper copy of the hearing bundle.";
 
     public static final String WELSH_LANG_DESCRIPTION =

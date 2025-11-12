@@ -12,6 +12,7 @@ import java.time.LocalDate;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.ROAD_TRAFFIC_ACCIDENT_UPLOAD_DJ;
 
 @ExtendWith(MockitoExtension.class)
 class DjRoadTrafficAccidentDirectionsServiceTest {
@@ -34,6 +35,6 @@ class DjRoadTrafficAccidentDirectionsServiceTest {
         TrialRoadTrafficAccident accident = service.buildTrialRoadTrafficAccident();
 
         assertThat(accident.getDate1()).isEqualTo(LocalDate.of(2025, 9, 1).plusWeeks(4));
-        assertThat(accident.getInput()).contains("Photographs and/or a plan of the accident location");
+        assertThat(accident.getInput()).isEqualTo(ROAD_TRAFFIC_ACCIDENT_UPLOAD_DJ);
     }
 }

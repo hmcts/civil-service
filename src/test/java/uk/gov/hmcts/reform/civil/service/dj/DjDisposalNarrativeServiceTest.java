@@ -9,9 +9,18 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.lenient;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_BUNDLE_REQUIREMENT;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_DOCUMENTS_EXCHANGE;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_SCHEDULE_CLAIMANT_SEND_DJ;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_SCHEDULE_COUNTER_SEND;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_SCHEDULE_COUNTER_UPLOAD_DJ;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_SCHEDULE_FUTURE_LOSS;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_WITNESS_CPR32_6;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_WITNESS_CPR32_7_DEADLINE;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_WITNESS_TRIAL_NOTE_DJ;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_WITNESS_UPLOAD;
 
 @ExtendWith(MockitoExtension.class)
 class DjDisposalNarrativeServiceTest {
@@ -45,7 +54,7 @@ class DjDisposalNarrativeServiceTest {
     void shouldBuildDisclosureWithFourWeekDeadline() {
         var disclosure = service.buildDisclosureOfDocuments();
 
-        assertThat(disclosure.getInput()).contains("The parties shall serve on each other");
+        assertThat(disclosure.getInput()).isEqualTo(DISPOSAL_DOCUMENTS_EXCHANGE);
         assertThat(disclosure.getDate()).isEqualTo(LocalDate.of(2025, 1, 1).plusWeeks(4));
     }
 
@@ -55,6 +64,21 @@ class DjDisposalNarrativeServiceTest {
 
         assertThat(schedules.getDate1()).isEqualTo(LocalDate.of(2025, 1, 1).plusWeeks(10));
         assertThat(schedules.getDate2()).isEqualTo(LocalDate.of(2025, 1, 1).plusWeeks(12));
-        assertThat(schedules.getInputText4()).contains("future pecuniary loss");
+        assertThat(schedules.getInput1()).isEqualTo(DISPOSAL_SCHEDULE_CLAIMANT_SEND_DJ);
+        assertThat(schedules.getInput2()).isEqualTo(DISPOSAL_SCHEDULE_COUNTER_SEND);
+        assertThat(schedules.getInput3()).isEqualTo(DISPOSAL_SCHEDULE_COUNTER_UPLOAD_DJ);
+        assertThat(schedules.getInputText4()).isEqualTo(DISPOSAL_SCHEDULE_FUTURE_LOSS);
+    }
+
+    @Test
+    void shouldBuildWitnessOfFactAndBundleUsingSharedText() {
+        var witness = service.buildWitnessOfFact();
+        var bundle = service.buildBundle();
+
+        assertThat(witness.getInput1()).isEqualTo(DISPOSAL_WITNESS_UPLOAD + " ");
+        assertThat(witness.getInput2()).isEqualTo(DISPOSAL_WITNESS_CPR32_6);
+        assertThat(witness.getInput3()).isEqualTo(DISPOSAL_WITNESS_CPR32_7_DEADLINE);
+        assertThat(witness.getInput4()).isEqualTo(DISPOSAL_WITNESS_TRIAL_NOTE_DJ);
+        assertThat(bundle.getInput()).isEqualTo(DISPOSAL_BUNDLE_REQUIREMENT);
     }
 }

@@ -8,6 +8,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
 import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.ORDER_WITHOUT_HEARING_RECEIVED_BY_COURT_WITH_ARTICLE;
 
 @Service
 public class DjWelshLanguageService {
@@ -23,10 +24,8 @@ public class DjWelshLanguageService {
 
     public String buildOrderMadeWithoutHearingText(LocalDate deadlineDate) {
         return String.format(
-            "This order has been made without a hearing. "
-                + "Each party has the right to apply to have this Order "
-                + "set aside or varied. Any such application must be received by the Court "
-                + "(together with the appropriate fee) by 4pm on %s.",
+            "%s %s.",
+            ORDER_WITHOUT_HEARING_RECEIVED_BY_COURT_WITH_ARTICLE,
             deadlineDate.format(DEADLINE_FORMATTER)
         );
     }

@@ -14,6 +14,13 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.lenient;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FLIGHT_DELAY_LEGAL_ARGUMENTS_NOTICE;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FLIGHT_DELAY_RELATED_CLAIMS_NOTICE;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.ORDER_WITHOUT_HEARING_RECEIVED_BY_COURT_NO_ARTICLE;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.ROAD_TRAFFIC_ACCIDENT_SMALL_CLAIMS;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.SMALL_CLAIMS_DOCUMENTS_UPLOAD;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.SMALL_CLAIMS_DOCUMENTS_WARNING;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.SMALL_CLAIMS_WITNESS_STATEMENTS_UPLOAD;
 
 @ExtendWith(MockitoExtension.class)
 class SdoSmallClaimsNarrativeServiceTest {
@@ -45,7 +52,9 @@ class SdoSmallClaimsNarrativeServiceTest {
         assertThat(result.getSmallClaimsJudgesRecital().getInput())
             .isEqualTo("Upon considering the statements of case and the information provided by the parties,");
         assertThat(result.getSmallClaimsDocuments().getInput1())
-            .contains("Each party must upload to the Digital Portal copies of all documents");
+            .isEqualTo(SMALL_CLAIMS_DOCUMENTS_UPLOAD);
+        assertThat(result.getSmallClaimsDocuments().getInput2())
+            .isEqualTo(SMALL_CLAIMS_DOCUMENTS_WARNING);
     }
 
     @Test
@@ -58,6 +67,8 @@ class SdoSmallClaimsNarrativeServiceTest {
         CaseData result = builder.build();
         assertThat(result.getSdoR2SmallClaimsWitnessStatementOther().getSdoR2SmallClaimsRestrictWitness()
                        .getNoOfWitnessClaimant()).isEqualTo(2);
+        assertThat(result.getSdoR2SmallClaimsWitnessStatementOther().getSdoStatementOfWitness())
+            .isEqualTo(SMALL_CLAIMS_WITNESS_STATEMENTS_UPLOAD);
         assertThat(result.getSmallClaimsCreditHire().getDate4())
             .isEqualTo(LocalDate.of(2025, 3, 1).plusWeeks(10));
     }
@@ -69,7 +80,7 @@ class SdoSmallClaimsNarrativeServiceTest {
         service.applyRoadTrafficAccident(builder);
 
         assertThat(builder.build().getSmallClaimsRoadTrafficAccident().getInput())
-            .contains("Photographs and/or a plan of the accident location");
+            .isEqualTo(ROAD_TRAFFIC_ACCIDENT_SMALL_CLAIMS);
     }
 
     @Test
@@ -83,7 +94,12 @@ class SdoSmallClaimsNarrativeServiceTest {
         CaseData result = builder.build();
         assertThat(result.getSmallClaimsFlightDelay().getSmallClaimsFlightDelayToggle())
             .containsExactly(OrderDetailsPagesSectionsToggle.SHOW);
+        assertThat(result.getSmallClaimsFlightDelay().getRelatedClaimsInput())
+            .isEqualTo(FLIGHT_DELAY_RELATED_CLAIMS_NOTICE);
+        assertThat(result.getSmallClaimsFlightDelay().getLegalDocumentsInput())
+            .isEqualTo(FLIGHT_DELAY_LEGAL_ARGUMENTS_NOTICE);
         assertThat(result.getSmallClaimsHearing().getInput2()).isNotBlank();
-        assertThat(result.getSmallClaimsNotes().getInput()).contains("This order has been made without hearing.");
+        assertThat(result.getSmallClaimsNotes().getInput())
+            .startsWith(ORDER_WITHOUT_HEARING_RECEIVED_BY_COURT_NO_ARTICLE);
     }
 }

@@ -9,6 +9,10 @@ import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderS
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CLINICAL_DOCUMENTS_HEADING;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CLINICAL_NOTES_DJ;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CLINICAL_PARTIES_DJ;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.PERSONAL_INJURY_ANSWERS;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.PERSONAL_INJURY_PERMISSION_DJ;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.PERSONAL_INJURY_QUESTIONS;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.PERSONAL_INJURY_UPLOAD;
 
 @Service
 @RequiredArgsConstructor
@@ -27,22 +31,13 @@ public class DjClinicalDirectionsService {
 
     public TrialPersonalInjury buildTrialPersonalInjury() {
         return TrialPersonalInjury.builder()
-            .input1("The claimant has permission to rely upon the written "
-                        + "expert evidence already uploaded to the Digital"
-                        + " Portal with the particulars of claim and in addition "
-                        + "has permission to rely upon any associated "
-                        + "correspondence or updating report which is uploaded "
-                        + "to the Digital Portal by 4pm on")
+            .input1(PERSONAL_INJURY_PERMISSION_DJ)
             .date1(deadlineService.nextWorkingDayInWeeks(4))
-            .input2("Any questions which are to be addressed to an expert must "
-                        + "be sent to the expert directly and"
-                        + " uploaded to the Digital "
-                        + "Portal by 4pm on")
+            .input2(PERSONAL_INJURY_QUESTIONS)
             .date2(deadlineService.nextWorkingDayInWeeks(8))
-            .input3("The answers to the questions shall be answered "
-                        + "by the Expert by")
+            .input3(PERSONAL_INJURY_ANSWERS)
             .date3(deadlineService.nextWorkingDayInWeeks(4))
-            .input4("and uploaded to the Digital Portal by")
+            .input4(PERSONAL_INJURY_UPLOAD)
             .date4(deadlineService.nextWorkingDayInWeeks(8))
             .build();
     }

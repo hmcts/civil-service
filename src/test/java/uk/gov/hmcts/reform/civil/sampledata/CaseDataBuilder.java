@@ -238,6 +238,19 @@ import static uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration.MINUTES_12
 import static uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingFinalDisposalHearingTimeEstimate.FIFTEEN_MINUTES;
 import static uk.gov.hmcts.reform.civil.model.mediation.MediationDocumentsType.NON_ATTENDANCE_STATEMENT;
 import static uk.gov.hmcts.reform.civil.model.mediation.MediationDocumentsType.REFERRED_DOCUMENTS;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_BASIC_RATE_EVIDENCE_SDO;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_CLAIMANT_EVIDENCE_SDO;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_DEFENDANT_UPLOAD_SDO;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_DISCLOSURE_SDO;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_NON_COMPLIANCE_SDO;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_PARTIES_LIAISE;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_STATEMENT_PROMPT_SDO;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_WITNESS_LIMIT_SDO;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FAST_TRACK_TRIAL_BUNDLE_NOTICE;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FAST_TRACK_TRIAL_MANUAL_BUNDLE_GUIDANCE;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FLIGHT_DELAY_LEGAL_ARGUMENTS_NOTICE;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FLIGHT_DELAY_RELATED_CLAIMS_NOTICE;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.ORDER_WITHOUT_HEARING_RECEIVED_BY_COURT_WITH_ARTICLE;
 import static uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator.DISPOSAL_HEARING;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
@@ -2924,39 +2937,20 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateSdoFastTrackCreditHire() {
         sdoR2FastTrackCreditHireDetails = SdoR2FastTrackCreditHireDetails.builder()
-            .input2("The claimant must upload to the Digital Portal a witness statement addressing\n"
-                + "a) the need to hire a replacement vehicle; and\n"
-                + "b) impecuniosity")
+            .input2(CREDIT_HIRE_STATEMENT_PROMPT_SDO)
             .date1(LocalDate.parse("2022-01-01"))
-            .input3("A failure to comply with the paragraph above will result in the claimant being debarred from "
-                + "asserting need or relying on impecuniosity as the case may be at the final hearing, "
-                + "save with permission of the Trial Judge.")
-            .input4("The parties are to liaise and use reasonable endeavours to agree the basic hire rate no "
-                + "later than 4pm on")
+            .input3(CREDIT_HIRE_NON_COMPLIANCE_SDO)
+            .input4(CREDIT_HIRE_PARTIES_LIAISE)
             .date2(LocalDate.parse("2022-01-02"))
             .build();
         sdoR2FastTrackCreditHire = SdoR2FastTrackCreditHire.builder()
-            .input1("If impecuniosity is alleged by the claimant and not admitted by the defendant, the claimant's "
-                + "disclosure as ordered earlier in this Order must include:\n"
-                + "a) Evidence of all income from all sources for a period of 3 months prior to the "
-                + "commencement of hire until the earlier of:\n "
-                + "     i) 3 months after cessation of hire\n"
-                + "     ii) the repair or replacement of the claimant's vehicle\n"
-                + "b) Copies of all bank, credit card, and saving account statements for a period of 3 months "
-                + "prior to the commencement of hire until the earlier of:\n"
-                + "     i) 3 months after cessation of hire\n"
-                + "     ii) the repair or replacement of the claimant's vehicle\n"
-                + "c) Evidence of any loan, overdraft or other credit facilities available to the claimant.")
-            .input5("If the parties fail to agree rates subject to liability and/or other issues pursuant to the "
-                + "paragraph above, each party may rely upon written evidence by way of witness statement of "
-                + "one witness to provide evidence of basic hire rates available within the claimant's "
-                + "geographical location, from a mainstream supplier, or a local reputable supplier if none "
-                + "is available.")
-            .input6("The defendant's evidence is to be uploaded to the Digital Portal by 4pm on")
+            .input1(CREDIT_HIRE_DISCLOSURE_SDO)
+            .input5(CREDIT_HIRE_BASIC_RATE_EVIDENCE_SDO)
+            .input6(CREDIT_HIRE_DEFENDANT_UPLOAD_SDO)
             .date3(LocalDate.parse("2022-01-01"))
-            .input7("and the claimant's evidence in reply if so advised to be uploaded by 4pm on")
+            .input7(CREDIT_HIRE_CLAIMANT_EVIDENCE_SDO)
             .date4(LocalDate.parse("2022-01-02"))
-            .input8("This witness statement is limited to 10 pages per party, including any appendices.")
+            .input8(CREDIT_HIRE_WITNESS_LIMIT_SDO)
             .detailsShowToggle(List.of(AddOrRemoveToggle.ADD))
             .sdoR2FastTrackCreditHireDetails(sdoR2FastTrackCreditHireDetails)
             .build();
@@ -3139,23 +3133,18 @@ public class CaseDataBuilder {
         trialHearingTimeDJ = TrialHearingTimeDJ.builder()
             .helpText1("If either party considers that the time estimate is insufficient, "
                 + "they must inform the court within 7 days of the date of this order.")
-            .helpText2("Not more than seven nor less than three clear days before the trial, "
-                + "the claimant must file at court and serve an indexed and paginated bundle of "
-                + "documents which complies with the requirements of Rule 39.5 Civil Procedure Rules "
-                + "and which complies with requirements of PD32. The parties must endeavour to agree "
-                + "the contents of the bundle before it is filed. The bundle will include a case "
-                + "summary and a chronology.")
+            .helpText2(FAST_TRACK_TRIAL_MANUAL_BUNDLE_GUIDANCE)
             .hearingTimeEstimate(TrialHearingTimeEstimateDJ.ONE_HOUR)
             .dateToToggle(dateToShowTrue)
             .date1(LocalDate.now().plusWeeks(22))
             .date2(LocalDate.now().plusWeeks(30))
             .build();
         trialOrderMadeWithoutHearingDJ = TrialOrderMadeWithoutHearingDJ.builder()
-            .input("This order has been made without a hearing. "
-                + "Each party has the right to apply to have this Order "
-                + "set aside or varied. Any such application must be "
-                + "received by the Court "
-                + "(together with the appropriate fee) by 4pm on 01 12 2022.")
+            .input(String.format(
+                "%s %s.",
+                ORDER_WITHOUT_HEARING_RECEIVED_BY_COURT_WITH_ARTICLE,
+                "01 12 2022"
+            ))
             .build();
         return this;
     }
@@ -3169,16 +3158,7 @@ public class CaseDataBuilder {
             .input2("If either party considers that the time estimates is"
                 + " insufficient, they must inform the court within "
                 + "7 days of the date of this order.")
-            .input3("Not more than seven nor less than three clear days before "
-                + "the trial, the claimant must file at court and serve an"
-                + "indexed and paginated bundle of documents which complies"
-                + " with the requirements of Rule 39.5 Civil "
-                + "Procedure Rules"
-                + " and Practice Direction 39A. The parties must "
-                + "endeavour to agree the contents of the "
-                + "bundle before it is filed. "
-                + "The bundle will include a case summary"
-                + " and a chronology.")
+            .input3(FAST_TRACK_TRIAL_BUNDLE_NOTICE + " ")
             .type(List.of(DisposalHearingBundleType.DOCUMENTS))
             .build();
         return this;
@@ -7372,8 +7352,8 @@ public class CaseDataBuilder {
     public CaseDataBuilder atSmallSmallClaimsFlightDelayInputs() {
         atStateClaimNotified();
         this.smallClaimsFlightDelay = SmallClaimsFlightDelay.builder()
-            .relatedClaimsInput(" ")
-            .legalDocumentsInput(" ")
+            .relatedClaimsInput(FLIGHT_DELAY_RELATED_CLAIMS_NOTICE)
+            .legalDocumentsInput(FLIGHT_DELAY_LEGAL_ARGUMENTS_NOTICE)
             .build();
 
         return this;

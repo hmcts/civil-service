@@ -15,21 +15,30 @@ import uk.gov.hmcts.reform.civil.model.sdo.SdoR2FastTrackCreditHireDetails;
 import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.BUILDING_SCHEDULE_CLAIMANT_INSTRUCTION;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.BUILDING_SCHEDULE_COLUMNS_SDO;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.BUILDING_SCHEDULE_DEFENDANT_INSTRUCTION;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.BUILDING_SCHEDULE_INTRO_SDO;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.BUILDING_SCHEDULE_COLUMNS_SDO;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CLINICAL_BUNDLE_SDO;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CLINICAL_DOCUMENTS_HEADING;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CLINICAL_NOTES_SDO;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CLINICAL_PARTIES_SDO;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_BASIC_RATE_EVIDENCE_SDO;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_CLAIMANT_EVIDENCE_SDO;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_DEFENDANT_UPLOAD_SDO;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_DISCLOSURE_SDO;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_NON_COMPLIANCE_SDO;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_PARTIES_LIAISE;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_STATEMENT_PROMPT_SDO;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_WITNESS_LIMIT_SDO;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.HOUSING_SCHEDULE_CLAIMANT_INSTRUCTION;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.HOUSING_SCHEDULE_COLUMNS_SDO;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.HOUSING_SCHEDULE_DEFENDANT_INSTRUCTION;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.HOUSING_SCHEDULE_INTRO_SDO;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.HOUSING_SCHEDULE_COLUMNS_SDO;
-import static uk.gov.hmcts.reform.civil.service.sdo.SdoTrackOrderText.CLAIMANT_EVIDENCE_TEXT;
-import static uk.gov.hmcts.reform.civil.service.sdo.SdoTrackOrderText.LATER_THAN_FOUR_PM_TEXT;
-import static uk.gov.hmcts.reform.civil.service.sdo.SdoTrackOrderText.PARTIES_LIASE_TEXT;
-import static uk.gov.hmcts.reform.civil.service.sdo.SdoTrackOrderText.WITNESS_STATEMENT;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.PERSONAL_INJURY_ANSWERS;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.PERSONAL_INJURY_PERMISSION_SDO;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.PERSONAL_INJURY_QUESTIONS;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.PERSONAL_INJURY_UPLOAD;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.ROAD_TRAFFIC_ACCIDENT_UPLOAD_SDO;
 
 /**
  * Builds the specialist fast-track sections (credit hire, building/clinical disputes, PI, housing, RTA) so the
@@ -74,26 +83,13 @@ public class SdoFastTrackSpecialistDirectionsService {
         List<AddOrRemoveToggle> toggleList = List.of(AddOrRemoveToggle.ADD);
 
         return SdoR2FastTrackCreditHire.builder()
-            .input1("If impecuniosity is alleged by the claimant and not admitted by the defendant, the claimant's "
-                        + "disclosure as ordered earlier in this Order must include:\n"
-                        + "a) Evidence of all income from all sources for a period of 3 months prior to the "
-                        + "commencement of hire until the earlier of:\n "
-                        + "     i) 3 months after cessation of hire\n"
-                        + "     ii) the repair or replacement of the claimant's vehicle\n"
-                        + "b) Copies of all bank, credit card, and saving account statements for a period of 3 months "
-                        + "prior to the commencement of hire until the earlier of:\n"
-                        + "     i) 3 months after cessation of hire\n"
-                        + "     ii) the repair or replacement of the claimant's vehicle\n"
-                        + "c) Evidence of any loan, overdraft or other credit facilities available to the claimant.")
-            .input5("If the parties fail to agree basic hire rates pursuant to the paragraph above, "
-                        + "each party may rely upon written evidence by way of witness statement of one witness to"
-                        + " provide evidence of basic hire rates available within the claimant's geographical location,"
-                        + " from a mainstream supplier, or a local reputable supplier if none is available.")
-            .input6("The defendant's evidence is to be uploaded to the Digital Portal by 4pm on")
+            .input1(CREDIT_HIRE_DISCLOSURE_SDO)
+            .input5(CREDIT_HIRE_BASIC_RATE_EVIDENCE_SDO)
+            .input6(CREDIT_HIRE_DEFENDANT_UPLOAD_SDO)
             .date3(deadlineService.nextWorkingDayFromNowWeeks(8))
-            .input7(CLAIMANT_EVIDENCE_TEXT)
+            .input7(CREDIT_HIRE_CLAIMANT_EVIDENCE_SDO)
             .date4(deadlineService.nextWorkingDayFromNowWeeks(10))
-            .input8(WITNESS_STATEMENT)
+            .input8(CREDIT_HIRE_WITNESS_LIMIT_SDO)
             .detailsShowToggle(toggleList)
             .sdoR2FastTrackCreditHireDetails(buildCreditHireDetails())
             .build();
@@ -101,14 +97,10 @@ public class SdoFastTrackSpecialistDirectionsService {
 
     private SdoR2FastTrackCreditHireDetails buildCreditHireDetails() {
         return SdoR2FastTrackCreditHireDetails.builder()
-            .input2("The claimant must upload to the Digital Portal a witness statement addressing\n"
-                        + "a) the need to hire a replacement vehicle; and\n"
-                        + "b) impecuniosity")
+            .input2(CREDIT_HIRE_STATEMENT_PROMPT_SDO)
             .date1(deadlineService.nextWorkingDayFromNowWeeks(4))
-            .input3("A failure to comply with the paragraph above will result in the claimant being debarred from "
-                        + "asserting need or relying on impecuniosity as the case may be at the final hearing, "
-                        + "save with permission of the Trial Judge.")
-            .input4(PARTIES_LIASE_TEXT + LATER_THAN_FOUR_PM_TEXT)
+            .input3(CREDIT_HIRE_NON_COMPLIANCE_SDO)
+            .input4(CREDIT_HIRE_PARTIES_LIAISE)
             .date2(deadlineService.nextWorkingDayFromNowWeeks(6))
             .build();
     }
@@ -126,25 +118,20 @@ public class SdoFastTrackSpecialistDirectionsService {
 
     private FastTrackPersonalInjury buildPersonalInjury() {
         return FastTrackPersonalInjury.builder()
-            .input1("The claimant has permission to rely upon the written expert evidence already uploaded to "
-                        + "the Digital Portal with the particulars of claim and in addition has permission to rely upon"
-                        + " any associated correspondence or updating report which is uploaded to the Digital Portal by"
-                        + " 4pm on")
+            .input1(PERSONAL_INJURY_PERMISSION_SDO)
             .date1(deadlineService.nextWorkingDayFromNowWeeks(4))
-            .input2("Any questions which are to be addressed to an expert must be sent to the expert directly "
-                        + "and uploaded to the Digital Portal by 4pm on")
+            .input2(PERSONAL_INJURY_QUESTIONS)
             .date2(deadlineService.nextWorkingDayFromNowWeeks(4))
-            .input3("The answers to the questions shall be answered by the Expert by")
+            .input3(PERSONAL_INJURY_ANSWERS)
             .date3(deadlineService.nextWorkingDayFromNowWeeks(8))
-            .input4("and uploaded to the Digital Portal by")
+            .input4(PERSONAL_INJURY_UPLOAD)
             .date4(deadlineService.nextWorkingDayFromNowWeeks(8))
             .build();
     }
 
     private FastTrackRoadTrafficAccident buildRoadTrafficAccident() {
         return FastTrackRoadTrafficAccident.builder()
-            .input("Photographs and/or a plan of the accident location shall be prepared and agreed by the "
-                       + "parties and uploaded to the Digital Portal by 4pm on")
+            .input(ROAD_TRAFFIC_ACCIDENT_UPLOAD_SDO)
             .date(deadlineService.nextWorkingDayFromNowWeeks(8))
             .build();
     }

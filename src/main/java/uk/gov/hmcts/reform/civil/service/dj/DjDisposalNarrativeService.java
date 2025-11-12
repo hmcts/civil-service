@@ -13,6 +13,19 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingSchedulesO
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingWitnessOfFactDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearingTimeDJ;
 
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_BUNDLE_REQUIREMENT;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_DOCUMENTS_EXCHANGE;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_SCHEDULE_CLAIMANT_SEND_DJ;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_SCHEDULE_COUNTER_SEND;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_SCHEDULE_COUNTER_UPLOAD_DJ;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_SCHEDULE_FUTURE_LOSS;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_WITNESS_CPR32_6;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_WITNESS_CPR32_7_DEADLINE;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_WITNESS_TRIAL_NOTE_DJ;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_WITNESS_UPLOAD;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.ORDER_WITHOUT_HEARING_UPLOAD_TO_PORTAL_DJ;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.PERSONAL_INJURY_PERMISSION_DJ;
+
 @Service
 @RequiredArgsConstructor
 public class DjDisposalNarrativeService {
@@ -28,33 +41,25 @@ public class DjDisposalNarrativeService {
 
     public DisposalHearingDisclosureOfDocumentsDJ buildDisclosureOfDocuments() {
         return DisposalHearingDisclosureOfDocumentsDJ.builder()
-            .input("The parties shall serve on each other copies of the documents upon which "
-                       + "reliance is to be placed at the disposal hearing by 4pm on")
+            .input(DISPOSAL_DOCUMENTS_EXCHANGE)
             .date(deadlineService.nextWorkingDayInWeeks(4))
             .build();
     }
 
     public DisposalHearingWitnessOfFactDJ buildWitnessOfFact() {
         return DisposalHearingWitnessOfFactDJ.builder()
-            .input1("The claimant must upload to the Digital Portal copies of "
-                        + "the witness statements of all witnesses of fact on whose evidence reliance "
-                        + "is to be placed by 4pm on ")
+            .input1(DISPOSAL_WITNESS_UPLOAD + " ")
             .date1(deadlineService.nextWorkingDayInWeeks(4))
-            .input2("The provisions of CPR 32.6 apply to such evidence.")
-            .input3("Any application by the defendant in relation to CPR 32.7 must be made by 4pm on")
+            .input2(DISPOSAL_WITNESS_CPR32_6)
+            .input3(DISPOSAL_WITNESS_CPR32_7_DEADLINE)
             .date2(deadlineService.nextWorkingDayInWeeks(2))
-            .input4("and must be accompanied by proposed directions for allocation and listing for trial on "
-                        + "quantum. This is because cross-examination will cause the hearing to exceed the "
-                        + "30 minute maximum time estimate for a disposal hearing.")
+            .input4(DISPOSAL_WITNESS_TRIAL_NOTE_DJ)
             .build();
     }
 
     public DisposalHearingMedicalEvidenceDJ buildMedicalEvidence() {
         return DisposalHearingMedicalEvidenceDJ.builder()
-            .input1("The claimant has permission to rely upon the written expert evidence already uploaded to"
-                        + " the Digital Portal with the particulars of claim and in addition has permission to rely"
-                        + " upon any associated correspondence or updating report which is uploaded to the"
-                        + " Digital Portal by 4pm on")
+            .input1(PERSONAL_INJURY_PERMISSION_DJ)
             .date1(deadlineService.nextWorkingDayInWeeks(4))
             .build();
     }
@@ -67,18 +72,13 @@ public class DjDisposalNarrativeService {
 
     public DisposalHearingSchedulesOfLossDJ buildSchedulesOfLoss() {
         return DisposalHearingSchedulesOfLossDJ.builder()
-            .input1("If there is a claim for ongoing or future loss in the original schedule of losses then the"
-                        + " claimant must send an up to date schedule of loss to the defendant by 4pm on the")
+            .input1(DISPOSAL_SCHEDULE_CLAIMANT_SEND_DJ)
             .date1(deadlineService.nextWorkingDayInWeeks(10))
-            .input2("If the defendant wants to challenge this claim, they must send an up-to-date counter-schedule"
-                        + " of loss to the claimant by 4pm on")
+            .input2(DISPOSAL_SCHEDULE_COUNTER_SEND)
             .date2(deadlineService.nextWorkingDayInWeeks(12))
-            .input3("If the defendant wants to challenge the sums claimed in the schedule of loss they must"
-                        + " upload to the Digital Portal an updated counter schedule of loss by 4pm on")
+            .input3(DISPOSAL_SCHEDULE_COUNTER_UPLOAD_DJ)
             .date3(deadlineService.nextWorkingDayInWeeks(12))
-            .inputText4("If there is a claim for future pecuniary loss and the parties have not already set out their"
-                            + " case on periodical payments, they must do so in the respective schedule and "
-                            + "counter-schedule.")
+            .inputText4(DISPOSAL_SCHEDULE_FUTURE_LOSS)
             .build();
     }
 
@@ -98,15 +98,13 @@ public class DjDisposalNarrativeService {
 
     public DisposalHearingBundleDJ buildBundle() {
         return DisposalHearingBundleDJ.builder()
-            .input("At least 7 days before the disposal hearing, the claimant must file and serve")
+            .input(DISPOSAL_BUNDLE_REQUIREMENT)
             .build();
     }
 
     public DisposalHearingNotesDJ buildNotes() {
         return DisposalHearingNotesDJ.builder()
-            .input("This order has been made without a hearing. Each party has the right to apply to have this "
-                       + "order set aside or varied. Any such application must be uploaded to the Digital Portal together"
-                       + " with payment of any appropriate fee, by 4pm on")
+            .input(ORDER_WITHOUT_HEARING_UPLOAD_TO_PORTAL_DJ)
             .date(deadlineService.nextWorkingDayInWeeks(1))
             .build();
     }

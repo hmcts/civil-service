@@ -9,6 +9,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.ORDER_WITHOUT_HEARING_RECEIVED_BY_COURT_WITH_ARTICLE;
 
 class DjWelshLanguageServiceTest {
 
@@ -28,7 +29,10 @@ class DjWelshLanguageServiceTest {
         String result = service.buildOrderMadeWithoutHearingText(deadline);
 
         String formattedDate = deadline.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH));
-        assertThat(result).contains(formattedDate);
-        assertThat(result).contains("This order has been made without a hearing.");
+        assertThat(result).isEqualTo(String.format(
+            "%s %s.",
+            ORDER_WITHOUT_HEARING_RECEIVED_BY_COURT_WITH_ARTICLE,
+            formattedDate
+        ));
     }
 }

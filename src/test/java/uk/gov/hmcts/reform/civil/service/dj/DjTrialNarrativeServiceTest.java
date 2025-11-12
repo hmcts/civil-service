@@ -15,6 +15,7 @@ import java.time.LocalDate;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FAST_TRACK_TRIAL_MANUAL_BUNDLE_GUIDANCE;
 
 @ExtendWith(MockitoExtension.class)
 class DjTrialNarrativeServiceTest {
@@ -67,6 +68,7 @@ class DjTrialNarrativeServiceTest {
         assertThat(result.getDate1()).isEqualTo(twentyTwoWeeks);
         assertThat(result.getDate2()).isEqualTo(thirtyWeeks);
         assertThat(result.getDateToToggle()).hasSize(1);
+        assertThat(result.getHelpText2()).isEqualTo(FAST_TRACK_TRIAL_MANUAL_BUNDLE_GUIDANCE);
     }
 
     @Test

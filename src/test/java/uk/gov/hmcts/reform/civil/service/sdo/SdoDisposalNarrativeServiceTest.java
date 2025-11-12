@@ -12,6 +12,18 @@ import java.time.LocalDate;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.lenient;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_BUNDLE_REQUIREMENT;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_DOCUMENTS_EXCHANGE;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_DOCUMENTS_UPLOAD;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_SCHEDULE_CLAIMANT_UPLOAD_SDO;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_SCHEDULE_COUNTER_SEND;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_SCHEDULE_COUNTER_UPLOAD_SDO;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_WITNESS_CPR32_6;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_WITNESS_CPR32_7_DEADLINE;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_WITNESS_TRIAL_NOTE_SDO;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_WITNESS_UPLOAD;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.ORDER_WITHOUT_HEARING_RECEIVED_BY_COURT_NO_ARTICLE;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.ORDER_WITHOUT_HEARING_UPLOAD_TO_PORTAL_SDO;
 
 @ExtendWith(MockitoExtension.class)
 class SdoDisposalNarrativeServiceTest {
@@ -42,8 +54,20 @@ class SdoDisposalNarrativeServiceTest {
         CaseData result = builder.build();
         assertThat(result.getDisposalHearingDisclosureOfDocuments().getDate1())
             .isEqualTo(LocalDate.of(2025, 4, 1).plusWeeks(10));
+        assertThat(result.getDisposalHearingDisclosureOfDocuments().getInput1())
+            .isEqualTo(DISPOSAL_DOCUMENTS_EXCHANGE);
+        assertThat(result.getDisposalHearingDisclosureOfDocuments().getInput2())
+            .isEqualTo(DISPOSAL_DOCUMENTS_UPLOAD);
         assertThat(result.getDisposalHearingWitnessOfFact().getDate2())
             .isEqualTo(LocalDate.of(2025, 4, 1).plusWeeks(4));
+        assertThat(result.getDisposalHearingWitnessOfFact().getInput3())
+            .isEqualTo(DISPOSAL_WITNESS_UPLOAD);
+        assertThat(result.getDisposalHearingWitnessOfFact().getInput4())
+            .isEqualTo(DISPOSAL_WITNESS_CPR32_6);
+        assertThat(result.getDisposalHearingWitnessOfFact().getInput5())
+            .isEqualTo(DISPOSAL_WITNESS_CPR32_7_DEADLINE);
+        assertThat(result.getDisposalHearingWitnessOfFact().getInput6())
+            .isEqualTo(DISPOSAL_WITNESS_TRIAL_NOTE_SDO);
     }
 
     @Test
@@ -55,9 +79,29 @@ class SdoDisposalNarrativeServiceTest {
 
         CaseData result = builder.build();
         assertThat(result.getDisposalOrderWithoutHearing().getInput())
-            .contains("This order has been made without hearing.");
+            .startsWith(ORDER_WITHOUT_HEARING_RECEIVED_BY_COURT_NO_ARTICLE);
+        assertThat(result.getDisposalHearingNotes().getInput())
+            .isEqualTo(ORDER_WITHOUT_HEARING_UPLOAD_TO_PORTAL_SDO);
         assertThat(result.getDisposalHearingNotes().getDate())
             .isEqualTo(LocalDate.of(2025, 4, 1).plusWeeks(1));
+    }
+
+    @Test
+    void shouldPopulateSchedulesAndBundleUsingLibraryText() {
+        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
+
+        service.applySchedulesOfLoss(builder);
+        service.applyBundle(builder);
+
+        CaseData result = builder.build();
+        assertThat(result.getDisposalHearingSchedulesOfLoss().getInput2())
+            .isEqualTo(DISPOSAL_SCHEDULE_CLAIMANT_UPLOAD_SDO);
+        assertThat(result.getDisposalHearingSchedulesOfLoss().getInput3())
+            .isEqualTo(DISPOSAL_SCHEDULE_COUNTER_SEND);
+        assertThat(result.getDisposalHearingSchedulesOfLoss().getInput4())
+            .isEqualTo(DISPOSAL_SCHEDULE_COUNTER_UPLOAD_SDO);
+        assertThat(result.getDisposalHearingBundle().getInput())
+            .isEqualTo(DISPOSAL_BUNDLE_REQUIREMENT);
     }
 
     @Test

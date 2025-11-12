@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialRoadTrafficAccident;
 
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.ROAD_TRAFFIC_ACCIDENT_UPLOAD_DJ;
+
 @Service
 @RequiredArgsConstructor
 public class DjRoadTrafficAccidentDirectionsService {
@@ -12,10 +14,7 @@ public class DjRoadTrafficAccidentDirectionsService {
 
     public TrialRoadTrafficAccident buildTrialRoadTrafficAccident() {
         return TrialRoadTrafficAccident.builder()
-            .input("Photographs and/or a plan of the accident location "
-                       + "shall be prepared "
-                       + "and agreed by the parties and uploaded to the"
-                       + " Digital Portal by 4pm on")
+            .input(ROAD_TRAFFIC_ACCIDENT_UPLOAD_DJ)
             .date1(deadlineService.nextWorkingDayInWeeks(4))
             .build();
     }

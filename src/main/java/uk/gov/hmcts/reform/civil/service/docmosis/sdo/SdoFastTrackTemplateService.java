@@ -19,6 +19,7 @@ import java.util.Optional;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.sdo.AddOrRemoveToggle.ADD;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FAST_TRACK_DIGITAL_PORTAL_BUNDLE_WARNING;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +31,8 @@ public class SdoFastTrackTemplateService {
     private final SdoFastTrackTemplateFieldService fastTrackTemplateFieldService;
 
     public SdoDocumentFormFast buildTemplate(CaseData caseData, String judgeName, boolean isJudge, String authorisation) {
+        boolean showBundleInfo = hasVariable(caseData, FastTrackVariable.TRIAL_BUNDLE_TOGGLE);
+
         SdoDocumentFormFast.SdoDocumentFormFastBuilder builder = SdoDocumentFormFast.builder()
             .writtenByJudge(isJudge)
             .currentDate(LocalDate.now())
@@ -58,6 +61,9 @@ public class SdoFastTrackTemplateService {
             .fastTrackSchedulesOfLoss(caseData.getFastTrackSchedulesOfLoss())
             .fastTrackTrial(caseData.getFastTrackTrial())
             .fastTrackTrialBundleTypeText(fastTrackTemplateFieldService.getTrialBundleTypeText(caseData))
+            .fastTrackDigitalPortalBundleWarning(
+                showBundleInfo ? FAST_TRACK_DIGITAL_PORTAL_BUNDLE_WARNING : null
+            )
             .fastTrackMethod(caseData.getFastTrackMethod())
             .fastTrackMethodInPerson(caseData.getFastTrackMethodInPerson())
             .fastTrackMethodTelephoneHearing(fastTrackTemplateFieldService.getMethodTelephoneHearingLabel(caseData))
@@ -83,7 +89,7 @@ public class SdoFastTrackTemplateService {
             .fastTrackTrialToggle(hasVariable(caseData, FastTrackVariable.TRIAL))
             .fastTrackMethodToggle(true) // legacy toggle always true per CIV-5142
             .fastTrackAllocation(fastTrackTemplateFieldService.getAllocationSummary(caseData))
-            .showBundleInfo(hasVariable(caseData, FastTrackVariable.TRIAL_BUNDLE_TOGGLE))
+            .showBundleInfo(showBundleInfo)
             .fastTrackOrderWithoutJudgement(caseData.getFastTrackOrderWithoutJudgement())
             .fastTrackHearingTime(caseData.getFastTrackHearingTime())
             .fastTrackHearingTimeEstimate(fastTrackTemplateFieldService.getHearingTimeLabel(caseData))
