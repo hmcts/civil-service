@@ -28,6 +28,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -119,8 +120,12 @@ class NoOngoingBusinessProcessAspectTest {
                 .errors(List.of(ERROR_MESSAGE))
                 .build();
 
-            when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(stateFlow);
-            when(stateFlow.getStateHistory()).thenReturn(List.of(State.from("state1")));
+            StateFlow mockStateFlow = mock(StateFlow.class);
+            State mockState = mock(uk.gov.hmcts.reform.civil.stateflow.model.State.class);
+            when(mockState.getName()).thenReturn("state1");
+            when(mockStateFlow.getState()).thenReturn(mockState);
+            when(mockStateFlow.getStateHistory()).thenReturn(List.of(mockState));
+            when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockStateFlow);
 
             CallbackParams callbackParams = createCallbackParams(
                 CREATE_CLAIM.name(),
