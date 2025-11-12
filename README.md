@@ -27,6 +27,9 @@ Visual snapshots of the automated journey logic are generated from the live Stat
 
 Each image links to an SVG whose source (`docs/*.mmd`) is produced by `python3 scripts/export_stateflow_transitions.py`. If you need the narrative in text form, see `docs/stateflow_transition_catalogue.md` or the structured `docs/stateflow/transition_catalogue.json`.
 
+- Per-state allowed CCD events: [flowstate_allowed_events.md](docs/flowstate_allowed_events.md)
+- Spec-only allowed CCD events: [flowstate_allowed_spec_events.md](docs/flowstate_allowed_spec_events.md)
+
 ## Building and deploying the application
 
 ### Dependencies
