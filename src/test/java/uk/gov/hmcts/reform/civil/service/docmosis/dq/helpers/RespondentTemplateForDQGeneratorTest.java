@@ -9,16 +9,22 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.DirectionsQuestionnaireForm;
 import uk.gov.hmcts.reform.civil.model.dq.DQ;
+import uk.gov.hmcts.reform.civil.model.dq.Expert;
+import uk.gov.hmcts.reform.civil.model.dq.Experts;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @ExtendWith(MockitoExtension.class)
 class RespondentTemplateForDQGeneratorTest {
@@ -111,5 +117,25 @@ class RespondentTemplateForDQGeneratorTest {
         assertNotNull(result);
         assertNotNull(result.getExperts());
         assertEquals(NO, result.getExperts().getExpertRequired());
+    }
+
+    @Test
+    void shouldDefaultExpertCostToZeroWhenEstimatedCostMissing() {
+        Expert expertWithNullCost = Expert.builder()
+            .firstName("John")
+            .lastName("Doe")
+            .estimatedCost(null)
+            .build();
+
+        Respondent1DQ dq = Respondent1DQ.builder()
+            .respondent1DQExperts(Experts.builder()
+                                       .expertRequired(YES)
+                                       .details(List.of(element(expertWithNullCost)))
+                                       .build())
+            .build();
+
+        List<uk.gov.hmcts.reform.civil.model.docmosis.dq.Expert> experts = respondentTemplateForDQGenerator.getExpertsDetails(dq);
+
+        assertEquals("£0.00", experts.get(0).getFormattedCost());
     }
 }
