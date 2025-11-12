@@ -65,13 +65,13 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
     TransitionsTestConfiguration.class,
     EventHistorySequencer.class,
     EventHistoryMapper.class,
-    RoboticsDataMapper.class,
+    RoboticsDataMapperForUnspec.class,
     RoboticsAddressMapper.class,
     AddressLinesMapper.class,
     OrganisationService.class
 })
 @ExtendWith(SpringExtension.class)
-class RoboticsDataMapperTest {
+class RoboticsDataMapperForUnspecTest {
 
     private static final ContactInformation CONTACT_INFORMATION = ContactInformation.builder()
         .addressLine1("line 1")
@@ -115,7 +115,7 @@ class RoboticsDataMapperTest {
     }
 
     @Autowired
-    RoboticsDataMapper mapper;
+    RoboticsDataMapperForUnspec mapper;
 
     @Test
     void shouldMapToRoboticsCaseData_whenHandOffPointIsUnrepresentedDefendant() {
