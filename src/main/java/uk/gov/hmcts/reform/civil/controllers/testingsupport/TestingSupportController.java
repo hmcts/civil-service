@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.ccd.client.model.CaseAssignmentUserRolesResource;
+import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.controllers.testingsupport.model.TestCamundaProcess;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.event.HearingFeePaidEvent;
@@ -50,12 +51,12 @@ import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.judgments.CjesMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper;
-import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForUnspec;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSpec;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 
@@ -77,9 +78,11 @@ public class TestingSupportController {
     private final FeatureToggleService featureToggleService;
     private final IStateFlowEngine stateFlowEngine;
     private final EventHistoryMapper eventHistoryMapper;
-    private final RoboticsDataMapper roboticsDataMapper;
+    private final RoboticsDataMapperForUnspec roboticsDataMapper;
     private final RoboticsDataMapperForSpec roboticsSpecDataMapper;
     private final CjesMapper cjesMapper;
+    private final SystemUpdateUserConfiguration systemUserConfig;
+    private final UserService userService;
 
     private final ClaimDismissedHandler claimDismissedHandler;
     private final HearingFeePaidEventHandler hearingFeePaidHandler;
@@ -89,7 +92,6 @@ public class TestingSupportController {
 
     private final CheckStayOrderDeadlineEndTaskHandler checkStayOrderDeadlineEndTaskHandler;
     private final CheckUnlessOrderDeadlineEndTaskHandler checkUnlessOrderDeadlineEndTaskHandler;
-    private final UserService userService;
     private final OrganisationService organisationService;
     private final GaOrganisationService gaOrganisationService;
     private final CoreCaseUserService coreCaseUserService;
@@ -206,7 +208,7 @@ public class TestingSupportController {
         produces = "application/json")
     public String getRPAJsonInformationForCaseData(
         @RequestBody CaseData caseData) throws JsonProcessingException {
-        return roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
+        return roboticsDataMapper.toRoboticsCaseData(caseData, getSystemUserToken()).toJsonString();
     }
 
     @PostMapping(
@@ -214,7 +216,7 @@ public class TestingSupportController {
         produces = "application/json")
     public String getRPAJsonInformationForSpecCaseData(
         @RequestBody CaseData caseData) throws JsonProcessingException {
-        return roboticsSpecDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
+        return roboticsSpecDataMapper.toRoboticsCaseData(caseData, getSystemUserToken()).toJsonString();
     }
 
     @PostMapping(
@@ -307,22 +309,21 @@ public class TestingSupportController {
     }
 
     @RequestMapping(
-        method = RequestMethod.GET,
-        value = "/testing-support/camunda-processes",
-        produces = "application/json")
+            method = RequestMethod.GET,
+            value = "/testing-support/camunda-processes",
+            produces = "application/json")
     public ResponseEntity<List<HistoricProcessInstanceDto>> getCamundaProcesses(
-        @RequestParam(value = "processInstanceId", required = false) String processInstanceId,
-        @RequestParam(value = "definitionKey", required = false) String definitionKey,
-        @RequestParam(value = "variables", required = false) String variables
+            @RequestParam(value = "processInstanceId", required = false) String processInstanceId,
+            @RequestParam(value = "definitionKey", required = false) String definitionKey,
+            @RequestParam(value = "variables", required = false) String variables
     ) {
         ResponseEntity<List<HistoricProcessInstanceDto>> response =
-            camundaRestEngineClient.getProcessInstances(processInstanceId, definitionKey, variables);
+                camundaRestEngineClient.getProcessInstances(processInstanceId, definitionKey, variables);
         return new ResponseEntity<>(response.getBody(), response.getStatusCode());
     }
 
-
     /*Check if Camunda Event CREATE_GENERAL_APPLICATION_CASE is Finished
-    if so, generalApplicationsDetails object will be populated with GA case references*/
+if so, generalApplicationsDetails object will be populated with GA case references*/
     @GetMapping("/testing-support/case/{caseId}/business-process/ga")
     public ResponseEntity<BusinessProcessInfo> getGACaseReference(@PathVariable("caseId") Long caseId) {
         log.info("Get GA case reference for caseId: {}", caseId);
@@ -407,5 +408,9 @@ public class TestingSupportController {
         return gaOrganisationService.findOrganisationByUserId(userId)
             .map(Organisation::getOrganisationIdentifier).orElse(null);
 
+    }
+
+    private String getSystemUserToken() {
+        return userService.getAccessToken(systemUserConfig.getUserName(), systemUserConfig.getPassword());
     }
 }
