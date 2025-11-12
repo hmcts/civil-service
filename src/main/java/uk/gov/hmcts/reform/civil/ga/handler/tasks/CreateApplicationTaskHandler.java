@@ -100,7 +100,7 @@ public class CreateApplicationTaskHandler extends BaseExternalTaskHandler {
             )
         );
 
-        log.info("Parent case data updated for case ID: {}", caseData.getCcdCaseReference());
+        log.info("Parent case data updated for case data: {}", parentCaseData);
 
         return ExternalTaskData.builder()
             .parentCaseData(parentCaseData)
