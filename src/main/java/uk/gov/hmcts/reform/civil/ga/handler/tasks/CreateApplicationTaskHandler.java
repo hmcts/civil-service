@@ -73,7 +73,7 @@ public class CreateApplicationTaskHandler extends BaseExternalTaskHandler {
                     && application.getValue().getBusinessProcess().getProcessInstanceId() != null).findFirst();
 
             if (genApps.isPresent()) {
-                log.info("Eligible general application found for processing in case data: {}", caseData);
+                log.debug("Eligible general application found for processing in case ID: {}", caseId);
 
                 GeneralApplication generalApplication = genApps.get().getValue();
 
@@ -81,27 +81,18 @@ public class CreateApplicationTaskHandler extends BaseExternalTaskHandler {
                 boolean defendantBilingual = caseData.getRespondent1LiPResponse() != null
                     && BILINGUAL_TYPES.contains(caseData.getRespondent1LiPResponse().getRespondent1ResponseLanguage());
                 generalAppCaseData = createGeneralApplicationCase(caseId, generalApplication, claimantBilingual, defendantBilingual);
-                log.info("General application case created data: {}", generalAppCaseData);
-                generalApplication = updateParentCaseGeneralApplication(variables, generalApplication, generalAppCaseData);
-                log.info("Update Parent Case General Application ID: {}", generalAppCaseData.getCcdCaseReference());
+                log.debug("General application case created with ID: {}", generalAppCaseData.getCcdCaseReference());
+                updateParentCaseGeneralApplication(variables, generalApplication, generalAppCaseData);
+
                 caseData = withoutNoticeNoConsent(generalApplication, caseData, generalAppCaseData);
-                log.info("Without Notice No Consent ID: {}", generalAppCaseData.getCcdCaseReference());
+
             }
         }
 
-        log.info("About to update parent case data ID {}", caseData.getCcdCaseReference());
-        log.info("About to update parent case data with {}", caseData);
-
-        var parentCaseData = coreCaseDataService.submitUpdate(
-            caseId,
-            coreCaseDataService.caseDataContentFromStartEventResponse(
-                startEventResponse,
-                caseData.toMap(mapper)
-            )
-        );
-
-        log.info("Parent case data updated for case data: {}", parentCaseData);
-
+        var parentCaseData = coreCaseDataService.submitUpdate(caseId,
+                                                              coreCaseDataService.caseDataContentFromStartEventResponse(
+                                                                  startEventResponse,
+                                                                  caseData.toMap(mapper)));
         return ExternalTaskData.builder()
             .parentCaseData(parentCaseData)
             .updateGeneralApplicationCaseData(generalAppCaseData)
@@ -252,24 +243,19 @@ public class CreateApplicationTaskHandler extends BaseExternalTaskHandler {
         return newApplication;
     }
 
-    private GeneralApplication updateParentCaseGeneralApplication(ExternalTaskInput variables,
-                                                                  GeneralApplication generalApplication,
-                                                                  GeneralApplicationCaseData generalAppCaseData) {
-        return generalApplication.toBuilder()
-            .generalAppN245FormUpload(null)
-            .generalAppEvidenceDocument(null)
-            .businessProcess(
-                generalApplication.getBusinessProcess().toBuilder()
-                    .status(BusinessProcessStatus.FINISHED)
-                    .camundaEvent(variables.getCaseEvent().name())
-                    .build()
-            )
-            .caseLink(
-                generalAppCaseData != null && generalAppCaseData.getCcdCaseReference() != null
-                    ? CaseLink.builder().caseReference(String.valueOf(generalAppCaseData.getCcdCaseReference())).build()
-                    : generalApplication.getCaseLink()
-            )
-            .build();
+    private void updateParentCaseGeneralApplication(ExternalTaskInput variables,
+                                                    GeneralApplication generalApplication,
+                                                    GeneralApplicationCaseData generalAppCaseData) {
+        generalApplication.getBusinessProcess().setStatus(BusinessProcessStatus.FINISHED);
+        if (Objects.nonNull(generalApplication.getGeneralAppEvidenceDocument())) {
+            generalApplication.getGeneralAppEvidenceDocument().clear();
+        }
+        generalApplication.setGeneralAppN245FormUpload(null);
+        generalApplication.getBusinessProcess().setCamundaEvent(variables.getCaseEvent().name());
+        if (generalAppCaseData != null && generalAppCaseData.getCcdCaseReference() != null) {
+            generalApplication.setCaseLink(CaseLink.builder().caseReference(String.valueOf(
+                generalAppCaseData.getCcdCaseReference())).build());
+        }
     }
 
     private GeneralApplicationCaseData createGeneralApplicationCase(String caseId, GeneralApplication generalApplication,
