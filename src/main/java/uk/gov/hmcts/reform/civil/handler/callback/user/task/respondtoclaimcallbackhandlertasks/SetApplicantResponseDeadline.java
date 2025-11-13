@@ -103,7 +103,6 @@ public class SetApplicantResponseDeadline implements CaseTask {
                 .updateBothRespondentsResponseSameLegalRep(
                     callbackParams,
                     caseData,
-                    caseData,
                     responseDate,
                     applicant1Deadline
             );
@@ -112,7 +111,6 @@ public class SetApplicantResponseDeadline implements CaseTask {
                 .updateResponseDataForSecondRespondent(
                     callbackParams,
                     caseData,
-                    responseDate,
                     caseData,
                     applicant1Deadline
             );

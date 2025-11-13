@@ -41,7 +41,6 @@ public class UpdateDataRespondentDeadlineResponse {
 
     void updateBothRespondentsResponseSameLegalRep(CallbackParams callbackParams,
                                                    CaseData caseData,
-                                                   CaseData updatedData,
                                                    LocalDateTime responseDate,
                                                    LocalDateTime applicant1Deadline) {
         if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == YES) {
@@ -58,7 +57,6 @@ public class UpdateDataRespondentDeadlineResponse {
 
     void updateResponseDataForSecondRespondent(CallbackParams callbackParams,
                                                CaseData updatedData,
-                                               LocalDateTime responseDate,
                                                CaseData caseData,
                                                LocalDateTime applicant1Deadline) {
         updatedData.getRespondent2ResponseDate();

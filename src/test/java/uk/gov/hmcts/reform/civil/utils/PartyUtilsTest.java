@@ -271,8 +271,11 @@ class PartyUtilsTest {
             String partyReferences = PartyUtils.buildPartiesReferences(caseData);
 
             assertEquals(
-                "Claimant reference: 12345\nDefendant 1 reference: 6789\nDefendant 2 reference: "
-                    + "defendant sol 2",
+                """
+                Claimant reference: 12345
+                Defendant 1 reference: 6789
+                Defendant 2 reference: defendant sol 2
+                """,
                 partyReferences
             );
         }
@@ -357,21 +360,22 @@ class PartyUtilsTest {
         @Test
         void shouldReturnCorrectResponseTypeFor1v1Cases() {
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build();
-
             assertEquals(
+                FULL_DEFENCE,
                 PartyUtils.getResponseTypeForRespondent(
                     caseData,
                     caseData.getRespondent1()
-                ), FULL_DEFENCE
+                )
             );
 
             CaseData partAdmissionCaseData = CaseDataBuilder.builder().atStateRespondentPartAdmission().build();
 
             assertEquals(
+                PART_ADMISSION,
                 PartyUtils.getResponseTypeForRespondent(
                     partAdmissionCaseData,
                     partAdmissionCaseData.getRespondent1()
-                ), PART_ADMISSION
+                )
             );
         }
 
@@ -384,17 +388,19 @@ class PartyUtilsTest {
                 .build();
 
             assertEquals(
+                FULL_DEFENCE,
                 PartyUtils.getResponseTypeForRespondent(
                     caseData,
                     caseData.getRespondent1()
-                ), FULL_DEFENCE
+                )
             );
 
             assertEquals(
+                FULL_DEFENCE,
                 PartyUtils.getResponseTypeForRespondent(
                     caseData,
                     caseData.getRespondent2()
-                ), FULL_DEFENCE
+                )
             );
 
             CaseData partAdmissionCaseData = CaseDataBuilder.builder()
@@ -405,17 +411,19 @@ class PartyUtilsTest {
                 .build();
 
             assertEquals(
+                FULL_ADMISSION,
                 PartyUtils.getResponseTypeForRespondent(
                     partAdmissionCaseData,
                     partAdmissionCaseData.getRespondent1()
-                ), FULL_ADMISSION
+                )
             );
 
             assertEquals(
+                PART_ADMISSION,
                 PartyUtils.getResponseTypeForRespondent(
                     partAdmissionCaseData,
                     partAdmissionCaseData.getRespondent2()
-                ), PART_ADMISSION
+                )
             );
         }
 
