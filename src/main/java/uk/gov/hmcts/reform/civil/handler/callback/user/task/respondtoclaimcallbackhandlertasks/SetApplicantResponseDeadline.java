@@ -107,6 +107,7 @@ public class SetApplicantResponseDeadline implements CaseTask {
                     applicant1Deadline
             );
         } else if (isSolicitorRepresentingOneOrBothRespondents(callbackParams, RESPONDENTSOLICITORTWO)) {
+            caseData.setRespondent2ResponseDate(responseDate);
             updateDataRespondentDeadlineResponse
                 .updateResponseDataForSecondRespondent(
                     callbackParams,

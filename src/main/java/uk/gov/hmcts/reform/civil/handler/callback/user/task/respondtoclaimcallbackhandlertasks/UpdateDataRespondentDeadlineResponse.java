@@ -59,7 +59,6 @@ public class UpdateDataRespondentDeadlineResponse {
                                                CaseData updatedData,
                                                CaseData caseData,
                                                LocalDateTime applicant1Deadline) {
-        updatedData.getRespondent2ResponseDate();
         updatedData.setBusinessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE));
         updateRespondent2StatementOfTruth(callbackParams, caseData);
         setApplicantDeadLineIfRespondent1DateExist(caseData, applicant1Deadline);
