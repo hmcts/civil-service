@@ -41,7 +41,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MAKE_PBA_PAYMENT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_EVENT;
 import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.FLOW_FLAGS;
 import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.FLOW_STATE;
 
@@ -150,7 +150,7 @@ class PaymentTaskHandlerTest {
         @Test
         void shouldNotCallHandleFailureMethod_whenCaseIdNotFound() {
             //given: ExternalTask variables without caseId
-            Map<String, Object> allVariables = Map.of("caseEvent", NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE);
+            Map<String, Object> allVariables = Map.of("caseEvent", NOTIFY_EVENT);
             when(mockExternalTask.getAllVariables())
                 .thenReturn(allVariables);
 
