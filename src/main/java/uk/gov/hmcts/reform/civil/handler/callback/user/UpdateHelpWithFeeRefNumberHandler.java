@@ -49,8 +49,7 @@ public class UpdateHelpWithFeeRefNumberHandler extends CallbackHandler {
     private CallbackResponse updateHwFReferenceNumber(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData updatedCaseData = setUpBusinessProcess(caseData);
-        updatedCaseData = updateHwFReference(updatedCaseData);
-
+        updateHwFReference(updatedCaseData);
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(updatedCaseData.toMap(objectMapper))
                 .build();
