@@ -12,14 +12,21 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
-import uk.gov.hmcts.reform.civil.service.dj.DjNotificationPropertiesService;
-import uk.gov.hmcts.reform.civil.service.dj.DjNotificationRecipientService;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DIRECTION_ORDER_DJ_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @Service
 @RequiredArgsConstructor
@@ -28,8 +35,11 @@ public class StandardDirectionOrderDJClaimantNotificationHandler extends Callbac
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
     private final ObjectMapper objectMapper;
-    private final DjNotificationRecipientService recipientService;
-    private final DjNotificationPropertiesService propertiesService;
+    private final OrganisationService organisationService;
+    private final NotificationsSignatureConfiguration configuration;
+    private final FeatureToggleService featureToggleService;
+    private static final String CLAIM_NUMBER = "claimReferenceNumber";
+    private static final String LEGAL_ORG_NAME = "legalOrgName";
     private static final List<CaseEvent> EVENTS = List.of(NOTIFY_DIRECTION_ORDER_DJ_CLAIMANT);
     private static final String REFERENCE_TEMPLATE_SDO_DJ = "sdo-dj-order-notification-claimant-%s";
     private static final String TASK_ID_CLAIMANT = "StandardDirectionOrderDj";
@@ -37,7 +47,7 @@ public class StandardDirectionOrderDJClaimantNotificationHandler extends Callbac
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::notifyClaimantSDOrderDj
+                callbackKey(ABOUT_TO_SUBMIT), this::notifyClaimantSDOrderDj
         );
     }
 
@@ -49,13 +59,15 @@ public class StandardDirectionOrderDJClaimantNotificationHandler extends Callbac
     private CallbackResponse notifyClaimantSDOrderDj(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         notificationService.sendMail(
-            recipientService.getClaimantEmail(caseData),
-            notificationsProperties.getStandardDirectionOrderDJTemplate(),
-            addProperties(caseData),
-            String.format(REFERENCE_TEMPLATE_SDO_DJ, caseData.getLegacyCaseReference()));
+                caseData.isApplicant1NotRepresented()
+                        ? caseData.getClaimantUserDetails().getEmail()
+                        : caseData.getApplicantSolicitor1UserDetails().getEmail(),
+                notificationsProperties.getStandardDirectionOrderDJTemplate(),
+                addProperties(caseData),
+                String.format(REFERENCE_TEMPLATE_SDO_DJ, caseData.getLegacyCaseReference()));
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseData.toMap(objectMapper))
-            .build();
+                .data(caseData.toMap(objectMapper))
+                .build();
     }
 
     @Override
@@ -65,6 +77,26 @@ public class StandardDirectionOrderDJClaimantNotificationHandler extends Callbac
 
     @Override
     public Map<String, String> addProperties(final CaseData caseData) {
-        return propertiesService.buildClaimantProperties(caseData);
+        HashMap<String, String> properties = new HashMap<>(Map.of(
+                LEGAL_ORG_NAME, getLegalOrganizationName(caseData),
+                CLAIM_NUMBER, caseData.getCcdCaseReference().toString(),
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+                CASEMAN_REF, caseData.getLegacyCaseReference()
+        ));
+        addAllFooterItems(caseData, properties, configuration,
+                featureToggleService.isPublicQueryManagementEnabled(caseData));
+        return properties;
+    }
+
+    private String getLegalOrganizationName(final CaseData caseData) {
+        if (nonNull(caseData.getApplicant1OrganisationPolicy().getOrganisation())) {
+            Optional<Organisation> organisation = organisationService
+                    .findOrganisationById(caseData.getApplicant1OrganisationPolicy()
+                            .getOrganisation().getOrganisationID());
+            if (organisation.isPresent()) {
+                return organisation.get().getName();
+            }
+        }
+        return caseData.getApplicant1().getPartyName();
     }
 }
