@@ -104,7 +104,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
     @ValueSource(booleans = {true, false})
     void shouldDetermineNextStateWhenCallbackIsVersion1(boolean postTranslation) {
 
-        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
         BusinessProcess businessProcess = BusinessProcess.builder().build();
 
         CaseData caseData = CaseDataBuilder.builder()
@@ -141,7 +140,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
 
         when(flowStateAllowedEventService.getFlowState(any())).thenReturn(flowStateTest);
 
-        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
         CaseData caseData;
         if (lipCase.equals("LIP")) {
             caseData = CaseDataBuilder.builder()
@@ -165,7 +163,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
     @ValueSource(booleans = {true, false})
     void shouldSetStateInMediationWhenClaimantAgreeToFreeMediation(boolean postTranslation) {
 
-        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
         BusinessProcess businessProcess = BusinessProcess.builder().build();
 
         CaseData caseData = CaseDataBuilder.builder()
@@ -242,7 +239,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
     @ValueSource(booleans = {true, false})
     void shouldSetProceedsInHeritageSystemWhenApplicantRejectedRepaymentPlan(boolean postTranslation) {
 
-        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
         BusinessProcess businessProcess = BusinessProcess.builder().build();
 
         CaseData caseData = CaseDataBuilder.builder()
@@ -265,7 +261,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
     @ValueSource(booleans = {true, false})
     void shouldSetStateJudicialReferralWhenClaimIsNotSettled(boolean postTranslation) {
 
-        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
         BusinessProcess businessProcess = BusinessProcess.builder().build();
 
         CaseData caseData = CaseDataBuilder.builder()
@@ -290,7 +285,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
     @ValueSource(booleans = {true, false})
     void shouldNotSetStateWhenMultiClaimIsNotSettled(boolean postTranslation) {
 
-        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
         BusinessProcess businessProcess = BusinessProcess.builder().build();
 
         CaseData caseData = CaseDataBuilder.builder()
@@ -319,7 +313,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
     @ValueSource(booleans = {true, false})
     void shouldNotSetStateWhenIntermediateClaimIsNotSettled(boolean postTranslation) {
 
-        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
         BusinessProcess businessProcess = BusinessProcess.builder().build();
 
         CaseData caseData = CaseDataBuilder.builder()
@@ -348,7 +341,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
     @ValueSource(booleans = {true, false})
     void shouldSetStateCaseSettledWhenClaimIsPartAdmitSettled(boolean postTranslation) {
 
-        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
         BusinessProcess businessProcess = BusinessProcess.builder().build();
 
         CaseData caseData = CaseDataBuilder.builder()
@@ -375,7 +367,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
     @ValueSource(booleans = {true, false})
     void shouldSetStateCaseStayedWhenItsLipVLipOneVOne(boolean postTranslation) {
 
-        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
         BusinessProcess businessProcess = BusinessProcess.builder().build();
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceSpec().build()
@@ -459,7 +450,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
     @ValueSource(booleans = {true, false})
     void shouldSetAwaitingApplicantIntentionWhenApplicantAcceptedImmediatePaymentPlanFor1V1(boolean postTranslation) {
 
-        CaseData.CaseDataBuilder<?, ?> builder = mock(CaseData.CaseDataBuilder.class);
         BusinessProcess businessProcess = BusinessProcess.builder().build();
 
         CaseData caseData = CaseDataBuilder.builder()
@@ -487,7 +477,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
     @Test
     void shouldSetAwaitingApplicantIntentionWhenApplicantWantToProceedImmediatePaymentPlanFor1V1() {
 
-        CaseData.CaseDataBuilder<?, ?> builder = mock(CaseData.CaseDataBuilder.class);
         BusinessProcess businessProcess = BusinessProcess.builder().build();
 
         CaseData caseData = CaseDataBuilder.builder()

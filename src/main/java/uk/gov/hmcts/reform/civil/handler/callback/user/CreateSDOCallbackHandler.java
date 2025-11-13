@@ -886,7 +886,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .date4(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusDays(49)))
             .build();
 
-        updatedData.fastTrackPersonalInjury(tempFastTrackPersonalInjury).build();
+        updatedData.fastTrackPersonalInjury(tempFastTrackPersonalInjury);
     }
 
     private void updateDisclosureOfDocumentFields(CaseData.CaseDataBuilder<?, ?> updatedData) {
@@ -903,7 +903,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .date3(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)))
             .build();
 
-        updatedData.fastTrackDisclosureOfDocuments(tempFastTrackDisclosureOfDocuments).build();
+        updatedData.fastTrackDisclosureOfDocuments(tempFastTrackDisclosureOfDocuments);
     }
 
     private void populateDRHFields(CallbackParams callbackParams,
@@ -912,9 +912,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         DynamicList courtList = getCourtLocationForSdoR2(preferredCourt.orElse(null), locationRefDataList);
         courtList.setValue(courtList.getListItems().get(0));
 
-        DynamicListElement hearingMethodTelephone = hearingMethodList.getListItems().stream().filter(elem -> elem.getLabel()
-            .equals(HearingMethod.TELEPHONE.getLabel())).findFirst().orElse(null);
-        hearingMethodList.setValue(hearingMethodTelephone);
+        hearingMethodList.setValue(hearingMethodList.getListItems().stream().filter(elem -> elem.getLabel()
+            .equals(HearingMethod.TELEPHONE.getLabel())).findFirst().orElse(null));
 
         updatedData.sdoR2SmallClaimsJudgesRecital(SdoR2SmallClaimsJudgesRecital.builder().input(
             SdoR2UiConstantSmallClaim.JUDGE_RECITAL).build());
@@ -967,8 +966,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.sdoR2SmallClaimsWitnessStatementsToggle(includeInOrderToggle);
         updatedData.sdoR2DrhUseOfWelshLanguage(SdoR2WelshLanguageUsage.builder().description(SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION).build());
 
-        CaseData caseData = callbackParams.getCaseData();
-        if (featureToggleService.isCarmEnabledForCase(caseData)) {
+        if (featureToggleService.isCarmEnabledForCase(callbackParams.getCaseData())) {
             updatedData.sdoR2SmallClaimsMediationSectionToggle(includeInOrderToggle);
             updatedData.sdoR2SmallClaimsMediationSectionStatement(SdoR2SmallClaimsMediation.builder()
                                                                       .input(SdoR2UiConstantSmallClaim.CARM_MEDIATION_TEXT)
@@ -980,9 +978,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                                        Optional<RequestedCourt> preferredCourt,
                                        List<LocationRefData> locationRefDataList) {
 
-        DynamicListElement hearingMethodInPerson = hearingMethodList.getListItems().stream().filter(elem -> elem.getLabel()
-            .equals(HearingMethod.IN_PERSON.getLabel())).findFirst().orElse(null);
-        hearingMethodList.setValue(hearingMethodInPerson);
+        hearingMethodList.setValue(hearingMethodList.getListItems().stream().filter(elem -> elem.getLabel()
+            .equals(HearingMethod.IN_PERSON.getLabel())).findFirst().orElse(null));
         updatedData.sdoFastTrackJudgesRecital(FastTrackJudgesRecital.builder()
                                                   .input(SdoR2UiConstantFastTrack.JUDGE_RECITAL).build());
         updatedData.sdoR2DisclosureOfDocuments(SdoR2DisclosureOfDocuments.builder()
@@ -1617,8 +1614,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     // During SDO the claim track can change based on judges selection. In this case we want to update claims track
     // to this decision, or maintain it, if it was not changed.
     private void setClaimsTrackBasedOnJudgeSelection(CaseData.CaseDataBuilder<?, ?> dataBuilder, CaseData caseData) {
-        CaseCategory caseAccessCategory = caseData.getCaseAccessCategory();
-        switch (caseAccessCategory) {
+        switch (caseData.getCaseAccessCategory()) {
             case UNSPEC_CLAIM:// unspec use allocatedTrack to hold claims track value
                 if (SdoHelper.isSmallClaimsTrack(caseData)) {
                     dataBuilder.allocatedTrack(SMALL_CLAIM);
@@ -1674,8 +1670,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     }
 
     private CaseData.CaseDataBuilder<?, ?> getSharedData(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> dataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> dataBuilder = callbackParams.getCaseData().toBuilder();
 
         dataBuilder.businessProcess(BusinessProcess.ready(CREATE_SDO));
 
