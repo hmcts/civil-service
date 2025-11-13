@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -47,21 +46,6 @@ public class GaPaymentRequestUpdateCallbackService {
 
     private GeneralApplicationCaseData data;
 
-    public void processCallback(ServiceRequestUpdateDto serviceRequestUpdateDto) {
-        log.info("Processing the callback for the caseId {} with status {}", serviceRequestUpdateDto.getCcdCaseNumber(),
-                 serviceRequestUpdateDto.getServiceRequestStatus());
-
-        if (serviceRequestUpdateDto.getServiceRequestStatus().equalsIgnoreCase(PAID)) {
-
-            log.info("Fetching the Case details based on caseId {}", serviceRequestUpdateDto.getCcdCaseNumber());
-            CaseDetails caseDetails = coreCaseDataService.getCase(Long.valueOf(serviceRequestUpdateDto
-                                                                                   .getCcdCaseNumber()));
-            GeneralApplicationCaseData caseData = caseDetailsConverter.toGeneralApplicationCaseData(caseDetails);
-
-            processServiceRequest(serviceRequestUpdateDto, caseData, false);
-        }
-    }
-
     public GeneralApplicationCaseData processHwf(GeneralApplicationCaseData caseData) {
         ServiceRequestUpdateDto serviceRequestUpdateDto = ServiceRequestUpdateDto
                 .builder()
@@ -74,9 +58,9 @@ public class GaPaymentRequestUpdateCallbackService {
         return processServiceRequest(serviceRequestUpdateDto, caseData, true);
     }
 
-    private GeneralApplicationCaseData processServiceRequest(ServiceRequestUpdateDto serviceRequestUpdateDto,
-                                       GeneralApplicationCaseData caseData,
-                                       boolean hwf) {
+    public GeneralApplicationCaseData processServiceRequest(ServiceRequestUpdateDto serviceRequestUpdateDto,
+                                                            GeneralApplicationCaseData caseData,
+                                                            boolean hwf) {
         if (!Objects.isNull(caseData)) {
 
             switch (caseData.getCcdState()) {
