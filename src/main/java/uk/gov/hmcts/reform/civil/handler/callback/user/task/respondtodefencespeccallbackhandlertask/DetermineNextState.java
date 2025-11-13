@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentByAdmissionOnlineMapper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowStateAllowedEventService;
@@ -124,7 +125,6 @@ public class DetermineNextState extends CallbackHandler {
 
     public String determineNextState(CaseData caseData,
                                      CallbackParams callbackParams,
-                                     CaseData.CaseDataBuilder<?, ?> builder,
                                      String nextState,
                                      BusinessProcess businessProcess) {
 
@@ -136,7 +136,7 @@ public class DetermineNextState extends CallbackHandler {
             if (!caseData.isFullAdmitClaimSpec() && caseData.hasClaimantAgreedToFreeMediation()) {
                 nextState = CaseState.IN_MEDIATION.name();
             } else if (caseData.hasApplicantAcceptedRepaymentPlan()) {
-                Pair<String, BusinessProcess> result = handleAcceptedRepaymentPlan(caseData, builder, businessProcess);
+                Pair<String, BusinessProcess> result = handleAcceptedRepaymentPlan(caseData, businessProcess);
                 nextState = result.getLeft();
                 businessProcess = result.getRight();
             } else if (isDefenceAdmitPayImmediately(caseData)) {
@@ -165,7 +165,7 @@ public class DetermineNextState extends CallbackHandler {
             nextState = CaseState.AWAITING_APPLICANT_INTENTION.name();
         }
 
-        builder.businessProcess(businessProcess);
+        caseData.setBusinessProcess(businessProcess);
         return nextState;
     }
 
@@ -214,7 +214,6 @@ public class DetermineNextState extends CallbackHandler {
     }
 
     private Pair<String, BusinessProcess> handleAcceptedRepaymentPlan(CaseData caseData,
-                                               CaseData.CaseDataBuilder<?, ?> builder,
                                                BusinessProcess businessProcess) {
         String nextState;
         if (featureToggleService.isJudgmentOnlineLive()
@@ -225,7 +224,8 @@ public class DetermineNextState extends CallbackHandler {
             nextState = CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name();
         }
         if (featureToggleService.isJudgmentOnlineLive()) {
-            judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData, builder);
+            JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData);
+            caseData.setActiveJudgment(activeJudgment);
         }
 
         return Pair.of(nextState, businessProcess);

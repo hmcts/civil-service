@@ -151,10 +151,8 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 .partyEmail("claimant@email.com").build())
                 .build();
 
-            caseData = caseData.toBuilder()
-                .respondent1(PartyUtils.appendWithNewPartyId(caseData.getRespondent1()))
-                .applicant1(PartyUtils.appendWithNewPartyId(caseData.getApplicant1()))
-                .build();
+            caseData.setRespondent1(PartyUtils.appendWithNewPartyId(caseData.getRespondent1()));
+            caseData.setApplicant1(PartyUtils.appendWithNewPartyId(caseData.getApplicant1()));
 
             CallbackParams localParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId(CREATE_LIP_CLAIM.name()).build())
@@ -282,7 +280,7 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldSetLanguageDisplayToEnglishAndWelshIfSpecified() {
             when(toggleService.isWelshEnabledForMainCase()).thenReturn(true);
-            caseData = caseData.toBuilder().claimantBilingualLanguagePreference("BOTH").build();
+            caseData.setClaimantBilingualLanguagePreference("BOTH");
             CallbackParams localParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId(CREATE_LIP_CLAIM.name()).build())
                 .build();

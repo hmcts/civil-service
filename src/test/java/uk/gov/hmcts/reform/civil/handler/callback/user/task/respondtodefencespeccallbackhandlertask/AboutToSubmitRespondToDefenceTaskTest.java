@@ -150,12 +150,8 @@ class AboutToSubmitRespondToDefenceTaskTest {
     @Test
     void shouldSetClaimantResponseDocs() {
         Document document = DocumentBuilder.builder().build();
-        CaseData fullDefenceData = CaseDataBuilder.builder().atState(FULL_DEFENCE_PROCEED).build();
-        CaseData caseData = fullDefenceData.toBuilder()
-            .applicant1DQ(fullDefenceData.getApplicant1DQ().toBuilder()
-                              .applicant1DQDraftDirections(document)
-                              .build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atState(FULL_DEFENCE_PROCEED).build();
+        caseData.getApplicant1DQ().setApplicant1DQDraftDirections(document);
 
         List<Element<CaseDocument>> expectedResponseDocuments = List.of(
             Element.<CaseDocument>builder()
@@ -179,14 +175,9 @@ class AboutToSubmitRespondToDefenceTaskTest {
 
     @Test
     void shouldAddEventAndDateToApplicantExperts() {
-        CaseData fullDefenceData = CaseDataBuilder.builder().atState(FULL_DEFENCE_PROCEED).build();
-        CaseData caseData = fullDefenceData.toBuilder()
-            .applicant1DQ(fullDefenceData.getApplicant1DQ().toBuilder()
-                              .applicant1RespondToClaimExperts(
-                              ExpertDetails.builder().build())
-                              .build())
-            .applicant1ResponseDate(LocalDateTime.now())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atState(FULL_DEFENCE_PROCEED).build();
+        caseData.getApplicant1DQ().setApplicant1RespondToClaimExperts(ExpertDetails.builder().build());
+        caseData.setApplicant1ResponseDate(LocalDateTime.now());
 
         AboutToStartOrSubmitCallbackResponse response =
             (AboutToStartOrSubmitCallbackResponse) task.execute(callbackParams(caseData));
@@ -201,13 +192,9 @@ class AboutToSubmitRespondToDefenceTaskTest {
             .details(wrapElements(Witness.builder().name("John Smith").reasonForWitness("reason").build()))
             .build();
 
-        CaseData fullDefenceData = CaseDataBuilder.builder().atState(FULL_DEFENCE_PROCEED).build();
-        CaseData caseData = fullDefenceData.toBuilder()
-            .applicant1DQ(fullDefenceData.getApplicant1DQ().toBuilder()
-                              .applicant1DQWitnesses(witnesses)
-                              .build())
-            .applicant1ResponseDate(LocalDateTime.now())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atState(FULL_DEFENCE_PROCEED).build();
+        caseData.getApplicant1DQ().setApplicant1DQWitnesses(witnesses);
+        caseData.setApplicant1ResponseDate(LocalDateTime.now());
 
         AboutToStartOrSubmitCallbackResponse response =
             (AboutToStartOrSubmitCallbackResponse) task.execute(callbackParams(caseData));

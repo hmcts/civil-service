@@ -40,13 +40,34 @@ public class Respondent2CaseDataUpdater implements SetApplicantResponseDeadlineC
         if (ofNullable(caseData.getRespondent2()).isPresent()
             && ofNullable(caseData.getRespondent2Copy()).isPresent()) {
             log.debug("Updating Respondent2 primary address and flags for caseId: {}", caseData.getCcdCaseReference());
-            Party updatedRespondent2 = caseData.getRespondent2().toBuilder()
-                .primaryAddress(caseData.getRespondent2Copy().getPrimaryAddress())
-                .flags(caseData.getRespondent2Copy().getFlags())
-                .build();
-            caseData.setRespondent2(updatedRespondent2);
+            caseData.getRespondent2().setPrimaryAddress(caseData.getRespondent2Copy().getPrimaryAddress());
+            caseData.getRespondent2().setFlags(caseData.getRespondent2Copy().getFlags());
             caseData.setRespondent2Copy(null);
-            caseData.setRespondent2DetailsForClaimDetailsTab(updatedRespondent2.toBuilder().flags(null).build());
+            Party respondent2DetailsForTab = Party.builder()
+                .partyID(caseData.getRespondent2().getPartyID())
+                .type(caseData.getRespondent2().getType())
+                .individualTitle(caseData.getRespondent2().getIndividualTitle())
+                .individualFirstName(caseData.getRespondent2().getIndividualFirstName())
+                .individualLastName(caseData.getRespondent2().getIndividualLastName())
+                .individualDateOfBirth(caseData.getRespondent2().getIndividualDateOfBirth())
+                .companyName(caseData.getRespondent2().getCompanyName())
+                .organisationName(caseData.getRespondent2().getOrganisationName())
+                .soleTraderTitle(caseData.getRespondent2().getSoleTraderTitle())
+                .soleTraderFirstName(caseData.getRespondent2().getSoleTraderFirstName())
+                .soleTraderLastName(caseData.getRespondent2().getSoleTraderLastName())
+                .soleTraderTradingAs(caseData.getRespondent2().getSoleTraderTradingAs())
+                .soleTraderDateOfBirth(caseData.getRespondent2().getSoleTraderDateOfBirth())
+                .primaryAddress(caseData.getRespondent2().getPrimaryAddress())
+                .partyName(caseData.getRespondent2().getPartyName())
+                .bulkClaimPartyName(caseData.getRespondent2().getBulkClaimPartyName())
+                .partyTypeDisplayValue(caseData.getRespondent2().getPartyTypeDisplayValue())
+                .partyEmail(caseData.getRespondent2().getPartyEmail())
+                .partyPhone(caseData.getRespondent2().getPartyPhone())
+                .legalRepHeading(caseData.getRespondent2().getLegalRepHeading())
+                .unavailableDates(caseData.getRespondent2().getUnavailableDates())
+                .flags(null)
+                .build();
+            caseData.setRespondent2DetailsForClaimDetailsTab(respondent2DetailsForTab);
         }
 
         log.debug(

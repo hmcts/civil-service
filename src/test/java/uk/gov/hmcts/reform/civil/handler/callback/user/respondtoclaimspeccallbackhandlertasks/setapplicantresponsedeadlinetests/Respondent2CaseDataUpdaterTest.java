@@ -60,9 +60,7 @@ class Respondent2CaseDataUpdaterTest {
 
     @Test
     void shouldNotUpdateCaseDataWhenRespondent2HasDifferentLegalRep() {
-        caseData = caseData.toBuilder()
-                .respondentResponseIsSame(YesOrNo.NO)
-                .build();
+        caseData.setRespondentResponseIsSame(YesOrNo.NO);
 
         updater.update(caseData);
 
@@ -75,10 +73,8 @@ class Respondent2CaseDataUpdaterTest {
     @Test
     void shouldUpdateRespondent2ClaimResponseTypeAndResponseDateWhenConditionsAreMet() {
         LocalDateTime responseDate = LocalDateTime.now();
-        caseData = caseData.toBuilder()
-                .respondentResponseIsSame(YesOrNo.YES)
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-                .build();
+        caseData.setRespondentResponseIsSame(YesOrNo.YES);
+        caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE);
 
         when(time.now()).thenReturn(responseDate);
         when(respondToClaimSpecUtils.isRespondent2HasSameLegalRep(caseData)).thenReturn(true);

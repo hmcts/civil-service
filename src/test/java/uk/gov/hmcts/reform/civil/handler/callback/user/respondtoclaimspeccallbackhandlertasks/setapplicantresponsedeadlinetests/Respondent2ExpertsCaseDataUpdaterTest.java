@@ -57,7 +57,7 @@ class Respondent2ExpertsCaseDataUpdaterTest {
     @Test
     void shouldHandleNoExpertsRequired() {
         Respondent2DQ respondent2DQ = Respondent2DQ.builder().build();
-        CaseData testCaseData = caseData.toBuilder()
+        CaseData testCaseData = CaseData.builder()
                 .respondent2DQ(respondent2DQ)
                 .responseClaimExpertSpecRequired2(YesOrNo.NO)
                 .build();
