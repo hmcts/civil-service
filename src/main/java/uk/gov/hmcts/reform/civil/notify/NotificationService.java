@@ -1,12 +1,13 @@
 package uk.gov.hmcts.reform.civil.notify;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 
 import java.util.Map;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
@@ -23,7 +24,11 @@ public class NotificationService {
     ) {
         try {
             log.info("NotificationService::sendMail::templateID: {}", emailTemplate);
-            notificationClient.sendEmail(emailTemplate, targetEmail, parameters, reference);
+            if (targetEmail == null || targetEmail.isEmpty()) {
+                throw new NotificationClientException("Target Email is empty");
+            } else {
+                notificationClient.sendEmail(emailTemplate, targetEmail, parameters, reference);
+            }
         } catch (NotificationClientException e) {
             log.error("Notification Service error {}", e.getMessage());
             throw new NotificationException(e);

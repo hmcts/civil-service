@@ -1,6 +1,9 @@
 package uk.gov.hmcts.reform.civil.notification.handlers;
 
-import lombok.extern.slf4j.Slf4j;
+import static java.lang.String.format;
+import static java.lang.String.join;
+import static java.util.stream.Collectors.joining;
+
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService;
@@ -9,6 +12,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public abstract class Notifier extends BaseNotifier {
@@ -23,7 +28,7 @@ public abstract class Notifier extends BaseNotifier {
         this.partiesNotifier         = partiesNotifier;
     }
 
-    public void notifyParties(CaseData caseData, String eventId, String taskId) {
+    public String notifyParties(CaseData caseData, String eventId, String taskId) {
         log.info(
             "Notifying parties for case ID: {} and eventId: {} and taskId: {} ",
             caseData.getCcdCaseReference(),
@@ -36,8 +41,14 @@ public abstract class Notifier extends BaseNotifier {
             final HashMap<String, String> additionalProperties = new HashMap<>();
             additionalProperties.put("Errors", errors.toString());
             trackErrors(caseData.getCcdCaseReference(), eventId, taskId, additionalProperties);
-            caseTaskTrackingService.rememberErrors(String.valueOf(caseData.getCcdCaseReference()), taskId, errors);
         }
+
+        String attempted = partiesToEmail.stream()
+            .map(p -> p.getTargetEmail() + " : " + p.getReference() + " : "
+                + p.getEmailTemplate())
+            .collect(joining(" | "));
+
+        return format("Attempted: %s || Errors: %s", attempted, join(" | ", errors));
     }
 
     private void trackErrors(final Long caseId,

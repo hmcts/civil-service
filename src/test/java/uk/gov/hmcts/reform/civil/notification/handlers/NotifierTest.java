@@ -1,18 +1,5 @@
 package uk.gov.hmcts.reform.civil.notification.handlers;
 
-import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.notification.handlers.claimdismissed.ClaimDismissedAllLegalRepsEmailGenerator;
-import uk.gov.hmcts.reform.civil.notify.NotificationException;
-import uk.gov.hmcts.reform.civil.notify.NotificationService;
-import uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService;
-
-import java.util.Map;
-import java.util.Set;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -26,6 +13,20 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.notification.handlers.claimantresponsecui.confirmproceed.ClaimantConfirmProceedDefendantEmailDTOGenerator.NO_EMAIL_OPERATION;
+
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.notification.handlers.claimdismissed.ClaimDismissedAllLegalRepsEmailGenerator;
+import uk.gov.hmcts.reform.civil.notify.NotificationException;
+import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService;
+
+import java.util.Map;
+import java.util.Set;
+
+import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.MockitoAnnotations;
 
 class NotifierTest {
 
@@ -135,9 +136,6 @@ class NotifierTest {
                 "taskId",
                 Map.of("Errors", "[Failed to send email to respondentsolicitor@example.com : java.lang.Exception: Notification Service error null]")
             );
-        // also ensures we remember errors so SUBMITTED can display them in comments
-        verify(caseTaskTrackingService, times(1))
-            .rememberErrors(org.mockito.ArgumentMatchers.eq(CASE_ID.toString()), org.mockito.ArgumentMatchers.eq("taskId"), org.mockito.ArgumentMatchers.anyList());
         verify(emailGenerator, times(1)).getPartiesToNotify(caseData, taskId);
         verify(notificationService, times(3)).sendMail(anyString(), anyString(), anyMap(), anyString());
     }
