@@ -5,7 +5,7 @@ import uk.gov.hmcts.reform.civil.service.flowstate.repository.AllowedEventReposi
 
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 
-public final class UnspecScenario extends AllowedEventsScenario {
+public final class UnspecScenario extends AllowedEventScenario {
 
     private static final String SCENARIO_FILE = "allowed-unspec-events.yml";
 
