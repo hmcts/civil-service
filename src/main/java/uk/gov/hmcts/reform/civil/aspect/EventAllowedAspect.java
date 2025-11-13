@@ -12,7 +12,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.flowstate.AllowedEventProvider;
+import uk.gov.hmcts.reform.civil.service.flowstate.AllowedEventService;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.exception.StateFlowException;
@@ -30,7 +30,7 @@ public class EventAllowedAspect {
     private static final String ERROR_MESSAGE = "This action cannot currently be performed because it has either "
         + "already been completed or another action must be completed first.";
 
-    private final AllowedEventProvider allowedEventProvider;
+    private final AllowedEventService allowedEventService;
 
     private final IStateFlowEngine stateFlowEngine;
 
@@ -51,11 +51,7 @@ public class EventAllowedAspect {
         CaseDetails caseDetails = callbackParams.getRequest().getCaseDetails();
         CaseData caseData = callbackParams.getCaseData();
 
-        // Note: Inconsistent use CaseData vs CaseDetails
-        // In FlowStateAllowedEventService isAllowed converts CaseDetails into CaseData
-        // so why are we not just using CaseData if we have it?
-        //TODO: review with SME (Mike / Ruban / Nigel)
-        if (allowedEventProvider.isAllowed(caseDetails, caseEvent)) {
+        if (allowedEventService.isAllowed(caseData, caseEvent)) {
             return joinPoint.proceed();
         } else {
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
