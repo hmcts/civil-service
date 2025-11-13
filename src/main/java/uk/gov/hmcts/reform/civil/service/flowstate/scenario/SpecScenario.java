@@ -5,7 +5,7 @@ import uk.gov.hmcts.reform.civil.service.flowstate.repository.AllowedEventReposi
 
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 
-public final class SpecScenario extends AllowedEventsScenario {
+public final class SpecScenario extends AllowedEventScenario {
 
     private static final String SCENARIO_FILE = "allowed-spec-events.yml";
 

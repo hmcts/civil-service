@@ -7,11 +7,11 @@ import uk.gov.hmcts.reform.civil.service.flowstate.repository.AllowedEventReposi
 import java.util.HashSet;
 import java.util.Set;
 
-public abstract class AllowedEventsScenario {
+public abstract class AllowedEventScenario {
 
     protected final AllowedEventRepository repo;
 
-    protected AllowedEventsScenario(AllowedEventRepository repo) {
+    protected AllowedEventScenario(AllowedEventRepository repo) {
         this.repo = repo;
     }
 

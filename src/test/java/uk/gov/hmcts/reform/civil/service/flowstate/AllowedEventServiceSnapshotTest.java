@@ -5,13 +5,20 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.yaml.snakeyaml.Yaml;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.config.AllowedEventsConfig;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.wrapper.CaseDataDirector;
 import uk.gov.hmcts.reform.civil.stateflow.exception.StateFlowException;
+import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
 
 import java.io.InputStream;
 import java.util.List;
@@ -26,13 +33,28 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_L
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 
-abstract class AbstractAllowedEventProviderTest {
+@SpringBootTest(classes = {
+    JacksonAutoConfiguration.class,
+    CaseDetailsConverter.class,
+    SimpleStateFlowEngine.class,
+    SimpleStateFlowBuilder.class,
+    TransitionsTestConfiguration.class,
+    AllowedEventsConfig.class,
+    AllowedEventService.class
+})
+class AllowedEventServiceSnapshotTest {
 
     private static final String TEST_CASES_FILE = "allowed-test-cases.yml";
     private static List<CaseEvent> whitelistEvents;
 
     @Autowired
+    private AllowedEventService allowedEventService;
+
+    @Autowired
     protected IStateFlowEngine stateFlowEngine;
+
+    @MockBean
+    private FeatureToggleService featureToggleService;
 
     @BeforeAll
     static void setup() {
@@ -59,10 +81,10 @@ abstract class AbstractAllowedEventProviderTest {
     @SuppressWarnings("unchecked")
     static Stream<Arguments> flowStateCaseEventSnapshot() {
         Yaml yaml = new Yaml();
-        InputStream is = AbstractAllowedEventProviderTest.class.getResourceAsStream("/config/" + TEST_CASES_FILE);
+        InputStream is = AllowedEventServiceSnapshotTest.class.getResourceAsStream("/config/" + TEST_CASES_FILE);
 
         if (is == null) {
-            throw new IllegalStateException("Test resource 'allowed-test-cases-new.yml' not found in classpath.");
+            throw new IllegalStateException("Test resource '" + TEST_CASES_FILE + "' not found in classpath.");
         }
 
         List<Map<String, Object>> stateEntries = yaml.load(is);
@@ -102,8 +124,6 @@ abstract class AbstractAllowedEventProviderTest {
                 });
             });
     }
-
-    protected abstract boolean isAllowed(CaseData caseData, CaseEvent event);
 
     @ParameterizedTest(name = "Whitelist {0}")
     @MethodSource("whitelist")
@@ -282,11 +302,14 @@ abstract class AbstractAllowedEventProviderTest {
         }
     }
 
+    private boolean isAllowed(uk.gov.hmcts.reform.civil.model.CaseData caseData, CaseEvent event) {
+        return allowedEventService.isAllowed(caseData, event);
+    }
+
     private CaseData buildCaseData(MultiPartyScenario party, CaseCategory category, FlowState.Main state) {
         CaseDataDirector caseDataDirector = new CaseDataDirector();
         caseDataDirector.party(party);
         caseDataDirector.category(category);
         return caseDataDirector.buildCaseData(state);
     }
-
 }
