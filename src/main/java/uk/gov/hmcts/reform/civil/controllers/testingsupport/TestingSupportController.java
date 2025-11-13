@@ -106,28 +106,6 @@ public class TestingSupportController {
     public ResponseEntity<BusinessProcessInfo> getBusinessProcess(@PathVariable("caseId") Long caseId) {
         CaseData caseData = caseDetailsConverter.toCaseData(coreCaseDataService.getCase(caseId));
         var businessProcess = caseData.getBusinessProcess();
-        var businessProcessInfo = new BusinessProcessInfo(businessProcess);
-
-        if (businessProcess.getStatus() == STARTED) {
-            try {
-                camundaRestEngineClient.findIncidentByProcessInstanceId(businessProcess.getProcessInstanceId())
-                    .map(camundaRestEngineClient::getIncidentMessage)
-                    .ifPresent(businessProcessInfo::setIncidentMessage);
-            } catch (FeignException e) {
-                if (e.status() != 404) {
-                    businessProcessInfo.setIncidentMessage(e.contentUTF8());
-                }
-            }
-        }
-
-        return new ResponseEntity<>(businessProcessInfo, HttpStatus.OK);
-    }
-
-    @GetMapping("/testing-support/ga/case/{caseId}/business-process")
-    public ResponseEntity<BusinessProcessInfo> getBusinessProcessGa(@PathVariable("caseId") Long caseId) {
-        log.info("Get business process for caseId: {}", caseId);
-        GeneralApplicationCaseData caseData = caseDetailsConverter.toGeneralApplicationCaseData(coreCaseDataService.getCase(caseId));
-        var businessProcess = caseData.getBusinessProcess();
         var caseState = caseData.getCcdState();
         var businessProcessInfo = new BusinessProcessInfo(businessProcess);
 

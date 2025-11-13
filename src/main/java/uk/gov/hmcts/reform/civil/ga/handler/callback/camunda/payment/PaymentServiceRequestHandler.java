@@ -76,10 +76,13 @@ public class PaymentServiceRequestHandler extends CallbackHandler implements Gen
             String serviceRequestReference = GeneralAppFeesService.FREE_REF;
             boolean freeGa = feeService.isFreeApplication(caseData);
             boolean freeGaLip = isFreeGaLip(caseData);
-            if (!freeGa && !isHelpWithFees(caseData) && !freeGaLip) {
+            boolean helpWithFees = isHelpWithFees(caseData);
+            log.info("Free GA: {}, Free GA Lip: {}, Help with Fees: {}", freeGa, freeGaLip, helpWithFees);
+            if (!freeGa && !helpWithFees && !freeGaLip) {
                 serviceRequestReference = paymentsService.createServiceRequestGa(caseData, authToken)
                         .getServiceRequestReference();
             }
+            log.info("after calling payment service request for case {}", caseData.getCcdCaseReference());
             GAPbaDetails pbaDetails = caseData.getGeneralAppPBADetails();
             GAPbaDetails.GAPbaDetailsBuilder pbaDetailsBuilder = pbaDetails.toBuilder();
             pbaDetailsBuilder

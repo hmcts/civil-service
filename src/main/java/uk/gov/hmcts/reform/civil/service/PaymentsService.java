@@ -180,7 +180,9 @@ public class PaymentsService {
     }
 
     public PaymentServiceResponse createServiceRequestGa(GeneralApplicationCaseData caseData, String authToken) {
-        return paymentsClient.createServiceRequest(authToken, buildServiceRequest(caseData));
+        CreateServiceRequestDTO paymentRequest = buildServiceRequest(caseData);
+        log.info("Calling payment service request for general application case {} and callbackUrl {} ", caseData.getCcdCaseReference(), paymentRequest.getCallBackUrl());
+        return paymentsClient.createServiceRequest(authToken, paymentRequest);
     }
 
     private CreateServiceRequestDTO buildServiceRequest(CaseData caseData) {

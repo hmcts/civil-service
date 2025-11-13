@@ -1177,7 +1177,9 @@ public class JudicialDecisionHandler extends CallbackHandler implements GeneralA
 
         if (caseData.getJudicialListForHearing().getJudicialSupportRequirement() != null) {
             caseData.getJudicialListForHearing().getJudicialSupportRequirement()
-                .forEach(sr -> supportReq.add(sr.getDisplayedValue()));
+                .forEach(sr -> {
+                    supportReq.add(sr.getDisplayedValue());
+                });
 
             return format(
                 JUDICIAL_HEARING_REQ, supportReq);
@@ -1288,7 +1290,7 @@ public class JudicialDecisionHandler extends CallbackHandler implements GeneralA
                 hearingTimeEst += format(APPLICANT_ESTIMATES, applicantHearingDuration.getDisplayedValue());
             }
             if (respondentHearingDuration != null) {
-                hearingTimeEst += ((!hearingTimeEst.isEmpty() ? ". " : StringUtils.EMPTY)
+                hearingTimeEst += ((hearingTimeEst.length() > 0 ? ". " : StringUtils.EMPTY)
                     + format(RESPONDENT_ESTIMATES, respondentHearingDuration.getDisplayedValue()));
             }
             return hearingTimeEst + (hearingTimeEst.contains(".") ? "." : StringUtils.EMPTY);
@@ -1309,11 +1311,11 @@ public class JudicialDecisionHandler extends CallbackHandler implements GeneralA
                 hearingTimeEst += format(APPLICANT_ESTIMATES, applicantHearingDuration.getDisplayedValue());
             }
             if (respondent1HearingDuration != null) {
-                hearingTimeEst += ((!hearingTimeEst.isEmpty() ? ". " : StringUtils.EMPTY)
+                hearingTimeEst += ((hearingTimeEst.length() > 0 ? ". " : StringUtils.EMPTY)
                     + format(RESPONDENT1_ESTIMATES, respondent1HearingDuration.getDisplayedValue()));
             }
             if (respondent2HearingDuration != null) {
-                hearingTimeEst += ((!hearingTimeEst.isEmpty() ? ". " : StringUtils.EMPTY)
+                hearingTimeEst += ((hearingTimeEst.length() > 0 ? ". " : StringUtils.EMPTY)
                     + format(RESPONDENT2_ESTIMATES, respondent2HearingDuration.getDisplayedValue()));
             }
             return hearingTimeEst + (hearingTimeEst.contains(".") ? "." : StringUtils.EMPTY);
@@ -1679,7 +1681,7 @@ public class JudicialDecisionHandler extends CallbackHandler implements GeneralA
         Optional<Element<GARespondentResponse>> responseElementOptional2 = Optional.empty();
 
         if (caseData.getGeneralAppRespondentSolicitors() != null
-            && !caseData.getGeneralAppRespondentSolicitors().isEmpty()) {
+            && caseData.getGeneralAppRespondentSolicitors().size() > 0) {
             log.info(
                 "General app respondent has more than 0 solicitor(s) for caseId: {}",
                 caseData.getCcdCaseReference()
