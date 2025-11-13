@@ -76,7 +76,6 @@ public class DiscontinueClaimClaimantCallbackHandler extends CallbackHandler {
 
     private CallbackResponse checkPermissionGrantedFields(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         List<String> errors = new ArrayList<>();
 
         if (null != caseData.getPermissionGrantedComplex()
@@ -89,28 +88,26 @@ public class DiscontinueClaimClaimantCallbackHandler extends CallbackHandler {
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .errors(errors)
             .build();
     }
 
     private CallbackResponse updateSelectedClaimant(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         if (MultiPartyScenario.isTwoVOne(caseData)) {
-            caseDataBuilder.selectedClaimantForDiscontinuance(caseData.getClaimantWhoIsDiscontinuing()
+            caseData.setSelectedClaimantForDiscontinuance(caseData.getClaimantWhoIsDiscontinuing()
                                                                   .getValue().getLabel());
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
     private CallbackResponse populateData(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
-        final var caseDataBuilder = caseData.toBuilder();
         List<String> errors = new ArrayList<>();
 
         DiscontinueClaimHelper.checkState(caseData, errors);
@@ -121,20 +118,20 @@ public class DiscontinueClaimClaimantCallbackHandler extends CallbackHandler {
                 claimantNames.add(caseData.getApplicant2().getPartyName());
                 claimantNames.add(BOTH);
 
-                caseDataBuilder.claimantWhoIsDiscontinuing(DynamicList.fromList(claimantNames));
+                caseData.setClaimantWhoIsDiscontinuing(DynamicList.fromList(claimantNames));
             }
             if (is1v2LrVLrCase(caseData)) {
                 List<String> defendantNames = new ArrayList<>();
                 defendantNames.add(caseData.getRespondent1().getPartyName());
                 defendantNames.add(caseData.getRespondent2().getPartyName());
 
-                caseDataBuilder.discontinuingAgainstOneDefendant(DynamicList.fromList(defendantNames));
+                caseData.setDiscontinuingAgainstOneDefendant(DynamicList.fromList(defendantNames));
             }
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
@@ -201,21 +198,20 @@ public class DiscontinueClaimClaimantCallbackHandler extends CallbackHandler {
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         CaseData oldCaseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetailsBefore());
 
         // persist party flags (ccd issue)
         persistFlagsForParties(oldCaseData, caseData);
 
-        caseDataBuilder.businessProcess(BusinessProcess.ready(DISCONTINUE_CLAIM_CLAIMANT));
+        caseData.setBusinessProcess(BusinessProcess.ready(DISCONTINUE_CLAIM_CLAIMANT));
         if (MultiPartyScenario.isTwoVOne(caseData)) {
-            caseDataBuilder.selectedClaimantForDiscontinuance(caseData.getClaimantWhoIsDiscontinuing()
+            caseData.setSelectedClaimantForDiscontinuance(caseData.getClaimantWhoIsDiscontinuing()
                                                                   .getValue().getLabel());
         }
-        caseDataBuilder.previousCCDState(caseData.getCcdState());
+        caseData.setPreviousCCDState(caseData.getCcdState());
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .state(updateCaseState(caseData))
-                .data(caseDataBuilder.build().toMap(objectMapper))
+                .data(caseData.toMap(objectMapper))
                 .build();
     }
 

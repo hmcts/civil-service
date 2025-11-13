@@ -481,15 +481,13 @@ public class PartyUtils {
     }
 
     @SuppressWarnings("unchecked")
-    public static void populatePartyIndividuals(CaseData.CaseDataBuilder builder) {
-        CaseData caseData = builder.build();
-        builder
-            .applicant1LRIndividuals(appendWithNewPartyIds(caseData.getApplicant1LRIndividuals()))
-            .respondent1LRIndividuals(appendWithNewPartyIds(caseData.getRespondent1LRIndividuals()))
-            .respondent2LRIndividuals(appendWithNewPartyIds(caseData.getRespondent2LRIndividuals()))
-            .applicant1OrgIndividuals(appendWithNewPartyIds(caseData.getApplicant1OrgIndividuals()))
-            .applicant2OrgIndividuals(appendWithNewPartyIds(caseData.getApplicant2OrgIndividuals()))
-            .respondent1OrgIndividuals(appendWithNewPartyIds(caseData.getRespondent1OrgIndividuals()))
-            .respondent2OrgIndividuals(appendWithNewPartyIds(caseData.getRespondent2OrgIndividuals()));
+    public static void populatePartyIndividuals(CaseData caseData) {
+        caseData.setApplicant1LRIndividuals(appendWithNewPartyIds(caseData.getApplicant1LRIndividuals()));
+        caseData.setRespondent1LRIndividuals(appendWithNewPartyIds(caseData.getRespondent1LRIndividuals()));
+        caseData.setRespondent2LRIndividuals(appendWithNewPartyIds(caseData.getRespondent2LRIndividuals()));
+        caseData.setApplicant1OrgIndividuals(appendWithNewPartyIds(caseData.getApplicant1OrgIndividuals()));
+        caseData.setApplicant2OrgIndividuals(appendWithNewPartyIds(caseData.getApplicant2OrgIndividuals()));
+        caseData.setRespondent1OrgIndividuals(appendWithNewPartyIds(caseData.getRespondent1OrgIndividuals()));
+        caseData.setRespondent2OrgIndividuals(appendWithNewPartyIds(caseData.getRespondent2OrgIndividuals()));
     }
 }

@@ -1060,9 +1060,8 @@ class PartyUtilsTest {
                 .respondent2OrgIndividuals(wrapElements(PartyFlagStructure.builder().firstName("res2").lastName(
                     "orgindividual").build()));
 
-            PartyUtils.populatePartyIndividuals(builder);
-
             CaseData actual = builder.build();
+            PartyUtils.populatePartyIndividuals(actual);
 
             var app1LRIndividual = unwrapElements(actual.getApplicant1LRIndividuals()).get(0);
             assertNotNull(app1LRIndividual.getPartyID());
@@ -1108,9 +1107,8 @@ class PartyUtilsTest {
                 .respondent1OrgIndividuals(wrapElements(PartyFlagStructure.builder().firstName("res1").lastName(
                     "orgindividual").build()));
 
-            PartyUtils.populatePartyIndividuals(builder);
-
             CaseData actual = builder.build();
+            PartyUtils.populatePartyIndividuals(actual);
 
             var app1LRIndividual = unwrapElements(actual.getApplicant1LRIndividuals()).get(0);
             assertNotNull(app1LRIndividual.getPartyID());
@@ -1147,9 +1145,8 @@ class PartyUtilsTest {
                 .respondent2OrgIndividuals(wrapElements(PartyFlagStructure.builder().partyID("res2-org-ind-id").firstName(
                     "res2").lastName("orgindividual").build()));
 
-            PartyUtils.populatePartyIndividuals(builder);
-
             CaseData actual = builder.build();
+            PartyUtils.populatePartyIndividuals(actual);
 
             var app1LRIndividual = unwrapElements(actual.getApplicant1LRIndividuals()).get(0);
             assertEquals(app1LRIndividual.getPartyID(), "app1-lr-ind-id");
