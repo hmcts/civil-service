@@ -38,7 +38,7 @@ public class SdoSubmissionService {
             .hearingNotes(getHearingNotes(caseData));
 
         moveGeneratedDocument(caseData, builder);
-        directionsOrderCaseProgressionService.applyCaseProgressionRouting(caseData, builder, authToken);
+        directionsOrderCaseProgressionService.applyCaseProgressionRouting(caseData, builder, authToken, false);
         trimMethodLocations(caseData, builder);
         updateSmallClaimsHearing(caseData, builder);
         updateClaimsTrack(caseData, builder);

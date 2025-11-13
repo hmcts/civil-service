@@ -57,6 +57,6 @@ public class DirectionsOrderCaseProgressionService {
             }
             return;
         }
-        sdoLocationService.updateWaLocationsIfRequired(caseData, builder, authToken);
+        sdoLocationService.updateWaLocationsIfRequired(builder, authToken);
     }
 }

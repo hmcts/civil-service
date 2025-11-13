@@ -2,8 +2,10 @@ package uk.gov.hmcts.reform.civil.service.dj;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.ccd.model.Organisation;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
@@ -54,7 +56,7 @@ public class DjNotificationPropertiesService {
         properties.put(CLAIM_NUMBER, Optional.ofNullable(caseData.getCcdCaseReference())
             .map(Object::toString)
             .orElse(""));
-        properties.put(PARTY_REFERENCES, Optional.ofNullable(buildPartiesReferencesEmailSubject(caseData)).orElse(""));
+        properties.put(PARTY_REFERENCES, Optional.of(buildPartiesReferencesEmailSubject(caseData)).orElse(""));
         properties.put(CASEMAN_REF, Optional.ofNullable(caseData.getLegacyCaseReference()).orElse(""));
         addAllFooterItems(caseData, properties, configuration,
             featureToggleService.isPublicQueryManagementEnabled(caseData));
@@ -67,24 +69,38 @@ public class DjNotificationPropertiesService {
                 caseData.getApplicant1OrganisationPolicy() != null
                     ? caseData.getApplicant1OrganisationPolicy().getOrganisation()
                     : null,
-                Optional.ofNullable(caseData.getApplicant1()).map(p -> p.getPartyName()).orElse(null)
+                Optional.ofNullable(caseData.getApplicant1()).map(Party::getPartyName).orElse(null)
             );
             case DEFENDANT_ONE -> organisationName(
-                caseData.getRespondent1OrganisationPolicy() != null
-                    ? caseData.getRespondent1OrganisationPolicy().getOrganisation()
-                    : null,
-                Optional.ofNullable(caseData.getRespondent1()).map(p -> p.getPartyName()).orElse(null)
+                organisationFromPolicy(caseData.getRespondent1OrganisationPolicy()),
+                Optional.ofNullable(caseData.getRespondent1()).map(Party::getPartyName).orElse(null)
             );
-            case DEFENDANT_TWO -> organisationName(
-                caseData.getRespondent2OrganisationPolicy() != null
-                    ? caseData.getRespondent2OrganisationPolicy().getOrganisation()
-                    : null,
-                Optional.ofNullable(caseData.getRespondent2()).map(p -> p.getPartyName()).orElse(null)
-            );
+            case DEFENDANT_TWO -> {
+                uk.gov.hmcts.reform.ccd.model.Organisation respondentTwoOrganisation =
+                    organisationFromPolicy(caseData.getRespondent2OrganisationPolicy());
+
+                if (respondentTwoOrganisation == null
+                    && YesOrNo.YES.equals(caseData.getRespondent2SameLegalRepresentative())) {
+                    respondentTwoOrganisation = organisationFromPolicy(caseData.getRespondent1OrganisationPolicy());
+                }
+
+                yield organisationName(
+                    respondentTwoOrganisation,
+                    Optional.ofNullable(caseData.getRespondent2()).map(Party::getPartyName)
+                        .orElseGet(() -> Optional.ofNullable(caseData.getRespondent1())
+                            .map(Party::getPartyName).orElse(null))
+                );
+            }
         };
     }
 
-    private String organisationName(Organisation organisation, String fallback) {
+    private uk.gov.hmcts.reform.ccd.model.Organisation organisationFromPolicy(OrganisationPolicy policy) {
+        return Optional.ofNullable(policy)
+            .map(OrganisationPolicy::getOrganisation)
+            .orElse(null);
+    }
+
+    private String organisationName(uk.gov.hmcts.reform.ccd.model.Organisation organisation, String fallback) {
         if (organisation != null && organisation.getOrganisationID() != null) {
             Optional<uk.gov.hmcts.reform.civil.prd.model.Organisation> org =
                 organisationService.findOrganisationById(organisation.getOrganisationID());

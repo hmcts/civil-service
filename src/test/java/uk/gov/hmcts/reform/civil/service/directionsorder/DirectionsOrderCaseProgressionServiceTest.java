@@ -69,7 +69,7 @@ class DirectionsOrderCaseProgressionServiceTest {
         service.updateWaLocationsIfEnabled(caseData, builder, AUTH);
 
         ArgumentCaptor<CaseData.CaseDataBuilder<?, ?>> captor = ArgumentCaptor.forClass(CaseData.CaseDataBuilder.class);
-        verify(locationService).updateWaLocationsIfRequired(eq(caseData), captor.capture(), eq(AUTH));
+        verify(locationService).updateWaLocationsIfRequired(captor.capture(), eq(AUTH));
         assertThat(captor.getValue()).isSameAs(builder);
     }
 
@@ -81,7 +81,7 @@ class DirectionsOrderCaseProgressionServiceTest {
 
         service.updateWaLocationsIfEnabled(caseData, builder, AUTH);
 
-        verify(locationService, never()).updateWaLocationsIfRequired(any(), any(), any());
+        verify(locationService, never()).updateWaLocationsIfRequired(any(), any());
         verify(locationService).clearWaLocationMetadata(builder);
     }
 
@@ -94,7 +94,7 @@ class DirectionsOrderCaseProgressionServiceTest {
         service.updateWaLocationsIfEnabled(caseData, builder, AUTH, false);
 
         verify(locationService, never()).clearWaLocationMetadata(builder);
-        verify(locationService, never()).updateWaLocationsIfRequired(any(), any(), any());
+        verify(locationService, never()).updateWaLocationsIfRequired(any(), any());
     }
 
     @Test
@@ -107,7 +107,7 @@ class DirectionsOrderCaseProgressionServiceTest {
         service.applyCaseProgressionRouting(caseData, builder, AUTH);
 
         ArgumentCaptor<CaseData.CaseDataBuilder<?, ?>> captor = ArgumentCaptor.forClass(CaseData.CaseDataBuilder.class);
-        verify(locationService).updateWaLocationsIfRequired(eq(caseData), captor.capture(), eq(AUTH));
+        verify(locationService).updateWaLocationsIfRequired(captor.capture(), eq(AUTH));
         assertThat(captor.getValue()).isSameAs(builder);
         assertThat(builder.build().getEaCourtLocation()).isEqualTo(YesOrNo.YES);
     }
@@ -121,7 +121,7 @@ class DirectionsOrderCaseProgressionServiceTest {
         service.applyCaseProgressionRouting(caseData, builder, AUTH);
 
         verify(locationService).clearWaLocationMetadata(builder);
-        verify(locationService, never()).updateWaLocationsIfRequired(any(), any(), any());
+        verify(locationService, never()).updateWaLocationsIfRequired(any(), any());
     }
 
     @Test
@@ -133,6 +133,6 @@ class DirectionsOrderCaseProgressionServiceTest {
         service.applyCaseProgressionRouting(caseData, builder, AUTH, false);
 
         verify(locationService, never()).clearWaLocationMetadata(builder);
-        verify(locationService, never()).updateWaLocationsIfRequired(any(), any(), any());
+        verify(locationService, never()).updateWaLocationsIfRequired(any(), any());
     }
 }

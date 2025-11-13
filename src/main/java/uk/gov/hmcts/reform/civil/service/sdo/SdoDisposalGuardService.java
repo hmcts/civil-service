@@ -13,17 +13,19 @@ public class SdoDisposalGuardService {
     private final SdoFeatureToggleService featureToggleService;
 
     public boolean shouldBlockPrePopulate(CaseData caseData) {
-        return featureToggleService.isMultiOrIntermediateTrackCase(caseData);
+        return shouldBlockDisposalOrders(caseData);
     }
 
     public boolean shouldBlockOrderDetails(CaseData caseData) {
+        return shouldBlockDisposalOrders(caseData);
+    }
+
+    private boolean shouldBlockDisposalOrders(CaseData caseData) {
         if (!featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
             return false;
         }
 
-        boolean isMultiOrIntermediate = featureToggleService.isMultiOrIntermediateTrackCase(caseData);
-
-        return isMultiOrIntermediate
+        return featureToggleService.isMultiOrIntermediateTrackCase(caseData)
             && OrderType.DISPOSAL.equals(caseData.getOrderType())
             && CaseState.JUDICIAL_REFERRAL.equals(caseData.getCcdState());
     }

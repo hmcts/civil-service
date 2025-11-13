@@ -197,7 +197,7 @@ class SdoSubmissionServiceTest {
 
         service.prepareSubmission(caseData, AUTH_TOKEN);
 
-        verify(caseProgressionService).applyCaseProgressionRouting(eq(caseData), any(), eq(AUTH_TOKEN));
+        verify(caseProgressionService).applyCaseProgressionRouting(eq(caseData), any(), eq(AUTH_TOKEN), eq(false));
     }
 
     private void mockEaCourtMutation(CaseData caseData, YesOrNo value) {
@@ -205,7 +205,7 @@ class SdoSubmissionServiceTest {
             CaseData.CaseDataBuilder<?, ?> builder = invocation.getArgument(1);
             builder.eaCourtLocation(value);
             return null;
-        }).when(caseProgressionService).applyCaseProgressionRouting(eq(caseData), any(), eq(AUTH_TOKEN));
+        }).when(caseProgressionService).applyCaseProgressionRouting(eq(caseData), any(), eq(AUTH_TOKEN), eq(false));
     }
 
 }

@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service.docmosis.dj;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.sdo.AddOrRemoveToggle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.SdoDJR2TrialCreditHire;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,7 +16,7 @@ public class DjTrialTemplateFieldService {
 
     public boolean showCreditHireDetails(CaseData caseData) {
         return Optional.ofNullable(caseData.getSdoDJR2TrialCreditHire())
-            .map(creditHire -> creditHire.getDetailsShowToggle())
+            .map(SdoDJR2TrialCreditHire::getDetailsShowToggle)
             .map(this::containsAddToggle)
             .orElse(false);
     }

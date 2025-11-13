@@ -160,7 +160,7 @@ class SdoLocationServiceTest {
         CaseData caseData = CaseData.builder().build();
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
 
-        service.updateWaLocationsIfRequired(caseData, builder, AUTH_TOKEN);
+        service.updateWaLocationsIfRequired(builder, AUTH_TOKEN);
 
         verify(updateWaCourtLocationsService)
             .updateCourtListingWALocations(eq(AUTH_TOKEN), caseDataBuilderCaptor.capture());
@@ -178,7 +178,7 @@ class SdoLocationServiceTest {
         CaseData caseData = CaseData.builder().build();
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
 
-        service.updateWaLocationsIfRequired(caseData, builder, AUTH_TOKEN);
+        service.updateWaLocationsIfRequired(builder, AUTH_TOKEN);
 
         verify(updateWaCourtLocationsService, never()).updateCourtListingWALocations(eq(AUTH_TOKEN), any());
     }

@@ -28,16 +28,24 @@ public final class DirectionsOrderSpecialistTextLibrary {
         "The claimant must prepare a Scott Schedule of the defects, items of damage "
             + "or any other relevant matters";
     public static final String BUILDING_SCHEDULE_COLUMNS_SDO =
-        "The columns should be headed:\n"
-            + "  •  Item\n"
-            + "  •  Alleged defect\n"
-            + "  •  Claimant’s costing\n"
-            + "  •  Defendant’s response\n"
-            + "  •  Defendant’s costing\n"
-            + "  •  Reserved for Judge’s use";
+            """
+                    The columns should be headed:
+                      •  Item
+                      •  Alleged defect
+                      •  Claimant’s costing
+                      •  Defendant’s response
+                      •  Defendant’s costing
+                      •  Reserved for Judge’s use""";
     public static final String BUILDING_SCHEDULE_COLUMNS_DJ =
-        "The columns should be headed: \n - Item \n - Alleged Defect \n - Claimant's costing\n - Defendant's"
-            + " response\n - Defendant's costing \n - Reserved for Judge's use";
+            """
+                    The columns should be headed:\s
+                     - Item\s
+                     - Alleged Defect\s
+                     - Claimant's costing
+                     - Defendant's\
+                     response
+                     - Defendant's costing\s
+                     - Reserved for Judge's use""";
     public static final String BUILDING_SCHEDULE_CLAIMANT_INSTRUCTION =
         "The claimant must upload to the Digital Portal the Scott Schedule with the relevant columns completed by 4pm on";
     public static final String BUILDING_SCHEDULE_DEFENDANT_INSTRUCTION =
@@ -50,14 +58,20 @@ public final class DirectionsOrderSpecialistTextLibrary {
     public static final String HOUSING_SCHEDULE_INTRO_DJ =
         "The claimant must prepare a Scott Schedule of the items in disrepair";
     public static final String HOUSING_SCHEDULE_COLUMNS_SDO =
-        "The columns should be headed:\n"
-            + "  •  Item\n"
-            + "  •  Alleged disrepair\n"
-            + "  •  Defendant’s response\n"
-            + "  •  Reserved for Judge’s use";
+            """
+                    The columns should be headed:
+                      •  Item
+                      •  Alleged disrepair
+                      •  Defendant’s response
+                      •  Reserved for Judge’s use""";
     public static final String HOUSING_SCHEDULE_COLUMNS_DJ =
-        "The columns should be headed: \n - Item \n - Alleged disrepair \n - Defendant's Response \n - "
-            + "Reserved for Judge's Use";
+            """
+                    The columns should be headed:\s
+                     - Item\s
+                     - Alleged disrepair\s
+                     - Defendant's Response\s
+                     - \
+                    Reserved for Judge's Use""";
     public static final String HOUSING_SCHEDULE_CLAIMANT_INSTRUCTION =
         "The claimant must upload to the Digital Portal the Scott Schedule with the relevant "
             + "columns completed by 4pm on";
@@ -138,17 +152,19 @@ public final class DirectionsOrderSpecialistTextLibrary {
 
     /* Credit hire: SDO narrative */
     public static final String CREDIT_HIRE_DISCLOSURE_SDO =
-        "If impecuniosity is alleged by the claimant and not admitted by the defendant, the claimant's "
-            + "disclosure as ordered earlier in this Order must include:\n"
-            + "a) Evidence of all income from all sources for a period of 3 months prior to the "
-            + "commencement of hire until the earlier of:\n "
-            + "     i) 3 months after cessation of hire\n"
-            + "     ii) the repair or replacement of the claimant's vehicle\n"
-            + "b) Copies of all bank, credit card, and saving account statements for a period of 3 months "
-            + "prior to the commencement of hire until the earlier of:\n"
-            + "     i) 3 months after cessation of hire\n"
-            + "     ii) the repair or replacement of the claimant's vehicle\n"
-            + "c) Evidence of any loan, overdraft or other credit facilities available to the claimant.";
+            """
+                    If impecuniosity is alleged by the claimant and not admitted by the defendant, the claimant's \
+                    disclosure as ordered earlier in this Order must include:
+                    a) Evidence of all income from all sources for a period of 3 months prior to the \
+                    commencement of hire until the earlier of:
+                     \
+                         i) 3 months after cessation of hire
+                         ii) the repair or replacement of the claimant's vehicle
+                    b) Copies of all bank, credit card, and saving account statements for a period of 3 months \
+                    prior to the commencement of hire until the earlier of:
+                         i) 3 months after cessation of hire
+                         ii) the repair or replacement of the claimant's vehicle
+                    c) Evidence of any loan, overdraft or other credit facilities available to the claimant.""";
     public static final String CREDIT_HIRE_BASIC_RATE_EVIDENCE_SDO =
         "If the parties fail to agree basic hire rates pursuant to the paragraph above, each party may rely "
             + "upon written evidence by way of witness statement of one witness to provide evidence of basic "
@@ -167,9 +183,10 @@ public final class DirectionsOrderSpecialistTextLibrary {
     public static final String CREDIT_HIRE_DEFENDANT_UPLOAD_SDO =
         "The defendant's evidence is to be uploaded to the Digital Portal by 4pm on";
     public static final String CREDIT_HIRE_STATEMENT_PROMPT_SDO =
-        "The claimant must upload to the Digital Portal a witness statement addressing\n"
-            + "a) the need to hire a replacement vehicle; and\n"
-            + "b) impecuniosity";
+            """
+                    The claimant must upload to the Digital Portal a witness statement addressing
+                    a) the need to hire a replacement vehicle; and
+                    b) impecuniosity""";
     public static final String CREDIT_HIRE_NON_COMPLIANCE_SDO =
         "A failure to comply with the paragraph above will result in the claimant being debarred from asserting "
             + "need or relying on impecuniosity as the case may be at the final hearing, "
@@ -183,21 +200,29 @@ public final class DirectionsOrderSpecialistTextLibrary {
 
     /* Credit hire: DJ narrative */
     public static final String CREDIT_HIRE_DISCLOSURE_DJ =
-        "If impecuniosity is alleged by the claimant and not admitted by the defendant, the claimant's "
-            + "disclosure as ordered earlier in this order must include:\n"
-            + "a. Evidence of all income from all sources for a period of 3 months prior to the "
-            + "commencement of hire until the earlier of \n    i) 3 months after cessation of hire or \n    ii) "
-            + "the repair or replacement of the claimant's vehicle;\n"
-            + "b. Copy statements of all bank, credit card and savings account statements for a period of 3 months "
-            + "prior to the commencement of hire until the earlier of \n    i) 3 months after cessation of hire "
-            + "or \n    ii) the repair or replacement of the claimant's vehicle;\n"
-            + "c. Evidence of any loan, overdraft or other credit facilities available to the claimant";
+            """
+                    If impecuniosity is alleged by the claimant and not admitted by the defendant, the claimant's \
+                    disclosure as ordered earlier in this order must include:
+                    a. Evidence of all income from all sources for a period of 3 months prior to the \
+                    commencement of hire until the earlier of\s
+                        i) 3 months after cessation of hire or\s
+                        ii) \
+                    the repair or replacement of the claimant's vehicle;
+                    b. Copy statements of all bank, credit card and savings account statements for a period of 3 months \
+                    prior to the commencement of hire until the earlier of\s
+                        i) 3 months after cessation of hire \
+                    or\s
+                        ii) the repair or replacement of the claimant's vehicle;
+                    c. Evidence of any loan, overdraft or other credit facilities available to the claimant""";
     public static final String CREDIT_HIRE_DEFENDANT_UPLOAD_DJ =
         "The defendant’s evidence is to be uploaded to the Digital Portal by 4pm on";
     public static final String CREDIT_HIRE_STATEMENT_PROMPT_DJ =
-        "The claimant must upload to the Digital Portal a witness "
-            + "statement addressing \na) the need to hire a replacement "
-            + "vehicle; and \nb) impecuniosity";
+            """
+                    The claimant must upload to the Digital Portal a witness \
+                    statement addressing\s
+                    a) the need to hire a replacement \
+                    vehicle; and\s
+                    b) impecuniosity""";
     public static final String CREDIT_HIRE_STATEMENT_DEADLINE_DJ =
         "This statement must be uploaded to the Digital Portal by 4pm on";
     public static final String CREDIT_HIRE_NON_COMPLIANCE_DJ =
@@ -288,28 +313,6 @@ public final class DirectionsOrderSpecialistTextLibrary {
     public static final String WITNESS_PAGE_LIMIT_SUFFIX_DJ =
         "A4 pages. Statements should be double spaced using a font size of 12.";
 
-    /* ADR / settlement guidance */
-    public static final String ALTERNATIVE_DISPUTE_RESOLUTION_PARAGRAPH =
-        "At all stages, the parties must consider settling this litigation by any means of Alternative "
-            + "Dispute Resolution. This includes round table conferences, early neutral evaluation, "
-            + "mediation and arbitration. Any party not engaging in any such means proposed by another "
-            + "must upload to the Digital Portal a witness statement giving reasons within 21 days of "
-            + "receipt of that proposal. That witness statement must not be shown to the trial judge "
-            + "until questions of costs arise.";
-    public static final String ALTERNATIVE_DISPUTE_RESOLUTION_LABEL =
-        "## Alternative dispute resolution \n" + ALTERNATIVE_DISPUTE_RESOLUTION_PARAGRAPH;
-    public static final String SETTLEMENT_DIGITAL_PORTAL_PARAGRAPH =
-        "Each party must inform the Court immediately if the case is settled whether or not it is then "
-            + "possible to upload to the Digital Portal a draft consent order to give effect to their "
-            + "agreement.";
-    public static final String SETTLEMENT_DIGITAL_PORTAL_LABEL =
-        "## Settlement \n" + SETTLEMENT_DIGITAL_PORTAL_PARAGRAPH;
-    public static final String CLAIM_SETTLING_CONSENT_ORDER_PARAGRAPH =
-        "Each party must inform the court immediately if the case is settled, whether or not it is "
-            + "then possible to file a draft consent order to give effect to their agreement.";
-    public static final String CLAIM_SETTLING_CONSENT_ORDER_LABEL =
-        "## Claim settling \n " + CLAIM_SETTLING_CONSENT_ORDER_PARAGRAPH;
-
     /* Trial witnesses (DJ) */
     public static final String TRIAL_WITNESS_STATEMENT_UPLOAD_NOTICE =
         "Each party must upload to the Digital Portal copies of the statements of all witnesses of fact "
@@ -384,18 +387,20 @@ public final class DirectionsOrderSpecialistTextLibrary {
 
     /* Small claims: flight delay */
     public static final String FLIGHT_DELAY_RELATED_CLAIMS_NOTICE =
-        "In the event that the Claimant(s) or Defendant(s) are aware if other \n"
-            + "claims relating to the same flight they must notify the court \n"
-            + "where the claim is being managed within 14 days of receipt of \n"
-            + "this Order providing all relevant details of those claims including \n"
-            + "case number(s), hearing date(s) and copy final substantive order(s) \n"
-            + "if any, to assist the Court with ongoing case management which may \n"
-            + "include the cases being heard together.";
+            """
+                    In the event that the Claimant(s) or Defendant(s) are aware if other\s
+                    claims relating to the same flight they must notify the court\s
+                    where the claim is being managed within 14 days of receipt of\s
+                    this Order providing all relevant details of those claims including\s
+                    case number(s), hearing date(s) and copy final substantive order(s)\s
+                    if any, to assist the Court with ongoing case management which may\s
+                    include the cases being heard together.""";
     public static final String FLIGHT_DELAY_LEGAL_ARGUMENTS_NOTICE =
-        "Any arguments as to the law to be applied to this claim, together with \n"
-            + "copies of legal authorities or precedents relied on, shall be uploaded \n"
-            + "to the Digital Portal not later than 3 full working days before the \n"
-            + "final hearing date.";
+            """
+                    Any arguments as to the law to be applied to this claim, together with\s
+                    copies of legal authorities or precedents relied on, shall be uploaded\s
+                    to the Digital Portal not later than 3 full working days before the\s
+                    final hearing date.""";
 
     /* Disposal hearings */
     public static final String DISPOSAL_DOCUMENTS_EXCHANGE =

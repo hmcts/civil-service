@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
@@ -104,6 +105,29 @@ class DjNotificationPropertiesServiceTest {
         Map<String, String> properties = service.buildDefendant2Properties(caseData);
 
         assertThat(properties).containsEntry("LegalOrgName", "Def Two Org");
+    }
+
+    @Test
+    void shouldFallbackToRespondent1OrganisationWhenSameSolicitor() {
+        CaseData caseData = CaseData.builder()
+            .ccdCaseReference(1594901956117591L)
+            .legacyCaseReference("000DC001")
+            .respondent2SameLegalRepresentative(YesOrNo.YES)
+            .respondent1(PartyBuilder.builder().individual().build())
+            .respondent2(PartyBuilder.builder().individual().build())
+            .respondent1OrganisationPolicy(OrganisationPolicy.builder()
+                .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                    .organisationID("OrgShared")
+                    .build())
+                .build())
+            .build();
+
+        when(organisationService.findOrganisationById("OrgShared"))
+            .thenReturn(Optional.of(Organisation.builder().name("Shared Org").build()));
+
+        Map<String, String> properties = service.buildDefendant2Properties(caseData);
+
+        assertThat(properties).containsEntry("LegalOrgName", "Shared Org");
     }
 
 }

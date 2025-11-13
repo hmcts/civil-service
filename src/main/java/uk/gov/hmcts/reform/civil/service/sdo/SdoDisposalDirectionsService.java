@@ -77,67 +77,80 @@ public class SdoDisposalDirectionsService {
     }
 
     public boolean hasDisposalVariable(CaseData caseData, String variableName) {
-        switch (variableName) {
-            case "disposalHearingBundleToggle":
-                return caseData.getDisposalHearingBundleToggle() != null;
-            case "disposalHearingClaimSettlingToggle":
-                return caseData.getDisposalHearingClaimSettlingToggle() != null;
-            case "disposalHearingCostsToggle":
-                return caseData.getDisposalHearingCostsToggle() != null;
-            case "disposalHearingAddNewDirections":
-                return caseData.getDisposalHearingAddNewDirections() != null;
-            case "disposalHearingDisclosureOfDocumentsToggle":
-                return caseData.getDisposalHearingDisclosureOfDocumentsToggle() != null;
-            case "disposalHearingWitnessOfFactToggle":
-                return caseData.getDisposalHearingWitnessOfFactToggle() != null;
-            case "disposalHearingMedicalEvidenceToggle":
-                return caseData.getDisposalHearingMedicalEvidenceToggle() != null;
-            case "disposalHearingQuestionsToExpertsToggle":
-                return caseData.getDisposalHearingQuestionsToExpertsToggle() != null;
-            case "disposalHearingSchedulesOfLossToggle":
-                return caseData.getDisposalHearingSchedulesOfLossToggle() != null;
-            case "disposalHearingFinalDisposalHearingToggle":
-                return caseData.getDisposalHearingFinalDisposalHearingToggle() != null;
-            case "disposalHearingMethodToggle":
-                return true;
-            case "disposalHearingDateToToggle":
-                return caseData.getTrialHearingTimeDJ() != null
+        return switch (variableName) {
+            case "disposalHearingBundleToggle" -> caseData.getDisposalHearingBundleToggle() != null;
+            case "disposalHearingClaimSettlingToggle" -> caseData.getDisposalHearingClaimSettlingToggle() != null;
+            case "disposalHearingCostsToggle" -> caseData.getDisposalHearingCostsToggle() != null;
+            case "disposalHearingAddNewDirections" -> caseData.getDisposalHearingAddNewDirections() != null;
+            case "disposalHearingDisclosureOfDocumentsToggle" -> caseData.getDisposalHearingDisclosureOfDocumentsToggle() != null;
+            case "disposalHearingWitnessOfFactToggle" -> caseData.getDisposalHearingWitnessOfFactToggle() != null;
+            case "disposalHearingMedicalEvidenceToggle" -> caseData.getDisposalHearingMedicalEvidenceToggle() != null;
+            case "disposalHearingQuestionsToExpertsToggle" -> caseData.getDisposalHearingQuestionsToExpertsToggle() != null;
+            case "disposalHearingSchedulesOfLossToggle" -> caseData.getDisposalHearingSchedulesOfLossToggle() != null;
+            case "disposalHearingFinalDisposalHearingToggle" -> caseData.getDisposalHearingFinalDisposalHearingToggle() != null;
+            case "disposalHearingMethodToggle" -> true;
+            case "disposalHearingDateToToggle" -> caseData.getTrialHearingTimeDJ() != null
                     && caseData.getTrialHearingTimeDJ().getDateToToggle() != null;
-            default:
-                return false;
-        }
+            default -> false;
+        };
     }
 
     public String getHearingTimeLabel(CaseData caseData) {
         DisposalHearingHearingTime hearingTime = caseData.getDisposalHearingHearingTime();
 
-        String label = "";
-
-        if (Optional.ofNullable(hearingTime)
-            .map(DisposalHearingHearingTime::getTime)
-            .map(DisposalHearingFinalDisposalHearingTimeEstimate::getLabel).isPresent()) {
-            if (hearingTime.getTime().getLabel().equals(OTHER)) {
-                StringBuilder otherLength = new StringBuilder();
-                if (hearingTime.getOtherHours() != null
-                    && Integer.parseInt(hearingTime.getOtherHours()) != 0) {
-                    String hourString = Integer.parseInt(hearingTime.getOtherHours()) == 1
-                        ? " hour" : " hours";
-                    otherLength.append(hearingTime.getOtherHours().trim()).append(hourString);
-                }
-                if (hearingTime.getOtherMinutes() != null
-                    && Integer.parseInt(hearingTime.getOtherMinutes()) != 0) {
-                    String minuteString = Integer.parseInt(hearingTime.getOtherMinutes()) == 1
-                        ? " minute" : MINUTES;
-                    String spaceBeforeMinute = otherLength.toString().contains("hour") ? " " : "";
-                    otherLength.append(spaceBeforeMinute)
-                        .append(hearingTime.getOtherMinutes().trim())
-                        .append(minuteString);
-                }
-                return otherLength.toString();
-            }
-            label = hearingTime.getTime().getLabel().toLowerCase(Locale.ROOT);
+        if (!hasTimeSelection(hearingTime)) {
+            return "";
         }
 
-        return label;
+        if (isOtherSelection(hearingTime)) {
+            return buildOtherLength(hearingTime);
+        }
+
+        return hearingTime.getTime().getLabel().toLowerCase(Locale.ROOT);
+    }
+
+    private boolean hasTimeSelection(DisposalHearingHearingTime hearingTime) {
+        return Optional.ofNullable(hearingTime)
+            .map(DisposalHearingHearingTime::getTime)
+            .map(DisposalHearingFinalDisposalHearingTimeEstimate::getLabel)
+            .isPresent();
+    }
+
+    private boolean isOtherSelection(DisposalHearingHearingTime hearingTime) {
+        return Optional.ofNullable(hearingTime)
+            .map(DisposalHearingHearingTime::getTime)
+            .map(DisposalHearingFinalDisposalHearingTimeEstimate::getLabel)
+            .filter(OTHER::equals)
+            .isPresent();
+    }
+
+    private String buildOtherLength(DisposalHearingHearingTime hearingTime) {
+        int hours = parseToInt(hearingTime.getOtherHours());
+        int minutes = parseToInt(hearingTime.getOtherMinutes());
+        StringBuilder otherLength = new StringBuilder();
+
+        if (hours > 0) {
+            otherLength.append(hours).append(hours == 1 ? " hour" : " hours");
+        }
+
+        if (minutes > 0) {
+            if (otherLength.length() > 0) {
+                otherLength.append(" ");
+            }
+            otherLength.append(minutes).append(minutes == 1 ? " minute" : MINUTES);
+        }
+
+        return otherLength.toString();
+    }
+
+    private int parseToInt(String value) {
+        if (value == null) {
+            return 0;
+        }
+        try {
+            return Integer.parseInt(value.trim());
+        } catch (NumberFormatException ex) {
+            return 0;
+        }
     }
 }

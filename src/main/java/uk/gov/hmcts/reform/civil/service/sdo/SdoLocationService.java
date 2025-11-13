@@ -89,7 +89,7 @@ public class SdoLocationService {
         return DynamicListUtils.trimToSelectedValue(list);
     }
 
-    public void updateWaLocationsIfRequired(CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder, String authToken) {
+    public void updateWaLocationsIfRequired(CaseData.CaseDataBuilder<?, ?> builder, String authToken) {
         updateWaCourtLocationsService.ifPresent(service -> service.updateCourtListingWALocations(authToken, builder));
     }
 

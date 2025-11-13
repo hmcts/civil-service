@@ -4,7 +4,9 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingFinalDisposalHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingFinalDisposalHearingDJ;
 
 import java.util.Optional;
 
@@ -17,7 +19,7 @@ public class DjDisposalTemplateFieldService {
 
     public String getCourtLocation(CaseData caseData) {
         return Optional.ofNullable(caseData.getDisposalHearingMethodInPersonDJ())
-            .map(dynamicList -> dynamicList.getValue())
+            .map(DynamicList::getValue)
             .map(DynamicListElement::getLabel)
             .orElse(null);
     }
@@ -30,13 +32,12 @@ public class DjDisposalTemplateFieldService {
             case disposalHearingMethodTelephoneHearing -> "by telephone";
             case disposalHearingMethodInPerson -> "in person";
             case disposalHearingMethodVideoConferenceHearing -> "by video conference";
-            default -> null;
         };
     }
 
     public String getHearingDuration(CaseData caseData) {
         return Optional.ofNullable(caseData.getDisposalHearingFinalDisposalHearingDJ())
-            .map(disposal -> disposal.getTime())
+            .map(DisposalHearingFinalDisposalHearingDJ::getTime)
             .map(this::mapDuration)
             .orElse(null);
     }

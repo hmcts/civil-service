@@ -26,11 +26,24 @@ class SdoDisposalGuardServiceTest {
     }
 
     @Test
-    void shouldBlockPrePopulateWhenMultiOrIntermediateTrackCase() {
-        CaseData caseData = CaseData.builder().build();
+    void shouldBlockPrePopulateOnlyForDisposalOrdersInJudicialReferral() {
+        CaseData caseData = CaseData.builder()
+            .orderType(OrderType.DISPOSAL)
+            .ccdState(CaseState.JUDICIAL_REFERRAL)
+            .build();
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(true);
         when(featureToggleService.isMultiOrIntermediateTrackCase(caseData)).thenReturn(true);
 
         assertThat(service.shouldBlockPrePopulate(caseData)).isTrue();
+    }
+
+    @Test
+    void shouldNotBlockPrePopulateWhenNotDisposal() {
+        CaseData caseData = CaseData.builder().build();
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(true);
+        when(featureToggleService.isMultiOrIntermediateTrackCase(caseData)).thenReturn(true);
+
+        assertThat(service.shouldBlockPrePopulate(caseData)).isFalse();
     }
 
     @Test
@@ -46,10 +59,11 @@ class SdoDisposalGuardServiceTest {
     }
 
     @Test
-    void shouldNotBlockOrderDetailsWhenFeatureDisabled() {
+    void shouldNotBlockWhenFeatureDisabled() {
         CaseData caseData = CaseData.builder().build();
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(false);
 
+        assertThat(service.shouldBlockPrePopulate(caseData)).isFalse();
         assertThat(service.shouldBlockOrderDetails(caseData)).isFalse();
     }
 }
