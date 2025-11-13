@@ -56,9 +56,6 @@ java:
     SPRING_CLOUD_BOOTSTRAP_ENABLED: true
     DASHBOARD_API_URL: http://${SERVICE_NAME}-civil-service
     SOME_ENV_VARIABLE: true
-    FEIGN_CLIENT_CONFIG_REMOTERUNTIMESERVICE_URL: http://${SERVICE_NAME}-camunda/engine-rest/
-    FEIGN_CLIENT_CONFIG_REMOTEEXTERNALTASKSERVICE_URL: http://${SERVICE_NAME}-camunda/engine-rest/
-    FEIGN_CLIENT_CONFIG_REMOTEREPOSITORYSERVICE_URL: http://${SERVICE_NAME}-camunda/engine-rest/
   keyVaults:
     civil:
       resourceGroup: civil

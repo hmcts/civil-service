@@ -174,6 +174,7 @@ public class ParentCaseUpdateHelper {
         docVisibilityRoles[3] = "Staff";
 
         List<Element<GeneralApplication>> civilGeneralApplications = caseData.getGeneralApplications();
+        log.info("updateParentWithGAState() Civil General Applications before for case ID: {}", parentCaseId);
         if (generalAppCaseData.getCcdState().equals(PENDING_APPLICATION_ISSUED) && !isEmpty(civilGeneralApplications)) {
             List<Element<GeneralApplication>> generalApplicationsList = civilGeneralApplications.stream()
                 .filter(app -> app.getValue().getCaseLink() != null && !app.getValue().getCaseLink().getCaseReference().equals(
@@ -211,6 +212,7 @@ public class ParentCaseUpdateHelper {
             && !generalAppCaseData.getGaDraftDocument().isEmpty())) {
             updateEvidence(updateMap, caseData, generalAppCaseData, docVisibilityRoles);
         }
+        log.info("updateParentWithGAState() Civil General Applications about to submit for case ID: {}", parentCaseId);
         coreCaseDataService.submitUpdate(parentCaseId, coreCaseDataService.caseDataContentFromStartEventResponse(
             startEventResponse, updateMap));
     }
