@@ -10,6 +10,7 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.util.Assert;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -34,12 +35,6 @@ public class ScenarioConfigLoader implements AllowedEventRepository {
     private volatile Set<CaseEvent> whitelist;
 
     @Override
-    public Set<CaseEvent> getAllowedEvents(String scenarioFile, String stateFullName) {
-        Map<String, Set<CaseEvent>> eventsByState = cache.computeIfAbsent(scenarioFile, this::loadScenario);
-        return eventsByState.getOrDefault(stateFullName, Set.of());
-    }
-
-    @Override
     public Set<CaseEvent> getWhitelist() {
         Set<CaseEvent> result = whitelist;
         if (result == null) {
@@ -51,6 +46,12 @@ public class ScenarioConfigLoader implements AllowedEventRepository {
             }
         }
         return result;
+    }
+
+    @Override
+    public Set<CaseEvent> getAllowedEvents(String scenarioFile, String stateFullName) {
+        Map<String, Set<CaseEvent>> eventsByState = cache.computeIfAbsent(scenarioFile, this::loadScenario);
+        return eventsByState.getOrDefault(stateFullName, Set.of());
     }
 
     private Map<String, Set<CaseEvent>> loadScenario(String scenarioFile) {
@@ -68,7 +69,7 @@ public class ScenarioConfigLoader implements AllowedEventRepository {
                 raw.forEach((state, events) -> mapped.put(state, toCaseEvents(events)));
                 return Map.copyOf(mapped);
             }
-        } catch (Exception ex) {
+        } catch (IOException ex) {
             throw new IllegalStateException("Failed to load scenario config: " + location, ex);
         }
     }

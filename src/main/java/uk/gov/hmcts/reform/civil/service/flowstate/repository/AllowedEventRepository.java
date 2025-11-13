@@ -6,12 +6,8 @@ import java.util.Set;
 
 public interface AllowedEventRepository {
 
-    Set<CaseEvent> getAllowedEvents(String scenarioKey, String stateFullName);
-
     Set<CaseEvent> getWhitelist();
 
-    default boolean isWhitelistEvent(CaseEvent event) {
-        return getWhitelist().contains(event);
-    }
+    Set<CaseEvent> getAllowedEvents(String scenarioKey, String stateFullName);
 
 }

@@ -10,14 +10,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
-import uk.gov.hmcts.reform.civil.service.flowstate.AllowedEventProvider;
+import uk.gov.hmcts.reform.civil.service.flowstate.AllowedEventService;
 import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
@@ -43,7 +42,7 @@ class EventAllowedAspectTest {
     private ProceedingJoinPoint proceedingJoinPoint;
 
     @Mock
-    private AllowedEventProvider allowedEventProvider;
+    private AllowedEventService allowedEventService;
 
     @Mock
     private SimpleStateFlowEngine stateFlowEngine;
@@ -74,7 +73,7 @@ class EventAllowedAspectTest {
         when(mockStateFlow.getStateHistory()).thenReturn(List.of(mockState));
 
         when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockStateFlow);
-        when(allowedEventProvider.isAllowed(any(CaseDetails.class), any())).thenReturn(false);
+        when(allowedEventService.isAllowed(any(CaseData.class), any())).thenReturn(false);
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build();
         CallbackParams callbackParams = buildCallbackParamsWithRequest(CallbackType.ABOUT_TO_START, caseData,
@@ -89,7 +88,7 @@ class EventAllowedAspectTest {
     @Test
     void shouldProceed_whenEventIsAllowed() throws Throwable {
         AboutToStartOrSubmitCallbackResponse response = mockProceedingJoinPoint();
-        when(allowedEventProvider.isAllowed(any(CaseDetails.class), any())).thenReturn(true);
+        when(allowedEventService.isAllowed(any(CaseData.class), any())).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
         CallbackParams callbackParams = buildCallbackParamsWithRequest(CallbackType.ABOUT_TO_START, caseData,
