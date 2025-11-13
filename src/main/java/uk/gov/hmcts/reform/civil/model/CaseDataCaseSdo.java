@@ -144,19 +144,19 @@ public class CaseDataCaseSdo implements MappableObject {
     private DisposalHearingMethodDJ disposalHearingMethodDJ;
     private DynamicList trialHearingMethodInPersonDJ;
     private DynamicList disposalHearingMethodInPersonDJ;
-    private final DynamicList hearingMethodValuesDisposalHearingDJ;
-    private final DynamicList hearingMethodValuesTrialHearingDJ;
+    private  DynamicList hearingMethodValuesDisposalHearingDJ;
+    private  DynamicList hearingMethodValuesTrialHearingDJ;
     private List<Element<DisposalHearingAddNewDirectionsDJ>> disposalHearingAddNewDirectionsDJ;
     private List<Element<TrialHearingAddNewDirectionsDJ>> trialHearingAddNewDirectionsDJ;
     private HearingMethodTelephoneHearingDJ disposalHearingMethodTelephoneHearingDJ;
     private HearingMethodVideoConferenceDJ disposalHearingMethodVideoConferenceHearingDJ;
     @Builder.Default
-    private final List<Element<CaseDocument>> orderSDODocumentDJCollection = new ArrayList<>();
+    private  List<Element<CaseDocument>> orderSDODocumentDJCollection = new ArrayList<>();
     private String caseManagementOrderSelection;
     private Document orderSDODocumentDJ;
 
     // CreateSdo fields
-    private final JudgementSum drawDirectionsOrder;
+    private  JudgementSum drawDirectionsOrder;
     private DisposalHearingJudgesRecital disposalHearingJudgesRecital;
     private DisposalHearingJudgementDeductionValue disposalHearingJudgementDeductionValue;
     private DisposalHearingDisclosureOfDocuments disposalHearingDisclosureOfDocuments;
@@ -172,21 +172,21 @@ public class CaseDataCaseSdo implements MappableObject {
     private DisposalHearingNotes disposalHearingNotes;
     private String disposalHearingHearingNotes;
     private DisposalOrderWithoutHearing disposalOrderWithoutHearing;
-    private final DisposalHearingMethod disposalHearingMethod;
-    private final DisposalHearingMethodTelephoneHearing disposalHearingMethodTelephoneHearing;
-    private final DisposalHearingMethodVideoConferenceHearing disposalHearingMethodVideoConferenceHearing;
-    private final List<Element<DisposalHearingAddNewDirections>> disposalHearingAddNewDirections;
-    private final DynamicList disposalHearingMethodInPerson;
-    private final DynamicList fastTrackMethodInPerson;
-    private final DynamicList hearingMethodValuesFastTrack;
-    private final DynamicList hearingMethodValuesDisposalHearing;
-    private final DynamicList hearingMethodValuesSmallClaims;
-    private final DynamicList smallClaimsMethodInPerson;
-    private final DynamicList hearingMethod;
-    private final YesOrNo drawDirectionsOrderRequired;
-    private final YesOrNo drawDirectionsOrderSmallClaims;
-    private final ClaimsTrack claimsTrack;
-    private final OrderType orderType;
+    private  DisposalHearingMethod disposalHearingMethod;
+    private  DisposalHearingMethodTelephoneHearing disposalHearingMethodTelephoneHearing;
+    private  DisposalHearingMethodVideoConferenceHearing disposalHearingMethodVideoConferenceHearing;
+    private  List<Element<DisposalHearingAddNewDirections>> disposalHearingAddNewDirections;
+    private  DynamicList disposalHearingMethodInPerson;
+    private  DynamicList fastTrackMethodInPerson;
+    private  DynamicList hearingMethodValuesFastTrack;
+    private  DynamicList hearingMethodValuesDisposalHearing;
+    private  DynamicList hearingMethodValuesSmallClaims;
+    private  DynamicList smallClaimsMethodInPerson;
+    private  DynamicList hearingMethod;
+    private  YesOrNo drawDirectionsOrderRequired;
+    private  YesOrNo drawDirectionsOrderSmallClaims;
+    private  ClaimsTrack claimsTrack;
+    private  OrderType orderType;
     private FastTrackBuildingDispute fastTrackBuildingDispute;
     private FastTrackClinicalNegligence fastTrackClinicalNegligence;
     private FastTrackCreditHire fastTrackCreditHire;
@@ -203,12 +203,12 @@ public class CaseDataCaseSdo implements MappableObject {
     private FastTrackNotes fastTrackNotes;
     private FastTrackHearingNotes fastTrackHearingNotes;
     private FastTrackOrderWithoutJudgement fastTrackOrderWithoutJudgement;
-    private final List<FastTrack> fastClaims;
-    private final List<FastTrack> trialAdditionalDirectionsForFastTrack;
-    private final FastTrackMethod fastTrackMethod;
-    private final FastTrackMethodTelephoneHearing fastTrackMethodTelephoneHearing;
-    private final FastTrackMethodVideoConferenceHearing fastTrackMethodVideoConferenceHearing;
-    private final List<Element<FastTrackAddNewDirections>> fastTrackAddNewDirections;
+    private  List<FastTrack> fastClaims;
+    private  List<FastTrack> trialAdditionalDirectionsForFastTrack;
+    private  FastTrackMethod fastTrackMethod;
+    private  FastTrackMethodTelephoneHearing fastTrackMethodTelephoneHearing;
+    private  FastTrackMethodVideoConferenceHearing fastTrackMethodVideoConferenceHearing;
+    private  List<Element<FastTrackAddNewDirections>> fastTrackAddNewDirections;
     private SmallClaimsCreditHire smallClaimsCreditHire;
     private SmallClaimsRoadTrafficAccident smallClaimsRoadTrafficAccident;
     private SmallClaimsDocuments smallClaimsDocuments;
@@ -220,12 +220,12 @@ public class CaseDataCaseSdo implements MappableObject {
     private SmallClaimsFlightDelay smallClaimsFlightDelay;
     private SDOHearingNotes sdoHearingNotes;
     private ReasonNotSuitableSDO reasonNotSuitableSDO;
-    private final List<SmallTrack> smallClaims;
-    private final List<SmallTrack> drawDirectionsOrderSmallClaimsAdditionalDirections;
-    private final SmallClaimsMethod smallClaimsMethod;
-    private final SmallClaimsMethodTelephoneHearing smallClaimsMethodTelephoneHearing;
-    private final SmallClaimsMethodVideoConferenceHearing smallClaimsMethodVideoConferenceHearing;
-    private final List<Element<SmallClaimsAddNewDirections>> smallClaimsAddNewDirections;
+    private  List<SmallTrack> smallClaims;
+    private  List<SmallTrack> drawDirectionsOrderSmallClaimsAdditionalDirections;
+    private  SmallClaimsMethod smallClaimsMethod;
+    private  SmallClaimsMethodTelephoneHearing smallClaimsMethodTelephoneHearing;
+    private  SmallClaimsMethodVideoConferenceHearing smallClaimsMethodVideoConferenceHearing;
+    private  List<Element<SmallClaimsAddNewDirections>> smallClaimsAddNewDirections;
     private List<OrderDetailsPagesSectionsToggle> fastTrackAltDisputeResolutionToggle;
     private List<OrderDetailsPagesSectionsToggle> fastTrackVariationOfDirectionsToggle;
     private List<OrderDetailsPagesSectionsToggle> fastTrackSettlementToggle;
@@ -248,14 +248,14 @@ public class CaseDataCaseSdo implements MappableObject {
     private List<OrderDetailsPagesSectionsToggle> disposalHearingCostsToggle;
     private List<OrderDetailsPagesSectionsToggle> smallClaimsHearingToggle;
     private CaseDocument sdoOrderDocument;
-    private final YesOrNo eaCourtLocation;
-    private final YesOrNo hmcEaCourtLocation;
+    private  YesOrNo eaCourtLocation;
+    private  YesOrNo hmcEaCourtLocation;
 
     // sdo ui flags
-    private final YesOrNo setSmallClaimsFlag;
-    private final YesOrNo setFastTrackFlag;
-    private final String eventDescriptionRTJ;
-    private final String additionalInformationRTJ;
+    private  YesOrNo setSmallClaimsFlag;
+    private  YesOrNo setFastTrackFlag;
+    private  String eventDescriptionRTJ;
+    private  String additionalInformationRTJ;
 
     //default judgement SDO R2 fields for trial
     private SdoDJR2TrialCreditHire sdoDJR2TrialCreditHire;

@@ -94,91 +94,91 @@ import static java.util.Optional.ofNullable;
 @Data
 public class CaseDataCaseProgression extends CaseDataCaseSdo implements MappableObject {
 
-    private final String notificationText;
-    private final List<EvidenceUploadDisclosure> disclosureSelectionEvidence;
-    private final List<EvidenceUploadDisclosure> disclosureSelectionEvidenceRes;
-    private final List<EvidenceUploadWitness> witnessSelectionEvidence;
-    private final List<EvidenceUploadWitness> witnessSelectionEvidenceSmallClaim;
-    private final List<EvidenceUploadWitness> witnessSelectionEvidenceRes;
-    private final List<EvidenceUploadWitness> witnessSelectionEvidenceSmallClaimRes;
-    private final List<EvidenceUploadExpert> expertSelectionEvidenceRes;
-    private final List<EvidenceUploadExpert> expertSelectionEvidence;
-    private final List<EvidenceUploadExpert> expertSelectionEvidenceSmallClaim;
-    private final List<EvidenceUploadExpert> expertSelectionEvidenceSmallClaimRes;
-    private final List<EvidenceUploadTrial> trialSelectionEvidence;
-    private final List<EvidenceUploadTrial> trialSelectionEvidenceSmallClaim;
-    private final List<EvidenceUploadTrial> trialSelectionEvidenceRes;
-    private final List<EvidenceUploadTrial> trialSelectionEvidenceSmallClaimRes;
+    private  String notificationText;
+    private  List<EvidenceUploadDisclosure> disclosureSelectionEvidence;
+    private  List<EvidenceUploadDisclosure> disclosureSelectionEvidenceRes;
+    private  List<EvidenceUploadWitness> witnessSelectionEvidence;
+    private  List<EvidenceUploadWitness> witnessSelectionEvidenceSmallClaim;
+    private  List<EvidenceUploadWitness> witnessSelectionEvidenceRes;
+    private  List<EvidenceUploadWitness> witnessSelectionEvidenceSmallClaimRes;
+    private  List<EvidenceUploadExpert> expertSelectionEvidenceRes;
+    private  List<EvidenceUploadExpert> expertSelectionEvidence;
+    private  List<EvidenceUploadExpert> expertSelectionEvidenceSmallClaim;
+    private  List<EvidenceUploadExpert> expertSelectionEvidenceSmallClaimRes;
+    private  List<EvidenceUploadTrial> trialSelectionEvidence;
+    private  List<EvidenceUploadTrial> trialSelectionEvidenceSmallClaim;
+    private  List<EvidenceUploadTrial> trialSelectionEvidenceRes;
+    private  List<EvidenceUploadTrial> trialSelectionEvidenceSmallClaimRes;
     //applicant
-    private final List<Element<UploadEvidenceDocumentType>> documentDisclosureList;
-    private final List<Element<UploadEvidenceDocumentType>> documentForDisclosure;
-    private final List<Element<UploadEvidenceWitness>> documentWitnessStatement;
-    private final List<Element<UploadEvidenceWitness>> documentWitnessSummary;
-    private final List<Element<UploadEvidenceWitness>> documentHearsayNotice;
-    private final List<Element<UploadEvidenceDocumentType>> documentReferredInStatement;
-    private final List<Element<UploadEvidenceExpert>> documentExpertReport;
-    private final List<Element<UploadEvidenceExpert>> documentJointStatement;
-    private final List<Element<UploadEvidenceExpert>> documentQuestions;
-    private final List<Element<UploadEvidenceExpert>> documentAnswers;
-    private final List<Element<UploadEvidenceDocumentType>> documentCaseSummary;
-    private final List<Element<UploadEvidenceDocumentType>> documentSkeletonArgument;
-    private final List<Element<UploadEvidenceDocumentType>> documentAuthorities;
-    private final List<Element<UploadEvidenceDocumentType>> documentCosts;
-    private final List<Element<UploadEvidenceDocumentType>> documentEvidenceForTrial;
+    private  List<Element<UploadEvidenceDocumentType>> documentDisclosureList;
+    private  List<Element<UploadEvidenceDocumentType>> documentForDisclosure;
+    private  List<Element<UploadEvidenceWitness>> documentWitnessStatement;
+    private  List<Element<UploadEvidenceWitness>> documentWitnessSummary;
+    private  List<Element<UploadEvidenceWitness>> documentHearsayNotice;
+    private  List<Element<UploadEvidenceDocumentType>> documentReferredInStatement;
+    private  List<Element<UploadEvidenceExpert>> documentExpertReport;
+    private  List<Element<UploadEvidenceExpert>> documentJointStatement;
+    private  List<Element<UploadEvidenceExpert>> documentQuestions;
+    private  List<Element<UploadEvidenceExpert>> documentAnswers;
+    private  List<Element<UploadEvidenceDocumentType>> documentCaseSummary;
+    private  List<Element<UploadEvidenceDocumentType>> documentSkeletonArgument;
+    private  List<Element<UploadEvidenceDocumentType>> documentAuthorities;
+    private  List<Element<UploadEvidenceDocumentType>> documentCosts;
+    private  List<Element<UploadEvidenceDocumentType>> documentEvidenceForTrial;
     //applicant2
-    private final List<Element<UploadEvidenceDocumentType>> documentDisclosureListApp2;
-    private final List<Element<UploadEvidenceDocumentType>> documentForDisclosureApp2;
-    private final List<Element<UploadEvidenceWitness>> documentWitnessStatementApp2;
-    private final List<Element<UploadEvidenceWitness>> documentWitnessSummaryApp2;
-    private final List<Element<UploadEvidenceWitness>> documentHearsayNoticeApp2;
-    private final List<Element<UploadEvidenceDocumentType>> documentReferredInStatementApp2;
-    private final List<Element<UploadEvidenceExpert>> documentExpertReportApp2;
-    private final List<Element<UploadEvidenceExpert>> documentJointStatementApp2;
-    private final List<Element<UploadEvidenceExpert>> documentQuestionsApp2;
-    private final List<Element<UploadEvidenceExpert>> documentAnswersApp2;
-    private final List<Element<UploadEvidenceDocumentType>> documentCaseSummaryApp2;
-    private final List<Element<UploadEvidenceDocumentType>> documentSkeletonArgumentApp2;
-    private final List<Element<UploadEvidenceDocumentType>> documentAuthoritiesApp2;
-    private final List<Element<UploadEvidenceDocumentType>> documentCostsApp2;
-    private final List<Element<UploadEvidenceDocumentType>> documentEvidenceForTrialApp2;
-    private final LocalDateTime caseDocumentUploadDate;
+    private  List<Element<UploadEvidenceDocumentType>> documentDisclosureListApp2;
+    private  List<Element<UploadEvidenceDocumentType>> documentForDisclosureApp2;
+    private  List<Element<UploadEvidenceWitness>> documentWitnessStatementApp2;
+    private  List<Element<UploadEvidenceWitness>> documentWitnessSummaryApp2;
+    private  List<Element<UploadEvidenceWitness>> documentHearsayNoticeApp2;
+    private  List<Element<UploadEvidenceDocumentType>> documentReferredInStatementApp2;
+    private  List<Element<UploadEvidenceExpert>> documentExpertReportApp2;
+    private  List<Element<UploadEvidenceExpert>> documentJointStatementApp2;
+    private  List<Element<UploadEvidenceExpert>> documentQuestionsApp2;
+    private  List<Element<UploadEvidenceExpert>> documentAnswersApp2;
+    private  List<Element<UploadEvidenceDocumentType>> documentCaseSummaryApp2;
+    private  List<Element<UploadEvidenceDocumentType>> documentSkeletonArgumentApp2;
+    private  List<Element<UploadEvidenceDocumentType>> documentAuthoritiesApp2;
+    private  List<Element<UploadEvidenceDocumentType>> documentCostsApp2;
+    private  List<Element<UploadEvidenceDocumentType>> documentEvidenceForTrialApp2;
+    private  LocalDateTime caseDocumentUploadDate;
     //respondent
-    private final List<Element<UploadEvidenceDocumentType>> documentDisclosureListRes;
-    private final List<Element<UploadEvidenceDocumentType>> documentForDisclosureRes;
-    private final List<Element<UploadEvidenceWitness>> documentWitnessStatementRes;
-    private final List<Element<UploadEvidenceWitness>> documentWitnessSummaryRes;
-    private final List<Element<UploadEvidenceWitness>> documentHearsayNoticeRes;
-    private final List<Element<UploadEvidenceDocumentType>> documentReferredInStatementRes;
-    private final List<Element<UploadEvidenceExpert>> documentExpertReportRes;
-    private final List<Element<UploadEvidenceExpert>> documentJointStatementRes;
-    private final List<Element<UploadEvidenceExpert>> documentQuestionsRes;
-    private final List<Element<UploadEvidenceExpert>> documentAnswersRes;
-    private final List<Element<UploadEvidenceDocumentType>> documentCaseSummaryRes;
-    private final List<Element<UploadEvidenceDocumentType>> documentSkeletonArgumentRes;
-    private final List<Element<UploadEvidenceDocumentType>> documentAuthoritiesRes;
-    private final List<Element<UploadEvidenceDocumentType>> documentCostsRes;
-    private final List<Element<UploadEvidenceDocumentType>> documentEvidenceForTrialRes;
+    private  List<Element<UploadEvidenceDocumentType>> documentDisclosureListRes;
+    private  List<Element<UploadEvidenceDocumentType>> documentForDisclosureRes;
+    private  List<Element<UploadEvidenceWitness>> documentWitnessStatementRes;
+    private  List<Element<UploadEvidenceWitness>> documentWitnessSummaryRes;
+    private  List<Element<UploadEvidenceWitness>> documentHearsayNoticeRes;
+    private  List<Element<UploadEvidenceDocumentType>> documentReferredInStatementRes;
+    private  List<Element<UploadEvidenceExpert>> documentExpertReportRes;
+    private  List<Element<UploadEvidenceExpert>> documentJointStatementRes;
+    private  List<Element<UploadEvidenceExpert>> documentQuestionsRes;
+    private  List<Element<UploadEvidenceExpert>> documentAnswersRes;
+    private  List<Element<UploadEvidenceDocumentType>> documentCaseSummaryRes;
+    private  List<Element<UploadEvidenceDocumentType>> documentSkeletonArgumentRes;
+    private  List<Element<UploadEvidenceDocumentType>> documentAuthoritiesRes;
+    private  List<Element<UploadEvidenceDocumentType>> documentCostsRes;
+    private  List<Element<UploadEvidenceDocumentType>> documentEvidenceForTrialRes;
     //these fields are shown if the solicitor is for respondent 2 and respondents have different solicitors
-    private final List<Element<UploadEvidenceDocumentType>> documentDisclosureListRes2;
-    private final List<Element<UploadEvidenceDocumentType>> documentForDisclosureRes2;
-    private final List<Element<UploadEvidenceWitness>> documentWitnessStatementRes2;
-    private final List<Element<UploadEvidenceWitness>> documentWitnessSummaryRes2;
-    private final List<Element<UploadEvidenceWitness>> documentHearsayNoticeRes2;
-    private final List<Element<UploadEvidenceDocumentType>> documentReferredInStatementRes2;
-    private final List<Element<UploadEvidenceExpert>> documentExpertReportRes2;
-    private final List<Element<UploadEvidenceExpert>> documentJointStatementRes2;
-    private final List<Element<UploadEvidenceExpert>> documentQuestionsRes2;
-    private final List<Element<UploadEvidenceExpert>> documentAnswersRes2;
-    private final List<Element<UploadEvidenceDocumentType>> documentCaseSummaryRes2;
-    private final List<Element<UploadEvidenceDocumentType>> documentSkeletonArgumentRes2;
-    private final List<Element<UploadEvidenceDocumentType>> documentAuthoritiesRes2;
-    private final List<Element<UploadEvidenceDocumentType>> documentCostsRes2;
-    private final List<Element<UploadEvidenceDocumentType>> documentEvidenceForTrialRes2;
-    private final LocalDateTime caseDocumentUploadDateRes;
-    private final HearingNotes hearingNotes;
-    private final List<Element<UploadEvidenceDocumentType>> applicantDocsUploadedAfterBundle;
-    private final List<Element<UploadEvidenceDocumentType>> respondentDocsUploadedAfterBundle;
-    private final List<Element<UploadEvidenceDocumentType>> bundleEvidence;
+    private  List<Element<UploadEvidenceDocumentType>> documentDisclosureListRes2;
+    private  List<Element<UploadEvidenceDocumentType>> documentForDisclosureRes2;
+    private  List<Element<UploadEvidenceWitness>> documentWitnessStatementRes2;
+    private  List<Element<UploadEvidenceWitness>> documentWitnessSummaryRes2;
+    private  List<Element<UploadEvidenceWitness>> documentHearsayNoticeRes2;
+    private  List<Element<UploadEvidenceDocumentType>> documentReferredInStatementRes2;
+    private  List<Element<UploadEvidenceExpert>> documentExpertReportRes2;
+    private  List<Element<UploadEvidenceExpert>> documentJointStatementRes2;
+    private  List<Element<UploadEvidenceExpert>> documentQuestionsRes2;
+    private  List<Element<UploadEvidenceExpert>> documentAnswersRes2;
+    private  List<Element<UploadEvidenceDocumentType>> documentCaseSummaryRes2;
+    private  List<Element<UploadEvidenceDocumentType>> documentSkeletonArgumentRes2;
+    private  List<Element<UploadEvidenceDocumentType>> documentAuthoritiesRes2;
+    private  List<Element<UploadEvidenceDocumentType>> documentCostsRes2;
+    private  List<Element<UploadEvidenceDocumentType>> documentEvidenceForTrialRes2;
+    private  LocalDateTime caseDocumentUploadDateRes;
+    private  HearingNotes hearingNotes;
+    private  List<Element<UploadEvidenceDocumentType>> applicantDocsUploadedAfterBundle;
+    private  List<Element<UploadEvidenceDocumentType>> respondentDocsUploadedAfterBundle;
+    private  List<Element<UploadEvidenceDocumentType>> bundleEvidence;
 
     /* Final Orders */
     private YesOrNo finalOrderMadeSelection;
@@ -215,14 +215,13 @@ public class CaseDataCaseProgression extends CaseDataCaseSdo implements Mappable
     private OrderAfterHearingDate orderAfterHearingDate;
     private YesOrNo showOrderAfterHearingDatePage;
 
-    // judge final freeform orders
-    private final FinalOrderSelection finalOrderSelection;
-    private final String freeFormRecordedTextArea;
-    private final String freeFormOrderedTextArea;
-    private final FreeFormOrderValues orderOnCourtInitiative;
-    private final FreeFormOrderValues orderWithoutNotice;
-    private final OrderOnCourtsList orderOnCourtsList;
-    private final String freeFormHearingNotes;
+    private  FinalOrderSelection finalOrderSelection;
+    private  String freeFormRecordedTextArea;
+    private  String freeFormOrderedTextArea;
+    private  FreeFormOrderValues orderOnCourtInitiative;
+    private  FreeFormOrderValues orderWithoutNotice;
+    private  OrderOnCourtsList orderOnCourtsList;
+    private  String freeFormHearingNotes;
     private CaseDocument finalOrderDocument;
     @Builder.Default
     private final List<Element<CaseDocument>> finalOrderDocumentCollection = new ArrayList<>();
@@ -266,52 +265,52 @@ public class CaseDataCaseProgression extends CaseDataCaseSdo implements Mappable
     private HearingOtherComments respondent1HearingOtherComments;
     private HearingOtherComments respondent2HearingOtherComments;
     @Builder.Default
-    private final List<Element<CaseDocument>> trialReadyDocuments = new ArrayList<>();
+    private  List<Element<CaseDocument>> trialReadyDocuments = new ArrayList<>();
 
     // // MINTI case prog
     private DynamicList requestHearingNoticeDynamic;
-    private final List<ConfirmListingTickBox> confirmListingTickBox;
+    private  List<ConfirmListingTickBox> confirmListingTickBox;
     private TaskManagementLocationTypes taskManagementLocations;
     private TaskManagementLocationTab taskManagementLocationsTab;
     private TaskManagementLocationTab caseManagementLocationTab;
     private DynamicList hearingListedDynamicList;
 
     //case progression
-    private final List<Element<DocumentWithName>> documentAndName;
-    private final List<Element<DocumentWithName>> documentAndNameToAdd;
-    private final List<Element<DocumentAndNote>> documentAndNote;
-    private final List<Element<DocumentAndNote>> documentAndNoteToAdd;
-    private final CaseNoteType caseNoteType;
-    private final String caseNoteTA;
-    private final List<Element<CaseNote>> caseNotesTA;
-    private final LocalDateTime noteAdditionDateTime;
-    private final String caseTypeFlag;
-    private final String witnessStatementFlag;
-    private final String witnessSummaryFlag;
-    private final String witnessReferredStatementFlag;
-    private final String expertReportFlag;
-    private final String expertJointFlag;
-    private final String trialAuthorityFlag;
-    private final String trialCostsFlag;
-    private final String trialDocumentaryFlag;
+    private  List<Element<DocumentWithName>> documentAndName;
+    private  List<Element<DocumentWithName>> documentAndNameToAdd;
+    private  List<Element<DocumentAndNote>> documentAndNote;
+    private  List<Element<DocumentAndNote>> documentAndNoteToAdd;
+    private  CaseNoteType caseNoteType;
+    private  String caseNoteTA;
+    private  List<Element<CaseNote>> caseNotesTA;
+    private  LocalDateTime noteAdditionDateTime;
+    private  String caseTypeFlag;
+    private  String witnessStatementFlag;
+    private  String witnessSummaryFlag;
+    private  String witnessReferredStatementFlag;
+    private  String expertReportFlag;
+    private  String expertJointFlag;
+    private  String trialAuthorityFlag;
+    private  String trialCostsFlag;
+    private  String trialDocumentaryFlag;
 
-    private final YesOrNo urgentFlag;
-    private final String caseProgAllocatedTrack;
-    private final DynamicList evidenceUploadOptions;
+    private  YesOrNo urgentFlag;
+    private  String caseProgAllocatedTrack;
+    private  DynamicList evidenceUploadOptions;
 
-    private final List<Element<RegistrationInformation>> registrationTypeRespondentOne;
-    private final List<Element<RegistrationInformation>> registrationTypeRespondentTwo;
+    private  List<Element<RegistrationInformation>> registrationTypeRespondentOne;
+    private  List<Element<RegistrationInformation>> registrationTypeRespondentTwo;
 
-    private final String respondent1DocumentURL;
-    private final String respondent2DocumentURL;
-    private final String respondent2DocumentGeneration;
-    private final String hearingHelpFeesReferenceNumber;
+    private  String respondent1DocumentURL;
+    private  String respondent2DocumentURL;
+    private  String respondent2DocumentGeneration;
+    private  String hearingHelpFeesReferenceNumber;
 
-    private final String hearingLocationCourtName;
+    private  String hearingLocationCourtName;
     // bulk claims
-    private final String bulkCustomerId;
-    private final String sdtRequestIdFromSdt;
-    private final List<Element<String>> sdtRequestId;
+    private  String bulkCustomerId;
+    private  String sdtRequestIdFromSdt;
+    private  List<Element<String>> sdtRequestId;
 
     //Judgments Online
     private JudgmentRecordedReason joJudgmentRecordReason;
@@ -356,7 +355,7 @@ public class CaseDataCaseProgression extends CaseDataCaseSdo implements Mappable
     private YesOrNo respondForImmediateOption;
     private LocalDateTime joDJCreatedDate;
 
-    private final TransferCaseDetails transferCaseDetails;
+    private  TransferCaseDetails transferCaseDetails;
 
     //SDO-R2
     private YesOrNo isFlightDelayClaim;
@@ -390,7 +389,7 @@ public class CaseDataCaseProgression extends CaseDataCaseSdo implements Mappable
     private ConfirmOrderGivesPermission confirmOrderGivesPermission;
     private SettleDiscontinueYesOrNoList isDiscontinuingAgainstBothDefendants;
     private SettlementReason settleReason;
-    private final MarkPaidConsentList markPaidConsent;
+    private  MarkPaidConsentList markPaidConsent;
     private YesOrNo claimantsConsentToDiscontinuance;
     private CaseDocument applicant1NoticeOfDiscontinueCWViewDoc;
     private CaseDocument respondent1NoticeOfDiscontinueCWViewDoc;
@@ -425,12 +424,12 @@ public class CaseDataCaseProgression extends CaseDataCaseSdo implements Mappable
     private String waTaskToCompleteId;
 
     //QueryManagement
-    private final CaseQueriesCollection qmApplicantSolicitorQueries;
-    private final CaseQueriesCollection qmRespondentSolicitor1Queries;
-    private final CaseQueriesCollection qmRespondentSolicitor2Queries;
-    private final CaseQueriesCollection queries;
-    private final CaseMessage caseMessage;
-    private final LatestQuery qmLatestQuery;
+    private  CaseQueriesCollection qmApplicantSolicitorQueries;
+    private  CaseQueriesCollection qmRespondentSolicitor1Queries;
+    private  CaseQueriesCollection qmRespondentSolicitor2Queries;
+    private  CaseQueriesCollection queries;
+    private  CaseMessage caseMessage;
+    private  LatestQuery qmLatestQuery;
 
     /**
      * Claimant has requested a reconsideration of the SDO.
