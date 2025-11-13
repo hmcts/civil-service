@@ -274,8 +274,7 @@ class PartyUtilsTest {
                 """
                 Claimant reference: 12345
                 Defendant 1 reference: 6789
-                Defendant 2 reference: defendant sol 2
-                """,
+                Defendant 2 reference: defendant sol 2""",
                 partyReferences
             );
         }
