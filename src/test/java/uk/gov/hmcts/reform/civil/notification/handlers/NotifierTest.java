@@ -47,7 +47,7 @@ class NotifierTest {
     CaseData caseData;
     String taskId = "taskId";
 
-    private class TestNotifier extends Notifier {
+    private static class TestNotifier extends Notifier {
         public TestNotifier(NotificationService notificationService,
                             CaseTaskTrackingService caseTaskTrackingService,
                             PartiesEmailGenerator emailGenerator) {

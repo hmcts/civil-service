@@ -41,7 +41,6 @@ public class NotificationHandler extends CallbackHandler {
     private final NotifierFactory notifierFactory;
     private final CoreCaseDataService coreCaseDataService;
     private final ObjectMapper objectMapper;
-    private final uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService caseTaskTrackingService;
 
     @Override
     protected Map<String, Callback> callbacks() {
