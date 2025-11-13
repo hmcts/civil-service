@@ -25,7 +25,7 @@ public abstract class Notifier extends BaseNotifier {
                        PartiesEmailGenerator partiesNotifier) {
         super(notificationService);
         this.caseTaskTrackingService = caseTaskTrackingService;
-        this.partiesNotifier         = partiesNotifier;
+        this.partiesNotifier = partiesNotifier;
     }
 
     public String notifyParties(CaseData caseData, String eventId, String taskId) {
