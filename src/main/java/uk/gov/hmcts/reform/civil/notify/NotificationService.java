@@ -24,11 +24,7 @@ public class NotificationService {
     ) {
         try {
             log.info("NotificationService::sendMail::templateID: {}", emailTemplate);
-            if (targetEmail == null || targetEmail.isEmpty()) {
-                throw new NotificationClientException("Target Email is empty");
-            } else {
-                notificationClient.sendEmail(emailTemplate, targetEmail, parameters, reference);
-            }
+            notificationClient.sendEmail(emailTemplate, targetEmail, parameters, reference);
         } catch (NotificationClientException e) {
             log.error("Notification Service error {}", e.getMessage());
             throw new NotificationException(e);
