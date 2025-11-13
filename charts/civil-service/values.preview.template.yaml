@@ -190,7 +190,7 @@ ccd:
         PROXY_DOCUMENT_MANAGEMENT: http://dm-store-aat.service.core-compute-aat.internal
       ingressHost: gateway-${SERVICE_FQDN}
       ingressIP: ${INGRESS_IP}
-      disableKeyVaults: true
+      keyVaults: []
   ccd-data-store-api:
     java:
       imagePullPolicy: Always
@@ -224,7 +224,7 @@ ccd:
           secretRef: "{{ .Values.global.postgresSecret }}"
           key: PASSWORD
           disabled: true
-      disableKeyVaults: true
+      keyVaults: []
       ingressHost: ccd-data-store-api-${SERVICE_FQDN}
 
   ccd-definition-store-api:
@@ -246,16 +246,8 @@ ccd:
           secretRef: "{{ .Values.global.postgresSecret }}"
           key: PASSWORD
           disabled: true
-      disableKeyVaults: true
+      keyVaults: []
       ingressHost: ccd-definition-store-${SERVICE_FQDN}
-
-  draft-store-service:
-    java:
-      disableKeyVaults: true
-
-  rpe-service-auth-provider:
-    java:
-      disableKeyVaults: true
 
   postgresql:
     persistence:
@@ -381,7 +373,7 @@ ccd-case-document-am-api:
       DM_STORE_BASE_URL: http://dm-store-aat.service.core-compute-aat.internal
       CCD_DATA_STORE_API_BASE_URL: http://${SERVICE_NAME}-ccd-data-store-api
       CASE_DOCUMENT_AM_API_S2S_SECRET: ${CASE_DOCUMENT_AM_API_S2S_SECRET}
-    disableKeyVaults: true
+    keyVaults: []
 
 wiremock:
   enabled: true
