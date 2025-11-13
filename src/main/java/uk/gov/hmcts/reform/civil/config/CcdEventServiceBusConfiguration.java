@@ -34,6 +34,8 @@ public class CcdEventServiceBusConfiguration {
             .sessionReceiver()
             .topicName(topicName)
             .subscriptionName(ccdCaseEventsSubscriptionName)
+            .prefetchCount(10)  // ADDED: Keep connection alive by prefetching messages
+            .maxAutoLockRenewDuration(Duration.ofMinutes(5))  // ADDED: Auto-renew locks for 5 minutes
             .buildClient();
 
         log.info("CCD Case Events Session receiver created successfully");
