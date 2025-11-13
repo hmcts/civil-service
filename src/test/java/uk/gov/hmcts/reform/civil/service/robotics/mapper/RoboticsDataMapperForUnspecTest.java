@@ -41,19 +41,6 @@ import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.flowstate.TransitionsTestConfiguration;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
-import uk.gov.hmcts.reform.civil.service.robotics.strategy.BreathingSpaceEventStrategy;
-import uk.gov.hmcts.reform.civil.service.robotics.strategy.CaseProceedsInCasemanStrategy;
-import uk.gov.hmcts.reform.civil.service.robotics.strategy.DefaultJudgmentEventStrategy;
-import uk.gov.hmcts.reform.civil.service.robotics.strategy.DefendantNoCDeadlineStrategy;
-import uk.gov.hmcts.reform.civil.service.robotics.strategy.MediationEventStrategy;
-import uk.gov.hmcts.reform.civil.service.robotics.strategy.TakenOfflineByStaffEventStrategy;
-import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsManualOfflineSupport;
-import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextFormatter;
-import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsPartyLookup;
-import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenerator;
-import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsCaseDataSupport;
-import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsRespondentResponseSupport;
-import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsTimelineHelper;
 import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
 import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 
@@ -78,26 +65,13 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
     TransitionsTestConfiguration.class,
     EventHistorySequencer.class,
     EventHistoryMapper.class,
-    RoboticsTimelineHelper.class,
-    RoboticsEventTextFormatter.class,
-    RoboticsSequenceGenerator.class,
-    BreathingSpaceEventStrategy.class,
-    TakenOfflineByStaffEventStrategy.class,
-    DefaultJudgmentEventStrategy.class,
-    CaseProceedsInCasemanStrategy.class,
-    DefendantNoCDeadlineStrategy.class,
-    MediationEventStrategy.class,
-    RoboticsManualOfflineSupport.class,
-    RoboticsRespondentResponseSupport.class,
-    RoboticsDataMapper.class,
+    RoboticsDataMapperForUnspec.class,
     RoboticsAddressMapper.class,
     AddressLinesMapper.class,
-    OrganisationService.class,
-    RoboticsPartyLookup.class,
-    RoboticsCaseDataSupport.class
+    OrganisationService.class
 })
 @ExtendWith(SpringExtension.class)
-class RoboticsDataMapperTest {
+class RoboticsDataMapperForUnspecTest {
 
     private static final ContactInformation CONTACT_INFORMATION = ContactInformation.builder()
         .addressLine1("line 1")
@@ -141,7 +115,7 @@ class RoboticsDataMapperTest {
     }
 
     @Autowired
-    RoboticsDataMapper mapper;
+    RoboticsDataMapperForUnspec mapper;
 
     @Test
     void shouldMapToRoboticsCaseData_whenHandOffPointIsUnrepresentedDefendant() {

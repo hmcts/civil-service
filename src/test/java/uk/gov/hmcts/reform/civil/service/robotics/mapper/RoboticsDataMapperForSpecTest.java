@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.ccd.model.PreviousOrganisation;
@@ -22,8 +21,6 @@ import uk.gov.hmcts.reform.civil.model.robotics.NoticeOfChange;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseDataSpec;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
-import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsCaseDataSupport;
-import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsPartyLookup;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -39,16 +36,13 @@ class RoboticsDataMapperForSpecTest {
     private RoboticsDataMapperForSpec mapper;
 
     @Mock
+    private RoboticsAddressMapper addressMapper;
+    @Mock
     private EventHistoryMapper eventHistoryMapper;
     @Mock
     private OrganisationService organisationService;
     @Mock
     private FeatureToggleService featureToggleService;
-    @Spy
-    private RoboticsPartyLookup partyLookup = new RoboticsPartyLookup();
-    @Spy
-    private RoboticsCaseDataSupport caseDataSupport =
-        new RoboticsCaseDataSupport(new RoboticsAddressMapper(new AddressLinesMapper()), partyLookup);
     private static final String BEARER_TOKEN = "Bearer Token";
 
     @Test

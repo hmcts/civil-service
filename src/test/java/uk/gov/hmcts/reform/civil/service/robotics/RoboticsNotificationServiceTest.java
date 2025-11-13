@@ -11,9 +11,7 @@ import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.config.PrdAdminUserConfiguration;
@@ -45,7 +43,7 @@ import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistorySequencer;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
-import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForUnspec;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSpec;
 import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
 import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
@@ -77,10 +75,10 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
         TransitionsTestConfiguration.class,
         EventHistorySequencer.class,
         EventHistoryMapper.class,
+        RoboticsDataMapperForUnspec.class,
         RoboticsAddressMapper.class,
         AddressLinesMapper.class,
-        OrganisationService.class,
-        RoboticsNotificationServiceTest.RoboticsTestConfiguration.class
+        OrganisationService.class
     },
     properties = {
         "sendgrid.api-key:some-key",
@@ -93,21 +91,12 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 )
 class RoboticsNotificationServiceTest {
 
-    @TestConfiguration
-    @ComponentScan(basePackageClasses = {
-        uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper.class,
-        uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsCaseDataSupport.class,
-        uk.gov.hmcts.reform.civil.service.robotics.strategy.EventHistoryStrategy.class
-    })
-    static class RoboticsTestConfiguration {
-    }
-
     @Autowired
     RoboticsNotificationService service;
     @Autowired
     RoboticsEmailConfiguration emailConfiguration;
     @Autowired
-    RoboticsDataMapper roboticsDataMapper;
+    RoboticsDataMapperForUnspec roboticsDataMapper;
     @MockBean
     FeatureToggleService featureToggleService;
 
