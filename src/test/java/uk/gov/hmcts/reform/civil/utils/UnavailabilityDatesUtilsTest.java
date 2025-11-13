@@ -75,7 +75,8 @@ public class UnavailabilityDatesUtilsTest {
 
             rollUpUnavailabilityDatesForRespondent(caseData);
 
-            assertThat(caseData.getRespondent1().getUnavailableDates()).isNull();        }
+            assertThat(caseData.getRespondent1().getUnavailableDates()).isNull();
+        }
 
         @Test
         public void shouldReturnDateRangesWhenProvidedForRespondent1() {
