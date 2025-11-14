@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static java.util.Collections.singletonList;
+import static org.jose4j.json.JsonUtil.toJson;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_COSC_APPLICATION_AFTER_PAYMENT;
@@ -61,7 +62,9 @@ public class GeneralApplicationAfterPaymentCallbackHandler extends CallbackHandl
         // No need to initiate the business process if payment status is failed
         if (gaForLipService.isLipApp(caseData) && paymentStatus == PaymentStatus.FAILED) {
             log.info("Payment status is failed for caseId: {}", caseData.getCcdCaseReference());
-            return getCallbackResponse(caseDataBuilder);
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .data(caseDataBuilder.build().toMap(objectMapper))
+                .build();
         }
 
         if (caseData.getGeneralAppType().getTypes().contains(
@@ -81,13 +84,11 @@ public class GeneralApplicationAfterPaymentCallbackHandler extends CallbackHandl
             );
         }
 
-        return getCallbackResponse(caseDataBuilder);
-    }
+        Map<String, Object> caseDataMap = caseDataBuilder.build().toMap(objectMapper);
+        log.info("About to respond generalAppAfterPayment caseId: {} data: {}", caseData.getCcdCaseReference(), toJson(caseDataMap));
 
-    private CallbackResponse getCallbackResponse(GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder) {
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseDataMap)
             .build();
     }
-
 }
