@@ -418,12 +418,22 @@ public class BundleRequestMapper {
             BundleFileNameList.CLAIM_FORM.getDisplayName()
         ));
         bundlingRequestDocuments.addAll(mapParticularsOfClaimDocs(caseData));
-        List<Element<CaseDocument>> clAndDfDocList = caseData.getDefendantResponseDocuments();
+        List<Element<CaseDocument>> clAndDfDocList = new ArrayList<>();
+        clAndDfDocList.addAll(caseData.getDefendantResponseDocuments());
         clAndDfDocList.addAll(caseData.getClaimantResponseDocuments());
+        caseData.getSystemGeneratedCaseDocuments().stream()
+            .filter(caseDocumentElement ->
+                        DocumentType.DEFENDANT_DEFENCE.equals(caseDocumentElement.getValue().getDocumentType())
+                    || DocumentType.CLAIMANT_DEFENCE.equals(caseDocumentElement.getValue().getDocumentType())
+            )
+            .filter(caseDocumentElement -> !clAndDfDocList.contains(caseDocumentElement))
+            .forEach(clAndDfDocList::add);
+
         List<Element<CaseDocument>> sortedDefendantDefenceAndClaimantReply =
             bundleDocumentsRetrieval.getSortedDefendantDefenceAndClaimantReply(clAndDfDocList);
         sortedDefendantDefenceAndClaimantReply.forEach(caseDocumentElement -> {
-            String docType = caseDocumentElement.getValue().getDocumentType().equals(DocumentType.DEFENDANT_DEFENCE)
+            DocumentType documentType = caseDocumentElement.getValue().getDocumentType();
+            String docTitleTemplate = DocumentType.DEFENDANT_DEFENCE.equals(documentType)
                 ? BundleFileNameList.DEFENCE.getDisplayName() : BundleFileNameList.CL_REPLY.getDisplayName();
             String party;
             if (caseDocumentElement.getValue().getCreatedBy().equalsIgnoreCase("Defendant")) {
@@ -433,13 +443,13 @@ public class BundleRequestMapper {
             } else {
                 party = "";
             }
-            String docName = generateDocName(docType, party, null,
+            String docName = generateDocName(docTitleTemplate, party, null,
                                              caseDocumentElement.getValue().getCreatedDatetime().toLocalDate()
             );
             bundlingRequestDocuments.add(buildBundlingRequestDoc(
                 docName,
                 caseDocumentElement.getValue().getDocumentLink(),
-                docType
+                documentType.name()
             ));
         });
         Arrays.stream(PartyType.values()).toList().forEach(partyType ->
