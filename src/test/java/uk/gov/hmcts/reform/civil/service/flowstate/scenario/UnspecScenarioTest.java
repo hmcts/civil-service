@@ -26,8 +26,10 @@ class UnspecScenarioTest {
         CaseData spec = mock(CaseData.class);
         when(spec.getCaseAccessCategory()).thenReturn(SPEC_CLAIM);
 
-        assertThat(scenario.appliesTo(unspec)).isTrue();
-        assertThat(scenario.appliesTo(spec)).isFalse();
+        assertThat(scenario.appliesTo(unspec, false)).isTrue();
+        assertThat(scenario.appliesTo(unspec, true)).isFalse();
+        assertThat(scenario.appliesTo(spec, false)).isFalse();
+        assertThat(scenario.appliesTo(spec, true)).isFalse();
     }
 
     @Test
