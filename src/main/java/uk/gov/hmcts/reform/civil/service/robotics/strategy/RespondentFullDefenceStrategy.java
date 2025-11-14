@@ -38,6 +38,7 @@ import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsDirecti
 import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsDirectionsQuestionnaireSupport.getRespondent2DQOrDefault;
 import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildDirectionsQuestionnaireEvent;
 import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildDefenceOrStatesPaidEvent;
+import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildCounterClaimEvent;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT2_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT_ID;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1ResponseExists;
@@ -98,6 +99,7 @@ public class RespondentFullDefenceStrategy implements EventHistoryStrategy {
 
         builder.defenceFiled(buckets.defenceEvents);
         builder.statesPaid(buckets.statesPaidEvents);
+        builder.defenceAndCounterClaim(buckets.defenceAndCounterClaimEvents);
         builder.clearDirectionsQuestionnaireFiled().directionsQuestionnaireFiled(buckets.directionsQuestionnaireEvents);
     }
 
@@ -105,7 +107,8 @@ public class RespondentFullDefenceStrategy implements EventHistoryStrategy {
         List<Event> defenceEvents = sanitise(history.getDefenceFiled());
         List<Event> statesPaidEvents = sanitise(history.getStatesPaid());
         List<Event> directionsQuestionnaireEvents = sanitise(history.getDirectionsQuestionnaireFiled());
-        return new EventBuckets(defenceEvents, statesPaidEvents, directionsQuestionnaireEvents);
+        List<Event> counterClaimEvents = sanitise(history.getDefenceAndCounterClaim());
+        return new EventBuckets(defenceEvents, statesPaidEvents, directionsQuestionnaireEvents, counterClaimEvents);
     }
 
     private List<Event> sanitise(List<Event> events) {
@@ -127,6 +130,7 @@ public class RespondentFullDefenceStrategy implements EventHistoryStrategy {
         } else {
             addDefenceOrStatesPaid(builder, caseData, buckets, responseDate, RESPONDENT_ID, caseData.getRespondToClaim());
         }
+        addCounterClaimEventIfNeeded(builder, caseData, buckets, responseDate, RESPONDENT_ID, true);
         addRespondentMiscEvent(builder, caseData, caseData.getRespondent1(), true, responseDate);
 
         Respondent1DQ respondent1DQ = getRespondent1DQOrDefault(caseData);
@@ -160,6 +164,7 @@ public class RespondentFullDefenceStrategy implements EventHistoryStrategy {
             : caseData.getRespondToClaim2();
 
         addDefenceOrStatesPaid(builder, caseData, buckets, responseDate, RESPONDENT2_ID, respondToClaim);
+        addCounterClaimEventIfNeeded(builder, caseData, buckets, responseDate, RESPONDENT2_ID, false);
         addRespondentMiscEvent(builder, caseData, caseData.getRespondent2(), false, responseDate);
 
         Respondent2DQ respondent2DQ = getRespondent2DQOrDefault(caseData);
@@ -224,6 +229,7 @@ public class RespondentFullDefenceStrategy implements EventHistoryStrategy {
                 true
             )
         );
+        addCounterClaimEventIfNeeded(builder, caseData, buckets, respondent2ResponseDate, RESPONDENT2_ID, false);
         addRespondentMiscEvent(builder, caseData, caseData.getRespondent2(), false, respondent2ResponseDate);
     }
 
@@ -270,18 +276,65 @@ public class RespondentFullDefenceStrategy implements EventHistoryStrategy {
     }
 
     private boolean hasFullDefenceResponse(CaseData caseData) {
+        return hasFullDefenceOrCounterClaimResponse(caseData);
+    }
+
+    private boolean hasFullDefenceOrCounterClaimResponse(CaseData caseData) {
         if (caseData == null) {
             return false;
         }
         if (CaseCategory.SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            return RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-                || RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseTypeForSpec());
+            return isSpecFullDefenceOrCounterClaim(caseData.getRespondent1ClaimResponseTypeForSpec())
+                || isSpecFullDefenceOrCounterClaim(caseData.getRespondent2ClaimResponseTypeForSpec());
         }
-        return RespondentResponseType.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseType())
-            || RespondentResponseType.FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseType());
+        return isUnspecFullDefenceOrCounterClaim(caseData.getRespondent1ClaimResponseType())
+            || isUnspecFullDefenceOrCounterClaim(caseData.getRespondent2ClaimResponseType());
     }
 
-    private record EventBuckets(List<Event> defenceEvents, List<Event> statesPaidEvents, List<Event> directionsQuestionnaireEvents) {
+    private boolean isSpecFullDefenceOrCounterClaim(RespondentResponseTypeSpec responseType) {
+        return RespondentResponseTypeSpec.FULL_DEFENCE.equals(responseType)
+            || RespondentResponseTypeSpec.COUNTER_CLAIM.equals(responseType);
+    }
+
+    private boolean isUnspecFullDefenceOrCounterClaim(RespondentResponseType responseType) {
+        return RespondentResponseType.FULL_DEFENCE.equals(responseType)
+            || RespondentResponseType.COUNTER_CLAIM.equals(responseType);
+    }
+
+    private void addCounterClaimEventIfNeeded(EventHistory.EventHistoryBuilder builder,
+                                              CaseData caseData,
+                                              EventBuckets buckets,
+                                              LocalDateTime responseDate,
+                                              String partyId,
+                                              boolean isRespondent1) {
+        if (!isCounterClaimResponse(caseData, isRespondent1) || responseDate == null) {
+            return;
+        }
+        buckets.defenceAndCounterClaimEvents.add(
+            buildCounterClaimEvent(builder, sequenceGenerator, responseDate, partyId)
+        );
+    }
+
+    private boolean isCounterClaimResponse(CaseData caseData, boolean isRespondent1) {
+        if (caseData == null) {
+            return false;
+        }
+        if (CaseCategory.SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            RespondentResponseTypeSpec responseType = isRespondent1
+                ? caseData.getRespondent1ClaimResponseTypeForSpec()
+                : caseData.getRespondent2ClaimResponseTypeForSpec();
+            return RespondentResponseTypeSpec.COUNTER_CLAIM.equals(responseType);
+        }
+        RespondentResponseType responseType = isRespondent1
+            ? caseData.getRespondent1ClaimResponseType()
+            : caseData.getRespondent2ClaimResponseType();
+        return RespondentResponseType.COUNTER_CLAIM.equals(responseType);
+    }
+
+    private record EventBuckets(List<Event> defenceEvents,
+                                List<Event> statesPaidEvents,
+                                List<Event> directionsQuestionnaireEvents,
+                                List<Event> defenceAndCounterClaimEvents) {
     }
 
 }

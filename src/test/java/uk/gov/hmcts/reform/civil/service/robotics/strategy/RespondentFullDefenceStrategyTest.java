@@ -29,11 +29,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENCE;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFENCE_FILED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DIRECTIONS_QUESTIONNAIRE_FILED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.STATES_PAID;
+import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFENCE_AND_COUNTER_CLAIM;
 
 class RespondentFullDefenceStrategyTest {
 
@@ -127,6 +129,31 @@ class RespondentFullDefenceStrategyTest {
                 true,
                 caseData.getRespondent1()
             ));
+    }
+
+    @Test
+    void contributeAddsCounterClaimEventForSpecResponses() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .setClaimTypeToSpecClaim()
+            .atStateRespondentFullDefence()
+            .build()
+            .toBuilder()
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
+            .build();
+
+        when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(10, 11, 12);
+
+        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        strategy.contribute(builder, caseData, null);
+
+        EventHistory history = builder.build();
+        assertThat(history.getDefenceFiled()).hasSize(1);
+        assertThat(history.getDefenceFiled().get(0).getEventCode()).isEqualTo(DEFENCE_FILED.getCode());
+
+        assertThat(history.getDefenceAndCounterClaim()).hasSize(1);
+        assertThat(history.getDefenceAndCounterClaim().get(0).getEventCode())
+            .isEqualTo(DEFENCE_AND_COUNTER_CLAIM.getCode());
+        assertThat(history.getDefenceAndCounterClaim().get(0).getLitigiousPartyID()).isEqualTo("002");
     }
 
     @Test

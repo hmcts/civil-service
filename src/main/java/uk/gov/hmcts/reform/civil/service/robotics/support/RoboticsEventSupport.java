@@ -11,6 +11,7 @@ import java.util.function.BiFunction;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFENCE_FILED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MISCELLANEOUS;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.STATES_PAID;
+import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFENCE_AND_COUNTER_CLAIM;
 
 public final class RoboticsEventSupport {
 
@@ -63,6 +64,18 @@ public final class RoboticsEventSupport {
         return Event.builder()
             .eventSequence(sequenceGenerator.nextSequence(builder.build()))
             .eventCode(statesPaid ? STATES_PAID.getCode() : DEFENCE_FILED.getCode())
+            .dateReceived(dateReceived)
+            .litigiousPartyID(partyId)
+            .build();
+    }
+
+    public static Event buildCounterClaimEvent(EventHistory.EventHistoryBuilder builder,
+                                               RoboticsSequenceGenerator sequenceGenerator,
+                                               LocalDateTime dateReceived,
+                                               String partyId) {
+        return Event.builder()
+            .eventSequence(sequenceGenerator.nextSequence(builder.build()))
+            .eventCode(DEFENCE_AND_COUNTER_CLAIM.getCode())
             .dateReceived(dateReceived)
             .litigiousPartyID(partyId)
             .build();

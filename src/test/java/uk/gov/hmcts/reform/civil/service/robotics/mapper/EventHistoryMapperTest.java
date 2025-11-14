@@ -1918,42 +1918,48 @@ class EventHistoryMapperTest {
                     .build();
             }
 
-            List<Event> expectedMiscellaneousEvents = List.of(
-                Event.builder()
-                    .eventSequence(1)
-                    .eventCode("999")
-                    .dateReceived(caseData.getIssueDate().atStartOfDay())
-                    .eventDetailsText("Claim issued in CCD.")
-                    .eventDetails(EventDetails.builder()
-                                      .miscText("Claim issued in CCD.")
-                                      .build())
-                    .build(),
-                Event.builder()
-                    .eventSequence(2)
-                    .eventCode("999")
-                    .dateReceived(caseData.getRespondent1ResponseDate())
-                    .eventDetailsText("RPA Reason: Defendant rejects and counter claims.")
-                    .eventDetails(EventDetails.builder()
-                                      .miscText("RPA Reason: Defendant rejects and counter claims.")
-                                      .build())
-                    .build()
-            );
-
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
-            assertThat(eventHistory).extracting("miscellaneous").asInstanceOf(list(Object.class))
-                .containsExactly(expectedMiscellaneousEvents.get(0), expectedMiscellaneousEvents.get(1));
+            assertThat(eventHistory.getMiscellaneous())
+                .extracting(Event::getEventDetailsText)
+                .contains(
+                    "Claim issued in CCD.",
+                    "RPA Reason: Defendant rejects and counter claims."
+                );
 
-            assertEmptyEvents(
-                eventHistory,
-                "defenceFiled",
-                "receiptOfAdmission",
-                "receiptOfPartAdmission",
-                "replyToDefence",
-                "consentExtensionFilingDefence",
-                "directionsQuestionnaireFiled"
-            );
+            List<Event> defenceEvents = eventHistory.getDefenceFiled().stream()
+                .filter(event -> event.getEventCode() != null)
+                .toList();
+            assertThat(defenceEvents)
+                .hasSize(1)
+                .first()
+                .satisfies(event -> {
+                    assertThat(event.getEventCode()).isEqualTo("50");
+                    assertThat(event.getLitigiousPartyID()).isEqualTo("002");
+                });
+
+            List<Event> dqEvents = eventHistory.getDirectionsQuestionnaireFiled().stream()
+                .filter(event -> "197".equals(event.getEventCode()))
+                .toList();
+            assertThat(dqEvents)
+                .hasSize(1)
+                .first()
+                .satisfies(event -> {
+                    assertThat(event.getLitigiousPartyID()).isEqualTo("002");
+                    assertThat(event.getEventDetailsText()).contains("COUNTER_CLAIM");
+                });
+
+            List<Event> counterClaimEvents = eventHistory.getDefenceAndCounterClaim().stream()
+                .filter(event -> "52".equals(event.getEventCode()))
+                .toList();
+            assertThat(counterClaimEvents)
+                .hasSize(1)
+                .first()
+                .satisfies(event -> assertThat(event.getLitigiousPartyID()).isEqualTo("002"));
+
+            assertThat(eventHistory.getStatesPaid())
+                .allMatch(event -> event.getEventCode() == null);
         }
     }
 
