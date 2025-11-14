@@ -1,9 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.flowstate.scenario;
 
-import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.flowstate.repository.AllowedEventRepository;
-
-import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 
 public final class UnspecScenario extends AllowedEventScenario {
 
@@ -19,8 +16,8 @@ public final class UnspecScenario extends AllowedEventScenario {
     }
 
     @Override
-    public boolean appliesTo(CaseData caseData) {
-        return UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory());
+    public boolean appliesTo(boolean specOrLip) {
+        return !specOrLip;
     }
 
 }

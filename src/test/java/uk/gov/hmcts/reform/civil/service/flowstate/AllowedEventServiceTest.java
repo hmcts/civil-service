@@ -1,11 +1,14 @@
 package uk.gov.hmcts.reform.civil.service.flowstate;
 
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.flowstate.repository.AllowedEventRepository;
 import uk.gov.hmcts.reform.civil.service.flowstate.scenario.AllowedEventScenario;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
+import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
 import java.util.List;
 import java.util.Set;
@@ -17,7 +20,10 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_CASE_NOTE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_LIP_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
@@ -28,13 +34,16 @@ class AllowedEventServiceTest {
     void returnsTrue_whenWhitelistEvent() {
         AllowedEventRepository repo = mock(AllowedEventRepository.class);
         IStateFlowEngine engine = mock(IStateFlowEngine.class);
+        CaseDetailsConverter converter = mock(CaseDetailsConverter.class);
         AllowedEventScenario scenario = mock(AllowedEventScenario.class);
-        AllowedEventService service = new AllowedEventService(repo, engine, List.of(scenario));
+        AllowedEventService service = new AllowedEventService(repo, engine, converter, List.of(scenario));
+        CaseEvent caseEvent = ADD_CASE_NOTE;
 
-        when(repo.getWhitelist()).thenReturn(Set.of(CaseEvent.ADD_CASE_NOTE));
+        when(repo.getWhitelist()).thenReturn(Set.of(caseEvent));
 
-        boolean allowed = service.isAllowed(mock(CaseData.class), CaseEvent.ADD_CASE_NOTE);
+        boolean allowed = service.isAllowed(mock(CaseDetails.class), caseEvent);
         assertThat(allowed).isTrue();
+
         verifyNoInteractions(engine, scenario);
     }
 
@@ -42,14 +51,18 @@ class AllowedEventServiceTest {
     void returnsFalse_whenNoScenarioApplies() {
         AllowedEventRepository repo = mock(AllowedEventRepository.class);
         IStateFlowEngine engine = mock(IStateFlowEngine.class);
+        CaseDetailsConverter converter = mock(CaseDetailsConverter.class);
         AllowedEventScenario scenario = mock(AllowedEventScenario.class);
-        AllowedEventService service = new AllowedEventService(repo, engine, List.of(scenario));
+        AllowedEventService service = new AllowedEventService(repo, engine, converter, List.of(scenario));
 
+        CaseDetails caseDetails = mock(CaseDetails.class);
         CaseData caseData = mock(CaseData.class);
-        when(scenario.appliesTo(caseData)).thenReturn(false);
+        when(scenario.appliesTo(false)).thenReturn(false);
+        when(converter.toCaseData(caseDetails)).thenReturn(caseData);
 
-        boolean allowed = service.isAllowed(caseData, DEFENDANT_RESPONSE);
+        boolean allowed = service.isAllowed(caseDetails, DEFENDANT_RESPONSE);
         assertThat(allowed).isFalse();
+
         verifyNoInteractions(engine);
     }
 
@@ -57,75 +70,160 @@ class AllowedEventServiceTest {
     void usesEvaluateSpec_whenCaseIsSpec() {
         AllowedEventRepository repo = mock(AllowedEventRepository.class);
         IStateFlowEngine engine = mock(IStateFlowEngine.class);
+        CaseDetailsConverter converter = mock(CaseDetailsConverter.class);
         AllowedEventScenario scenario = mock(AllowedEventScenario.class);
-        AllowedEventService service = new AllowedEventService(repo, engine, List.of(scenario));
+        AllowedEventService service = new AllowedEventService(repo, engine, converter, List.of(scenario));
+        CaseEvent caseEvent = DEFENDANT_RESPONSE;
 
+        CaseDetails caseDetails = mock(CaseDetails.class);
         CaseData caseData = mock(CaseData.class);
+
+        when(converter.toCaseData(caseDetails)).thenReturn(caseData);
+        when(scenario.appliesTo(true)).thenReturn(true);
         when(caseData.getCaseAccessCategory()).thenReturn(SPEC_CLAIM);
 
         StateFlow stateFlow = mock(StateFlow.class);
-        var state = mock(uk.gov.hmcts.reform.civil.stateflow.model.State.class);
-        when(state.getName()).thenReturn("MAIN.DRAFT");
+        when(engine.evaluateSpec(caseDetails)).thenReturn(stateFlow);
+
+        State state = mock(State.class);
         when(stateFlow.getState()).thenReturn(state);
-        when(engine.evaluateSpec(caseData)).thenReturn(stateFlow);
+        FlowState.Main flowState = FlowState.Main.DRAFT;
+        when(state.getName()).thenReturn(flowState.fullName());
+        when(scenario.loadBaseEvents(flowState.fullName())).thenReturn(Set.of(caseEvent));
 
-        when(scenario.appliesTo(caseData)).thenReturn(true);
-        when(scenario.loadBaseEvents("MAIN.DRAFT")).thenReturn(Set.of(DEFENDANT_RESPONSE));
-
-        boolean allowed = service.isAllowed(caseData, DEFENDANT_RESPONSE);
+        boolean allowed = service.isAllowed(caseDetails, caseEvent);
         assertThat(allowed).isTrue();
-        verify(engine).evaluateSpec(caseData);
-        verify(engine, never()).evaluate(any(CaseData.class));
+
+        verify(engine).evaluateSpec(caseDetails);
+        verify(engine, never()).evaluate(any(CaseDetails.class));
+    }
+
+    @Test
+    void usesEvaluateDefaultUnspec_whenCaseCategoryIsNull() {
+        AllowedEventRepository repo = mock(AllowedEventRepository.class);
+        IStateFlowEngine engine = mock(IStateFlowEngine.class);
+        CaseDetailsConverter converter = mock(CaseDetailsConverter.class);
+        AllowedEventScenario scenario = mock(AllowedEventScenario.class);
+        AllowedEventService service = new AllowedEventService(repo, engine, converter, List.of(scenario));
+        CaseEvent caseEvent = CREATE_CLAIM;
+
+        CaseDetails caseDetails = mock(CaseDetails.class);
+        CaseData caseData = mock(CaseData.class);
+
+        when(converter.toCaseData(caseDetails)).thenReturn(caseData);
+        when(scenario.appliesTo(false)).thenReturn(true);
+        when(caseData.getCaseAccessCategory()).thenReturn(null);
+
+        StateFlow stateFlow = mock(StateFlow.class);
+        when(engine.evaluate(caseDetails)).thenReturn(stateFlow);
+
+        State state = mock(State.class);
+        when(stateFlow.getState()).thenReturn(state);
+        FlowState.Main flowState = FlowState.Main.DRAFT;
+        when(state.getName()).thenReturn(flowState.fullName());
+        when(scenario.loadBaseEvents(flowState.fullName())).thenReturn(Set.of(caseEvent));
+
+        boolean allowed = service.isAllowed(caseDetails, caseEvent);
+        assertThat(allowed).isTrue();
+
+        verify(engine).evaluate(caseDetails);
+        verify(engine, never()).evaluateSpec(any(CaseDetails.class));
     }
 
     @Test
     void usesEvaluateSpec_whenEventIsCreateClaimSpec_evenIfCaseIsUnspec() {
         AllowedEventRepository repo = mock(AllowedEventRepository.class);
         IStateFlowEngine engine = mock(IStateFlowEngine.class);
+        CaseDetailsConverter converter = mock(CaseDetailsConverter.class);
         AllowedEventScenario scenario = mock(AllowedEventScenario.class);
-        AllowedEventService service = new AllowedEventService(repo, engine, List.of(scenario));
+        AllowedEventService service = new AllowedEventService(repo, engine, converter, List.of(scenario));
+        CaseEvent caseEvent = CREATE_CLAIM_SPEC;
 
+        CaseDetails caseDetails = mock(CaseDetails.class);
         CaseData caseData = mock(CaseData.class);
+
+        when(converter.toCaseData(caseDetails)).thenReturn(caseData);
+        when(scenario.appliesTo(true)).thenReturn(true);
         when(caseData.getCaseAccessCategory()).thenReturn(UNSPEC_CLAIM);
 
         StateFlow stateFlow = mock(StateFlow.class);
-        var state = mock(uk.gov.hmcts.reform.civil.stateflow.model.State.class);
-        when(state.getName()).thenReturn("MAIN.DRAFT");
+        when(engine.evaluateSpec(caseDetails)).thenReturn(stateFlow);
+
+        State state = mock(State.class);
         when(stateFlow.getState()).thenReturn(state);
-        when(engine.evaluateSpec(caseData)).thenReturn(stateFlow);
+        FlowState.Main flowState = FlowState.Main.DRAFT;
+        when(state.getName()).thenReturn(flowState.fullName());
+        when(scenario.loadBaseEvents(flowState.fullName())).thenReturn(Set.of(caseEvent));
 
-        when(scenario.appliesTo(caseData)).thenReturn(true);
-        when(scenario.loadBaseEvents("MAIN.DRAFT")).thenReturn(Set.of(CREATE_CLAIM_SPEC));
-
-        boolean allowed = service.isAllowed(caseData, CREATE_CLAIM_SPEC);
+        boolean allowed = service.isAllowed(caseDetails, caseEvent);
         assertThat(allowed).isTrue();
-        verify(engine).evaluateSpec(caseData);
-        verify(engine, never()).evaluate(any(CaseData.class));
+
+        verify(engine).evaluateSpec(caseDetails);
+        verify(engine, never()).evaluate(any(CaseDetails.class));
     }
 
     @Test
     void usesEvaluate_whenNotSpecAndEventNotSpecOrLip() {
         AllowedEventRepository repo = mock(AllowedEventRepository.class);
         IStateFlowEngine engine = mock(IStateFlowEngine.class);
+        CaseDetailsConverter converter = mock(CaseDetailsConverter.class);
         AllowedEventScenario scenario = mock(AllowedEventScenario.class);
-        AllowedEventService service = new AllowedEventService(repo, engine, List.of(scenario));
+        AllowedEventService service = new AllowedEventService(repo, engine, converter, List.of(scenario));
 
+        CaseDetails caseDetails = mock(CaseDetails.class);
         CaseData caseData = mock(CaseData.class);
+        CaseEvent caseEvent = DEFENDANT_RESPONSE;
+
+        when(converter.toCaseData(caseDetails)).thenReturn(caseData);
+        when(scenario.appliesTo(false)).thenReturn(true);
         when(caseData.getCaseAccessCategory()).thenReturn(UNSPEC_CLAIM);
 
         StateFlow stateFlow = mock(StateFlow.class);
-        var state = mock(uk.gov.hmcts.reform.civil.stateflow.model.State.class);
-        when(state.getName()).thenReturn("MAIN.CLAIM_ISSUED");
+        when(engine.evaluate(caseDetails)).thenReturn(stateFlow);
+
+        State state = mock(State.class);
         when(stateFlow.getState()).thenReturn(state);
-        when(engine.evaluate(caseData)).thenReturn(stateFlow);
+        FlowState.Main flowState = FlowState.Main.DRAFT;
+        when(state.getName()).thenReturn(flowState.fullName());
+        when(scenario.loadBaseEvents(flowState.fullName())).thenReturn(Set.of(caseEvent));
 
-        when(scenario.appliesTo(caseData)).thenReturn(true);
-        when(scenario.loadBaseEvents("MAIN.CLAIM_ISSUED")).thenReturn(Set.of(DEFENDANT_RESPONSE));
-
-        boolean allowed = service.isAllowed(caseData, DEFENDANT_RESPONSE);
+        boolean allowed = service.isAllowed(caseDetails, caseEvent);
         assertThat(allowed).isTrue();
-        verify(engine).evaluate(caseData);
-        verify(engine, never()).evaluateSpec(any(CaseData.class));
+
+        verify(engine).evaluate(caseDetails);
+        verify(engine, never()).evaluateSpec(any(CaseDetails.class));
+    }
+
+    @Test
+    void usesEvaluate_whenNotSpecAndEventSpecOrLip() {
+        AllowedEventRepository repo = mock(AllowedEventRepository.class);
+        IStateFlowEngine engine = mock(IStateFlowEngine.class);
+        CaseDetailsConverter converter = mock(CaseDetailsConverter.class);
+        AllowedEventScenario scenario = mock(AllowedEventScenario.class);
+        AllowedEventService service = new AllowedEventService(repo, engine, converter, List.of(scenario));
+
+        CaseDetails caseDetails = mock(CaseDetails.class);
+        CaseData caseData = mock(CaseData.class);
+        CaseEvent caseEvent = CREATE_LIP_CLAIM;
+
+        when(converter.toCaseData(caseDetails)).thenReturn(caseData);
+        when(scenario.appliesTo(true)).thenReturn(true);
+        when(caseData.getCaseAccessCategory()).thenReturn(UNSPEC_CLAIM);
+
+        StateFlow stateFlow = mock(StateFlow.class);
+        when(engine.evaluateSpec(caseDetails)).thenReturn(stateFlow);
+
+        State state = mock(State.class);
+        when(stateFlow.getState()).thenReturn(state);
+        FlowState.Main flowState = FlowState.Main.DRAFT;
+        when(state.getName()).thenReturn(flowState.fullName());
+        when(scenario.loadBaseEvents(flowState.fullName())).thenReturn(Set.of(caseEvent));
+
+        boolean allowed = service.isAllowed(caseDetails, caseEvent);
+        assertThat(allowed).isTrue();
+
+        verify(engine).evaluateSpec(caseDetails);
+        verify(engine, never()).evaluate(any(CaseDetails.class));
     }
 
 }

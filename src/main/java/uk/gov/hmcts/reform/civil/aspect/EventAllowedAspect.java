@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.flowstate.AllowedEventService;
+import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.exception.StateFlowException;
@@ -51,12 +52,12 @@ public class EventAllowedAspect {
         CaseDetails caseDetails = callbackParams.getRequest().getCaseDetails();
         CaseData caseData = callbackParams.getCaseData();
 
-        if (allowedEventService.isAllowed(caseData, caseEvent)) {
+        if (allowedEventService.isAllowed(caseDetails, caseEvent)) {
             return joinPoint.proceed();
         } else {
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
             StringBuilder stateHistoryBuilder = new StringBuilder();
-            stateFlowEngine.evaluate(caseData).getStateHistory().forEach(s -> {
+            stateFlow.getStateHistory().forEach(s -> {
                 stateHistoryBuilder.append(s.getName());
                 stateHistoryBuilder.append(", ");
             });
@@ -66,7 +67,7 @@ public class EventAllowedAspect {
                     "{} is not allowed on the case id {}, current FlowState: {}, stateFlowHistory: {}",
                     caseEvent.name(),
                     caseData.getCcdCaseReference(),
-                    stateFlow.getState().getName(),
+                    FlowState.fromFullName(stateFlow.getState().getName()),
                     stateHistoryBuilder
                 );
             } catch (StateFlowException e) {

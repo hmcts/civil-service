@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.flowstate.scenario;
 
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.flowstate.repository.AllowedEventRepository;
 
 import java.util.HashSet;
@@ -17,7 +16,7 @@ public abstract class AllowedEventScenario {
 
     protected abstract String scenarioFile();
 
-    public abstract boolean appliesTo(CaseData caseData);
+    public abstract boolean appliesTo(boolean specOrLip);
 
     public Set<CaseEvent> loadBaseEvents(String state) {
         // Default: reuse existing unspec map; spec scenarios should override

@@ -2,8 +2,10 @@ package uk.gov.hmcts.reform.civil.service.flowstate;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.flowstate.repository.AllowedEventRepository;
 import uk.gov.hmcts.reform.civil.service.flowstate.scenario.AllowedEventScenario;
@@ -21,39 +23,40 @@ public class AllowedEventService {
 
     private final AllowedEventRepository repo;
     private final IStateFlowEngine stateFlowEngine;
+    private final CaseDetailsConverter caseDetailsConverter;
     private final List<AllowedEventScenario> scenarios;
 
-    public boolean isAllowed(CaseData caseData, CaseEvent event) {
+    private static boolean isSpecOrLip(CaseData caseData, CaseEvent event) {
+        return SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+            || CREATE_CLAIM_SPEC.equals(event)
+            || CREATE_LIP_CLAIM.equals(event);
+    }
+
+    public boolean isAllowed(CaseDetails caseDetails, CaseEvent event) {
 
         if (repo.getWhitelist().contains(event)) {
             return true;
         }
 
-        // Find scenario (or default) chain first match wins
-        // AllowedEventsConfig.java for strict precedence
+        CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
+        boolean specOrLip = isSpecOrLip(caseData, event);
         AllowedEventScenario scenario = scenarios.stream()
-            .filter(s -> s.appliesTo(caseData))
+            .filter(s -> s.appliesTo(specOrLip))
             .findFirst()
             .orElse(null);
 
         if (scenario == null) {
-            log.warn("Scenario not found ({}:{})",
-                     MultiPartyScenario.getMultiPartyScenario(caseData),
-                     caseData.getCaseAccessCategory());
+            log.warn(
+                "Scenario not found ({}:{})",
+                MultiPartyScenario.getMultiPartyScenario(caseData),
+                caseData.getCaseAccessCategory()
+            );
             return false;
         }
 
-        StateFlow stateFlow = selectStateFlow(caseData, event);
-        String stateFullName = stateFlow.getState().getName();
-
-        return scenario.loadBaseEvents(stateFullName).contains(event);
-    }
-
-    private StateFlow selectStateFlow(CaseData caseData, CaseEvent event) {
-        boolean isSpecOrLip = SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
-                || CREATE_CLAIM_SPEC.equals(event)
-                || CREATE_LIP_CLAIM.equals(event);
-        return isSpecOrLip ? stateFlowEngine.evaluateSpec(caseData) : stateFlowEngine.evaluate(caseData);
+        StateFlow stateFlow = specOrLip ? stateFlowEngine.evaluateSpec(caseDetails)
+            : stateFlowEngine.evaluate(caseDetails);
+        return scenario.loadBaseEvents(stateFlow.getState().getName()).contains(event);
     }
 
 }
