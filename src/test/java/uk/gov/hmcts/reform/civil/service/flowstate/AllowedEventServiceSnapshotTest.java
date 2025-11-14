@@ -9,6 +9,7 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.yaml.snakeyaml.Yaml;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.AllowedEventsConfig;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
@@ -17,7 +18,6 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.wrapper.CaseDataDirector;
-import uk.gov.hmcts.reform.civil.stateflow.exception.StateFlowException;
 import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
 
 import java.io.InputStream;
@@ -28,6 +28,7 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.params.provider.Arguments.of;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
@@ -42,19 +43,21 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
     AllowedEventsConfig.class,
     AllowedEventService.class
 })
+@SuppressWarnings("unused")
 class AllowedEventServiceSnapshotTest {
 
     private static final String TEST_CASES_FILE = "allowed-test-cases.yml";
-    private static List<CaseEvent> whitelistEvents;
 
     @Autowired
     private AllowedEventService allowedEventService;
 
-    @Autowired
-    protected IStateFlowEngine stateFlowEngine;
-
     @MockBean
     private FeatureToggleService featureToggleService;
+
+    @MockBean
+    private CaseDetailsConverter caseDetailsConverter;
+
+    private static List<CaseEvent> whitelistEvents;
 
     @BeforeAll
     static void setup() {
@@ -128,8 +131,8 @@ class AllowedEventServiceSnapshotTest {
     @ParameterizedTest(name = "Whitelist {0}")
     @MethodSource("whitelist")
     void flowStateCaseEvents_whitelist(CaseEvent event) {
-        CaseData caseData = mock(CaseData.class);
-        assertThat(isAllowed(caseData, event))
+        CaseDetails caseDetails = mock(CaseDetails.class);
+        assertThat(isAllowed(caseDetails, event))
             .as("Scenario whitelist: %s", event)
             .isTrue();
     }
@@ -140,19 +143,15 @@ class AllowedEventServiceSnapshotTest {
                                         List<MultiPartyScenario> unspec, List<MultiPartyScenario> spec) {
         MultiPartyScenario party = ONE_V_ONE;
         CaseCategory category = CaseCategory.UNSPEC_CLAIM;
-
         var expected = unspec.contains(party);
-        try {
-            CaseData caseData = buildCaseData(party, category, state);
-            assertThat(isAllowed(caseData, event))
-                .as("Scenario: %s %s %s %s", party, category, state, event)
-                .isEqualTo(expected);
-        } catch (StateFlowException e) {
-            System.err.println(e.getMessage());
-            assertThat(expected)
-                .as("Ambiguous Scenario: %s %s %s %s", party, category, state, event)
-                .isFalse();
-        }
+
+        CaseDetails caseDetails = mock(CaseDetails.class);
+        CaseData caseData = buildCaseData(party, category, state);
+        when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
+
+        assertThat(isAllowed(caseDetails, event))
+            .as("Scenario: %s %s %s %s", party, category, state, event)
+            .isEqualTo(expected);
     }
 
     @ParameterizedTest(name = "FlowState CaseEvent 1v1 Spec {0} {1}")
@@ -163,17 +162,13 @@ class AllowedEventServiceSnapshotTest {
         CaseCategory category = CaseCategory.SPEC_CLAIM;
         var expected = spec.contains(party);
 
-        try {
-            CaseData caseData = buildCaseData(party, category, state);
-            assertThat(isAllowed(caseData, event))
-                .as("Scenario: %s %s %s %s", party, category, state, event)
-                .isEqualTo(expected);
-        } catch (StateFlowException e) {
-            System.err.println(e.getMessage());
-            assertThat(expected)
-                .as("Ambiguous Scenario: %s %s %s %s", party, category, state, event)
-                .isFalse();
-        }
+        CaseDetails caseDetails = mock(CaseDetails.class);
+        CaseData caseData = buildCaseData(party, category, state);
+        when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
+
+        assertThat(isAllowed(caseDetails, event))
+            .as("Scenario: %s %s %s %s", party, category, state, event)
+            .isEqualTo(expected);
     }
 
     @ParameterizedTest(name = "FlowState CaseEvent 1v2 1LR UnSpec {0} {1}")
@@ -184,17 +179,13 @@ class AllowedEventServiceSnapshotTest {
         CaseCategory category = CaseCategory.UNSPEC_CLAIM;
         var expected = unspec.contains(party);
 
-        try {
-            CaseData caseData = buildCaseData(party, category, state);
-            assertThat(isAllowed(caseData, event))
-                .as("Scenario: %s %s %s %s", party, category, state, event)
-                .isEqualTo(expected);
-        } catch (StateFlowException e) {
-            System.err.println(e.getMessage());
-            assertThat(expected)
-                .as("Ambiguous Scenario: %s %s %s %s", party, category, state, event)
-                .isFalse();
-        }
+        CaseDetails caseDetails = mock(CaseDetails.class);
+        CaseData caseData = buildCaseData(party, category, state);
+        when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
+
+        assertThat(isAllowed(caseDetails, event))
+            .as("Scenario: %s %s %s %s", party, category, state, event)
+            .isEqualTo(expected);
     }
 
     @ParameterizedTest(name = "FlowState CaseEvent 1v2 1LR Spec {0} {1}")
@@ -205,17 +196,13 @@ class AllowedEventServiceSnapshotTest {
         CaseCategory category = CaseCategory.SPEC_CLAIM;
         var expected = spec.contains(party);
 
-        try {
-            CaseData caseData = buildCaseData(party, category, state);
-            assertThat(isAllowed(caseData, event))
-                .as("Scenario: %s %s %s %s", party, category, state, event)
-                .isEqualTo(expected);
-        } catch (StateFlowException e) {
-            System.err.println(e.getMessage());
-            assertThat(expected)
-                .as("Ambiguous Scenario: %s %s %s %s", party, category, state, event)
-                .isFalse();
-        }
+        CaseDetails caseDetails = mock(CaseDetails.class);
+        CaseData caseData = buildCaseData(party, category, state);
+        when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
+
+        assertThat(isAllowed(caseDetails, event))
+            .as("Scenario: %s %s %s %s", party, category, state, event)
+            .isEqualTo(expected);
     }
 
     @ParameterizedTest(name = "FlowState CaseEvent 1v2 2LR UnSpec {0} {1}")
@@ -226,17 +213,13 @@ class AllowedEventServiceSnapshotTest {
         CaseCategory category = CaseCategory.UNSPEC_CLAIM;
         var expected = unspec.contains(party);
 
-        try {
-            CaseData caseData = buildCaseData(party, category, state);
-            assertThat(isAllowed(caseData, event))
-                .as("Scenario: %s %s %s %s", party, category, state, event)
-                .isEqualTo(expected);
-        } catch (StateFlowException e) {
-            System.err.println(e.getMessage());
-            assertThat(expected)
-                .as("Ambiguous Scenario: %s %s %s %s", party, category, state, event)
-                .isFalse();
-        }
+        CaseDetails caseDetails = mock(CaseDetails.class);
+        CaseData caseData = buildCaseData(party, category, state);
+        when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
+
+        assertThat(isAllowed(caseDetails, event))
+            .as("Scenario: %s %s %s %s", party, category, state, event)
+            .isEqualTo(expected);
     }
 
     @ParameterizedTest(name = "FlowState CaseEvent 1v2 2LR Spec {0} {1}")
@@ -247,17 +230,13 @@ class AllowedEventServiceSnapshotTest {
         CaseCategory category = CaseCategory.SPEC_CLAIM;
         var expected = spec.contains(party);
 
-        try {
-            CaseData caseData = buildCaseData(party, category, state);
-            assertThat(isAllowed(caseData, event))
-                .as("Scenario: %s %s %s %s", party, category, state, event)
-                .isEqualTo(expected);
-        } catch (StateFlowException e) {
-            System.err.println(e.getMessage());
-            assertThat(expected)
-                .as("Ambiguous Scenario: %s %s %s %s", party, category, state, event)
-                .isFalse();
-        }
+        CaseDetails caseDetails = mock(CaseDetails.class);
+        CaseData caseData = buildCaseData(party, category, state);
+        when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
+
+        assertThat(isAllowed(caseDetails, event))
+            .as("Scenario: %s %s %s %s", party, category, state, event)
+            .isEqualTo(expected);
     }
 
     @ParameterizedTest(name = "FlowState CaseEvent 1v2 2LR UnSpec {0} {1}")
@@ -268,17 +247,13 @@ class AllowedEventServiceSnapshotTest {
         CaseCategory category = CaseCategory.UNSPEC_CLAIM;
         var expected = unspec.contains(party);
 
-        try {
-            CaseData caseData = buildCaseData(party, category, state);
-            assertThat(isAllowed(caseData, event))
-                .as("Scenario: %s %s %s %s", party, category, state, event)
-                .isEqualTo(expected);
-        } catch (StateFlowException e) {
-            System.err.println(e.getMessage());
-            assertThat(expected)
-                .as("Ambiguous Scenario: %s %s %s %s", party, category, state, event)
-                .isFalse();
-        }
+        CaseDetails caseDetails = mock(CaseDetails.class);
+        CaseData caseData = buildCaseData(party, category, state);
+        when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
+
+        assertThat(isAllowed(caseDetails, event))
+            .as("Scenario: %s %s %s %s", party, category, state, event)
+            .isEqualTo(expected);
     }
 
     @ParameterizedTest(name = "FlowState CaseEvent 1v2 2LR Spec {0} {1}")
@@ -289,21 +264,17 @@ class AllowedEventServiceSnapshotTest {
         CaseCategory category = CaseCategory.SPEC_CLAIM;
         var expected = spec.contains(party);
 
-        try {
-            CaseData caseData = buildCaseData(party, category, state);
-            assertThat(isAllowed(caseData, event))
-                .as("Scenario: %s %s %s %s", party, category, state, event)
-                .isEqualTo(expected);
-        } catch (StateFlowException e) {
-            System.err.println(e.getMessage());
-            assertThat(expected)
-                .as("Ambiguous Scenario: %s %s %s %s", party, category, state, event)
-                .isFalse();
-        }
+        CaseDetails caseDetails = mock(CaseDetails.class);
+        CaseData caseData = buildCaseData(party, category, state);
+        when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
+
+        assertThat(isAllowed(caseDetails, event))
+            .as("Scenario: %s %s %s %s", party, category, state, event)
+            .isEqualTo(expected);
     }
 
-    private boolean isAllowed(uk.gov.hmcts.reform.civil.model.CaseData caseData, CaseEvent event) {
-        return allowedEventService.isAllowed(caseData, event);
+    private boolean isAllowed(CaseDetails caseDetails, CaseEvent event) {
+        return allowedEventService.isAllowed(caseDetails, event);
     }
 
     private CaseData buildCaseData(MultiPartyScenario party, CaseCategory category, FlowState.Main state) {

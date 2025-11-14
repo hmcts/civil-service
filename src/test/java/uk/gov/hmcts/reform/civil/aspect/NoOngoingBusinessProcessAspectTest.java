@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
@@ -116,12 +117,11 @@ class NoOngoingBusinessProcessAspectTest {
                 .errors(List.of(ERROR_MESSAGE))
                 .build();
 
-            StateFlow mockStateFlow = mock(StateFlow.class);
-            State mockState = mock(uk.gov.hmcts.reform.civil.stateflow.model.State.class);
-            when(mockState.getName()).thenReturn("state1");
-            when(mockStateFlow.getState()).thenReturn(mockState);
-            when(mockStateFlow.getStateHistory()).thenReturn(List.of(mockState));
-            when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockStateFlow);
+            State mockState = mock(State.class);
+            when(mockState.getName()).thenReturn(FlowState.Main.DRAFT.fullName());
+            when(stateFlow.getState()).thenReturn(mockState);
+            when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(stateFlow);
+            when(stateFlow.getStateHistory()).thenReturn(List.of(mockState));
 
             CallbackParams callbackParams = createCallbackParams(
                 CREATE_CLAIM.name(),
@@ -135,6 +135,7 @@ class NoOngoingBusinessProcessAspectTest {
 
             assertThat(result).isEqualTo(response);
             verify(proceedingJoinPoint, never()).proceed();
+            verify(stateFlow).getStateHistory();
         }
 
         @ParameterizedTest

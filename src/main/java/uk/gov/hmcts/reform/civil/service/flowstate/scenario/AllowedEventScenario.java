@@ -17,7 +17,7 @@ public abstract class AllowedEventScenario {
 
     protected abstract String scenarioFile();
 
-    public abstract boolean appliesTo(CaseData caseData);
+    public abstract boolean appliesTo(CaseData caseData, boolean specOrLip);
 
     public Set<CaseEvent> loadBaseEvents(String state) {
         // Default: reuse existing unspec map; spec scenarios should override

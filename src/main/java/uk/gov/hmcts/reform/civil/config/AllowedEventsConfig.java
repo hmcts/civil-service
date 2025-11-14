@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ResourceLoader;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.service.flowstate.AllowedEventService;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.flowstate.repository.AllowedEventRepository;
@@ -25,9 +26,10 @@ public class AllowedEventsConfig {
     AllowedEventService allowedEventService(
         AllowedEventRepository repo,
         IStateFlowEngine stateFlowEngine,
+        CaseDetailsConverter caseDetailsConverter,
         List<AllowedEventScenario> scenarios
     ) {
-        return new AllowedEventService(repo, stateFlowEngine, scenarios);
+        return new AllowedEventService(repo, stateFlowEngine, caseDetailsConverter, scenarios);
     }
 
     @Bean

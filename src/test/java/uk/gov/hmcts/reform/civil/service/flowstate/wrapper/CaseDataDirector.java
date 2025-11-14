@@ -5,6 +5,7 @@ import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
+import uk.gov.hmcts.reform.civil.service.flowstate.wrapper.handler.ClaimIssuedUnrepresentedDefendant;
 import uk.gov.hmcts.reform.civil.service.flowstate.wrapper.handler.ClainDetailsNotificationPastDeadlineHandler;
 import uk.gov.hmcts.reform.civil.service.flowstate.wrapper.handler.CounterClaimHandler;
 import uk.gov.hmcts.reform.civil.service.flowstate.wrapper.handler.DivergentRespondentResponseHandler;
@@ -103,6 +104,9 @@ public class CaseDataDirector {
                 ));
             case PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA -> handler.setNext(
                 new ClainDetailsNotificationPastDeadlineHandler()
+            );
+            case PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT -> handler.setNext(
+                new ClaimIssuedUnrepresentedDefendant()
             );
             case PREPARE_FOR_HEARING_CONDUCT_HEARING -> handler.setNext(new PrepareForHearingHandler());
             case SPEC_DRAFT -> handler.setNext(
