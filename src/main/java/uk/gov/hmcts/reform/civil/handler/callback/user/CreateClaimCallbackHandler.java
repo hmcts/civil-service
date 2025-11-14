@@ -382,8 +382,11 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
                 }
             }
 
-            caseData.getRespondent1OrganisationPolicy().setOrganisation(
-                uk.gov.hmcts.reform.ccd.model.Organisation.builder().build()
+            caseData.setRespondent1OrganisationPolicy(
+                caseData.getRespondent1OrganisationPolicy()
+                    .toBuilder()
+                    .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder().build())
+                    .build()
             );
         }
 
@@ -398,8 +401,11 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
                 }
             }
 
-            caseData.getRespondent2OrganisationPolicy().setOrganisation(
-                uk.gov.hmcts.reform.ccd.model.Organisation.builder().build()
+            caseData.setRespondent2OrganisationPolicy(
+                caseData.getRespondent2OrganisationPolicy()
+                    .toBuilder()
+                    .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder().build())
+                    .build()
             );
         }
     }
@@ -421,8 +427,9 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
                     .build()
             );
 
+            // Use the respondent1OrganisationIDCopy which was already set by clearOrganisationPolicyId
             caseData.setRespondent2OrganisationIDCopy(
-                caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID()
+                caseData.getRespondent1OrganisationIDCopy()
             );
         }
     }

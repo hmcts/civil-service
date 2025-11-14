@@ -1583,9 +1583,8 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(respondent2OrgPolicy)
                 .extracting("Organisation").doesNotHaveToString("OrganisationID");
             assertThat(respondentSolicitor2EmailAddress).isEqualTo("respondentsolicitor@example.com");
-            // Note: respondent2OrganisationIDCopy is not set in the handler when same legal representative
-            // because clearOrganisationPolicyId is called before addOrgPolicy2ForSameLegalRepresentative
             assertThat(response.getData()).containsKey("respondent1OrganisationIDCopy");
+            assertThat(response.getData()).containsKey("respondent2OrganisationIDCopy");
         }
 
         @Test
@@ -2009,12 +2008,9 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData())
                 .extracting("respondent1OrganisationIDCopy")
                 .isEqualTo("QWERTY R");
-            // Note: respondent2OrganisationIDCopy is not properly set in the handler for same solicitor cases
-            // because clearOrganisationPolicyId is called before addOrgPolicy2ForSameLegalRepresentative,
-            // so the Organisation is already cleared when trying to copy the ID
-            // The field doesn't exist in the response, so we verify it's not present
             assertThat(response.getData())
-                .doesNotContainKey("respondent2OrganisationIDCopy");
+                .extracting("respondent2OrganisationIDCopy")
+                .isEqualTo("QWERTY R");
         }
 
         @Test
