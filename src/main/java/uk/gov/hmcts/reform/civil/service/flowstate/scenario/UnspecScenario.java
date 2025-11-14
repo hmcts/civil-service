@@ -19,8 +19,8 @@ public final class UnspecScenario extends AllowedEventScenario {
     }
 
     @Override
-    public boolean appliesTo(CaseData caseData) {
-        return UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory());
+    public boolean appliesTo(CaseData caseData, boolean specOrLip) {
+        return !specOrLip && UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory());
     }
 
 }

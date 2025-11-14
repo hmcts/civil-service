@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.exception.StateFlowException;
@@ -45,9 +46,9 @@ public class NoOngoingBusinessProcessAspect {
         ) {
             return joinPoint.proceed();
         }
-        StringBuilder stateHistoryBuilder = new StringBuilder();
         StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
-        stateFlowEngine.evaluate(caseData).getStateHistory().forEach(s -> {
+        StringBuilder stateHistoryBuilder = new StringBuilder();
+        stateFlow.getStateHistory().forEach(s -> {
             stateHistoryBuilder.append(s.getName());
             stateHistoryBuilder.append(", ");
         });
@@ -58,7 +59,7 @@ public class NoOngoingBusinessProcessAspect {
                     + "stateFlowHistory: %s",
                 caseEvent.name(),
                 caseData.getCcdCaseReference(),
-                stateFlow.getState().getName(),
+                FlowState.fromFullName(stateFlow.getState().getName()),
                 stateHistoryBuilder
             ));
         } catch (StateFlowException e) {

@@ -19,8 +19,8 @@ public final class SpecScenario extends AllowedEventScenario {
     }
 
     @Override
-    public boolean appliesTo(CaseData caseData) {
-        return SPEC_CLAIM.equals(caseData.getCaseAccessCategory());
+    public boolean appliesTo(CaseData caseData, boolean specOrLip) {
+        return specOrLip || SPEC_CLAIM.equals(caseData.getCaseAccessCategory());
     }
 
 }
