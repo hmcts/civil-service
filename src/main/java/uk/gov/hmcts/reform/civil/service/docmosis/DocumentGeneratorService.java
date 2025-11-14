@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisRequest;
 
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 @Service
@@ -20,6 +21,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class DocumentGeneratorService {
 
+    public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("d MMMM yyyy");
     private final DocmosisApiClient docmosisApiClient;
     private final DocmosisConfiguration configuration;
     private final ObjectMapper mapper;

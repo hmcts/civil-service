@@ -11,6 +11,10 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.ga.service.flowstate.GaFlowState;
+import uk.gov.hmcts.reform.civil.ga.service.flowstate.GaFlowStateAllowedEventService;
+import uk.gov.hmcts.reform.civil.ga.service.flowstate.GaStateFlowEngine;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowStateAllowedEventService;
@@ -31,8 +35,10 @@ public class EventAllowedAspect {
         + "already been completed or another action must be completed first.";
 
     private final FlowStateAllowedEventService flowStateAllowedEventService;
+    private final GaFlowStateAllowedEventService gaFlowStateAllowedEventService;
 
     private final IStateFlowEngine stateFlowEngine;
+    private final GaStateFlowEngine gaStateFlowEngine;
 
     @Pointcut("execution(* *(*)) && @annotation(EventAllowed)")
     public void eventAllowedPointCut() {
@@ -49,24 +55,48 @@ public class EventAllowedAspect {
         }
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
         CaseDetails caseDetails = callbackParams.getRequest().getCaseDetails();
-        CaseData caseData = callbackParams.getCaseData();
 
-        if (flowStateAllowedEventService.isAllowed(caseDetails, caseEvent)) {
+        if (flowStateAllowedEventService.isAllowed(caseDetails, caseEvent)
+            || gaFlowStateAllowedEventService.isAllowed(caseDetails, caseEvent)) {
             return joinPoint.proceed();
         } else {
-            StringBuilder stateHistoryBuilder = new StringBuilder();
-            FlowState flowState = flowStateAllowedEventService.getFlowState(caseData);
-            stateFlowEngine.evaluate(caseData).getStateHistory().forEach(s -> {
-                stateHistoryBuilder.append(s.getName());
-                stateHistoryBuilder.append(", ");
-            });
-            log.info(format(
-                "%s is not allowed on the case id %s, current FlowState: %s, stateFlowHistory: %s",
-                caseEvent.name(), caseDetails.getId(), flowState, stateHistoryBuilder.toString()
-            ));
+            if (callbackParams.isGeneralApplicationCase()) {
+                logGeneralApplicationFlowStateNotAllowed(callbackParams, caseEvent, caseDetails);
+            } else {
+                logCivilFlowStateNotAllowed(callbackParams, caseEvent, caseDetails);
+            }
+
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(List.of(ERROR_MESSAGE))
                 .build();
         }
+    }
+
+    private void logCivilFlowStateNotAllowed(CallbackParams callbackParams, CaseEvent caseEvent, CaseDetails caseDetails) {
+        CaseData caseData = callbackParams.getCaseData();
+        StringBuilder stateHistoryBuilder = new StringBuilder();
+        FlowState flowState = flowStateAllowedEventService.getFlowState(caseData);
+        stateFlowEngine.evaluate(caseData).getStateHistory().forEach(s -> {
+            stateHistoryBuilder.append(s.getName());
+            stateHistoryBuilder.append(", ");
+        });
+        log.info(format(
+            "%s is not allowed on the case id %s, current FlowState: %s, stateFlowHistory: %s",
+            caseEvent.name(), caseDetails.getId(), flowState, stateHistoryBuilder
+        ));
+    }
+
+    private void logGeneralApplicationFlowStateNotAllowed(CallbackParams callbackParams, CaseEvent caseEvent, CaseDetails caseDetails) {
+        GeneralApplicationCaseData caseData = (GeneralApplicationCaseData)callbackParams.getBaseCaseData();
+        StringBuilder stateHistoryBuilder = new StringBuilder();
+        GaFlowState flowState = gaFlowStateAllowedEventService.getFlowState(caseData);
+        gaStateFlowEngine.evaluate(caseData).getStateHistory().forEach(s -> {
+            stateHistoryBuilder.append(s.getName());
+            stateHistoryBuilder.append(", ");
+        });
+        log.info(format(
+            "%s is not allowed on the case id %s, current FlowState: %s, stateFlowHistory: %s",
+            caseEvent.name(), caseDetails.getId(), flowState, stateHistoryBuilder
+        ));
     }
 }
