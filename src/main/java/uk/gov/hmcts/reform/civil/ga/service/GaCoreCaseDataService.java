@@ -260,13 +260,21 @@ public class GaCoreCaseDataService {
     }
 
     private UserAuthContent getSystemUpdateUser() {
-        String userToken = userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
+        String userName = userConfig.getUserName();
+        if (userName == null || userName.isBlank()) {
+            log.info("******************* System update user name is not configured");
+        }
+        String userToken = userService.getAccessToken(userName, userConfig.getPassword());
         String userId = userService.getUserInfo(userToken).getUid();
         return UserAuthContent.builder().userToken(userToken).userId(userId).build();
     }
 
     private UserAuthContent refreshSystemUpdateUser() {
-        String userToken = userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
+        String userName = userConfig.getUserName();
+        if (userName == null || userName.isBlank()) {
+            log.info("******************* System update user name is not configured");
+        }
+        String userToken = userService.getAccessToken(userName, userConfig.getPassword());
         String userId = userService.getUserInfo(userToken).getUid();
         return UserAuthContent.builder().userToken(userToken).userId(userId).build();
     }

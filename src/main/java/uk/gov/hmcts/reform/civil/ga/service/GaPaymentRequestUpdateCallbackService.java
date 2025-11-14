@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import static java.util.Optional.ofNullable;
+import static org.jose4j.json.JsonUtil.toJson;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION_AFTER_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MODIFY_STATE_AFTER_ADDITIONAL_FEE_PAID;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
@@ -86,8 +87,10 @@ public class GaPaymentRequestUpdateCallbackService {
                      + "for the caseId {}", serviceRequestUpdateDto.getCcdCaseNumber());
         caseData = updateCaseDataWithPaymentDetails(serviceRequestUpdateDto, caseData);
         if (!hwf) {
+            log.info("Triggering INITIATE_GENERAL_APPLICATION_AFTER_PAYMENT event case data {}", toJson(caseData.toMap(objectMapper)));
             createEvent(caseData, INITIATE_GENERAL_APPLICATION_AFTER_PAYMENT,
                     serviceRequestUpdateDto.getCcdCaseNumber());
+            log.info("Triggering INITIATE_GENERAL_APPLICATION_AFTER_PAYMENT event completed");
         }
         return caseData;
     }
