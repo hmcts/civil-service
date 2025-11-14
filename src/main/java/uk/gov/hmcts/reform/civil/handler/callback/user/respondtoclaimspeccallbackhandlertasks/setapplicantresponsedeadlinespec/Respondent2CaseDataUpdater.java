@@ -29,7 +29,7 @@ public class Respondent2CaseDataUpdater implements SetApplicantResponseDeadlineC
         LocalDateTime responseDate = time.now();
         if (respondToClaimSpecUtils.isRespondent2HasSameLegalRep(caseData)
             && caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == YES) {
-            log.debug(
+            log.info(
                 "Respondent2 has the same legal representative and response is same for caseId: {}",
                 caseData.getCcdCaseReference()
             );
@@ -39,7 +39,7 @@ public class Respondent2CaseDataUpdater implements SetApplicantResponseDeadlineC
 
         if (ofNullable(caseData.getRespondent2()).isPresent()
             && ofNullable(caseData.getRespondent2Copy()).isPresent()) {
-            log.debug("Updating Respondent2 primary address and flags for caseId: {}", caseData.getCcdCaseReference());
+            log.info("Updating Respondent2 primary address and flags for caseId: {}", caseData.getCcdCaseReference());
             caseData.getRespondent2().setPrimaryAddress(caseData.getRespondent2Copy().getPrimaryAddress());
             caseData.getRespondent2().setFlags(caseData.getRespondent2Copy().getFlags());
             caseData.setRespondent2Copy(null);
@@ -70,7 +70,7 @@ public class Respondent2CaseDataUpdater implements SetApplicantResponseDeadlineC
             caseData.setRespondent2DetailsForClaimDetailsTab(respondent2DetailsForTab);
         }
 
-        log.debug(
+        log.info(
             "Updating case list display defendant solicitor references for caseId: {}",
             caseData.getCcdCaseReference()
         );

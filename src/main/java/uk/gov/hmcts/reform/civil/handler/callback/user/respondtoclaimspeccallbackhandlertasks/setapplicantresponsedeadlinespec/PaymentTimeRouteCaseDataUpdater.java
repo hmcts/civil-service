@@ -47,5 +47,4 @@ public class PaymentTimeRouteCaseDataUpdater implements SetApplicantResponseDead
             || FULL_ADMISSION.equals(
             caseData.getRespondent2ClaimResponseTypeForSpec());
     }
-
 }

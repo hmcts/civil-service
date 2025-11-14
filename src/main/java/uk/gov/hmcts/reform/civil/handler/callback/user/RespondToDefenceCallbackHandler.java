@@ -223,7 +223,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         caseData.setBusinessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE));
         caseData.setApplicant1ResponseDate(currentTime);
 
-        log.debug(
+        log.info(
             "Case management location for {} is {}",
             caseData.getLegacyCaseReference(),
             caseData.getCaseManagementLocation()

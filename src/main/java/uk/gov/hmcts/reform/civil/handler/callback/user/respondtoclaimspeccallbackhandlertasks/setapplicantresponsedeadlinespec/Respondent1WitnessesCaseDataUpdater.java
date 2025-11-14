@@ -13,7 +13,7 @@ public class Respondent1WitnessesCaseDataUpdater implements ExpertsAndWitnessesC
         log.info("Updating Respondent1WitnessesCaseData for caseId: {}", caseData.getCcdCaseReference());
 
         if (caseData.getRespondent1DQWitnessesSmallClaim() != null) {
-            log.debug("Setting respondent1DQWitnesses with small claim witnesses for caseId: {}", caseData.getCcdCaseReference());
+            log.info("Setting respondent1DQWitnesses with small claim witnesses for caseId: {}", caseData.getCcdCaseReference());
             caseData.setRespondent1DQ(
                     caseData.getRespondent1DQ().toBuilder()
                             .respondent1DQWitnesses(caseData.getRespondent1DQWitnessesSmallClaim())

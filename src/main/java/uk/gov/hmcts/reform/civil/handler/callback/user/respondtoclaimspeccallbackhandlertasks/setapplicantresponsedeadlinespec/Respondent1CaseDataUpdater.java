@@ -25,12 +25,12 @@ public class Respondent1CaseDataUpdater implements SetApplicantResponseDeadlineC
 
         Party updatedRespondent1;
         if (NO.equals(caseData.getSpecAoSApplicantCorrespondenceAddressRequired())) {
-            log.debug("Setting primary address to applicant correspondence address for caseId: {}", caseData.getCcdCaseReference());
+            log.info("Setting primary address to applicant correspondence address for caseId: {}", caseData.getCcdCaseReference());
             updatedRespondent1 = caseData.getRespondent1().toBuilder()
                     .primaryAddress(caseData.getSpecAoSApplicantCorrespondenceAddressdetails())
                     .build();
         } else {
-            log.debug("Setting primary address to respondent1 copy's primary address for caseId: {}", caseData.getCcdCaseReference());
+            log.info("Setting primary address to respondent1 copy's primary address for caseId: {}", caseData.getCcdCaseReference());
             updatedRespondent1 = caseData.getRespondent1().toBuilder()
                     .primaryAddress(caseData.getRespondent1Copy().getPrimaryAddress())
                     .build();
@@ -38,14 +38,14 @@ public class Respondent1CaseDataUpdater implements SetApplicantResponseDeadlineC
         caseData.setRespondent1(updatedRespondent1);
 
         if (caseData.getRespondent1Copy() != null) {
-            log.debug("Copying flags from respondent1 copy for caseId: {}", caseData.getCcdCaseReference());
+            log.info("Copying flags from respondent1 copy for caseId: {}", caseData.getCcdCaseReference());
             updatedRespondent1 = caseData.getRespondent1().toBuilder()
                     .flags(caseData.getRespondent1Copy().getFlags())
                     .build();
             caseData.setRespondent1(updatedRespondent1);
         }
 
-        log.debug("Setting respondent1Copy to null and updating claimDismissedDeadline for caseId: {}", caseData.getCcdCaseReference());
+        log.info("Setting respondent1Copy to null and updating claimDismissedDeadline for caseId: {}", caseData.getCcdCaseReference());
         caseData.setRespondent1Copy(null);
         caseData.setClaimDismissedDeadline(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(
                 RESPONSE_CLAIM_SPEC_DEADLINE_EXTENSION_MONTHS,

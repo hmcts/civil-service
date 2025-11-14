@@ -71,7 +71,7 @@ public class RespondToClaimSpecUtils {
         if (respondent1SpecDefenceResponseDocument != null) {
             uk.gov.hmcts.reform.civil.documentmanagement.model.Document respondent1ClaimDocument = respondent1SpecDefenceResponseDocument.getFile();
             if (respondent1ClaimDocument != null) {
-                log.debug("CaseId {}: Adding Respondent 1 claim document", caseData.getCcdCaseReference());
+                log.info("CaseId {}: Adding Respondent 1 claim document", caseData.getCcdCaseReference());
                 Element<CaseDocument> documentElement = buildElemCaseDocument(
                         respondent1ClaimDocument, "Defendant",
                         caseData.getRespondent1ResponseDate(),
@@ -120,19 +120,19 @@ public class RespondToClaimSpecUtils {
 
         switch (mpScenario) {
             case ONE_V_ONE:
-                log.debug("CaseId {}: Handling ONE_V_ONE scenario", caseData.getCcdCaseReference());
+                log.info("CaseId {}: Handling ONE_V_ONE scenario", caseData.getCcdCaseReference());
                 handleOneVOneScenario(caseData, tags);
                 break;
             case TWO_V_ONE:
-                log.debug("CaseId {}: Handling TWO_V_ONE scenario", caseData.getCcdCaseReference());
+                log.info("CaseId {}: Handling TWO_V_ONE scenario", caseData.getCcdCaseReference());
                 handleTwoVOneScenario(caseData, tags);
                 break;
             case ONE_V_TWO_ONE_LEGAL_REP:
-                log.debug("CaseId {}: Handling ONE_V_TWO_ONE_LEGAL_REP scenario", caseData.getCcdCaseReference());
+                log.info("CaseId {}: Handling ONE_V_TWO_ONE_LEGAL_REP scenario", caseData.getCcdCaseReference());
                 handleOneVTwoOneLegalRepScenario(caseData, tags);
                 break;
             case ONE_V_TWO_TWO_LEGAL_REP:
-                log.debug("CaseId {}: Handling ONE_V_TWO_TWO_LEGAL_REP scenario", caseData.getCcdCaseReference());
+                log.info("CaseId {}: Handling ONE_V_TWO_TWO_LEGAL_REP scenario", caseData.getCcdCaseReference());
                 handleOneVTwoTwoLegalRepScenario(caseData, tags);
                 break;
             default:
@@ -147,7 +147,7 @@ public class RespondToClaimSpecUtils {
     private void handleOneVOneScenario(CaseData caseData, Set<DefendantResponseShowTag> tags) {
         log.info("Handling ONE_V_ONE scenario for caseId: {}", caseData.getCcdCaseReference());
         if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
-            log.debug("CaseId {}: Respondent 1 disputes in ONE_V_ONE scenario", caseData.getCcdCaseReference());
+            log.info("CaseId {}: Respondent 1 disputes in ONE_V_ONE scenario", caseData.getCcdCaseReference());
             tags.add(ONLY_RESPONDENT_1_DISPUTES);
         }
     }
@@ -159,7 +159,7 @@ public class RespondToClaimSpecUtils {
                 && caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION)
                 || caseData.getClaimant1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION
                 || caseData.getClaimant2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
-            log.debug(ADDING_ONLY_RESPONDENT_1_DISPUTES_TAG, caseData.getCcdCaseReference());
+            log.info(ADDING_ONLY_RESPONDENT_1_DISPUTES_TAG, caseData.getCcdCaseReference());
             tags.add(ONLY_RESPONDENT_1_DISPUTES);
         }
     }
@@ -168,17 +168,17 @@ public class RespondToClaimSpecUtils {
         log.info("Handling ONE_V_TWO_ONE_LEGAL_REP scenario for caseId: {}", caseData.getCcdCaseReference());
 
         if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
-            log.debug("CaseId {}: Respondent 1 disputes in ONE_V_TWO_ONE_LEGAL_REP scenario", caseData.getCcdCaseReference());
+            log.info("CaseId {}: Respondent 1 disputes in ONE_V_TWO_ONE_LEGAL_REP scenario", caseData.getCcdCaseReference());
             if (caseData.getRespondentResponseIsSame() == YES
                     || caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
-                log.debug("CaseId {}: Adding BOTH_RESPONDENTS_DISPUTE tag", caseData.getCcdCaseReference());
+                log.info("CaseId {}: Adding BOTH_RESPONDENTS_DISPUTE tag", caseData.getCcdCaseReference());
                 tags.add(DefendantResponseShowTag.BOTH_RESPONDENTS_DISPUTE);
             } else {
-                log.debug(ADDING_ONLY_RESPONDENT_1_DISPUTES_TAG, caseData.getCcdCaseReference());
+                log.info(ADDING_ONLY_RESPONDENT_1_DISPUTES_TAG, caseData.getCcdCaseReference());
                 tags.add(ONLY_RESPONDENT_1_DISPUTES);
             }
         } else if (caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
-            log.debug(ADDING_ONLY_RESPONDENT_2_DISPUTES_TAG, caseData.getCcdCaseReference());
+            log.info(ADDING_ONLY_RESPONDENT_2_DISPUTES_TAG, caseData.getCcdCaseReference());
             tags.add(DefendantResponseShowTag.ONLY_RESPONDENT_2_DISPUTES);
         }
     }
@@ -188,11 +188,11 @@ public class RespondToClaimSpecUtils {
 
         if (caseData.getShowConditionFlags().contains(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1)
                 && caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
-            log.debug(ADDING_ONLY_RESPONDENT_1_DISPUTES_TAG, caseData.getCcdCaseReference());
+            log.info(ADDING_ONLY_RESPONDENT_1_DISPUTES_TAG, caseData.getCcdCaseReference());
             tags.add(ONLY_RESPONDENT_1_DISPUTES);
         } else if (caseData.getShowConditionFlags().contains(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_2)
                 && caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
-            log.debug(ADDING_ONLY_RESPONDENT_2_DISPUTES_TAG, caseData.getCcdCaseReference());
+            log.info(ADDING_ONLY_RESPONDENT_2_DISPUTES_TAG, caseData.getCcdCaseReference());
             tags.add(DefendantResponseShowTag.ONLY_RESPONDENT_2_DISPUTES);
         }
     }
@@ -247,13 +247,13 @@ public class RespondToClaimSpecUtils {
 
         List<Element<CaseDocument>> defendantUploads = nonNull(caseData.getDefendantResponseDocuments())
                 ? caseData.getDefendantResponseDocuments() : new ArrayList<>();
-        log.debug("CaseId {}: Initialized defendant uploads list", caseData.getCcdCaseReference());
+        log.info("CaseId {}: Initialized defendant uploads list", caseData.getCcdCaseReference());
 
         addRespondent1Documents(caseData, defendantUploads);
-        log.debug("CaseId {}: Added Respondent 1 documents to defendant uploads", caseData.getCcdCaseReference());
+        log.info("CaseId {}: Added Respondent 1 documents to defendant uploads", caseData.getCcdCaseReference());
 
         addRespondent2Documents(caseData, defendantUploads);
-        log.debug("CaseId {}: Added Respondent 2 documents to defendant uploads", caseData.getCcdCaseReference());
+        log.info("CaseId {}: Added Respondent 2 documents to defendant uploads", caseData.getCcdCaseReference());
 
         log.info("CaseId {}: Defendant uploads retrieval complete", caseData.getCcdCaseReference());
         return defendantUploads;
@@ -305,18 +305,18 @@ public class RespondToClaimSpecUtils {
         log.info("Clearing temporary documents for caseId: {}", caseData.getCcdCaseReference());
 
         caseData.setRespondent1SpecDefenceResponseDocument(null);
-        log.debug("CaseId {}: Cleared Respondent 1 Spec Defence Response Document", caseData.getCcdCaseReference());
+        log.info("CaseId {}: Cleared Respondent 1 Spec Defence Response Document", caseData.getCcdCaseReference());
 
         caseData.setRespondent2SpecDefenceResponseDocument(null);
-        log.debug("CaseId {}: Cleared Respondent 2 Spec Defence Response Document", caseData.getCcdCaseReference());
+        log.info("CaseId {}: Cleared Respondent 2 Spec Defence Response Document", caseData.getCcdCaseReference());
 
         if (nonNull(caseData.getRespondent1DQ())) {
             caseData.setRespondent1DQ(caseData.getRespondent1DQ().toBuilder().respondent1DQDraftDirections(null).build());
-            log.debug("CaseId {}: Cleared Respondent 1 DQ Draft Directions", caseData.getCcdCaseReference());
+            log.info("CaseId {}: Cleared Respondent 1 DQ Draft Directions", caseData.getCcdCaseReference());
         }
         if (nonNull(caseData.getRespondent2DQ())) {
             caseData.setRespondent2DQ(caseData.getRespondent2DQ().toBuilder().respondent2DQDraftDirections(null).build());
-            log.debug("CaseId {}: Cleared Respondent 2 DQ Draft Directions", caseData.getCcdCaseReference());
+            log.info("CaseId {}: Cleared Respondent 2 DQ Draft Directions", caseData.getCcdCaseReference());
         }
     }
 }

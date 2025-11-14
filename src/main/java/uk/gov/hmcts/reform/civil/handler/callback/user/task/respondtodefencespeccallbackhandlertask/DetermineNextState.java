@@ -89,7 +89,7 @@ public class DetermineNextState extends CallbackHandler {
 
         if (V_2.equals(callbackParams.getVersion())
             && isOneVOne(caseData)) {
-            log.debug("Pin in Post enabled for Case: {}", caseData.getCcdCaseReference());
+            log.info("Pin in Post enabled for Case: {}", caseData.getCcdCaseReference());
             if (caseData.hasClaimantAgreedToFreeMediation()) {
                 nextState = CaseState.IN_MEDIATION.name();
             } else if (isDefenceAdmitPayImmediately(caseData)) {
@@ -132,7 +132,7 @@ public class DetermineNextState extends CallbackHandler {
         if (V_2.equals(callbackParams.getVersion())
             && isOneVOne(caseData)) {
 
-            log.debug("Pin in Post enabled for Case : {}", caseData.getCcdCaseReference());
+            log.info("Pin in Post enabled for Case : {}", caseData.getCcdCaseReference());
             if (!caseData.isFullAdmitClaimSpec() && caseData.hasClaimantAgreedToFreeMediation()) {
                 nextState = CaseState.IN_MEDIATION.name();
             } else if (caseData.hasApplicantAcceptedRepaymentPlan()) {

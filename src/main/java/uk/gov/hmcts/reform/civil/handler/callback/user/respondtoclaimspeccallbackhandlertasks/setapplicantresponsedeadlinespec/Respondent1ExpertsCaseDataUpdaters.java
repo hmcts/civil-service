@@ -22,7 +22,7 @@ public class Respondent1ExpertsCaseDataUpdaters implements ExpertsAndWitnessesCa
         if (caseData.getRespondent1DQ() != null) {
             if (YES.equals(caseData.getResponseClaimExpertSpecRequired())
                     && caseData.getRespondent1DQ().getSmallClaimExperts() != null) {
-                log.debug("Setting respondent1DQExperts with expert details for caseId: {}", caseData.getCcdCaseReference());
+                log.info("Setting respondent1DQExperts with expert details for caseId: {}", caseData.getCcdCaseReference());
                 Expert expert = fromSmallClaimExpertDetails(caseData.getRespondent1DQ().getSmallClaimExperts());
                 caseData.setRespondent1DQ(
                         caseData.getRespondent1DQ().toBuilder()
@@ -32,7 +32,7 @@ public class Respondent1ExpertsCaseDataUpdaters implements ExpertsAndWitnessesCa
                                         .build())
                                 .build());
             } else if (NO.equals(caseData.getResponseClaimExpertSpecRequired())) {
-                log.debug("Setting respondent1DQExperts with expertRequired as NO for caseId: {}", caseData.getCcdCaseReference());
+                log.info("Setting respondent1DQExperts with expertRequired as NO for caseId: {}", caseData.getCcdCaseReference());
                 caseData.setRespondent1DQ(
                         caseData.getRespondent1DQ().toBuilder()
                                 .respondent1DQExperts(Experts.builder()
