@@ -31,6 +31,9 @@ jobs:
       - name: Export StateFlow artefacts
         run: python3 scripts/export_stateflow_transitions.py
 
+      - name: Generate flowstate tables
+        run: ruby scripts/generate_flowstate_tables.rb
+
       - name: Render diagrams
         run: |
           npx mmdc -i docs/draft_flow.mmd -o docs/draft_flow.svg --puppeteerConfigFile docs/stateflow/puppeteer-config.json
@@ -42,7 +45,7 @@ jobs:
         run: |
           git config user.name "stateflow-diagram-bot"
           git config user.email "civil-service@users.noreply.github.com"
-          git add docs/*.mmd docs/*.svg docs/stateflow_transition_catalogue.md docs/stateflow/*.json
+          git add docs/*.mmd docs/*.svg docs/*.md docs/stateflow_transition_catalogue.md docs/stateflow/*.json
           if git diff --cached --quiet; then
             echo "No diagram changes"
           else
