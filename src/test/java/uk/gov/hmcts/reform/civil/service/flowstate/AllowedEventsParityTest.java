@@ -4,12 +4,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.civil.config.FlowStateAllowedEventsConfig;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.testsupport.mockito.MockitoBean;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -31,7 +31,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class AllowedEventsParityTest {
 
     @SuppressWarnings("unused")
-    @MockBean
+    @MockitoBean
     private FeatureToggleService toggleService;
 
     @Autowired

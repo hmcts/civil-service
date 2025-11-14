@@ -1,4 +1,4 @@
-server:
+wserver:
   port: 4000
 
 management:
@@ -737,8 +737,8 @@ spring:
       on-profile: integration-test
   datasource:
     driverClassName: org.testcontainers.jdbc.ContainerDatabaseDriver
-    url: jdbc:tc:postgresql:15://localhost/cmc
-    jdbcUrl: jdbc:tc:postgresql:15://localhost/cmc
+    url: jdbc:tc:postgresql:14.11://localhost/cmc
+    jdbcUrl: jdbc:tc:postgresql:14.11://localhost/cmc
     hikari:
       minimum-idle: 1
       connectionTimeout: 10000
@@ -753,7 +753,7 @@ spring:
       hibernate:
         show_sql: false
         format_sql: true
-        dialect: org.hibernate.dialect.PostgreSQL10Dialect
+        dialect: org.hibernate.dialect.PostgreSQLDialect
   flyway:
     enabled: true
     baselineOnMigrate: true

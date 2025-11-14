@@ -12,7 +12,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.testsupport.mockito.MockitoBean;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -219,7 +219,7 @@ class FlowStateAllowedEventServiceTest {
 
     // used by StateFlowEngine bean
     @SuppressWarnings("unused")
-    @MockBean
+    @MockitoBean
     private FeatureToggleService toggleService;
 
     static class GetFlowStateArguments implements ArgumentsProvider {

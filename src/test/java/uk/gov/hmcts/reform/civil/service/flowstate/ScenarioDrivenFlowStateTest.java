@@ -7,7 +7,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
@@ -19,6 +18,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
+import uk.gov.hmcts.reform.civil.testsupport.mockito.MockitoBean;
 
 import java.time.LocalDateTime;
 import java.util.stream.Stream;
@@ -76,7 +76,7 @@ class ScenarioDrivenFlowStateTest {
     private SimpleStateFlowEngine stateFlowEngine;
 
     @SuppressWarnings("unused")
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
 
     @Nested

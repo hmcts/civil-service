@@ -10,7 +10,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.testsupport.mockito.MockitoBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.documentmanagement.SecuredDocumentManagementService;
@@ -91,19 +91,19 @@ public class HearingFormGeneratorTest {
         .courtTypeId("10").courtLocationCode("121")
         .epimmsId("000000").build();
 
-    @MockBean
+    @MockitoBean
     private SecuredDocumentManagementService documentManagementService;
-    @MockBean
+    @MockitoBean
     private DocumentGeneratorService documentGeneratorService;
-    @MockBean
+    @MockitoBean
     private AssignCategoryId assignCategoryId;
-    @MockBean
+    @MockitoBean
     FeatureToggleService featureToggleService;
-    @MockBean
+    @MockitoBean
     private LocationReferenceDataService locationRefDataService;
     @Autowired
     private HearingFormGenerator generator;
-    @MockBean
+    @MockitoBean
     private DocumentHearingLocationHelper locationHelper;
 
     @BeforeEach

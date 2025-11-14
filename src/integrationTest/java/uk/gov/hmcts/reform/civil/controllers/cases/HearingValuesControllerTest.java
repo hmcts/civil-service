@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.civil.controllers.cases;
 
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.testsupport.mockito.MockitoBean;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.exceptions.MissingFieldsUpdatedException;
 import uk.gov.hmcts.reform.civil.model.HearingValuesRequest;
@@ -20,7 +20,7 @@ public class HearingValuesControllerTest extends BaseIntegrationTest {
 
     private static final String HEARING_VALUES_URL = "/serviceHearingValues";
 
-    @MockBean
+    @MockitoBean
     private HearingValuesService hearingValuesService;
 
     @Test
