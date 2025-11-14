@@ -34,7 +34,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISCONTINUE_CLAIM_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISCONTINUED;
 import static uk.gov.hmcts.reform.civil.helpers.settlediscontinue.DiscontinueClaimHelper.is1v2LrVLrCase;
-import static uk.gov.hmcts.reform.civil.utils.PersistDataUtils.persistFlagsForParties;
 
 @Service
 @RequiredArgsConstructor
@@ -198,10 +197,6 @@ public class DiscontinueClaimClaimantCallbackHandler extends CallbackHandler {
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData oldCaseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetailsBefore());
-
-        // persist party flags (ccd issue)
-        persistFlagsForParties(oldCaseData, caseData);
 
         caseData.setBusinessProcess(BusinessProcess.ready(DISCONTINUE_CLAIM_CLAIMANT));
         if (MultiPartyScenario.isTwoVOne(caseData)) {
