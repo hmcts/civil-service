@@ -24,6 +24,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
@@ -192,7 +193,7 @@ public class ClaimantResponseStrategy implements EventHistoryStrategy {
             builder,
             sequenceGenerator,
             message,
-            timelineHelper.ensurePresentOrNow(caseData.getApplicant1ResponseDate())
+            resolveApplicantResponseDate(caseData)
         ));
     }
 
@@ -249,7 +250,7 @@ public class ClaimantResponseStrategy implements EventHistoryStrategy {
     private List<Event> prepareMiscEvents(EventHistory.EventHistoryBuilder builder,
                                           CaseData caseData,
                                           List<String> texts) {
-        LocalDateTime defaultDate = timelineHelper.ensurePresentOrNow(caseData.getApplicant1ResponseDate());
+        LocalDateTime defaultDate = resolveApplicantResponseDate(caseData);
         return texts.stream()
             .map(text -> buildMiscEvent(builder, sequenceGenerator, text, defaultDate))
             .toList();
@@ -262,7 +263,7 @@ public class ClaimantResponseStrategy implements EventHistoryStrategy {
                 builder,
                 sequenceGenerator,
                 message,
-                timelineHelper.ensurePresentOrNow(caseData.getApplicant1ResponseDate())
+                resolveApplicantResponseDate(caseData)
             ));
         }
     }
@@ -314,6 +315,10 @@ public class ClaimantResponseStrategy implements EventHistoryStrategy {
 
     private boolean isAnyNo(YesOrNo first, YesOrNo second) {
         return NO.equals(first) || NO.equals(second);
+    }
+
+    private LocalDateTime resolveApplicantResponseDate(CaseData caseData) {
+        return Optional.ofNullable(caseData.getApplicant1ResponseDate()).orElseGet(timelineHelper::now);
     }
 
     private boolean hasState(StateFlow stateFlow, FlowState.Main state) {

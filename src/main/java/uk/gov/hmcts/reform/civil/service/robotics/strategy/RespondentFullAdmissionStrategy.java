@@ -88,10 +88,6 @@ public class RespondentFullAdmissionStrategy implements EventHistoryStrategy {
                                   Party respondent,
                                   boolean isRespondent1,
                                   LocalDateTime responseDate) {
-        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            return;
-        }
-
         respondentResponseSupport.addRespondentMiscEvent(builder, sequenceGenerator, caseData, respondent, isRespondent1, responseDate);
     }
 

@@ -2,7 +2,9 @@ package uk.gov.hmcts.reform.civil.service.robotics.support;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -11,6 +13,7 @@ import uk.gov.hmcts.reform.civil.model.dq.DQ;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
@@ -58,6 +61,7 @@ public class RoboticsRespondentResponseSupport {
                     case COUNTER_CLAIM -> textFormatter.defendantRejectsAndCounterClaims();
                     case FULL_ADMISSION -> textFormatter.defendantFullyAdmits();
                     case PART_ADMISSION -> textFormatter.defendantPartialAdmission();
+                    case FULL_DEFENCE -> formatFullDefenceResponseText(caseData, true);
                     default -> "";
                 };
             }
@@ -71,8 +75,29 @@ public class RoboticsRespondentResponseSupport {
             case COUNTER_CLAIM -> textFormatter.defendantRejectsAndCounterClaims();
             case FULL_ADMISSION -> textFormatter.defendantFullyAdmits();
             case PART_ADMISSION -> textFormatter.defendantPartialAdmission();
+            case FULL_DEFENCE -> formatFullDefenceResponseText(caseData, false);
             default -> "";
         };
+    }
+
+    private String formatFullDefenceResponseText(CaseData caseData, boolean isSpec) {
+        Party respondent = caseData.getRespondent1();
+        String respondentName = respondent != null ? respondent.getPartyName() : "Defendant";
+        String responseLabel = isSpec
+            ? Optional.ofNullable(respondent)
+                .map(value -> getResponseTypeForRespondentSpec(caseData, value))
+                .map(Enum::name)
+                .orElse(RespondentResponseTypeSpec.FULL_DEFENCE.name())
+            : Optional.ofNullable(respondent)
+                .map(value -> getResponseTypeForRespondent(caseData, value))
+                .map(Enum::name)
+                .orElse(RespondentResponseType.FULL_DEFENCE.name());
+
+        return textFormatter.formatRpa(
+            "Defendant: %s has responded: %s",
+            respondentName,
+            responseLabel
+        );
     }
 
     private RespondentResponseTypeSpec resolveSpecResponseType(CaseData caseData) {
@@ -148,6 +173,9 @@ public class RoboticsRespondentResponseSupport {
                                        boolean isRespondent1,
                                        LocalDateTime dateReceived) {
         String message = prepareRespondentResponseText(caseData, respondent, isRespondent1);
+        if (!StringUtils.hasText(message)) {
+            return;
+        }
         RoboticsEventSupport.addRespondentMiscEvent(builder, sequenceGenerator, message, dateReceived);
     }
 }

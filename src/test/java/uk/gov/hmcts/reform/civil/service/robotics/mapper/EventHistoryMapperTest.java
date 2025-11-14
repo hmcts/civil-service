@@ -87,7 +87,6 @@ import uk.gov.hmcts.reform.civil.service.robotics.strategy.GeneralApplicationStr
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.InterlocutoryJudgmentStrategy;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.JudgmentByAdmissionStrategy;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.MediationEventStrategy;
-import uk.gov.hmcts.reform.civil.service.robotics.strategy.RespondentCounterClaimStrategy;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.RespondentDivergentResponseStrategy;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.RespondentFullAdmissionStrategy;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.RespondentFullDefenceStrategy;
@@ -209,7 +208,6 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     RespondentFullDefenceStrategy.class,
     RespondentFullAdmissionStrategy.class,
     RespondentPartAdmissionStrategy.class,
-    RespondentCounterClaimStrategy.class,
     RoboticsManualOfflineSupport.class
 })
 class EventHistoryMapperTest {

@@ -7,6 +7,8 @@ import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.dq.DQ;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.model.robotics.EventType;
@@ -29,6 +31,8 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_L
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsDirectionsQuestionnaireSupport.getPreferredCourtCode;
+import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsDirectionsQuestionnaireSupport.getRespondent1DQOrDefault;
+import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsDirectionsQuestionnaireSupport.getRespondent2DQOrDefault;
 import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsDirectionsQuestionnaireSupport.isStayClaim;
 import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildDirectionsQuestionnaireEvent;
 import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildLipVsLrMiscEvent;
@@ -84,6 +88,7 @@ public class RespondentPartAdmissionStrategy implements EventHistoryStrategy {
             .forEach(builder::directionsQuestionnaire);
 
         if (defendant1ResponseExists.test(caseData)) {
+            Respondent1DQ respondent1DQ = getRespondent1DQOrDefault(caseData);
             addLipVsLrMisc(builder, caseData);
 
             if (useStatesPaid(caseData)) {
@@ -99,9 +104,9 @@ public class RespondentPartAdmissionStrategy implements EventHistoryStrategy {
                 sequenceGenerator,
                 caseData.getRespondent1ResponseDate(),
                 RESPONDENT_ID,
-                caseData.getRespondent1DQ(),
-                getPreferredCourtCode(caseData.getRespondent1DQ()),
-                prepareEventDetailsText(caseData, caseData.getRespondent1DQ(), caseData.getRespondent1(), true)
+                respondent1DQ,
+                getPreferredCourtCode(respondent1DQ),
+                prepareEventDetailsText(caseData, respondent1DQ, caseData.getRespondent1(), true)
             ));
 
             if (defendant1v2SameSolicitorSameResponse.test(caseData)) {
@@ -123,14 +128,15 @@ public class RespondentPartAdmissionStrategy implements EventHistoryStrategy {
                     sequenceGenerator,
                     respondent2ResponseDate,
                     RESPONDENT2_ID,
-                    caseData.getRespondent1DQ(),
-                    getPreferredCourtCode(caseData.getRespondent1DQ()),
-                    prepareEventDetailsText(caseData, caseData.getRespondent1DQ(), caseData.getRespondent2(), true)
+                    respondent1DQ,
+                    getPreferredCourtCode(respondent1DQ),
+                    prepareEventDetailsText(caseData, respondent1DQ, caseData.getRespondent2(), true)
                 ));
             }
         }
 
         if (defendant2ResponseExists.test(caseData)) {
+            Respondent2DQ respondent2DQ = getRespondent2DQOrDefault(caseData);
             builder.receiptOfPartAdmission(addReceiptOfPartAdmissionEvent(builder, caseData.getRespondent2ResponseDate(), RESPONDENT2_ID));
             addRespondentMisc(builder, caseData, caseData.getRespondent2(), false, caseData.getRespondent2ResponseDate());
 
@@ -139,9 +145,9 @@ public class RespondentPartAdmissionStrategy implements EventHistoryStrategy {
                 sequenceGenerator,
                 caseData.getRespondent2ResponseDate(),
                 RESPONDENT2_ID,
-                caseData.getRespondent2DQ(),
-                getPreferredCourtCode(caseData.getRespondent2DQ()),
-                prepareEventDetailsText(caseData, caseData.getRespondent2DQ(), caseData.getRespondent2(), false)
+                respondent2DQ,
+                getPreferredCourtCode(respondent2DQ),
+                prepareEventDetailsText(caseData, respondent2DQ, caseData.getRespondent2(), false)
             ));
         }
     }
@@ -177,10 +183,6 @@ public class RespondentPartAdmissionStrategy implements EventHistoryStrategy {
                                    Party respondent,
                                    boolean isRespondent1,
                                    LocalDateTime responseDate) {
-        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            return;
-        }
-
         respondentResponseSupport.addRespondentMiscEvent(builder, sequenceGenerator, caseData, respondent, isRespondent1, responseDate);
     }
 

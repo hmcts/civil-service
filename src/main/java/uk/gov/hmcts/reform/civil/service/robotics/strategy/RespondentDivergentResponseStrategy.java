@@ -33,6 +33,8 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.RECEIPT_OF_ADMISSION;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.RECEIPT_OF_PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsDirectionsQuestionnaireSupport.getPreferredCourtCode;
+import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsDirectionsQuestionnaireSupport.getRespondent1DQOrDefault;
+import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsDirectionsQuestionnaireSupport.getRespondent2DQOrDefault;
 import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildDirectionsQuestionnaireEvent;
 import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildDefenceOrStatesPaidEvent;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT2_ID;
@@ -217,7 +219,7 @@ public class RespondentDivergentResponseStrategy implements EventHistoryStrategy
             builder.defenceFiled(defenceEvent);
         }
 
-        DQ respondentDQ = isRespondent1 ? caseData.getRespondent1DQ() : caseData.getRespondent2DQ();
+        DQ respondentDQ = isRespondent1 ? getRespondent1DQOrDefault(caseData) : getRespondent2DQOrDefault(caseData);
         Party respondent = isRespondent1 ? caseData.getRespondent1() : caseData.getRespondent2();
         if (respondent != null) {
             builder.directionsQuestionnaire(createDirectionsQuestionnaireEvent(

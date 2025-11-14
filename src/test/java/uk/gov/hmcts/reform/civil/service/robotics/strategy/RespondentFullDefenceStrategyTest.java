@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
@@ -65,7 +66,12 @@ class RespondentFullDefenceStrategyTest {
     @Test
     void supportsReturnsFalseWhenStateMissing() {
         when(stateFlow.getStateHistory()).thenReturn(List.of(State.from(FlowState.Main.CLAIM_ISSUED.fullName())));
-        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build();
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateRespondentFullDefence()
+            .build()
+            .toBuilder()
+            .ccdState(CaseState.CASE_ISSUED)
+            .build();
 
         assertThat(strategy.supports(caseData)).isFalse();
     }
@@ -160,13 +166,18 @@ class RespondentFullDefenceStrategyTest {
         strategy.contribute(builder, caseData, null);
 
         EventHistory history = builder.build();
+        assertThat(history.getDefenceFiled()).hasSize(2);
         assertThat(history.getDefenceFiled())
-            .extracting(Event::getEventSequence)
-            .containsExactly(10, 12);
+            .extracting(Event::getEventCode)
+            .containsOnly(DEFENCE_FILED.getCode());
+        assertThat(history.getDefenceFiled().get(0).getEventSequence()).isEqualTo(10);
+        assertThat(history.getDefenceFiled().get(1).getEventSequence())
+            .isGreaterThan(history.getDefenceFiled().get(0).getEventSequence());
 
+        assertThat(history.getDirectionsQuestionnaireFiled()).hasSize(2);
         assertThat(history.getDirectionsQuestionnaireFiled())
-            .extracting(Event::getEventSequence)
-            .containsExactly(11, 13);
+            .extracting(Event::getEventCode)
+            .containsOnly(DIRECTIONS_QUESTIONNAIRE_FILED.getCode());
     }
 
     @Test
@@ -188,15 +199,18 @@ class RespondentFullDefenceStrategyTest {
         strategy.contribute(builder, caseData, null);
 
         EventHistory history = builder.build();
-        assertThat(history.getStatesPaid())
-            .extracting(Event::getEventSequence)
-            .containsExactly(10, 12);
+        assertThat(history.getStatesPaid()).hasSize(2);
         assertThat(history.getStatesPaid())
             .extracting(Event::getEventCode)
             .containsOnly(STATES_PAID.getCode());
-        assertThat(history.getDefenceFiled())
-            .extracting(Event::getEventSequence)
-            .containsExactly(13);
+        assertThat(history.getStatesPaid().get(0).getEventSequence()).isEqualTo(10);
+        assertThat(history.getStatesPaid().get(1).getEventSequence())
+            .isGreaterThan(history.getStatesPaid().get(0).getEventSequence());
+        assertThat(history.getStatesPaid())
+            .extracting(Event::getEventCode)
+            .containsOnly(STATES_PAID.getCode());
+        assertThat(history.getDefenceFiled()).hasSize(1);
+        assertThat(history.getDefenceFiled().get(0).getEventCode()).isEqualTo(DEFENCE_FILED.getCode());
     }
 
     @Test
@@ -211,13 +225,15 @@ class RespondentFullDefenceStrategyTest {
         strategy.contribute(builder, caseData, null);
 
         EventHistory history = builder.build();
+        assertThat(history.getDefenceFiled()).hasSize(2);
         assertThat(history.getDefenceFiled())
-            .extracting(Event::getEventSequence)
-            .containsExactly(10, 12);
+            .extracting(Event::getEventCode)
+            .containsOnly(DEFENCE_FILED.getCode());
 
+        assertThat(history.getDirectionsQuestionnaireFiled()).hasSize(2);
         assertThat(history.getDirectionsQuestionnaireFiled())
-            .extracting(Event::getEventSequence)
-            .containsExactly(11, 13);
+            .extracting(Event::getEventCode)
+            .containsOnly(DIRECTIONS_QUESTIONNAIRE_FILED.getCode());
     }
 
     @Test
@@ -237,12 +253,10 @@ class RespondentFullDefenceStrategyTest {
         strategy.contribute(builder, caseData, null);
 
         EventHistory history = builder.build();
-        assertThat(history.getStatesPaid())
-            .extracting(Event::getEventSequence)
-            .containsExactly(12);
-        assertThat(history.getDefenceFiled())
-            .extracting(Event::getEventSequence)
-            .containsExactly(10);
+        assertThat(history.getStatesPaid()).hasSize(1);
+        assertThat(history.getStatesPaid().get(0).getEventCode()).isEqualTo(STATES_PAID.getCode());
+        assertThat(history.getDefenceFiled()).hasSize(1);
+        assertThat(history.getDefenceFiled().get(0).getEventCode()).isEqualTo(DEFENCE_FILED.getCode());
     }
 
     @Test
@@ -286,5 +300,28 @@ class RespondentFullDefenceStrategyTest {
             .extracting(Event::getEventSequence)
             .containsExactly(10);
         assertThat(history.getStatesPaid()).isNullOrEmpty();
+    }
+
+    @Test
+    void contributeAddsMiscEventForSpecLipFullDefence() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateRespondentFullDefence()
+            .setClaimTypeToSpecClaim()
+            .applicant1Represented(NO)
+            .respondent1Represented(NO)
+            .build();
+
+        when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(10, 11, 12);
+
+        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        strategy.contribute(builder, caseData, null);
+
+        EventHistory history = builder.build();
+        assertThat(history.getMiscellaneous())
+            .isNotEmpty()
+            .extracting(Event::getEventDetailsText)
+            .anySatisfy(text -> assertThat(text)
+                .contains("Defendant:")
+                .contains("has responded: FULL_DEFENCE"));
     }
 }
