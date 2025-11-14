@@ -53,7 +53,7 @@ public class GaInvalidHwFCallbackHandler extends HWFCallbackHandlerBase {
 
     private GeneralApplicationCaseData setUpBusinessProcess(GeneralApplicationCaseData caseData) {
         GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> updatedData = caseData.toBuilder()
-                .businessProcess(BusinessProcess.ready(NOTIFY_APPLICANT_LIP_HWF));
+                .businessProcess(BusinessProcess.readyGa(NOTIFY_APPLICANT_LIP_HWF));
         log.info("Start business process NOTIFY_APPLICANT_LIP_HWF for caseId: {}", caseData.getCcdCaseReference());
         HwFFeeTypeUtil.updateEventInHwfDetails(caseData, updatedData, INVALID_HWF_REFERENCE_GA);
         log.info("Update event in HWF to INVALID_HWF_REFERENCE_GA for caseId: {}", caseData.getCcdCaseReference());

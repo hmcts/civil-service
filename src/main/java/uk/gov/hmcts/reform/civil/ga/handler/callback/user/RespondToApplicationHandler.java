@@ -336,7 +336,7 @@ public class RespondToApplicationHandler extends CallbackHandler implements Gene
         caseDataBuilder.generalAppRespondDocument(null);
         caseDataBuilder.generalAppRespondConsentDocument(null);
         caseDataBuilder.generalAppRespondDebtorDocument(null);
-        caseDataBuilder.businessProcess(BusinessProcess.ready(RESPOND_TO_APPLICATION)).build();
+        caseDataBuilder.businessProcess(BusinessProcess.readyGa(RESPOND_TO_APPLICATION)).build();
         GeneralApplicationCaseData updatedCaseData = caseDataBuilder.build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()

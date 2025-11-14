@@ -327,7 +327,7 @@ public class JudicialFinalDecisionHandler extends CallbackHandler implements Gen
         GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         log.info("General app for LiP is enabled for caseId: {}", caseData.getCcdCaseReference());
         caseDataBuilder.bilingualHint(null);
-        caseDataBuilder.businessProcess(BusinessProcess.ready(GENERATE_DIRECTIONS_ORDER)).build();
+        caseDataBuilder.businessProcess(BusinessProcess.readyGa(GENERATE_DIRECTIONS_ORDER)).build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))

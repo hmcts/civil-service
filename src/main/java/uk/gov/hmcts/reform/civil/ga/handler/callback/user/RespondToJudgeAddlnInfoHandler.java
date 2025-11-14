@@ -102,7 +102,7 @@ public class RespondToJudgeAddlnInfoHandler extends CallbackHandler implements G
             DocUploadUtils.setRespondedValues(caseDataBuilder, role);
         }
         caseDataBuilder.generalAppAddlnInfoUpload(Collections.emptyList());
-        caseDataBuilder.businessProcess(BusinessProcess.ready(RESPOND_TO_JUDGE_ADDITIONAL_INFO)).build();
+        caseDataBuilder.businessProcess(BusinessProcess.readyGa(RESPOND_TO_JUDGE_ADDITIONAL_INFO)).build();
         caseDataBuilder.generalAppAddlnInfoText(null);
 
         // Generate Dashboard Notification for Lip Party

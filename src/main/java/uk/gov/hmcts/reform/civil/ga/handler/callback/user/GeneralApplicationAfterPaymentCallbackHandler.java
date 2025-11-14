@@ -67,14 +67,14 @@ public class GeneralApplicationAfterPaymentCallbackHandler extends CallbackHandl
         if (caseData.getGeneralAppType().getTypes().contains(
             GeneralApplicationTypes.CONFIRM_CCJ_DEBT_PAID)) {
             caseDataBuilder.businessProcess(BusinessProcess
-                                                .ready(INITIATE_COSC_APPLICATION_AFTER_PAYMENT));
+                                                .readyGa(INITIATE_COSC_APPLICATION_AFTER_PAYMENT));
             log.info(
                 "Business process INITIATE_COSC_APPLICATION_AFTER_PAYMENT has initiated for caseId: {}",
                 caseData.getCcdCaseReference()
             );
         } else {
             caseDataBuilder.businessProcess(BusinessProcess
-                                                .ready(INITIATE_GENERAL_APPLICATION_AFTER_PAYMENT));
+                                                .readyGa(INITIATE_GENERAL_APPLICATION_AFTER_PAYMENT));
             log.info(
                 "Business process INITIATE_GENERAL_APPLICATION_AFTER_PAYMENT has initiated for caseId: {}",
                 caseData.getCcdCaseReference()

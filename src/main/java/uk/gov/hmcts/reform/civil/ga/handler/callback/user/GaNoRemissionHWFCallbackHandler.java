@@ -47,7 +47,7 @@ public class GaNoRemissionHWFCallbackHandler extends HWFCallbackHandlerBase {
         caseData = HwFFeeTypeUtil.updateOutstandingFee(caseData, callbackParams.getRequest().getEventId());
 
         GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> updatedData = caseData.toBuilder()
-            .businessProcess(BusinessProcess.ready(NOTIFY_APPLICANT_LIP_HWF));
+            .businessProcess(BusinessProcess.readyGa(NOTIFY_APPLICANT_LIP_HWF));
         log.info("NOTIFY_APPLICANT_LIP_HWF business process for caseId: {}", caseData.getCcdCaseReference());
 
         HwFFeeTypeUtil.updateEventInHwfDetails(caseData, updatedData, NO_REMISSION_HWF_GA);

@@ -861,7 +861,7 @@ public class JudicialDecisionHandler extends CallbackHandler implements GeneralA
             dataBuilder = updatedCaseData.toBuilder();
         }
         String caseId = caseData.getCcdCaseReference().toString();
-        dataBuilder.businessProcess(BusinessProcess.ready(MAKE_DECISION)).build();
+        dataBuilder.businessProcess(BusinessProcess.readyGa(MAKE_DECISION)).build();
 
         var isApplicationUncloaked = isApplicationContinuesCloakedAfterJudicialDecision(caseData);
         if (Objects.isNull(isApplicationUncloaked)

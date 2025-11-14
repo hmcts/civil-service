@@ -58,7 +58,7 @@ public class UpdatedRefNumberHWFCallbackHandler extends CallbackHandler implemen
 
     private GeneralApplicationCaseData updateHwFReference(GeneralApplicationCaseData caseData) {
         GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> updatedData = caseData.toBuilder()
-                .businessProcess(BusinessProcess.ready(NOTIFY_APPLICANT_LIP_HWF));
+                .businessProcess(BusinessProcess.readyGa(NOTIFY_APPLICANT_LIP_HWF));
         if (caseData.isHWFTypeApplication()) {
             String newRefNumber = getHwFNewReferenceNumber(caseData.getGaHwfDetails());
             ofNullable(caseData.getGeneralAppHelpWithFees())

@@ -65,7 +65,7 @@ public class ResponseToJudgeDirectionsOrder extends CallbackHandler implements G
                                          false
         );
         caseDataBuilder.generalAppDirOrderUpload(Collections.emptyList());
-        caseDataBuilder.businessProcess(BusinessProcess.ready(RESPOND_TO_JUDGE_DIRECTIONS)).build();
+        caseDataBuilder.businessProcess(BusinessProcess.readyGa(RESPOND_TO_JUDGE_DIRECTIONS)).build();
         GeneralApplicationCaseData updatedCaseData = caseDataBuilder.build();
 
         // Generate Dashboard Notification for Lip Party

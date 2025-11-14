@@ -108,7 +108,7 @@ public class ApproveConsentOrderCallbackHandler extends CallbackHandler implemen
     private CallbackResponse setBusinessProcess(CallbackParams callbackParams) {
         GeneralApplicationCaseData caseData = (GeneralApplicationCaseData) callbackParams.getBaseCaseData();
         GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> dataBuilder = caseData.toBuilder();
-        dataBuilder.businessProcess(BusinessProcess.ready(APPROVE_CONSENT_ORDER)).build();
+        dataBuilder.businessProcess(BusinessProcess.readyGa(APPROVE_CONSENT_ORDER)).build();
         log.info("Set business process to APPROVE_CONSENT_ORDER for caseId: {}", caseData.getCcdCaseReference());
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))

@@ -53,7 +53,7 @@ public class UploadTranslatedDocumentCallbackHandler extends CallbackHandler imp
         caseDataBuilder = uploadTranslatedDocumentService.processTranslatedDocument(caseDataBuilder.build(), translator);
         CaseEvent businessProcessEvent = uploadTranslatedDocumentService.getBusinessProcessEvent(caseData);
         if (businessProcessEvent != null) {
-            caseDataBuilder = caseDataBuilder.businessProcess(BusinessProcess.ready(businessProcessEvent));
+            caseDataBuilder = caseDataBuilder.businessProcess(BusinessProcess.readyGa(businessProcessEvent));
         }
         caseDataBuilder.preTranslationGaDocumentType(null);
         GeneralApplicationCaseData updatedCaseData = caseDataBuilder.build();

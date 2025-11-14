@@ -140,7 +140,7 @@ public class HearingScheduledEventCallbackHandler extends CallbackHandler implem
             caseData.getGaHearingNoticeDetail().getHearingLocation().setListItems(null);
         }
         GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> dataBuilder = caseData.toBuilder();
-        dataBuilder.businessProcess(BusinessProcess.ready(HEARING_SCHEDULED_GA)).build();
+        dataBuilder.businessProcess(BusinessProcess.readyGa(HEARING_SCHEDULED_GA)).build();
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
             .build();

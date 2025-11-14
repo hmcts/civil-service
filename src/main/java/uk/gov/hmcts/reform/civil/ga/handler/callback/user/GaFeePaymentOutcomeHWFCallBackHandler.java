@@ -129,7 +129,7 @@ public class GaFeePaymentOutcomeHWFCallBackHandler extends HWFCallbackHandlerBas
                                                               .getGeneralAppHelpWithFees()
                                                               .getHelpWithFeesReferenceNumber())
                                       .outstandingFee(BigDecimal.ZERO).build())
-                    .businessProcess(BusinessProcess.ready(caseEvent)).build();
+                    .businessProcess(BusinessProcess.readyGa(caseEvent)).build();
             } else if (processedCaseData.isHWFTypeAdditional()) {
                 caseData = processedCaseData.toBuilder()
                     .additionalHwfDetails(caseData.getAdditionalHwfDetails().toBuilder()
@@ -138,7 +138,7 @@ public class GaFeePaymentOutcomeHWFCallBackHandler extends HWFCallbackHandlerBas
                                                                       .getGeneralAppHelpWithFees()
                                                                       .getHelpWithFeesReferenceNumber())
                                               .outstandingFee(BigDecimal.ZERO).build())
-                    .businessProcess(BusinessProcess.ready(UPDATE_GA_ADD_HWF))
+                    .businessProcess(BusinessProcess.readyGa(UPDATE_GA_ADD_HWF))
                     .build();
                 log.info("Start business process UPDATE_GA_ADD_HWF for caseId: {}", caseData.getCcdCaseReference());
             } else {

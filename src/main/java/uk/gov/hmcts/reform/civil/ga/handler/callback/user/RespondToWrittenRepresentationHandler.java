@@ -112,7 +112,7 @@ public class RespondToWrittenRepresentationHandler extends CallbackHandler imple
         }
         caseDataBuilder.generalAppWrittenRepUpload(Collections.emptyList());
         caseDataBuilder.generalAppWrittenRepText(null);
-        caseDataBuilder.businessProcess(BusinessProcess.ready(RESPOND_TO_JUDGE_WRITTEN_REPRESENTATION)).build();
+        caseDataBuilder.businessProcess(BusinessProcess.readyGa(RESPOND_TO_JUDGE_WRITTEN_REPRESENTATION)).build();
         GeneralApplicationCaseData updatedCaseData = caseDataBuilder.build();
 
         // Generate Dashboard Notification for Lip Party

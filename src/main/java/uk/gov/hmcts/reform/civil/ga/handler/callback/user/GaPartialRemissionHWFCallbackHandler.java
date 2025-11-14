@@ -76,7 +76,7 @@ public class GaPartialRemissionHWFCallbackHandler extends HWFCallbackHandlerBase
         GeneralApplicationCaseData caseData = (GeneralApplicationCaseData) callbackParams.getBaseCaseData();
         caseData = HwFFeeTypeUtil.updateOutstandingFee(caseData, callbackParams.getRequest().getEventId());
         GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> updatedData = caseData.toBuilder()
-                .businessProcess(BusinessProcess.ready(NOTIFY_APPLICANT_LIP_HWF));
+                .businessProcess(BusinessProcess.readyGa(NOTIFY_APPLICANT_LIP_HWF));
         HwFFeeTypeUtil.updateEventInHwfDetails(caseData, updatedData, PARTIAL_REMISSION_HWF_GA);
 
         return AboutToStartOrSubmitCallbackResponse.builder()

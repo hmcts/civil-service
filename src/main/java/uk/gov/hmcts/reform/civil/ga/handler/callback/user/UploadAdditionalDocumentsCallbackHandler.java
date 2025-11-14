@@ -70,7 +70,7 @@ public class UploadAdditionalDocumentsCallbackHandler extends CallbackHandler im
                                                      caseData.getUploadDocument(), role, true);
 
         caseDataBuilder.uploadDocument(null);
-        caseDataBuilder.businessProcess(BusinessProcess.ready(UPLOAD_ADDL_DOCUMENTS)).build();
+        caseDataBuilder.businessProcess(BusinessProcess.readyGa(UPLOAD_ADDL_DOCUMENTS)).build();
         GeneralApplicationCaseData updatedCaseData = caseDataBuilder.build();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         // Generate Dashboard Notification for Lip Party
