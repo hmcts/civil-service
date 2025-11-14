@@ -38,10 +38,10 @@ public class SetUploadTimelineTypeFlag implements CaseTask {
 
         if (shouldAddTimelineUploadFlag(caseData)) {
             updatedShowConditions.add(TIMELINE_UPLOAD);
-            log.debug("CaseId {}: Timeline upload flag added", caseData.getCcdCaseReference());
+            log.info("CaseId {}: Timeline upload flag added", caseData.getCcdCaseReference());
         } else if (shouldAddTimelineManualFlag(caseData)) {
             updatedShowConditions.add(TIMELINE_MANUALLY);
-            log.debug("CaseId {}: Timeline manual flag added", caseData.getCcdCaseReference());
+            log.info("CaseId {}: Timeline manual flag added", caseData.getCcdCaseReference());
         }
 
         updatedData.showConditionFlags(updatedShowConditions);
@@ -59,7 +59,7 @@ public class SetUploadTimelineTypeFlag implements CaseTask {
     }
 
     private boolean shouldAddTimelineUploadFlag(CaseData caseData) {
-        log.debug("Checking if timeline upload flag should be added for caseId: {}", caseData.getCcdCaseReference());
+        log.info("Checking if timeline upload flag should be added for caseId: {}", caseData.getCcdCaseReference());
         return (YES.equals(caseData.getIsRespondent1())
                 && caseData.getSpecClaimResponseTimelineList() == TimelineUploadTypeSpec.UPLOAD)
                 || (YES.equals(caseData.getIsRespondent2())
@@ -67,7 +67,7 @@ public class SetUploadTimelineTypeFlag implements CaseTask {
     }
 
     private boolean shouldAddTimelineManualFlag(CaseData caseData) {
-        log.debug("Checking if timeline manual flag should be added for caseId: {}", caseData.getCcdCaseReference());
+        log.info("Checking if timeline manual flag should be added for caseId: {}", caseData.getCcdCaseReference());
         return (YES.equals(caseData.getIsRespondent1())
                 && caseData.getSpecClaimResponseTimelineList() == TimelineUploadTypeSpec.MANUAL)
                 || (YES.equals(caseData.getIsRespondent2())

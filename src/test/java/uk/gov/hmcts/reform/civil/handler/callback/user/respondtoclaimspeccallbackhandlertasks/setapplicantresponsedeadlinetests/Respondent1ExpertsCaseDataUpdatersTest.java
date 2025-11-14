@@ -38,12 +38,11 @@ class Respondent1ExpertsCaseDataUpdatersTest {
 
     @Test
     void shouldUpdateCaseDataWhenExpertRequired() {
-        CaseData.CaseDataBuilder<?, ?> updatedData = CaseData.builder()
-                .respondent1DQ(caseData.getRespondent1DQ());
+        CaseData updatedData = updater.update(caseData);
 
-        updater.update(caseData, updatedData);
+        assertThat(updatedData).isNotNull();
 
-        Respondent1DQ updatedRespondent1DQ = updatedData.build().getRespondent1DQ();
+        Respondent1DQ updatedRespondent1DQ = updatedData.getRespondent1DQ();
         assertThat(updatedRespondent1DQ).isNotNull();
 
         Experts updatedExperts = updatedRespondent1DQ.getRespondent1DQExperts();
@@ -62,12 +61,11 @@ class Respondent1ExpertsCaseDataUpdatersTest {
                         .build())
                 .build();
 
-        CaseData.CaseDataBuilder<?, ?> updatedData = CaseData.builder()
-                .respondent1DQ(caseData.getRespondent1DQ());
+        CaseData updatedData = updater.update(caseData);
 
-        updater.update(caseData, updatedData);
+        assertThat(updatedData).isNotNull();
 
-        Respondent1DQ updatedRespondent1DQ = updatedData.build().getRespondent1DQ();
+        Respondent1DQ updatedRespondent1DQ = updatedData.getRespondent1DQ();
         assertThat(updatedRespondent1DQ).isNotNull();
 
         Experts updatedExperts = updatedRespondent1DQ.getRespondent1DQExperts();
@@ -81,11 +79,9 @@ class Respondent1ExpertsCaseDataUpdatersTest {
                 .respondent1DQ(null)
                 .build();
 
-        CaseData.CaseDataBuilder<?, ?> updatedData = CaseData.builder();
+        CaseData updatedData = updater.update(caseData);
 
-        updater.update(caseData, updatedData);
-
-        CaseData result = updatedData.build();
-        assertThat(result.getRespondent1DQ()).isNull();
+        assertThat(updatedData).isNotNull();
+        assertThat(updatedData.getRespondent1DQ()).isNull();
     }
 }

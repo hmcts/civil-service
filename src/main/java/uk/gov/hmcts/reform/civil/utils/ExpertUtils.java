@@ -34,19 +34,19 @@ public class ExpertUtils {
         return experts.toBuilder().details(updatedExpertDetails).build();
     }
 
-    public static void addEventAndDateAddedToRespondentExperts(CaseData.CaseDataBuilder<?, ?> updatedData) {
-        CaseData caseData = updatedData.build();
+    public static void addEventAndDateAddedToRespondentExperts(CaseData caseData) {
         if (caseData.getRespondent1DQ() != null
             && caseData.getRespondent1DQ().getRespondent1DQExperts() != null
             && caseData.getRespondent1DQ().getRespondent1DQExperts().getDetails() != null
-            && !caseData.getRespondent1DQ().getRespondent1DQExperts().getDetails().isEmpty()) {
+            && !caseData.getRespondent1DQ().getRespondent1DQExperts().getDetails().isEmpty()
+            && caseData.getRespondent1ResponseDate() != null) {
             Experts respondent1DQExperts = caseData.getRespondent1DQ().getRespondent1DQExperts();
             Experts updatedRespondent1Experts = addEventAndDateToExperts(
                 respondent1DQExperts,
                 caseData.getRespondent1ResponseDate().toLocalDate(),
                 DEFENDANT_RESPONSE_EVENT.getValue()
             );
-            updatedData.respondent1DQ(caseData.getRespondent1DQ().toBuilder()
+            caseData.setRespondent1DQ(caseData.getRespondent1DQ().toBuilder()
                                           .respondent1DQExperts(updatedRespondent1Experts).build());
 
             // copy in respondent2 for 1v2SS single response
@@ -54,11 +54,11 @@ public class ExpertUtils {
                 && YES.equals(caseData.getRespondent2SameLegalRepresentative())
                 && YES.equals(caseData.getRespondentResponseIsSame())) {
                 if (caseData.getRespondent2DQ() == null) {
-                    updatedData.respondent2DQ(Respondent2DQ.builder()
+                    caseData.setRespondent2DQ(Respondent2DQ.builder()
                                                   .respondent2DQExperts(updatedRespondent1Experts)
                                                   .build());
                 } else {
-                    updatedData.respondent2DQ(caseData.getRespondent2DQ().toBuilder()
+                    caseData.setRespondent2DQ(caseData.getRespondent2DQ().toBuilder()
                                                   .respondent2DQExperts(updatedRespondent1Experts).build());
                 }
             }
@@ -67,31 +67,32 @@ public class ExpertUtils {
         if (caseData.getRespondent2DQ() != null
             && caseData.getRespondent2DQ().getRespondent2DQExperts() != null
             && caseData.getRespondent2DQ().getRespondent2DQExperts().getDetails() != null
-            && !caseData.getRespondent2DQ().getRespondent2DQExperts().getDetails().isEmpty()) {
+            && !caseData.getRespondent2DQ().getRespondent2DQExperts().getDetails().isEmpty()
+            && caseData.getRespondent2ResponseDate() != null) {
             Experts respondent2DQExperts = caseData.getRespondent2DQ().getRespondent2DQExperts();
             Experts updatedRespondent2Experts = addEventAndDateToExperts(
                 respondent2DQExperts,
                 caseData.getRespondent2ResponseDate().toLocalDate(),
                 DEFENDANT_RESPONSE_EVENT.getValue()
             );
-            updatedData.respondent2DQ(caseData.getRespondent2DQ().toBuilder()
+            caseData.setRespondent2DQ(caseData.getRespondent2DQ().toBuilder()
                                           .respondent2DQExperts(updatedRespondent2Experts).build());
         }
     }
 
-    public static void addEventAndDateAddedToApplicantExperts(CaseData.CaseDataBuilder<?, ?> builder) {
-        CaseData caseData = builder.build();
+    public static void addEventAndDateAddedToApplicantExperts(CaseData caseData) {
         if (caseData.getApplicant1DQ() != null
             && caseData.getApplicant1DQ().getApplicant1DQExperts() != null
             && caseData.getApplicant1DQ().getApplicant1DQExperts().getDetails() != null
-            && !caseData.getApplicant1DQ().getApplicant1DQExperts().getDetails().isEmpty()) {
+            && !caseData.getApplicant1DQ().getApplicant1DQExperts().getDetails().isEmpty()
+            && caseData.getApplicant1ResponseDate() != null) {
             Experts applicant1DQExperts = caseData.getApplicant1DQ().getApplicant1DQExperts();
             Experts updatedApplicant1Experts = addEventAndDateToExperts(
                 applicant1DQExperts,
                 caseData.getApplicant1ResponseDate().toLocalDate(),
                 CLAIMANT_INTENTION_EVENT.getValue()
             );
-            builder.applicant1DQ(caseData.getApplicant1DQ().toBuilder()
+            caseData.setApplicant1DQ(caseData.getApplicant1DQ().toBuilder()
                                          .applicant1DQExperts(updatedApplicant1Experts).build());
 
             // copy in applicant 2 for single response
@@ -100,11 +101,11 @@ public class ExpertUtils {
                 && YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1()))
                 || YES.equals(caseData.getApplicant1ProceedWithClaimSpec2v1()))) {
                 if (caseData.getApplicant2DQ() == null) {
-                    builder.applicant2DQ(Applicant2DQ.builder()
+                    caseData.setApplicant2DQ(Applicant2DQ.builder()
                                              .applicant2DQExperts(updatedApplicant1Experts)
                                              .build());
                 } else {
-                    builder.applicant2DQ(caseData.getApplicant2DQ().toBuilder()
+                    caseData.setApplicant2DQ(caseData.getApplicant2DQ().toBuilder()
                                              .applicant2DQExperts(updatedApplicant1Experts).build());
                 }
             }
@@ -113,14 +114,15 @@ public class ExpertUtils {
         if (caseData.getApplicant2DQ() != null
             && caseData.getApplicant2DQ().getApplicant2DQExperts() != null
             && caseData.getApplicant2DQ().getApplicant2DQExperts().getDetails() != null
-            && !caseData.getApplicant2DQ().getApplicant2DQExperts().getDetails().isEmpty()) {
+            && !caseData.getApplicant2DQ().getApplicant2DQExperts().getDetails().isEmpty()
+            && caseData.getApplicant2ResponseDate() != null) {
             Experts applicant2DQExperts = caseData.getApplicant2DQ().getApplicant2DQExperts();
             Experts updatedApplicant2Experts = addEventAndDateToExperts(
                 applicant2DQExperts,
                 caseData.getApplicant2ResponseDate().toLocalDate(),
                 CLAIMANT_INTENTION_EVENT.getValue()
             );
-            builder.applicant2DQ(caseData.getApplicant2DQ().toBuilder()
+            caseData.setApplicant2DQ(caseData.getApplicant2DQ().toBuilder()
                                          .applicant2DQExperts(updatedApplicant2Experts).build());
         }
     }

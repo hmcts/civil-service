@@ -43,7 +43,7 @@ public class BuildConfirmationTask implements CaseTask {
         SubmittedCallbackResponse.SubmittedCallbackResponseBuilder responseBuilder =
             SubmittedCallbackResponse.builder();
 
-        log.debug("Setting confirmation Body & Header for Case : {} ", caseData.getCcdCaseReference());
+        log.info("Setting confirmation Body & Header for Case : {} ", caseData.getCcdCaseReference());
         responseBuilder.confirmationBody(
                 CaseDataToTextGenerator.getTextFor(
                     confirmationTextGenerators.stream(),

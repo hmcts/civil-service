@@ -105,10 +105,10 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
             }
         }
         if (errors.isEmpty()) {
-            CaseData.CaseDataBuilder<?, ?> updatedData = getPartyDetails(callbackParams);
+            caseData = callbackParams.getCaseData();
+            setPartyDetails(caseData, callbackParams);
             return AboutToStartOrSubmitCallbackResponse.builder()
-                .data(updatedData.build().toMap(objectMapper))
-                .build();
+                .data(caseData.toMap(objectMapper)).build();
         } else {
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(errors)
@@ -116,18 +116,15 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
         }
     }
 
-    private CaseData.CaseDataBuilder<?, ?> getPartyDetails(CallbackParams callbackParams) {
-        var caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
+    private void setPartyDetails(CaseData caseData, CallbackParams callbackParams) {
         List<String> roles = getUserRole(callbackParams);
         if (isApplicantSolicitor(roles)) {
-            updatedData.casePartyRequestForReconsideration("Applicant");
+            caseData.setCasePartyRequestForReconsideration("Applicant");
         } else if (isRespondentSolicitorOne(roles)) {
-            updatedData.casePartyRequestForReconsideration("Respondent1");
+            caseData.setCasePartyRequestForReconsideration("Respondent1");
         } else if (isRespondentSolicitorTwo(roles)) {
-            updatedData.casePartyRequestForReconsideration("Respondent2");
+            caseData.setCasePartyRequestForReconsideration("Respondent2");
         }
-        return updatedData;
     }
 
     private boolean applicant2Present(CaseData caseData) {
@@ -146,7 +143,6 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
 
     private CallbackResponse saveRequestForReconsiderationReason(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
         List<String> roles = getUserRole(callbackParams);
         StringBuilder partyName = new StringBuilder();
         if (isApplicantSolicitor(roles)) {
@@ -159,15 +155,15 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
             if (StringUtils.isBlank(reasonForReconsideration.getReasonForReconsiderationTxt())) {
                 reasonForReconsideration.setReasonForReconsiderationTxt(REASON_NOT_PROVIDED);
             }
-            updatedData.reasonForReconsiderationApplicant(reasonForReconsideration);
+            caseData.setReasonForReconsiderationApplicant(reasonForReconsideration);
             if (featureToggleService.isCaseProgressionEnabled() && caseData.isRespondent1LiP()) {
-                updatedData.requestForReconsiderationDocument(documentGenerator.generateLiPDocument(
+                caseData.setRequestForReconsiderationDocument(documentGenerator.generateLiPDocument(
                     caseData,
                     callbackParams.getParams().get(BEARER_TOKEN).toString(),
                     true
                 ));
-                updatedData.businessProcess(BusinessProcess.ready(REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI_CLAIMANT));
-                updatedData.orderRequestedForReviewClaimant(YES);
+                caseData.setBusinessProcess(BusinessProcess.ready(REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI_CLAIMANT));
+                caseData.setOrderRequestedForReviewClaimant(YES);
             }
         } else if (isRespondentSolicitorOne(roles)) {
             partyName.append(DEFENDANT);
@@ -180,15 +176,15 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
             if (StringUtils.isBlank(reasonForReconsideration.getReasonForReconsiderationTxt())) {
                 reasonForReconsideration.setReasonForReconsiderationTxt(REASON_NOT_PROVIDED);
             }
-            updatedData.reasonForReconsiderationRespondent1(reasonForReconsideration);
+            caseData.setReasonForReconsiderationRespondent1(reasonForReconsideration);
             if (featureToggleService.isCaseProgressionEnabled() && caseData.isApplicantLiP()) {
-                updatedData.requestForReconsiderationDocumentRes(documentGenerator.generateLiPDocument(
+                caseData.setRequestForReconsiderationDocumentRes(documentGenerator.generateLiPDocument(
                     caseData,
                     callbackParams.getParams().get(BEARER_TOKEN).toString(),
                     false
                 ));
-                updatedData.businessProcess(BusinessProcess.ready(REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI_DEFENDANT));
-                updatedData.orderRequestedForReviewDefendant(YES);
+                caseData.setBusinessProcess(BusinessProcess.ready(REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI_DEFENDANT));
+                caseData.setOrderRequestedForReviewDefendant(YES);
             }
         } else if (isRespondentSolicitorTwo(roles)) {
             partyName.append(DEFENDANT);
@@ -198,7 +194,7 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
             if (StringUtils.isBlank(reasonForReconsideration.getReasonForReconsiderationTxt())) {
                 reasonForReconsideration.setReasonForReconsiderationTxt(REASON_NOT_PROVIDED);
             }
-            updatedData.reasonForReconsiderationRespondent2(reasonForReconsideration);
+            caseData.setReasonForReconsiderationRespondent2(reasonForReconsideration);
         } else if (featureToggleService.isCaseProgressionEnabled() && isLIPClaimant(roles)) {
             ReasonForReconsideration reasonForReconsideration = Optional
                 .ofNullable(caseData.getReasonForReconsiderationApplicant())
@@ -208,30 +204,30 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
                 caseData.getApplicant1(),
                 caseData.getApplicant2()
             ));
-            updatedData.reasonForReconsiderationApplicant(reasonForReconsideration);
+            caseData.setReasonForReconsiderationApplicant(reasonForReconsideration);
             reasonForReconsideration.setReasonForReconsiderationTxt(Optional.ofNullable(caseData.getCaseDataLiP())
                                                                         .map(CaseDataLiP::getRequestForReviewCommentsClaimant)
                                                                         .filter(StringUtils::isNotBlank)
                                                                         .orElse(REASON_NOT_PROVIDED));
 
             // visible if respondent is LiP but also because CUI confirmation page includes the link
-            updatedData.requestForReconsiderationDocument(documentGenerator.generateLiPDocument(
+            caseData.setRequestForReconsiderationDocument(documentGenerator.generateLiPDocument(
                 caseData,
-                callbackParams.getParams().get(
-                    BEARER_TOKEN).toString(),
+                callbackParams.getParams().get(BEARER_TOKEN).toString(),
                 true
             ));
 
-            updatedData.orderRequestedForReviewClaimant(YES);
-            updatedData.businessProcess(BusinessProcess.ready(REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI_CLAIMANT));
+            caseData.setOrderRequestedForReviewClaimant(YES);
+            caseData.setBusinessProcess(BusinessProcess.ready(REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI_CLAIMANT));
         } else if (featureToggleService.isCaseProgressionEnabled() && isLIPDefendant(roles)) {
             ReasonForReconsideration reasonForReconsideration = Optional
                 .ofNullable(caseData.getReasonForReconsiderationRespondent1())
                 .orElseGet(ReasonForReconsideration::new);
-            reasonForReconsideration.setRequestor(getPartyAsRequestor(DEFENDANT,
-                                                                      caseData.getRespondent1(), null
+            reasonForReconsideration.setRequestor(getPartyAsRequestor(
+                DEFENDANT,
+                caseData.getRespondent1(), null
             ));
-            updatedData.reasonForReconsiderationRespondent1(reasonForReconsideration);
+            caseData.setReasonForReconsiderationRespondent1(reasonForReconsideration);
             reasonForReconsideration.setReasonForReconsiderationTxt(
                 Optional.ofNullable(caseData.getCaseDataLiP())
                     .map(CaseDataLiP::getRequestForReviewCommentsDefendant)
@@ -240,18 +236,17 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
             );
 
             // visible if applicant is LiP but also because CUI confirmation page includes the link
-            updatedData.requestForReconsiderationDocumentRes(documentGenerator.generateLiPDocument(
+            caseData.setRequestForReconsiderationDocumentRes(documentGenerator.generateLiPDocument(
                 caseData,
-                callbackParams.getParams().get(
-                    BEARER_TOKEN).toString(),
+                callbackParams.getParams().get(BEARER_TOKEN).toString(),
                 false
             ));
 
-            updatedData.orderRequestedForReviewDefendant(YES);
-            updatedData.businessProcess(BusinessProcess.ready(REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI_DEFENDANT));
+            caseData.setOrderRequestedForReviewDefendant(YES);
+            caseData.setBusinessProcess(BusinessProcess.ready(REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI_DEFENDANT));
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedData.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 

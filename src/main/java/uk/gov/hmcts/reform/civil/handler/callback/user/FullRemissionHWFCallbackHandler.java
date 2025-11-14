@@ -51,21 +51,20 @@ public class FullRemissionHWFCallbackHandler extends CallbackHandler {
 
     private CallbackResponse fullRemissionHWF(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder()
-            .businessProcess(BusinessProcess.ready(NOTIFY_LIP_CLAIMANT_HWF_OUTCOME));
+        caseData.setBusinessProcess(BusinessProcess.ready(NOTIFY_LIP_CLAIMANT_HWF_OUTCOME));
         BigDecimal claimFeeAmount = caseData.getCalculatedClaimFeeInPence();
         BigDecimal hearingFeeAmount = caseData.getCalculatedHearingFeeInPence();
 
         if (caseData.isHWFTypeClaimIssued() && claimFeeAmount.compareTo(BigDecimal.ZERO) != 0) {
             Optional.ofNullable(caseData.getClaimIssuedHwfDetails())
                 .ifPresentOrElse(
-                    claimIssuedHwfDetails -> updatedData.claimIssuedHwfDetails(
+                    claimIssuedHwfDetails -> caseData.setClaimIssuedHwfDetails(
                         claimIssuedHwfDetails.toBuilder().remissionAmount(claimFeeAmount)
                             .outstandingFeeInPounds(BigDecimal.ZERO)
                             .hwfCaseEvent(FULL_REMISSION_HWF)
                             .build()
                     ),
-                    () -> updatedData.claimIssuedHwfDetails(
+                    () -> caseData.setClaimIssuedHwfDetails(
                         HelpWithFeesDetails.builder().remissionAmount(claimFeeAmount)
                             .outstandingFeeInPounds(BigDecimal.ZERO)
                             .hwfCaseEvent(FULL_REMISSION_HWF)
@@ -75,23 +74,23 @@ public class FullRemissionHWFCallbackHandler extends CallbackHandler {
         } else if (caseData.isHWFTypeHearing() && hearingFeeAmount.compareTo(BigDecimal.ZERO) != 0) {
             Optional.ofNullable(caseData.getHearingHwfDetails())
                 .ifPresentOrElse(
-                    hearingHwfDetails -> updatedData.hearingHwfDetails(
+                    hearingHwfDetails -> caseData.setHearingHwfDetails(
                         HelpWithFeesDetails.builder().remissionAmount(hearingFeeAmount)
                             .outstandingFeeInPounds(BigDecimal.ZERO)
                             .hwfCaseEvent(FULL_REMISSION_HWF)
                             .build()
                     ),
-                    () -> updatedData.hearingHwfDetails(
+                    () -> caseData.setHearingHwfDetails(
                         HelpWithFeesDetails.builder().remissionAmount(hearingFeeAmount)
                             .hwfCaseEvent(FULL_REMISSION_HWF)
                             .build()
                     )
                 );
         }
-        helpWithFeesForTabService.setUpHelpWithFeeTab(updatedData);
+        helpWithFeesForTabService.setUpHelpWithFeeTab(caseData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedData.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 }

@@ -404,8 +404,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private  MediationAvailability resp1MediationAvailability;
     private  MediationAvailability resp2MediationAvailability;
 
-    private  String additionalInformationForJudge;
-    private  String applicantAdditionalInformationForJudge;
+    private final String additionalInformationForJudge;
+    private final String applicantAdditionalInformationForJudge;
     @JsonUnwrapped
     private  ExpertRequirements respondToClaimExperts;
 

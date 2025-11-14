@@ -78,24 +78,21 @@ public class ResetPinCUICallbackHandler extends CallbackHandler {
 
     private CallbackResponse resetPinExpiryDate(CallbackParams callbackParams) {
         log.info("Resetting pin expiry date for case id: {}", callbackParams.getCaseData().getCcdCaseReference());
-        CaseData updatedCase = callbackParams.getCaseData().toBuilder()
-            .respondent1PinToPostLRspec(defendantPinToPostLRspecService
-                .resetPinExpiryDate(callbackParams
-                    .getCaseData()
-                    .getRespondent1PinToPostLRspec()))
+        CaseData caseData = callbackParams.getCaseData();
+        caseData.setRespondent1PinToPostLRspec(defendantPinToPostLRspecService
+                                                   .resetPinExpiryDate(caseData.getRespondent1PinToPostLRspec()));
 
-            .build();
-        List<String> errors = resetPinDefendantLipNotifier.notifyParties(updatedCase);
+        List<String> errors = resetPinDefendantLipNotifier.notifyParties(caseData);
 
         if (!errors.isEmpty()) {
-            log.error("Error sending notification for case id {} : {}", updatedCase.getCcdCaseReference(), errors);
+            log.error("Error sending notification for case id {} : {}", caseData.getCcdCaseReference(), errors);
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(errors)
                 .build();
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCase.toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 }

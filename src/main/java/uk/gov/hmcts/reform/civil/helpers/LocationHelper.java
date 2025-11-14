@@ -202,11 +202,11 @@ public class LocationHelper {
      * @param getLocations   how to get the list of locations
      * @return matching location
      */
-    public Optional<LocationRefData> updateCaseManagementLocation(CaseData.CaseDataBuilder<?, ?> updatedData,
+    public Optional<LocationRefData> updateCaseManagementLocation(CaseData updatedData,
                                                                   RequestedCourt requestedCourt,
                                                                   Supplier<List<LocationRefData>> getLocations) {
         Optional<LocationRefData> matchingLocation = getMatching(getLocations.get(), requestedCourt);
-        Long reference = updatedData.build().getCcdCaseReference();
+        Long reference = updatedData.getCcdCaseReference();
         if (log.isInfoEnabled()) {
             Optional.ofNullable(requestedCourt)
                 .map(RequestedCourt::getCaseLocation)
@@ -221,14 +221,14 @@ public class LocationHelper {
             );
         }
         updatedData
-            .caseManagementLocation(Stream.of(
+            .setCaseManagementLocation(Stream.of(
                     Optional.ofNullable(requestedCourt).map(RequestedCourt::getCaseLocation),
                     matchingLocation.map(LocationHelper::buildCaseLocation)
                 ).filter(Optional::isPresent)
                                         .map(Optional::get)
                                         .filter(this::isValidCaseLocation)
                                         .findFirst().orElseGet(CaseLocationCivil::new));
-        matchingLocation.map(LocationRefData::getSiteName).ifPresent(updatedData::locationName);
+        matchingLocation.map(LocationRefData::getSiteName).ifPresent(updatedData::setLocationName);
         return matchingLocation;
     }
 

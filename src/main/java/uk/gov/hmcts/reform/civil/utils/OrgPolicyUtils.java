@@ -32,17 +32,16 @@ public class OrgPolicyUtils {
             ? orgPolicy.getOrganisation().getOrganisationID() : null;
     }
 
-    public static void addMissingOrgPolicies(CaseData.CaseDataBuilder dataBuilder) {
-        CaseData caseData = dataBuilder.build();
+    public static void addMissingOrgPolicies(CaseData caseData) {
         if (caseData.getRespondent1OrganisationPolicy() == null) {
-            dataBuilder
-                .respondent1OrganisationPolicy(OrganisationPolicy.builder()
+            caseData
+                .setRespondent1OrganisationPolicy(OrganisationPolicy.builder()
                                                    .orgPolicyCaseAssignedRole(RESPONDENTSOLICITORONE.getFormattedName())
                                                    .build());
         }
         if (caseData.getRespondent2OrganisationPolicy() == null) {
-            dataBuilder
-                .respondent2OrganisationPolicy(OrganisationPolicy.builder()
+            caseData
+                .setRespondent2OrganisationPolicy(OrganisationPolicy.builder()
                                                    .orgPolicyCaseAssignedRole(RESPONDENTSOLICITORTWO.getFormattedName())
                                                    .build());
         }

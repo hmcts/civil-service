@@ -47,10 +47,9 @@ public class RequestForReconsiderationNotificationDeadlineCallbackHandler extend
 
     private CallbackResponse deleteNotifications(CallbackParams callbackParams) {
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        CaseData caseData = callbackParams.getCaseData().toBuilder()
-            .build();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        caseDataBuilder.requestForReconsiderationDeadlineChecked(YesOrNo.YES).build();
+        CaseData caseData = callbackParams.getCaseData();
+        caseData.setRequestForReconsiderationDeadlineChecked(YesOrNo.YES);
+
         HashMap<String, Object> paramsMap = mapper.mapCaseDataToParams(caseData);
 
         dashboardScenariosService.recordScenarios(
@@ -61,7 +60,7 @@ public class RequestForReconsiderationNotificationDeadlineCallbackHandler extend
         );
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 }

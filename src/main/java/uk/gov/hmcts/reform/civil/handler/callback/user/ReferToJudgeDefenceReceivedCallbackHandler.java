@@ -27,6 +27,9 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REFER_JUDGE_DEFENCE_R
 public class ReferToJudgeDefenceReceivedCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(REFER_JUDGE_DEFENCE_RECEIVED);
+    private static final String CASE_REFERRED_TO_JUDGE = "# The case has been referred to a judge for a decision";
+    private static final String GET_BODY_STRING = "<br />";
+
     protected final ObjectMapper objectMapper;
 
     @Override
@@ -45,13 +48,9 @@ public class ReferToJudgeDefenceReceivedCallbackHandler extends CallbackHandler 
             .build();
     }
 
-    private static final String CASE_REFERRED_TO_JUDGE = "# The case has been referred to a judge for a decision";
-
     private String getHeader() {
         return CASE_REFERRED_TO_JUDGE;
     }
-
-    private static final String GET_BODY_STRING = "<br />";
 
     private String getBody() {
         return GET_BODY_STRING;
@@ -59,9 +58,10 @@ public class ReferToJudgeDefenceReceivedCallbackHandler extends CallbackHandler 
 
     private CallbackResponse saveReferToJudgeDefenceReceivedInTimeDetails(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> dataBuilder = caseData.toBuilder();
+
+        // No modifications needed - just return the existing caseData
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(dataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 

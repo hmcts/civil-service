@@ -138,8 +138,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
     private CallbackResponse setGenericResponseTypeFlag(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> updatedData =
-            caseData.toBuilder().multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.NOT_FULL_DEFENCE);
+        caseData.setMultiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.NOT_FULL_DEFENCE);
 
         YesOrNo isRespondent1 = YES;
         if (isSolicitorRepresentingOnlyOneOrBothRespondents(callbackParams, RESPONDENTSOLICITORTWO)) {
@@ -147,9 +146,9 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         }
 
         if (isResponseMatchingType(caseData, isRespondent1, RespondentResponseType.FULL_DEFENCE)) {
-            updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_DEFENCE).build();
+            caseData.setMultiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_DEFENCE);
         } else if (isResponseMatchingType(caseData, isRespondent1, RespondentResponseType.PART_ADMISSION)) {
-            updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.PART_ADMISSION).build();
+            caseData.setMultiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.PART_ADMISSION);
         }
 
         List<String> errors = new ArrayList<>();
@@ -162,7 +161,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
-            .data(updatedData.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 

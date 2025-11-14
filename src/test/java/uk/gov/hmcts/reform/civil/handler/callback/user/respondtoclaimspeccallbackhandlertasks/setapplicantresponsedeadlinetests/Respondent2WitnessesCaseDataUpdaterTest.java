@@ -45,7 +45,7 @@ class Respondent2WitnessesCaseDataUpdaterTest {
         CaseData.CaseDataBuilder<?, ?> updatedData = CaseData.builder()
                 .respondent2DQ(caseData.getRespondent2DQ());
 
-        updater.update(caseData, updatedData);
+        updater.update(caseData);
 
         Respondent2DQ updatedRespondent2DQ = updatedData.build().getRespondent2DQ();
         assertThat(updatedRespondent2DQ).isNotNull();
@@ -63,7 +63,7 @@ class Respondent2WitnessesCaseDataUpdaterTest {
         CaseData.CaseDataBuilder<?, ?> updatedData = CaseData.builder()
                 .respondent2DQ(caseData.getRespondent2DQ());
 
-        updater.update(caseData, updatedData);
+        updater.update(caseData);
 
         Respondent2DQ updatedRespondent2DQ = updatedData.build().getRespondent2DQ();
         assertThat(updatedRespondent2DQ).isNotNull();

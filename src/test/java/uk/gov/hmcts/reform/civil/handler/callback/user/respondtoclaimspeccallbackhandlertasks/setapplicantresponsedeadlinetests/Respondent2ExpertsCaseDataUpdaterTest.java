@@ -39,10 +39,9 @@ class Respondent2ExpertsCaseDataUpdaterTest {
 
     @Test
     void shouldUpdateCaseDataWithExperts() {
-        CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
-        updater.update(caseData, updatedData);
+        CaseData result = updater.update(caseData);
 
-        Respondent2DQ updatedRespondent2DQ = updatedData.build().getRespondent2DQ();
+        Respondent2DQ updatedRespondent2DQ = result.getRespondent2DQ();
         assertThat(updatedRespondent2DQ).isNotNull();
 
         Experts updatedExperts = updatedRespondent2DQ.getRespondent2DQExperts();
@@ -58,15 +57,14 @@ class Respondent2ExpertsCaseDataUpdaterTest {
     @Test
     void shouldHandleNoExpertsRequired() {
         Respondent2DQ respondent2DQ = Respondent2DQ.builder().build();
-        caseData = caseData.toBuilder()
+        CaseData testCaseData = CaseData.builder()
                 .respondent2DQ(respondent2DQ)
                 .responseClaimExpertSpecRequired2(YesOrNo.NO)
                 .build();
 
-        CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
-        updater.update(caseData, updatedData);
+        CaseData result = updater.update(testCaseData);
 
-        Respondent2DQ updatedRespondent2DQ = updatedData.build().getRespondent2DQ();
+        Respondent2DQ updatedRespondent2DQ = result.getRespondent2DQ();
         assertThat(updatedRespondent2DQ).isNotNull();
 
         Experts updatedExperts = updatedRespondent2DQ.getRespondent2DQExperts();

@@ -44,14 +44,14 @@ public class SetSettlementAgreementDeadlineCallbackHandler extends CallbackHandl
     private CallbackResponse setSettlementAgreementDeadline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime currentDateTime = LocalDateTime.now();
-        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
         if (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual()) {
-            builder.respondent1RespondToSettlementAgreementDeadline(getRespondToSettlementAgreementDeadline(caseData, currentDateTime));
+            caseData.setRespondent1RespondToSettlementAgreementDeadline(
+                getRespondToSettlementAgreementDeadline(caseData, currentDateTime)
+            );
         }
-        CaseData updatedData = builder.build();
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response =
             AboutToStartOrSubmitCallbackResponse.builder()
-                .data(updatedData.toMap(objectMapper));
+                .data(caseData.toMap(objectMapper));
 
         return response.build();
     }

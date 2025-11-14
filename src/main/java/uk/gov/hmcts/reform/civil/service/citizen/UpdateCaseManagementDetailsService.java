@@ -38,53 +38,51 @@ public class UpdateCaseManagementDetailsService {
     private final AirlineEpimsService airlineEpimsService;
     private static final String LIVERPOOL_SITE_NAME = "Liverpool Civil and Family Court";
 
-    public void updateCaseManagementDetails(CaseData.CaseDataBuilder<?, ?> builder, CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
+    public void updateCaseManagementDetails(CaseData caseData, CallbackParams callbackParams) {
         final List<LocationRefData> availableLocations = fetchLocationData(callbackParams);
 
-        updateApplicant1RequestedCourtDetails(caseData, builder, availableLocations);
+        updateApplicant1RequestedCourtDetails(caseData, availableLocations);
 
-        caseData = builder.build();
         if (caseData.getIsFlightDelayClaim() == YesOrNo.YES && caseData.isSmallClaim()) {
-            updateFlightDelayCaseManagementLocation(caseData, builder, availableLocations);
+            updateFlightDelayCaseManagementLocation(caseData, availableLocations);
         } else {
             locationHelper.getCaseManagementLocation(caseData)
                 .ifPresent(requestedCourt -> locationHelper.updateCaseManagementLocation(
-                    builder,
+                    caseData,
                     requestedCourt,
                     () -> locationRefDataService.getCourtLocationsForDefaultJudgments(callbackParams.getParams().get(
                         CallbackParams.Params.BEARER_TOKEN).toString())
                 ));
         }
 
-        builder.caseNameHmctsInternal(caseParticipants(caseData).toString());
+        caseData.setCaseNameHmctsInternal(caseParticipants(caseData).toString());
 
         CaseManagementCategoryElement civil =
             CaseManagementCategoryElement.builder().code("Civil").label("Civil").build();
         List<Element<CaseManagementCategoryElement>> itemList = new ArrayList<>();
         itemList.add(element(civil));
-        builder.caseManagementCategory(
+        caseData.setCaseManagementCategory(
             CaseManagementCategory.builder().value(civil).list_items(itemList).build());
 
     }
 
     private void updateFlightDelayCaseManagementLocation(
-        CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder, List<LocationRefData> availableLocations) {
+        CaseData caseData, List<LocationRefData> availableLocations) {
         Optional.ofNullable(caseData.getFlightDelayDetails())
             .map(FlightDelayDetails::getNameOfAirline)
             .map(airline -> mapToLocation(airline, availableLocations))
-            .ifPresent(caseLocationCivil -> setCaseManagementLocation(builder, caseLocationCivil, availableLocations));
+            .ifPresent(caseLocationCivil -> setCaseManagementLocation(caseData, caseLocationCivil, availableLocations));
     }
 
     public void setCaseManagementLocation(
-        CaseData.CaseDataBuilder<?, ?> builder, CaseLocationCivil caseLocationCivil, List<LocationRefData> availableLocations) {
-        builder.caseManagementLocation(caseLocationCivil);
+        CaseData caseData, CaseLocationCivil caseLocationCivil, List<LocationRefData> availableLocations) {
+        caseData.setCaseManagementLocation(caseLocationCivil);
         availableLocations.stream()
             .filter(locationRefData -> locationRefData.getRegionId().equals(caseLocationCivil.getRegion())
                 && locationRefData.getEpimmsId().equals(caseLocationCivil.getBaseLocation()))
             .findFirst()
             .map(LocationRefData::getSiteName)
-            .ifPresent(builder::locationName);
+            .ifPresent(caseData::setLocationName);
     }
 
     private CaseLocationCivil mapToLocation(String airlineName, List<LocationRefData> availableLocations) {
@@ -104,19 +102,19 @@ public class UpdateCaseManagementDetailsService {
                         .orElse(null));
     }
 
-    private void updateApplicant1RequestedCourtDetails(CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder, List<LocationRefData> availableLocations) {
+    private void updateApplicant1RequestedCourtDetails(CaseData caseData, List<LocationRefData> availableLocations) {
         Optional.ofNullable(caseData.getApplicant1DQ())
             .ifPresent(dq -> Optional.ofNullable(dq.getApplicant1DQRequestedCourt())
-                .ifPresent(requestedCourt -> builder.applicant1DQ(
+                .ifPresent(requestedCourt -> caseData.setApplicant1DQ(
                     dq.toBuilder().applicant1DQRequestedCourt(correctCaseLocation(requestedCourt, availableLocations))
                         .build())));
     }
 
-    public void updateRespondent1RequestedCourtDetails(CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder, List<LocationRefData> availableLocations) {
+    public void updateRespondent1RequestedCourtDetails(CaseData caseData, List<LocationRefData> availableLocations) {
         if (caseData.isRespondent1LiP()) {
             Optional.ofNullable(caseData.getRespondent1DQ())
                 .ifPresent(dq -> Optional.ofNullable(dq.getRespondent1DQRequestedCourt())
-                    .ifPresent(requestedCourt -> builder.respondent1DQ(
+                    .ifPresent(requestedCourt -> caseData.setRespondent1DQ(
                         dq.toBuilder().respondent1DQRequestedCourt(correctCaseLocation(requestedCourt, availableLocations))
                             .build())));
         }

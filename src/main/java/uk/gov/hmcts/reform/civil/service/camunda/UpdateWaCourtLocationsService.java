@@ -33,8 +33,7 @@ public class UpdateWaCourtLocationsService {
     @Value("${court-location.specified-claim.epimms-id}") private String cnbcEpimmId;
     @Value("${court-location.unspecified-claim.epimms-id}") private String ccmccEpimmId;
 
-    public void updateCourtListingWALocations(String authorisation, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
-        CaseData caseData = caseDataBuilder.build();
+    public void updateCourtListingWALocations(String authorisation, CaseData caseData) {
         List<LocationRefData> locationRefDataList = locationRefDataService.getHearingCourtLocations(authorisation);
 
         String claimTrack = getClaimTrack(caseData);
@@ -44,15 +43,15 @@ public class UpdateWaCourtLocationsService {
             LocationRefData caseManagementLocationName = courtLocationDetails(locationRefDataList,
                                                                               caseData.getCaseManagementLocation().getBaseLocation(),
                                                                               "CML location");
-            caseDataBuilder.caseManagementLocationTab(TaskManagementLocationTab.builder()
+            caseData.setCaseManagementLocationTab(TaskManagementLocationTab.builder()
                                                           .caseManagementLocation(caseManagementLocationName.getSiteName())
                                                           .build());
-            caseDataBuilder.taskManagementLocations(null);
+            caseData.setTaskManagementLocations(null);
             return;
         }
 
         Map<String, Object> evaluatedCourtMap = camundaRuntimeClient
-            .getEvaluatedDmnCourtLocations(caseDataBuilder.build().getCaseManagementLocation().getBaseLocation(), claimTrack);
+            .getEvaluatedDmnCourtLocations(caseData.getCaseManagementLocation().getBaseLocation(), claimTrack);
         DmnListingLocations dmnListingLocations = objectMapper.convertValue(evaluatedCourtMap, DmnListingLocations.class);
 
         try {
@@ -65,7 +64,7 @@ public class UpdateWaCourtLocationsService {
             LocationRefData trialListing = courtLocationDetails(locationRefDataList,
                                                                 dmnListingLocations.getTrialListingLocation().getValue(), "Trial Listing");
 
-            caseDataBuilder.taskManagementLocations(TaskManagementLocationTypes.builder()
+            caseData.setTaskManagementLocations(TaskManagementLocationTypes.builder()
                                                         .cmcListingLocation(TaskManagementLocationsModel.builder()
                                                                                 .region(cmcListing.getRegionId())
                                                                                 .regionName(cmcListing.getRegion())
@@ -92,15 +91,14 @@ public class UpdateWaCourtLocationsService {
                                                                                   .build())
                                                         .build());
 
-            populateSummaryTab(caseDataBuilder, locationRefDataList);
+            populateSummaryTab(caseData, locationRefDataList);
 
         } catch (NullPointerException e) {
             log.info("Court epimmId missing");
         }
     }
 
-    private void populateSummaryTab(CaseData.CaseDataBuilder<?, ?> caseDataBuilder, List<LocationRefData> locationRefDataList) {
-        CaseData caseData = caseDataBuilder.build();
+    private void populateSummaryTab(CaseData caseData, List<LocationRefData> locationRefDataList) {
 
         TaskManagementLocationTab tabContent = TaskManagementLocationTab.builder()
             .cmcListingLocation(caseData.getTaskManagementLocations().getCmcListingLocation().getLocationName())
@@ -117,11 +115,11 @@ public class UpdateWaCourtLocationsService {
                                                                           caseData.getCaseManagementLocation().getBaseLocation(),
                                                                           "CML location");
 
-        caseDataBuilder.caseManagementLocationTab(TaskManagementLocationTab.builder()
+        caseData.setCaseManagementLocationTab(TaskManagementLocationTab.builder()
                                                       .caseManagementLocation(caseManagementLocationName.getSiteName())
                                                       .build());
 
-        caseDataBuilder.taskManagementLocationsTab(tabContent).build();
+        caseData.setTaskManagementLocationsTab(tabContent);
     }
 
     private LocationRefData courtLocationDetails(List<LocationRefData> locationRefDataList, String court, String courtType) {

@@ -34,7 +34,7 @@ public class ResourceExceptionHandler {
     @ExceptionHandler(value = CallbackException.class)
     public ResponseEntity<Object> notFound(Exception exception,
                                            ContentCachingRequestWrapper contentCachingRequestWrapper) {
-        log.debug(exception.getMessage(), exception);
+        log.info(exception.getMessage(), exception);
         String errorMessage = "Not found error with message: %s for case %s run by user %s";
         log.error(errorMessage.formatted(exception.getMessage(), getCaseId(contentCachingRequestWrapper),
                                          getUserId(contentCachingRequestWrapper)));
@@ -44,7 +44,7 @@ public class ResourceExceptionHandler {
     @ExceptionHandler({ClientAbortException.class})
     public ResponseEntity<String> handleClientAbortException(Exception exception,
                                                              ContentCachingRequestWrapper contentCachingRequestWrapper) {
-        log.debug(exception.getMessage(), exception);
+        log.info(exception.getMessage(), exception);
         String errorMessage = "Request aborted error with message: %s for case %s run by user %s";
         log.error(errorMessage.formatted(exception.getMessage(), getCaseId(contentCachingRequestWrapper),
                                          getUserId(contentCachingRequestWrapper)));
@@ -59,7 +59,7 @@ public class ResourceExceptionHandler {
     })
     public ResponseEntity<Object> incorrectStateFlowOrIllegalArgument(Exception exception,
                                                                       ContentCachingRequestWrapper contentCachingRequestWrapper) {
-        log.debug(exception.getMessage(), exception);
+        log.info(exception.getMessage(), exception);
         String errorMessage = "Illegal flow state / illegal arg error with message: %s for case %s run by user %s";
         log.error(errorMessage.formatted(exception.getMessage(), getCaseId(contentCachingRequestWrapper),
                                          getUserId(contentCachingRequestWrapper)));
@@ -69,7 +69,7 @@ public class ResourceExceptionHandler {
     @ExceptionHandler(value = HttpClientErrorException.BadRequest.class)
     public ResponseEntity<Object> badRequest(Exception exception,
                                              ContentCachingRequestWrapper contentCachingRequestWrapper) {
-        log.debug(exception.getMessage(), exception);
+        log.info(exception.getMessage(), exception);
         String errorMessage = "Bad request error with message: %s for case %s run by user %s";
         log.error(errorMessage.formatted(exception.getMessage(), getCaseId(contentCachingRequestWrapper),
                                          getUserId(contentCachingRequestWrapper)));
@@ -82,7 +82,7 @@ public class ResourceExceptionHandler {
     })
     public ResponseEntity<Object> unknownHostAndInvalidPayment(Exception exception,
                                                                ContentCachingRequestWrapper contentCachingRequestWrapper) {
-        log.debug(exception.getMessage(), exception);
+        log.info(exception.getMessage(), exception);
         String errorMessage = "Unknown host / invalid payment error with message: %s for case %s run by user %s";
         log.error(errorMessage.formatted(exception.getMessage(), getCaseId(contentCachingRequestWrapper),
                                          getUserId(contentCachingRequestWrapper)));
@@ -92,7 +92,7 @@ public class ResourceExceptionHandler {
     @ExceptionHandler(value =  FeignException.Unauthorized.class)
     public ResponseEntity<Object> unauthorizedFeign(Exception exception,
                                                     ContentCachingRequestWrapper contentCachingRequestWrapper) {
-        log.debug(exception.getMessage(), exception);
+        log.info(exception.getMessage(), exception);
         String errorMessage = "Unauthorized feign error with message: %s for case %s run by user %s";
         log.error(errorMessage.formatted(exception.getMessage(), getCaseId(contentCachingRequestWrapper),
                                          getUserId(contentCachingRequestWrapper)));
@@ -102,7 +102,7 @@ public class ResourceExceptionHandler {
     @ExceptionHandler(value =  FeignException.Forbidden.class)
     public ResponseEntity<Object> forbiddenFeign(Exception exception,
                                                  ContentCachingRequestWrapper contentCachingRequestWrapper) {
-        log.debug(exception.getMessage(), exception);
+        log.info(exception.getMessage(), exception);
         String errorMessage = "Forbidden feign error with message: %s for case %s run by user %s";
         log.error(errorMessage.formatted(exception.getMessage(), getCaseId(contentCachingRequestWrapper),
                                          getUserId(contentCachingRequestWrapper)));
@@ -112,7 +112,7 @@ public class ResourceExceptionHandler {
     @ExceptionHandler(value = FeignException.NotFound.class)
     public ResponseEntity<Object> feignExceptionNotFound(FeignException exception,
                                                          ContentCachingRequestWrapper contentCachingRequestWrapper) {
-        log.debug(exception.getMessage(), exception);
+        log.info(exception.getMessage(), exception);
         String errorMessage = "Not found feign error with message: %s for case %s run by user %s";
         log.error(errorMessage.formatted(exception.getMessage(), getCaseId(contentCachingRequestWrapper),
                                          getUserId(contentCachingRequestWrapper)));
@@ -122,7 +122,7 @@ public class ResourceExceptionHandler {
     @ExceptionHandler(value = NoSuchMethodError.class)
     public ResponseEntity<Object> noSuchMethodError(Throwable error,
                                                     ContentCachingRequestWrapper contentCachingRequestWrapper) {
-        log.debug(error.getMessage(), error);
+        log.info(error.getMessage(), error);
         String errorMessage = "No such method error with message: %s for case %s run by user %s";
         log.error(errorMessage.formatted(error.getMessage(), getCaseId(contentCachingRequestWrapper),
                                          getUserId(contentCachingRequestWrapper)));
@@ -132,7 +132,7 @@ public class ResourceExceptionHandler {
     @ExceptionHandler({FeignException.GatewayTimeout.class, SocketTimeoutException.class})
     public ResponseEntity<String> handleFeignExceptionGatewayTimeout(Exception exception,
                                                                      ContentCachingRequestWrapper contentCachingRequestWrapper) {
-        log.debug(exception.getMessage(), exception);
+        log.info(exception.getMessage(), exception);
         String errorMessage = "Feign gateway timeout error with message: %s for case %s run by user %s";
         log.error(errorMessage.formatted(exception.getMessage(), getCaseId(contentCachingRequestWrapper),
                                          getUserId(contentCachingRequestWrapper)));
@@ -144,7 +144,7 @@ public class ResourceExceptionHandler {
     @ExceptionHandler(NotificationClientException.class)
     public ResponseEntity<Object> handleNotificationClientException(NotificationClientException exception,
                                                                     ContentCachingRequestWrapper contentCachingRequestWrapper) {
-        log.debug(exception.getMessage(), exception);
+        log.info(exception.getMessage(), exception);
         String errorMessage = "Notification client error with message: %s for case %s run by user %s";
         log.error(errorMessage.formatted(exception.getMessage(), getCaseId(contentCachingRequestWrapper),
                                          getUserId(contentCachingRequestWrapper)));
