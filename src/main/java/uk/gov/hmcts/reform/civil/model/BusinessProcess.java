@@ -29,6 +29,10 @@ public class BusinessProcess {
         return BusinessProcess.builder().status(READY).camundaEvent(caseEvent.name()).readyOn(LocalDateTime.now()).build();
     }
 
+    public static BusinessProcess readyGa(CaseEvent caseEvent) {
+        return BusinessProcess.builder().status(READY).camundaEvent(caseEvent.name()).build();
+    }
+
     @JsonIgnore
     public boolean hasSameProcessInstanceId(String processInstanceId) {
         return this.getProcessInstanceId().equals(processInstanceId);
