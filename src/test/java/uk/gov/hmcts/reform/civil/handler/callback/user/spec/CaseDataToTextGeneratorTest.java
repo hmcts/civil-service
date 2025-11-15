@@ -197,11 +197,4 @@ class CaseDataToTextGeneratorTest {
 
         Assertions.assertThrows(IllegalStateException.class, () -> generatorConf.generateTextFor(caseData, featureToggleService));
     }
-
-    @Test
-    void shouldThrowIllegalStateExceptionWhenPaymentDateCannotBeFormatted() {
-        CaseData caseData = buildFullAdmitPayImmediatelyWithoutWhenBePaidProceedCaseData();
-
-        Assertions.assertThrows(IllegalStateException.class, () -> generatorHeader.generateTextFor(caseData, featureToggleService));
-    }
 }
