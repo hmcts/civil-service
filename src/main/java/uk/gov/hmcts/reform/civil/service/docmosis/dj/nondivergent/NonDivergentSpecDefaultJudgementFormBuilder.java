@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
 import uk.gov.hmcts.reform.civil.model.docmosis.dj.DefaultJudgmentForm;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentFormBuilderBase;
+import uk.gov.hmcts.reform.civil.service.docmosis.dj.DjWelshTextService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.JudgmentAmountsCalculator;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
@@ -28,8 +29,9 @@ public class NonDivergentSpecDefaultJudgementFormBuilder extends DefaultJudgment
     @Autowired
     public NonDivergentSpecDefaultJudgementFormBuilder(InterestCalculator interestCalculator,
                                                        JudgmentAmountsCalculator judgmentAmountsCalculator,
-                                                       OrganisationService organisationService) {
-        super(interestCalculator, judgmentAmountsCalculator, organisationService);
+                                                       OrganisationService organisationService,
+                                                       DjWelshTextService djWelshTextService) {
+        super(interestCalculator, judgmentAmountsCalculator, organisationService, djWelshTextService);
     }
 
     public DefaultJudgmentForm getDefaultJudgmentForm(CaseData caseData, String partyType) {

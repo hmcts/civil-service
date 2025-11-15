@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.dj.DefaultJudgmentForm;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.service.docmosis.dj.DjWelshTextService;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
 import java.math.BigDecimal;
@@ -17,9 +18,11 @@ import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getApplicant;
 public class DefaultJudgmentFormBuilder extends DefaultJudgmentFormBuilderBase implements StandardDefaultJudgmentBuilder {
 
     @Autowired
-    public DefaultJudgmentFormBuilder(InterestCalculator interestCalculator, JudgmentAmountsCalculator judgmentAmountsCalculator,
-                                      OrganisationService organisationService) {
-        super(interestCalculator, judgmentAmountsCalculator, organisationService);
+    public DefaultJudgmentFormBuilder(InterestCalculator interestCalculator,
+                                      JudgmentAmountsCalculator judgmentAmountsCalculator,
+                                      OrganisationService organisationService,
+                                      DjWelshTextService djWelshTextService) {
+        super(interestCalculator, judgmentAmountsCalculator, organisationService, djWelshTextService);
     }
 
     public DefaultJudgmentForm getDefaultJudgmentForm(CaseData caseData,

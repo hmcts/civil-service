@@ -80,6 +80,7 @@ public class SdoDocumentFormFast implements MappableObject {
     private final FastTrackHearingTime fastTrackHearingTime;
     private final String fastTrackHearingTimeEstimate;
     private final String fastTrackTrialBundleTypeText;
+    private final String fastTrackDigitalPortalBundleWarning;
 
     private final FastTrackMethod fastTrackMethod;
     private final DynamicList fastTrackMethodInPerson;

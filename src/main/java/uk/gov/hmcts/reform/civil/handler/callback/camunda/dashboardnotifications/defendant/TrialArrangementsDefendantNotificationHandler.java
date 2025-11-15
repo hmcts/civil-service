@@ -4,10 +4,10 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.callback.CaseProgressionDashboardCallbackHandler;
-import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoCaseClassificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import java.util.List;
@@ -21,11 +21,14 @@ public class TrialArrangementsDefendantNotificationHandler extends CaseProgressi
 
     private static final List<CaseEvent> EVENTS = List.of(CREATE_DASHBOARD_NOTIFICATION_CP_TRIAL_ARRANGEMENTS_DEFENDANT);
     public static final String TASK_ID = "GenerateDashboardDefendantNotificationTrialArrangements";
+    private final SdoCaseClassificationService sdoCaseClassificationService;
 
     public TrialArrangementsDefendantNotificationHandler(DashboardScenariosService dashboardScenariosService,
                                                          DashboardNotificationsParamsMapper mapper,
-                                                         FeatureToggleService featureToggleService) {
+                                                         FeatureToggleService featureToggleService,
+                                                         SdoCaseClassificationService sdoCaseClassificationService) {
         super(dashboardScenariosService, mapper, featureToggleService);
+        this.sdoCaseClassificationService = sdoCaseClassificationService;
     }
 
     @Override
@@ -45,7 +48,7 @@ public class TrialArrangementsDefendantNotificationHandler extends CaseProgressi
 
     @Override
     public boolean shouldRecordScenario(CaseData caseData) {
-        return caseData.isRespondent1NotRepresented() && SdoHelper.isFastTrack(caseData)
+        return caseData.isRespondent1NotRepresented() && sdoCaseClassificationService.isFastTrack(caseData)
             && isNull(caseData.getTrialReadyRespondent1());
     }
 }
