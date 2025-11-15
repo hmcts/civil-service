@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.claimant;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,7 +16,6 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -25,12 +23,6 @@ public class HearingFeeHwfPartialRemissionGrantedScenarioTest extends DashboardB
 
     @Autowired
     private HwFDashboardNotificationsHandler hwFDashboardNotificationsHandler;
-
-    @BeforeEach
-    public void before() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
-    }
 
     @Test
     void should_create_hearing_fee_hwf_partial_remission_scenario() throws Exception {

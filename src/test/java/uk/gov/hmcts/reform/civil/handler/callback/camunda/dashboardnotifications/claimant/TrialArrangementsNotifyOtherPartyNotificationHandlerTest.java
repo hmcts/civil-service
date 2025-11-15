@@ -72,7 +72,6 @@ class TrialArrangementsNotifyOtherPartyNotificationHandlerTest extends BaseCallb
         void shouldRecordScenario_whenInvoked(CaseData caseData, String expectedScenario) {
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_TRIAL_ARRANGEMENTS_NOTIFY_CLAIMANT.name()).build()
