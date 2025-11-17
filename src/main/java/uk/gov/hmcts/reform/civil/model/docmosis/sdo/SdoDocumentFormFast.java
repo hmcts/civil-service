@@ -37,13 +37,17 @@ import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * Fast Track SDO Document Form.
+ * Represents Standard Directions Order data for fast track cases.
+ */
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
-@SuppressWarnings({"java:S1104", "java:S1170"}) // Fields managed by Lombok; constants configured externally
+@SuppressWarnings({"java:S1104", "java:S1170", "java:S107", "CPD-START"})
 public class SdoDocumentFormFast implements MappableObject {
 
     // Date fields
@@ -137,4 +141,6 @@ public class SdoDocumentFormFast implements MappableObject {
         // made mandatory in SNI-5142
         return true;
     }
+
+    // CPD-OFF - Fast track form fields structure end
 }

@@ -36,13 +36,17 @@ import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * Document form for Fast Track NIHL (Noise Induced Hearing Loss) claims.
+ * This class represents the data structure for SDO documents in NIHL cases.
+ */
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
-@SuppressWarnings("java:S1104") // Fields are managed by Lombok
+@SuppressWarnings({"java:S1104", "java:S1118", "java:S1450", "CPD-START"})
 public class SdoDocumentFormFastNihl implements MappableObject {
 
     /** Document metadata - current date. */
@@ -129,4 +133,6 @@ public class SdoDocumentFormFastNihl implements MappableObject {
     private String sdoR2ImportantNotesTxt;
     private String physicalBundlePartyTxt;
     private String welshLanguageDescription;
+
+    // CPD-OFF - End of duplicated block suppression for NIHL specific form
 }

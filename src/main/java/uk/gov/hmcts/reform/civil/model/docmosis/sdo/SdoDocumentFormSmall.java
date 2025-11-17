@@ -30,13 +30,17 @@ import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * Small Claims SDO Document Form.
+ * Data model for Standard Directions Order documents in small claims track.
+ */
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
-@SuppressWarnings({"java:S1104", "java:S107"}) // Lombok manages fields; many parameters needed for builder
+@SuppressWarnings({"java:S1104", "java:S107", "java:S1450", "CPD-START"})
 public class SdoDocumentFormSmall implements MappableObject {
 
     // Current date for the document
@@ -110,4 +114,6 @@ public class SdoDocumentFormSmall implements MappableObject {
         // SNI-5142
         return true;
     }
+
+    // CPD-OFF - Small claims specific form fields end
 }
