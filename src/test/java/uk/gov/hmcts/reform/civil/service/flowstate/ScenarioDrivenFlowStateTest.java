@@ -341,7 +341,7 @@ class ScenarioDrivenFlowStateTest {
             };
         };
 
-        return builder.atStateClaimDismissedPastHearingFeeDueDeadline(partyShape).build();
+        return builder.atStateClaimDismissedPastHearingFeeDueDeadline().build();
     }
 
     private static CaseData buildCaseDataTakenOfflineAfterClaimNotified(CaseCategory category, MultiPartyScenario partyShape) {
@@ -740,11 +740,6 @@ class ScenarioDrivenFlowStateTest {
                     FULL_DEFENCE_NOT_PROCEED
                 ),
                 Arguments.of(
-                    "Default judgment eligibility",
-                    buildCaseDataDJPastHearingFeeDueDeadline(UNSPEC_CLAIM, ONE_V_TWO_ONE_LEGAL_REP),
-                    CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE
-                ),
-                Arguments.of(
                     "Taken offline After Claim Notified",
                     buildCaseDataTakenOfflineAfterClaimNotified(UNSPEC_CLAIM, ONE_V_TWO_ONE_LEGAL_REP),
                     TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED
@@ -876,11 +871,6 @@ class ScenarioDrivenFlowStateTest {
                     "Applicant response Full Defence NOT proceed",
                     buildCaseDataFullDefenceNotProceed(UNSPEC_CLAIM, ONE_V_TWO_TWO_LEGAL_REP),
                     FULL_DEFENCE_NOT_PROCEED
-                ),
-                Arguments.of(
-                    "Default judgment eligibility",
-                    buildCaseDataDJPastHearingFeeDueDeadline(UNSPEC_CLAIM, ONE_V_TWO_TWO_LEGAL_REP),
-                    CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE
                 ),
                 Arguments.of(
                     "Taken offline After Claim Notified",
@@ -1488,11 +1478,6 @@ class ScenarioDrivenFlowStateTest {
                     "Mediation branch: unsuccessful - proceed",
                     buildCaseDataMediationUnsuccessfulProceed(SPEC_CLAIM, TWO_V_ONE),
                     MEDIATION_UNSUCCESSFUL_PROCEED
-                ),
-                Arguments.of(
-                    "Default judgment eligibility",
-                    buildCaseDataDJPastHearingFeeDueDeadline(SPEC_CLAIM, TWO_V_ONE),
-                    CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE
                 ),
                 Arguments.of(
                     "Taken offline After Claim Notified",
