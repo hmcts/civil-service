@@ -291,6 +291,8 @@ jacocoTestReport.dependsOn subprojects.collect { project ->
 }.findAll { it != null }
 
 jacocoTestReport.dependsOn tasks.matching { it.name.startsWith('compile') || it.name.startsWith('process') }
+jacocoTestReport.dependsOn tasks.named('bootStartScripts')
+jacocoTestReport.dependsOn tasks.named('startScripts')
 
 tasks.named('test') {
   finalizedBy jacocoTestReport
