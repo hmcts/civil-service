@@ -32,15 +32,6 @@ Each image links to an SVG whose source (`docs/*.mmd`) is produced by `python3 s
 
 ## Building and deploying the application
 
-### Dependencies
-
-The project is dependent on other Civil repositories:
-
-- [civil-ccd-definition](https://github.com/hmcts/civil-ccd-definition)
-- [civil-camunda-bpmn-definition](https://github.com/hmcts/civil-camunda-bpmn-definition)
-
-To set up complete local environment for Civil check [civil-sdk](https://github.com/hmcts/civil-sdk)
-
 ### Building the application
 
 The project uses [Gradle](https://gradle.org) as a build tool. It already contains
@@ -50,65 +41,6 @@ To build the project execute the following command:
 
 ```bash
   ./gradlew build
-```
-
-### Running the application
-
-#### Environment variables
-
-You will need the following environment variables setup in your bashrc/zshrc or IntelliJ run configuration. API keys can
-be found in the Azure key store.
-
-| Name | Use | Value |
-| ---- | --- | ----- |
-| `DOCMOSIS_TORNADO_KEY` | [Docmosis](https://www.docmosis.com/) is our document generation service. For development purposes we have been using trial keys which can be obtained [here](https://www.docmosis.com/products/tornado/try.html). **Note:** These expire after a month. | |
-| `GOV_NOTIFY_API_KEY` | [GOV.UK Notify](https://www.notifications.service.gov.uk/) is our notification service for sending emails.  | |
-| `LAUNCH_DARKLY_SDK_KEY` | [LaunchDarkly](https://launchdarkly.com/) is our platform for managing feature toggles. | |
-| `LAUNCH_DARKLY_OFFLINE_MODE` | Sets LaunchDarkly to use local values for flags rather than connecting to the service | `true` |
-| `SPRING_PROFILES_ACTIVE` | Sets the active Spring profile | `local` |
-
-#### Running through IntelliJ
-
-IntelliJ will create a Spring Boot run configuration for you. Which, after setting up your environment variables, can be
-run from there.
-
-They are also base64 encoded and stored in the aat-env keystore in azure, in civil-service-dot-env secret.
-
-The loadEnvSecrets gradle task downloads them to a local .aat-env file which is read in the gradle bootRun task.
-
-#### Create a Docker image
-
-While not necessary for local development, you can create the image of the application by executing the following
-command:
-
-```bash
-  ./gradlew assemble
-```
-
-Create docker image:
-
-```bash
-  docker-compose build
-```
-
-Run the distribution (created in `build/install/civil-service` directory) by executing the following command:
-
-```bash
-  docker-compose up
-```
-
-This will start the API container exposing the application's port (set to `4000` in this template app).
-
-In order to test if the application is up, you can call its health endpoint:
-
-```bash
-  curl http://localhost:4000/health
-```
-
-You should get a response similar to this:
-
-```
-  {"status":"UP","diskSpace":{"status":"UP","total":249644974080,"free":137188298752,"threshold":10485760}}
 ```
 
 ### Preview environment
@@ -181,35 +113,6 @@ To publish your contracts:
 ```
 
 * If connecting to Pactflow, please disable the HMCTS VPN.
-
-## Adding Git Conventions
-
-### Include the git conventions.
- * Make sure your git version is at least 2.9 using the `git --version` command
- * Run the following command:
-```
-git config --local core.hooksPath .git-config/hooks
-```
-Once the above is done, you will be required to follow specific conventions for your commit messages and branch names.
-
-If you violate a convention, the git error message will report clearly the convention you should follow and provide
-additional information where necessary.
-
-*Optional:*
-* Install this plugin in Chrome: https://github.com/refined-github/refined-github
-
-  It will automatically set the title for new PRs according to the first commit message, so you won't have to change it manually.
-
-  Note that it will also alter other behaviours in GitHub. Hopefully these will also be improvements to you.
-
-*In case of problems*
-
-1. Get in touch with your Technical Lead so that they can get you unblocked
-2. If the rare eventuality that the above is not possible, you can disable enforcement of conventions using the following command
-
-   `git config --local --unset core.hooksPath`
-
-   Still, you shouldn't be doing it so make sure you get in touch with a Technical Lead soon afterwards.
 
 ## Gradle Dependency Check - Running Locally
 In the local environment, as of 15/12/2023 where dependency check is mandated to use version 9 or above:
