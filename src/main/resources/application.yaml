@@ -232,7 +232,7 @@ rtl:
 
 dashboard:
   api:
-    url: http://localhost:4000
+    url: ${CIVIL_SERVICE_URL:http://localhost:4000}
 
 migration:
   batchsize: 100
