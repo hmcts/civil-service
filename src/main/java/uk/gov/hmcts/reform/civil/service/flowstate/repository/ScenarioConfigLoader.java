@@ -1,13 +1,11 @@
 package uk.gov.hmcts.reform.civil.service.flowstate.repository;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.util.Assert;
+import org.yaml.snakeyaml.Yaml;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 
 import java.io.IOException;
@@ -28,7 +26,8 @@ public class ScenarioConfigLoader implements AllowedEventRepository {
     private static final String WHITELIST_FILE = "allowed-whitelist-events.yml";
 
     private final ResourceLoader resourceLoader;
-    private final ObjectMapper yaml = new ObjectMapper(new YAMLFactory());
+
+    private final Yaml yaml = new Yaml();
 
     private final Map<String, Map<String, Set<CaseEvent>>> cache = new ConcurrentHashMap<>();
 
@@ -56,19 +55,14 @@ public class ScenarioConfigLoader implements AllowedEventRepository {
 
     private Map<String, Set<CaseEvent>> loadScenario(String scenarioFile) {
         String location = "classpath:config/" + scenarioFile;
-        try {
-            Resource resource = resourceLoader.getResource(location);
-            Assert.isTrue(resource.exists(), () -> "Scenario config not found: " + location);
+        Resource resource = resourceLoader.getResource(location);
+        Assert.isTrue(resource.exists(), () -> "Scenario config not found: " + location);
 
-            try (InputStream is = resource.getInputStream()) {
-                Map<String, List<String>> raw = yaml.readValue(
-                    is, new TypeReference<>() {
-                    }
-                );
-                Map<String, Set<CaseEvent>> mapped = new HashMap<>();
-                raw.forEach((state, events) -> mapped.put(state, toCaseEvents(events)));
-                return Map.copyOf(mapped);
-            }
+        try (InputStream is = resource.getInputStream()) {
+            Map<String, List<String>> raw = yaml.load(is); // unchecked cast – may want to wrap
+            Map<String, Set<CaseEvent>> mapped = new HashMap<>();
+            raw.forEach((state, events) -> mapped.put(state, toCaseEvents(events)));
+            return Map.copyOf(mapped);
         } catch (IOException ex) {
             throw new IllegalStateException("Failed to load scenario config: " + location, ex);
         }
@@ -82,10 +76,7 @@ public class ScenarioConfigLoader implements AllowedEventRepository {
                 return Set.of();
             }
             try (InputStream is = resource.getInputStream()) {
-                List<String> raw = yaml.readValue(
-                    is, new TypeReference<>() {
-                    }
-                );
+                List<String> raw = yaml.load(is);
                 LinkedHashSet<CaseEvent> set = new LinkedHashSet<>();
                 for (String v : Optional.ofNullable(raw).orElse(List.of())) {
                     set.add(CaseEvent.valueOf(v));
