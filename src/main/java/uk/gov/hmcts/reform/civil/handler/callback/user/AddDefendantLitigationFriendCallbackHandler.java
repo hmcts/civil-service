@@ -74,13 +74,14 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
 
     private CallbackResponse getLitigationFriend(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataUpdated = caseData.toBuilder();
+
         String selectedOption = Optional.of(caseData).map(CaseData::getSelectLitigationFriend)
             .map(DynamicList::getValue).map(DynamicListElement::getLabel).orElse("").split(":")[0]
             .toUpperCase();
+        caseData.setLitigantFriendSelection(selectedOption);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataUpdated.litigantFriendSelection(selectedOption).build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 

@@ -1,11 +1,12 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -23,7 +24,6 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
-import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 
 import java.util.Optional;
@@ -45,18 +45,19 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
     private LocationHelper helper;
 
     @Mock
-    private Time time;
-
-    @InjectMocks
-    private CreateReferToJudgeCallbackHandler handler;
-
-    @Mock
     private LocationReferenceDataService locationService;
 
-    @Mock
+    private CreateReferToJudgeCallbackHandler handler;
     private ObjectMapper objectMapper;
 
     public static final String REFERENCE_NUMBER = "000DC001";
+
+    @BeforeEach
+    void setUp() {
+        objectMapper = new ObjectMapper()
+            .registerModule(new JavaTimeModule());
+        handler = new CreateReferToJudgeCallbackHandler(locationService, helper, objectMapper);
+    }
 
     @Nested
     class AboutToStartCallback {
@@ -82,7 +83,10 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
             CallbackParams localParams = callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT);
             AboutToStartOrSubmitCallbackResponse response =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
+
             assertThat(response).isNotNull();
+            assertThat(updatedData.getIsReferToJudgeClaim()).isEqualTo(YesOrNo.YES);
         }
 
         @Test
@@ -102,7 +106,10 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
             CallbackParams localParams = callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT);
             AboutToStartOrSubmitCallbackResponse response =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
+
             assertThat(response).isNotNull();
+            assertThat(updatedData.getIsReferToJudgeClaim()).isEqualTo(YesOrNo.YES);
         }
 
         @Test
@@ -113,9 +120,6 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
                 .respondent2(PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build())
                 .build();
 
-            given(helper.leadDefendantIs1(any()))
-                .willReturn(false);
-
             given(helper.getClaimantRequestedCourt(any()))
                 .willReturn(Optional.of(RequestedCourt.builder().responseCourtCode("123").build()));
 
@@ -125,7 +129,10 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
             CallbackParams localParams = callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT);
             AboutToStartOrSubmitCallbackResponse response =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
+
             assertThat(response).isNotNull();
+            assertThat(updatedData.getIsReferToJudgeClaim()).isEqualTo(YesOrNo.YES);
         }
 
         @Test
@@ -139,17 +146,20 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
             CallbackParams localParams = callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT);
             AboutToStartOrSubmitCallbackResponse response =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
+
             assertThat(response).isNotNull();
+            assertThat(updatedData.getIsReferToJudgeClaim()).isEqualTo(YesOrNo.YES);
         }
 
         @Test
         void thereIsAMatchingLocation() {
-            CaseData.CaseDataBuilder<?, ?> updatedData = CaseData.builder();
+            CaseData updatedData = CaseData.builder().build();
 
             LocationHelper.updateWithLocation(updatedData, LocationRefData.builder()
                 .courtLocationCode("123").regionId("regionId").region("region name").epimmsId("epimms").build());
 
-            Assertions.assertThat(updatedData.build().getCaseManagementLocation())
+            Assertions.assertThat(updatedData.getCaseManagementLocation())
                 .isNotNull()
                 .isEqualTo(CaseLocationCivil.builder()
                                .region("regionId")
@@ -168,7 +178,10 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
             CallbackParams localParams = callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT);
             AboutToStartOrSubmitCallbackResponse response =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
+
             assertThat(response).isNotNull();
+            assertThat(updatedData.getIsReferToJudgeClaim()).isEqualTo(YesOrNo.YES);
         }
     }
 

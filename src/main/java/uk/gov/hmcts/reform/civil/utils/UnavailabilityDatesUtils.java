@@ -103,8 +103,7 @@ public class UnavailabilityDatesUtils {
         }
     }
 
-    public static void rollUpUnavailabilityDatesForApplicantDJ(CaseData.CaseDataBuilder<?, ?> builder) {
-        CaseData caseData = builder.build();
+    public static void rollUpUnavailabilityDatesForApplicantDJ(CaseData caseData) {
         if (caseData.getHearingSupportRequirementsDJ() != null
             && YES.equals(caseData.getHearingSupportRequirementsDJ().getHearingUnavailableDates())) {
             List<UnavailableDate> unavailableDates = new ArrayList<>();
@@ -134,17 +133,17 @@ public class UnavailabilityDatesUtils {
                 }
             }
 
-            builder.applicant1(caseData.getApplicant1().toBuilder()
+            caseData.setApplicant1(caseData.getApplicant1().toBuilder()
                                    .unavailableDates(wrapElements(unavailableDates))
                                    .build());
 
-            builder.applicant1UnavailableDatesForTab(wrapElements(unavailableDates));
+            caseData.setApplicant1UnavailableDatesForTab(wrapElements(unavailableDates));
 
             if (caseData.getApplicant2() != null) {
-                builder.applicant2(caseData.getApplicant2().toBuilder()
+                caseData.setApplicant2(caseData.getApplicant2().toBuilder()
                                        .unavailableDates(wrapElements(unavailableDates))
                                        .build());
-                builder.applicant2UnavailableDatesForTab(wrapElements(unavailableDates));
+                caseData.setApplicant2UnavailableDatesForTab(wrapElements(unavailableDates));
             }
         }
     }
@@ -299,7 +298,7 @@ public class UnavailabilityDatesUtils {
         if (isClaimantIntentionEvent(caseData)) {
             rollUpUnavailabilityDatesForApplicant(builder);
         } else {
-            rollUpUnavailabilityDatesForApplicantDJ(builder);
+            rollUpUnavailabilityDatesForApplicantDJ(caseData);
         }
     }
 

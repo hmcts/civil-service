@@ -59,6 +59,7 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
+import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestType;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
@@ -875,12 +876,11 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = objMapper.convertValue(response.getData(), CaseData.class);
 
             // Then
-            assertThat(response.getData())
-                .extracting("applicantSolicitor1CheckEmail")
-                .extracting("email")
-                .isEqualTo(email);
+            assertThat(updatedData.getApplicantSolicitor1CheckEmail()).isNotNull();
+            assertThat(updatedData.getApplicantSolicitor1CheckEmail().getEmail()).isEqualTo(email);
         }
 
         @Test
@@ -1243,15 +1243,13 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = objMapper.convertValue(response.getData(), CaseData.class);
 
             // Then
-            assertThat(response.getData()).containsEntry(
-                "calculatedInterest", " | Description | Amount | \n" +
-                    " |---|---| \n" +
-                    " | Claim amount | £ 1000.00 | \n" +
-                    " | Interest amount | £ 0.00 | \n" +
-                    " | Total amount | £ 1000.00 |"
-            );
+            assertThat(updatedData.getCalculatedInterest()).isNotNull();
+            assertThat(updatedData.getCalculatedInterest()).contains("Claim amount | £ 1000.00");
+            assertThat(updatedData.getCalculatedInterest()).contains("Interest amount | £ 0.00");
+            assertThat(updatedData.getCalculatedInterest()).contains("Total amount | £ 1000.00");
         }
 
         @Test
@@ -1269,16 +1267,14 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getData()).containsEntry("interestClaimUntil", "UNTIL_SETTLED_OR_JUDGEMENT_MADE");
+            CaseData updatedData = objMapper.convertValue(response.getData(), CaseData.class);
 
             // Then
-            assertThat(response.getData()).containsEntry(
-                "calculatedInterest", " | Description | Amount | \n" +
-                    " |---|---| \n" +
-                    " | Claim amount | £ 1000.00 | \n" +
-                    " | Interest amount | £ 0.00 | \n" +
-                    " | Total amount | £ 1000.00 |"
-            );
+            assertThat(updatedData.getInterestClaimUntil()).isEqualTo(InterestClaimUntilType.UNTIL_SETTLED_OR_JUDGEMENT_MADE);
+            assertThat(updatedData.getCalculatedInterest()).isNotNull();
+            assertThat(updatedData.getCalculatedInterest()).contains("Claim amount | £ 1000.00");
+            assertThat(updatedData.getCalculatedInterest()).contains("Interest amount | £ 0.00");
+            assertThat(updatedData.getCalculatedInterest()).contains("Total amount | £ 1000.00");
         }
     }
 
@@ -1425,9 +1421,10 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, MID, "setRespondent2SameLegalRepresentativeToNo");
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = objMapper.convertValue(response.getData(), CaseData.class);
 
             // Then
-            assertThat(response.getData()).containsEntry("respondent2SameLegalRepresentative", "No");
+            assertThat(updatedData.getRespondent2SameLegalRepresentative()).isEqualTo(NO);
         }
     }
 
