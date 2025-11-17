@@ -31,7 +31,7 @@ import static uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType.DEFAUL
 @Slf4j
 public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher implements Claim {
 
-    private static LocalTime FOUR_PM = LocalTime.of(16, 1, 0);
+    private static final LocalTime FOUR_PM = LocalTime.of(16, 1, 0);
 
     public CcdDashboardDefendantClaimMatcher(CaseData caseData,
                                              FeatureToggleService featureToggleService,

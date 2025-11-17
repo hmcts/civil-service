@@ -11,7 +11,7 @@ public enum SearchParameterKey {
     CASE_ID("case_id");
 
     @JsonValue
-    private String id;
+    private final String id;
 
     @Override
     public String toString() {

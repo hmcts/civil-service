@@ -22,8 +22,8 @@ import static uk.gov.hmcts.reform.civil.utils.DateUtils.convertFromUTC;
 @AllArgsConstructor
 public class DocumentQueryMessage {
 
-    private static String HEARING_DATE_FORMAT = "dd-MM-yyyy";
-    private static String CREATED_ON_FORMAT = "dd-MM-yyyy HH:mm";
+    private static final String HEARING_DATE_FORMAT = "dd-MM-yyyy";
+    private static final String CREATED_ON_FORMAT = "dd-MM-yyyy HH:mm";
 
     private String messageType;
     private String id;

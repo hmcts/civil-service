@@ -34,11 +34,11 @@ import static uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils.formatCc
 @RequiredArgsConstructor
 public class ClaimFormMapper {
 
-    private static String STANDARD_INTEREST_RATE = "8";
-    public static String EXPLANATION_OF_INTEREST_RATE = "The claimant reserves the right to claim interest under "
+    private static final String STANDARD_INTEREST_RATE = "8";
+    public static final String EXPLANATION_OF_INTEREST_RATE = "The claimant reserves the right to claim interest under "
         + "Section 69 of the County Courts Act 1984";
-    public static String INTEREST_START_FROM_CLAIM_SUBMITTED_DATE = "From the date the claim was submitted";
-    private InterestCalculator interestCalculator;
+    public static final String INTEREST_START_FROM_CLAIM_SUBMITTED_DATE = "From the date the claim was submitted";
+    private final InterestCalculator interestCalculator;
 
     public ClaimForm toClaimForm(CaseData caseData) {
         BigDecimal interest = interestCalculator.calculateInterest(caseData);
